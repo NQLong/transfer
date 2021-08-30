@@ -1,0 +1,195 @@
+.component {
+    position: relative;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    min-height: 72px;
+    background-color: #eee;
+
+    .control {
+        display: none;
+        position: absolute;
+        top: 6px;
+        right: 6px;
+    }
+
+    &:hover > .control {
+        display: block;
+    }
+}
+
+.widget-small {
+    background-color: white;
+
+    img {
+        background-color: transparent;
+    }
+
+    .info {
+        flex: 1;
+        padding: "0 20px";
+        align-self: center;
+
+        p {
+            color: black;
+        }
+    }
+}
+
+.central-box {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    border: 1px dashed #167ce9;
+    padding: 10px;
+
+    p {
+        margin: 16px;
+    }
+}
+
+.table td {
+    vertical-align: middle !important;
+}
+
+.select2-container {
+    width: 100% !important;
+}
+
+.menuList > li {
+    width: "100%";
+    margin-top: 10px;
+    margin-bottom: 10px;
+
+    .buttons {
+        display: block;
+        margin-left: 6px;
+    }
+
+    div > div.buttons {
+        visibility: hidden;
+    }
+    div:hover > div.buttons {
+        visibility: visible;
+    }
+}
+
+.menuSub > li {
+    width: "100%";
+    margin-top: 10px;
+    margin-bottom: 10px;
+
+    .buttons {
+        display: block;
+        margin-left: 6px;
+    }
+
+    div > div.buttons {
+        visibility: hidden;
+    }
+    div:hover > div.buttons {
+        visibility: visible;
+    }
+}
+
+.tinTucList > li {
+    width: "100%";
+    margin-top: 10px;
+    margin-bottom: 10px;
+
+    .buttons {
+        display: block;
+        margin-left: 6px;
+    }
+
+    div > div.buttons {
+        visibility: hidden;
+    }
+    div:hover > div.buttons {
+        visibility: visible;
+    }
+}
+
+.btn-circle {
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    padding: 10px 16px;
+    line-height: 1.33;
+    border-radius: 50%;
+    font-size: 18px;
+
+    .fa {
+        font-size: 18px;
+    }
+}
+
+.swal-button--false {
+    background-color: #28a745;
+}
+
+.has-search {
+    .form-control {
+        padding-left: 2.375rem;
+    }
+    .form-control-feedback {
+        position: absolute;
+        z-index: 2;
+        display: block;
+        width: 2.375rem;
+        height: 2.375rem;
+        line-height: 2.375rem;
+        text-align: center;
+        pointer-events: none;
+        color: #aaa;
+    }
+    .form-control-clear {
+        z-index: 2;
+        display: block;
+        line-height: 2.375rem;
+        text-align: center;
+        pointer-events: none;
+        color: red;
+        top: 5px;
+        right: 0px;
+        width: 16px;
+        height: 16px;
+        float: right;
+    }
+}
+
+.form-control-black:focus {
+    border-color: #343a40;
+}
+
+.menuSearchItem {
+    margin-top: 24px;
+    text-align: center;
+}
+
+.button-edit {
+    width: 40px;
+    height: 30px;
+    text-align: center;
+    padding: 0px;
+}
+
+.list-group-item-tin-tuc {
+    border: 0px;
+}
+
+.show-on-hover {
+    & .btn {
+        visibility: hidden;
+    }
+    &:hover .btn {
+        visibility: visible;
+    }
+}
+
+.cke_editable {
+    img {
+        width: 100%;
+    }
+}

@@ -1,0 +1,52 @@
+$rhap_main: #0000FF;
+$rhap_secondary: #1488db;
+
+.rhap_container {
+  .rhap_main {
+    .rhap_progress-section {
+      .rhap_progress-container {
+        .rhap_progress-bar {
+          .rhap_progress-indicator {
+            background: $rhap_main;
+          }
+
+          .rhap_progress-filled {
+            background: $rhap_secondary;
+          }
+
+          .rhap_download-progress {
+            background: rgba(20, 136, 219, 0.5);
+          }
+        }
+      }
+    }
+
+    .rhap_controls-section {
+      .rhap_main-controls {
+        .rhap_main-controls-button {
+          color: $rhap_secondary;
+        }
+
+        .rhap_play-pause-button {
+          svg {
+            margin-bottom: 10px;
+          }
+        }
+      }
+
+      .rhap_volume-controls {
+        .rhap_volume-container {
+          .rhap_volume-button {
+            color: $rhap_secondary;
+          }
+
+          .rhap_volume-bar-area {
+            .rhap_volume-indicator {
+              background: $rhap_main;
+            }
+          }
+        }
+      }
+    }
+  }
+}

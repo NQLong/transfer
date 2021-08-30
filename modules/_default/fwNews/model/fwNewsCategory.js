@@ -1,0 +1,34 @@
+const keys = ['NEWS_ID', 'CATEGORY_ID'];
+const obj2Db = { 'newsId': 'NEWS_ID', 'categoryId': 'CATEGORY_ID' };
+module.exports = app => {
+    // app.model.fwNewsCategory.foo = () => { };
+    app.model.fwNewsCategory.createMany = (data, done) => {
+        let statement = '', values = '', parameter = [];
+        for (let i = 0; i < data.length; i++) {
+            Object.keys(data[i]).forEach(column => {
+                if (obj2Db[column]) {
+                    if (i === 0) {
+                        statement += ', ' + obj2Db[column];
+                        values += ', :' + column;
+                    }
+                    if (!parameter[i]) parameter[i] = {};
+                    parameter[i][column] = parseInt(data[i][column]);
+                }
+            });
+        }
+
+        if (statement.length == 0) {
+            done('Data is empty!');
+        } else {
+            const sql = 'INSERT INTO FW_NEWS_CATEGORY (' + statement.substring(2) + ') VALUES (' + values.substring(2) + ')';
+            app.dbConnection.executeMany(sql, parameter, (error, resultSet) => {
+                if (error || resultSet === null)
+                    done(error);
+                else if (!resultSet.rowsAffected)
+                    done('Execute SQL command fail! Sql = ' + sql);
+                else
+                    done();
+            });
+        }
+    }
+}
