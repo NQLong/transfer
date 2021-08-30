@@ -20,4 +20,5 @@ public/photo-booth/*
 public/img/*
 !public/img/*.*
 .DS_Store
+.gitignore
 .editorconfig

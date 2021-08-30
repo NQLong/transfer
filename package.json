@@ -19,7 +19,7 @@
         "local_host": "172.28.2.6",
         "sid": "ptchc",
         "username": "hcmussh",
-        "password": "cChmpuCryRUzUnDvmWh3"
+        "password": "---"
     },
     "dbTest": {
         "owner": "HCMUSSH",
