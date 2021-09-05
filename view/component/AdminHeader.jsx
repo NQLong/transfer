@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { changeRole } from 'modules/_default/fwRole/redux';
 import { updateSystemState, logout } from 'modules/_default/_init/reduxSystem';
 import { SelectAdapter_FwUser, switchUser } from 'modules/_default/fwUser/reduxUser';
-import { SelectAdapter_FwCanBo } from 'modules/_default/fwCanBo/redux';
+import { SelectAdapter_FwCanBo } from 'modules/mdTccb/fwCanBo/redux';
 
 import { Select } from './Input';
 

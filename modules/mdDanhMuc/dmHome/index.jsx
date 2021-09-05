@@ -6,6 +6,10 @@ export default {
     redux: {},
     routes: [
         {
+            path: '/user/tccb',
+            component: () => <SubMenusPage menuLink='/user/tccb' menuKey={3000} headerIcon='fa-list-alt' />
+        },
+        {
             path: '/user/category',
             component: () => <SubMenusPage menuLink='/user/category' menuKey={4000} headerIcon='fa-list-alt' />
         },

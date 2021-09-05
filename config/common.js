@@ -67,6 +67,10 @@ module.exports = app => {
             index: 100, title: 'Dashboard', link: '/user/dashboard', icon: 'fa-dashboard',
             subMenusRender: false,
         },
+        tccb: {
+            index: 3000, title: 'Tổ chức cán bộ', link: '/user/tccb', icon: 'fa-list-alt',
+            subMenusRender: false,
+        },
         category: {
             index: 4000, title: 'Danh mục', link: '/user/category', icon: 'fa-list-alt',
             subMenusRender: false,

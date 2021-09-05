@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { updateProfile } from '../_init/reduxSystem';
 import Dropdown from 'view/component/Dropdown';
 import ImageBox from 'view/component/ImageBox';
-import { userGetStaff, updateStaffUser, createQuanHeStaffUser, updateQuanHeStaffUser, deleteQuanHeStaffUser } from 'modules/_default/fwCanBo/redux';
+import { userGetStaff, updateStaffUser, createQuanHeStaffUser, updateQuanHeStaffUser, deleteQuanHeStaffUser } from 'modules/mdTccb/fwCanBo/redux';
 import { Link } from 'react-router-dom';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_DmChucVu } from 'modules/mdDanhMuc/dmChucVu/redux';

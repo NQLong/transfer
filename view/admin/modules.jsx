@@ -1,6 +1,6 @@
 // That code below is generated automatically. Do not change them manually!
 import _init from 'modules/_default/_init/index';
-import fwCanBo from 'modules/_default/fwCanBo/index';
+import fwCanBo from 'modules/mdTccb/fwCanBo/index';
 import fwContact from 'modules/_default/fwContact/index';
 import fwEmail from 'modules/_default/fwEmail/index';
 import fwEvent from 'modules/_default/fwEvent/index';

@@ -1,8 +1,8 @@
 module.exports = app => {
     const menu = {
-        parentMenu: { index: 2000, title: 'Cấu hình', icon: 'fa-cog' },
+        parentMenu: app.parentMenu.tccb,
         menus: {
-            2070: { title: 'Tổ chức - Cán bộ', link: '/user/staff' },
+            3001: { title: 'Danh sách cán bộ', link: '/user/staff' },
         },
     };
 
@@ -49,10 +49,10 @@ module.exports = app => {
         }
 
         app.model.canBo.getPage(pageNumber, pageSize, condition, (error, page) => {
-            res.send({error, page});
+            res.send({ error, page });
         });
     });
-    
+
     app.get('/api/staff/item/:shcc', checkGetStaffPermission, (req, res) => {
         app.model.canBo.get({ shcc: req.params.shcc }, (error, item) => res.send({ error, item }));
     });
@@ -73,7 +73,7 @@ module.exports = app => {
                         resolve();
                     })
                 }).then(() => new Promise(resolve => {
-                    app.model.trinhDoNgoaiNgu.getAll({ shcc: canBo.shcc}, (error, trinhDoNN) => {
+                    app.model.trinhDoNgoaiNgu.getAll({ shcc: canBo.shcc }, (error, trinhDoNN) => {
                         if (error || trinhDoNN == null) {
                             result = app.clone(result, { trinhDoNN: null });
                         } else {
@@ -82,7 +82,7 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtHocTapCongTac.getAll({ shcc: canBo.shcc}, '*', 'batDau ASC', (error, hocTapCongTac) => {
+                    app.model.qtHocTapCongTac.getAll({ shcc: canBo.shcc }, '*', 'batDau ASC', (error, hocTapCongTac) => {
                         if (error || hocTapCongTac == null) {
                             result = app.clone(result, { hocTapCongTac: null });
                         } else {
@@ -91,7 +91,7 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtDaoTao.getAll({ shcc: canBo.shcc}, '*', 'id ASC', (error, daoTao) => {
+                    app.model.qtDaoTao.getAll({ shcc: canBo.shcc }, '*', 'id ASC', (error, daoTao) => {
                         if (error || daoTao == null) {
                             result = app.clone(result, { daoTao: null });
                         } else {
@@ -100,7 +100,7 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtNuocNgoai.getAll({ shcc: canBo.shcc}, '*', 'batDau ASC', (error, nuocNgoai) => {
+                    app.model.qtNuocNgoai.getAll({ shcc: canBo.shcc }, '*', 'batDau ASC', (error, nuocNgoai) => {
                         if (error || nuocNgoai == null) {
                             result = app.clone(result, { nuocNgoai: null });
                         } else {
@@ -109,7 +109,7 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtKhenThuong.getAll({ shcc: canBo.shcc}, '*', 'id ASC', (error, khenThuong) => {
+                    app.model.qtKhenThuong.getAll({ shcc: canBo.shcc }, '*', 'id ASC', (error, khenThuong) => {
                         if (error || khenThuong == null) {
                             result = app.clone(result, { khenThuong: null });
                         } else {
@@ -118,7 +118,7 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtKyLuat.getAll({ shcc: canBo.shcc}, '*', 'batDau ASC', (error, kyLuat) => {
+                    app.model.qtKyLuat.getAll({ shcc: canBo.shcc }, '*', 'batDau ASC', (error, kyLuat) => {
                         if (error || kyLuat == null) {
                             result = app.clone(result, { kyLuat: null });
                         } else {
@@ -127,7 +127,7 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtNghienCuuKhoaHoc.getAll({ shcc: canBo.shcc}, (error, nghienCuuKhoaHoc) => {
+                    app.model.qtNghienCuuKhoaHoc.getAll({ shcc: canBo.shcc }, (error, nghienCuuKhoaHoc) => {
                         if (error || nghienCuuKhoaHoc == null) {
                             result = app.clone(result, { nghienCuuKhoaHoc: null });
                         } else {
@@ -136,7 +136,7 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtHuongDanLuanVan.getAll({ shcc: canBo.shcc}, (error, huongDanLuanVan) => {
+                    app.model.qtHuongDanLuanVan.getAll({ shcc: canBo.shcc }, (error, huongDanLuanVan) => {
                         if (error || huongDanLuanVan == null) {
                             result = app.clone(result, { huongDanLuanVan: null });
                         } else {
@@ -145,7 +145,7 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.sachGiaoTrinh.getAll({ shcc: canBo.shcc}, (error, sachGiaoTrinh) => {
+                    app.model.sachGiaoTrinh.getAll({ shcc: canBo.shcc }, (error, sachGiaoTrinh) => {
                         if (error || sachGiaoTrinh == null) {
                             result = app.clone(result, { sachGiaoTrinh: null });
                         } else {
@@ -154,7 +154,7 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtBaiVietKhoaHoc.getAll({ shcc: canBo.shcc}, '*', 'namXuatBan ASC', (error, baiVietKhoaHoc) => {
+                    app.model.qtBaiVietKhoaHoc.getAll({ shcc: canBo.shcc }, '*', 'namXuatBan ASC', (error, baiVietKhoaHoc) => {
                         if (error || baiVietKhoaHoc == null) {
                             result = app.clone(result, { baiVietKhoaHoc: null });
                         } else {
@@ -163,7 +163,7 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtKyYeu.getAll({ shcc: canBo.shcc}, (error, kyYeu) => {
+                    app.model.qtKyYeu.getAll({ shcc: canBo.shcc }, (error, kyYeu) => {
                         if (error || kyYeu == null) {
                             result = app.clone(result, { kyYeu: null });
                         } else {
@@ -172,7 +172,7 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtGiaiThuong.getAll({ shcc: canBo.shcc}, (error, giaiThuong) => {
+                    app.model.qtGiaiThuong.getAll({ shcc: canBo.shcc }, (error, giaiThuong) => {
                         if (error || giaiThuong == null) {
                             result = app.clone(result, { giaiThuong: null });
                         } else {
@@ -181,7 +181,7 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtBangPhatMinh.getAll({ shcc: canBo.shcc}, (error, bangPhatMinh) => {
+                    app.model.qtBangPhatMinh.getAll({ shcc: canBo.shcc }, (error, bangPhatMinh) => {
                         if (error || bangPhatMinh == null) {
                             result = app.clone(result, { bangPhatMinh: null });
                         } else {
@@ -190,7 +190,7 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtUngDungThuongMai.getAll({ shcc: canBo.shcc}, (error, ungDungThuongMai) => {
+                    app.model.qtUngDungThuongMai.getAll({ shcc: canBo.shcc }, (error, ungDungThuongMai) => {
                         if (error || ungDungThuongMai == null) {
                             result = app.clone(result, { ungDungThuongMai: null });
                         } else {
@@ -199,7 +199,7 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtLamViecNgoai.getAll({ shcc: canBo.shcc}, (error, lamViecNgoai) => {
+                    app.model.qtLamViecNgoai.getAll({ shcc: canBo.shcc }, (error, lamViecNgoai) => {
                         if (error || lamViecNgoai == null) {
                             result = app.clone(result, { lamViecNgoai: null });
                         } else {
@@ -242,63 +242,63 @@ module.exports = app => {
                     resolve();
                 })
             }).then(() => new Promise(resolve => {
-                app.model.trinhDoNgoaiNgu.delete({ shcc: req.body.shcc}, (error) => {
+                app.model.trinhDoNgoaiNgu.delete({ shcc: req.body.shcc }, (error) => {
                     resolve();
                 });
             })).then(() => new Promise(resolve => {
-                app.model.qtHocTapCongTac.delete({ shcc: req.body.shcc}, (error) => {
+                app.model.qtHocTapCongTac.delete({ shcc: req.body.shcc }, (error) => {
                     resolve();
                 });
             })).then(() => new Promise(resolve => {
-                app.model.qtDaoTao.delete({ shcc: req.body.shcc}, (error) => {
+                app.model.qtDaoTao.delete({ shcc: req.body.shcc }, (error) => {
                     resolve();
                 });
             })).then(() => new Promise(resolve => {
-                app.model.qtNuocNgoai.delete({ shcc: req.body.shcc}, (error) => {
+                app.model.qtNuocNgoai.delete({ shcc: req.body.shcc }, (error) => {
                     resolve();
                 });
             })).then(() => new Promise(resolve => {
-                app.model.qtKhenThuong.delete({ shcc: req.body.shcc}, (error) => {
+                app.model.qtKhenThuong.delete({ shcc: req.body.shcc }, (error) => {
                     resolve();
                 });
             })).then(() => new Promise(resolve => {
-                app.model.qtKyLuat.delete({ shcc: req.body.shcc}, (error) => {
+                app.model.qtKyLuat.delete({ shcc: req.body.shcc }, (error) => {
                     resolve();
                 });
             })).then(() => new Promise(resolve => {
-                app.model.qtNghienCuuKhoaHoc.delete({ shcc: req.body.shcc}, (error) => {
+                app.model.qtNghienCuuKhoaHoc.delete({ shcc: req.body.shcc }, (error) => {
                     resolve();
                 });
             })).then(() => new Promise(resolve => {
-                app.model.qtHuongDanLuanVan.delete({ shcc: req.body.shcc}, (error) => {
-                   resolve();
-                });
-            })).then(() => new Promise(resolve => {
-                app.model.sachGiaoTrinh.delete({ shcc: req.body.shcc}, (error) => {
+                app.model.qtHuongDanLuanVan.delete({ shcc: req.body.shcc }, (error) => {
                     resolve();
                 });
             })).then(() => new Promise(resolve => {
-                app.model.qtBaiVietKhoaHoc.delete({ shcc: req.body.shcc}, (error) => {
+                app.model.sachGiaoTrinh.delete({ shcc: req.body.shcc }, (error) => {
                     resolve();
                 });
             })).then(() => new Promise(resolve => {
-                app.model.qtKyYeu.delete({ shcc: req.body.shcc}, (error) => {
+                app.model.qtBaiVietKhoaHoc.delete({ shcc: req.body.shcc }, (error) => {
                     resolve();
                 });
             })).then(() => new Promise(resolve => {
-                app.model.qtGiaiThuong.delete({ shcc: req.body.shcc}, (error) => {
+                app.model.qtKyYeu.delete({ shcc: req.body.shcc }, (error) => {
                     resolve();
                 });
             })).then(() => new Promise(resolve => {
-                app.model.qtBangPhatMinh.delete({ shcc: req.body.shcc}, (error) => {
+                app.model.qtGiaiThuong.delete({ shcc: req.body.shcc }, (error) => {
                     resolve();
                 });
             })).then(() => new Promise(resolve => {
-                app.model.qtUngDungThuongMai.delete({ shcc: req.body.shcc}, (error) => {
+                app.model.qtBangPhatMinh.delete({ shcc: req.body.shcc }, (error) => {
                     resolve();
                 });
             })).then(() => new Promise(resolve => {
-                app.model.qtLamViecNgoai.delete({ shcc: req.body.shcc}, (error) => {
+                app.model.qtUngDungThuongMai.delete({ shcc: req.body.shcc }, (error) => {
+                    resolve();
+                });
+            })).then(() => new Promise(resolve => {
+                app.model.qtLamViecNgoai.delete({ shcc: req.body.shcc }, (error) => {
                     resolve();
                 });
             })).then(() => {
@@ -318,8 +318,8 @@ module.exports = app => {
 
     app.post('/api/staff/multiple', app.permission.check('staff:write'), (req, res) => {
         const canBoList = req.body.canBoList;
-        const danTocMapping = {}, quocGiaMapping = {}, tonGiaoMapping = {}, trinhDoLyLuanChinhTriMapping = {}, donViMapping = {}, chucVuMapping = {}, 
-            tinhMapping = {}, xaMapping = {}, huyenMapping = {}, chucDanhMapping = {}, trinhDoMapping = {}, trinhDoQuanLyNhaNuocMapping = {}, 
+        const danTocMapping = {}, quocGiaMapping = {}, tonGiaoMapping = {}, trinhDoLyLuanChinhTriMapping = {}, donViMapping = {}, chucVuMapping = {},
+            tinhMapping = {}, xaMapping = {}, huyenMapping = {}, chucDanhMapping = {}, trinhDoMapping = {}, trinhDoQuanLyNhaNuocMapping = {},
             trinhDoTinHocMapping = {}, quanHeMapping = {}, ngoaiNguMapping = {};
 
         new Promise(resolve => {
@@ -402,64 +402,64 @@ module.exports = app => {
             const handleCanBo = (index = 0) => {
                 let item = canBoList[index];
                 if (index < canBoList.length) {
-                    let canBo = { 
+                    let canBo = {
                         shcc: item.shcc,
-                        ten: item.hoTen.split(' ')[item.hoTen.split(' ').length - 1].toUpperCase(), 
-                        ho:  item.hoTen.substring(0, item.hoTen.indexOf(item.hoTen.split(' ')[item.hoTen.split(' ').length - 1])).toUpperCase().trim(),
-                        phai: item.phai.toLowerCase() == 'nam' ? '01' : item.phai.toLowerCase() == 'nữ' ? '02' : null, 
-                        dienThoaiCaNhan: item.dienThoaiCaNhan, 
-                        email: item.email, 
-                        ngaySinh: item.ngaySinh, 
-                        ngayBatDauCongTac: item.ngayBatDauCongTac, 
-                        ngayBienChe: item.ngayBienChe, 
-                        chucVuDoanThe: item.chucVuDoanThe, 
-                        chucVuDang: item.chucVuDang, 
+                        ten: item.hoTen.split(' ')[item.hoTen.split(' ').length - 1].toUpperCase(),
+                        ho: item.hoTen.substring(0, item.hoTen.indexOf(item.hoTen.split(' ')[item.hoTen.split(' ').length - 1])).toUpperCase().trim(),
+                        phai: item.phai.toLowerCase() == 'nam' ? '01' : item.phai.toLowerCase() == 'nữ' ? '02' : null,
+                        dienThoaiCaNhan: item.dienThoaiCaNhan,
+                        email: item.email,
+                        ngaySinh: item.ngaySinh,
+                        ngayBatDauCongTac: item.ngayBatDauCongTac,
+                        ngayBienChe: item.ngayBienChe,
+                        chucVuDoanThe: item.chucVuDoanThe,
+                        chucVuDang: item.chucVuDang,
                         chucVuKiemNhiem: item.chucVuKiemNhiem,
-                        maTrinhDoLlct: item.trinhDoLlct && trinhDoLyLuanChinhTriMapping[item.trinhDoLlct.toLowerCase()] ? trinhDoLyLuanChinhTriMapping[item.trinhDoLlct.toLowerCase()] : null, 
-                        maTrinhDoQlnn: item.trinhDoQlnn && trinhDoQuanLyNhaNuocMapping[item.trinhDoQlnn.toLowerCase()] ? trinhDoQuanLyNhaNuocMapping[item.trinhDoQlnn.toLowerCase()] : null, 
-                        maTrinhDoTinHoc: item.trinhDoTinHoc && trinhDoTinHocMapping[item.trinhDoTinHoc.toLowerCase()] ? trinhDoTinHocMapping[item.trinhDoTinHoc.toLowerCase()] : null, 
-                        hoKhau: item.hoKhau, 
-                        diaChiHienTai: item.diaChiHienTai, 
-                        danToc: item.danToc && danTocMapping[item.danToc.toLowerCase()] ? danTocMapping[item.danToc.toLowerCase()] : null, 
-                        tonGiao: item.tonGiao && tonGiaoMapping[item.tonGiao.toLowerCase()] ? tonGiaoMapping[item.tonGiao.toLowerCase()] : null, 
-                        dangVien: item.ngayVaoDang || item.ngayVaoDangChinhThuc || item.noiDangDb || item.noiDangDb ? 1 : 0, 
-                        maDonVi: item.donVi && donViMapping[item.donVi.toLowerCase().replace('khoa', '').trim()] ? donViMapping[item.donVi.toLowerCase().replace('khoa', '').trim()] : null, 
-                        emailCaNhan: item.emailCaNhan, 
-                        biDanh: item.biDanh, 
-                        dienThoaiBaoTin: item.dienThoaiBaoTin, 
-                        ngheNghiepCu: item.ngheNghiepCu, 
-                        cmnd: item.cmnd, 
-                        cmndNgayCap: item.cmndNgayCap, 
-                        cmndNoiCap: item.cmndNoiCap, 
-                        chucVuKhac: item.chucVuKhac, 
-                        quocGia: item.quocGia && quocGiaMapping[item.quocGia.toLowerCase()] ? quocGiaMapping[item.quocGia.toLowerCase()] : null, 
-                        chucDanh: item.chucDanh && chucDanhMapping[item.chucDanh.toLowerCase()] ? chucDanhMapping[item.chucDanh.toLowerCase()] : null, 
-                        trinhDoPhoThong: item.trinhDoPhoThong ? typeof(item.trinhDoPhoThong) == 'object' ? item.trinhDoPhoThong.getDate() + '/' + item.trinhDoPhoThong.getMonth() : item.trinhDoPhoThong.replaceAll('//','/') : null, 
-                        hocVi: item.hocVi && trinhDoMapping[item.hocVi.toLowerCase()] ? trinhDoMapping[item.hocVi.toLowerCase()] : null, 
-                        chuyenNganh: item.chuyenNganh, 
-                        sucKhoe: item.sucKhoe, 
-                        canNang: item.canNang, 
-                        chieuCao: item.chieuCao, 
-                        ngayNhapNgu: item.ngayNhapNgu, 
-                        ngayXuatNgu: item.ngayXuatNgu, 
-                        quanHamCaoNhat: item.quanHam, 
-                        hangThuongBinh: item.hangThuongBinh, 
-                        giaDinhChinhSach: item.giaDinhChinhSach, 
-                        danhHieu: item.danhHieu, 
-                        ngayVaoDang: item.ngayVaoDang, 
-                        ngayVaoDangChinhThuc: item.ngayVaoDangChinhThuc, 
-                        noiDangDb: item.noiDangDb, 
-                        noiDangCt: item.noiDangCt, 
-                        ngayVaoDoan: item.ngayVaoDoan, 
-                        noiVaoDoan: item.noiVaoDoan, 
-                        soTruong: item.soTruong, 
-                        nhomMau: item.nhomMau, 
-                        soBhxh: item.soBhxh, 
-                        doanVien: item.noiVaoDoan || item.ngayVaoDoan ? 1 : 0, 
-                        namChucDanh: item.namChucDanh, 
+                        maTrinhDoLlct: item.trinhDoLlct && trinhDoLyLuanChinhTriMapping[item.trinhDoLlct.toLowerCase()] ? trinhDoLyLuanChinhTriMapping[item.trinhDoLlct.toLowerCase()] : null,
+                        maTrinhDoQlnn: item.trinhDoQlnn && trinhDoQuanLyNhaNuocMapping[item.trinhDoQlnn.toLowerCase()] ? trinhDoQuanLyNhaNuocMapping[item.trinhDoQlnn.toLowerCase()] : null,
+                        maTrinhDoTinHoc: item.trinhDoTinHoc && trinhDoTinHocMapping[item.trinhDoTinHoc.toLowerCase()] ? trinhDoTinHocMapping[item.trinhDoTinHoc.toLowerCase()] : null,
+                        hoKhau: item.hoKhau,
+                        diaChiHienTai: item.diaChiHienTai,
+                        danToc: item.danToc && danTocMapping[item.danToc.toLowerCase()] ? danTocMapping[item.danToc.toLowerCase()] : null,
+                        tonGiao: item.tonGiao && tonGiaoMapping[item.tonGiao.toLowerCase()] ? tonGiaoMapping[item.tonGiao.toLowerCase()] : null,
+                        dangVien: item.ngayVaoDang || item.ngayVaoDangChinhThuc || item.noiDangDb || item.noiDangDb ? 1 : 0,
+                        maDonVi: item.donVi && donViMapping[item.donVi.toLowerCase().replace('khoa', '').trim()] ? donViMapping[item.donVi.toLowerCase().replace('khoa', '').trim()] : null,
+                        emailCaNhan: item.emailCaNhan,
+                        biDanh: item.biDanh,
+                        dienThoaiBaoTin: item.dienThoaiBaoTin,
+                        ngheNghiepCu: item.ngheNghiepCu,
+                        cmnd: item.cmnd,
+                        cmndNgayCap: item.cmndNgayCap,
+                        cmndNoiCap: item.cmndNoiCap,
+                        chucVuKhac: item.chucVuKhac,
+                        quocGia: item.quocGia && quocGiaMapping[item.quocGia.toLowerCase()] ? quocGiaMapping[item.quocGia.toLowerCase()] : null,
+                        chucDanh: item.chucDanh && chucDanhMapping[item.chucDanh.toLowerCase()] ? chucDanhMapping[item.chucDanh.toLowerCase()] : null,
+                        trinhDoPhoThong: item.trinhDoPhoThong ? typeof (item.trinhDoPhoThong) == 'object' ? item.trinhDoPhoThong.getDate() + '/' + item.trinhDoPhoThong.getMonth() : item.trinhDoPhoThong.replaceAll('//', '/') : null,
+                        hocVi: item.hocVi && trinhDoMapping[item.hocVi.toLowerCase()] ? trinhDoMapping[item.hocVi.toLowerCase()] : null,
+                        chuyenNganh: item.chuyenNganh,
+                        sucKhoe: item.sucKhoe,
+                        canNang: item.canNang,
+                        chieuCao: item.chieuCao,
+                        ngayNhapNgu: item.ngayNhapNgu,
+                        ngayXuatNgu: item.ngayXuatNgu,
+                        quanHamCaoNhat: item.quanHam,
+                        hangThuongBinh: item.hangThuongBinh,
+                        giaDinhChinhSach: item.giaDinhChinhSach,
+                        danhHieu: item.danhHieu,
+                        ngayVaoDang: item.ngayVaoDang,
+                        ngayVaoDangChinhThuc: item.ngayVaoDangChinhThuc,
+                        noiDangDb: item.noiDangDb,
+                        noiDangCt: item.noiDangCt,
+                        ngayVaoDoan: item.ngayVaoDoan,
+                        noiVaoDoan: item.noiVaoDoan,
+                        soTruong: item.soTruong,
+                        nhomMau: item.nhomMau,
+                        soBhxh: item.soBhxh,
+                        doanVien: item.noiVaoDoan || item.ngayVaoDoan ? 1 : 0,
+                        namChucDanh: item.namChucDanh,
                         namHocVi: item.namHocVi,
                         noiSinh: item.noiSinh,
-                        queQuan: item.nguyenQuan 
+                        queQuan: item.nguyenQuan
                     }
                     // if (item.noiSinh) {
                     //     let dsNoiSinh = item.noiSinh.split(/[-,]/);
@@ -496,16 +496,16 @@ module.exports = app => {
                     //     }
                     // }
                     if (canBo.shcc) {
-                        app.model.canBo.get({shcc: canBo.shcc}, (error, cbItem) => {
+                        app.model.canBo.get({ shcc: canBo.shcc }, (error, cbItem) => {
                             if (cbItem == null) {
-                                app.model.canBo.create(canBo, (error2, newCb) => { 
+                                app.model.canBo.create(canBo, (error2, newCb) => {
                                     if (!error2 && newCb) {
                                         if (item.quanHe && item.quanHe.length > 0) {
                                             const handleQuanHe = (index = 0) => {
                                                 let quanHe = item.quanHe[index];
                                                 if (index < item.quanHe.length) {
                                                     newQuanHe = {
-                                                        hoTen : quanHe.hoTen,
+                                                        hoTen: quanHe.hoTen,
                                                         moiQuanHe: quanHeMapping[quanHe.quanHe.toLowerCase()],
                                                         namSinh: new Date(quanHe.namSinh).getTime(),
                                                         queQuan: quanHe.queQuan,
@@ -519,7 +519,7 @@ module.exports = app => {
                                                     })
                                                 }
                                             }
-                                            handleQuanHe();       
+                                            handleQuanHe();
                                         }
 
                                         if (item.trinhDoNgoaiNgu && item.trinhDoNgoaiNgu.length > 0) {
@@ -843,23 +843,23 @@ module.exports = app => {
                                             handleLamViecNgoai();
                                         }
                                     }
-                                    handleCanBo(index+1);
+                                    handleCanBo(index + 1);
                                 });
                             } else {
-                                handleCanBo(index+1);
+                                handleCanBo(index + 1);
                             }
                         });
                     } else {
-                        handleCanBo(index+1);
+                        handleCanBo(index + 1);
                     }
                 } else {
-                    res.send({error: null});
+                    res.send({ error: null });
                 }
             }
 
             handleCanBo();
-        }); 
-        
+        });
+
     });
 
     // USER APIs ------------------------------------------------------------------------------------------------------------------------------------
@@ -879,7 +879,7 @@ module.exports = app => {
                         resolve();
                     })
                 }).then(() => new Promise(resolve => {
-                    app.model.trinhDoNgoaiNgu.getAll({ shcc: canBo.shcc}, (error, trinhDoNN) => {
+                    app.model.trinhDoNgoaiNgu.getAll({ shcc: canBo.shcc }, (error, trinhDoNN) => {
                         if (error || trinhDoNN == null) {
                             result = app.clone(result, { trinhDoNN: null });
                         } else {
@@ -888,7 +888,7 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtHocTapCongTac.getAll({ shcc: canBo.shcc}, '*', 'batDau ASC', (error, hocTapCongTac) => {
+                    app.model.qtHocTapCongTac.getAll({ shcc: canBo.shcc }, '*', 'batDau ASC', (error, hocTapCongTac) => {
                         if (error || hocTapCongTac == null) {
                             result = app.clone(result, { hocTapCongTac: null });
                         } else {
@@ -897,7 +897,7 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtDaoTao.getAll({ shcc: canBo.shcc}, (error, daoTao) => {
+                    app.model.qtDaoTao.getAll({ shcc: canBo.shcc }, (error, daoTao) => {
                         if (error || daoTao == null) {
                             result = app.clone(result, { daoTao: null });
                         } else {
@@ -906,7 +906,7 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtNuocNgoai.getAll({ shcc: canBo.shcc}, (error, nuocNgoai) => {
+                    app.model.qtNuocNgoai.getAll({ shcc: canBo.shcc }, (error, nuocNgoai) => {
                         if (error || nuocNgoai == null) {
                             result = app.clone(result, { nuocNgoai: null });
                         } else {
@@ -915,7 +915,7 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtKhenThuong.getAll({ shcc: canBo.shcc}, (error, khenThuong) => {
+                    app.model.qtKhenThuong.getAll({ shcc: canBo.shcc }, (error, khenThuong) => {
                         if (error || khenThuong == null) {
                             result = app.clone(result, { khenThuong: null });
                         } else {
@@ -924,7 +924,7 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtKyLuat.getAll({ shcc: canBo.shcc}, (error, kyLuat) => {
+                    app.model.qtKyLuat.getAll({ shcc: canBo.shcc }, (error, kyLuat) => {
                         if (error || kyLuat == null) {
                             result = app.clone(result, { kyLuat: null });
                         } else {
@@ -933,7 +933,7 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtNghienCuuKhoaHoc.getAll({ shcc: canBo.shcc}, (error, nghienCuuKhoaHoc) => {
+                    app.model.qtNghienCuuKhoaHoc.getAll({ shcc: canBo.shcc }, (error, nghienCuuKhoaHoc) => {
                         if (error || nghienCuuKhoaHoc == null) {
                             result = app.clone(result, { nghienCuuKhoaHoc: null });
                         } else {
@@ -942,7 +942,7 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtHuongDanLuanVan.getAll({ shcc: canBo.shcc}, (error, huongDanLuanVan) => {
+                    app.model.qtHuongDanLuanVan.getAll({ shcc: canBo.shcc }, (error, huongDanLuanVan) => {
                         if (error || huongDanLuanVan == null) {
                             result = app.clone(result, { huongDanLuanVan: null });
                         } else {
@@ -951,7 +951,7 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.sachGiaoTrinh.getAll({ shcc: canBo.shcc}, (error, sachGiaoTrinh) => {
+                    app.model.sachGiaoTrinh.getAll({ shcc: canBo.shcc }, (error, sachGiaoTrinh) => {
                         if (error || sachGiaoTrinh == null) {
                             result = app.clone(result, { sachGiaoTrinh: null });
                         } else {
@@ -960,7 +960,7 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtBaiVietKhoaHoc.getAll({ shcc: canBo.shcc}, (error, baiVietKhoaHoc) => {
+                    app.model.qtBaiVietKhoaHoc.getAll({ shcc: canBo.shcc }, (error, baiVietKhoaHoc) => {
                         if (error || baiVietKhoaHoc == null) {
                             result = app.clone(result, { baiVietKhoaHoc: null });
                         } else {
@@ -969,7 +969,7 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtKyYeu.getAll({ shcc: canBo.shcc}, (error, kyYeu) => {
+                    app.model.qtKyYeu.getAll({ shcc: canBo.shcc }, (error, kyYeu) => {
                         if (error || kyYeu == null) {
                             result = app.clone(result, { kyYeu: null });
                         } else {
@@ -978,7 +978,7 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtGiaiThuong.getAll({ shcc: canBo.shcc}, (error, giaiThuong) => {
+                    app.model.qtGiaiThuong.getAll({ shcc: canBo.shcc }, (error, giaiThuong) => {
                         if (error || giaiThuong == null) {
                             result = app.clone(result, { giaiThuong: null });
                         } else {
@@ -987,7 +987,7 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtBangPhatMinh.getAll({ shcc: canBo.shcc}, (error, bangPhatMinh) => {
+                    app.model.qtBangPhatMinh.getAll({ shcc: canBo.shcc }, (error, bangPhatMinh) => {
                         if (error || bangPhatMinh == null) {
                             result = app.clone(result, { bangPhatMinh: null });
                         } else {
@@ -996,7 +996,7 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtUngDungThuongMai.getAll({ shcc: canBo.shcc}, (error, ungDungThuongMai) => {
+                    app.model.qtUngDungThuongMai.getAll({ shcc: canBo.shcc }, (error, ungDungThuongMai) => {
                         if (error || ungDungThuongMai == null) {
                             result = app.clone(result, { ungDungThuongMai: null });
                         } else {
@@ -1005,7 +1005,7 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtLamViecNgoai.getAll({ shcc: canBo.shcc}, (error, lamViecNgoai) => {
+                    app.model.qtLamViecNgoai.getAll({ shcc: canBo.shcc }, (error, lamViecNgoai) => {
                         if (error || lamViecNgoai == null) {
                             result = app.clone(result, { lamViecNgoai: null });
                         } else {
@@ -1023,7 +1023,7 @@ module.exports = app => {
     app.put('/api/user/staff', app.permission.check('staff:login'), (req, res) => {
         if (req.body.changes && req.session.user) {
             const changes = req.body.changes;
-            
+
             app.model.canBo.update({ shcc: req.session.user.shcc }, changes, (error, item) => {
                 res.send({ error, item });
             });
@@ -1080,12 +1080,12 @@ module.exports = app => {
 
     app.get('/user/staff/:shcc/word', app.permission.check('staff:login'), (req, res) => {
         if (req.params && req.params.shcc) {
-            app.model.canBo.get({shcc: req.params.shcc}, (error, canBo) => {
+            app.model.canBo.get({ shcc: req.params.shcc }, (error, canBo) => {
                 if (error || canBo == null) {
                     res.send({ error });
                 } else {
-                    const danTocMapping = {}, quocGiaMapping = {}, tonGiaoMapping = {}, trinhDoLyLuanChinhTriMapping = {}, donViMapping = {}, chucVuMapping = {}, 
-                        tinhMapping = {}, xaMapping = {}, huyenMapping = {}, chucDanhMapping = {}, trinhDoMapping = {}, trinhDoQuanLyNhaNuocMapping = {}, 
+                    const danTocMapping = {}, quocGiaMapping = {}, tonGiaoMapping = {}, trinhDoLyLuanChinhTriMapping = {}, donViMapping = {}, chucVuMapping = {},
+                        tinhMapping = {}, xaMapping = {}, huyenMapping = {}, chucDanhMapping = {}, trinhDoMapping = {}, trinhDoQuanLyNhaNuocMapping = {},
                         trinhDoTinHocMapping = {}, quanHeMapping = {}, ngoaiNguMapping = {};
                     const source = app.path.join(__dirname, 'resource', 'Mau-2C-BNV-2008.docx');
 
@@ -1181,15 +1181,15 @@ module.exports = app => {
                             // qqXa: canBo.maXaNguyenQuan ? xaMapping[canBo.xaNguyenQuan] + ',' : '',
                             // qqHuyen: canBo.maHuyenNguyenQuan ? huyenMapping[canBo.maHuyenNguyenQuan] + ',' : '',
                             // qqTinh: canBo.maTinhNguyenQuan ? tinhMapping[canBo.maTinhNguyenQuan] : '',
-                            noiSinh: canBo.noiSinh ? canBo.noiSinh: '',
-                            queQuan: canBo.queQuan ? canBo.queQuan: '',
+                            noiSinh: canBo.noiSinh ? canBo.noiSinh : '',
+                            queQuan: canBo.queQuan ? canBo.queQuan : '',
                             danToc: canBo.danToc ? danTocMapping[canBo.danToc] : '',
                             tonGiao: canBo.tonGiao ? tonGiaoMapping[canBo.tonGiao] : 'Không',
                             hoKhau: canBo.hoKhau ? canBo.hoKhau : '',
                             diaChiHienTai: canBo.diaChiHienTai ? canBo.diaChiHienTai : '',
                             ngheNghiepCu: canBo.ngheNghiepCu ? canBo.ngheNghiepCu : '',
                             ngayBatDauCongTac: canBo.ngayBatDauCongTac ? app.date.viDateFormat(new Date(canBo.ngayBatDauCongTac)) : '',
-                            ngayBienChe: canBo.ngayBienChe ?  app.date.viDateFormat(new Date(canBo.ngayBienChe)) : '',
+                            ngayBienChe: canBo.ngayBienChe ? app.date.viDateFormat(new Date(canBo.ngayBienChe)) : '',
                             // ngach_cong_chuc: canBo.tenNgach ? canBo.tenNgach : '',
                             // ma_ngach: canBo.maNgach ? canBo.maNgach : '',
                             // bac_luong: canBo.bacLuong ? canBo.bacLuong : '',
@@ -1216,7 +1216,7 @@ module.exports = app => {
                             nhomMau: canBo.nhomMau ? canBo.nhomMau : '',
                             sucKhoe: canBo.sucKhoe ? canBo.sucKhoe : '',
                             canNang: canBo.canNang ? canBo.canNang : '',
-                            chieuCao: canBo.chieuCao ? Math.floor(Number(canBo.chieuCao)/100) + 'm' + (Number(canBo.chieuCao)%100) : '',
+                            chieuCao: canBo.chieuCao ? Math.floor(Number(canBo.chieuCao) / 100) + 'm' + (Number(canBo.chieuCao) % 100) : '',
                             ngayVaoDang: canBo.ngayVaoDang ? app.date.viDateFormat(new Date(canBo.ngayVaoDang)) : '',
                             ngayVaoDangChinhThuc: canBo.ngayVaoDangChinhThuc ? app.date.viDateFormat(new Date(canBo.ngayVaoDangChinhThuc)) : '',
                             danhHieu: canBo.danhHieu ? canBo.danhHieu : '',
@@ -1226,12 +1226,12 @@ module.exports = app => {
                             ngayXuatNgu: canBo.ngayXuatNgu ? app.date.viDateFormat(new Date(canBo.ngayXuatNgu)) : '',
                             quanHam: canBo.quanHam ? canBo.quanHam : '',
                             hangThuongBinh: canBo.hangThuongBinh ? canBo.hangThuongBinh : '',
-                            giaDinhChinhSach : canBo.giaDinhChinhSach ? canBo.giaDinhChinhSach : ''
+                            giaDinhChinhSach: canBo.giaDinhChinhSach ? canBo.giaDinhChinhSach : ''
                         }
                         resolve(data);
-                        
+
                     })).then((data) => new Promise(resolve => {
-                        app.model.quanHeCanBo.getAll({shcc: canBo.shcc}, '*', 'id ASC' , (error, qhItems) => {
+                        app.model.quanHeCanBo.getAll({ shcc: canBo.shcc }, '*', 'id ASC', (error, qhItems) => {
                             if (!error && qhItems && qhItems.length > 0) {
                                 const handleQuanHe = (index = 0) => {
                                     item = qhItems[index];
@@ -1239,19 +1239,19 @@ module.exports = app => {
                                         if (item.type == 0) data.quanhe.push({
                                             moiQuanHe: item.moiQuanHe ? quanHeMapping[item.moiQuanHe] : '',
                                             hoTen: item.hoTen,
-                                            namSinh: item.namSinh ?  new Date(item.namSinh).getFullYear() : '',
+                                            namSinh: item.namSinh ? new Date(item.namSinh).getFullYear() : '',
                                             queQuan: item.queQuan ? item.queQuan : '',
-                                            ngheNghiep : item.ngheNghiep ? item.ngheNghiep : '',
+                                            ngheNghiep: item.ngheNghiep ? item.ngheNghiep : '',
                                             diaChi: item.diaChi ? item.diaChi : ''
                                         }); else data.quanHeInLaw.push({
                                             moiQuanHe: item.moiQuanHe ? quanHeMapping[item.moiQuanHe] : '',
                                             hoTen: item.hoTen,
-                                            namSinh: item.namSinh ?  new Date(item.namSinh).getFullYear() : '',
+                                            namSinh: item.namSinh ? new Date(item.namSinh).getFullYear() : '',
                                             queQuan: item.queQuan ? item.queQuan : '',
-                                            ngheNghiep : item.ngheNghiep ? item.ngheNghiep : '',
+                                            ngheNghiep: item.ngheNghiep ? item.ngheNghiep : '',
                                             diaChi: item.diaChi ? item.diaChi : ''
                                         });
-                                        handleQuanHe(index+1);
+                                        handleQuanHe(index + 1);
                                     }
                                 }
                                 handleQuanHe();
@@ -1259,7 +1259,7 @@ module.exports = app => {
                             resolve(data);
                         })
                     })).then((data) => new Promise(resolve => {
-                        app.model.trinhDoNgoaiNgu.getAll({shcc: canBo.shcc}, '*', 'id ASC' , (error, nnItems) => {
+                        app.model.trinhDoNgoaiNgu.getAll({ shcc: canBo.shcc }, '*', 'id ASC', (error, nnItems) => {
                             if (!error && nnItems && nnItems.length > 0) {
                                 const handleNgoaiNgu = (index = 0) => {
                                     item = nnItems[index];
@@ -1268,7 +1268,7 @@ module.exports = app => {
                                             ngonNgu: ngoaiNguMapping[item.loaiNgonNgu],
                                             trinhDo: item.trinhDo
                                         })
-                                        handleNgoaiNgu(index+1);
+                                        handleNgoaiNgu(index + 1);
                                     }
                                 }
                                 handleNgoaiNgu();
@@ -1276,21 +1276,21 @@ module.exports = app => {
                             resolve(data);
                         })
                     })).then((data) => new Promise(resolve => {
-                        app.model.qtDaoTao.getAll({shcc: canBo.shcc}, '*', 'id ASC' , (error, dtItems) => {
+                        app.model.qtDaoTao.getAll({ shcc: canBo.shcc }, '*', 'id ASC', (error, dtItems) => {
                             if (!error && dtItems && dtItems.length > 0) {
                                 const handleDaoTao = (index = 0) => {
                                     item = dtItems[index];
                                     if (index < dtItems.length) {
                                         data.daoTao.push({
                                             coSo: item.tenTruong,
-                                            chuyenNganh: item.chuyenNganh ? item.chuyenNganh: '',
+                                            chuyenNganh: item.chuyenNganh ? item.chuyenNganh : '',
                                             batDau: item.batDau ? app.date.dateTimeFormat(new Date(item.batDau), item.batDauType ? item.batDauType : 'dd/mm/yyyy') : '',
                                             ketThuc: item.ketThuc ? app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : '',
                                             hinhThuc: item.hinhThuc ? item.hinhThuc : '',
                                             vanBang: item.loaiBangCap ? item.loaiBangCap : '',
                                             thoiGian: item.thoiGian ? item.thoiGian + ' tháng' : ''
                                         })
-                                        handleDaoTao(index+1);
+                                        handleDaoTao(index + 1);
                                     }
                                 }
                                 handleDaoTao();
@@ -1298,24 +1298,24 @@ module.exports = app => {
                             resolve(data);
                         })
                     })).then((data) => new Promise(resolve => {
-                        app.model.qtHocTapCongTac.getAll({shcc: canBo.shcc}, '*', 'batDau ASC' , (error, htctItems) => {
+                        app.model.qtHocTapCongTac.getAll({ shcc: canBo.shcc }, '*', 'batDau ASC', (error, htctItems) => {
                             if (!error && htctItems && htctItems.length > 0) {
                                 const handleHtct = (index = 0) => {
                                     item = htctItems[index];
                                     if (index < htctItems.length) {
                                         data.htct.push({
-                                            noiDung: item.noiDung ? item.noiDung: '',
+                                            noiDung: item.noiDung ? item.noiDung : '',
                                             batDau: item.batDau ? app.date.dateTimeFormat(new Date(item.batDau), item.batDauType ? item.batDauType : 'dd/mm/yyyy') : '',
                                             ketThuc: item.ketThuc ? item.ketThuc == -1 ? 'đến nay' : app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : '',
                                         })
-                                        handleHtct(index+1);
+                                        handleHtct(index + 1);
                                     }
                                 }
                                 handleHtct();
                             }
                             resolve(data);
                         })
-                    })).then((data) =>  {
+                    })).then((data) => {
                         app.docx.generateFile(source, data, (error, data) => {
                             if (error)
                                 res.send({ error })
@@ -1330,12 +1330,12 @@ module.exports = app => {
 
     app.get('/user/staff/:shcc/word-llkh', app.permission.check('staff:login'), (req, res) => {
         if (req.params && req.params.shcc) {
-            app.model.canBo.get({shcc: req.params.shcc}, (error, canBo) => {
+            app.model.canBo.get({ shcc: req.params.shcc }, (error, canBo) => {
                 if (error || canBo == null) {
                     res.send({ error });
                 } else {
-                    const danTocMapping = {}, quocGiaMapping = {}, tonGiaoMapping = {}, trinhDoLyLuanChinhTriMapping = {}, donViMapping = {}, chucVuMapping = {}, 
-                        tinhMapping = {}, xaMapping = {}, huyenMapping = {}, chucDanhMapping = {}, trinhDoMapping = {}, trinhDoQuanLyNhaNuocMapping = {}, 
+                    const danTocMapping = {}, quocGiaMapping = {}, tonGiaoMapping = {}, trinhDoLyLuanChinhTriMapping = {}, donViMapping = {}, chucVuMapping = {},
+                        tinhMapping = {}, xaMapping = {}, huyenMapping = {}, chucDanhMapping = {}, trinhDoMapping = {}, trinhDoQuanLyNhaNuocMapping = {},
                         trinhDoTinHocMapping = {}, quanHeMapping = {}, ngoaiNguMapping = {};
                     const source = app.path.join(__dirname, 'resource', 'Mau-LLKH.docx');
 
@@ -1421,8 +1421,8 @@ module.exports = app => {
                             nam: canBo.phai == '01' ? true : false,
                             nu: canBo.phai == '02' ? true : false,
                             dienThoaiBaoTin: canBo.dienThoaiBaoTin ? canBo.dienThoaiBaoTin : '',
-                            dienThoaiCaNhan : canBo.dienThoaiCaNhan ? canBo.dienThoaiCaNhan : '',
-                            noiSinh: canBo.noiSinh ? canBo.noiSinh: '',
+                            dienThoaiCaNhan: canBo.dienThoaiCaNhan ? canBo.dienThoaiCaNhan : '',
+                            noiSinh: canBo.noiSinh ? canBo.noiSinh : '',
                             diaChi: canBo.diaChiHienTai ? canBo.diaChiHienTai : '',
                             hocVi: canBo.hocVi ? trinhDoMapping[canBo.hocVi] : '',
                             chucVu: canBo.maChucVu ? chucVuMapping[canBo.maChucVu] : '',
@@ -1438,7 +1438,7 @@ module.exports = app => {
                             firstMst = canBo.shcc.split('.')[0];
                             lastMst = canBo.shcc.split('.')[1];
                         } else {
-                            firstMst = canBo.shcc.substring(0,  canBo.shcc.length - 4);
+                            firstMst = canBo.shcc.substring(0, canBo.shcc.length - 4);
                             lastMst = canBo.shcc.substring(canBo.shcc.length - 4);
                         }
                         if (firstMst.length == 1) {
@@ -1459,10 +1459,10 @@ module.exports = app => {
                         data.m5 = lastMst[1] ? lastMst[1] : '';
                         data.m6 = lastMst[2] ? lastMst[2] : '';
                         data.m7 = lastMst[3] ? lastMst[3] : '';
-                        
+
                         resolve(data);
-                        
-                    })).then((data) =>  {
+
+                    })).then((data) => {
                         app.docx.generateFile(source, data, (error, data) => {
                             if (error) {
                                 console.log(error);
@@ -1492,65 +1492,65 @@ module.exports = app => {
                         } else {
                             if (worksheet.getCell('B' + index).value) {
                                 let newElement = {
-                                        shcc: worksheet.getCell('C' + index).value,
-                                        hoTen: worksheet.getCell('D' + index).value ? worksheet.getCell('D' + index).value.trim() : '',
-                                        biDanh: worksheet.getCell('E' + index).value ? worksheet.getCell('E' + index).value.trim() : '',
-                                        phai: worksheet.getCell('F' + index).value && typeof(worksheet.getCell('F' + index).value) == 'string' ? worksheet.getCell('F' + index).value.trim() : 'Nam',
-                                        ngaySinh: worksheet.getCell('G' + index).value ? new Date(worksheet.getCell('G' + index).value).getTime() : null,
-                                        noiSinh: worksheet.getCell('H' + index).value ? worksheet.getCell('H' + index).value.trim() : '',
-                                        cmnd: worksheet.getCell('I' + index).value,
-                                        cmndNgayCap: worksheet.getCell('J' + index).value ? new Date(worksheet.getCell('J' + index).value).getTime() : null,
-                                        cmndNoiCap: worksheet.getCell('K' + index).value,
-                                        nguyenQuan: worksheet.getCell('L' + index).value ? worksheet.getCell('L' + index).value.trim() : '',
-                                        hoKhau: worksheet.getCell('M' + index).value ? worksheet.getCell('M' + index).value.trim() : '',
-                                        diaChiHienTai: worksheet.getCell('N' + index).value ? worksheet.getCell('N' + index).value.trim() : '',
-                                        dienThoaiCaNhan: worksheet.getCell('O' + index).value,
-                                        dienThoaiBaoTin: worksheet.getCell('P' + index).value,
-                                        emailCaNhan: worksheet.getCell('Q' + index).value ? typeof(worksheet.getCell('Q' + index).value) =='string' ? worksheet.getCell('Q' + index).value : worksheet.getCell('Q' + index).value.text: null,
-                                        email: worksheet.getCell('R' + index).value ? typeof(worksheet.getCell('R' + index).value) =='string' ? worksheet.getCell('R' + index).value : worksheet.getCell('R' + index).value.text: null,
-                                        quocGia: worksheet.getCell('S' + index).value ? worksheet.getCell('S' + index).value.trim() : '',
-                                        danToc: worksheet.getCell('T' + index).value ? worksheet.getCell('T' + index).value.trim() : '',
-                                        tonGiao: worksheet.getCell('U' + index).value ? worksheet.getCell('U' + index).value.trim() : '',
-                                        ngheNghiepCu: worksheet.getCell('V' + index).value,
-                                        ngayBatDauCongTac: worksheet.getCell('W' + index).value ? new Date(worksheet.getCell('W' + index).value).getTime() : null,
-                                        ngayBienChe: worksheet.getCell('X' + index).value ? new Date(worksheet.getCell('X' + index).value).getTime() : null,
-                                        trinhDoTinHoc: worksheet.getCell('AB' + index).value,
-                                        donVi: worksheet.getCell('AC' + index).value ? worksheet.getCell('AC' + index).value.trim() : '',
-                                        // chucVu: worksheet.getCell('AD' + index).value,
-                                        chucDanh: worksheet.getCell('AI' + index).value ? worksheet.getCell('AI' + index).value : worksheet.getCell('AG' + index).value,
-                                        trinhDoPhoThong: worksheet.getCell('AH' + index).value ? worksheet.getCell('AH' + index).value : '',
-                                        namChucDanh: worksheet.getCell('AJ' + index).value ? new Date(worksheet.getCell('AJ' + index).value).getTime() : null,
-                                        hocVi: worksheet.getCell('AK' + index).value ? worksheet.getCell('AK' + index).value.trim() : '',
-                                        chuyenNganh: worksheet.getCell('AL' + index).value,
-                                        namHocVi: worksheet.getCell('AM' + index).value ? new Date(worksheet.getCell('AM' + index).value).getTime() : null,
-                                        trinhDoLlct: worksheet.getCell('AN' + index).value ? worksheet.getCell('AN' + index).value : '',
-                                        trinhDoQlnn: worksheet.getCell('AO' + index).value ? worksheet.getCell('AO' + index).value : '',
-                                        soTruong: worksheet.getCell('AP' + index).value,
-                                        sucKhoe: worksheet.getCell('AQ' + index).value,
-                                        canNang: worksheet.getCell('AR' + index).value ? worksheet.getCell('AR' + index).value.toString().replaceAll('kg','') : null,
-                                        // chieuCao: worksheet.getCell('AS' + index).value, 
-                                        nhomMau: worksheet.getCell('AT' + index).value,
-                                        ngayVaoDoan: worksheet.getCell('AU' + index).value ? new Date(worksheet.getCell('AU' + index).value).getTime() : null,
-                                        noiVaoDang: worksheet.getCell('AV' + index).value ,
-                                        ngayVaoDang: worksheet.getCell('AW' + index).value ? new Date(worksheet.getCell('AW' + index).value).getTime() : null,
-                                        ngayVaoDangChinhThuc: worksheet.getCell('AX' + index).value ? new Date(worksheet.getCell('AX' + index).value).getTime() : null,
-                                        noiVaoDang: worksheet.getCell('AY' + index).value,
-                                        ngayNhapNgu: worksheet.getCell('AZ' + index).value ? new Date(worksheet.getCell('AZ' + index).value).getTime() : null,
-                                        ngayXuatNgu: worksheet.getCell('BA' + index).value ? new Date(worksheet.getCell('BA' + index).value).getTime() : null,
-                                        quanHam: worksheet.getCell('BB' + index).value,
-                                        hangThuongBinh: worksheet.getCell('BC' + index).value,
-                                        giaDinhChinhSach: worksheet.getCell('BD' + index).value,
-                                        danhHieu: worksheet.getCell('BE' + index).value, 
-                                        tuNhanXetUuDiem: worksheet.getCell('FG' + index).value,
-                                        tuNhanXetUuDiem: worksheet.getCell('FG' + index).value,
-                                        loiCamDoan: worksheet.getCell('FI' + index).value,
-                                    };
-                                    let chieuCao = worksheet.getCell('AS' + index).value ? worksheet.getCell('AS' + index).value.toString() : null;
-                                    if (chieuCao && chieuCao.includes('cm')) {
-                                        newElement.chieuCao = Number(chieuCao.split('cm')[0]);
-                                    } else if (chieuCao && chieuCao.includes('m')) {
-                                        newElement.chieuCao = Number(chieuCao.split('m')[0]) * 100 + Number(chieuCao.split('m')[1]);
-                                    }
+                                    shcc: worksheet.getCell('C' + index).value,
+                                    hoTen: worksheet.getCell('D' + index).value ? worksheet.getCell('D' + index).value.trim() : '',
+                                    biDanh: worksheet.getCell('E' + index).value ? worksheet.getCell('E' + index).value.trim() : '',
+                                    phai: worksheet.getCell('F' + index).value && typeof (worksheet.getCell('F' + index).value) == 'string' ? worksheet.getCell('F' + index).value.trim() : 'Nam',
+                                    ngaySinh: worksheet.getCell('G' + index).value ? new Date(worksheet.getCell('G' + index).value).getTime() : null,
+                                    noiSinh: worksheet.getCell('H' + index).value ? worksheet.getCell('H' + index).value.trim() : '',
+                                    cmnd: worksheet.getCell('I' + index).value,
+                                    cmndNgayCap: worksheet.getCell('J' + index).value ? new Date(worksheet.getCell('J' + index).value).getTime() : null,
+                                    cmndNoiCap: worksheet.getCell('K' + index).value,
+                                    nguyenQuan: worksheet.getCell('L' + index).value ? worksheet.getCell('L' + index).value.trim() : '',
+                                    hoKhau: worksheet.getCell('M' + index).value ? worksheet.getCell('M' + index).value.trim() : '',
+                                    diaChiHienTai: worksheet.getCell('N' + index).value ? worksheet.getCell('N' + index).value.trim() : '',
+                                    dienThoaiCaNhan: worksheet.getCell('O' + index).value,
+                                    dienThoaiBaoTin: worksheet.getCell('P' + index).value,
+                                    emailCaNhan: worksheet.getCell('Q' + index).value ? typeof (worksheet.getCell('Q' + index).value) == 'string' ? worksheet.getCell('Q' + index).value : worksheet.getCell('Q' + index).value.text : null,
+                                    email: worksheet.getCell('R' + index).value ? typeof (worksheet.getCell('R' + index).value) == 'string' ? worksheet.getCell('R' + index).value : worksheet.getCell('R' + index).value.text : null,
+                                    quocGia: worksheet.getCell('S' + index).value ? worksheet.getCell('S' + index).value.trim() : '',
+                                    danToc: worksheet.getCell('T' + index).value ? worksheet.getCell('T' + index).value.trim() : '',
+                                    tonGiao: worksheet.getCell('U' + index).value ? worksheet.getCell('U' + index).value.trim() : '',
+                                    ngheNghiepCu: worksheet.getCell('V' + index).value,
+                                    ngayBatDauCongTac: worksheet.getCell('W' + index).value ? new Date(worksheet.getCell('W' + index).value).getTime() : null,
+                                    ngayBienChe: worksheet.getCell('X' + index).value ? new Date(worksheet.getCell('X' + index).value).getTime() : null,
+                                    trinhDoTinHoc: worksheet.getCell('AB' + index).value,
+                                    donVi: worksheet.getCell('AC' + index).value ? worksheet.getCell('AC' + index).value.trim() : '',
+                                    // chucVu: worksheet.getCell('AD' + index).value,
+                                    chucDanh: worksheet.getCell('AI' + index).value ? worksheet.getCell('AI' + index).value : worksheet.getCell('AG' + index).value,
+                                    trinhDoPhoThong: worksheet.getCell('AH' + index).value ? worksheet.getCell('AH' + index).value : '',
+                                    namChucDanh: worksheet.getCell('AJ' + index).value ? new Date(worksheet.getCell('AJ' + index).value).getTime() : null,
+                                    hocVi: worksheet.getCell('AK' + index).value ? worksheet.getCell('AK' + index).value.trim() : '',
+                                    chuyenNganh: worksheet.getCell('AL' + index).value,
+                                    namHocVi: worksheet.getCell('AM' + index).value ? new Date(worksheet.getCell('AM' + index).value).getTime() : null,
+                                    trinhDoLlct: worksheet.getCell('AN' + index).value ? worksheet.getCell('AN' + index).value : '',
+                                    trinhDoQlnn: worksheet.getCell('AO' + index).value ? worksheet.getCell('AO' + index).value : '',
+                                    soTruong: worksheet.getCell('AP' + index).value,
+                                    sucKhoe: worksheet.getCell('AQ' + index).value,
+                                    canNang: worksheet.getCell('AR' + index).value ? worksheet.getCell('AR' + index).value.toString().replaceAll('kg', '') : null,
+                                    // chieuCao: worksheet.getCell('AS' + index).value, 
+                                    nhomMau: worksheet.getCell('AT' + index).value,
+                                    ngayVaoDoan: worksheet.getCell('AU' + index).value ? new Date(worksheet.getCell('AU' + index).value).getTime() : null,
+                                    noiVaoDang: worksheet.getCell('AV' + index).value,
+                                    ngayVaoDang: worksheet.getCell('AW' + index).value ? new Date(worksheet.getCell('AW' + index).value).getTime() : null,
+                                    ngayVaoDangChinhThuc: worksheet.getCell('AX' + index).value ? new Date(worksheet.getCell('AX' + index).value).getTime() : null,
+                                    noiVaoDang: worksheet.getCell('AY' + index).value,
+                                    ngayNhapNgu: worksheet.getCell('AZ' + index).value ? new Date(worksheet.getCell('AZ' + index).value).getTime() : null,
+                                    ngayXuatNgu: worksheet.getCell('BA' + index).value ? new Date(worksheet.getCell('BA' + index).value).getTime() : null,
+                                    quanHam: worksheet.getCell('BB' + index).value,
+                                    hangThuongBinh: worksheet.getCell('BC' + index).value,
+                                    giaDinhChinhSach: worksheet.getCell('BD' + index).value,
+                                    danhHieu: worksheet.getCell('BE' + index).value,
+                                    tuNhanXetUuDiem: worksheet.getCell('FG' + index).value,
+                                    tuNhanXetUuDiem: worksheet.getCell('FG' + index).value,
+                                    loiCamDoan: worksheet.getCell('FI' + index).value,
+                                };
+                                let chieuCao = worksheet.getCell('AS' + index).value ? worksheet.getCell('AS' + index).value.toString() : null;
+                                if (chieuCao && chieuCao.includes('cm')) {
+                                    newElement.chieuCao = Number(chieuCao.split('cm')[0]);
+                                } else if (chieuCao && chieuCao.includes('m')) {
+                                    newElement.chieuCao = Number(chieuCao.split('m')[0]) * 100 + Number(chieuCao.split('m')[1]);
+                                }
                                 handleChucVu = (cIndex) => {
                                     if (cIndex <= totalRow && (cIndex == index || !worksheet.getCell('B' + cIndex).value)) {
                                         if (worksheet.getCell('AE' + cIndex).value && worksheet.getCell('AF' + cIndex).value) {
@@ -1560,7 +1560,7 @@ module.exports = app => {
                                             if (worksheet.getCell('AE' + cIndex).value.toLowerCase() == 'kiêm nhiệm') newElement.chucVuKiemNhiem = worksheet.getCell('AF' + cIndex).value;
                                             if (worksheet.getCell('AE' + cIndex).value.toLowerCase() == 'khác') newElement.chucVuKhac = worksheet.getCell('AF' + cIndex).value;
                                         }
-                                        handleChucVu(cIndex+1);
+                                        handleChucVu(cIndex + 1);
                                     }
                                 }
                                 handleChucVu(index);
@@ -1569,17 +1569,17 @@ module.exports = app => {
                                     if (qIndex <= totalRow && (qIndex == index || !worksheet.getCell('B' + qIndex).value)) {
                                         if (worksheet.getCell('BM' + qIndex).value && worksheet.getCell('BN' + qIndex).value) {
                                             let curQuanHe = {}, nextQIndex;
-                                            nextQIndex = qIndex+1;
+                                            nextQIndex = qIndex + 1;
                                             while (worksheet.getCell('BN' + qIndex).value == worksheet.getCell('BN' + nextQIndex).value) {
                                                 nextQIndex++;
                                             }
-                                            curQuanHe.quanHe = worksheet.getCell('BM' + qIndex).value && typeof(worksheet.getCell('BM' + qIndex).value) == 'string' ? worksheet.getCell('BM' + qIndex).value.trim() : '';
+                                            curQuanHe.quanHe = worksheet.getCell('BM' + qIndex).value && typeof (worksheet.getCell('BM' + qIndex).value) == 'string' ? worksheet.getCell('BM' + qIndex).value.trim() : '';
                                             curQuanHe.hoTen = worksheet.getCell('BN' + qIndex).value;
                                             curQuanHe.namSinh = worksheet.getCell('BO' + qIndex).value;
                                             curQuanHe.type = 0;
 
-                                            for(let i = qIndex; i < nextQIndex; i++) {
-                                                let value = worksheet.getCell('BP' + i).value && typeof(worksheet.getCell('BP' + i).value) == 'string' && worksheet.getCell('BP' + i).value.split(':')[1] ? worksheet.getCell('BP' + i).value.split(':')[1].trim() : null;
+                                            for (let i = qIndex; i < nextQIndex; i++) {
+                                                let value = worksheet.getCell('BP' + i).value && typeof (worksheet.getCell('BP' + i).value) == 'string' && worksheet.getCell('BP' + i).value.split(':')[1] ? worksheet.getCell('BP' + i).value.split(':')[1].trim() : null;
                                                 if (value && worksheet.getCell('BP' + i).value && worksheet.getCell('BP' + i).value.includes('Quê quán')) curQuanHe.queQuan = value;
                                                 else if (value && worksheet.getCell('BP' + i).value && worksheet.getCell('BP' + i).value.includes('Nghề nghiệp')) curQuanHe.ngheNghiep = value;
                                                 else if (value && worksheet.getCell('BP' + i).value && worksheet.getCell('BP' + i).value.includes('Nơi ở hiện nay')) curQuanHe.diaChi = value;
@@ -1587,7 +1587,7 @@ module.exports = app => {
                                             newElement.quanHe.push(curQuanHe);
                                             qIndex = nextQIndex - 1;
                                         }
-                                        handleQuanHe1(qIndex+1);
+                                        handleQuanHe1(qIndex + 1);
                                     }
                                 }
                                 handleQuanHe1(index);
@@ -1595,17 +1595,17 @@ module.exports = app => {
                                     if (qIndex <= totalRow && (qIndex == index || !worksheet.getCell('B' + qIndex).value)) {
                                         if (worksheet.getCell('BR' + qIndex).value && worksheet.getCell('BS' + qIndex).value) {
                                             let curQuanHe = {}, nextQIndex;
-                                            nextQIndex = qIndex+1;
+                                            nextQIndex = qIndex + 1;
                                             while (worksheet.getCell('BS' + qIndex).value == worksheet.getCell('BS' + nextQIndex).value) {
                                                 nextQIndex++;
                                             }
-                                            curQuanHe.quanHe = worksheet.getCell('BR' + qIndex).value && typeof(worksheet.getCell('BR' + qIndex).value) == 'string' ? worksheet.getCell('BR' + qIndex).value.trim() : '';
+                                            curQuanHe.quanHe = worksheet.getCell('BR' + qIndex).value && typeof (worksheet.getCell('BR' + qIndex).value) == 'string' ? worksheet.getCell('BR' + qIndex).value.trim() : '';
                                             curQuanHe.hoTen = worksheet.getCell('BS' + qIndex).value;
                                             curQuanHe.namSinh = worksheet.getCell('BT' + qIndex).value;
                                             curQuanHe.type = 0;
 
-                                            for(let i = qIndex; i < nextQIndex; i++) {
-                                                let value = worksheet.getCell('BU' + i).value && typeof(worksheet.getCell('BU' + i).value) == 'string' && worksheet.getCell('BU' + i).value.split(':')[1] ? worksheet.getCell('BU' + i).value.split(':')[1].trim() : null;
+                                            for (let i = qIndex; i < nextQIndex; i++) {
+                                                let value = worksheet.getCell('BU' + i).value && typeof (worksheet.getCell('BU' + i).value) == 'string' && worksheet.getCell('BU' + i).value.split(':')[1] ? worksheet.getCell('BU' + i).value.split(':')[1].trim() : null;
                                                 if (value && worksheet.getCell('BU' + i).value && worksheet.getCell('BU' + i).value.includes('Quê quán')) curQuanHe.queQuan = value;
                                                 else if (value && worksheet.getCell('BU' + i).value && worksheet.getCell('BU' + i).value.includes('Nghề nghiệp')) curQuanHe.ngheNghiep = value;
                                                 else if (value && worksheet.getCell('BU' + i).value && worksheet.getCell('BU' + i).value.includes('Nơi ở hiện nay')) curQuanHe.diaChi = value;
@@ -1613,7 +1613,7 @@ module.exports = app => {
                                             newElement.quanHe.push(curQuanHe);
                                             qIndex = nextQIndex - 1;
                                         }
-                                        handleQuanHe2(qIndex+1);
+                                        handleQuanHe2(qIndex + 1);
                                     }
                                 }
                                 handleQuanHe2(index);
@@ -1621,17 +1621,17 @@ module.exports = app => {
                                     if (qIndex <= totalRow && (qIndex == index || !worksheet.getCell('B' + qIndex).value)) {
                                         if (worksheet.getCell('BW' + qIndex).value && worksheet.getCell('BX' + qIndex).value) {
                                             let curQuanHe = {}, nextQIndex;
-                                            nextQIndex = qIndex+1;
+                                            nextQIndex = qIndex + 1;
                                             while (worksheet.getCell('BX' + qIndex).value == worksheet.getCell('BX' + nextQIndex).value) {
                                                 nextQIndex++;
                                             }
-                                            curQuanHe.quanHe = worksheet.getCell('BW' + qIndex).value && typeof(worksheet.getCell('BW' + qIndex).value) == 'string' ? worksheet.getCell('BW' + qIndex).value.trim() : '';
+                                            curQuanHe.quanHe = worksheet.getCell('BW' + qIndex).value && typeof (worksheet.getCell('BW' + qIndex).value) == 'string' ? worksheet.getCell('BW' + qIndex).value.trim() : '';
                                             curQuanHe.hoTen = worksheet.getCell('BX' + qIndex).value;
                                             curQuanHe.namSinh = worksheet.getCell('BY' + qIndex).value;
                                             curQuanHe.type = 1;
 
-                                            for(let i = qIndex; i < nextQIndex; i++) {
-                                                let value = worksheet.getCell('BZ' + i).value && typeof(worksheet.getCell('BZ' + i).value) == 'string' && worksheet.getCell('BZ' + i).value.split(':')[1] ? worksheet.getCell('BZ' + i).value.split(':')[1].trim() : null;
+                                            for (let i = qIndex; i < nextQIndex; i++) {
+                                                let value = worksheet.getCell('BZ' + i).value && typeof (worksheet.getCell('BZ' + i).value) == 'string' && worksheet.getCell('BZ' + i).value.split(':')[1] ? worksheet.getCell('BZ' + i).value.split(':')[1].trim() : null;
                                                 if (value && worksheet.getCell('BZ' + i).value && worksheet.getCell('BZ' + i).value.includes('Quê quán')) curQuanHe.queQuan = value;
                                                 else if (value && worksheet.getCell('BZ' + i).value && worksheet.getCell('BZ' + i).value.includes('Nghề nghiệp')) curQuanHe.ngheNghiep = value;
                                                 else if (value && worksheet.getCell('BZ' + i).value && worksheet.getCell('BZ' + i).value.includes('Nơi ở hiện nay')) curQuanHe.diaChi = value;
@@ -1639,7 +1639,7 @@ module.exports = app => {
                                             newElement.quanHe.push(curQuanHe);
                                             qIndex = nextQIndex - 1;
                                         }
-                                        handleQuanHe3(qIndex+1);
+                                        handleQuanHe3(qIndex + 1);
                                     }
                                 }
                                 handleQuanHe3(index);
@@ -1652,17 +1652,17 @@ module.exports = app => {
                                                 trinhDo: worksheet.getCell('AA' + tIndex).value
                                             });
                                         }
-                                        handleTrinhDoTinHoc(tIndex+1);
+                                        handleTrinhDoTinHoc(tIndex + 1);
                                     }
                                 }
                                 handleTrinhDoTinHoc(index);
 
                                 const getTime = (date, format) => {
                                     if (format == 'yyyy') return new Date(date).getTime();
-                                    else if (format == 'mm/yyyy') return new Date(date.split('/')[1]+'/'+date.split('/')[0]).getTime();
-                                    else if (format == 'dd/mm/yyyy') return new Date(date.split('/')[2]+'/'+date.split('/')[1]+'/'+date.split('/')[0]).getTime();
+                                    else if (format == 'mm/yyyy') return new Date(date.split('/')[1] + '/' + date.split('/')[0]).getTime();
+                                    else if (format == 'dd/mm/yyyy') return new Date(date.split('/')[2] + '/' + date.split('/')[1] + '/' + date.split('/')[0]).getTime();
                                 }
-                                
+
                                 newElement.qtHtct = [];
                                 const handleQTHTCT = (qtIndex) => {
                                     if (qtIndex <= totalRow && (qtIndex == index || !worksheet.getCell('B' + qtIndex).value)) {
@@ -1670,10 +1670,10 @@ module.exports = app => {
                                             let time = worksheet.getCell('CB' + qtIndex).value.toString(),
                                                 noiDung = worksheet.getCell('CC' + qtIndex).value,
                                                 batDau, ketThuc, batDauType, ketThucType,
-                                                timeList = time ? time.replaceAll(/\./g,'/').match(/([0-9]?[0-9][/])?([0-9]?[0-9][/])?[0-9][0-9][0-9][0-9]/g): [],
+                                                timeList = time ? time.replaceAll(/\./g, '/').match(/([0-9]?[0-9][/])?([0-9]?[0-9][/])?[0-9][0-9][0-9][0-9]/g) : [],
                                                 monthPatt = /[0-9]?[0-9][/][0-9][0-9][0-9][0-9]/,
                                                 yearPatt = /[0-9][0-9][0-9][0-9]/;
-                                            if (timeList && timeList.length == 1 ) {
+                                            if (timeList && timeList.length == 1) {
                                                 batDau = timeList[0];
                                                 batDauType = monthPatt.test(batDau) ? 'mm/yyyy' : yearPatt.test(batDau) ? 'yyyy' : null;
                                             } else if (timeList && timeList.length == 2) {
@@ -1686,15 +1686,15 @@ module.exports = app => {
                                                 ketThuc = -1;
                                             }
                                             if (timeList && timeList.length > 0)
-                                            newElement.qtHtct.push({
-                                                batDau: batDau ? batDauType == 'yyyy' ? new Date(batDau).getTime() : new Date(batDau.split('/')[1]+'/'+batDau.split('/')[0]).getTime() : null,
-                                                ketThuc: ketThuc && ketThuc != -1 ? ketThucType == 'yyyy' ? new Date(ketThuc).getTime() : new Date(ketThuc.split('/')[1]+'/'+ketThuc.split('/')[0]).getTime() : ketThuc,
-                                                noiDung: noiDung,
-                                                batDauType: batDauType,
-                                                ketThucType: ketThucType
-                                            });
+                                                newElement.qtHtct.push({
+                                                    batDau: batDau ? batDauType == 'yyyy' ? new Date(batDau).getTime() : new Date(batDau.split('/')[1] + '/' + batDau.split('/')[0]).getTime() : null,
+                                                    ketThuc: ketThuc && ketThuc != -1 ? ketThucType == 'yyyy' ? new Date(ketThuc).getTime() : new Date(ketThuc.split('/')[1] + '/' + ketThuc.split('/')[0]).getTime() : ketThuc,
+                                                    noiDung: noiDung,
+                                                    batDauType: batDauType,
+                                                    ketThucType: ketThucType
+                                                });
                                         }
-                                        handleQTHTCT(qtIndex+1);
+                                        handleQTHTCT(qtIndex + 1);
                                     }
                                 }
                                 handleQTHTCT(index);
@@ -1713,18 +1713,18 @@ module.exports = app => {
                                                 yearPatt = /[0-9][0-9][0-9][0-9]/,
                                                 inTimeMonthPatt = /[0-9]+([.][0-9]+)?[ ]*tháng/,
                                                 inTimeYearPatt = /[0-9]+([.][0-9]+)?[ ]*năm/;
-                                            if (time && typeof(time) == 'object') {
+                                            if (time && typeof (time) == 'object') {
                                                 batDau = new Date(time).getTime();
                                             } else {
-                                                if (time && time.toString().toLowerCase().trim().replaceAll(',','.').match(/[0-9]+([.][0-9]+)?[ ]*(tháng|năm)/g)) {
-                                                    if (inTimeMonthPatt.test(time.toLowerCase().trim().replaceAll(',','.'))) {
+                                                if (time && time.toString().toLowerCase().trim().replaceAll(',', '.').match(/[0-9]+([.][0-9]+)?[ ]*(tháng|năm)/g)) {
+                                                    if (inTimeMonthPatt.test(time.toLowerCase().trim().replaceAll(',', '.'))) {
                                                         thoiGian = Number(time.toLowerCase().trim().match(/[0-9]+([.][0-9]+)?/g)[0]);
-                                                    } else if (inTimeYearPatt.test(time.toLowerCase().trim().replaceAll(',','.'))) {
-                                                        thoiGian = Number(time.toLowerCase().trim().replaceAll(',','.').match(/[0-9]+([.][0-9]+)?/g)[0]) * 12;
+                                                    } else if (inTimeYearPatt.test(time.toLowerCase().trim().replaceAll(',', '.'))) {
+                                                        thoiGian = Number(time.toLowerCase().trim().replaceAll(',', '.').match(/[0-9]+([.][0-9]+)?/g)[0]) * 12;
                                                     }
                                                 } else {
-                                                    let  timeList = time ? time.toString().replaceAll(/\./g,'/').match(/([0-9]?[0-9][/])?([0-9]?[0-9][/])?[0-9][0-9][0-9][0-9]/g): [];
-                                                    if (timeList && timeList.length == 1 ) {
+                                                    let timeList = time ? time.toString().replaceAll(/\./g, '/').match(/([0-9]?[0-9][/])?([0-9]?[0-9][/])?[0-9][0-9][0-9][0-9]/g) : [];
+                                                    if (timeList && timeList.length == 1) {
                                                         batDau = timeList[0];
                                                         batDauType = monthPatt.test(batDau) ? 'mm/yyyy' : yearPatt.test(batDau) ? 'yyyy' : null;
                                                     } else if (timeList && timeList.length == 2) {
@@ -1740,14 +1740,14 @@ module.exports = app => {
                                                 chuyenNganh: chuyenNganh,
                                                 hinhThuc: hinhThuc,
                                                 loaiBangCap: loaiBangCap,
-                                                batDau: batDau && typeof(time) != 'object' ? getTime(batDau, batDauType) : batDau,
+                                                batDau: batDau && typeof (time) != 'object' ? getTime(batDau, batDauType) : batDau,
                                                 ketThuc: ketThuc && ketThuc != -1 ? getTime(ketThuc, ketThucType) : ketThuc,
                                                 batDauType: batDauType,
                                                 ketThucType: ketThucType,
                                                 thoiGian: thoiGian
                                             });
                                         }
-                                        handleQTDaoTao(qtIndex+1);
+                                        handleQTDaoTao(qtIndex + 1);
                                     }
                                 }
                                 handleQTDaoTao(index);
@@ -1763,13 +1763,13 @@ module.exports = app => {
                                                 dayPatt = /[0-9]?[0-9][/][0-9]?[0-9][/][0-9][0-9][0-9][0-9]/,
                                                 monthPatt = /[0-9]?[0-9][/][0-9][0-9][0-9][0-9]/,
                                                 yearPatt = /[0-9][0-9][0-9][0-9]/;
-                                            if (time && typeof(time) == 'object') {
+                                            if (time && typeof (time) == 'object') {
                                                 batDau = new Date(time).getTime();
                                             } else {
-                                                let  timeList = time ? time.toString().replaceAll(/\./g,'/').match(/([0-9]?[0-9][/])?([0-9]?[0-9][/])?[0-9][0-9][0-9][0-9]/g): [];
-                                                if (timeList && timeList.length == 1 ) {
+                                                let timeList = time ? time.toString().replaceAll(/\./g, '/').match(/([0-9]?[0-9][/])?([0-9]?[0-9][/])?[0-9][0-9][0-9][0-9]/g) : [];
+                                                if (timeList && timeList.length == 1) {
                                                     batDau = timeList[0];
-                                                    batDauType = dayPatt.test(batDau) ? 'dd/mm/yyyy' : monthPatt.test(batDau) ? 'mm/yyyy' : yearPatt.test(batDau) ? 'yyyy' : null ;
+                                                    batDauType = dayPatt.test(batDau) ? 'dd/mm/yyyy' : monthPatt.test(batDau) ? 'mm/yyyy' : yearPatt.test(batDau) ? 'yyyy' : null;
                                                 } else if (timeList && timeList.length == 2) {
                                                     batDau = timeList[0];
                                                     ketThuc = timeList[1];
@@ -1777,17 +1777,17 @@ module.exports = app => {
                                                     ketThucType = dayPatt.test(ketThuc) ? 'dd/mm/yyyy' : monthPatt.test(ketThuc) ? 'mm/yyyy' : yearPatt.test(ketThuc) ? 'yyyy' : null;
                                                 }
                                             }
-                                            
+
                                             newElement.qtNuocNgoai.push({
                                                 quocGia: quocGia,
                                                 noiDung: noiDung,
-                                                batDau: batDau && typeof(time) != 'object' ? getTime(batDau, batDauType) : batDau,
+                                                batDau: batDau && typeof (time) != 'object' ? getTime(batDau, batDauType) : batDau,
                                                 ketThuc: ketThuc && ketThuc != -1 ? getTime(ketThuc, ketThucType) : ketThuc,
                                                 batDauType: batDauType,
                                                 ketThucType: ketThucType
                                             });
                                         }
-                                        handleQTNuocNgoai(qtIndex+1);
+                                        handleQTNuocNgoai(qtIndex + 1);
                                     }
                                 }
                                 handleQTNuocNgoai(index);
@@ -1803,13 +1803,13 @@ module.exports = app => {
                                                 dayPatt = /[0-9]?[0-9][/][0-9]?[0-9][/][0-9][0-9][0-9][0-9]/,
                                                 monthPatt = /[0-9]?[0-9][/][0-9][0-9][0-9][0-9]/,
                                                 yearPatt = /[0-9][0-9][0-9][0-9]/;
-                                            if (time && typeof(time) == 'object') {
+                                            if (time && typeof (time) == 'object') {
                                                 batDau = new Date(time).getTime();
                                             } else {
-                                                let  timeList = time ? time.toString().replaceAll(/\./g,'/').match(/([0-9]?[0-9][/])?([0-9]?[0-9][/])?[0-9][0-9][0-9][0-9]/g): [];
-                                                if (timeList && timeList.length == 1 ) {
+                                                let timeList = time ? time.toString().replaceAll(/\./g, '/').match(/([0-9]?[0-9][/])?([0-9]?[0-9][/])?[0-9][0-9][0-9][0-9]/g) : [];
+                                                if (timeList && timeList.length == 1) {
                                                     batDau = timeList[0];
-                                                    batDauType = dayPatt.test(batDau) ? 'dd/mm/yyyy' : monthPatt.test(batDau) ? 'mm/yyyy' : yearPatt.test(batDau) ? 'yyyy' : null ;
+                                                    batDauType = dayPatt.test(batDau) ? 'dd/mm/yyyy' : monthPatt.test(batDau) ? 'mm/yyyy' : yearPatt.test(batDau) ? 'yyyy' : null;
                                                 } else if (timeList && timeList.length == 2) {
                                                     batDau = timeList[0];
                                                     ketThuc = timeList[1];
@@ -1817,17 +1817,17 @@ module.exports = app => {
                                                     ketThucType = dayPatt.test(ketThuc) ? 'dd/mm/yyyy' : monthPatt.test(ketThuc) ? 'mm/yyyy' : yearPatt.test(ketThuc) ? 'yyyy' : null;
                                                 }
                                             }
-                                            
+
                                             newElement.qtKhenThuong.push({
                                                 noiDung: noiDung,
                                                 capQuyetDinh: capQuyetDinh,
-                                                batDau: batDau && typeof(time) != 'object' ? getTime(batDau, batDauType) : batDau,
+                                                batDau: batDau && typeof (time) != 'object' ? getTime(batDau, batDauType) : batDau,
                                                 ketThuc: ketThuc && ketThuc != -1 ? getTime(ketThuc, ketThucType) : ketThuc,
                                                 batDauType: batDauType,
                                                 ketThucType: ketThucType
                                             });
                                         }
-                                        handleQTKhenThuong(qtIndex+1);
+                                        handleQTKhenThuong(qtIndex + 1);
                                     }
                                 }
                                 handleQTKhenThuong(index);
@@ -1842,13 +1842,13 @@ module.exports = app => {
                                                 dayPatt = /[0-9]?[0-9][/][0-9]?[0-9][/][0-9][0-9][0-9][0-9]/,
                                                 monthPatt = /[0-9]?[0-9][/][0-9][0-9][0-9][0-9]/,
                                                 yearPatt = /[0-9][0-9][0-9][0-9]/;
-                                            if (time && typeof(time) == 'object') {
+                                            if (time && typeof (time) == 'object') {
                                                 batDau = new Date(time).getTime();
                                             } else {
-                                                let  timeList = time ? time.toString().replaceAll(/\./g,'/').match(/([0-9]?[0-9][/])?([0-9]?[0-9][/])?[0-9][0-9][0-9][0-9]/g): [];
-                                                if (timeList && timeList.length == 1 ) {
+                                                let timeList = time ? time.toString().replaceAll(/\./g, '/').match(/([0-9]?[0-9][/])?([0-9]?[0-9][/])?[0-9][0-9][0-9][0-9]/g) : [];
+                                                if (timeList && timeList.length == 1) {
                                                     batDau = timeList[0];
-                                                    batDauType = dayPatt.test(batDau) ? 'dd/mm/yyyy' : monthPatt.test(batDau) ? 'mm/yyyy' : yearPatt.test(batDau) ? 'yyyy' : null ;
+                                                    batDauType = dayPatt.test(batDau) ? 'dd/mm/yyyy' : monthPatt.test(batDau) ? 'mm/yyyy' : yearPatt.test(batDau) ? 'yyyy' : null;
                                                 } else if (timeList && timeList.length == 2) {
                                                     batDau = timeList[0];
                                                     ketThuc = timeList[1];
@@ -1856,17 +1856,17 @@ module.exports = app => {
                                                     ketThucType = dayPatt.test(ketThuc) ? 'dd/mm/yyyy' : monthPatt.test(ketThuc) ? 'mm/yyyy' : yearPatt.test(ketThuc) ? 'yyyy' : null;
                                                 }
                                             }
-                                            
+
                                             newElement.qtKyLuat.push({
                                                 lyDoHinhThuc: lyDoHinhThuc,
                                                 capQuyetDinh: capQuyetDinh,
-                                                batDau: batDau && typeof(time) != 'object' ? getTime(batDau, batDauType) : batDau,
+                                                batDau: batDau && typeof (time) != 'object' ? getTime(batDau, batDauType) : batDau,
                                                 ketThuc: ketThuc && ketThuc != -1 ? getTime(ketThuc, ketThucType) : ketThuc,
                                                 batDauType: batDauType,
                                                 ketThucType: ketThucType
                                             });
                                         }
-                                        handleQTKyLuat(qtIndex+1);
+                                        handleQTKyLuat(qtIndex + 1);
                                     }
                                 }
                                 handleQTKyLuat(index);
@@ -1888,7 +1888,7 @@ module.exports = app => {
                                                 yearPatt = /[0-9][0-9][0-9][0-9]/,
                                                 inTimeMonthPatt = /[0-9]+[ ]*tháng/,
                                                 inTimeYearPatt = /[0-9]+[ ]*năm/;
-                                            if (time && typeof(time) == 'object') {
+                                            if (time && typeof (time) == 'object') {
                                                 batDau = new Date(time).getTime();
                                             } else {
                                                 if (time && time.toString().toLowerCase().trim().match(/[0-9]+[ ]*(tháng|năm)/g)) {
@@ -1898,10 +1898,10 @@ module.exports = app => {
                                                         thoiGian = Number(time.toLowerCase().trim().match(/[0-9]+/g)[0]) * 12;
                                                     }
                                                 } else {
-                                                    let timeList = time ? time.toString().replaceAll(/\./g,'/').match(/([0-9]?[0-9][/])?([0-9]?[0-9][/])?[0-9][0-9][0-9][0-9]/g): [];
-                                                    if (timeList && timeList.length == 1 ) {
+                                                    let timeList = time ? time.toString().replaceAll(/\./g, '/').match(/([0-9]?[0-9][/])?([0-9]?[0-9][/])?[0-9][0-9][0-9][0-9]/g) : [];
+                                                    if (timeList && timeList.length == 1) {
                                                         batDau = timeList[0];
-                                                        batDauType = dayPatt.test(batDau) ? 'dd/mm/yyyy' : monthPatt.test(batDau) ? 'mm/yyyy' : yearPatt.test(batDau) ? 'yyyy' : null ;
+                                                        batDauType = dayPatt.test(batDau) ? 'dd/mm/yyyy' : monthPatt.test(batDau) ? 'mm/yyyy' : yearPatt.test(batDau) ? 'yyyy' : null;
                                                     } else if (timeList && timeList.length == 2) {
                                                         batDau = timeList[0];
                                                         ketThuc = timeList[1];
@@ -1912,13 +1912,13 @@ module.exports = app => {
                                             }
 
                                             if (ngayNghiemThu) {
-                                                if (typeof(ngayNghiemThu) == 'object') {
+                                                if (typeof (ngayNghiemThu) == 'object') {
                                                     ngayNghiemThu = new Date(ngayNghiemThu).getTime();
                                                 } else {
                                                     ngayNghiemThuType = dayPatt.test(ngayNghiemThu) ? 'dd/mm/yyyy' : monthPatt.test(ngayNghiemThu) ? 'mm/yyyy' : yearPatt.test(ngayNghiemThu) ? 'yyyy' : null;
                                                 }
                                             }
-                                            
+
                                             newElement.qtNCKH.push({
                                                 tenDeTai: tenDeTai,
                                                 maSoCapQuanLy: maSoCapQuanLy,
@@ -1926,15 +1926,15 @@ module.exports = app => {
                                                 vaiTro: vaiTro,
                                                 ketQua: ketQua,
                                                 thoiGian: thoiGian,
-                                                ngayNghiemThu: ngayNghiemThu ? typeof(ngayNghiemThu) == 'object' ? new Date(ngayNghiemThu).getTime() : getTime(ngayNghiemThu, ngayNghiemThuType) : null,
-                                                batDau: batDau && typeof(time) != 'object' ? getTime(batDau, batDauType) : batDau,
+                                                ngayNghiemThu: ngayNghiemThu ? typeof (ngayNghiemThu) == 'object' ? new Date(ngayNghiemThu).getTime() : getTime(ngayNghiemThu, ngayNghiemThuType) : null,
+                                                batDau: batDau && typeof (time) != 'object' ? getTime(batDau, batDauType) : batDau,
                                                 ketThuc: ketThuc && ketThuc != -1 ? getTime(ketThuc, ketThucType) : ketThuc,
                                                 batDauType: batDauType,
                                                 ketThucType: ketThucType,
                                                 ngayNghiemThuType: ngayNghiemThuType
                                             });
                                         }
-                                        handleQTNCKH(qtIndex+1);
+                                        handleQTNCKH(qtIndex + 1);
                                     }
                                 }
                                 handleQTNCKH(index);
@@ -1949,13 +1949,13 @@ module.exports = app => {
                                                 sanPham = worksheet.getCell('DI' + qtIndex).value,
                                                 namTotNghiep;
 
-                                                if (time && typeof(time) == 'object') {
-                                                    namTotNghiep = new Date(time).getFullYear();
-                                                } else {
-                                                    let timeList = time ? time.toString().replaceAll(/\./g,'/').match(/[0-9][0-9][0-9][0-9]/i): [];
-                                                    namTotNghiep = timeList && timeList.length > 0 ? timeList[0] : null;
-                                                }
-                                            
+                                            if (time && typeof (time) == 'object') {
+                                                namTotNghiep = new Date(time).getFullYear();
+                                            } else {
+                                                let timeList = time ? time.toString().replaceAll(/\./g, '/').match(/[0-9][0-9][0-9][0-9]/i) : [];
+                                                namTotNghiep = timeList && timeList.length > 0 ? timeList[0] : null;
+                                            }
+
                                             newElement.qtHuongDan.push({
                                                 hoTen: hoTen,
                                                 tenLuanVan: tenLuanVan,
@@ -1964,7 +1964,7 @@ module.exports = app => {
                                                 bacDaoTao: bacDaoTao
                                             });
                                         }
-                                        handleQTHuongDan(qtIndex+1);
+                                        handleQTHuongDan(qtIndex + 1);
                                     }
                                 }
                                 handleQTHuongDan(index);
@@ -1981,7 +1981,7 @@ module.exports = app => {
                                                 sanPham = worksheet.getCell('DP' + qtIndex).value,
                                                 butDanh = worksheet.getCell('DQ' + qtIndex).value,
                                                 quocTe = worksheet.getCell('DR' + qtIndex).value;
-                                            
+
                                             newElement.sachGiaoTrinh.push({
                                                 ten: ten,
                                                 theLoai: theLoai,
@@ -1993,7 +1993,7 @@ module.exports = app => {
                                                 quocTe: quocTe ? quocTe.toLowerCase().trim().includes('trong nước') ? 0 : quocTe.toLowerCase().trim().includes('quốc tế') ? 1 : quocTe.toLowerCase().trim().includes('trong và ngoài nước') ? 2 : null : null
                                             });
                                         }
-                                        handleSachGiaoTrinh(qtIndex+1);
+                                        handleSachGiaoTrinh(qtIndex + 1);
                                     }
                                 }
                                 handleSachGiaoTrinh(index);
@@ -2011,7 +2011,7 @@ module.exports = app => {
                                                 sanPham = worksheet.getCell('DZ' + qtIndex).value,
                                                 quocTe = worksheet.getCell('EA' + qtIndex).value;
                                             if (tenTapChi) {
-                                                if (typeof(tenTapChi) == 'object' && tenTapChi.richText) {
+                                                if (typeof (tenTapChi) == 'object' && tenTapChi.richText) {
                                                     tenTapChi = tenTapChi.richText[0].text + tenTapChi.richText[1].text
                                                 }
                                             }
@@ -2026,7 +2026,7 @@ module.exports = app => {
                                                 quocTe: quocTe ? quocTe.toLowerCase().trim().includes('trong nước') ? 0 : quocTe.toLowerCase().trim().includes('quốc tế') ? 1 : quocTe.toLowerCase().trim().includes('trong và ngoài nước') ? 2 : null : null
                                             });
                                         }
-                                        handleBaiVietKhoaHoc(qtIndex+1);
+                                        handleBaiVietKhoaHoc(qtIndex + 1);
                                     }
                                 }
                                 handleBaiVietKhoaHoc(index);
@@ -2045,14 +2045,14 @@ module.exports = app => {
                                                 sanPham = worksheet.getCell('EI' + qtIndex).value,
                                                 quocTe = worksheet.getCell('EJ' + qtIndex).value;
                                             if (time) {
-                                                if (typeof(time) == 'object') {
+                                                if (typeof (time) == 'object') {
                                                     thoiGian = new Date(time).getFullYear()
                                                 } else {
-                                                    let timeList = time ? time.toString().replaceAll(/\./g,'/').match(/[0-9][0-9][0-9][0-9]/g): [];
+                                                    let timeList = time ? time.toString().replaceAll(/\./g, '/').match(/[0-9][0-9][0-9][0-9]/g) : [];
                                                     thoiGian = timeList && timeList.length > 0 ? timeList[timeList.length - 1] : null;
                                                 }
                                             }
-                                            
+
                                             newElement.kyYeu.push({
                                                 tenTacGia: tenTacGia,
                                                 tenHoiNghi: tenHoiNghi,
@@ -2064,7 +2064,7 @@ module.exports = app => {
                                                 quocTe: quocTe ? quocTe.toLowerCase().trim().includes('trong nước') ? 0 : quocTe.toLowerCase().trim().includes('quốc tế') ? 1 : quocTe.toLowerCase().trim().includes('trong và ngoài nước') ? 2 : null : null
                                             });
                                         }
-                                        handleKyYeu(qtIndex+1);
+                                        handleKyYeu(qtIndex + 1);
                                     }
                                 }
                                 handleKyYeu(index);
@@ -2077,7 +2077,7 @@ module.exports = app => {
                                                 noiDung = worksheet.getCell('EM' + qtIndex).value,
                                                 noiCap = worksheet.getCell('EN' + qtIndex).value,
                                                 namCap = worksheet.getCell('EO' + qtIndex).value;
-                                            
+
                                             newElement.giaiThuong.push({
                                                 tenGiaiThuong: tenGiaiThuong,
                                                 noiDung: noiDung,
@@ -2085,7 +2085,7 @@ module.exports = app => {
                                                 namCap: namCap,
                                             });
                                         }
-                                        handleGiaiThuong(qtIndex+1);
+                                        handleGiaiThuong(qtIndex + 1);
                                     }
                                 }
                                 handleGiaiThuong(index);
@@ -2101,7 +2101,7 @@ module.exports = app => {
                                                 tacGia = worksheet.getCell('EU' + qtIndex).value,
                                                 sanPham = worksheet.getCell('EV' + qtIndex).value,
                                                 loaiBang = worksheet.getCell('EW' + qtIndex).value;
-                                            
+
                                             newElement.bangPMSC.push({
                                                 tenBang: tenBang,
                                                 soHieu: soHieu,
@@ -2112,7 +2112,7 @@ module.exports = app => {
                                                 loaiBang: loaiBang
                                             });
                                         }
-                                        handleBangPMSC(qtIndex+1);
+                                        handleBangPMSC(qtIndex + 1);
                                     }
                                 }
                                 handleBangPMSC(index);
@@ -2125,7 +2125,7 @@ module.exports = app => {
                                                 hinhThuc = worksheet.getCell('EZ' + qtIndex).value,
                                                 namChuyenGia = worksheet.getCell('FA' + qtIndex).value,
                                                 sanPham = worksheet.getCell('FB' + qtIndex).value;
-                                            
+
                                             newElement.ungDungThuongMai.push({
                                                 tenCongNghe: tenCongNghe,
                                                 hinhThuc: hinhThuc,
@@ -2133,7 +2133,7 @@ module.exports = app => {
                                                 sanPham: sanPham,
                                             });
                                         }
-                                        handleUngDungThuongMai(qtIndex+1);
+                                        handleUngDungThuongMai(qtIndex + 1);
                                     }
                                 }
                                 handleUngDungThuongMai(index);
@@ -2146,18 +2146,18 @@ module.exports = app => {
                                                 noiLamViec = worksheet.getCell('FE' + qtIndex).value,
                                                 noiDung = worksheet.getCell('FF' + qtIndex).value,
                                                 batDau, ketThuc, batDauType, ketThucType,
-                                                timeList = time ? time.toString().replaceAll(/\./g,'/').match(/([0-9]?[0-9][/])?([0-9]?[0-9][/])?[0-9][0-9][0-9][0-9]/g): [],
+                                                timeList = time ? time.toString().replaceAll(/\./g, '/').match(/([0-9]?[0-9][/])?([0-9]?[0-9][/])?[0-9][0-9][0-9][0-9]/g) : [],
                                                 dayPatt = /[0-9]?[0-9][/][0-9]?[0-9][/][0-9][0-9][0-9][0-9]/,
                                                 monthPatt = /[0-9]?[0-9][/][0-9][0-9][0-9][0-9]/,
                                                 yearPatt = /[0-9][0-9][0-9][0-9]/;
 
-                                            if (time && typeof(time) == 'object') {
+                                            if (time && typeof (time) == 'object') {
                                                 batDau = new Date(time).getTime();
                                             } else {
-                                                let  timeList = time ? time.toString().replaceAll(/\./g,'/').match(/([0-9]?[0-9][/])?([0-9]?[0-9][/])?[0-9][0-9][0-9][0-9]/g): [];
-                                                if (timeList && timeList.length == 1 ) {
+                                                let timeList = time ? time.toString().replaceAll(/\./g, '/').match(/([0-9]?[0-9][/])?([0-9]?[0-9][/])?[0-9][0-9][0-9][0-9]/g) : [];
+                                                if (timeList && timeList.length == 1) {
                                                     batDau = timeList[0];
-                                                    batDauType = dayPatt.test(batDau) ? 'dd/mm/yyyy' : monthPatt.test(batDau) ? 'mm/yyyy' : yearPatt.test(batDau) ? 'yyyy' : null ;
+                                                    batDauType = dayPatt.test(batDau) ? 'dd/mm/yyyy' : monthPatt.test(batDau) ? 'mm/yyyy' : yearPatt.test(batDau) ? 'yyyy' : null;
                                                 } else if (timeList && timeList.length == 2) {
                                                     batDau = timeList[0];
                                                     ketThuc = timeList[1];
@@ -2169,23 +2169,23 @@ module.exports = app => {
                                                 ketThuc = -1;
                                             }
                                             if (timeList && timeList.length > 0)
-                                            newElement.lamViecNgoai.push({
-                                                noiLamViec: noiLamViec,
-                                                noiDung: noiDung,
-                                                batDau: batDau && typeof(time) != 'object' ? getTime(batDau, batDauType) : batDau,
-                                                ketThuc: ketThuc && ketThuc != -1 ? getTime(ketThuc, ketThucType) : ketThuc,
-                                                batDauType: batDauType,
-                                                ketThucType: ketThucType
-                                            });
+                                                newElement.lamViecNgoai.push({
+                                                    noiLamViec: noiLamViec,
+                                                    noiDung: noiDung,
+                                                    batDau: batDau && typeof (time) != 'object' ? getTime(batDau, batDauType) : batDau,
+                                                    ketThuc: ketThuc && ketThuc != -1 ? getTime(ketThuc, ketThucType) : ketThuc,
+                                                    batDauType: batDauType,
+                                                    ketThucType: ketThucType
+                                                });
                                         }
-                                        handleLamViecNgoai(qtIndex+1);
+                                        handleLamViecNgoai(qtIndex + 1);
                                     }
                                 }
                                 handleLamViecNgoai(index);
 
                                 element.push(newElement);
                             }
-                            
+
                             handleUpload(index + 1);
                         }
                     };

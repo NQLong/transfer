@@ -1,8 +1,8 @@
 module.exports = app => {
     const menu = {
-        parentMenu: { index: 3000, title: 'Đơn vị', icon: 'fa-file' },
+        parentMenu: app.parentMenu.category,
         menus: {
-            3001: { title: 'Danh mục', link: '/user/dm-loai-don-vi' },
+            2030: { title: 'Danh mục loại đơn vị', link: '/user/dm-loai-don-vi' },
         },
     };
     app.permission.add(
