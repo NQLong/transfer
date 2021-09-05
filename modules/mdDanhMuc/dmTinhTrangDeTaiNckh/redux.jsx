@@ -55,7 +55,7 @@ export function getDmTinhTrangDeTaiNckhPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: DmTinhTrangDeTaiNckhGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách tình trạng đề tài NCKH bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách tình trạng đề tài NCKH bị lỗi!', 'danger'));
     };
 }
 
@@ -70,12 +70,12 @@ export function getDmTinhTrangDeTaiNckhAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmTinhTrangDeTaiNckhGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách tình trạng đề tài NCKH bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách tình trạng đề tài NCKH bị lỗi!', 'danger'));
     };
 }
 
 export function getDmTinhTrangDeTaiNckh(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/tinh-trang-de-tai-nckh/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -99,7 +99,7 @@ export function createDmTinhTrangDeTaiNckh(item, done) {
                 dispatch(getDmTinhTrangDeTaiNckhAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo tình trạng đề tài NCKH bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo tình trạng đề tài NCKH bị lỗi!', 'danger'));
     };
 }
 
@@ -114,7 +114,7 @@ export function deleteDmTinhTrangDeTaiNckh(ma) {
                 T.alert('Danh mục đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmTinhTrangDeTaiNckhAll());
             }
-        }, error => T.notify('Xóa tình trạng đề tài NCKH bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa tình trạng đề tài NCKH bị lỗi!', 'danger'));
     };
 }
 
@@ -130,7 +130,7 @@ export function updateDmTinhTrangDeTaiNckh(ma, changes, done) {
                 T.notify('Cập nhật thông tin tình trạng đề tài NCKH thành công!', 'success');
                 dispatch(getDmTinhTrangDeTaiNckhAll());
             }
-        }, error => T.notify('Cập nhật thông tin tình trạng đề tài NCKH bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin tình trạng đề tài NCKH bị lỗi!', 'danger'));
     };
 }
 

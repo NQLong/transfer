@@ -55,7 +55,7 @@ export function getDmTrinhDoLyLuanChinhTriPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: DmTrinhDoLyLuanChinhTriGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách ca học bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách ca học bị lỗi!', 'danger'));
     };
 }
 
@@ -70,12 +70,12 @@ export function getDmTrinhDoLyLuanChinhTriAll(condition, done) {
                 if (done) done(data.items);
                 dispatch({ type: DmTrinhDoLyLuanChinhTriGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách trình độ lý luận chính trị bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách trình độ lý luận chính trị bị lỗi!', 'danger'));
     };
 }
 
 export function getDmTrinhDoLyLuanChinhTri(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/trinh-do-ly-luan-chinh-tri/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -99,7 +99,7 @@ export function createDmTrinhDoLyLuanChinhTri(item, done) {
                 dispatch(getDmTrinhDoLyLuanChinhTriAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo trình độ lý luận chính trị bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo trình độ lý luận chính trị bị lỗi!', 'danger'));
     };
 }
 
@@ -114,7 +114,7 @@ export function deleteDmTrinhDoLyLuanChinhTri(ma) {
                 T.alert('Danh mục đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmTrinhDoLyLuanChinhTriAll());
             }
-        }, error => T.notify('Xóa trình độ lý luận chính trị bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa trình độ lý luận chính trị bị lỗi!', 'danger'));
     };
 }
 
@@ -130,7 +130,7 @@ export function updateDmTrinhDoLyLuanChinhTri(ma, changes, done) {
                 T.notify('Cập nhật thông tin trình độ lý luận chính trị thành công!', 'success');
                 dispatch(getDmTrinhDoLyLuanChinhTriAll());
             }
-        }, error => T.notify('Cập nhật thông tin trình độ lý luận chính trị bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin trình độ lý luận chính trị bị lỗi!', 'danger'));
     };
 }
 

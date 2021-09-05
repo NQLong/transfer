@@ -190,7 +190,7 @@ module.exports = app => {
             let result = {};
             let totalItem = res && res.rows && res.rows[0] ? res.rows[0]['COUNT(*)'] : 0;
             result = { totalItem, pageSize, pageTotal: Math.ceil(totalItem / pageSize) };
-            result.pageNumber = pageNumber === -1 ? pageTotal : Math.min(pageNumber, result.pageTotal);
+            result.pageNumber = pageNumber === -1 ? 1 : Math.min(pageNumber, result.pageTotal);
             leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
             const sql = 'SELECT ' + app.dbConnection.parseSelectedColumns(obj2Db, selectedColumns) + ', CATEGORY_ID AS "category_Id", CATEGORY_TITLE AS "category_Title" ' + 'FROM (SELECT FN.*, COUNT(*) over (partition by FN.ID) AS CNT, FC.ID AS CATEGORY_ID, FC.TITLE AS CATEGORY_TITLE, ROW_NUMBER() OVER (ORDER BY '
                 + (orderBy ? ' FN.' + orderBy : ' FN.' + keys) + ') R FROM FW_EVENT FN INNER JOIN FW_EVENT_CATEGORY FNC on FN.ID = FNC.EVENT_ID INNER JOIN FW_CATEGORY FC on FNC.CATEGORY_ID = FC.ID WHERE CATEGORY_ID IN( '

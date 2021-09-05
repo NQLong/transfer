@@ -55,7 +55,7 @@ export function getDmTrinhDoTinHocPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: DmTrinhDoTinHocGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách ca học bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách ca học bị lỗi!', 'danger'));
     };
 }
 
@@ -70,12 +70,12 @@ export function getDmTrinhDoTinHocAll(condition, done) {
                 if (done) done(data.items);
                 dispatch({ type: DmTrinhDoTinHocGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách trình độ tin học bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách trình độ tin học bị lỗi!', 'danger'));
     };
 }
 
 export function getDmTrinhDoTinHoc(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/trinh-do-tin-hoc/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -99,7 +99,7 @@ export function createDmTrinhDoTinHoc(item, done) {
                 dispatch(getDmTrinhDoTinHocAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo trình độ tin học bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo trình độ tin học bị lỗi!', 'danger'));
     };
 }
 
@@ -114,7 +114,7 @@ export function deleteDmTrinhDoTinHoc(ma) {
                 T.alert('Danh mục đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmTrinhDoTinHocAll());
             }
-        }, error => T.notify('Xóa trình độ tin học bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa trình độ tin học bị lỗi!', 'danger'));
     };
 }
 
@@ -130,7 +130,7 @@ export function updateDmTrinhDoTinHoc(ma, changes, done) {
                 T.notify('Cập nhật thông tin trình độ tin học thành công!', 'success');
                 dispatch(getDmTrinhDoTinHocAll());
             }
-        }, error => T.notify('Cập nhật thông tin trình độ tin học bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin trình độ tin học bị lỗi!', 'danger'));
     };
 }
 

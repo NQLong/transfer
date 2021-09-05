@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 module.exports = app => {
     // app.model.fwDraft.foo = () => { };
     app.model.fwDraft.create2 = (data, done) => {

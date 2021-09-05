@@ -1,8 +1,9 @@
+// eslint-disable-next-line no-unused-vars
 module.exports = app => {
     // app.model.homeCarouselItem.foo = () => { };
     app.model.homeCarouselItem.sortable = async (condition, done) => {
         const { newPriority, oldPriority, carouselId } = condition;
-        app.model.homeCarouselItem.getAll({carouselId: carouselId}, '*', '', (error, items) => {
+        app.model.homeCarouselItem.getAll({ carouselId: carouselId }, '*', '', (error, items) => {
             let sqlUpdate = '';
             if (newPriority > oldPriority) {
                 items.forEach(item => {

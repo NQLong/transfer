@@ -138,13 +138,13 @@ class AdminPage extends React.Component {
                         </tr>
                     </thead>
                     <tbody>
-                        {this.props.dmTrinhDoQuanLyNhaNuoc.page.list.map((item, index) => (
+                        {this.props.dmTrinhDoQuanLyNhaNuoc.page.list.map((item) => (
                             <tr key={item.ma}>
                                 <td>{item.ma}</td>
                                 <td><a href='#' onClick={e => this.edit(e, item)}>{item.ten}</a></td>
                                 <td className='toggle' style={{ textAlign: 'center' }}>
                                     <label>
-                                        <input type='checkbox' checked={item.kichHoat} onChange={e => permissionWrite && this.changeActive(item)} />
+                                        <input type='checkbox' checked={item.kichHoat} onChange={() => permissionWrite && this.changeActive(item)} />
                                         <span className='button-indecator' />
                                     </label>
                                 </td>

@@ -6,7 +6,7 @@ import Editor from 'view/component/CkEditor4';
 import Datetime from 'react-datetime';
 import InputMask from 'react-input-mask';
 import 'react-datetime/css/react-datetime.css';
-import AdminSearchBox from 'view/component/AdminSearchBox';
+// import AdminSearchBox from 'view/component/AdminSearchBox';
 
 // Table components ---------------------------------------------------------------------------------------------------
 export class TableCell extends React.Component { // type = number | date | link | image | checkbox | buttons | text (default)
@@ -166,13 +166,13 @@ export class FormCheckbox extends React.Component {
                     </label>
                 </div>
             </div>) : (
-            <div className={'animated-checkbox ' + className} style={style}>
-                <label>
-                    <input type='checkbox' checked={this.state.checked} onChange={this.onCheck} />
-                    <span className={'label-text ' + (this.state.checked ? trueClassName : falseClassName)}>{label}</span>
-                </label>
-            </div>
-        );
+                <div className={'animated-checkbox ' + className} style={style}>
+                    <label>
+                        <input type='checkbox' checked={this.state.checked} onChange={this.onCheck} />
+                        <span className={'label-text ' + (this.state.checked ? trueClassName : falseClassName)}>{label}</span>
+                    </label>
+                </div>
+            );
     }
 }
 
@@ -449,10 +449,10 @@ export class FormDatePicker extends React.Component {
                         formatChars={{ '2': '[12]', '0': '[09]', '1': '[01]', '3': '[0-3]', '9': '[0-9]', '5': '[0-5]', 'h': '[0-2]' }}
                         value={this.state.value} readOnly={readOnly} placeholder={label} />
                 ) : (
-                    <Datetime ref={e => this.input = e} timeFormat={type == 'time' ? 'HH:mm' : false} dateFormat='DD/MM/YYYY'
-                        inputProps={{ placeholder: label, ref: e => this.inputRef = e, readOnly, style: { display: readOnly ? 'none' : '' } }}
-                        value={this.state.value} onChange={e => this.setState({ value: new Date(e) })} closeOnSelect={true} />
-                )}
+                        <Datetime ref={e => this.input = e} timeFormat={type == 'time' ? 'HH:mm' : false} dateFormat='DD/MM/YYYY'
+                            inputProps={{ placeholder: label, ref: e => this.inputRef = e, readOnly, style: { display: readOnly ? 'none' : '' } }}
+                            value={this.state.value} onChange={e => this.setState({ value: new Date(e) })} closeOnSelect={true} />
+                    )}
             </div>);
     }
 }

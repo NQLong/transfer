@@ -110,8 +110,8 @@ class DmTrinhDoTinHocPage extends React.Component {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmTrinhDoTinHoc:write'),
             permissionDelete = currentPermissions.includes('dmTrinhDoTinHoc:delete');
-        const { pageNumber, pageSize, pageTotal, totalItem } = this.props.dmTrinhDoTinHoc && this.props.dmTrinhDoTinHoc.page ?
-            this.props.dmTrinhDoTinHoc.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0 };
+        // const { pageNumber, pageSize, pageTotal, totalItem } = this.props.dmTrinhDoTinHoc && this.props.dmTrinhDoTinHoc.page ?
+        //     this.props.dmTrinhDoTinHoc.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0 };
         let table = 'Không có danh sách!',
             items = this.props.dmTrinhDoTinHoc && this.props.dmTrinhDoTinHoc.items ? this.props.dmTrinhDoTinHoc.items : [];
         if (items.length > 0) {

@@ -1,5 +1,6 @@
 const keys = ['NEWS_ID', 'CATEGORY_ID'];
 const obj2Db = { 'newsId': 'NEWS_ID', 'categoryId': 'CATEGORY_ID' };
+// eslint-disable-next-line no-unused-vars
 module.exports = app => {
     // app.model.fwNewsCategory.foo = () => { };
     app.model.fwNewsCategory.createMany = (data, done) => {

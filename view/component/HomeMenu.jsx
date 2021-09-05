@@ -268,7 +268,7 @@ class HomeMenu extends React.Component {
                             className='navbar-toggler'>
                             <a style={{ color: 'grey' }}><i className='fa fa-lg fa-user'
                                 data-toggle='collapse' data-target='#dang-xuat' aria-expanded="false"
-                                aria-controls="dang-xuat" aria-expanded='false' aria-label='Toggle navigation'
+                                aria-controls="dang-xuat" aria-label='Toggle navigation'
                                 style={{ color: 'white' }} /></a>
                         </div>
                         <div className='collapse navbar-collapse' id='ftco-nav' >

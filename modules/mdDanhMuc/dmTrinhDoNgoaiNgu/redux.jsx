@@ -57,7 +57,7 @@ export function getDmTrinhDoNgoaiNguPage(pageNumber, pageSize, pageCondition, do
                 if (done) done(data.page);
                 dispatch({ type: DmTrinhDoNgoaiNguGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách trình độ ngoại ngữ bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách trình độ ngoại ngữ bị lỗi!', 'danger'));
     };
 }
 
@@ -72,12 +72,12 @@ export function getDmTrinhDoNgoaiNguAll(condition, done) {
                 if (done) done(data.items);
                 dispatch({ type: DmTrinhDoNgoaiNguGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách trình độ ngoại ngữ bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách trình độ ngoại ngữ bị lỗi!', 'danger'));
     };
 }
 
 export function getDmTrinhDoNgoaiNgu(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/trinh-do-ngoai-ngu/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -101,7 +101,7 @@ export function createDmTrinhDoNgoaiNgu(dmTrinhDoNgoaiNgu, done) {
                 dispatch(getDmTrinhDoNgoaiNguAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo mới một trình độ ngoại ngữ bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo mới một trình độ ngoại ngữ bị lỗi!', 'danger'));
     };
 }
 
@@ -132,7 +132,7 @@ export function deleteDmTrinhDoNgoaiNgu(ma, done) {
                 dispatch(getDmTrinhDoNgoaiNguAll());
             }
             done && done();
-        }, error => T.notify('Xóa trình độ ngoại ngữ bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa trình độ ngoại ngữ bị lỗi!', 'danger'));
     };
 }
 

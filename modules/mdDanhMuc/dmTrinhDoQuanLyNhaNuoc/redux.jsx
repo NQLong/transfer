@@ -55,7 +55,7 @@ export function getDmTrinhDoQuanLyNhaNuocPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: DmTrinhDoQuanLyNhaNuocGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách chức vụ bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách chức vụ bị lỗi!', 'danger'));
     };
 }
 
@@ -70,7 +70,7 @@ export function dmTrinhDoQuanLyNhaNuocGetAll(condition, done) {
                 if (done) done(data.items);
                 dispatch({ type: DmTrinhDoQuanLyNhaNuocGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách trình độ quản lý nhà nước bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách trình độ quản lý nhà nước bị lỗi!', 'danger'));
     };
 }
 
@@ -85,7 +85,7 @@ export function createDmTrinhDoQuanLyNhaNuoc(item, done) {
                 dispatch(getDmTrinhDoQuanLyNhaNuocPage());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo dữ liệu bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo dữ liệu bị lỗi!', 'danger'));
     };
 }
 
@@ -98,7 +98,7 @@ export function deleteDmTrinhDoQuanLyNhaNuoc(ma) {
             } else {
                 dispatch(getDmTrinhDoQuanLyNhaNuocPage());
             }
-        }, error => T.notify('Xóa dữ liệu bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa dữ liệu bị lỗi!', 'danger'));
     };
 }
 
@@ -115,7 +115,7 @@ export function updateDmTrinhDoQuanLyNhaNuoc(ma, changes, done) {
                 done && done(data.item);
                 dispatch(getDmTrinhDoQuanLyNhaNuocPage());
             }
-        }, error => T.notify('Cập nhật dữ liệu bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật dữ liệu bị lỗi!', 'danger'));
     };
 }
 

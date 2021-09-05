@@ -30,7 +30,7 @@ export function getDanhSachTinhTrangThietBi(pageNumber, pageSize, pageCondition,
                 if (done) done(data.page);
                 dispatch({ type: GET_PAGE, page: data.page });
             }
-        }, error => T.notify(`Lấy danh sách ${LABEL} bị lỗi` + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, error => T.notify(`Lấy danh sách ${LABEL} bị lỗi` + (error.error.message && (':<br>' + error.message)), 'danger'));
     };
 }
 
@@ -89,7 +89,7 @@ export function updateTinhTrangThietBi(ma, changes, done) {
 }
 
 export function getTinhTrangThietBi(maTinhTrangThietBi, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/tinh-trang-thiet-bi/${maTinhTrangThietBi}`;
         T.get(url, {}, data => {
             if (data.error) {
@@ -100,6 +100,6 @@ export function getTinhTrangThietBi(maTinhTrangThietBi, done) {
                     done(data);
                 }
             }
-        }, error => T.notify(`Lấy thông tin ${LABEL} bị lỗi!`, 'danger'));
+        }, () => T.notify(`Lấy thông tin ${LABEL} bị lỗi!`, 'danger'));
     };
 }

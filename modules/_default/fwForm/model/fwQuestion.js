@@ -1,6 +1,7 @@
 const keys = ['ID'];
 const obj2Db = { 'active': 'ACTIVE', 'title': 'TITLE', 'content': 'CONTENT', 'typeName': 'TYPE_NAME', 'typeValue': 'TYPE_VALUE', 'rowNums': 'ROW_NUMS', 'id': 'ID', 'formId': 'FORM_ID', 'priority': 'PRIORITY' };
 
+// eslint-disable-next-line no-unused-vars
 module.exports = app => {
     // app.model.fwQuestion.foo = () => { };
     app.model.fwQuestion.createMany = (data, done) => {

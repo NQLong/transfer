@@ -639,7 +639,7 @@ export class Select extends InputBase {
 
     }
 
-    #handleOnChange = event => {
+    #handleOnChange = () => {
         this.onBlur && this.onBlur();
         this.props.onChange && this.props.onChange(this.getVal());
     }

@@ -1,4 +1,4 @@
-const package = require('./package'),
+const appConfig = require('./package'),
     fs = require('fs'),
     path = require('path'),
     endOfLine = require('os').EOL;
@@ -40,7 +40,7 @@ UpdateModulesPlugin.prototype.apply = compiler => compiler.hooks.done.tap('Updat
     });
 
     const moduleData = [];
-    fs.readdirSync(`./modules`).forEach(mainModuleName => {
+    fs.readdirSync('./modules').forEach(mainModuleName => {
         fs.statSync(`./modules/${mainModuleName}`).isDirectory() && fs.readdirSync(`./modules/${mainModuleName}`).forEach(moduleName => {
             if (fs.statSync(`./modules/${mainModuleName}/${moduleName}`).isDirectory() && fs.existsSync(`./modules/${mainModuleName}/${moduleName}/index.jsx`)) {
                 moduleData.push(mainModuleName + '|' + moduleName);
@@ -85,10 +85,10 @@ const genHtmlWebpackPlugins = (isProductionMode) => {
             inject: false,
             hash: true,
             minifyOptions: { removeComments: true, collapseWhitespace: true, conservativeCollapse: true },
-            title: package.title,
-            keywords: package.keywords,
-            version: package.version,
-            description: package.description,
+            title: appConfig.title,
+            keywords: appConfig.keywords,
+            version: appConfig.version,
+            description: appConfig.description,
         };
     fs.readdirSync('./view').forEach(filename => {
         const template = `./view/${filename}/${filename}.pug`;
@@ -140,7 +140,7 @@ module.exports = (env, argv) => ({
     },
     devServer: {
         contentBase: path.join(__dirname, 'public'),
-        port: package.port + 1,
+        port: appConfig.port + 1,
         compress: true,
         historyApiFallback: true,
         disableHostCheck: true,

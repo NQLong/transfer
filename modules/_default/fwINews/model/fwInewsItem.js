@@ -1,6 +1,7 @@
 const keys = ['ID'];
 const obj2Db = { 'width': 'WIDTH', 'display': 'DISPLAY', 'lang': 'LANG', 'payload': 'PAYLOAD', 'type': 'TYPE', 'inewsId': 'INEWS_ID', 'priority': 'PRIORITY', 'id': 'ID' };
 
+// eslint-disable-next-line no-unused-vars
 module.exports = app => {
     // app.model.fwInewsItem.foo = () => { };
     app.model.fwInewsItem.swapPriority = (id, inewsId, isMoveUp, done) => {

@@ -164,7 +164,7 @@ module.exports = app => {
             let result = {};
             let totalItem = res && res.rows && res.rows[0] ? res.rows[0]['COUNT(DISTINCTID)'] : 0;
             result = { totalItem, pageSize, pageTotal: Math.ceil(totalItem / pageSize) };
-            result.pageNumber = pageNumber === -1 ? pageTotal : Math.min(pageNumber, result.pageTotal);
+            result.pageNumber = pageNumber === -1 ? 1 : Math.min(pageNumber, result.pageTotal);
             leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
             const sql = 'SELECT DISTINCT ID,' + app.dbConnection.parseSelectedColumns(obj2DbFilter, selectedColumns) + 'FROM (SELECT FN.*, COUNT(*) over (partition by FN.ID) AS CNT, FC.ID AS CATEGORY_ID, FC.TITLE AS CATEGORY_TITLE, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : ' FN.' + keys) + ') R FROM FW_NEWS FN INNER JOIN FW_NEWS_CATEGORY FNC on FN.ID = FNC.NEWS_ID INNER JOIN FW_CATEGORY FC on FNC.CATEGORY_ID = FC.ID WHERE CATEGORY_ID IN ('
                 + category + ')' + (condition.statement ? ' AND ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize) + ' ORDER BY pinned DESC, START_POST DESC';
