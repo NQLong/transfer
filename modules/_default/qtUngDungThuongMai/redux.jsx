@@ -10,7 +10,7 @@ export function createQtUngDungThuongMaiStaff(data, done) {
                 if (done) done(res);
             }
         }, error => T.notify('Thêm thông tin quá trình ứng dụng thực tiễn và thương mại hóa kết quả nghiên cứu bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function updateQtUngDungThuongMaiStaff(id, changes, done) {
@@ -25,7 +25,7 @@ export function updateQtUngDungThuongMaiStaff(id, changes, done) {
                 if (done) done();
             }
         }, error => T.notify('Cập nhật thông tin quá trình ứng dụng thực tiễn và thương mại hóa kết quả nghiên cứu bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function deleteQtUngDungThuongMaiStaff(id, done) {
@@ -40,7 +40,7 @@ export function deleteQtUngDungThuongMaiStaff(id, done) {
                 if (done) done();
             }
         }, error => T.notify('Xóa thông tin quá trình ứng dụng thực tiễn và thương mại hóa kết quả nghiên cứu bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function createQtUngDungThuongMaiStaffUser(data, done) {
@@ -55,7 +55,7 @@ export function createQtUngDungThuongMaiStaffUser(data, done) {
                 if (done) done(res);
             }
         }, error => T.notify('Thêm thông tin quá trình ứng dụng thực tiễn và thương mại hóa kết quả nghiên cứu bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function updateQtUngDungThuongMaiStaffUser(id, changes, done) {
@@ -70,7 +70,7 @@ export function updateQtUngDungThuongMaiStaffUser(id, changes, done) {
                 if (done) done();
             }
         }, error => T.notify('Cập nhật thông tin quá trình ứng dụng thực tiễn và thương mại hóa kết quả nghiên cứu bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function deleteQtUngDungThuongMaiStaffUser(id, done) {
@@ -82,8 +82,8 @@ export function deleteQtUngDungThuongMaiStaffUser(id, done) {
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
                 T.alert('Thông tin quá trình ứng dụng thực tiễn và thương mại hóa kết quả nghiên cứu được xóa thành công!', 'info', false, 800);
-                done && done()
+                done && done();
             }
         }, error => T.notify('Xóa thông tin quá trình ứng dụng thực tiễn và thương mại hóa kết quả nghiên cứu bị lỗi' , 'danger'));
-    }
+    };
 }

@@ -13,7 +13,7 @@ class EditModal extends React.Component {
     componentDidMount() {
         $(document).ready(() => setTimeout(() => {
             $(this.modal.current).on('shown.bs.modal', () => {
-                $(`a[href='#dmCaHocTabVi']`).tab('show');
+                $('a[href=\'#dmCaHocTabVi\']').tab('show');
                 $('#dmCaHocTen').focus();
             });
         }, 250));
@@ -50,7 +50,7 @@ class EditModal extends React.Component {
                 thoiGianBatDau: `${$('#dmCaHocThoiGianBatDauHours').val()}:${$('#dmCaHocThoiGianBatDauMinutes').val()}`,
                 thoiGianKetThuc: `${$('#dmCaHocThoiGianKetThucHours').val()}:${$('#dmCaHocThoiGianKetThucMinutes').val()}`,
                 kichHoat: Number(this.state.kichHoat),
-            }
+            };
 
         if (changes.ten == '') {
             T.notify('Tên ca học bị trống!', 'danger');

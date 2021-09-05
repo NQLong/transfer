@@ -32,7 +32,7 @@ export default function dmBenhVienReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -58,12 +58,12 @@ export function getDmBenhVienPage(pageNumber, pageSize, pageCondition, done) {
                 dispatch({ type: DmBenhVienGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách bệnh viện bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmBenhVienAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/benh-vien/all`;
+        const url = '/api/danh-muc/benh-vien/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách bệnh viện bị lỗi!', 'danger');
@@ -73,7 +73,7 @@ export function getDmBenhVienAll(done) {
                 dispatch({ type: DmBenhVienGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách bệnh viện bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmBenhVien(ma, done) {
@@ -87,12 +87,12 @@ export function getDmBenhVien(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmBenhVien(dmBenhVien, done) {
     return dispatch => {
-        const url = `/api/danh-muc/benh-vien`;
+        const url = '/api/danh-muc/benh-vien';
         T.post(url, { dmBenhVien }, data => {
             if (data.error) {
                 T.notify(data.error.message ? data.error.message : 'Tạo mới một bệnh viện bị lỗi!', 'danger');
@@ -103,12 +103,12 @@ export function createDmBenhVien(dmBenhVien, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo mới một bệnh viện bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDmBenhVien(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/benh-vien`;
+        const url = '/api/danh-muc/benh-vien';
         T.put(url, { ma, changes }, data => {
             if (data.error) {
                 T.notify('Cập nhật dữ liệu bệnh viện bị lỗi!', 'danger');
@@ -119,12 +119,12 @@ export function updateDmBenhVien(ma, changes, done) {
                 dispatch(getDmBenhVienPage());
             }
         }, () => T.notify('Cập nhật dữ liệu bệnh viện bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteDmBenhVien(ma, done) {
     return dispatch => {
-        const url = `/api/danh-muc/benh-vien`;
+        const url = '/api/danh-muc/benh-vien';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa bệnh viện bị lỗi!', 'danger');
@@ -135,12 +135,12 @@ export function deleteDmBenhVien(ma, done) {
             }
             done && done();
         }, error => T.notify('Xóa bệnh viện bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function createMultiDmBenhVien(dmBenhVien, done) {
     return dispatch => {
-        const url = `/api/danh-muc/benh-vien/multiple`;
+        const url = '/api/danh-muc/benh-vien/multiple';
         T.post(url, { dmBenhVien }, data => {
             if (data.error) {
                 T.notify('Upload thông tin bệnh viện có lỗi!', 'danger');
@@ -149,5 +149,5 @@ export function createMultiDmBenhVien(dmBenhVien, done) {
             }
             done && done();
         }, error => T.notify('Upload thông tin bệnh viện có lỗi!', 'danger'));
-    }
+    };
 }

@@ -112,7 +112,7 @@ class WebsiteGioiThieuEditPage extends React.Component {
                 $('#dvGioiThieuTrongSo').val(data.trongSo).focus;
                 this.editor.vi.current.html(noiDung.vi);
                 this.editor.en.current.html(noiDung.en);
-                this.setState({ donViSelected: data.maDonVi })
+                this.setState({ donViSelected: data.maDonVi });
                 this.setState({ ma: data.ma });
             });
         });

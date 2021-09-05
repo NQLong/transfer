@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getTranslateDraftNews, checkLink, updateTranslateDraftNews } from './redux'
+import { getTranslateDraftNews, checkLink, updateTranslateDraftNews } from './redux';
 import { Link } from 'react-router-dom';
 import ImageBox from 'view/component/ImageBox';
 import Editor from 'view/component/CkEditor4';
@@ -33,7 +33,7 @@ class DraftNewsEditPage extends React.Component {
     getData = () => {
         const route = T.routeMatcher('/user/news/draft/translate/edit/:newsId'),
             IdNews = route.parse(window.location.pathname).newsId;
-        this.setState({ draftId: IdNews })
+        this.setState({ draftId: IdNews });
         this.props.getTranslateDraftNews(IdNews, data => {
             if (data.error) {
                 T.notify('Lấy bản nháp tin tức bị lỗi!', 'danger');
@@ -99,8 +99,8 @@ class DraftNewsEditPage extends React.Component {
             lastModified: new Date().getTime(),
             isDraftApproved: 1,
             isUnitApproved: 1,
-        }
-        this.props.updateTranslateDraftNews(this.state.draftId, newDraft, data => { })
+        };
+        this.props.updateTranslateDraftNews(this.state.draftId, newDraft, data => { });
 
     }
 
@@ -188,7 +188,7 @@ class DraftNewsEditPage extends React.Component {
                             <div className='tile-body'>
                                 <div className='form-group'>
                                     <label className='control-label'>Link mặc định</label><br />
-                                    <a href={linkDefaultNews} style={{ fontWeight: 'bold' }} target='_blank'>{linkDefaultNews}</a>
+                                    <a href={linkDefaultNews} style={{ fontWeight: 'bold' }} target='_blank' rel="noreferrer">{linkDefaultNews}</a>
                                 </div>
                                 <div className='form-group'>
                                     <label className='control-label'>Link truyền thông</label><br />

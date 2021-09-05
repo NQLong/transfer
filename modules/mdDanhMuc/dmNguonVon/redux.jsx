@@ -32,7 +32,7 @@ export default function DmNguonVonReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -58,12 +58,12 @@ export function getDmNguonVonPage(pageNumber, pageSize, pageCondition, done) {
                 dispatch({ type: DmNguonVonGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách Nguồn Vốn bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmNguonVonAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/nguon-von/all`;
+        const url = '/api/danh-muc/nguon-von/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách Nguồn Vốn bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -73,7 +73,7 @@ export function getDmNguonVonAll(done) {
                 dispatch({ type: DmNguonVonGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách Nguồn Vốn bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmNguonVon(ma, done) {
@@ -87,12 +87,12 @@ export function getDmNguonVon(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmNguonVon(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/nguon-von`;
+        const url = '/api/danh-muc/nguon-von';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo Nguồn Vốn bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -102,12 +102,12 @@ export function createDmNguonVon(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo Nguồn Vốn bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function updateDmNguonVon(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/nguon-von`;
+        const url = '/api/danh-muc/nguon-von';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tin Nguồn Vốn bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -118,12 +118,12 @@ export function updateDmNguonVon(ma, changes, done) {
                 dispatch(getDmNguonVonPage());
             }
         }, error => T.notify('Cập nhật thông tin Nguồn Vốn bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function deleteDmNguonVon(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/nguon-von`;
+        const url = '/api/danh-muc/nguon-von';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa Nguồn Vốn bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -133,7 +133,7 @@ export function deleteDmNguonVon(ma) {
                 dispatch(getDmNguonVonPage());
             }
         }, error => T.notify('Xóa Nguồn Vốn bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function changeDmNguonVon(item) {
@@ -147,4 +147,4 @@ export const SelectAdapter_DmNguonVon = {
     processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: `${item.ma}: ${item.tenNguonVon}` })) : [] }),
     getOne: getDmNguonVon,
     processResultOne: response => response && ({ value: response.ma, text: `${response.ma}:${response.tenNguonVon}` }),
-}
+};

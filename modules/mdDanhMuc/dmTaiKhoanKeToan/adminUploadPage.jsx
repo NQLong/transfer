@@ -29,7 +29,7 @@ class EditModal extends React.Component {
             changes = {
                 ma: $('#dmtkktMaTaiKhoanKeToan').val().trim().toUpperCase(),
                 tenTaiKhoan: $('#dmtkktTenTaiKhoanKeToan').val().trim(),
-            }
+            };
 
         if (changes.ma == '') {
             T.notify('Mã Tài Khoản bị trống!', 'danger');
@@ -40,7 +40,7 @@ class EditModal extends React.Component {
         } else {
             let dataChanges = {
                 changes, ma
-            }
+            };
             this.props.dataChanges(dataChanges);
             $(this.modal.current).modal('hide');
         }
@@ -103,7 +103,7 @@ class adminUploadPage extends React.Component {
                     if (data.ma == item.ma) {
                         indexDelete = index;
                     }
-                })
+                });
                 state.dmTaiKhoanKeToan.splice(indexDelete, 1);
                 return state;
             }));
@@ -115,7 +115,7 @@ class adminUploadPage extends React.Component {
                 if (data.ma == dataEditModal.changes.ma) {
                     data.tenTaiKhoan = dataEditModal.changes.tenTaiKhoan;
                 }
-            })
+            });
             return state;
         });
     }

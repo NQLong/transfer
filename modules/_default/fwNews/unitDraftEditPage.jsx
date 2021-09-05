@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getUnitDraftNews, checkLink, updateUnitDraftNews, } from './redux'
+import { getUnitDraftNews, checkLink, updateUnitDraftNews, } from './redux';
 import { Link } from 'react-router-dom';
 import { getDmDonViFaculty } from 'modules/mdDanhMuc/dmDonVi/redux';
 import ImageBox from 'view/component/ImageBox';
@@ -31,14 +31,14 @@ class UnitDraftNewsEditPage extends React.Component {
     }
     componentDidUpdate() {
         $(this.DonVi.current).on('change', e => {
-            let donVi = e.target.selectedOptions[0] && e.target.selectedOptions[0].value || null
+            let donVi = e.target.selectedOptions[0] && e.target.selectedOptions[0].value || null;
             if (donVi != this.state.donVi) this.setState({ donVi });
         });
     }
     getData = () => {
         const route = T.routeMatcher('/user/news/unit/draft/edit/:newsId'),
             IdNews = route.parse(window.location.pathname).newsId;
-        this.setState({ draftId: IdNews })
+        this.setState({ draftId: IdNews });
         this.props.getUnitDraftNews(IdNews, data => {
             if (data.error) {
                 T.notify('Lấy bản nháp tin tức bị lỗi!', 'danger');
@@ -124,7 +124,7 @@ class UnitDraftNewsEditPage extends React.Component {
             lastModified: new Date().getTime(),
             displayCover: this.state.item.displayCover ? 1 : 0,
             maDonVi: this.state.donVi,
-        }
+        };
 
         if ($('#neNewsEnTitle').val() && $('#neNewsEnAbstract').val() && $('#neNewsEnAbstract').val()) {
             newDraft.isTranslated = 'done';
@@ -134,7 +134,7 @@ class UnitDraftNewsEditPage extends React.Component {
             delete newDraft.editorId;
             delete newDraft.editorName;
         }
-        this.props.updateUnitDraftNews(this.state.draftId, newDraft, data => { })
+        this.props.updateUnitDraftNews(this.state.draftId, newDraft, data => { });
 
     }
 
@@ -237,7 +237,7 @@ class UnitDraftNewsEditPage extends React.Component {
                             <div className='tile-body'>
                                 <div className='form-group'>
                                     <label className='control-label'>Link mặc định</label><br />
-                                    <a href={linkDefaultNews} style={{ fontWeight: 'bold' }} target='_blank'>{linkDefaultNews}</a>
+                                    <a href={linkDefaultNews} style={{ fontWeight: 'bold' }} target='_blank' rel="noreferrer">{linkDefaultNews}</a>
                                 </div>
                                 <div className='form-group'>
                                     <label className='control-label'>Link truyền thông</label><br />

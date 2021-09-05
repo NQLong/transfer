@@ -32,7 +32,7 @@ export default function DmHoSoCcvcNldReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -44,7 +44,7 @@ export default function DmHoSoCcvcNldReducer(state = null, data) {
 // Actions ------------------------------------------------------------------------------------------------------------
 export function getDmHoSoCcvcNldAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/ho-so-cong-chuc-vien-chuc-nguoi-lao-dong/all`;
+        const url = '/api/danh-muc/ho-so-cong-chuc-vien-chuc-nguoi-lao-dong/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách Hồ sơ công chức viên chức - người lao động bị lỗi!', 'danger');
@@ -54,7 +54,7 @@ export function getDmHoSoCcvcNldAll(done) {
                 dispatch({ type: DmHoSoCcvcNldGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách Hồ sơ công chức viên chức - người lao động bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmHoSoCcvcNld(ma, done) {
@@ -68,12 +68,12 @@ export function getDmHoSoCcvcNld(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmHoSoCcvcNld(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/ho-so-cong-chuc-vien-chuc-nguoi-lao-dong`;
+        const url = '/api/danh-muc/ho-so-cong-chuc-vien-chuc-nguoi-lao-dong';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo Hồ sơ công chức viên chức - người lao động bị lỗi!', 'danger');
@@ -83,12 +83,12 @@ export function createDmHoSoCcvcNld(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo Hồ sơ công chức viên chức - người lao động bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteDmHoSoCcvcNld(ma, done) {
     return dispatch => {
-        const url = `/api/danh-muc/ho-so-cong-chuc-vien-chuc-nguoi-lao-dong`;
+        const url = '/api/danh-muc/ho-so-cong-chuc-vien-chuc-nguoi-lao-dong';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục Hồ sơ công chức viên chức - người lao động bị lỗi!', 'danger');
@@ -99,12 +99,12 @@ export function deleteDmHoSoCcvcNld(ma, done) {
             }
             done && done(data.error);
         }, error => T.notify('Xóa Hồ sơ công chức viên chức - người lao động bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDmHoSoCcvcNld(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/ho-so-cong-chuc-vien-chuc-nguoi-lao-dong`;
+        const url = '/api/danh-muc/ho-so-cong-chuc-vien-chuc-nguoi-lao-dong';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tin Hồ sơ công chức viên chức - người lao động bị lỗi!', 'danger');
@@ -115,7 +115,7 @@ export function updateDmHoSoCcvcNld(ma, changes, done) {
             }
             done && done(data.error);
         }, error => T.notify('Cập nhật thông tin Hồ sơ công chức viên chức - người lao động bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function changeDmHoSoCcvcNld(item) {

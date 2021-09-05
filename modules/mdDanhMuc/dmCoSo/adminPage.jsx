@@ -13,7 +13,7 @@ class EditModal extends React.Component {
     componentDidMount() {
         $(document).ready(() => setTimeout(() => {
             $(this.modal.current).on('shown.bs.modal', () => {
-                $(`a[href='#dmCoSoTabVi']`).tab('show');
+                $('a[href=\'#dmCoSoTabVi\']').tab('show');
                 $('#dmCoSoNameVi').focus();
             });
         }, 250));
@@ -49,15 +49,15 @@ class EditModal extends React.Component {
                 tenVietTat: { vi: $('#dmCoSoAbbreviationVi').val().trim(), en: $('#dmCoSoAbbreviationEn').val().trim() },
                 moTa: { vi: this.editorVi.current.html(), en: this.editorEn.current.html() },
                 kichHoat: this.state.active ? '1' : '0',
-            }
+            };
 
         if (changes.ten.vi == '') {
             T.notify('Tên cơ sở bị trống!', 'danger');
-            $(`a[href='#dmCoSoTabVi']`).tab('show');
+            $('a[href=\'#dmCoSoTabVi\']').tab('show');
             $('#dmCoSoNameVi').focus();
         } else if (changes.ten.en == '') {
             T.notify('Tên cơ sở bị trống!', 'danger');
-            $(`a[href='#dmCoSoTabEn']`).tab('show');
+            $('a[href=\'#dmCoSoTabEn\']').tab('show');
             $('#dmCoSoNameEn').focus();
         } else {
             changes.ten = JSON.stringify(changes.ten);

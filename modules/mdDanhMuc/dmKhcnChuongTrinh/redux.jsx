@@ -26,7 +26,7 @@ export function getDmKhcnChuongTrinh(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 // Actions ------------------------------------------------------------------------------------------------------------
 export const PageName = 'pagedmKhcnChuongTrinh';
@@ -39,4 +39,4 @@ export const SelectAdapter_DmKhcnChuongTrinh = {
     processResults: response => ({ results: response ? response.items.map(item => ({ id: item.ma, text: item.ten })) : [] }),
     getOne: getDmKhcnChuongTrinh,
     processResultOne: data => data && ({ value: data.ma, text: data.ma + ': ' + data.ten }),
-}
+};

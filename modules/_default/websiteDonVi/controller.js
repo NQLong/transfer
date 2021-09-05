@@ -34,7 +34,7 @@ module.exports = app => {
             } else {
                 res.send({ error, page });
             }
-        })
+        });
     });
 
     app.get('/api/website/all', (req, res) => {
@@ -170,7 +170,7 @@ module.exports = app => {
         if (fields.userData && fields.userData[0].startsWith('DvWebsiteGioiThieu:') && files.DvWebsiteGioiThieuImage && files.DvWebsiteGioiThieuImage.length > 0) {
             console.log('Hook: uploadDvWebsiteGioiThieuImage => website image upload');
             let userData = fields.userData[0].split(' ');
-            const conditions = userData[1] == 'new' ? { ma: 'new' } : { ma: userData[1] }
+            const conditions = userData[1] == 'new' ? { ma: 'new' } : { ma: userData[1] };
             uploadComponentImageWebsite(req, 'dvWebsiteGioiThieu', app.model.dvWebsiteGioiThieuHinh, conditions, files.DvWebsiteGioiThieuImage[0].path, done);
         }
     };
@@ -240,7 +240,7 @@ module.exports = app => {
                             }
                         });
                     }
-                }
+                };
                 handleGetImage(0);
             }
         });
@@ -256,7 +256,7 @@ module.exports = app => {
         if (fields.userData && fields.userData[0].startsWith('DvWebsiteHinh:') && files.DvWebsiteGioiThieuImage && files.DvWebsiteGioiThieuImage.length > 0) {
             console.log('Hook: uploadDvWebsiteHinh => website image upload');
             let userData = fields.userData[0].split(' ');
-            const conditions = userData[1] == 'new' ? { ma: 'new' } : { ma: userData[1] }
+            const conditions = userData[1] == 'new' ? { ma: 'new' } : { ma: userData[1] };
             uploadComponentImageWebsite(req, 'dvWebsiteHinh', app.model.dvWebsiteHinh, conditions, files.DvWebsiteGioiThieuImage[0].path, done);
         }
     };
@@ -322,4 +322,4 @@ module.exports = app => {
             }
         }),
     });
-}
+};

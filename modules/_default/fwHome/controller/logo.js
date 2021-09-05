@@ -21,10 +21,10 @@ module.exports = app => {
             } else{
                 uploadComponentImage(req, 'logo', app.model.homeLogoItem.get, 'new', req.session.logoImage, response => { 
                     app.model.homeLogoItem.create({logoId: req.body.id, priority: logos.length + 1, name: req.body.name, address: req.body.address, link: req.body.link, image: response.image }, (error, item) => {
-                        res.send({ error, item })});
+                        res.send({ error, item });});
                 });
             }
-        })
+        });
     });
 
     app.get('/api/logoItem/item/:logoId', app.permission.check('component:read'), (req, res) =>

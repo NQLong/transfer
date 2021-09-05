@@ -31,12 +31,12 @@ export function getDmHoatDongKhcnPage(pageNumber, pageSize, pageCondition, done)
                 dispatch({ type: DmHoatDongKhcnPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách danh mục hoạt động KH&CN bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmHoatDongKhcnAll(done) {
     return dispatch => {
-        const url = `/api/khcn/dm-hoat-dong-khcn/all`;
+        const url = '/api/khcn/dm-hoat-dong-khcn/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách danh mục hoạt động KH&CN bị lỗi!', 'danger');
@@ -46,7 +46,7 @@ export function getDmHoatDongKhcnAll(done) {
                 dispatch({ type: DmHoatDongKhcnAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách danh mục hoạt động KH&CN bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmHoatDongKhcn(ma, done) {
@@ -60,7 +60,7 @@ export function getDmHoatDongKhcn(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmHoatDongKhcn(dmHoatDongKhcn, done) {
@@ -76,7 +76,7 @@ export function createDmHoatDongKhcn(dmHoatDongKhcn, done) {
                 dispatch(getDmHoatDongKhcnPage());
             }
         }, error => T.notify('Tạo mới một danh mục hoạt động KH&CN bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDmHoatDongKhcn(ma, changes, done) {
@@ -92,12 +92,12 @@ export function updateDmHoatDongKhcn(ma, changes, done) {
                 dispatch(getDmHoatDongKhcnPage());
             }
         }, () => T.notify('Cập nhật dữ liệu danh mục hoạt động KH&CN bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteDmHoatDongKhcn(ma, done) {
     return dispatch => {
-        const url = `/api/khcn/dm-hoat-dong-khcn`;
+        const url = '/api/khcn/dm-hoat-dong-khcn';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục hoạt động KH&CN bị lỗi!', 'danger');
@@ -108,10 +108,10 @@ export function deleteDmHoatDongKhcn(ma, done) {
             }
             done && done();
         }, error => T.notify('Xóa danh mục hoạt động KH&CN bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export const SelectAdapter_DmHoatDongKhcnAll = {
     getAll: getDmHoatDongKhcnAll,
     processResults: (data) => ({ results: data.map(item => ({ value: item.ma, text: item.ten })) })
-}
+};

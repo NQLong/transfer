@@ -32,7 +32,7 @@ export default function DmNgoaiNguReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -44,7 +44,7 @@ export default function DmNgoaiNguReducer(state = null, data) {
 // Actions ------------------------------------------------------------------------------------------------------------
 export function getDmNgoaiNguAll(condition, done) {
     return dispatch => {
-        const url = `/api/danh-muc/ngoai-ngu/all`;
+        const url = '/api/danh-muc/ngoai-ngu/all';
         T.get(url, { condition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách ngoại ngữ bị lỗi!', 'danger');
@@ -54,7 +54,7 @@ export function getDmNgoaiNguAll(condition, done) {
                 dispatch({ type: DmNgoaiNguGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách ngoại ngữ bị lỗi!', 'danger'));
-    }
+    };
 }
 
 T.initPage('pageDmNgoaiNgu');
@@ -71,7 +71,7 @@ export function getDmNgoaiNguPage(pageNumber, pageSize, done) {
                 dispatch({ type: DmNgoaiNguGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách ngoại ngữ bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmNgoaiNgu(ma, done) {
@@ -87,12 +87,12 @@ export function getDmNgoaiNgu(ma, done) {
         }, error => {
             console.error(`GET: ${url}.`, error);
         });
-    }
+    };
 }
 
 export function createDmNgoaiNgu(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/ngoai-ngu`;
+        const url = '/api/danh-muc/ngoai-ngu';
         T.post(url, { item }, data => {
             if (data.error) {
                 console.error(`POST: ${url}.`, data.error);
@@ -102,12 +102,12 @@ export function createDmNgoaiNgu(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo ngoại ngữ bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteDmNgoaiNgu(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/ngoai-ngu`;
+        const url = '/api/danh-muc/ngoai-ngu';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục  bị lỗi!', 'danger');
@@ -117,12 +117,12 @@ export function deleteDmNgoaiNgu(ma) {
                 dispatch(getDmNgoaiNguAll());
             }
         }, error => T.notify('Xóa tổ chức cơ sở xuất bản bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDmNgoaiNgu(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/ngoai-ngu`;
+        const url = '/api/danh-muc/ngoai-ngu';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật ngoại ngữ bị lỗi!', 'danger');
@@ -133,7 +133,7 @@ export function updateDmNgoaiNgu(ma, changes, done) {
                 dispatch(getDmNgoaiNguAll());
             }
         }, error => T.notify('Cập nhật ngoại ngữ bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function changeDmNgoaiNgu(item) {
@@ -145,4 +145,4 @@ export const SelectAdapter_DmNgoaiNgu = {
     getAll: getDmNgoaiNguAll,
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
     condition: { kichHoat: 1 },
-}
+};

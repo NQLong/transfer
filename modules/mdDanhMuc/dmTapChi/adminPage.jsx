@@ -94,7 +94,7 @@ class DmTapChiPage extends React.Component {
 
     componentDidMount() {
         T.ready('/user/category');
-        this.props.getDmTapChiAll()
+        this.props.getDmTapChiAll();
     }
 
     edit = (e, item) => {

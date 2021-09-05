@@ -32,7 +32,7 @@ export default function DmTinhTrangHonNhanReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -44,7 +44,7 @@ export default function DmTinhTrangHonNhanReducer(state = null, data) {
 // Actions ------------------------------------------------------------------------------------------------------------
 export function getDmTinhTrangHonNhanAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/tinh-trang-hon-nhan/all`;
+        const url = '/api/danh-muc/tinh-trang-hon-nhan/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách tình trạng hôn nhân bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -54,7 +54,7 @@ export function getDmTinhTrangHonNhanAll(done) {
                 dispatch({ type: DmTinhTrangHonNhanAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách tình trạng hôn nhân bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 T.initPage('pageDmTinhTrangHonNhan');
@@ -71,7 +71,7 @@ export function getDmTinhTrangHonNhanPage(pageNumber, pageSize, done) {
                 dispatch({ type: DmTinhTrangHonNhanGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách tình trạng hôn nhân bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmTinhTrangHonNhan(ma, done) {
@@ -87,12 +87,12 @@ export function getDmTinhTrangHonNhan(ma, done) {
         }, error => {
             console.error(`GET: ${url}.`, error);
         });
-    }
+    };
 }
 
 export function createDmTinhTrangHonNhan(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/tinh-trang-hon-nhan`;
+        const url = '/api/danh-muc/tinh-trang-hon-nhan';
         T.post(url, { item }, data => {
             if (data.error) {
                 if (data.error.errorNum == 1) {
@@ -104,12 +104,12 @@ export function createDmTinhTrangHonNhan(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo tình trạng hôn nhân bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function deleteDmTinhTrangHonNhan(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/tinh-trang-hon-nhan`;
+        const url = '/api/danh-muc/tinh-trang-hon-nhan';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục  bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -119,12 +119,12 @@ export function deleteDmTinhTrangHonNhan(ma) {
                 dispatch(getDmTinhTrangHonNhanAll());
             }
         }, error => T.notify('Xóa tình trạng hôn nhân bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function updateDmTinhTrangHonNhan(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/tinh-trang-hon-nhan`;
+        const url = '/api/danh-muc/tinh-trang-hon-nhan';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tình trạng hôn nhân bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -135,7 +135,7 @@ export function updateDmTinhTrangHonNhan(ma, changes, done) {
                 dispatch(getDmTinhTrangHonNhanAll());
             }
         }, error => T.notify('Cập nhật thông tin tình trạng hôn nhân bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function changeDmTinhTrangHonNhan(item) {

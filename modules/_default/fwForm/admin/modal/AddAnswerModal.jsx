@@ -14,7 +14,7 @@ class AddAnswerModal extends React.Component {
         for (let i = 0; i < 300; i++) {
             this.valueList[i] = React.createRef();
         }
-        this.state = { show: false, user: null, message: '' }
+        this.state = { show: false, user: null, message: '' };
     }
 
     componentDidMount() {
@@ -124,7 +124,7 @@ class AddAnswerModal extends React.Component {
                 this.props.addAnswer(changes, eventId, () => {
                     T.notify('Thêm người tham gia thành công!', 'success');
                     this.hide();
-                })
+                });
             } else {
                 T.notify('Thêm người tham gia bị lỗi!', 'danger');
             }

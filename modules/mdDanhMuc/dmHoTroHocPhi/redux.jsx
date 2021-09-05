@@ -32,7 +32,7 @@ export default function DmHoTroHocPhiReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -56,12 +56,12 @@ export function getDmHoTroHocPhiPage(pageNumber, pageSize, done) {
                 dispatch({ type: DmHoTroHocPhiGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách hỗ trợ học phí bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmHoTroHocPhiAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/ho-tro-hoc-phi/all`;
+        const url = '/api/danh-muc/ho-tro-hoc-phi/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách hỗ trợ học phí bị lỗi!', 'danger');
@@ -71,7 +71,7 @@ export function getDmHoTroHocPhiAll(done) {
                 dispatch({ type: DmHoTroHocPhiGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách hỗ trợ học phí bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmHoTroHocPhi(ma, done) {
@@ -85,12 +85,12 @@ export function getDmHoTroHocPhi(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmHoTroHocPhi(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/ho-tro-hoc-phi`;
+        const url = '/api/danh-muc/ho-tro-hoc-phi';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo hỗ trợ học phí bị lỗi!', 'danger');
@@ -100,12 +100,12 @@ export function createDmHoTroHocPhi(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo hỗ trợ học phí bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteDmHoTroHocPhi(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/ho-tro-hoc-phi`;
+        const url = '/api/danh-muc/ho-tro-hoc-phi';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục hỗ trợ học phí bị lỗi!', 'danger');
@@ -115,12 +115,12 @@ export function deleteDmHoTroHocPhi(ma) {
                 dispatch(getDmHoTroHocPhiAll());
             }
         }, error => T.notify('Xóa hỗ trợ học phí bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDmHoTroHocPhi(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/ho-tro-hoc-phi`;
+        const url = '/api/danh-muc/ho-tro-hoc-phi';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tin hỗ trợ học phí bị lỗi!', 'danger');
@@ -131,7 +131,7 @@ export function updateDmHoTroHocPhi(ma, changes, done) {
                 dispatch(getDmHoTroHocPhiAll());
             }
         }, error => T.notify('Cập nhật thông tin hỗ trợ học phí bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function changeDmHoTroHocPhi(item) {

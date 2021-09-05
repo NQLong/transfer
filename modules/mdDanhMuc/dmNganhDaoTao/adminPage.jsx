@@ -16,7 +16,7 @@ class EditModal extends React.Component {
     componentDidMount() {
         $(document).ready(() => setTimeout(() => {
             $(this.modal.current).on('shown.bs.modal', () => {
-                $(`a[href='#dmNganhDaoTaoTabVi']`).tab('show');
+                $('a[href=\'#dmNganhDaoTaoTabVi\']').tab('show');
                 $('#dmNganhDaoTaoNameVi').focus();
             });
             $('#dmNganhDaoTaoFaculty').select2({ minimumResultsForSearch: -1 });
@@ -47,14 +47,14 @@ class EditModal extends React.Component {
                 moTa: { vi: this.editorVi.current.html(), en: this.editorEn.current.html() },
                 maDonVi: $('#dmNganhDaoTaoFaculty').val(),
                 kichHoat: this.state.kichHoat ? '1' : '0'
-            }
+            };
         if (changes.ten.vi == '') {
             T.notify('Tên ngành đào tạo bị trống!', 'danger');
-            $(`a[href='#dmNganhDaoTaoTabVi']`).tab('show');
+            $('a[href=\'#dmNganhDaoTaoTabVi\']').tab('show');
             $('#dmNganhDaoTaoNameVi').focus();
         } else if (changes.ten.en == '') {
             T.notify('Tên ngành đào tạo bị trống!', 'danger');
-            $(`a[href='#dmNganhDaoTaoTabEn']`).tab('show');
+            $('a[href=\'#dmNganhDaoTaoTabEn\']').tab('show');
             $('#dmNganhDaoTaoNameEn').focus();
         } else if (changes.maDonVi == null) {
             T.notify('Đơn vị chưa được chọn!', 'danger');
@@ -140,7 +140,7 @@ class EditModal extends React.Component {
             </div>
         );
     }
-};
+}
 
 class DmNganhDaoTaoPage extends React.Component {
     state = { searching: false };
@@ -155,7 +155,7 @@ class DmNganhDaoTaoPage extends React.Component {
                 const mapper = {};
                 items.forEach(item => {
                     mapper[item.ma] = item.ten;
-                    if (item.kichHoat == 1 && item.maPl == '01') this.optionsDonVi.push(<option key={item.ma} value={item.ma}>{item.ten}</option>)
+                    if (item.kichHoat == 1 && item.maPl == '01') this.optionsDonVi.push(<option key={item.ma} value={item.ma}>{item.ten}</option>);
                 });
                 this.mapperDonVi = mapper;
             }

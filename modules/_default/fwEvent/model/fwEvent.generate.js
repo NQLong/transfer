@@ -1,6 +1,6 @@
 // Table name: FW_EVENT { priority, name, title, image, link, active, isInternal, location, abstract, content, maxRegisteredUsers, trainingPoint, socialWorkDay, createdDate, startPost, stopPost, startRegister, stopRegister, startEvent, stopEvent, views, form, id, isTranslate, language, maDonVi }
 const keys = ['ID'];
-const obj2Db = { 'priority': 'PRIORITY', 'name': 'NAME', 'title': 'TITLE', 'image': 'IMAGE', 'link': 'LINK', 'active': 'ACTIVE', 'isInternal': 'IS_INTERNAL', 'location': 'LOCATION', 'abstract': 'ABSTRACT', 'content': 'CONTENT', 'maxRegisteredUsers': 'MAX_REGISTERED_USERS', 'trainingPoint': 'TRAINING_POINT', 'socialWorkDay': 'SOCIAL_WORK_DAY', 'createdDate': 'CREATED_DATE', 'startPost': 'START_POST', 'stopPost': 'STOP_POST', 'startRegister': 'START_REGISTER', 'stopRegister': 'STOP_REGISTER', 'startEvent': 'START_EVENT', 'stopEvent': 'STOP_EVENT', 'views': 'VIEWS', 'form': 'FORM', 'id': 'ID', 'isTranslate': 'IS_TRANSLATE', 'language': 'LANGUAGE', 'maDonVi': 'MA_DON_VI', "displayCover": 'DISPLAY_COVER' };
+const obj2Db = { 'priority': 'PRIORITY', 'name': 'NAME', 'title': 'TITLE', 'image': 'IMAGE', 'link': 'LINK', 'active': 'ACTIVE', 'isInternal': 'IS_INTERNAL', 'location': 'LOCATION', 'abstract': 'ABSTRACT', 'content': 'CONTENT', 'maxRegisteredUsers': 'MAX_REGISTERED_USERS', 'trainingPoint': 'TRAINING_POINT', 'socialWorkDay': 'SOCIAL_WORK_DAY', 'createdDate': 'CREATED_DATE', 'startPost': 'START_POST', 'stopPost': 'STOP_POST', 'startRegister': 'START_REGISTER', 'stopRegister': 'STOP_REGISTER', 'startEvent': 'START_EVENT', 'stopEvent': 'STOP_EVENT', 'views': 'VIEWS', 'form': 'FORM', 'id': 'ID', 'isTranslate': 'IS_TRANSLATE', 'language': 'LANGUAGE', 'maDonVi': 'MA_DON_VI', 'displayCover': 'DISPLAY_COVER' };
 
 module.exports = app => {
     app.model.fwEvent = {
@@ -130,5 +130,5 @@ module.exports = app => {
             const sql = 'SELECT COUNT(*) FROM FW_EVENT' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.dbConnection.execute(sql, parameter, (error, result) => done(error, result));
         },
-    }
-}
+    };
+};

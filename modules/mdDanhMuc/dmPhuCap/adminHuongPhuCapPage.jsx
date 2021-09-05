@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getDmHuongPhuCapAll, deleteDmHuongPhuCap, createDmHuongPhuCap, updateDmHuongPhuCap } from './reduxHuongPhuCap'
+import { getDmHuongPhuCapAll, deleteDmHuongPhuCap, createDmHuongPhuCap, updateDmHuongPhuCap } from './reduxHuongPhuCap';
 import { Link } from 'react-router-dom';
 
 class EditModal extends React.Component {
@@ -90,7 +90,7 @@ class AdminPage extends React.Component {
 
     componentDidMount() {
         T.ready('/user/category');
-        this.props.getDmHuongPhuCapAll()
+        this.props.getDmHuongPhuCapAll();
     }
 
     edit = (e, item) => {
@@ -99,7 +99,7 @@ class AdminPage extends React.Component {
     }
 
     changeActive = item => {
-        this.props.updateDmHuongPhuCap(item.ma, { kichHoat: Number(!item.kichHoat) })
+        this.props.updateDmHuongPhuCap(item.ma, { kichHoat: Number(!item.kichHoat) });
     };
 
     delete = (e, item) => {

@@ -44,7 +44,7 @@ export function getQuestionsList(formId, done) {
           }, error => {
                console.error('GET: ' + url + '.', error);
           });
-     }
+     };
 }
 
 export function getQuestionInPageByUser(formId, pageNumber, pageSize, done) {
@@ -52,13 +52,13 @@ export function getQuestionInPageByUser(formId, pageNumber, pageSize, done) {
           const url = `/api/home/questions-page/${formId}/${pageNumber}/${pageSize}`;
           T.get(url, data => {
                if (data.error) {
-                    T.notify('Lấy danh sách câu hỏi bị lỗi!', 'danger')
+                    T.notify('Lấy danh sách câu hỏi bị lỗi!', 'danger');
                } else {
                     dispatch({ type: GET_QUESTIONS_PAGE, list: data.list, pageNumber, pageSize, totalItem: data.totalItem });
                     done && done(data);
                }
           }, () => T.notify('Lấy danh sách câu hỏi bị lỗi!', 'danger'));
-     }
+     };
 }
 
 export function getQuestionAllByUser(formId, done) {
@@ -72,7 +72,7 @@ export function getQuestionAllByUser(formId, done) {
                     done && done(data);
                }
           }, () => T.notify('Lấy danh sách câu hỏi bị lỗi!', 'danger'));
-     }
+     };
 }
 
 export function createQuestion(id, data, done) {
@@ -87,7 +87,7 @@ export function createQuestion(id, data, done) {
                     done && done(data.item);
                }
           }, error => console.error('POST: ' + url + '.', error));
-     }
+     };
 }
 
 export function updateQuestion(id, data, formId, done) {
@@ -102,12 +102,12 @@ export function updateQuestion(id, data, formId, done) {
                     done && done();
                }
           }, error => console.error('PUT: ' + url + '.', error));
-     }
+     };
 }
 
 export function swapQuestion(id, formId, isMoveUp, done) {
      return dispatch => {
-          const url = `/api/question/swap`;
+          const url = '/api/question/swap';
           T.put(url, { id, formId, isMoveUp }, data => {
                if (data.error) {
                     T.notify('Thay đổi thứ tự câu hỏi bị lỗi!', 'danger');
@@ -117,12 +117,12 @@ export function swapQuestion(id, formId, isMoveUp, done) {
                     done && done();
                }
           }, error => console.error('PUT: ' + url + '.', error));
-     }
+     };
 }
 
 export function deleteQuestion(id, formId, done) {
      return dispatch => {
-          const url = `/api/question`;
+          const url = '/api/question';
           T.delete(url, { id }, data => {
                if (data.error) {
                     T.notify('Xóa câu hỏi bị lỗi!', 'danger');
@@ -132,5 +132,5 @@ export function deleteQuestion(id, formId, done) {
                     done && done();
                }
           }, error => console.error('DELETE: ' + url + '.', error));
-     }
+     };
 }

@@ -32,7 +32,7 @@ export default function DmTapChiReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -56,12 +56,12 @@ export function getDmTapChiPage(pageNumber, pageSize, done) {
                 dispatch({ type: DmTapChiGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách tạp chí bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmTapChiAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/tap-chi/all`;
+        const url = '/api/danh-muc/tap-chi/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách tạp chí bị lỗi!', 'danger');
@@ -71,7 +71,7 @@ export function getDmTapChiAll(done) {
                 dispatch({ type: DmTapChiGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách tạp chí bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmTapChi(ma, done) {
@@ -85,12 +85,12 @@ export function getDmTapChi(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmTapChi(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/tap-chi`;
+        const url = '/api/danh-muc/tap-chi';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo tạp chí bị lỗi!', 'danger');
@@ -100,12 +100,12 @@ export function createDmTapChi(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo tạp chí bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteDmTapChi(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/tap-chi`;
+        const url = '/api/danh-muc/tap-chi';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục tạp chí bị lỗi!', 'danger');
@@ -115,12 +115,12 @@ export function deleteDmTapChi(ma) {
                 dispatch(getDmTapChiAll());
             }
         }, error => T.notify('Xóa tạp chí bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDmTapChi(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/tap-chi`;
+        const url = '/api/danh-muc/tap-chi';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tin tạp chí bị lỗi!', 'danger');
@@ -131,7 +131,7 @@ export function updateDmTapChi(ma, changes, done) {
                 dispatch(getDmTapChiAll());
             }
         }, error => T.notify('Cập nhật thông tin tạp chí bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function changeDmTapChi(item) {
@@ -145,4 +145,4 @@ export const SelectAdapter_DmTapChi = {
     data: params => ({ condition: params.term }),
     processResults: data => ({ results: data && data.page && data.page.list ? data.page.list.map(item => ({ id: item.ma, text: item.ten })) : [] }),
     processResultOne: data => (data ? { value: data.ma, text: data.ma + ': ' + data.ten } : {})
-}
+};

@@ -17,20 +17,20 @@ const texts = {
         loginButton: 'SIGN IN',
         logoutButton: 'SIGN OUT',
         search: 'Search',
-        adminPage: "DASHBOARD"
+        adminPage: 'DASHBOARD'
     }
 };
 
 class HomeMenu extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { width: 0, divisionMenu: null, headerTitle: '', searchValue: '', headerMobile: '/img/logo-ussh.png?t=3' }
+        this.state = { width: 0, divisionMenu: null, headerTitle: '', searchValue: '', headerMobile: '/img/logo-ussh.png?t=3' };
         this.nav = React.createRef();
     }
 
     componentDidMount() {
         this.updateDimensions();
-        const donVi = $('meta[property=donVi]').attr("content");
+        const donVi = $('meta[property=donVi]').attr('content');
         if (this.props.isDonVi) {
             this.getMenu(donVi);
         }
@@ -41,11 +41,11 @@ class HomeMenu extends React.Component {
             } else {
                 setTimeout(ready, 100);
             }
-            $("#ftco-nav").on("show.bs.collapse", function () {
-                $("#dang-xuat").collapse("hide");
+            $('#ftco-nav').on('show.bs.collapse', function () {
+                $('#dang-xuat').collapse('hide');
             });
-            $("#dang-xuat").on("show.bs.collapse", function () {
-                $("#ftco-nav").collapse("hide");
+            $('#dang-xuat').on('show.bs.collapse', function () {
+                $('#ftco-nav').collapse('hide');
             });
         };
         $(document).ready(ready);
@@ -77,7 +77,7 @@ class HomeMenu extends React.Component {
                                 headerTitle: websites[0].headerTitle,
                                 showHeaderTitle: websites[0].showHeaderTitle,
                                 headerMobile: websites[0].headerMobile ? websites[0].headerMobile : '/img/logo-ussh.png'
-                            })
+                            });
                         }
                     }
                 });
@@ -103,7 +103,7 @@ class HomeMenu extends React.Component {
     render() {
         const language = T.language(texts);
         let menusView, menus = this.props.system && this.props.system.menus ? [...this.props.system.menus]
-            .map(item => { delete item.submenus; return item }) : [];
+            .map(item => { delete item.submenus; return item; }) : [];
         if (this.props.isDonVi) {
             menus = this.state.divisionMenu;
         }
@@ -118,8 +118,8 @@ class HomeMenu extends React.Component {
                         if (item.submenus) item.submenus.push(element);
                         else item.submenus = [element];
                     }
-                    return item
-                })
+                    return item;
+                });
             });
             menusView = menus.map((item, index) => {
                 if (!item.active) return null;
@@ -130,7 +130,7 @@ class HomeMenu extends React.Component {
                     <li key={index} className={`nav-item has-down ${index !== (menus.length - 1) && link !== '/' && 'menuStyle'} ${link !== '/' ? 'flex-lg-grow-1' : 'pr-4'}`}>
                         {isExternalLink ? <a href={link} target='_blank' className='nav-link d-flex align-items-center'
                             style={{ margin: 0, justifyContent: 'center' }}
-                            htmlFor={`link${index}MenuCheck`} ><h6 style={{ margin: '0 10px' }}><b>{title}</b></h6></a> :
+                            htmlFor={`link${index}MenuCheck`} rel="noreferrer" ><h6 style={{ margin: '0 10px' }}><b>{title}</b></h6></a> :
                             (item.link ? <Link to={link} className='nav-link d-flex align-items-center'
                                 htmlFor={`link${index}MenuCheck`} style={{ margin: 0, justifyContent: 'center' }} onClick={this.onMenuClick}><h6 style={{ margin: '0 10px' }}><b>{title}</b></h6></Link> :
                                 <a href='#' className='nav-link' htmlFor={`link${index}MenuCheck`} style={{ margin: '0 10px', justifyContent: 'center' }} onClick={e => e.preventDefault()}>{title}</a>)
@@ -152,7 +152,7 @@ class HomeMenu extends React.Component {
                                                     <li className="dropdown-item" key={index}>
                                                         {item.link.includes('http')
                                                             ? <a href={'#'} onClick={() => window.open(item.link, '_blank')}
-                                                                target='_blank' style={{ color: 'white', padding: 0, }}>
+                                                                target='_blank' style={{ color: 'white', padding: 0, }} rel="noreferrer">
                                                                 {T.language.parse(item.title)}</a>
                                                             : <Link to={item.link} onClick={this.onMenuClick}
                                                                 style={{ color: 'white', padding: 0, }}>{T.language.parse(item.title)}
@@ -166,7 +166,7 @@ class HomeMenu extends React.Component {
                                                 target='_blank'
                                                 style={{ color: 'white', padding: '0 20px', marginLeft: 8, marginRight: 8, marginBottom: 0 }}
                                                 data-toggle={submenu2 ? 'dropdown' : ''} className={submenu2 ? 'dropdown-toggle' : ''}
-                                                data-display="static">{T.language.parse(subMenu.title)}</a>
+                                                data-display="static" rel="noreferrer">{T.language.parse(subMenu.title)}</a>
                                             {submenu2}
                                         </li> :
                                         <li className="dropdown" key={subIndex}>
@@ -185,7 +185,7 @@ class HomeMenu extends React.Component {
                     </li>
                 ) :
                     (<li key={index} className={`nav-item d-flex justify-content-lg-center justify-content-left ${index !== (menus.length - 1) && link !== '/' && 'menuStyle'} ${link !== '/' ? 'flex-lg-grow-1' : 'pr-4'}`}>
-                        {isExternalLink ? <a href={link} target='_blank' className='nav-link d-flex align-items-center'><h6 style={{ margin: '0 10px' }}><b>{title}</b></h6></a> :
+                        {isExternalLink ? <a href={link} target='_blank' className='nav-link d-flex align-items-center' rel="noreferrer"><h6 style={{ margin: '0 10px' }}><b>{title}</b></h6></a> :
                             <Link to={link} className='nav-link d-flex align-items-center' onClick={this.onMenuClick}><h6 style={{ margin: '0 10px' }}><b>{title}</b></h6></Link>}
                     </li>);
             });
@@ -198,7 +198,7 @@ class HomeMenu extends React.Component {
                 return (
                     <div key={index} className='menuStyle d-flex justify-content-center align-items-center px-2'
                         style={{ backgroundColor: item.highlight ? 'red' : '', borderColor: 'transparent', borderRightWidth: 1, borderColor: '#0139A6' }}>
-                        {isExternalLink ? <a href={link} target='_blank' style={{ color: '#0139a6', fontSize: '0.9vw', fontWeight: 'bold' }}>{title}</a> :
+                        {isExternalLink ? <a href={link} target='_blank' style={{ color: '#0139a6', fontSize: '0.9vw', fontWeight: 'bold' }} rel="noreferrer">{title}</a> :
                             <Link to={Link} style={{ color: '#0139a6', fontSize: '0.9vw', fontWeight: 'bold' }}>{title}</Link>}
                     </div>
                 );
@@ -224,7 +224,7 @@ class HomeMenu extends React.Component {
                     <div className='p-2 col-3 offset-9 d-flex align-items-center justify-content-center' style={{ backgroundColor: '#e2e3ff' }}>
                         {
                             isExternalLink ?
-                                <a href={link} target='_blank' className='d-flex'><h5 className='m-0 text-center p-2' style={{ color: '#303591' }}><b className='homeHeading'>{title}</b></h5></a> :
+                                <a href={link} target='_blank' className='d-flex' rel="noreferrer"><h5 className='m-0 text-center p-2' style={{ color: '#303591' }}><b className='homeHeading'>{title}</b></h5></a> :
                                 <Link to={link} className='d-flex'><h5 className='m-0 text-center' style={{ color: '#303591' }}><b className='homeHeading'>{title}</b></h5></Link>
                         }
                     </div> : ''}

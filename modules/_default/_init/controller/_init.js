@@ -58,7 +58,7 @@ module.exports = app => {
         const count = {
             todayViews: app.data.todayViews,
             allViews: app.data.allViews
-        }
+        };
         app.io.emit('count', count);
         app.model.setting.setValue(count);
     };
@@ -88,17 +88,17 @@ module.exports = app => {
                 ngaySinh: req.body.changes.ngaySinh,
                 dienThoai: req.body.changes.dienThoai,
                 phai: req.body.changes.phai
-            }
+            };
             app.model.fwUser.update({ ma: req.session.user.ma }, changes, (error, user) => {
                 if (user) {
                     app.updateSessionUser(req, user);
                 }
                 res.send({ error, user });
-            })
+            });
         } else {
-            res.send({ eror: 'Not found user' })
+            res.send({ eror: 'Not found user' });
         }
-    })
+    });
 
     app.uploadComponentImage = (req, dataName, model, conditions, srcPath, sendResponse) => {
         if (conditions == 'new') {
@@ -142,7 +142,7 @@ module.exports = app => {
                             }
                         });
                     }
-                })
+                });
             } else {
                 const image = '/img/' + dataName + '/' + (new Date().getTime()).toString().slice(-8) + app.path.extname(srcPath);
                 app.fs.rename(srcPath, app.path.join(app.publicPath, image), error => sendResponse({ error, image }));

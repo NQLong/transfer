@@ -32,7 +32,7 @@ export default function DmPhuongXaReducer(state = null, data) {
 						}
 					}
 				}
-				return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+				return Object.assign({}, state, { items: updatedItems, page: updatedPage });
 			} else {
 				return null;
 			}
@@ -44,7 +44,7 @@ export default function DmPhuongXaReducer(state = null, data) {
 // Actions ------------------------------------------------------------------------------------------------------------
 export function getDmPhuongXaAll(done) {
 	return dispatch => {
-		const url = `/api/danh-muc/phuong-xa/all`;
+		const url = '/api/danh-muc/phuong-xa/all';
 		T.get(url, data => {
 			if (data.error) {
 				T.notify('Lấy danh sách phường xã bị lỗi!', 'danger');
@@ -54,7 +54,7 @@ export function getDmPhuongXaAll(done) {
 				dispatch({ type: DmPhuongXaGetAll, items: data.items ? data.items : [] });
 			}
 		}, error => T.notify('Lấy danh sách phường xã bị lỗi!', 'danger'));
-	}
+	};
 }
 
 T.initPage('dmPhuongXa');
@@ -72,7 +72,7 @@ export function getDmPhuongXaPage(pageNumber, pageSize, pageCondition, done) {
 				dispatch({ type: DmPhuongXaGetPage, page: data.page });
 			}
 		}, error => T.notify('Lấy danh sách phường xã bị lỗi!', 'danger'));
-	}
+	};
 }
 
 export function getDmPhuongXa(maPhuongXa, done) {
@@ -88,28 +88,28 @@ export function getDmPhuongXa(maPhuongXa, done) {
 		}, error => {
 			console.error(`GET: ${url}.`, error);
 		});
-	}
+	};
 }
 
 export function createDmPhuongXa(item, done) {
 	return dispatch => {
-		const url = `/api/danh-muc/phuong-xa`;
+		const url = '/api/danh-muc/phuong-xa';
 		T.post(url, { item }, data => {
 			if (data.error) {
 				console.error(`POST: ${url}.`, data.error);
-				T.notify('Tạo thông tin phường xã bị lỗi!', 'danger')
+				T.notify('Tạo thông tin phường xã bị lỗi!', 'danger');
 			} else {
 				dispatch(getDmPhuongXaPage());
 				if (done) done(data);
-				T.notify('Tạo thông tin phường xã thành công!', 'success')
+				T.notify('Tạo thông tin phường xã thành công!', 'success');
 			}
 		}, error => T.notify('Tạo thông tin phường xã bị lỗi!', 'danger'));
-	}
+	};
 }
 
 export function deleteDmPhuongXa(maPhuongXa) {
 	return dispatch => {
-		const url = `/api/danh-muc/phuong-xa`;
+		const url = '/api/danh-muc/phuong-xa';
 		T.delete(url, { maPhuongXa }, data => {
 			if (data.error) {
 				T.notify('Xóa thông tin phường xã bị lỗi!', 'danger');
@@ -119,12 +119,12 @@ export function deleteDmPhuongXa(maPhuongXa) {
 				dispatch(getDmPhuongXaPage());
 			}
 		}, error => T.notify('Xóa thông tin phường xã bị lỗi!', 'danger'));
-	}
+	};
 }
 
 export function updateDmPhuongXa(maPhuongXa, changes, done) {
 	return dispatch => {
-		const url = `/api/danh-muc/phuong-xa`;
+		const url = '/api/danh-muc/phuong-xa';
 		T.put(url, { maPhuongXa, changes }, data => {
 			if (data.error || changes == null) {
 				T.notify('Cập nhật thông phường xã bị lỗi!', 'danger');
@@ -135,22 +135,22 @@ export function updateDmPhuongXa(maPhuongXa, changes, done) {
 				dispatch(getDmPhuongXaPage());
 			}
 		}, error => T.notify('Cập nhật thông tin phường xã bị lỗi!', 'danger'));
-	}
+	};
 }
 export function createDmPhuongXaByUpload(item, done) {
 	return dispatch => {
-		const url = `/api/danh-muc/phuong-xa/createFromFile`;
+		const url = '/api/danh-muc/phuong-xa/createFromFile';
 		T.post(url, { item }, data => {
 			if (data.error) {
 				console.error(`POST: ${url}.`, data.error);
-				T.notify('Tạo thông tin phường xã bị lỗi!', 'danger')
+				T.notify('Tạo thông tin phường xã bị lỗi!', 'danger');
 			} else {
 				dispatch(getDmPhuongXaPage());
 				if (done) done(data);
 				T.notify('Import dữ liệu thành công!', 'success');
 			}
 		}, error => T.notify('Tạo thông tin phường xã bị lỗi!', 'danger'));
-	}
+	};
 }
 
 export function changeDmPhuongXa(item) {
@@ -162,4 +162,4 @@ export const SelectAdapter_DmPhuongXa = {
 	getAll: getDmPhuongXaAll,
 	processResults: response => ({ results: response ? response.map(item => ({ value: item.maPhuongXa, text: item.maPhuongXa + ': ' + item.tenPhuongXa, maQuanHuyen: item.maQuanHuyen })) : [] }),
 	condition: { kichHoat: 1 },
-}
+};

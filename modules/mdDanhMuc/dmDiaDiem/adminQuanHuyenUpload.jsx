@@ -139,7 +139,7 @@ class DmQuanHuyenUploadPage extends React.Component {
 				}
 			});
 			return state;
-		})
+		});
 	};
 	delete = (e, item) => {
 		e.preventDefault();

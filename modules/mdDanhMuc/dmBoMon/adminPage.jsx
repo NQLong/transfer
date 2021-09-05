@@ -66,7 +66,7 @@ class EditModal extends React.Component {
                 this.props.createDmBoMon(changes);
             }
             $(this.modal.current).modal('hide');
-        };
+        }
         e.preventDefault();
     }
 

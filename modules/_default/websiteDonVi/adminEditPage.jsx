@@ -69,8 +69,8 @@ class AdminEditPage extends React.Component {
             permissionWrite = currentPermissions.includes('website:write');
         let groupMenus = [], menus = [
             { title: 'Cấu hình menu', link: `/user/menu/${this.state.shortname}` },
-            { title: 'Danh mục bài viết', link: `/user/news/category` },
-            { title: 'Danh mục sự kiện', link: `/user/event/category` },
+            { title: 'Danh mục bài viết', link: '/user/news/category' },
+            { title: 'Danh mục sự kiện', link: '/user/event/category' },
             { title: 'Bài viết', link: `/user/news-donvi/${this.state.id}` },
             { title: 'Sự kiện', link: `/user/event-donvi/${this.state.id}` },
             { title: 'Thành phần giao diện', link: '/user/component' }

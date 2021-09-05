@@ -32,7 +32,7 @@ export default function DmChucDanhKhoaHocReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -56,12 +56,12 @@ export function getDmChucDanhKhoaHocPage(pageNumber, pageSize, done) {
                 dispatch({ type: DmChucDanhKhoaHocGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách ca học bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmChucDanhKhoaHocAll(condition, done) {
     return dispatch => {
-        const url = `/api/danh-muc/chuc-danh-khoa-hoc/all`;
+        const url = '/api/danh-muc/chuc-danh-khoa-hoc/all';
         T.get(url, { condition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách chức danh khoa học bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -71,7 +71,7 @@ export function getDmChucDanhKhoaHocAll(condition, done) {
                 dispatch({ type: DmChucDanhKhoaHocGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách chức danh khoa học bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmChucDanhKhoaHoc(ma, done) {
@@ -85,12 +85,12 @@ export function getDmChucDanhKhoaHoc(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmChucDanhKhoaHoc(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/chuc-danh-khoa-hoc`;
+        const url = '/api/danh-muc/chuc-danh-khoa-hoc';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo chức danh khoa học bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -100,12 +100,12 @@ export function createDmChucDanhKhoaHoc(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo chức danh khoa học bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function deleteDmChucDanhKhoaHoc(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/chuc-danh-khoa-hoc`;
+        const url = '/api/danh-muc/chuc-danh-khoa-hoc';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục chức danh khoa học bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -115,13 +115,13 @@ export function deleteDmChucDanhKhoaHoc(ma) {
                 dispatch(getDmChucDanhKhoaHocAll());
             }
         }, error => T.notify('Xóa chức danh khoa học bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function updateDmChucDanhKhoaHoc(ma, changes, done) {
 
     return dispatch => {
-        const url = `/api/danh-muc/chuc-danh-khoa-hoc`;
+        const url = '/api/danh-muc/chuc-danh-khoa-hoc';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tin chức danh khoa học bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -132,7 +132,7 @@ export function updateDmChucDanhKhoaHoc(ma, changes, done) {
                 dispatch(getDmChucDanhKhoaHocAll());
             }
         }, error => T.notify('Cập nhật thông tin chức danh khoa học bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function changeDmChucDanhKhoaHoc(item) {
@@ -144,4 +144,4 @@ export const SelectAdapter_DmChucDanhKhoaHoc = {
     getAll: getDmChucDanhKhoaHocAll,
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
     condition: { kichHoat: 1 },
-}
+};

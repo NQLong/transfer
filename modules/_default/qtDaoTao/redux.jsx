@@ -10,7 +10,7 @@ export function createQtDaoTaoStaff(data, done) {
                 if (done) done(res);
             }
         }, error => T.notify('Thêm thông tin quá trình đào tạo bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function updateQtDaoTaoStaff(id, changes, done) {
@@ -25,7 +25,7 @@ export function updateQtDaoTaoStaff(id, changes, done) {
                 if (done) done();
             }
         }, error => T.notify('Cập nhật thông tin quá trình đào tạo bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function deleteQtDaoTaoStaff(id, done) {
@@ -40,7 +40,7 @@ export function deleteQtDaoTaoStaff(id, done) {
                 if (done) done();
             }
         }, error => T.notify('Xóa thông tin quá trình đào tạo bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function createQtDaoTaoStaffUser(data, done) {
@@ -55,7 +55,7 @@ export function createQtDaoTaoStaffUser(data, done) {
                 if (done) done(res);
             }
         }, error => T.notify('Thêm thông tin quá trình đào tạo bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function updateQtDaoTaoStaffUser(id, changes, done) {
@@ -70,7 +70,7 @@ export function updateQtDaoTaoStaffUser(id, changes, done) {
                 if (done) done();
             }
         }, error => T.notify('Cập nhật thông tin quá trình đào tạo bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function deleteQtDaoTaoStaffUser(id, done) {
@@ -82,8 +82,8 @@ export function deleteQtDaoTaoStaffUser(id, done) {
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
                 T.alert('Thông tin quá trình đào tạo được xóa thành công!', 'info', false, 800);
-                done && done()
+                done && done();
             }
         }, error => T.notify('Xóa thông tin quá trình đào tạo bị lỗi' , 'danger'));
-    }
+    };
 }

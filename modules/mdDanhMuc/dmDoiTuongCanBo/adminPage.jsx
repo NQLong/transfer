@@ -33,7 +33,7 @@ class EditModal extends React.Component {
                 ma: $('#dmDoiTuongCanBoMa').val().trim(),
                 ghiChu: $('#dmDoiTuongCanBoGhiChu').val(),
                 kichHoat: this.state.active ? 1 : 0,
-            }
+            };
 
         if (changes.ten == '') {
             T.notify('Tên đối tượng cán bộ bị trống!', 'danger');

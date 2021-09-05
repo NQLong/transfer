@@ -20,7 +20,7 @@ module.exports = app => {
             condition = {
                 statement: 'lower(ma) LIKE :searchText OR lower(ten) LIKE :searchText',
                 parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
-            }
+            };
         }
         app.model.dmChiBo.getPage(pageNumber, pageSize, condition, '*', 'ten ASC', (error, page) => res.send({ error, page }));
     });

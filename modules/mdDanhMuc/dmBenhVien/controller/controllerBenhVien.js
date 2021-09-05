@@ -22,18 +22,18 @@ module.exports = app => {
             condition = {
                 statement: 'lower(ten) LIKE :searchText OR lower(diaChi) LIKE :searchText',
                 parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
-            }
+            };
         }
         app.model.dmBenhVien.getPage(pageNumber, pageSize, condition, '*', 'ma', (error, page) => res.send({ error, page }));
 
     });
 
     app.get('/api/danh-muc/benh-vien/all', app.permission.check('user:login'), (req, res) => {
-        app.model.dmBenhVien.getAll((error, items) => res.send({ error, items }))
+        app.model.dmBenhVien.getAll((error, items) => res.send({ error, items }));
     });
 
     app.get('/api/danh-muc/benh-vien/item/:ma', app.permission.check('user:login'), (req, res) => {
-        app.model.dmBenhVien.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }))
+        app.model.dmBenhVien.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
     });
 
     app.post('/api/danh-muc/benh-vien', app.permission.check('dmBenhVien:write'), (req, res) => {
@@ -53,7 +53,7 @@ module.exports = app => {
         const data = req.body.dmBenhVien;
         const dataImported = [];
         const handleCreate = index => {
-            if (index >= data.length) res.send({ items: dataImported })
+            if (index >= data.length) res.send({ items: dataImported });
             else
                 app.model.dmBenhVien.get({ ma: data[index].ma }, (error, item) => {
                     let currentDate = data[index];
@@ -76,13 +76,13 @@ module.exports = app => {
                             }
                         });
                     }
-                })
+                });
         };
         handleCreate(0);
     });
 
     app.put('/api/danh-muc/benh-vien', app.permission.check('dmBenhVien:write'), (req, res) => {
-        app.model.dmBenhVien.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }))
+        app.model.dmBenhVien.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
     app.delete('/api/danh-muc/benh-vien', app.permission.check('dmBenhVien:delete'), (req, res) => {

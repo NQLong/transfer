@@ -10,7 +10,7 @@ export function createQtKhenThuongStaff(data, done) {
                 if (done) done(res);
             }
         }, error => T.notify('Thêm thông tin quá trình khen thưởng bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function updateQtKhenThuongStaff(id, changes, done) {
@@ -25,7 +25,7 @@ export function updateQtKhenThuongStaff(id, changes, done) {
                 if (done) done();
             }
         }, error => T.notify('Cập nhật thông tin quá trình khen thưởng bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function deleteQtKhenThuongStaff(id, done) {
@@ -40,7 +40,7 @@ export function deleteQtKhenThuongStaff(id, done) {
                 if (done) done();
             }
         }, error => T.notify('Xóa thông tin quá trình khen thưởng bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function createQtKhenThuongStaffUser(data, done) {
@@ -55,7 +55,7 @@ export function createQtKhenThuongStaffUser(data, done) {
                 if (done) done(res);
             }
         }, error => T.notify('Thêm thông tin quá trình khen thưởng bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function updateQtKhenThuongStaffUser(id, changes, done) {
@@ -70,7 +70,7 @@ export function updateQtKhenThuongStaffUser(id, changes, done) {
                 if (done) done();
             }
         }, error => T.notify('Cập nhật thông tin quá trình khen thưởng bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function deleteQtKhenThuongStaffUser(id, done) {
@@ -82,8 +82,8 @@ export function deleteQtKhenThuongStaffUser(id, done) {
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
                 T.alert('Thông tin quá trình khen thưởng được xóa thành công!', 'info', false, 800);
-                done && done()
+                done && done();
             }
         }, error => T.notify('Xóa thông tin quá trình khen thưởng bị lỗi' , 'danger'));
-    }
+    };
 }

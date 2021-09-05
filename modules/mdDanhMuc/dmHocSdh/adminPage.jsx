@@ -11,7 +11,7 @@ class EditModal extends React.Component {
     componentDidMount() {
         $(document).ready(() => {
             $(this.modal.current).on('shown.bs.modal', () => $('#dmHocSdhMa').focus());
-        })
+        });
     }
 
     show = (item) => {
@@ -87,7 +87,7 @@ class EditModal extends React.Component {
                     </div>
                 </form>
             </div>
-        )
+        );
     }
 }
 
@@ -113,7 +113,7 @@ class dmHocSdhPage extends React.Component {
 
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permissionWrite = currentPermissions.includes('dmHocSdh:write')
+            permissionWrite = currentPermissions.includes('dmHocSdh:write');
         const { pageNumber, pageSize, pageTotal, totalItem, list } = this.props.dmHocSdh && this.props.dmHocSdh.page ?
             this.props.dmHocSdh.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: [] };
         let table = 'Không có dữ liệu!';

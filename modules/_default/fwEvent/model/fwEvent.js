@@ -112,7 +112,7 @@ module.exports = app => {
                 });
             }
         });
-    }
+    };
 
     app.model.fwEvent.swapPriority = (id, isMoveUp, done) => {
         app.model.fwEvent.get({ id }, (error, item1) => {
@@ -138,12 +138,12 @@ module.exports = app => {
                         item2.priority = priority;
                         app.model.fwEvent.update({ id: item1.id }, { priority: item1.priority }, error1 => {
                             app.model.fwEvent.update({ id: item2.id }, { priority: item2.priority }, error2 => done(error1 || error2));
-                        })
+                        });
                     }
                 });
             }
         });
-    }
+    };
 
     app.model.fwEvent.getByLink = (link, done) => app.model.fwEvent.get({ link }, done);
 
@@ -192,7 +192,7 @@ module.exports = app => {
             result = { totalItem, pageSize, pageTotal: Math.ceil(totalItem / pageSize) };
             result.pageNumber = pageNumber === -1 ? pageTotal : Math.min(pageNumber, result.pageTotal);
             leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
-            const sql = 'SELECT ' + app.dbConnection.parseSelectedColumns(obj2Db, selectedColumns) + `, CATEGORY_ID AS "category_Id", CATEGORY_TITLE AS "category_Title" ` + `FROM (SELECT FN.*, COUNT(*) over (partition by FN.ID) AS CNT, FC.ID AS CATEGORY_ID, FC.TITLE AS CATEGORY_TITLE, ROW_NUMBER() OVER (ORDER BY `
+            const sql = 'SELECT ' + app.dbConnection.parseSelectedColumns(obj2Db, selectedColumns) + ', CATEGORY_ID AS "category_Id", CATEGORY_TITLE AS "category_Title" ' + 'FROM (SELECT FN.*, COUNT(*) over (partition by FN.ID) AS CNT, FC.ID AS CATEGORY_ID, FC.TITLE AS CATEGORY_TITLE, ROW_NUMBER() OVER (ORDER BY '
                 + (orderBy ? ' FN.' + orderBy : ' FN.' + keys) + ') R FROM FW_EVENT FN INNER JOIN FW_EVENT_CATEGORY FNC on FN.ID = FNC.EVENT_ID INNER JOIN FW_CATEGORY FC on FNC.CATEGORY_ID = FC.ID WHERE CATEGORY_ID IN( '
                 + category + ')' + (condition.statement ? ' AND ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize) + (condition.statement ? ' AND CNT = 1' : '');
             app.dbConnection.execute(sql, parameter, (error, resultSet) => {
@@ -201,4 +201,4 @@ module.exports = app => {
             });
         });
     };
-}
+};

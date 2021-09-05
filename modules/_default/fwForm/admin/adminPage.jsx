@@ -42,7 +42,7 @@ class CopyModal extends React.Component {
                     this.props.getFormInPage();
                 }
                 $(this.modal.current).modal('hide');
-            })
+            });
         }
         e.preventDefault();
     };

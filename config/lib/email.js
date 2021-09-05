@@ -10,7 +10,7 @@ module.exports = app => {
                 from: app.mailSentName, // Change to your verified sender
                 subject: mailSubject,
                 html: mailHtml,
-            }
+            };
             sgMail.send(msg).then(() => {
                 console.log('Email sent');
                 successCallback('success');
@@ -55,5 +55,5 @@ module.exports = app => {
         isHCMUSSH: email => {
             return email.endsWith('@hcmussh.edu.vn');
         }
-    }
+    };
 };

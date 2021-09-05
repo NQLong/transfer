@@ -32,7 +32,7 @@ export default function DmNghiemThuXepLoaiKhcnReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -56,12 +56,12 @@ export function getDmNghiemThuXepLoaiKhcnPage(pageNumber, pageSize, done) {
                 dispatch({ type: DmNghiemThuXepLoaiKhcnGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách nghiệm thu xếp loại KHCN bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmNghiemThuXepLoaiKhcnAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/nghiem-thu-xep-loai-khcn/all`;
+        const url = '/api/danh-muc/nghiem-thu-xep-loai-khcn/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách nghiệm thu xếp loại KHCN bị lỗi!', 'danger');
@@ -71,7 +71,7 @@ export function getDmNghiemThuXepLoaiKhcnAll(done) {
                 dispatch({ type: DmNghiemThuXepLoaiKhcnGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách nghiệm thu xếp loại KHCN bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmNghiemThuXepLoaiKhcn(ma, done) {
@@ -85,12 +85,12 @@ export function getDmNghiemThuXepLoaiKhcn(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmNghiemThuXepLoaiKhcn(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/nghiem-thu-xep-loai-khcn`;
+        const url = '/api/danh-muc/nghiem-thu-xep-loai-khcn';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo nghiệm thu xếp loại KHCN bị lỗi!', 'danger');
@@ -101,12 +101,12 @@ export function createDmNghiemThuXepLoaiKhcn(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo nghiệm thu xếp loại KHCN bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteDmNghiemThuXepLoaiKhcn(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/nghiem-thu-xep-loai-khcn`;
+        const url = '/api/danh-muc/nghiem-thu-xep-loai-khcn';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục nghiệm thu xếp loại KHCN bị lỗi!', 'danger');
@@ -116,12 +116,12 @@ export function deleteDmNghiemThuXepLoaiKhcn(ma) {
                 dispatch(getDmNghiemThuXepLoaiKhcnAll());
             }
         }, error => T.notify('Xóa nghiệm thu xếp loại KHCN bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDmNghiemThuXepLoaiKhcn(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/nghiem-thu-xep-loai-khcn`;
+        const url = '/api/danh-muc/nghiem-thu-xep-loai-khcn';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tin nghiệm thu xếp loại KHCN bị lỗi!', 'danger');
@@ -132,7 +132,7 @@ export function updateDmNghiemThuXepLoaiKhcn(ma, changes, done) {
                 dispatch(getDmNghiemThuXepLoaiKhcnAll());
             }
         }, error => T.notify('Cập nhật thông tin nghiệm thu xếp loại KHCN bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function changeDmNghiemThuXepLoaiKhcn(item) {

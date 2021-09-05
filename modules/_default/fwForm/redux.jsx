@@ -83,7 +83,7 @@ export function getForm(id, done) {
                 done && done(data);
             }
         }, error => T.notify('Lấy bảng câu hỏi bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function createForm(done) {
@@ -101,7 +101,7 @@ export function createForm(done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo bảng câu hỏi bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function duplicateForm(id, title, done) {
@@ -115,7 +115,7 @@ export function duplicateForm(id, title, done) {
                 if (done) done(data);
             }
         }, () => T.notify('Sao chép bảng câu hỏi bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateForm(id, changes, done) {
@@ -131,7 +131,7 @@ export function updateForm(id, changes, done) {
                 done && done();
             }
         }, error => T.notify('Cập nhật thông tin bảng câu hỏi bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function swapForm(id, isMoveUp) {
@@ -146,7 +146,7 @@ export function swapForm(id, isMoveUp) {
                 dispatch(getFormInPage());
             }
         }, error => T.notify('Thay đổi thứ tự bảng câu hỏi bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteForm(id) {
@@ -161,12 +161,12 @@ export function deleteForm(id) {
                 dispatch(getFormInPage());
             }
         }, error => T.notify('Xóa bảng câu hỏi bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteFile(formId, type, done) {
     return dispatch => {
-        const url = `/api/form-media`;
+        const url = '/api/form-media';
         T.delete(url, { formId, type }, data => {
             if (data.error) {
                 T.notify('Xóa file bị lỗi!', 'danger');
@@ -175,7 +175,7 @@ export function deleteFile(formId, type, done) {
                 done && done();
             }
         });
-    }
+    };
 }
 
 // Actions (user) -----------------------------------------------------------------------------------------------------
@@ -191,7 +191,7 @@ export function homeGetForm(id, done) {
                 done && done(data.item, data.payment);
             }
         }, error => T.notify('Lấy bảng câu hỏi bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function homeGetInstruction(id, paymentId, done) {
@@ -206,7 +206,7 @@ export function homeGetInstruction(id, paymentId, done) {
                 done && done(data.item);
             }
         }, error => T.notify('Lấy clip hướng dẫn bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function homeTestForm(id, done) {
@@ -221,7 +221,7 @@ export function homeTestForm(id, done) {
                 done && done(data.item);
             }
         }, error => T.notify('Lấy bảng câu hỏi bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getFormInPageByUser(pageNumber, pageSize, isNew, pageCondition, done) {

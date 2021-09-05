@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { getDmNghiemThuXepLoaiKhcnAll, deleteDmNghiemThuXepLoaiKhcn, createDmNghiemThuXepLoaiKhcn, updateDmNghiemThuXepLoaiKhcn } from './redux';
-import TextInput, { TextareaInput, BooleanInput } from 'view/component/Input'
+import TextInput, { TextareaInput, BooleanInput } from 'view/component/Input';
 import { Link } from 'react-router-dom';
 
 class EditModal extends React.Component {
@@ -47,7 +47,7 @@ class EditModal extends React.Component {
                 ten: this.getValue(this.ten.current),
                 ghiChu: this.getValue(this.ghiChu.current),
                 kichHoat: this.getValue(this.kichHoat.current)
-            }
+            };
             this.saveBtn.current.disabled = true;
             this.state.isUpdate ? this.props.update(data.ma, data) : this.props.create(data);
             $(this.modal.current).modal('hide');
@@ -102,7 +102,7 @@ class DmNghiemThuXepLoaiKhcnPage extends React.Component {
 
     componentDidMount() {
         T.ready('/user/category');
-        this.props.getDmNghiemThuXepLoaiKhcnAll()
+        this.props.getDmNghiemThuXepLoaiKhcnAll();
     }
 
     edit = (e, item) => {

@@ -72,7 +72,7 @@ export default class LogoCarousel extends React.Component {
                     container.css('left', left - speed);
                 }, 60);
             }
-        }
+        };
         onLoad();
     }
 
@@ -81,9 +81,9 @@ export default class LogoCarousel extends React.Component {
         if (this.state.logos.length > 0) {
             const logo = this.state.logos[0];
             firstImage =
-                <a href={logo.link} style={Object.assign({}, scrollerItemStyle, { left: -startLeft })} target='_blank'>
+                <a href={logo.link} style={Object.assign({}, scrollerItemStyle, { left: -startLeft })} target='_blank' rel="noreferrer">
                     <img src={logo.image} alt={logo.title} width='auto' height='100%' onLoad={this.onImageLoad} />
-                </a>
+                </a>;
         }
 
         return (

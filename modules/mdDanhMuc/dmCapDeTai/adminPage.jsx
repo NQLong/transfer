@@ -34,7 +34,7 @@ class EditModal extends React.Component {
     focusInput = element => element.focus ? element.focus() : $(element).data('select2-hidden-accessible') ? $(element).select2('open') : $(element).focus();
 
     getValue = (selector, required = true, dataGetter = i => i.val ? i.val() : $(i).val() ? $(i).val().trim() : '') => {
-        const data = dataGetter(selector)
+        const data = dataGetter(selector);
         if (data) return data;
         if (required) throw selector;
         return '';
@@ -109,16 +109,16 @@ class EditModal extends React.Component {
                                 <input className='form-control' id='dmCapDeTaiTenCap' type='text' placeholder='Tên cấp' readOnly={readOnly} />
                             </div>
                             <div className='form-group col-12 col-md-6'>
-                                <DateInput2 ref={this.dkdtNgayBdRef} onChange={event => { this.handleOnChange(event, this.dkdtNgayBdRef) }} type='minute' label='Ngày bắt đầu đăng ký' placeholder='Ngày bắt đầu đăng ký' disabled={readOnly} />
+                                <DateInput2 ref={this.dkdtNgayBdRef} onChange={event => { this.handleOnChange(event, this.dkdtNgayBdRef); }} type='minute' label='Ngày bắt đầu đăng ký' placeholder='Ngày bắt đầu đăng ký' disabled={readOnly} />
                             </div>
                             <div className='form-group col-12 col-md-6'>
-                                <DateInput2 ref={this.dkdtNgayKtRef} onChange={event => { this.handleOnChange(event, this.dkdtNgayKtRef) }} type='minute' label='Ngày kết thúc đăng ký' placeholder='Ngày kết thúc đăng ký' disabled={readOnly} />
+                                <DateInput2 ref={this.dkdtNgayKtRef} onChange={event => { this.handleOnChange(event, this.dkdtNgayKtRef); }} type='minute' label='Ngày kết thúc đăng ký' placeholder='Ngày kết thúc đăng ký' disabled={readOnly} />
                             </div>
                             <div className='form-group col-12 col-md-6'>
-                                <DateInput2 ref={this.pbdtNgayBdRef} onChange={event => { this.handleOnChange(event, this.pbdtNgayBdRef) }} type='minute' label='Ngày bắt đầu phản biện' placeholder='Ngày bắt đầu phản biện' disabled={readOnly} />
+                                <DateInput2 ref={this.pbdtNgayBdRef} onChange={event => { this.handleOnChange(event, this.pbdtNgayBdRef); }} type='minute' label='Ngày bắt đầu phản biện' placeholder='Ngày bắt đầu phản biện' disabled={readOnly} />
                             </div>
                             <div className='form-group col-12 col-md-6'>
-                                <DateInput2 ref={this.pbdtNgayKtRef} onChange={event => { this.handleOnChange(event, this.pbdtNgayKtRef) }} type='minute' label='Ngày kết thúc phản biện' placeholder='Ngày kết thúc phản biện' disabled={readOnly} />
+                                <DateInput2 ref={this.pbdtNgayKtRef} onChange={event => { this.handleOnChange(event, this.pbdtNgayKtRef); }} type='minute' label='Ngày kết thúc phản biện' placeholder='Ngày kết thúc phản biện' disabled={readOnly} />
                             </div>
                         </div>
                         <div className='modal-footer'>
@@ -137,13 +137,13 @@ class AdminPage extends React.Component {
     optionsMaCapCha = [];
 
     componentDidMount() {
-        this.props.getDmCapDeTaiAll()
+        this.props.getDmCapDeTaiAll();
         T.ready('/user/khcn', () => {
             this.props.getDmCapDeTaiAll(items => {
                 if (items) {
                     items.forEach(item => {
-                        this.optionsMaCapCha.push(<option key={item.maCap} value={item.maCap}>{item.maCap + ': ' + item.tenCap}</option>)
-                    })
+                        this.optionsMaCapCha.push(<option key={item.maCap} value={item.maCap}>{item.maCap + ': ' + item.tenCap}</option>);
+                    });
                 }
             });
         });
@@ -161,7 +161,7 @@ class AdminPage extends React.Component {
     }
 
     toggleDktmdT = item => {
-        this.props.updateDmCapDeTai(item.maCap, { dkTmdt: item.dkTmdt === 1 ? 0 : 1 })
+        this.props.updateDmCapDeTai(item.maCap, { dkTmdt: item.dkTmdt === 1 ? 0 : 1 });
     }
 
     render() {
@@ -192,11 +192,11 @@ class AdminPage extends React.Component {
                                 <td style={{ textAlign: 'center' }}>{item.maCap ? item.maCap : ''}</td>
                                 <td>
                                     {item.dkdtNgayBd ? T.dateToText(item.dkdtNgayBd, 'dd/mm/yyyy HH:MM') : ''} <br />
-                                    {item.dkdtNgayKt ? `- ` + T.dateToText(item.dkdtNgayKt, 'dd/mm/yyyy HH:MM') : ''}
+                                    {item.dkdtNgayKt ? '- ' + T.dateToText(item.dkdtNgayKt, 'dd/mm/yyyy HH:MM') : ''}
                                 </td>
                                 <td>
                                     {item.pbdtNgayBd ? T.dateToText(item.pbdtNgayBd, 'dd/mm/yyyy HH:MM') : ''} <br />
-                                    {item.pbdtNgayKt ? `- ` + T.dateToText(item.pbdtNgayKt, 'dd/mm/yyyy HH:MM') : ''}
+                                    {item.pbdtNgayKt ? '- ' + T.dateToText(item.pbdtNgayKt, 'dd/mm/yyyy HH:MM') : ''}
                                 </td>
                                 <td style={{ textAlign: 'center' }}>
                                     <div className='btn-group'>

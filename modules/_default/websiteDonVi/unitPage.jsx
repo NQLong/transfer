@@ -39,8 +39,8 @@ class UnitPage extends React.Component {
                 margin: 0,
                 nav: true,
                 dots: false,
-                navText: ["<div class='next-button' style=' position: absolute; left: 10px'><div style='width: 0px; margin: 7px;border-top: 8px solid transparent; border-right: 10px solid #283889; border-bottom: 8px solid transparent'></div></div>"
-                    , "<div class='next-button' style=' position: absolute; right: 10px'><div style='width: 0px; margin: 7px;margin-left: 10px;border-top: 8px solid transparent; border-left: 10px solid #283889; border-bottom: 8px solid transparent'></div></div>"],
+                navText: ['<div class=\'next-button\' style=\' position: absolute; left: 10px\'><div style=\'width: 0px; margin: 7px;border-top: 8px solid transparent; border-right: 10px solid #283889; border-bottom: 8px solid transparent\'></div></div>'
+                    , '<div class=\'next-button\' style=\' position: absolute; right: 10px\'><div style=\'width: 0px; margin: 7px;margin-left: 10px;border-top: 8px solid transparent; border-left: 10px solid #283889; border-bottom: 8px solid transparent\'></div></div>'],
                 responsive: {
                     0: { items: 1 },
                     400: { item: 2 },
@@ -87,8 +87,8 @@ class UnitPage extends React.Component {
                 margin: 0,
                 nav: true,
                 dots: false,
-                navText: ["<div class='next-button' style=' position: absolute; left: 10px'><div style='width: 0px; margin: 7px;border-top: 8px solid transparent; border-right: 10px solid #283889; border-bottom: 8px solid transparent'></div></div>"
-                    , "<div class='next-button' style=' position: absolute; right: 10px'><div style='width: 0px; margin: 7px;margin-left: 10px;border-top: 8px solid transparent; border-left: 10px solid #283889; border-bottom: 8px solid transparent'></div></div>"],
+                navText: ['<div class=\'next-button\' style=\' position: absolute; left: 10px\'><div style=\'width: 0px; margin: 7px;border-top: 8px solid transparent; border-right: 10px solid #283889; border-bottom: 8px solid transparent\'></div></div>'
+                    , '<div class=\'next-button\' style=\' position: absolute; right: 10px\'><div style=\'width: 0px; margin: 7px;margin-left: 10px;border-top: 8px solid transparent; border-left: 10px solid #283889; border-bottom: 8px solid transparent\'></div></div>'],
                 responsive: {
                     0: { items: 1 },
                     400: { item: 2 },
@@ -130,7 +130,7 @@ class UnitPage extends React.Component {
                                 {this.props.dvWebsiteGioiThieu && this.props.dvWebsiteGioiThieu.homeDv.map((item, index) => {
                                     if (item.trongSo == 1) {
                                         return <div className='col-6 colKhoa' key={index} style={{ height: 140 }} >
-                                            <div className={this.state.hoverItem != index ? 'boxKhoa' : 'boxKhoa boxKhoa-active'} style={{}} onClick={() => { this.setState({ hoverItem: index }) }}>
+                                            <div className={this.state.hoverItem != index ? 'boxKhoa' : 'boxKhoa boxKhoa-active'} style={{}} onClick={() => { this.setState({ hoverItem: index }); }}>
                                                 <div style={{ width: '100%' }}>
                                                     {T.language.parse(item.ten)}
                                                 </div>
@@ -138,7 +138,7 @@ class UnitPage extends React.Component {
                                         </div>;
                                     } else {
                                         return <div className='col-12 colKhoa' key={index} style={{ height: 140 }}>
-                                            <div className={this.state.hoverItem != index ? 'boxKhoa' : 'boxKhoa boxKhoa-active'} style={{}} onClick={() => { this.setState({ hoverItem: index }) }}>
+                                            <div className={this.state.hoverItem != index ? 'boxKhoa' : 'boxKhoa boxKhoa-active'} style={{}} onClick={() => { this.setState({ hoverItem: index }); }}>
                                                 <div style={{ width: '100%', fontWeight: 'bold' }}>
                                                     {T.language.parse(item.ten)}
                                                 </div>
@@ -204,7 +204,7 @@ class UnitPage extends React.Component {
                     </div>
                 }
             </div>
-        )
+        );
     }
 }
 

@@ -31,7 +31,7 @@ export default class ImageBox extends React.Component {
         event.preventDefault();
         const readOnly = this.props.readOnly ? this.props.readOnly : false;
         if (!readOnly) {
-            $(this.box.current).css('background-color', '#FFF')
+            $(this.box.current).css('background-color', '#FFF');
 
             if (event.dataTransfer.items) {
                 if (event.dataTransfer.items.length > 0) {

@@ -13,7 +13,7 @@ class EditAnswerModal extends React.Component {
             this.valueList[i] = React.createRef();
         }
 
-        this.state = { item: null }
+        this.state = { item: null };
     }
 
     componentDidMount() {

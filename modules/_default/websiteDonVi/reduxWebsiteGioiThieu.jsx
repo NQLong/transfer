@@ -41,7 +41,7 @@ export default function WebsiteGioiThieuReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -70,7 +70,7 @@ export default function WebsiteGioiThieuReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -96,12 +96,12 @@ export function getWebsiteGioiThieuPage(pageNumber, pageSize, pageCondition, don
                 dispatch({ type: WebsiteGioiThieuGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách giới thiệu website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getWebsiteGioiThieuAll(maDonVi, done) {
     return dispatch => {
-        const url = `/api/website/intro/all/` + maDonVi;
+        const url = '/api/website/intro/all/' + maDonVi;
         T.get(url, { maDonVi }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách giới thiệu website đơn vị bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -111,7 +111,7 @@ export function getWebsiteGioiThieuAll(maDonVi, done) {
                 dispatch({ type: WebsiteGioiThieuGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách giới thiệu website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getWebsiteGioiThieu(ma, done) {
@@ -126,12 +126,12 @@ export function getWebsiteGioiThieu(ma, done) {
                 dispatch({ type: WebsiteGioiThieuGet, item: data.item });
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createWebsiteGioiThieu(item, done) {
     return dispatch => {
-        const url = `/api/website/intro`;
+        const url = '/api/website/intro';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo giới thiệu website đơn vị bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -142,12 +142,12 @@ export function createWebsiteGioiThieu(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo giới thiệu website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
-    }
+    };
 }
 
 export function deleteWebsiteGioiThieu(maDonVi, ma) {
     return dispatch => {
-        const url = `/api/website/intro`;
+        const url = '/api/website/intro';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa mục giới thiệu website đơn vị bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -157,12 +157,12 @@ export function deleteWebsiteGioiThieu(maDonVi, ma) {
                 dispatch(getWebsiteGioiThieuAll(maDonVi));
             }
         }, error => T.notify('Xóa giới thiệu website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
-    }
+    };
 }
 
 export function updateWebsiteGioiThieu(maDonVi, ma, changes, done) {
     return dispatch => {
-        const url = `/api/website/intro`;
+        const url = '/api/website/intro';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tin giới thiệu website đơn vị bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -174,7 +174,7 @@ export function updateWebsiteGioiThieu(maDonVi, ma, changes, done) {
                 dispatch(getWebsiteGioiThieuAll(maDonVi));
             }
         }, error => T.notify('Cập nhật thông tin giới thiệu website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
-    }
+    };
 }
 
 export function swapWebsiteGioiThieu(maDonVi, ma, thuTu, isMoveUp, done) {
@@ -182,14 +182,14 @@ export function swapWebsiteGioiThieu(maDonVi, ma, thuTu, isMoveUp, done) {
         const url = '/api/website/intro/swap';
         T.put(url, { ma, thuTu, isMoveUp, maDonVi }, data => {
             if (data.error) {
-                T.notify('Thay đổi vị trí mục giới thiệu khoa bị lỗi!', 'danger')
+                T.notify('Thay đổi vị trí mục giới thiệu khoa bị lỗi!', 'danger');
                 console.error('PUT: ' + url + '. ' + data.error);
             } else {
                 dispatch(getWebsiteGioiThieuAll(maDonVi));
                 done && done();
             }
         }, error => T.notify('Thay đổi vị trí mục giới thiệu khoa bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function changeWebsiteGioiThieu(item) {
@@ -199,7 +199,7 @@ export function changeWebsiteGioiThieu(item) {
 //WebsiteGioiThieuHinh
 export function getWebsiteGioiThieuHinhAll(condition, done) {
     return dispatch => {
-        const url = `/api/website/intro/image/all`;
+        const url = '/api/website/intro/image/all';
         T.get(url, { condition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách hinh giới thiệu website đơn vị bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -209,7 +209,7 @@ export function getWebsiteGioiThieuHinhAll(condition, done) {
                 dispatch({ type: WebsiteGioiThieuHinhGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách hình giới thiệu website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getWebsiteGioiThieuHinhAllById(maWebsiteGioiThieu, done) {
@@ -224,7 +224,7 @@ export function getWebsiteGioiThieuHinhAllById(maWebsiteGioiThieu, done) {
                 dispatch({ type: WebsiteGioiThieuHinhGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách hình giới thiệu website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getWebsiteGioiThieuHinh(ma, done) {
@@ -238,12 +238,12 @@ export function getWebsiteGioiThieuHinh(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createWebsiteGioiThieuHinh(item, done) {
     return dispatch => {
-        const url = `/api/website/intro/image`;
+        const url = '/api/website/intro/image';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo hình giới thiệu website đơn vị bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -254,12 +254,12 @@ export function createWebsiteGioiThieuHinh(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo hình giới thiệu website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
-    }
+    };
 }
 
 export function deleteWebsiteGioiThieuHinh(item) {
     return dispatch => {
-        const url = `/api/website/intro/image`;
+        const url = '/api/website/intro/image';
         T.delete(url, { ma: item.ma }, data => {
             if (data.error) {
                 T.notify('Xóa hình giới thiệu website đơn vị bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -269,12 +269,12 @@ export function deleteWebsiteGioiThieuHinh(item) {
                 dispatch(getWebsiteGioiThieu(item.maWebsiteGioiThieu));
             }
         }, error => T.notify('Xóa hình giới thiệu website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
-    }
+    };
 }
 
 export function updateWebsiteGioiThieuHinh(maWebsiteGioiThieu, ma, changes, done) {
     return dispatch => {
-        const url = `/api/website/intro/image`;
+        const url = '/api/website/intro/image';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tin hình giới thiệu website đơn vị bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -286,7 +286,7 @@ export function updateWebsiteGioiThieuHinh(maWebsiteGioiThieu, ma, changes, done
                 dispatch(getWebsiteGioiThieu(maWebsiteGioiThieu));
             }
         }, error => T.notify('Cập nhật thông tin hình giới thiệu website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
-    }
+    };
 }
 
 export function swapWebsiteGioiThieuHinh(maWebsiteGioiThieu, ma, thuTu, isMoveUp, done) {
@@ -294,19 +294,19 @@ export function swapWebsiteGioiThieuHinh(maWebsiteGioiThieu, ma, thuTu, isMoveUp
         const url = '/api/website/intro/image/swap';
         T.put(url, { ma, thuTu, isMoveUp, maWebsiteGioiThieu }, data => {
             if (data.error) {
-                T.notify('Thay đổi vị trí hình giới thiệu khoa bị lỗi!', 'danger')
+                T.notify('Thay đổi vị trí hình giới thiệu khoa bị lỗi!', 'danger');
                 console.error('PUT: ' + url + '. ' + data.error);
             } else {
                 if (done) done(data.items);
                 dispatch(getWebsiteGioiThieu(maWebsiteGioiThieu));
             }
         }, error => T.notify('Thay đổi vị trí hình giới thiệu khoa bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getThongTinGioiThieu(maDonVi, done) {
     return dispatch => {
-        const url = `/website/intro/all/` + maDonVi;
+        const url = '/website/intro/all/' + maDonVi;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách giới thiệu website đơn vị bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -316,7 +316,7 @@ export function getThongTinGioiThieu(maDonVi, done) {
                 dispatch({ type: WebsiteGioiThieuHomeDv, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách giới thiệu website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
-    }
+    };
 }
 
 export function changeWebsiteGioiThieuHinh(item) {

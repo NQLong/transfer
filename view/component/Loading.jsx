@@ -8,7 +8,7 @@ class Loading extends React.Component {
             setTimeout(() => {
                 $('#loading_wrapper').removeClass('shine');
             }, 500);
-        }, 1000))
+        }, 1000));
     }
 
     render() {

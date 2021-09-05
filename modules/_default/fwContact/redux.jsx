@@ -64,7 +64,7 @@ export function getContactPage(pageNumber, pageSize, done) {
                 dispatch({ type: ContactGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách liên hệ bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getContact(contactId, done) {
@@ -79,7 +79,7 @@ export function getContact(contactId, done) {
                 dispatch({ type: ContactUpdate, item: data.item });
             }
         }, error => T.notify('Lấy thông tin liên hệ bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getUnreadContacts(done) {
@@ -94,12 +94,12 @@ export function getUnreadContacts(done) {
                 dispatch({ type: ContactGetUnread, items: data.items });
             }
         }, error => T.notify('Lấy danh sách thông tin liên hệ bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateContact(id, changes, done) {
     return dispatch => {
-        const url = `/api/contact`;
+        const url = '/api/contact';
         T.put(url, { id, changes }, data => {
             if (data.error) {
                 T.notify('Cập nhật thông tin liên hệ bị lỗi!', 'danger');
@@ -111,12 +111,12 @@ export function updateContact(id, changes, done) {
                 done && done();
             }
         }, error => T.notify('Cập nhật thông tin liên hệ bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteContact(id) {
     return dispatch => {
-        const url = `/api/contact`;
+        const url = '/api/contact';
         T.delete(url, { id }, data => {
             if (data.error) {
                 T.notify('Xóa thông tin liên hệ bị lỗi!', 'danger');
@@ -126,7 +126,7 @@ export function deleteContact(id) {
                 dispatch(getContactPage());
             }
         }, error => T.notify('Xóa thông tin liên hệ bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function changeContact(item) {
@@ -135,7 +135,7 @@ export function changeContact(item) {
 
 export function createContact(contact, done) {
     return dispatch => {
-        const url = `/api/contact`;
+        const url = '/api/contact';
         T.post(url, { contact }, data => {
             if (data.error) {
                 T.notify('Gửi thông tin liên hệ bị lỗi!', 'danger');
@@ -145,5 +145,5 @@ export function createContact(contact, done) {
                 //dispatch(getContactPage());
             }
         }, error => T.notify('Gửi thông tin liên hệ bị lỗi!', 'danger'));
-    }
+    };
 }

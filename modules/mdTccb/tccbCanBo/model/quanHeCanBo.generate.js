@@ -130,5 +130,5 @@ module.exports = app => {
             const sql = 'SELECT COUNT(*) FROM QUAN_HE_CAN_BO' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.dbConnection.execute(sql, parameter, (error, result) => done(error, result));
         },
-    }
-}
+    };
+};

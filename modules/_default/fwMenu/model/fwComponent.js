@@ -32,7 +32,7 @@ module.exports = app => {
                 } else
                     done && done(error);
             });
-        })
+        });
     };
     app.model.fwComponent.addViewTypes = (viewType) => {
         if (!app.model.fwComponent.viewTypes.includes(viewType)) {
@@ -90,8 +90,8 @@ module.exports = app => {
                     }
                     done();
                 }
-            }
+            };
             getComponentView(0);
         });
     };
-}
+};

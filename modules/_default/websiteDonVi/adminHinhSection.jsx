@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { getWebsiteHinhAll, createWebsiteHinh, updateWebsiteHinh, deleteWebsiteHinh, swapWebsiteHinh } from './reduxWebsiteHinh'
+import { getWebsiteHinhAll, createWebsiteHinh, updateWebsiteHinh, deleteWebsiteHinh, swapWebsiteHinh } from './reduxWebsiteHinh';
 import { getDvWebsite } from './redux';
 import ImageBox from 'view/component/ImageBox';
 

@@ -12,7 +12,7 @@ class EditModal extends React.Component {
     componentDidMount() {
         $(document).ready(() => {
             $(this.modal.current).on('shown.bs.modal', () => $('#dmTonGiaoMa').focus());
-        })
+        });
     }
 
     show = (item) => {
@@ -40,7 +40,7 @@ class EditModal extends React.Component {
             T.notify('Tên tôn giáo bị trống!', 'danger');
             $('#dmTonGiaoTen').focus();
         } else if (changes.ma.length != 2) {
-            this.setState({ visible: true })
+            this.setState({ visible: true });
         } else {
             if (maDmTonGiao) {
                 this.props.update(maDmTonGiao, changes);
@@ -91,7 +91,7 @@ class EditModal extends React.Component {
                     </div>
                 </form>
             </div>
-        )
+        );
     }
 }
 

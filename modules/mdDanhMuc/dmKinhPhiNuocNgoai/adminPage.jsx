@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getDmKinhPhiNuocNgoaiAll, deleteDmKinhPhiNuocNgoai, createDmKinhPhiNuocNgoai, updateDmKinhPhiNuocNgoai } from './redux'
+import { getDmKinhPhiNuocNgoaiAll, deleteDmKinhPhiNuocNgoai, createDmKinhPhiNuocNgoai, updateDmKinhPhiNuocNgoai } from './redux';
 import { Link } from 'react-router-dom';
 
 class EditModal extends React.Component {
@@ -100,7 +100,7 @@ class DmKinhPhiNuocNgoaiPage extends React.Component {
 
     componentDidMount() {
         T.ready('/user/category');
-        this.props.getDmKinhPhiNuocNgoaiAll()
+        this.props.getDmKinhPhiNuocNgoaiAll();
     }
 
     edit = (e, item) => {

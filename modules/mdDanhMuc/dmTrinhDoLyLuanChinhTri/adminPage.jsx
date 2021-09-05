@@ -90,7 +90,7 @@ class AdminPage extends React.Component {
 
     componentDidMount() {
         T.ready('/user/category');
-        this.props.getDmTrinhDoLyLuanChinhTriAll()
+        this.props.getDmTrinhDoLyLuanChinhTriAll();
     }
 
     edit = (e, item) => {

@@ -90,7 +90,7 @@ class DmViTriTuyenDungPage extends React.Component {
 
     componentDidMount() {
         T.ready('/user/category');
-        this.props.getDmViTriTuyenDungAll()
+        this.props.getDmViTriTuyenDungAll();
     }
 
     edit = (e, item) => {
@@ -99,7 +99,7 @@ class DmViTriTuyenDungPage extends React.Component {
     }
 
     changeActive = item => {
-        this.props.updateDmViTriTuyenDung(item.ma, { kichHoat: Number(!item.kichHoat) })
+        this.props.updateDmViTriTuyenDung(item.ma, { kichHoat: Number(!item.kichHoat) });
     };
 
     delete = (e, item) => {

@@ -35,7 +35,7 @@ class DraftEventEditPage extends React.Component {
     getData = () => {
         const route = T.routeMatcher('/user/event/draft/edit/:eventId'),
             IdEvent = route.parse(window.location.pathname).eventId;
-        this.setState({ draftId: IdEvent })
+        this.setState({ draftId: IdEvent });
         this.props.getDraftEvent(IdEvent, data => {
             if (data.error) {
                 T.notify('Lấy bản nháp sự kiện bị lỗi!', 'danger');
@@ -81,7 +81,7 @@ class DraftEventEditPage extends React.Component {
             } else {
                 this.props.history.push('/user/event/draft');
             }
-        })
+        });
     }
 
     changeActive = (event) => {
@@ -196,7 +196,7 @@ class DraftEventEditPage extends React.Component {
             isInternal: this.state.item.isInternal ? 1 : 0,
             documentJson: JSON.stringify(changes),
             lastModified: new Date().getTime(),
-        }
+        };
         if (this.props.system.user.permissions.includes('event:write')) {
             delete newDraft.editorId; delete newDraft.editorName;
         }
@@ -298,7 +298,7 @@ class DraftEventEditPage extends React.Component {
                             <div className='tile-body'>
                                 <div className='form-group'>
                                     <label className='control-label'>Link mặc định</label><br />
-                                    <a href={linkDefaultEvent} style={{ fontWeight: 'bold' }} target='_blank'>{linkDefaultEvent}</a>
+                                    <a href={linkDefaultEvent} style={{ fontWeight: 'bold' }} target='_blank' rel="noreferrer">{linkDefaultEvent}</a>
                                 </div>
                                 <div className='form-group'>
                                     <label className='control-label'>Link truyền thông</label><br />

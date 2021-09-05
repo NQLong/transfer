@@ -1,7 +1,7 @@
 import React from 'react';
 
 const UploadBoxStyle = {
-    backgroundImage: `url('/img/upload.png')`,
+    backgroundImage: 'url(\'/img/upload.png\')',
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',
     backgroundSize: 'contain',
@@ -28,12 +28,12 @@ export default class FileBox extends React.Component {
 
     init = () => {
         this.setState({ file: null });
-        $(this.box.current).css({ 'background-image': `url('/img/upload.png')` });
+        $(this.box.current).css({ 'background-image': 'url(\'/img/upload.png\')' });
     }
 
     onDrop = (event) => {
         event.preventDefault();
-        $(this.box.current).css('background-color', '#FFF')
+        $(this.box.current).css('background-color', '#FFF');
 
         if (event.dataTransfer.items) {
             if (event.dataTransfer.items.length > 0) {
@@ -67,7 +67,7 @@ export default class FileBox extends React.Component {
         event.preventDefault();
     }
     getFileState = () => {
-        return this.state.file
+        return this.state.file;
     }
     onSelectFileChanged = (event) => {
         if (event.target.files.length > 0) {
@@ -79,7 +79,7 @@ export default class FileBox extends React.Component {
                     T.alert(`Tệp hình ảnh có kích thước ${Math.round(sizeFiles * 100) / 100} MB`, 'warning', false, 2000);
                 }
                 this.setState({ file: event.target.files[0] });
-                $(this.box.current).css({ 'background-image': `url('/img/received.png')` });
+                $(this.box.current).css({ 'background-image': 'url(\'/img/received.png\')' });
             }
             event.target.value = '';
         }
@@ -88,10 +88,10 @@ export default class FileBox extends React.Component {
     onUploadFile = (body) => {
         const { file } = this.state;
         if (!file) {
-            T.alert(`Bạn chưa đính kèm tệp tin`, 'warning', false, 2000);
+            T.alert('Bạn chưa đính kèm tệp tin', 'warning', false, 2000);
             return;
         } else if (!body) {
-            T.alert(`Bạn chưa điền đủ dữ liệu`, 'warning', false, 2000);
+            T.alert('Bạn chưa điền đủ dữ liệu', 'warning', false, 2000);
             return;
         }
         this.setState({ isUploading: true });

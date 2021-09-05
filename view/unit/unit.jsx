@@ -25,7 +25,7 @@ import { getDvWebsiteAll } from 'modules/_default/websiteDonVi/redux';
 import { modules } from './modules';
 const reducers = {}, routeMapper = {},
     addRoute = route => {
-        if (!route.path.startsWith('/user')) routeMapper[route.path] = <Route key={route.path} {...route} />
+        if (!route.path.startsWith('/user')) routeMapper[route.path] = <Route key={route.path} {...route} />;
     };
 modules.forEach(module => {
     Object.keys(module.redux).forEach(key => reducers[key] = module.redux[key]);
@@ -44,7 +44,7 @@ class App extends React.Component {
     componentDidMount() {
         const done = () => {
             if ($(this.loader.current).length > 0 && this.props.system && this.props.system.menus) { // Finished loading
-                this.loader.current.isShown() && this.loader.current.hide()
+                this.loader.current.isShown() && this.loader.current.hide();
 
                 let menuList = [...this.props.system.divisionMenus];
                 menuList.map(item => {
@@ -66,9 +66,9 @@ class App extends React.Component {
                         });
                     }
                     this.setState({ routes: Object.keys(routeMapper).sort().reverse().map(key => routeMapper[key]) });
-                })
+                });
             } else {
-                setTimeout(done, 200)
+                setTimeout(done, 200);
             }
         };
         $(document).ready(done);

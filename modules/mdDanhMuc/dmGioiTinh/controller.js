@@ -40,7 +40,7 @@ module.exports = app => {
     });
 
     app.put('/api/danh-muc/gioi-tinh', app.permission.check('dmGioiTinh:write'), (req, res) => {
-        app.model.dmGioiTinh.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }))
+        app.model.dmGioiTinh.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
     app.delete('/api/danh-muc/gioi-tinh', app.permission.check('dmGioiTinh:delete'), (req, res) => {

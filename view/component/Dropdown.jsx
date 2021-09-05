@@ -5,7 +5,7 @@ export default class Dropdown extends React.Component {
         super(props);
         this.state = {
             items: []
-        }
+        };
         this.element = React.createRef();
         this.menu = React.createRef();
 

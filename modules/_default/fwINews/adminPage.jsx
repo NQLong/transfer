@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 import Pagination from 'view/component/Pagination';
 import { connect } from 'react-redux';
 import { getINewsPage, createInews, deleteInews } from './redux';

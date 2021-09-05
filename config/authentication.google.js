@@ -60,7 +60,7 @@ module.exports = (app) => {
     app.get('/auth/google', passport.authenticate('google', { scope: ['email', 'profile'] }));
     // Do Google login callback action
     app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/login-fail' }), (req, res) => {
-        console.log('successRedirect', req.user)
+        console.log('successRedirect', req.user);
         app.updateSessionUser(req, req.user, sessionUser => res.redirect('/user'));
     });
 };

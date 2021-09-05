@@ -10,7 +10,7 @@ export function createQtGiaiThuongStaff(data, done) {
                 if (done) done(res);
             }
         }, error => T.notify('Thêm thông tin quá trình giải thưởng bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function updateQtGiaiThuongStaff(id, changes, done) {
@@ -25,7 +25,7 @@ export function updateQtGiaiThuongStaff(id, changes, done) {
                 if (done) done();
             }
         }, error => T.notify('Cập nhật thông tin quá trình giải thưởng bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function deleteQtGiaiThuongStaff(id, done) {
@@ -40,7 +40,7 @@ export function deleteQtGiaiThuongStaff(id, done) {
                 if (done) done();
             }
         }, error => T.notify('Xóa thông tin quá trình giải thưởng bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function createQtGiaiThuongStaffUser(data, done) {
@@ -55,7 +55,7 @@ export function createQtGiaiThuongStaffUser(data, done) {
                 if (done) done(res);
             }
         }, error => T.notify('Thêm thông tin quá trình giải thưởng bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function updateQtGiaiThuongStaffUser(id, changes, done) {
@@ -70,7 +70,7 @@ export function updateQtGiaiThuongStaffUser(id, changes, done) {
                 if (done) done();
             }
         }, error => T.notify('Cập nhật thông tin quá trình giải thưởng bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function deleteQtGiaiThuongStaffUser(id, done) {
@@ -82,8 +82,8 @@ export function deleteQtGiaiThuongStaffUser(id, done) {
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
                 T.alert('Thông tin quá trình giải thưởng được xóa thành công!', 'info', false, 800);
-                done && done()
+                done && done();
             }
         }, error => T.notify('Xóa thông tin quá trình giải thưởng bị lỗi' , 'danger'));
-    }
+    };
 }

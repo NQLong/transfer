@@ -94,7 +94,7 @@ class DmHoiNghiPage extends React.Component {
 
     componentDidMount() {
         T.ready('/user/category');
-        this.props.getDmHoiNghiAll()
+        this.props.getDmHoiNghiAll();
     }
 
     edit = (e, item) => {

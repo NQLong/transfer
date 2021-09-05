@@ -32,7 +32,7 @@ export default function FwStorageReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -44,7 +44,7 @@ export default function FwStorageReducer(state = null, data) {
 // Actions ------------------------------------------------------------------------------------------------------------
 export function getFwStorageAll(done) {
     return dispatch => {
-        const url = `/api/storage/all`;
+        const url = '/api/storage/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách lưu trữ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -54,7 +54,7 @@ export function getFwStorageAll(done) {
                 dispatch({ type: FwStorageGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách lưu trữ bị lỗi!', 'danger'));
-    }
+    };
 }
 
 T.initPage('pageFwStorage');
@@ -71,7 +71,7 @@ export function getFwStoragePage(pageNumber, pageSize, done) {
                 dispatch({ type: FwStorageGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách lưu trữ bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getFwStorage(ma, done) {
@@ -87,7 +87,7 @@ export function getFwStorage(ma, done) {
         }, error => {
             console.error(`GET: ${url}.`, error);
         });
-    }
+    };
 }
 
 export function getDonViById(ma, done) {
@@ -103,12 +103,12 @@ export function getDonViById(ma, done) {
         }, error => {
             console.error(`GET: ${url}.`, error);
         });
-    }
+    };
 }
 
 export function createFwStorage(item, done) {
     return dispatch => {
-        const url = `/api/storage`;
+        const url = '/api/storage';
         T.post(url, { item }, data => {
             if (data.error) {
                 if (data.error.errorNum == 1) {
@@ -120,12 +120,12 @@ export function createFwStorage(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo lưu trữ bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteStorage(id) {
     return dispatch => {
-        const url = `/api/storage`;
+        const url = '/api/storage';
         T.delete(url, { id }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục  bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -135,12 +135,12 @@ export function deleteStorage(id) {
                 dispatch(getFwStoragePage());
             }
         }, error => T.notify('Xóa lưu trữ bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateStorage(id, changes, done) {
     return dispatch => {
-        const url = `/api/storage`;
+        const url = '/api/storage';
         T.put(url, { id, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông lưu trữ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -151,7 +151,7 @@ export function updateStorage(id, changes, done) {
                 dispatch(getFwStoragePage());
             }
         }, error => T.notify('Cập nhật thông tin lưu trữ bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function changeFwStorage(item) {
@@ -171,7 +171,7 @@ export const SelectAdapter_FwStorage = {
         value: response.item.id,
         text: `${response.item.nameDisplay}`
     }),
-}
+};
 
 export function getStorageItem(id, done) {
     return dispatch => {
@@ -184,5 +184,5 @@ export function getStorageItem(id, done) {
                 if (done) done(data);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }

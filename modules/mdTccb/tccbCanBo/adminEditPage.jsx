@@ -1554,7 +1554,7 @@ class CanBoEditPage extends QTForm {
             if (this.urlSHCC) {
                 this.props.updateStaff(this.urlSHCC, data.data, () => {
                     this.main.current.classList.remove('validated');
-                    this.props.history.push(`/user/staff`);
+                    this.props.history.push('/user/staff');
                 });
             } else {
                 this.props.createStaff(data.data, data => {
@@ -1824,14 +1824,14 @@ class CanBoEditPage extends QTForm {
         e.preventDefault();
         this.props.downloadWord(this.urlSHCC, data => {
             T.FileSaver(new Blob([new Uint8Array(data.data)]), this.urlSHCC + '_2c.docx');
-        })
+        });
     }
 
     downloadWordLlkh = e => {
         e.preventDefault();
         this.props.downloadWordLlkh(this.urlSHCC, data => {
             T.FileSaver(new Blob([new Uint8Array(data.data)]), (this.state.hoTen ? this.state.hoTen + '_' : '') + this.urlSHCC + '_LLKH.docx');
-        })
+        });
     }
 
     render() {

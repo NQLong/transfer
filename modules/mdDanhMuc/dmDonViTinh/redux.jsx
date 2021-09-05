@@ -67,7 +67,7 @@ export function getDmDonViTinhPage(pageNumber, pageSize, pageCondition, done) {
 
 export function getDmDonViTinhAll(done) {
   return (dispatch) => {
-    const url = `/api/danh-muc/don-vi-tinh/all`;
+    const url = '/api/danh-muc/don-vi-tinh/all';
     T.get(url, (data) => {
       if (data.error) {
         T.notify('Lấy danh sách đơn vị tính bị lỗi' + (data.error.message && ':<br>' + data.error.message), 'danger');
@@ -96,7 +96,7 @@ export function getDmDonViTinh(ma, done) {
 
 export function createDmDonViTinh(item, done) {
   return (dispatch) => {
-    const url = `/api/danh-muc/don-vi-tinh`;
+    const url = '/api/danh-muc/don-vi-tinh';
     T.post(url, { item }, (data) => {
       if (data.error) {
         T.notify('Tạo đơn vị tính bị lỗi' + (data.error.message && ':<br>' + data.error.message), 'danger');
@@ -111,7 +111,7 @@ export function createDmDonViTinh(item, done) {
 
 export function updateDmDonViTinh(ma, changes, done) {
   return (dispatch) => {
-    const url = `/api/danh-muc/don-vi-tinh`;
+    const url = '/api/danh-muc/don-vi-tinh';
     T.put(url, { ma, changes }, (data) => {
       if (data.error || changes == null) {
         T.notify('Cập nhật thông tin đơn vị tính bị lỗi' + (data.error.message && ':<br>' + data.error.message), 'danger');
@@ -127,7 +127,7 @@ export function updateDmDonViTinh(ma, changes, done) {
 
 export function deleteDmDonViTinh(ma) {
   return (dispatch) => {
-    const url = `/api/danh-muc/don-vi-tinh`;
+    const url = '/api/danh-muc/don-vi-tinh';
     T.delete(url, { ma }, (data) => {
       if (data.error) {
         T.notify('Xóa danh mục đơn vị tính bị lỗi' + (data.error.message && ':<br>' + data.error.message), 'danger');
@@ -146,7 +146,7 @@ export function changeDmDonViTinh(item) {
 
 export function createDmDonViTinhByUpload(item, done) {
   return (dispatch) => {
-    const url = `/api/danh-muc/don-vi-tinh/createFromFile`;
+    const url = '/api/danh-muc/don-vi-tinh/createFromFile';
     T.post(url, { item }, (data) => {
       if (data.error) {
         console.error(`POST: ${url}.`, data.error);

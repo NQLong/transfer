@@ -20,7 +20,7 @@ class SectionLogo extends React.Component {
             stagePadding: 0,
             nav: true,
             dots: true,
-            navText: [`<span class='ion-ios-arrow-back'>`, `<span class='ion-ios-arrow-forward'>`],
+            navText: ['<span class=\'ion-ios-arrow-back\'>', '<span class=\'ion-ios-arrow-forward\'>'],
             responsive: {
                 0: {
                     items: 1
@@ -34,7 +34,7 @@ class SectionLogo extends React.Component {
             }
         });
         setTimeout(() => {
-            var i = 0;
+            let i = 0;
             $('.ftco-animate').waypoint(function (direction) {
                 if (direction === 'down' && !$(this.element).hasClass('ftco-animated')) {
                     i++;
@@ -42,9 +42,9 @@ class SectionLogo extends React.Component {
                     setTimeout(function () {
 
                         $('body .ftco-animate.item-animate').each(function (k) {
-                            var el = $(this);
+                            let el = $(this);
                             setTimeout(function () {
-                                var effect = el.data('animate-effect');
+                                let effect = el.data('animate-effect');
                                 if (effect === 'fadeIn') {
                                     el.addClass('fadeIn ftco-animated');
                                 } else if (effect === 'fadeInLeft') {
@@ -84,7 +84,7 @@ class SectionLogo extends React.Component {
                                     <div key={index} className='item'>
                                         <div className='destination'>
                                             <a href={item.link} className='img d-flex justify-content-center align-items-center' target='_blank'
-                                                style={{ backgroundImage: `url('${item.image}')` }}>
+                                                style={{ backgroundImage: `url('${item.image}')` }} rel="noreferrer">
                                             </a>
                                             <div className='text p-3'>
                                                 <h3><a href='#'>{T.language.parse(item.name)}</a></h3>

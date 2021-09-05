@@ -32,7 +32,7 @@ export default function DmNguonKinhPhiTrongNuocReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -57,12 +57,12 @@ export function getDmNguonKinhPhiTrongNuocPage(pageNumber, pageSize, pageConditi
                 dispatch({ type: DmNguonKinhPhiTrongNuocGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách nguồn kinh phí trong nước bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmNguonKinhPhiTrongNuocAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/nguon-kinh-phi-trong-nuoc/all`;
+        const url = '/api/danh-muc/nguon-kinh-phi-trong-nuoc/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách nguồn kinh phí trong nước bị lỗi!', 'danger');
@@ -72,7 +72,7 @@ export function getDmNguonKinhPhiTrongNuocAll(done) {
                 dispatch({ type: DmNguonKinhPhiTrongNuocGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách nguồn kinh phí trong nước bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmNguonKinhPhiTrongNuoc(ma, done) {
@@ -86,12 +86,12 @@ export function getDmNguonKinhPhiTrongNuoc(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmNguonKinhPhiTrongNuoc(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/nguon-kinh-phi-trong-nuoc`;
+        const url = '/api/danh-muc/nguon-kinh-phi-trong-nuoc';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo nguồn kinh phí trong nước bị lỗi!', 'danger');
@@ -101,12 +101,12 @@ export function createDmNguonKinhPhiTrongNuoc(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo nguồn kinh phí trong nước bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteDmNguonKinhPhiTrongNuoc(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/nguon-kinh-phi-trong-nuoc`;
+        const url = '/api/danh-muc/nguon-kinh-phi-trong-nuoc';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục nguồn kinh phí trong nước bị lỗi!', 'danger');
@@ -116,12 +116,12 @@ export function deleteDmNguonKinhPhiTrongNuoc(ma) {
                 dispatch(getDmNguonKinhPhiTrongNuocPage());
             }
         }, error => T.notify('Xóa nguồn kinh phí trong nước bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDmNguonKinhPhiTrongNuoc(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/nguon-kinh-phi-trong-nuoc`;
+        const url = '/api/danh-muc/nguon-kinh-phi-trong-nuoc';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tin nguồn kinh phí trong nước bị lỗi!', 'danger');
@@ -132,7 +132,7 @@ export function updateDmNguonKinhPhiTrongNuoc(ma, changes, done) {
                 dispatch(getDmNguonKinhPhiTrongNuocPage());
             }
         }, error => T.notify('Cập nhật thông tin nguồn kinh phí trong nước bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function changeDmNguonKinhPhiTrongNuoc(item) {

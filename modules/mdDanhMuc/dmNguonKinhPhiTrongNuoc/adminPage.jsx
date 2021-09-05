@@ -107,7 +107,7 @@ class DmNguonKinhPhiTrongNuocPage extends React.Component {
     }
 
     changeActive = item => {
-        this.props.updateDmNguonKinhPhiTrongNuoc(item.ma, { kichHoat: Number(!item.kichHoat) })
+        this.props.updateDmNguonKinhPhiTrongNuoc(item.ma, { kichHoat: Number(!item.kichHoat) });
     };
 
     delete = (e, item) => {

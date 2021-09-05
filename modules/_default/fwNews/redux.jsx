@@ -87,7 +87,7 @@ export function getNewsInPage(pageNumber, pageSize, pageCondition, done) {
                 dispatch({ type: NewsGetNewsInPage, page: data.page, });
             }
         }, error => T.notify('Lấy danh sách tin tức bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getNewsDonVi(pageNumber, pageSize, pageCondition, done) {
@@ -104,7 +104,7 @@ export function getNewsDonVi(pageNumber, pageSize, pageCondition, done) {
                 // dispatch({ type: NewsGetNewsInPage, page: data.page, });
             }
         }, error => T.notify('Lấy danh sách tin tức bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDraftNewsInPage(pageNumber, pageSize, pageCondition, done) {
@@ -121,7 +121,7 @@ export function getDraftNewsInPage(pageNumber, pageSize, pageCondition, done) {
                 dispatch({ type: NewsGetDraftNewsInPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách bản nháp tin tức bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDraftAdmissionNewsInPage(pageNumber, pageSize, pageCondition, done) {
@@ -138,7 +138,7 @@ export function getDraftAdmissionNewsInPage(pageNumber, pageSize, pageCondition,
                 //dispatch({ type: NewsGetDraftNewsInPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách bản nháp tin tức bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getUnitDraftNewsInPage(pageNumber, pageSize, pageCondition, done) {
@@ -155,7 +155,7 @@ export function getUnitDraftNewsInPage(pageNumber, pageSize, pageCondition, done
                 dispatch({ type: NewsGetDraftNewsInPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách bản nháp tin tức đơn vị bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getTranslateDraftNewsInPage(pageNumber, pageSize, pageCondition, done) {
@@ -172,7 +172,7 @@ export function getTranslateDraftNewsInPage(pageNumber, pageSize, pageCondition,
                 dispatch({ type: NewsGetDraftNewsInPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách bản nháp tin tức đơn vị bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function draftToNews(draftNewsId, done) {
@@ -189,7 +189,7 @@ export function draftToNews(draftNewsId, done) {
                 dispatch(getNewsInPage());
             }
         }, error => T.notify('Thao tác bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function createNews(done) {
@@ -204,7 +204,7 @@ export function createNews(done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo tin tức bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function createDraftNewsDefault(done) {
@@ -223,7 +223,7 @@ export function createDraftNewsDefault(done) {
             documentJson: JSON.stringify(docData),
             editorName: state.system.user.lastName + ' ' + state.system.user.firstName,
             isDraftApproved: 1,
-        }
+        };
         const url = '/api/news/draft';
         T.post(url, passValue, data => {
             if (data.error) {
@@ -235,8 +235,8 @@ export function createDraftNewsDefault(done) {
                 dispatch(getDraftNewsInPage());
                 done && done(data);
             }
-        })
-    }
+        });
+    };
 }
 
 export function createUnitDraftNewsDefault(done) {
@@ -269,9 +269,9 @@ export function createUnitDraftNewsDefault(done) {
                     dispatch(getUnitDraftNewsInPage());
                     done && done(data);
                 }
-            })
+            });
         }
-    }
+    };
 }
 export function createUnitDraftNewsDean(done) {
     return (dispatch, getState) => {
@@ -290,7 +290,7 @@ export function createUnitDraftNewsDean(done) {
             editorName: state.system.user.lastName + ' ' + state.system.user.firstName,
             isUnitApproved: 1,
             isDraftApproved: 0,
-        }
+        };
         if (!state.system.user.maDonVi) T.notify('Bạn chưa được gán với đơn vị!', 'danger');
         else {
             const url = '/api/news/unit/draft';
@@ -304,9 +304,9 @@ export function createUnitDraftNewsDean(done) {
                     dispatch(getUnitDraftNewsInPage());
                     done && done(data);
                 }
-            })
+            });
         }
-    }
+    };
 }
 
 export function createDraftNews(result, done) {
@@ -314,17 +314,17 @@ export function createDraftNews(result, done) {
         const url = '/api/news/draft';
         T.post(url, result, data => {
             if (data.error) {
-                T.notify(`Tạo bản nháp tin tức bị lỗi!`, 'danger');
+                T.notify('Tạo bản nháp tin tức bị lỗi!', 'danger');
                 console.error('POST: ' + url + '.', data.error);
                 done && done(data.error);
             } else {
-                T.notify(`Bản nháp tin tức đã tạo thành công!`, 'success');
+                T.notify('Bản nháp tin tức đã tạo thành công!', 'success');
                 dispatch(getDraftNewsInPage());
                 done && done();
             }
             if (done) done(data);
-        })
-    }
+        });
+    };
 }
 
 export function createUnitDraftNews(result, done) {
@@ -332,17 +332,17 @@ export function createUnitDraftNews(result, done) {
         const url = '/api/news/unit/draft';
         T.post(url, result, data => {
             if (data.error) {
-                T.notify(`Tạo bản nháp tin tức đơn vị bị lỗi!`, 'danger');
+                T.notify('Tạo bản nháp tin tức đơn vị bị lỗi!', 'danger');
                 console.error('POST: ' + url + '.', data.error);
                 done && done(data.error);
             } else {
-                T.notify(`Bản nháp tin tức đơn vị đã tạo thành công!`, 'success');
+                T.notify('Bản nháp tin tức đơn vị đã tạo thành công!', 'success');
                 dispatch(getUnitDraftNewsInPage());
                 done && done();
             }
             if (done) done(data);
-        })
-    }
+        });
+    };
 }
 
 export function updateNews(id, changes, done) {
@@ -363,7 +363,7 @@ export function updateNews(id, changes, done) {
                 done && done();
             }
         }, error => T.notify('Cập nhật thông tin tin tức bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function swapNews(id, isMoveUp, done) {
@@ -378,7 +378,7 @@ export function swapNews(id, isMoveUp, done) {
                 T.notify('Thay đổi thứ tự tin tức thành công!', 'success');
             }
         }, error => T.notify('Thay đổi thứ tự tin tức bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDraftNews(id, changes, done) {
@@ -395,7 +395,7 @@ export function updateDraftNews(id, changes, done) {
                 done && done();
             }
         }, () => T.notify('Cập nhật thông tin bản nháp tin tức bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateUnitDraftNews(id, changes, done) {
@@ -412,7 +412,7 @@ export function updateUnitDraftNews(id, changes, done) {
                 done && done();
             }
         }, () => T.notify('Cập nhật thông tin bản nháp tin tức đơn vị bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateTranslateDraftNews(id, changes, done) {
@@ -429,7 +429,7 @@ export function updateTranslateDraftNews(id, changes, done) {
                 done && done();
             }
         }, () => T.notify('Cập nhật thông tin bản nháp tin tức đơn vị bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteNews(id, done) {
@@ -444,7 +444,7 @@ export function deleteNews(id, done) {
                 T.alert('Tin tức được xóa thành công!', 'error', false, 800);
             }
         }, error => T.notify('Xóa tin tức bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteDraftNews(id) {
@@ -459,7 +459,7 @@ export function deleteDraftNews(id) {
                 dispatch(getDraftNewsInPage());
             }
         }, error => T.notify('Xóa bản nháp tin tức bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteUnitDraftNews(id) {
@@ -474,7 +474,7 @@ export function deleteUnitDraftNews(id) {
                 dispatch(getUnitDraftNewsInPage());
             }
         }, error => T.notify('Xóa bản nháp tin tức đơn vị bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getNews(id, done) {
@@ -489,7 +489,7 @@ export function getNews(id, done) {
                 done && done(data);
             }
         }, error => done({ error }));
-    }
+    };
 }
 
 export function getDraftNews(id, done) {
@@ -504,7 +504,7 @@ export function getDraftNews(id, done) {
                 dispatch({ type: NewsGetDraftNews, item: data.item, categories: data.categories });
             }
         }, error => done({ error }));
-    }
+    };
 }
 
 export function getUnitDraftNews(id, done) {
@@ -519,7 +519,7 @@ export function getUnitDraftNews(id, done) {
                 dispatch({ type: NewsGetDraftNews, item: data.item, categories: data.categories });
             }
         }, error => done({ error }));
-    }
+    };
 }
 
 export function getTranslateDraftNews(id, done) {
@@ -534,7 +534,7 @@ export function getTranslateDraftNews(id, done) {
                 dispatch({ type: NewsGetDraftNews, item: data.item, categories: data.categories });
             }
         }, error => done({ error }));
-    }
+    };
 }
 
 export function getNewsByAdmission(pageNumber, pageSize, done) {
@@ -556,8 +556,8 @@ export function getNewsByAdmission(pageNumber, pageSize, done) {
                 dispatch({ type: NewsGetByAdmission, page: data.page });
                 done && done(data.page);
             }
-        })
-    }
+        });
+    };
 }
 
 export function getNewsByNotification(pageNumber, pageSize, done) {
@@ -579,8 +579,8 @@ export function getNewsByNotification(pageNumber, pageSize, done) {
                 dispatch({ type: NewsGetByNotification, page: data.page });
                 done && done(data.page);
             }
-        })
-    }
+        });
+    };
 }
 
 export function getNewsByNews(pageNumber, pageSize, done) {
@@ -602,8 +602,8 @@ export function getNewsByNews(pageNumber, pageSize, done) {
                 dispatch({ type: NewsGetByNews, page: data.page });
                 done && done(data.page);
             }
-        })
-    }
+        });
+    };
 }
 // Actions (user) -----------------------------------------------------------------------------------------------------
 const texts = {
@@ -632,7 +632,7 @@ export function getNewsInPageByUser(pageNumber, pageSize) {
                 dispatch({ type: NewsGetNewsInPageByUser, page: data.page });
             }
         }, error => T.notify(language.getNewsInPageByUserError, 'danger'));
-    }
+    };
 }
 
 export function getNewsByCategoryAdmin(category, pageNumber, pageSize, done) {
@@ -654,7 +654,7 @@ export function getNewsByCategoryAdmin(category, pageNumber, pageSize, done) {
                 done && done(data.page);
             }
         }, error => T.notify(language.getNewsInPageByUserError, 'danger'));
-    }
+    };
 }
 export function getNewsByCategoriId(category, pageNumber, pageSize, done) {
     const page = T.updatePage('homeNewsList', pageNumber, pageSize);
@@ -676,7 +676,7 @@ export function getNewsByCategoriId(category, pageNumber, pageSize, done) {
                 done && done(data.page);
             }
         }, error => T.notify(language.getNewsInPageByUserError, 'danger'));
-    }
+    };
 }
 
 export function getNewsByCategory(pageNumber, pageSize, category, done) {
@@ -698,7 +698,7 @@ export function getNewsByCategory(pageNumber, pageSize, category, done) {
                 done && done(data.page);
             }
         }, error => T.notify(language.getNewsInPageByUserError, 'danger'));
-    }
+    };
 }
 
 export function getNewsByUser(newsId, newsLink, done) {
@@ -713,12 +713,12 @@ export function getNewsByUser(newsId, newsLink, done) {
                 done && done(data);
             }
         }, error => T.notify(language.getNewsByUserError, 'danger'));
-    }
+    };
 }
 
 export function getNewsFeed(maDonVi) {
     return dispatch => {
-        const url = '/news/page/1/' + T.newsFeedPageSize
+        const url = '/news/page/1/' + T.newsFeedPageSize;
         T.get(url, { maDonVi }, data => {
             if (data.error) {
                 T.notify(language.getNewsFeedError, 'danger');
@@ -727,7 +727,7 @@ export function getNewsFeed(maDonVi) {
                 dispatch({ type: NewsGetNewsFeed, list: data.page.list });
             }
         }, error => T.notify(language.getNewsFeedError, 'danger'));
-    }
+    };
 }
 export function getNewsFeedByCategory(type) {
     return dispatch => {
@@ -742,7 +742,7 @@ export function getNewsFeedByCategory(type) {
                 dispatch({ type: NewsGetNewsFeed, list: list });
             }
         }, error => T.notify(language.getNewsFeedError, 'danger'));
-    }
+    };
 }
 
 export function checkLink(id, link, done) {
@@ -757,7 +757,7 @@ export function checkLink(id, link, done) {
             }
             done && done(data);
         }, error => T.notify('Kiểm tra Link bị lỗi!', 'danger'));
-    }
+    };
 }
 export function adminCheckLink(id, link, done) {
     return dispatch => {
@@ -765,11 +765,11 @@ export function adminCheckLink(id, link, done) {
         T.put(url, { id, link }, data => {
             done && done(data);
         }, error => T.notify('Kiểm tra Link bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export const ajaxSelectNews = {
     url: '/api/news/page/1/20',
     data: params => ({ condition: params.term }),
     processResults: data => ({ results: data && data.page && data.page.list ? data.page.list.map(item => ({ id: JSON.stringify(item), text: T.language.parse(item.title) })) : [] })
-}
+};

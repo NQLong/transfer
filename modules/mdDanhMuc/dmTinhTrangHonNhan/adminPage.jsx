@@ -32,7 +32,7 @@ class EditModal extends React.Component {
                 ten: $('#dmTinhTrangHonNhanTen').val().trim(),
                 ma: $('#dmTinhTrangHonNhanMa').val().trim(),
                 kichHoat: this.state.active ? '1' : '0',
-            }
+            };
 
         if (changes.ten == '') {
             T.notify('Tên tình trạng hôn nhân bị trống!', 'danger');

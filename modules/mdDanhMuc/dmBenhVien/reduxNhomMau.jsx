@@ -32,7 +32,7 @@ export default function dmNhomMauReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -58,12 +58,12 @@ export function getDmNhomMauPage(pageNumber, pageSize, pageCondition, done) {
                 dispatch({ type: DmNhomMauGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách nhóm máu bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmNhomMauAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/nhom-mau/all`;
+        const url = '/api/danh-muc/nhom-mau/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách nhóm máu bị lỗi!', 'danger');
@@ -73,7 +73,7 @@ export function getDmNhomMauAll(done) {
                 dispatch({ type: DmNhomMauGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách nhóm máu bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmNhomMau(ma, done) {
@@ -87,7 +87,7 @@ export function getDmNhomMau(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmNhomMau(dmNhomMau, done) {
@@ -103,7 +103,7 @@ export function createDmNhomMau(dmNhomMau, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo mới một nhóm máu bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDmNhomMau(ma, changes, done) {
@@ -119,12 +119,12 @@ export function updateDmNhomMau(ma, changes, done) {
                 dispatch(getDmNhomMauAll());
             }
         }, () => T.notify('Cập nhật dữ liệu nhóm máu bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteDmNhomMau(ma, done) {
     return dispatch => {
-        const url = `/api/danh-muc/nhom-mau`;
+        const url = '/api/danh-muc/nhom-mau';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa nhóm máu bị lỗi!', 'danger');
@@ -135,7 +135,7 @@ export function deleteDmNhomMau(ma, done) {
             }
             done && done();
         }, error => T.notify('Xóa nhóm máu bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export const SelectAdapter_DmNhomMau = {
@@ -143,4 +143,4 @@ export const SelectAdapter_DmNhomMau = {
     getAll: getDmNhomMauAll,
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
     condition: { kichHoat: 1 },
-}
+};

@@ -68,7 +68,7 @@ class SectionNews extends React.Component {
                                             <Link to={link}><h6 className='homeBody' style={{ color: '#626262' }}><b>{item.isTranslate == 1 ? T.language.parse(item.title) : T.language.parse(item.title, true)[item.language]}</b></h6></Link>
                                         </div>
                                     </div>
-                                )
+                                );
                             })}
                         </div>
                         <div className='col-12 d-flex justify-content-center'>
@@ -76,7 +76,7 @@ class SectionNews extends React.Component {
                         </div>
                     </div>
                 </div>
-            )
+            );
         }
 
         return (
@@ -88,7 +88,7 @@ class SectionNews extends React.Component {
                 </div>
                 {news}
             </section>
-        )
+        );
     }
 }
 

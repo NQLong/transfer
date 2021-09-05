@@ -41,7 +41,7 @@ class EditModal extends React.Component {
                 maKhuVuc: $('#dmqgMaKhuVuc').val().trim().toUpperCase(),
                 tenKhac: $('#dmqgTenKhac').val().trim().toUpperCase(),
                 maCu: '',
-            }
+            };
 
         if (changes.maCode == '') {
             T.notify('Mã quốc gia bị trống!', 'danger');

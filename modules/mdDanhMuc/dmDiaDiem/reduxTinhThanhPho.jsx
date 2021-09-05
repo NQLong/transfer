@@ -18,7 +18,7 @@ export default function dmTinhThanhPhoReducer(state = null, data) {
 // Actions ------------------------------------------------------------------------------------------------------------
 export function getDMTinhThanhPhoAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/tinh-thanh-pho/all`;
+        const url = '/api/danh-muc/tinh-thanh-pho/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách tỉnh thành phố bị lỗi!', 'danger');
@@ -28,7 +28,7 @@ export function getDMTinhThanhPhoAll(done) {
                 dispatch({ type: DmTinhThanhPhoGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách tỉnh thành phố bị lỗi!', 'danger'));
-    }
+    };
 }
 
 T.initPage('dmTinhThanhPho');
@@ -46,12 +46,12 @@ export function getDMTinhThanhPhoPage(pageNumber, pageSize, pageCondition, done)
                 dispatch({ type: DmTinhThanhPhoGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách tỉnh / thành phố bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDMTinhThanhPho(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/tinh-thanh-pho`;
+        const url = '/api/danh-muc/tinh-thanh-pho';
         T.put(url, { ma, changes }, data => {
             done && done(data.error, data.item);
             if (data.error) {
@@ -62,38 +62,38 @@ export function updateDMTinhThanhPho(ma, changes, done) {
                 dispatch(getDMTinhThanhPhoPage());
             }
         }, error => done(error));
-    }
+    };
 }
 
 export function createMultiDMTinhThanhPho(multiDMTinhThanhPho, isOverride, done) {
     return dispatch => {
-        const url = `/api/danh-muc/tinh-thanh-pho/multiple`;
+        const url = '/api/danh-muc/tinh-thanh-pho/multiple';
         T.post(url, { multiDMTinhThanhPho, isOverride }, data => {
             done && done(data.error, data.item);
             if (data.error) console.error(`POST: ${url}. ${data.error}`);
         }, error => done(error));
-    }
+    };
 }
 
 export function createDMTinhThanhPho(dmTinhThanhPho, done) {
     return dispatch => {
-        const url = `/api/danh-muc/tinh-thanh-pho`;
+        const url = '/api/danh-muc/tinh-thanh-pho';
         T.post(url, { dmTinhThanhPho }, data => {
             if (data.error) {
                 console.error(`POST: ${url}. ${data.error}`);
-                T.notify('Tạo thông tin tỉnh / thành phố bị lỗi!', 'danger')
+                T.notify('Tạo thông tin tỉnh / thành phố bị lỗi!', 'danger');
             } else {
                 dispatch(getDMTinhThanhPhoPage());
                 done && done(data);
-                T.notify('Tạo thông tin tỉnh / thành phố thành công!', 'success')
+                T.notify('Tạo thông tin tỉnh / thành phố thành công!', 'success');
             }
         }, error => done(error));
-    }
+    };
 }
 
 export function deleteDMTinhThanhPho(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/tinh-thanh-pho`;
+        const url = '/api/danh-muc/tinh-thanh-pho';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa thông tin tỉnh / thành phố bị lỗi!', 'danger');
@@ -103,7 +103,7 @@ export function deleteDMTinhThanhPho(ma) {
                 dispatch(getDMTinhThanhPhoPage());
             }
         }, error => T.notify('Xóa thông tin tỉnh / thành phố bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export const SelectAdapter_DmTinhThanhPho = {
@@ -111,4 +111,4 @@ export const SelectAdapter_DmTinhThanhPho = {
     getAll: getDMTinhThanhPhoAll,
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
     condition: { kichHoat: 1 },
-}
+};

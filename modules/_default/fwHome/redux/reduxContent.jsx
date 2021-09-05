@@ -38,7 +38,7 @@ export default function contentReducer(state = [], data) {
 // Action --------------------------------------------------------------------------------------------------------------
 export function getAllContents() {
     return dispatch => {
-        const url = `/api/content/all`;
+        const url = '/api/content/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách nội dung bị lỗi!', 'danger');
@@ -49,12 +49,12 @@ export function getAllContents() {
         }, error => {
             console.error('GET: ' + url + '. ' + error);
         });
-    }
+    };
 }
 
 export function createContent(done) {
     return dispatch => {
-        const url = `/api/content`;
+        const url = '/api/content';
         T.post(url, data => {
             if (data.error) {
                 T.notify('Tạo nội dung bị lỗi!', 'danger');
@@ -64,12 +64,12 @@ export function createContent(done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo nội dung bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateContent(id, changes) {
     return dispatch => {
-        const url = `/api/content`;
+        const url = '/api/content';
         T.put(url, { id, changes }, data => {
             if (data.error) {
                 T.notify('Cập nhật nội dung bị lỗi!', 'danger');
@@ -79,12 +79,12 @@ export function updateContent(id, changes) {
                 dispatch(getAllContents());
             }
         }, error => T.notify('Cập nhật nội dung bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteContent(id) {
     return dispatch => {
-        const url = `/api/content`;
+        const url = '/api/content';
         T.delete(url, { id }, data => {
             if (data.error) {
                 T.notify('Xóa nội dung bị lỗi!', 'danger');
@@ -94,7 +94,7 @@ export function deleteContent(id) {
                 dispatch({ type: ContentDelete, id });
             }
         }, error => T.notify('Xóa nội dung bị lỗi!', 'danger'));
-    }
+    };
 }
 
 
@@ -112,5 +112,5 @@ export function getContent(id, done) {
         }, error => {
             console.error('GET: ' + url + '. ' + error);
         });
-    }
+    };
 }

@@ -157,7 +157,7 @@ export class DateInput extends InputBase {
     getVal = () => {
         if (this.isEmpty()) return '';
         let dateValue = this.state.value;
-        if (!dateValue) return ''
+        if (!dateValue) return '';
         if (this.props.type === 'month') dateValue = '01/' + dateValue;
         else if (this.props.type === 'year') dateValue = '01/01/' + dateValue;
 
@@ -248,7 +248,7 @@ export class NumberInput extends InputBase {
     #handleOnChange = event => {
         event.preventDefault();
         this.setState({ value: event.target.value }, () => {
-            this.getFormVal()
+            this.getFormVal();
             this.props.onChange && this.props.onChange(this.getVal());
         });
     }
@@ -306,7 +306,7 @@ export class DateInput2 extends InputBase {
     getVal = () => {
         if (this.isEmpty()) return '';
         let dateValue = this.state.value;
-        if (!dateValue) return ''
+        if (!dateValue) return '';
 
         const date = T.formatDate(this.state.value);
         if (date == null || Number.isNaN(date.getTime())) return '';
@@ -499,7 +499,7 @@ export class Select extends InputBase {
             const callback = response => {
                 const data = (this.props.adapter.processResults ? this.props.adapter.processResults(response) : response || { results: null }).results;
                 this.setState({ data }, () => done && done(data));
-            }
+            };
             let getAllCall = (this.props.adapter.getAll.length === 1 && this.props.adapter.getAll(callback)) || (this.props.adapter.getAll.length === 2 && this.props.adapter.getAll(condition, callback));
             if (typeof getAllCall === 'function') getAllCall(() => 0);
         }
@@ -509,9 +509,9 @@ export class Select extends InputBase {
         if (this.props.adapter) {
             if (!this.props.adapter.ajax) {
                 if (prevProps.adapter.condition !== this.props.adapter.condition && prevProps.value !== this.props.value) {
-                    this.#fetchAll(() => { this.setVal(this.props.value) });
+                    this.#fetchAll(() => { this.setVal(this.props.value); });
                 } else if (prevProps.adapter.condition !== this.props.adapter.condition) {
-                    this.#fetchAll(() => { })
+                    this.#fetchAll(() => { });
                 }
             }
         }
@@ -563,7 +563,7 @@ export class Select extends InputBase {
                     }
 
 
-                }
+                };
                 if (value === null || value === undefined || (value.trim && value.trim() === '')) {
                     this.clear(done);
                 } else if (value.constructor === String || value.constructor === Number) {
@@ -573,7 +573,7 @@ export class Select extends InputBase {
                     value.forEach(item => {
                         const option = new Option(item.text, item.value, true, true);
                         this.$input().append(option);
-                    })
+                    });
                     this.$input().trigger('change');
                     // this.clear(done);
                 } else if (value.constructor === ({}).constructor) {
@@ -624,7 +624,7 @@ export class Select extends InputBase {
                             };
                             this.#fetchAll(fetchDone);
                         } else {
-                            done({ value, text: this.$input().find('option:selected').text() })
+                            done({ value, text: this.$input().find('option:selected').text() });
                         }
                     }
                 }

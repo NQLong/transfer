@@ -22,7 +22,7 @@ module.exports = app => {
         app.post('/api/debug/change-role', (req, res) => { //TODO: delete
             new Promise((resolve, reject) => {
                 app.model.fwUserRole.get({ roleId: req.body.roleId }, (error, userRole) => {
-                    userRole ? resolve(userRole) : reject(error ? error : 'Debug user is not available!')
+                    userRole ? resolve(userRole) : reject(error ? error : 'Debug user is not available!');
                 });
             }).then(userRole => new Promise((resolve, reject) => {
                 app.model.fwUser.get({ email: userRole.email }, (error, debugUser) =>

@@ -110,12 +110,12 @@ class DmHoSoCcvcNldPage extends React.Component {
 
     changeKichHoat = (e, item) => {
         e.preventDefault();
-        this.props.updateDmHoSoCcvcNld(item.ma, { kichHoat: item.kichHoat ? 0 : 1 })
+        this.props.updateDmHoSoCcvcNld(item.ma, { kichHoat: item.kichHoat ? 0 : 1 });
     };
 
     changeQuyetDinh = (e, item) => {
         e.preventDefault();
-        this.props.updateDmHoSoCcvcNld(item.ma, { loaiQuyetDinh: item.loaiQuyetDinh ? 0 : 1 })
+        this.props.updateDmHoSoCcvcNld(item.ma, { loaiQuyetDinh: item.loaiQuyetDinh ? 0 : 1 });
     };
 
     delete = (e, item) => {

@@ -24,9 +24,9 @@ module.exports = app => {
                         app.model.dvWebsite.update({ shortname }, { header: image }, (error, item) => done({ error, image: image }));
                     }
                 });
-            })
+            });
         }
-    }
+    };
 
     app.uploadHooks.add('uploadDivisionHeaderMobile', (req, fields, files, params, done) =>
         app.permission.has(req, () => uploadDivisionHeaderMobile(req, fields, files, params, done), done, 'menu:write'));
@@ -46,9 +46,9 @@ module.exports = app => {
                         app.model.dvWebsite.update({ shortname }, { headerMobile: image }, (error, item) => done({ error, image: image }));
                     }
                 });
-            })
+            });
         }
-    }
+    };
 
     app.uploadHooks.add('uploadDivisionHeader', (req, fields, files, params, done) =>
         app.permission.has(req, () => uploadDivisionHeader(req, fields, files, params, done), done, 'menu:write'));

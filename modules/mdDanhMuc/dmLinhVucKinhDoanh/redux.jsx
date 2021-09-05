@@ -32,7 +32,7 @@ export default function DmLinhVucKinhDoanhReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -57,12 +57,12 @@ export function getDmLinhVucKinhDoanhPage(pageNumber, pageSize, pageCondition, d
                 dispatch({ type: DmLinhVucKinhDoanhGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách lĩnh vực kinh doanh bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmLinhVucKinhDoanhAll(condition, done) {
     return dispatch => {
-        const url = `/api/danh-muc/linh-vuc-kinh-doanh/all`;
+        const url = '/api/danh-muc/linh-vuc-kinh-doanh/all';
         T.get(url, { condition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách lĩnh vực kinh doanh bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -72,7 +72,7 @@ export function getDmLinhVucKinhDoanhAll(condition, done) {
                 dispatch({ type: DmLinhVucKinhDoanhGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách lĩnh vực kinh doanh bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmLinhVucKinhDoanh(ma, done) {
@@ -86,12 +86,12 @@ export function getDmLinhVucKinhDoanh(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmLinhVucKinhDoanh(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/linh-vuc-kinh-doanh`;
+        const url = '/api/danh-muc/linh-vuc-kinh-doanh';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo lĩnh vực kinh doanh bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -101,12 +101,12 @@ export function createDmLinhVucKinhDoanh(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo lĩnh vực kinh doanh bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function deleteDmLinhVucKinhDoanh(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/linh-vuc-kinh-doanh`;
+        const url = '/api/danh-muc/linh-vuc-kinh-doanh';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục lĩnh vực kinh doanh bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -116,12 +116,12 @@ export function deleteDmLinhVucKinhDoanh(ma) {
                 dispatch(getDmLinhVucKinhDoanhPage());
             }
         }, error => T.notify('Xóa lĩnh vực kinh doanh bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function updateDmLinhVucKinhDoanh(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/linh-vuc-kinh-doanh`;
+        const url = '/api/danh-muc/linh-vuc-kinh-doanh';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tin lĩnh vực kinh doanh bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -132,7 +132,7 @@ export function updateDmLinhVucKinhDoanh(ma, changes, done) {
                 dispatch(getDmLinhVucKinhDoanhPage());
             }
         }, error => T.notify('Cập nhật thông tin lĩnh vực kinh doanh bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function changeDmLinhVucKinhDoanh(item) {

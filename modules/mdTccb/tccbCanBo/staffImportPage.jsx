@@ -51,7 +51,7 @@ class StaffImportPage extends React.Component {
             this.props.createMultiCanBo(this.state.staff, () => {
                 T.notify('Cập nhật thành công!', 'success');
                 this.props.history.push('/user/staff');
-            })
+            });
         }
 
     };

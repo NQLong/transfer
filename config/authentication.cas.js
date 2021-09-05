@@ -19,15 +19,15 @@ module.exports = (app, config) => {
             redisClient = redis.createClient();
         redisClient.keys('*', function (err, keys) {
             if (err) return console.log(err);
-            for (var i = 0, len = keys.length; i < len; i++) {
+            for (let i = 0, len = keys.length; i < len; i++) {
                 let key = keys[i];
                 redisClient.get(key, (err2, value) => {
                     if (value.indexOf(ticketId)) {
-                        console.log('destroy session with ticket ' + ticketId + ' success')
-                        redisClient.del(key)
+                        console.log('destroy session with ticket ' + ticketId + ' success');
+                        redisClient.del(key);
                         return cb();
                     }
-                })
+                });
             }
         });
     }

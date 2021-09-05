@@ -32,7 +32,7 @@ export default function dmTrinhDoNgoaiNguReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -58,12 +58,12 @@ export function getDmTrinhDoNgoaiNguPage(pageNumber, pageSize, pageCondition, do
                 dispatch({ type: DmTrinhDoNgoaiNguGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách trình độ ngoại ngữ bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmTrinhDoNgoaiNguAll(condition, done) {
     return dispatch => {
-        const url = `/api/danh-muc/trinh-do-ngoai-ngu/all`;
+        const url = '/api/danh-muc/trinh-do-ngoai-ngu/all';
         T.get(url, { condition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách trình độ ngoại ngữ bị lỗi!', 'danger');
@@ -73,7 +73,7 @@ export function getDmTrinhDoNgoaiNguAll(condition, done) {
                 dispatch({ type: DmTrinhDoNgoaiNguGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách trình độ ngoại ngữ bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmTrinhDoNgoaiNgu(ma, done) {
@@ -87,7 +87,7 @@ export function getDmTrinhDoNgoaiNgu(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmTrinhDoNgoaiNgu(dmTrinhDoNgoaiNgu, done) {
@@ -102,7 +102,7 @@ export function createDmTrinhDoNgoaiNgu(dmTrinhDoNgoaiNgu, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo mới một trình độ ngoại ngữ bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDmTrinhDoNgoaiNgu(ma, changes, done) {
@@ -117,12 +117,12 @@ export function updateDmTrinhDoNgoaiNgu(ma, changes, done) {
                 dispatch(getDmTrinhDoNgoaiNguAll());
             }
         }, () => T.notify('Cập nhật dữ liệu trình độ ngoại ngữ bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteDmTrinhDoNgoaiNgu(ma, done) {
     return dispatch => {
-        const url = `/api/danh-muc/trinh-do-ngoai-ngu`;
+        const url = '/api/danh-muc/trinh-do-ngoai-ngu';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa trình độ ngoại ngữ bị lỗi!', 'danger');
@@ -133,7 +133,7 @@ export function deleteDmTrinhDoNgoaiNgu(ma, done) {
             }
             done && done();
         }, error => T.notify('Xóa trình độ ngoại ngữ bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export const SelectAdapter_DmTrinhDoNgoaiNgu = {
@@ -141,4 +141,4 @@ export const SelectAdapter_DmTrinhDoNgoaiNgu = {
     getAll: getDmTrinhDoNgoaiNguAll,
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
     condition: { kichHoat: 1 },
-}
+};

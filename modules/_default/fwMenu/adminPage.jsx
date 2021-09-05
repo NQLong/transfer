@@ -14,7 +14,7 @@ class EditModal extends React.Component {
     };
 
     show = menu => {
-        let { title, link, active, highlight, id } = menu || { title: `{ "vi": "", "en": "" }`, link: '', active: false, highlight: false, id: '' };
+        let { title, link, active, highlight, id } = menu || { title: '{ "vi": "", "en": "" }', link: '', active: false, highlight: false, id: '' };
 
         $('#submenuViTitle').val(JSON.parse(title).vi);
         $('#submenuEnTitle').val(JSON.parse(title).en);
@@ -35,7 +35,7 @@ class EditModal extends React.Component {
                 highlight: this.state.highlight ? 1 : 0
             };
 
-        if (!!id) {
+        if (id) {
             this.props.update(id, changes);
         } else {
             this.props.create(changes);
@@ -111,7 +111,7 @@ class MenuPage extends React.Component {
             $('#headerViTitle').val(data.headerTitle ? JSON.parse(data.headerTitle).vi : '');
             $('#headerEnTitle').val(data.headerTitle ? JSON.parse(data.headerTitle).en : '');
             $('#headerLink').val(data.headerLink || 'a');
-            this.setState({ isShowHeaderTitle: data.isShowHeaderTitle == '1' ? true : false })
+            this.setState({ isShowHeaderTitle: data.isShowHeaderTitle == '1' ? true : false });
         });
         T.ready(('/user/menu'), () => {
             $('.menuList').sortable({ update: () => this.updateMenuPriorities() });
@@ -214,7 +214,7 @@ class MenuPage extends React.Component {
                 headerTitle: JSON.stringify({ vi: titleVi, en: titleEn }),
                 headerLink: link,
                 isShowHeaderTitle: this.state.isShowHeaderTitle ? 1 : 0
-            }
+            };
             this.props.updateHeader(payload);
         }
     }
@@ -226,7 +226,7 @@ class MenuPage extends React.Component {
                     <Link to={'/user/menu/edit/' + menu.id} style={{ color: menu.active ? '#009688' : 'gray' }}>
                         {T.language.parse(menu.title, true).vi}
                     </Link>&nbsp;
-                    {menu.link ? <p>(<a href={menu.link} target='_blank' style={{ color: 'blue' }}>{menu.link}</a>)</p> : null}
+                    {menu.link ? <p>(<a href={menu.link} target='_blank' style={{ color: 'blue' }} rel="noreferrer">{menu.link}</a>)</p> : null}
                 </div>
                 <div className='buttons btn-group btn-group-sm'>
                     {hasCreate && level == 0 ?
@@ -291,7 +291,7 @@ class MenuPage extends React.Component {
                                                 <a href='#' onClick={(e) => this.showSubMenu(e, menu)} style={{ color: menu.active ? '#009688' : 'gray' }}>
                                                     {T.language.parse(menu.title)}
                                                 </a>&nbsp;
-                                                {menu.link ? <p>(<a href={menu.link} target='_blank' style={{ color: 'blue' }}>{menu.link}</a>)</p> : null}
+                                                {menu.link ? <p>(<a href={menu.link} target='_blank' style={{ color: 'blue' }} rel="noreferrer">{menu.link}</a>)</p> : null}
                                             </div>
                                             <div className='buttons btn-group btn-group-sm'>
                                                 <a href='#' className={menu.active ? 'btn btn-warning' : 'btn btn-secondary'} onClick={e => this.changeSubMenuActive(e, menu)}>

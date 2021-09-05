@@ -32,7 +32,7 @@ export default function DmViTriTuyenDungReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -56,12 +56,12 @@ export function getDmViTriTuyenDungPage(pageNumber, pageSize, done) {
                 dispatch({ type: DmViTriTuyenDungGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách vị trí tuyển dụng bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmViTriTuyenDungAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/vi-tri-tuyen-dung/all`;
+        const url = '/api/danh-muc/vi-tri-tuyen-dung/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách vị trí tuyển dụng bị lỗi!', 'danger');
@@ -71,7 +71,7 @@ export function getDmViTriTuyenDungAll(done) {
                 dispatch({ type: DmViTriTuyenDungGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách vị trí tuyển dụng bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmViTriTuyenDung(ma, done) {
@@ -85,12 +85,12 @@ export function getDmViTriTuyenDung(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmViTriTuyenDung(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/vi-tri-tuyen-dung`;
+        const url = '/api/danh-muc/vi-tri-tuyen-dung';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo vị trí tuyển dụng bị lỗi!', 'danger');
@@ -100,12 +100,12 @@ export function createDmViTriTuyenDung(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo vị trí tuyển dụng bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteDmViTriTuyenDung(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/vi-tri-tuyen-dung`;
+        const url = '/api/danh-muc/vi-tri-tuyen-dung';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục vị trí tuyển dụng bị lỗi!', 'danger');
@@ -115,12 +115,12 @@ export function deleteDmViTriTuyenDung(ma) {
                 dispatch(getDmViTriTuyenDungAll());
             }
         }, error => T.notify('Xóa vị trí tuyển dụng bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDmViTriTuyenDung(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/vi-tri-tuyen-dung`;
+        const url = '/api/danh-muc/vi-tri-tuyen-dung';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tin vị trí tuyển dụng bị lỗi!', 'danger');
@@ -131,7 +131,7 @@ export function updateDmViTriTuyenDung(ma, changes, done) {
                 dispatch(getDmViTriTuyenDungAll());
             }
         }, error => T.notify('Cập nhật thông tin vị trí tuyển dụng bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function changeDmViTriTuyenDung(item) {

@@ -13,7 +13,7 @@ class TestimonyModal extends React.Component {
         // this.imageBox = React.createRef();
         this.state = {
             image: null
-        }
+        };
     }
 
     componentDidMount() {
@@ -55,7 +55,7 @@ class TestimonyModal extends React.Component {
                 if (!data.error) {
                     $(this.modal.current).modal('hide');
                 }
-            })
+            });
         }
     }
 

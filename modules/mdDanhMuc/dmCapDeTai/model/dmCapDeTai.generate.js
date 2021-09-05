@@ -135,5 +135,5 @@ module.exports = app => {
             app.dbConnection.execute('BEGIN :ret:=khcn_cap_de_tai_tmdt_search_list(:curdate, :searchterm); END;',
                 { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, curdate, searchterm }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
         },
-    }
-}
+    };
+};

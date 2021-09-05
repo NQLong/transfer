@@ -19,8 +19,8 @@ class sectionContent extends React.Component {
     render() {
         const title = T.language.parse(this.state.title);
         let content = this.state.content ? T.language.parse(this.state.content)
-            .replaceAll("<strong>", `<b style="font-weight: bold;color:black;">`)
-            .replaceAll("</strong>", "</b>") : '';
+            .replaceAll('<strong>', '<b style="font-weight: bold;color:black;">')
+            .replaceAll('</strong>', '</b>') : '';
         return (
             <section className=' ftco-section-2' style={{ padding: 0 }}>
                 <br />

@@ -10,7 +10,7 @@ export function createSachGTStaff(data, done) {
                 if (done) done(res);
             }
         }, error => T.notify('Thêm thông tin sách, giáo trình bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function updateSachGTStaff(id, changes, done) {
@@ -25,7 +25,7 @@ export function updateSachGTStaff(id, changes, done) {
                 if (done) done();
             }
         }, error => T.notify('Cập nhật thông tin sách, giáo trình bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function deleteSachGTStaff(id, done) {
@@ -40,7 +40,7 @@ export function deleteSachGTStaff(id, done) {
                 if (done) done();
             }
         }, error => T.notify('Xóa thông tin sách, giáo trình bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function createSachGTStaffUser(data, done) {
@@ -55,7 +55,7 @@ export function createSachGTStaffUser(data, done) {
                 if (done) done(res);
             }
         }, error => T.notify('Thêm thông tin sách, giáo trình bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function updateSachGTStaffUser(id, changes, done) {
@@ -70,7 +70,7 @@ export function updateSachGTStaffUser(id, changes, done) {
                 if (done) done();
             }
         }, error => T.notify('Cập nhật thông tin sách, giáo trình bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function deleteSachGTStaffUser(id, done) {
@@ -82,8 +82,8 @@ export function deleteSachGTStaffUser(id, done) {
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
                 T.alert('Thông tin sách, giáo trình được xóa thành công!', 'info', false, 800);
-                done && done()
+                done && done();
             }
         }, error => T.notify('Xóa thông tin sách, giáo trình bị lỗi' , 'danger'));
-    }
+    };
 }

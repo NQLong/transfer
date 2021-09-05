@@ -31,7 +31,7 @@ module.exports = app => {
                 } else {
                     res.send({ error, items });
                 }
-            }
+            };
             solve(0);
         });
     });

@@ -48,7 +48,7 @@ export function getAllCarousels(done) {
                 dispatch({ type: CarouselGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách tập hình ảnh bị lỗi!', 'danger'));
-    }
+    };
 }
 
 T.initPage('adminCarousel');
@@ -65,7 +65,7 @@ export function getCarouselInPage(pageNumber, pageSize, done) {
                 dispatch({ type: CarouselGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách hình ảnh bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getCarousel(id, done) {
@@ -80,7 +80,7 @@ export function getCarousel(id, done) {
                 dispatch({ type: CarouselGet, item: data.item });
             }
         }, error => T.notify('Lấy thông tin tập hình ảnh bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function createCarousel(data, done) {
@@ -95,7 +95,7 @@ export function createCarousel(data, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo tập hình ảnh bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateCarousel(id, changes, done) {
@@ -111,7 +111,7 @@ export function updateCarousel(id, changes, done) {
                 done && done();
             }
         }, error => T.notify('Cập nhật tập hình ảnh bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteCarousel(id) {
@@ -126,7 +126,7 @@ export function deleteCarousel(id) {
                 dispatch(getCarouselInPage());
             }
         }, error => T.notify('Xóa hình ảnh bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function createCarouselItem(data, done) {
@@ -141,7 +141,7 @@ export function createCarouselItem(data, done) {
                 if (done) done(res);
             }
         }, error => T.notify('Tạo hình ảnh bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateCarouselItem(carouselId, priority, changes, done) {
@@ -157,7 +157,7 @@ export function updateCarouselItem(carouselId, priority, changes, done) {
                 if (done) done();
             }
         }, error => T.notify('Cập nhật hình ảnh bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function swapCarouselItem(carouselId, priority, isMoveUp) {
@@ -165,13 +165,13 @@ export function swapCarouselItem(carouselId, priority, isMoveUp) {
         const url = '/api/carousel/item/swap';
         T.put(url, { carouselId, priority, isMoveUp }, data => {
             if (data.error) {
-                T.notify('Thay đổi vị trí hình ảnh bị lỗi!', 'danger')
+                T.notify('Thay đổi vị trí hình ảnh bị lỗi!', 'danger');
                 console.error('PUT: ' + url + '. ' + data.error);
             } else {
                 dispatch(getCarousel(carouselId));
             }
         }, error => T.notify('Thay đổi vị trí hình ảnh bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteCarouselItem(carouselId, priority) {
@@ -186,12 +186,12 @@ export function deleteCarouselItem(carouselId, priority) {
                 dispatch(getCarousel(carouselId));
             }
         }, error => T.notify('Xóa hình ảnh bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function moveCarouselItem(carouselId, oldPriority, newPriority) {
     return dispatch => {
-        const url = `/api/carousel/item/priority`
+        const url = '/api/carousel/item/priority';
         T.put(url, { carouselId, oldPriority, newPriority }, data => {
             if (data.error) {
                 T.notify('Thay đổi vị trí hình ảnh bị lỗi!', 'danger');
@@ -201,7 +201,7 @@ export function moveCarouselItem(carouselId, oldPriority, newPriority) {
                 dispatch(getCarousel(carouselId));
             }
         }, error => T.notify('Thay đổi vị trí hình ảnh bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function changeCarouselItem(item) {
@@ -223,5 +223,5 @@ export function homeGetCarousel(id, done) {
         }, error => {
             console.error('GET: ' + url + '. ' + error);
         });
-    }
+    };
 }

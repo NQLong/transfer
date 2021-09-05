@@ -26,7 +26,7 @@ module.exports = app => {
             condition = {
                 statement,
                 parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
-            }
+            };
         }
         app.model.dmDonVi.getPage(pageNumber, pageSize, condition, (error, page) => {
             res.send({ error, page });
@@ -67,15 +67,15 @@ module.exports = app => {
 
     app.post('/api/danh-muc/don-vi/upload', app.permission.check('dmDonVi:upload'), (req, res) => {
         app.model.dmDonVi.upload(req.body.upload, error => res.send({ error }));
-    })
+    });
     app.get('/api/danh-muc/don-vi/faculty', app.permission.check('user:login'), (req, res) => {
         let condition = {
             statement: 'maPl IN (:maPl) OR ma IN (:ma)',
             parameter: {
-                maPl: `01`,
+                maPl: '01',
                 ma: ['30', '57']
             },
-        }
+        };
         app.model.dmDonVi.getAll(condition, '*', null, (error, items) => res.send({ error, items }));
     });
     app.get('/dm-don-vi/:idLoaiDonVi', (req, res) => {

@@ -11,7 +11,7 @@ class EditModal extends React.Component {
     componentDidMount() {
         $(document).ready(() => {
             $(this.modal.current).on('hidden.bs.modal', () => this.setState({ index: -1 }));
-        })
+        });
     }
 
     show = (index, item) => {
@@ -82,7 +82,7 @@ class EditModal extends React.Component {
                     </div>
                 </form>
             </div>
-        )
+        );
     }
 }
 
@@ -131,18 +131,18 @@ class DmChucVuImportPage extends React.Component {
                     T.notify(`Cập nhật ${data && data.items ? data.items.length + ' ' : ''} chức vụ thành công!`, 'success');
                     this.props.history.push('/user/danh-muc/chuc-vu');
                 }
-            })
-        }
+            });
+        };
         e.preventDefault();
         T.confirm3('Cập nhật dữ liệu', 'Bạn có muốn <b>ghi đè</b> dữ liệu đang có bằng dữ liệu mới không?<br>Nếu không rõ, hãy chọn <b>Không ghi đè</b>!', 'warning', 'Ghi đè', 'Không ghi đè', isOverride => {
             if (isOverride !== null) {
                 if (isOverride)
                     T.confirm('Ghi đè dữ liệu', 'Bạn có chắc chắn muốn ghi đè dữ liệu?', 'warning', true, isConfirm => {
                         if (isConfirm) doSave('TRUE');
-                    })
+                    });
                 else doSave('FALSE');
             }
-        })
+        });
     };
 
     showUpload = (e) => {
@@ -172,7 +172,7 @@ class DmChucVuImportPage extends React.Component {
                     </div>
                 </div>
             </div>
-        )
+        );
     }
 
     render() {

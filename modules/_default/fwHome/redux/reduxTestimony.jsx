@@ -83,7 +83,7 @@ export function getAllTestimonys(done) {
                 dispatch({ type: TestimonyGetAll, items: data.items });
             }
         }, error => T.notify('Lấy danh sách testimony bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function createTestimony(title, done) {
@@ -98,7 +98,7 @@ export function createTestimony(title, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo testimony bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateTestimony(_id, changes, done) {
@@ -115,7 +115,7 @@ export function updateTestimony(_id, changes, done) {
                 done && done();
             }
         }, error => T.notify('Cập nhật thông tin testimony bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteTestimony(_id) {
@@ -130,7 +130,7 @@ export function deleteTestimony(_id) {
                 dispatch(getAllTestimonys());
             }
         }, error => T.notify('Xóa testimony bị lỗi!', 'danger'));
-    }
+    };
 }
 
 
@@ -147,7 +147,7 @@ export function getTestimonyItem(_id, done) {
                 dispatch({ type: TestimonyUpdate, item: data.item });
             }
         }, error => T.notify('Lấy testimony bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function addTestimonyIntoGroup(fullname, jobPosition, image, content) {
@@ -178,5 +178,5 @@ export function getTestimonyByUser(_id, done) {
                 if (done) done(data.item);
             }
         }, error => T.notify('Lấy testimony bị lỗi!', 'danger'));
-    }
+    };
 }

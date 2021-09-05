@@ -52,7 +52,7 @@ class EditModal extends React.Component {
                 idNgach: Number(this.maSoCdnn.current.getVal()),
                 bac: this.state.vuotKhung ? 0 : this.bac.current.getVal(),
                 heSo: this.heSo.current.getVal(),
-            }
+            };
         if (changes.idNgach == '') {
             T.notify('Vui lòng chọn ngạch!', 'danger');
             this.maSoCdnn.current.focus();

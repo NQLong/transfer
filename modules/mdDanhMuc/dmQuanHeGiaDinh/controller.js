@@ -20,14 +20,14 @@ module.exports = app => {
             condition = {
                 statement: 'lower(ma) LIKE :searchText OR lower(ten) LIKE :searchText',
                 parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
-            }
+            };
         }
         app.model.dmQuanHeGiaDinh.getPage(pageNumber, pageSize, condition, '*', 'ma', (error, page) => res.send({ error, page }));
     });
 
     app.get('/api/danh-muc/quan-he-gia-dinh/all', app.permission.check('user:login'), (req, res) => {
         const condition = req.query.condition || {};
-        app.model.dmQuanHeGiaDinh.getAll(condition, (error, items) => res.send({ error, items }))
+        app.model.dmQuanHeGiaDinh.getAll(condition, (error, items) => res.send({ error, items }));
     });
 
     app.post('/api/danh-muc/quan-he-gia-dinh', app.permission.check('dmQuanHeGiaDinh:write'), (req, res) => {
@@ -44,7 +44,7 @@ module.exports = app => {
     });
 
     app.put('/api/danh-muc/quan-he-gia-dinh', app.permission.check('dmQuanHeGiaDinh:write'), (req, res) => {
-        app.model.dmQuanHeGiaDinh.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }))
+        app.model.dmQuanHeGiaDinh.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
     app.delete('/api/danh-muc/quan-he-gia-dinh', app.permission.check('dmQuanHeGiaDinh:delete'), (req, res) => {

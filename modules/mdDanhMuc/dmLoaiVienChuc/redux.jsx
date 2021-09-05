@@ -32,7 +32,7 @@ export default function DmLoaiVienChucReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -46,7 +46,7 @@ T.initPage('pageDmLoaiVienChuc');
 
 export function getDmLoaiVienChucAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/loai-vien-chuc/all`;
+        const url = '/api/danh-muc/loai-vien-chuc/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách loại viên chức bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -56,7 +56,7 @@ export function getDmLoaiVienChucAll(done) {
                 dispatch({ type: DmLoaiVienChucGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách loại viên chức bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmLoaiVienChucPage(pageNumber, pageSize, done) {
@@ -72,7 +72,7 @@ export function getDmLoaiVienChucPage(pageNumber, pageSize, done) {
                 dispatch({ type: DmLoaiVienChucGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách loại viên chức bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmLoaiVienChuc(ma, done) {
@@ -88,13 +88,13 @@ export function getDmLoaiVienChuc(ma, done) {
         }, error => {
             console.error(`GET: ${url}.`, error);
         });
-    }
+    };
 }
 
 export function createDmLoaiVienChuc(item, done) {
     return dispatch => {
 
-        const url = `/api/danh-muc/loai-vien-chuc`;
+        const url = '/api/danh-muc/loai-vien-chuc';
         T.post(url, { item }, data => {
             if (data.error) {
                 console.error(`POST: ${url}.`, data.error);
@@ -104,12 +104,12 @@ export function createDmLoaiVienChuc(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo loại viên chức bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function deleteDmLoaiVienChuc(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/loai-vien-chuc`;
+        const url = '/api/danh-muc/loai-vien-chuc';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa loại viên chức  bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -119,12 +119,12 @@ export function deleteDmLoaiVienChuc(ma) {
                 dispatch(getDmLoaiVienChucAll());
             }
         }, error => T.notify('Xóa loại viên chức bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function updateDmLoaiVienChuc(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/loai-vien-chuc`;
+        const url = '/api/danh-muc/loai-vien-chuc';
         T.put(url, { ma, changes }, data => {
             if (data.error) {
                 T.notify('Cập nhật loại viên chức bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -135,7 +135,7 @@ export function updateDmLoaiVienChuc(ma, changes, done) {
                 dispatch(getDmLoaiVienChucAll());
             }
         }, error => T.notify('Cập nhật loại viên chức bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function changeDmLoaiVienChuc(item) {

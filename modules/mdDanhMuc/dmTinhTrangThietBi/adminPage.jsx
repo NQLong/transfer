@@ -35,7 +35,7 @@ class DanhMucTinhTrangThietBi extends Component {
             if (!error) {
                 this.modal.current?.hide();
             }
-        })
+        });
     };
 
     showEditModal = (item) => {
@@ -46,7 +46,7 @@ class DanhMucTinhTrangThietBi extends Component {
 
     delete = (e, ma) => {
         e.preventDefault();
-        T.confirm('Tình trạng thiết bị', `Bạn có chắc bạn muốn xóa tình trạng thiết bị này?`, 'warning', true, isConfirm =>
+        T.confirm('Tình trạng thiết bị', 'Bạn có chắc bạn muốn xóa tình trạng thiết bị này?', 'warning', true, isConfirm =>
             isConfirm && this.props.deleteTinhTrangThietBi(ma));
     }
 
@@ -97,7 +97,7 @@ class DanhMucTinhTrangThietBi extends Component {
                         ))}
                     </tbody>
                 </table>
-            )
+            );
         }
 
         return (
@@ -197,7 +197,7 @@ class EditModal extends Component {
                     </div>
                 </form>
             </div>
-        )
+        );
     }
 }
 

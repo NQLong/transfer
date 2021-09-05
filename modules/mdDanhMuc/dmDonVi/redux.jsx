@@ -35,7 +35,7 @@ export default function dmDonViReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -61,12 +61,12 @@ export function getDmDonViPage(pageNumber, pageSize, pageCondition, done) {
                 dispatch({ type: DmDonViGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách đơn vị trường đại học bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmDonViAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/don-vi/all`;
+        const url = '/api/danh-muc/don-vi/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách đơn vị trường đại học bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -76,7 +76,7 @@ export function getDmDonViAll(done) {
                 dispatch({ type: DmDonViGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách đơn vị trường đại học bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmDonVi(ma, done) {
@@ -92,12 +92,12 @@ export function getDmDonVi(ma, done) {
         }, error => {
             console.error(`GET: ${url}.`, error);
         });
-    }
+    };
 }
 
 export function createDmDonVi(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/don-vi`;
+        const url = '/api/danh-muc/don-vi';
         T.post(url, { item }, data => {
             if (data.error) {
                 console.error(`POST: ${url}.`, data.error);
@@ -106,12 +106,12 @@ export function createDmDonVi(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo đơn vị trường đại học bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function deleteDmDonVi(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/don-vi`;
+        const url = '/api/danh-muc/don-vi';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục  bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -121,12 +121,12 @@ export function deleteDmDonVi(ma) {
                 dispatch(getDmDonViPage());
             }
         }, error => T.notify('Xóa đơn vị trường đại học bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function updateDmDonVi(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/don-vi`;
+        const url = '/api/danh-muc/don-vi';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông đơn vị trường đại học bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -137,7 +137,7 @@ export function updateDmDonVi(ma, changes, done) {
                 dispatch(getDmDonViPage());
             }
         }, error => T.notify('Cập nhật thông tin đơn vị trường đại học bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function changeDmDonVi(item) {
@@ -146,20 +146,20 @@ export function changeDmDonVi(item) {
 
 export function uploadDmDonVi(upload, history) {
     return dispatch => {
-        const url = `/api/danh-muc/don-vi/upload`;
+        const url = '/api/danh-muc/don-vi/upload';
         T.post(url, { upload }, data => {
             if (data.error.length == 0) {
-                T.notify('Upload thông tin đơn vị trường đại học thành công!', 'info')
+                T.notify('Upload thông tin đơn vị trường đại học thành công!', 'info');
                 history.push('/user/danh-muc/don-vi');
             } else {
                 T.notify('Upload thông tin đơn vị trường đại học có lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
             }
-        })
-    }
+        });
+    };
 }
 export function getDmDonViFaculty(done) {
     return dispatch => {
-        const url = `/api/danh-muc/don-vi/all`;
+        const url = '/api/danh-muc/don-vi/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách khoa bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -169,7 +169,7 @@ export function getDmDonViFaculty(done) {
                 dispatch({ type: DmDonViGetAllFaculty, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách khoa bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export const SelectAdapter_DmDonVi = {
@@ -179,14 +179,14 @@ export const SelectAdapter_DmDonVi = {
     processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: `${item.ma}: ${item.ten}` })) : [] }),
     getOne: getDmDonVi,
     processResultOne: response => response && ({ value: response.ma, text: response.ma + ': ' + response.ten }),
-}
+};
 
 export const SelectAdapter_DmDonViFaculty = {
     ajax: false,
     getAll: getDmDonViFaculty,
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ma + ': ' + item.ten })) : [] }),
     condition: { kichHoat: 1 },
-}
+};
 
 export const SelectAdapter_NoiKyHopDong = {
     ajax: true,
@@ -198,10 +198,10 @@ export const SelectAdapter_NoiKyHopDong = {
             return (ten.includes('trung tâm') || ten.includes('công ty')) && item.kichHoat === 1;
         }).map(donVi => ({ id: donVi.ten, text: `${donVi.ten}` }));
         list.push({ id: 'Khác', text: 'Khác' });
-        return ({ results: list })
+        return ({ results: list });
     },
     processResultOne: response => response && ({ value: response.ma, text: response.ma + ': ' + response.ten }),
-}
+};
 
 export const SelectAdapter_DmDonViFilter = {
     ajax: true,
@@ -209,9 +209,9 @@ export const SelectAdapter_DmDonViFilter = {
     data: params => ({ condition: params.term }),
     processResults: data => {
         const results = data && data.page && data.page.list ? data.page.list.map(item => ({ id: item.ma, text: `${item.ma}: ${item.ten}` })) : [];
-        results.unshift({ id: '00', text: 'Chọn tất cả' })
-        return { results }
+        results.unshift({ id: '00', text: 'Chọn tất cả' });
+        return { results };
     },
     getOne: getDmDonVi,
     processResultOne: response => response && ({ value: response.ma, text: response.ma + ': ' + response.ten }),
-}
+};

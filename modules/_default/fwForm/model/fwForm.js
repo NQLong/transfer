@@ -31,7 +31,7 @@ module.exports = app => {
                 });
             }
         });
-    }
+    };
 
     app.model.fwForm.swapPriority = (id, isMoveUp, done) => {
         app.model.fwForm.get({ id }, (error, item1) => {
@@ -57,10 +57,10 @@ module.exports = app => {
                         item2.priority = priority;
                         app.model.fwForm.update({ id: item1.id }, { priority: item1.priority }, error1 => {
                             app.model.fwForm.update({ id: item2.id }, { priority: item2.priority }, error2 => done(error1 || error2));
-                        })
+                        });
                     }
                 });
             }
         });
-    }
-}
+    };
+};

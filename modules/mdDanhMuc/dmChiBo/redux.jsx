@@ -32,7 +32,7 @@ export default function DmChiBoReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -57,12 +57,12 @@ export function getDmChiBoPage(pageNumber, pageSize, pageCondition, done) {
                 dispatch({ type: DmChiBoGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách chi bộ bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmChiBoAll(condition, done) {
     return dispatch => {
-        const url = `/api/danh-muc/chi-bo/all`;
+        const url = '/api/danh-muc/chi-bo/all';
         T.get(url, { condition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách chi bộ lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -72,12 +72,12 @@ export function getDmChiBoAll(condition, done) {
                 dispatch({ type: DmChiBoGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách chi bộ bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function createDmChiBo(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/chi-bo`;
+        const url = '/api/danh-muc/chi-bo';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo dữ liệu bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -87,12 +87,12 @@ export function createDmChiBo(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo dữ liệu bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function deleteDmChiBo(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/chi-bo`;
+        const url = '/api/danh-muc/chi-bo';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 console.error(`DELETE: ${url}.`, data.error);
@@ -100,12 +100,12 @@ export function deleteDmChiBo(ma) {
                 dispatch(getDmChiBoPage());
             }
         }, error => T.notify('Xóa dữ liệu bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function updateDmChiBo(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/chi-bo`;
+        const url = '/api/danh-muc/chi-bo';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật dữ liệu bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -117,7 +117,7 @@ export function updateDmChiBo(ma, changes, done) {
                 dispatch(getDmChiBoPage());
             }
         }, error => T.notify('Cập nhật dữ liệu bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export const SelectAdapter_DmChiBo = {
@@ -125,4 +125,4 @@ export const SelectAdapter_DmChiBo = {
     getAll: getDmChiBoAll,
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ma + ': ' + item.ten })) : [] }),
     condition: { kichHoat: 1 },
-}
+};

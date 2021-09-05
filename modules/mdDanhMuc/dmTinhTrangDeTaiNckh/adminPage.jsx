@@ -107,7 +107,7 @@ class DmTinhTrangDeTaiNckhPage extends React.Component {
 
     componentDidMount() {
         T.ready('/user/category');
-        this.props.getDmTinhTrangDeTaiNckhAll()
+        this.props.getDmTinhTrangDeTaiNckhAll();
     }
 
     edit = (e, item) => {

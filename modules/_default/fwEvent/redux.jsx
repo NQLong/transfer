@@ -90,7 +90,7 @@ export function getEventByCategoryAdmin(category, pageNumber, pageSize, done) {
                 done && done(data.page);
             }
         }, error => T.notify(language.getNewsInPageByUserError, 'danger'));
-    }
+    };
 }
 export function getDraftEventInPage(pageNumber, pageSize, done) {
     const page = T.updatePage('pageDraftEvent', pageNumber, pageSize);
@@ -105,7 +105,7 @@ export function getDraftEventInPage(pageNumber, pageSize, done) {
                 dispatch({ type: EventGetDraftPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách tin tức bị lỗi!', 'danger'));
-    }
+    };
 }
 export function draftToEvent(draftEventId, done) {
     return dispatch => {
@@ -120,7 +120,7 @@ export function draftToEvent(draftEventId, done) {
                 dispatch(getEventInPage());
             }
         }, error => T.notify('Thao tác bị lỗi bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function createEvent(done) {
@@ -135,7 +135,7 @@ export function createEvent(done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo sự kiện bị lỗi!', 'danger'));
-    }
+    };
 }
 export function createDraftEventDefault(done) {
     return (dispatch, getState) => {
@@ -154,7 +154,7 @@ export function createDraftEventDefault(done) {
             action: 'create',
             documentJson: JSON.stringify(docData),
             editorName: 'Test',
-        }
+        };
         if (state.system.user.permissions.includes('event:write')) {
             delete passValue.editorId;
             delete passValue.editorName;
@@ -170,8 +170,8 @@ export function createDraftEventDefault(done) {
                 dispatch(getDraftEventInPage());
                 done && done(data);
             }
-        })
-    }
+        });
+    };
 }
 export function createDraftEvent(result, done) {
     return dispatch => {
@@ -187,8 +187,8 @@ export function createDraftEvent(result, done) {
                 done && done();
             }
             if (done) done(data);
-        })
-    }
+        });
+    };
 }
 
 export function updateEvent(id, changes, done) {
@@ -205,7 +205,7 @@ export function updateEvent(id, changes, done) {
                 done && done();
             }
         }, error => T.notify('Cập nhật thông tin sự kiện bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDraftEvent(id, changes, done) {
@@ -222,7 +222,7 @@ export function updateDraftEvent(id, changes, done) {
                 done && done();
             }
         }, error => T.notify('Cập nhật thông tin bản nháp sự kiện bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function swapEvent(id, isMoveUp) {
@@ -237,7 +237,7 @@ export function swapEvent(id, isMoveUp) {
                 dispatch(getEventInPage());
             }
         }, error => T.notify('Thay đổi thứ tự sự kiện bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteEvent(id) {
@@ -252,7 +252,7 @@ export function deleteEvent(id) {
                 dispatch(getEventInPage());
             }
         }, error => T.notify('Xóa sự kiện bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteDraftEvent(id) {
@@ -267,7 +267,7 @@ export function deleteDraftEvent(id) {
                 dispatch(getDraftEventInPage());
             }
         }, error => T.notify('Xóa sự kiện bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getEvent(id, done) {
@@ -283,10 +283,10 @@ export function getEvent(id, done) {
                 T.get(url2, draft => {
                     if (done) done(data);
                     dispatch({ type: EventGet, item: data.item, categories: data.categories, docDraftUser: draft });
-                }, error => T.notify('Lấy danh sách tin tức bị lỗi!', 'danger'))
+                }, error => T.notify('Lấy danh sách tin tức bị lỗi!', 'danger'));
             }
         }, error => done({ error }));
-    }
+    };
 }
 export function getDraftEvent(id, done) {
     return dispatch => {
@@ -300,7 +300,7 @@ export function getDraftEvent(id, done) {
                 dispatch({ type: EventGetDraft, item: data.item, categories: data.categories });
             }
         }, error => done({ error }));
-    }
+    };
 }
 
 export function getEventWithQuestion(id, done) {
@@ -315,7 +315,7 @@ export function getEventWithQuestion(id, done) {
                 if (done) done(data);
             }
         }, error => done({ error }));
-    }
+    };
 }
 
 // Actions (editor) ---------------------------------------------------------------------------------------------------
@@ -363,7 +363,7 @@ export function getEventByEditor(id, done) {
                 dispatch({ type: EventGet, item: data.item, categories: data.categories });
             }
         }, error => done({ error }));
-    }
+    };
 }
 
 export function swapEventByEditor(id, isMoveUp) {
@@ -378,7 +378,7 @@ export function swapEventByEditor(id, isMoveUp) {
                 dispatch(getEventInPageByEditor());
             }
         }, error => T.notify('Thay đổi thứ tự sự kiện bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function changeEventActiveByEditor(id, active) {
@@ -393,7 +393,7 @@ export function changeEventActiveByEditor(id, active) {
                 dispatch(getEventInPageByEditor());
             }
         }, error => T.notify('Thay đổi trạng thái sự kiện bị lỗi!', 'danger'));
-    }
+    };
 }
 
 // Actions (user) -----------------------------------------------------------------------------------------------------
@@ -425,7 +425,7 @@ export function getEventInPageByUser(pageNumber, pageSize, done) {
                 // dispatch({ type: GET_EVENT_IN_PAGE_BY_USER, page: data.page });
             }
         }, error => T.notify(language.getNewsInPageByUserError, 'danger'));
-    }
+    };
 }
 export function getEventInPageByCategory(pageNumber, pageSize, category, done) {
     return dispatch => {
@@ -438,7 +438,7 @@ export function getEventInPageByCategory(pageNumber, pageSize, category, done) {
                 done && done(data);
             }
         }, error => T.notify(language.getNewsInPageByUserError, 'danger'));
-    }
+    };
 }
 
 export function getEventByUser(eventId, eventLink, done) {
@@ -453,7 +453,7 @@ export function getEventByUser(eventId, eventLink, done) {
                 done && done(data);
             }
         }, error => T.notify(language.getNewsByUserError, 'danger'));
-    }
+    };
 }
 
 export function getEventFeed() {
@@ -467,7 +467,7 @@ export function getEventFeed() {
                 dispatch({ type: EventFeed, list: data.page.list });
             }
         }, error => T.notify(language.getNewsFeedError, 'danger'));
-    }
+    };
 }
 
 export function checkLink(id, link) {
@@ -481,7 +481,7 @@ export function checkLink(id, link) {
                 T.notify('Link hợp lệ!', 'success');
             }
         }, error => T.notify('Kiểm tra Link bị lỗi!', 'danger'));
-    }
+    };
 }
 
 //Question
@@ -497,5 +497,5 @@ export function getEventWithQuestionByUser(id, link, done) {
                 dispatch({ type: GET_EVENT_BY_USER, item: data.item });
             }
         }, error => done({ error }));
-    }
+    };
 }

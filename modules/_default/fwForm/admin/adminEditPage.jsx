@@ -212,7 +212,7 @@ class FormEditPage extends React.Component {
                     this.imageBox.current.setData('form:' + data.item.id, data.item.image ? data.item.image : '/img/avatar.png');
 
                     let title = T.language.parse(data.item.title, true), description = data.item.description ? T.language.parse(data.item.description, true) : '';
-                    $('#formHeaderTitle').html(title.vi != '' ? 'Tiêu đề: <b>' + title.vi + '</b> - ' + T.dateToText(data.item.createdDate) : '')
+                    $('#formHeaderTitle').html(title.vi != '' ? 'Tiêu đề: <b>' + title.vi + '</b> - ' + T.dateToText(data.item.createdDate) : '');
                     $('#formViTitle').val(title.vi);
                     $('#formEnTitle').val(title.en);
                     description && this.viEditor.current.html(description.vi);
@@ -254,7 +254,7 @@ class FormEditPage extends React.Component {
     updateQuestion = (id, changes) => {
         this.props.updateQuestion(id, changes, this.state.item.id, () => {
             T.notify('Cập nhật câu hỏi thành công!', 'info');
-        })
+        });
     };
 
     swap = (e, item, isMoveUp) => {
@@ -274,7 +274,7 @@ class FormEditPage extends React.Component {
             if (isConfirm) {
                 this.props.deleteQuestion(item.id, this.state.item.id, () => {
                     T.alert('Xoá câu hỏi thành công!', 'success', false, 1000);
-                })
+                });
             } else {
                 T.alert('Cancelled!', 'error', false, 500);
             }

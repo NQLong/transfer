@@ -91,7 +91,7 @@ class DmTangBhxhPage extends React.Component {
 
     componentDidMount() {
         T.ready('/user/category');
-        this.props.getDmTangBhxhAll()
+        this.props.getDmTangBhxhAll();
     }
 
     edit = (e, item) => {

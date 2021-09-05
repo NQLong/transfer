@@ -73,4 +73,4 @@ module.exports = app => {
         };
         solveAnItem(0);
     };
-}
+};

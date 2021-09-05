@@ -37,7 +37,7 @@ module.exports = app => {
     });
 
     app.put('/api/danh-muc/trinh-do', app.permission.check('dmTrinhDo:write'), (req, res) => {
-        app.model.dmTrinhDo.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }))
+        app.model.dmTrinhDo.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
     app.delete('/api/danh-muc/trinh-do', app.permission.check('dmTrinhDo:delete'), (req, res) => {

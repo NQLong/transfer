@@ -114,7 +114,7 @@ class AdminPage extends React.Component {
             isConfirm && this.props.deleteDmTrinhDoQuanLyNhaNuoc(item.ma, error => {
                 if (error) T.notify(error.message ? error.message : `Xoá trình độ ${item.ten} bị lỗi!`, 'danger');
                 else T.alert(`Xoá trình độ ${item.ten} thành công!`, 'success', false, 800);
-            })
+            });
         });
         e.preventDefault();
     }

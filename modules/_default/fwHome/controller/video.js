@@ -32,7 +32,7 @@ module.exports = app => {
             } else {
                 res.send({ error, video });
             }
-        })
+        });
     });
 
     app.put('/api/video', app.permission.check('website:write'), (req, res) => {
@@ -52,7 +52,7 @@ module.exports = app => {
                 app.deleteImage(item.image);
             }
         });
-        app.model.homeVideo.delete({ id: req.body.id }, error => res.send({ error }))
+        app.model.homeVideo.delete({ id: req.body.id }, error => res.send({ error }));
     });
 
 

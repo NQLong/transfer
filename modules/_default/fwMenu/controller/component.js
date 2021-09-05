@@ -115,11 +115,11 @@ module.exports = app => {
                 condition.maDonVi = req.session.user.maDonVi;
             } else {
                 res.send({ error: 'User not have permission' });
-                return
+                return;
             }
 
             app.model.homeCarousel.getAll(condition, (error, items) => {
-                res.send({ error, items: items.map(item => ({ id: item.id, text: item.title })) })
+                res.send({ error, items: items.map(item => ({ id: item.id, text: item.title })) });
             });
         } else if (pageType == 'feature') {
             let condition = { active: 1 };
@@ -130,11 +130,11 @@ module.exports = app => {
                 condition.maDonVi = req.session.user.maDonVi;
             } else {
                 res.send({ error: 'User not have permission' });
-                return
+                return;
             }
 
             app.model.homeFeature.getAll(condition, (error, items) => {
-                res.send({ error, items: items.map(item => ({ id: item.id, text: item.title })) })
+                res.send({ error, items: items.map(item => ({ id: item.id, text: item.title })) });
             });
         } else if (pageType == 'video') {
             let condition = { type: 'news', active: 1 };
@@ -145,18 +145,18 @@ module.exports = app => {
                 condition.maDonVi = req.session.user.maDonVi;
             } else {
                 res.send({ error: 'User not have permission' });
-                return
+                return;
             }
             app.model.homeVideo.getAll(condition, (error, items) => {
-                res.send({ error, items: items.map(item => ({ id: item.id, text: item.title })) })
+                res.send({ error, items: items.map(item => ({ id: item.id, text: item.title })) });
             });
         } else if (pageType == 'news') {
             app.model.fwNews.getAll((error, items) => {
-                res.send({ error, items: items.map(item => ({ id: item.id, text: item.title })) })
+                res.send({ error, items: items.map(item => ({ id: item.id, text: item.title })) });
             });
         } else if (pageType == 'event') {
             app.model.fwEvent.getAll((error, items) => {
-                res.send({ error, items: items.map(item => ({ id: item.ma, text: item.tieuDe })) })
+                res.send({ error, items: items.map(item => ({ id: item.ma, text: item.tieuDe })) });
             });
         } else if (pageType == 'content') {
             let condition = { type: 'news', active: 1 };
@@ -167,10 +167,10 @@ module.exports = app => {
                 condition.maDonVi = req.session.user.maDonVi;
             } else {
                 res.send({ error: 'User not have permission' });
-                return
+                return;
             }
             app.model.homeContent.getAll(condition, (error, items) => {
-                res.send({ error, items: items.map(item => ({ id: item.id, text: item.title })) })
+                res.send({ error, items: items.map(item => ({ id: item.id, text: item.title })) });
             });
         } else if (pageType == 'all-news') {
             let condition = { type: 'news', active: 1 };
@@ -181,14 +181,14 @@ module.exports = app => {
                 condition.maDonVi = req.session.user.maDonVi;
             } else {
                 res.send({ error: 'User not have permission' });
-                return
+                return;
             }
             app.model.fwCategory.getAll(condition, '*', 'priority DESC', (error, items) => {
-                res.send({ error, items: items.map(item => ({ id: item.id, text: item.title })) })
-            })
+                res.send({ error, items: items.map(item => ({ id: item.id, text: item.title })) });
+            });
         } else if (pageType == 'division') {
             app.model.dmLoaiDonVi.getAll((error, items) => {
-                res.send({ error, items: items.map(item => ({ id: item.ma, text: item.ten })) })
+                res.send({ error, items: items.map(item => ({ id: item.ma, text: item.ten })) });
             });
         } else if (pageType == 'last events' || pageType == 'all-events') {
             let condition = { type: 'event', active: 1 };
@@ -202,7 +202,7 @@ module.exports = app => {
                 return;
             }
             app.model.fwCategory.getAll(condition, '*', 'priority DESC', (error, items) => {
-                res.send({ error, items: items.map(item => ({ id: item.id, text: JSON.parse(item.title).vi })) })
+                res.send({ error, items: items.map(item => ({ id: item.id, text: JSON.parse(item.title).vi })) });
             });
         } else {
             res.send({ error: 'Invalid page type!' });

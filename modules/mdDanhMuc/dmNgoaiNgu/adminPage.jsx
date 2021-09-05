@@ -25,7 +25,7 @@ class EditModal extends React.Component {
                 ma: $('#ma').val(),
                 ten: $('#ten').val(),
                 kichHoat: Number(this.state.kichHoat),
-            }
+            };
         if (changes.ma == '') {
             T.notify('Mã ngoại ngữ bị trống!', 'danger');
             $('#ma').focus();

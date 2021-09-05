@@ -32,7 +32,7 @@ module.exports = app => {
     });
 
     app.put('/api/danh-muc/phan-loai-vien-chuc', app.permission.check('dmPhanLoaiVienChuc:write'), (req, res) => {
-        app.model.dmPhanLoaiVienChuc.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }))
+        app.model.dmPhanLoaiVienChuc.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
     app.delete('/api/danh-muc/phan-loai-vien-chuc', app.permission.check('dmPhanLoaiVienChuc:delete'), (req, res) => {

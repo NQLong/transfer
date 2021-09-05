@@ -42,7 +42,7 @@ module.exports = app => {
     });
 
     app.put('/api/danh-muc/trinh-do-ngoai-ngu', app.permission.check('dmTrinhDoNgoaiNgu:write'), (req, res) => {
-        app.model.dmTrinhDoNgoaiNgu.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }))
+        app.model.dmTrinhDoNgoaiNgu.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
     app.delete('/api/danh-muc/trinh-do-ngoai-ngu', app.permission.check('dmTrinhDoNgoaiNgu:delete'), (req, res) => {

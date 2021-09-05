@@ -32,7 +32,7 @@ export default function dmLoaiDonViReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -44,7 +44,7 @@ export default function dmLoaiDonViReducer(state = null, data) {
 // Actions ------------------------------------------------------------------------------------------------------------
 export function getdmLoaiHopDongAll(condition, done) {
     return dispatch => {
-        const url = `/api/danh-muc/loai-hop-dong/all`;
+        const url = '/api/danh-muc/loai-hop-dong/all';
         T.get(url, { condition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách loại hợp đồng bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -54,7 +54,7 @@ export function getdmLoaiHopDongAll(condition, done) {
                 dispatch({ type: DmLoaiDonViGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách loại hợp đồng bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 T.initPage('pageDmLoaiHopDong');
@@ -71,7 +71,7 @@ export function getDmLoaiHopDongPage(pageNumber, pageSize, done) {
                 dispatch({ type: DmLoaiDonViGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách loại hợp đồng bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmLoaiHopDong(ma, done) {
@@ -87,12 +87,12 @@ export function getDmLoaiHopDong(ma, done) {
         }, error => {
             console.error(`GET: ${url}.`, error);
         });
-    }
+    };
 }
 
 export function createDmLoaiHopdong(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/loai-hop-dong`;
+        const url = '/api/danh-muc/loai-hop-dong';
         T.post(url, { item }, data => {
             if (data.error) {
                 if (data.error.errorNum == 1) {
@@ -104,12 +104,12 @@ export function createDmLoaiHopdong(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo loại hợp đồng bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function deleteDmLoaiHopDong(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/loai-hop-dong`;
+        const url = '/api/danh-muc/loai-hop-dong';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục  bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -119,12 +119,12 @@ export function deleteDmLoaiHopDong(ma) {
                 dispatch(getdmLoaiHopDongAll());
             }
         }, error => T.notify('Xóa loại hợp đồng bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function updateDmLoaiHopDong(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/loai-hop-dong`;
+        const url = '/api/danh-muc/loai-hop-dong';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông loại hợp đồng bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -135,7 +135,7 @@ export function updateDmLoaiHopDong(ma, changes, done) {
                 dispatch(getdmLoaiHopDongAll());
             }
         }, error => T.notify('Cập nhật thông tin loại hợp đồng bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function changeDmLoaiHopDong(item) {
@@ -147,4 +147,4 @@ export const SelectAdapter_DmLoaiHopDong = {
     getAll: getdmLoaiHopDongAll,
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
     condition: { kichHoat: 1 },
-}
+};

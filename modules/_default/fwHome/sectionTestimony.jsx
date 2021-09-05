@@ -18,7 +18,7 @@ class SectionFeature extends React.Component {
                 margin: 0,
                 loop: true,
                 nav: false,
-                navText: [`<i class='fa fa-angle-left'/>`, `<i class='fa fa-angle-right'/>`],
+                navText: ['<i class=\'fa fa-angle-left\'/>', '<i class=\'fa fa-angle-right\'/>'],
                 dots: true,
                 autoplay: true,
                 autoplayTimeout: 6000,
@@ -27,7 +27,7 @@ class SectionFeature extends React.Component {
                 responsive: { 0: { items: 1 }, 576: { items: 2 }, 992: { items: 3 } }
             });
 
-            var i = 0;
+            let i = 0;
             $('.ftco-animate').waypoint(function (direction) {
                 if (direction === 'down' && !$(this.element).hasClass('ftco-animated')) {
                     i++;
@@ -36,7 +36,7 @@ class SectionFeature extends React.Component {
                         $('body .ftco-animate.item-animate').each(function (k) {
                             const el = $(this);
                             setTimeout(function () {
-                                var effect = el.data('animate-effect');
+                                let effect = el.data('animate-effect');
                                 if (effect === 'fadeIn') {
                                     el.addClass('fadeIn ftco-animated');
                                 } else if (effect === 'fadeInLeft') {
@@ -107,10 +107,10 @@ class SectionFeature extends React.Component {
                     image: '/img/img15.png'
                 },
             ]
-        }
+        };
         return (
             <section style={{ backgroundImage: `url(${testimony.image})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
-                <div className='row p-3' style={{ backgroundColor: `rgba(48, 53, 145, 0.9)` }}>
+                <div className='row p-3' style={{ backgroundColor: 'rgba(48, 53, 145, 0.9)' }}>
                     <div className='col-12 text-center pt-3'><h3 className='homeTitle' style={{ color: 'white' }}><b>{T.language(testimony.title)}</b></h3></div>
                     {testimony.list.map((item, index) => (
                         <div key={index} className='col-lg-4 col-12 d-flex align-items-center py-3 py-lg-4'>

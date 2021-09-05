@@ -7,7 +7,7 @@ module.exports = app => {
     app.get('/api/answer/count/:eventId/:formId', (req, res) => {
         app.model.fwAnswer.count({ eventId: req.params.eventId, formId: req.params.formId }, (error, total) => {
             res.send({ error, total: total.rows[0]['COUNT(*)'] || 0 });
-        })
+        });
     });
 
     app.get('/api/answer/item/:answerId', app.permission.check('form:read'), (req, res) =>
@@ -38,9 +38,9 @@ module.exports = app => {
             if (error) {
                 res.send({ error });
             } else {
-                app.model.fwAnswer.delete({ id: req.body.id }, (error) => res.send({ error }))
+                app.model.fwAnswer.delete({ id: req.body.id }, (error) => res.send({ error }));
             }
-        })
+        });
     });
 
     // User =========================================================================================================================================
@@ -84,8 +84,8 @@ module.exports = app => {
                     res.send({ error, check });
                 }
             }
-        })
-    })
+        });
+    });
 
     // Hook upload files ---------------------------------------------------------------------------------------------------------------------------s
     const importRegistration = (req, srcPath, sendResponse) => {

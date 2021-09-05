@@ -20,11 +20,11 @@ module.exports = app => {
     });
 
     app.get('/api/danh-muc/loai-vien-chuc/all', app.permission.check('user:login'), (req, res) => {
-        app.model.dmLoaiVienChuc.getAll({}, '*', 'ma', (error, items) => res.send({ error, items }))
-    })
+        app.model.dmLoaiVienChuc.getAll({}, '*', 'ma', (error, items) => res.send({ error, items }));
+    });
 
     app.get('/api/danh-muc/item/:ma', app.permission.check('user:login'), (req, res) => {
-        app.model.dmLoaiVienChuc.get({ ma: req.body.ma }, (error, item) => res.send({ error, item }))
+        app.model.dmLoaiVienChuc.get({ ma: req.body.ma }, (error, item) => res.send({ error, item }));
     });
 
     app.post('/api/danh-muc/loai-vien-chuc', app.permission.check('dmLoaiVienChuc:write'), (req, res) => {
@@ -43,7 +43,7 @@ module.exports = app => {
     });
 
     app.put('/api/danh-muc/loai-vien-chuc', app.permission.check('dmLoaiVienChuc:write'), (req, res) => {
-        app.model.dmLoaiVienChuc.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }))
+        app.model.dmLoaiVienChuc.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
     app.delete('/api/danh-muc/loai-vien-chuc', app.permission.check('dmLoaiVienChuc:delete'), (req, res) => {

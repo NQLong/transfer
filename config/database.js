@@ -105,7 +105,7 @@ module.exports = async (app, db) => {
                     });
                     promiseAllObject(fetchPromises).then(resolvedResult => done(null, resolvedResult));
                 } else {
-                    done('The fetchRowsFromCursor has errors!')
+                    done('The fetchRowsFromCursor has errors!');
                 }
             };
 

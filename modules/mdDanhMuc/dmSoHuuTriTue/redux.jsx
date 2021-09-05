@@ -32,7 +32,7 @@ export default function DmSoHuuTriTueReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -56,12 +56,12 @@ export function getDmSoHuuTriTuePage(pageNumber, pageSize, done) {
                 dispatch({ type: DmSoHuuTriTueGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách sở hữu trí tuệ bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmSoHuuTriTueAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/so-huu-tri-tue/all`;
+        const url = '/api/danh-muc/so-huu-tri-tue/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách sở hữu trí tuệ bị lỗi!', 'danger');
@@ -71,7 +71,7 @@ export function getDmSoHuuTriTueAll(done) {
                 dispatch({ type: DmSoHuuTriTueGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách sở hữu trí tuệ bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmSoHuuTriTue(ma, done) {
@@ -85,15 +85,15 @@ export function getDmSoHuuTriTue(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmSoHuuTriTue(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/so-huu-tri-tue`;
+        const url = '/api/danh-muc/so-huu-tri-tue';
         T.post(url, { item }, data => {
             if (data.error) {
-                T.notify(data.error.message || 'Tạo sở hữu trí tuệ bị lỗi', 'danger')
+                T.notify(data.error.message || 'Tạo sở hữu trí tuệ bị lỗi', 'danger');
                 console.error(`POST: ${url}.`, data.error);
                 if (done) done(data.error);
             } else {
@@ -101,12 +101,12 @@ export function createDmSoHuuTriTue(item, done) {
                 if (done) done();
             }
         }, error => T.notify('Tạo sở hữu trí tuệ bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteDmSoHuuTriTue(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/so-huu-tri-tue`;
+        const url = '/api/danh-muc/so-huu-tri-tue';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục sở hữu trí tuệ bị lỗi!', 'danger');
@@ -116,12 +116,12 @@ export function deleteDmSoHuuTriTue(ma) {
                 dispatch(getDmSoHuuTriTueAll());
             }
         }, error => T.notify('Xóa sở hữu trí tuệ bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDmSoHuuTriTue(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/so-huu-tri-tue`;
+        const url = '/api/danh-muc/so-huu-tri-tue';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify(data.error.message || 'Cập nhật thông tin sở hữu trí tuệ bị lỗi', 'danger');
@@ -133,7 +133,7 @@ export function updateDmSoHuuTriTue(ma, changes, done) {
                 if (done) done();
             }
         }, error => T.notify('Cập nhật thông tin sở hữu trí tuệ bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function changeDmSoHuuTriTue(item) {
@@ -147,4 +147,4 @@ export const SelectAdapter_DmSoHuuTriTue = {
     processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.ten })) : [] }),
     getOne: getDmSoHuuTriTue,
     processResultOne: response => response && ({ value: response.ma, text: response.ma + ': ' + response.ten }),
-}
+};

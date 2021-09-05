@@ -32,7 +32,7 @@ export default function DmQuanHeGiaDinhReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -58,12 +58,12 @@ export function getDmQuanHeGiaDinhPage(pageNumber, pageSize, pageCondition, done
                 dispatch({ type: DmQuanHeGiaDinhGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách quan hệ gia đình bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmQuanHeGiaDinhAll(condition, done) {
     return dispatch => {
-        const url = `/api/danh-muc/quan-he-gia-dinh/all`;
+        const url = '/api/danh-muc/quan-he-gia-dinh/all';
         T.get(url, { condition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách quan hệ gia đình bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -73,7 +73,7 @@ export function getDmQuanHeGiaDinhAll(condition, done) {
                 dispatch({ type: DmQuanHeGiaDinhGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách quan hệ gia đình bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmQuanHeGiaDinh(ma, done) {
@@ -87,7 +87,7 @@ export function getDmQuanHeGiaDinh(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmQuanHeGiaDinh(dmQuanHeGiaDinh, done) {
@@ -103,7 +103,7 @@ export function createDmQuanHeGiaDinh(dmQuanHeGiaDinh, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo mới một quan hệ gia đình bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function updateDmQuanHeGiaDinh(ma, changes, done) {
@@ -119,12 +119,12 @@ export function updateDmQuanHeGiaDinh(ma, changes, done) {
                 dispatch(getDmQuanHeGiaDinhPage());
             }
         }, error => T.notify('Cập nhật dữ liệu quan hệ gia đình bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function deleteDmQuanHeGiaDinh(ma, done) {
     return dispatch => {
-        const url = `/api/danh-muc/quan-he-gia-dinh`;
+        const url = '/api/danh-muc/quan-he-gia-dinh';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa quan hệ gia đình bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -135,7 +135,7 @@ export function deleteDmQuanHeGiaDinh(ma, done) {
             }
             done && done();
         }, error => T.notify('Xóa quan hệ gia đình bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export const SelectAdapter_DmQuanHeGiaDinh = {
@@ -143,4 +143,4 @@ export const SelectAdapter_DmQuanHeGiaDinh = {
     getAll: getDmQuanHeGiaDinhAll,
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
     condition: { kichHoat: 1 },
-}
+};

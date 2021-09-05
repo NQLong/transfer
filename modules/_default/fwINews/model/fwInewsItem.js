@@ -27,12 +27,12 @@ module.exports = app => {
                         item2.priority = priority;
                         app.model.fwInewsItem.update({ id: item1.id }, { priority: item1.priority }, error1 => {
                             app.model.fwInewsItem.update({ id: item2.id }, { priority: item2.priority }, error2 => done(error1 || error2));
-                        })
+                        });
                     }
                 });
             }
         });
-    }
+    };
 
     app.model.fwInewsItem.createWithPriority = (data, done) => {
         app.model.fwInewsItem.get({ inewsId: data.inewsId }, '*', 'priority DESC', (error, item) => {
@@ -60,7 +60,7 @@ module.exports = app => {
                 });
             }
         });
-    }
+    };
 
     app.model.fwInewsItem.delete2 = (id, done) => {
         app.model.fwInewsItem.getAll({ inewsId: id }, '*', 'priority DESC', (error, items) => {
@@ -76,5 +76,5 @@ module.exports = app => {
                 });
             }
         });
-    }
-}
+    };
+};

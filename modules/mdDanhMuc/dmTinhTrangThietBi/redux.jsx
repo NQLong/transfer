@@ -1,6 +1,6 @@
 import T from 'view/js/common';
 
-const LABEL = 'tình trạng thiết bị'
+const LABEL = 'tình trạng thiết bị';
 
 // Reducer ------------------------------------------------------------------------------------------------------------
 const GET_PAGE = 'dmTinhTrangThietBi:GetPage';
@@ -11,8 +11,8 @@ export default function dmTinhTrangThietBi(state = null, data) {
             return Object.assign({}, state, { page: data.page });
         default:
             return state;
-    };
-};
+    }
+}
 
 // Actions ------------------------------------------------------------------------------------------------------------
 T.initPage('dmTinhTrangThietBi', true);
@@ -31,12 +31,12 @@ export function getDanhSachTinhTrangThietBi(pageNumber, pageSize, pageCondition,
                 dispatch({ type: GET_PAGE, page: data.page });
             }
         }, error => T.notify(`Lấy danh sách ${LABEL} bị lỗi` + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function createTinhTrangThietBi(tinhTrangThietBi, done) {
     return dispatch => {
-        const url = `/api/danh-muc/tinh-trang-thiet-bi/`
+        const url = '/api/danh-muc/tinh-trang-thiet-bi/';
         T.post(url, { tinhTrangThietBi }, data => {
             if (data.error) {
                 T.notify(data.error.message || `Tạo mới ${LABEL} bị lỗi`, 'danger');
@@ -48,8 +48,8 @@ export function createTinhTrangThietBi(tinhTrangThietBi, done) {
                     done(data.error, data.item);
                 }
             }
-        })
-    }
+        });
+    };
 }
 
 export function deleteTinhTrangThietBi(ma, done) {
@@ -66,8 +66,8 @@ export function deleteTinhTrangThietBi(ma, done) {
                     done(data.error, data.item);
                 }
             }
-        })
-    }
+        });
+    };
 }
 
 export function updateTinhTrangThietBi(ma, changes, done) {
@@ -84,8 +84,8 @@ export function updateTinhTrangThietBi(ma, changes, done) {
                     done(data.error);
                 }
             }
-        })
-    }
+        });
+    };
 }
 
 export function getTinhTrangThietBi(maTinhTrangThietBi, done) {

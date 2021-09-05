@@ -29,7 +29,7 @@ class NewsPage extends React.Component {
                     if (language.en == categoryPicker) {
                         this.pickerType.current.setText(language.vi);
                     }
-                })
+                });
             });
             this.props.getNewsByCategoryAdmin(categoryPicker);
         } else {
@@ -38,7 +38,7 @@ class NewsPage extends React.Component {
             this.props.getNewsDonVi(null, null, {}, data => {
                 this.setState({ ...data });
             });
-        };
+        }
     }
 
     create = (e) => {
@@ -72,7 +72,7 @@ class NewsPage extends React.Component {
                 this.setState({ ...data, categoryPicker: type.text, typeId: type.id });
             });
         else this.props.getNewsByCategoryAdmin(type.id, 1, 25, data => {
-            this.setState({ ...data, categoryPicker: type.text, typeId: type.id })
+            this.setState({ ...data, categoryPicker: type.text, typeId: type.id });
         });
     }
 
@@ -111,7 +111,7 @@ class NewsPage extends React.Component {
             this.state : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0 };
         let table = <div>Không có bài viết!</div>, category = [{ id: 0, text: 'Tất cả' }];
         this.props.category.forEach(item => {
-            if (item.active == true && item.type == 'news') category.push({ id: item.id, text: T.language.parse(item.title, true).vi })
+            if (item.active == true && item.type == 'news') category.push({ id: item.id, text: T.language.parse(item.title, true).vi });
         });
         if (this.state.list) {
             const { list } = this.state;

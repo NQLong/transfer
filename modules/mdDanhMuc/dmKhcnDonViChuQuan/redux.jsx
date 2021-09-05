@@ -25,4 +25,4 @@ export const SelectAdapter_DmKhcnDonViChuQuan = {
     url: '/api/danh-muc/khcn-don-vi-chu-quan',
     data: params => ({ condition: params.term }),
     processResults: response => ({ results: response ? response.items.map(item => ({id: item.ma , text:item.ten})) : [] })
-}
+};

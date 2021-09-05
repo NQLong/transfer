@@ -20,11 +20,11 @@ module.exports = app => {
     });
 
     app.get('/api/danh-muc/nghi-cong-tac/all', app.permission.check('user:login'), (req, res) => {
-        app.model.dmNghiCongTac.getAll({}, '*', 'ma', (error, items) => res.send({ error, items }))
+        app.model.dmNghiCongTac.getAll({}, '*', 'ma', (error, items) => res.send({ error, items }));
     });
 
     app.get('/api/danh-muc/nghi-cong-tac/item/:ma', app.permission.check('user:login'), (req, res) => {
-        app.model.dmNghiCongTac.get({ ma: req.body.ma }, (error, item) => res.send({ error, item }))
+        app.model.dmNghiCongTac.get({ ma: req.body.ma }, (error, item) => res.send({ error, item }));
     });
 
     app.post('/api/danh-muc/nghi-cong-tac', app.permission.check('dmNghiCongTac:write'), (req, res) => {
@@ -41,7 +41,7 @@ module.exports = app => {
     });
 
     app.put('/api/danh-muc/nghi-cong-tac', app.permission.check('dmNghiCongTac:write'), (req, res) => {
-        app.model.dmNghiCongTac.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }))
+        app.model.dmNghiCongTac.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
     app.delete('/api/danh-muc/nghi-cong-tac', app.permission.check('dmNghiCongTac:delete'), (req, res) => {

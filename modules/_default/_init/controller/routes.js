@@ -127,16 +127,16 @@ module.exports = app => {
                                 delete data.user.menu['5000'].menus['5002'];
                                 delete data.user.menu['5000'].menus['5003'];
 
-                            };
+                            }
                             if (data.user && data.user.permissions
                                 && data.user.permissions.includes('website:write')
                                 && !data.user.permissions.includes('news:write')) {
                                 if (data.user.menu['2000']) delete data.user.menu['2000'].menus['2090'];
                             }
                             res.send(data);
-                        })
+                        });
                     });
-                })
+                });
             } else {
                 setTimeout(ready, 500);
             }
@@ -246,7 +246,7 @@ module.exports = app => {
                 res.send({ error: 'Menu không hợp lệ! 3', pathname, divisionMenus: app.divisionMenus, menus: app.menus });
             }
         };
-        ready()
+        ready();
     });
 
     app.delete('/api/clear-session', app.permission.check(), (req, res) => {

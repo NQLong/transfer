@@ -26,7 +26,7 @@ const texts = {
         overDated: 'This form is overdue',
         noForm: 'No question from this form',
         registerAction: 'Submit register',
-        notLoggedIn: `You haven't logged in yet!`,
+        notLoggedIn: 'You haven\'t logged in yet!',
         askLogin: 'Login?',
         next: 'Next',
         hasRecorded: <p className='text-success font-weight-bold'>Your registration have been recorded!</p>,
@@ -217,7 +217,7 @@ class HomeRegistrationForm extends React.Component {
                         <div key='submit-button' className='btn btn-large btn-primary submitRegister'>
                             <a href='#' onClick={this.submit}><span>{language.registerAction}</span></a>
                         </div>
-                    </>)
+                    </>);
             } else {
                 const { startRegister, stopRegister } = formInfo ? formInfo : { startRegister: null, stopRegister: null };
                 const currentTime = new Date();

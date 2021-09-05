@@ -32,7 +32,7 @@ export default function dmKhuVucReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -59,12 +59,12 @@ export function getDmKhuVucPage(pageNumber, pageSize, pageCondition, done) {
                 dispatch({ type: DmKhuVucGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách khu vực bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmKhuVucAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/khu-vuc/all`;
+        const url = '/api/danh-muc/khu-vuc/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách khu vực bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -74,7 +74,7 @@ export function getDmKhuVucAll(done) {
                 dispatch({ type: DmKhuVucGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách khu vực bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmKhuVuc(ma, done) {
@@ -89,7 +89,7 @@ export function getDmKhuVuc(ma, done) {
                 dispatch(changeDmKhuVuc(data.item));
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmKhuVuc(dmKhuVuc, done) {
@@ -105,7 +105,7 @@ export function createDmKhuVuc(dmKhuVuc, done) {
                 if (done) done(data);
             }
         }, error => done(error));
-    }
+    };
 }
 
 export function updateDmKhuVuc(condition, changes, done) {
@@ -121,7 +121,7 @@ export function updateDmKhuVuc(condition, changes, done) {
                 dispatch(getDmKhuVucPage());
             }
         }, error => done(error));
-    }
+    };
 }
 
 export function deleteDmKhuVuc(ma, done) {
@@ -137,7 +137,7 @@ export function deleteDmKhuVuc(ma, done) {
             }
             done && done();
         }, error => done(error));
-    }
+    };
 }
 
 export function changeDmKhuVuc(item) {

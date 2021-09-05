@@ -32,7 +32,7 @@ export default function DmCaHocReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -56,12 +56,12 @@ export function getDmCaHocPage(pageNumber, pageSize, done) {
                 dispatch({ type: DmCaHocGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách ca học bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmCaHocAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/ca-hoc/all`;
+        const url = '/api/danh-muc/ca-hoc/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách ca học bị lỗi!', 'danger');
@@ -71,7 +71,7 @@ export function getDmCaHocAll(done) {
                 dispatch({ type: DmCaHocGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách ca học bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmCaHoc(_id, done) {
@@ -85,12 +85,12 @@ export function getDmCaHoc(_id, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmCaHoc(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/ca-hoc`;
+        const url = '/api/danh-muc/ca-hoc';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo ca học bị lỗi!', 'danger');
@@ -100,12 +100,12 @@ export function createDmCaHoc(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo ca học bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteDmCaHoc(_id) {
     return dispatch => {
-        const url = `/api/danh-muc/ca-hoc`;
+        const url = '/api/danh-muc/ca-hoc';
         T.delete(url, { _id }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục ca học bị lỗi!', 'danger');
@@ -115,12 +115,12 @@ export function deleteDmCaHoc(_id) {
                 dispatch(getDmCaHocAll());
             }
         }, error => T.notify('Xóa ca học bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDmCaHoc(_id, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/ca-hoc`;
+        const url = '/api/danh-muc/ca-hoc';
         T.put(url, { _id, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tin ca học bị lỗi!', 'danger');
@@ -131,7 +131,7 @@ export function updateDmCaHoc(_id, changes, done) {
                 dispatch(getDmCaHocAll());
             }
         }, error => T.notify('Cập nhật thông tin ca học bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function changeDmCaHoc(item) {

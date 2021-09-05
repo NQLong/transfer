@@ -32,7 +32,7 @@ export default function dmCoSoReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -44,7 +44,7 @@ export default function dmCoSoReducer(state = null, data) {
 // Actions ------------------------------------------------------------------------------------------------------------
 export function getDmCoSoAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/co-so/all`;
+        const url = '/api/danh-muc/co-so/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách cơ sở trường đại học bị lỗi!', 'danger');
@@ -54,7 +54,7 @@ export function getDmCoSoAll(done) {
                 dispatch({ type: DmCoSoGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách cơ sở trường đại học bị lỗi!', 'danger'));
-    }
+    };
 }
 
 T.initPage('pageDmCoSo');
@@ -71,7 +71,7 @@ export function getDmCoSoPage(pageNumber, pageSize, done) {
                 dispatch({ type: DmCoSoGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách cơ sở trường đại học bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmCoSo(ma, done) {
@@ -87,12 +87,12 @@ export function getDmCoSo(ma, done) {
         }, error => {
             console.error(`GET: ${url}.`, error);
         });
-    }
+    };
 }
 
 export function createDmCoSo(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/co-so`;
+        const url = '/api/danh-muc/co-so';
         T.post(url, { item }, data => {
             if (data.error) {
                 console.error(`POST: ${url}.`, data.error);
@@ -101,12 +101,12 @@ export function createDmCoSo(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo cơ sở trường đại học bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteDmCoSo(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/co-so`;
+        const url = '/api/danh-muc/co-so';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục  bị lỗi!', 'danger');
@@ -116,12 +116,12 @@ export function deleteDmCoSo(ma) {
                 dispatch(getDmCoSoAll());
             }
         }, error => T.notify('Xóa cơ sở trường đại học bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDmCoSo(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/co-so`;
+        const url = '/api/danh-muc/co-so';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông cơ sở trường đại học bị lỗi!', 'danger');
@@ -132,7 +132,7 @@ export function updateDmCoSo(ma, changes, done) {
                 dispatch(getDmCoSoAll());
             }
         }, error => T.notify('Cập nhật thông tin cơ sở trường đại học bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function changeDmCoSo(item) {

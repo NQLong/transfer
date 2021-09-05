@@ -49,7 +49,7 @@ module.exports = app => {
                 }
             };
         }
-    }
+    };
 
     // Upload Hook ----------------------------------------------------------------------------------------------------------------------------------
     const uploadHooksList = {};
@@ -155,5 +155,5 @@ module.exports = app => {
         });
         modelPaths.forEach(path => require(path)(app));
         if (loadController) controllerPaths.forEach(path => require(path)(app));
-    }
+    };
 };

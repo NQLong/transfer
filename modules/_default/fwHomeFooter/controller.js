@@ -2,26 +2,26 @@ module.exports = app => {
     app.get('/api/system/footer', app.permission.check('system:settings'), (req, res) => {
         app.model.fwHomeFooter.getAll({}, '*', 'priority ASC', (error, item) => {
             res.send({ error, item });
-        })
+        });
     });
 
     app.put('/api/system/footer', app.permission.check('system:settings'), (req, res) => {
         app.model.fwHomeFooter.update({ id: req.body.id }, req.body.changes, (error, item) => {
             res.send({ error, item });
-        })
+        });
     });
 
     app.post('/api/system/footer', app.permission.check('system:settings'), (req, res) => {
         app.model.fwHomeFooter.create(req.body.changes, (error, item) => {
             res.send({ error, item });
-        })
+        });
     });
 
     app.delete('/api/system/footer', app.permission.check('system:settings'), (req, res) => {
         app.model.fwHomeFooter.delete({ id: req.body.id }, (error, item) => {
             res.send({ error, item });
-        })
-    })
+        });
+    });
 
     app.put('/api/system/footer/swap', app.permission.check('system:settings'), (req, res) => {
         let { id, priority } = req.body;
@@ -42,7 +42,7 @@ module.exports = app => {
     app.get('/system/footer', (req, res) => {
         app.model.fwHomeFooter.getAll({ active: 1 }, '*', 'priority ASC', (error, item) => {
             res.send({ error, item });
-        })
+        });
     });
 
-}
+};

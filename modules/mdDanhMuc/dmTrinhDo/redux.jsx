@@ -32,7 +32,7 @@ export default function dmTrinhDoReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -58,12 +58,12 @@ export function getDmTrinhDoPage(pageNumber, pageSize, pageCondition, done) {
                 dispatch({ type: DmTrinhDoGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách trình độ bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmTrinhDoAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/trinh-do/all`;
+        const url = '/api/danh-muc/trinh-do/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách trình độ bị lỗi!', 'danger');
@@ -73,7 +73,7 @@ export function getDmTrinhDoAll(done) {
                 dispatch({ type: DmTrinhDoGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách trình độ bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmTrinhDo(ma, done) {
@@ -87,7 +87,7 @@ export function getDmTrinhDo(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmTrinhDo(dmTrinhDo, done) {
@@ -102,7 +102,7 @@ export function createDmTrinhDo(dmTrinhDo, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo mới một trình độ bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDmTrinhDo(ma, changes, done) {
@@ -117,12 +117,12 @@ export function updateDmTrinhDo(ma, changes, done) {
                 dispatch(getDmTrinhDoAll());
             }
         }, () => T.notify('Cập nhật dữ liệu trình độ bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteDmTrinhDo(ma, done) {
     return dispatch => {
-        const url = `/api/danh-muc/trinh-do`;
+        const url = '/api/danh-muc/trinh-do';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa trình độ bị lỗi!', 'danger');
@@ -133,7 +133,7 @@ export function deleteDmTrinhDo(ma, done) {
             }
             done && done();
         }, error => T.notify('Xóa trình độ bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export const SelectAdapter_DmTrinhDo = {
@@ -141,4 +141,4 @@ export const SelectAdapter_DmTrinhDo = {
     getAll: getDmTrinhDoAll,
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
     condition: { kichHoat: 1 },
-}
+};

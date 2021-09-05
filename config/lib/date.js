@@ -1,7 +1,7 @@
 module.exports = app => {
 
     Date.prototype.yyyymmdd = function() {
-        return this.toISOString().slice(0, 10).replace(/-/g, '')
+        return this.toISOString().slice(0, 10).replace(/-/g, '');
     };
     
     const get2 = (x) => ('0' + x).slice(-2);

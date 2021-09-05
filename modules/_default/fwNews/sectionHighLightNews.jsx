@@ -56,7 +56,7 @@ class SectionHighLightNews extends React.Component {
                                         </h6>
                                     </Link>
                                 </div>
-                            )
+                            );
                         })}
                     </div>
                     <div className='col-12 d-flex justify-content-center'>

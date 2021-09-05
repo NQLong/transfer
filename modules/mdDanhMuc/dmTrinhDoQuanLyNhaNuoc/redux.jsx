@@ -32,7 +32,7 @@ export default function DmTrinhDoQuanLyNhaNuocReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -56,12 +56,12 @@ export function getDmTrinhDoQuanLyNhaNuocPage(pageNumber, pageSize, done) {
                 dispatch({ type: DmTrinhDoQuanLyNhaNuocGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách chức vụ bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function dmTrinhDoQuanLyNhaNuocGetAll(condition, done) {
     return dispatch => {
-        const url = `/api/danh-muc/trinh-do-quan-ly-nha-nuoc/all`;
+        const url = '/api/danh-muc/trinh-do-quan-ly-nha-nuoc/all';
         T.get(url, { condition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách trình độ quản lý nhà nước lỗi!', 'danger');
@@ -71,12 +71,12 @@ export function dmTrinhDoQuanLyNhaNuocGetAll(condition, done) {
                 dispatch({ type: DmTrinhDoQuanLyNhaNuocGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách trình độ quản lý nhà nước bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function createDmTrinhDoQuanLyNhaNuoc(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/trinh-do-quan-ly-nha-nuoc`;
+        const url = '/api/danh-muc/trinh-do-quan-ly-nha-nuoc';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo dữ liệu bị lỗi!', 'danger');
@@ -86,12 +86,12 @@ export function createDmTrinhDoQuanLyNhaNuoc(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo dữ liệu bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteDmTrinhDoQuanLyNhaNuoc(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/trinh-do-quan-ly-nha-nuoc`;
+        const url = '/api/danh-muc/trinh-do-quan-ly-nha-nuoc';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 console.error(`DELETE: ${url}.`, data.error);
@@ -99,12 +99,12 @@ export function deleteDmTrinhDoQuanLyNhaNuoc(ma) {
                 dispatch(getDmTrinhDoQuanLyNhaNuocPage());
             }
         }, error => T.notify('Xóa dữ liệu bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDmTrinhDoQuanLyNhaNuoc(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/trinh-do-quan-ly-nha-nuoc`;
+        const url = '/api/danh-muc/trinh-do-quan-ly-nha-nuoc';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật dữ liệu bị lỗi!', 'danger');
@@ -116,7 +116,7 @@ export function updateDmTrinhDoQuanLyNhaNuoc(ma, changes, done) {
                 dispatch(getDmTrinhDoQuanLyNhaNuocPage());
             }
         }, error => T.notify('Cập nhật dữ liệu bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export const SelectAdapter_DmTrinhDoQuanLyNhaNuoc = {
@@ -124,4 +124,4 @@ export const SelectAdapter_DmTrinhDoQuanLyNhaNuoc = {
     getAll: dmTrinhDoQuanLyNhaNuocGetAll,
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
     condition: { kichHoat: 1 },
-}
+};

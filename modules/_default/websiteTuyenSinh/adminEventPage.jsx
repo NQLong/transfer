@@ -21,7 +21,7 @@ class adminEventPage extends React.Component {
             this.props.getTuyenSinh('event', category => {
                 let valueCate = category.map(item => item.id.toString());
                 this.props.getEventByCategoryAdmin(valueCate, data => {
-                    this.setState({ ...data, category, valueCate })
+                    this.setState({ ...data, category, valueCate });
                 });
             });
         });

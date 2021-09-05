@@ -42,7 +42,7 @@ class SectionApplyForm extends React.Component {
                         this.setState({ options });
                     }
                 }, () => T.notify('Lấy danh sách form bị lỗi!', 'danger'));
-            })
+            });
         });
     }
 

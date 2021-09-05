@@ -4,7 +4,7 @@ module.exports = app => {
             condition = {
                 maDonVi: user.permissions.includes('website:manage') ? '0' : user.maDonVi
             };
-        app.model.homeFeature.getAll(condition, (error, items) => res.send({ error, items }))
+        app.model.homeFeature.getAll(condition, (error, items) => res.send({ error, items }));
     });
 
     app.get('/api/feature/item/:featureId', app.permission.check('component:read'), (req, res) =>
@@ -13,7 +13,7 @@ module.exports = app => {
     app.post('/api/feature', app.permission.check('website:write'), (req, res) => {
         let body = { title: req.body.title }, user = req.session.user;
         body.maDonVi = user.permissions.includes('website:manage') ? '0' : (user.maDonVi ? user.maDonVi : -1);
-        app.model.homeFeature.create(body, (error, item) => res.send({ error, item }))
+        app.model.homeFeature.create(body, (error, item) => res.send({ error, item }));
     });
 
     app.put('/api/feature', app.permission.check('website:write'), (req, res) =>
@@ -34,7 +34,7 @@ module.exports = app => {
 
     app.post('/api/featureItem', app.permission.check('website:write'), (req, res) => {
         let body = req.body; console.log(body);
-        app.model.homeFeatureItem.create(body, (error, item) => res.send({ error, item }))
+        app.model.homeFeatureItem.create(body, (error, item) => res.send({ error, item }));
     });
 
     app.put('/api/featureItem', app.permission.check('website:write'), (req, res) =>
@@ -63,8 +63,8 @@ module.exports = app => {
             console.log('Hook: uploadFeature => feature image upload');
             app.uploadComponentImage(req, 'feature', app.model.homeFeatureItem, fields.userData[0].substring(8), files.FeatureImage[0].path, done);
         }
-    }
+    };
 
     app.uploadHooks.add('uploadFeature', (req, fields, files, params, done) =>
         app.permission.has(req, () => uploadFeature(req, fields, files, params, done), done, 'website:write'));
-}
+};

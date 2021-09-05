@@ -21,7 +21,7 @@ module.exports = app => {
             condition = {
                 statement: 'lower(ma) LIKE :searchText OR lower(ten) LIKE :searchText',
                 parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
-            }
+            };
         }
         app.model.dmQuanHeChuHo.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
     });
@@ -40,7 +40,7 @@ module.exports = app => {
     });
 
     app.put('/api/danh-muc/quan-he-chu-ho', app.permission.check('dmQuanHeChuHo:write'), (req, res) => {
-        app.model.dmQuanHeChuHo.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }))
+        app.model.dmQuanHeChuHo.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
     app.delete('/api/danh-muc/quan-he-chu-ho', app.permission.check('dmQuanHeChuHo:delete'), (req, res) => {

@@ -16,7 +16,7 @@ module.exports = app => {
     });
 
     app.delete('/api/submenu', app.permission.check('menu:write'), (req, res) => {
-        app.model.fwSubmenu.delete({ id: req.body.id }, error => res.send({ error }))
+        app.model.fwSubmenu.delete({ id: req.body.id }, error => res.send({ error }));
     });
 
     app.put('/api/submenu/swap', app.permission.check('menu:write'), (req, res) => {

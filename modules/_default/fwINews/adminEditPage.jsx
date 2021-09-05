@@ -29,7 +29,7 @@ class EditModal extends React.Component {
 			let lang = $('#comNewsLang').is(':checked') ? 'vi' : 'en';
 			this.newsTitle.current.html(JSON.parse(this.state.news.title)[lang]);
 			this.newsDesc.current.html(JSON.parse(this.state.news.abstract)[lang]);
-		})
+		});
 		$('#comWidth').select2({
 			placeholder: 'Chọn độ rộng',
 			dropdownParent: $('#comWidth').parent().parent()
@@ -88,7 +88,7 @@ class EditModal extends React.Component {
 			let temp = {
 				title: this.newsTitle.current.html(),
 				abstract: this.newsDesc.current.html()
-			}
+			};
 			data.display = JSON.stringify(temp);
 			data.type = 'news';
 			data.lang = lang;
@@ -124,7 +124,7 @@ class EditModal extends React.Component {
 				<div className='form-group'>
 					<label htmlFor='comText'>Nội dung</label>
 					<Editor ref={this.textEditor} placeholder='Nội dung' height={150} />
-				</div>
+				</div>;
 		} else if (this.state.type === 'image') {
 			$('#comNewsParent').css('display', 'none');
 			$('#comImageParent').css('display', 'block');
@@ -281,7 +281,7 @@ class adminINewsEdit extends React.Component {
 			let iNewsComs = [...this.state.iNewsComs];
 			iNewsComs.push(data);
 			this.setState(({ iNewsComs }));
-		})
+		});
 	}
 
 	editItem = (e, item, index) => {
@@ -325,7 +325,7 @@ class adminINewsEdit extends React.Component {
 			}
 			if (current && toChange) {
 				temp[index] = toChange;
-				temp[isMoveUp ? index + 1 : index - 1] = current
+				temp[isMoveUp ? index + 1 : index - 1] = current;
 				this.setState({ iNewsComs: temp });
 				T.notify('Thay đổi thứ tự item thành công', 'success');
 			}
@@ -334,9 +334,9 @@ class adminINewsEdit extends React.Component {
 	}
 
 	renderINews = () => {
-		let result = ``;
+		let result = '';
 		let widthCount = 0;
-		let innerBlock = ``;
+		let innerBlock = '';
 		let attachments = [];
 		this.state.iNewsComs.map((item, index) => {
 			if (parseInt(widthCount) + parseInt(item.width) > 12) {
@@ -349,7 +349,7 @@ class adminINewsEdit extends React.Component {
 							</tbody>
 						</table>
 					</tr>`;
-				innerBlock = ``;
+				innerBlock = '';
 			}
 
 			if (item.type === 'text') {
@@ -363,7 +363,7 @@ class adminINewsEdit extends React.Component {
 					filename: item.payload.split('/').slice(-1)[0],
 					path: T.rootUrl + item.payload,
 					cid: T.rootUrl + item.payload
-				})
+				});
 				innerBlock += `
 					<td style='width: ${(item.width / 12) * 100}%; padding: 0 0.25rem 0 0.25rem;'>
 						<img src='${T.rootUrl + item.payload}' width='100%' style='margin-bottom: 0.75rem; align-self: center;' alt='img'/>
@@ -540,7 +540,7 @@ class adminINewsEdit extends React.Component {
 							);
 						}
 					})}
-				</div>
+				</div>;
 		}
 		return (
 			<div className='app-content'>

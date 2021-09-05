@@ -25,7 +25,7 @@ export function saveSystemState(changes, done) {
                 dispatch({ type: UPDATE_SYSTEM_STATE, state: data });
             }
         }, error => T.notify('Lưu thông tin hệ thống bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function createFooterItem(changes, done) {
@@ -41,25 +41,25 @@ export function createFooterItem(changes, done) {
                 T.notify('Tạo dữ liệu thành công!', 'success');
 
             }
-        })
-    }
+        });
+    };
 }
 
 export function getFooter(done) {
     return (dispatch, getState) => {
-        const url = `/system/footer`;
+        const url = '/system/footer';
         T.get(url, data => {
             if (done) done(data);
         }, error => {
             T.notify('Lấy thông tin hệ thống bị lỗi!', 'danger');
             if (done) done();
         });
-    }
+    };
 }
 
 export function getFooterSystem(done) {
     return (dispatch, getState) => {
-        const url = `/api/system/footer`;
+        const url = '/api/system/footer';
         T.get(url, data => {
             if (data) {
                 let currentSystem = getState().system;
@@ -75,11 +75,11 @@ export function getFooterSystem(done) {
             T.notify('Lấy thông tin hệ thống bị lỗi!', 'danger');
             if (done) done();
         });
-    }
+    };
 }
 export function updateFooterItem(id, changes) {
     return (dispatch, getState) => {
-        const url = `/api/system/footer`;
+        const url = '/api/system/footer';
         T.put(url, { id, changes }, data => {
             if (data.error) {
                 T.notify(data.error, 'danger');
@@ -91,7 +91,7 @@ export function updateFooterItem(id, changes) {
         }, error => {
             T.notify('Lấy thông tin hệ thống bị lỗi!', 'danger');
         });
-    }
+    };
 }
 
 export function swapFooterItem(id, priority, done) {
@@ -107,12 +107,12 @@ export function swapFooterItem(id, priority, done) {
             }
             done && done();
         }, error => T.notify('Thay đổi thứ tự menu bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteFooterItem(id, done) {
     return (dispatch) => {
-        const url = `/api/system/footer`;
+        const url = '/api/system/footer';
         T.delete(url, { id }, data => {
             if (data.error) {
                 T.notify(data.error, 'danger');
@@ -122,13 +122,13 @@ export function deleteFooterItem(id, done) {
                 dispatch(getFooterSystem());
                 if (done) done(data);
             }
-        })
-    }
+        });
+    };
 }
 
 export function getSystemState(done) {
     return dispatch => {
-        const url = `/api/state`;
+        const url = '/api/state';
         T.get(url, data => {
             if (data) {
                 dispatch({ type: UPDATE_SYSTEM_STATE, state: data });
@@ -138,7 +138,7 @@ export function getSystemState(done) {
             T.notify('Lấy thông tin hệ thống bị lỗi!', 'danger');
             if (done) done();
         });
-    }
+    };
 }
 
 export function login(data, done) {
@@ -245,5 +245,5 @@ export function clearSession(sessionName, done) {
     return dispatch => {
         const url = '/api/clear-session';
         T.delete(url, { sessionName }, () => done && done());
-    }
+    };
 }

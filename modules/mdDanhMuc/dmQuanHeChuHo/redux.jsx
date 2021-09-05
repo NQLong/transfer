@@ -32,7 +32,7 @@ export default function dmQuanHeChuHoReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -58,12 +58,12 @@ export function getDmQuanHeChuHoPage(pageNumber, pageSize, pageCondition, done) 
                 dispatch({ type: DmQuanHeChuHoGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách quan hệ chủ hộ bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmQuanHeChuHoAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/quan-he-chu-ho/all`;
+        const url = '/api/danh-muc/quan-he-chu-ho/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách quan hệ chủ hộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -73,7 +73,7 @@ export function getDmQuanHeChuHoAll(done) {
                 dispatch({ type: DmQuanHeChuHoGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách quan hệ chủ hộ bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmQuanHeChuHo(ma, done) {
@@ -87,7 +87,7 @@ export function getDmQuanHeChuHo(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmQuanHeChuHo(dmQuanHeChuHo, done) {
@@ -102,7 +102,7 @@ export function createDmQuanHeChuHo(dmQuanHeChuHo, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo mới một quan hệ chủ hộ bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function updateDmQuanHeChuHo(ma, changes, done) {
@@ -117,12 +117,12 @@ export function updateDmQuanHeChuHo(ma, changes, done) {
                 dispatch(getDmQuanHeChuHoPage());
             }
         }, error => T.notify('Cập nhật dữ liệu quan hệ chủ hộ bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function deleteDmQuanHeChuHo(ma, done) {
     return dispatch => {
-        const url = `/api/danh-muc/quan-he-chu-ho`;
+        const url = '/api/danh-muc/quan-he-chu-ho';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa quan hệ chủ hộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -133,5 +133,5 @@ export function deleteDmQuanHeChuHo(ma, done) {
             }
             done && done();
         }, error => T.notify('Xóa quan hệ chủ hộ bị lỗi!', 'danger'));
-    }
+    };
 }

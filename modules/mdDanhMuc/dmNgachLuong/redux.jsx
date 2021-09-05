@@ -32,7 +32,7 @@ export default function DmNgachLuongReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -56,12 +56,12 @@ export function getDmNgachLuongPage(pageNumber, pageSize, done) {
                 dispatch({ type: DmNgachLuongGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách ngạch lương bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmNgachLuongAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/ngach-luong/all`;
+        const url = '/api/danh-muc/ngach-luong/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách ngạch lương bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -71,7 +71,7 @@ export function getDmNgachLuongAll(done) {
                 dispatch({ type: DmNgachLuongGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách ngạch lương bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmNgachLuong(id, done) {
@@ -85,12 +85,12 @@ export function getDmNgachLuong(id, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmNgachLuong(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/ngach-luong`;
+        const url = '/api/danh-muc/ngach-luong';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo ngạch lương bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -100,12 +100,12 @@ export function createDmNgachLuong(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo ngạch lương bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function deleteDmNgachLuong(idNgach, bac) {
     return dispatch => {
-        const url = `/api/danh-muc/ngach-luong`;
+        const url = '/api/danh-muc/ngach-luong';
         T.delete(url, { idNgach, bac }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục ngạch lương bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -115,12 +115,12 @@ export function deleteDmNgachLuong(idNgach, bac) {
                 dispatch(getDmNgachLuongAll());
             }
         }, error => T.notify('Xóa ngạch lương bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function updateDmNgachLuong(idNgach, bac, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/ngach-luong`;
+        const url = '/api/danh-muc/ngach-luong';
         T.put(url, { idNgach, bac, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tin ngạch lương bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -131,7 +131,7 @@ export function updateDmNgachLuong(idNgach, bac, changes, done) {
                 dispatch(getDmNgachLuongAll());
             }
         }, error => T.notify('Cập nhật thông tin ngạch lương bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function changeDmNgachLuong(item) {
@@ -143,4 +143,4 @@ export const SelectAdapter_DmNgachLuong = {
     getAll: getDmNgachLuongAll,
     processResults: response => ({ results: response ? response.map(item => ({ value: item.id, text: item.id + ': ' + item.tenNgach })) : [] }),
     condition: { kichHoat: 1 },
-}
+};

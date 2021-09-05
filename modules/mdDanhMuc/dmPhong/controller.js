@@ -23,7 +23,7 @@ module.exports = app => {
 
     app.get('/api/danh-muc/phong/all', app.permission.check('user:login'), (req, res) => {
         const condition = req.query.condition || {};
-        Object.keys(condition).forEach(key => { condition[key] === '' ? condition[key] = null : '' });
+        Object.keys(condition).forEach(key => { condition[key] === '' ? condition[key] = null : ''; });
         app.model.dmPhong.getAll(condition, (error, items) => res.send({ error, items }));
     });
 
@@ -78,7 +78,7 @@ module.exports = app => {
             const workbook = app.excel.create();
             const parseLanguage = (text, getAll) => {
                 let obj = {};
-                try { obj = JSON.parse(text) } catch { };
+                try { obj = JSON.parse(text); } catch { }
                 if (obj.vi == null) obj.vi = text;
                 if (obj.en == null) obj.en = text;
                 return getAll ? obj : obj[T.language()];

@@ -19,7 +19,7 @@ const libraries = [
     { value: '14', text: 'TV ĐH Quốc tế' },
 
 
-]
+];
 class searchPage extends React.Component {
 
     constructor(props) {
@@ -33,12 +33,12 @@ class searchPage extends React.Component {
 
     }
     search = () => {
-        if ($('#tab2:visible').attr("id")) {
+        if ($('#tab2:visible').attr('id')) {
             if (this.keyword2.val()) {
-                window.open(`http://search.ebscohost.com/login.aspx?direct=true&scope=site&site=eds-live&authtype=ip%2Cguest&custid=ns266778&groupid=main&profid=eds&bquery=${this.keyword2.val()}`, "_blank");
+                window.open(`http://search.ebscohost.com/login.aspx?direct=true&scope=site&site=eds-live&authtype=ip%2Cguest&custid=ns266778&groupid=main&profid=eds&bquery=${this.keyword2.val()}`, '_blank');
             }
         } else {
-            window.open(`https://opac.vnulib.edu.vn/search*eng/?searchtype=${this.searchType.val()}&SORT=D&searcharg=${this.keyword1.val()}&searchscope=${this.searchScope.val()}`, "_blank");
+            window.open(`https://opac.vnulib.edu.vn/search*eng/?searchtype=${this.searchType.val()}&SORT=D&searcharg=${this.keyword1.val()}&searchscope=${this.searchScope.val()}`, '_blank');
         }
 
     }

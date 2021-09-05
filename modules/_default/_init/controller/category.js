@@ -10,7 +10,7 @@ module.exports = app => {
             condition = {
                 statement: 'title LIKE :searchText AND type LIKE :type',
                 parameter: { searchText: `%${condition}%`, type: `%${req.params.type}%` }
-            }
+            };
         } else {
             condition = { type: req.params.type };
             const user = req.session.user;
@@ -22,7 +22,7 @@ module.exports = app => {
         }
         app.model.fwCategory.getAll(condition, '*', 'priority DESC', (error, items) => {
             res.send({ error, items });
-        })
+        });
     });
 
     app.get('/api/category-donvi/:type', (req, res) => {
@@ -31,13 +31,13 @@ module.exports = app => {
             condition = {
                 statement: 'title LIKE :searchText AND type LIKE :type',
                 parameter: { searchText: `%${condition}%`, type: `%${req.params.type}%` }
-            }
+            };
         } else {
             condition = { type: req.params.type, maDonVi: req.session.user.maDonVi };
         }
         app.model.fwCategory.getAll(condition, '*', 'priority DESC', (error, items) => {
             res.send({ error, items });
-        })
+        });
     });
 
     app.post('/api/category', app.permission.check('category:write'), (req, res) => {
@@ -47,7 +47,7 @@ module.exports = app => {
             console.log(body);
             app.model.fwCategory.create2(body, (error, item) => {
                 res.send({ error, item });
-            })
+            });
         } else {
             res.send({ error: 'You do not have permission' });
         }
@@ -56,7 +56,7 @@ module.exports = app => {
 
     app.put('/api/category', app.permission.check('category:write'), (req, res) =>
         app.model.fwCategory.update({ id: req.body.id }, req.body.changes, (error, item) => {
-            res.send({ error, item })
+            res.send({ error, item });
         }));
 
     app.put('/api/category/swap', app.permission.check('category:write'), (req, res) => {

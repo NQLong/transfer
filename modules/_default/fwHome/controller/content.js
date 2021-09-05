@@ -42,6 +42,6 @@ module.exports = app => {
     app.uploadHooks.add('uploadContentCkEditor', (req, fields, files, params, done) => {
         let permissions = req.session.user.permissions;
         if (permissions.includes('website:write') || permissions.includes('website:manage') || permissions.includes('component:write'))
-            app.permission.has(req, () => app.uploadCkEditorImage('content', fields, files, params, done), done, 'component:read')
+            app.permission.has(req, () => app.uploadCkEditorImage('content', fields, files, params, done), done, 'component:read');
     });
 };

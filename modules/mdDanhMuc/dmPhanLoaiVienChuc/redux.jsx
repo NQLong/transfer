@@ -32,7 +32,7 @@ export default function dmPhanLoaiVienChucReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -58,12 +58,12 @@ export function getDmPhanLoaiVienChucPage(pageNumber, pageSize, pageCondition, d
                 dispatch({ type: DmPhanLoaiVienChucGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách phân loại viên chức bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmPhanLoaiVienChucAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/phan-loai-vien-chuc/all`;
+        const url = '/api/danh-muc/phan-loai-vien-chuc/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách phân loại viên chức bị lỗi!', 'danger');
@@ -73,7 +73,7 @@ export function getDmPhanLoaiVienChucAll(done) {
                 dispatch({ type: DmPhanLoaiVienChucGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách phân loại viên chức bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmPhanLoaiVienChuc(ma, done) {
@@ -87,7 +87,7 @@ export function getDmPhanLoaiVienChuc(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmPhanLoaiVienChuc(dmPhanLoaiVienChuc, done) {
@@ -102,7 +102,7 @@ export function createDmPhanLoaiVienChuc(dmPhanLoaiVienChuc, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo mới một phân loại viên chức bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDmPhanLoaiVienChuc(ma, changes, done) {
@@ -117,12 +117,12 @@ export function updateDmPhanLoaiVienChuc(ma, changes, done) {
                 dispatch(getDmPhanLoaiVienChucPage());
             }
         }, () => T.notify('Cập nhật dữ liệu phân loại viên chức bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteDmPhanLoaiVienChuc(ma, done) {
     return dispatch => {
-        const url = `/api/danh-muc/phan-loai-vien-chuc`;
+        const url = '/api/danh-muc/phan-loai-vien-chuc';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa phân loại viên chức bị lỗi!', 'danger');
@@ -133,5 +133,5 @@ export function deleteDmPhanLoaiVienChuc(ma, done) {
             }
             done && done();
         }, error => T.notify('Xóa phân loại viên chức bị lỗi!', 'danger'));
-    }
+    };
 }

@@ -32,7 +32,7 @@ export default function DmLuongDiNuocNgoaiReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -44,7 +44,7 @@ export default function DmLuongDiNuocNgoaiReducer(state = null, data) {
 // Actions ------------------------------------------------------------------------------------------------------------
 export function getDmLuongDiNuocNgoaiAll(condition, done) {
     return dispatch => {
-        const url = `/api/danh-muc/luong-di-nuoc-ngoai/all`;
+        const url = '/api/danh-muc/luong-di-nuoc-ngoai/all';
         T.get(url, { condition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách lương đi nước ngoài bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -53,8 +53,8 @@ export function getDmLuongDiNuocNgoaiAll(condition, done) {
                 if (done) done(data.items);
                 dispatch({ type: DmLuongDiNuocNgoaiAll, items: data.items ? data.items : [] });
             }
-        })
-    }
+        });
+    };
 }
 
 T.initPage('pageDmLuongDiNuocNgoai');
@@ -71,13 +71,13 @@ export function getDmLuongDiNuocNgoaiPage(pageNumber, pageSize, pageCondition, d
                 if (done) done(data.page);
                 dispatch({ type: DmLuongDiNuocNgoaiGetPage, page: data.page });
             }
-        })
-    }
+        });
+    };
 }
 
 export function createDmLuongDiNuocNgoai(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/luong-di-nuoc-ngoai`;
+        const url = '/api/danh-muc/luong-di-nuoc-ngoai';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo lương đi nước ngoài bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -86,13 +86,13 @@ export function createDmLuongDiNuocNgoai(item, done) {
                 if (done) done(data.items);
                 dispatch(getDmLuongDiNuocNgoaiPage());
             }
-        })
-    }
+        });
+    };
 }
 
 export function deleteDmLuongDiNuocNgoai(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/luong-di-nuoc-ngoai`;
+        const url = '/api/danh-muc/luong-di-nuoc-ngoai';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa lương đi nước ngoài bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -102,12 +102,12 @@ export function deleteDmLuongDiNuocNgoai(ma) {
                 dispatch(getDmLuongDiNuocNgoaiPage());
             }
         }, error => T.notify('Xóa lương đi nước ngoài bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function updateDmLuongDiNuocNgoai(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/luong-di-nuoc-ngoai`;
+        const url = '/api/danh-muc/luong-di-nuoc-ngoai';
         T.put(url, { ma, changes }, data => {
             if (data.error) {
                 T.notify('Cập nhật lương đi nước ngoài bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -119,7 +119,7 @@ export function updateDmLuongDiNuocNgoai(ma, changes, done) {
                 dispatch(getDmLuongDiNuocNgoaiPage());
             }
         }, error => T.notify('Cập nhật thông tin lương đi nước ngoài bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function changeDmLuongDiNuocNgoai(item) {
@@ -131,4 +131,4 @@ export const SelectAdapter_DmLuongDiNuocNgoai = {
     getAll: getDmLuongDiNuocNgoaiAll,
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.moTa })) : [] }),
     condition: { kichHoat: 1 },
-}
+};

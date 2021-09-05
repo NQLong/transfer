@@ -21,7 +21,7 @@ export function getHeader(done) {
             else
                 T.notify('Lấy header bị lỗi!', 'danger');
         }, error => T.notify('Lấy header bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateHeader(changes, done) {
@@ -33,9 +33,9 @@ export function updateHeader(changes, done) {
                 console.error(`PUT: ${url}. ${data.error}`);
             } else {
                 dispatch(getHeader());
-                T.notify('Cập nhật header thành công', 'success')
+                T.notify('Cập nhật header thành công', 'success');
                 if (done) done(data);
             }
         }, error => T.notify('Cập nhật header bị lỗi!', 'danger'));
-    }
+    };
 }

@@ -10,7 +10,7 @@ export function createQtKyYeuStaff(data, done) {
                 if (done) done(res);
             }
         }, error => T.notify('Thêm thông tin kỷ yếu hội nghị, hội thảo bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function updateQtKyYeuStaff(id, changes, done) {
@@ -25,7 +25,7 @@ export function updateQtKyYeuStaff(id, changes, done) {
                 if (done) done();
             }
         }, error => T.notify('Cập nhật thông tin kỷ yếu hội nghị, hội thảo bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function deleteQtKyYeuStaff(id, done) {
@@ -40,7 +40,7 @@ export function deleteQtKyYeuStaff(id, done) {
                 if (done) done();
             }
         }, error => T.notify('Xóa thông tin kỷ yếu hội nghị, hội thảo bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function createQtKyYeuStaffUser(data, done) {
@@ -55,7 +55,7 @@ export function createQtKyYeuStaffUser(data, done) {
                 if (done) done(res);
             }
         }, error => T.notify('Thêm thông tin kỷ yếu hội nghị, hội thảo bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function updateQtKyYeuStaffUser(id, changes, done) {
@@ -70,7 +70,7 @@ export function updateQtKyYeuStaffUser(id, changes, done) {
                 if (done) done();
             }
         }, error => T.notify('Cập nhật thông tin kỷ yếu hội nghị, hội thảo bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function deleteQtKyYeuStaffUser(id, done) {
@@ -82,8 +82,8 @@ export function deleteQtKyYeuStaffUser(id, done) {
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
                 T.alert('Thông tin kỷ yếu hội nghị, hội thảo được xóa thành công!', 'info', false, 800);
-                done && done()
+                done && done();
             }
         }, error => T.notify('Xóa thông tin kỷ yếu hội nghị, hội thảo bị lỗi' , 'danger'));
-    }
+    };
 }

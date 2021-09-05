@@ -19,11 +19,11 @@ module.exports = app => {
 
     app.get('/api/danh-muc/tinh-trang-cong-tac/all', app.permission.check('user:login'), (req, res) => {
         const condition = req.query.condition || {};
-        app.model.dmTinhTrangCongTac.getAll(condition, (error, items) => res.send({ error, items }))
+        app.model.dmTinhTrangCongTac.getAll(condition, (error, items) => res.send({ error, items }));
     });
 
     app.get('/api/danh-muc/tinh-trang-cong-tac/item/:ma', app.permission.check('user:login'), (req, res) => {
-        app.model.dmTinhTrangCongTac.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }))
+        app.model.dmTinhTrangCongTac.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
     });
 
     app.post('/api/danh-muc/tinh-trang-cong-tac', app.permission.check('dmTinhTrangCongTac:write'), (req, res) => {
@@ -40,7 +40,7 @@ module.exports = app => {
     });
 
     app.put('/api/danh-muc/tinh-trang-cong-tac', app.permission.check('dmTinhTrangCongTac:write'), (req, res) => {
-        app.model.dmTinhTrangCongTac.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }))
+        app.model.dmTinhTrangCongTac.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
     app.delete('/api/danh-muc/tinh-trang-cong-tac', app.permission.check('dmTinhTrangCongTac:delete'), (req, res) => {

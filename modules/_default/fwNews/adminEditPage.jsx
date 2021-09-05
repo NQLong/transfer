@@ -37,7 +37,7 @@ class NewsEditPage extends React.Component {
     }
     componentDidUpdate() {
         $(this.DonVi.current).on('change', e => {
-            let donVi = e.target.selectedOptions[0] && e.target.selectedOptions[0].value || null
+            let donVi = e.target.selectedOptions[0] && e.target.selectedOptions[0].value || null;
             if (donVi != this.state.donVi) this.setState({ donVi });
         });
     }
@@ -160,9 +160,9 @@ class NewsEditPage extends React.Component {
                 } else {
                     this.props.updateNews(this.state.item.id, changes, () => {
                         $('#neNewsLink').val(changes.link);
-                    })
+                    });
                 }
-            })
+            });
         } else if (this.props.system.user.permissions.includes('news:tuyensinh')) {
             let labelSelected = $('#neNewsCategories').find('option:selected').text();
             if (!labelSelected.includes('TS')) {
@@ -175,9 +175,9 @@ class NewsEditPage extends React.Component {
                 } else {
                     this.props.updateNews(this.state.item.id, changes, () => {
                         $('#neNewsLink').val(changes.link);
-                    })
+                    });
                 }
-            })
+            });
         } else {
             newDraft.isDraftApproved = 1;
             this.props.createDraftNews(newDraft, result => { this.getData(); });
@@ -311,7 +311,7 @@ class NewsEditPage extends React.Component {
                             <div className='tile-body'>
                                 <div className='form-group'>
                                     <label className='control-label'>Link mặc định</label><br />
-                                    <a href={linkDefaultNews} style={{ fontWeight: 'bold' }} target='_blank'>{linkDefaultNews}</a>
+                                    <a href={linkDefaultNews} style={{ fontWeight: 'bold' }} target='_blank' rel="noreferrer">{linkDefaultNews}</a>
                                 </div>
                                 <div className='form-group'>
                                     <label className='control-label'>Link truyền thông</label><br />

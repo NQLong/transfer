@@ -56,7 +56,7 @@ class NewsListView extends React.Component {
                         this.loading = false;
                         data.list = [...this.state.list, ...data.list];
                         this.setState({ ...data, pageNumber: data.pageNumber, pageTotal: data.pageTotal });
-                    };
+                    }
                 });
             }
         });

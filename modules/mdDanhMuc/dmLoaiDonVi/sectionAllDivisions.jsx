@@ -23,7 +23,7 @@ const texts = {
         department: 'Department',
         lab: 'Lab',
     }
-}
+};
 class SectionAllDivision extends React.Component {
     state = { division: [] };
     loading = false;
@@ -31,13 +31,13 @@ class SectionAllDivision extends React.Component {
 
     componentDidMount() {
         function sortComparer(a, b) {
-            return a.ten.localeCompare(b.ten)
-        };
+            return a.ten.localeCompare(b.ten);
+        }
 
         this.props.getDonViById(this.props.viewId, division => {
             const test = division.sort(sortComparer);
             // console.log(test);
-            this.setState({ division: test })
+            this.setState({ division: test });
         });
     }
 
@@ -56,7 +56,7 @@ class SectionAllDivision extends React.Component {
             elements.push(
                 <div key={index} className='col-12 col-md-3 d-flex ftco-animate' style={{ paddingTop: '20px' }}>
                     <div className='col-md-7 d-flex align-items-center' style={{ minHeight: '180px', borderTop: styleString, borderLeft: styleString, borderBottom: styleString, padding: 0, borderTopLeftRadius: '5px', borderBottomLeftRadius: '5px' }}>
-                        {isExternalLink ? <a href={item.duongDan} target='_blank'>
+                        {isExternalLink ? <a href={item.duongDan} target='_blank' rel="noreferrer">
                             <img style={{ width: '100%', padding: '10px' }} src={item.image ? item.image : '/img/avatar.png'} />
                         </a> :
                             <Link to={item.duongDan ? item.duongDan : '/division/item/' + item.ma} id={'duongDan' + item.id}>
@@ -65,7 +65,7 @@ class SectionAllDivision extends React.Component {
                         }
                     </div>
                     <div className='col-md-5 d-flex align-items-center' style={borderStyle}>
-                        {isExternalLink ? <a href={item.duongDan} target='_blank' className='mb-1' htmlFor={`link${index}MenuCheck`}>
+                        {isExternalLink ? <a href={item.duongDan} target='_blank' className='mb-1' htmlFor={`link${index}MenuCheck`} rel="noreferrer">
                             <h5 className='mb-1' >{ten}</h5>
                         </a> :
                             <Link to={item.duongDan ? item.duongDan : '/division/item/' + item.ma}>

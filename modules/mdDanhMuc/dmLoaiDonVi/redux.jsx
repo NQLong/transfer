@@ -32,7 +32,7 @@ export default function dmLoaiDonViReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -44,7 +44,7 @@ export default function dmLoaiDonViReducer(state = null, data) {
 // Actions ------------------------------------------------------------------------------------------------------------
 export function getDmLoaiDonViAll(done) {
     return dispatch => {
-        const url = `/api/dm-loai-don-vi/all`;
+        const url = '/api/dm-loai-don-vi/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách loại đơn vị trường đại học bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -54,7 +54,7 @@ export function getDmLoaiDonViAll(done) {
                 dispatch({ type: DmLoaiDonViGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách loại đơn vị trường đại học bị lỗi!', 'danger'));
-    }
+    };
 }
 
 T.initPage('pageDmLoaiDonVi');
@@ -71,7 +71,7 @@ export function getDmLoaiDonViPage(pageNumber, pageSize, done) {
                 dispatch({ type: DmLoaiDonViGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách loại đơn vị trường đại học bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmLoaiDonVi(ma, done) {
@@ -87,7 +87,7 @@ export function getDmLoaiDonVi(ma, done) {
         }, error => {
             console.error(`GET: ${url}.`, error);
         });
-    }
+    };
 }
 
 export function getDonViById(ma, done) {
@@ -103,12 +103,12 @@ export function getDonViById(ma, done) {
         }, error => {
             console.error(`GET: ${url}.`, error);
         });
-    }
+    };
 }
 
 export function createDmLoaiDonVi(item, done) {
     return dispatch => {
-        const url = `/api/dm-loai-don-vi`;
+        const url = '/api/dm-loai-don-vi';
         T.post(url, { item }, data => {
             if (data.error) {
                 if (data.error.errorNum == 1) {
@@ -120,12 +120,12 @@ export function createDmLoaiDonVi(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo loại đơn vị trường đại học bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteDmLoaiDonVi(ma) {
     return dispatch => {
-        const url = `/api/dm-loai-don-vi`;
+        const url = '/api/dm-loai-don-vi';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục  bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -135,12 +135,12 @@ export function deleteDmLoaiDonVi(ma) {
                 dispatch(getDmLoaiDonViAll());
             }
         }, error => T.notify('Xóa loại đơn vị trường đại học bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDmLoaiDonVi(ma, changes, done) {
     return dispatch => {
-        const url = `/api/dm-loai-don-vi`;
+        const url = '/api/dm-loai-don-vi';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông loại đơn vị trường đại học bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -151,7 +151,7 @@ export function updateDmLoaiDonVi(ma, changes, done) {
                 dispatch(getDmLoaiDonViAll());
             }
         }, error => T.notify('Cập nhật thông tin loại đơn vị trường đại học bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function changeDmLoaiDonVi(item) {

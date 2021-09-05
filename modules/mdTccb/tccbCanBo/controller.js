@@ -71,7 +71,7 @@ module.exports = app => {
                             result = app.clone(result, { items });
                         }
                         resolve();
-                    })
+                    });
                 }).then(() => new Promise(resolve => {
                     app.model.trinhDoNgoaiNgu.getAll({ shcc: canBo.shcc }, (error, trinhDoNN) => {
                         if (error || trinhDoNN == null) {
@@ -209,7 +209,7 @@ module.exports = app => {
                     });
                 })).then(() => {
                     res.send({ error, item: result });
-                })
+                });
             }
         });
     });
@@ -240,7 +240,7 @@ module.exports = app => {
             new Promise(resolve => {
                 app.model.quanHeCanBo.delete({ shcc: req.body.shcc }, (error) => {
                     resolve();
-                })
+                });
             }).then(() => new Promise(resolve => {
                 app.model.trinhDoNgoaiNgu.delete({ shcc: req.body.shcc }, (error) => {
                     resolve();
@@ -303,7 +303,7 @@ module.exports = app => {
                 });
             })).then(() => {
                 res.send({ error });
-            })
+            });
         });
     });
 
@@ -460,7 +460,7 @@ module.exports = app => {
                         namHocVi: item.namHocVi,
                         noiSinh: item.noiSinh,
                         queQuan: item.nguyenQuan
-                    }
+                    };
                     // if (item.noiSinh) {
                     //     let dsNoiSinh = item.noiSinh.split(/[-,]/);
                     //     if (dsNoiSinh.length == 1) {
@@ -513,12 +513,12 @@ module.exports = app => {
                                                         type: quanHe.type,
                                                         shcc: newCb.shcc,
                                                         ngheNghiep: quanHe.ngheNghiep
-                                                    }
+                                                    };
                                                     app.model.quanHeCanBo.create(newQuanHe, (error3, qhItem) => {
                                                         handleQuanHe(index + 1);
-                                                    })
+                                                    });
                                                 }
-                                            }
+                                            };
                                             handleQuanHe();
                                         }
 
@@ -530,12 +530,12 @@ module.exports = app => {
                                                         loaiNgonNgu: ngoaiNguMapping[ngoaiNgu.loaiNgonNgu.toLowerCase()],
                                                         shcc: newCb.shcc,
                                                         trinhDo: ngoaiNgu.trinhDo
-                                                    }
+                                                    };
                                                     app.model.trinhDoNgoaiNgu.create(newNgoaiNgu, (error3, nnItem) => {
                                                         handleNgoaiNgu(index + 1);
-                                                    })
+                                                    });
                                                 }
-                                            }
+                                            };
                                             handleNgoaiNgu();
                                         }
 
@@ -550,12 +550,12 @@ module.exports = app => {
                                                         batDauType: htct.batDauType,
                                                         ketThucType: htct.ketThucType,
                                                         noiDung: htct.noiDung
-                                                    }
+                                                    };
                                                     app.model.qtHocTapCongTac.create(newHtct, (error3, nnItem) => {
                                                         handleQTHTCT(index + 1);
                                                     });
                                                 }
-                                            }
+                                            };
                                             handleQTHTCT();
                                         }
 
@@ -574,12 +574,12 @@ module.exports = app => {
                                                         hinhThuc: daoTao.hinhThuc,
                                                         loaiBangCap: daoTao.loaiBangCap,
                                                         thoiGian: daoTao.thoiGian
-                                                    }
+                                                    };
                                                     app.model.qtDaoTao.create(newDaoTao, (error3, nnItem) => {
                                                         handleQTDaoTao(index + 1);
                                                     });
                                                 }
-                                            }
+                                            };
                                             handleQTDaoTao();
                                         }
 
@@ -595,12 +595,12 @@ module.exports = app => {
                                                         ketThucType: nuocNgoai.ketThucType,
                                                         quocGia: nuocNgoai.quocGia,
                                                         noiDung: nuocNgoai.noiDung
-                                                    }
+                                                    };
                                                     app.model.qtNuocNgoai.create(newNuocNgoai, (error3, nnItem) => {
                                                         handleQTNuocNgoai(index + 1);
                                                     });
                                                 }
-                                            }
+                                            };
                                             handleQTNuocNgoai();
                                         }
 
@@ -616,12 +616,12 @@ module.exports = app => {
                                                         ketThucType: khenThuong.ketThucType,
                                                         capQuyetDinh: khenThuong.capQuyetDinh,
                                                         noiDung: khenThuong.noiDung
-                                                    }
+                                                    };
                                                     app.model.qtKhenThuong.create(newKhenThuong, (error3, nnItem) => {
                                                         handleQTKhenThuong(index + 1);
                                                     });
                                                 }
-                                            }
+                                            };
                                             handleQTKhenThuong();
                                         }
 
@@ -637,12 +637,12 @@ module.exports = app => {
                                                         ketThucType: kyLuat.ketThucType,
                                                         capQuyetDinh: kyLuat.capQuyetDinh,
                                                         lyDoHinhThuc: kyLuat.lyDoHinhThuc
-                                                    }
+                                                    };
                                                     app.model.qtKyLuat.create(newKyLuat, (error3, nnItem) => {
                                                         handleQTKyLuat(index + 1);
                                                     });
                                                 }
-                                            }
+                                            };
                                             handleQTKyLuat();
                                         }
 
@@ -664,12 +664,12 @@ module.exports = app => {
                                                         thoiGian: nckh.thoiGian,
                                                         ngayNghiemThu: nckh.ngayNghiemThu,
                                                         ngayNghiemThuType: nckh.ngayNghiemThuType
-                                                    }
+                                                    };
                                                     app.model.qtNghienCuuKhoaHoc.create(newNckh, (error3, nnItem) => {
                                                         handleQTNCKH(index + 1);
                                                     });
                                                 }
-                                            }
+                                            };
                                             handleQTNCKH();
                                         }
 
@@ -684,12 +684,12 @@ module.exports = app => {
                                                         namTotNghiep: huongDan.namTotNghiep,
                                                         sanPham: huongDan.sanPham,
                                                         bacDaoTao: huongDan.bacDaoTao
-                                                    }
+                                                    };
                                                     app.model.qtHuongDanLuanVan.create(newHuongDan, (error3, nnItem) => {
                                                         handleHuongDan(index + 1);
                                                     });
                                                 }
-                                            }
+                                            };
                                             handleHuongDan();
                                         }
 
@@ -707,12 +707,12 @@ module.exports = app => {
                                                         sanPham: sach.sanPham,
                                                         butDanh: sach.butDanh,
                                                         quocTe: sach.quocTe
-                                                    }
+                                                    };
                                                     app.model.sachGiaoTrinh.create(newSach, (error3, nnItem) => {
                                                         handleSachGiaoTrinh(index + 1);
                                                     });
                                                 }
-                                            }
+                                            };
                                             handleSachGiaoTrinh();
                                         }
 
@@ -730,12 +730,12 @@ module.exports = app => {
                                                         sanPham: baiViet.sanPham,
                                                         diemIf: baiViet.diemIf,
                                                         quocTe: baiViet.quocTe
-                                                    }
+                                                    };
                                                     app.model.qtBaiVietKhoaHoc.create(newBaiViet, (error3, nnItem) => {
                                                         handleBaiViet(index + 1);
                                                     });
                                                 }
-                                            }
+                                            };
                                             handleBaiViet();
                                         }
 
@@ -753,12 +753,12 @@ module.exports = app => {
                                                         thoiGian: kYeu.thoiGian,
                                                         sanPham: kYeu.sanPham,
                                                         quocTe: kYeu.quocTe
-                                                    }
+                                                    };
                                                     app.model.qtKyYeu.create(newKYeu, (error3, nnItem) => {
                                                         handleKyYeu(index + 1);
                                                     });
                                                 }
-                                            }
+                                            };
                                             handleKyYeu();
                                         }
 
@@ -772,12 +772,12 @@ module.exports = app => {
                                                         noiDung: gt.noiDung,
                                                         noiCap: gt.noiCap,
                                                         namCap: gt.namCap
-                                                    }
+                                                    };
                                                     app.model.qtGiaiThuong.create(newGT, (error3, nnItem) => {
                                                         handleGiaiThuong(index + 1);
                                                     });
                                                 }
-                                            }
+                                            };
                                             handleGiaiThuong();
                                         }
 
@@ -794,12 +794,12 @@ module.exports = app => {
                                                         tacGia: bang.tacGia,
                                                         sanPham: bang.sanPham,
                                                         loaiBang: bang.loaiBang
-                                                    }
+                                                    };
                                                     app.model.qtBangPhatMinh.create(newBang, (error3, nnItem) => {
                                                         handleBangPMSC(index + 1);
                                                     });
                                                 }
-                                            }
+                                            };
                                             handleBangPMSC();
                                         }
 
@@ -813,12 +813,12 @@ module.exports = app => {
                                                         hinhThuc: ungDung.hinhThuc,
                                                         namChuyenGia: ungDung.namChuyenGia,
                                                         sanPham: ungDung.sanPham,
-                                                    }
+                                                    };
                                                     app.model.qtUngDungThuongMai.create(newUngDung, (error3, nnItem) => {
                                                         handleUngDungThuongMai(index + 1);
                                                     });
                                                 }
-                                            }
+                                            };
                                             handleUngDungThuongMai();
                                         }
 
@@ -834,12 +834,12 @@ module.exports = app => {
                                                         ketThuc: LVN.ketThuc,
                                                         batDauType: LVN.batDauType,
                                                         ketThucType: LVN.ketThucType
-                                                    }
+                                                    };
                                                     app.model.qtLamViecNgoai.create(newLVN, (error3, nnItem) => {
                                                         handleLamViecNgoai(index + 1);
                                                     });
                                                 }
-                                            }
+                                            };
                                             handleLamViecNgoai();
                                         }
                                     }
@@ -855,7 +855,7 @@ module.exports = app => {
                 } else {
                     res.send({ error: null });
                 }
-            }
+            };
 
             handleCanBo();
         });
@@ -877,7 +877,7 @@ module.exports = app => {
                             result = app.clone(result, { items });
                         }
                         resolve();
-                    })
+                    });
                 }).then(() => new Promise(resolve => {
                     app.model.trinhDoNgoaiNgu.getAll({ shcc: canBo.shcc }, (error, trinhDoNN) => {
                         if (error || trinhDoNN == null) {
@@ -1015,7 +1015,7 @@ module.exports = app => {
                     });
                 })).then(() => {
                     res.send({ error, item: result });
-                })
+                });
             }
         });
     });
@@ -1227,7 +1227,7 @@ module.exports = app => {
                             quanHam: canBo.quanHam ? canBo.quanHam : '',
                             hangThuongBinh: canBo.hangThuongBinh ? canBo.hangThuongBinh : '',
                             giaDinhChinhSach: canBo.giaDinhChinhSach ? canBo.giaDinhChinhSach : ''
-                        }
+                        };
                         resolve(data);
 
                     })).then((data) => new Promise(resolve => {
@@ -1253,11 +1253,11 @@ module.exports = app => {
                                         });
                                         handleQuanHe(index + 1);
                                     }
-                                }
+                                };
                                 handleQuanHe();
                             }
                             resolve(data);
-                        })
+                        });
                     })).then((data) => new Promise(resolve => {
                         app.model.trinhDoNgoaiNgu.getAll({ shcc: canBo.shcc }, '*', 'id ASC', (error, nnItems) => {
                             if (!error && nnItems && nnItems.length > 0) {
@@ -1267,14 +1267,14 @@ module.exports = app => {
                                         if (item.loaiNgonNgu) data.ngoaiNgu.push({
                                             ngonNgu: ngoaiNguMapping[item.loaiNgonNgu],
                                             trinhDo: item.trinhDo
-                                        })
+                                        });
                                         handleNgoaiNgu(index + 1);
                                     }
-                                }
+                                };
                                 handleNgoaiNgu();
                             }
                             resolve(data);
-                        })
+                        });
                     })).then((data) => new Promise(resolve => {
                         app.model.qtDaoTao.getAll({ shcc: canBo.shcc }, '*', 'id ASC', (error, dtItems) => {
                             if (!error && dtItems && dtItems.length > 0) {
@@ -1289,14 +1289,14 @@ module.exports = app => {
                                             hinhThuc: item.hinhThuc ? item.hinhThuc : '',
                                             vanBang: item.loaiBangCap ? item.loaiBangCap : '',
                                             thoiGian: item.thoiGian ? item.thoiGian + ' tháng' : ''
-                                        })
+                                        });
                                         handleDaoTao(index + 1);
                                     }
-                                }
+                                };
                                 handleDaoTao();
                             }
                             resolve(data);
-                        })
+                        });
                     })).then((data) => new Promise(resolve => {
                         app.model.qtHocTapCongTac.getAll({ shcc: canBo.shcc }, '*', 'batDau ASC', (error, htctItems) => {
                             if (!error && htctItems && htctItems.length > 0) {
@@ -1307,26 +1307,26 @@ module.exports = app => {
                                             noiDung: item.noiDung ? item.noiDung : '',
                                             batDau: item.batDau ? app.date.dateTimeFormat(new Date(item.batDau), item.batDauType ? item.batDauType : 'dd/mm/yyyy') : '',
                                             ketThuc: item.ketThuc ? item.ketThuc == -1 ? 'đến nay' : app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : '',
-                                        })
+                                        });
                                         handleHtct(index + 1);
                                     }
-                                }
+                                };
                                 handleHtct();
                             }
                             resolve(data);
-                        })
+                        });
                     })).then((data) => {
                         app.docx.generateFile(source, data, (error, data) => {
                             if (error)
-                                res.send({ error })
+                                res.send({ error });
                             else
-                                res.send({ data })
+                                res.send({ data });
                         });
                     });
                 }
             });
         }
-    })
+    });
 
     app.get('/user/staff/:shcc/word-llkh', app.permission.check('staff:login'), (req, res) => {
         if (req.params && req.params.shcc) {
@@ -1432,7 +1432,7 @@ module.exports = app => {
                             namChucDanh: canBo.namChucDanh ? new Date(canBo.namChucDanh).getFullYear() : '',
                             emailTruong: canBo.email ? canBo.email : '',
                             emailCaNhan: canBo.emailCaNhan ? canBo.emailCaNhan : '',
-                        }
+                        };
                         let firstMst, lastMst;
                         if (canBo.shcc.includes('.')) {
                             firstMst = canBo.shcc.split('.')[0];
@@ -1466,16 +1466,16 @@ module.exports = app => {
                         app.docx.generateFile(source, data, (error, data) => {
                             if (error) {
                                 console.log(error);
-                                res.send({ error })
+                                res.send({ error });
                             }
                             else
-                                res.send({ data })
+                                res.send({ data });
                         });
                     });
                 }
             });
         }
-    })
+    });
 
     // Hook--------------------------------------------------------------------------------------------------------------------------------------------------------
     const staffImportData = (req, fields, files, params, done) => {
@@ -1562,7 +1562,7 @@ module.exports = app => {
                                         }
                                         handleChucVu(cIndex + 1);
                                     }
-                                }
+                                };
                                 handleChucVu(index);
                                 newElement.quanHe = [];
                                 handleQuanHe1 = (qIndex) => {
@@ -1589,7 +1589,7 @@ module.exports = app => {
                                         }
                                         handleQuanHe1(qIndex + 1);
                                     }
-                                }
+                                };
                                 handleQuanHe1(index);
                                 handleQuanHe2 = (qIndex) => {
                                     if (qIndex <= totalRow && (qIndex == index || !worksheet.getCell('B' + qIndex).value)) {
@@ -1615,7 +1615,7 @@ module.exports = app => {
                                         }
                                         handleQuanHe2(qIndex + 1);
                                     }
-                                }
+                                };
                                 handleQuanHe2(index);
                                 handleQuanHe3 = (qIndex) => {
                                     if (qIndex <= totalRow && (qIndex == index || !worksheet.getCell('B' + qIndex).value)) {
@@ -1641,7 +1641,7 @@ module.exports = app => {
                                         }
                                         handleQuanHe3(qIndex + 1);
                                     }
-                                }
+                                };
                                 handleQuanHe3(index);
                                 newElement.trinhDoNgoaiNgu = [];
                                 handleTrinhDoTinHoc = (tIndex) => {
@@ -1654,14 +1654,14 @@ module.exports = app => {
                                         }
                                         handleTrinhDoTinHoc(tIndex + 1);
                                     }
-                                }
+                                };
                                 handleTrinhDoTinHoc(index);
 
                                 const getTime = (date, format) => {
                                     if (format == 'yyyy') return new Date(date).getTime();
                                     else if (format == 'mm/yyyy') return new Date(date.split('/')[1] + '/' + date.split('/')[0]).getTime();
                                     else if (format == 'dd/mm/yyyy') return new Date(date.split('/')[2] + '/' + date.split('/')[1] + '/' + date.split('/')[0]).getTime();
-                                }
+                                };
 
                                 newElement.qtHtct = [];
                                 const handleQTHTCT = (qtIndex) => {
@@ -1696,7 +1696,7 @@ module.exports = app => {
                                         }
                                         handleQTHTCT(qtIndex + 1);
                                     }
-                                }
+                                };
                                 handleQTHTCT(index);
 
                                 newElement.qtDaoTao = [];
@@ -1749,7 +1749,7 @@ module.exports = app => {
                                         }
                                         handleQTDaoTao(qtIndex + 1);
                                     }
-                                }
+                                };
                                 handleQTDaoTao(index);
 
                                 newElement.qtNuocNgoai = [];
@@ -1789,7 +1789,7 @@ module.exports = app => {
                                         }
                                         handleQTNuocNgoai(qtIndex + 1);
                                     }
-                                }
+                                };
                                 handleQTNuocNgoai(index);
 
                                 newElement.qtKhenThuong = [];
@@ -1829,7 +1829,7 @@ module.exports = app => {
                                         }
                                         handleQTKhenThuong(qtIndex + 1);
                                     }
-                                }
+                                };
                                 handleQTKhenThuong(index);
                                 newElement.qtKyLuat = [];
                                 handleQTKyLuat = (qtIndex) => {
@@ -1868,7 +1868,7 @@ module.exports = app => {
                                         }
                                         handleQTKyLuat(qtIndex + 1);
                                     }
-                                }
+                                };
                                 handleQTKyLuat(index);
 
                                 newElement.qtNCKH = [];
@@ -1936,7 +1936,7 @@ module.exports = app => {
                                         }
                                         handleQTNCKH(qtIndex + 1);
                                     }
-                                }
+                                };
                                 handleQTNCKH(index);
                                 newElement.qtHuongDan = [];
                                 handleQTHuongDan = (qtIndex) => {
@@ -1966,7 +1966,7 @@ module.exports = app => {
                                         }
                                         handleQTHuongDan(qtIndex + 1);
                                     }
-                                }
+                                };
                                 handleQTHuongDan(index);
 
                                 newElement.sachGiaoTrinh = [];
@@ -1995,7 +1995,7 @@ module.exports = app => {
                                         }
                                         handleSachGiaoTrinh(qtIndex + 1);
                                     }
-                                }
+                                };
                                 handleSachGiaoTrinh(index);
 
                                 newElement.baiVietKhoaHoc = [];
@@ -2012,7 +2012,7 @@ module.exports = app => {
                                                 quocTe = worksheet.getCell('EA' + qtIndex).value;
                                             if (tenTapChi) {
                                                 if (typeof (tenTapChi) == 'object' && tenTapChi.richText) {
-                                                    tenTapChi = tenTapChi.richText[0].text + tenTapChi.richText[1].text
+                                                    tenTapChi = tenTapChi.richText[0].text + tenTapChi.richText[1].text;
                                                 }
                                             }
                                             newElement.baiVietKhoaHoc.push({
@@ -2028,7 +2028,7 @@ module.exports = app => {
                                         }
                                         handleBaiVietKhoaHoc(qtIndex + 1);
                                     }
-                                }
+                                };
                                 handleBaiVietKhoaHoc(index);
 
                                 newElement.kyYeu = [];
@@ -2046,7 +2046,7 @@ module.exports = app => {
                                                 quocTe = worksheet.getCell('EJ' + qtIndex).value;
                                             if (time) {
                                                 if (typeof (time) == 'object') {
-                                                    thoiGian = new Date(time).getFullYear()
+                                                    thoiGian = new Date(time).getFullYear();
                                                 } else {
                                                     let timeList = time ? time.toString().replaceAll(/\./g, '/').match(/[0-9][0-9][0-9][0-9]/g) : [];
                                                     thoiGian = timeList && timeList.length > 0 ? timeList[timeList.length - 1] : null;
@@ -2066,7 +2066,7 @@ module.exports = app => {
                                         }
                                         handleKyYeu(qtIndex + 1);
                                     }
-                                }
+                                };
                                 handleKyYeu(index);
 
                                 newElement.giaiThuong = [];
@@ -2087,7 +2087,7 @@ module.exports = app => {
                                         }
                                         handleGiaiThuong(qtIndex + 1);
                                     }
-                                }
+                                };
                                 handleGiaiThuong(index);
 
                                 newElement.bangPMSC = [];
@@ -2114,7 +2114,7 @@ module.exports = app => {
                                         }
                                         handleBangPMSC(qtIndex + 1);
                                     }
-                                }
+                                };
                                 handleBangPMSC(index);
 
                                 newElement.ungDungThuongMai = [];
@@ -2135,7 +2135,7 @@ module.exports = app => {
                                         }
                                         handleUngDungThuongMai(qtIndex + 1);
                                     }
-                                }
+                                };
                                 handleUngDungThuongMai(index);
 
                                 newElement.lamViecNgoai = [];
@@ -2180,7 +2180,7 @@ module.exports = app => {
                                         }
                                         handleLamViecNgoai(qtIndex + 1);
                                     }
-                                }
+                                };
                                 handleLamViecNgoai(index);
 
                                 element.push(newElement);
@@ -2201,4 +2201,4 @@ module.exports = app => {
 
     app.uploadHooks.add('staffData', (req, fields, files, params, done) =>
         app.permission.has(req, () => staffImportData(req, fields, files, params, done), done, 'staff:write'));
-}
+};

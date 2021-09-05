@@ -7,7 +7,7 @@ module.exports = app => {
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/danh-muc/khcn-chuong-trinh', app.permission.check('dmChuongTrinh:read'), (req, res) => {
         app.model.dmKhcnChuongTrinh.getAll((error, items) => {
-            res.send({ error, items })
+            res.send({ error, items });
         });
         
     });

@@ -69,7 +69,7 @@ class SectionEvent extends React.Component {
                                     <Link to={link}><h5 className='mb-0 homeBody' style={{ color: '#626262' }}><b>{item.isTranslate == 1 ? T.language.parse(item.title) : T.language.parse(item.title, true).vi}</b></h5></Link>
                                     <h5 className='mb-0 homeBody' style={{ color: '#626262' }}> {item.location}</h5>
                                 </div>
-                            </div>)
+                            </div>);
                         })}
                     </div>
                     <div className='col-lg-6 col-12 px-0 py-2'>
@@ -88,14 +88,14 @@ class SectionEvent extends React.Component {
                                     <Link to={link}><h5 className='mb-0 homeBody' style={{ color: '#626262' }}><b>{item.isTranslate == 1 ? T.language.parse(item.title) : T.language.parse(item.title, true).vi}</b></h5></Link>
                                     <h5 className='mb-0 homeBody' style={{ color: '#626262' }}> {item.location}</h5>
                                 </div>
-                            </div>)
+                            </div>);
                         })}
                     </div>
                     <div className='col-12 d-flex justify-content-center'>
                         <Link to={detail.linkSeeAll} className='btn btn-lg btn-outline-dark px-5 viewAll' style={{ borderRadius: 0 }}>{language.viewAll}</Link>
                     </div>
                 </div>
-            )
+            );
         } else if (eventList.length !== 0 && this.state.typeView == 2) {
             events = (<div className='col-12 row px-0 py-3 d-flex justify-content-start'>
                 <div className='col-12 px-0 py-2'>
@@ -114,13 +114,13 @@ class SectionEvent extends React.Component {
                                 <Link to={link}><h5 className='mb-0 homeBody' style={{ color: '#626262' }}><b>{item.isTranslate == 1 ? T.language.parse(item.title) : T.language.parse(item.title, true).vi}</b></h5></Link>
                                 <h5 className='mb-0 homeBody' style={{ color: '#626262' }}> {item.location}</h5>
                             </div>
-                        </div>)
+                        </div>);
                     })}
                 </div>
                 <div className='col-12 d-flex justify-content-center'>
                     <Link to={detail.linkSeeAll} className='btn btn-lg btn-outline-dark px-5 viewAll' style={{ borderRadius: 0 }}>{language.viewAll}</Link>
                 </div>
-            </div>)
+            </div>);
         }
 
         return (

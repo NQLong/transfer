@@ -10,7 +10,7 @@ export function createTrinhDoNNStaff(data, done) {
                 if (done) done(res);
             }
         }, error => T.notify('Thêm thông tin trình độ ngoại ngữ bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function updateTrinhDoNNStaff(id, changes, done) {
@@ -25,7 +25,7 @@ export function updateTrinhDoNNStaff(id, changes, done) {
                 if (done) done();
             }
         }, error => T.notify('Cập nhật thông tin trình độ ngoại ngữ bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function deleteTrinhDoNNStaff(id, done) {
@@ -40,7 +40,7 @@ export function deleteTrinhDoNNStaff(id, done) {
                 if (done) done();
             }
         }, error => T.notify('Xóa thông tin trình độ ngoại ngữ bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function createTrinhDoNNStaffUser(data, done) {
@@ -55,7 +55,7 @@ export function createTrinhDoNNStaffUser(data, done) {
                 if (done) done(res);
             }
         }, error => T.notify('Thêm thông tin trình độ ngoại ngữ bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function updateTrinhDoNNStaffUser(id, changes, done) {
@@ -70,7 +70,7 @@ export function updateTrinhDoNNStaffUser(id, changes, done) {
                 if (done) done();
             }
         }, error => T.notify('Cập nhật thông tin trình độ ngoại ngữ bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function deleteTrinhDoNNStaffUser(id, done) {
@@ -82,8 +82,8 @@ export function deleteTrinhDoNNStaffUser(id, done) {
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
                 T.alert('Thông tin trình độ ngoại ngữ được xóa thành công!', 'info', false, 800);
-                done && done()
+                done && done();
             }
         }, error => T.notify('Xóa thông tin trình độ ngoại ngữ bị lỗi' , 'danger'));
-    }
+    };
 }

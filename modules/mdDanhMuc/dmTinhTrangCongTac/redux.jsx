@@ -32,7 +32,7 @@ export default function dmTinhTrangCongTacReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -58,12 +58,12 @@ export function getDmTinhTrangCongTacPage(pageNumber, pageSize, pageCondition, d
                 dispatch({ type: DmTinhTrangCongTacGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách tình trạng công tác bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmTinhTrangCongTacAll(condition, done) {
     return dispatch => {
-        const url = `/api/danh-muc/tinh-trang-cong-tac/all`;
+        const url = '/api/danh-muc/tinh-trang-cong-tac/all';
         T.get(url, { condition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách tình trạng công tác bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -73,7 +73,7 @@ export function getDmTinhTrangCongTacAll(condition, done) {
                 dispatch({ type: DmTinhTrangCongTacGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách tình trạng công tác bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmTinhTrangCongTac(ma, done) {
@@ -87,7 +87,7 @@ export function getDmTinhTrangCongTac(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmTinhTrangCongTac(dmTinhTrangCongTac, done) {
@@ -103,7 +103,7 @@ export function createDmTinhTrangCongTac(dmTinhTrangCongTac, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo mới một tình trạng công tác bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function updateDmTinhTrangCongTac(ma, changes, done) {
@@ -119,12 +119,12 @@ export function updateDmTinhTrangCongTac(ma, changes, done) {
                 dispatch(getDmTinhTrangCongTacAll());
             }
         }, error => T.notify('Cập nhật dữ liệu tình trạng công tác bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function deleteDmTinhTrangCongTac(ma, done) {
     return dispatch => {
-        const url = `/api/danh-muc/tinh-trang-cong-tac`;
+        const url = '/api/danh-muc/tinh-trang-cong-tac';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa tình trạng công tác bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -135,7 +135,7 @@ export function deleteDmTinhTrangCongTac(ma, done) {
             }
             done && done();
         }, error => T.notify('Xóa tình trạng công tác bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export const SelectAdapter_DmTinhTrangCongTac = {
@@ -143,4 +143,4 @@ export const SelectAdapter_DmTinhTrangCongTac = {
     getAll: getDmTinhTrangCongTacAll,
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
     condition: { kichHoat: 1 },
-}
+};

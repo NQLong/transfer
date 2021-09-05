@@ -33,7 +33,7 @@ export default function dmLuongCoSoReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -59,12 +59,12 @@ export function getDmLuongCoSoPage(pageNumber, pageSize, pageCondition, done) {
                 dispatch({ type: DmLuongCoSoGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách lương cơ sở bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmLuongCoSoAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/luong-co-so/all`;
+        const url = '/api/danh-muc/luong-co-so/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách lương cơ sở bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -74,7 +74,7 @@ export function getDmLuongCoSoAll(done) {
                 dispatch({ type: DmLuongCoSoGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách lương cơ sở bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmLuongCoSo(ma, done) {
@@ -88,7 +88,7 @@ export function getDmLuongCoSo(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmLuongCoSo(dmLuongCoSo, done) {
@@ -103,7 +103,7 @@ export function createDmLuongCoSo(dmLuongCoSo, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo mới một lương cơ sở bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function updateDmLuongCoSo(ma, changes, done) {
@@ -118,12 +118,12 @@ export function updateDmLuongCoSo(ma, changes, done) {
                 dispatch(getDmLuongCoSoPage());
             }
         }, error => T.notify('Cập nhật dữ liệu lương cơ sở bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function deleteDmLuongCoSo(ma, done) {
     return dispatch => {
-        const url = `/api/danh-muc/luong-co-so`;
+        const url = '/api/danh-muc/luong-co-so';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa lương cơ sở bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -134,5 +134,5 @@ export function deleteDmLuongCoSo(ma, done) {
             }
             done && done();
         }, error => T.notify('Xóa lương cơ sở bị lỗi!', 'danger'));
-    }
+    };
 }

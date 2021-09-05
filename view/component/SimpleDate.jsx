@@ -21,6 +21,6 @@ export default class SimpleDate extends React.Component {
             autofix={true}
             unmask={true}
             placeholder='dd/mm/yyyy'
-        />
+        />;
     }
 }

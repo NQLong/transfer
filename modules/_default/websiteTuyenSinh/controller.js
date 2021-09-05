@@ -43,7 +43,7 @@ module.exports = app => {
                         const condition = {
                             statement: 'title LIKE :searchText AND type LIKE :type',
                             parameter: { searchText: '%TS%', type: '%news%' }
-                        }
+                        };
                         app.model.fwCategory.getAll(condition, '*', 'priority DESC', (error, categories) => {
                             const categoryFilter = categories.map(item => item.id.toString());
                             let newList = [];
@@ -51,7 +51,7 @@ module.exports = app => {
                                 documentJson = JSON.parse(item.documentJson);
                                 const found = documentJson.categories.some(r => categoryFilter.includes(r));
                                 if (found) newList.push(item);
-                            })
+                            });
                             let list = newList.map(item => app.clone(item, { content: null, donVi: dmDonViMapper[item.maDonVi] }));
                             let totalItem = list.length;
                             response.page = app.clone(page, { list, totalItem });
@@ -62,6 +62,6 @@ module.exports = app => {
             } else {
                 res.send({ error });
             }
-        })
+        });
     });
 };

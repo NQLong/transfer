@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { getDvWebsite } from './redux';
-import { getWebsiteGioiThieuAll, createWebsiteGioiThieu, updateWebsiteGioiThieu, deleteWebsiteGioiThieu, swapWebsiteGioiThieu } from './reduxWebsiteGioiThieu'
+import { getWebsiteGioiThieuAll, createWebsiteGioiThieu, updateWebsiteGioiThieu, deleteWebsiteGioiThieu, swapWebsiteGioiThieu } from './reduxWebsiteGioiThieu';
 import { Link } from 'react-router-dom';
 import Editor from 'view/component/CkEditor4';
 

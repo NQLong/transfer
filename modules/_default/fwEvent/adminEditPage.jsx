@@ -11,7 +11,7 @@ import { Select } from 'view/component/Input';
 const languageOption = [
     { value: 'vi', text: 'Tiếng Việt' },
     { value: 'en', text: 'Tiếng Anh' }
-]
+];
 
 class EventEditPage extends React.Component {
     constructor(props) {
@@ -153,11 +153,11 @@ class EventEditPage extends React.Component {
             isInternal: this.state.item.isInternal,
             documentType: 'event',
             documentJson: JSON.stringify(changes),
-        }
+        };
         if (this.props.system.user.permissions.includes('event:write') || this.props.system.user.permissions.includes('website:write')) {
             this.props.updateEvent(this.state.item.id, changes, () => {
-                $('#evEventLink').val(changes.link)
-            })
+                $('#evEventLink').val(changes.link);
+            });
         }
         else {
             this.props.createDraftEvent(newDraft, result => {
@@ -299,7 +299,7 @@ class EventEditPage extends React.Component {
                             <div className='tile-body'>
                                 <div className='form-group'>
                                     <label className='control-label'>Link mặc định</label><br />
-                                    <a href={linkDefaultEvent} style={{ fontWeight: 'bold' }} target='_blank'>{linkDefaultEvent}</a>
+                                    <a href={linkDefaultEvent} style={{ fontWeight: 'bold' }} target='_blank' rel="noreferrer">{linkDefaultEvent}</a>
                                 </div>
                                 <div className='form-group'>
                                     <label className='control-label'>Link truyền thông</label><br />

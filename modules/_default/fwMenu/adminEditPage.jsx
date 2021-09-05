@@ -142,7 +142,7 @@ export class ComponentModal extends React.Component {
                 viewTypeDisplay,
                 valueTitleCom,
                 linkSeeAll
-            })
+            });
         data.viewId = $('#itemViewItem').val();
         if (id) {
             this.props.onUpdate(id, data, () => $(this.modal.current).modal('hide'));
@@ -286,11 +286,11 @@ export class MenuEditPage extends React.Component {
         }
         if (changes.link != '#') this.props.homeMenuGet(changes.link, data => {
             if (data.menu && data.menu.id != this.state.id) {
-                T.alert(`Địa chỉ bạn nhập bị trùng, vui lòng nhập lại`, 'error', false, 2000);
+                T.alert('Địa chỉ bạn nhập bị trùng, vui lòng nhập lại', 'error', false, 2000);
             } else {
                 this.props.updateMenu(this.state.id, changes, () => $('#menuLink').val(changes.link));
             }
-        })
+        });
         else {
             this.props.updateMenu(this.state.id, changes, () => $('#menuLink').val(changes.link));
         }

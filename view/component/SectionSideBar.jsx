@@ -108,7 +108,7 @@ class SectionSideBar extends React.Component {
                         </div> */}
                     </div>
                 </div>
-            )
+            );
         });
         const recentNews = (this.props.news && this.props.news.newsFeed ? this.props.news.newsFeed : []).map((item, index) => {
             const link = item.link ? '/tin-tuc/' + item.link : '/news/item/' + item.id;
@@ -126,7 +126,7 @@ class SectionSideBar extends React.Component {
                         </div> */}
                     </div>
                 </div>
-            )
+            );
         });
         return (
             <React.Fragment>

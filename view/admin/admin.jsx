@@ -22,7 +22,7 @@ import { changeUser } from 'modules/_default/fwUser/reduxUser';
 import { modules } from './modules';
 const reducers = {}, routeMapper = {},
     addRoute = route => {
-        if (route.path.startsWith('/user')) routeMapper[route.path] = <Route key={route.path} {...route} />
+        if (route.path.startsWith('/user')) routeMapper[route.path] = <Route key={route.path} {...route} />;
     };
 modules.forEach(module => {
     if (module.redux) Object.keys(module.redux).forEach(key => reducers[key] = module.redux[key]);

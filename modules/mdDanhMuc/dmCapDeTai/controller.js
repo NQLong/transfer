@@ -15,7 +15,7 @@ module.exports = app => {
             condition = {
                 statement: 'lower(tenCap) LIKE :searchText OR lower(maCap) LIKE :searchText',
                 parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
-            }
+            };
         }
         app.model.dmCapDeTai.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
     });
@@ -46,9 +46,9 @@ module.exports = app => {
 
     app.get('/api/danh-muc/cap-de-tai/item/:maCap', app.permission.check('user:login'), (req, res) => {
         if (req.params.maCap.length === 2) {
-            app.model.dmCapDeTai.get({ maCu: req.params.maCap }, (error, item) => { res.send({ error, item }) });
+            app.model.dmCapDeTai.get({ maCu: req.params.maCap }, (error, item) => { res.send({ error, item }); });
         } else {
-            app.model.dmCapDeTai.get({ maCap: req.params.maCap }, (error, item) => { res.send({ error, item }) });
+            app.model.dmCapDeTai.get({ maCap: req.params.maCap }, (error, item) => { res.send({ error, item }); });
         }
     });
 

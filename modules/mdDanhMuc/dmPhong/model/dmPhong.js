@@ -6,6 +6,6 @@ module.exports = app => {
             } else {
                 app.model.dmPhong.create(data, done);
             }
-        })
+        });
     };
-}
+};

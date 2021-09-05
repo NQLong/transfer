@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { createUnitDraftNewsDefault, draftToNews, deleteUnitDraftNews, getUnitDraftNewsInPage, updateUnitDraftNews } from './redux'
+import { createUnitDraftNewsDefault, draftToNews, deleteUnitDraftNews, getUnitDraftNewsInPage, updateUnitDraftNews } from './redux';
 import { Link } from 'react-router-dom';
 import Pagination from 'view/component/Pagination';
 
@@ -115,7 +115,7 @@ class UnitNewsWaitApprovalPage extends React.Component {
         let table = 'Không có bản nháp tin tức!';
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             viewerType = currentPermissions.includes('unit:write') ? 2 : (currentPermissions.includes('unit:draft') ? 1 : 0);
-        const isAdmin = currentPermissions.includes('unit:write') && currentPermissions.includes('news:write')
+        const isAdmin = currentPermissions.includes('unit:write') && currentPermissions.includes('news:write');
         if (list && list.length) {
             table = (
                 <table className='table table-hover table-bordered'>

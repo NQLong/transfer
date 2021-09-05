@@ -9,15 +9,15 @@ class SectionSupport extends React.Component {
         super(props);
         this.state = {
             featureItem: []
-        }
+        };
         this.language = React.createRef();
     }
     componentDidMount() {
-        this.props.getFeatureItemByUser(this.props.item.viewId, featureItem => { featureItem && this.setState({ featureItem }) });
+        this.props.getFeatureItemByUser(this.props.item.viewId, featureItem => { featureItem && this.setState({ featureItem }); });
     }
     onClick = (link) => {
         if (link && link.includes('http')) {
-            window.open(link, "_blank");
+            window.open(link, '_blank');
         } else if (link) {
             this.props.history.push(link);
         }
@@ -32,7 +32,7 @@ class SectionSupport extends React.Component {
                     <span onClick={() => this.onClick(item.link)}
                         style={{ paddingLeft: 8, cursor: 'pointer' }}>{T.language.parse(item.content, true).vi}</span>
                 </div>
-            </div>))
+            </div>));
         return (
             <section data-aos='fade-up' className='row p-3'>
                 <div className='col-12 homeBorderLeft'>

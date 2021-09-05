@@ -92,7 +92,7 @@ class MenuPage extends React.Component {
                 headerTitle: JSON.stringify({ vi: titleVi, en: titleEn }),
                 headerLink: link,
                 showHeaderTitle: this.state.showHeaderTitle ? 1 : 0
-            }
+            };
             this.props.updateDvWebsite(this.state.shortname, payload, () => this.getData());
         }
     }
@@ -104,7 +104,7 @@ class MenuPage extends React.Component {
                     {T.language.parse(menu.title, true).vi}
                 </Link>&nbsp;
                 {menu.link ? <p>(<a href={menu.link}
-                    target='_blank' style={{ color: 'blue' }}>
+                    target='_blank' style={{ color: 'blue' }} rel="noreferrer">
                     {menu.link.length > 60 ? menu.link.slice(0, 60) + '...' : menu.link}
                 </a>)</p> : null}
 

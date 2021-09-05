@@ -32,7 +32,7 @@ export default function DmLoaiHinhNghienCuuReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -56,7 +56,7 @@ export function getDmLoaiHinhNghienCuuPage(pageNumber, pageSize, done) {
                 dispatch({ type: DmLoaiHinhNghienCuuGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách loại hình nghiên cứu bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmLoaiHinhNghienCuuAll(condition, done) {
@@ -65,7 +65,7 @@ export function getDmLoaiHinhNghienCuuAll(condition, done) {
         condition = {};
     }
     return dispatch => {
-        const url = `/api/danh-muc/loai-hinh-nghien-cuu/all`;
+        const url = '/api/danh-muc/loai-hinh-nghien-cuu/all';
         T.get(url, { condition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách loại hình nghiên cứu bị lỗi!', 'danger');
@@ -75,7 +75,7 @@ export function getDmLoaiHinhNghienCuuAll(condition, done) {
                 dispatch({ type: DmLoaiHinhNghienCuuGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách loại hình nghiên cứu bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmLoaiHinhNghienCuu(ma, done) {
@@ -89,12 +89,12 @@ export function getDmLoaiHinhNghienCuu(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmLoaiHinhNghienCuu(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/loai-hinh-nghien-cuu`;
+        const url = '/api/danh-muc/loai-hinh-nghien-cuu';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo loại hình nghiên cứu bị lỗi!', 'danger');
@@ -105,12 +105,12 @@ export function createDmLoaiHinhNghienCuu(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo loại hình nghiên cứu bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteDmLoaiHinhNghienCuu(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/loai-hinh-nghien-cuu`;
+        const url = '/api/danh-muc/loai-hinh-nghien-cuu';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục loại hình nghiên cứu bị lỗi!', 'danger');
@@ -120,12 +120,12 @@ export function deleteDmLoaiHinhNghienCuu(ma) {
                 dispatch(getDmLoaiHinhNghienCuuAll());
             }
         }, error => T.notify('Xóa loại hình nghiên cứu bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDmLoaiHinhNghienCuu(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/loai-hinh-nghien-cuu`;
+        const url = '/api/danh-muc/loai-hinh-nghien-cuu';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tin loại hình nghiên cứu bị lỗi!', 'danger');
@@ -136,7 +136,7 @@ export function updateDmLoaiHinhNghienCuu(ma, changes, done) {
                 dispatch(getDmLoaiHinhNghienCuuAll());
             }
         }, error => T.notify('Cập nhật thông tin loại hình nghiên cứu bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function changeDmLoaiHinhNghienCuu(item) {
@@ -147,7 +147,7 @@ export const SelectAdapter_DmLoaiHinhNghienCuu = {
     ajax: false,
     getAll: getDmLoaiHinhNghienCuuAll,
     processResults: response => ({ results: response ? response.filter(item => item.kichHoat == 1).map(item => ({ value: item.ma, text: item.ten })) : [] }),
-}
+};
 
 export const SelectAdapter_DmLoaiHinhNghienCuuTmdt = (maCha) => {
     return {
@@ -155,5 +155,5 @@ export const SelectAdapter_DmLoaiHinhNghienCuuTmdt = (maCha) => {
         getAll: getDmLoaiHinhNghienCuuAll,
         processResults: response => ({ results: response ? response.filter(item => item.kichHoat == 1).map(item => ({ value: item.ma, text: item.ten })) : [] }),
         condition: { maCha: maCha }
-    }
-}
+    };
+};

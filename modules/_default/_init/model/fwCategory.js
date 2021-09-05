@@ -98,10 +98,10 @@ module.exports = app => {
                         item2.priority = priority;
                         app.model.fwCategory.update({ id: item1.id }, { priority: item1.priority }, error1 => {
                             app.model.fwCategory.update({ id: item2.id }, { priority: item2.priority }, error2 => done(error1 || error2));
-                        })
+                        });
                     }
                 });
             }
         });
     };
-}
+};

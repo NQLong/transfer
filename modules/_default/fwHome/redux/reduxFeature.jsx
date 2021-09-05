@@ -57,7 +57,7 @@ export function getAllFeatures(done) {
                 dispatch({ type: FeatureGetAll, items: data.items });
             }
         }, error => T.notify('Lấy danh sách feature bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getFeatureById(id, done) {
@@ -72,7 +72,7 @@ export function getFeatureById(id, done) {
                 dispatch({ type: FeatureGet, item: data.item });
             }
         }, error => T.notify('Lấy feature bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function createFeature(payload, done) {
@@ -87,7 +87,7 @@ export function createFeature(payload, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo feature bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateFeature(id, changes, done) {
@@ -104,7 +104,7 @@ export function updateFeature(id, changes, done) {
                 done && done();
             }
         }, error => T.notify('Cập nhật thông tin feature bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteFeature(item) {
@@ -127,7 +127,7 @@ export function deleteFeature(item) {
             }, error => T.notify('Xóa feature bị lỗi!', 'danger'));
         });
 
-    }
+    };
 }
 
 export function getFeatureItem(featureId, done) {
@@ -142,7 +142,7 @@ export function getFeatureItem(featureId, done) {
                 dispatch({ type: FeatureItemGetAll, items: data.items });
             }
         }, error => T.notify('Lấy feature item bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function createFeatureItem(image, content, featureId, link, done) {
@@ -157,7 +157,7 @@ export function createFeatureItem(image, content, featureId, link, done) {
                 dispatch(getFeatureItem(featureId));
             }
         }, error => T.notify('Tạo feature item bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateFeatureItem(id, featureId, changes, done) {
@@ -172,7 +172,7 @@ export function updateFeatureItem(id, featureId, changes, done) {
                 dispatch(getFeatureItem(featureId));
             }
         }, error => T.notify('Cập nhật feature item bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteFeatureItem(item, done) {
@@ -187,7 +187,7 @@ export function deleteFeatureItem(item, done) {
                 dispatch(getFeatureItem(item.featureId));
             }
         }, error => T.notify('Xoá feature item bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getFeatureByUser(id, done) {
@@ -201,7 +201,7 @@ export function getFeatureByUser(id, done) {
                 if (done) done(data.item);
             }
         }, error => T.notify('Lấy feature bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getFeatureItemByUser(featureId, done) {
@@ -215,5 +215,5 @@ export function getFeatureItemByUser(featureId, done) {
                 if (done) done(data.items);
             }
         }, error => T.notify('Lấy feature item bị lỗi!', 'danger'));
-    }
+    };
 }

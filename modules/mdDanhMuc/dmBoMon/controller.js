@@ -21,17 +21,17 @@ module.exports = app => {
             condition = {
                 statement: 'lower(ma) LIKE :searchText OR lower(ten) LIKE :searchText OR lower(tenTiengAnh) LIKE :searchText',
                 parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
-            }
+            };
         }
         app.model.dmBoMon.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
     });
 
     app.get('/api/dm-bo-mon/all', app.permission.check('staff:login'), (req, res) => {
-        app.model.dmBoMon.getAll((error, items) => res.send({ error, items }))
+        app.model.dmBoMon.getAll((error, items) => res.send({ error, items }));
     });
 
     app.get('/api/dm-bo-mon/item/:ma', app.permission.check('staff:login'), (req, res) => {
-        app.model.dmBoMon.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }))
+        app.model.dmBoMon.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
     });
 
     app.get('/api/dm-bo-mon/donVi', app.permission.check('staff:login'), (req, res) => {
@@ -94,4 +94,4 @@ module.exports = app => {
             });
         }
     };
-}
+};

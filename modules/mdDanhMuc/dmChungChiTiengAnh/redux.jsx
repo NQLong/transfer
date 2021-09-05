@@ -32,7 +32,7 @@ export default function DmChungChiTiengAnhReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -56,12 +56,12 @@ export function getDmChungChiTiengAnhPage(pageNumber, pageSize, done) {
                 dispatch({ type: DmChungChiTiengAnhGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách chứng chỉ tiếng Anh bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmChungChiTiengAnhAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/chung-chi-tieng-anh/all`;
+        const url = '/api/danh-muc/chung-chi-tieng-anh/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách chứng chỉ tiếng Anh bị lỗi!', 'danger');
@@ -71,7 +71,7 @@ export function getDmChungChiTiengAnhAll(done) {
                 dispatch({ type: DmChungChiTiengAnhGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách chứng chỉ tiếng Anh bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmChungChiTiengAnh(ma, done) {
@@ -85,12 +85,12 @@ export function getDmChungChiTiengAnh(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmChungChiTiengAnh(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/chung-chi-tieng-anh`;
+        const url = '/api/danh-muc/chung-chi-tieng-anh';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo chứng chỉ tiếng Anh bị lỗi!', 'danger');
@@ -100,12 +100,12 @@ export function createDmChungChiTiengAnh(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo chứng chỉ tiếng Anh bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteDmChungChiTiengAnh(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/chung-chi-tieng-anh`;
+        const url = '/api/danh-muc/chung-chi-tieng-anh';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục chứng chỉ tiếng Anh bị lỗi!', 'danger');
@@ -115,12 +115,12 @@ export function deleteDmChungChiTiengAnh(ma) {
                 dispatch(getDmChungChiTiengAnhAll());
             }
         }, error => T.notify('Xóa chứng chỉ tiếng Anh bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDmChungChiTiengAnh(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/chung-chi-tieng-anh`;
+        const url = '/api/danh-muc/chung-chi-tieng-anh';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tin chứng chỉ tiếng Anh bị lỗi!', 'danger');
@@ -131,7 +131,7 @@ export function updateDmChungChiTiengAnh(ma, changes, done) {
                 dispatch(getDmChungChiTiengAnhAll());
             }
         }, error => T.notify('Cập nhật thông tin chứng chỉ tiếng Anh bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function changeDmChungChiTiengAnh(item) {

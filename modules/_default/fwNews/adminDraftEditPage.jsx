@@ -89,7 +89,7 @@ class DraftNewsEditPage extends React.Component {
     }
     componentDidUpdate() {
         $(this.DonVi.current).on('change', e => {
-            let donVi = e.target.selectedOptions[0] && e.target.selectedOptions[0].value || null
+            let donVi = e.target.selectedOptions[0] && e.target.selectedOptions[0].value || null;
             if (donVi != this.state.donVi) this.setState({ donVi });
         });
     }
@@ -100,7 +100,7 @@ class DraftNewsEditPage extends React.Component {
     getData = () => {
         const route = T.routeMatcher('/user/news/draft/edit/:newsId'),
             IdNews = route.parse(window.location.pathname).newsId;
-        this.setState({ draftId: IdNews })
+        this.setState({ draftId: IdNews });
         this.props.getDraftNews(IdNews, data => {
             if (data.error) {
                 T.notify('Lấy bản nháp tin tức bị lỗi!', 'danger');
@@ -204,14 +204,14 @@ class DraftNewsEditPage extends React.Component {
             isUnitApproved: 1,
             maDonVi: this.state.donVi,
 
-        }
+        };
         if (this.props.system.user.permissions.includes('news:write')) {
             delete newDraft.editorId; delete newDraft.editorName;
         }
         if ($('#neNewsEnTitle').val() && $('#neNewsEnAbstract').val() && $('#neNewsEnAbstract').val()) {
             newDraft.isTranslated = 'done';
         }
-        this.props.updateDraftNews(this.state.draftId, newDraft, data => { })
+        this.props.updateDraftNews(this.state.draftId, newDraft, data => { });
 
     }
 
@@ -315,7 +315,7 @@ class DraftNewsEditPage extends React.Component {
                             <div className='tile-body'>
                                 <div className='form-group'>
                                     <label className='control-label'>Link mặc định</label><br />
-                                    <a href={linkDefaultNews} style={{ fontWeight: 'bold' }} target='_blank'>{linkDefaultNews}</a>
+                                    <a href={linkDefaultNews} style={{ fontWeight: 'bold' }} target='_blank' rel="noreferrer">{linkDefaultNews}</a>
                                 </div>
                                 <div className='form-group'>
                                     <label className='control-label'>Link truyền thông</label><br />

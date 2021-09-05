@@ -31,7 +31,7 @@ class EditModal extends React.Component {
                 ten: $('#dmKhenThuongTen').val().trim(),
                 ma: $('#dmKhenThuongMa').val().trim(),
                 kichHoat: this.state.active ? '1' : '0',
-            }
+            };
 
         if (changes.ten == '') {
             T.notify('Tên khen thưởng bị trống!', 'danger');

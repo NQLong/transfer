@@ -54,7 +54,7 @@ export function getAnswerInPage(eventId, formId, pageNumber, pageSize, done) {
                 }
             }, () => T.notify('Lấy danh sách câu trả lời bị lỗi!', 'danger'));
         }
-    }
+    };
 }
 
 export function getAnswer(id, done) {
@@ -67,7 +67,7 @@ export function getAnswer(id, done) {
                 done && done(data.item);
             }
         }, () => T.notify('Lấy câu trả lời bị lỗi', 'danger'));
-    }
+    };
 }
 
 export function searchUserFromSystem(email, done) {
@@ -76,7 +76,7 @@ export function searchUserFromSystem(email, done) {
         T.get(url, data => {
             done && done(data);
         }, () => done && done({ error: true }));
-    }
+    };
 }
 
 export function addAnswer(newData, eventId, formId, done) {
@@ -93,7 +93,7 @@ export function addAnswer(newData, eventId, formId, done) {
                 done && done(data.item);
             }
         }, error => T.notify('Thêm câu trả lời bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateAnswer(id, changes, done) {
@@ -108,7 +108,7 @@ export function updateAnswer(id, changes, done) {
                 dispatch({ type: UPDATE_ITEM, item: data.item });
             }
         }, () => T.notify('Cập nhật câu trả lời bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteAnswer(id, eventId, formId, done) {
@@ -124,7 +124,7 @@ export function deleteAnswer(id, eventId, formId, done) {
                 dispatch(getAnswerInPage(eventId, formId));
             }
         }, error => T.alert('Xoá câu trả lời bị lỗi!', 'error'));
-    }
+    };
 }
 
 export function deleteManyAnswerByAdmin(postId, done) {
@@ -143,7 +143,7 @@ export function deleteManyAnswerByAdmin(postId, done) {
 // Actions (user) -----------------------------------------------------------------------------------------------------
 export function addAnswerByUser(newData, done) {
     return dispatch => {
-        const url = `/api/home/answer`;
+        const url = '/api/home/answer';
         T.post(url, { newData }, data => {
             if (data.error) {
                 T.notify(data.error, 'danger');
@@ -155,7 +155,7 @@ export function addAnswerByUser(newData, done) {
                 dispatch({ type: CLEAR_TEMPLATE_ANSWER });
             }
         }, error => T.notify('Nộp bài thi bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function countAnswer(eventId, formId, done) {
@@ -168,14 +168,14 @@ export function countAnswer(eventId, formId, done) {
                 done && done(data.total);
             }
         }, () => console.error('GET: ' + url + ' has error!'));
-    }
+    };
 }
 
 export function clearParticipantsSession() {
     return dispatch => {
         const url = '/api/answer/clear-participants-session';
         T.delete(url);
-    }
+    };
 }
 
 export function checkHasAnswered(formId, eventId, done) {
@@ -187,6 +187,6 @@ export function checkHasAnswered(formId, eventId, done) {
             } else {
                 done && done(data);
             }
-        })
-    }
+        });
+    };
 }

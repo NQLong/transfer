@@ -21,7 +21,7 @@ module.exports = app => {
             condition = {
                 statement: 'lower(ma) LIKE :searchText OR lower(moTa) LIKE :searchText',
                 parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
-            }
+            };
         }
         app.model.dmNguonKinhPhiTrongNuoc.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
     });

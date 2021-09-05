@@ -296,7 +296,7 @@ class ProfilePage extends QTForm {
                     this.props.getDmDonViAll(items => items.forEach(item => this.mapperDonVi[item.ma] = item.ten));
                     this.props.getDmNgoaiNguAll({ kichHoat: 1 }, items => {
                         items.forEach(item => this.mapperNgonNgu[item.ma] = item.ten);
-                    })
+                    });
                     this.getData(user.shcc);
                 } else {
                     let { dienThoai, ngaySinh } = user ? user : { dienThoai: '', ngaySinh: '' };
@@ -461,7 +461,7 @@ class ProfilePage extends QTForm {
             ngaySinh = $('#ngaySinh').val() || null,
             changes = { dienThoai: $('#dienThoai').val() };
         if (phai && sexObject[phai]) changes.phai = sexObject[phai];
-        if (ngaySinh) changes.ngaySinh = T.formatDate(ngaySinh).getTime()
+        if (ngaySinh) changes.ngaySinh = T.formatDate(ngaySinh).getTime();
         this.props.updateProfile(changes);
     }
 

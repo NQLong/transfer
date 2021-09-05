@@ -10,7 +10,7 @@ export function createQTHTCTStaff(data, done) {
                 if (done) done(res);
             }
         }, error => T.notify('Thêm thông tin quá trình học tập, công tác bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function updateQTHTCTStaff(id, changes, done) {
@@ -25,7 +25,7 @@ export function updateQTHTCTStaff(id, changes, done) {
                 if (done) done();
             }
         }, error => T.notify('Cập nhật thông tin quá trình học tập, công tác bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function deleteQTHTCTStaff(id, done) {
@@ -40,7 +40,7 @@ export function deleteQTHTCTStaff(id, done) {
                 if (done) done();
             }
         }, error => T.notify('Xóa thông tin quá trình học tập, công tác bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function createQTHTCTStaffUser(data, done) {
@@ -55,7 +55,7 @@ export function createQTHTCTStaffUser(data, done) {
                 if (done) done(res);
             }
         }, error => T.notify('Thêm thông tin quá trình học tập, công tác bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function updateQTHTCTStaffUser(id, changes, done) {
@@ -70,7 +70,7 @@ export function updateQTHTCTStaffUser(id, changes, done) {
                 if (done) done();
             }
         }, error => T.notify('Cập nhật thông tin quá trình học tập, công tác bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function deleteQTHTCTStaffUser(id, done) {
@@ -82,8 +82,8 @@ export function deleteQTHTCTStaffUser(id, done) {
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
                 T.alert('Thông tin quá trình học tập, công tác được xóa thành công!', 'info', false, 800);
-                done && done()
+                done && done();
             }
         }, error => T.notify('Xóa thông tin quá trình học tập, công tác bị lỗi' , 'danger'));
-    }
+    };
 }

@@ -128,7 +128,7 @@ class DmChucVu extends React.Component {
             isConfirm && this.props.deleteDmChucVu(item.ma, error => {
                 if (error) T.notify(error.message ? error.message : `Xoá Chức vụ ${item.ten} bị lỗi!`, 'danger');
                 else T.alert(`Xoá chức vụ ${item.ten} thành công!`, 'success', false, 800);
-            })
+            });
         });
         e.preventDefault();
     }

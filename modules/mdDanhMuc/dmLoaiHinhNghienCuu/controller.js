@@ -21,7 +21,7 @@ module.exports = app => {
 
     app.get('/api/danh-muc/loai-hinh-nghien-cuu/all', app.permission.check('user:login'), (req, res) => {
         const condition = req.query.condition || {};
-        Object.keys(condition).forEach(key => { condition[key] === '' ? condition[key] = null : '' });
+        Object.keys(condition).forEach(key => { condition[key] === '' ? condition[key] = null : ''; });
         app.model.dmLoaiHinhNghienCuu.getAll(condition, '*', 'ma', (error, items) => res.send({ error, items }));
     });
 

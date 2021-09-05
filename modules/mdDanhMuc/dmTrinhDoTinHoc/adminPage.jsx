@@ -90,7 +90,7 @@ class DmTrinhDoTinHocPage extends React.Component {
 
     componentDidMount() {
         T.ready('/user/category');
-        this.props.getDmTrinhDoTinHocAll()
+        this.props.getDmTrinhDoTinHocAll();
     }
 
     edit = (e, item) => {

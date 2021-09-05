@@ -32,7 +32,7 @@ export default function DmMucDichNuocNgoaiReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -56,12 +56,12 @@ export function getDmMucDichNuocNgoaiPage(pageNumber, pageSize, done) {
                 dispatch({ type: DmMucDichNuocNgoaiGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách ca học bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmMucDichNuocNgoaiAll(condition, done) {
     return dispatch => {
-        const url = `/api/danh-muc/muc-dich-nuoc-ngoai/all`;
+        const url = '/api/danh-muc/muc-dich-nuoc-ngoai/all';
         T.get(url, { condition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách mục đích nước ngoài bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -71,7 +71,7 @@ export function getDmMucDichNuocNgoaiAll(condition, done) {
                 dispatch({ type: DmMucDichNuocNgoaiGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách mục đích nước ngoài bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmMucDichNuocNgoai(ma, done) {
@@ -85,12 +85,12 @@ export function getDmMucDichNuocNgoai(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmMucDichNuocNgoai(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/muc-dich-nuoc-ngoai`;
+        const url = '/api/danh-muc/muc-dich-nuoc-ngoai';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo mục đích nước ngoài bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -100,12 +100,12 @@ export function createDmMucDichNuocNgoai(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo mục đích nước ngoài bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function deleteDmMucDichNuocNgoai(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/muc-dich-nuoc-ngoai`;
+        const url = '/api/danh-muc/muc-dich-nuoc-ngoai';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục mục đích nước ngoài bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -115,12 +115,12 @@ export function deleteDmMucDichNuocNgoai(ma) {
                 dispatch(getDmMucDichNuocNgoaiAll());
             }
         }, error => T.notify('Xóa mục đích nước ngoài bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function updateDmMucDichNuocNgoai(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/muc-dich-nuoc-ngoai`;
+        const url = '/api/danh-muc/muc-dich-nuoc-ngoai';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tin mục đích nước ngoài bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -131,7 +131,7 @@ export function updateDmMucDichNuocNgoai(ma, changes, done) {
                 dispatch(getDmMucDichNuocNgoaiAll());
             }
         }, error => T.notify('Cập nhật thông tin mục đích nước ngoài bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function changeDmMucDichNuocNgoai(item) {
@@ -143,4 +143,4 @@ export const SelectAdapter_DmMucDichNuocNgoai = {
     getAll: getDmMucDichNuocNgoaiAll,
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.moTa })) : [] }),
     condition: { kichHoat: 1 },
-}
+};

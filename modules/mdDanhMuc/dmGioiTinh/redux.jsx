@@ -32,7 +32,7 @@ export default function dmGioiTinhReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -59,12 +59,12 @@ export function getDmGioiTinhPage(pageNumber, pageSize, pageCondition, done) {
                 dispatch({ type: DmGioiTinhGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách giới tính bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmGioiTinhAll(condition, done) {
     return dispatch => {
-        const url = `/api/danh-muc/gioi-tinh/all`;
+        const url = '/api/danh-muc/gioi-tinh/all';
         T.get(url, { condition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách giới tính bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -74,7 +74,7 @@ export function getDmGioiTinhAll(condition, done) {
                 dispatch({ type: DmGioiTinhGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách giới tính bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmGioiTinh(ma, done) {
@@ -89,7 +89,7 @@ export function getDmGioiTinh(ma, done) {
                 dispatch(changeDmGioiTinh(data.item));
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmGioiTinh(dmGioiTinh, done) {
@@ -105,7 +105,7 @@ export function createDmGioiTinh(dmGioiTinh, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo mới một giới tính bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function updateDmGioiTinh(ma, changes, done) {
@@ -121,12 +121,12 @@ export function updateDmGioiTinh(ma, changes, done) {
                 dispatch(getDmGioiTinhAll());
             }
         }, error => T.notify('Cập nhật dữ liệu giới tính bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function deleteDmGioiTinh(ma, done) {
     return dispatch => {
-        const url = `/api/danh-muc/gioi-tinh`;
+        const url = '/api/danh-muc/gioi-tinh';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa giới tính bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -137,7 +137,7 @@ export function deleteDmGioiTinh(ma, done) {
             }
             done && done();
         }, error => T.notify('Xóa giới tính bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function changeDmGioiTinh(item) {
@@ -149,4 +149,4 @@ export const SelectAdapter_DmGioiTinh = {
     getAll: getDmGioiTinhAll,
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: JSON.parse(item.ten).vi })) : [] }),
     condition: { kichHoat: 1 },
-}
+};

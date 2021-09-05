@@ -5,7 +5,7 @@ import xlsx from 'xlsx';
 import { Link } from 'react-router-dom';
 
 const UploadBoxStyle = {
-    backgroundImage: `url('/img/upload.png')`,
+    backgroundImage: 'url(\'/img/upload.png\')',
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',
     backgroundSize: 'contain',
@@ -59,12 +59,12 @@ class UploadDmDonVi extends React.Component {
                     <input id='ghiChu${index}' type='string' value='${data['GHI_CHU'] != undefined ? data['GHI_CHU'] : ''}' />
                 </td>
             </tr>
-        `
+        `;
     }
 
     onDrop = (e) => {
         e.preventDefault();
-        $(this.box.current).css('background-color', '#FFF')
+        $(this.box.current).css('background-color', '#FFF');
 
         if (e.dataTransfer.items) {
             if (e.dataTransfer.items.length > 0) {
@@ -100,7 +100,7 @@ class UploadDmDonVi extends React.Component {
 
     onSelectFileChanged = (e) => {
         if (e.target.files.length > 0) {
-            this.onUploadFile(e.target.files[0])
+            this.onUploadFile(e.target.files[0]);
         }
     };
 
@@ -109,7 +109,7 @@ class UploadDmDonVi extends React.Component {
         let reader = new FileReader();
         reader.onload = (event) => {
             let data = event.target.result;
-            let workbook = xlsx.read(data, { type: 'binary' })
+            let workbook = xlsx.read(data, { type: 'binary' });
             workbook.SheetNames.forEach((sheetName) => {
                 let XL_row = xlsx.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
                 this.setState({ totalRecord: XL_row.length });
@@ -118,8 +118,8 @@ class UploadDmDonVi extends React.Component {
                     result += this.parseDataToInput(item, index);
                 });
                 document.getElementById('tbodyTableDmDonVi').innerHTML = result;
-            })
-        }
+            });
+        };
         reader.onerror = (event) => console.log('errors', event.target.error);
         reader.readAsBinaryString(file);
     }
@@ -138,7 +138,7 @@ class UploadDmDonVi extends React.Component {
                 qdXoaTen: $(`#kichHoat${i}`).is(':checked') ? '0' : '1',
                 maPL: $(`#maPL${i}`).val(),
                 ghiChu: $(`#ghiChu${i}`).val(),
-            })
+            });
         }
         this.props.uploadDmDonVi(params, this.props.history);
     }

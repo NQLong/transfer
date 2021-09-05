@@ -12,7 +12,7 @@ export default function subMenuReducer(state = null, data) {
 
 export function getAllSubMenu(done) {
     return dispatch => {
-        const url = `/api/submenu/all`;
+        const url = '/api/submenu/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy menu phụ bị lỗi!', 'danger');
@@ -22,12 +22,12 @@ export function getAllSubMenu(done) {
                 dispatch({ type: SubMenuGetAll, items: data.items });
             }
         }, error => T.notify('Lấy menu phụ bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function createSubMenu(submenu, done) {
     return dispatch => {
-        const url = `/api/submenu`;
+        const url = '/api/submenu';
         T.post(url, { submenu }, data => {
             if (data.error) {
                 T.notify('Tạo menu phụ bị lỗi!', 'danger');
@@ -37,12 +37,12 @@ export function createSubMenu(submenu, done) {
                 done && done(data);
             }
         }, error => T.notify('Tạo menu phụ bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateSubMenu(id, changes, done) {
     return dispatch => {
-        const url = `/api/submenu`;
+        const url = '/api/submenu';
         T.put(url, { id, changes }, data => {
             if (data.error) {
                 T.notify('Cập nhật menu phụ bị lỗi!', 'danger');
@@ -53,13 +53,13 @@ export function updateSubMenu(id, changes, done) {
                 dispatch(getAllSubMenu());
                 done && done();
             }
-        }, error => T.notify('Cập nhật menu phụ bị lỗi!', 'danger'))
+        }, error => T.notify('Cập nhật menu phụ bị lỗi!', 'danger'));
     };
 }
 
 export function deleteSubMenu(id) {
     return dispatch => {
-        const url = `/api/submenu`;
+        const url = '/api/submenu';
         T.delete(url, { id }, data => {
             if (data.error) {
                 T.notify('Xóa menu phụ bị lỗi!', 'danger');
@@ -69,7 +69,7 @@ export function deleteSubMenu(id) {
                 dispatch(getAllSubMenu());
             }
         }, error => T.notify('Xóa menu phụ bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function swapSubMenu(id, priority, done) {
@@ -85,5 +85,5 @@ export function swapSubMenu(id, priority, done) {
             }
             done && done();
         }, error => T.notify('Thay đổi thứ tự việc làm bị lỗi!', 'danger'));
-    }
+    };
 }

@@ -8,7 +8,7 @@ const dateFormatChars = {
     '1': '[01]',
     '3': '[0-3]',
     '9': '[0-9]'
-}
+};
 
 export default class DateInput extends React.Component {
     date = React.createRef();

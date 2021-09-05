@@ -34,7 +34,7 @@ module.exports = app => {
     });
 
     app.put('/api/danh-muc/luong-co-so', app.permission.check('dmLuongCoSo:write'), (req, res) => {
-        app.model.dmLuongCoSo.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }))
+        app.model.dmLuongCoSo.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
     app.delete('/api/danh-muc/luong-co-so', app.permission.check('dmLuongCoSo:delete'), (req, res) => {

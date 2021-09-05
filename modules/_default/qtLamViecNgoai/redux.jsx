@@ -10,7 +10,7 @@ export function createQtLamViecNgoaiStaff(data, done) {
                 if (done) done(res);
             }
         }, error => T.notify('Thêm thông tin quá trình tham gia làm việc bên ngoài theo lời mời bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function updateQtLamViecNgoaiStaff(id, changes, done) {
@@ -25,7 +25,7 @@ export function updateQtLamViecNgoaiStaff(id, changes, done) {
                 if (done) done();
             }
         }, error => T.notify('Cập nhật thông tin quá trình tham gia làm việc bên ngoài theo lời mời bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function deleteQtLamViecNgoaiStaff(id, done) {
@@ -40,7 +40,7 @@ export function deleteQtLamViecNgoaiStaff(id, done) {
                 if (done) done();
             }
         }, error => T.notify('Xóa thông tin quá trình tham gia làm việc bên ngoài theo lời mời bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function createQtLamViecNgoaiStaffUser(data, done) {
@@ -55,7 +55,7 @@ export function createQtLamViecNgoaiStaffUser(data, done) {
                 if (done) done(res);
             }
         }, error => T.notify('Thêm thông tin quá trình tham gia làm việc bên ngoài theo lời mời bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function updateQtLamViecNgoaiStaffUser(id, changes, done) {
@@ -70,7 +70,7 @@ export function updateQtLamViecNgoaiStaffUser(id, changes, done) {
                 if (done) done();
             }
         }, error => T.notify('Cập nhật thông tin quá trình tham gia làm việc bên ngoài theo lời mời bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function deleteQtLamViecNgoaiStaffUser(id, done) {
@@ -82,8 +82,8 @@ export function deleteQtLamViecNgoaiStaffUser(id, done) {
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
                 T.alert('Thông tin quá trình tham gia làm việc bên ngoài theo lời mời được xóa thành công!', 'info', false, 800);
-                done && done()
+                done && done();
             }
         }, error => T.notify('Xóa thông tin quá trình tham gia làm việc bên ngoài theo lời mời bị lỗi' , 'danger'));
-    }
+    };
 }

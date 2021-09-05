@@ -14,7 +14,7 @@ class EditModal extends React.Component {
     componentDidMount() {
         $(document).ready(() => setTimeout(() => {
             $(this.modal.current).on('shown.bs.modal', () => {
-                $(`a[href='#dmToaNhaTabVi']`).tab('show');
+                $('a[href=\'#dmToaNhaTabVi\']').tab('show');
                 $('#dmToaNhaNameVi').focus();
             });
             $('#categoryCampus').select2({ minimumResultsForSearch: -1 });
@@ -45,14 +45,14 @@ class EditModal extends React.Component {
                 moTa: { vi: this.editorVi.current.html(), en: this.editorEn.current.html() },
                 coSo: $('#dmToaNhaCampus').val(),
                 kichHoat: this.state.active ? '1' : '0',
-            }
+            };
         if (changes.ten.vi == '') {
             T.notify('Tên tòa nhà bị trống!', 'danger');
-            $(`a[href='#dmToaNhaTabVi']`).tab('show');
+            $('a[href=\'#dmToaNhaTabVi\']').tab('show');
             $('#dmToaNhaNameVi').focus();
         } else if (changes.ten.en == '') {
             T.notify('Tên tòa nhà bị trống!', 'danger');
-            $(`a[href='#dmToaNhaTabEn']`).tab('show');
+            $('a[href=\'#dmToaNhaTabEn\']').tab('show');
             $('#dmToaNhaNameEn').focus();
         } else if (changes.coSo == null) {
             T.notify('Cơ sở chưa được chọn!', 'danger');
@@ -71,7 +71,7 @@ class EditModal extends React.Component {
     render() {
         const readOnly = this.props.readOnly;
         let campuses = this.props.campuses, campusList = null;
-        if (typeof (campuses) == 'object') { campuses = Object.values(campuses) };
+        if (typeof (campuses) == 'object') { campuses = Object.values(campuses); }
         campusList = campuses.map(item => <option key={item.ma} value={item.ma}>{T.language.parse(item.ten, true).vi}</option>);
 
         return (
@@ -172,7 +172,7 @@ class DmToaNhaPage extends React.Component {
             permissionDelete = currentPermissions.includes('dmToaNha:delete');
         let table = 'Không có tòa nhà!';
         let coSoList = this.props.categoryCampus && this.props.categoryCampus.items ? this.props.categoryCampus.items : [];
-        if (typeof (coSoList) == 'object') { coSoList = Object.values(coSoList) };
+        if (typeof (coSoList) == 'object') { coSoList = Object.values(coSoList); }
 
         if (this.props.dmToaNha && this.props.dmToaNha.items && this.props.dmToaNha.items.length > 0) {
             table = (

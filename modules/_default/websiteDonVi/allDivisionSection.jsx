@@ -23,12 +23,12 @@ class AllDivisionSection extends React.Component {
                             <div className='row' style={{ minHeight: '160px' }}>
                                 <div className='col-5 d-flex' style={{ margin: 'auto' }}>
                                     {item.link ? item.external ? <Link to={item.link} ><img style={{ width: '100%', padding: '5px' }} src={image} alt={title} /></Link> :
-                                        <a href={item.link} target='_blank' ><img style={{ width: '100%', padding: '5px' }} src={image} alt={title} /></a> :
+                                        <a href={item.link} target='_blank' rel="noreferrer" ><img style={{ width: '100%', padding: '5px' }} src={image} alt={title} /></a> :
                                         <img style={{ width: '100%', padding: '5px' }} src={image} alt={title} />}
                                 </div>
                                 <div className='col-7'>
                                     <div className='text d-block'>
-                                        <h3 className='heading mt-3'>{item.external ? <Link to={item.link} style={{ wordBreak: 'break-word', fontSize: '18px' }}>{title}</Link> : <a href={item.link} style={{ wordBreak: 'break-word', fontSize: '18px' }} target='_blank'>{title}</a>}</h3>
+                                        <h3 className='heading mt-3'>{item.external ? <Link to={item.link} style={{ wordBreak: 'break-word', fontSize: '18px' }}>{title}</Link> : <a href={item.link} style={{ wordBreak: 'break-word', fontSize: '18px' }} target='_blank' rel="noreferrer">{title}</a>}</h3>
                                     </div>
                                 </div>
                             </div>

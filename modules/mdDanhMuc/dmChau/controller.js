@@ -20,7 +20,7 @@ module.exports = app => {
             condition = {
                 statement: 'lower(ma) LIKE :searchText OR lower(ten) LIKE :searchText OR lower(territory) LIKE :searchText',
                 parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
-            }
+            };
         }
         app.model.dmChau.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
     });
@@ -47,7 +47,7 @@ module.exports = app => {
     });
 
     app.put('/api/danh-muc/chau', app.permission.check('dmChau:write'), (req, res) => {
-        app.model.dmChau.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }))
+        app.model.dmChau.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
     app.delete('/api/danh-muc/chau', app.permission.check('dmChau:delete'), (req, res) => {

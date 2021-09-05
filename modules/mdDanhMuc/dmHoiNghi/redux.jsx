@@ -32,7 +32,7 @@ export default function DmHoiNghiReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -56,12 +56,12 @@ export function getDmHoiNghiPage(pageNumber, pageSize, done) {
                 dispatch({ type: DmHoiNghiGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách hội nghị bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmHoiNghiAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/hoi-nghi/all`;
+        const url = '/api/danh-muc/hoi-nghi/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách hội nghị bị lỗi!', 'danger');
@@ -71,7 +71,7 @@ export function getDmHoiNghiAll(done) {
                 dispatch({ type: DmHoiNghiGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách hội nghị bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmHoiNghi(ma, done) {
@@ -85,12 +85,12 @@ export function getDmHoiNghi(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmHoiNghi(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/hoi-nghi`;
+        const url = '/api/danh-muc/hoi-nghi';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo hội nghị bị lỗi!', 'danger');
@@ -100,12 +100,12 @@ export function createDmHoiNghi(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo hội nghị bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteDmHoiNghi(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/hoi-nghi`;
+        const url = '/api/danh-muc/hoi-nghi';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục hội nghị bị lỗi!', 'danger');
@@ -115,12 +115,12 @@ export function deleteDmHoiNghi(ma) {
                 dispatch(getDmHoiNghiAll());
             }
         }, error => T.notify('Xóa hội nghị bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDmHoiNghi(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/hoi-nghi`;
+        const url = '/api/danh-muc/hoi-nghi';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tin hội nghị bị lỗi!', 'danger');
@@ -131,7 +131,7 @@ export function updateDmHoiNghi(ma, changes, done) {
                 dispatch(getDmHoiNghiAll());
             }
         }, error => T.notify('Cập nhật thông tin hội nghị bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function changeDmHoiNghi(item) {
@@ -145,4 +145,4 @@ export const SelectAdapter_DmHoiNghi = {
     data: params => ({ condition: params.term }),
     processResults: data => ({ results: data && data.page && data.page.list ? data.page.list.map(item => ({ id: item.ma, text: item.ten })) : [] }),
     processResultOne: data => (data ? { value: data.ma, text: data.ma + ': ' + data.ten } : {})
-}
+};

@@ -13,7 +13,7 @@ class EditModal extends React.Component {
     componentDidMount() {
         $(document).ready(() => setTimeout(() => {
             $(this.modal.current).on('shown.bs.modal', () => $('#dmBenhVienMa').focus());
-            $('#dmBenhVienMaTuyen').select2({ minimumResultsForSearch: -1 })
+            $('#dmBenhVienMaTuyen').select2({ minimumResultsForSearch: -1 });
         }, 250));
     }
 
@@ -110,7 +110,7 @@ class EditModal extends React.Component {
                     </div>
                 </form>
             </div>
-        )
+        );
     }
 }
 
@@ -198,7 +198,7 @@ class dmBenhVienPage extends React.Component {
                         ))}
                     </tbody>
                 </table>
-            )
+            );
         }
 
         return (

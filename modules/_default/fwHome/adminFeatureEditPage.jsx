@@ -127,7 +127,7 @@ class TestimonyEditPage extends React.Component {
                     T.notify('Lấy nhóm feature bị lỗi!', 'danger');
                     this.props.history.push('/user/component');
                 } else if (data.item) {
-                    const title = T.language.parse(data.item.title, true)
+                    const title = T.language.parse(data.item.title, true);
                     $('#featureViTitle').val(title.vi).focus();
                     $('#featureEnTitle').val(title.en);
                     // this.imageBox.current.setData('feature:' + (data.item.id || 'fnew'), data.item.image);

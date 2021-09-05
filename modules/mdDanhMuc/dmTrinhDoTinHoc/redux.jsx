@@ -32,7 +32,7 @@ export default function DmTrinhDoTinHocReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -56,12 +56,12 @@ export function getDmTrinhDoTinHocPage(pageNumber, pageSize, done) {
                 dispatch({ type: DmTrinhDoTinHocGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách ca học bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmTrinhDoTinHocAll(condition, done) {
     return dispatch => {
-        const url = `/api/danh-muc/trinh-do-tin-hoc/all`;
+        const url = '/api/danh-muc/trinh-do-tin-hoc/all';
         T.get(url, { condition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách trình độ tin học bị lỗi!', 'danger');
@@ -71,7 +71,7 @@ export function getDmTrinhDoTinHocAll(condition, done) {
                 dispatch({ type: DmTrinhDoTinHocGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách trình độ tin học bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmTrinhDoTinHoc(ma, done) {
@@ -85,12 +85,12 @@ export function getDmTrinhDoTinHoc(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmTrinhDoTinHoc(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/trinh-do-tin-hoc`;
+        const url = '/api/danh-muc/trinh-do-tin-hoc';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo trình độ tin học bị lỗi!', 'danger');
@@ -100,12 +100,12 @@ export function createDmTrinhDoTinHoc(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo trình độ tin học bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteDmTrinhDoTinHoc(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/trinh-do-tin-hoc`;
+        const url = '/api/danh-muc/trinh-do-tin-hoc';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục trình độ tin học bị lỗi!', 'danger');
@@ -115,12 +115,12 @@ export function deleteDmTrinhDoTinHoc(ma) {
                 dispatch(getDmTrinhDoTinHocAll());
             }
         }, error => T.notify('Xóa trình độ tin học bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDmTrinhDoTinHoc(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/trinh-do-tin-hoc`;
+        const url = '/api/danh-muc/trinh-do-tin-hoc';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tin trình độ tin học bị lỗi!', 'danger');
@@ -131,7 +131,7 @@ export function updateDmTrinhDoTinHoc(ma, changes, done) {
                 dispatch(getDmTrinhDoTinHocAll());
             }
         }, error => T.notify('Cập nhật thông tin trình độ tin học bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function changeDmTrinhDoTinHoc(item) {
@@ -143,4 +143,4 @@ export const SelectAdapter_DmTrinhDoTinHoc = {
     getAll: getDmTrinhDoTinHocAll,
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
     condition: { kichHoat: 1 },
-}
+};

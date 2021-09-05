@@ -15,7 +15,7 @@ class SectionStatistic extends React.Component {
         setTimeout(() => {
             $('.section-counter-class').waypoint(function (direction) {
                 if (direction === 'down' && !$(this.element).hasClass('ftco-animated')) {
-                    const comma_separator_number_step = $.animateNumber.numberStepFactories.separator(',')
+                    const comma_separator_number_step = $.animateNumber.numberStepFactories.separator(',');
                     $('.number').each(function () {
                         const $this = $(this);
                         $this.animateNumber({ number: $this.data('number'), numberStep: comma_separator_number_step }, 7000);

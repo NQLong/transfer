@@ -14,8 +14,8 @@ class SectionStaffGroup extends React.Component {
     }
 
     renderStaff = (staff) => {
-        const fbLink = staff.info.facebook ? <a href={staff.info.facebook} target='_blank' style={{ fontSize: '20px' }}><span className='icon-facebook'></span></a> : '',
-            websiteLink = staff.info.website ? <a href={staff.info.website} target='_blank' className='' style={{ fontSize: '20px' }}>W</a> : '',
+        const fbLink = staff.info.facebook ? <a href={staff.info.facebook} target='_blank' style={{ fontSize: '20px' }} rel="noreferrer"><span className='icon-facebook'></span></a> : '',
+            websiteLink = staff.info.website ? <a href={staff.info.website} target='_blank' className='' style={{ fontSize: '20px' }} rel="noreferrer">W</a> : '',
             emailLink = staff.info.email ? <a href={'mailto:' + staff.info.email} className='' style={{ fontSize: '20px' }}><span className='icon-mail_outline'></span></a> : '';
 
         return (

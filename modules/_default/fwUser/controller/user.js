@@ -23,7 +23,7 @@ module.exports = app => {
             new Promise(resolve => {
                 app.model.fwRole.get({ name: 'admin' }, (error, role) => {
                     if (error) {
-                        console.log('Error once get Admin role.')
+                        console.log('Error once get Admin role.');
                     } else if (role == null) {
                         app.model.fwRole.create({ name: 'admin', active: 1, isDefault: 0 }, (error, adminRole) => {
                             if (error || adminRole == null) {
@@ -58,7 +58,7 @@ module.exports = app => {
                                     console.log(' - Generate default Admin user successfully!');
                                     resolve(adminUser);
                                 }
-                            })
+                            });
                         } else {
                             resolve(adminUser);
                         }
@@ -84,18 +84,18 @@ module.exports = app => {
             if (app.isDebug) {
                 app.model.fwRole.getAll((error, roles) => {
                     if (error || roles == null) {
-                        console.log(`Error: Get all roles!`, error)
+                        console.log('Error: Get all roles!', error);
                     } else {
                         roles.forEach(role => {
                             if (role.name != 'admin') {
                                 const testEmail = role.name.toLowerCase().replaceAll(' ', '_') + '@hcmussh.edu.vn';
                                 app.model.fwUser.get({ email: testEmail }, (error, testUser) => {
                                     if (error) {
-                                        console.log(`Error: Get test user by email!`, error)
+                                        console.log('Error: Get test user by email!', error);
                                     }
                                 });
                             }
-                        })
+                        });
                     }
                 });
             }
@@ -117,10 +117,10 @@ module.exports = app => {
                 }
 
                 if (req.query.isStaff == '1') {
-                    condition.statement = condition.statement.length > 0 ? `(${condition.statement}) AND isStaff=1` : `isStaff=1`;
+                    condition.statement = condition.statement.length > 0 ? `(${condition.statement}) AND isStaff=1` : 'isStaff=1';
                 }
                 if (req.query.isStudent == '1') {
-                    condition.statement = condition.statement.length > 0 ? `(${condition.statement}) AND isStudent=1` : `isStudent=1`;
+                    condition.statement = condition.statement.length > 0 ? `(${condition.statement}) AND isStudent=1` : 'isStudent=1';
                 }
             } else {
                 condition = {
@@ -135,7 +135,7 @@ module.exports = app => {
                 let mapperUser = {},
                     emails = page.list.map(user => {
                         mapperUser[user.email] = user;
-                        return user.email
+                        return user.email;
                     });
 
                 app.model.fwUserRole.getAll({ statement: 'email IN (:inParams)', parameter: { inParams: emails } }, (error2, userRoles) => {
@@ -149,7 +149,7 @@ module.exports = app => {
                                     user.roles = [userRole.roleId];
                                 }
                             }
-                        })
+                        });
                     }
                     res.send({ error1, page });
                 });
@@ -250,10 +250,10 @@ module.exports = app => {
             condition = {
                 statement: 'lower(shcc) LIKE :searchText OR lower(lastName || \' \' || firstName) LIKE :searchText OR email LIKE :searchText',
                 parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
-            }
+            };
         }
         app.model.fwUser.getPage(pageNumber, pageSize, condition, (error, page) => {
-            res.send({ error, page })
+            res.send({ error, page });
         });
     });
 
@@ -271,7 +271,7 @@ module.exports = app => {
             } else {
                 res.send({ error: 'Invalid email!' });
             }
-        })
+        });
     });
 
     // Hook upload images ---------------------------------------------------------------------------------------------------------------------------
@@ -300,7 +300,7 @@ module.exports = app => {
                     app.deleteImage(user.image);
                     app.fs.rename(srcPath, userImagePath + '/' + filename, error => {
                         if (error) {
-                            console.log(error)
+                            console.log(error);
                             done({ error });
                         } else {
                             filename = '/img/user/' + filename;

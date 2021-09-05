@@ -24,7 +24,7 @@ module.exports = app => {
             condition = {
                 statement,
                 parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
-            }
+            };
         }
         app.model.dmQuocGia.getPage(pageNumber, pageSize, condition, '*', 'maCode', (error, page) => {
             res.send({ error, page });

@@ -32,7 +32,7 @@ export default function DmNgachCdnnReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -56,12 +56,12 @@ export function getDmNgachCdnnPage(pageNumber, pageSize, done) {
                 dispatch({ type: DmNgachCdnnGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách chức danh nghề nghiệp bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmNgachCdnnAll(condition, done) {
     return dispatch => {
-        const url = `/api/danh-muc/ngach-cdnn/all`;
+        const url = '/api/danh-muc/ngach-cdnn/all';
         T.get(url, { condition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách chức danh nghề nghiệp bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -71,7 +71,7 @@ export function getDmNgachCdnnAll(condition, done) {
                 dispatch({ type: DmNgachCdnnGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách chức danh nghề nghiệp bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmNgachCdnn(id, done) {
@@ -85,12 +85,12 @@ export function getDmNgachCdnn(id, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmNgachCdnn(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/ngach-cdnn`;
+        const url = '/api/danh-muc/ngach-cdnn';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo chức danh nghề nghiệp bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -100,12 +100,12 @@ export function createDmNgachCdnn(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo chức danh nghề nghiệp bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function deleteDmNgachCdnn(id) {
     return dispatch => {
-        const url = `/api/danh-muc/ngach-cdnn`;
+        const url = '/api/danh-muc/ngach-cdnn';
         T.delete(url, { id }, data => {
             if (data.error) {
                 T.notify('Xóa chức danh nghề nghiệp bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -115,12 +115,12 @@ export function deleteDmNgachCdnn(id) {
                 dispatch(getDmNgachCdnnAll());
             }
         }, error => T.notify('Xóa chức danh nghề nghiệp bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function updateDmNgachCdnn(id, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/ngach-cdnn`;
+        const url = '/api/danh-muc/ngach-cdnn';
         T.put(url, { id, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tin chức danh nghề nghiệp bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -131,7 +131,7 @@ export function updateDmNgachCdnn(id, changes, done) {
                 dispatch(getDmNgachCdnnAll());
             }
         }, error => T.notify('Cập nhật thông tin chức danh nghề nghiệp bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function changeDmNgachCdnn(item) {
@@ -143,4 +143,4 @@ export const SelectAdapter_DmNgachCdnn = {
     getAll: getDmNgachCdnnAll,
     processResults: response => ({ results: response ? response.map(item => ({ value: item.id, text: `${item.maSoCdnn} (${item.ma}): ${item.ten}` })) : [] }),
     condition: { kichHoat: 1 },
-}
+};

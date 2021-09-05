@@ -27,7 +27,7 @@ class EditModal extends React.Component {
     componentDidMount() {
         $(document).ready(() => {
             $(this.modal.current).on('hidden.bs.modal', () => this.setState({ index: -1 }));
-        })
+        });
     }
 
     show = (index, item) => {
@@ -56,7 +56,7 @@ class EditModal extends React.Component {
                 qdThanhLap: $('#qdThanhLap').val().trim(),
                 qdXoaTen: $('#qdXoaTen').val().trim(),
                 ghiChu: $('#ghiChu').val().trim(),
-            }
+            };
         if (changes.ma == '') {
             T.notify('Mã bộ môn bị trống!', 'danger');
             $('#ma').focus();
@@ -129,7 +129,7 @@ class EditModal extends React.Component {
                     </div>
                 </form>
             </div>
-        )
+        );
     }
 }
 
@@ -174,7 +174,7 @@ class DmBoMonImportPage extends React.Component {
         this.props.createMultiDmBoMon(this.state.dmBoMon, () => {
             T.notify('Cập nhật thành công!', 'success');
             this.props.history.push('/user/dm-bo-mon');
-        })
+        });
     };
 
     showUpload = (e) => {
@@ -184,7 +184,7 @@ class DmBoMonImportPage extends React.Component {
 
     onChangeCheckBox = (e, index) => {
         let { dmBoMon } = this.state;
-        dmBoMon[index].kichHoat = dmBoMon[index].kichHoat === 1 ? 0 : 1
+        dmBoMon[index].kichHoat = dmBoMon[index].kichHoat === 1 ? 0 : 1;
         this.setState({ dmBoMon });
     }
 

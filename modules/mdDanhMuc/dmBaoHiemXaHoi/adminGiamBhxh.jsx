@@ -91,7 +91,7 @@ class DmGiamBhxhPage extends React.Component {
 
     componentDidMount() {
         T.ready('/user/category');
-        this.props.getDmGiamBhxhAll()
+        this.props.getDmGiamBhxhAll();
     }
 
     edit = (e, item) => {

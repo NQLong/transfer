@@ -32,7 +32,7 @@ export default function DmGiamBhxhReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -56,12 +56,12 @@ export function getDmGiamBhxhPage(pageNumber, pageSize, done) {
                 dispatch({ type: DmGiamBhxhGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách giảm Bảo hiểm xã hội bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmGiamBhxhAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/giam-bao-hiem-xa-hoi/all`;
+        const url = '/api/danh-muc/giam-bao-hiem-xa-hoi/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách giảm Bảo hiểm xã hội bị lỗi!', 'danger');
@@ -71,7 +71,7 @@ export function getDmGiamBhxhAll(done) {
                 dispatch({ type: DmGiamBhxhGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách giảm Bảo hiểm xã hội bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmGiamBhxh(ma, done) {
@@ -85,12 +85,12 @@ export function getDmGiamBhxh(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmGiamBhxh(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/giam-bao-hiem-xa-hoi`;
+        const url = '/api/danh-muc/giam-bao-hiem-xa-hoi';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo giảm Bảo hiểm xã hội bị lỗi!', 'danger');
@@ -100,12 +100,12 @@ export function createDmGiamBhxh(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo giảm Bảo hiểm xã hội bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteDmGiamBhxh(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/giam-bao-hiem-xa-hoi`;
+        const url = '/api/danh-muc/giam-bao-hiem-xa-hoi';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục giảm Bảo hiểm xã hội bị lỗi!', 'danger');
@@ -115,12 +115,12 @@ export function deleteDmGiamBhxh(ma) {
                 dispatch(getDmGiamBhxhAll());
             }
         }, error => T.notify('Xóa giảm Bảo hiểm xã hội bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDmGiamBhxh(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/giam-bao-hiem-xa-hoi`;
+        const url = '/api/danh-muc/giam-bao-hiem-xa-hoi';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tin giảm Bảo hiểm xã hội bị lỗi!', 'danger');
@@ -131,7 +131,7 @@ export function updateDmGiamBhxh(ma, changes, done) {
                 dispatch(getDmGiamBhxhAll());
             }
         }, error => T.notify('Cập nhật thông tin giảm Bảo hiểm xã hội bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function changeDmGiamBhxh(item) {

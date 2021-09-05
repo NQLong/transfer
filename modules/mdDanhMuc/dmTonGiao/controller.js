@@ -20,7 +20,7 @@ module.exports = app => {
             condition = {
                 statement: 'lower(ma) LIKE :searchText OR lower(ten) LIKE :searchText',
                 parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
-            }
+            };
         }
         app.model.dmTonGiao.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
     });
@@ -44,7 +44,7 @@ module.exports = app => {
     });
 
     app.put('/api/danh-muc/ton-giao', app.permission.check('dmTonGiao:write'), (req, res) => {
-        app.model.dmTonGiao.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }))
+        app.model.dmTonGiao.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
     app.delete('/api/danh-muc/ton-giao', app.permission.check('dmTonGiao:delete'), (req, res) => {

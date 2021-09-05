@@ -32,7 +32,7 @@ export default function DmTrinhDoLyLuanChinhTriReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -56,12 +56,12 @@ export function getDmTrinhDoLyLuanChinhTriPage(pageNumber, pageSize, done) {
                 dispatch({ type: DmTrinhDoLyLuanChinhTriGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách ca học bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmTrinhDoLyLuanChinhTriAll(condition, done) {
     return dispatch => {
-        const url = `/api/danh-muc/trinh-do-ly-luan-chinh-tri/all`;
+        const url = '/api/danh-muc/trinh-do-ly-luan-chinh-tri/all';
         T.get(url, { condition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách trình độ lý luận chính trị bị lỗi!', 'danger');
@@ -71,7 +71,7 @@ export function getDmTrinhDoLyLuanChinhTriAll(condition, done) {
                 dispatch({ type: DmTrinhDoLyLuanChinhTriGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách trình độ lý luận chính trị bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmTrinhDoLyLuanChinhTri(ma, done) {
@@ -85,12 +85,12 @@ export function getDmTrinhDoLyLuanChinhTri(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmTrinhDoLyLuanChinhTri(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/trinh-do-ly-luan-chinh-tri`;
+        const url = '/api/danh-muc/trinh-do-ly-luan-chinh-tri';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo trình độ lý luận chính trị bị lỗi!', 'danger');
@@ -100,12 +100,12 @@ export function createDmTrinhDoLyLuanChinhTri(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo trình độ lý luận chính trị bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteDmTrinhDoLyLuanChinhTri(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/trinh-do-ly-luan-chinh-tri`;
+        const url = '/api/danh-muc/trinh-do-ly-luan-chinh-tri';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục trình độ lý luận chính trị bị lỗi!', 'danger');
@@ -115,12 +115,12 @@ export function deleteDmTrinhDoLyLuanChinhTri(ma) {
                 dispatch(getDmTrinhDoLyLuanChinhTriAll());
             }
         }, error => T.notify('Xóa trình độ lý luận chính trị bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDmTrinhDoLyLuanChinhTri(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/trinh-do-ly-luan-chinh-tri`;
+        const url = '/api/danh-muc/trinh-do-ly-luan-chinh-tri';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tin trình độ lý luận chính trị bị lỗi!', 'danger');
@@ -131,7 +131,7 @@ export function updateDmTrinhDoLyLuanChinhTri(ma, changes, done) {
                 dispatch(getDmTrinhDoLyLuanChinhTriAll());
             }
         }, error => T.notify('Cập nhật thông tin trình độ lý luận chính trị bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function changeDmTrinhDoLyLuanChinhTri(item) {
@@ -143,4 +143,4 @@ export const SelectAdapter_DmTrinhDoLyLuanChinhTri = {
     getAll: getDmTrinhDoLyLuanChinhTriAll,
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
     condition: { kichHoat: 1 },
-}
+};

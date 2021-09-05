@@ -32,7 +32,7 @@ export default function DmMucDichTrongNuocReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -56,12 +56,12 @@ export function getDmMucDichTrongNuocPage(pageNumber, pageSize, done) {
                 dispatch({ type: DmMucDichTrongNuocGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách ca học bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmMucDichTrongNuocAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/muc-dich-trong-nuoc/all`;
+        const url = '/api/danh-muc/muc-dich-trong-nuoc/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách mục đích đi công tác trong nước bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -71,7 +71,7 @@ export function getDmMucDichTrongNuocAll(done) {
                 dispatch({ type: DmMucDichTrongNuocGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách mục đích đi công tác trong nước bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmMucDichTrongNuoc(ma, done) {
@@ -85,12 +85,12 @@ export function getDmMucDichTrongNuoc(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmMucDichTrongNuoc(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/muc-dich-trong-nuoc`;
+        const url = '/api/danh-muc/muc-dich-trong-nuoc';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo mục đích đi công tác trong nước bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -100,12 +100,12 @@ export function createDmMucDichTrongNuoc(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo mục đích đi công tác trong nước bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function deleteDmMucDichTrongNuoc(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/muc-dich-trong-nuoc`;
+        const url = '/api/danh-muc/muc-dich-trong-nuoc';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục mục đích đi công tác trong nước bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -115,12 +115,12 @@ export function deleteDmMucDichTrongNuoc(ma) {
                 dispatch(getDmMucDichTrongNuocAll());
             }
         }, error => T.notify('Xóa mục đích đi công tác trong nước bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function updateDmMucDichTrongNuoc(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/muc-dich-trong-nuoc`;
+        const url = '/api/danh-muc/muc-dich-trong-nuoc';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tin mục đích đi công tác trong nước bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -131,7 +131,7 @@ export function updateDmMucDichTrongNuoc(ma, changes, done) {
                 dispatch(getDmMucDichTrongNuocAll());
             }
         }, error => T.notify('Cập nhật thông tin mục đích đi công tác trong nước bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function changeDmMucDichTrongNuoc(item) {

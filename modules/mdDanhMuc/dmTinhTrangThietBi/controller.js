@@ -23,7 +23,7 @@ module.exports = app => {
             searchTerm = {
                 statement: 'lower(tinhTrangThietBi) LIKE :searchText',
                 parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
-            }
+            };
         }
         app.model.dmTinhTrangThietBi.getPage(pageNumber, pageSize, searchTerm, '*', 'ma asc', (error, page) => {
             if (error || page == null) {
@@ -45,14 +45,14 @@ module.exports = app => {
     });
 
     app.put('/api/danh-muc/tinh-trang-thiet-bi', app.permission.check('dmTinhTrangThietBi:write'), (req, res) => {
-        const changesTinhTrangThietBi = req.body.changes
+        const changesTinhTrangThietBi = req.body.changes;
         app.model.dmTinhTrangThietBi.update(
             { ma: req.body.ma },
             changesTinhTrangThietBi,
-            (err, items) => res.send({ err, items }))
+            (err, items) => res.send({ err, items }));
     });
 
     app.delete('/api/danh-muc/tinh-trang-thiet-bi', app.permission.check('dmTinhTrangThietBi:delete'), (req, res) => {
-        app.model.dmTinhTrangThietBi.delete({ ma: req.body.ma }, (err, items) => res.send({ err, items }))
+        app.model.dmTinhTrangThietBi.delete({ ma: req.body.ma }, (err, items) => res.send({ err, items }));
     });
-}
+};

@@ -92,8 +92,8 @@ class Select2 extends React.Component {
                     permission.push(e.target.selectedOptions[i].value);
                 }
                 this.props.update(this.props.id, { permission });
-            })
-        })
+            });
+        });
     }
 
     componentDidUpdate(prevProps) {

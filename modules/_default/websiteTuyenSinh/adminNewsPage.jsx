@@ -26,7 +26,7 @@ class adminNewsPage extends React.Component {
         this.props.getTuyenSinh('news', category => {
             let valueCate = category.map(item => item.id.toString());
             this.props.getNewsByCategoryAdmin(valueCate, 1, 100, data => {
-                this.setState({ ...data, category, valueCate })
+                this.setState({ ...data, category, valueCate });
             });
         });
     }
@@ -55,7 +55,7 @@ class adminNewsPage extends React.Component {
 
     onChangeType = (type) => {
         this.props.getNewsByCategoryAdmin(type.id ? type.id : this.state.valueCate, 1, 25, data => {
-            this.setState({ ...data, categoryPicker: type.text, typeId: type.id })
+            this.setState({ ...data, categoryPicker: type.text, typeId: type.id });
         });
     }
 
@@ -71,7 +71,7 @@ class adminNewsPage extends React.Component {
 
     getPage = (pageSize, pageNumber, pageCondition) => {
         this.props.getNewsByCategoryAdmin(this.state.typeId == 0 ? this.state.valueCate : this.state.typeId, pageSize, pageNumber, data => {
-            this.setState({ ...data, categoryPicker: type.text, typeId: type.id })
+            this.setState({ ...data, categoryPicker: type.text, typeId: type.id });
         });
 
     }
@@ -91,7 +91,7 @@ class adminNewsPage extends React.Component {
             this.state : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0 };
         let table = <div>Không có bài viết!</div>, category = [{ id: 0, text: 'Tất cả' }];
         this.state.category.forEach(item => {
-            if (item.active == true && item.type == 'news') category.push({ id: item.id, text: T.language.parse(item.title, true).vi })
+            if (item.active == true && item.type == 'news') category.push({ id: item.id, text: T.language.parse(item.title, true).vi });
         });
         const { list } = this.state;
         table = (

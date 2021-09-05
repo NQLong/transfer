@@ -91,7 +91,7 @@ class DmPhuCapPage extends React.Component {
 
     componentDidMount() {
         T.ready('/user/category');
-        this.props.getDmPhuCapAll()
+        this.props.getDmPhuCapAll();
     }
 
     edit = (e, item) => {

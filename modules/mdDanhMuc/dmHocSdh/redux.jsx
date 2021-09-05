@@ -67,7 +67,7 @@ export function getDmHocSdhPage(pageNumber, pageSize, pageCondition, done) {
 
 export function getDmHocSdhAll(done) {
     return (dispatch) => {
-        const url = `/api/danh-muc/hoc-sdh/all`;
+        const url = '/api/danh-muc/hoc-sdh/all';
         T.get(url, (data) => {
             if (data.error) {
                 T.notify('Lấy danh sách học Sau đại học bị lỗi' + (data.error.message && ':<br>' + data.error.message), 'danger');
@@ -96,7 +96,7 @@ export function getDmHocSdh(ma, done) {
 
 export function createDmHocSdh(changes, done) {
     return (dispatch) => {
-        const url = `/api/danh-muc/hoc-sdh`;
+        const url = '/api/danh-muc/hoc-sdh';
         T.post(url, { changes }, (data) => {
             if (data.error) {
                 T.notify('Tạo học Sau đại học bị lỗi' + (data.error.message && ':<br>' + data.error.message), 'danger');
@@ -111,7 +111,7 @@ export function createDmHocSdh(changes, done) {
 
 export function updateDmHocSdh(ma, changes, done) {
     return (dispatch) => {
-        const url = `/api/danh-muc/hoc-sdh`;
+        const url = '/api/danh-muc/hoc-sdh';
         T.put(url, { ma, changes }, (data) => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tin học Sau đại học bị lỗi' + (data.error.message && ':<br>' + data.error.message), 'danger');
@@ -127,7 +127,7 @@ export function updateDmHocSdh(ma, changes, done) {
 
 export function deleteDmHocSdh(ma) {
     return (dispatch) => {
-        const url = `/api/danh-muc/hoc-sdh`;
+        const url = '/api/danh-muc/hoc-sdh';
         T.delete(url, { ma }, (data) => {
             if (data.error) {
                 T.notify('Xóa danh mục học Sau đại học bị lỗi' + (data.error.message && ':<br>' + data.error.message), 'danger');
@@ -146,7 +146,7 @@ export function changeDmHocSdh(item) {
 
 export function createDmHocSdhByUpload(item, done) {
     return (dispatch) => {
-        const url = `/api/danh-muc/hoc-sdh/createFromFile`;
+        const url = '/api/danh-muc/hoc-sdh/createFromFile';
         T.post(url, { item }, (data) => {
             if (data.error) {
                 console.error(`POST: ${url}.`, data.error);
@@ -164,5 +164,5 @@ export const SelectAdapter_DmHocSdh = {
     processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: `${item.ma}: ${item.ten}` })) : [] }),
     getOne: getDmHocSdh,
     processResultOne: (response) => response && { value: response.ma, text: response.ma + ': ' + response.ten },
-}
+};
 

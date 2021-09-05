@@ -19,7 +19,7 @@ class EmailItem extends React.Component {
             title: this.title.current.value,
             text: this.editor.current.text(),
             html: this.editor.current.html(),
-        }
+        };
     }
 
     render() {

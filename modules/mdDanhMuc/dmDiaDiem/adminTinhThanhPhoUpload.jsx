@@ -27,12 +27,12 @@ class DMTinhThanhPhoImportPage extends React.Component {
         const data = JSON.parse(JSON.stringify(this.state.data));
         for (let i = 0; i < data.length; i++)
             if (data[i].ma == condition.ma) {
-                data[i] = Object.assign({}, data[i], changes)
+                data[i] = Object.assign({}, data[i], changes);
                 this.setState({ data });
                 done && done(null, data[i]);
                 return;
             }
-        done && done('Item not found')
+        done && done('Item not found');
     };
 
     delete = (e, index) => {
@@ -59,18 +59,18 @@ class DMTinhThanhPhoImportPage extends React.Component {
                     this.props.history.push('/user/danh-muc/tinh-thanh-pho');
                 }
                 this.setState({ saving: false });
-            })
-        }
+            });
+        };
         e.preventDefault();
         T.confirm3('Cập nhật dữ liệu', 'Bạn có muốn <b>ghi đè</b> dữ liệu đang có bằng dữ liệu mới không?<br>Nếu không rõ, hãy chọn <b>Không ghi đè</b>!', 'warning', 'Ghi đè', 'Không ghi đè', isOverride => {
             if (isOverride !== null) {
                 if (isOverride)
                     T.confirm('Ghi đè dữ liệu', 'Bạn có chắc chắn muốn ghi đè dữ liệu?', 'warning', true, isConfirm => {
                         if (isConfirm) doSave('TRUE');
-                    })
+                    });
                 else doSave('FALSE');
             }
-        })
+        });
     };
 
     changeActive = (item, key) => this.update({ ma: item.ma }, { [key]: !item[key] }, () => T.notify('Cập nhật tỉnh/thành phố thành công!', 'success'));

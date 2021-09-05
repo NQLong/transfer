@@ -21,7 +21,7 @@ module.exports = app => {
                 res.redirect(req.session.user ? '/request-permissions' : '/request-login');
             }
         } else {
-            res.send({ error: `You don't have permission!` });
+            res.send({ error: 'You don\'t have permission!' });
         }
     };
     const responseWithPermissions = (req, success, fail, permissions) => {
@@ -101,7 +101,7 @@ module.exports = app => {
                         }
                         if (permission.menu.menus == null) {
                             menuTree[index].parentMenu.permissions = [permission.name];
-                        };
+                        }
                         menuTree[index].parentMenu.subMenusRender = menuTree[index].parentMenu.subMenusRender || (subMenusRender != null ? subMenusRender : true);
                     }
 
@@ -131,12 +131,12 @@ module.exports = app => {
             if (app.isDebug && (req.session.user == null || req.session.user == undefined)) {
                 const personId = req.cookies.personId || '003379';
                 const condition = {
-                    statement: `shcc=:personId OR studentId=:personId OR email=:personId`,
+                    statement: 'shcc=:personId OR studentId=:personId OR email=:personId',
                     parameter: { personId }
                 };
                 app.model.fwUser.get(condition, (error, user) => {
                     if (error || user == null) {
-                        res.send({ error: `System has errors!` });
+                        res.send({ error: 'System has errors!' });
                     } else {
                         app.updateSessionUser(req, user, sessionUser => checkPermissions(req, res, next, permissions));
                     }
@@ -155,7 +155,7 @@ module.exports = app => {
                 const personId = req.cookies.personId || '003379';
                 app.model.fwUser.get({ shcc: personId }, (error, user) => {
                     if (error || user == null) {
-                        res.send({ error: `System has errors!` });
+                        res.send({ error: 'System has errors!' });
                     } else {
                         app.updateSessionUser(req, user, sessionUser => responseWithPermissions(req, success, fail, permissions));
                     }
@@ -249,7 +249,7 @@ module.exports = app => {
             if (permissionHookContainer[type]) {
                 permissionHookContainer[type][name] = hook;
             } else {
-                console.log('Invalid hook type!')
+                console.log('Invalid hook type!');
             }
         },
         remove: (type, name) => {

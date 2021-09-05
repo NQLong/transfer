@@ -35,12 +35,12 @@ class FileModal extends React.Component {
             nameDisplay: $('#nameDisplay').val(),
             note: $('#note').val(),
             active: 1
-        }
+        };
         const value = this.fileBox.current.getFileState();
         if (!body.nameDisplay) {
             T.alert('Vui lòng điền tên hiện thị', 'error', false, 2000);
         } else if (!value && !this.state.id) {
-            T.alert(`Bạn chưa đính kèm tệp tin, vui lòng kiểm tra lại`, 'error', false, 2000);
+            T.alert('Bạn chưa đính kèm tệp tin, vui lòng kiểm tra lại', 'error', false, 2000);
         } else {
             if (this.state.id) {
                 delete body.id;

@@ -11,7 +11,7 @@ class EditFooterModal extends React.Component {
     };
 
     show = menu => {
-        let { title, link, active, header, id } = menu || { title: `{ "vi": "", "en": "" }`, link: '', active: false, header: false, id: '' };
+        let { title, link, active, header, id } = menu || { title: '{ "vi": "", "en": "" }', link: '', active: false, header: false, id: '' };
         $('#submenuViTitle').val(JSON.parse(title).vi);
         $('#submenuEnTitle').val(JSON.parse(title).en);
         $('#submenuLink').val(link);
@@ -30,7 +30,7 @@ class EditFooterModal extends React.Component {
                 active: this.state.active ? 1 : 0,
                 header: this.state.header ? 1 : 0,
             };
-        if (!!id) {
+        if (id) {
             this.props.update(id, changes);
         } else {
             this.props.create(changes);
@@ -174,10 +174,10 @@ class SettingsPage extends React.Component {
             $(this.emailPassword1.current).focus();
         } else if (emailPassword2 == '') {
             T.notify('Vui lòng nhập lại mật khẩu mới của email!', 'danger');
-            $(this.emailPassword2.current)
+            $(this.emailPassword2.current);
         } else if (emailPassword1 != emailPassword2) {
             T.notify('Mật khẩu mới của email không trùng nhau!', 'danger');
-            $(this.emailPassword1.current)
+            $(this.emailPassword1.current);
         } else {
             this.props.saveSystemState({ password: emailPassword1 });
             $(this.emailPassword1.current).val('');

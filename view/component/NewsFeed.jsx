@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getNewsFeed } from 'modules/_default/fwNews/redux'
+import { getNewsFeed } from 'modules/_default/fwNews/redux';
 import { getEventFeed } from 'modules/_default/fwEvent/redux';
 import { getJobFeed } from 'modules/_default/fwJob/redux';
 import { Link } from 'react-router-dom';

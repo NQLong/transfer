@@ -18,7 +18,7 @@ module.exports = app => {
     // Send email test
     app.post('/api/inews/test', (req, res) => {
         const { mailFrom, mailFromPassword, mailTo, mailCc, mailSubject, mailText, mailHtml, mailAttachments } = req.body;
-        app.email.sendEmail(mailFrom, mailFromPassword, mailTo, mailCc, mailSubject, mailText, mailHtml, mailAttachments, () => { console.log('mail sent'); res.send({ success: true }) }, (error) => res.send({ error }));
+        app.email.sendEmail(mailFrom, mailFromPassword, mailTo, mailCc, mailSubject, mailText, mailHtml, mailAttachments, () => { console.log('mail sent'); res.send({ success: true }); }, (error) => res.send({ error }));
     });
 
     app.get('/api/inews/page/:pageNumber/:pageSize', app.permission.check('inews:read'), (req, res) => {
@@ -26,14 +26,14 @@ module.exports = app => {
             pageSize = parseInt(req.params.pageSize);
         app.model.fwInews.getPage(pageNumber, pageSize, (error, page) => {
             res.send({ error, page });
-        })
+        });
     });
 
     app.get('/api/inews/item/:inewsId', app.permission.check('inews:read'), (req, res) => {
         const { inewsId } = req.params;
         app.model.fwInews.get({ id: inewsId }, (error, item) => {
             if (error) {
-                res.send({ error })
+                res.send({ error });
             } else {
                 app.model.fwInewsItem.getAll({ inewsId }, '*', 'priority DESC', (error, list) => {
                     if (error) {
@@ -108,8 +108,8 @@ module.exports = app => {
             console.log('Hook: uploadINewsImage => iNews image upload');
             app.uploadComponentImage(req, 'iNews', null, fields.userData[0].substring(6), files.INewsImage[0].path, done);
         }
-    }
+    };
 
     app.uploadHooks.add('uploadINewsImage', (req, fields, files, params, done) =>
         app.permission.has(req, () => uploadINewsImage(req, fields, files, params, done), done, 'component:write'));
-}
+};

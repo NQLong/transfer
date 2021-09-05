@@ -140,5 +140,5 @@ module.exports = app => {
             app.dbConnection.execute('BEGIN dv_website_gioi_thieu_swap_thu_tu(:pId, :pIsMoveUp, :pMadonvi); END;',
                 { pId, pIsMoveUp, pMadonvi }, done);
         },
-    }
-}
+    };
+};

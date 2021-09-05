@@ -32,7 +32,7 @@ export default function dmDoiTuongMghpReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -58,12 +58,12 @@ export function getDmDoiTuongMghpPage(pageNumber, pageSize, pageCondition, done)
                 dispatch({ type: DmDoiTuongMghpGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách đối tượng bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmDoiTuongMghpAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/doi-tuong-mghp/all`;
+        const url = '/api/danh-muc/doi-tuong-mghp/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách đối tượng bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -73,7 +73,7 @@ export function getDmDoiTuongMghpAll(done) {
                 dispatch({ type: DmDoiTuongMghpGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách đối tượng bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmDoiTuongMghp(ma, done) {
@@ -87,7 +87,7 @@ export function getDmDoiTuongMghp(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmDoiTuongMghp(dmDoiTuongMGHP, done) {
@@ -102,7 +102,7 @@ export function createDmDoiTuongMghp(dmDoiTuongMGHP, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo mới một đối tượng bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function updateDmDoiTuongMghp(ma, changes, done) {
@@ -117,12 +117,12 @@ export function updateDmDoiTuongMghp(ma, changes, done) {
                 dispatch(getDmDoiTuongMghpAll());
             }
         }, error => T.notify('Cập nhật dữ liệu đối tượng MGHP bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function deleteDmDoiTuongMghp(ma, done) {
     return dispatch => {
-        const url = `/api/danh-muc/doi-tuong-mghp`;
+        const url = '/api/danh-muc/doi-tuong-mghp';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa đối tượng bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -133,5 +133,5 @@ export function deleteDmDoiTuongMghp(ma, done) {
             }
             done && done();
         }, error => T.notify('Xóa châu bị lỗi!', 'danger'));
-    }
+    };
 }

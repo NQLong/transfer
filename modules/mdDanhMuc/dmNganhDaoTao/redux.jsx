@@ -32,7 +32,7 @@ export default function dmNganhDaoTaoReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -44,7 +44,7 @@ export default function dmNganhDaoTaoReducer(state = null, data) {
 // Actions ------------------------------------------------------------------------------------------------------------
 export function getDmNganhDaoTaoAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/nganh-dao-Tao/all`;
+        const url = '/api/danh-muc/nganh-dao-Tao/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách ngành đào tạo bị lỗi', 'danger');
@@ -53,8 +53,8 @@ export function getDmNganhDaoTaoAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmNganhDaoTaoGetAll, items: data.items ? data.items : [] });
             }
-        })
-    }
+        });
+    };
 }
 
 T.initPage('pageDmNganhDaoTao');
@@ -71,13 +71,13 @@ export function getDmNganhDaoTaoPage(pageNumber, pageSize, pageCondition, done) 
                 if (done) done(data.page);
                 dispatch({ type: DmNganhDaoTaoGetPage, page: data.page });
             }
-        })
-    }
+        });
+    };
 }
 
 export function createDmNganhDaoTao(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/nganh-dao-Tao`;
+        const url = '/api/danh-muc/nganh-dao-Tao';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo ngành đào tạo bị lỗi!', 'danger');
@@ -86,13 +86,13 @@ export function createDmNganhDaoTao(item, done) {
                 if (done) done(data.items);
                 dispatch(getDmNganhDaoTaoPage());
             }
-        })
-    }
+        });
+    };
 }
 
 export function deleteDmNganhDaoTao(_id) {
     return dispatch => {
-        const url = `/api/danh-muc/nganh-dao-Tao`;
+        const url = '/api/danh-muc/nganh-dao-Tao';
         T.delete(url, { _id }, data => {
             if (data.error) {
                 T.notify('Xóa ngành đào tạo bị lỗi!', 'danger');
@@ -102,12 +102,12 @@ export function deleteDmNganhDaoTao(_id) {
                 dispatch(getDmNganhDaoTaoPage());
             }
         }, error => T.notify('Xóa ngành đào tạo bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDmNganhDaoTao(_id, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/nganh-dao-Tao`;
+        const url = '/api/danh-muc/nganh-dao-Tao';
         T.put(url, { _id, changes }, data => {
             if (data.error) {
                 T.notify('Cập nhật ngành đào tạo bị lỗi!', 'danger');
@@ -119,7 +119,7 @@ export function updateDmNganhDaoTao(_id, changes, done) {
                 dispatch(getDmNganhDaoTaoPage());
             }
         }, error => T.notify('Cập nhật thông tin ngành đào tạo bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmNganhDaoTao(ma, done) {
@@ -133,7 +133,7 @@ export function getDmNganhDaoTao(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function changeDmNganhDaoTao(item) {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getWebsiteGioiThieuAll, getWebsiteGioiThieu } from './reduxWebsiteGioiThieu'
-import { getDvWebsite } from './redux'
+import { getWebsiteGioiThieuAll, getWebsiteGioiThieu } from './reduxWebsiteGioiThieu';
+import { getDvWebsite } from './redux';
 
 class GioiThieuSection extends React.Component {
     constructor(props) {
@@ -21,12 +21,12 @@ class GioiThieuSection extends React.Component {
 
     render() {
         const gioiThieu = this.state.gioiThieu ? this.state.gioiThieu : [];
-        var title_list = [];
-        var content_list = [];
-        var carousel = [];
+        let title_list = [];
+        let content_list = [];
+        let carousel = [];
         gioiThieu.map((item, index) => {
             title_list.push(<li key={index} className={(item.trongSo == 1 ? 'col-5' : 'col-10') + ' text-center border gtkhoa-cate gtkhoa-cate-1'} role='presentation'><button href={'#' + index} aria-controls='first' role='tab'
-                data-toggle='tab' className={index == 0 ? 'active' : ''}>{T.language.parse(item.ten)}</button></li>)
+                data-toggle='tab' className={index == 0 ? 'active' : ''}>{T.language.parse(item.ten)}</button></li>);
             content_list.push(
                 <div key={index} className={index == 0 ? 'tab-pane fade in active show' : 'tab-pane fade'} id={index} role='tabpanel'>
                     <div dangerouslySetInnerHTML={{ __html: T.language.parse(item.noiDung) }} className='row' />
@@ -81,7 +81,7 @@ class GioiThieuSection extends React.Component {
                         </div>
                     </div>
                 </div>
-            )
+            );
         });
 
         return (

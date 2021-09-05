@@ -33,7 +33,7 @@ module.exports = app => {
                                 app.model.fwDraft.update({ id: item.id }, { image }, done);
                             }
                         });
-                    })
+                    });
                 }
             }
         });
@@ -105,7 +105,7 @@ module.exports = app => {
                                     });
                                 }
 
-                            })
+                            });
                         } else {
                             app.model.fwNews.create2(news, (error, item) => {
                                 if (error) {
@@ -189,4 +189,4 @@ module.exports = app => {
         });
     };
     app.model.fwDraft.userGet = (documentType, editorId, done) => app.model.fwDraft.getAll({ editorId, documentType }, done);
-}
+};

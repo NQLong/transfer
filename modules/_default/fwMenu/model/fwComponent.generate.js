@@ -135,5 +135,5 @@ module.exports = app => {
             app.dbConnection.execute('BEGIN :ret:=component_create_new(:className, :style, :viewType, :viewId, :detail); END;',
                 { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, className, style, viewType, viewId, detail }, done);
         },
-    }
-}
+    };
+};

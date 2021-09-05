@@ -39,7 +39,7 @@ module.exports = app => {
     });
 
     app.post('/api/form', app.permission.check('form:write'), (req, res) => app.model.fwForm.createWithPriority(req.body.data, (error, item) => {
-        res.send({ error, item })
+        res.send({ error, item });
     }));
 
     app.post('/api/form-duplicate/:id', app.permission.check('form:write'), (req, res) => {
@@ -75,7 +75,7 @@ module.exports = app => {
                                     res.send({ error, item });
                                 });
                             }
-                        })
+                        });
                     }
                 });
             }
@@ -113,7 +113,7 @@ module.exports = app => {
             pageCondition = req.query.pageCondition ? req.query.pageCondition : {};
         pageCondition.active = true;
         app.model.fwForm.getPage(pageNumber, pageSize, pageCondition, (error, page) => {
-            res.send({ error, page })
+            res.send({ error, page });
         });
     });
 
@@ -135,7 +135,7 @@ module.exports = app => {
             } else if (!item) {
                 res.send({ error: 'Invalid form id!' });
             } else {
-                res.send({ error, item })
+                res.send({ error, item });
             }
         });
     });
@@ -155,7 +155,7 @@ module.exports = app => {
         const formId = req.params.formId;
         app.model.fwQuestion.getAll({ formId }, '*', 'priority DESC', (error, list) => {
             res.send({ error, list });
-        })
+        });
     });
 
     app.get('/api/questions/:formId', app.permission.check('form:read'), (req, res) => {

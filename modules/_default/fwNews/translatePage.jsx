@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getTranslateDraftNewsInPage, updateTranslateDraftNews } from './redux'
+import { getTranslateDraftNewsInPage, updateTranslateDraftNews } from './redux';
 import { Link } from 'react-router-dom';
 import Pagination from 'view/component/Pagination';
 

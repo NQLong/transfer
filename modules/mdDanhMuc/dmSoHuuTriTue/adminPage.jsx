@@ -47,7 +47,7 @@ class EditModal extends React.Component {
                 ten: this.getValue(this.ten.current),
                 ghiChu: this.getValue(this.ghiChu.current),
                 kichHoat: this.getValue(this.kichHoat.current)
-            }
+            };
             const done = (error) => {
                 this.setState({ btnSaveLoading: false }, () => {
                     !error && $(this.modal.current).modal('hide');

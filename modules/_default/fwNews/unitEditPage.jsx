@@ -30,7 +30,7 @@ class UnitNewsEditPage extends React.Component {
     }
     componentDidUpdate() {
         $(this.DonVi.current).on('change', e => {
-            let donVi = e.target.selectedOptions[0] && e.target.selectedOptions[0].value || null
+            let donVi = e.target.selectedOptions[0] && e.target.selectedOptions[0].value || null;
             if (donVi != this.state.donVi) this.setState({ donVi });
         });
     }
@@ -123,7 +123,7 @@ class UnitNewsEditPage extends React.Component {
             displayCover: this.state.item.displayCover ? 1 : 0,
             maDonVi: this.state.donVi,
 
-        }
+        };
 
         if ($('#neNewsEnTitle').val() && $('#neNewsEnAbstract').val() && $('#neNewsEnAbstract').val()) {
             newDraft.isTranslated = 'done';
@@ -134,7 +134,7 @@ class UnitNewsEditPage extends React.Component {
 
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [];
-        const isAdmin = currentPermissions.includes('unit:write') && currentPermissions.includes('news:write')
+        const isAdmin = currentPermissions.includes('unit:write') && currentPermissions.includes('news:write');
         const readOnly = !currentPermissions.includes('unit:write') && !isAdmin;
         const item = this.state.item ? this.state.item : {
             priority: 1, categories: [], title: '', content: '', image: T.url('/image/avatar.png'),
@@ -235,7 +235,7 @@ class UnitNewsEditPage extends React.Component {
                             <div className='tile-body'>
                                 <div className='form-group'>
                                     <label className='control-label'>Link mặc định</label><br />
-                                    <a href={linkDefaultNews} style={{ fontWeight: 'bold' }} target='_blank'>{linkDefaultNews}</a>
+                                    <a href={linkDefaultNews} style={{ fontWeight: 'bold' }} target='_blank' rel="noreferrer">{linkDefaultNews}</a>
                                 </div>
                                 <div className='form-group'>
                                     <label className='control-label'>Link truyền thông</label><br />

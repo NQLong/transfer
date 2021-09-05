@@ -10,7 +10,7 @@ export function createQtHuongDanLVStaff(data, done) {
                 if (done) done(res);
             }
         }, error => T.notify('Thêm thông tin quá trình hướng dẫn luận văn bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function updateQtHuongDanLVStaff(id, changes, done) {
@@ -25,7 +25,7 @@ export function updateQtHuongDanLVStaff(id, changes, done) {
                 if (done) done();
             }
         }, error => T.notify('Cập nhật thông tin quá trình hướng dẫn luận văn bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function deleteQtHuongDanLVStaff(id, done) {
@@ -40,7 +40,7 @@ export function deleteQtHuongDanLVStaff(id, done) {
                 if (done) done();
             }
         }, error => T.notify('Xóa thông tin quá trình hướng dẫn luận văn bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function createQtHuongDanLVStaffUser(data, done) {
@@ -55,7 +55,7 @@ export function createQtHuongDanLVStaffUser(data, done) {
                 if (done) done(res);
             }
         }, error => T.notify('Thêm thông tin quá trình hướng dẫn luận văn bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function updateQtHuongDanLVStaffUser(id, changes, done) {
@@ -70,7 +70,7 @@ export function updateQtHuongDanLVStaffUser(id, changes, done) {
                 if (done) done();
             }
         }, error => T.notify('Cập nhật thông tin quá trình hướng dẫn luận văn bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function deleteQtHuongDanLVStaffUser(id, done) {
@@ -82,8 +82,8 @@ export function deleteQtHuongDanLVStaffUser(id, done) {
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
                 T.alert('Thông tin quá trình hướng dẫn luận văn được xóa thành công!', 'info', false, 800);
-                done && done()
+                done && done();
             }
         }, error => T.notify('Xóa thông tin quá trình hướng dẫn luận văn bị lỗi' , 'danger'));
-    }
+    };
 }

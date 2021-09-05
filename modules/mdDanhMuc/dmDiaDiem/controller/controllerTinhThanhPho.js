@@ -20,7 +20,7 @@ module.exports = app => {
             condition = {
                 statement: 'lower(ma) LIKE :searchText OR lower(ten) LIKE :searchText',
                 parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
-            }
+            };
         }
         app.model.dmTinhThanhPho.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
     });
@@ -35,9 +35,9 @@ module.exports = app => {
     app.post('/api/danh-muc/tinh-thanh-pho/multiple', app.permission.check('dmTinhThanhPho:write'), (req, res) => {
         const data = req.body.multiDMTinhThanhPho;
         const isOverride = req.body.isOverride;
-        const dataImported = []
+        const dataImported = [];
         const handleCreate = index => {
-            if (index >= data.length) res.send({ data: { message: 'Upload success', items: dataImported } })
+            if (index >= data.length) res.send({ data: { message: 'Upload success', items: dataImported } });
             else
                 app.model.dmTinhThanhPho.get({ ma: data[index].ma }, (error, item) => {
                     if (error) res.send({ error });
@@ -59,7 +59,7 @@ module.exports = app => {
                             handleCreate(index + 1);
                         }
                     });
-                })
+                });
         };
         handleCreate(0);
     });

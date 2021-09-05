@@ -32,7 +32,7 @@ export default function dmNhomTaiSanCoDinhReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -44,7 +44,7 @@ export default function dmNhomTaiSanCoDinhReducer(state = null, data) {
 // Actions ------------------------------------------------------------------------------------------------------------
 export function getdmNhomTaiSanCoDinhAll(condition, done) {
     return dispatch => {
-        const url = `/api/danh-muc/nhom-tai-san-co-dinh/all`;
+        const url = '/api/danh-muc/nhom-tai-san-co-dinh/all';
         T.get(url, { condition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách nhóm tài sản cố đinh bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -54,7 +54,7 @@ export function getdmNhomTaiSanCoDinhAll(condition, done) {
                 dispatch({ type: DmNhomTaiSanCoDinhGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách nhóm tài sản cố đinh bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 T.initPage('dmNhomTaiSanCoDinh');
@@ -72,7 +72,7 @@ export function getDmNhomTaiSanCoDinhPage(pageNumber, pageSize, pageCondition, d
                 dispatch({ type: DmNhomTaiSanCoDinhGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách nhóm tài sản cố đinh bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmNhomTaiSanCoDinh(ma, done) {
@@ -88,12 +88,12 @@ export function getDmNhomTaiSanCoDinh(ma, done) {
         }, error => {
             console.error(`GET: ${url}.`, error);
         });
-    }
+    };
 }
 
 export function createDmNhomTaiSanCoDinh(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/nhom-tai-san-co-dinh`;
+        const url = '/api/danh-muc/nhom-tai-san-co-dinh';
         T.post(url, { item }, data => {
             if (data.error) {
                 if (data.error.errorNum == 1) {
@@ -105,12 +105,12 @@ export function createDmNhomTaiSanCoDinh(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo nhóm tài sản cố định bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function deleteDmNhomTaiSanCoDinh(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/nhom-tai-san-co-dinh`;
+        const url = '/api/danh-muc/nhom-tai-san-co-dinh';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục  bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -120,12 +120,12 @@ export function deleteDmNhomTaiSanCoDinh(ma) {
                 dispatch(getdmNhomTaiSanCoDinhPage());
             }
         }, error => T.notify('Xóa nhóm tài sản cố định bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function updateDmNhomTaiSanCoDinh(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/nhom-tai-san-co-dinh`;
+        const url = '/api/danh-muc/nhom-tai-san-co-dinh';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông nhóm tài sản cố định bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -136,7 +136,7 @@ export function updateDmNhomTaiSanCoDinh(ma, changes, done) {
                 dispatch(getDmNhomTaiSanCoDinhPage());
             }
         }, error => T.notify('Cập nhật thông tin nhóm tài sản cố định bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function changeDmNhomTaiSanCoDinh(item) {
@@ -148,4 +148,4 @@ export const SelectAdapter_DmNhomTaiSanCoDinh = {
     getAll: getdmNhomTaiSanCoDinhAll,
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
     condition: { kichHoat: 1 },
-}
+};

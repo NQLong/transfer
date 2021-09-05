@@ -13,7 +13,7 @@ class EditModal extends React.Component {
     componentDidMount() {
         $(document).ready(() => {
             $(this.modal.current).on('hidden.bs.modal', () => this.setState({ ma: null, isUpdate: false }));
-        })
+        });
         $('#inputmaChau').select2({
             ajax: {
                 url: '/api/danh-muc/chau/page/1/20',
@@ -29,10 +29,10 @@ class EditModal extends React.Component {
         if (item) this.setState({
             ma: item && item.ma ? item.ma : null,
             isUpdate: true
-        })
+        });
         else {
             item = {};
-            this.setState({ ma: null, isUpdate: false })
+            this.setState({ ma: null, isUpdate: false });
         }
         $('#inputma').val(item.ma ? item.ma : null);
         $('#inputten').val(item.ten ? item.ten : null);
@@ -132,7 +132,7 @@ class EditModal extends React.Component {
                     </div>
                 </form>
             </div>
-        )
+        );
     }
 }
 

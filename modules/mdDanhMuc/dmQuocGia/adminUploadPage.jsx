@@ -40,7 +40,7 @@ class EditModal extends React.Component {
                 maKhuVuc: $('#dmqgMaKhuVuc').val().trim().toUpperCase(),
                 tenKhac: $('#dmqgTenKhac').val().trim().toUpperCase(),
                 maCu: '',
-            }
+            };
 
         if (changes.maCode == '') {
             T.notify('Mã quốc gia bị trống!', 'danger');
@@ -64,7 +64,7 @@ class EditModal extends React.Component {
             let dataChanges = {
                 changes: changes,
                 maCode: maCode
-            }
+            };
             this.props.dataChanges(dataChanges);
             $(this.modal.current).modal('hide');
         }
@@ -150,7 +150,7 @@ class adminUploadPage extends React.Component {
                     if (data.maCode == item.maCode) {
                         indexDelete = index;
                     }
-                })
+                });
                 state.dmQuocGia.splice(indexDelete, 1);
                 return state;
             }));
@@ -167,7 +167,7 @@ class adminUploadPage extends React.Component {
                     data.maKhuVuc = dataEditModal.changes.maKhuVuc;
                     data.tenKhac = dataEditModal.changes.tenKhac;
                 }
-            })
+            });
             return state;
         });
     }

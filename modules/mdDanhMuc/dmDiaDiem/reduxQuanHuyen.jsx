@@ -32,7 +32,7 @@ export default function DmQuanHuyenReducer(state = null, data) {
 						}
 					}
 				}
-				return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+				return Object.assign({}, state, { items: updatedItems, page: updatedPage });
 			} else {
 				return null;
 			}
@@ -44,7 +44,7 @@ export default function DmQuanHuyenReducer(state = null, data) {
 // Actions ------------------------------------------------------------------------------------------------------------
 export function getDmQuanHuyenAll(done) {
 	return dispatch => {
-		const url = `/api/danh-muc/quan-huyen/all`;
+		const url = '/api/danh-muc/quan-huyen/all';
 		T.get(url, data => {
 			if (data.error) {
 				T.notify('Lấy danh sách quận huyện bị lỗi!', 'danger');
@@ -54,7 +54,7 @@ export function getDmQuanHuyenAll(done) {
 				dispatch({ type: DmQuanHuyenGetAll, items: data.items ? data.items : [] });
 			}
 		}, error => T.notify('Lấy danh sách quận huyện bị lỗi!', 'danger'));
-	}
+	};
 }
 
 T.initPage('dmQuanHuyen');
@@ -72,7 +72,7 @@ export function getDmQuanHuyenPage(pageNumber, pageSize, pageCondition, done) {
 				dispatch({ type: DmQuanHuyenGetPage, page: data.page });
 			}
 		}, error => T.notify('Lấy danh sách quận huyện bị lỗi!', 'danger'));
-	}
+	};
 }
 
 export function getDmQuanHuyen(ma, done) {
@@ -89,28 +89,28 @@ export function getDmQuanHuyen(ma, done) {
 		}, error => {
 			console.error(`GET: ${url}.`, error);
 		});
-	}
+	};
 }
 
 export function createDmQuanHuyen(item, done) {
 	return dispatch => {
-		const url = `/api/danh-muc/quan-huyen`;
+		const url = '/api/danh-muc/quan-huyen';
 		T.post(url, { item }, data => {
 			if (data.error) {
 				console.error(`POST: ${url}.`, data.error);
-				T.notify('Tạo thông tin quận huyện bị lỗi!', 'danger')
+				T.notify('Tạo thông tin quận huyện bị lỗi!', 'danger');
 			} else {
 				dispatch(getDmQuanHuyenPage());
 				if (done) done(data);
-				T.notify('Tạo thông tin quận huyện thành công!', 'success')
+				T.notify('Tạo thông tin quận huyện thành công!', 'success');
 			}
 		}, error => T.notify('Tạo thông tin quận huyện bị lỗi!', 'danger'));
-	}
+	};
 }
 
 export function deleteDmQuanHuyen(maQuanHuyen) {
 	return dispatch => {
-		const url = `/api/danh-muc/quan-huyen`;
+		const url = '/api/danh-muc/quan-huyen';
 		T.delete(url, { maQuanHuyen }, data => {
 			if (data.error) {
 				T.notify('Xóa thông tin quận huyện bị lỗi!', 'danger');
@@ -120,12 +120,12 @@ export function deleteDmQuanHuyen(maQuanHuyen) {
 				dispatch(getDmQuanHuyenPage());
 			}
 		}, error => T.notify('Xóa thông tin quận huyện bị lỗi!', 'danger'));
-	}
+	};
 }
 
 export function updateDmQuanHuyen(maQuanHuyen, changes, done) {
 	return dispatch => {
-		const url = `/api/danh-muc/quan-huyen`;
+		const url = '/api/danh-muc/quan-huyen';
 		T.put(url, { maQuanHuyen, changes }, data => {
 			if (data.error || changes == null) {
 				T.notify('Cập nhật thông quận huyện bị lỗi!', 'danger');
@@ -136,23 +136,23 @@ export function updateDmQuanHuyen(maQuanHuyen, changes, done) {
 				dispatch(getDmQuanHuyenPage());
 			}
 		}, error => T.notify('Cập nhật thông tin quận huyện bị lỗi!', 'danger'));
-	}
+	};
 }
 
 export function createDmQuanHuyenByUpload(item, done) {
 	return dispatch => {
-		const url = `/api/danh-muc/quan-huyen/createFromFile`;
+		const url = '/api/danh-muc/quan-huyen/createFromFile';
 		T.post(url, { item }, data => {
 			if (data.error) {
 				console.error(`POST: ${url}.`, data.error);
-				T.notify('Tạo thông tin quận huyện bị lỗi!', 'danger')
+				T.notify('Tạo thông tin quận huyện bị lỗi!', 'danger');
 			} else {
 				dispatch(getDmQuanHuyenPage());
 				if (done) done(data);
 				T.notify('Import dữ liệu thành công!', 'success');
 			}
 		}, error => T.notify('Tạo thông tin quận huyện bị lỗi!', 'danger'));
-	}
+	};
 }
 
 export function changeDmQuanHuyen(item) {
@@ -164,4 +164,4 @@ export const SelectAdapter_DmQuanHuyen = {
 	getAll: getDmQuanHuyenAll,
 	processResults: response => ({ results: response ? response.map(item => ({ value: item.maQuanHuyen, text: item.maQuanHuyen + ': ' + item.tenQuanHuyen, maTinhThanhPho: item.maTinhThanhPho })) : [] }),
 	condition: { kichHoat: 1 },
-}
+};

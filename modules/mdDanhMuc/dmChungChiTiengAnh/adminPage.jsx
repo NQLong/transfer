@@ -13,7 +13,7 @@ class EditModal extends React.Component {
     componentDidMount() {
         $(document).ready(() => setTimeout(() => {
             $(this.modal.current).on('shown.bs.modal', () => {
-                $(`a[href='#dmChungChiTiengAnhTabVi']`).tab('show');
+                $('a[href=\'#dmChungChiTiengAnhTabVi\']').tab('show');
                 $('#dmCCTATen').focus();
             });
         }, 250));
@@ -40,7 +40,7 @@ class EditModal extends React.Component {
                 ten: $('#dmCCTATen').val().trim(),
                 moTa: JSON.stringify({ vi: this.editorVi.current.html(), en: this.editorEn.current.html() }),
                 kichHoat: Number(this.state.kichHoat),
-            }
+            };
 
         if (changes.ten == '') {
             T.notify('Tên chứng chỉ tiếng Anh bị trống!', 'danger');

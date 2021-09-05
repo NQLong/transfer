@@ -32,7 +32,7 @@ export default function dmLoaiTaiSanCoDinhReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -44,7 +44,7 @@ export default function dmLoaiTaiSanCoDinhReducer(state = null, data) {
 // Actions ------------------------------------------------------------------------------------------------------------
 export function getDmLoaiTaiSanCoDinhAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/loai-tai-san-co-dinh/all`;
+        const url = '/api/danh-muc/loai-tai-san-co-dinh/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách loại tài sản cố định bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -54,7 +54,7 @@ export function getDmLoaiTaiSanCoDinhAll(done) {
                 dispatch({ type: DmLoaiTaiSanCoDinhGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách loại tài sản cố định bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 T.initPage('dmLoaiTaiSanCoDinh', true);
@@ -72,7 +72,7 @@ export function getDmLoaiTaiSanCoDinhPage(pageNumber, pageSize, pageCondition, d
                 dispatch({ type: DmLoaiTaiSanCoDinhGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách loại tài sản cố định bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmLoaiTaiSanCoDinh(ma, done) {
@@ -88,12 +88,12 @@ export function getDmLoaiTaiSanCoDinh(ma, done) {
         }, error => {
             console.error(`GET: ${url}.`, error);
         });
-    }
+    };
 }
 
 export function createDmLoaiTaiSanCoDinh(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/loai-tai-san-co-dinh`;
+        const url = '/api/danh-muc/loai-tai-san-co-dinh';
         T.post(url, { item }, data => {
             if (data.error) {
                 if (data.error.errorNum == 1) {
@@ -105,12 +105,12 @@ export function createDmLoaiTaiSanCoDinh(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo loại tài sản cố định bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function deleteDmLoaiTaiSanCoDinh(ma, done) {
     return dispatch => {
-        const url = `/api/danh-muc/loai-tai-san-co-dinh`;
+        const url = '/api/danh-muc/loai-tai-san-co-dinh';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục  bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -121,12 +121,12 @@ export function deleteDmLoaiTaiSanCoDinh(ma, done) {
             }
             done && done();
         }, error => T.notify('Xóa loại tài sản cố định bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function updateDmLoaiTaiSanCoDinh(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/loai-tai-san-co-dinh`;
+        const url = '/api/danh-muc/loai-tai-san-co-dinh';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông loại tài sản cố định bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -137,7 +137,7 @@ export function updateDmLoaiTaiSanCoDinh(ma, changes, done) {
                 dispatch(getDmLoaiTaiSanCoDinhPage());
             }
         }, error => T.notify('Cập nhật thông tin loại tài sản cố định bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export const SelectAdapter_DmLoaiTaiSanCoDinh = {

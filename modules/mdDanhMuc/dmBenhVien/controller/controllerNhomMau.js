@@ -18,11 +18,11 @@ module.exports = app => {
     });
 
     app.get('/api/danh-muc/nhom-mau/all', app.permission.check('user:login'), (req, res) => {
-        app.model.dmNhomMau.getAll({}, '*', 'ma', (error, items) => res.send({ error, items }))
+        app.model.dmNhomMau.getAll({}, '*', 'ma', (error, items) => res.send({ error, items }));
     });
 
     app.get('/api/danh-muc/nhom-mau/item/:ma', app.permission.check('user:login'), (req, res) => {
-        app.model.dmNhomMau.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }))
+        app.model.dmNhomMau.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
     });
 
     app.post('/api/danh-muc/nhom-mau', app.permission.check('dmNhomMau:write'), (req, res) => {
@@ -39,7 +39,7 @@ module.exports = app => {
     });
 
     app.put('/api/danh-muc/nhom-mau', app.permission.check('dmNhomMau:write'), (req, res) => {
-        app.model.dmNhomMau.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }))
+        app.model.dmNhomMau.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
     app.delete('/api/danh-muc/nhom-mau', app.permission.check('dmNhomMau:delete'), (req, res) => {

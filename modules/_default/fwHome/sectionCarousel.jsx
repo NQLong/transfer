@@ -48,7 +48,7 @@ class SectionCarousel extends React.Component {
                 });
                 T.ftcoAnimate();
             }, 250);
-        })
+        });
     }
 
     render() {
@@ -57,7 +57,7 @@ class SectionCarousel extends React.Component {
                 {this.state.items ? this.state.items.map((item, index) => (
                     <div key={index} className='item'>
                         {item.link && item.link.includes('http') ?
-                            <a target='_blank' href={item.link}>
+                            <a target='_blank' href={item.link} rel="noreferrer">
                                 <img src={item.image} alt='' />
                             </a> :
                             <Link to={item.link}>
@@ -80,7 +80,7 @@ class SectionCarousel extends React.Component {
                     </div>
                 )) : ''}
             </div>
-        )
+        );
     }
 }
 

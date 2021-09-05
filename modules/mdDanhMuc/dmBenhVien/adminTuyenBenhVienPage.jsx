@@ -10,7 +10,7 @@ class EditModal extends React.Component {
     componentDidMount() {
         $(document).ready(() => {
             $(this.modal.current).on('shown.bs.modal', () => $('#dmTuyenBenhVienMa').focus());
-        })
+        });
     }
 
     show = (item) => {
@@ -39,7 +39,7 @@ class EditModal extends React.Component {
             T.notify('Tên tuyến bệnh viện bị trống!', 'danger');
             $('#dmTuyenBenhVienTen').focus();
         } else if (changes.ma.length != 2) {
-            this.setState({ visible: true })
+            this.setState({ visible: true });
         } else {
             if (maTuyenBenhVien) {
                 this.props.update(maTuyenBenhVien, changes);
@@ -90,7 +90,7 @@ class EditModal extends React.Component {
                     </div>
                 </form>
             </div>
-        )
+        );
     }
 }
 

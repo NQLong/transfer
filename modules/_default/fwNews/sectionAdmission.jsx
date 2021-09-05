@@ -65,7 +65,7 @@ class SectionAdmission extends React.Component {
                             return (<div key={index} className='col-12 row ml-0 ml-lg-3 px-0 pb-2 mb-3 text-justify' style={(index !== admissionList.slice(1).length - 1) ? { borderBottom: 'dashed 1px #dacaba' } : {}}>
                                 <div className='col-1 p-1 d-flex justify-content-center align-items-center homeIndex' style={{ color: '#676767' }}><i className='fa fa-circle' /></div>
                                 <Link className='col-11 d-flex align-items-center' to={link}><h6 className='homeBody' style={{ color: '#676767', margin: 0 }}><b>{item.isTranslate == 1 ? T.language.parse(item.title) : T.language.parse(item.title, true)[item.language]}</b></h6></Link>
-                            </div>)
+                            </div>);
                         })}
                         <div className='d-flex justify-content-center'>
                             <Link to={detail.linkSeeAll} className='btn btn-lg btn-outline-dark px-5 viewAll' style={{ borderRadius: 0 }}>{viewAll}</Link>

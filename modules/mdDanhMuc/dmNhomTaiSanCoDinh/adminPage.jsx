@@ -41,7 +41,7 @@ class EditModal extends React.Component {
                 ma: $('#dmNhomTaiSanCoDinhMa').val().trim(),
                 ngayBienBan: ngayBienBanDate.getTime(),
                 daIn: $('#dmNhomTaiSanCoDinhDaIn').val().trim(),
-            }
+            };
 
         if (changes.ma == '') {
             T.notify('Mã nhóm tài sản cố định bị trống!', 'danger');

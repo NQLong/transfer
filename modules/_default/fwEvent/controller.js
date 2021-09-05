@@ -163,7 +163,7 @@ module.exports = app => {
                     res.send({ error, item });
                 });
         } else {
-            res.send({ eror: 'Bugs' })
+            res.send({ eror: 'Bugs' });
         }
     });
 
@@ -200,7 +200,7 @@ module.exports = app => {
     app.delete('/api/event', app.permission.check('staff:login'), (req, res) => {
         let permissions = req.session.user.permissions;
         if (permissions.includes('event:write') || permissions.includes('website:write')) {
-            app.model.fwEvent.delete2({ id: req.body.id }, error => res.send({ error }))
+            app.model.fwEvent.delete2({ id: req.body.id }, error => res.send({ error }));
         } else {
             res.send({ error: 'you do not have permission' });
         }
@@ -230,7 +230,7 @@ module.exports = app => {
                     });
                 });
             }
-        })
+        });
     });
     app.get('/api/draft-event/item/:eventId', app.permission.check('event:draft'), (req, res) => {
         app.model.fwCategory.getAll({ type: 'event', active: 1 }, (error, categories) => {
@@ -254,9 +254,9 @@ module.exports = app => {
             user = req.session.user;
 
         const condition = {
-            statement: `ACTIVE = :active AND (START_POST <= :startPost OR STOP_POST >= :stopPost)`,
+            statement: 'ACTIVE = :active AND (START_POST <= :startPost OR STOP_POST >= :stopPost)',
             parameter: { active: 1, startPost: today, stopPost: today }
-        }
+        };
 
         if (!user) {
             condition.statement += ' AND IS_INTERNAL = :isInternal';
@@ -277,10 +277,10 @@ module.exports = app => {
     });
 
     app.get('/event/item/id/:eventId', (req, res) => app.model.fwEvent.readById(req.params.eventId, (error, item) => {
-        res.send({ error, item })
+        res.send({ error, item });
     }));
     app.get('/event/item/link/:link', (req, res) => app.model.fwEvent.readByLink(req.params.link, (error, item) => {
-        res.send({ error, item })
+        res.send({ error, item });
     }));
 
     app.put('/event/item/check-link', (req, res) => app.model.fwEvent.getByLink(req.body.link, (error, item) => {

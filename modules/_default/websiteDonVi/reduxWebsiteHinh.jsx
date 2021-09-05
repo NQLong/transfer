@@ -35,7 +35,7 @@ export default function WebsiteReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -59,7 +59,7 @@ export function getWebsiteHinhAll(maDonVi, done) {
                 dispatch({ type: WebsiteHinhGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách hình website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getWebsiteHinh(ma, done) {
@@ -73,12 +73,12 @@ export function getWebsiteHinh(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createWebsiteHinh(item, done) {
     return dispatch => {
-        const url = `/api/website/image`;
+        const url = '/api/website/image';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo hình website đơn vị bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -89,12 +89,12 @@ export function createWebsiteHinh(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo hình website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
-    }
+    };
 }
 
 export function deleteWebsiteHinh(item) {
     return dispatch => {
-        const url = `/api/website/image`;
+        const url = '/api/website/image';
         T.delete(url, { ma: item.ma }, data => {
             if (data.error) {
                 T.notify('Xóa hình website đơn vị bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -104,12 +104,12 @@ export function deleteWebsiteHinh(item) {
                 dispatch(getWebsiteHinhAll(item.maDonVi));
             }
         }, error => T.notify('Xóa hình website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
-    }
+    };
 }
 
 export function updateWebsiteHinh(maDonVi, ma, changes, done) {
     return dispatch => {
-        const url = `/api/website/image`;
+        const url = '/api/website/image';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tin hình website đơn vị bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -121,7 +121,7 @@ export function updateWebsiteHinh(maDonVi, ma, changes, done) {
                 dispatch(getWebsiteHinhAll(maDonVi));
             }
         }, error => T.notify('Cập nhật thông tin hình website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
-    }
+    };
 }
 
 export function swapWebsiteHinh(maDonVi, ma, thuTu, isMoveUp, done) {
@@ -129,7 +129,7 @@ export function swapWebsiteHinh(maDonVi, ma, thuTu, isMoveUp, done) {
         const url = '/api/website/image/swap';
         T.put(url, { ma, thuTu, isMoveUp, maDonVi }, data => {
             if (data.error) {
-                T.notify('Thay đổi vị trí hình khoa bị lỗi!', 'danger')
+                T.notify('Thay đổi vị trí hình khoa bị lỗi!', 'danger');
                 console.error('PUT: ' + url + '. ' + data.error);
             } else {
 
@@ -138,7 +138,7 @@ export function swapWebsiteHinh(maDonVi, ma, thuTu, isMoveUp, done) {
 
             }
         }, error => T.notify('Thay đổi vị trí hình khoa bị lỗi!', 'danger'));
-    }
+    };
 }
 //User 
 
@@ -157,7 +157,7 @@ export function getWebsiteHinhDonVi(maDonVi, done) {
                 if (done) done(data.items);
             }
         }, error => T.notify('Lấy danh sách hình website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
-    }
+    };
 }
 
 export function changeWebsiteHinh(item) {

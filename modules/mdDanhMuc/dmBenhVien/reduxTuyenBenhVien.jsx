@@ -32,7 +32,7 @@ export default function dmTuyenBenhVienReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -58,12 +58,12 @@ export function getDmTuyenBenhVienPage(pageNumber, pageSize, pageCondition, done
                 dispatch({ type: DmTuyenBenhVienGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách tuyến bệnh viện bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmTuyenBenhVienAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/tuyen-benh-vien/all`;
+        const url = '/api/danh-muc/tuyen-benh-vien/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách tuyến bệnh viện bị lỗi!', 'danger');
@@ -73,7 +73,7 @@ export function getDmTuyenBenhVienAll(done) {
                 dispatch({ type: DmTuyenBenhVienGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách tuyến bệnh viện bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmTuyenBenhVien(ma, done) {
@@ -87,7 +87,7 @@ export function getDmTuyenBenhVien(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmTuyenBenhVien(dmTuyenBenhVien, done) {
@@ -103,7 +103,7 @@ export function createDmTuyenBenhVien(dmTuyenBenhVien, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo mới một tuyến bệnh viện bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDmTuyenBenhVien(ma, changes, done) {
@@ -119,12 +119,12 @@ export function updateDmTuyenBenhVien(ma, changes, done) {
                 dispatch(getDmTuyenBenhVienAll());
             }
         }, () => T.notify('Cập nhật dữ liệu tuyến bệnh viện bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteDmTuyenBenhVien(ma, done) {
     return dispatch => {
-        const url = `/api/danh-muc/tuyen-benh-vien`;
+        const url = '/api/danh-muc/tuyen-benh-vien';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa tuyến bệnh viện bị lỗi!', 'danger');
@@ -135,5 +135,5 @@ export function deleteDmTuyenBenhVien(ma, done) {
             }
             done && done();
         }, error => T.notify('Xóa tuyến bệnh viện bị lỗi!', 'danger'));
-    }
+    };
 }

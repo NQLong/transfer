@@ -210,6 +210,6 @@ class Category extends React.Component {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, category: state.category })
+const mapStateToProps = state => ({ system: state.system, category: state.category });
 const mapActionsToProps = { getAll, createCategory, swapCategory, updateCategory, deleteCategory, getDmDonVi };
 export default connect(mapStateToProps, mapActionsToProps)(Category);

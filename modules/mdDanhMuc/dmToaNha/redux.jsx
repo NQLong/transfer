@@ -32,7 +32,7 @@ export default function dmToaNhaReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -48,7 +48,7 @@ export function getDmToaNhaAll(condition, done) {
         condition = {};
     }
     return dispatch => {
-        const url = `/api/danh-muc/toa-nha/all`;
+        const url = '/api/danh-muc/toa-nha/all';
         T.get(url, { condition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách tòa nhà bị lỗi', 'danger');
@@ -57,8 +57,8 @@ export function getDmToaNhaAll(condition, done) {
                 if (done) done(data.items);
                 dispatch({ type: DmToaNhaGetAll, items: data.items ? data.items : [] });
             }
-        })
-    }
+        });
+    };
 }
 
 T.initPage('pageDmToaNha');
@@ -74,13 +74,13 @@ export function getDmToaNhaPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: DmToaNhaGetPage, page: data.page });
             }
-        })
-    }
+        });
+    };
 }
 
 export function createDmToaNha(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/toa-nha`;
+        const url = '/api/danh-muc/toa-nha';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo tòa nhà bị lỗi!', 'danger');
@@ -89,13 +89,13 @@ export function createDmToaNha(item, done) {
                 if (done) done(data.items);
                 dispatch(getDmToaNhaAll());
             }
-        })
-    }
+        });
+    };
 }
 
 export function deleteDmToaNha(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/toa-nha`;
+        const url = '/api/danh-muc/toa-nha';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa tòa nhà bị lỗi!', 'danger');
@@ -105,12 +105,12 @@ export function deleteDmToaNha(ma) {
                 dispatch(getDmToaNhaAll());
             }
         }, error => T.notify('Xóa tòa nhà bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDmToaNha(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/toa-nha`;
+        const url = '/api/danh-muc/toa-nha';
         T.put(url, { ma, changes }, data => {
             if (data.error) {
                 T.notify('Cập nhật tòa nhà bị lỗi!', 'danger');
@@ -121,7 +121,7 @@ export function updateDmToaNha(ma, changes, done) {
                 dispatch(getDmToaNhaAll());
             }
         }, error => T.notify('Cập nhật thông tin tòa nhà bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function changeDmToaNha(item) {

@@ -22,7 +22,7 @@ module.exports = app => {
             condition = {
                 statement,
                 parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
-            }
+            };
         }
         app.model.dmDanToc.getPage(pageNumber, pageSize, condition, '*', 'ma', (error, page) => res.send({ error, page }));
     });

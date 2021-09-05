@@ -24,11 +24,11 @@ module.exports = app => {
             const sql = 'INSERT INTO FW_ANSWER_RECORD (' + statement.substring(2) + ') VALUES (' + values.substring(2) + ')';
             app.dbConnection.executeMany(sql, parameter, (error, resultSet) => {
                 if (!error || !resultSet.rowsAffected) {
-                    done()
+                    done();
                 } else {
                     done(error ? error : 'Execute SQL command fail! Sql = ' + sql);
                 }
             });
         }
-    }
-}
+    };
+};

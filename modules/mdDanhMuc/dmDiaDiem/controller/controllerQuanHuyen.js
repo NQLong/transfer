@@ -23,7 +23,7 @@ module.exports = app => {
 			condition = {
 				statement: 'lower(tenQuanHuyen) LIKE :searchText',
 				parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
-			}
+			};
 		}
 		app.model.dmQuanHuyen.getPage(pageNumber, pageSize, condition, '*', 'maTinhThanhPho ASC, tenQuanHuyen ASC', (error, page) => res.send({ error, page }));
 	});
@@ -54,7 +54,7 @@ module.exports = app => {
 			autoCommit: true,
 			batchErrors: true
 		};
-		const sql = `INSERT INTO DM_QUAN_HUYEN (MA_QUAN_HUYEN, MA_TINH_THANH_PHO, TEN_QUAN_HUYEN, KICH_HOAT) VALUES (:maQuanHuyen, :maTinhThanhPho, :tenQuanHuyen, :kichHoat)`
+		const sql = 'INSERT INTO DM_QUAN_HUYEN (MA_QUAN_HUYEN, MA_TINH_THANH_PHO, TEN_QUAN_HUYEN, KICH_HOAT) VALUES (:maQuanHuyen, :maTinhThanhPho, :tenQuanHuyen, :kichHoat)';
 		app.dbConnection.executeMany(sql, dataUpload, options, (err, result) => {
 			res.send(result);
 		});

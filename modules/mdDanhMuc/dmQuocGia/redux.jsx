@@ -32,7 +32,7 @@ export default function DmQuocGiaReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -58,12 +58,12 @@ export function getDmQuocGiaPage(pageNumber, pageSize, pageCondition, done) {
                 dispatch({ type: DmQuocGiaGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách Quốc gia bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmQuocGiaAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/quoc-gia/all`;
+        const url = '/api/danh-muc/quoc-gia/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách Quốc gia bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -73,7 +73,7 @@ export function getDmQuocGiaAll(done) {
                 dispatch({ type: DmQuocGiaGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách Quốc gia bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmQuocGia(maCode, done) {
@@ -87,12 +87,12 @@ export function getDmQuocGia(maCode, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmQuocGia(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/quoc-gia`;
+        const url = '/api/danh-muc/quoc-gia';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo Quốc gia bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -102,12 +102,12 @@ export function createDmQuocGia(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo Quốc gia bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function updateDmQuocGia(maCode, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/quoc-gia`;
+        const url = '/api/danh-muc/quoc-gia';
         T.put(url, { maCode, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tin Quốc gia bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -118,13 +118,13 @@ export function updateDmQuocGia(maCode, changes, done) {
                 dispatch(getDmQuocGiaPage());
             }
         }, error => T.notify('Cập nhật thông tin Quốc gia bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function deleteDmQuocGia(maCode) {
     return dispatch => {
-        maCode
-        const url = `/api/danh-muc/quoc-gia`;
+        maCode;
+        const url = '/api/danh-muc/quoc-gia';
         T.delete(url, { maCode }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục Quốc gia bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -134,7 +134,7 @@ export function deleteDmQuocGia(maCode) {
                 dispatch(getDmQuocGiaPage());
             }
         }, error => T.notify('Xóa Quốc gia bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function changeDmQuocGia(item) {
@@ -143,7 +143,7 @@ export function changeDmQuocGia(item) {
 
 export function createDmQuocGiaByUpload(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/quoc-gia/createFromFile`;
+        const url = '/api/danh-muc/quoc-gia/createFromFile';
         T.post(url, { item }, data => {
             if (data.error) {
                 console.error(`POST: ${url}.`, data.error);
@@ -152,7 +152,7 @@ export function createDmQuocGiaByUpload(item, done) {
             if (done) done(data);
 
         }, error => T.notify('Tạo danh mục quốc gia bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export const SelectAdapter_DmQuocGia = {
@@ -162,4 +162,4 @@ export const SelectAdapter_DmQuocGia = {
     processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.maCode, text: `${item.maCode}: ${item.tenQuocGia}` })) : [] }),
     getOne: getDmQuocGia,
     processResultOne: response => response && ({ value: response.maCode, text: response.maCode + ': ' + response.tenQuocGia }),
-}
+};

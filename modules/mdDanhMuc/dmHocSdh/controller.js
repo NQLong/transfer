@@ -18,7 +18,7 @@ module.exports = app => {
             searchTerm = {
                 statement: 'lower(ma) LIKE :searchText OR lower(ten) LIKE :searchText',
                 parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
-            }
+            };
         }
         app.model.dmHocSdh.getPage(pageNumber, pageSize, searchTerm, (error, page) => {
             res.send({ error, page });
@@ -26,7 +26,7 @@ module.exports = app => {
     });
 
     app.get('/api/danh-muc/hoc-sdh/all', app.permission.check('staff:login'), (req, res) => {
-        app.model.dmHocSdh.getAll((error, items) => res.send({ error, items }))
+        app.model.dmHocSdh.getAll((error, items) => res.send({ error, items }));
     });
 
     app.get('/api/danh-muc/hoc-sdh/item/:ma', app.permission.check('dmHocSdh:read'), (req, res) => {
@@ -35,14 +35,14 @@ module.exports = app => {
 
     app.post('/api/danh-muc/hoc-sdh', app.permission.check('dmHocSdh:write'), (req, res) => {
         const changes = req.body.changes;
-        app.model.dmHocSdh.create(changes, (error, item) => { res.send({ error, item }) });
+        app.model.dmHocSdh.create(changes, (error, item) => { res.send({ error, item }); });
     });
 
     app.put('/api/danh-muc/hoc-sdh', app.permission.check('dmHocSdh:write'), (req, res) => {
         let newItem = req.body.changes;
         app.model.dmHocSdh.update({ ma: req.body.ma }, newItem, (error, item) => {
-            res.send({ error, item })
-        })
+            res.send({ error, item });
+        });
     });
 
     app.delete('/api/danh-muc/hoc-sdh', app.permission.check('dmHocSdh:write'), (req, res) => {

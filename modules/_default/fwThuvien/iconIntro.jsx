@@ -9,14 +9,14 @@ class SectionIntro extends React.Component {
         super(props);
         this.state = {
             featureItem: []
-        }
+        };
     }
     componentDidMount() {
-        this.props.getFeatureItemByUser(this.props.item.viewId, featureItem => { featureItem && this.setState({ featureItem }) });
+        this.props.getFeatureItemByUser(this.props.item.viewId, featureItem => { featureItem && this.setState({ featureItem }); });
     }
     onClick = (link) => {
         if (link && link.includes('http')) {
-            window.open(link, "_blank");
+            window.open(link, '_blank');
         } else if (link) {
             this.props.history.push(link);
         }
@@ -31,7 +31,7 @@ class SectionIntro extends React.Component {
                     style={{ fontWeight: '700', fontSize: 20, paddingLeft: 5, cursor: 'pointer' }}>
                     {T.language.parse(item.content, true).vi}
                 </div>
-            </div>))
+            </div>));
         return (
             <section data-aos='fade-up' className='row p-3'>
                 <div className='col-12 homeBorderLeft'>

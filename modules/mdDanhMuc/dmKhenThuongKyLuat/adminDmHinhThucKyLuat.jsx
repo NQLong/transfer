@@ -34,7 +34,7 @@ class EditModal extends React.Component {
                 ma: $('#dmHinhThucKyLuatMa').val().trim(),
                 ghiChu: $('#dmDonViGhiChu').val(),
                 kichHoat: this.state.active ? '1' : '0',
-            }
+            };
 
         if (changes.dienGiai == '') {
             T.notify('Tên Hình thức kỷ luật bị trống!', 'danger');

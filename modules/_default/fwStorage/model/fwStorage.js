@@ -5,4 +5,4 @@ module.exports = app => {
             app.model.fwStorage.delete(condition, done);
         });
     };
-}
+};

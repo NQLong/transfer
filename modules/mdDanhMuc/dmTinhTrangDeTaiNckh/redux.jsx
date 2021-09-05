@@ -32,7 +32,7 @@ export default function DmTinhTrangDeTaiNckhReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -56,12 +56,12 @@ export function getDmTinhTrangDeTaiNckhPage(pageNumber, pageSize, done) {
                 dispatch({ type: DmTinhTrangDeTaiNckhGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách tình trạng đề tài NCKH bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmTinhTrangDeTaiNckhAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/tinh-trang-de-tai-nckh/all`;
+        const url = '/api/danh-muc/tinh-trang-de-tai-nckh/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách tình trạng đề tài NCKH bị lỗi!', 'danger');
@@ -71,7 +71,7 @@ export function getDmTinhTrangDeTaiNckhAll(done) {
                 dispatch({ type: DmTinhTrangDeTaiNckhGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách tình trạng đề tài NCKH bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmTinhTrangDeTaiNckh(ma, done) {
@@ -85,12 +85,12 @@ export function getDmTinhTrangDeTaiNckh(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmTinhTrangDeTaiNckh(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/tinh-trang-de-tai-nckh`;
+        const url = '/api/danh-muc/tinh-trang-de-tai-nckh';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo tình trạng đề tài NCKH bị lỗi!', 'danger');
@@ -100,12 +100,12 @@ export function createDmTinhTrangDeTaiNckh(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo tình trạng đề tài NCKH bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteDmTinhTrangDeTaiNckh(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/tinh-trang-de-tai-nckh`;
+        const url = '/api/danh-muc/tinh-trang-de-tai-nckh';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục tình trạng đề tài NCKH bị lỗi!', 'danger');
@@ -115,12 +115,12 @@ export function deleteDmTinhTrangDeTaiNckh(ma) {
                 dispatch(getDmTinhTrangDeTaiNckhAll());
             }
         }, error => T.notify('Xóa tình trạng đề tài NCKH bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDmTinhTrangDeTaiNckh(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/tinh-trang-de-tai-nckh`;
+        const url = '/api/danh-muc/tinh-trang-de-tai-nckh';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tin tình trạng đề tài NCKH bị lỗi!', 'danger');
@@ -131,7 +131,7 @@ export function updateDmTinhTrangDeTaiNckh(ma, changes, done) {
                 dispatch(getDmTinhTrangDeTaiNckhAll());
             }
         }, error => T.notify('Cập nhật thông tin tình trạng đề tài NCKH bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function changeDmTinhTrangDeTaiNckh(item) {
@@ -145,7 +145,7 @@ export const SelectAdapter_DmTinhTrangDeTaiNckh = {
     processResults: data => ({ results: data && data.page && data.page.list ? data.page.list.map(item => ({ id: item.ma, text: item.ten })) : [] }),
     getOne: getDmTinhTrangDeTaiNckh,
     processResultOne: data => (data ? { value: data.ma, text: data.ma + ': ' + data.ten } : {})
-}
+};
 
 export const SelectAdapter_DmTinhTrangDeTaiNckhFilter = {
     ajax: true,
@@ -153,9 +153,9 @@ export const SelectAdapter_DmTinhTrangDeTaiNckhFilter = {
     data: params => ({ condition: params.term }),
     processResults: data => {
         const results = data && data.page && data.page.list ? data.page.list.map(item => ({ id: item.ma, text: `${item.ma}: ${item.ten}` })) : [];
-        results.unshift({ id: '00', text: 'Chọn tất cả' })
-        return { results }
+        results.unshift({ id: '00', text: 'Chọn tất cả' });
+        return { results };
     },
     getOne: getDmTinhTrangDeTaiNckh,
     processResultOne: data => (data ? { value: data.ma, text: data.ma + ': ' + data.ten } : {})
-}
+};

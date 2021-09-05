@@ -53,8 +53,8 @@ class EventDetail extends React.Component {
                 return (<a key={index} href='#' className='tag-cloud-link'>{T.language.parse(categoryItem.text)}</a>);
             });
             let content = T.language.parse(item.content)
-                .replaceAll("<strong>", `<b style="font-weight: bold;color:black;">`)
-                .replaceAll("</strong>", "</b>");
+                .replaceAll('<strong>', '<b style="font-weight: bold;color:black;">')
+                .replaceAll('</strong>', '</b>');
 
             return (
                 <section className='ftco-section ftco-degree-bg'>
@@ -65,15 +65,15 @@ class EventDetail extends React.Component {
                                     {item.isTranslate == 1 ? T.language.parse(item.title) : T.language.parse(item.title, true)[item.language]}
                                 </h2>
                                 <div className='row' style={{ justifyContent: 'flex-end', paddingBottom: 10 }}>
-                                    <a href='#' onClick={() => { window.open(`http://www.facebook.com/sharer.php?u=${window.location.href}`) }}>
+                                    <a href='#' onClick={() => { window.open(`http://www.facebook.com/sharer.php?u=${window.location.href}`); }}>
                                         <img src="https://vnuhcm.edu.vn/img/facebook.png" alt="Facebook" style={{ height: 18, width: 18 }} />
                                     </a>
                                     <a href='#' style={{ paddingLeft: 15 }}
-                                        onClick={() => { window.open(`http://twitter.com/share?url=${window.location.href}`) }}>
+                                        onClick={() => { window.open(`http://twitter.com/share?url=${window.location.href}`); }}>
                                         <img src="https://vnuhcm.edu.vn/img/tiwtter.png" alt="Twitter" style={{ height: 18, width: 18 }} />
                                     </a>
                                     <a href='#' style={{ paddingLeft: 15 }}
-                                        onClick={() => { window.open(`https://plus.google.com/share?url=${window.location.href}`) }}>
+                                        onClick={() => { window.open(`https://plus.google.com/share?url=${window.location.href}`); }}>
                                         <img src="https://vnuhcm.edu.vn/img/google-plus.png" alt="Google plus" style={{ height: 18, width: 18 }} />
                                     </a>
                                 </div>

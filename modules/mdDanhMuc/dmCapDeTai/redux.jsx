@@ -32,7 +32,7 @@ export default function DmCapDeTaiReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -56,12 +56,12 @@ export function getDmCapDeTaiPage(pageNumber, pageSize, done) {
                 dispatch({ type: DmCapDeTaiGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách cấp đề tài bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmCapDeTaiAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/cap-de-tai/all`;
+        const url = '/api/danh-muc/cap-de-tai/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách cấp đề tài bị lỗi!', 'danger');
@@ -71,7 +71,7 @@ export function getDmCapDeTaiAll(done) {
                 dispatch({ type: DmCapDeTaiGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách cấp đề tài bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmCapDeTai(maCap, done) {
@@ -85,12 +85,12 @@ export function getDmCapDeTai(maCap, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmCapDeTai(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/cap-de-tai`;
+        const url = '/api/danh-muc/cap-de-tai';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo cấp đề tài bị lỗi!', 'danger');
@@ -100,12 +100,12 @@ export function createDmCapDeTai(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo cấp đề tài bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteDmCapDeTai(maCap, done) {
     return dispatch => {
-        const url = `/api/danh-muc/cap-de-tai`;
+        const url = '/api/danh-muc/cap-de-tai';
         T.delete(url, { maCap }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục cấp đề tài bị lỗi!', 'danger');
@@ -116,12 +116,12 @@ export function deleteDmCapDeTai(maCap, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Xóa cấp đề tài bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDmCapDeTai(maCap, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/cap-de-tai`;
+        const url = '/api/danh-muc/cap-de-tai';
         T.put(url, { maCap, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tin cấp đề tài bị lỗi!', 'danger');
@@ -133,7 +133,7 @@ export function updateDmCapDeTai(maCap, changes, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Cập nhật thông tin cấp đề tài bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function changeDmCapDeTai(item) {
@@ -147,7 +147,7 @@ export const SelectAdapter_DmCapDeTai = {
     processResults: data => ({ results: data && data.page && data.page.list ? data.page.list.map(item => ({ id: item.maCap, text: `${item.maCap}: ${item.tenCap}` })) : [] }),
     getOne: getDmCapDeTai,
     processResultOne: data => data && ({ value: data.maCap, text: data.maCap + ': ' + data.tenCap }),
-}
+};
 
 export const SelectAdapter_DmCapDeTai_DkyTmdt = {
     ajax: true,
@@ -161,7 +161,7 @@ export const SelectAdapter_DmCapDeTai_DkyTmdt = {
     },
     getOne: getDmCapDeTai,
     processResultOne: data => data && ({ value: data.maCap, text: data.maCap + ': ' + data.tenCap }),
-}
+};
 
 export const SelectAdapter_DmCapDeTaiFilter = {
     ajax: true,
@@ -169,10 +169,10 @@ export const SelectAdapter_DmCapDeTaiFilter = {
     data: params => ({ condition: params.term }),
     processResults: data => {
         const list = data && data.page && data.page.list ? data.page.list.map(item => ({ id: item.maCap, text: `${item.maCap}: ${item.tenCap}` })) : [];
-        list.unshift({ id: '00', text: 'Chọn tất cả' })
-        return { results: list }
+        list.unshift({ id: '00', text: 'Chọn tất cả' });
+        return { results: list };
     },
     getOne: getDmCapDeTai,
     processResultOne: data => data && ({ value: data.maCap, text: data.maCap + ': ' + data.tenCap }),
-}
+};
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { createUnitDraftNewsDefault, createUnitDraftNewsDean, draftToNews, deleteUnitDraftNews, getUnitDraftNewsInPage, updateUnitDraftNews } from './redux'
+import { createUnitDraftNewsDefault, createUnitDraftNewsDean, draftToNews, deleteUnitDraftNews, getUnitDraftNewsInPage, updateUnitDraftNews } from './redux';
 import { Link } from 'react-router-dom';
 import Pagination from 'view/component/Pagination';
 

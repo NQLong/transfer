@@ -32,7 +32,7 @@ export default function DmKhenThuongReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -44,7 +44,7 @@ export default function DmKhenThuongReducer(state = null, data) {
 // Actions ------------------------------------------------------------------------------------------------------------
 export function getDmKhenThuongAll(done) {
     return dispatch => {
-        const url = `/api/dm-khen-thuong/all`;
+        const url = '/api/dm-khen-thuong/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách khen thưởng bị lỗi!', 'danger');
@@ -54,7 +54,7 @@ export function getDmKhenThuongAll(done) {
                 dispatch({ type: DmKhenThuongGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách khen thưởng bị lỗi!', 'danger'));
-    }
+    };
 }
 
 T.initPage('pageDmKhenThuong');
@@ -71,7 +71,7 @@ export function getDmKhenThuongPage(pageNumber, pageSize, done) {
                 dispatch({ type: DmKhenThuongGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách khen thưởng bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmKhenThuong(_id, done) {
@@ -87,12 +87,12 @@ export function getDmKhenThuong(_id, done) {
         }, error => {
             console.error(`GET: ${url}.`, error);
         });
-    }
+    };
 }
 
 export function createDmKhenThuong(item, done) {
     return dispatch => {
-        const url = `/api/dm-khen-thuong`;
+        const url = '/api/dm-khen-thuong';
         T.post(url, { item }, data => {
             if (data.error) {
                 if (data.error.errorNum == 1) {
@@ -104,12 +104,12 @@ export function createDmKhenThuong(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo khen thưởng bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteDmKhenThuong(ma) {
     return dispatch => {
-        const url = `/api/dm-khen-thuong`;
+        const url = '/api/dm-khen-thuong';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục  bị lỗi!', 'danger');
@@ -119,12 +119,12 @@ export function deleteDmKhenThuong(ma) {
                 dispatch(getDmKhenThuongAll());
             }
         }, error => T.notify('Xóa khen thưởng bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDmKhenThuong(ma, changes, done) {
     return dispatch => {
-        const url = `/api/dm-khen-thuong`;
+        const url = '/api/dm-khen-thuong';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông khen thưởng bị lỗi!', 'danger');
@@ -135,7 +135,7 @@ export function updateDmKhenThuong(ma, changes, done) {
                 dispatch(getDmKhenThuongAll());
             }
         }, error => T.notify('Cập nhật thông tin khen thưởng bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function changeDmKhenThuong(item) {
@@ -149,4 +149,4 @@ export const SelectAdapter_DmKhenThuong = {
     processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.ten })) : [] }),
     getOne: getDmKhenThuong,
     processResultOne: response => response && ({ value: response.ma, text: response.ma + ': ' + response.ten }),
-}
+};

@@ -190,7 +190,7 @@ class VideoPage extends React.Component {
                                     <a href='#' onClick={e => this.edit(e, item)}>{T.language.parse(item.title)}</a>
                                 </td>
                                 <td>
-                                    <a href={item.link} target='_blank'>{item.link}</a>
+                                    <a href={item.link} target='_blank' rel="noreferrer">{item.link}</a>
                                 </td>
                                 <td style={{ textAlign: 'center' }}>
                                     <img src={item.image ? item.image : '/img/avatar.png'} alt='avatar' style={{ height: '32px' }} />

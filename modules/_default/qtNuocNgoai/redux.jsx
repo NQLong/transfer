@@ -10,7 +10,7 @@ export function createQtNuocNgoaiStaff(data, done) {
                 if (done) done(res);
             }
         }, error => T.notify('Thêm thông tin quá trình đi nước ngoài bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function updateQtNuocNgoaiStaff(id, changes, done) {
@@ -25,7 +25,7 @@ export function updateQtNuocNgoaiStaff(id, changes, done) {
                 if (done) done();
             }
         }, error => T.notify('Cập nhật thông tin quá trình đi nước ngoài bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function deleteQtNuocNgoaiStaff(id, done) {
@@ -40,7 +40,7 @@ export function deleteQtNuocNgoaiStaff(id, done) {
                 if (done) done();
             }
         }, error => T.notify('Xóa thông tin quá trình đi nước ngoài bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function createQtNuocNgoaiStaffUser(data, done) {
@@ -55,7 +55,7 @@ export function createQtNuocNgoaiStaffUser(data, done) {
                 if (done) done(res);
             }
         }, error => T.notify('Thêm thông tin quá trình đi nước ngoài bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function updateQtNuocNgoaiStaffUser(id, changes, done) {
@@ -70,7 +70,7 @@ export function updateQtNuocNgoaiStaffUser(id, changes, done) {
                 if (done) done();
             }
         }, error => T.notify('Cập nhật thông tin quá trình đi nước ngoài bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function deleteQtNuocNgoaiStaffUser(id, done) {
@@ -82,8 +82,8 @@ export function deleteQtNuocNgoaiStaffUser(id, done) {
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
                 T.alert('Thông tin quá trình đi nước ngoài được xóa thành công!', 'info', false, 800);
-                done && done()
+                done && done();
             }
         }, error => T.notify('Xóa thông tin quá trình đi nước ngoài bị lỗi' , 'danger'));
-    }
+    };
 }

@@ -135,5 +135,5 @@ module.exports = app => {
             app.dbConnection.execute('BEGIN :ret:=menu_create_default(:parentId, :title, :link, :active, :madonvi, :mawebsite); END;',
                 { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, parentId, title, link, active, madonvi, mawebsite }, done);
         },
-    }
-}
+    };
+};

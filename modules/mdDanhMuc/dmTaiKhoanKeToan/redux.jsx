@@ -32,7 +32,7 @@ export default function DmTaiKhoanKeToanReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -58,12 +58,12 @@ export function getDmTaiKhoanKeToanPage(pageNumber, pageSize, pageCondition, don
                 dispatch({ type: DmTaiKhoanKeToanGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách Tài Khoản Kế Toán bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmTaiKhoanKeToanAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/tai-khoan-ke-toan/all`;
+        const url = '/api/danh-muc/tai-khoan-ke-toan/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách Tài Khoản Kế Toán bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -73,7 +73,7 @@ export function getDmTaiKhoanKeToanAll(done) {
                 dispatch({ type: DmTaiKhoanKeToanGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách Tài Khoản Kế Toán bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmTaiKhoanKeToan(ma, done) {
@@ -87,12 +87,12 @@ export function getDmTaiKhoanKeToan(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmTaiKhoanKeToan(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/tai-khoan-ke-toan`;
+        const url = '/api/danh-muc/tai-khoan-ke-toan';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo Tài Khoản Kế Toán bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -102,12 +102,12 @@ export function createDmTaiKhoanKeToan(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo Tài Khoản Kế Toán bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function updateDmTaiKhoanKeToan(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/tai-khoan-ke-toan`;
+        const url = '/api/danh-muc/tai-khoan-ke-toan';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tin Tài Khoản Kế Toán bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -118,12 +118,12 @@ export function updateDmTaiKhoanKeToan(ma, changes, done) {
                 dispatch(getDmTaiKhoanKeToanPage());
             }
         }, error => T.notify('Cập nhật thông tin Tài Khoản Kế Toán bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function deleteDmTaiKhoanKeToan(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/tai-khoan-ke-toan`;
+        const url = '/api/danh-muc/tai-khoan-ke-toan';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục Tài Khoản Kế Toán bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -133,7 +133,7 @@ export function deleteDmTaiKhoanKeToan(ma) {
                 dispatch(getDmTaiKhoanKeToanPage());
             }
         }, error => T.notify('Xóa Tài Khoản Kế Toán bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function changeDmTaiKhoanKeToan(item) {
@@ -142,7 +142,7 @@ export function changeDmTaiKhoanKeToan(item) {
 
 export function createDmTaiKhoanKeToanByUpload(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/tai-khoan-ke-toan/createFromFile`;
+        const url = '/api/danh-muc/tai-khoan-ke-toan/createFromFile';
         T.post(url, { item }, data => {
             if (data.error) {
                 console.error(`POST: ${url}.`, data.error);
@@ -151,7 +151,7 @@ export function createDmTaiKhoanKeToanByUpload(item, done) {
             if (done) done(data);
 
         }, error => T.notify('Tạo danh mục Tài Khoản Kế Toán bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export const SelectAdapter_DmTaiKhoanKeToan = {
@@ -161,4 +161,4 @@ export const SelectAdapter_DmTaiKhoanKeToan = {
     processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: `${item.ma}: ${item.tenTaiKhoan}` })) : [] }),
     getOne: getDmTaiKhoanKeToan,
     processResultOne: response => response && ({ value: response.ma, text: `${response.ma}:${response.tenTaiKhoan}` }),
-}
+};

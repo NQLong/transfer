@@ -16,14 +16,14 @@ const texts = {
         'notification': 'LAST NOTIFICATION',
         'noNews': 'THERE IS NO NEWS!'
     }
-}
+};
 
 class NewsDetail extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             title: ''
-        }
+        };
     }
 
     componentDidMount() {

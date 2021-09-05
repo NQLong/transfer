@@ -51,7 +51,7 @@ export function getAll(type, done) {
                 done && done(data.items);
             }
         }, error => T.notify('Lấy danh mục bị lỗi!', 'danger'));
-    }
+    };
 }
 export function getByDonVi(type, done) {
     return dispatch => {
@@ -65,7 +65,7 @@ export function getByDonVi(type, done) {
                 done && done(data.items);
             }
         }, error => T.notify('Lấy danh mục bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getTuyenSinh(type, done) {
@@ -80,7 +80,7 @@ export function getTuyenSinh(type, done) {
                 done && done(data.items);
             }
         }, error => T.notify('Lấy danh mục bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function createCategory(data, done) {
@@ -96,7 +96,7 @@ export function createCategory(data, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo danh mục bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateCategory(id, changes, done) {
@@ -113,7 +113,7 @@ export function updateCategory(id, changes, done) {
                 done && done();
             }
         }, error => T.notify('Cập nhật danh mục bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function swapCategory(id, isMoveUp, type) {
@@ -121,13 +121,13 @@ export function swapCategory(id, isMoveUp, type) {
         const url = '/api/category/swap/';
         T.put(url, { id, isMoveUp }, data => {
             if (data.error) {
-                T.notify('Thay đổi vị trí danh mục bị lỗi!', 'danger')
+                T.notify('Thay đổi vị trí danh mục bị lỗi!', 'danger');
                 console.error('PUT: ' + url + '.', data.error);
             } else {
                 dispatch(getAll(type));
             }
         }, error => T.notify('Thay đổi vị trí danh mục bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteCategory(id) {
@@ -142,7 +142,7 @@ export function deleteCategory(id) {
                 dispatch({ type: CategoryDelete, id });
             }
         }, error => T.notify('Xóa danh mục bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function changeCategory(category) {

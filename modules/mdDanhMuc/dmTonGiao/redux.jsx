@@ -32,7 +32,7 @@ export default function DmTonGiaoReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -58,12 +58,12 @@ export function getDmTonGiaoPage(pageNumber, pageSize, pageCondition, done) {
                 dispatch({ type: DmTonGiaoGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách tôn giáo bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmTonGiaoAll(condition, done) {
     return dispatch => {
-        const url = `/api/danh-muc/ton-giao/all`;
+        const url = '/api/danh-muc/ton-giao/all';
         T.get(url, { condition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách tôn giáo bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -73,7 +73,7 @@ export function getDmTonGiaoAll(condition, done) {
                 dispatch({ type: DmTonGiaoGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách tôn giáo bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmTonGiao(ma, done) {
@@ -87,7 +87,7 @@ export function getDmTonGiao(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmTonGiao(dmTonGiao, done) {
@@ -103,7 +103,7 @@ export function createDmTonGiao(dmTonGiao, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo mới một tôn giáo bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function updateDmTonGiao(ma, changes, done) {
@@ -119,12 +119,12 @@ export function updateDmTonGiao(ma, changes, done) {
                 dispatch(getDmTonGiaoPage());
             }
         }, error => T.notify('Cập nhật dữ liệu tôn giáo bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function deleteDmTonGiao(ma, done) {
     return dispatch => {
-        const url = `/api/danh-muc/ton-giao`;
+        const url = '/api/danh-muc/ton-giao';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa tôn giáo bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -135,7 +135,7 @@ export function deleteDmTonGiao(ma, done) {
             }
             done && done();
         }, error => T.notify('Xóa tôn giáo bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export const SelectAdapter_DmTonGiao = {
@@ -143,4 +143,4 @@ export const SelectAdapter_DmTonGiao = {
     getAll: getDmTonGiaoAll,
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
     condition: { kichHoat: 1 },
-}
+};

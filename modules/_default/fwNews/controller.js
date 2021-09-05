@@ -12,7 +12,7 @@ module.exports = app => {
         menus: {
             5004: { title: 'Dịch Tiếng Anh', link: '/user/news/draft/translate' },
         }
-    }
+    };
     const menuUnit = {
         parentMenu: { index: 5000, title: 'Bài viết', icon: 'fa-file' },
         menus: {
@@ -20,7 +20,7 @@ module.exports = app => {
             5006: { title: 'Chờ duyệt', link: '/user/news/unit/draft' },
             5008: { title: 'Danh sách bài viết chính thức', link: '/user/news/list' },
         }
-    }
+    };
     app.permission.add(
         { name: 'news:manage', menu },
         { name: 'news:read', menu },
@@ -42,7 +42,7 @@ module.exports = app => {
             } catch (e) {
                 title = news.title;
                 abstract = news.abstract;
-            };
+            }
             data = data.replace('<title>TRƯỜNG ĐẠI HỌC KHOA HỌC XÃ HỘI VÀ NHÂN VĂN - ĐHQG TP.HCM</title>',
                 `<title>${(title || '').replaceAll('\'', '')}</title>
                 <meta property='og:url' content='${app.rootUrl + req.originalUrl}' />
@@ -54,11 +54,11 @@ module.exports = app => {
                 <meta property='og:image' content='${app.rootUrl + news.image}' />
                 <meta property='donVi' content=${news.maDonVi} />`);
             res.send(data);
-        }
+        };
         new Promise(resolve => {
             if (req.originalUrl.startsWith('/news/item/')) {
                 const idNews = req.originalUrl.substring('/news/item/'.length).split('?')[0];
-                app.model.fwNews.get({ id: idNews }, (error, item) => resolve(item))
+                app.model.fwNews.get({ id: idNews }, (error, item) => resolve(item));
             } else {
                 resolve(null);
             }
@@ -73,13 +73,13 @@ module.exports = app => {
             }
         })).then(news => {
             if (news && news.maDonVi == 0) app.templates.home(req, { send: (data) => changeMeta(news, data) });
-            else if (news) app.templates.unit(req, { send: (data) => changeMeta(news, data) })
+            else if (news) app.templates.unit(req, { send: (data) => changeMeta(news, data) });
             else {
                 console.log(route, 'bugs');
                 res.redirect('/404.html');
             }
-        })
-    }))
+        });
+    }));
 
 
     app.get('/user/news/category', app.permission.check('category:read'), app.templates.admin);
@@ -103,7 +103,7 @@ module.exports = app => {
             condition = {
                 statement: 'title LIKE :searchText',
                 parameter: { searchText: `%${condition}%` }
-            }
+            };
         } else {
             condition = {};
             const permissions = req.session.user && req.session.user.permissions ? req.session.user.permissions : [];
@@ -131,7 +131,7 @@ module.exports = app => {
             condition = {
                 statement: 'title LIKE :searchText',
                 parameter: { searchText: `%${condition}%` }
-            }
+            };
         } else if (req.session.user && req.session.user.maDonVi) {
             condition = { maDonVi: req.session.user.maDonVi };
         }
@@ -207,7 +207,7 @@ module.exports = app => {
             } else {
                 res.send({ error });
             }
-        })
+        });
     });
 
     app.get('/api/unit-draft-news/page/:pageNumber/:pageSize', app.permission.check('unit:draft'), (req, res) => {
@@ -260,9 +260,9 @@ module.exports = app => {
                 language: 'vi',
                 maDonVi: permissions.includes('news:manage') ? '0' : (req.session.user && req.session.user.maDonVi ?
                     req.session.user.maDonVi : -1),
-            }, (error, item) => res.send({ error, item }))
+            }, (error, item) => res.send({ error, item }));
         } else {
-            res.send({ error: 'User not has permission.' })
+            res.send({ error: 'User not has permission.' });
         }
     }
     );
@@ -274,7 +274,7 @@ module.exports = app => {
         if (valid) {
             app.model.fwNews.delete2({ id: req.body.id }, error => res.send({ error }));
         } else {
-            res.send({ error: 'User not has permission.' })
+            res.send({ error: 'User not has permission.' });
         }
     });
 
@@ -296,7 +296,7 @@ module.exports = app => {
             const isMoveUp = req.body.isMoveUp.toString() == 'true';
             app.model.fwNews.swapPriority(req.body.id, isMoveUp, error => res.send({ error }));
         } else {
-            res.send({ error: 'User not has permission.' })
+            res.send({ error: 'User not has permission.' });
         }
     });
 
@@ -315,13 +315,13 @@ module.exports = app => {
                             const data = categories.map(categoryId => ({ newsId: id, categoryId }));
                             app.model.fwNewsCategory.createMany(data, error => res.send({ error }));
                         } else {
-                            res.send({ error })
-                        };
+                            res.send({ error });
+                        }
                     }) : res.send({ error: null });
                 }
             });
         } else {
-            res.send({ error: 'User not has permission.' })
+            res.send({ error: 'User not has permission.' });
         }
     });
 
@@ -334,7 +334,7 @@ module.exports = app => {
             conditionCategory = {
                 statement: 'TYPE=:type AND ACTIVE=:active AND maDonVi IN (0,39)',
                 parameter: { type: 'news', active: 1, }
-            }
+            };
         }
         app.model.fwCategory.getAll(conditionCategory, '*', 'ID ASC', (error, categories) => {
             if (error || categories == null) {
@@ -356,9 +356,9 @@ module.exports = app => {
                                         app.model.fwStorage.get({ id: item.attachment.split(',')[index] }, (err, itemStorage) => {
                                             if (itemStorage) listAttachment.push(itemStorage);
                                             handleGetAttachment(index + 1);
-                                        })
+                                        });
                                     }
-                                }
+                                };
                                 handleGetAttachment(0);
                             } else {
                                 res.send({ error, categories, item });
@@ -376,13 +376,13 @@ module.exports = app => {
         if (valid) {
             app.model.fwDraft.toNews(req.params.draftId, (error, item) => {
                 res.send({ error, item });
-            })
+            });
         } else {
-            res.send({ error: 'User not has permission.' })
+            res.send({ error: 'User not has permission.' });
 
         }
 
-    })
+    });
     //TODO
     app.get('/api/draft-news/item/:newsId', app.permission.check('news:draft'), (req, res) => {
         app.model.fwCategory.getAll({ type: 'news', active: 1 }, (error, categories) => {
@@ -403,9 +403,9 @@ module.exports = app => {
                                 app.model.fwStorage.get({ id: dataItem.attachment.split(',')[index] }, (err, itemStorage) => {
                                     if (itemStorage) listAttachment.push(itemStorage);
                                     handleGetAttachment(index + 1);
-                                })
+                                });
                             }
-                        }
+                        };
                         handleGetAttachment(0);
                     } else {
                         res.send({
@@ -438,9 +438,9 @@ module.exports = app => {
                                 app.model.fwStorage.get({ id: dataItem.attachment.split(',')[index] }, (err, itemStorage) => {
                                     if (itemStorage) listAttachment.push(itemStorage);
                                     handleGetAttachment(index + 1);
-                                })
+                                });
                             }
-                        }
+                        };
                         handleGetAttachment(0);
                     } else {
                         res.send({
@@ -475,12 +475,12 @@ module.exports = app => {
     app.put('/api/unit-draft-news', app.permission.check('unit:draft'), (req, res) => {
         const changes = req.body.changes;
         app.model.fwDraft.update({ id: req.body.id }, changes, (error, item) => {
-            res.send({ error, item })
-        })
+            res.send({ error, item });
+        });
     });
 
     app.put('/api/translate-draft-news', app.permission.check('news:translate'), (req, res) => {
-        app.model.fwDraft.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item }))
+        app.model.fwDraft.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
     // Home -----------------------------------------------------------------------------------------------------------------------------------------
@@ -492,9 +492,9 @@ module.exports = app => {
             maDonVi = req.query.maDonVi;
 
         const condition = {
-            statement: `MA_DON_VI = :maDonVi AND ACTIVE = :active AND (START_POST <= :startPost )`,
+            statement: 'MA_DON_VI = :maDonVi AND ACTIVE = :active AND (START_POST <= :startPost )',
             parameter: { active: 1, startPost: today, maDonVi: maDonVi ? maDonVi : 0 },
-        }
+        };
 
         if (!user) {
             condition.statement += ' AND IS_INTERNAL = :isInternal';
@@ -559,9 +559,9 @@ module.exports = app => {
                         app.model.fwStorage.get({ id: item.attachment.split(',')[index] }, (err, itemStorage) => {
                             if (itemStorage) listAttachment.push(itemStorage);
                             handleGetAttachment(index + 1);
-                        })
+                        });
                     }
-                }
+                };
                 handleGetAttachment(0);
             } else {
                 res.send({ error, item });
@@ -579,9 +579,9 @@ module.exports = app => {
                     app.model.fwStorage.get({ id: item.attachment.split(',')[index] }, (err, itemStorage) => {
                         if (itemStorage) listAttachment.push(itemStorage);
                         handleGetAttachment(index + 1);
-                    })
+                    });
                 }
-            }
+            };
             handleGetAttachment(0);
         } else {
             res.send({ error, item });

@@ -32,7 +32,7 @@ class EditModal extends React.Component {
                 moTa: $('#dmLuongDiNuocNgoaiMoTa').val(),
                 ghiChu: $('#dmLuongDiNuocNgoaiGhiChu').val(),
                 kichHoat: this.state.kichHoat ? '1' : '0'
-            }
+            };
         if (changes.moTa == '') {
             T.notify('Mô tả Lương đi nước ngoài bị trống!', 'danger');
             $('#dmLuongDiNuocNgoaiMoTa').focus();
@@ -97,7 +97,7 @@ class EditModal extends React.Component {
             </div>
         );
     }
-};
+}
 
 class DmLuongDiNuocNgoaiPage extends React.Component {
     state = { searching: false };

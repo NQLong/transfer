@@ -10,7 +10,7 @@ export function createQtKyLuatStaff(data, done) {
                 if (done) done(res);
             }
         }, error => T.notify('Thêm thông tin quá trình kỷ luật bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function updateQtKyLuatStaff(id, changes, done) {
@@ -25,7 +25,7 @@ export function updateQtKyLuatStaff(id, changes, done) {
                 if (done) done();
             }
         }, error => T.notify('Cập nhật thông tin quá trình kỷ luật bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function deleteQtKyLuatStaff(id, done) {
@@ -40,7 +40,7 @@ export function deleteQtKyLuatStaff(id, done) {
                 if (done) done();
             }
         }, error => T.notify('Xóa thông tin quá trình kỷ luật bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function createQtKyLuatStaffUser(data, done) {
@@ -55,7 +55,7 @@ export function createQtKyLuatStaffUser(data, done) {
                 if (done) done(res);
             }
         }, error => T.notify('Thêm thông tin quá trình kỷ luật bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function updateQtKyLuatStaffUser(id, changes, done) {
@@ -70,7 +70,7 @@ export function updateQtKyLuatStaffUser(id, changes, done) {
                 if (done) done();
             }
         }, error => T.notify('Cập nhật thông tin quá trình kỷ luật bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function deleteQtKyLuatStaffUser(id, done) {
@@ -82,8 +82,8 @@ export function deleteQtKyLuatStaffUser(id, done) {
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
                 T.alert('Thông tin quá trình kỷ luật được xóa thành công!', 'info', false, 800);
-                done && done()
+                done && done();
             }
         }, error => T.notify('Xóa thông tin quá trình kỷ luật bị lỗi' , 'danger'));
-    }
+    };
 }

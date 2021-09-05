@@ -32,7 +32,7 @@ export default function DmHuongPhuCapReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -56,12 +56,12 @@ export function getDmHuongPhuCapPage(pageNumber, pageSize, done) {
                 dispatch({ type: DmHuongPhuCapGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách hưởng phụ cấp bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmHuongPhuCapAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/huong-phu-cap/all`;
+        const url = '/api/danh-muc/huong-phu-cap/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách hưởng phụ cấp bị lỗi!', 'danger');
@@ -71,7 +71,7 @@ export function getDmHuongPhuCapAll(done) {
                 dispatch({ type: DmHuongPhuCapGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách hưởng phụ cấp bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmHuongPhuCap(ma, done) {
@@ -85,12 +85,12 @@ export function getDmHuongPhuCap(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmHuongPhuCap(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/huong-phu-cap`;
+        const url = '/api/danh-muc/huong-phu-cap';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo hưởng phụ cấp bị lỗi!', 'danger');
@@ -100,12 +100,12 @@ export function createDmHuongPhuCap(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo hưởng phụ cấp bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteDmHuongPhuCap(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/huong-phu-cap`;
+        const url = '/api/danh-muc/huong-phu-cap';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục hưởng phụ cấp bị lỗi!', 'danger');
@@ -115,12 +115,12 @@ export function deleteDmHuongPhuCap(ma) {
                 dispatch(getDmHuongPhuCapAll());
             }
         }, error => T.notify('Xóa hưởng  hình thức hưởng phụ cấp bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDmHuongPhuCap(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/huong-phu-cap`;
+        const url = '/api/danh-muc/huong-phu-cap';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tin hưởng phụ cấp bị lỗi!', 'danger');
@@ -131,7 +131,7 @@ export function updateDmHuongPhuCap(ma, changes, done) {
                 dispatch(getDmHuongPhuCapAll());
             }
         }, error => T.notify('Cập nhật thông tin hưởng phụ cấp bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function changeDmHuongPhuCap(item) {

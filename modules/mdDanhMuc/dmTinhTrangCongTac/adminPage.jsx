@@ -10,7 +10,7 @@ class EditModal extends React.Component {
     componentDidMount() {
         $(document).ready(() => {
             $(this.modal.current).on('shown.bs.modal', () => $('#dmTinhTrangCongTacTen').focus());
-        })
+        });
     }
 
     show = (item) => {
@@ -77,7 +77,7 @@ class EditModal extends React.Component {
                     </div>
                 </form>
             </div>
-        )
+        );
     }
 }
 

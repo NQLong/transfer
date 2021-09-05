@@ -23,7 +23,7 @@ module.exports = app => {
 			condition = {
 				statement: 'lower(tenPhuongXa) LIKE :searchText',
 				parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
-			}
+			};
 		}
 		app.model.dmPhuongXa.getPage(pageNumber, pageSize, condition, '*', 'maPhuongXa ASC', (error, page) => res.send({ error, page }));
 	});
@@ -55,7 +55,7 @@ module.exports = app => {
 			autoCommit: true,
 			batchErrors: true
 		};
-		const sql = `INSERT INTO DM_PHUONG_XA (MA_PHUONG_XA, MA_QUAN_HUYEN, TEN_PHUONG_XA, KICH_HOAT) VALUES (:maPhuongXa, :maQuanHuyen, :tenPhuongXa, :kichHoat)`
+		const sql = 'INSERT INTO DM_PHUONG_XA (MA_PHUONG_XA, MA_QUAN_HUYEN, TEN_PHUONG_XA, KICH_HOAT) VALUES (:maPhuongXa, :maQuanHuyen, :tenPhuongXa, :kichHoat)';
 		app.dbConnection.executeMany(sql, dataUpload, options, (err, result) => {
 			res.send(result);
 		});

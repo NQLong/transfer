@@ -6,7 +6,7 @@ import { getDmTuyenBenhVienAll } from './reduxTuyenBenhVien';
 import xlsx from 'xlsx';
 
 const UploadBoxStyle = {
-    backgroundImage: `url('/img/upload.png')`,
+    backgroundImage: 'url(\'/img/upload.png\')',
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',
     backgroundSize: 'contain',
@@ -48,7 +48,7 @@ class UploadDmBenhVien extends React.Component {
 
     onDrop = (event) => {
         event.preventDefault();
-        $(this.box.current).css('background-color', '#FFF')
+        $(this.box.current).css('background-color', '#FFF');
 
         if (event.dataTransfer.items) {
             if (event.dataTransfer.items.length > 0) {
@@ -94,7 +94,7 @@ class UploadDmBenhVien extends React.Component {
         let reader = new FileReader();
         reader.onload = (event) => {
             let data = event.target.result;
-            let workbook = xlsx.read(data, { type: 'binary' })
+            let workbook = xlsx.read(data, { type: 'binary' });
             workbook.SheetNames.forEach((sheetName) => {
                 let XL_row = xlsx.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
                 this.setState({ totalRecord: XL_row.length });
@@ -103,8 +103,8 @@ class UploadDmBenhVien extends React.Component {
                     result += this.parseDataToInput(item, index);
                 });
                 document.getElementById('tbodyTableDmBenhVien').innerHTML = result;
-            })
-        }
+            });
+        };
         reader.onerror = (event) => console.log('errors', event.target.error);
         reader.readAsBinaryString(file);
     }
@@ -121,12 +121,12 @@ class UploadDmBenhVien extends React.Component {
                 diaChi: $(`#diaChi${i}`).val().trim(),
                 maTuyen: ma_tuyen,
                 kichHoat: 1
-            })
+            });
         }
 
         this.props.createMultiDmBenhVien(params, () => {
             this.props.history.push('/user/danh-muc/benh-vien');
-        })
+        });
     }
 
     render() {

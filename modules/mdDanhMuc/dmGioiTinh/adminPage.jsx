@@ -10,7 +10,7 @@ class EditModal extends React.Component {
     componentDidMount() {
         $(document).ready(() => {
             $(this.modal.current).on('shown.bs.modal', () => $('#dmGioiTinhMa').focus());
-        })
+        });
     }
 
     show = (item) => {
@@ -43,7 +43,7 @@ class EditModal extends React.Component {
             T.notify('Tên giới tính tiếng Anh bị trống!', 'danger');
             $('#dmGioiTinhTenTiengAnh').focus();
         } else if (changes.ma.length != 2) {
-            this.setState({ visible: true })
+            this.setState({ visible: true });
         } else {
             if (maGioiTinh) {
                 this.props.update(maGioiTinh, changes);
@@ -56,7 +56,7 @@ class EditModal extends React.Component {
 
     render() {
         const readOnly = this.props.readOnly;
-        let help = this.state.visible ? <small id='maHelp' class='form-text text-muted'>Mã giới tính chỉ gồm 2 kí tự</small> : null;
+        let help = this.state.visible ? <small id='maHelp' className='form-text text-muted'>Mã giới tính chỉ gồm 2 kí tự</small> : null;
         return (
             <div className='modal' tabIndex='-1' role='dialog' ref={this.modal}>
                 <form className='modal-dialog' role='document' onSubmit={this.save}>
@@ -98,7 +98,7 @@ class EditModal extends React.Component {
                     </div>
                 </form>
             </div>
-        )
+        );
     }
 }
 

@@ -15,7 +15,7 @@ class EditModal extends React.Component {
     componentDidMount() {
         $(document).ready(() => setTimeout(() => {
             $(this.modal.current).on('shown.bs.modal', () => {
-                $(`a[href='#dmPhongTabVi']`).tab('show');
+                $('a[href=\'#dmPhongTabVi\']').tab('show');
                 $('#dmPhongName').focus();
             });
             $('#categoryBuilding').select2({ minimumResultsForSearch: -1 });
@@ -49,7 +49,7 @@ class EditModal extends React.Component {
             };
         if (changes.ten == '') {
             T.notify('Tên phòng học bị trống!', 'danger');
-            $(`a[href='#dmPhongTabVi']`).tab('show');
+            $('a[href=\'#dmPhongTabVi\']').tab('show');
             $('#dmPhongName').focus();
         } else if (changes.toaNha == null) {
             T.notify('Toà nhà chưa được chọn!', 'danger');
@@ -155,7 +155,7 @@ class adminUploadPage extends React.Component {
                 }
             });
             return state;
-        })
+        });
     };
 
     delete = (e, item) => {

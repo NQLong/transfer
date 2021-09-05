@@ -32,7 +32,7 @@ export default function DmKyLuatReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -44,7 +44,7 @@ export default function DmKyLuatReducer(state = null, data) {
 // Actions ------------------------------------------------------------------------------------------------------------
 export function getDmKyLuatAll(done) {
     return dispatch => {
-        const url = `/api/dm-ky-luat/all`;
+        const url = '/api/dm-ky-luat/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách hình thức kỷ luật bị lỗi!', 'danger');
@@ -54,7 +54,7 @@ export function getDmKyLuatAll(done) {
                 dispatch({ type: DmKyLuatGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách hình thức kỷ luật bị lỗi!', 'danger'));
-    }
+    };
 }
 
 T.initPage('pageDmKyLuat');
@@ -71,7 +71,7 @@ export function getDmKyLuatPage(pageNumber, pageSize, done) {
                 dispatch({ type: DmKyLuatGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách hình thức kỷ luật bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmKyLuat(_id, done) {
@@ -87,12 +87,12 @@ export function getDmKyLuat(_id, done) {
         }, error => {
             console.error(`GET: ${url}.`, error);
         });
-    }
+    };
 }
 
 export function createDmKyLuat(item, done) {
     return dispatch => {
-        const url = `/api/dm-ky-luat`;
+        const url = '/api/dm-ky-luat';
         T.post(url, { item }, data => {
             if (data.error) {
                 if (data.error.errorNum == 1) {
@@ -104,12 +104,12 @@ export function createDmKyLuat(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo hình thức kỷ luật bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteDmKyLuat(ma) {
     return dispatch => {
-        const url = `/api/dm-ky-luat`;
+        const url = '/api/dm-ky-luat';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa hình thức kỷ luật bị lỗi!', 'danger');
@@ -119,12 +119,12 @@ export function deleteDmKyLuat(ma) {
                 dispatch(getDmKyLuatAll());
             }
         }, error => T.notify('Xóa hình thức kỷ luật bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDmKyLuat(ma, changes, done) {
     return dispatch => {
-        const url = `/api/dm-ky-luat`;
+        const url = '/api/dm-ky-luat';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông hình thức kỷ luật bị lỗi!', 'danger');
@@ -135,7 +135,7 @@ export function updateDmKyLuat(ma, changes, done) {
                 dispatch(getDmKyLuatAll());
             }
         }, error => T.notify('Cập nhật thông tin hình thức kỷ luật bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function changeDmKyLuat(item) {
@@ -147,4 +147,4 @@ export const SelectAdapter_DmKyLuat = {
     getAll: getDmKyLuatAll,
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
     condition: { kichHoat: 1 },
-}
+};

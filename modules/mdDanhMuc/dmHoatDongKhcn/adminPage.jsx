@@ -26,7 +26,7 @@ class EditModal extends React.Component {
     focusInput = element => element.focus ? element.focus() : $(element).data('select2-hidden-accessible') ? $(element).select2('open') : $(element).focus();
 
     getValue = (selector, required = true, dataGetter = i => i.val ? i.val() : $(i).val() ? $(i).val().trim() : '') => {
-        const data = dataGetter(selector)
+        const data = dataGetter(selector);
         if (data) return data;
         if (required) throw selector;
         return '';
@@ -38,7 +38,7 @@ class EditModal extends React.Component {
             const changes = {
                 ten: this.getValue(this.ten.current),
                 ghiChu: this.getValue(this.ghiChu.current, false)
-            }
+            };
             const done = item => {
                 if (item) $(this.modal.current).modal('hide');
             };
@@ -78,7 +78,7 @@ class EditModal extends React.Component {
                     </div>
                 </form>
             </div>
-        )
+        );
     }
 }
 

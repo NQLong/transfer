@@ -27,7 +27,7 @@ export function getDmKhcnLinhVucKhoaHoc(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 // Actions ------------------------------------------------------------------------------------------------------------
 export const PageName = 'pageDmKhcnLinhVucKhoaHoc';
@@ -40,4 +40,4 @@ export const SelectAdapter_DmKhcnLinhVucKhoaHoc = {
     processResults: response => ({ results: response ? response.items.map(item => ({ id: item.ma, text: item.ten })) : [] }),
     getOne: getDmKhcnLinhVucKhoaHoc,
     processResultOne: data => data && ({ value: data.ma, text: data.ma + ': ' + data.ten }),
-}
+};

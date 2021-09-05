@@ -22,7 +22,7 @@ module.exports = app => {
     });
 
     app.get('/api/danh-muc/tuyen-benh-vien/item/:ma', app.permission.check('user:login'), (req, res) => {
-        app.model.dmTuyenBenhVien.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }))
+        app.model.dmTuyenBenhVien.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
     });
 
     app.post('/api/danh-muc/tuyen-benh-vien', app.permission.check('dmTuyenBenhVien:write'), (req, res) => {
@@ -39,7 +39,7 @@ module.exports = app => {
     });
 
     app.put('/api/danh-muc/tuyen-benh-vien', app.permission.check('dmTuyenBenhVien:write'), (req, res) => {
-        app.model.dmTuyenBenhVien.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }))
+        app.model.dmTuyenBenhVien.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
     app.delete('/api/danh-muc/tuyen-benh-vien', app.permission.check('dmTuyenBenhVien:delete'), (req, res) => {

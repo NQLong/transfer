@@ -14,7 +14,7 @@ class EditModal extends React.Component {
     componentDidMount() {
         $(document).ready(() => setTimeout(() => {
             $(this.modal.current).on('shown.bs.modal', () => {
-                $(`a[href='#dmChuongTrinhDaoTaoTabVi']`).tab('show');
+                $('a[href=\'#dmChuongTrinhDaoTaoTabVi\']').tab('show');
                 $('#dmctdtTenVi').focus();
             });
         }, 250));
@@ -43,7 +43,7 @@ class EditModal extends React.Component {
                 ten: JSON.stringify({ vi: $('#dmctdtTenVi').val().trim(), en: $('#dmctdtTenEn').val().trim() }),
                 moTa: JSON.stringify({ vi: this.editorVi.current.html(), en: this.editorEn.current.html() }),
                 kichHoat: Number(this.state.kichHoat),
-            }
+            };
 
         if (changes.ten.vi == '') {
             T.notify('Tên chương trình đào tạo bị trống!', 'danger');

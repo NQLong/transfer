@@ -42,7 +42,7 @@ module.exports = app => {
     });
 
     app.put('/api/danh-muc/dien-chinh-sach', app.permission.check('dmDienChinhSach:write'), (req, res) => {
-        app.model.dmDienChinhSach.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }))
+        app.model.dmDienChinhSach.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
     app.delete('/api/danh-muc/dien-chinh-sach', app.permission.check('dmDienChinhSach:delete'), (req, res) => {

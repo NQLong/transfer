@@ -32,7 +32,7 @@ export default function dmPhongReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -49,7 +49,7 @@ export function getDmPhongAll(condition, done) {
     }
 
     return dispatch => {
-        const url = `/api/danh-muc/phong/all`;
+        const url = '/api/danh-muc/phong/all';
         T.get(url, { condition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách phòng học bị lỗi!', 'danger');
@@ -59,7 +59,7 @@ export function getDmPhongAll(condition, done) {
                 dispatch({ type: DmPhongGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách phòng học bị lỗi!', 'danger'));
-    }
+    };
 }
 
 T.initPage('dmPhong');
@@ -76,7 +76,7 @@ export function getDmPhongPage(pageNumber, pageSize, done) {
                 dispatch({ type: DmPhongGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách phòng học bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmPhong(ma, done) {
@@ -92,12 +92,12 @@ export function getDmPhong(ma, done) {
         }, error => {
             console.error(`GET: ${url}.`, error);
         });
-    }
+    };
 }
 
 export function createDmPhong(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/phong`;
+        const url = '/api/danh-muc/phong';
         T.post(url, { item }, data => {
             if (data.error) {
                 console.error(`POST: ${url}.`, data.error);
@@ -106,12 +106,12 @@ export function createDmPhong(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo phòng học bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteDmPhong(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/phong`;
+        const url = '/api/danh-muc/phong';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa phòng học bị lỗi!', 'danger');
@@ -121,12 +121,12 @@ export function deleteDmPhong(ma) {
                 dispatch(getDmPhongAll());
             }
         }, error => T.notify('Xóa phòng học bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDmPhong(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/phong`;
+        const url = '/api/danh-muc/phong';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông phòng học bị lỗi!', 'danger');
@@ -137,11 +137,11 @@ export function updateDmPhong(ma, changes, done) {
                 dispatch(getDmPhongAll());
             }
         }, error => T.notify('Cập nhật thông tin phòng học bị lỗi!', 'danger'));
-    }
+    };
 }
 export function createDmPhongByUpload(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/phong/createFromFile`;
+        const url = '/api/danh-muc/phong/createFromFile';
         T.post(url, { item }, data => {
             if (data.error) {
                 console.error(`POST: ${url}.`, data.error);
@@ -151,7 +151,7 @@ export function createDmPhongByUpload(item, done) {
                 T.notify('Import dữ liệu thành công!', 'success');
             }
         }, error => T.notify('Tạo phòng học bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function changeDmPhong(item) {

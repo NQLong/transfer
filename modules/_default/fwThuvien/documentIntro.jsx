@@ -9,7 +9,7 @@ class SectionIntro extends React.Component {
         super(props);
         this.state = {
             carousel: []
-        }
+        };
         this.language = React.createRef();
     }
     componentDidMount() {
@@ -17,7 +17,7 @@ class SectionIntro extends React.Component {
     }
     onClick = (link) => {
         if (link && link.includes('http')) {
-            window.open(link, "_blank");
+            window.open(link, '_blank');
         } else if (link) {
             this.props.history.push(link);
         }

@@ -21,7 +21,7 @@ module.exports = app => {
             condition = {
                 statement: 'lower(ma) LIKE :searchText OR lower(ten) LIKE :searchText',
                 parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
-            }
+            };
         }
         app.model.dmChucVu.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
     });
@@ -50,10 +50,10 @@ module.exports = app => {
     app.post('/api/danh-muc/chuc-vu/multiple', app.permission.check('dmChucVu:write'), (req, res) => {
         const isOverride = req.body.isOverride;
         const data = req.body.dmChucVu;
-        const dataImported = []
+        const dataImported = [];
         const handleCreate = index => {
             if (index >= data.length) {
-                res.send({ data: { message: 'Upload success', items: dataImported } })
+                res.send({ data: { message: 'Upload success', items: dataImported } });
             } else {
                 app.model.dmChucVu.get({ ma: data[index].ma }, (error, item) => {
                     let currentDate = data[index];
@@ -84,7 +84,7 @@ module.exports = app => {
                             }
                         });
                     }
-                })
+                });
             }
         };
         handleCreate(0);

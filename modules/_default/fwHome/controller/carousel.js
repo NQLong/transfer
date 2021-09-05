@@ -40,19 +40,19 @@ module.exports = app => {
                     return -1;
                 }
                 if (a.priority > b.priority) {
-                    return 1
+                    return 1;
                 }
                 return 0;
-            })
-        }
+            });
+        };
     }));
 
     app.post('/api/carousel', app.permission.check('component:read'), (req, res) => {
         let body = req.body.data, user = req.session.user;
         body.maDonVi = user.permissions.includes('website:manage') ? '0' : (user.maDonVi ? user.maDonVi : -1);
         app.model.homeCarousel.create(body, (error, carousel) => {
-            res.send({ error, carousel })
-        })
+            res.send({ error, carousel });
+        });
     });
 
     app.put('/api/carousel', app.permission.check('component:read'), (req, res) => {
@@ -79,18 +79,18 @@ module.exports = app => {
                     } else {
                         res.send({ error, item });
                     }
-                })
+                });
             }
-        })
+        });
     });
 
     app.put('/api/carousel/item', app.permission.check('component:read'), (req, res) => {
         app.model.homeCarouselItem.update({ carouselId: req.body.carouselId, priority: req.body.priority },
-            req.body.changes, (error, item) => { res.send({ error, item }) })
+            req.body.changes, (error, item) => { res.send({ error, item }); });
     });
 
     app.put('/api/carousel/item/priority', app.permission.check('component:write'), (req, res) => {
-        app.model.homeCarouselItem.sortable({ newPriority: req.body.newPriority, oldPriority: req.body.oldPriority, carouselId: req.body.carouselId }, error => res.send({ error }))
+        app.model.homeCarouselItem.sortable({ newPriority: req.body.newPriority, oldPriority: req.body.oldPriority, carouselId: req.body.carouselId }, error => res.send({ error }));
     });
 
     app.put('/api/carousel/item/swap', app.permission.check('component:read'), (req, res) => {
@@ -118,18 +118,18 @@ module.exports = app => {
                                     }
                                 });
                             }
-                        })
+                        });
                     }
-                    else swapPriority(carouselId, nextPriority, target, isMoveUp, maxPriority)
-                })
+                    else swapPriority(carouselId, nextPriority, target, isMoveUp, maxPriority);
+                });
             }
-        }
+        };
     });
 
     app.delete('/api/carousel/item', app.permission.check('component:read'), (req, res) => {
         let permissions = req.session.user.permissions;
         if (permissions.includes('website:write') || permissions.includes('website:manage') || permissions.includes('component:write'))
-            app.model.homeCarouselItem.delete({ carouselId: req.body.carouselId, priority: req.body.priority }, (error, item) => res.send({ error, carouselId: item && item.carouselId }))
+            app.model.homeCarouselItem.delete({ carouselId: req.body.carouselId, priority: req.body.priority }, (error, item) => res.send({ error, carouselId: item && item.carouselId }));
     });
 
     // Home -----------------------------------------------------------------------------------------------------------------------------------------
@@ -155,14 +155,14 @@ module.exports = app => {
         if (fields.userData && fields.userData[0].startsWith('CarouselItem:') && files.CarouselItemImage && files.CarouselItemImage.length > 0) {
             console.log('Hook: uploadCarouselItemImage => carousel image upload');
             let userData = fields.userData[0].split(' ');
-            const conditions = userData[1] == 'new' ? 'new' : { carouselId: userData[1], priority: userData[2] }
+            const conditions = userData[1] == 'new' ? 'new' : { carouselId: userData[1], priority: userData[2] };
             app.uploadComponentImage(req, 'carouselItem', app.model.homeCarouselItem, conditions, files.CarouselItemImage[0].path, done);
         }
     };
     app.uploadHooks.add('uploadCarouselItemImage', (req, fields, files, params, done) => {
         let permissions = req.session.user.permissions;
         if (permissions.includes('website:write') || permissions.includes('website:manage') || permissions.includes('component:write'))
-            app.permission.has(req, () => uploadCarouselItemImage(req, fields, files, params, done), done, 'component:read')
+            app.permission.has(req, () => uploadCarouselItemImage(req, fields, files, params, done), done, 'component:read');
     });
 };
 
@@ -172,4 +172,4 @@ const findMax = (arr) => {
         if (element.priority > max) max = element.priority;
     });
     return max;
-}
+};

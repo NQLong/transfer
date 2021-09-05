@@ -23,14 +23,14 @@ module.exports = app => {
     app.get('/api/danh-muc/ngoai-ngu/all', app.permission.check('user:login'), (req, res) => {
         const condition = req.query.condition || {};
         app.model.dmNgoaiNgu.getAll(condition, '*', 'ma', (error, items) => {
-            res.send({ error, items })
-        })
+            res.send({ error, items });
+        });
     });
 
     app.get('/api/danh-muc/ngoai-ngu/item/:ma', app.permission.check('user:login'), (req, res) => {
         app.model.dmNgoaiNgu.get({ ma: req.params.ma }, (error, item) => {
-            res.send({ error, item })
-        })
+            res.send({ error, item });
+        });
     });
 
     app.post('/api/danh-muc/ngoai-ngu', app.permission.check('dmNgoaiNgu:write'), (req, res) => {
@@ -44,4 +44,4 @@ module.exports = app => {
     app.delete('/api/danh-muc/ngoai-ngu', app.permission.check('dmNgoaiNgu:delete'), (req, res) => {
         app.model.dmNgoaiNgu.delete({ ma: req.body.ma }, errors => res.send({ errors }));
     });
-}
+};

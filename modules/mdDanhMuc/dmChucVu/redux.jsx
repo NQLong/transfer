@@ -32,7 +32,7 @@ export default function DmChucVuReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -57,12 +57,12 @@ export function getDmChucVuPage(pageNumber, pageSize, pageCondition, done) {
                 dispatch({ type: DmChucVuGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách chức vụ bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmChucVuAll(condition, done) {
     return dispatch => {
-        const url = `/api/danh-muc/chuc-vu/all`;
+        const url = '/api/danh-muc/chuc-vu/all';
         T.get(url, { condition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách chức vụ lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -72,12 +72,12 @@ export function getDmChucVuAll(condition, done) {
                 dispatch({ type: DmChucVuGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách chức vụ bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function createDmChucVu(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/chuc-vu`;
+        const url = '/api/danh-muc/chuc-vu';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo dữ liệu bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -87,12 +87,12 @@ export function createDmChucVu(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo dữ liệu bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function deleteDmChucVu(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/chuc-vu`;
+        const url = '/api/danh-muc/chuc-vu';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 console.error(`DELETE: ${url}.`, data.error);
@@ -100,12 +100,12 @@ export function deleteDmChucVu(ma) {
                 dispatch(getDmChucVuPage());
             }
         }, error => T.notify('Xóa dữ liệu bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function updateDmChucVu(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/chuc-vu`;
+        const url = '/api/danh-muc/chuc-vu';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật dữ liệu bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -117,7 +117,7 @@ export function updateDmChucVu(ma, changes, done) {
                 dispatch(getDmChucVuPage());
             }
         }, error => T.notify('Cập nhật dữ liệu bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function createMultiDmChucVu(dmChucVu, isOverride, done) {
@@ -131,7 +131,7 @@ export function createMultiDmChucVu(dmChucVu, isOverride, done) {
                 done && done(data.item);
             }
         }, error => T.notify('Cập nhật dữ liệu bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export const SelectAdapter_DmChucVu = {
@@ -139,4 +139,4 @@ export const SelectAdapter_DmChucVu = {
     getAll: getDmChucVuAll,
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
     condition: { kichHoat: 1 },
-}
+};

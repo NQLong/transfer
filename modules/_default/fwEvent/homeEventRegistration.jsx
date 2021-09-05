@@ -65,7 +65,7 @@ class EventRegistration extends React.Component {
                         {/* <div className='overlay' /> */}
                         <div className='container'>
                             <div className='row no-gutters slider-text js-fullheight align-items-center justify-content-center' data-scrollax-parent='true'>
-                                <div className='col-md-8 ftco-animate text-center' style={{ background: `rgba(0,0,0,0.5)`, paddingTop: '15px' }}>
+                                <div className='col-md-8 ftco-animate text-center' style={{ background: 'rgba(0,0,0,0.5)', paddingTop: '15px' }}>
                                     <p className='breadcrumbs'><span className='mr-2'><Link to='/'>{language.homeTitle}</Link></span></p>
                                     <h1 className='mb-3 bread'>{item.title.getText()}</h1>
                                     <p>{language.register}</p>
@@ -87,7 +87,7 @@ class EventRegistration extends React.Component {
 }
 
 const mapStateToProps = state => {
-    return ({ event: state.event, system: state.system, question: state.reduxQuestion, form: state.form })
+    return ({ event: state.event, system: state.system, question: state.reduxQuestion, form: state.form });
 };
 const mapActionsToProps = { getEventWithQuestionByUser, getEventByUser, getQuestionInPageByUser };
 export default connect(mapStateToProps, mapActionsToProps)(EventRegistration);

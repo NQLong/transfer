@@ -21,7 +21,7 @@ module.exports = app => {
 
     app.get('/api/danh-muc/toa-nha/all', app.permission.check('user:login'), (req, res) => {
         const condition = req.query.condition || {};
-        Object.keys(condition).forEach(key => { condition[key] === '' ? condition[key] = null : '' });
+        Object.keys(condition).forEach(key => { condition[key] === '' ? condition[key] = null : ''; });
         app.model.dmToaNha.getAll(condition, '*', 'ten ASC', (error, items) => res.send({ error, items }));
     });
 

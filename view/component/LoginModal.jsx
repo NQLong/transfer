@@ -69,7 +69,7 @@ export default class LoginModal extends React.Component {
         modal.find('a.nav-link').removeClass('active').removeClass('show');
         modal.find(`a.nav-link[href='#${state}']`).addClass('active').addClass('show');
 
-        modal.find('div.modal-content div.modal-body div.form-group').css('display', 'flex')
+        modal.find('div.modal-content div.modal-body div.form-group').css('display', 'flex');
         const language = T.language(texts);
         if (state === 'register') {
             $(this.btnForgotPassword.current).css('display', 'none');
@@ -77,8 +77,8 @@ export default class LoginModal extends React.Component {
             $(this.btnSend.current).attr('data-action', state).html(language.registerButton);
         } else {
             $(this.btnForgotPassword.current).css('display', 'block');
-            $(this.txtFirstname.current).parent().parent().css('display', 'none')
-            $(this.txtLastname.current).parent().parent().css('display', 'none')
+            $(this.txtFirstname.current).parent().parent().css('display', 'none');
+            $(this.txtLastname.current).parent().parent().css('display', 'none');
             $(this.btnSend.current).attr('data-action', state).html(language.loginButton);
         }
     }

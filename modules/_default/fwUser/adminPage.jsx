@@ -16,7 +16,7 @@ class RolesModal extends React.Component {
     componentDidMount() {
         T.ready(() => {
             $('#userRoles').select2();
-            $(this.modal.current).on('shown.bs.modal', () => $('#userRoles').focus())
+            $(this.modal.current).on('shown.bs.modal', () => $('#userRoles').focus());
         });
     }
 
@@ -65,7 +65,7 @@ class RolesModal extends React.Component {
                 </form>
             </div>
         );
-    };
+    }
 }
 
 class UserModal extends React.Component {
@@ -76,7 +76,7 @@ class UserModal extends React.Component {
 
     componentDidMount() {
         $(document).ready(() => setTimeout(() => {
-            $(this.modal.current).on('shown.bs.modal', () => $('#userEmail').focus())
+            $(this.modal.current).on('shown.bs.modal', () => $('#userEmail').focus());
         }, 250));
     }
 

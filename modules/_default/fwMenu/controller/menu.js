@@ -50,7 +50,7 @@ module.exports = app => {
                 });
                 app.menus = menus;
                 app.divisionMenus = divisionMenus;
-            })
+            });
             // app.model.fwMenu.getMenuTree((error, menuTree) => {
             //     getMenu(0, menuTree, () => {
             //         app.menus = menus;
@@ -58,7 +58,7 @@ module.exports = app => {
             //     })
             // });
         }
-    }
+    };
 
     // const ready = () => {
     //     if (app.dbConnection && app.dbConnection.buildCondition) {
@@ -115,7 +115,7 @@ module.exports = app => {
                             }
                         });
                     }
-                }
+                };
                 handleCreateDefault();
             }
         }),
@@ -157,7 +157,7 @@ module.exports = app => {
                                     } else {
                                         getComponent(level, index + 1, componentIds, components, done);
                                     }
-                                }
+                                };
                                 if (component.viewType && component.viewId) {
                                     let viewType = component.viewType;
                                     if (component.viewId && (['carousel', 'news', 'event', 'feature', 'video', 'gallery', 'content', 'all news', 'all divisions'].indexOf(viewType) != -1)) {
@@ -190,7 +190,7 @@ module.exports = app => {
                     } else {
                         done();
                     }
-                }
+                };
 
                 const getAllComponents = () => {
                     menuComponentIds.push(menu.componentId);
@@ -200,7 +200,7 @@ module.exports = app => {
                         menu.component = Object.assign(menuComponents[0], { components: newComponents });
                         res.send({ menu });
                     });
-                }
+                };
 
                 if (menu.componentId == null || menu.componentId == undefined) {
                     app.model.fwComponent.createNew('container', '', '<empty>', null, '', (error, result) => {
@@ -232,7 +232,7 @@ module.exports = app => {
             if (error == null && result && result.outBinds && result.outBinds.ret != null) {
                 app.model.fwMenu.get({ id: result.outBinds.ret }, (error, item) => {
                     if (error == null) app.buildAppMenus();
-                    res.send({ error, item })
+                    res.send({ error, item });
                 });
             } else {
                 console.log(error);
@@ -283,7 +283,7 @@ module.exports = app => {
 
     app.put('/api/menu/build', app.permission.check('component:write'), (req, res) => {
         app.buildAppMenus();
-        res.send('OK')
+        res.send('OK');
     });
 
     app.get('/api/dvWebsite/menu/:maDonVi', app.permission.check('menu:read'), (req, res) => {

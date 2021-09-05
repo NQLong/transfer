@@ -93,7 +93,7 @@ class AdminPage extends React.Component {
 
     componentDidMount() {
         T.ready('/user/category');
-        this.props.getDmMucDichNuocNgoaiAll()
+        this.props.getDmMucDichNuocNgoaiAll();
     }
 
     edit = (e, item) => {
@@ -102,7 +102,7 @@ class AdminPage extends React.Component {
     }
 
     changeActive = item => {
-        this.props.updateDmMucDichNuocNgoai(item.ma, { kichHoat: Number(!item.kichHoat) })
+        this.props.updateDmMucDichNuocNgoai(item.ma, { kichHoat: Number(!item.kichHoat) });
     };
 
     delete = (e, item) => {

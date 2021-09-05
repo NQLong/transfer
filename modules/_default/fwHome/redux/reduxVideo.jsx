@@ -41,7 +41,7 @@ export function getVideoInPage(pageNumber, pageSize, done) {
                 dispatch({ type: VideoGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách video bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function createVideo(video, done) {
@@ -56,7 +56,7 @@ export function createVideo(video, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo video bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateVideo(id, changes, done) {
@@ -72,7 +72,7 @@ export function updateVideo(id, changes, done) {
                 dispatch(getVideoInPage());
             }
         }, error => T.notify('Cập nhật thông tin video bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteVideo(id) {
@@ -87,7 +87,7 @@ export function deleteVideo(id) {
                 dispatch(getVideoInPage());
             }
         }, error => T.notify('Xóa video bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function changeVideo(video) {
@@ -107,5 +107,5 @@ export function getVideo(id, done) {
                 done(data.item);
             }
         }, error => T.notify('Lấy video bị lỗi!', 'danger'));
-    }
+    };
 }

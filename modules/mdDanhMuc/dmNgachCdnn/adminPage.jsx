@@ -11,7 +11,7 @@ class EditModal extends React.Component {
     componentDidMount() {
         $(document).ready(() => setTimeout(() => {
             $(this.modal.current).on('shown.bs.modal', () => {
-                $(`a[href='#dmNgachCdnnTiengViet']`).tab('show');
+                $('a[href=\'#dmNgachCdnnTiengViet\']').tab('show');
                 $('#dmNgachCdnnMa').focus();
             });
         }, 250));
@@ -36,10 +36,10 @@ class EditModal extends React.Component {
                 maSoCdnn: $('#dmNgachCdnnMasoCdnn').val().trim(),
                 ten: $('#dmNgachCdnnTen').val().trim(),
                 nhom: $('#dmNgachCdnnNhom').val().trim(),
-            }
+            };
         if (changes.ten == '') {
             T.notify('Tên ngạch cdnn bị trống!', 'danger');
-            $(`a[href='#dmNgachCdnnTiengViet']`).tab('show');
+            $('a[href=\'#dmNgachCdnnTiengViet\']').tab('show');
             $('#dmNgachCdnnTen').focus();
         } else {
             if (id) {

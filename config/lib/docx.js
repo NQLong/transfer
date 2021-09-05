@@ -34,15 +34,15 @@ module.exports = app => {
                 let doc = new Docxtemplater(zip);
                 doc.setData(data);
                 // render the document (replace all occurences of {first_name} by John, {last_name} by Doe, ...)
-                doc.render()
-                var buf = doc.getZip().generate({ type: 'nodebuffer' });
+                doc.render();
+                let buf = doc.getZip().generate({ type: 'nodebuffer' });
                 done && done(null, buf);
             } catch (error) { done && done(error); }
         },
 
         generateFileHasImage: (inputFile, data, done) => {
             //Below the options that will be passed to ImageModule instance
-            let opts = {}
+            let opts = {};
             opts.centered = true; //Set to true to always center images
             opts.fileType = 'docx'; //Or pptx
 
@@ -51,7 +51,7 @@ module.exports = app => {
                 //tagValue is 'examples/image.png'
                 //tagName is 'image'
                 return fs.readFileSync(tagValue);
-            }
+            };
 
             //Pass the function that return image size
             opts.getSize = function (img, tagValue, tagName = 'image') {
@@ -60,7 +60,7 @@ module.exports = app => {
                 //tagName is 'image'
                 //tip: you can use node module 'image-size' here
                 return [120, 120];
-            }
+            };
 
             let imageModule = new ImageModule(opts);
 
@@ -72,8 +72,8 @@ module.exports = app => {
             doc.loadZip(zip);
             doc.setData(data);
             // render the document (replace all occurences of {first_name} by John, {last_name} by Doe, ...)
-            doc.render()
-            var buf = doc.getZip().generate({ type: 'nodebuffer' });
+            doc.render();
+            let buf = doc.getZip().generate({ type: 'nodebuffer' });
             done && done(null, buf);
             // } catch (error) { done && done(error); }
         },
@@ -101,12 +101,12 @@ module.exports = app => {
                 errorHandler(error);
             }
 
-            var buf = doc.getZip().generate({ type: 'nodebuffer' });
+            let buf = doc.getZip().generate({ type: 'nodebuffer' });
 
             // buf is a nodejs buffer, you can either write it to a file or do anything else with it.
             fs.writeFileSync(app.publicPath + outputFile, buf);
 
             done();
         },
-    }
-}
+    };
+};

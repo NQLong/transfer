@@ -39,7 +39,7 @@ class SectionNotification extends React.Component {
                                 <div key={index} className='col-12 px-0 pb-2 mb-3 text-justify' style={(index !== notificationList.length - 1) ? { borderBottom: 'dashed 1px #dacaba' } : {}}>
                                     <Link to={link}><h6 className='homeBody' style={{ color: '#676767' }}><b>{item.isTranslate == 1 ? T.language.parse(item.title) : T.language.parse(item.title, true)[item.language]}</b></h6></Link>
                                 </div>
-                            )
+                            );
                         })}
                     </div>
                     <div className='col-12 d-flex justify-content-center'>

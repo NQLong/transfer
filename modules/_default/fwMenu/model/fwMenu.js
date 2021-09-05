@@ -36,9 +36,9 @@ module.exports = app => {
                                             if (submenus2) submenus[index1].submenus = submenus2;
                                             items[index].submenus = submenus;
                                             menuLv2(index1 + 1);
-                                        })
+                                        });
                                     }
-                                }
+                                };
                                 menuLv2(0);
                             } else solve(index + 1);
                         });
@@ -71,9 +71,9 @@ module.exports = app => {
                                             if (submenus2) submenus[index1].submenus = submenus2;
                                             items[index].submenus = submenus;
                                             menuLv2(index1 + 1);
-                                        })
+                                        });
                                     }
-                                }
+                                };
                                 menuLv2(0);
                             } else solve(index + 1);
                         });
@@ -88,4 +88,4 @@ module.exports = app => {
         });
     };
 
-}
+};

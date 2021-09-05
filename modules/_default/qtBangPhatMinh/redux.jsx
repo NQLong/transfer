@@ -10,7 +10,7 @@ export function createQtBangPhatMinhStaff(data, done) {
                 if (done) done(res);
             }
         }, error => T.notify('Thêm thông tin quá trình bằng phát minh bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function updateQtBangPhatMinhStaff(id, changes, done) {
@@ -25,7 +25,7 @@ export function updateQtBangPhatMinhStaff(id, changes, done) {
                 if (done) done();
             }
         }, error => T.notify('Cập nhật thông tin quá trình bằng phát minh bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function deleteQtBangPhatMinhStaff(id, done) {
@@ -40,7 +40,7 @@ export function deleteQtBangPhatMinhStaff(id, done) {
                 if (done) done();
             }
         }, error => T.notify('Xóa thông tin quá trình bằng phát minh bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function createQtBangPhatMinhStaffUser(data, done) {
@@ -55,7 +55,7 @@ export function createQtBangPhatMinhStaffUser(data, done) {
                 if (done) done(res);
             }
         }, error => T.notify('Thêm thông tin quá trình bằng phát minh bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function updateQtBangPhatMinhStaffUser(id, changes, done) {
@@ -70,7 +70,7 @@ export function updateQtBangPhatMinhStaffUser(id, changes, done) {
                 if (done) done();
             }
         }, error => T.notify('Cập nhật thông tin quá trình bằng phát minh bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function deleteQtBangPhatMinhStaffUser(id, done) {
@@ -82,8 +82,8 @@ export function deleteQtBangPhatMinhStaffUser(id, done) {
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
                 T.alert('Thông tin quá trình bằng phát minh được xóa thành công!', 'info', false, 800);
-                done && done()
+                done && done();
             }
         }, error => T.notify('Xóa thông tin quá trình bằng phát minh bị lỗi' , 'danger'));
-    }
+    };
 }

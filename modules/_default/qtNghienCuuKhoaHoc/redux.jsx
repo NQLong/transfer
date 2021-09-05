@@ -10,7 +10,7 @@ export function createQtNckhStaff(data, done) {
                 if (done) done(res);
             }
         }, error => T.notify('Thêm thông tin quá trình nghiên cứu khoa học bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function updateQtNckhStaff(id, changes, done) {
@@ -25,7 +25,7 @@ export function updateQtNckhStaff(id, changes, done) {
                 if (done) done();
             }
         }, error => T.notify('Cập nhật thông tin quá trình nghiên cứu khoa học bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function deleteQtNckhStaff(id, done) {
@@ -40,7 +40,7 @@ export function deleteQtNckhStaff(id, done) {
                 if (done) done();
             }
         }, error => T.notify('Xóa thông tin quá trình nghiên cứu khoa học bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function createQtNckhStaffUser(data, done) {
@@ -55,7 +55,7 @@ export function createQtNckhStaffUser(data, done) {
                 if (done) done(res);
             }
         }, error => T.notify('Thêm thông tin quá trình nghiên cứu khoa học bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function updateQtNckhStaffUser(id, changes, done) {
@@ -70,7 +70,7 @@ export function updateQtNckhStaffUser(id, changes, done) {
                 if (done) done();
             }
         }, error => T.notify('Cập nhật thông tin quá trình nghiên cứu khoa học bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function deleteQtNckhStaffUser(id, done) {
@@ -82,8 +82,8 @@ export function deleteQtNckhStaffUser(id, done) {
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
                 T.alert('Thông tin quá trình nghiên cứu khoa học được xóa thành công!', 'info', false, 800);
-                done && done()
+                done && done();
             }
         }, error => T.notify('Xóa thông tin quá trình nghiên cứu khoa học bị lỗi' , 'danger'));
-    }
+    };
 }

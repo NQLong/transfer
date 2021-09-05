@@ -15,7 +15,7 @@ class ComponentPage extends React.Component {
             navTabs.find('li:nth-child(' + (tabIndex + 1) + ') a').tab('show');
             $('#componentPage').fadeIn();
 
-            $(`a[data-toggle='tab']`).on('shown.bs.tab', e => {
+            $('a[data-toggle=\'tab\']').on('shown.bs.tab', e => {
                 T.cookie('componentPageTab', $(e.target).parent().index());
             });
         });

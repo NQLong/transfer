@@ -46,7 +46,7 @@ class SectionContact extends React.Component {
         this.message = React.createRef();
         this.state = {
             address: ''
-        }
+        };
     }
     componentDidMount() {
         if (this.props.dvWebsite && this.props.dvWebsite.items) {
@@ -101,7 +101,7 @@ class SectionContact extends React.Component {
                         </div>
                         <div className='w-100' />
                         <div className='col-md-6' style={{ fontSize: '17px' }}>
-                            <p><span>{language.address}:</span> <a href={linkMap} target='_blank'>
+                            <p><span>{language.address}:</span> <a href={linkMap} target='_blank' rel="noreferrer">
                                 {this.state.address}
                             </a></p>
                         </div>
@@ -132,7 +132,7 @@ class SectionContact extends React.Component {
                             </form>
                         </div>
                         <div className='col-md-6'>
-                            <a href={linkMap} target='_blank'>
+                            <a href={linkMap} target='_blank' rel="noreferrer">
                                 <img src={map} style={{ width: '100%' }} />
                             </a>
                         </div>

@@ -36,7 +36,7 @@ export default function staffReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -64,7 +64,7 @@ export function getStaffPage(pageNumber, pageSize, pageCondition, done) {
                 dispatch({ type: StaffGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách cán bộ bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function getStaff(shcc, done) {
@@ -78,7 +78,7 @@ export function getStaff(shcc, done) {
                 done(data);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function getStaffEdit(shcc, done) {
@@ -93,7 +93,7 @@ export function getStaffEdit(shcc, done) {
                 dispatch({ type: StaffGet, item: data.item });
             }
         }, error => T.notify('Lấy thông tin cán bộ bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function createStaff(canBo, done) {
@@ -108,7 +108,7 @@ export function createStaff(canBo, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo mới một cán bộ bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function updateStaff(shcc, changes, done) {
@@ -124,12 +124,12 @@ export function updateStaff(shcc, changes, done) {
                 dispatch(getStaff(shcc));
             }
         }, error => T.notify('Cập nhật dữ liệu cán bộ bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function deleteStaff(shcc, done) {
     return dispatch => {
-        const url = `/api/staff`;
+        const url = '/api/staff';
         T.delete(url, { shcc }, data => {
             if (data.error) {
                 T.notify('Xóa cán bộ bị lỗi' , 'danger');
@@ -140,7 +140,7 @@ export function deleteStaff(shcc, done) {
             }
             done && done();
         }, error => T.notify('Xóa cán bộ bị lỗi', 'danger'));
-    }
+    };
 }
 
 //#region quanHeCanBo
@@ -157,7 +157,7 @@ export function createQuanHeCanBo(data, done) {
                 if (done) done(res);
             }
         }, error => T.notify('Thêm thông tin người thân bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function updateQuanHeCanBo(id, changes, done) {
@@ -173,7 +173,7 @@ export function updateQuanHeCanBo(id, changes, done) {
                 if (done) done();
             }
         }, error => T.notify('Cập nhật thông tin người thân bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function deleteQuanHeCanBo(id, shcc) {
@@ -188,7 +188,7 @@ export function deleteQuanHeCanBo(id, shcc) {
                 dispatch(getStaffEdit(shcc));
             }
         }, error => T.notify('Xóa thông tin người thân bị lỗi' , 'danger'));
-    }
+    };
 }
 //#endregion quanHeCanBo
 
@@ -199,7 +199,7 @@ export const SelectAdapter_FwCanBo = {
     processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.shcc, text: `${item.shcc}: ${item.ho} ${item.ten}` })) : [] }),
     getOne: getStaff,
     processResultOne: response => response && response.item && ({ value: response.item.shcc, text: `${response.item.shcc}: ${response.item.ho} ${response.item.ten}` }),
-}
+};
 
 export function createMultiCanBo(canBoList, done) {
     return dispatch => {
@@ -211,8 +211,8 @@ export function createMultiCanBo(canBoList, done) {
             } else {
                 done && done(data.item);
             }
-        }, () => T.notify('Cập nhật dữ liệu bị lỗi!', 'danger'))
-    }
+        }, () => T.notify('Cập nhật dữ liệu bị lỗi!', 'danger'));
+    };
 }
 
 export function downloadWord(shcc, done) {
@@ -226,7 +226,7 @@ export function downloadWord(shcc, done) {
                 done(data.data);
             }
         }, error => T.notify('Tải file word bị lỗi', 'danger'));
-    }
+    };
 }
 
 export function downloadWordLlkh(shcc, done) {
@@ -240,7 +240,7 @@ export function downloadWordLlkh(shcc, done) {
                 done(data.data);
             }
         }, error => T.notify('Tải file word bị lỗi', 'danger'));
-    }
+    };
 }
 
 // User Actions ------------------------------------------------------------------------------------------------------------
@@ -256,7 +256,7 @@ export function userGetStaff(shcc, done) {
                 done && done(data);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function updateStaffUser(changes, shcc, done) {
@@ -272,7 +272,7 @@ export function updateStaffUser(changes, shcc, done) {
                 dispatch(userGetStaff(shcc));
             }
         }, error => T.notify('Cập nhật dữ liệu cán bộ bị lỗi' , 'danger'));
-    }
+    };
 }
 
 //#region quanHeStaff User
@@ -289,7 +289,7 @@ export function createQuanHeStaffUser(data, shcc, done) {
                 if (done) done(res);
             }
         }, error => T.notify('Thêm thông tin người thân bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function updateQuanHeStaffUser(id, changes, shcc, done) {
@@ -305,7 +305,7 @@ export function updateQuanHeStaffUser(id, changes, shcc, done) {
                 if (done) done();
             }
         }, error => T.notify('Cập nhật thông tin người thân bị lỗi' , 'danger'));
-    }
+    };
 }
 
 export function deleteQuanHeStaffUser(id, shcc) {
@@ -320,6 +320,6 @@ export function deleteQuanHeStaffUser(id, shcc) {
                 dispatch(userGetStaff(shcc));
             }
         }, error => T.notify('Xóa thông tin người thân bị lỗi' , 'danger'));
-    }
+    };
 }
 //#endregion quanHeCanBo User

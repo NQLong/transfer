@@ -133,7 +133,7 @@ module.exports = app => {
                         item2.priority = priority;
                         app.model.fwNews.update({ id: item1.id }, { priority: item1.priority }, error1 => {
                             app.model.fwNews.update({ id: item2.id }, { priority: item2.priority }, error2 => done(error1 || error2));
-                        })
+                        });
                     }
                 });
             }
@@ -166,7 +166,7 @@ module.exports = app => {
             result = { totalItem, pageSize, pageTotal: Math.ceil(totalItem / pageSize) };
             result.pageNumber = pageNumber === -1 ? pageTotal : Math.min(pageNumber, result.pageTotal);
             leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
-            const sql = 'SELECT DISTINCT ID,' + app.dbConnection.parseSelectedColumns(obj2DbFilter, selectedColumns) + `FROM (SELECT FN.*, COUNT(*) over (partition by FN.ID) AS CNT, FC.ID AS CATEGORY_ID, FC.TITLE AS CATEGORY_TITLE, ROW_NUMBER() OVER (ORDER BY ` + (orderBy ? orderBy : ' FN.' + keys) + ') R FROM FW_NEWS FN INNER JOIN FW_NEWS_CATEGORY FNC on FN.ID = FNC.NEWS_ID INNER JOIN FW_CATEGORY FC on FNC.CATEGORY_ID = FC.ID WHERE CATEGORY_ID IN ('
+            const sql = 'SELECT DISTINCT ID,' + app.dbConnection.parseSelectedColumns(obj2DbFilter, selectedColumns) + 'FROM (SELECT FN.*, COUNT(*) over (partition by FN.ID) AS CNT, FC.ID AS CATEGORY_ID, FC.TITLE AS CATEGORY_TITLE, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : ' FN.' + keys) + ') R FROM FW_NEWS FN INNER JOIN FW_NEWS_CATEGORY FNC on FN.ID = FNC.NEWS_ID INNER JOIN FW_CATEGORY FC on FNC.CATEGORY_ID = FC.ID WHERE CATEGORY_ID IN ('
                 + category + ')' + (condition.statement ? ' AND ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize) + ' ORDER BY pinned DESC, START_POST DESC';
             app.dbConnection.execute(sql, parameter, (error, resultSet) => {
                 result.list = resultSet && resultSet.rows ? resultSet.rows : [];
@@ -175,4 +175,4 @@ module.exports = app => {
         });
     };
 
-}
+};

@@ -26,13 +26,13 @@ module.exports = app => {
             const sql = 'INSERT INTO FW_QUESTION (' + statement.substring(2) + ') VALUES (' + values.substring(2) + ')';
             app.dbConnection.executeMany(sql, parameter, (error, resultSet) => {
                 if (!error || !resultSet.rowsAffected) {
-                    done()
+                    done();
                 } else {
                     done(error ? error : 'Execute SQL command fail! Sql = ' + sql);
                 }
             });
         }
-    }
+    };
 
     app.model.fwQuestion.swapPriority = (id, formId, isMoveUp, done) => {
         app.model.fwQuestion.get({ id }, (error, item1) => {
@@ -58,12 +58,12 @@ module.exports = app => {
                         item2.priority = priority;
                         app.model.fwQuestion.update({ id: item1.id }, { priority: item1.priority }, error1 => {
                             app.model.fwQuestion.update({ id: item2.id }, { priority: item2.priority }, error2 => done(error1 || error2));
-                        })
+                        });
                     }
                 });
             }
         });
-    }
+    };
 
     app.model.fwQuestion.createWithPriority = (formId, data, done) => {
         app.model.fwQuestion.get({ formId }, '*', 'priority DESC', (error, form) => {
@@ -92,5 +92,5 @@ module.exports = app => {
                 });
             }
         });
-    }
-}
+    };
+};

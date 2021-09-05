@@ -96,7 +96,7 @@ class DmHoTroHocPhiPage extends React.Component {
 
     componentDidMount() {
         T.ready('/user/category');
-        this.props.getDmHoTroHocPhiAll()
+        this.props.getDmHoTroHocPhiAll();
     }
 
     edit = (e, item) => {

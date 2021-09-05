@@ -32,7 +32,7 @@ export default function DmBoMonReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -58,12 +58,12 @@ export function getDmBoMonPage(pageNumber, pageSize, pageCondition, done) {
                 dispatch({ type: DmBoMonGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách bộ môn bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmBoMonAll(done) {
     return dispatch => {
-        const url = `/api/dm-bo-mon/all`;
+        const url = '/api/dm-bo-mon/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách bộ môn bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -73,7 +73,7 @@ export function getDmBoMonAll(done) {
                 dispatch({ type: DmBoMonGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách bộ môn bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function getDmBoMon(ma, done) {
@@ -89,12 +89,12 @@ export function getDmBoMon(ma, done) {
         }, error => {
             console.error(`GET: ${url}.`, error);
         });
-    }
+    };
 }
 
 export function getmaDonVi(done) {
     return dispatch => {
-        const url = `/api/dm-bo-mon/donVi`;
+        const url = '/api/dm-bo-mon/donVi';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy thông tin bộ môn bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -105,12 +105,12 @@ export function getmaDonVi(done) {
         }, error => {
             console.error(`GET: ${url}.`, error);
         });
-    }
+    };
 }
 
 export function createDmBoMon(item, done) {
     return dispatch => {
-        const url = `/api/dm-bo-mon`;
+        const url = '/api/dm-bo-mon';
         T.post(url, { item }, data => {
             if (data.error) {
                 console.error(`POST: ${url}.`, data.error);
@@ -121,12 +121,12 @@ export function createDmBoMon(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo bộ môn bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function deleteDmBoMon(ma) {
     return dispatch => {
-        const url = `/api/dm-bo-mon`;
+        const url = '/api/dm-bo-mon';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa bộ môn bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -136,12 +136,12 @@ export function deleteDmBoMon(ma) {
                 dispatch(getDmBoMonPage());
             }
         }, error => T.notify('Xóa Bộ môn bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function updateDmBoMon(ma, changes, done) {
     return dispatch => {
-        const url = `/api/dm-bo-mon`;
+        const url = '/api/dm-bo-mon';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật bộ môn bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -153,7 +153,7 @@ export function updateDmBoMon(ma, changes, done) {
                 dispatch(getDmBoMonPage());
             }
         }, error => T.notify('Cập nhật bộ môn bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
-    }
+    };
 }
 
 export function changeDmBoMon(item) {
@@ -170,8 +170,8 @@ export function createMultiDmBoMon(dmBoMon, done) {
             } else {
                 done && done(data.item);
             }
-        }, () => T.notify('Cập nhật dữ liệu bị lỗi!', 'danger'))
-    }
+        }, () => T.notify('Cập nhật dữ liệu bị lỗi!', 'danger'));
+    };
 }
 
 export const SelectAdapter_DmBoMon = {
@@ -181,4 +181,4 @@ export const SelectAdapter_DmBoMon = {
     processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.ten })) : [] }),
     getOne: getDmBoMon,
     processResultOne: response => response && ({ value: response.ma, text: response.ma + ': ' + response.ten }),
-}
+};

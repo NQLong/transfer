@@ -39,7 +39,7 @@ class Footer extends React.Component {
                     this.setState({ footerData: footerData.reverse() });
                 }
             });
-        })
+        });
     }
 
     componentDidUpdate() {
@@ -70,13 +70,13 @@ class Footer extends React.Component {
                                 {item.childData.map((childItem, childIndex) => (
                                     <li key={childIndex}>
                                         {childItem.link ? childItem.link.includes('http://') || childItem.link.includes('https://') ?
-                                            <a target='_blank' href={childItem.link}>{T.language.parse(childItem.title)}</a> : <Link target='_blank' to={childItem.link}>{T.language.parse(childItem.title)}</Link> : <a target='_blank' href='#'>{T.language.parse(childItem.title)}</a>}
+                                            <a target='_blank' href={childItem.link} rel="noreferrer">{T.language.parse(childItem.title)}</a> : <Link target='_blank' to={childItem.link}>{T.language.parse(childItem.title)}</Link> : <a target='_blank' href='#'>{T.language.parse(childItem.title)}</a>}
                                     </li>
                                 ))}
                             </ul>
                         </div>
                     </div>
-                )
+                );
             });
             if (hostname.includes('tuyensinh')) {
                 footerList = [
@@ -98,16 +98,16 @@ class Footer extends React.Component {
                                 style={{ width: '100%', maxWidth: 450, cursor: 'pointer' }} />
                             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', paddingTop: 10, maxWidth: 450 }}>
                                 {mobile &&
-                                    <a target='_blank' href={`tel:${mobile}`}>
+                                    <a target='_blank' href={`tel:${mobile}`} rel="noreferrer">
                                         <img src={'/img/social-media-icon/1.png?t=1'} style={{ height: 50, cursor: 'pointer' }} />
                                     </a>}
-                                {youtube && <a target='_blank' href={youtube}>
+                                {youtube && <a target='_blank' href={youtube} rel="noreferrer">
                                     <img src={'/img/social-media-icon/2.png?t=1'} style={{ height: 50, }} />
                                 </a>}
-                                <a target='_blank' href={`https://www.linkedin.com/company/ussh-vnuhcm/`}>
+                                <a target='_blank' href={'https://www.linkedin.com/company/ussh-vnuhcm/'} rel="noreferrer">
                                     <img src={'/img/social-media-icon/3.png?t=1'} style={{ height: 50, }} />
                                 </a>
-                                {facebook && <a target='_blank' href={facebook}>
+                                {facebook && <a target='_blank' href={facebook} rel="noreferrer">
                                     <img src={'/img/social-media-icon/4.png?t=1'} href={facebook} style={{ height: 50, cursor: 'pointer' }} />
                                 </a>}
                             </div>
@@ -125,7 +125,7 @@ class Footer extends React.Component {
                     <div className='footer-link'>
                         <h3>KẾT NỐI VỚI VNUHCM <i className='fa fa-angle-down d-md-none'></i></h3>
                         <div className='list-unstyled' style={{ fontWeight: 'bold', fontSize: 16 }}>
-                            <a href={'https://vnuhcm.edu.vn/'} target='_blank'> <img src={'/img/logo-vnu.png?t=2000'}
+                            <a href={'https://vnuhcm.edu.vn/'} target='_blank' rel="noreferrer"> <img src={'/img/logo-vnu.png?t=2000'}
                                 style={{
                                     width: width < 700 ? '90%' : '82%', paddingTop: 10, maxWidth: 450, cursor: 'pointer',
                                     paddingLeft: width < 700 ? '5%' : 0
@@ -142,7 +142,7 @@ class Footer extends React.Component {
                         </div>
                     </div>
                 </div> */
-            ])
+            ]);
             if (hostname.includes('ctsv')) {
                 footerList[0] = <div key={0} className='col-sm'>
                     <div className='footer-link'>
@@ -157,7 +157,7 @@ class Footer extends React.Component {
                                 .map((childItem, childIndex) => (
                                     <li key={childIndex}>
                                         {childItem.link ? childItem.link.includes('http://') || childItem.link.includes('https://') ?
-                                            <a target='_blank' href={childItem.link}>{T.language.parse(childItem.title)}</a> : <Link target='_blank' to={childItem.link}>{T.language.parse(childItem.title)}</Link> : <a target='_blank' href='#'>{T.language.parse(childItem.title)}</a>}
+                                            <a target='_blank' href={childItem.link} rel="noreferrer">{T.language.parse(childItem.title)}</a> : <Link target='_blank' to={childItem.link}>{T.language.parse(childItem.title)}</Link> : <a target='_blank' href='#'>{T.language.parse(childItem.title)}</a>}
                                     </li>
                                 ))}
                         </ul>
@@ -171,7 +171,7 @@ class Footer extends React.Component {
                             <li><i className='fa fa-map-marker'></i><span className='ml-1' style={{ paddingLeft: '10px', fontWeight: 'bold' }}>{'Cơ sở Thủ Đức: Phòng P2-01, Nhà Điều hành, Khu phố 6, phường Linh Trung, TP. Thủ Đức, TP. Hồ Chí Minh'}</span></li>
                         </div>
                     </div>
-                </div>
+                </div>;
                 footerList[3] =
                     <div className='footer-link' key={4}>
                         <h3>{'KẾT NỐI'} <i className='fa fa-angle-down d-md-none'></i></h3>
@@ -191,7 +191,7 @@ class Footer extends React.Component {
                                 <a href='https://www.facebook.com/ctsv.hcmussh'>https://www.facebook.com/ctsv.hcmussh</a>
                             </span></li>
                         </div>
-                    </div>
+                    </div>;
             }
             else if (hostname.includes('triethoc')) {
                 footerList[2] =
@@ -203,7 +203,7 @@ class Footer extends React.Component {
                             </div>
                         </div>
                     </div>
-                    ]
+                    ];
             } else if (hostname.includes('era')) {
                 footerList[0] = <div className='col-sm' key={'11'}>
                     <div className='footer-link'>
@@ -225,7 +225,7 @@ class Footer extends React.Component {
                             </li>
                         </div>
                     </div>
-                </div>
+                </div>;
                 footerList[1] =
                     <div className='col-sm' key={'12'}>
                         <div className='footer-link'>
@@ -247,7 +247,7 @@ class Footer extends React.Component {
                                 </li>
                             </div>
                         </div>
-                    </div>
+                    </div>;
                 delete footerList[2];
                 // footerList[2] =
                 //     <div className='col-sm' key={'13'}>
@@ -279,17 +279,17 @@ class Footer extends React.Component {
                         <h3>{'LIÊN HỆ'} <i className='fa fa-angle-down d-md-none'></i></h3>
                         <ul className='list-unstyled' style={{ display: 'none' }}>
                             <li>
-                                <a target='_blank' href='https://www.facebook.com/Libussh'>Fanpage Thư viện</a>
+                                <a target='_blank' href='https://www.facebook.com/Libussh' rel="noreferrer">Fanpage Thư viện</a>
                             </li>
                             <li>
-                                <a target='_blank' href='https://hcmussh.edu.vn/tin-tuc/lien-lac'>Thông tin liên lạc</a>
+                                <a target='_blank' href='https://hcmussh.edu.vn/tin-tuc/lien-lac' rel="noreferrer">Thông tin liên lạc</a>
                             </li>
                             <li>
-                                <a target='_blank' href='https://hcmussh.edu.vn/tin-tuc/vi-tri-tv'>Đường đến Thư viện</a>
+                                <a target='_blank' href='https://hcmussh.edu.vn/tin-tuc/vi-tri-tv' rel="noreferrer">Đường đến Thư viện</a>
                             </li>
                         </ul>
                     </div>
-                </div>
+                </div>;
             }
         }
         return (

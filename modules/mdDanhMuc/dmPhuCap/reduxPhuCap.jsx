@@ -32,7 +32,7 @@ export default function DmPhuCapReducer(state = null, data) {
                         }
                     }
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage })
+                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
             } else {
                 return null;
             }
@@ -56,12 +56,12 @@ export function getDmPhuCapPage(pageNumber, pageSize, done) {
                 dispatch({ type: DmPhuCapGetPage, page: data.page });
             }
         }, error => T.notify('Lấy danh sách phụ cấp bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmPhuCapAll(done) {
     return dispatch => {
-        const url = `/api/danh-muc/phu-cap/all`;
+        const url = '/api/danh-muc/phu-cap/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách phụ cấp bị lỗi!', 'danger');
@@ -71,7 +71,7 @@ export function getDmPhuCapAll(done) {
                 dispatch({ type: DmPhuCapGetAll, items: data.items ? data.items : [] });
             }
         }, error => T.notify('Lấy danh sách phụ cấp bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function getDmPhuCap(ma, done) {
@@ -85,12 +85,12 @@ export function getDmPhuCap(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    }
+    };
 }
 
 export function createDmPhuCap(item, done) {
     return dispatch => {
-        const url = `/api/danh-muc/phu-cap`;
+        const url = '/api/danh-muc/phu-cap';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo phụ cấp bị lỗi!', 'danger');
@@ -100,12 +100,12 @@ export function createDmPhuCap(item, done) {
                 if (done) done(data);
             }
         }, error => T.notify('Tạo phụ cấp bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function deleteDmPhuCap(ma) {
     return dispatch => {
-        const url = `/api/danh-muc/phu-cap`;
+        const url = '/api/danh-muc/phu-cap';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục phụ cấp bị lỗi!', 'danger');
@@ -115,12 +115,12 @@ export function deleteDmPhuCap(ma) {
                 dispatch(getDmPhuCapAll());
             }
         }, error => T.notify('Xóa phụ cấp bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function updateDmPhuCap(ma, changes, done) {
     return dispatch => {
-        const url = `/api/danh-muc/phu-cap`;
+        const url = '/api/danh-muc/phu-cap';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tin phụ cấp bị lỗi!', 'danger');
@@ -131,7 +131,7 @@ export function updateDmPhuCap(ma, changes, done) {
                 dispatch(getDmPhuCapAll());
             }
         }, error => T.notify('Cập nhật thông tin phụ cấp bị lỗi!', 'danger'));
-    }
+    };
 }
 
 export function changeDmPhuCap(item) {
