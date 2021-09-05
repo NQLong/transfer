@@ -11,7 +11,7 @@ export default class MessagePage extends React.Component {
         if (pathname.startsWith('/active-user/')) {
             T.post(window.location.pathname,
                 res => this.setState({ message: res.message }),
-                error => T.notify('Kích hoạt người dùng bị lỗi!', 'danger'));
+                () => T.notify('Kích hoạt người dùng bị lỗi!', 'danger'));
         }
     }
 

@@ -110,7 +110,7 @@ class adminUploadPage extends React.Component {
     }
 
     updateTableData = (dataEditModal) => {
-        this.setState((state, props) => {
+        this.setState((state) => {
             state.dmTaiKhoanKeToan.forEach(data => {
                 if (data.ma == dataEditModal.changes.ma) {
                     data.tenTaiKhoan = dataEditModal.changes.tenTaiKhoan;

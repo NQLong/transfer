@@ -55,7 +55,7 @@ export function getDmTapChiPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: DmTapChiGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách tạp chí bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách tạp chí bị lỗi!', 'danger'));
     };
 }
 
@@ -70,12 +70,12 @@ export function getDmTapChiAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmTapChiGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách tạp chí bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách tạp chí bị lỗi!', 'danger'));
     };
 }
 
 export function getDmTapChi(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/tap-chi/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -99,7 +99,7 @@ export function createDmTapChi(item, done) {
                 dispatch(getDmTapChiAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo tạp chí bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo tạp chí bị lỗi!', 'danger'));
     };
 }
 
@@ -114,7 +114,7 @@ export function deleteDmTapChi(ma) {
                 T.alert('Danh mục đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmTapChiAll());
             }
-        }, error => T.notify('Xóa tạp chí bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa tạp chí bị lỗi!', 'danger'));
     };
 }
 
@@ -130,7 +130,7 @@ export function updateDmTapChi(ma, changes, done) {
                 T.notify('Cập nhật thông tin tạp chí thành công!', 'success');
                 dispatch(getDmTapChiAll());
             }
-        }, error => T.notify('Cập nhật thông tin tạp chí bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin tạp chí bị lỗi!', 'danger'));
     };
 }
 

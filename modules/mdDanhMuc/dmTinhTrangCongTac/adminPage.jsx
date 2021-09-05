@@ -126,7 +126,7 @@ class dmTinhTrangCongTacPage extends React.Component {
                                 <td><a href='#' onClick={e => this.edit(e, item)}>{item.ten}</a></td>
                                 <td className='toggle' style={{ textAlign: 'center' }}>
                                     <label>
-                                        <input type='checkbox' checked={item.kichHoat} onChange={e => permissionWrite && this.changeActive(item)} />
+                                        <input type='checkbox' checked={item.kichHoat} onChange={() => permissionWrite && this.changeActive(item)} />
                                         <span className='button-indecator' />
                                     </label>
                                 </td>

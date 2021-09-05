@@ -197,7 +197,7 @@ class HomeMenu extends React.Component {
                     isExternalLink = link.startsWith('http://') || link.startsWith('https://');
                 return (
                     <div key={index} className='menuStyle d-flex justify-content-center align-items-center px-2'
-                        style={{ backgroundColor: item.highlight ? 'red' : '', borderColor: 'transparent', borderRightWidth: 1, borderColor: '#0139A6' }}>
+                        style={{ backgroundColor: item.highlight ? 'red' : '', borderRightWidth: 1, borderColor: '#0139A6' }}>
                         {isExternalLink ? <a href={link} target='_blank' style={{ color: '#0139a6', fontSize: '0.9vw', fontWeight: 'bold' }} rel="noreferrer">{title}</a> :
                             <Link to={Link} style={{ color: '#0139a6', fontSize: '0.9vw', fontWeight: 'bold' }}>{title}</Link>}
                     </div>
@@ -237,7 +237,7 @@ class HomeMenu extends React.Component {
                     {submenus}
                     <div className='d-flex align-items-center'>
                         {languageToggle}
-                        <input type='text' className='mx-2 px-2' id='inputID' onKeyPress={this.onKeyPress} className='subMenu' placeholder={language.search}
+                        <input type='text' className='mx-2 px-2 subMenu' id='inputID' onKeyPress={this.onKeyPress} placeholder={language.search}
                             style={{ borderColor: '#0139a6', backgroundColor: 'transparent', borderRadius: 5, marginLeft: 10, marginBottom: 2 }} />
                     </div>
                     <div className='d-flex align-items-center'>

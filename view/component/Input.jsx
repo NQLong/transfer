@@ -115,8 +115,8 @@ export class DateInput extends InputBase {
         ...InputBase.defaultProps,
         defaultValue: NaN,
         type: 'date',
-        min: new Date(0).getTime(),
-        max: Date.nextYear().roundDate().getTime(),
+        // min: new Date(0).getTime(),
+        // max: Date.nextYear().roundDate().getTime(),
         min: -999999999999999,
         max: 999999999999999,
     }
@@ -266,8 +266,8 @@ export class DateInput2 extends InputBase {
         ...InputBase.defaultProps,
         defaultValue: NaN,
         type: 'date',
-        min: new Date(0).getTime(),
-        max: Date.nextYear().roundDate().getTime(),
+        // min: new Date(0).getTime(),
+        // max: Date.nextYear().roundDate().getTime(),
         min: -2209012924000,//01/01/1900 00:00
         max: 7289542800000,//31/12/2200 00:00
     }

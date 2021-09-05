@@ -56,23 +56,23 @@ export function getStaffPage(pageNumber, pageSize, pageCondition, done) {
         const url = `/api/staff/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition }, data => {
             if (data.error) {
-                T.notify('Lấy danh sách cán bộ bị lỗi' , 'danger');
+                T.notify('Lấy danh sách cán bộ bị lỗi', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 if (done) done(data.page);
                 dispatch({ type: StaffGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách cán bộ bị lỗi' , 'danger'));
+        }, () => T.notify('Lấy danh sách cán bộ bị lỗi', 'danger'));
     };
 }
 
 export function getStaff(shcc, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/staff/item/${shcc}`;
         T.get(url, data => {
             if (data.error) {
-                T.notify('Lấy thông tin cán bộ bị lỗi' , 'danger');
+                T.notify('Lấy thông tin cán bộ bị lỗi', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else if (done) {
                 done(data);
@@ -92,22 +92,22 @@ export function getStaffEdit(shcc, done) {
                 if (done) done(data);
                 dispatch({ type: StaffGet, item: data.item });
             }
-        }, error => T.notify('Lấy thông tin cán bộ bị lỗi' , 'danger'));
+        }, () => T.notify('Lấy thông tin cán bộ bị lỗi', 'danger'));
     };
 }
 
 export function createStaff(canBo, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/staff';
         T.post(url, { canBo }, data => {
             if (data.error) {
-                T.notify('Tạo mới một cán bộ bị lỗi' , 'danger');
+                T.notify('Tạo mới một cán bộ bị lỗi', 'danger');
                 console.error(`POST: ${url}.`, data.error);
             } else {
                 T.notify('Tạo mới một cán bộ thành công!', 'success');
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo mới một cán bộ bị lỗi' , 'danger'));
+        }, () => T.notify('Tạo mới một cán bộ bị lỗi', 'danger'));
     };
 }
 
@@ -116,14 +116,14 @@ export function updateStaff(shcc, changes, done) {
         const url = '/api/staff';
         T.put(url, { shcc, changes }, data => {
             if (data.error) {
-                T.notify('Cập nhật dữ liệu cán bộ bị lỗi' , 'danger');
+                T.notify('Cập nhật dữ liệu cán bộ bị lỗi', 'danger');
                 console.error(`PUT: ${url}.`, data.error);
             } else {
                 T.notify('Cập nhật thông tin cán bộ thành công!', 'success');
                 done && done(data.item);
                 dispatch(getStaff(shcc));
             }
-        }, error => T.notify('Cập nhật dữ liệu cán bộ bị lỗi' , 'danger'));
+        }, () => T.notify('Cập nhật dữ liệu cán bộ bị lỗi', 'danger'));
     };
 }
 
@@ -132,14 +132,14 @@ export function deleteStaff(shcc, done) {
         const url = '/api/staff';
         T.delete(url, { shcc }, data => {
             if (data.error) {
-                T.notify('Xóa cán bộ bị lỗi' , 'danger');
+                T.notify('Xóa cán bộ bị lỗi', 'danger');
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('Xóa cán bộ thành công!', 'success', false, 800);
                 dispatch(getStaffPage());
             }
             done && done();
-        }, error => T.notify('Xóa cán bộ bị lỗi', 'danger'));
+        }, () => T.notify('Xóa cán bộ bị lỗi', 'danger'));
     };
 }
 
@@ -149,14 +149,14 @@ export function createQuanHeCanBo(data, done) {
         const url = '/api/staff/quan-he';
         T.post(url, { data }, res => {
             if (res.error) {
-                T.notify('Thêm thông tin người thân bị lỗi' , 'danger');
+                T.notify('Thêm thông tin người thân bị lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
                 T.notify('Thêm thông tin người thân thành công!', 'info');
                 dispatch(getStaffEdit(res.item.shcc));
                 if (done) done(res);
             }
-        }, error => T.notify('Thêm thông tin người thân bị lỗi' , 'danger'));
+        }, () => T.notify('Thêm thông tin người thân bị lỗi', 'danger'));
     };
 }
 
@@ -165,14 +165,14 @@ export function updateQuanHeCanBo(id, changes, done) {
         const url = '/api/staff/quan-he';
         T.put(url, { id, changes }, data => {
             if (data.error) {
-                T.notify('Cập nhật thông tin người thân bị lỗi' , 'danger');
+                T.notify('Cập nhật thông tin người thân bị lỗi', 'danger');
                 console.error('PUT: ' + url + '. ' + data.error);
             } else if (data.item) {
                 T.notify('Cập nhật thông tin người thân thành công!', 'info');
                 dispatch(getStaffEdit(data.item.shcc));
                 if (done) done();
             }
-        }, error => T.notify('Cập nhật thông tin người thân bị lỗi' , 'danger'));
+        }, () => T.notify('Cập nhật thông tin người thân bị lỗi', 'danger'));
     };
 }
 
@@ -181,13 +181,13 @@ export function deleteQuanHeCanBo(id, shcc) {
         const url = '/api/staff/quan-he';
         T.delete(url, { id }, data => {
             if (data.error) {
-                T.notify('Xóa thông tin người thân bị lỗi' , 'danger');
+                T.notify('Xóa thông tin người thân bị lỗi', 'danger');
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
                 T.alert('Thông tin người thân được xóa thành công!', 'info', false, 800);
                 dispatch(getStaffEdit(shcc));
             }
-        }, error => T.notify('Xóa thông tin người thân bị lỗi' , 'danger'));
+        }, () => T.notify('Xóa thông tin người thân bị lỗi', 'danger'));
     };
 }
 //#endregion quanHeCanBo
@@ -202,7 +202,7 @@ export const SelectAdapter_FwCanBo = {
 };
 
 export function createMultiCanBo(canBoList, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/staff/multiple';
         T.post(url, { canBoList }, data => {
             if (data.error) {
@@ -216,7 +216,7 @@ export function createMultiCanBo(canBoList, done) {
 }
 
 export function downloadWord(shcc, done) {
-    return dispatch => {
+    return () => {
         const url = `/user/staff/${shcc}/word`;
         T.get(url, data => {
             if (data.error) {
@@ -225,12 +225,12 @@ export function downloadWord(shcc, done) {
             } else if (done) {
                 done(data.data);
             }
-        }, error => T.notify('Tải file word bị lỗi', 'danger'));
+        }, () => T.notify('Tải file word bị lỗi', 'danger'));
     };
 }
 
 export function downloadWordLlkh(shcc, done) {
-    return dispatch => {
+    return () => {
         const url = `/user/staff/${shcc}/word-llkh`;
         T.get(url, data => {
             if (data.error) {
@@ -239,7 +239,7 @@ export function downloadWordLlkh(shcc, done) {
             } else if (done) {
                 done(data.data);
             }
-        }, error => T.notify('Tải file word bị lỗi', 'danger'));
+        }, () => T.notify('Tải file word bị lỗi', 'danger'));
     };
 }
 
@@ -264,14 +264,14 @@ export function updateStaffUser(changes, shcc, done) {
         const url = '/api/user/staff';
         T.put(url, { changes }, data => {
             if (data.error) {
-                T.notify('Cập nhật dữ liệu cán bộ bị lỗi' , 'danger');
+                T.notify('Cập nhật dữ liệu cán bộ bị lỗi', 'danger');
                 console.error(`PUT: ${url}.`, data.error);
             } else {
                 T.notify('Cập nhật thông tin cán bộ thành công!', 'success');
                 done && done(data.item);
                 dispatch(userGetStaff(shcc));
             }
-        }, error => T.notify('Cập nhật dữ liệu cán bộ bị lỗi' , 'danger'));
+        }, () => T.notify('Cập nhật dữ liệu cán bộ bị lỗi', 'danger'));
     };
 }
 
@@ -281,14 +281,14 @@ export function createQuanHeStaffUser(data, shcc, done) {
         const url = '/api/user/staff/quan-he';
         T.post(url, { data }, res => {
             if (res.error) {
-                T.notify('Thêm thông tin người thân bị lỗi' , 'danger');
+                T.notify('Thêm thông tin người thân bị lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
                 T.notify('Thêm thông tin người thân thành công!', 'info');
                 dispatch(userGetStaff(shcc));
                 if (done) done(res);
             }
-        }, error => T.notify('Thêm thông tin người thân bị lỗi' , 'danger'));
+        }, () => T.notify('Thêm thông tin người thân bị lỗi', 'danger'));
     };
 }
 
@@ -297,14 +297,14 @@ export function updateQuanHeStaffUser(id, changes, shcc, done) {
         const url = '/api/user/staff/quan-he';
         T.put(url, { id, changes }, data => {
             if (data.error) {
-                T.notify('Cập nhật thông tin người thân bị lỗi' , 'danger');
+                T.notify('Cập nhật thông tin người thân bị lỗi', 'danger');
                 console.error('PUT: ' + url + '. ' + data.error);
             } else if (data.item) {
                 T.notify('Cập nhật thông tin người thân thành công!', 'info');
                 dispatch(userGetStaff(shcc));
                 if (done) done();
             }
-        }, error => T.notify('Cập nhật thông tin người thân bị lỗi' , 'danger'));
+        }, () => T.notify('Cập nhật thông tin người thân bị lỗi', 'danger'));
     };
 }
 
@@ -313,13 +313,13 @@ export function deleteQuanHeStaffUser(id, shcc) {
         const url = '/api/user/staff/quan-he';
         T.delete(url, { id }, data => {
             if (data.error) {
-                T.notify('Xóa thông tin người thân bị lỗi' , 'danger');
+                T.notify('Xóa thông tin người thân bị lỗi', 'danger');
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
                 T.alert('Thông tin người thân được xóa thành công!', 'info', false, 800);
                 dispatch(userGetStaff(shcc));
             }
-        }, error => T.notify('Xóa thông tin người thân bị lỗi' , 'danger'));
+        }, () => T.notify('Xóa thông tin người thân bị lỗi', 'danger'));
     };
 }
 //#endregion quanHeCanBo User

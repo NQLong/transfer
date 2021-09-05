@@ -14,7 +14,7 @@ class EditModal extends React.Component {
     }
 
     show = (item) => {
-        let { maCode, tenQuocGia, country, shortenName, codeAlpha, maKhuVuc, tenKhac, maCu } = item ? item : { maCode: '', tenQuocGia: '', country: '', shortenName: '', codeAlpha: '', maKhuVuc: '', tenKhac: '', maCu: '' };
+        let { maCode, tenQuocGia, country, shortenName, codeAlpha, maKhuVuc, tenKhac, } = item ? item : { maCode: '', tenQuocGia: '', country: '', shortenName: '', codeAlpha: '', maKhuVuc: '', tenKhac: '', maCu: '' };
         $('#dmqgMaQuocGia').val(maCode);
         $('#dmqgTenQuocGia').val(tenQuocGia);
         $('#dmqgQuocGia').val(country);
@@ -157,7 +157,7 @@ class adminUploadPage extends React.Component {
     }
 
     updateTableData = (dataEditModal) => {
-        this.setState((state, props) => {
+        this.setState((state,) => {
             state.dmQuocGia.forEach(data => {
                 if (data.maCode == dataEditModal.changes.maCode) {
                     data.tenQuocGia = dataEditModal.changes.tenQuocGia;

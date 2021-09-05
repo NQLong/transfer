@@ -1,4 +1,4 @@
-import { type } from 'jquery';
+// import { type } from 'jquery';
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -215,6 +215,6 @@ class StaffImportPage extends React.Component {
     }
 }
 
-const mapStateToProps = state => ({});
+const mapStateToProps = () => ({});
 const mapActionsToProps = { createMultiCanBo };
 export default connect(mapStateToProps, mapActionsToProps)(StaffImportPage);

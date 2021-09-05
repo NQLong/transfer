@@ -7,7 +7,7 @@ export class QTForm extends AdminPage {
         let formEntries = Object.entries(formValue);
         const errorEntry = formEntries.find(field => field[1].error);
         if (errorEntry) {
-            const fieldName = errorEntry[0];
+            // const fieldName = errorEntry[0];
             const error = errorEntry[1].error;
             let message = '';
             if (error.message) message = error.message;
@@ -31,7 +31,7 @@ export class QTForm extends AdminPage {
         let formEntries = Object.entries(formValue);
         const errorEntry = formEntries.find(field => field[1].error);
         if (errorEntry) {
-            const fieldName = errorEntry[0];
+            // const fieldName = errorEntry[0];
             const error = errorEntry[1].error;
             let message = '';
             if (error.message) message = error.message;

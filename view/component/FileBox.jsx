@@ -205,7 +205,7 @@ export default class FileBox extends React.Component {
     }
 
     render() {
-        const accept = this.props.accept ? this.props.accept : '';
+        // const accept = this.props.accept ? this.props.accept : '';
         const fileAttrs = { type: 'file' };
         if (this.props.accept) fileAttrs.accept = this.props.accept;
 

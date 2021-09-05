@@ -55,7 +55,7 @@ export function getDmHuongPhuCapPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: DmHuongPhuCapGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách hưởng phụ cấp bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách hưởng phụ cấp bị lỗi!', 'danger'));
     };
 }
 
@@ -70,12 +70,12 @@ export function getDmHuongPhuCapAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmHuongPhuCapGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách hưởng phụ cấp bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách hưởng phụ cấp bị lỗi!', 'danger'));
     };
 }
 
 export function getDmHuongPhuCap(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/huong-phu-cap/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -99,7 +99,7 @@ export function createDmHuongPhuCap(item, done) {
                 dispatch(getDmHuongPhuCapAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo hưởng phụ cấp bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo hưởng phụ cấp bị lỗi!', 'danger'));
     };
 }
 
@@ -114,7 +114,7 @@ export function deleteDmHuongPhuCap(ma) {
                 T.alert('Danh mục đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmHuongPhuCapAll());
             }
-        }, error => T.notify('Xóa hưởng  hình thức hưởng phụ cấp bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa hưởng  hình thức hưởng phụ cấp bị lỗi!', 'danger'));
     };
 }
 
@@ -130,7 +130,7 @@ export function updateDmHuongPhuCap(ma, changes, done) {
                 T.notify('Cập nhật thông tin hưởng phụ cấp thành công!', 'success');
                 dispatch(getDmHuongPhuCapAll());
             }
-        }, error => T.notify('Cập nhật thông tin hưởng phụ cấp bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin hưởng phụ cấp bị lỗi!', 'danger'));
     };
 }
 

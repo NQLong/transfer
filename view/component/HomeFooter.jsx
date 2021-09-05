@@ -53,7 +53,7 @@ class Footer extends React.Component {
             qrcode = 'https://hcmussh.edu.vn/static/document/qrcode-tuyensinh.png',
             width = $(window).width();
 
-        let { facebook, youtube, todayViews, allViews, mobile, address, address2, email } =
+        let { facebook, youtube, mobile, address, address2, } =
             this.props.system ? this.props.system : { logo: '', todayViews: 0, allViews: 0, address2: '', youtube: '' },
             footerList = [];
         address = T.language.parse(address);
@@ -80,7 +80,7 @@ class Footer extends React.Component {
             });
             if (hostname.includes('tuyensinh')) {
                 footerList = [
-                    <div className='col-sm'>
+                    <div className='col-sm' key={'13'}>
                         <div className='footer-link'>
                             <h3>{'QUÉT MÃ TƯ VẤN TUYỂN SINH'} <i className='fa fa-angle-down d-md-none'></i></h3>
                             <img src={qrcode} style={{ height: '100%', width: 500 }} />
