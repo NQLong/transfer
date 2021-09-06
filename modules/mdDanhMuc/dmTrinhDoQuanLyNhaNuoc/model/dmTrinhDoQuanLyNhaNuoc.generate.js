@@ -1,5 +1,5 @@
 // Table name: DM_TRINH_DO_QUAN_LY_NHA_NUOC { ma, ten, kichHoat }
-const keys = [''];
+const keys = ['MA'];
 const obj2Db = { 'ma': 'MA', 'ten': 'TEN', 'kichHoat': 'KICH_HOAT' };
 
 module.exports = app => {

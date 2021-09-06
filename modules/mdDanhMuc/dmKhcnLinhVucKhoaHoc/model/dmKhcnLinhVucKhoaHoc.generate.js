@@ -1,5 +1,5 @@
 // Table name: DM_KHCN_LINH_VUC_KHOA_HOC { ma, ten }
-const keys = [''];
+const keys = ['MA'];
 const obj2Db = { 'ma': 'MA', 'ten': 'TEN' };
 
 module.exports = app => {

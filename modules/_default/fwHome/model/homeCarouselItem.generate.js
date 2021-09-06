@@ -1,5 +1,5 @@
 // Table name: FW_HOME_CAROUSEL_ITEM { carouselId, priority, title, image, description, link, active }
-const keys = [''];
+const keys = ['CAROUSEL_ID', 'PRIORITY'];
 const obj2Db = { 'carouselId': 'CAROUSEL_ID', 'priority': 'PRIORITY', 'title': 'TITLE', 'image': 'IMAGE', 'description': 'DESCRIPTION', 'link': 'LINK', 'active': 'ACTIVE' };
 
 module.exports = app => {

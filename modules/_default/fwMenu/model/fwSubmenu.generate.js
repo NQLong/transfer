@@ -1,6 +1,6 @@
-// Table name: FW_SUBMENU { id, title, link, highlight, active, priority }
+// Table name: FW_SUBMENU { title, link, highlight, active, id, priority }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'title': 'TITLE', 'link': 'LINK', 'highlight': 'HIGHLIGHT', 'active': 'ACTIVE', 'priority': 'PRIORITY' };
+const obj2Db = { 'title': 'TITLE', 'link': 'LINK', 'highlight': 'HIGHLIGHT', 'active': 'ACTIVE', 'id': 'ID', 'priority': 'PRIORITY' };
 
 module.exports = app => {
     app.model.fwSubmenu = {

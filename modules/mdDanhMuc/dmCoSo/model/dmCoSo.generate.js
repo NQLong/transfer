@@ -1,5 +1,5 @@
 // Table name: DM_CO_SO { ten, diaChi, tenVietTat, moTa, kichHoat, ma }
-const keys = [''];
+const keys = ['MA'];
 const obj2Db = { 'ten': 'TEN', 'diaChi': 'DIA_CHI', 'tenVietTat': 'TEN_VIET_TAT', 'moTa': 'MO_TA', 'kichHoat': 'KICH_HOAT', 'ma': 'MA' };
 
 module.exports = app => {

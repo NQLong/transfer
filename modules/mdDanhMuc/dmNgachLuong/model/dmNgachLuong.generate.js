@@ -1,5 +1,5 @@
 // Table name: DM_NGACH_LUONG { idNgach, bac, heSo }
-const keys = [''];
+const keys = ['BAC', 'ID_NGACH'];
 const obj2Db = { 'idNgach': 'ID_NGACH', 'bac': 'BAC', 'heSo': 'HE_SO' };
 
 module.exports = app => {

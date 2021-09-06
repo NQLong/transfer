@@ -1,5 +1,5 @@
 // Table name: DM_MUC_DICH_TRONG_NUOC { ma, moTa, kichHoat }
-const keys = [''];
+const keys = ['MA'];
 const obj2Db = { 'ma': 'MA', 'moTa': 'MO_TA', 'kichHoat': 'KICH_HOAT' };
 
 module.exports = app => {
