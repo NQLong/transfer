@@ -104,7 +104,7 @@ export function deleteDmToaNha(ma) {
                 T.alert('Tòa nhà đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmToaNhaAll());
             }
-        }, error => T.notify('Xóa tòa nhà bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa tòa nhà bị lỗi!', 'danger'));
     };
 }
 
@@ -120,7 +120,7 @@ export function updateDmToaNha(ma, changes, done) {
                 T.notify('Cập nhật thông tin tòa nhà thành công!', 'success');
                 dispatch(getDmToaNhaAll());
             }
-        }, error => T.notify('Cập nhật thông tin tòa nhà bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin tòa nhà bị lỗi!', 'danger'));
     };
 }
 

@@ -57,7 +57,7 @@ export function getDmTonGiaoPage(pageNumber, pageSize, pageCondition, done) {
                 if (done) done(data.page);
                 dispatch({ type: DmTonGiaoGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách tôn giáo bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, error => T.notify('Lấy danh sách tôn giáo bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
     };
 }
 
@@ -72,12 +72,12 @@ export function getDmTonGiaoAll(condition, done) {
                 if (done) done(data.items);
                 dispatch({ type: DmTonGiaoGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách tôn giáo bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, error => T.notify('Lấy danh sách tôn giáo bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
     };
 }
 
 export function getDmTonGiao(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/ton-giao/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -102,7 +102,7 @@ export function createDmTonGiao(dmTonGiao, done) {
                 dispatch(getDmTonGiaoPage());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo mới một tôn giáo bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, error => T.notify('Tạo mới một tôn giáo bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
     };
 }
 
@@ -118,7 +118,7 @@ export function updateDmTonGiao(ma, changes, done) {
                 done && done(data.item);
                 dispatch(getDmTonGiaoPage());
             }
-        }, error => T.notify('Cập nhật dữ liệu tôn giáo bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, error => T.notify('Cập nhật dữ liệu tôn giáo bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
     };
 }
 
@@ -134,7 +134,7 @@ export function deleteDmTonGiao(ma, done) {
                 dispatch(getDmTonGiaoPage());
             }
             done && done();
-        }, error => T.notify('Xóa tôn giáo bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa tôn giáo bị lỗi!', 'danger'));
     };
 }
 

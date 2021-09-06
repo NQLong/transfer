@@ -32,7 +32,7 @@ CleanFileslugin.prototype.apply = compiler => {
 
 const moduleContainer = { admin: {}, home: {}, unit: {} }, // Add template here
     templateNames = Object.keys(moduleContainer);
-const UpdateModulesPlugin = function (options) { };
+const UpdateModulesPlugin = function () { };
 UpdateModulesPlugin.prototype.apply = compiler => compiler.hooks.done.tap('UpdateModules', () => {
     templateNames.forEach(templateName => {
         moduleContainer[templateName].moduleNames = [];

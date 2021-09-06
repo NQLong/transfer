@@ -55,7 +55,7 @@ export function getDmSoHuuTriTuePage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: DmSoHuuTriTueGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách sở hữu trí tuệ bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách sở hữu trí tuệ bị lỗi!', 'danger'));
     };
 }
 
@@ -70,12 +70,12 @@ export function getDmSoHuuTriTueAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmSoHuuTriTueGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách sở hữu trí tuệ bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách sở hữu trí tuệ bị lỗi!', 'danger'));
     };
 }
 
 export function getDmSoHuuTriTue(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/so-huu-tri-tue/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -100,7 +100,7 @@ export function createDmSoHuuTriTue(item, done) {
                 dispatch(getDmSoHuuTriTueAll());
                 if (done) done();
             }
-        }, error => T.notify('Tạo sở hữu trí tuệ bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo sở hữu trí tuệ bị lỗi!', 'danger'));
     };
 }
 
@@ -115,7 +115,7 @@ export function deleteDmSoHuuTriTue(ma) {
                 T.alert('Danh mục đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmSoHuuTriTueAll());
             }
-        }, error => T.notify('Xóa sở hữu trí tuệ bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa sở hữu trí tuệ bị lỗi!', 'danger'));
     };
 }
 
@@ -132,7 +132,7 @@ export function updateDmSoHuuTriTue(ma, changes, done) {
                 dispatch(getDmSoHuuTriTueAll());
                 if (done) done();
             }
-        }, error => T.notify('Cập nhật thông tin sở hữu trí tuệ bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin sở hữu trí tuệ bị lỗi!', 'danger'));
     };
 }
 
