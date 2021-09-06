@@ -1,6 +1,6 @@
-// Table name: FW_HOME_CONTENT { id, title, active, content, maDonVi }
+// Table name: FW_HOME_CONTENT { title, active, content, maDonVi, id }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'title': 'TITLE', 'active': 'ACTIVE', 'content': 'CONTENT', 'maDonVi': 'MA_DON_VI' };
+const obj2Db = { 'title': 'TITLE', 'active': 'ACTIVE', 'content': 'CONTENT', 'maDonVi': 'MA_DON_VI', 'id': 'ID' };
 
 module.exports = app => {
     app.model.homeContent = {

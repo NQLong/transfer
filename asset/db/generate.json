@@ -7,7 +7,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_292686\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_414123\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -81,7 +81,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_292715\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_414126\".nextval",
                 "nullable": false,
                 "size": "22,0"
             }
@@ -202,9 +202,7 @@
         "primaryKeys": [
             "MA"
         ],
-        "foreignKeys": [
-            "MA_DV"
-        ]
+        "foreignKeys": []
     },
     "DM_CHAU": {
         "active": true,
@@ -253,7 +251,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_292722\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316116\".nextval",
                 "nullable": false,
                 "size": "20,0"
             },
@@ -419,7 +417,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_292683\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316120\".nextval",
                 "nullable": false,
                 "size": "22,0"
             }
@@ -802,7 +800,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_282008\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316130\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -905,7 +903,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_292692\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316134\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -1188,9 +1186,7 @@
         "primaryKeys": [
             "MA"
         ],
-        "foreignKeys": [
-            "MA_CHAU"
-        ]
+        "foreignKeys": []
     },
     "DM_KINH_PHI_NUOC_NGOAI": {
         "active": true,
@@ -1271,7 +1267,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_292694\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316146\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -1473,7 +1469,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_292701\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316151\".nextval",
                 "nullable": false,
                 "size": "10,0"
             }
@@ -1622,7 +1618,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_292698\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316156\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -1644,6 +1640,13 @@
         "moduleName": "dmNgachLuong",
         "modelName": "dmNgachLuong",
         "columns": {
+            "HE_SO": {
+                "value": "heSo",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "22,0"
+            },
             "ID_NGACH": {
                 "value": "idNgach",
                 "dataType": "NUMBER",
@@ -1656,13 +1659,6 @@
                 "dataType": "NUMBER",
                 "dataDefault": "",
                 "nullable": false,
-                "size": "22,0"
-            },
-            "HE_SO": {
-                "value": "heSo",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
                 "size": "22,0"
             }
         },
@@ -1680,7 +1676,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_292719\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316159\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -1716,9 +1712,7 @@
         "primaryKeys": [
             "MA"
         ],
-        "foreignKeys": [
-            "MA_DON_VI"
-        ]
+        "foreignKeys": []
     },
     "DM_NGHIEM_THU_XEP_LOAI_KHCN": {
         "active": true,
@@ -1966,7 +1960,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_282094\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316168\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -2002,9 +1996,7 @@
         "primaryKeys": [
             "MA"
         ],
-        "foreignKeys": [
-            "TOA_NHA"
-        ]
+        "foreignKeys": []
     },
     "DM_PHUONG_XA": {
         "active": true,
@@ -2436,7 +2428,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_282106\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316181\".nextval",
                 "nullable": false,
                 "size": "22,0"
             }
@@ -2532,7 +2524,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_292725\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316185\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -2564,7 +2556,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_282087\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316187\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -2883,7 +2875,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_282097\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316195\".nextval",
                 "nullable": false,
                 "size": "22,0"
             }
@@ -3038,7 +3030,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_259752\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_259355\".nextval",
                 "nullable": false,
                 "size": "20,0"
             },
@@ -3119,7 +3111,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_259771\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_259764\".nextval",
                 "nullable": false,
                 "size": "20,0"
             },
@@ -3151,7 +3143,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_259757\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_259360\".nextval",
                 "nullable": false,
                 "size": "20,0"
             },
@@ -3232,7 +3224,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_199922\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236031\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -3247,10 +3239,7 @@
         "primaryKeys": [
             "ID"
         ],
-        "foreignKeys": [
-            "EVENT_ID",
-            "FORM_ID"
-        ]
+        "foreignKeys": []
     },
     "FW_ANSWER_RECORD": {
         "active": true,
@@ -3281,7 +3270,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_199929\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236033\".nextval",
                 "nullable": false,
                 "size": "22,0"
             }
@@ -3289,10 +3278,7 @@
         "primaryKeys": [
             "ID"
         ],
-        "foreignKeys": [
-            "ANSWER_ID",
-            "QUESTION_ID"
-        ]
+        "foreignKeys": []
     },
     "FW_CATEGORY": {
         "active": true,
@@ -3302,7 +3288,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_190161\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236114\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -3362,7 +3348,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_220916\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236116\".nextval",
                 "nullable": false,
                 "size": "20,0"
             },
@@ -3419,13 +3405,6 @@
         "moduleName": "_init",
         "modelName": "fwDraft",
         "columns": {
-            "ID": {
-                "value": "id",
-                "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_238326\".nextval",
-                "nullable": false,
-                "size": "22,0"
-            },
             "EDITOR_ID": {
                 "value": "editorId",
                 "dataType": "NUMBER",
@@ -3534,9 +3513,16 @@
             "DISPLAY_COVER": {
                 "value": "displayCover",
                 "dataType": "NUMBER",
-                "dataDefault": "",
+                "dataDefault": "1",
                 "nullable": true,
                 "size": "1,0"
+            },
+            "ID": {
+                "value": "id",
+                "dataType": "NUMBER",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236039\".nextval",
+                "nullable": false,
+                "size": "22,0"
             }
         },
         "primaryKeys": [
@@ -3549,13 +3535,6 @@
         "moduleName": "fwEvent",
         "modelName": "fwEvent",
         "columns": {
-            "PRIORITY": {
-                "value": "priority",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": false,
-                "size": "22,0"
-            },
             "NAME": {
                 "value": "name",
                 "dataType": "NVARCHAR2",
@@ -3703,13 +3682,6 @@
                 "nullable": true,
                 "size": "22,0"
             },
-            "ID": {
-                "value": "id",
-                "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_199880\".nextval",
-                "nullable": false,
-                "size": "22,0"
-            },
             "IS_TRANSLATE": {
                 "value": "isTranslate",
                 "dataType": "NUMBER",
@@ -3737,14 +3709,26 @@
                 "dataDefault": "1",
                 "nullable": true,
                 "size": "1,0"
+            },
+            "PRIORITY": {
+                "value": "priority",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": false,
+                "size": "22,0"
+            },
+            "ID": {
+                "value": "id",
+                "dataType": "NUMBER",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236042\".nextval",
+                "nullable": false,
+                "size": "22,0"
             }
         },
         "primaryKeys": [
             "ID"
         ],
-        "foreignKeys": [
-            "FORM"
-        ]
+        "foreignKeys": []
     },
     "FW_EVENT_CATEGORY": {
         "active": true,
@@ -3770,10 +3754,7 @@
             "CATEGORY_ID",
             "EVENT_ID"
         ],
-        "foreignKeys": [
-            "CATEGORY_ID",
-            "EVENT_ID"
-        ]
+        "foreignKeys": []
     },
     "FW_FORM": {
         "active": true,
@@ -3853,7 +3834,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_199897\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236118\".nextval",
                 "nullable": false,
                 "size": "22,0"
             }
@@ -3899,7 +3880,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_166716\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236123\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -3921,13 +3902,6 @@
         "moduleName": "fwHome",
         "modelName": "homeCarouselItem",
         "columns": {
-            "CAROUSEL_ID": {
-                "value": "carouselId",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": false,
-                "size": "22,0"
-            },
             "PRIORITY": {
                 "value": "priority",
                 "dataType": "NUMBER",
@@ -3969,15 +3943,20 @@
                 "dataDefault": "0",
                 "nullable": false,
                 "size": "1,0"
+            },
+            "CAROUSEL_ID": {
+                "value": "carouselId",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": false,
+                "size": "22,0"
             }
         },
         "primaryKeys": [
             "CAROUSEL_ID",
             "PRIORITY"
         ],
-        "foreignKeys": [
-            "CAROUSEL_ID"
-        ]
+        "foreignKeys": []
     },
     "FW_HOME_COMPONENT": {
         "active": true,
@@ -4029,7 +4008,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_167741\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236125\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -4051,13 +4030,6 @@
         "moduleName": "fwHome",
         "modelName": "homeContent",
         "columns": {
-            "ID": {
-                "value": "id",
-                "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_210005\".nextval",
-                "nullable": false,
-                "size": "22,0"
-            },
             "TITLE": {
                 "value": "title",
                 "dataType": "NVARCHAR2",
@@ -4085,6 +4057,13 @@
                 "dataDefault": "-1",
                 "nullable": true,
                 "size": "5,0"
+            },
+            "ID": {
+                "value": "id",
+                "dataType": "NUMBER",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236053\".nextval",
+                "nullable": false,
+                "size": "22,0"
             }
         },
         "primaryKeys": [
@@ -4114,7 +4093,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_169642\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236127\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -4150,17 +4129,10 @@
                 "nullable": false,
                 "size": 1000
             },
-            "FEATURE_ID": {
-                "value": "featureId",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": false,
-                "size": "22,0"
-            },
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_169644\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236129\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -4170,27 +4142,25 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": 500
+            },
+            "FEATURE_ID": {
+                "value": "featureId",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": false,
+                "size": "22,0"
             }
         },
         "primaryKeys": [
             "ID"
         ],
-        "foreignKeys": [
-            "FEATURE_ID"
-        ]
+        "foreignKeys": []
     },
     "FW_HOME_FOOTER": {
         "active": true,
         "moduleName": "fwHomeFooter",
         "modelName": "fwHomeFooter",
         "columns": {
-            "ID": {
-                "value": "id",
-                "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_234162\".nextval",
-                "nullable": false,
-                "size": "3,0"
-            },
             "HEADER": {
                 "value": "header",
                 "dataType": "NUMBER",
@@ -4225,6 +4195,13 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": "1,0"
+            },
+            "ID": {
+                "value": "id",
+                "dataType": "NUMBER",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236131\".nextval",
+                "nullable": false,
+                "size": "3,0"
             }
         },
         "primaryKeys": [
@@ -4282,14 +4259,14 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_167744\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236133\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
             "MA_DON_VI": {
                 "value": "maDonVi",
                 "dataType": "NVARCHAR2",
-                "dataDefault": "",
+                "dataDefault": "-1",
                 "nullable": true,
                 "size": 5
             },
@@ -4304,10 +4281,7 @@
         "primaryKeys": [
             "ID"
         ],
-        "foreignKeys": [
-            "COMPONENT_ID",
-            "PARENT_ID"
-        ]
+        "foreignKeys": []
     },
     "FW_HOME_VIDEO": {
         "active": true,
@@ -4345,7 +4319,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_166735\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236135\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -4377,7 +4351,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_204342\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236137\".nextval",
                 "nullable": false,
                 "size": "22,0"
             }
@@ -4444,7 +4418,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_204345\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236139\".nextval",
                 "nullable": false,
                 "size": "22,0"
             }
@@ -4452,9 +4426,7 @@
         "primaryKeys": [
             "ID"
         ],
-        "foreignKeys": [
-            "INEWS_ID"
-        ]
+        "foreignKeys": []
     },
     "FW_NEWS": {
         "active": true,
@@ -4538,13 +4510,6 @@
                 "nullable": true,
                 "size": "20,0"
             },
-            "ID": {
-                "value": "id",
-                "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_210005\".nextval",
-                "nullable": false,
-                "size": "22,0"
-            },
             "VIEWS": {
                 "value": "views",
                 "dataType": "NUMBER",
@@ -4593,6 +4558,13 @@
                 "dataDefault": "0",
                 "nullable": true,
                 "size": "20,0"
+            },
+            "ID": {
+                "value": "id",
+                "dataType": "NUMBER",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236070\".nextval",
+                "nullable": false,
+                "size": "22,0"
             }
         },
         "primaryKeys": [
@@ -4624,9 +4596,7 @@
             "CATEGORY_ID",
             "NEWS_ID"
         ],
-        "foreignKeys": [
-            "CATEGORY_ID"
-        ]
+        "foreignKeys": []
     },
     "FW_QUESTION": {
         "active": true,
@@ -4678,7 +4648,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_199894\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236141\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -4700,9 +4670,7 @@
         "primaryKeys": [
             "ID"
         ],
-        "foreignKeys": [
-            "FORM_ID"
-        ]
+        "foreignKeys": []
     },
     "FW_ROLE": {
         "active": true,
@@ -4747,7 +4715,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_166738\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236143\".nextval",
                 "nullable": false,
                 "size": "22,0"
             }
@@ -4790,7 +4758,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_253667\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_248674\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -4907,6 +4875,13 @@
         "moduleName": "fwMenu",
         "modelName": "fwSubmenu",
         "columns": {
+            "ID": {
+                "value": "id",
+                "dataType": "NUMBER",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_238083\".nextval",
+                "nullable": false,
+                "size": "22,0"
+            },
             "TITLE": {
                 "value": "title",
                 "dataType": "NVARCHAR2",
@@ -4935,13 +4910,6 @@
                 "nullable": false,
                 "size": "1,0"
             },
-            "ID": {
-                "value": "id",
-                "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_169637\".nextval",
-                "nullable": false,
-                "size": "22,0"
-            },
             "PRIORITY": {
                 "value": "priority",
                 "dataType": "NUMBER",
@@ -4963,7 +4931,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_227714\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236149\".nextval",
                 "nullable": false,
                 "size": "10,0"
             },
@@ -5098,7 +5066,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_333786\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_325235\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -5179,7 +5147,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_333788\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_325244\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -5267,7 +5235,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_333790\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316662\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -5348,7 +5316,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_333792\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316666\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -5387,7 +5355,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_333794\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_325241\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -5468,7 +5436,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_333796\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316664\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -5500,7 +5468,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_333798\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_324764\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -5560,7 +5528,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_333800\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316679\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -5627,7 +5595,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_333802\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316685\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -5694,7 +5662,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_333804\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_325238\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -5775,7 +5743,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_333806\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_325250\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -5870,7 +5838,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_333808\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316660\".nextval",
                 "nullable": false,
                 "size": "22,0"
             }
@@ -5888,7 +5856,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_333810\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316682\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -6046,7 +6014,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_333812\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316670\".nextval",
                 "nullable": false,
                 "size": "22,0"
             }
@@ -6064,7 +6032,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_333814\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_325247\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -6117,7 +6085,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_320529\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316200\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -6198,7 +6166,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_333816\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_324767\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -6871,7 +6839,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"HCMUSSH\".\"ISEQ$$_320531\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_317634\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },

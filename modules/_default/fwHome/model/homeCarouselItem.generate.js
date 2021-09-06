@@ -1,6 +1,6 @@
-// Table name: FW_HOME_CAROUSEL_ITEM { carouselId, priority, title, image, description, link, active }
+// Table name: FW_HOME_CAROUSEL_ITEM { priority, title, image, description, link, active, carouselId }
 const keys = ['CAROUSEL_ID', 'PRIORITY'];
-const obj2Db = { 'carouselId': 'CAROUSEL_ID', 'priority': 'PRIORITY', 'title': 'TITLE', 'image': 'IMAGE', 'description': 'DESCRIPTION', 'link': 'LINK', 'active': 'ACTIVE' };
+const obj2Db = { 'priority': 'PRIORITY', 'title': 'TITLE', 'image': 'IMAGE', 'description': 'DESCRIPTION', 'link': 'LINK', 'active': 'ACTIVE', 'carouselId': 'CAROUSEL_ID' };
 
 module.exports = app => {
     app.model.homeCarouselItem = {

@@ -1,6 +1,6 @@
-// Table name: FW_HOME_FOOTER { id, header, title, link, priority, active }
+// Table name: FW_HOME_FOOTER { header, title, link, priority, active, id }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'header': 'HEADER', 'title': 'TITLE', 'link': 'LINK', 'priority': 'PRIORITY', 'active': 'ACTIVE' };
+const obj2Db = { 'header': 'HEADER', 'title': 'TITLE', 'link': 'LINK', 'priority': 'PRIORITY', 'active': 'ACTIVE', 'id': 'ID' };
 
 module.exports = app => {
     app.model.fwHomeFooter = {

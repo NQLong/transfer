@@ -1,6 +1,6 @@
-// Table name: DM_NGACH_LUONG { idNgach, bac, heSo }
+// Table name: DM_NGACH_LUONG { heSo, idNgach, bac }
 const keys = ['BAC', 'ID_NGACH'];
-const obj2Db = { 'idNgach': 'ID_NGACH', 'bac': 'BAC', 'heSo': 'HE_SO' };
+const obj2Db = { 'heSo': 'HE_SO', 'idNgach': 'ID_NGACH', 'bac': 'BAC' };
 
 module.exports = app => {
     app.model.dmNgachLuong = {
