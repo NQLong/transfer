@@ -16,17 +16,8 @@
         "lint:jsx": "eslint . --ext .jsx,.js --ignore-path .gitignore"
     },
     "db": {
-        "owner": "HCMUSSH",
+        "owner": "DEV_HCMUSSH",
         "host": "203.205.32.235",
-        "local_host": "172.28.2.6",
-        "sid": "ptchc",
-        "username": "hcmussh",
-        "password": "---"
-    },
-    "dbTest": {
-        "owner": "HCMUSSH",
-        "host": "203.205.32.235",
-        "local_host": "172.28.2.6",
         "sid": "ptchc",
         "username": "dev_hcmussh",
         "password": "8YPtqq3u72qVQTgE6QQhYkQW"
