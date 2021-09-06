@@ -57,7 +57,7 @@ export function getDmTaiKhoanKeToanPage(pageNumber, pageSize, pageCondition, don
                 if (done) done(data.page);
                 dispatch({ type: DmTaiKhoanKeToanGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách Tài Khoản Kế Toán bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, error => T.notify('Lấy danh sách Tài Khoản Kế Toán bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
     };
 }
 
@@ -72,12 +72,12 @@ export function getDmTaiKhoanKeToanAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmTaiKhoanKeToanGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách Tài Khoản Kế Toán bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, error => T.notify('Lấy danh sách Tài Khoản Kế Toán bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
     };
 }
 
 export function getDmTaiKhoanKeToan(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/tai-khoan-ke-toan/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -101,7 +101,7 @@ export function createDmTaiKhoanKeToan(item, done) {
                 dispatch(getDmTaiKhoanKeToanPage());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo Tài Khoản Kế Toán bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, error => T.notify('Tạo Tài Khoản Kế Toán bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
     };
 }
 
@@ -117,7 +117,7 @@ export function updateDmTaiKhoanKeToan(ma, changes, done) {
                 T.notify('Cập nhật thông tin Tài Khoản Kế Toán thành công!', 'success');
                 dispatch(getDmTaiKhoanKeToanPage());
             }
-        }, error => T.notify('Cập nhật thông tin Tài Khoản Kế Toán bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, error => T.notify('Cập nhật thông tin Tài Khoản Kế Toán bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
     };
 }
 
@@ -132,7 +132,7 @@ export function deleteDmTaiKhoanKeToan(ma) {
                 T.alert('Khoa đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmTaiKhoanKeToanPage());
             }
-        }, error => T.notify('Xóa Tài Khoản Kế Toán bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, error => T.notify('Xóa Tài Khoản Kế Toán bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
     };
 }
 
@@ -150,7 +150,7 @@ export function createDmTaiKhoanKeToanByUpload(item, done) {
             dispatch(getDmTaiKhoanKeToanPage());
             if (done) done(data);
 
-        }, error => T.notify('Tạo danh mục Tài Khoản Kế Toán bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo danh mục Tài Khoản Kế Toán bị lỗi!', 'danger'));
     };
 }
 
