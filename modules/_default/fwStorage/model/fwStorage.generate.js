@@ -1,4 +1,4 @@
-// Table name: FW_STORAGE { id, nameDisplay, path, active, note, userUpload }
+// Table name: FW_STORAGE { id, nameDisplay, path, active, note, userUpload, maDonVi }
 const keys = ['ID'];
 const obj2Db = { 'id': 'ID', 'nameDisplay': 'NAME_DISPLAY', 'path': 'PATH', 'active': 'ACTIVE', 'note': 'NOTE', 'userUpload': 'USER_UPLOAD', 'maDonVi': 'MA_DON_VI' };
 
@@ -81,7 +81,7 @@ module.exports = app => {
                 let result = {};
                 let totalItem = res && res.rows && res.rows[0] ? res.rows[0]['COUNT(*)'] : 0;
                 result = { totalItem, pageSize, pageTotal: Math.ceil(totalItem / pageSize) };
-                result.pageNumber = pageNumber === -1 ? 1 : Math.min(pageNumber, result.pageTotal);
+                result.pageNumber = Math.max(1, Math.min(pageNumber, result.pageTotal));
                 leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
                 const sql = 'SELECT ' + app.dbConnection.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT FW_STORAGE.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM FW_STORAGE' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
                 app.dbConnection.execute(sql, parameter, (error, resultSet) => {

@@ -1,5 +1,4 @@
-const cluster = require('cluster'),
-    package = require('./package'),
+let packageConfig = require('./package'),
     isDebug = !__dirname.startsWith('/var/www/');
 const express = require('express');
 const app = express();
@@ -16,29 +15,29 @@ const server = app.isDebug ?
     }, app);
 
 // Variables ==================================================================
-app.port = package.port;
-app.rootUrl = package.rootUrl;
+app.port = packageConfig.port;
+app.rootUrl = packageConfig.rootUrl;
 app.debugUrl = 'http://localhost:' + app.port;
-app.mongodb = 'mongodb://localhost:27017/' + package.dbName;
-app.apiKeySendGrid = package.email.apiKeySendGrid;
-app.defaultAdminEmail = package.default.adminEmail;
-// app.defaultAdminPassword = package.default.adminPassword;
+app.mongodb = 'mongodb://localhost:27017/' + packageConfig.dbName;
+app.apiKeySendGrid = packageConfig.email.apiKeySendGrid;
+app.defaultAdminEmail = packageConfig.default.adminEmail;
+if (!app.isDebug && app.fs.existsSync('./asset/config.json')) packageConfig = Object.assign({}, packageConfig, require('../asset/config.json'));
 
-app.mailSentName = package.email.from;
+app.mailSentName = packageConfig.email.from;
 app.assetPath = app.path.join(__dirname, 'asset');
-app.modulesPath = app.path.join(__dirname, package.path.modules);
-app.viewPath = app.path.join(__dirname, package.path.view);
-app.publicPath = app.path.join(__dirname, package.path.public);
-app.imagePath = app.path.join(package.path.public, 'img');
-app.uploadPath = app.path.join(__dirname, package.path.upload);
-app.documentPath = app.path.join(__dirname, package.path.document);
-app.faviconPath = app.path.join(__dirname, package.path.favicon);
+app.modulesPath = app.path.join(__dirname, packageConfig.path.modules);
+app.viewPath = app.path.join(__dirname, packageConfig.path.view);
+app.publicPath = app.path.join(__dirname, packageConfig.path.public);
+app.imagePath = app.path.join(packageConfig.path.public, 'img');
+app.uploadPath = app.path.join(__dirname, packageConfig.path.upload);
+app.documentPath = app.path.join(__dirname, packageConfig.path.document);
+app.faviconPath = app.path.join(__dirname, packageConfig.path.favicon);
 
 // Configure ==================================================================
 require('./config/common')(app);
 require('./config/view')(app, express);
-require('./config/packages')(app, server, package);
-require('./config/database')(app, app.isDebug ? package.dbTest : package.db);
+require('./config/packages')(app, server, packageConfig);
+require('./config/database')(app, packageConfig.db);
 require('./config/authentication')(app);
 require('./config/permission')(app);
 require('./config/authentication.google')(app);
@@ -48,14 +47,14 @@ require('./config/io')(app, server);
 app.createTemplate('home', 'admin', 'unit');
 app.loadModules();
 app.get('/user', app.permission.check(), app.templates.admin);
-app.get('/download/:name', (req, res, next) => {
+app.get('/download/:name', (req, res) => {
     const fileName = req.params.name, path = app.path.join(app.documentPath, fileName);
     if (app.fs.existsSync(path)) {
         res.download(path, fileName);
     } else {
         res.redirect('/404.html');
     }
-})
+});
 
 app.get('*', (req, res, next) => {
     if (app.isDebug && req.session.user) app.updateSessionUser(req, req.session.user);
@@ -76,4 +75,4 @@ app.get('*', (req, res, next) => {
 
 // Launch website =============================================================
 require('./config/debug')(app);
-server.listen(app.port, () => console.log(` - ${package.title} is ${app.isDebug ? 'debugging on ' + app.debugUrl : 'running on http://localhost:' + app.port}`));
+server.listen(app.port, () => console.log(` - ${packageConfig.title} is ${app.isDebug ? 'debugging on ' + app.debugUrl : 'running on http://localhost:' + app.port}`));
