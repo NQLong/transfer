@@ -132,9 +132,7 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": [
-            "MA"
-        ],
+        "primaryKeys": ["MA"],
         "foreignKeys": []
     },
     "DM_BO_MON": {
@@ -659,9 +657,7 @@
                 "size": 200
             }
         },
-        "primaryKeys": [
-            "MA"
-        ],
+        "primaryKeys": ["MA"],
         "foreignKeys": []
     },
     "DM_DON_VI_TINH": {
@@ -1325,9 +1321,7 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": [
-            "MA"
-        ],
+        "primaryKeys": ["MA"],
         "foreignKeys": []
     },
     "DM_LOAI_HINH_NGHIEN_CUU": {
@@ -1819,9 +1813,7 @@
                 "size": 2000
             }
         },
-        "primaryKeys": [
-            "MA"
-        ],
+        "primaryKeys": ["MA"],
         "foreignKeys": []
     },
     "DM_NGUON_KINH_PHI_TRONG_NUOC": {
@@ -1851,9 +1843,7 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": [
-            "MA"
-        ],
+        "primaryKeys": ["MA"],
         "foreignKeys": []
     },
     "DM_NGUON_VON": {
@@ -2841,9 +2831,7 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": [
-            "MA"
-        ],
+        "primaryKeys": ["MA"],
         "foreignKeys": []
     },
     "DM_VIEC_LAM": {
@@ -3017,9 +3005,7 @@
                 "size": 500
             }
         },
-        "primaryKeys": [
-            "SHORTNAME"
-        ],
+        "primaryKeys": ["SHORTNAME"],
         "foreignKeys": []
     },
     "DV_WEBSITE_GIOI_THIEU": {
@@ -3077,9 +3063,7 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": [
-            "MA"
-        ],
+        "primaryKeys": ["MA"],
         "foreignKeys": []
     },
     "DV_WEBSITE_GIOI_THIEU_HINH": {
@@ -3130,9 +3114,7 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": [
-            "MA"
-        ],
+        "primaryKeys": ["MA"],
         "foreignKeys": []
     },
     "DV_WEBSITE_HINH": {
@@ -3190,9 +3172,7 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": [
-            "MA"
-        ],
+        "primaryKeys": ["MA"],
         "foreignKeys": []
     },
     "FW_ANSWER": {
@@ -3236,9 +3216,7 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "FW_ANSWER_RECORD": {
@@ -3275,9 +3253,7 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "FW_CATEGORY": {
@@ -3335,9 +3311,7 @@
                 "size": "5,0"
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "FW_CONTACT": {
@@ -3395,9 +3369,7 @@
                 "size": "20,0"
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "FW_DRAFT": {
@@ -3525,9 +3497,7 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "FW_EVENT": {
@@ -3725,9 +3695,7 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "FW_EVENT_CATEGORY": {
@@ -3750,10 +3718,7 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": [
-            "CATEGORY_ID",
-            "EVENT_ID"
-        ],
+        "primaryKeys": ["CATEGORY_ID", "EVENT_ID"],
         "foreignKeys": []
     },
     "FW_FORM": {
@@ -3839,9 +3804,7 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "FW_HOME_CAROUSEL": {
@@ -3892,9 +3855,7 @@
                 "size": "5,0"
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "FW_HOME_CAROUSEL_ITEM": {
@@ -4020,9 +3981,7 @@
                 "size": 1000
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "FW_HOME_CONTENT": {
@@ -4066,9 +4025,7 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "FW_HOME_FEATURE": {
@@ -4105,9 +4062,7 @@
                 "size": "5,0"
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "FW_HOME_FEATURE_ITEM": {
@@ -4151,9 +4106,7 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "FW_HOME_FOOTER": {
@@ -4204,9 +4157,7 @@
                 "size": "3,0"
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "FW_HOME_MENU": {
@@ -4278,9 +4229,7 @@
                 "size": 20
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "FW_HOME_VIDEO": {
@@ -4331,9 +4280,7 @@
                 "size": "5,0"
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "FW_INEWS": {
@@ -4356,9 +4303,7 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "FW_INEWS_ITEM": {
@@ -4423,9 +4368,7 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "FW_NEWS": {
@@ -4567,9 +4510,7 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "FW_NEWS_CATEGORY": {
@@ -4592,10 +4533,7 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": [
-            "CATEGORY_ID",
-            "NEWS_ID"
-        ],
+        "primaryKeys": ["CATEGORY_ID", "NEWS_ID"],
         "foreignKeys": []
     },
     "FW_QUESTION": {
@@ -4667,9 +4605,7 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "FW_ROLE": {
@@ -4720,9 +4656,7 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "FW_SETTING": {
@@ -4745,9 +4679,7 @@
                 "size": 1000
             }
         },
-        "primaryKeys": [
-            "KEY"
-        ],
+        "primaryKeys": ["KEY"],
         "foreignKeys": []
     },
     "FW_STORAGE": {
@@ -4805,9 +4737,7 @@
                 "size": "5,0"
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "FW_STUDENT": {
@@ -4865,9 +4795,7 @@
                 "size": "20,0"
             }
         },
-        "primaryKeys": [
-            "MSSV"
-        ],
+        "primaryKeys": ["MSSV"],
         "foreignKeys": []
     },
     "FW_SUBMENU": {
@@ -4918,15 +4846,16 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "FW_USER": {
         "active": true,
         "moduleName": "fwUser",
         "modelName": "fwUser",
+        "methods": {
+            "FW_USER_GET_USER_ROLES": "getUserRoles"
+        },
         "columns": {
             "MA": {
                 "value": "ma",
@@ -5027,9 +4956,7 @@
                 "size": 20
             }
         },
-        "primaryKeys": [
-            "MA"
-        ],
+        "primaryKeys": ["MA"],
         "foreignKeys": []
     },
     "FW_USER_ROLE": {
@@ -5052,10 +4979,7 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": [
-            "EMAIL",
-            "ROLE_ID"
-        ],
+        "primaryKeys": ["EMAIL", "ROLE_ID"],
         "foreignKeys": []
     },
     "QT_BAI_VIET_KHOA_HOC": {
@@ -5134,9 +5058,7 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "QT_BANG_PHAT_MINH": {
@@ -5208,9 +5130,7 @@
                 "size": 100
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "QT_CHINH_TRI_XA_HOI": {
@@ -5254,9 +5174,7 @@
                 "size": "20,0"
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "QT_DAO_TAO": {
@@ -5342,9 +5260,7 @@
                 "size": "4,0"
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "QT_GIAI_THUONG": {
@@ -5395,9 +5311,7 @@
                 "size": 2
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "QT_HOC_TAP_CONG_TAC": {
@@ -5455,9 +5369,7 @@
                 "size": 10
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "QT_HUONG_DAN_LUAN_VAN": {
@@ -5515,9 +5427,7 @@
                 "size": 100
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "QT_KHEN_THUONG": {
@@ -5582,9 +5492,7 @@
                 "size": 10
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "QT_KY_LUAT": {
@@ -5649,9 +5557,7 @@
                 "size": 10
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "QT_KY_YEU": {
@@ -5730,9 +5636,7 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "QT_LAM_VIEC_NGOAI": {
@@ -5797,9 +5701,7 @@
                 "size": 200
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "QT_LICH_SU": {
@@ -5843,9 +5745,7 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "QT_NGHIEN_CUU_KHOA_HOC": {
@@ -5952,9 +5852,7 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "QT_NUOC_NGOAI": {
@@ -6019,9 +5917,7 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "QT_UNG_DUNG_THUONG_MAI": {
@@ -6072,9 +5968,7 @@
                 "size": 200
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "QUAN_HE_CAN_BO": {
@@ -6153,9 +6047,7 @@
                 "size": 200
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "SACH_GIAO_TRINH": {
@@ -6234,9 +6126,7 @@
                 "size": 10
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     },
     "TCHC_CAN_BO": {
@@ -6826,9 +6716,7 @@
                 "size": 200
             }
         },
-        "primaryKeys": [
-            "SHCC"
-        ],
+        "primaryKeys": ["SHCC"],
         "foreignKeys": []
     },
     "TRINH_DO_NGOAI_NGU": {
@@ -6865,9 +6753,7 @@
                 "size": 200
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": []
     }
 }

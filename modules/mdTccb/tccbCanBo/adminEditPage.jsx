@@ -35,7 +35,7 @@ import { createQtGiaiThuongStaff, updateQtGiaiThuongStaff, deleteQtGiaiThuongSta
 import { createQtBangPhatMinhStaff, updateQtBangPhatMinhStaff, deleteQtBangPhatMinhStaff } from 'modules/_default/qtBangPhatMinh/redux.jsx';
 import { createQtUngDungThuongMaiStaff, updateQtUngDungThuongMaiStaff, deleteQtUngDungThuongMaiStaff } from 'modules/_default/qtUngDungThuongMai/redux.jsx';
 import { createQtLamViecNgoaiStaff, updateQtLamViecNgoaiStaff, deleteQtLamViecNgoaiStaff } from 'modules/_default/qtLamViecNgoai/redux.jsx';
-import { AdminPage, TableCell, renderTable, FormDatePicker, AdminModal, FormSelect, FormRichTextBox, FormCheckbox, FormTextBox } from 'view/component/AdminPage';
+import { TableCell, renderTable, AdminModal, FormSelect, FormRichTextBox, FormCheckbox, FormTextBox } from 'view/component/AdminPage';
 import { QTForm } from 'view/component/Form';
 
 const dateType = [
@@ -178,7 +178,7 @@ class HocTapCongTacModal extends AdminModal {
         this.batDau.clear();
         this.ketThuc.clear();
         let { id, batDauType, ketThucType, batDau, ketThuc, noiDung } = item ? item : { id: null, batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', batDau: null, ketThuc: null, noiDung: '' };
-        this.setState({ batDauType: batDauType ? batDauType : 'dd/mm/yyyy', ketThucType: ketThuc && ketThuc != -1 ? ketThucType : 'dd/mm/yyyy', toDay: ketThuc == -1, shcc, id, batDau, ketThuc, toDay: ketThuc == -1 ? true : false });
+        this.setState({ batDauType: batDauType ? batDauType : 'dd/mm/yyyy', ketThucType: ketThuc && ketThuc != -1 ? ketThucType : 'dd/mm/yyyy', shcc, id, batDau, ketThuc, toDay: ketThuc == -1 ? true : false });
         setTimeout(() => {
             this.batDauType.value(batDauType ? batDauType : 'dd/mm/yyyy');
             if (ketThuc && ketThuc != -1) this.ketThucType.value(ketThucType); else this.ketThucType.value('dd/mm/yyyy');
@@ -261,7 +261,7 @@ class DaoTaoModal extends AdminModal {
         this.batDau.clear();
         this.ketThuc.clear();
         let { id, batDauType, ketThucType, batDau, ketThuc, tenTruong, chuyenNganh, hinhThuc, thoiGian, loaiBangCap } = item ? item : { id: null, batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', batDau: null, ketThuc: null, tenTruong: '', chuyenNganh: '', hinhThuc: '', thoiGian: null, loaiBangCap: '' };
-        this.setState({ batDauType: batDauType ? batDauType : 'dd/mm/yyyy', ketThucType: ketThuc && ketThuc != -1 ? ketThucType : 'dd/mm/yyyy', toDay: ketThuc == -1, shcc, id, batDau, ketThuc, toDay: ketThuc == -1 ? true : false });
+        this.setState({ batDauType: batDauType ? batDauType : 'dd/mm/yyyy', ketThucType: ketThuc && ketThuc != -1 ? ketThucType : 'dd/mm/yyyy', shcc, id, batDau, ketThuc, toDay: ketThuc == -1 ? true : false });
         setTimeout(() => {
             this.batDauType.value(batDauType ? batDauType : 'dd/mm/yyyy');
             if (ketThuc && ketThuc != -1) this.ketThucType.value(ketThucType); else this.ketThucType.value('dd/mm/yyyy');
@@ -356,7 +356,7 @@ class NuocNgoaiModal extends AdminModal {
         this.batDau.clear();
         this.ketThuc.clear();
         let { id, batDauType, ketThucType, batDau, ketThuc, noiDung, quocGia } = item ? item : { id: null, batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', batDau: null, ketThuc: null, noiDung: '', quocGia: '' };
-        this.setState({ batDauType: batDauType ? batDauType : 'dd/mm/yyyy', ketThucType: ketThuc && ketThuc != -1 ? ketThucType : 'dd/mm/yyyy', toDay: ketThuc == -1, shcc, id, batDau, ketThuc, toDay: ketThuc == -1 ? true : false });
+        this.setState({ batDauType: batDauType ? batDauType : 'dd/mm/yyyy', ketThucType: ketThuc && ketThuc != -1 ? ketThucType : 'dd/mm/yyyy', shcc, id, batDau, ketThuc, toDay: ketThuc == -1 ? true : false });
         setTimeout(() => {
             this.batDauType.value(batDauType ? batDauType : 'dd/mm/yyyy');
             if (ketThuc && ketThuc != -1) this.ketThucType.value(ketThucType); else this.ketThucType.value('dd/mm/yyyy');
@@ -442,7 +442,7 @@ class KhenThuongModal extends AdminModal {
         this.batDau.clear();
         this.ketThuc.clear();
         let { id, batDauType, ketThucType, batDau, ketThuc, noiDung, capQuyetDinh } = item ? item : { id: null, batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', batDau: null, ketThuc: null, noiDung: '', capQuyetDinh: '' };
-        this.setState({ batDauType: batDauType ? batDauType : 'dd/mm/yyyy', ketThucType: ketThuc && ketThuc != -1 ? ketThucType : 'dd/mm/yyyy', toDay: ketThuc == -1, shcc, id, batDau, ketThuc, toDay: ketThuc == -1 ? true : false });
+        this.setState({ batDauType: batDauType ? batDauType : 'dd/mm/yyyy', ketThucType: ketThuc && ketThuc != -1 ? ketThucType : 'dd/mm/yyyy', shcc, id, batDau, ketThuc, toDay: ketThuc == -1 ? true : false });
         setTimeout(() => {
             this.batDauType.value(batDauType ? batDauType : 'dd/mm/yyyy');
             if (ketThuc && ketThuc != -1) this.ketThucType.value(ketThucType); else this.ketThucType.value('dd/mm/yyyy');
@@ -528,7 +528,7 @@ class KyLuatModal extends AdminModal {
         this.batDau.clear();
         this.ketThuc.clear();
         let { id, batDauType, ketThucType, batDau, ketThuc, lyDoHinhThuc, capQuyetDinh } = item ? item : { id: null, batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', batDau: null, ketThuc: null, lyDoHinhThuc: '', capQuyetDinh: '' };
-        this.setState({ batDauType: batDauType ? batDauType : 'dd/mm/yyyy', ketThucType: ketThuc && ketThuc != -1 ? ketThucType : 'dd/mm/yyyy', toDay: ketThuc == -1, shcc, id, batDau, ketThuc, toDay: ketThuc == -1 ? true : false });
+        this.setState({ batDauType: batDauType ? batDauType : 'dd/mm/yyyy', ketThucType: ketThuc && ketThuc != -1 ? ketThucType : 'dd/mm/yyyy', shcc, id, batDau, ketThuc, toDay: ketThuc == -1 ? true : false });
         setTimeout(() => {
             this.batDauType.value(batDauType ? batDauType : 'dd/mm/yyyy');
             if (ketThuc && ketThuc != -1) this.ketThucType.value(ketThucType); else this.ketThucType.value('dd/mm/yyyy');
@@ -1150,7 +1150,7 @@ class LamViecNgoaiModal extends AdminModal {
         this.batDau.clear();
         this.ketThuc.clear();
         let { id, batDauType, ketThucType, batDau, ketThuc, noiDung, noiLamViec } = item ? item : { id: null, batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', batDau: null, ketThuc: null, noiDung: '', noiLamViec: '' };
-        this.setState({ batDauType: batDauType ? batDauType : 'dd/mm/yyyy', ketThucType: ketThuc && ketThuc != -1 ? ketThucType : 'dd/mm/yyyy', toDay: ketThuc == -1, shcc, id, batDau, ketThuc, toDay: ketThuc == -1 ? true : false });
+        this.setState({ batDauType: batDauType ? batDauType : 'dd/mm/yyyy', ketThucType: ketThuc && ketThuc != -1 ? ketThucType : 'dd/mm/yyyy', shcc, id, batDau, ketThuc, toDay: ketThuc == -1 ? true : false });
         setTimeout(() => {
             this.batDauType.value(batDauType ? batDauType : 'dd/mm/yyyy');
             if (ketThuc && ketThuc != -1) this.ketThucType.value(ketThucType); else this.ketThucType.value('dd/mm/yyyy');
@@ -1361,9 +1361,9 @@ class CanBoEditPage extends QTForm {
     };
 
     setVal = (data = {}) => {
-        const { shcc = '', ho = '', ten = '', biDanh = '', cmnd = '', cmndNgayCap = '', cmndNoiCap = '', emailCaNhan = '', email = '', dienThoaiCaNhan = '', dienThoaiBaoTin = '', ngaySinh = '', ngayBatDauCongTac = '', ngayVao = '', ngayCbgd = '', ngayBienChe = '', ngayNghi = '', ngach = '', ngachMoi = '', heSoLuong = '', bacLuong = '', mocNangLuong = '', ngayHuongLuong = '', tyLeVuotKhung = '',
-            phuCapCongViec = '', ngayPhuCapCongViec = '', maChucVu = '', chucVuDang = '', chucVuDoanThe = '', chucVuKiemNhiem = '', maTrinhDoLlct = '', maTrinhDoQlnn = '', maTrinhDoTinHoc = '', hoKhau = '', diaChiHienTai = '', danToc = '', tonGiao = '', chucDanh = '', trinhDoPhoThong = '', hocVi = '', chuyenNganh = '', namChucDanh = '', namHocVi = '',
-            maDonVi = '', phucLoi = '', nhaGiaoNhanDan = null, nhaGiaoUuTu = null, lyDoONuocNgoai = '', ghiChu = '', dangONuocNgoai = false, dangVien = false, phai = '', nhomMau = '', ngayVaoDang = '', ngayVaoDangChinhThuc = '', ngayNhapNgu = '', ngayXuatNgu = '', quanHamCaoNhat = '', soBhxh = '', maXaNoiSinh = null, maXaNguyenQuan = null, noiSinh = '', queQuan = '',
+        const { shcc = '', ho = '', ten = '', biDanh = '', cmnd = '', cmndNgayCap = '', cmndNoiCap = '', emailCaNhan = '', email = '', dienThoaiCaNhan = '', dienThoaiBaoTin = '', ngaySinh = '', ngayBatDauCongTac = '', ngayBienChe = '',
+            maChucVu = '', chucVuDang = '', chucVuDoanThe = '', chucVuKiemNhiem = '', maTrinhDoLlct = '', maTrinhDoQlnn = '', maTrinhDoTinHoc = '', hoKhau = '', diaChiHienTai = '', danToc = '', tonGiao = '', chucDanh = '', trinhDoPhoThong = '', hocVi = '', chuyenNganh = '', namChucDanh = '', namHocVi = '',
+            maDonVi = '', lyDoONuocNgoai = '', dangONuocNgoai = false, dangVien = false, phai = '', nhomMau = '', ngayVaoDang = '', ngayVaoDangChinhThuc = '', ngayNhapNgu = '', ngayXuatNgu = '', quanHamCaoNhat = '', soBhxh = '', noiSinh = '', queQuan = '',
             soTheDang = '', noiDangDb = '', noiDangCt = '', doanVien = false, ngayVaoDoan = '', noiVaoDoan = '', ngheNghiepCu = '', chucVuKhac = '', quocGia = null, hangThuongBinh = '', giaDinhChinhSach = '', danhHieu = '', soTruong = '', sucKhoe = '', canNang = '', chieuCao = '' } = data.constructor === ({}).constructor ? data : {};
         this.shcc.current.setVal(shcc);
         this.ho.current.setVal(ho);

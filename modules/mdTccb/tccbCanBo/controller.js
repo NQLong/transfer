@@ -238,67 +238,67 @@ module.exports = app => {
     app.delete('/api/staff', app.permission.check('staff:delete'), (req, res) => {
         app.model.canBo.delete({ shcc: req.body.shcc }, error => {
             new Promise(resolve => {
-                app.model.quanHeCanBo.delete({ shcc: req.body.shcc }, (error) => {
+                app.model.quanHeCanBo.delete({ shcc: req.body.shcc }, () => {
                     resolve();
                 });
             }).then(() => new Promise(resolve => {
-                app.model.trinhDoNgoaiNgu.delete({ shcc: req.body.shcc }, (error) => {
+                app.model.trinhDoNgoaiNgu.delete({ shcc: req.body.shcc }, () => {
                     resolve();
                 });
             })).then(() => new Promise(resolve => {
-                app.model.qtHocTapCongTac.delete({ shcc: req.body.shcc }, (error) => {
+                app.model.qtHocTapCongTac.delete({ shcc: req.body.shcc }, () => {
                     resolve();
                 });
             })).then(() => new Promise(resolve => {
-                app.model.qtDaoTao.delete({ shcc: req.body.shcc }, (error) => {
+                app.model.qtDaoTao.delete({ shcc: req.body.shcc }, () => {
                     resolve();
                 });
             })).then(() => new Promise(resolve => {
-                app.model.qtNuocNgoai.delete({ shcc: req.body.shcc }, (error) => {
+                app.model.qtNuocNgoai.delete({ shcc: req.body.shcc }, () => {
                     resolve();
                 });
             })).then(() => new Promise(resolve => {
-                app.model.qtKhenThuong.delete({ shcc: req.body.shcc }, (error) => {
+                app.model.qtKhenThuong.delete({ shcc: req.body.shcc }, () => {
                     resolve();
                 });
             })).then(() => new Promise(resolve => {
-                app.model.qtKyLuat.delete({ shcc: req.body.shcc }, (error) => {
+                app.model.qtKyLuat.delete({ shcc: req.body.shcc }, () => {
                     resolve();
                 });
             })).then(() => new Promise(resolve => {
-                app.model.qtNghienCuuKhoaHoc.delete({ shcc: req.body.shcc }, (error) => {
+                app.model.qtNghienCuuKhoaHoc.delete({ shcc: req.body.shcc }, () => {
                     resolve();
                 });
             })).then(() => new Promise(resolve => {
-                app.model.qtHuongDanLuanVan.delete({ shcc: req.body.shcc }, (error) => {
+                app.model.qtHuongDanLuanVan.delete({ shcc: req.body.shcc }, () => {
                     resolve();
                 });
             })).then(() => new Promise(resolve => {
-                app.model.sachGiaoTrinh.delete({ shcc: req.body.shcc }, (error) => {
+                app.model.sachGiaoTrinh.delete({ shcc: req.body.shcc }, () => {
                     resolve();
                 });
             })).then(() => new Promise(resolve => {
-                app.model.qtBaiVietKhoaHoc.delete({ shcc: req.body.shcc }, (error) => {
+                app.model.qtBaiVietKhoaHoc.delete({ shcc: req.body.shcc }, () => {
                     resolve();
                 });
             })).then(() => new Promise(resolve => {
-                app.model.qtKyYeu.delete({ shcc: req.body.shcc }, (error) => {
+                app.model.qtKyYeu.delete({ shcc: req.body.shcc }, () => {
                     resolve();
                 });
             })).then(() => new Promise(resolve => {
-                app.model.qtGiaiThuong.delete({ shcc: req.body.shcc }, (error) => {
+                app.model.qtGiaiThuong.delete({ shcc: req.body.shcc }, () => {
                     resolve();
                 });
             })).then(() => new Promise(resolve => {
-                app.model.qtBangPhatMinh.delete({ shcc: req.body.shcc }, (error) => {
+                app.model.qtBangPhatMinh.delete({ shcc: req.body.shcc }, () => {
                     resolve();
                 });
             })).then(() => new Promise(resolve => {
-                app.model.qtUngDungThuongMai.delete({ shcc: req.body.shcc }, (error) => {
+                app.model.qtUngDungThuongMai.delete({ shcc: req.body.shcc }, () => {
                     resolve();
                 });
             })).then(() => new Promise(resolve => {
-                app.model.qtLamViecNgoai.delete({ shcc: req.body.shcc }, (error) => {
+                app.model.qtLamViecNgoai.delete({ shcc: req.body.shcc }, () => {
                     resolve();
                 });
             })).then(() => {
@@ -504,7 +504,7 @@ module.exports = app => {
                                             const handleQuanHe = (index = 0) => {
                                                 let quanHe = item.quanHe[index];
                                                 if (index < item.quanHe.length) {
-                                                    newQuanHe = {
+                                                    let newQuanHe = {
                                                         hoTen: quanHe.hoTen,
                                                         moiQuanHe: quanHeMapping[quanHe.quanHe.toLowerCase()],
                                                         namSinh: new Date(quanHe.namSinh).getTime(),
@@ -514,7 +514,7 @@ module.exports = app => {
                                                         shcc: newCb.shcc,
                                                         ngheNghiep: quanHe.ngheNghiep
                                                     };
-                                                    app.model.quanHeCanBo.create(newQuanHe, (error3, qhItem) => {
+                                                    app.model.quanHeCanBo.create(newQuanHe, () => {
                                                         handleQuanHe(index + 1);
                                                     });
                                                 }
@@ -526,12 +526,12 @@ module.exports = app => {
                                             const handleNgoaiNgu = (index = 0) => {
                                                 let ngoaiNgu = item.trinhDoNgoaiNgu[index];
                                                 if (index < item.trinhDoNgoaiNgu.length) {
-                                                    newNgoaiNgu = {
+                                                    let newNgoaiNgu = {
                                                         loaiNgonNgu: ngoaiNguMapping[ngoaiNgu.loaiNgonNgu.toLowerCase()],
                                                         shcc: newCb.shcc,
                                                         trinhDo: ngoaiNgu.trinhDo
                                                     };
-                                                    app.model.trinhDoNgoaiNgu.create(newNgoaiNgu, (error3, nnItem) => {
+                                                    app.model.trinhDoNgoaiNgu.create(newNgoaiNgu, () => {
                                                         handleNgoaiNgu(index + 1);
                                                     });
                                                 }
@@ -543,7 +543,7 @@ module.exports = app => {
                                             const handleQTHTCT = (index = 0) => {
                                                 let htct = item.qtHtct[index];
                                                 if (index < item.qtHtct.length) {
-                                                    newHtct = {
+                                                    const newHtct = {
                                                         shcc: newCb.shcc,
                                                         batDau: htct.batDau,
                                                         ketThuc: htct.ketThuc,
@@ -551,7 +551,7 @@ module.exports = app => {
                                                         ketThucType: htct.ketThucType,
                                                         noiDung: htct.noiDung
                                                     };
-                                                    app.model.qtHocTapCongTac.create(newHtct, (error3, nnItem) => {
+                                                    app.model.qtHocTapCongTac.create(newHtct, () => {
                                                         handleQTHTCT(index + 1);
                                                     });
                                                 }
@@ -563,7 +563,7 @@ module.exports = app => {
                                             const handleQTDaoTao = (index = 0) => {
                                                 let daoTao = item.qtDaoTao[index];
                                                 if (index < item.qtDaoTao.length) {
-                                                    newDaoTao = {
+                                                    const newDaoTao = {
                                                         shcc: newCb.shcc,
                                                         batDau: daoTao.batDau,
                                                         ketThuc: daoTao.ketThuc,
@@ -575,7 +575,7 @@ module.exports = app => {
                                                         loaiBangCap: daoTao.loaiBangCap,
                                                         thoiGian: daoTao.thoiGian
                                                     };
-                                                    app.model.qtDaoTao.create(newDaoTao, (error3, nnItem) => {
+                                                    app.model.qtDaoTao.create(newDaoTao, () => {
                                                         handleQTDaoTao(index + 1);
                                                     });
                                                 }
@@ -587,7 +587,7 @@ module.exports = app => {
                                             const handleQTNuocNgoai = (index = 0) => {
                                                 let nuocNgoai = item.qtNuocNgoai[index];
                                                 if (index < item.qtNuocNgoai.length) {
-                                                    newNuocNgoai = {
+                                                    const newNuocNgoai = {
                                                         shcc: newCb.shcc,
                                                         batDau: nuocNgoai.batDau,
                                                         ketThuc: nuocNgoai.ketThuc,
@@ -596,7 +596,7 @@ module.exports = app => {
                                                         quocGia: nuocNgoai.quocGia,
                                                         noiDung: nuocNgoai.noiDung
                                                     };
-                                                    app.model.qtNuocNgoai.create(newNuocNgoai, (error3, nnItem) => {
+                                                    app.model.qtNuocNgoai.create(newNuocNgoai, () => {
                                                         handleQTNuocNgoai(index + 1);
                                                     });
                                                 }
@@ -608,7 +608,7 @@ module.exports = app => {
                                             const handleQTKhenThuong = (index = 0) => {
                                                 let khenThuong = item.qtKhenThuong[index];
                                                 if (index < item.qtKhenThuong.length) {
-                                                    newKhenThuong = {
+                                                    const newKhenThuong = {
                                                         shcc: newCb.shcc,
                                                         batDau: khenThuong.batDau,
                                                         ketThuc: khenThuong.ketThuc,
@@ -617,7 +617,7 @@ module.exports = app => {
                                                         capQuyetDinh: khenThuong.capQuyetDinh,
                                                         noiDung: khenThuong.noiDung
                                                     };
-                                                    app.model.qtKhenThuong.create(newKhenThuong, (error3, nnItem) => {
+                                                    app.model.qtKhenThuong.create(newKhenThuong, () => {
                                                         handleQTKhenThuong(index + 1);
                                                     });
                                                 }
@@ -629,7 +629,7 @@ module.exports = app => {
                                             const handleQTKyLuat = (index = 0) => {
                                                 let kyLuat = item.qtKyLuat[index];
                                                 if (index < item.qtKyLuat.length) {
-                                                    newKyLuat = {
+                                                    const newKyLuat = {
                                                         shcc: newCb.shcc,
                                                         batDau: kyLuat.batDau,
                                                         ketThuc: kyLuat.ketThuc,
@@ -638,7 +638,7 @@ module.exports = app => {
                                                         capQuyetDinh: kyLuat.capQuyetDinh,
                                                         lyDoHinhThuc: kyLuat.lyDoHinhThuc
                                                     };
-                                                    app.model.qtKyLuat.create(newKyLuat, (error3, nnItem) => {
+                                                    app.model.qtKyLuat.create(newKyLuat, () => {
                                                         handleQTKyLuat(index + 1);
                                                     });
                                                 }
@@ -650,7 +650,7 @@ module.exports = app => {
                                             const handleQTNCKH = (index = 0) => {
                                                 let nckh = item.qtNCKH[index];
                                                 if (index < item.qtNCKH.length) {
-                                                    newNckh = {
+                                                    const newNckh = {
                                                         shcc: newCb.shcc,
                                                         batDau: nckh.batDau,
                                                         ketThuc: nckh.ketThuc,
@@ -665,7 +665,7 @@ module.exports = app => {
                                                         ngayNghiemThu: nckh.ngayNghiemThu,
                                                         ngayNghiemThuType: nckh.ngayNghiemThuType
                                                     };
-                                                    app.model.qtNghienCuuKhoaHoc.create(newNckh, (error3, nnItem) => {
+                                                    app.model.qtNghienCuuKhoaHoc.create(newNckh, () => {
                                                         handleQTNCKH(index + 1);
                                                     });
                                                 }
@@ -677,7 +677,7 @@ module.exports = app => {
                                             const handleHuongDan = (index = 0) => {
                                                 let huongDan = item.qtHuongDan[index];
                                                 if (index < item.qtHuongDan.length) {
-                                                    newHuongDan = {
+                                                    const newHuongDan = {
                                                         shcc: newCb.shcc,
                                                         hoTen: huongDan.hoTen,
                                                         tenLuanVan: huongDan.tenLuanVan,
@@ -685,7 +685,7 @@ module.exports = app => {
                                                         sanPham: huongDan.sanPham,
                                                         bacDaoTao: huongDan.bacDaoTao
                                                     };
-                                                    app.model.qtHuongDanLuanVan.create(newHuongDan, (error3, nnItem) => {
+                                                    app.model.qtHuongDanLuanVan.create(newHuongDan, () => {
                                                         handleHuongDan(index + 1);
                                                     });
                                                 }
@@ -697,7 +697,7 @@ module.exports = app => {
                                             const handleSachGiaoTrinh = (index = 0) => {
                                                 let sach = item.sachGiaoTrinh[index];
                                                 if (index < item.sachGiaoTrinh.length) {
-                                                    newSach = {
+                                                    const newSach = {
                                                         shcc: newCb.shcc,
                                                         ten: sach.ten,
                                                         theLoai: sach.theLoai,
@@ -708,7 +708,7 @@ module.exports = app => {
                                                         butDanh: sach.butDanh,
                                                         quocTe: sach.quocTe
                                                     };
-                                                    app.model.sachGiaoTrinh.create(newSach, (error3, nnItem) => {
+                                                    app.model.sachGiaoTrinh.create(newSach, () => {
                                                         handleSachGiaoTrinh(index + 1);
                                                     });
                                                 }
@@ -720,7 +720,7 @@ module.exports = app => {
                                             const handleBaiViet = (index = 0) => {
                                                 let baiViet = item.baiVietKhoaHoc[index];
                                                 if (index < item.baiVietKhoaHoc.length) {
-                                                    newBaiViet = {
+                                                    const newBaiViet = {
                                                         shcc: newCb.shcc,
                                                         tenTacGia: baiViet.tenTacGia,
                                                         namXuatBan: baiViet.namXuatBan,
@@ -731,7 +731,7 @@ module.exports = app => {
                                                         diemIf: baiViet.diemIf,
                                                         quocTe: baiViet.quocTe
                                                     };
-                                                    app.model.qtBaiVietKhoaHoc.create(newBaiViet, (error3, nnItem) => {
+                                                    app.model.qtBaiVietKhoaHoc.create(newBaiViet, () => {
                                                         handleBaiViet(index + 1);
                                                     });
                                                 }
@@ -743,7 +743,7 @@ module.exports = app => {
                                             const handleKyYeu = (index = 0) => {
                                                 let kYeu = item.kyYeu[index];
                                                 if (index < item.kyYeu.length) {
-                                                    newKYeu = {
+                                                    const newKYeu = {
                                                         shcc: newCb.shcc,
                                                         tenTacGia: kYeu.tenTacGia,
                                                         tenHoiNghi: kYeu.tenHoiNghi,
@@ -754,7 +754,7 @@ module.exports = app => {
                                                         sanPham: kYeu.sanPham,
                                                         quocTe: kYeu.quocTe
                                                     };
-                                                    app.model.qtKyYeu.create(newKYeu, (error3, nnItem) => {
+                                                    app.model.qtKyYeu.create(newKYeu, () => {
                                                         handleKyYeu(index + 1);
                                                     });
                                                 }
@@ -766,14 +766,14 @@ module.exports = app => {
                                             const handleGiaiThuong = (index = 0) => {
                                                 let gt = item.giaiThuong[index];
                                                 if (index < item.giaiThuong.length) {
-                                                    newGT = {
+                                                    const newGT = {
                                                         shcc: newCb.shcc,
                                                         tenGiaiThuong: gt.tenGiaiThuong,
                                                         noiDung: gt.noiDung,
                                                         noiCap: gt.noiCap,
                                                         namCap: gt.namCap
                                                     };
-                                                    app.model.qtGiaiThuong.create(newGT, (error3, nnItem) => {
+                                                    app.model.qtGiaiThuong.create(newGT, () => {
                                                         handleGiaiThuong(index + 1);
                                                     });
                                                 }
@@ -785,7 +785,7 @@ module.exports = app => {
                                             const handleBangPMSC = (index = 0) => {
                                                 let bang = item.bangPMSC[index];
                                                 if (index < item.bangPMSC.length) {
-                                                    newBang = {
+                                                    const newBang = {
                                                         shcc: newCb.shcc,
                                                         tenBang: bang.tenBang,
                                                         soHieu: bang.soHieu,
@@ -795,7 +795,7 @@ module.exports = app => {
                                                         sanPham: bang.sanPham,
                                                         loaiBang: bang.loaiBang
                                                     };
-                                                    app.model.qtBangPhatMinh.create(newBang, (error3, nnItem) => {
+                                                    app.model.qtBangPhatMinh.create(newBang, () => {
                                                         handleBangPMSC(index + 1);
                                                     });
                                                 }
@@ -807,14 +807,14 @@ module.exports = app => {
                                             const handleUngDungThuongMai = (index = 0) => {
                                                 let ungDung = item.ungDungThuongMai[index];
                                                 if (index < item.ungDungThuongMai.length) {
-                                                    newUngDung = {
+                                                    const newUngDung = {
                                                         shcc: newCb.shcc,
                                                         tenCongNghe: ungDung.tenCongNghe,
                                                         hinhThuc: ungDung.hinhThuc,
                                                         namChuyenGia: ungDung.namChuyenGia,
                                                         sanPham: ungDung.sanPham,
                                                     };
-                                                    app.model.qtUngDungThuongMai.create(newUngDung, (error3, nnItem) => {
+                                                    app.model.qtUngDungThuongMai.create(newUngDung, () => {
                                                         handleUngDungThuongMai(index + 1);
                                                     });
                                                 }
@@ -826,7 +826,7 @@ module.exports = app => {
                                             const handleLamViecNgoai = (index = 0) => {
                                                 let LVN = item.lamViecNgoai[index];
                                                 if (index < item.lamViecNgoai.length) {
-                                                    newLVN = {
+                                                    const newLVN = {
                                                         shcc: newCb.shcc,
                                                         noiLamViec: LVN.noiLamViec,
                                                         noiDung: LVN.noiDung,
@@ -835,7 +835,7 @@ module.exports = app => {
                                                         batDauType: LVN.batDauType,
                                                         ketThucType: LVN.ketThucType
                                                     };
-                                                    app.model.qtLamViecNgoai.create(newLVN, (error3, nnItem) => {
+                                                    app.model.qtLamViecNgoai.create(newLVN, () => {
                                                         handleLamViecNgoai(index + 1);
                                                     });
                                                 }
@@ -1234,7 +1234,7 @@ module.exports = app => {
                         app.model.quanHeCanBo.getAll({ shcc: canBo.shcc }, '*', 'id ASC', (error, qhItems) => {
                             if (!error && qhItems && qhItems.length > 0) {
                                 const handleQuanHe = (index = 0) => {
-                                    item = qhItems[index];
+                                    let item = qhItems[index];
                                     if (index < qhItems.length) {
                                         if (item.type == 0) data.quanhe.push({
                                             moiQuanHe: item.moiQuanHe ? quanHeMapping[item.moiQuanHe] : '',
@@ -1262,7 +1262,7 @@ module.exports = app => {
                         app.model.trinhDoNgoaiNgu.getAll({ shcc: canBo.shcc }, '*', 'id ASC', (error, nnItems) => {
                             if (!error && nnItems && nnItems.length > 0) {
                                 const handleNgoaiNgu = (index = 0) => {
-                                    item = nnItems[index];
+                                    let item = nnItems[index];
                                     if (index < nnItems.length) {
                                         if (item.loaiNgonNgu) data.ngoaiNgu.push({
                                             ngonNgu: ngoaiNguMapping[item.loaiNgonNgu],
@@ -1279,7 +1279,7 @@ module.exports = app => {
                         app.model.qtDaoTao.getAll({ shcc: canBo.shcc }, '*', 'id ASC', (error, dtItems) => {
                             if (!error && dtItems && dtItems.length > 0) {
                                 const handleDaoTao = (index = 0) => {
-                                    item = dtItems[index];
+                                    let item = dtItems[index];
                                     if (index < dtItems.length) {
                                         data.daoTao.push({
                                             coSo: item.tenTruong,
@@ -1301,7 +1301,7 @@ module.exports = app => {
                         app.model.qtHocTapCongTac.getAll({ shcc: canBo.shcc }, '*', 'batDau ASC', (error, htctItems) => {
                             if (!error && htctItems && htctItems.length > 0) {
                                 const handleHtct = (index = 0) => {
-                                    item = htctItems[index];
+                                    let item = htctItems[index];
                                     if (index < htctItems.length) {
                                         data.htct.push({
                                             noiDung: item.noiDung ? item.noiDung : '',
@@ -1534,14 +1534,13 @@ module.exports = app => {
                                     noiVaoDang: worksheet.getCell('AV' + index).value,
                                     ngayVaoDang: worksheet.getCell('AW' + index).value ? new Date(worksheet.getCell('AW' + index).value).getTime() : null,
                                     ngayVaoDangChinhThuc: worksheet.getCell('AX' + index).value ? new Date(worksheet.getCell('AX' + index).value).getTime() : null,
-                                    noiVaoDang: worksheet.getCell('AY' + index).value,
+                                    // noiVaoDang: worksheet.getCell('AY' + index).value,//TODO
                                     ngayNhapNgu: worksheet.getCell('AZ' + index).value ? new Date(worksheet.getCell('AZ' + index).value).getTime() : null,
                                     ngayXuatNgu: worksheet.getCell('BA' + index).value ? new Date(worksheet.getCell('BA' + index).value).getTime() : null,
                                     quanHam: worksheet.getCell('BB' + index).value,
                                     hangThuongBinh: worksheet.getCell('BC' + index).value,
                                     giaDinhChinhSach: worksheet.getCell('BD' + index).value,
                                     danhHieu: worksheet.getCell('BE' + index).value,
-                                    tuNhanXetUuDiem: worksheet.getCell('FG' + index).value,
                                     tuNhanXetUuDiem: worksheet.getCell('FG' + index).value,
                                     loiCamDoan: worksheet.getCell('FI' + index).value,
                                 };
@@ -1551,7 +1550,7 @@ module.exports = app => {
                                 } else if (chieuCao && chieuCao.includes('m')) {
                                     newElement.chieuCao = Number(chieuCao.split('m')[0]) * 100 + Number(chieuCao.split('m')[1]);
                                 }
-                                handleChucVu = (cIndex) => {
+                                const handleChucVu = (cIndex) => {
                                     if (cIndex <= totalRow && (cIndex == index || !worksheet.getCell('B' + cIndex).value)) {
                                         if (worksheet.getCell('AE' + cIndex).value && worksheet.getCell('AF' + cIndex).value) {
                                             if (worksheet.getCell('AE' + cIndex).value.toLowerCase() == 'đoàn thể') newElement.chucVuDoanThe = worksheet.getCell('AF' + cIndex).value;
@@ -1565,7 +1564,7 @@ module.exports = app => {
                                 };
                                 handleChucVu(index);
                                 newElement.quanHe = [];
-                                handleQuanHe1 = (qIndex) => {
+                                const handleQuanHe1 = (qIndex) => {
                                     if (qIndex <= totalRow && (qIndex == index || !worksheet.getCell('B' + qIndex).value)) {
                                         if (worksheet.getCell('BM' + qIndex).value && worksheet.getCell('BN' + qIndex).value) {
                                             let curQuanHe = {}, nextQIndex;
@@ -1591,7 +1590,7 @@ module.exports = app => {
                                     }
                                 };
                                 handleQuanHe1(index);
-                                handleQuanHe2 = (qIndex) => {
+                                const handleQuanHe2 = (qIndex) => {
                                     if (qIndex <= totalRow && (qIndex == index || !worksheet.getCell('B' + qIndex).value)) {
                                         if (worksheet.getCell('BR' + qIndex).value && worksheet.getCell('BS' + qIndex).value) {
                                             let curQuanHe = {}, nextQIndex;
@@ -1617,7 +1616,7 @@ module.exports = app => {
                                     }
                                 };
                                 handleQuanHe2(index);
-                                handleQuanHe3 = (qIndex) => {
+                                const handleQuanHe3 = (qIndex) => {
                                     if (qIndex <= totalRow && (qIndex == index || !worksheet.getCell('B' + qIndex).value)) {
                                         if (worksheet.getCell('BW' + qIndex).value && worksheet.getCell('BX' + qIndex).value) {
                                             let curQuanHe = {}, nextQIndex;
@@ -1644,7 +1643,7 @@ module.exports = app => {
                                 };
                                 handleQuanHe3(index);
                                 newElement.trinhDoNgoaiNgu = [];
-                                handleTrinhDoTinHoc = (tIndex) => {
+                                const handleTrinhDoTinHoc = (tIndex) => {
                                     if (tIndex <= totalRow && (tIndex == index || !worksheet.getCell('B' + tIndex).value)) {
                                         if (worksheet.getCell('Z' + tIndex).value && worksheet.getCell('AA' + tIndex).value) {
                                             newElement.trinhDoNgoaiNgu.push({
@@ -1700,7 +1699,7 @@ module.exports = app => {
                                 handleQTHTCT(index);
 
                                 newElement.qtDaoTao = [];
-                                handleQTDaoTao = (qtIndex) => {
+                                const handleQTDaoTao = (qtIndex) => {
                                     if (qtIndex <= totalRow && (qtIndex == index || !worksheet.getCell('B' + qtIndex).value)) {
                                         if (worksheet.getCell('CE' + qtIndex).value && worksheet.getCell('CF' + qtIndex).value) {
                                             let tenTruong = worksheet.getCell('CE' + qtIndex).value,
@@ -1753,7 +1752,7 @@ module.exports = app => {
                                 handleQTDaoTao(index);
 
                                 newElement.qtNuocNgoai = [];
-                                handleQTNuocNgoai = (qtIndex) => {
+                                const handleQTNuocNgoai = (qtIndex) => {
                                     if (qtIndex <= totalRow && (qtIndex == index || !worksheet.getCell('B' + qtIndex).value)) {
                                         if (worksheet.getCell('CK' + qtIndex).value && worksheet.getCell('CL' + qtIndex).value) {
                                             let time = worksheet.getCell('CK' + qtIndex).value,
@@ -1793,7 +1792,7 @@ module.exports = app => {
                                 handleQTNuocNgoai(index);
 
                                 newElement.qtKhenThuong = [];
-                                handleQTKhenThuong = (qtIndex) => {
+                                const handleQTKhenThuong = (qtIndex) => {
                                     if (qtIndex <= totalRow && (qtIndex == index || !worksheet.getCell('B' + qtIndex).value)) {
                                         if (worksheet.getCell('CO' + qtIndex).value && worksheet.getCell('CP' + qtIndex).value) {
                                             let time = worksheet.getCell('CO' + qtIndex).value,
@@ -1832,7 +1831,7 @@ module.exports = app => {
                                 };
                                 handleQTKhenThuong(index);
                                 newElement.qtKyLuat = [];
-                                handleQTKyLuat = (qtIndex) => {
+                                const handleQTKyLuat = (qtIndex) => {
                                     if (qtIndex <= totalRow && (qtIndex == index || !worksheet.getCell('B' + qtIndex).value)) {
                                         if (worksheet.getCell('CS' + qtIndex).value && worksheet.getCell('CT' + qtIndex).value) {
                                             let time = worksheet.getCell('CS' + qtIndex).value,
@@ -1872,7 +1871,7 @@ module.exports = app => {
                                 handleQTKyLuat(index);
 
                                 newElement.qtNCKH = [];
-                                handleQTNCKH = (qtIndex) => {
+                                const handleQTNCKH = (qtIndex) => {
                                     if (qtIndex <= totalRow && (qtIndex == index || !worksheet.getCell('B' + qtIndex).value)) {
                                         if (worksheet.getCell('CW' + qtIndex).value && worksheet.getCell('CX' + qtIndex).value) {
                                             let tenDeTai = worksheet.getCell('CW' + qtIndex).value,
@@ -1939,7 +1938,7 @@ module.exports = app => {
                                 };
                                 handleQTNCKH(index);
                                 newElement.qtHuongDan = [];
-                                handleQTHuongDan = (qtIndex) => {
+                                const handleQTHuongDan = (qtIndex) => {
                                     if (qtIndex <= totalRow && (qtIndex == index || !worksheet.getCell('B' + qtIndex).value)) {
                                         if (worksheet.getCell('DE' + qtIndex).value && worksheet.getCell('DF' + qtIndex).value) {
                                             let hoTen = worksheet.getCell('DE' + qtIndex).value,
@@ -1970,7 +1969,7 @@ module.exports = app => {
                                 handleQTHuongDan(index);
 
                                 newElement.sachGiaoTrinh = [];
-                                handleSachGiaoTrinh = (qtIndex) => {
+                                const handleSachGiaoTrinh = (qtIndex) => {
                                     if (qtIndex <= totalRow && (qtIndex == index || !worksheet.getCell('B' + qtIndex).value)) {
                                         if (worksheet.getCell('DK' + qtIndex).value && worksheet.getCell('DL' + qtIndex).value) {
                                             let ten = worksheet.getCell('DK' + qtIndex).value,
@@ -1999,7 +1998,7 @@ module.exports = app => {
                                 handleSachGiaoTrinh(index);
 
                                 newElement.baiVietKhoaHoc = [];
-                                handleBaiVietKhoaHoc = (qtIndex) => {
+                                const handleBaiVietKhoaHoc = (qtIndex) => {
                                     if (qtIndex <= totalRow && (qtIndex == index || !worksheet.getCell('B' + qtIndex).value)) {
                                         if (worksheet.getCell('DU' + qtIndex).value && worksheet.getCell('DW' + qtIndex).value) {
                                             let tenTacGia = worksheet.getCell('DT' + qtIndex).value,
@@ -2032,7 +2031,7 @@ module.exports = app => {
                                 handleBaiVietKhoaHoc(index);
 
                                 newElement.kyYeu = [];
-                                handleKyYeu = (qtIndex) => {
+                                const handleKyYeu = (qtIndex) => {
                                     if (qtIndex <= totalRow && (qtIndex == index || !worksheet.getCell('B' + qtIndex).value)) {
                                         if (worksheet.getCell('EC' + qtIndex).value && worksheet.getCell('ED' + qtIndex).value) {
                                             let tenTacGia = worksheet.getCell('EC' + qtIndex).value,
@@ -2070,7 +2069,7 @@ module.exports = app => {
                                 handleKyYeu(index);
 
                                 newElement.giaiThuong = [];
-                                handleGiaiThuong = (qtIndex) => {
+                                const handleGiaiThuong = (qtIndex) => {
                                     if (qtIndex <= totalRow && (qtIndex == index || !worksheet.getCell('B' + qtIndex).value)) {
                                         if (worksheet.getCell('EL' + qtIndex).value && worksheet.getCell('EM' + qtIndex).value) {
                                             let tenGiaiThuong = worksheet.getCell('EL' + qtIndex).value,
@@ -2091,7 +2090,7 @@ module.exports = app => {
                                 handleGiaiThuong(index);
 
                                 newElement.bangPMSC = [];
-                                handleBangPMSC = (qtIndex) => {
+                                const handleBangPMSC = (qtIndex) => {
                                     if (qtIndex <= totalRow && (qtIndex == index || !worksheet.getCell('B' + qtIndex).value)) {
                                         if (worksheet.getCell('EQ' + qtIndex).value && worksheet.getCell('ER' + qtIndex).value) {
                                             let tenBang = worksheet.getCell('EQ' + qtIndex).value,
@@ -2118,7 +2117,7 @@ module.exports = app => {
                                 handleBangPMSC(index);
 
                                 newElement.ungDungThuongMai = [];
-                                handleUngDungThuongMai = (qtIndex) => {
+                                const handleUngDungThuongMai = (qtIndex) => {
                                     if (qtIndex <= totalRow && (qtIndex == index || !worksheet.getCell('B' + qtIndex).value)) {
                                         if (worksheet.getCell('EY' + qtIndex).value && worksheet.getCell('EZ' + qtIndex).value) {
                                             let tenCongNghe = worksheet.getCell('EY' + qtIndex).value,
