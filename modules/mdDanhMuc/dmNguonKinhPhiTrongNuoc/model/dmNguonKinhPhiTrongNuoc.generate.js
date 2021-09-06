@@ -1,5 +1,5 @@
 // Table name: DM_NGUON_KINH_PHI_TRONG_NUOC { ma, moTa, kichHoat }
-const keys = [''];
+const keys = ['MA'];
 const obj2Db = { 'ma': 'MA', 'moTa': 'MO_TA', 'kichHoat': 'KICH_HOAT' };
 
 module.exports = app => {
@@ -81,7 +81,7 @@ module.exports = app => {
                 let result = {};
                 let totalItem = res && res.rows && res.rows[0] ? res.rows[0]['COUNT(*)'] : 0;
                 result = { totalItem, pageSize, pageTotal: Math.ceil(totalItem / pageSize) };
-                result.pageNumber = pageNumber === -1 ? 1 : Math.min(pageNumber, result.pageTotal);
+                result.pageNumber = Math.max(1, Math.min(pageNumber, result.pageTotal));
                 leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
                 const sql = 'SELECT ' + app.dbConnection.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT DM_NGUON_KINH_PHI_TRONG_NUOC.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM DM_NGUON_KINH_PHI_TRONG_NUOC' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
                 app.dbConnection.execute(sql, parameter, (error, resultSet) => {
