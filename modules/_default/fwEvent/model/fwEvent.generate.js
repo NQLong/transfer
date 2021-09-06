@@ -1,4 +1,4 @@
-// Table name: FW_EVENT { priority, name, title, image, link, active, isInternal, location, abstract, content, maxRegisteredUsers, trainingPoint, socialWorkDay, createdDate, startPost, stopPost, startRegister, stopRegister, startEvent, stopEvent, views, form, id, isTranslate, language, maDonVi }
+// Table name: FW_EVENT { priority, name, title, image, link, active, isInternal, location, abstract, content, maxRegisteredUsers, trainingPoint, socialWorkDay, createdDate, startPost, stopPost, startRegister, stopRegister, startEvent, stopEvent, views, form, id, isTranslate, language, maDonVi, displayCover }
 const keys = ['ID'];
 const obj2Db = { 'priority': 'PRIORITY', 'name': 'NAME', 'title': 'TITLE', 'image': 'IMAGE', 'link': 'LINK', 'active': 'ACTIVE', 'isInternal': 'IS_INTERNAL', 'location': 'LOCATION', 'abstract': 'ABSTRACT', 'content': 'CONTENT', 'maxRegisteredUsers': 'MAX_REGISTERED_USERS', 'trainingPoint': 'TRAINING_POINT', 'socialWorkDay': 'SOCIAL_WORK_DAY', 'createdDate': 'CREATED_DATE', 'startPost': 'START_POST', 'stopPost': 'STOP_POST', 'startRegister': 'START_REGISTER', 'stopRegister': 'STOP_REGISTER', 'startEvent': 'START_EVENT', 'stopEvent': 'STOP_EVENT', 'views': 'VIEWS', 'form': 'FORM', 'id': 'ID', 'isTranslate': 'IS_TRANSLATE', 'language': 'LANGUAGE', 'maDonVi': 'MA_DON_VI', 'displayCover': 'DISPLAY_COVER' };
 
@@ -81,7 +81,7 @@ module.exports = app => {
                 let result = {};
                 let totalItem = res && res.rows && res.rows[0] ? res.rows[0]['COUNT(*)'] : 0;
                 result = { totalItem, pageSize, pageTotal: Math.ceil(totalItem / pageSize) };
-                result.pageNumber = pageNumber === -1 ? 1 : Math.min(pageNumber, result.pageTotal);
+                result.pageNumber = Math.max(1, Math.min(pageNumber, result.pageTotal));
                 leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
                 const sql = 'SELECT ' + app.dbConnection.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT FW_EVENT.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM FW_EVENT' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
                 app.dbConnection.execute(sql, parameter, (error, resultSet) => {
