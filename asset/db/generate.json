@@ -40,7 +40,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_CHAU": {
@@ -480,7 +482,9 @@
                 "size": 200
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_DON_VI_TINH": {
@@ -1108,7 +1112,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_LOAI_HINH_NGHIEN_CUU": {
@@ -1550,7 +1556,7 @@
                 "value": "ma",
                 "dataType": "NVARCHAR2",
                 "dataDefault": "",
-                "nullable": true,
+                "nullable": false,
                 "size": 2
             },
             "TEN": {
@@ -1575,7 +1581,9 @@
                 "size": 2000
             }
         },
-        "primaryKeys": [],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_NGUON_KINH_PHI_TRONG_NUOC": {
@@ -1587,7 +1595,7 @@
                 "value": "ma",
                 "dataType": "NVARCHAR2",
                 "dataDefault": "",
-                "nullable": true,
+                "nullable": false,
                 "size": 2
             },
             "MO_TA": {
@@ -1605,7 +1613,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": [],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_NGUON_VON": {
@@ -2541,7 +2551,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_VIEC_LAM": {
@@ -2613,7 +2625,7 @@
     },
     "DV_WEBSITE": {
         "active": true,
-        "moduleName": "dvWebsite",
+        "moduleName": "websiteDonVi",
         "modelName": "dvWebsite",
         "methods": {
             "DV_WEBSITE_SEARCH_PAGE": "searchPage"
@@ -2711,17 +2723,15 @@
                 "size": 500
             }
         },
-        "primaryKeys": ["SHORTNAME"],
+        "primaryKeys": [
+            "SHORTNAME"
+        ],
         "foreignKeys": []
     },
     "DV_WEBSITE_GIOI_THIEU": {
         "active": true,
         "moduleName": "dvWebsiteGioiThieu",
         "modelName": "dvWebsiteGioiThieu",
-        "methods": {
-            "DV_WEBSITE_GIOI_THIEU_CREATE_NEW_ITEM": "createNewItem",
-            "DV_WEBSITE_GIOI_THIEU_SWAP_THU_TU": "swapThuTu"
-        },
         "columns": {
             "MA": {
                 "value": "ma",
@@ -2773,17 +2783,15 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DV_WEBSITE_GIOI_THIEU_HINH": {
         "active": true,
         "moduleName": "dvWebsiteGioiThieuHinh",
         "modelName": "dvWebsiteGioiThieuHinh",
-        "methods": {
-            "DV_WEBSITE_GIOI_THIEU_HINH_CREATE_NEW_ITEM": "createNewItem",
-            "DV_WEBSITE_GIOI_THIEU_HINH_SWAP_THU_TU": "swapThuTu"
-        },
         "columns": {
             "THU_TU": {
                 "value": "thuTu",
@@ -2828,17 +2836,15 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DV_WEBSITE_HINH": {
         "active": true,
         "moduleName": "dvWebsiteHinh",
         "modelName": "dvWebsiteHinh",
-        "methods": {
-            "DV_WEBSITE_HINH_CREATE_NEW_ITEM": "createNewItem",
-            "DV_WEBSITE_HINH_SWAP_THU_TU": "swapThuTu"
-        },
         "columns": {
             "MA": {
                 "value": "ma",
@@ -2890,7 +2896,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "FW_ANSWER": {
@@ -2934,7 +2942,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_ANSWER_RECORD": {
@@ -2971,7 +2981,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_CATEGORY": {
@@ -3029,16 +3041,15 @@
                 "size": "5,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_CONTACT": {
         "active": true,
         "moduleName": "fwContact",
         "modelName": "fwContact",
-        "methods": {
-            "CONTACT_SEARCH_PAGE": "searchPage"
-        },
         "columns": {
             "ID": {
                 "value": "id",
@@ -3090,7 +3101,9 @@
                 "size": "20,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_DRAFT": {
@@ -3218,7 +3231,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_EVENT": {
@@ -3407,9 +3422,18 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": "5,0"
+            },
+            "DISPLAY_COVER": {
+                "value": "displayCover",
+                "dataType": "NUMBER",
+                "dataDefault": "1",
+                "nullable": true,
+                "size": "1,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_EVENT_CATEGORY": {
@@ -3432,7 +3456,10 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["CATEGORY_ID", "EVENT_ID"],
+        "primaryKeys": [
+            "CATEGORY_ID",
+            "EVENT_ID"
+        ],
         "foreignKeys": []
     },
     "FW_FORM": {
@@ -3518,7 +3545,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_HOME_CAROUSEL": {
@@ -3562,7 +3591,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_HOME_CAROUSEL_ITEM": {
@@ -3627,9 +3658,6 @@
         "active": true,
         "moduleName": "fwMenu",
         "modelName": "fwComponent",
-        "methods": {
-            "COMPONENT_CREATE_NEW": "createNew"
-        },
         "columns": {
             "PRIORITY": {
                 "value": "priority",
@@ -3688,7 +3716,9 @@
                 "size": 500
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_HOME_CONTENT": {
@@ -3732,7 +3762,9 @@
                 "size": "5,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_HOME_FEATURE": {
@@ -3760,9 +3792,18 @@
                 "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236127\".nextval",
                 "nullable": false,
                 "size": "22,0"
+            },
+            "MA_DON_VI": {
+                "value": "maDonVi",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "5,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_HOME_FEATURE_ITEM": {
@@ -3797,9 +3838,18 @@
                 "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236129\".nextval",
                 "nullable": false,
                 "size": "22,0"
+            },
+            "LINK": {
+                "value": "link",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 300
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_HOME_FOOTER": {
@@ -3850,16 +3900,15 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_HOME_MENU": {
         "active": true,
         "moduleName": "fwMenu",
         "modelName": "fwMenu",
-        "methods": {
-            "MENU_CREATE_DEFAULT": "createDefault"
-        },
         "columns": {
             "PARENT_ID": {
                 "value": "parentId",
@@ -3925,7 +3974,9 @@
                 "size": 50
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_HOME_VIDEO": {
@@ -3967,9 +4018,18 @@
                 "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236135\".nextval",
                 "nullable": false,
                 "size": "22,0"
+            },
+            "MA_DON_VI": {
+                "value": "maDonVi",
+                "dataType": "NUMBER",
+                "dataDefault": "-1",
+                "nullable": true,
+                "size": "5,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_INEWS": {
@@ -3992,7 +4052,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_INEWS_ITEM": {
@@ -4057,7 +4119,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_NEWS": {
@@ -4199,7 +4263,9 @@
                 "size": "20,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_NEWS_CATEGORY": {
@@ -4222,7 +4288,10 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["CATEGORY_ID", "NEWS_ID"],
+        "primaryKeys": [
+            "CATEGORY_ID",
+            "NEWS_ID"
+        ],
         "foreignKeys": []
     },
     "FW_QUESTION": {
@@ -4294,7 +4363,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_ROLE": {
@@ -4345,7 +4416,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_SETTING": {
@@ -4368,7 +4441,9 @@
                 "size": 1000
             }
         },
-        "primaryKeys": ["KEY"],
+        "primaryKeys": [
+            "KEY"
+        ],
         "foreignKeys": []
     },
     "FW_STORAGE": {
@@ -4417,9 +4492,18 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": 100
+            },
+            "MA_DON_VI": {
+                "value": "maDonVi",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "5,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_STUDENT": {
@@ -4477,7 +4561,9 @@
                 "size": "20,0"
             }
         },
-        "primaryKeys": ["MSSV"],
+        "primaryKeys": [
+            "MSSV"
+        ],
         "foreignKeys": []
     },
     "FW_SUBMENU": {
@@ -4528,16 +4614,15 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_USER": {
         "active": true,
         "moduleName": "fwUser",
         "modelName": "fwUser",
-        "methods": {
-            "FW_USER_GET_USER_ROLES": "getUserRoles"
-        },
         "columns": {
             "MA": {
                 "value": "ma",
@@ -4638,7 +4723,9 @@
                 "size": 20
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "FW_USER_ROLE": {
@@ -4661,7 +4748,10 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["EMAIL", "ROLE_ID"],
+        "primaryKeys": [
+            "EMAIL",
+            "ROLE_ID"
+        ],
         "foreignKeys": []
     },
     "QT_BAI_VIET_KHOA_HOC": {
@@ -4740,7 +4830,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "QT_BANG_PHAT_MINH": {
@@ -4812,7 +4904,9 @@
                 "size": 100
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "QT_CHINH_TRI_XA_HOI": {
@@ -4856,7 +4950,9 @@
                 "size": "20,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "QT_DAO_TAO": {
@@ -4942,7 +5038,9 @@
                 "size": "4,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "QT_GIAI_THUONG": {
@@ -4993,7 +5091,9 @@
                 "size": 2
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "QT_HOC_TAP_CONG_TAC": {
@@ -5051,7 +5151,9 @@
                 "size": 10
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "QT_HUONG_DAN_LUAN_VAN": {
@@ -5109,7 +5211,9 @@
                 "size": 100
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "QT_KHEN_THUONG": {
@@ -5174,7 +5278,9 @@
                 "size": 10
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "QT_KY_LUAT": {
@@ -5239,7 +5345,9 @@
                 "size": 10
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "QT_KY_YEU": {
@@ -5318,7 +5426,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "QT_LAM_VIEC_NGOAI": {
@@ -5383,7 +5493,9 @@
                 "size": 200
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "QT_LICH_SU": {
@@ -5427,7 +5539,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "QT_NGHIEN_CUU_KHOA_HOC": {
@@ -5534,7 +5648,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "QT_NUOC_NGOAI": {
@@ -5599,7 +5715,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "QT_UNG_DUNG_THUONG_MAI": {
@@ -5650,12 +5768,14 @@
                 "size": 200
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "QUAN_HE_CAN_BO": {
         "active": true,
-        "moduleName": "fwCanBo",
+        "moduleName": "tccbCanBo",
         "modelName": "quanHeCanBo",
         "columns": {
             "ID": {
@@ -5729,7 +5849,9 @@
                 "size": 200
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "SACH_GIAO_TRINH": {
@@ -5808,12 +5930,14 @@
                 "size": 10
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "TCHC_CAN_BO": {
         "active": true,
-        "moduleName": "fwCanBo",
+        "moduleName": "tccbCanBo",
         "modelName": "canBo",
         "columns": {
             "TEN": {
@@ -6398,7 +6522,9 @@
                 "size": 200
             }
         },
-        "primaryKeys": ["SHCC"],
+        "primaryKeys": [
+            "SHCC"
+        ],
         "foreignKeys": []
     },
     "TRINH_DO_NGOAI_NGU": {
@@ -6435,7 +6561,9 @@
                 "size": 200
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     }
 }

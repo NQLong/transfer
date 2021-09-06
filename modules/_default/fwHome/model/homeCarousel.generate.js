@@ -1,6 +1,6 @@
 // Table name: FW_HOME_CAROUSEL { title, height, single, active, id }
 const keys = ['ID'];
-const obj2Db = { 'title': 'TITLE', 'height': 'HEIGHT', 'single': 'SINGLE', 'active': 'ACTIVE', 'id': 'ID', 'maDonVi': 'MA_DON_VI' };
+const obj2Db = { 'title': 'TITLE', 'height': 'HEIGHT', 'single': 'SINGLE', 'active': 'ACTIVE', 'id': 'ID' };
 
 module.exports = app => {
     app.model.homeCarousel = {
@@ -81,7 +81,7 @@ module.exports = app => {
                 let result = {};
                 let totalItem = res && res.rows && res.rows[0] ? res.rows[0]['COUNT(*)'] : 0;
                 result = { totalItem, pageSize, pageTotal: Math.ceil(totalItem / pageSize) };
-                result.pageNumber = pageNumber === -1 ? 1 : Math.min(pageNumber, result.pageTotal);
+                result.pageNumber = Math.max(1, Math.min(pageNumber, result.pageTotal));
                 leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
                 const sql = 'SELECT ' + app.dbConnection.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT FW_HOME_CAROUSEL.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM FW_HOME_CAROUSEL' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
                 app.dbConnection.execute(sql, parameter, (error, resultSet) => {
