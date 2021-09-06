@@ -37,6 +37,7 @@ module.exports = app => {
                 done = selectedColumns;
                 selectedColumns = '*';
             }
+
             if (orderBy) Object.keys(obj2Db).sort((a, b) => b.length - a.length).forEach(key => orderBy = orderBy.replaceAll(key, obj2Db[key]));
             condition = app.dbConnection.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
