@@ -11,7 +11,7 @@ class StaffPage extends AdminPage {
     searchBox = React.createRef();
 
     componentDidMount() {
-        T.ready(() => this.searchBox.current.getPage());
+        T.ready('/user/tccb', () => this.searchBox.current.getPage());
     }
 
     delete = (e, item) => {

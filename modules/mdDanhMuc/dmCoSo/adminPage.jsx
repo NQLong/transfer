@@ -248,7 +248,7 @@ class DmCoSoPage extends AdminPage {
     modal = React.createRef();
 
     componentDidMount() {
-        T.ready(() => this.props.getDmCoSoAll());
+        T.ready('/user/category', () => this.props.getDmCoSoAll());
     }
     edit = (e, item) => {
         e.preventDefault();
