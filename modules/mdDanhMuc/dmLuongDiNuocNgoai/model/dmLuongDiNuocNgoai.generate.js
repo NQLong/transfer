@@ -1,5 +1,5 @@
 // Table name: DM_LUONG_DI_NUOC_NGOAI { ma, moTa, ghiChu, kichHoat }
-const keys = [''];
+const keys = ['MA'];
 const obj2Db = { 'ma': 'MA', 'moTa': 'MO_TA', 'ghiChu': 'GHI_CHU', 'kichHoat': 'KICH_HOAT' };
 
 module.exports = app => {

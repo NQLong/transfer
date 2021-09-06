@@ -1,6 +1,6 @@
-// Table name: FW_HOME_CAROUSEL { title, height, single, active, id }
+// Table name: FW_HOME_CAROUSEL { title, height, single, active, id, maDonVi }
 const keys = ['ID'];
-const obj2Db = { 'title': 'TITLE', 'height': 'HEIGHT', 'single': 'SINGLE', 'active': 'ACTIVE', 'id': 'ID' };
+const obj2Db = { 'title': 'TITLE', 'height': 'HEIGHT', 'single': 'SINGLE', 'active': 'ACTIVE', 'id': 'ID', 'maDonVi': 'MA_DON_VI' };
 
 module.exports = app => {
     app.model.homeCarousel = {

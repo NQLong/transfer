@@ -1,5 +1,5 @@
 // Table name: DM_QUOC_GIA { maCode, tenQuocGia, country, codeAlpha, shortenName, maKhuVuc, tenKhac, maCu }
-const keys = [''];
+const keys = ['MA_CODE'];
 const obj2Db = { 'maCode': 'MA_CODE', 'tenQuocGia': 'TEN_QUOC_GIA', 'country': 'COUNTRY', 'codeAlpha': 'CODE_ALPHA', 'shortenName': 'SHORTEN_NAME', 'maKhuVuc': 'MA_KHU_VUC', 'tenKhac': 'TEN_KHAC', 'maCu': 'MA_CU' };
 
 module.exports = app => {

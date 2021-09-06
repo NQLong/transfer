@@ -1,6 +1,6 @@
-// Table name: FW_HOME_FEATURE_ITEM { image, content, featureId, id, link }
+// Table name: FW_HOME_FEATURE_ITEM { image, content, id, link, featureId }
 const keys = ['ID'];
-const obj2Db = { 'image': 'IMAGE', 'content': 'CONTENT', 'featureId': 'FEATURE_ID', 'id': 'ID', 'link': 'LINK' };
+const obj2Db = { 'image': 'IMAGE', 'content': 'CONTENT', 'id': 'ID', 'link': 'LINK', 'featureId': 'FEATURE_ID' };
 
 module.exports = app => {
     app.model.homeFeatureItem = {

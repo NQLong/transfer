@@ -1,6 +1,6 @@
-// Table name: FW_DRAFT { id, editorId, documentId, editorName, title, documentType, image, isInternal, isUnitApproved, isDraftApproved, isTranslated, lastModified, documentJson, maDonVi, status, rejectionReason, displayCover }
+// Table name: FW_DRAFT { editorId, documentId, editorName, title, documentType, image, isInternal, isUnitApproved, isDraftApproved, isTranslated, lastModified, documentJson, maDonVi, status, rejectionReason, displayCover, id }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'editorId': 'EDITOR_ID', 'documentId': 'DOCUMENT_ID', 'editorName': 'EDITOR_NAME', 'title': 'TITLE', 'documentType': 'DOCUMENT_TYPE', 'image': 'IMAGE', 'isInternal': 'IS_INTERNAL', 'isUnitApproved': 'IS_UNIT_APPROVED', 'isDraftApproved': 'IS_DRAFT_APPROVED', 'isTranslated': 'IS_TRANSLATED', 'lastModified': 'LAST_MODIFIED', 'documentJson': 'DOCUMENT_JSON', 'maDonVi': 'MA_DON_VI', 'status': 'STATUS', 'rejectionReason': 'REJECTION_REASON', 'displayCover': 'DISPLAY_COVER' };
+const obj2Db = { 'editorId': 'EDITOR_ID', 'documentId': 'DOCUMENT_ID', 'editorName': 'EDITOR_NAME', 'title': 'TITLE', 'documentType': 'DOCUMENT_TYPE', 'image': 'IMAGE', 'isInternal': 'IS_INTERNAL', 'isUnitApproved': 'IS_UNIT_APPROVED', 'isDraftApproved': 'IS_DRAFT_APPROVED', 'isTranslated': 'IS_TRANSLATED', 'lastModified': 'LAST_MODIFIED', 'documentJson': 'DOCUMENT_JSON', 'maDonVi': 'MA_DON_VI', 'status': 'STATUS', 'rejectionReason': 'REJECTION_REASON', 'displayCover': 'DISPLAY_COVER', 'id': 'ID' };
 
 module.exports = app => {
     app.model.fwDraft = {

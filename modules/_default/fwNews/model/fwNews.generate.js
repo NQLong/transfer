@@ -1,6 +1,6 @@
-// Table name: FW_NEWS { priority, title, image, link, active, isInternal, abstract, content, createdDate, startPost, stopPost, id, views, maDonVi, isTranslate, language, attachment, displayCover, pinned }
+// Table name: FW_NEWS { priority, title, image, link, active, isInternal, abstract, content, createdDate, startPost, stopPost, views, maDonVi, isTranslate, language, attachment, displayCover, pinned, id }
 const keys = ['ID'];
-const obj2Db = { 'priority': 'PRIORITY', 'title': 'TITLE', 'image': 'IMAGE', 'link': 'LINK', 'active': 'ACTIVE', 'isInternal': 'IS_INTERNAL', 'abstract': 'ABSTRACT', 'content': 'CONTENT', 'createdDate': 'CREATED_DATE', 'startPost': 'START_POST', 'stopPost': 'STOP_POST', 'id': 'ID', 'views': 'VIEWS', 'maDonVi': 'MA_DON_VI', 'isTranslate': 'IS_TRANSLATE', 'language': 'LANGUAGE', 'attachment': 'ATTACHMENT', 'displayCover': 'DISPLAY_COVER', 'pinned': 'PINNED' };
+const obj2Db = { 'priority': 'PRIORITY', 'title': 'TITLE', 'image': 'IMAGE', 'link': 'LINK', 'active': 'ACTIVE', 'isInternal': 'IS_INTERNAL', 'abstract': 'ABSTRACT', 'content': 'CONTENT', 'createdDate': 'CREATED_DATE', 'startPost': 'START_POST', 'stopPost': 'STOP_POST', 'views': 'VIEWS', 'maDonVi': 'MA_DON_VI', 'isTranslate': 'IS_TRANSLATE', 'language': 'LANGUAGE', 'attachment': 'ATTACHMENT', 'displayCover': 'DISPLAY_COVER', 'pinned': 'PINNED', 'id': 'ID' };
 
 module.exports = app => {
     app.model.fwNews = {
