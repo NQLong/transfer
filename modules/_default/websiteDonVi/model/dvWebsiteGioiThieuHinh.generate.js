@@ -81,7 +81,7 @@ module.exports = app => {
                 let result = {};
                 let totalItem = res && res.rows && res.rows[0] ? res.rows[0]['COUNT(*)'] : 0;
                 result = { totalItem, pageSize, pageTotal: Math.ceil(totalItem / pageSize) };
-                result.pageNumber = pageNumber === -1 ? 1 : Math.min(pageNumber, result.pageTotal);
+                result.pageNumber = Math.max(1, Math.min(pageNumber, result.pageTotal));
                 leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
                 const sql = 'SELECT ' + app.dbConnection.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT DV_WEBSITE_GIOI_THIEU_HINH.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM DV_WEBSITE_GIOI_THIEU_HINH' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
                 app.dbConnection.execute(sql, parameter, (error, resultSet) => {
@@ -131,9 +131,9 @@ module.exports = app => {
             app.dbConnection.execute(sql, parameter, (error, result) => done(error, result));
         },
 
-        createNewItem: (done) => {
-            app.dbConnection.execute('BEGIN :ret:=dv_website_gioi_thieu_hinh_create_new_item(); END;',
-                done);
+        createNewItem: (pLink, pMawebsitegioithieu, pImage, pKichhoat, done) => {
+            app.dbConnection.execute('BEGIN :ret:=dv_website_gioi_thieu_hinh_create_new_item(:pLink, :pMawebsitegioithieu, :pImage, :pKichhoat); END;',
+                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pLink, pMawebsitegioithieu, pImage, pKichhoat }, done);
         },
 
         swapThuTu: (pId, pIsMoveUp, pMawebsitegioithieu, done) => {

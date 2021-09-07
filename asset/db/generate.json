@@ -691,7 +691,7 @@
     },
     "DM_GIAM_BHXH": {
         "active": true,
-        "moduleName": "dmGiamBhxh",
+        "moduleName": "dmBaoHiemXaHoi",
         "modelName": "dmGiamBhxh",
         "columns": {
             "MA": {
@@ -929,7 +929,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": [],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_HO_TRO_HOC_PHI": {
