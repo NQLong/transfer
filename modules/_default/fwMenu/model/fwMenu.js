@@ -87,5 +87,8 @@ module.exports = app => {
             }
         });
     };
-
+    app.model.fwMenu.createDefault = (parentId, title, link, active, madonvi, mawebsite, done) => {
+        app.dbConnection.execute('BEGIN :ret:=menu_create_default(:parentId, :title, :link, :active, :madonvi, :mawebsite); END;',
+            { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, parentId, title, link, active, madonvi, mawebsite }, done);
+    };
 };

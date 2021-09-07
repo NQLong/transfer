@@ -57,7 +57,7 @@ export function getDmTrinhDoPage(pageNumber, pageSize, pageCondition, done) {
                 if (done) done(data.page);
                 dispatch({ type: DmTrinhDoGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách trình độ bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách trình độ bị lỗi!', 'danger'));
     };
 }
 
@@ -72,12 +72,12 @@ export function getDmTrinhDoAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmTrinhDoGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách trình độ bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách trình độ bị lỗi!', 'danger'));
     };
 }
 
 export function getDmTrinhDo(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/trinh-do/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -101,7 +101,7 @@ export function createDmTrinhDo(dmTrinhDo, done) {
                 dispatch(getDmTrinhDoAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo mới một trình độ bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo mới một trình độ bị lỗi!', 'danger'));
     };
 }
 
@@ -132,7 +132,7 @@ export function deleteDmTrinhDo(ma, done) {
                 dispatch(getDmTrinhDoAll());
             }
             done && done();
-        }, error => T.notify('Xóa trình độ bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa trình độ bị lỗi!', 'danger'));
     };
 }
 

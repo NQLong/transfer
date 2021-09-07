@@ -398,7 +398,6 @@ module.exports = app => {
                 resolve();
             });
         })).then(() => {
-            let error = [];
             const handleCanBo = (index = 0) => {
                 let item = canBoList[index];
                 if (index < canBoList.length) {

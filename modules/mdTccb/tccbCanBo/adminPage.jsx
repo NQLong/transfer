@@ -11,7 +11,7 @@ class StaffPage extends AdminPage {
     searchBox = React.createRef();
 
     componentDidMount() {
-        T.ready(() => this.searchBox.current.getPage());
+        T.ready('/user/tccb', () => this.searchBox.current.getPage());
     }
 
     delete = (e, item) => {
@@ -42,12 +42,11 @@ class StaffPage extends AdminPage {
                 <tr key={index}>
                     <TableCell type='number' content={(pageNumber - 1) * pageSize + index + 1} />
                     <TableCell type='link' content={item.shcc} url={`/user/staff/${item.shcc}`} style={{ textAlign: 'center' }} />
-                    <TableCell type='text' content={`${item.ho} ${item.ten}`} style={{ whiteSpace: 'nowrap' }}/>
+                    <TableCell type='text' content={`${item.ho} ${item.ten}`} style={{ whiteSpace: 'nowrap' }} />
                     <TableCell type='text' content={item.email} />
                     <TableCell type='buttons' content={item} permission={permission} onEdit={`/user/staff/${item.shcc}`} onDelete={this.delete}></TableCell>
                 </tr>)
         });
-        
 
         return (
             <main className='app-content'>
