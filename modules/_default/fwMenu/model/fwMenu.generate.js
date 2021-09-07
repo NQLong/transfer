@@ -130,5 +130,10 @@ module.exports = app => {
             const sql = 'SELECT COUNT(*) FROM FW_HOME_MENU' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.dbConnection.execute(sql, parameter, (error, result) => done(error, result));
         },
+
+        createDefault: (parentId, title, link, active, madonvi, mawebsite, done) => {
+            app.dbConnection.execute('BEGIN :ret:=menu_create_default(:parentId, :title, :link, :active, :madonvi, :mawebsite); END;',
+                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, parentId, title, link, active, madonvi, mawebsite }, done);
+        },
     };
 };

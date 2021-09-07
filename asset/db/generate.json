@@ -1,8 +1,8 @@
 {
     "CA_HOC": {
         "active": true,
-        "moduleName": "caHoc",
-        "modelName": "caHoc",
+        "moduleName": "dmCaHoc",
+        "modelName": "dmCaHoc",
         "columns": {
             "MA": {
                 "value": "ma",
@@ -47,13 +47,15 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "CHUONG_TRINH_DAO_TAO": {
         "active": true,
-        "moduleName": "chuongTrinhDaoTao",
-        "modelName": "chuongTrinhDaoTao",
+        "moduleName": "dmChuongTrinhDaoTao",
+        "modelName": "dmChuongTrinhDaoTao",
         "columns": {
             "TEN": {
                 "value": "ten",
@@ -84,7 +86,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_BENH_VIEN": {
@@ -128,7 +132,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_BO_MON": {
@@ -193,7 +199,9 @@
                 "size": 2000
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_CHAU": {
@@ -230,7 +238,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_CHI_BO": {
@@ -260,7 +270,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_CHUC_DANH_KHOA_HOC": {
@@ -297,7 +309,9 @@
                 "size": 10
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_CHUC_VU": {
@@ -355,7 +369,9 @@
                 "size": 2
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_CO_SO": {
@@ -406,7 +422,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_DAN_TOC": {
@@ -436,7 +454,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_DIEN_CHINH_SACH": {
@@ -466,7 +486,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_DOI_TUONG_CAN_BO": {
@@ -503,7 +525,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_DOI_TUONG_MGHP": {
@@ -547,7 +571,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_DON_VI": {
@@ -633,7 +659,9 @@
                 "size": 200
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_DON_VI_TINH": {
@@ -656,7 +684,9 @@
                 "size": 100
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_GIAM_BHXH": {
@@ -686,7 +716,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_GIOI_TINH": {
@@ -716,12 +748,14 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_HINH_THUC_KY_LUAT": {
         "active": true,
-        "moduleName": "dmHinhThucKyLuat",
+        "moduleName": "dmKhenThuongKyLuat",
         "modelName": "dmHinhThucKyLuat",
         "columns": {
             "MA": {
@@ -753,7 +787,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_HOAT_DONG_KHCN": {
@@ -783,7 +819,9 @@
                 "size": 2000
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_HOC_SDH": {
@@ -813,7 +851,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_HOI_NGHI": {
@@ -843,12 +883,14 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_HO_SO_CCVC_NLD": {
         "active": true,
-        "moduleName": "dmHoSoCcvcNld",
+        "moduleName": "dmHoSoCongChucVienChucNguoiLaoDong",
         "modelName": "dmHoSoCcvcNld",
         "columns": {
             "TEN": {
@@ -924,12 +966,14 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_HUONG_PHU_CAP": {
         "active": true,
-        "moduleName": "dmHuongPhuCap",
+        "moduleName": "dmPhuCap",
         "modelName": "dmHuongPhuCap",
         "columns": {
             "MA": {
@@ -954,7 +998,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_KHCN_CHUONG_TRINH": {
@@ -977,7 +1023,9 @@
                 "size": 200
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_KHCN_DON_VI_CHU_QUAN": {
@@ -1000,7 +1048,9 @@
                 "size": 200
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_KHCN_LINH_VUC_KHOA_HOC": {
@@ -1023,7 +1073,9 @@
                 "size": 200
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_KHCN_LOAI_SAN_PHAM_DE_TAI": {
@@ -1053,12 +1105,14 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_KHEN_THUONG": {
         "active": true,
-        "moduleName": "dmKhenThuong",
+        "moduleName": "dmKhenThuongKyLuat",
         "modelName": "dmKhenThuong",
         "columns": {
             "MA": {
@@ -1083,7 +1137,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_KHU_VUC": {
@@ -1127,7 +1183,9 @@
                 "size": 2
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_KINH_PHI_NUOC_NGOAI": {
@@ -1164,12 +1222,14 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_KY_LUAT": {
         "active": true,
-        "moduleName": "dmKyLuat",
+        "moduleName": "dmKhenThuongKyLuat",
         "modelName": "dmKyLuat",
         "columns": {
             "MA": {
@@ -1194,7 +1254,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_LINH_VUC_KINH_DOANH": {
@@ -1231,7 +1293,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_LOAI_DON_VI": {
@@ -1261,7 +1325,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_LOAI_HINH_NGHIEN_CUU": {
@@ -1298,7 +1364,9 @@
                 "size": 3
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_LOAI_HOP_DONG": {
@@ -1328,7 +1396,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_LOAI_VIEN_CHUC": {
@@ -1358,7 +1428,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_LUONG_CO_SO": {
@@ -1402,7 +1474,9 @@
                 "size": "10,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_LUONG_DI_NUOC_NGOAI": {
@@ -1439,7 +1513,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_MUC_DICH_NUOC_NGOAI": {
@@ -1469,7 +1545,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_MUC_DICH_TRONG_NUOC": {
@@ -1499,7 +1577,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_NGACH_CDNN": {
@@ -1550,7 +1630,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "DM_NGACH_LUONG": {
@@ -1580,7 +1662,10 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["BAC", "ID_NGACH"],
+        "primaryKeys": [
+            "BAC",
+            "ID_NGACH"
+        ],
         "foreignKeys": []
     },
     "DM_NGANH_DAO_TAO": {
@@ -1624,7 +1709,9 @@
                 "size": "20,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_NGHIEM_THU_XEP_LOAI_KHCN": {
@@ -1661,7 +1748,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_NGHI_CONG_TAC": {
@@ -1691,7 +1780,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_NGOAI_NGU": {
@@ -1728,7 +1819,9 @@
                 "size": 2000
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_NGUON_KINH_PHI_TRONG_NUOC": {
@@ -1758,7 +1851,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_NGUON_VON": {
@@ -1781,12 +1876,14 @@
                 "size": 200
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_NHOM_MAU": {
         "active": true,
-        "moduleName": "dmNhomMau",
+        "moduleName": "dmBenhVien",
         "modelName": "dmNhomMau",
         "columns": {
             "MA": {
@@ -1811,7 +1908,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_PHAN_LOAI_VIEN_CHUC": {
@@ -1848,7 +1947,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_PHONG": {
@@ -1892,12 +1993,14 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_PHUONG_XA": {
         "active": true,
-        "moduleName": "dmPhuongXa",
+        "moduleName": "dmDiaDiem",
         "modelName": "dmPhuongXa",
         "columns": {
             "MA_PHUONG_XA": {
@@ -1929,7 +2032,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA_PHUONG_XA"],
+        "primaryKeys": [
+            "MA_PHUONG_XA"
+        ],
         "foreignKeys": []
     },
     "DM_PHU_CAP": {
@@ -1959,7 +2064,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_QUAN_HE_CHU_HO": {
@@ -1989,7 +2096,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_QUAN_HE_GIA_DINH": {
@@ -2019,12 +2128,14 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_QUAN_HUYEN": {
         "active": true,
-        "moduleName": "dmQuanHuyen",
+        "moduleName": "dmDiaDiem",
         "modelName": "dmQuanHuyen",
         "columns": {
             "MA_QUAN_HUYEN": {
@@ -2056,7 +2167,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA_QUAN_HUYEN"],
+        "primaryKeys": [
+            "MA_QUAN_HUYEN"
+        ],
         "foreignKeys": []
     },
     "DM_QUOC_GIA": {
@@ -2121,7 +2234,9 @@
                 "size": 20
             }
         },
-        "primaryKeys": ["MA_CODE"],
+        "primaryKeys": [
+            "MA_CODE"
+        ],
         "foreignKeys": []
     },
     "DM_SO_HUU_TRI_TUE": {
@@ -2158,7 +2273,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_TAI_KHOAN_KE_TOAN": {
@@ -2188,12 +2305,14 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_TANG_BHXH": {
         "active": true,
-        "moduleName": "dmTangBhxh",
+        "moduleName": "dmBaoHiemXaHoi",
         "modelName": "dmTangBhxh",
         "columns": {
             "MA": {
@@ -2218,7 +2337,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_TAP_CHI": {
@@ -2248,12 +2369,14 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_TINH_THANH_PHO": {
         "active": true,
-        "moduleName": "dmTinhThanhPho",
+        "moduleName": "dmDiaDiem",
         "modelName": "dmTinhThanhPho",
         "columns": {
             "MA": {
@@ -2278,7 +2401,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_TINH_TRANG_CONG_TAC": {
@@ -2308,7 +2433,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_TINH_TRANG_DE_TAI_NCKH": {
@@ -2352,7 +2479,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_TINH_TRANG_HON_NHAN": {
@@ -2382,7 +2511,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_TINH_TRANG_THIET_BI": {
@@ -2412,7 +2543,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_TOA_NHA": {
@@ -2456,7 +2589,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_TON_GIAO": {
@@ -2486,7 +2621,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_TRINH_DO": {
@@ -2544,7 +2681,9 @@
                 "size": 4
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_TRINH_DO_LY_LUAN_CHINH_TRI": {
@@ -2574,7 +2713,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_TRINH_DO_NGOAI_NGU": {
@@ -2604,7 +2745,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_TRINH_DO_QUAN_LY_NHA_NUOC": {
@@ -2634,7 +2777,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_TRINH_DO_TIN_HOC": {
@@ -2664,12 +2809,14 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_TUYEN_BENH_VIEN": {
         "active": true,
-        "moduleName": "dmTuyenBenhVien",
+        "moduleName": "dmBenhVien",
         "modelName": "dmTuyenBenhVien",
         "columns": {
             "MA": {
@@ -2694,7 +2841,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_VIEC_LAM": {
@@ -2731,7 +2880,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DM_VI_TRI_TUYEN_DUNG": {
@@ -2761,7 +2912,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DV_WEBSITE": {
@@ -2864,12 +3017,14 @@
                 "size": 500
             }
         },
-        "primaryKeys": ["SHORTNAME"],
+        "primaryKeys": [
+            "SHORTNAME"
+        ],
         "foreignKeys": []
     },
     "DV_WEBSITE_GIOI_THIEU": {
         "active": true,
-        "moduleName": "dvWebsiteGioiThieu",
+        "moduleName": "websiteDonVi",
         "modelName": "dvWebsiteGioiThieu",
         "methods": {
             "DV_WEBSITE_GIOI_THIEU_CREATE_NEW_ITEM": "createNewItem",
@@ -2926,12 +3081,14 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DV_WEBSITE_GIOI_THIEU_HINH": {
         "active": true,
-        "moduleName": "dvWebsiteGioiThieuHinh",
+        "moduleName": "websiteDonVi",
         "modelName": "dvWebsiteGioiThieuHinh",
         "methods": {
             "DV_WEBSITE_GIOI_THIEU_HINH_CREATE_NEW_ITEM": "createNewItem",
@@ -2981,12 +3138,14 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "DV_WEBSITE_HINH": {
         "active": true,
-        "moduleName": "dvWebsiteHinh",
+        "moduleName": "websiteDonVi",
         "modelName": "dvWebsiteHinh",
         "methods": {
             "DV_WEBSITE_HINH_CREATE_NEW_ITEM": "createNewItem",
@@ -3043,7 +3202,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "FW_ANSWER": {
@@ -3087,7 +3248,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_ANSWER_RECORD": {
@@ -3124,7 +3287,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_CATEGORY": {
@@ -3182,7 +3347,9 @@
                 "size": "5,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_CONTACT": {
@@ -3243,7 +3410,9 @@
                 "size": "20,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_DRAFT": {
@@ -3371,7 +3540,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_EVENT": {
@@ -3569,7 +3740,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_EVENT_CATEGORY": {
@@ -3592,7 +3765,10 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["CATEGORY_ID", "EVENT_ID"],
+        "primaryKeys": [
+            "CATEGORY_ID",
+            "EVENT_ID"
+        ],
         "foreignKeys": []
     },
     "FW_FORM": {
@@ -3678,7 +3854,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_HOME_CAROUSEL": {
@@ -3729,7 +3907,9 @@
                 "size": "5,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_HOME_CAROUSEL_ITEM": {
@@ -3787,7 +3967,10 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["CAROUSEL_ID", "PRIORITY"],
+        "primaryKeys": [
+            "CAROUSEL_ID",
+            "PRIORITY"
+        ],
         "foreignKeys": []
     },
     "FW_HOME_COMPONENT": {
@@ -3855,7 +4038,9 @@
                 "size": 1000
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_HOME_CONTENT": {
@@ -3899,7 +4084,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_HOME_FEATURE": {
@@ -3936,7 +4123,9 @@
                 "size": "5,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_HOME_FEATURE_ITEM": {
@@ -3980,7 +4169,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_HOME_FOOTER": {
@@ -4031,7 +4222,9 @@
                 "size": "3,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_HOME_MENU": {
@@ -4106,7 +4299,9 @@
                 "size": 20
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_HOME_VIDEO": {
@@ -4157,7 +4352,9 @@
                 "size": "5,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_INEWS": {
@@ -4180,7 +4377,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_INEWS_ITEM": {
@@ -4245,7 +4444,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_NEWS": {
@@ -4387,7 +4588,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_NEWS_CATEGORY": {
@@ -4410,7 +4613,10 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["CATEGORY_ID", "NEWS_ID"],
+        "primaryKeys": [
+            "CATEGORY_ID",
+            "NEWS_ID"
+        ],
         "foreignKeys": []
     },
     "FW_QUESTION": {
@@ -4482,7 +4688,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_ROLE": {
@@ -4533,7 +4741,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_SETTING": {
@@ -4556,7 +4766,9 @@
                 "size": 1000
             }
         },
-        "primaryKeys": ["KEY"],
+        "primaryKeys": [
+            "KEY"
+        ],
         "foreignKeys": []
     },
     "FW_STORAGE": {
@@ -4614,7 +4826,9 @@
                 "size": "5,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_STUDENT": {
@@ -4672,7 +4886,9 @@
                 "size": "20,0"
             }
         },
-        "primaryKeys": ["MSSV"],
+        "primaryKeys": [
+            "MSSV"
+        ],
         "foreignKeys": []
     },
     "FW_SUBMENU": {
@@ -4723,7 +4939,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "FW_USER": {
@@ -4833,7 +5051,9 @@
                 "size": 20
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": []
     },
     "FW_USER_ROLE": {
@@ -4856,7 +5076,10 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["EMAIL", "ROLE_ID"],
+        "primaryKeys": [
+            "EMAIL",
+            "ROLE_ID"
+        ],
         "foreignKeys": []
     },
     "QT_BAI_VIET_KHOA_HOC": {
@@ -4935,7 +5158,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "QT_BANG_PHAT_MINH": {
@@ -5007,7 +5232,9 @@
                 "size": 100
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "QT_CHINH_TRI_XA_HOI": {
@@ -5051,7 +5278,9 @@
                 "size": "20,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "QT_DAO_TAO": {
@@ -5137,7 +5366,9 @@
                 "size": "4,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "QT_GIAI_THUONG": {
@@ -5188,7 +5419,9 @@
                 "size": 2
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "QT_HOC_TAP_CONG_TAC": {
@@ -5246,7 +5479,9 @@
                 "size": 10
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "QT_HUONG_DAN_LUAN_VAN": {
@@ -5304,7 +5539,9 @@
                 "size": 100
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "QT_KHEN_THUONG": {
@@ -5369,7 +5606,9 @@
                 "size": 10
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "QT_KY_LUAT": {
@@ -5434,7 +5673,9 @@
                 "size": 10
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "QT_KY_YEU": {
@@ -5513,7 +5754,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "QT_LAM_VIEC_NGOAI": {
@@ -5578,7 +5821,9 @@
                 "size": 200
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "QT_LICH_SU": {
@@ -5622,7 +5867,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "QT_NGHIEN_CUU_KHOA_HOC": {
@@ -5729,7 +5976,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "QT_NUOC_NGOAI": {
@@ -5794,7 +6043,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "QT_UNG_DUNG_THUONG_MAI": {
@@ -5845,7 +6096,9 @@
                 "size": 200
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "QUAN_HE_CAN_BO": {
@@ -5924,7 +6177,9 @@
                 "size": 200
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "SACH_GIAO_TRINH": {
@@ -6003,7 +6258,9 @@
                 "size": 10
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     },
     "TCHC_CAN_BO": {
@@ -6593,7 +6850,9 @@
                 "size": 200
             }
         },
-        "primaryKeys": ["SHCC"],
+        "primaryKeys": [
+            "SHCC"
+        ],
         "foreignKeys": []
     },
     "TRINH_DO_NGOAI_NGU": {
@@ -6630,7 +6889,9 @@
                 "size": 200
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": []
     }
 }

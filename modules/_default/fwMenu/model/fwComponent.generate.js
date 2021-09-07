@@ -130,5 +130,10 @@ module.exports = app => {
             const sql = 'SELECT COUNT(*) FROM FW_HOME_COMPONENT' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.dbConnection.execute(sql, parameter, (error, result) => done(error, result));
         },
+
+        createNew: (className, style, viewType, viewId, detail, done) => {
+            app.dbConnection.execute('BEGIN :ret:=component_create_new(:className, :style, :viewType, :viewId, :detail); END;',
+                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, className, style, viewType, viewId, detail }, done);
+        },
     };
 };

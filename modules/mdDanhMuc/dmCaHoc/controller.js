@@ -16,29 +16,29 @@ module.exports = app => {
     app.get('/api/danh-muc/ca-hoc/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
-        app.model.caHoc.getPage(pageNumber, pageSize, {}, (error, page) => {
+        app.model.dmCaHoc.getPage(pageNumber, pageSize, {}, (error, page) => {
             res.send({ error, page });
         });
     });
 
     app.get('/api/danh-muc/ca-hoc/all', app.permission.check('user:login'), (req, res) => {
-        app.model.caHoc.getAll((error, items) => res.send({ error, items }));
+        app.model.dmCaHoc.getAll((error, items) => res.send({ error, items }));
     });
 
     app.get('/api/danh-muc/ca-hoc/item/:_id', app.permission.check('user:login'), (req, res) => {
-        app.model.caHoc.get(req.params._id, (error, item) => res.send({ error, item }));
+        app.model.dmCaHoc.get(req.params._id, (error, item) => res.send({ error, item }));
     });
 
     app.post('/api/danh-muc/ca-hoc', app.permission.check('dmCaHoc:write'), (req, res) => {
-        app.model.caHoc.create(req.body.item, (error, item) => res.send({ error, item }));
+        app.model.dmCaHoc.create(req.body.item, (error, item) => res.send({ error, item }));
     });
 
     app.put('/api/danh-muc/ca-hoc', app.permission.check('dmCaHoc:write'), (req, res) => {
         let changes = app.clone(req.body.changes);
-        app.model.caHoc.update({ ma: req.body._id }, changes, (error, items) => res.send({ error, items }));
+        app.model.dmCaHoc.update({ ma: req.body._id }, changes, (error, items) => res.send({ error, items }));
     });
 
     app.delete('/api/danh-muc/ca-hoc', app.permission.check('dmCaHoc:delete'), (req, res) => {
-        app.model.caHoc.delete({ ma: req.body._id }, error => res.send({ error }));
+        app.model.dmCaHoc.delete({ ma: req.body._id }, error => res.send({ error }));
     });
 };
