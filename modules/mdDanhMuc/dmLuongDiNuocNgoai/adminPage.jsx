@@ -4,6 +4,7 @@ import { getDmLuongDiNuocNgoaiPage, createDmLuongDiNuocNgoai, deleteDmLuongDiNuo
 import Pagination, { OverlayLoading } from 'view/component/Pagination';
 import AdminSearchBox from 'view/component/AdminSearchBox';
 import { Link } from 'react-router-dom';
+import { AdminPage, TableCell, renderTable } from 'view/component/AdminPage';
 
 class EditModal extends React.Component {
     state = { kichHoat: true };
@@ -99,7 +100,7 @@ class EditModal extends React.Component {
     }
 }
 
-class DmLuongDiNuocNgoaiPage extends React.Component {
+class DmLuongDiNuocNgoaiPage extends AdminPage {
     state = { searching: false };
     searchBox = React.createRef();
     modal = React.createRef();
@@ -125,52 +126,34 @@ class DmLuongDiNuocNgoaiPage extends React.Component {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmLuongDiNuocNgoai:write'),
-            permissionDelete = currentPermissions.includes('dmLuongDiNuocNgoai:delete');
+            permissionDelete = currentPermissions.includes('dmLuongDiNuocNgoai:delete'),
+            permission = this.getUserPermission('dmLuongDiNuocNgoai', ['write', 'delete']);
         const { pageNumber, pageSize, pageTotal, totalItem, list } = this.props.dmLuongDiNuocNgoai && this.props.dmLuongDiNuocNgoai.page ?
             this.props.dmLuongDiNuocNgoai.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: [] };
         let table = 'Không có Lương đi nước ngoài!';
         if (list && list.length > 0) {
-            table = (
-                <table className='table table-hover table-bordered'>
-                    <thead>
-                        <tr>
-                            <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                            <td style={{ width: 'auto' }}>Mã</td>
-                            <td style={{ width: '50%' }}>Mô tả</td>
-                            <td style={{ width: '50%' }}>Ghi chú</td>
-                            <td style={{ width: 'auto' }} nowrap='true'>Kích hoạt</td>
-                            <td style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {list.map((item, index) => (
-                            <tr key={item.ma}>
-                                <td style={{ textAlign: 'right' }}>{(pageNumber - 1) * pageSize + index + 1}</td>
-                                <td><a href='#' onClick={e => this.edit(e, item)}>{item.ma}</a></td>
-                                <td>{item.moTa}</td>
-                                <td>{item.ghiChu}</td>
-                                <td className='toggle' style={{ textAlign: 'center' }}>
-                                    <label>
-                                        <input type='checkbox' checked={item.kichHoat} onChange={e => permissionWrite && this.changeActive(item)} />
-                                        <span className='button-indecator' />
-                                    </label>
-                                </td>
-                                <td style={{ textAlign: 'center' }}>
-                                    <div className='btn-group'>
-                                        <a className='btn btn-primary' href='#' onClick={e => this.edit(e, item)}>
-                                            <i className='fa fa-lg fa-edit' />
-                                        </a>
-                                        {permissionDelete &&
-                                            <a className='btn btn-danger' href='#' onClick={e => this.delete(e, item)}>
-                                                <i className='fa fa-trash-o fa-lg' />
-                                            </a>}
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            );
+            table = renderTable({
+                getDataSource: () => list, stickyHead: false,
+                renderHead: () => (
+                    <tr>
+                        <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
+                        <td style={{ width: 'auto' }}>Mã</td>
+                        <td style={{ width: '50%' }}>Mô tả</td>
+                        <td style={{ width: '50%' }}>Ghi chú</td>
+                        <td style={{ width: 'auto' }} nowrap='true'>Kích hoạt</td>
+                        <td style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</td>
+                    </tr>),
+                renderRow: (item, index) => (
+                    <tr key={index}>
+                        <TableCell type='number' content={(pageNumber - 1) * pageSize + index + 1} />
+                        <TableCell type='link' content={item.ma} onClick={(e) => this.edit(e, item)} />
+                        <TableCell type='text' content={item.moTa} />
+                        <TableCell type='text' content={item.ghiChu} />
+                        <TableCell type='checkbox' content={item.kichHoat} permission={permissionWrite} onChanged={() => permissionWrite && this.changeActive(item)} />
+                        <TableCell type='buttons' content={item} permission={permission} onEdit={this.edit} onDelete={this.delete} />
+                    </tr>
+                ),
+            });
         }
 
         return (

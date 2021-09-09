@@ -4,6 +4,7 @@ import { PageName, createDmDonViTinh, getDmDonViTinhPage, updateDmDonViTinh, del
 import Pagination, { OverlayLoading } from 'view/component/Pagination';
 import AdminSearchBox from 'view/component/AdminSearchBox';
 import { Link } from 'react-router-dom';
+import { AdminPage, TableCell, renderTable } from 'view/component/AdminPage';
 
 class EditModal extends React.Component {
   modal = React.createRef();
@@ -85,7 +86,7 @@ class EditModal extends React.Component {
   }
 }
 
-class AdminPage extends React.Component {
+class dmDonViTinhAdminPage extends AdminPage {
   state = { searching: false };
   searchBox = React.createRef();
   modal = React.createRef();
@@ -108,40 +109,29 @@ class AdminPage extends React.Component {
   render() {
     const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
       permissionWrite = currentPermissions.includes('dmDonViTinh:write'),
-      permissionDelete = currentPermissions.includes('dmDonViTinh:delete');
-    const { pageNumber, pageSize, pageTotal, totalItem } = this.props.dmDonViTinh && this.props.dmDonViTinh.page ? this.props.dmDonViTinh.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0 };
+      permissionDelete = currentPermissions.includes('dmDonViTinh:delete'),
+      permission = this.getUserPermission('dmDonViTinh', ['write', 'delete']);
+    const { pageNumber, pageSize, pageTotal, totalItem, list } = 
+      this.props.dmDonViTinh && this.props.dmDonViTinh.page ? 
+      this.props.dmDonViTinh.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: []  };
     let table = 'Không có dữ liệu đơn vị tính!';
-    if (this.props.dmDonViTinh && this.props.dmDonViTinh.page && this.props.dmDonViTinh.page.list && this.props.dmDonViTinh.page.list.length > 0) {
-      table = (
-        <table className='table table-hover table-bordered'>
-          <thead>
-            <tr>
-              <th style={{ width: 'auto' }}>Mã</th>
-              <th style={{ width: '100%' }} nowrap='true'>Tên</th>
-              <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            {this.props.dmDonViTinh.page.list.map((item, index) => (
-              <tr key={index}>
-                <td>{item.ma}</td>
-                <td><a href='#' onClick={(e) => this.edit(e, item)}>{item.ten}</a></td>
-                <td style={{ textAlign: 'center' }}>
-                  <div className='btn-group'>
-                    <a className='btn btn-primary' href='#' onClick={(e) => this.edit(e, item)}>
-                      <i className='fa fa-lg fa-edit' />
-                    </a>
-                    {permissionDelete && (
-                      <a className='btn btn-danger' href='#' onClick={(e) => this.delete(e, item)}>
-                        <i className='fa fa-trash-o fa-lg' />
-                      </a>)}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      );
+    if (list && list.length > 0) {
+      table = renderTable({
+        getDataSource: () => list, stickyHead: false,
+        renderHead: () => (
+          <tr>
+            <th style={{ width: 'auto' }}>Mã</th>
+            <th style={{ width: '100%' }} nowrap='true'>Tên</th>
+            <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+          </tr>),
+        renderRow: (item, index) => (
+          <tr key={index}>
+            <TableCell type='text' content={item.ma} />
+            <TableCell type='link' content={item.ten} onClick={(e) => this.edit(e, item)} />
+            <TableCell type='buttons' content={item} permission={permission} onEdit={this.edit} onDelete={this.delete}/>
+          </tr>
+        ),
+      })
     }
 
     return (
@@ -176,4 +166,4 @@ class AdminPage extends React.Component {
 
 const mapStateToProps = (state) => ({ system: state.system, dmDonViTinh: state.dmDonViTinh });
 const mapActionsToProps = { getDmDonViTinhPage, createDmDonViTinh, updateDmDonViTinh, deleteDmDonViTinh };
-export default connect(mapStateToProps, mapActionsToProps)(AdminPage);
+export default connect(mapStateToProps, mapActionsToProps)(dmDonViTinhAdminPage);

@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { createDmTrinhDoQuanLyNhaNuoc, deleteDmTrinhDoQuanLyNhaNuoc, updateDmTrinhDoQuanLyNhaNuoc, getDmTrinhDoQuanLyNhaNuocPage } from './redux';
 import Pagination from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
+import { AdminPage, TableCell, renderTable } from 'view/component/AdminPage';
 
 class EditModal extends React.Component {
     state = { active: 0 };
@@ -94,7 +95,7 @@ class EditModal extends React.Component {
     }
 }
 
-class AdminPage extends React.Component {
+class dmTrinhDoQLNNAdminPage extends AdminPage {
     modal = React.createRef();
 
     componentDidMount() {
@@ -122,48 +123,30 @@ class AdminPage extends React.Component {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmTrinhDoQuanLyNhaNuoc:write'),
-            permissionDelete = currentPermissions.includes('dmTrinhDoQuanLyNhaNuoc:delete');
-        const { pageNumber, pageSize, pageTotal, totalItem } = this.props.dmTrinhDoQuanLyNhaNuoc && this.props.dmTrinhDoQuanLyNhaNuoc.page ?
-            this.props.dmTrinhDoQuanLyNhaNuoc.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0 };
+            permissionDelete = currentPermissions.includes('dmTrinhDoQuanLyNhaNuoc:delete'),
+            permission = this.getUserPermission('dmTrinhDoQuanLyNhaNuoc', ['write', 'delete']);
+        const { pageNumber, pageSize, pageTotal, totalItem, list } = this.props.dmTrinhDoQuanLyNhaNuoc && this.props.dmTrinhDoQuanLyNhaNuoc.page ?
+            this.props.dmTrinhDoQuanLyNhaNuoc.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: [] };
         let table = 'Danh mục trình độ quản lý nhà nước trống!';
         if (this.props.dmTrinhDoQuanLyNhaNuoc && this.props.dmTrinhDoQuanLyNhaNuoc.page && this.props.dmTrinhDoQuanLyNhaNuoc.page.list && this.props.dmTrinhDoQuanLyNhaNuoc.page.list.length > 0) {
-            table = (
-                <table className='table table-hover table-bordered'>
-                    <thead>
-                        <tr>
-                            <td style={{ width: 'auto' }}>Mã</td>
-                            <td style={{ width: '100%' }}>Tên</td>
-                            <td style={{ width: 'auto' }} nowrap='true'>Kích hoạt</td>
-                            <td style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {this.props.dmTrinhDoQuanLyNhaNuoc.page.list.map((item) => (
-                            <tr key={item.ma}>
-                                <td>{item.ma}</td>
-                                <td><a href='#' onClick={e => this.edit(e, item)}>{item.ten}</a></td>
-                                <td className='toggle' style={{ textAlign: 'center' }}>
-                                    <label>
-                                        <input type='checkbox' checked={item.kichHoat} onChange={() => permissionWrite && this.changeActive(item)} />
-                                        <span className='button-indecator' />
-                                    </label>
-                                </td>
-                                <td style={{ textAlign: 'center' }}>
-                                    <div className='btn-group'>
-                                        <a className='btn btn-primary' href='#' onClick={e => this.edit(e, item)}>
-                                            <i className='fa fa-lg fa-edit' />
-                                        </a>
-                                        {permissionDelete &&
-                                            <a className='btn btn-danger' href='#' onClick={e => this.delete(e, item)}>
-                                                <i className='fa fa-trash-o fa-lg' />
-                                            </a>}
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            );
+            table = renderTable({
+                getDataSource: () => list, stickyHead: false,
+                renderHead: () => (
+                    <tr>
+                        <td style={{ width: 'auto' }}>Mã</td>
+                        <td style={{ width: '100%' }}>Tên</td>
+                        <td style={{ width: 'auto' }} nowrap='true'>Kích hoạt</td>
+                        <td style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</td>
+                    </tr>),
+                renderRow: (item, index) => (
+                    <tr key={index}>
+                        <TableCell type='text' content={item.ma} />
+                        <TableCell type='link' content={item.ten} onClick={e => this.edit(e, item)} />
+                        <TableCell type='checkbox' content={item.kichHoat} permission={permissionWrite} onChanged={() => permissionWrite && this.changeActive(item)} />
+                        <TableCell type='buttons' content={item} permission={permission} onEdit={this.edit} onDelete={this.delete} />
+                    </tr>
+                ),
+            });
         }
 
         return (
@@ -196,4 +179,4 @@ class AdminPage extends React.Component {
 
 const mapStateToProps = state => ({ system: state.system, dmTrinhDoQuanLyNhaNuoc: state.dmTrinhDoQuanLyNhaNuoc });
 const mapActionsToProps = { createDmTrinhDoQuanLyNhaNuoc, deleteDmTrinhDoQuanLyNhaNuoc, updateDmTrinhDoQuanLyNhaNuoc, getDmTrinhDoQuanLyNhaNuocPage };
-export default connect(mapStateToProps, mapActionsToProps)(AdminPage);
+export default connect(mapStateToProps, mapActionsToProps)(dmTrinhDoQLNNAdminPage);

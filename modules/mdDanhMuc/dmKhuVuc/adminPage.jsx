@@ -5,6 +5,7 @@ import { getDmChauAll } from 'modules/mdDanhMuc/dmChau/redux';
 import Pagination, { OverlayLoading } from 'view/component/Pagination';
 import AdminSearchBox from 'view/component/AdminSearchBox';
 import { Link } from 'react-router-dom';
+import { AdminPage, TableCell, renderTable } from 'view/component/AdminPage';
 
 class EditModal extends React.Component {
     state = { ma: null, saving: false, isUpdate: false };
@@ -136,7 +137,7 @@ class EditModal extends React.Component {
     }
 }
 
-class AdminPage extends React.Component {
+class dmKhuVucAdminPage extends AdminPage {
     state = { searching: true };
     searchBox = React.createRef();
     modal = React.createRef();
@@ -168,52 +169,34 @@ class AdminPage extends React.Component {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmKhuVuc:write'),
-            permissionDelete = currentPermissions.includes('dmKhuVuc:delete');
+            permissionDelete = currentPermissions.includes('dmKhuVuc:delete'),
+            permission = this.getUserPermission('dmKhuVuc', ['write', 'delete']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmKhuVuc && this.props.dmKhuVuc.page ?
             this.props.dmKhuVuc.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list };
         let table = 'Không có dữ liệu!';
         if (list && list.length > 0) {
-            table = (
-                <table className='table table-hover table-bordered table-responsive' ref={this.table}>
-                    <thead>
-                        <tr>
-                            <th style={{ width: 'auto' }}>Mã</th>
+            table = renderTable({
+                getDataSource: () => list, stickyHead: false,
+                renderHead: () => (
+                    <tr>
+                       <th style={{ width: 'auto' }}>Mã</th>
                             <th style={{ width: '50%' }} nowrap='true'>Tên khu vực</th>
                             <th style={{ width: '50%' }} nowrap='true'>Tên tiếng Anh</th>
                             <th style={{ width: 'auto' }} >Châu</th>
                             <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
                             <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {list.map((item, index) => (
-                            <tr key={index}>
-                                <td>{item.ma}</td>
-                                <td><a href='#' onClick={e => this.edit(e, item)}>{item.ten}</a></td>
-                                <td>{item.territory}</td>
-                                <td style={{ whiteSpace: 'nowrap' }}>{this.chauMapper && this.chauMapper[item.maChau] ? this.chauMapper[item.maChau] : ''}</td>
-                                <td className='toggle' style={{ textAlign: 'center' }}>
-                                    <label>
-                                        <input type='checkbox' checked={item.kichHoat ? true : false} onChange={() => permissionWrite && this.changeActive(item, 'kichHoat')} />
-                                        <span className='button-indecator' />
-                                    </label>
-                                </td>
-                                <td>
-                                    <div className='btn-group' style={{ display: 'flex' }}>
-                                        <a className='btn btn-primary' href='#' onClick={e => this.edit(e, item)}>
-                                            <i className='fa fa-lg fa-edit' />
-                                        </a>
-                                        {permissionDelete &&
-                                            <a className='btn btn-danger' href='#' onClick={e => this.delete(e, item)}>
-                                                <i className='fa fa-lg fa-trash' />
-                                            </a>}
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            );
+                       </tr>),
+                renderRow: (item, index) => (
+                    <tr key={index}>
+                        <TableCell type='text' content={item.ma} />
+                        <TableCell type='link' content={item.ten} onClick={(e) => this.edit(e, item)} />
+                        <TableCell type='text' content={item.territory} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={this.chauMapper && this.chauMapper[item.maChau] ? this.chauMapper[item.maChau] : ''} />
+                        <TableCell type='checkbox' content={item.kichHoat} permission={permissionWrite} onChanged={() => permissionWrite && this.changeActive(item)} />
+                        <TableCell type='buttons' content={item} permission={permission} onEdit={this.edit} onDelete={this.delete} />
+                    </tr>
+                ),
+            });
         }
 
         return (
@@ -249,4 +232,4 @@ class AdminPage extends React.Component {
 
 const mapStateToProps = state => ({ system: state.system, dmKhuVuc: state.dmKhuVuc, dmChau: state.dmChau });
 const mapActionsToProps = { getDmKhuVucPage: getDmKhuVucPage, createDmKhuVuc, updateDmKhuVuc, deleteDmKhuVuc, getDmChauAll };
-export default connect(mapStateToProps, mapActionsToProps)(AdminPage);
+export default connect(mapStateToProps, mapActionsToProps)(dmKhuVucAdminPage);

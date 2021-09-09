@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getDmTinhTrangCongTacAll, createDmTinhTrangCongTac, updateDmTinhTrangCongTac, deleteDmTinhTrangCongTac } from './redux';
 import { Link } from 'react-router-dom';
+import { AdminPage, TableCell, renderTable } from 'view/component/AdminPage';
 
 class EditModal extends React.Component {
     modal = React.createRef();
@@ -81,7 +82,7 @@ class EditModal extends React.Component {
     }
 }
 
-class dmTinhTrangCongTacPage extends React.Component {
+class dmTinhTrangCongTacPage extends AdminPage {
     modal = React.createRef();
 
     componentDidMount() {
@@ -105,47 +106,29 @@ class dmTinhTrangCongTacPage extends React.Component {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmTinhTrangCongTac:write'),
-            permissionDelete = currentPermissions.includes('dmTinhTrangCongTac:delete');
+            permissionDelete = currentPermissions.includes('dmTinhTrangCongTac:delete'),
+            permission = this.getUserPermission('dmTinhTrangCongTac', ['write', 'delete']);
         let table = 'Không có dữ liệu!',
             items = this.props.dmTinhTrangCongTac && this.props.dmTinhTrangCongTac.items;
         if (items && items.length > 0) {
-            table = (
-                <table className='table table-hover table-bordered table-responsive'>
-                    <thead>
-                        <tr>
-                            <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                            <th style={{ width: '100%' }} nowrap='true'>Tên tình trạng công tác</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                            <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {items.map((item, index) => (
-                            <tr key={index}>
-                                <td style={{ textAlign: 'right' }}>{index + 1}</td>
-                                <td><a href='#' onClick={e => this.edit(e, item)}>{item.ten}</a></td>
-                                <td className='toggle' style={{ textAlign: 'center' }}>
-                                    <label>
-                                        <input type='checkbox' checked={item.kichHoat} onChange={() => permissionWrite && this.changeActive(item)} />
-                                        <span className='button-indecator' />
-                                    </label>
-                                </td>
-                                <td style={{ textAlign: 'center' }}>
-                                    <div className='btn-group' style={{ display: 'flex', justifyContent: 'center' }}>
-                                        <a className='btn btn-primary' href='#' onClick={e => this.edit(e, item)}>
-                                            <i className='fa fa-lg fa-edit' />
-                                        </a>
-                                        {permissionDelete &&
-                                            <a className='btn btn-danger' href='#' onClick={e => this.delete(e, item)}>
-                                                <i className='fa fa-lg fa-trash' />
-                                            </a>}
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            );
+            table = renderTable({
+                getDataSource: () => items, stickyHead: false,
+                renderHead: () => (
+                    <tr>
+                        <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
+                        <th style={{ width: '100%' }} nowrap='true'>Tên tình trạng công tác</th>
+                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
+                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                    </tr>),
+                renderRow: (item, index) => (
+                    <tr key={index}>
+                        <TableCell type='number' content={index + 1} style={{ textAlign: 'right' }} />
+                        <TableCell type='link' content={item.ten} onClick={(e) => this.edit(e, item)} />
+                        <TableCell type='checkbox' content={item.kichHoat} permission={permissionWrite} onChanged={() => permissionWrite && this.changeActive(item)} />
+                        <TableCell type='buttons' content={item} permission={permission} onEdit={this.edit} onDelete={this.delete} />
+                    </tr>
+                ),
+            });
         }
 
         return (
