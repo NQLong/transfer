@@ -58,7 +58,7 @@ class FileModal extends React.Component {
                 <form className='modal-dialog' role='document' onSubmit={this.save}>
                     <div className='modal-content'>
                         <div className='modal-header'>
-                            <h5 className='modal-title'>Thông tin file</h5>
+                            <h5 className='modal-title'>Thông tin tệp tin</h5>
                             <button type='button' className='close' data-dismiss='modal' aria-label='Close'>
                                 <span aria-hidden='true'>&times;</span>
                             </button>
@@ -67,6 +67,12 @@ class FileModal extends React.Component {
                             <div className='form-group'>
                                 <label htmlFor='nameDisplay'>Tên hiện thị</label>
                                 <input className='form-control' id='nameDisplay' type='text' placeholder='Tên hiện thị' style={{ display: this.state.name == 'admin' ? 'none' : 'block' }} />
+                            </div>
+                            <div className='form-group'>
+                                <label className='control-label'>Danh mục tệp tin</label>
+                                <select className='form-control' id='neNewsCategories' multiple={true} defaultValue={[]} disabled={readOnly}>
+                                    <optgroup label='Lựa chọn danh mục' />
+                                </select>
                             </div>
                             <div className='form-group'>
                                 <label htmlFor='note'>Ghi chú</label>

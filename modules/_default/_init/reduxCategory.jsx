@@ -13,7 +13,7 @@ export default function categoryReducer(state = [], data) {
         case CategoryCreate:
             return [data.item].concat(state);
 
-        case CategoryUpdate:
+        case CategoryUpdate: {
             let updateItemState = state.slice();
             for (let i = 0; i < updateItemState.length; i++) {
                 if (updateItemState[i].id == data.item.id) {
@@ -22,8 +22,9 @@ export default function categoryReducer(state = [], data) {
                 }
             }
             return updateItemState;
+        }
 
-        case CategoryDelete:
+        case CategoryDelete: {
             let deleteItemState = state.slice();
             for (let i = 0; i < deleteItemState.length; i++) {
                 if (deleteItemState[i].id == data.id) {
@@ -32,6 +33,7 @@ export default function categoryReducer(state = [], data) {
                 }
             }
             return deleteItemState;
+        }
 
         default:
             return state;
@@ -50,7 +52,7 @@ export function getAll(type, done) {
                 dispatch({ type: CategoryGetAll, items: data.items });
                 done && done(data.items);
             }
-        }, error => T.notify('Lấy danh mục bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh mục bị lỗi!', 'danger'));
     };
 }
 export function getByDonVi(type, done) {
@@ -64,12 +66,12 @@ export function getByDonVi(type, done) {
                 dispatch({ type: CategoryGetAll, items: data.items });
                 done && done(data.items);
             }
-        }, error => T.notify('Lấy danh mục bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh mục bị lỗi!', 'danger'));
     };
 }
 
 export function getTuyenSinh(type, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/category/' + type;
         T.get(url, { condition: 'TS' }, data => {
             if (data.error) {
@@ -79,7 +81,7 @@ export function getTuyenSinh(type, done) {
                 //dispatch({ type: CategoryGetAll, items: data.items });
                 done && done(data.items);
             }
-        }, error => T.notify('Lấy danh mục bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh mục bị lỗi!', 'danger'));
     };
 }
 
@@ -95,7 +97,7 @@ export function createCategory(data, done) {
                 dispatch({ type: CategoryCreate, item: data.item });
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo danh mục bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo danh mục bị lỗi!', 'danger'));
     };
 }
 
@@ -112,7 +114,7 @@ export function updateCategory(id, changes, done) {
                 dispatch({ type: CategoryUpdate, item: data.item });
                 done && done();
             }
-        }, error => T.notify('Cập nhật danh mục bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật danh mục bị lỗi!', 'danger'));
     };
 }
 
@@ -126,7 +128,7 @@ export function swapCategory(id, isMoveUp, type) {
             } else {
                 dispatch(getAll(type));
             }
-        }, error => T.notify('Thay đổi vị trí danh mục bị lỗi!', 'danger'));
+        }, () => T.notify('Thay đổi vị trí danh mục bị lỗi!', 'danger'));
     };
 }
 
@@ -141,7 +143,7 @@ export function deleteCategory(id) {
                 T.alert('Xóa danh mục thành công!', 'error', false, 800);
                 dispatch({ type: CategoryDelete, id });
             }
-        }, error => T.notify('Xóa danh mục bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa danh mục bị lỗi!', 'danger'));
     };
 }
 

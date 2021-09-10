@@ -77,6 +77,9 @@ module.exports = app => {
         } else if (fields.userData && fields.userData[0].startsWith('eventCategoryImage:') && files.CategoryImage && files.CategoryImage.length > 0) {
             console.log('Hook: uploadCategoryImage => event');
             app.uploadComponentImage(req, 'category', app.model.fwCategory, fields.userData[0].substring(19), files.CategoryImage[0].path, done);
+        } else if (fields.userData && fields.userData[0].startsWith('documentCategoryImage:') && files.CategoryImage && files.CategoryImage.length > 0) {
+            console.log('Hook: uploadCategoryImage => document');
+            app.uploadComponentImage(req, 'category', app.model.fwCategory, fields.userData[0].substring(22), files.CategoryImage[0].path, done);
         } else if (fields.userData && fields.userData[0].startsWith('jobCategoryImage:') && files.CategoryImage && files.CategoryImage.length > 0) {
             console.log('Hook: uploadCategoryImage => job');
             app.uploadComponentImage(req, 'category', app.model.fwCategory, fields.userData[0].substring(17), files.CategoryImage[0].path, done);

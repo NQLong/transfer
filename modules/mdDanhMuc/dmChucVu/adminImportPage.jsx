@@ -246,6 +246,6 @@ class DmChucVuImportPage extends React.Component {
     }
 }
 
-const mapStateToProps = state => ({});
+const mapStateToProps = () => ({});
 const mapActionsToProps = { createMultiDmChucVu };
 export default connect(mapStateToProps, mapActionsToProps)(DmChucVuImportPage);
