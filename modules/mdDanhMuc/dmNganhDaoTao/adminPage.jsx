@@ -6,6 +6,8 @@ import Pagination, { OverlayLoading } from 'view/component/Pagination';
 import AdminSearchBox from 'view/component/AdminSearchBox';
 import Editor from 'view/component/CkEditor4';
 import { Link } from 'react-router-dom';
+import { AdminPage, TableCell, renderTable } from 'view/component/AdminPage';
+
 
 class EditModal extends React.Component {
     state = { kichHoat: true };
@@ -142,7 +144,7 @@ class EditModal extends React.Component {
     }
 }
 
-class DmNganhDaoTaoPage extends React.Component {
+class DmNganhDaoTaoPage extends AdminPage {
     state = { searching: false };
     searchBox = React.createRef();
     modal = React.createRef();
@@ -179,50 +181,37 @@ class DmNganhDaoTaoPage extends React.Component {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmNganhDaoTao:write'),
-            permissionDelete = currentPermissions.includes('dmNganhDaoTao:delete');
+            permissionDelete = currentPermissions.includes('dmNganhDaoTao:delete'),
+            permission = this.getUserPermission('dmNganhDaoTao', ['write', 'delete']);
+
         const { pageNumber, pageSize, pageTotal, totalItem, list } = this.props.dmNganhDaoTao && this.props.dmNganhDaoTao.page ?
             this.props.dmNganhDaoTao.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: [] };
         let table = 'Không có ngành đào tạo!';
         if (list && list.length > 0) {
-            table = (
-                <table className='table table-hover table-bordered'>
-                    <thead>
-                        <tr>
-                            <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                            <td style={{ width: '50%' }}>Ngành đào tạo</td>
-                            <td style={{ width: '50%' }}>Đơn vị</td>
-                            <td style={{ width: 'auto' }} nowrap='true'>Kích hoạt</td>
-                            <td style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {list.map((item, index) => (
-                            <tr key={item.ma}>
-                                <td style={{ textAlign: 'right' }}>{(pageNumber - 1) * pageSize + index + 1}</td>
-                                <td><a href='#' onClick={e => this.edit(e, item)}>{T.language.parse(item.ten, true).vi}</a></td>
-                                <td>{this.mapperDonVi[item.maDonVi] ? this.mapperDonVi[item.maDonVi] : ''}</td>
-                                <td className='toggle' style={{ textAlign: 'center' }}>
-                                    <label>
-                                        <input type='checkbox' checked={item.kichHoat} onChange={e => permissionWrite && this.changeActive(item)} />
-                                        <span className='button-indecator' />
-                                    </label>
-                                </td>
-                                <td style={{ textAlign: 'center' }}>
-                                    <div className='btn-group'>
-                                        <a className='btn btn-primary' href='#' onClick={e => this.edit(e, item)}>
-                                            <i className='fa fa-lg fa-edit' />
-                                        </a>
-                                        {permissionDelete &&
-                                            <a className='btn btn-danger' href='#' onClick={e => this.delete(e, item)}>
-                                                <i className='fa fa-trash-o fa-lg' />
-                                            </a>}
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            );
+            table = renderTable({
+                getDataSource: () => list, stickyHead: false, 
+                renderHead: () => (
+                    <tr>
+                        <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
+                        <th style={{ width: '50%' }}>Ngành đào tạo</th>
+                        <th style={{ width: '50%' }}>Đơn vị</th>
+                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
+                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                    </tr>
+                ),
+                renderRow: (item, index) => (
+                    <tr key={index} >
+                        <TableCell type='number' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
+                        <TableCell type='link' content={T.language.parse(item.ten, true).vi} 
+                            onClick = {e => this.edit(e, item)} />
+                        <TableCell type='text' content={this.mapperDonVi[item.maDonVi] ? this.mapperDonVi[item.maDonVi] : ''} />
+                        <TableCell type='checkbox' style={{ textAlign: 'center' }} content={item.kichHoat} permission={permissionWrite}
+                            onChange={() => permissionWrite && this.changeActive(item)} />
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} 
+                            onEdit={e => this.edit(e, item)} onDelete={e => this.delete(e, item)} />
+                    </tr>
+                )
+            });
         }
 
         return (
@@ -230,12 +219,12 @@ class DmNganhDaoTaoPage extends React.Component {
                 <div className='app-title'>
                     <h1><i className='fa fa-list-alt' /> Danh mục Ngành đào tạo</h1>
                     <AdminSearchBox ref={this.searchBox} getPage={this.props.getDmNganhDaoTaoPage} setSearching={value => this.setState({ searching: value })} />
-                    <ul className='app-breadcrumb breadcrumb'>
+                    {/* <ul className='app-breadcrumb breadcrumb'>
                         <Link to='/user'><i className='fa fa-home fa-lg' /></Link>
                         &nbsp;/&nbsp;
                         <Link to='/user/category'>Danh mục</Link>
                         &nbsp;/&nbsp;Ngành đào tạo
-                    </ul>
+                    </ul> */}
                 </div>
                 <div className='tile'>
                     {!this.state.searching ? table : <OverlayLoading text='Đang tải..' />}
@@ -258,3 +247,120 @@ class DmNganhDaoTaoPage extends React.Component {
 const mapStateToProps = state => ({ system: state.system, dmNganhDaoTao: state.dmNganhDaoTao, dmDonVi: state.dmDonVi });
 const mapActionsToProps = { getDmNganhDaoTaoPage, getDmDonViAll, getDmDonVi, createDmNganhDaoTao, deleteDmNganhDaoTao, updateDmNganhDaoTao };
 export default connect(mapStateToProps, mapActionsToProps)(DmNganhDaoTaoPage);
+
+// class DmNganhDaoTaoPage extends React.Component {
+//     state = { searching: false };
+//     searchBox = React.createRef();
+//     modal = React.createRef();
+//     mapperDonVi = [];
+//     optionsDonVi = [];
+
+//     componentDidMount() {
+//         this.props.getDmDonViAll(items => {
+//             if (items) {
+//                 const mapper = {};
+//                 items.forEach(item => {
+//                     mapper[item.ma] = item.ten;
+//                     if (item.kichHoat == 1 && item.maPl == '01') this.optionsDonVi.push(<option key={item.ma} value={item.ma}>{item.ten}</option>);
+//                 });
+//                 this.mapperDonVi = mapper;
+//             }
+//         });
+//         T.ready('/user/category', () => this.searchBox.current.getPage());
+//     }
+
+//     edit = (e, item) => {
+//         e.preventDefault();
+//         this.modal.current.show(item);
+//     }
+
+//     changeActive = item => this.props.updateDmNganhDaoTao(item.ma, { kichHoat: item.kichHoat == 1 ? 0 : 1 });
+
+//     delete = (e, item) => {
+//         e.preventDefault();
+//         T.confirm('Xóa ngành đào tạo', 'Bạn có chắc bạn muốn xóa ngành đào tạo này?', true, isConfirm =>
+//             isConfirm && this.props.deleteDmNganhDaoTao(item.ma));
+//     }
+
+//     render() {
+//         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
+//             permissionWrite = currentPermissions.includes('dmNganhDaoTao:write'),
+//             permissionDelete = currentPermissions.includes('dmNganhDaoTao:delete');
+//         const { pageNumber, pageSize, pageTotal, totalItem, list } = this.props.dmNganhDaoTao && this.props.dmNganhDaoTao.page ?
+//             this.props.dmNganhDaoTao.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: [] };
+//         let table = 'Không có ngành đào tạo!';
+//         if (list && list.length > 0) {
+//             table = (
+//                 <table className='table table-hover table-bordered'>
+//                     <thead>
+//                         <tr>
+//                             <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
+//                             <td style={{ width: '50%' }}>Ngành đào tạo</td>
+//                             <td style={{ width: '50%' }}>Đơn vị</td>
+//                             <td style={{ width: 'auto' }} nowrap='true'>Kích hoạt</td>
+//                             <td style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</td>
+//                         </tr>
+//                     </thead>
+//                     <tbody>
+//                         {list.map((item, index) => (
+//                             <tr key={item.ma}>
+//                                 <td style={{ textAlign: 'right' }}>{(pageNumber - 1) * pageSize + index + 1}</td>
+//                                 <td><a href='#' onClick={e => this.edit(e, item)}>{T.language.parse(item.ten, true).vi}</a></td>
+//                                 <td>{this.mapperDonVi[item.maDonVi] ? this.mapperDonVi[item.maDonVi] : ''}</td>
+//                                 <td className='toggle' style={{ textAlign: 'center' }}>
+//                                     <label>
+//                                         <input type='checkbox' checked={item.kichHoat} onChange={e => permissionWrite && this.changeActive(item)} />
+//                                         <span className='button-indecator' />
+//                                     </label>
+//                                 </td>
+//                                 <td style={{ textAlign: 'center' }}>
+//                                     <div className='btn-group'>
+//                                         <a className='btn btn-primary' href='#' onClick={e => this.edit(e, item)}>
+//                                             <i className='fa fa-lg fa-edit' />
+//                                         </a>
+//                                         {permissionDelete &&
+//                                             <a className='btn btn-danger' href='#' onClick={e => this.delete(e, item)}>
+//                                                 <i className='fa fa-trash-o fa-lg' />
+//                                             </a>}
+//                                     </div>
+//                                 </td>
+//                             </tr>
+//                         ))}
+//                     </tbody>
+//                 </table>
+//             );
+//         }
+
+//         return (
+//             <main className='app-content'>
+//                 <div className='app-title'>
+//                     <h1><i className='fa fa-list-alt' /> Danh mục Ngành đào tạo</h1>
+//                     <AdminSearchBox ref={this.searchBox} getPage={this.props.getDmNganhDaoTaoPage} setSearching={value => this.setState({ searching: value })} />
+//                     <ul className='app-breadcrumb breadcrumb'>
+//                         <Link to='/user'><i className='fa fa-home fa-lg' /></Link>
+//                         &nbsp;/&nbsp;
+//                         <Link to='/user/category'>Danh mục</Link>
+//                         &nbsp;/&nbsp;Ngành đào tạo
+//                     </ul>
+//                 </div>
+//                 <div className='tile'>
+//                     {!this.state.searching ? table : <OverlayLoading text='Đang tải..' />}
+//                     <EditModal ref={this.modal} readOnly={!permissionWrite} optionsDonVi={this.optionsDonVi} createDmNganhDaoTao={this.props.createDmNganhDaoTao} updateDmNganhDaoTao={this.props.updateDmNganhDaoTao} />
+//                     <Pagination name='pageDmNganhDaoTao' style={{ marginLeft: '70px', marginBottom: '5px' }} pageNumber={pageNumber} pageSize={pageSize} pageTotal={pageTotal} totalItem={totalItem}
+//                         getPage={this.searchBox.current && this.searchBox.current.getPage} />
+//                     {permissionWrite &&
+//                         <button type='button' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.edit}>
+//                             <i className='fa fa-lg fa-plus' />
+//                         </button>}
+//                     <Link to='/user/category' className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>
+//                         <i className='fa fa-lg fa-reply' />
+//                     </Link>
+//                 </div>
+//             </main>
+//         );
+//     }
+// }
+
+// const mapStateToProps = state => ({ system: state.system, dmNganhDaoTao: state.dmNganhDaoTao, dmDonVi: state.dmDonVi });
+// const mapActionsToProps = { getDmNganhDaoTaoPage, getDmDonViAll, getDmDonVi, createDmNganhDaoTao, deleteDmNganhDaoTao, updateDmNganhDaoTao };
+// export default connect(mapStateToProps, mapActionsToProps)(DmNganhDaoTaoPage);
