@@ -132,7 +132,7 @@ class DmMucDichTrongNuocPage extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index} >
-                        <TableCell type='number' style={{ textAlign: 'center' }} content={item.ma ? item.ma : ''} />
+                        <TableCell type='text' style={{ textAlign: 'center' }} content={item.ma ? item.ma : ''} />
                         <TableCell type='link' content={item.moTa ? item.moTa : ''} 
                             onClick = {e => this.edit(e, item)} />
                         <TableCell type='checkbox' style={{ textAlign: 'center' }} content={item.kichHoat} permission={permissionWrite}
