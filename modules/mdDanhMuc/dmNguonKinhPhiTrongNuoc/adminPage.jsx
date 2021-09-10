@@ -4,6 +4,7 @@ import { getDmNguonKinhPhiTrongNuocPage, deleteDmNguonKinhPhiTrongNuoc, createDm
 import AdminSearchBox from 'view/component/AdminSearchBox';
 import Pagination, { OverlayLoading } from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
+import { AdminPage, TableCell, renderTable } from 'view/component/AdminPage';
 
 class EditModal extends React.Component {
     state = { kichHoat: true };
@@ -73,7 +74,7 @@ class EditModal extends React.Component {
                             </div>
                             <div className='form-group' style={{ display: 'inline-flex', margin: 0 }}>
                                 <label htmlFor='dmNguonKinhPhiTrongNuocActive'>Kích hoạt: </label>&nbsp;&nbsp;
-                                        <div className='toggle'>
+                                <div className='toggle'>
                                     <label>
                                         <input type='checkbox' id='dmNguonKinhPhiTrongNuocActive' checked={this.state.kichHoat} onChange={() => !readOnly && this.setState({ kichHoat: !this.state.kichHoat })} />
                                         <span className='button-indecator' />
@@ -92,7 +93,7 @@ class EditModal extends React.Component {
     }
 }
 
-class DmNguonKinhPhiTrongNuocPage extends React.Component {
+class DmNguonKinhPhiTrongNuocPage extends AdminPage {
     state = { searching: false };
     searchBox = React.createRef();
     modal = React.createRef();
@@ -119,50 +120,32 @@ class DmNguonKinhPhiTrongNuocPage extends React.Component {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmNguonKinhPhiTrongNuoc:write'),
-            permissionDelete = currentPermissions.includes('dmNguonKinhPhiTrongNuoc:delete');
+            permissionDelete = currentPermissions.includes('dmNguonKinhPhiTrongNuoc:delete'),
+            permission = this.getUserPermission('dmNguonKinhPhiTrongNuoc', ['write', 'delete']);
         let table = 'Không có danh sách!',
             { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmNguonKinhPhiTrongNuoc && this.props.dmNguonKinhPhiTrongNuoc.page ?
                 this.props.dmNguonKinhPhiTrongNuoc.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         if (!this.state.searching && list && list.length > 0) {
-            table = (
-                <table className='table table-hover table-bordered'>
-                    <thead>
-                        <tr>
-                            <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                            <th style={{ width: 'auto' }}>Mã</th>
-                            <th style={{ width: '100%' }}>Mô tả</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                            <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {list.map((item, index) => (
-                            <tr key={index}>
-                                <td style={{ textAlign: 'right' }}>{index + 1}</td>
-                                <td><a href='#' onClick={e => this.edit(e, item)}>{item.ma}</a></td>
-                                <td>{item.moTa}</td>
-                                <td className='toggle' style={{ textAlign: 'center' }}>
-                                    <label>
-                                        <input type='checkbox' checked={item.kichHoat} onChange={e => permissionWrite && this.changeActive(item)} />
-                                        <span className='button-indecator' />
-                                    </label>
-                                </td>
-                                <td style={{ textAlign: 'center' }}>
-                                    <div className='btn-group'>
-                                        <a className='btn btn-primary' href='#' onClick={e => this.edit(e, item)}>
-                                            <i className='fa fa-lg fa-edit' />
-                                        </a>
-                                        {permissionDelete &&
-                                            <a className='btn btn-danger' href='#' onClick={e => this.delete(e, item)}>
-                                                <i className='fa fa-trash-o fa-lg' />
-                                            </a>}
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            );
+            table = renderTable({
+                getDataSource: () => list, stickyHead: false,
+                renderHead: () => (
+                    <tr>
+                        <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
+                        <th style={{ width: 'auto' }}>Mã</th>
+                        <th style={{ width: '100%' }}>Mô tả</th>
+                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
+                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                    </tr>),
+                renderRow: (item, index) => (
+                    <tr key={index}>
+                        <TableCell type='number' content={index + 1} style={{ textAlign: 'right' }} />
+                        <TableCell type='link' content={item.ma} onClick={(e) => this.edit(e, item)} />
+                        <TableCell type='text' content={item.moTa} />
+                        <TableCell type='checkbox' content={item.kichHoat} permission={permissionWrite} onChanged={() => permissionWrite && this.changeActive(item)} />
+                        <TableCell type='buttons' content={item} permission={permission} onEdit={this.edit} onDelete={this.delete} />
+                    </tr>
+                ),
+            });
         }
 
         return (

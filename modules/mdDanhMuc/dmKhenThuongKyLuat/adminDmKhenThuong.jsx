@@ -1,7 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { createDmKhenThuong, getDmKhenThuongAll, updateDmKhenThuong, deleteDmKhenThuong } from './reduxKhenThuong';
+import { getDmKhenThuongPage, createDmKhenThuong, getDmKhenThuongAll, updateDmKhenThuong, deleteDmKhenThuong } from './reduxKhenThuong';
 import { Link } from 'react-router-dom';
+import AdminSearchBox from 'view/component/AdminSearchBox';
+import { AdminPage, TableCell, renderTable } from 'view/component/AdminPage';
+import Pagination, { OverlayLoading } from 'view/component/Pagination';
+
 class EditModal extends React.Component {
     state = { active: true };
     modal = React.createRef();
@@ -88,12 +92,15 @@ class EditModal extends React.Component {
     }
 }
 
-class DmKhenThuongPage extends React.Component {
+class DmKhenThuongPage extends AdminPage {
+    state = { searching: false };
     modal = React.createRef();
+    searchBox = React.createRef();
 
     componentDidMount() {
-        this.props.getDmKhenThuongAll();
-        T.ready('/user/category');
+        // this.props.getDmKhenThuongAll();
+        // T.ready('/user/category');
+        T.ready('/user/category', () => this.props.getDmKhenThuongAll());
     }
 
     edit = (e, item) => {
@@ -112,75 +119,161 @@ class DmKhenThuongPage extends React.Component {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmKhenThuong:write'),
-            permissionDelete = currentPermissions.includes('dmKhenThuong:delete');
+            permissionDelete = currentPermissions.includes('dmKhenThuong:delete'),
+            permission = this.getUserPermission('dmKhenThuong', ['write', 'delete']);
         let table = 'Không có danh sách khen thưởng!',
             items = this.props.dmKhenThuong && this.props.dmKhenThuong.items ? this.props.dmKhenThuong.items : [];
         if (items.length > 0) {
-            table = (
-                <table className='table table-hover table-bordered'>
-                    <thead>
-                        <tr>
-                            <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
-                            <th style={{ width: '100%' }}>Tên Khen Thưởng</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                            <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {items.map((item, index) => (
-                            <tr key={index}>
-                                <td style={{ textAlign: 'right' }}><a href='#' onClick={e => this.edit(e, item)}>{item.ma}</a></td>
-                                <td>{item.ten}</td>
-                                <td className='toggle' style={{ textAlign: 'center' }}>
-                                    <label>
-                                        <input type='checkbox' checked={item.kichHoat == '1' ? true : false} onChange={() => permissionWrite && this.changeActive(item)} />
-                                        <span className='button-indecator' />
-                                    </label>
-                                </td>
-                                <td style={{ textAlign: 'center' }}>
-                                    <div className='btn-group'>
-                                        <a className='btn btn-primary' href='#' onClick={e => this.edit(e, item)}>
-                                            <i className='fa fa-lg fa-edit' />
-                                        </a>
-                                        {permissionDelete &&
-                                            <a className='btn btn-danger' href='#' onClick={e => this.delete(e, item)}>
-                                                <i className='fa fa-trash-o fa-lg' />
-                                            </a>}
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            );
+            table = renderTable({
+                getDataSource: () => items, stickyHead: false, 
+                renderHead: () => (
+                    <tr>
+                        <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
+                        <th style={{ width: '100%' }}>Tên Khen Thưởng</th>
+                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
+                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                    </tr>
+                ),
+                renderRow: (item, index) => (
+                    <tr key={index} >
+                        <TableCell type='link' style={{ textAlign: 'right' }} content={item.ma ? item.ma : ''} onClick={e => this.edit(e, item)} />
+                        <TableCell type='text' content={item.ten ? item.ten : ''} />
+                        <TableCell type='checkbox' style={{ textAlign: 'center' }} content={item.kichHoat} permission={permissionWrite}
+                            onChange={() => permissionWrite && this.changeActive(item)} />
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} 
+                            onEdit={e => this.edit(e, item)} onDelete={e => this.delete(e, item)} />
+                    </tr>
+                )
+            });
         }
 
         return (
             <main className='app-content'>
                 <div className='app-title'>
                     <h1><i className='fa fa-list-alt' /> Danh mục Khen thưởng</h1>
-                    <ul className='app-breadcrumb breadcrumb'>
+                    <AdminSearchBox ref={this.searchBox} getPage={this.props.getDmKhenThuongPage} 
+                        setSearching={value => this.setState({ searching: value })} />
+                    {/* <ul className='app-breadcrumb breadcrumb'>
                         <Link to='/user'><i className='fa fa-home fa-lg' /></Link>
                         &nbsp;/&nbsp;
                         <Link to='/user/category'>Danh mục</Link>
                         &nbsp;/&nbsp;Khen thưởng
-                    </ul>
+                    </ul> */}
                 </div>
-                <div className='tile'>{table}</div>
-                <EditModal ref={this.modal} readOnly={!permissionWrite}
-                    createDmKhenThuong={this.props.createDmKhenThuong} updateDmKhenThuong={this.props.updateDmKhenThuong} />
-                {permissionWrite &&
-                    <button type='button' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.edit}>
-                        <i className='fa fa-lg fa-plus' />
-                    </button>}
-                <Link to='/user/category' className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>
-                    <i className='fa fa-lg fa-reply' />
-                </Link>
+                <div className='tile'>
+                    {!this.state.searching ? table : <OverlayLoading text='Đang tải..' />}
+                    <EditModal ref={this.modal} readOnly={!permissionWrite}
+                        createDmKhenThuong={this.props.createDmKhenThuong} updateDmKhenThuong={this.props.updateDmKhenThuong} />
+                    
+                    {/* <Pagination name={'pageDmKhenThuong'} pageNumber={1} pageSize={1} pageTotal={1} totalItem={1} 
+                        style={{ marginLeft: '70px' }} getPage={this.searchBox.current && this.searchBox.current.getPage} /> */}
+
+                    {permissionWrite &&
+                        <button type='button' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.edit}>
+                            <i className='fa fa-lg fa-plus' />
+                        </button>}
+                    <Link to='/user/category' className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>
+                        <i className='fa fa-lg fa-reply' />
+                    </Link>
+                </div>
             </main>
         );
     }
 }
 
+// class DmKhenThuongPage extends React.Component {
+//     modal = React.createRef();
+
+//     componentDidMount() {
+//         this.props.getDmKhenThuongAll();
+//         T.ready('/user/category');
+//     }
+
+//     edit = (e, item) => {
+//         e.preventDefault();
+//         this.modal.current.show(item);
+//     }
+
+//     changeActive = item => this.props.updateDmKhenThuong(item.ma, { ma: item.ma, kichHoat: item.kichHoat == '1' ? '0' : '1' });
+
+//     delete = (e, item) => {
+//         e.preventDefault();
+//         T.confirm('Xóa danh mục khen thưởng', 'Bạn có chắc bạn muốn xóa khen thưởng này?', true, isConfirm =>
+//             isConfirm && this.props.deleteDmKhenThuong(item.ma));
+//     }
+
+//     render() {
+//         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
+//             permissionWrite = currentPermissions.includes('dmKhenThuong:write'),
+//             permissionDelete = currentPermissions.includes('dmKhenThuong:delete');
+//         let table = 'Không có danh sách khen thưởng!',
+//             items = this.props.dmKhenThuong && this.props.dmKhenThuong.items ? this.props.dmKhenThuong.items : [];
+//         if (items.length > 0) {
+//             table = (
+//                 <table className='table table-hover table-bordered'>
+//                     <thead>
+//                         <tr>
+//                             <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
+//                             <th style={{ width: '100%' }}>Tên Khen Thưởng</th>
+//                             <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
+//                             <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+//                         </tr>
+//                     </thead>
+//                     <tbody>
+//                         {items.map((item, index) => (
+//                             <tr key={index}>
+//                                 <td style={{ textAlign: 'right' }}><a href='#' onClick={e => this.edit(e, item)}>{item.ma}</a></td>
+//                                 <td>{item.ten}</td>
+//                                 <td className='toggle' style={{ textAlign: 'center' }}>
+//                                     <label>
+//                                         <input type='checkbox' checked={item.kichHoat == '1' ? true : false} onChange={() => permissionWrite && this.changeActive(item)} />
+//                                         <span className='button-indecator' />
+//                                     </label>
+//                                 </td>
+//                                 <td style={{ textAlign: 'center' }}>
+//                                     <div className='btn-group'>
+//                                         <a className='btn btn-primary' href='#' onClick={e => this.edit(e, item)}>
+//                                             <i className='fa fa-lg fa-edit' />
+//                                         </a>
+//                                         {permissionDelete &&
+//                                             <a className='btn btn-danger' href='#' onClick={e => this.delete(e, item)}>
+//                                                 <i className='fa fa-trash-o fa-lg' />
+//                                             </a>}
+//                                     </div>
+//                                 </td>
+//                             </tr>
+//                         ))}
+//                     </tbody>
+//                 </table>
+//             );
+//         }
+
+//         return (
+//             <main className='app-content'>
+//                 <div className='app-title'>
+//                     <h1><i className='fa fa-list-alt' /> Danh mục Khen thưởng</h1>
+//                     <ul className='app-breadcrumb breadcrumb'>
+//                         <Link to='/user'><i className='fa fa-home fa-lg' /></Link>
+//                         &nbsp;/&nbsp;
+//                         <Link to='/user/category'>Danh mục</Link>
+//                         &nbsp;/&nbsp;Khen thưởng
+//                     </ul>
+//                 </div>
+//                 <div className='tile'>{table}</div>
+//                 <EditModal ref={this.modal} readOnly={!permissionWrite}
+//                     createDmKhenThuong={this.props.createDmKhenThuong} updateDmKhenThuong={this.props.updateDmKhenThuong} />
+//                 {permissionWrite &&
+//                     <button type='button' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.edit}>
+//                         <i className='fa fa-lg fa-plus' />
+//                     </button>}
+//                 <Link to='/user/category' className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>
+//                     <i className='fa fa-lg fa-reply' />
+//                 </Link>
+//             </main>
+//         );
+//     }
+// }
+
 const mapStateToProps = state => ({ system: state.system, dmKhenThuong: state.dmKhenThuong });
-const mapActionsToProps = { getDmKhenThuongAll, createDmKhenThuong, updateDmKhenThuong, deleteDmKhenThuong };
+const mapActionsToProps = { getDmKhenThuongPage, getDmKhenThuongAll, createDmKhenThuong, updateDmKhenThuong, deleteDmKhenThuong };
 export default connect(mapStateToProps, mapActionsToProps)(DmKhenThuongPage);

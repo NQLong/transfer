@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { getDmLuongCoSoPage, createDmLuongCoSo, updateDmLuongCoSo, deleteDmLuongCoSo } from './redux';
 import Pagination, { OverlayLoading } from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
+import { AdminPage, TableCell, renderTable } from 'view/component/AdminPage';
 
 class EditModal extends React.Component {
     modal = React.createRef();
@@ -102,7 +103,7 @@ class EditModal extends React.Component {
     }
 }
 
-class dmLuongCoSoPage extends React.Component {
+class dmLuongCoSoPage extends AdminPage {
     state = {};
     modal = React.createRef();
 
@@ -131,63 +132,50 @@ class dmLuongCoSoPage extends React.Component {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmLuongCoSo:write'),
-            permissionDelete = currentPermissions.includes('dmLuongCoSo:delete');
+            permissionDelete = currentPermissions.includes('dmLuongCoSo:delete'),
+            permission = this.getUserPermission('dmLuongCoSo', ['write', 'delete']);
+
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmLuongCoSo && this.props.dmLuongCoSo.page ?
             this.props.dmLuongCoSo.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có dữ liệu!';
         list.sort((a, b) => b.hieuLucTu - a.hieuLucTu);
         if (list && list.length > 0) {
-            table = (
-                <table className='table table-hover table-bordered table-responsive'>
-                    <thead>
-                        <tr>
-                            <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                            <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Mức lương</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Hiệu lực từ</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Hiệu lực đến</th>
-                            <th style={{ width: '100%' }} nowrap='true'>Nghị định chính phủ</th>
-                            <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {list.map((item, index) => (
-                            <tr key={index}>
-                                <td style={{ textAlign: 'right' }}>{(pageNumber - 1) * pageSize + index + 1}</td>
-                                <td style={{ textAlign: 'right' }}>
-                                    <a href='#' onClick={e => this.edit(e, item)}>
-                                        {item.mucLuong.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                    </a>
-                                </td>
-                                <td>{T.dateToText(item.hieuLucTu, 'dd/mm/yyyy')}</td>
-                                <td>{item.hieuLucDen ? T.dateToText(item.hieuLucDen, 'dd/mm/yyyy') : ''}</td>
-                                <td>{item.nghiDinhChinhPhu}</td>
-                                <td style={{ textAlign: 'center' }}>
-                                    <div className='btn-group' style={{ display: 'flex' }}>
-                                        <a className='btn btn-primary' href='#' onClick={e => this.edit(e, item)}>
-                                            <i className='fa fa-lg fa-edit' />
-                                        </a>
-                                        {permissionDelete &&
-                                            <a className='btn btn-danger' href='#' onClick={e => this.delete(e, item)}>
-                                                <i className='fa fa-lg fa-trash' />
-                                            </a>}
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            );
+            table = renderTable({
+                getDataSource: () => list, stickyHead: false, 
+                renderHead: () => (
+                    <tr>
+                        <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Mức lương</th>
+                        <th style={{ width: 'auto' }} nowrap='true'>Hiệu lực từ</th>
+                        <th style={{ width: 'auto' }} nowrap='true'>Hiệu lực đến</th>
+                        <th style={{ width: '100%' }} nowrap='true'>Nghị định chính phủ</th>
+                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                    </tr>
+                ),
+                renderRow: (item, index) => (
+                    <tr key={index} >
+                        <TableCell type='number' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
+                        <TableCell type='link' style={{textAlign: 'right'}} content={item.mucLuong.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')} 
+                            onClick = {e => this.edit(e, item)} />
+                        <TableCell type='text' content={T.dateToText(item.hieuLucTu, 'dd/mm/yyyy')} />
+                        <TableCell type='text' content={item.hieuLucDen ? T.dateToText(item.hieuLucDen, 'dd/mm/yyyy') : ''} />
+                        <TableCell type='text' content={item.nghiDinhChinhPhu ? item.nghiDinhChinhPhu : ''} />
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} 
+                            onEdit={e => this.edit(e, item)} onDelete={e => this.delete(e, item)} />
+                    </tr>
+                )
+            });
         }
 
         return (
             <main className='app-content'>
                 <div className='app-title'>
                     <h1><i className='fa fa-list-alt' /> Danh mục Lương cơ sở</h1>
-                    <ul className='app-breadcrumb breadcrumb'>
+                    {/* <ul className='app-breadcrumb breadcrumb'>
                         <Link to='/user'><i className='fa fa-home fa-lg' /></Link>&nbsp;/&nbsp;
                         <Link to='/user/category'>Danh mục</Link>
                         &nbsp;/&nbsp;Lương cơ sở
-                    </ul>
+                    </ul> */}
                 </div>
                 <div className='tile'>
                     {!this.state.searching ? table : <OverlayLoading text='Đang tải..' />}
@@ -211,3 +199,113 @@ class dmLuongCoSoPage extends React.Component {
 const mapStateToProps = state => ({ system: state.system, dmLuongCoSo: state.dmLuongCoSo });
 const mapActionsToProps = { getDmLuongCoSoPage, createDmLuongCoSo, updateDmLuongCoSo, deleteDmLuongCoSo };
 export default connect(mapStateToProps, mapActionsToProps)(dmLuongCoSoPage);
+
+// class dmLuongCoSoPage extends React.Component {
+//     state = {};
+//     modal = React.createRef();
+
+//     componentDidMount() {
+//         T.ready('/user/category', () => this.getPage());
+//     }
+
+//     getPage = (pageNumber, pageSize, pageCondition) => {
+//         this.setState({ searching: true });
+//         this.props.getDmLuongCoSoPage(pageNumber, pageSize, pageCondition, page => {
+//             this.setState({ searching: false });
+//         });
+//     }
+
+//     edit = (e, item) => {
+//         e.preventDefault();
+//         this.modal.current.show(item);
+//     };
+
+//     delete = (e, item) => {
+//         e.preventDefault();
+//         T.confirm('Lương cơ sở', 'Bạn có chắc bạn muốn xóa lương cơ sở này?', 'warning', true, isConfirm =>
+//             isConfirm && this.props.deleteDmLuongCoSo(item.ma));
+//     };
+
+//     render() {
+//         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
+//             permissionWrite = currentPermissions.includes('dmLuongCoSo:write'),
+//             permissionDelete = currentPermissions.includes('dmLuongCoSo:delete');
+//         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmLuongCoSo && this.props.dmLuongCoSo.page ?
+//             this.props.dmLuongCoSo.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
+//         let table = 'Không có dữ liệu!';
+//         list.sort((a, b) => b.hieuLucTu - a.hieuLucTu);
+//         if (list && list.length > 0) {
+//             table = (
+//                 <table className='table table-hover table-bordered table-responsive'>
+//                     <thead>
+//                         <tr>
+//                             <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
+//                             <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Mức lương</th>
+//                             <th style={{ width: 'auto' }} nowrap='true'>Hiệu lực từ</th>
+//                             <th style={{ width: 'auto' }} nowrap='true'>Hiệu lực đến</th>
+//                             <th style={{ width: '100%' }} nowrap='true'>Nghị định chính phủ</th>
+//                             <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+//                         </tr>
+//                     </thead>
+//                     <tbody>
+//                         {list.map((item, index) => (
+//                             <tr key={index}>
+//                                 <td style={{ textAlign: 'right' }}>{(pageNumber - 1) * pageSize + index + 1}</td>
+//                                 <td style={{ textAlign: 'right' }}>
+//                                     <a href='#' onClick={e => this.edit(e, item)}>
+//                                         {item.mucLuong.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+//                                     </a>
+//                                 </td>
+//                                 <td>{T.dateToText(item.hieuLucTu, 'dd/mm/yyyy')}</td>
+//                                 <td>{item.hieuLucDen ? T.dateToText(item.hieuLucDen, 'dd/mm/yyyy') : ''}</td>
+//                                 <td>{item.nghiDinhChinhPhu}</td>
+//                                 <td style={{ textAlign: 'center' }}>
+//                                     <div className='btn-group' style={{ display: 'flex' }}>
+//                                         <a className='btn btn-primary' href='#' onClick={e => this.edit(e, item)}>
+//                                             <i className='fa fa-lg fa-edit' />
+//                                         </a>
+//                                         {permissionDelete &&
+//                                             <a className='btn btn-danger' href='#' onClick={e => this.delete(e, item)}>
+//                                                 <i className='fa fa-lg fa-trash' />
+//                                             </a>}
+//                                     </div>
+//                                 </td>
+//                             </tr>
+//                         ))}
+//                     </tbody>
+//                 </table>
+//             );
+//         }
+
+//         return (
+//             <main className='app-content'>
+//                 <div className='app-title'>
+//                     <h1><i className='fa fa-list-alt' /> Danh mục Lương cơ sở</h1>
+//                     <ul className='app-breadcrumb breadcrumb'>
+//                         <Link to='/user'><i className='fa fa-home fa-lg' /></Link>&nbsp;/&nbsp;
+//                         <Link to='/user/category'>Danh mục</Link>
+//                         &nbsp;/&nbsp;Lương cơ sở
+//                     </ul>
+//                 </div>
+//                 <div className='tile'>
+//                     {!this.state.searching ? table : <OverlayLoading text='Đang tải..' />}
+//                     <Pagination name='dmLuongCoSoPage' style={{ marginLeft: '70px', marginBottom: '5px' }} pageNumber={pageNumber} pageSize={pageSize} pageTotal={pageTotal} totalItem={totalItem} pageCondition={pageCondition}
+//                         getPage={this.getPage} />
+//                     <EditModal ref={this.modal} readOnly={!permissionWrite}
+//                         create={this.props.createDmLuongCoSo} update={this.props.updateDmLuongCoSo} />
+//                     {permissionWrite &&
+//                         <button type='button' className='btn btn-primary btn-circle' style={{ zIndex: 100, position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.edit}>
+//                             <i className='fa fa-lg fa-plus' />
+//                         </button>}
+//                     <Link to='/user/category' className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>
+//                         <i className='fa fa-lg fa-reply' />
+//                     </Link>
+//                 </div>
+//             </main>
+//         );
+//     }
+// }
+
+// const mapStateToProps = state => ({ system: state.system, dmLuongCoSo: state.dmLuongCoSo });
+// const mapActionsToProps = { getDmLuongCoSoPage, createDmLuongCoSo, updateDmLuongCoSo, deleteDmLuongCoSo };
+// export default connect(mapStateToProps, mapActionsToProps)(dmLuongCoSoPage);

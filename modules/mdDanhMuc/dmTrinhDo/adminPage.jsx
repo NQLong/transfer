@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getDmTrinhDoAll, createDmTrinhDo, updateDmTrinhDo, deleteDmTrinhDo } from './redux';
 import { Link } from 'react-router-dom';
+import { AdminPage, TableCell, renderTable } from 'view/component/AdminPage';
 
 class EditModal extends React.Component {
     modal = React.createRef();
@@ -116,7 +117,7 @@ class EditModal extends React.Component {
     }
 }
 
-class AdminPage extends React.Component {
+class dmTrinhDoAdminPage extends AdminPage {
     modal = React.createRef();
 
     componentDidMount() {
@@ -140,53 +141,35 @@ class AdminPage extends React.Component {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmTrinhDo:write'),
-            permissionDelete = currentPermissions.includes('dmTrinhDo:delete');
+            permissionDelete = currentPermissions.includes('dmTrinhDo:delete'),
+            permission = this.getUserPermission('dmTrinhDo', ['write', 'delete']);
         let items = this.props.dmTrinhDo && this.props.dmTrinhDo.items ? this.props.dmTrinhDo.items : [];
         let table = 'Không có dữ liệu!';
         if (items && items.length > 0) {
-            table = (
-                <table className='table table-hover table-bordered table-responsive'>
-                    <thead>
-                        <tr>
-                            <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
-                            <th style={{ width: '100%' }}>Tên</th>
-                            <th style={{ width: '100%' }} nowrap='true'>Tên tiếng Anh</th>
-                            <th style={{ width: '100%' }} nowrap='true'>Viết tắt</th>
-                            <th style={{ width: '100%' }} nowrap='true'>Viết tắt tiếng Anh</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                            <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {items.map((item, index) => (
-                            <tr key={index}>
-                                <td style={{ textAlign: 'center' }}>{item.ma}</td>
-                                <td><a href='#' onClick={e => this.edit(e, item)}>{item.ten}</a></td>
-                                <td>{item.tenTiengAnh}</td>
-                                <td>{item.vietTat}</td>
-                                <td>{item.vietTatTiengAnh}</td>
-                                <td className='toggle' style={{ textAlign: 'center' }}>
-                                    <label>
-                                        <input type='checkbox' checked={item.kichHoat == '1' ? true : false} onChange={() => permissionWrite && this.changeActive(item)} />
-                                        <span className='button-indecator' />
-                                    </label>
-                                </td>
-                                <td style={{ textAlign: 'center' }}>
-                                    <div className='btn-group' style={{ display: 'flex' }}>
-                                        <a className='btn btn-primary' href='#' onClick={e => this.edit(e, item)}>
-                                            <i className='fa fa-lg fa-edit' />
-                                        </a>
-                                        {permissionDelete &&
-                                            <a className='btn btn-danger' href='#' onClick={e => this.delete(e, item)}>
-                                                <i className='fa fa-lg fa-trash' />
-                                            </a>}
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            );
+            table = renderTable({
+                getDataSource: () => items, stickyHead: false,
+                renderHead: () => (
+                    <tr>
+                        <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
+                        <th style={{ width: '100%' }}>Tên</th>
+                        <th style={{ width: '100%' }} nowrap='true'>Tên tiếng Anh</th>
+                        <th style={{ width: '100%' }} nowrap='true'>Viết tắt</th>
+                        <th style={{ width: '100%' }} nowrap='true'>Viết tắt tiếng Anh</th>
+                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
+                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                    </tr>),
+                renderRow: (item, index) => (
+                    <tr key={index}>
+                        <TableCell type='text' content={item.ma} style={{ textAlign: 'center' }} />
+                        <TableCell type='link' content={item.ten} onClick={e => this.edit(e, item)} />
+                        <TableCell type='text' content={item.tenTiengAnh} />
+                        <TableCell type='text' content={item.vietTat} />
+                        <TableCell type='text' content={item.vietTatTiengAnh} />
+                        <TableCell type='checkbox' content={item.kichHoat} permission={permissionWrite} onChanged={() => permissionWrite && this.changeActive(item)} />
+                        <TableCell type='buttons' content={item} permission={permission} onEdit={this.edit} onDelete={this.delete} />
+                    </tr>
+                ),
+            });
         }
 
         return (
@@ -217,4 +200,4 @@ class AdminPage extends React.Component {
 
 const mapStateToProps = state => ({ system: state.system, dmTrinhDo: state.dmTrinhDo });
 const mapActionsToProps = { getDmTrinhDoAll, createDmTrinhDo, updateDmTrinhDo, deleteDmTrinhDo };
-export default connect(mapStateToProps, mapActionsToProps)(AdminPage);
+export default connect(mapStateToProps, mapActionsToProps)(dmTrinhDoAdminPage);

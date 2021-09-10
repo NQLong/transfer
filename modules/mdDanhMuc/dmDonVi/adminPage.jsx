@@ -5,6 +5,7 @@ import Pagination, { OverlayLoading } from 'view/component/Pagination';
 import AdminSearchBox from 'view/component/AdminSearchBox';
 import ImageBox from 'view/component/ImageBox';
 import { Link } from 'react-router-dom';
+import { AdminPage, TableCell, renderTable } from 'view/component/AdminPage';
 
 class EditModal extends React.Component {
     state = { active: true };
@@ -149,7 +150,7 @@ class EditModal extends React.Component {
     }
 }
 
-class DmDonViPage extends React.Component {
+class DmDonViPage extends AdminPage {
     state = { searching: false };
     searchBox = React.createRef();
     modal = React.createRef();
@@ -175,54 +176,39 @@ class DmDonViPage extends React.Component {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmDonVi:write'),
             permissionUpload = currentPermissions.includes('dmDonVi:upload'),
-            permissionDelete = currentPermissions.includes('dmDonVi:delete');
-        const { pageNumber, pageSize, pageTotal, totalItem } = this.props.dmDonVi && this.props.dmDonVi.page ?
-            this.props.dmDonVi.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0 };
+            permissionDelete = currentPermissions.includes('dmDonVi:delete'),
+            permission = this.getUserPermission('dmDonVi', ['write', 'delete']);
+        const { pageNumber, pageSize, pageTotal, totalItem, list} = this.props.dmDonVi && this.props.dmDonVi.page ?
+            this.props.dmDonVi.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0 , list: null};
         let table = 'Không có danh sách đơn vị!';
-        if (this.props.dmDonVi && this.props.dmDonVi.page && this.props.dmDonVi.page.list && this.props.dmDonVi.page.list.length > 0) {
-            table = (
-                <table className='table table-hover table-bordered'>
-                    <thead>
-                        <tr>
-                            {/* <th style={{ width: 'auto', textAlign: 'center' }}>#</th> */}
-                            <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
-                            <th style={{ width: '50%' }}>Tên đơn vị</th>
-                            <th style={{ width: '50%' }}>Tên tiếng Anh</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Mã PL</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                            <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {this.props.dmDonVi.page.list.map((item, index) => (
-                            <tr key={index}>
-                                {/* <td style={{ textAlign: 'right' }}>{(pageNumber - 1) * pageSize + index + 1}</td> */}
-                                <td style={{ textAlign: 'right' }}><a href='#' onClick={e => this.edit(e, item)}>{item.ma}</a></td>
-                                <td>{item.ten}</td>
-                                <td>{item.tenTiengAnh}</td>
-                                <td style={{ textAlign: 'right' }}>{item.maPl}</td>
-                                <td className='toggle' style={{ textAlign: 'center' }}>
-                                    <label>
-                                        <input type='checkbox' checked={item.kichHoat == '1' ? true : false} onChange={() => permissionWrite && this.changeActive(item)} />
-                                        <span className='button-indecator' />
-                                    </label>
-                                </td>
-                                <td style={{ textAlign: 'center' }}>
-                                    <div className='btn-group'>
-                                        <a className='btn btn-primary' href='#' onClick={e => this.edit(e, item)}>
-                                            <i className='fa fa-lg fa-edit' />
-                                        </a>
-                                        {permissionDelete &&
-                                            <a className='btn btn-danger' href='#' onClick={e => this.delete(e, item)}>
-                                                <i className='fa fa-trash-o fa-lg'></i>
-                                            </a>}
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            );
+        if (list && list.length > 0) {
+            table = renderTable({
+                getDataSource: () => list, stickyHead: false,
+                renderHead: () => (
+                    <tr>
+                        {/* <th style={{ width: 'auto', textAlign: 'center' }}>#</th> */}
+                        <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
+                        <th style={{ width: '50%' }}>Tên đơn vị</th>
+                        <th style={{ width: '50%' }}>Tên tiếng Anh</th>
+                        <th style={{ width: 'auto' }} nowrap='true'>Mã PL</th>
+                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
+                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>    
+                    </tr>
+                ),
+                renderRow: (item, index) => (
+                    <tr key={index}>
+                        <TableCell type='link' style={{ textAlign: 'right' }} content={item.ma ? item.ma : ''} 
+                            onClick={e => this.edit(e, item)} />
+                        <TableCell type='text' content={item.ten ? item.ten : ''} />
+                        <TableCell type='text' content={item.tenTiengAnh ? item.tenTiengAnh : ''} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={item.maPl ? item.maPl : ''} />
+                        <TableCell type='checkbox' style={{ textAlign: 'center' }} content={item.kichHoat} permission={permissionWrite} 
+                            onChange={() => permissionWrite && this.changeActive(item)} />
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} 
+                            onEdit={e => this.edit(e, item)} onDelete={e => this.delete(e, item)} />
+                    </tr>
+                )
+            });
         }
 
         return (
@@ -230,12 +216,12 @@ class DmDonViPage extends React.Component {
                 <div className='app-title'>
                     <h1><i className='fa fa-list-alt' /> Danh mục Đơn vị</h1>
                     <AdminSearchBox ref={this.searchBox} getPage={this.props.getDmDonViPage} setSearching={value => this.setState({ searching: value })} />
-                    <ul className='app-breadcrumb breadcrumb'>
+                    {/* <ul className='app-breadcrumb breadcrumb'>
                         <Link to='/user'><i className='fa fa-home fa-lg' /></Link>
                         &nbsp;/&nbsp;
                         <Link to='/user/category'>Danh mục</Link>
                         &nbsp;/&nbsp;Đơn vị
-                    </ul>
+                    </ul> */}
                 </div>
                 <div className='tile'>
                     {!this.state.searching ? table : <OverlayLoading text='Đang tải..' />}
@@ -246,6 +232,10 @@ class DmDonViPage extends React.Component {
                     <Link to='/user/category' className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>
                         <i className='fa fa-lg fa-reply' />
                     </Link>
+                    {permissionUpload && (
+                        <Link to='/user/danh-muc/don-vi/upload' className='btn btn-success btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px' }}>
+                            <i className='fa fa-lg fa-cloud-upload' />
+                        </Link>)}
                     {permissionWrite &&
                         <button type='button' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.edit}>
                             <i className='fa fa-lg fa-plus' />
@@ -255,6 +245,113 @@ class DmDonViPage extends React.Component {
         );
     }
 }
+
+// class DmDonViPage extends React.Component {
+//     state = { searching: false };
+//     searchBox = React.createRef();
+//     modal = React.createRef();
+
+//     componentDidMount() {
+//         T.ready('/user/danh-muc/don-vi', () => this.searchBox.current.getPage());
+//     }
+
+//     edit = (e, item) => {
+//         e.preventDefault();
+//         this.modal.current.show(item);
+//     }
+
+//     changeActive = item => this.props.updateDmDonVi(item.ma, { ma: item.ma, kichHoat: item.kichHoat ? 0 : 1 });
+
+//     delete = (e, item) => {
+//         e.preventDefault();
+//         T.confirm('Xóa danh mục đơn vị', 'Bạn có chắc bạn muốn xóa đơn vị này?', true, isConfirm =>
+//             isConfirm && this.props.deleteDmDonVi(item.ma));
+//     }
+
+//     render() {
+//         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
+//             permissionWrite = currentPermissions.includes('dmDonVi:write'),
+//             permissionUpload = currentPermissions.includes('dmDonVi:upload'),
+//             permissionDelete = currentPermissions.includes('dmDonVi:delete');
+//         const { pageNumber, pageSize, pageTotal, totalItem } = this.props.dmDonVi && this.props.dmDonVi.page ?
+//             this.props.dmDonVi.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0 };
+//         let table = 'Không có danh sách đơn vị!';
+//         if (this.props.dmDonVi && this.props.dmDonVi.page && this.props.dmDonVi.page.list && this.props.dmDonVi.page.list.length > 0) {
+//             table = (
+//                 <table className='table table-hover table-bordered'>
+//                     <thead>
+//                         <tr>
+//                             {/* <th style={{ width: 'auto', textAlign: 'center' }}>#</th> */}
+//                             <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
+//                             <th style={{ width: '50%' }}>Tên đơn vị</th>
+//                             <th style={{ width: '50%' }}>Tên tiếng Anh</th>
+//                             <th style={{ width: 'auto' }} nowrap='true'>Mã PL</th>
+//                             <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
+//                             <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+//                         </tr>
+//                     </thead>
+//                     <tbody>
+//                         {this.props.dmDonVi.page.list.map((item, index) => (
+//                             <tr key={index}>
+//                                 {/* <td style={{ textAlign: 'right' }}>{(pageNumber - 1) * pageSize + index + 1}</td> */}
+//                                 <td style={{ textAlign: 'right' }}><a href='#' onClick={e => this.edit(e, item)}>{item.ma}</a></td>
+//                                 <td>{item.ten}</td>
+//                                 <td>{item.tenTiengAnh}</td>
+//                                 <td style={{ textAlign: 'right' }}>{item.maPl}</td>
+//                                 <td className='toggle' style={{ textAlign: 'center' }}>
+//                                     <label>
+//                                         <input type='checkbox' checked={item.kichHoat == '1' ? true : false} onChange={() => permissionWrite && this.changeActive(item)} />
+//                                         <span className='button-indecator' />
+//                                     </label>
+//                                 </td>
+//                                 <td style={{ textAlign: 'center' }}>
+//                                     <div className='btn-group'>
+//                                         <a className='btn btn-primary' href='#' onClick={e => this.edit(e, item)}>
+//                                             <i className='fa fa-lg fa-edit' />
+//                                         </a>
+//                                         {permissionDelete &&
+//                                             <a className='btn btn-danger' href='#' onClick={e => this.delete(e, item)}>
+//                                                 <i className='fa fa-trash-o fa-lg'></i>
+//                                             </a>}
+//                                     </div>
+//                                 </td>
+//                             </tr>
+//                         ))}
+//                     </tbody>
+//                 </table>
+//             );
+//         }
+
+//         return (
+//             <main className='app-content'>
+//                 <div className='app-title'>
+//                     <h1><i className='fa fa-list-alt' /> Danh mục Đơn vị</h1>
+//                     <AdminSearchBox ref={this.searchBox} getPage={this.props.getDmDonViPage} setSearching={value => this.setState({ searching: value })} />
+//                     <ul className='app-breadcrumb breadcrumb'>
+//                         <Link to='/user'><i className='fa fa-home fa-lg' /></Link>
+//                         &nbsp;/&nbsp;
+//                         <Link to='/user/category'>Danh mục</Link>
+//                         &nbsp;/&nbsp;Đơn vị
+//                     </ul>
+//                 </div>
+//                 <div className='tile'>
+//                     {!this.state.searching ? table : <OverlayLoading text='Đang tải..' />}
+//                     <Pagination name={PageName} style={{ marginLeft: '70px', marginBottom: '5px' }} pageNumber={pageNumber} pageSize={pageSize} pageTotal={pageTotal} totalItem={totalItem}
+//                         getPage={this.searchBox.current && this.searchBox.current.getPage} />
+//                     <EditModal ref={this.modal} readOnly={!permissionWrite}
+//                         createDmDonVi={this.props.createDmDonVi} updateDmDonVi={this.props.updateDmDonVi} />
+//                     <Link to='/user/category' className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>
+//                         <i className='fa fa-lg fa-reply' />
+//                     </Link>
+//                     {permissionWrite &&
+//                         <button type='button' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.edit}>
+//                             <i className='fa fa-lg fa-plus' />
+//                         </button>}
+//                 </div>
+//             </main>
+//         );
+//     }
+// }
 
 const mapStateToProps = state => ({ system: state.system, dmDonVi: state.dmDonVi });
 const mapActionsToProps = { getDmDonViPage, createDmDonVi, updateDmDonVi, deleteDmDonVi };
