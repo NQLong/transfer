@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { createDmCaHoc, getDmCaHocAll, updateDmCaHoc, deleteDmCaHoc } from './redux';
 import { Link } from 'react-router-dom';
 import Editor from 'view/component/CkEditor4';
-import { AdminPage, TableCell, renderTable } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, AdminModal } from 'view/component/AdminPage';
 
 class EditModal extends React.Component {
     state = { kichHoat: true };
@@ -200,15 +200,15 @@ class dmCaHocAdminPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                        <td style={{ width: '40%' }}>Giờ học</td>
-                        <td style={{ width: '60%' }}>Thời gian</td>
-                        <td style={{ width: 'auto' }} nowrap='true'>Kích hoạt</td>
-                        <td style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</td>
+                        <th style={{ width: '40%' }}>Giờ học</th>
+                        <th style={{ width: '60%' }}>Thời gian</th>
+                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
+                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='number' conten={index + 1} style={{ textAlign: 'right' }}/>
+                        <TableCell type='number' content={index + 1} style={{ textAlign: 'right' }}/>
                         <TableCell type='link' onClick={e => this.edit(e, item)} content={item.ten}/>
                         <TableCell type='text' content={`${item.thoiGianBatDau} - ${item.thoiGianKetThuc}`} dateFormat/>
                         <TableCell type='checkbox' content={item.kichHoat} permission={permissionWrite} onChanged={() => permissionWrite && this.changeActive(item)} />

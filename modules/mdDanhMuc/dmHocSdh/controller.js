@@ -6,6 +6,7 @@ module.exports = app => {
     app.permission.add(
         { name: 'dmHocSdh:read', menu },
         { name: 'dmHocSdh:write' },
+        { name: 'dmHocSdh:delete' },
     );
     app.get('/user/danh-muc/hoc-sdh', app.permission.check('dmHocSdh:read'), app.templates.admin);
 

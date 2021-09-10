@@ -4,35 +4,35 @@ import { PageName, createDmDonViTinh, getDmDonViTinhPage, updateDmDonViTinh, del
 import Pagination, { OverlayLoading } from 'view/component/Pagination';
 import AdminSearchBox from 'view/component/AdminSearchBox';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox } from 'view/component/AdminPage';
 
-class EditModal extends React.Component {
+class EditModal extends AdminModal {
   modal = React.createRef();
 
   componentDidMount() {
     $(document).ready(() =>
       setTimeout(() => {
-        $(this.modal.current).on('shown.bs.modal', () => $('#dmdvtMaDonViTinh').focus());
+        $(this.modal).on('shown.bs.modal', () => $('#dmdvtMaDonViTinh').focus());
       }, 250)
     );
   }
 
   show = (item) => {
-    let { ma, ten, maCu } = item ? item : { ma: '', ten: '', maCu: '' };
+    let { ma, ten } = item ? item : { ma: '', ten: '' };
     $('#dmdvtMaDonViTinh').val(ma);
     $('#dmdvtTenDonViTinh').val(ten);
-    $(this.modal.current).attr('data-id', ma).modal('show');
+    this.ma.value(ma);
+    this.ten.value(ten);
+    $(this.modal).attr('data-id', ma).modal('show');
   };
 
-  hide = () => $(this.modal.current).modal('hide');
+  hide = () => $(this.modal).modal('hide');
 
-  save = (e) => {
-    e.preventDefault();
-    const ma = $(this.modal.current).attr('data-id'),
+  onSubmit = () => {
+    const ma = $(this.modal).attr('data-id'),
       changes = {
-        ma: $('#dmdvtMaDonViTinh').val().trim().toUpperCase(),
-        ten: $('#dmdvtTenDonViTinh').val().trim(),
-        maCu: '',
+        ma: this.ma.value().toUpperCase(),
+        ten: this.ten.value(),
       };
 
     if (changes.ma == '') {
@@ -47,42 +47,19 @@ class EditModal extends React.Component {
       } else {
         this.props.createDmDonViTinh(changes);
       }
-      $(this.modal.current).modal('hide');
+      $(this.modal).modal('hide');
     }
   };
 
-  render() {
+  render = () => {
     const readOnly = this.props.readOnly;
-    return (
-      <div className='modal' tabIndex='-1' role='dialog' ref={this.modal}>
-        <form className='modal-dialog modal-lg' role='document' onSubmit={this.save}>
-          <div className='modal-content'>
-            <div className='modal-header'>
-              <h5 className='modal-title'>Đơn vị tính</h5>
-              <button type='button' className='close' data-dismiss='modal' aria-label='Close'>
-                <span aria-hidden='true'>&times;</span>
-              </button>
-            </div>
-            <div className='modal-body'>
-              <div className='form-group row'>
-                <div className='col-12 col-sm-6'>
-                  <label htmlFor='dmdvtMaDonViTinh'>Mã đơn vị tính</label>
-                  <input className='form-control' id='dmdvtMaDonViTinh' type='text' placeholder='Mã đơn vị tính' style={{ textTransform: 'uppercase' }} />
-                </div>
-                <div className='col-12 col-sm-6'>
-                  <label htmlFor='dmdvtTenDonViTinh'>Tên đơn vị tính</label>
-                  <input className='form-control' id='dmdvtTenDonViTinh' type='text' placeholder='Tên đơn vị tính' />
-                </div>
-              </div>
-            </div>
-            <div className='modal-footer'>
-              <button type='button' className='btn btn-secondary' data-dismiss='modal'>Đóng</button>
-              {!readOnly && <button type='submit' className='btn btn-primary'>Lưu</button>}
-            </div>
-          </div>
-        </form>
+    return this.renderModal({
+      title: 'Đơn vị tính',
+      body: <div className='row'>
+        <FormTextBox type='text' className='col-12 col-sm-6' ref={e => this.ma = e} label='Mã đơn vị tính' readOnly={readOnly} placeholder='Mã Đối tượng cán bộ' required />
+        <FormTextBox type='text' className='col-12 col-sm-6' ref={e => this.ten = e} label='Tên đơn vị tính' readOnly={readOnly} placeholder='Tên Đối tượng cán bộ' required />
       </div>
-    );
+    });
   }
 }
 
@@ -111,9 +88,9 @@ class dmDonViTinhAdminPage extends AdminPage {
       permissionWrite = currentPermissions.includes('dmDonViTinh:write'),
       permissionDelete = currentPermissions.includes('dmDonViTinh:delete'),
       permission = this.getUserPermission('dmDonViTinh', ['write', 'delete']);
-    const { pageNumber, pageSize, pageTotal, totalItem, list } = 
-      this.props.dmDonViTinh && this.props.dmDonViTinh.page ? 
-      this.props.dmDonViTinh.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: []  };
+    const { pageNumber, pageSize, pageTotal, totalItem, list } =
+      this.props.dmDonViTinh && this.props.dmDonViTinh.page ?
+        this.props.dmDonViTinh.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: [] };
     let table = 'Không có dữ liệu đơn vị tính!';
     if (list && list.length > 0) {
       table = renderTable({
@@ -128,7 +105,7 @@ class dmDonViTinhAdminPage extends AdminPage {
           <tr key={index}>
             <TableCell type='text' content={item.ma} />
             <TableCell type='link' content={item.ten} onClick={(e) => this.edit(e, item)} />
-            <TableCell type='buttons' content={item} permission={permission} onEdit={this.edit} onDelete={this.delete}/>
+            <TableCell type='buttons' content={item} permission={permission} onEdit={this.edit} onDelete={this.delete} />
           </tr>
         ),
       })
@@ -139,10 +116,6 @@ class dmDonViTinhAdminPage extends AdminPage {
         <div className='app-title'>
           <h1><i className='fa fa-list-alt' /> Danh mục Đơn vị tính</h1>
           <AdminSearchBox ref={this.searchBox} getPage={this.props.getDmDonViTinhPage} setSearching={(value) => this.setState({ searching: value })} />
-          <ul className='app-breadcrumb breadcrumb'>
-            <Link to='/user'><i className='fa fa-home fa-lg' /></Link>&nbsp;/&nbsp;
-            <Link to='/user/category'>Danh mục</Link>&nbsp;/&nbsp;Đơn vị tính
-          </ul>
         </div>
         <div className='tile'>
           {!this.state.searching ? table : <OverlayLoading text='Đang tải..' />}
