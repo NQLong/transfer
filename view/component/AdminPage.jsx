@@ -787,10 +787,10 @@ export class AdminPage extends React.Component {
                         {breadcrumb.map((item, index) => <span key={index}>&nbsp;/&nbsp;{item}</span>)}
                     </ul>
                 </div>
-                <div className='app-advance-search'>
+                {/* <div className='app-advance-search'>
                     <h5>Tìm kiếm nâng cao</h5>
                     <div style={{ width: '100%' }}>{advanceSearch}</div>
-                </div>
+                </div> */}
                 {content}
                 {backRoute ? <CirclePageButton type='back' to={backRoute} /> : null}
                 {importButton} {exportButton} {saveButton} {createButton}

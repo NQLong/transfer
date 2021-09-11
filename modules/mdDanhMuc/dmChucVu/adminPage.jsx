@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { getDmChucVuPage, createDmChucVu, deleteDmChucVu, updateDmChucVu } from './redux';
 import Pagination from 'view/component/Pagination';
-// import AdminSearchBox from 'view/component/AdminSearchBox';
 import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
 
 class EditModal extends AdminModal {
@@ -77,8 +76,6 @@ class DmChucVuPage extends AdminPage {
         e.preventDefault();
         this.modal.show();
     }
-
-    changeActive = item => this.props.updateDmChucVu(item.ma, { kichHoat: item.kichHoat == 1 ? 0 : 1 });
 
     delete = (e, item) => {
         T.confirm('Xóa chức vụ', `Bạn có chắc bạn muốn xóa Chức vụ ${item.ten ? `<b>${item.ten}</b>` : 'này'}?`, 'warning', true, isConfirm => {
