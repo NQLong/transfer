@@ -114,8 +114,7 @@ class dmHocSdhPage extends AdminPage {
             <main className='app-content'>
                 <div className='app-title'>
                     <h1><i className='fa fa-list-alt' /> Danh mục học Sau Đại học</h1>
-
-                    <AdminSearchBox ref={this.searchBox} getPage={this.props.getDmDonViTinhPage} setSearching={(value) => this.setState({ searching: value })} />
+                    <AdminSearchBox ref={this.searchBox} getPage={this.props.getDmHocSdhPage} setSearching={(value) => this.setState({ searching: value })} />
                 </div>
                 <div className='tile'>
                     {!this.state.searching ? table : <OverlayLoading text='Đang tải..' />}

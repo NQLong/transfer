@@ -135,3 +135,10 @@ export function deleteDmChau(ma, done) {
         }, error => T.notify('Xóa châu bị lỗi!', 'danger'));
     };
 }
+
+export const SelectAdapter_DmChau = {
+    ajax: false,
+    getAll: getDmChauAll,
+    processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
+    condition: { kichHoat: 1 },
+};

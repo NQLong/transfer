@@ -1,25 +1,15 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { createDmDoiTuongCanBo, getDmDoiTuongCanBoAll, updateDmDoiTuongCanBo, deleteDmDoiTuongCanBo } from './redux';
+import {createDmDoiTuongCanBo, getDmDoiTuongCanBoAll, updateDmDoiTuongCanBo, deleteDmDoiTuongCanBo } from './redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormRichTextBox, FormCheckbox } from 'view/component/AdminPage';
-import AdminSearchBox from 'view/component/AdminSearchBox';
 
 class EditModal extends AdminModal {
     state = { kichHoat: true };
     modal = React.createRef();
 
-    componentDidMount() {
-        $(document).ready(() => setTimeout(() => {
-            $(this.modal).on('shown.bs.modal', () => $('#dmDoiTuongCanBoMa').focus());
-        }, 250));
-    }
-
     onShow = (item) => {
         let { ma, ten, kichHoat, ghiChu } = item ? item : { ma: null, ten: '', kichHoat: 1, ghiChu: '' };
-        $('#dmDoiTuongCanBoMa').val(ma);
-        $('#dmDoiTuongCanBoTen').val(ten);
-        $('#dmDoiTuongCanBoGhiChu').val(ghiChu);
 
         this.setState({ kichHoat });
         this.ma.value(ma);
@@ -43,7 +33,7 @@ class EditModal extends AdminModal {
 
         if (changes.ten == '') {
             T.notify('Tên đối tượng cán bộ bị trống!', 'danger');
-            $('#dmDoiTuongCanBoTen').focus();
+            this.ten.focus();
         } else {
             if (ma) {
                 this.props.updateDmDoiTuongCanBo(ma, changes);
@@ -70,8 +60,6 @@ class EditModal extends AdminModal {
 }
 
 class dmDoiTuongCanBoAdminPage extends AdminPage {
-    state = { searching: false };
-    searchBox = React.createRef();
     modal = React.createRef();
 
     componentDidMount() {
@@ -94,7 +82,6 @@ class dmDoiTuongCanBoAdminPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmDoiTuongCanBo:write'),
-            permissionDelete = currentPermissions.includes('dmDoiTuongCanBo:delete'),
             permission = this.getUserPermission('dmDoiTuongCanBo', ['write', 'delete']);
         let table = 'Không có danh sách đối tượng cán bộ!',
             items = this.props.dmDoiTuongCanBo && this.props.dmDoiTuongCanBo.items ? this.props.dmDoiTuongCanBo.items : [];
@@ -104,8 +91,8 @@ class dmDoiTuongCanBoAdminPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
-                        <th style={{ width: 'auto' }}>Tên</th>
-                        <th style={{ width: '100%' }}>Ghi chú</th>
+                        <th style={{ width: '30%' }}>Tên</th>
+                        <th style={{ width: '70%' }}>Ghi chú</th>
                         <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
                         <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
                     </tr>
@@ -126,7 +113,6 @@ class dmDoiTuongCanBoAdminPage extends AdminPage {
             <main className='app-content'>
                 <div className='app-title'>
                     <h1><i className='fa fa-list-alt' /> Danh mục Đối tượng cán bộ</h1>
-                    <AdminSearchBox ref={this.searchBox} getPage={this.props.getDmDanTocPage} setSearching={value => this.setState({ searching: value })} />
                 </div>
                 <div className='tile'>{table}</div>
                 <EditModal ref={this.modal} readOnly={!permissionWrite}

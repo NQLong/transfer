@@ -9,18 +9,9 @@ import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox } from 'view
 class EditModal extends AdminModal {
   modal = React.createRef();
 
-  componentDidMount() {
-    $(document).ready(() =>
-      setTimeout(() => {
-        $(this.modal).on('shown.bs.modal', () => $('#dmdvtMaDonViTinh').focus());
-      }, 250)
-    );
-  }
-
   show = (item) => {
     let { ma, ten } = item ? item : { ma: '', ten: '' };
-    $('#dmdvtMaDonViTinh').val(ma);
-    $('#dmdvtTenDonViTinh').val(ten);
+  
     this.ma.value(ma);
     this.ten.value(ten);
     $(this.modal).attr('data-id', ma).modal('show');
@@ -37,10 +28,10 @@ class EditModal extends AdminModal {
 
     if (changes.ma == '') {
       T.notify('Mã đơn vị tính bị trống!', 'danger');
-      $('#dmdvtMaDonViTinh').focus();
+      this.ma.focus();
     } else if (changes.ten == '') {
       T.notify('Tên đơn vị tính bị trống!', 'danger');
-      $('#dmdvtTenDonViTinh').focus();
+      this.ten.focus();
     } else {
       if (ma) {
         this.props.updateDmDonViTinh(ma, changes);

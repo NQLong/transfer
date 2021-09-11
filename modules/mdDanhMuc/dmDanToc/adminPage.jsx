@@ -8,28 +8,22 @@ import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormCheckbo
 
 class EditModal extends AdminModal {
     modal = React.createRef();
-    state = { kichHoat: true }
-
-    componentDidMount() {
-        $(document).ready(() => {
-            $(this.modal).on('shown.bs.modal', () => $('#dmDanTocMa').focus());
-        });
-    }
+    state = { kichHoat: true };
 
     onShow = (item) => {
         let { ma, ten, kichHoat } = item ? item : { ma: null, ten: '', kichHoat: 1 };
-        $('#dmDanTocMa').val(ma);
-        $('#dmDanTocTen').val(ten);
+
         this.ma.value(ma);
         this.ten.value(ten);
         this.kichHoat.value(kichHoat);
-        $(this.modal).find('.modal-title').html(item ? 'Cập nhật dân tộc' : 'Tạo mới dân tộc');
-        this.setState({kichHoat});
+
+        this.setState({ kichHoat });
 
         $(this.modal).attr('data-ma', ma).modal('show');
     };
+
     hide = () => $(this.modal).modal('hide');
-    
+
     onSubmit = () => {
         const maDanToc = $(this.modal).attr('data-ma'),
             changes = {
@@ -39,10 +33,10 @@ class EditModal extends AdminModal {
             };
         if (changes.ma == '') {
             T.notify('Mã dân tộc bị trống!', 'danger');
-            $('#dmDanTocMa').focus();
+            this.ma.focus();
         } else if (changes.ten == '') {
             T.notify('Tên dân tộc bị trống!', 'danger');
-            $('#dmDanTocTen').focus();
+            this.ten.focus();
         } else {
             if (maDanToc) {
                 if (typeof this.state.ImportIndex == 'number') changes.ImportIndex = this.state.ImportIndex;
@@ -98,32 +92,29 @@ class dmDanTocAdminPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmDanToc:write'),
-            permissionDelete = currentPermissions.includes('dmDanToc:delete'),
             permission = this.getUserPermission('dmDanToc', ['write', 'delete']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmDanToc && this.props.dmDanToc.page ?
             this.props.dmDanToc.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
-        let table = 'Không có dữ liệu!';
-        if (list && list.length > 0) {
-            table = renderTable({
-                getDataSource: () => list, stickyHead: false,
-                renderHead: () => (
-                    <tr>
-                        <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
-                        <th style={{ width: '100%' }}>Tên</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
-                    </tr>),
-                renderRow: (item, index) => (
-                    <tr key={index}>
-                        <TableCell type='link' content={item.ma} onClick={e => this.edit(e, item)} style={{ textAlign: 'center' }} />
-                        <TableCell type='text' content={item.ten} />
-                        <TableCell type='checkbox' content={item.kichHoat} permission={permissionWrite} onChanged={() => permissionWrite && this.changeActive(item)} />
-                        <TableCell type='buttons' content={item} permission={permission} onEdit={this.edit} onDelete={this.delete}></TableCell>
-                    </tr>
-                )
 
-            });
-        }
+        const table = renderTable({
+            getDataSource: () => list, stickyHead: false,
+            renderHead: () => (
+                <tr>
+                    <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
+                    <th style={{ width: '100%' }}>Tên</th>
+                    <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
+                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                </tr>),
+            renderRow: (item, index) => (
+                <tr key={index}>
+                    <TableCell type='link' content={item.ma} onClick={e => this.edit(e, item)} style={{ textAlign: 'center' }} />
+                    <TableCell type='text' content={item.ten} />
+                    <TableCell type='checkbox' content={item.kichHoat} permission={permissionWrite} onChanged={() => permissionWrite && this.changeActive(item)} />
+                    <TableCell type='buttons' content={item} permission={permission} onEdit={this.edit} onDelete={this.delete}></TableCell>
+                </tr>
+            )
+
+        });
 
         return (
             <main className='app-content'>

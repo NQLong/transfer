@@ -2,24 +2,15 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getDmGiamBhxhAll, deleteDmGiamBhxh, createDmGiamBhxh, updateDmGiamBhxh } from './reduxGiamBhxh';
 import { Link } from 'react-router-dom';
-import AdminSearchBox from 'view/component/AdminSearchBox';
-import  { OverlayLoading } from 'view/component/Pagination';
 import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormCheckbox  } from 'view/component/AdminPage';
 
 class EditModal extends AdminModal {
     state = { kichHoat: true };
     modal = React.createRef();
 
-    componentDidMount() {
-        $(document).ready(() => setTimeout(() => {
-            $(this.modal).on('shown.bs.modal', () => $('#dmGiamBhxhMa').focus());
-        }, 250));
-    }
-
     onShow = (item) => {
         let { ma, moTa, kichHoat } = item ? item : { ma: '', moTa: '', kichHoat: true };
-        $('#dmGiamBhxhMa').val(ma);
-        $('#dmGiamBhxhMoTa').val(moTa);
+ 
         this.setState({ kichHoat });
         this.ma.value(ma);
         this.moTa.value(moTa);
@@ -37,8 +28,8 @@ class EditModal extends AdminModal {
             };
         
         if (changes.ma == '') {
-            T.notify('Mã danh mục bị trống');
-            $('#dmGiamBhxhMa').focus();
+            T.notify('Mã danh mục bị trống', 'danger');
+            this.ma.focus();
         } else {
             if (ma) {
                 this.props.updateDmGiamBhxh(ma, changes);
@@ -52,7 +43,7 @@ class EditModal extends AdminModal {
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
-            title: 'Thông tin danh mục Giảm Bảo hiểm xã hội',
+            title: this.ma ? 'Cập nhật thông tin' : 'Tạo mới thông tin',
             body: <div className='row'>
                 <FormTextBox type='text' className='col-md-12' ref={e => this.ma = e} label='Mã' readOnly={readOnly} placeholder='Mã danh mục' required />
                 <FormTextBox type='text' className='col-md-12' ref={e => this.moTa = e} label='Mô tả' placeholder='Mô tả' readOnly={readOnly} required />
@@ -64,9 +55,7 @@ class EditModal extends AdminModal {
 }
 
 class DmGiamBhxhPage extends AdminPage {
-    state = { searching: false };
     modal = React.createRef();
-    searchBox = React.createRef();
 
     componentDidMount() {
         T.ready('/user/category', () => this.props.getDmGiamBhxhAll());
@@ -115,10 +104,8 @@ class DmGiamBhxhPage extends AdminPage {
             <main className='app-content'>
                 <div className='app-title'>
                     <h1><i className='fa fa-list-alt' /> Danh mục Giảm Bảo hiểm xã hội</h1>
-                    <AdminSearchBox ref={this.searchBox} getPage={this.props.getDmGiamBhxhAll} setSearching={value => this.setState({ searching: value })} />
                 </div>
-                <div className='tile'>
-                    {!this.state.searching ? table : <OverlayLoading text='Đang tải..' />}
+                <div className='tile'>{table}
                     <EditModal ref={this.modal} readOnly={!permissionWrite}
                         createDmGiamBhxh={this.props.createDmGiamBhxh} updateDmGiamBhxh={this.props.updateDmGiamBhxh} />
                     <Link to='/user/category' className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>

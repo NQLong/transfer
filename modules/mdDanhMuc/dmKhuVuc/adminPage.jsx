@@ -1,70 +1,28 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { PageName, getDmKhuVucPage, createDmKhuVuc, updateDmKhuVuc, deleteDmKhuVuc } from './redux';
-import { getDmChauAll } from 'modules/mdDanhMuc/dmChau/redux';
+import { getDmChauAll, SelectAdapter_DmChau } from 'modules/mdDanhMuc/dmChau/redux';
 import Pagination, { OverlayLoading } from 'view/component/Pagination';
 import AdminSearchBox from 'view/component/AdminSearchBox';
 import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormSelect, FormCheckbox } from 'view/component/AdminPage';
+import { Select } from 'view/component/Input';
 
 class EditModal extends AdminModal {
-    state = { kichHoat: true}; 
+    state = { kichHoat: true };
     modal = React.createRef();
-
-    maChauList=[{
-        ajax: {
-            url: '/api/danh-muc/chau/page/1/20',
-            data: params => ({ condition: params.term }),
-            processResults: data => ({ results: data && data.page && data.page.list ? data.page.list.map(item => ({ id: item.ma, text: `${item.ma}: ${item.ten}` })) : [] })
-        },
-        dropdownParent: $('#inputmaChau').parent().parent(),
-        placeholder: 'Chọn mã châu'
-    }];
-    
-    componentDidMount() {
-        $('#inputmaChau').select2({
-            ajax: {
-                url: '/api/danh-muc/chau/page/1/20',
-                data: params => ({ condition: params.term }),
-                processResults: data => ({ results: data && data.page && data.page.list ? data.page.list.map(item => ({ id: item.ma, text: `${item.ma}: ${item.ten}` })) : [] })
-            },
-            dropdownParent: $('#inputmaChau').parent().parent(),
-            placeholder: 'Chọn mã châu'
-        });
-    }
+    chauMapper = {};
 
     onShow = (item) => {
-       
-        let { ma, ten, kichHoat, territory, maChau } = item ? item : { ma: null, ten: '', kichHoat: true, territory: '', maChau: null };
-        
+
+        let { ma, ten, kichHoat, territory, maChau } = item ? item : { ma: '', ten: '', kichHoat: true, territory: '', maChau: '' };
         this.ma.value(ma);
         this.ten.value(ten);
-        this.maChau.value(maChau);
         this.territory.value(territory);
-
         this.kichHoat.value(kichHoat);
-    
-        if (this.maChau) {
-            $.ajax({
-                type: 'GET',
-                url: '/api/danh-muc/chau/item/' + this.maChau
-            }).then(function (data) {
-                let option = new Option(`${data.item.ma}: ${data.item.ten}`, data.item.ma, true, true);
-                this.maChau.append(option).trigger('change');
-                this.maChau.trigger({
-                    type: 'select2:select',
-                    params: {
-                        data: data
-                    }
-                });
-            });
-        console.log(this.maChau);
-        } else {
-            this.maChau.val('').trigger('change.select2');
-        }
-
+        this.maChau.setVal(maChau);
         this.setState({ kichHoat });
-        $(this.modal).modal('show');
+        $(this.modal).attr('data-ma', ma).modal('show');
     };
 
     onSubmit = () => {
@@ -73,7 +31,7 @@ class EditModal extends AdminModal {
             ma: this.ma.value().trim(),
             ten: this.ten.value().trim(),
             territory: this.territory.value().trim(),
-            maChau: this.maChau.value() ? this.maChau.value().trim() : '',
+            maChau: this.maChau.getFormVal().data,
             kichHoat: Number(this.state.kichHoat),
         };
         if (changes.ma == "") {
@@ -81,8 +39,8 @@ class EditModal extends AdminModal {
             this.ma.focus();
         }
         else {
-            if (maKhuVuc) this.props.update(maKhuVuc, changes);
-            else this.props.create(maKhuVuc, changes);
+            if (maKhuVuc) this.props.update({ ma: maKhuVuc }, changes);
+            else this.props.create(changes);
             $(this.modal).modal('hide');
         }
     };
@@ -92,57 +50,16 @@ class EditModal extends AdminModal {
         return this.renderModal({
             title: this.ma ? 'Cập nhật' : 'Tạo mới',
             body: <div className='row'>
-                <FormTextBox type='text' className='col-12 col-md-6' ref={e => this.ma = e} label='Mã khu vực' readOnly={readOnly} placeholder='Mã khu vực' required/>
-                <FormTextBox type='text' className='col-12 col-md-6' ref={e => this.ten = e} label='Tên khu vực' readOnly={readOnly} placeholder='Tên khu vực' required/>
-                <FormTextBox type='text' className='col-12 col-md-6' ref={e => this.territory = e} label='Tên tiếng Anh' readOnly={readOnly} placeholder='Tên tiếng Anh' required/>
-                <FormSelect className='col-12 col-md-6' ref={e => this.maChau = e} label='Châu' readOnly={readOnly} data={this.maChauList} onChange={data => this.changeType(false, data.id)} />
+                <FormTextBox type='text' className='col-12 col-md-6' ref={e => this.ma = e} label='Mã khu vực' readOnly={readOnly} placeholder='Mã khu vực' required />
+                <FormTextBox type='text' className='col-12 col-md-6' ref={e => this.ten = e} label='Tên khu vực' readOnly={readOnly} placeholder='Tên khu vực' required />
+                <FormTextBox type='text' className='col-12 col-md-6' ref={e => this.territory = e} label='Tên tiếng Anh' readOnly={readOnly} placeholder='Tên tiếng Anh' required />
+                <div className='col-12 col-md-6'>
+                    <Select ref={e => this.maChau = e} adapter={SelectAdapter_DmChau} label='Châu' required />
+                </div>
                 <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
                     onChange={() => !readOnly && this.setState({ kichHoat: !this.state.kichHoat })} />
             </div>
         }
-            // <div className='modal' tabIndex='-1' role='dialog' ref={this.modal}>
-            //     <form className='modal-dialog modal-lg' role='document'>
-            //         <div className='modal-content'>
-            //             <div className='modal-header'>
-            //                 <h5 className='modal-title'>{this.state.isUpdate ? 'Cập nhật' : 'Tạo mới'} khu vực</h5>
-            //                 <button type='button' className='close' data-dismiss='modal' aria-label='Close'>
-            //                     <span aria-hidden='true'>&times;</span>
-            //                 </button>
-            //             </div>
-            //             <div className='modal-body row'>
-            //                 <div className='form-group col-12 col-md-6'>
-            //                     <label htmlFor='inputma'>Mã khu vực</label>
-            //                     <input className='form-control' id='inputma' placeholder='Mã khu vực' type='text' auto-focus='' maxLength={3} readOnly={readOnly} />
-            //                 </div>
-            //                 <div className='form-group col-12 col-md-6'>
-            //                     <label htmlFor='inputten'>Tên khu vực</label>
-            //                     <input className='form-control' id='inputten' placeholder='Tên khu vực' type='text' readOnly={readOnly} />
-            //                 </div>
-            //                 <div className='form-group col-12 col-md-6'>
-            //                     <label htmlFor='inputterritory'>Tên tiếng Anh</label>
-            //                     <input className='form-control' id='inputterritory' placeholder='Tên tiếng Anh' type='text' readOnly={readOnly} />
-            //                 </div>
-            //                 <div className='form-group col-12 col-md-6'>
-            //                     <label htmlFor='inputmaChau'>Châu</label>
-            //                     <select className='form-control' id='inputmaChau' readOnly={readOnly}></select>
-            //                 </div>
-            //                 <div className='form-group col-12 col-md-6' style={{ display: 'inline-flex', width: '100%' }}>
-            //                     <label htmlFor='inputkichHoat'>Kích hoạt</label>&nbsp;&nbsp;
-            //                     <div className='toggle'>
-            //                         <label>
-            //                             <input type='checkbox' id='inputkichHoat' disabled={readOnly} />
-            //                             <span className='button-indecator' />
-            //                         </label>
-            //                     </div>
-            //                 </div>
-            //             </div>
-            //             <div className='modal-footer'>
-            //                 <button type='button' className='btn btn-secondary' data-dismiss='modal'>Đóng</button>
-            //                 {!readOnly && <button type='submit' className='btn btn-primary' onClick={this.save} disabled={this.state.saving}>Lưu</button>}
-            //             </div>
-            //         </div>
-            //     </form>
-            // </div>
         );
     }
 }
@@ -188,13 +105,13 @@ class dmKhuVucAdminPage extends AdminPage {
                 getDataSource: () => list, stickyHead: false,
                 renderHead: () => (
                     <tr>
-                       <th style={{ width: 'auto' }}>Mã</th>
-                            <th style={{ width: '50%' }} nowrap='true'>Tên khu vực</th>
-                            <th style={{ width: '50%' }} nowrap='true'>Tên tiếng Anh</th>
-                            <th style={{ width: 'auto' }} >Châu</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                            <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
-                       </tr>),
+                        <th style={{ width: 'auto' }}>Mã</th>
+                        <th style={{ width: '50%' }} nowrap='true'>Tên khu vực</th>
+                        <th style={{ width: '50%' }} nowrap='true'>Tên tiếng Anh</th>
+                        <th style={{ width: 'auto' }} >Châu</th>
+                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
+                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                    </tr>),
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' content={item.ma} />
