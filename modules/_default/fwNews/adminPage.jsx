@@ -47,19 +47,19 @@ class NewsPage extends React.Component {
     }
 
     swap = (e, item, isMoveUp) => {
-        this.props.swapNews(item.id, isMoveUp, done => {
+        this.props.swapNews(item.id, isMoveUp, () => {
             this.getData();
         });
         e.preventDefault();
     }
 
     changeActive = (item) => {
-        this.props.updateNews(item.id, { active: item.active ? 0 : 1 }, done => {
+        this.props.updateNews(item.id, { active: item.active ? 0 : 1 }, () => {
             this.getData();
         });
     }
 
-    changeisInternal = (item) => this.props.updateNews(item.id, { isInternal: item.isInternal ? 0 : 1 }, done => {
+    changeisInternal = (item) => this.props.updateNews(item.id, { isInternal: item.isInternal ? 0 : 1 }, () => {
         this.getData();
     });
 
@@ -95,7 +95,7 @@ class NewsPage extends React.Component {
 
     delete = (e, item) => {
         T.confirm('Bài viết', 'Bạn có chắc bạn muốn xóa bài viết này?', 'warning', true,
-            isConfirm => isConfirm && this.props.deleteNews(item.id, done => {
+            isConfirm => isConfirm && this.props.deleteNews(item.id, () => {
                 this.getData();
             }));
         e.preventDefault();
@@ -103,8 +103,8 @@ class NewsPage extends React.Component {
 
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permissionWrite = currentPermissions.includes('news:write'),
-            permissionRead = currentPermissions.includes('news:draft');
+            permissionWrite = currentPermissions.includes('news:write');
+        // permissionRead = currentPermissions.includes('news:draft');
         const { pageNumber, pageSize, pageTotal, totalItem } = this.state ?
             this.state : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0 };
         let table = <div>Không có bài viết!</div>, category = [{ id: 0, text: 'Tất cả' }];

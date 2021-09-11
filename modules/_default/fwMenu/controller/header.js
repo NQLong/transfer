@@ -21,7 +21,7 @@ module.exports = app => {
                     if (error) done({ error });
                     else if (website) {
                         if (website.header) app.deleteFile(app.path.join(app.publicPath, website.header));
-                        app.model.dvWebsite.update({ shortname }, { header: image }, (error, item) => done({ error, image: image }));
+                        app.model.dvWebsite.update({ shortname }, { header: image }, (error,) => done({ error, image: image }));
                     }
                 });
             });
@@ -43,7 +43,7 @@ module.exports = app => {
                     else if (website) {
                         // console.log(website.headerMobile, image);
                         if (website.headerMobile) app.deleteFile(app.path.join(app.publicPath, website.headerMobile));
-                        app.model.dvWebsite.update({ shortname }, { headerMobile: image }, (error, item) => done({ error, image: image }));
+                        app.model.dvWebsite.update({ shortname }, { headerMobile: image }, (error,) => done({ error, image: image }));
                     }
                 });
             });

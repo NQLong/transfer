@@ -56,7 +56,7 @@ export function getDmChiBoPage(pageNumber, pageSize, pageCondition, done) {
                 if (done) done(data.page);
                 dispatch({ type: DmChiBoGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách chi bộ bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách chi bộ bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -71,7 +71,7 @@ export function getDmChiBoAll(condition, done) {
                 if (done) done(data.items);
                 dispatch({ type: DmChiBoGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách chi bộ bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách chi bộ bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -86,7 +86,7 @@ export function createDmChiBo(item, done) {
                 dispatch(getDmChiBoPage());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo dữ liệu bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Tạo dữ liệu bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -99,7 +99,7 @@ export function deleteDmChiBo(ma) {
             } else {
                 dispatch(getDmChiBoPage());
             }
-        }, error => T.notify('Xóa dữ liệu bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Xóa dữ liệu bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -116,7 +116,7 @@ export function updateDmChiBo(ma, changes, done) {
                 done && done(data.item);
                 dispatch(getDmChiBoPage());
             }
-        }, error => T.notify('Cập nhật dữ liệu bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Cập nhật dữ liệu bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 

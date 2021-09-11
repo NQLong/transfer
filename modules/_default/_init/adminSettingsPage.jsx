@@ -191,7 +191,7 @@ class SettingsPage extends React.Component {
     createFooterItem = (item) => {
         if (!item.title) return T.notify('Vui lòng điền đầy đủ thông tin!', 'danger');
         item.priority = this.state.maxPrioritySubmenu + 1;
-        this.props.createFooterItem(item, done => this.getFooterSystem());
+        this.props.createFooterItem(item, () => this.getFooterSystem());
     }
     changeFooterActive = (e, menu) => {
         e.preventDefault();
@@ -344,7 +344,7 @@ class SettingsPage extends React.Component {
                             <div className='tile-body'>
                                 <ul id='menuSub' className='menuList' style={{ width: '100%', paddingLeft: 20, margin: 0 }}>
                                     {this.props.system && this.props.system.footerItem && this.props.system.footerItem.map((menu, index) => (
-                                        <li key={menu.id} data-id={menu.id} style={{ marginLeft: menu.header ? 0 : '25px' }}>
+                                        <li key={index} data-id={menu.id} style={{ marginLeft: menu.header ? 0 : '25px' }}>
                                             <div className='d-flex w-100 flex-grow-0 justify-content-between'>
                                                 <div className='d-flex'>
                                                     <a href='#' onClick={(e) => this.showSubMenu(e, menu)}

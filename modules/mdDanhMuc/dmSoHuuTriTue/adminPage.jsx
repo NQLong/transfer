@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormCheckbox, FormTextBox } from 'view/component/AdminPage';
 
 class EditModal extends AdminModal {
-    state = {kichHoat: true};
+    state = { kichHoat: true };
     modal = React.createRef();
 
     onShow = (item) => {
@@ -88,7 +88,7 @@ class DmSoHuuTriTuePage extends AdminPage {
 
         items.sort((a, b) => a.ma < b.ma ? -1 : 1);
         const table = renderTable({
-            getDataSource: () => list, stickyHead: false,
+            getDataSource: () => items, stickyHead: false,
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'center' }}>#</th>

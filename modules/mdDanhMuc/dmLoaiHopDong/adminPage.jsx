@@ -115,14 +115,13 @@ class DmLoaiHopDongPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmLoaiHopDong:write'),
-            permissionDelete = currentPermissions.includes('dmLoaiHopDong:delete'),
             permission = this.getUserPermission('dmLoaiHopDong', ['write', 'delete']);
 
         let table = 'Không có danh sách loại hợp đồng!',
             items = this.props.dmLoaiHopDong && this.props.dmLoaiHopDong.items ? this.props.dmLoaiHopDong.items : [];
         if (items.length > 0) {
             table = renderTable({
-                getDataSource: () => items, stickyHead: false, 
+                getDataSource: () => items, stickyHead: false,
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
@@ -133,12 +132,12 @@ class DmLoaiHopDongPage extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index} >
-                        <TableCell type='link' style={{ textAlign: 'right' }} content={item.ma ? item.ma : ''} 
+                        <TableCell type='link' style={{ textAlign: 'right' }} content={item.ma ? item.ma : ''}
                             onClick={e => this.edit(e, item)} />
                         <TableCell type='text' content={item.ten ? item.ten : ''} />
                         <TableCell type='checkbox' style={{ textAlign: 'center' }} content={item.kichHoat} permission={permissionWrite}
                             onChange={() => permissionWrite && this.changeActive(item)} />
-                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} 
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={e => this.edit(e, item)} onDelete={e => this.delete(e, item)} />
                     </tr>
                 )

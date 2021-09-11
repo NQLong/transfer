@@ -753,7 +753,7 @@ export class AdminPage extends React.Component {
         return permission;
     }
 
-    renderPage = ({ icon, title, subTitle, header, breadcrumb, advanceSearch, content, backRoute, onCreate, onSave, onExport, onImport }) => {
+    renderPage = ({ icon, title, subTitle, header, breadcrumb, content, backRoute, onCreate, onSave, onExport, onImport }) => {
         if (breadcrumb == null) breadcrumb = [];
 
         let right = 10, createButton, saveButton, exportButton, importButton;

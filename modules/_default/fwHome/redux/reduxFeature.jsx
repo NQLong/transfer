@@ -4,9 +4,6 @@ import T from 'view/js/common';
 const FeatureGetAll = 'Feature:GetAll';
 const FeatureGet = 'Feature:Get';
 const FeatureUpdate = 'Feature:Update';
-const FeatureAddItem = 'Feature:AddItem';
-const FeatureUpdateItem = 'Feature:UpdateItem';
-const FeatureRemoveItem = 'Feature:RemoveItem';
 const FeatureSwapItems = 'Feature:SwapItems';
 
 const FeatureItemGetAll = 'FeatureItem:GetAll';
@@ -56,7 +53,7 @@ export function getAllFeatures(done) {
                 if (done) done(data.items);
                 dispatch({ type: FeatureGetAll, items: data.items });
             }
-        }, error => T.notify('Lấy danh sách feature bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách feature bị lỗi!', 'danger'));
     };
 }
 
@@ -71,7 +68,7 @@ export function getFeatureById(id, done) {
                 if (done) done(data);
                 dispatch({ type: FeatureGet, item: data.item });
             }
-        }, error => T.notify('Lấy feature bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy feature bị lỗi!', 'danger'));
     };
 }
 
@@ -86,7 +83,7 @@ export function createFeature(payload, done) {
                 dispatch(getAllFeatures());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo feature bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo feature bị lỗi!', 'danger'));
     };
 }
 
@@ -103,7 +100,7 @@ export function updateFeature(id, changes, done) {
                 dispatch(getAllFeatures());
                 done && done();
             }
-        }, error => T.notify('Cập nhật thông tin feature bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin feature bị lỗi!', 'danger'));
     };
 }
 
@@ -124,7 +121,7 @@ export function deleteFeature(item) {
                     T.alert('Feature được xóa thành công!', 'error', false, 800);
                     dispatch(getAllFeatures());
                 }
-            }, error => T.notify('Xóa feature bị lỗi!', 'danger'));
+            }, () => T.notify('Xóa feature bị lỗi!', 'danger'));
         });
 
     };
@@ -141,7 +138,7 @@ export function getFeatureItem(featureId, done) {
                 if (done) done({ items: data.items });
                 dispatch({ type: FeatureItemGetAll, items: data.items });
             }
-        }, error => T.notify('Lấy feature item bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy feature item bị lỗi!', 'danger'));
     };
 }
 
@@ -156,7 +153,7 @@ export function createFeatureItem(image, content, featureId, link, done) {
                 if (done) done();
                 dispatch(getFeatureItem(featureId));
             }
-        }, error => T.notify('Tạo feature item bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo feature item bị lỗi!', 'danger'));
     };
 }
 
@@ -171,7 +168,7 @@ export function updateFeatureItem(id, featureId, changes, done) {
                 if (done) done();
                 dispatch(getFeatureItem(featureId));
             }
-        }, error => T.notify('Cập nhật feature item bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật feature item bị lỗi!', 'danger'));
     };
 }
 
@@ -186,12 +183,12 @@ export function deleteFeatureItem(item, done) {
                 if (done) done();
                 dispatch(getFeatureItem(item.featureId));
             }
-        }, error => T.notify('Xoá feature item bị lỗi!', 'danger'));
+        }, () => T.notify('Xoá feature item bị lỗi!', 'danger'));
     };
 }
 
 export function getFeatureByUser(id, done) {
-    return dispatch => {
+    return () => {
         const url = '/home/feature/' + id;
         T.get(url, data => {
             if (data.error) {
@@ -200,12 +197,12 @@ export function getFeatureByUser(id, done) {
             } else {
                 if (done) done(data.item);
             }
-        }, error => T.notify('Lấy feature bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy feature bị lỗi!', 'danger'));
     };
 }
 
 export function getFeatureItemByUser(featureId, done) {
-    return dispatch => {
+    return () => {
         const url = '/home/featureItem/' + featureId;
         T.get(url, data => {
             if (data.error) {
@@ -214,6 +211,6 @@ export function getFeatureItemByUser(featureId, done) {
             } else {
                 if (done) done(data.items);
             }
-        }, error => T.notify('Lấy feature item bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy feature item bị lỗi!', 'danger'));
     };
 }

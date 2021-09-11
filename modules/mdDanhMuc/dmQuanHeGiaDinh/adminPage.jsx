@@ -121,7 +121,7 @@ class AdminPage extends React.Component {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmQuanHeGiaDinh:write'),
             permissionDelete = currentPermissions.includes('dmQuanHeGiaDinh:delete');
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmQuanHeGiaDinh && this.props.dmQuanHeGiaDinh.page ?
+        let { pageNumber, pageSize, pageTotal, totalItem, list } = this.props.dmQuanHeGiaDinh && this.props.dmQuanHeGiaDinh.page ?
             this.props.dmQuanHeGiaDinh.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có dữ liệu!';
         if (list && list.length > 0) {
@@ -142,7 +142,7 @@ class AdminPage extends React.Component {
                                 <td>{item.ten}</td>
                                 <td className='toggle' style={{ textAlign: 'center' }}>
                                     <label>
-                                        <input type='checkbox' checked={item.kichHoat} onChange={e => permissionWrite && this.changeActive(item)} />
+                                        <input type='checkbox' checked={item.kichHoat} onChange={() => permissionWrite && this.changeActive(item)} />
                                         <span className='button-indecator' />
                                     </label>
                                 </td>

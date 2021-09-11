@@ -17,18 +17,20 @@ export default function carouselReducer(state = null, data) {
         case CarouselGet:
             return Object.assign({}, state, { selectedItem: data.item });
 
-        case CarouselUpdate:
+        case CarouselUpdate: {
             state = Object.assign({}, state);
             const updatedItem = data.item;
             if (state && state.selectedItem && state.selectedItem.carouselId == updatedItem.carouselId) {
                 for (let i = 0, items = state.selectedItem.items, n = items.length; i < n; i++) {
-                    if (items[i].carouselId = updatedItem.carouselId) {
+                    if (items[i].carouselId == updatedItem.carouselId) {
                         state.selectedItem.items.splice(i, 1, updatedItem);
                         break;
                     }
                 }
             }
             return state;
+        }
+
 
         default:
             return state;
@@ -47,7 +49,7 @@ export function getAllCarousels(done) {
                 if (done) done(data.items);
                 dispatch({ type: CarouselGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách tập hình ảnh bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách tập hình ảnh bị lỗi!', 'danger'));
     };
 }
 
@@ -64,7 +66,7 @@ export function getCarouselInPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: CarouselGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách hình ảnh bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách hình ảnh bị lỗi!', 'danger'));
     };
 }
 
@@ -79,7 +81,7 @@ export function getCarousel(id, done) {
                 if (done) done(data.item);
                 dispatch({ type: CarouselGet, item: data.item });
             }
-        }, error => T.notify('Lấy thông tin tập hình ảnh bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy thông tin tập hình ảnh bị lỗi!', 'danger'));
     };
 }
 
@@ -94,7 +96,7 @@ export function createCarousel(data, done) {
                 dispatch(getCarouselInPage());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo tập hình ảnh bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo tập hình ảnh bị lỗi!', 'danger'));
     };
 }
 
@@ -110,7 +112,7 @@ export function updateCarousel(id, changes, done) {
                 dispatch(getCarouselInPage());
                 done && done();
             }
-        }, error => T.notify('Cập nhật tập hình ảnh bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật tập hình ảnh bị lỗi!', 'danger'));
     };
 }
 
@@ -125,7 +127,7 @@ export function deleteCarousel(id) {
                 T.alert('Tập hình ảnh đã xóa thành công!', 'error', false, 800);
                 dispatch(getCarouselInPage());
             }
-        }, error => T.notify('Xóa hình ảnh bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa hình ảnh bị lỗi!', 'danger'));
     };
 }
 
@@ -140,7 +142,7 @@ export function createCarouselItem(data, done) {
                 dispatch(getCarousel(data.carouselId));
                 if (done) done(res);
             }
-        }, error => T.notify('Tạo hình ảnh bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo hình ảnh bị lỗi!', 'danger'));
     };
 }
 
@@ -156,7 +158,7 @@ export function updateCarouselItem(carouselId, priority, changes, done) {
                 dispatch(getCarousel(carouselId));
                 if (done) done();
             }
-        }, error => T.notify('Cập nhật hình ảnh bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật hình ảnh bị lỗi!', 'danger'));
     };
 }
 
@@ -170,7 +172,7 @@ export function swapCarouselItem(carouselId, priority, isMoveUp) {
             } else {
                 dispatch(getCarousel(carouselId));
             }
-        }, error => T.notify('Thay đổi vị trí hình ảnh bị lỗi!', 'danger'));
+        }, () => T.notify('Thay đổi vị trí hình ảnh bị lỗi!', 'danger'));
     };
 }
 
@@ -185,7 +187,7 @@ export function deleteCarouselItem(carouselId, priority) {
                 T.alert('Hình ảnh được xóa thành công!', 'error', false, 800);
                 dispatch(getCarousel(carouselId));
             }
-        }, error => T.notify('Xóa hình ảnh bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa hình ảnh bị lỗi!', 'danger'));
     };
 }
 
@@ -200,7 +202,7 @@ export function moveCarouselItem(carouselId, oldPriority, newPriority) {
                 T.notify('Thay đổi vị trí hình ảnh bị thành công!', 'info');
                 dispatch(getCarousel(carouselId));
             }
-        }, error => T.notify('Thay đổi vị trí hình ảnh bị lỗi!', 'danger'));
+        }, () => T.notify('Thay đổi vị trí hình ảnh bị lỗi!', 'danger'));
     };
 }
 
@@ -211,7 +213,7 @@ export function changeCarouselItem(item) {
 
 // Home -------------------------------------------------------------------------------------------
 export function homeGetCarousel(id, done) {
-    return dispatch => {
+    return () => {
         const url = '/home/carousel/' + id;
         T.get(url, data => {
             if (data.error) {

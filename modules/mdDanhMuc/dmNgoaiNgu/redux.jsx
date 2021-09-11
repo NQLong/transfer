@@ -53,7 +53,7 @@ export function getDmNgoaiNguAll(condition, done) {
                 if (done) done(data.items);
                 dispatch({ type: DmNgoaiNguGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách ngoại ngữ bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách ngoại ngữ bị lỗi!', 'danger'));
     };
 }
 
@@ -70,12 +70,12 @@ export function getDmNgoaiNguPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: DmNgoaiNguGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách ngoại ngữ bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách ngoại ngữ bị lỗi!', 'danger'));
     };
 }
 
 export function getDmNgoaiNgu(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/ngoai-ngu/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -101,7 +101,7 @@ export function createDmNgoaiNgu(item, done) {
                 dispatch(getDmNgoaiNguAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo ngoại ngữ bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo ngoại ngữ bị lỗi!', 'danger'));
     };
 }
 
@@ -116,7 +116,7 @@ export function deleteDmNgoaiNgu(ma) {
                 T.alert('Tổ chức cơ sở xuất bản đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmNgoaiNguAll());
             }
-        }, error => T.notify('Xóa tổ chức cơ sở xuất bản bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa tổ chức cơ sở xuất bản bị lỗi!', 'danger'));
     };
 }
 
@@ -132,7 +132,7 @@ export function updateDmNgoaiNgu(ma, changes, done) {
                 T.notify('Cập nhật ngoại ngữ thành công!', 'success');
                 dispatch(getDmNgoaiNguAll());
             }
-        }, error => T.notify('Cập nhật ngoại ngữ bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật ngoại ngữ bị lỗi!', 'danger'));
     };
 }
 

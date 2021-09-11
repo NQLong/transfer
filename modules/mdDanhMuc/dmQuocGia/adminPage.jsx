@@ -153,10 +153,10 @@ class DmQuocGiaPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmQuocGia:write'),
-            permissionDelete = currentPermissions.includes('dmQuocGia:delete'),
+            // permissionDelete = currentPermissions.includes('dmQuocGia:delete'),
             permission = this.getUserPermission('dmQuocGia', ['write', 'delete']);
-        const { pageNumber, pageSize, pageTotal, totalItem, list} = this.props.dmQuocGia && this.props.dmQuocGia.page ?
-            this.props.dmQuocGia.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null};
+        const { pageNumber, pageSize, pageTotal, totalItem, list } = this.props.dmQuocGia && this.props.dmQuocGia.page ?
+            this.props.dmQuocGia.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null };
         let table = 'Không có dữ liệu quốc gia!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -176,12 +176,12 @@ class DmQuocGiaPage extends AdminPage {
                     <tr key={index}>
                         <TableCell type='text' content={item.maCode ? item.maCode : ''} />
                         <TableCell type='link' content={<b>{item.tenQuocGia} {item.country ? `(${item.country})` : ''}</b>}
-                            onClick = {e => this.edit(e, item)} />
+                            onClick={e => this.edit(e, item)} />
                         <TableCell type='number' content={item.codeAlpha ? item.codeAlpha : ''} />
                         <TableCell type='text' content={item.shortenName ? item.shortenName : ''} />
                         <TableCell type='text' content={item.maKhuVuc ? item.maKhuVuc : ''} />
                         <TableCell type='text' content={item.tenKhac && item.tenKhac.length > 0 ? item.tenKhac.toString().replaceAll(',', ', ') : ''} />
-                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} 
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={e => this.edit(e, item)} onDelete={e => this.delete(e, item)} />
                     </tr>
                 )

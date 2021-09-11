@@ -2,7 +2,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getAllTestimonys, createTestimony, deleteTestimony } from './redux/reduxTestimony';
 import { Link } from 'react-router-dom';
-import ImageBox from 'view/component/ImageBox';
 import { getAllFeatures, createFeature, deleteFeature } from './redux/reduxFeature';
 
 class TestimonyModal extends React.Component {

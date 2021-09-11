@@ -53,8 +53,8 @@ class NewsDetail extends React.Component {
     render() {
         const language = T.language(texts);
         const width = $(window).width();
-        let { pageNumber, pageSize, pageTotal, totalItem, list } = this.props.news && this.props.news.userPage ?
-            this.props.news.userPage : { pageNumber: 1, pageSize: 25, pageTotal: 1, totalItem: 0, list: [] };
+        let { list } = this.props.news && this.props.news.userPage ?
+            this.props.news.userPage : { list: [] };
         let newsList = <p>Không có bài viết</p>;
         if (list.length > 0) {
             newsList = list.map((item, index) => {

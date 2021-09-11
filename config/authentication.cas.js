@@ -14,23 +14,6 @@ module.exports = (app, config) => {
             logout: config.rootUrl,
         });
 
-    function destroy(ticketId, cb) { //TODO: kiểm tra lại nha
-        const redis = require('redis'),
-            redisClient = redis.createClient();
-        redisClient.keys('*', function (err, keys) {
-            if (err) return console.log(err);
-            for (let i = 0, len = keys.length; i < len; i++) {
-                let key = keys[i];
-                redisClient.get(key, (err2, value) => {
-                    if (value.indexOf(ticketId)) {
-                        console.log('destroy session with ticket ' + ticketId + ' success');
-                        redisClient.del(key);
-                        return cb();
-                    }
-                });
-            }
-        });
-    }
 
     // Handle the login action of cas
     app.get('/auth/cas', (req, res, next) => {
@@ -43,7 +26,7 @@ module.exports = (app, config) => {
                     if (error || user == null) {
                         cas.logout(req, res);
                     } else {
-                        app.updateSessionUser(req, user, sessionUser => res.redirect('/user'));
+                        app.updateSessionUser(req, user, () => res.redirect('/user'));
                     }
                 });
             } else {

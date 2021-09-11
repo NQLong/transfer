@@ -27,10 +27,10 @@ class SectionFeature extends React.Component {
                 responsive: { 0: { items: 1 }, 576: { items: 2 }, 992: { items: 3 } }
             });
 
-            let i = 0;
+            // let i = 0;
             $('.ftco-animate').waypoint(function (direction) {
                 if (direction === 'down' && !$(this.element).hasClass('ftco-animated')) {
-                    i++;
+                    // i++;
                     $(this.element).addClass('item-animate');
                     setTimeout(function () {
                         $('body .ftco-animate.item-animate').each(function (k) {

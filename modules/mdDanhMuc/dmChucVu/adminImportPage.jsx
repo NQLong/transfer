@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import FileBox from 'view/component/FileBox';
 import { createMultiDmChucVu } from './redux';
-import { FormTextBox, FormCheckbox, renderTable, AdminModal, TableCell, AdminPage, FormSelect } from 'view/component/AdminPage';
+import { FormTextBox, FormCheckbox, renderTable, AdminModal, TableCell, AdminPage, } from 'view/component/AdminPage';
 
 class EditModal extends AdminModal {
     state = { index: -1, isActive: null };

@@ -61,7 +61,7 @@ export function getDmHocSdhPage(pageNumber, pageSize, pageCondition, done) {
                 if (done) done(data.page);
                 dispatch({ type: DmHocSdhGetPage, page: data.page });
             }
-        }, (error) => T.notify('Lấy danh sách học Sau đại học bị lỗi' + (error.error.message && ':<br>' + data.error.message), 'danger'));
+        }, (error) => T.notify('Lấy danh sách học Sau đại học bị lỗi' + (error.error.message && ':<br>' + error.error.message), 'danger'));
     };
 }
 
@@ -76,12 +76,12 @@ export function getDmHocSdhAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmHocSdhGetAll, items: data.items ? data.items : [] });
             }
-        }, (error) => T.notify('Lấy danh sách học Sau đại học bị lỗi' + (error.error.message && ':<br>' + data.error.message), 'danger'));
+        }, (error) => T.notify('Lấy danh sách học Sau đại học bị lỗi' + (error.error.message && ':<br>' + error.error.message), 'danger'));
     };
 }
 
 export function getDmHocSdh(ma, done) {
-    return (dispatch) => {
+    return () => {
         const url = `/api/danh-muc/hoc-sdh/item/${ma}`;
         T.get(url, (data) => {
             if (data.error) {
@@ -105,7 +105,7 @@ export function createDmHocSdh(changes, done) {
                 dispatch(getDmHocSdhPage());
                 if (done) done(data);
             }
-        }, (error) => T.notify('Tạo học Sau đại học bị lỗi' + (error.error.message && ':<br>' + data.error.message), 'danger'));
+        }, (error) => T.notify('Tạo học Sau đại học bị lỗi' + (error.error.message && ':<br>' + error.error.message), 'danger'));
     };
 }
 
@@ -121,7 +121,7 @@ export function updateDmHocSdh(ma, changes, done) {
                 T.notify('Cập nhật thông tin học Sau đại học thành công!', 'success');
                 dispatch(getDmHocSdhPage());
             }
-        }, (error) => T.notify('Cập nhật thông tin học Sau đại học bị lỗi' + (error.error.message && ':<br>' + data.error.message), 'danger'));
+        }, (error) => T.notify('Cập nhật thông tin học Sau đại học bị lỗi' + (error.error.message && ':<br>' + error.error.message), 'danger'));
     };
 }
 
@@ -136,7 +136,7 @@ export function deleteDmHocSdh(ma) {
                 T.alert('Khoa đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmHocSdhPage());
             }
-        }, (error) => T.notify('Xóa học Sau đại học bị lỗi' + (error.error.message && ':<br>' + data.error.message), 'danger'));
+        }, (error) => T.notify('Xóa học Sau đại học bị lỗi' + (error.error.message && ':<br>' + error.error.message), 'danger'));
     };
 }
 
@@ -153,7 +153,7 @@ export function createDmHocSdhByUpload(item, done) {
             }
             dispatch(getDmHocSdhPage());
             if (done) done(data);
-        }, (error) => T.notify('Tạo danh mục học Sau đại học bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo danh mục học Sau đại học bị lỗi!', 'danger'));
     };
 }
 

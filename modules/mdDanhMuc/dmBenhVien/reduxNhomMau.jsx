@@ -57,7 +57,7 @@ export function getDmNhomMauPage(pageNumber, pageSize, pageCondition, done) {
                 if (done) done(data.page);
                 dispatch({ type: DmNhomMauGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách nhóm máu bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách nhóm máu bị lỗi!', 'danger'));
     };
 }
 
@@ -72,12 +72,12 @@ export function getDmNhomMauAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmNhomMauGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách nhóm máu bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách nhóm máu bị lỗi!', 'danger'));
     };
 }
 
 export function getDmNhomMau(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/nhom-mau/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -102,7 +102,7 @@ export function createDmNhomMau(dmNhomMau, done) {
                 dispatch(getDmNhomMauAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo mới một nhóm máu bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo mới một nhóm máu bị lỗi!', 'danger'));
     };
 }
 
@@ -134,7 +134,7 @@ export function deleteDmNhomMau(ma, done) {
                 dispatch(getDmNhomMauAll());
             }
             done && done();
-        }, error => T.notify('Xóa nhóm máu bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa nhóm máu bị lỗi!', 'danger'));
     };
 }
 

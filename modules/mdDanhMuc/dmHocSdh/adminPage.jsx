@@ -33,7 +33,7 @@ class EditModal extends AdminModal {
             this.ma.focus();
         } else if (changes.ten == '') {
             T.notify('Tên bị trống!', 'danger');
-            this.ten.focus()
+            this.ten.focus();
             } else if (changes.ma.length != 2) {
                 T.notify('Mã sai!', 'danger');
                 this.ma.focus();

@@ -20,7 +20,7 @@ export function getHeader(done) {
             }
             else
                 T.notify('Lấy header bị lỗi!', 'danger');
-        }, error => T.notify('Lấy header bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy header bị lỗi!', 'danger'));
     };
 }
 
@@ -36,6 +36,6 @@ export function updateHeader(changes, done) {
                 T.notify('Cập nhật header thành công', 'success');
                 if (done) done(data);
             }
-        }, error => T.notify('Cập nhật header bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật header bị lỗi!', 'danger'));
     };
 }

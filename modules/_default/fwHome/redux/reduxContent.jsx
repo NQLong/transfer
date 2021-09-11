@@ -63,7 +63,7 @@ export function createContent(done) {
                 dispatch(getAllContents());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo nội dung bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo nội dung bị lỗi!', 'danger'));
     };
 }
 
@@ -78,7 +78,7 @@ export function updateContent(id, changes) {
                 T.notify('Nội dung cập nhật thành công!', 'success');
                 dispatch(getAllContents());
             }
-        }, error => T.notify('Cập nhật nội dung bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật nội dung bị lỗi!', 'danger'));
     };
 }
 
@@ -93,7 +93,7 @@ export function deleteContent(id) {
                 T.alert('Nội dung được xóa thành công!', 'error', false, 800);
                 dispatch({ type: ContentDelete, id });
             }
-        }, error => T.notify('Xóa nội dung bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa nội dung bị lỗi!', 'danger'));
     };
 }
 

@@ -1,4 +1,4 @@
-module.exports = app => {
+module.exports = () => {
 
   Array.prototype.contains = function (pattern) {
     return pattern.reduce((result, item) => result && this.includes(item), true);

@@ -149,7 +149,7 @@ class MenuPage extends React.Component {
     createSubMenu = (item) => {
         if (!item.title) return T.notify('Vui lòng điền đầy đủ thông tin!', 'danger');
         item.priority = this.state.maxPrioritySubmenu + 1;
-        this.props.createSubMenu(item, done => this.getAllSubMenu());
+        this.props.createSubMenu(item, () => this.getAllSubMenu());
     }
 
     updateSubMenuPriorities = (now, pre) => {
@@ -285,7 +285,7 @@ class MenuPage extends React.Component {
                             <h3>Menu phụ</h3>
                             <ul id='menuSub' className='menuSub' style={{ width: '100%', paddingLeft: 20, margin: 0 }}>
                                 {(this.props.submenu ? this.props.submenu : []).map((menu, index) => (
-                                    <li key={menu.id} data-id={menu.id}>
+                                    <li key={index} data-id={menu.id}>
                                         <div className='d-flex w-100 flex-grow-0 justify-content-between'>
                                             <div className='d-flex'>
                                                 <a href='#' onClick={(e) => this.showSubMenu(e, menu)} style={{ color: menu.active ? '#009688' : 'gray' }}>

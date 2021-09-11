@@ -53,7 +53,7 @@ export function getDmPhuongXaAll(done) {
 				if (done) done(data.items);
 				dispatch({ type: DmPhuongXaGetAll, items: data.items ? data.items : [] });
 			}
-		}, error => T.notify('Lấy danh sách phường xã bị lỗi!', 'danger'));
+		}, () => T.notify('Lấy danh sách phường xã bị lỗi!', 'danger'));
 	};
 }
 
@@ -71,12 +71,12 @@ export function getDmPhuongXaPage(pageNumber, pageSize, pageCondition, done) {
 				if (done) done(data.page);
 				dispatch({ type: DmPhuongXaGetPage, page: data.page });
 			}
-		}, error => T.notify('Lấy danh sách phường xã bị lỗi!', 'danger'));
+		}, () => T.notify('Lấy danh sách phường xã bị lỗi!', 'danger'));
 	};
 }
 
 export function getDmPhuongXa(maPhuongXa, done) {
-	return dispatch => {
+	return () => {
 		const url = `/api/danh-muc/phuong-xa/item/${maPhuongXa}`;
 		T.get(url, data => {
 			if (data.error) {
@@ -103,7 +103,7 @@ export function createDmPhuongXa(item, done) {
 				if (done) done(data);
 				T.notify('Tạo thông tin phường xã thành công!', 'success');
 			}
-		}, error => T.notify('Tạo thông tin phường xã bị lỗi!', 'danger'));
+		}, () => T.notify('Tạo thông tin phường xã bị lỗi!', 'danger'));
 	};
 }
 
@@ -118,7 +118,7 @@ export function deleteDmPhuongXa(maPhuongXa) {
 				T.alert('Xoá thành công!', 'success', false, 800);
 				dispatch(getDmPhuongXaPage());
 			}
-		}, error => T.notify('Xóa thông tin phường xã bị lỗi!', 'danger'));
+		}, () => T.notify('Xóa thông tin phường xã bị lỗi!', 'danger'));
 	};
 }
 
@@ -134,7 +134,7 @@ export function updateDmPhuongXa(maPhuongXa, changes, done) {
 				T.notify('Cập nhật thông tin phường xã thành công!', 'success');
 				dispatch(getDmPhuongXaPage());
 			}
-		}, error => T.notify('Cập nhật thông tin phường xã bị lỗi!', 'danger'));
+		}, () => T.notify('Cập nhật thông tin phường xã bị lỗi!', 'danger'));
 	};
 }
 export function createDmPhuongXaByUpload(item, done) {
@@ -149,7 +149,7 @@ export function createDmPhuongXaByUpload(item, done) {
 				if (done) done(data);
 				T.notify('Import dữ liệu thành công!', 'success');
 			}
-		}, error => T.notify('Tạo thông tin phường xã bị lỗi!', 'danger'));
+		}, () => T.notify('Tạo thông tin phường xã bị lỗi!', 'danger'));
 	};
 }
 

@@ -114,7 +114,7 @@ class DmTapChiPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmTapChi:write'),
-            permissionDelete = currentPermissions.includes('dmTapChi:delete'),
+            // permissionDelete = currentPermissions.includes('dmTapChi:delete'),
             permission = this.getUserPermission('dmTapChi', ['write', 'delete']);
 
         let table = 'Không có danh sách!',
@@ -134,13 +134,13 @@ class DmTapChiPage extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='number' style={{ textAlign: 'right'}} content={index + 1} />
-                        <TableCell type='link' content={item.ma ? item.ma : ''} 
-                            onClick = {e => this.edit(e, item)} />
+                        <TableCell type='number' style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='link' content={item.ma ? item.ma : ''}
+                            onClick={e => this.edit(e, item)} />
                         <TableCell type='text' content={item.ten ? item.ten : ''} />
                         <TableCell type='checkbox' style={{ textAlign: 'center' }} content={item.kichHoat} permission={permissionWrite}
                             onChange={() => permissionWrite && this.changeActive(item)} />
-                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} 
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={e => this.edit(e, item)} onDelete={e => this.delete(e, item)} />
                     </tr>
                 )

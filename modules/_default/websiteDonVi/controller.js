@@ -22,8 +22,7 @@ module.exports = app => {
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/website/page/:pageNumber/:pageSize', app.permission.check('website:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize),
-            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+            pageSize = parseInt(req.params.pageSize);
         let user = req.session.user, condition = {};
         if (user.permissions && !user.permissions.includes('website:manage')) {
             condition.maDonVi = user.maDonVi;
@@ -233,7 +232,7 @@ module.exports = app => {
                     } else {
                         app.model.dvWebsiteGioiThieuHinh.getAll({ maWebsiteGioiThieu: items[index].ma, kichHoat: 1 }, '*', 'thuTu DESC', (error, hinhAnh) => {
                             if (error || hinhAnh == null) {
-                                res.send({ item: app.clone(dvGioiThieu, { hinhAnh: null }) });
+                                res.send({ item: '' });
                             } else {
                                 result.push(app.clone(items[index], { hinhAnh }));
                                 handleGetImage(index + 1);

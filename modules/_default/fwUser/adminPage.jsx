@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { getUserPage, createUser, updateUser, deleteUser, changeUser, } from './reduxUser';
 import { getRoleAll } from '../fwRole/redux';
@@ -173,7 +173,7 @@ class UserModal extends React.Component {
                                     <label htmlFor='userActive'>Kích hoạt: </label>&nbsp;&nbsp;
                                         <div className='toggle'>
                                         <label>
-                                            <input type='checkbox' id='userActive' checked={this.state.active} onChange={e => permissionWrite && this.setState({ active: !this.state.active })} />
+                                            <input type='checkbox' id='userActive' checked={this.state.active} onChange={() => permissionWrite && this.setState({ active: !this.state.active })} />
                                             <span className='button-indecator' />
                                         </label>
                                     </div>
@@ -184,7 +184,7 @@ class UserModal extends React.Component {
                                     <label htmlFor='userIsStaff'>Người dùng là Cán bộ: </label>&nbsp;&nbsp;
                                         <div className='toggle'>
                                         <label>
-                                            <input type='checkbox' id='userIsStaff' checked={this.state.isStaff} onChange={e => permissionWrite && this.setState({ isStaff: !this.state.isStaff })} />
+                                            <input type='checkbox' id='userIsStaff' checked={this.state.isStaff} onChange={() => permissionWrite && this.setState({ isStaff: !this.state.isStaff })} />
                                             <span className='button-indecator' />
                                         </label>
                                     </div>
@@ -198,7 +198,7 @@ class UserModal extends React.Component {
                                     <label htmlFor='userIsStudent'>Người dùng là Sinh viên: </label>&nbsp;&nbsp;
                                             <div className='toggle'>
                                         <label>
-                                            <input type='checkbox' id='userIsStudent' checked={this.state.isStudent} onChange={e => permissionWrite && this.setState({ isStudent: !this.state.isStudent })} />
+                                            <input type='checkbox' id='userIsStudent' checked={this.state.isStudent} onChange={() => permissionWrite && this.setState({ isStudent: !this.state.isStudent })} />
                                             <span className='button-indecator' />
                                         </label>
                                     </div>
@@ -316,7 +316,7 @@ class UserPage extends React.Component {
                                 </td>
                                 <td className='toggle' style={{ textAlign: 'center' }}>
                                     <label>
-                                        <input type='checkbox' checked={item.active} onChange={e => this.changeActive(item, index)} />
+                                        <input type='checkbox' checked={item.active} onChange={() => this.changeActive(item, index)} />
                                         <span className='button-indecator' />
                                     </label>
                                 </td>

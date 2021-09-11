@@ -59,7 +59,7 @@ module.exports = app => {
                 if (dmBoMon[i].kichHoat === 'true' | dmBoMon[i].kichHoat === 'false')
                     dmBoMon[i].kichHoat === 'true' ? dmBoMon[i].kichHoat = 1 : dmBoMon[i].kichHoat = 0;
                 const current = dmBoMon[i];
-                app.model.dmBoMon.create(current, (error, _) => {
+                app.model.dmBoMon.create(current, (error,) => {
                     if (error) errorList.push(error);
                 });
             }

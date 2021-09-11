@@ -153,7 +153,7 @@ class DmQuanHuyenPage extends React.Component {
 							<th style={{ width: 'auto' }}>Mã</th>
 							<th style={{ width: '50%' }}>Tên quận/huyện</th>
 							<th style={{ width: '50%' }} nowrap='true'>Tỉnh/thành phố</th>
-							<th style={{ width: 'auto' }} nowrap='true' nowrap='true'>Kích hoạt</th>
+							<th style={{ width: 'auto' }} nowrap='true' >Kích hoạt</th>
 							<th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
 						</tr>
 					</thead>

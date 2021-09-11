@@ -4,9 +4,9 @@ import { updateProfile } from '../_init/reduxSystem';
 import Dropdown from 'view/component/Dropdown';
 import ImageBox from 'view/component/ImageBox';
 import { userGetStaff, updateStaffUser, createQuanHeStaffUser, updateQuanHeStaffUser, deleteQuanHeStaffUser } from 'modules/mdTccb/tccbCanBo/redux';
-import { Link } from 'react-router-dom';
-import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
-import { SelectAdapter_DmChucVu } from 'modules/mdDanhMuc/dmChucVu/redux';
+// import { Link } from 'react-router-dom';
+// import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
+// import { SelectAdapter_DmChucVu } from 'modules/mdDanhMuc/dmChucVu/redux';
 import { SelectAdapter_DmGioiTinh } from 'modules/mdDanhMuc/dmGioiTinh/redux';
 import { SelectAdapter_DmTrinhDoLyLuanChinhTri } from 'modules/mdDanhMuc/dmTrinhDoLyLuanChinhTri/redux';
 import { SelectAdapter_DmTrinhDoQuanLyNhaNuoc } from 'modules/mdDanhMuc/dmTrinhDoQuanLyNhaNuoc/redux';
@@ -15,9 +15,9 @@ import { createTrinhDoNNStaffUser, updateTrinhDoNNStaffUser, deleteTrinhDoNNStaf
 import { SelectAdapter_DmTrinhDoTinHoc } from 'modules/mdDanhMuc/dmTrinhDoTinHoc/redux';
 import { SelectAdapter_DmDanToc } from 'modules/mdDanhMuc/dmDanToc/redux';
 import { SelectAdapter_DmTonGiao } from 'modules/mdDanhMuc/dmTonGiao/redux';
-import { SelectAdapter_DmTinhThanhPho } from 'modules/mdDanhMuc/dmDiaDiem/reduxTinhThanhPho';
-import { SelectAdapter_DmQuanHuyen } from 'modules/mdDanhMuc/dmDiaDiem/reduxQuanHuyen';
-import { SelectAdapter_DmPhuongXa } from 'modules/mdDanhMuc/dmDiaDiem/reduxPhuongXa';
+// import { SelectAdapter_DmTinhThanhPho } from 'modules/mdDanhMuc/dmDiaDiem/reduxTinhThanhPho';
+// import { SelectAdapter_DmQuanHuyen } from 'modules/mdDanhMuc/dmDiaDiem/reduxQuanHuyen';
+// import { SelectAdapter_DmPhuongXa } from 'modules/mdDanhMuc/dmDiaDiem/reduxPhuongXa';
 import { SelectAdapter_DmQuanHeGiaDinh, getDmQuanHeGiaDinhAll } from 'modules/mdDanhMuc/dmQuanHeGiaDinh/redux';
 import { getDmDonViAll } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { getDmChucVuAll } from 'modules/mdDanhMuc/dmChucVu/redux';
@@ -336,14 +336,12 @@ class ProfilePage extends QTForm {
     };
 
     setVal = (data = {}) => {
-        const { shcc = '', ho = '', ten = '', biDanh = '', cmnd = '', cmndNgayCap = '', cmndNoiCap = '', emailCaNhan = '', noiSinh = '', queQuan = '',
-            email = '', dienThoaiCaNhan = '', dienThoaiBaoTin = '', ngaySinh = '', ngayBatDauCongTac = '', ngayVao = '', ngayCbgd = '', ngayBienChe = '', ngayNghi = '',
-            ngach = '', ngachMoi = '', heSoLuong = '', bacLuong = '', mocNangLuong = '', ngayHuongLuong = '', tyLeVuotKhung = '', maXaNoiSinh = null, maTinhNoiSinh = null,
-            phuCapCongViec = '', ngayPhuCapCongViec = '', maChucVu = '', chucVuDang = '', chucVuDoanThe = '', chucVuKiemNhiem = '', maHuyenNoiSinh = null, maHuyenNguyenQuan = null,
-            maTrinhDoLlct = '', maTrinhDoQlnn = '', maTrinhDoTinHoc = '', hoKhau = '', diaChiHienTai = '', danToc = '', tonGiao = '', maTinhNguyenQuan = null,
-            maDonVi = '', phucLoi = '', nhaGiaoNhanDan = null, nhaGiaoUuTu = null, lyDoONuocNgoai = '', ghiChu = '', dangONuocNgoai = false, dangVien = false, chucDanh = '', trinhDoPhoThong = '', hocVi = '', chuyenNganh = '', namChucDanh = '', namHocVi = '',
-            phai = '', nhomMau = '', ngayVaoDang = '', ngayVaoDangChinhThuc = '', ngayNhapNgu = '', ngayXuatNgu = '', quanHamCaoNhat = '', soBhxh = '', maXaNguyenQuan = '',
-            soTheDang = '', noiDangDb = '', noiDangCt = '', doanVien = false, ngayVaoDoan = '', noiVaoDoan = '', ngheNghiepCu = '', chucVuKhac = '', quocGia = null, hangThuongBinh = '', giaDinhChinhSach = '',
+        const { cmnd = '', cmndNgayCap = '', cmndNoiCap = '', emailCaNhan = '', noiSinh = '', queQuan = '',
+            email = '', dienThoaiCaNhan = '', dienThoaiBaoTin = '', ngaySinh = '',
+            maTrinhDoLlct = '', maTrinhDoQlnn = '', maTrinhDoTinHoc = '', hoKhau = '', diaChiHienTai = '', danToc = '', tonGiao = '',
+            lyDoONuocNgoai = '', dangONuocNgoai = false, dangVien = false, chucDanh = '', trinhDoPhoThong = '', hocVi = '', chuyenNganh = '', namChucDanh = '', namHocVi = '',
+            phai = '', nhomMau = '', ngayVaoDang = '', ngayVaoDangChinhThuc = '', ngayNhapNgu = '', ngayXuatNgu = '', quanHamCaoNhat = '', soBhxh = '',
+            soTheDang = '', noiDangDb = '', noiDangCt = '', doanVien = false, ngayVaoDoan = '', noiVaoDoan = '', ngheNghiepCu = '', quocGia = null, hangThuongBinh = '', giaDinhChinhSach = '',
             danhHieu = '', soTruong = '', sucKhoe = '', canNang = '', chieuCao = '' } = data.constructor === ({}).constructor ? data : {};
         this.cmnd.current.setVal(cmnd);
         this.cmndNgayCap.current.setVal(cmndNgayCap);
@@ -546,7 +544,7 @@ class ProfilePage extends QTForm {
         const item = this.state.canBo || {};
         const renderFieldText = (className, label, hasValue, value, noValue = 'Không có thông tin!') =>
             <div className={className}>{label}: <b>{hasValue ? value : noValue}</b></div>;
-        const roundNumber = num => num ? parseFloat(num).toFixed(2) : '';
+        // const roundNumber = num => num ? parseFloat(num).toFixed(2) : '';
         if (itemsNN && itemsNN.length > 0) {
             tableNN = (
                 <table className='table table-hover table-bordered' ref={this.table}>
@@ -627,7 +625,7 @@ class ProfilePage extends QTForm {
                         </button>
                     </div>
                 </div> :
-                    [<div className='tile'>
+                    [<div className='tile' key={1}>
                         <h3 className='tile-title'>Thông tin cá nhân</h3>
                         <div className='tile-body row'>
                             <div className='form-group col-md-3'>
@@ -666,7 +664,7 @@ class ProfilePage extends QTForm {
                             <div className='form-group col-md-6'><TextInput ref={this.ngheNghiepCu} label='Nghề nghiệp trước khi tuyển dụng' maxLength={100} /></div>
                         </div>
                     </div>,
-                    <div className='tile'>
+                    <div className='tile' key={2}>
                         <h3 className='tile-title'>Thông tin công tác</h3>
                         <div className='tile-body row'>
                             {this.state.dangVien && item.chucVuDang ? renderFieldText('form-group col-md-12', 'Chức vụ trong Đảng', item.chucVuDang, item.chucVuDang) : null}
@@ -719,7 +717,7 @@ class ProfilePage extends QTForm {
                             {item.phucLoi ? renderFieldText('form-group col-12', 'Phúc lợi', item.phucLoi, item.phucLoi) : null}
                         </div>
                     </div>,
-                    <div className='tile'>
+                    <div className='tile' key={3}>
                         <h3 className='tile-title'>Trình độ học vấn</h3>
                         <div className='tile-body row'>
                             <div className='form-group col-xl-4 col-md-6'><Select ref={this.chucDanh} adapter={SelectAdapter_DmChucDanhKhoaHoc} label='Chức danh' /></div>
@@ -739,7 +737,7 @@ class ProfilePage extends QTForm {
                             </div>
                         </div>
                     </div>,
-                    <div className='tile'>
+                    <div className='tile' key={4}>
                         <h3 className='tile-title'>Thông tin người thân</h3>
                         <ul className='nav nav-tabs' id='myTab' role='tablist'>
                             <li className='nav-item'>
@@ -774,11 +772,11 @@ class ProfilePage extends QTForm {
                             </div>
                         </div>
                     </div>,
-                    <button type='button' title='Save' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.save}>
+                    <button key={5} type='button' title='Save' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.save}>
                         <i className='fa fa-lg fa-save' />
                     </button>,
-                    <RelationModal ref={this.modal} create={this.props.createQuanHeStaffUser} update={this.props.updateQuanHeStaffUser} />,
-                    <TrinhDoNNModal ref={this.modalNN} create={this.props.createTrinhDoNNStaffUser} update={this.props.updateTrinhDoNNStaffUser} getData={this.props.userGetStaff} />
+                    <RelationModal key={6} ref={this.modal} create={this.props.createQuanHeStaffUser} update={this.props.updateQuanHeStaffUser} />,
+                    <TrinhDoNNModal key={7} ref={this.modalNN} create={this.props.createTrinhDoNNStaffUser} update={this.props.updateTrinhDoNNStaffUser} getData={this.props.userGetStaff} />
                     ]
                 }
             </main>

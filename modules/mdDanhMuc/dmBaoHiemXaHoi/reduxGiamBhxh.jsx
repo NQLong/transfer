@@ -55,7 +55,7 @@ export function getDmGiamBhxhPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: DmGiamBhxhGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách giảm Bảo hiểm xã hội bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách giảm Bảo hiểm xã hội bị lỗi!', 'danger'));
     };
 }
 
@@ -70,12 +70,12 @@ export function getDmGiamBhxhAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmGiamBhxhGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách giảm Bảo hiểm xã hội bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách giảm Bảo hiểm xã hội bị lỗi!', 'danger'));
     };
 }
 
 export function getDmGiamBhxh(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/giam-bao-hiem-xa-hoi/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -99,7 +99,7 @@ export function createDmGiamBhxh(item, done) {
                 dispatch(getDmGiamBhxhAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo giảm Bảo hiểm xã hội bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo giảm Bảo hiểm xã hội bị lỗi!', 'danger'));
     };
 }
 
@@ -114,7 +114,7 @@ export function deleteDmGiamBhxh(ma) {
                 T.alert('Danh mục đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmGiamBhxhAll());
             }
-        }, error => T.notify('Xóa giảm Bảo hiểm xã hội bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa giảm Bảo hiểm xã hội bị lỗi!', 'danger'));
     };
 }
 
@@ -130,7 +130,7 @@ export function updateDmGiamBhxh(ma, changes, done) {
                 T.notify('Cập nhật thông tin giảm Bảo hiểm xã hội thành công!', 'success');
                 dispatch(getDmGiamBhxhAll());
             }
-        }, error => T.notify('Cập nhật thông tin giảm Bảo hiểm xã hội bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin giảm Bảo hiểm xã hội bị lỗi!', 'danger'));
     };
 }
 

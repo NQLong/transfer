@@ -50,14 +50,15 @@ export function getdmNhomTaiSanCoDinhAll(condition, done) {
                 T.notify('Lấy danh sách nhóm tài sản cố đinh bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                if (done) done(data.items);
+                done && done(data.items);
                 dispatch({ type: DmNhomTaiSanCoDinhGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách nhóm tài sản cố đinh bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, error => T.notify('Lấy danh sách nhóm tài sản cố đinh bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
-T.initPage('dmNhomTaiSanCoDinh');
+export const PageName = 'dmNhomTaiSanCoDinh';
+T.initPage(PageName);
 export function getDmNhomTaiSanCoDinhPage(pageNumber, pageSize, pageCondition, done) {
     const page = T.updatePage('dmNhomTaiSanCoDinh', pageNumber, pageSize, pageCondition);
     return dispatch => {
@@ -68,22 +69,22 @@ export function getDmNhomTaiSanCoDinhPage(pageNumber, pageSize, pageCondition, d
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
-                if (done) done(data.page);
+                done && done(data.page);
                 dispatch({ type: DmNhomTaiSanCoDinhGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách nhóm tài sản cố đinh bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, error => T.notify('Lấy danh sách nhóm tài sản cố đinh bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
 export function getDmNhomTaiSanCoDinh(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/nhom-tai-san-co-dinh/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy thông tin nhóm tài sản cố định bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                if (done) done(data.item);
+                done && done(data.item);
             }
         }, error => {
             console.error(`GET: ${url}.`, error);
@@ -101,10 +102,10 @@ export function createDmNhomTaiSanCoDinh(item, done) {
                 }
                 console.error(`POST: ${url}.`, data.error);
             } else {
-                dispatch(getdmNhomTaiSanCoDinhAll());
-                if (done) done(data);
+                dispatch(getDmNhomTaiSanCoDinhPage());
+                done && done(data);
             }
-        }, error => T.notify('Tạo nhóm tài sản cố định bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, error => T.notify('Tạo nhóm tài sản cố định bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -116,10 +117,10 @@ export function deleteDmNhomTaiSanCoDinh(ma) {
                 T.notify('Xóa danh mục  bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
-                T.alert('Khoa đã xóa thành công!', 'success', false, 800);
-                dispatch(getdmNhomTaiSanCoDinhPage());
+                T.alert('Xóa nhóm tài sản cố định thành công!', 'success', false, 800);
+                dispatch(getDmNhomTaiSanCoDinhPage());
             }
-        }, error => T.notify('Xóa nhóm tài sản cố định bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, error => T.notify('Xóa nhóm tài sản cố định bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -135,7 +136,7 @@ export function updateDmNhomTaiSanCoDinh(ma, changes, done) {
                 T.notify('Cập nhật thông tin nhóm tài sản cố định thành công!', 'success');
                 dispatch(getDmNhomTaiSanCoDinhPage());
             }
-        }, error => T.notify('Cập nhật thông tin nhóm tài sản cố định bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, error => T.notify('Cập nhật thông tin nhóm tài sản cố định bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -143,9 +144,29 @@ export function changeDmNhomTaiSanCoDinh(item) {
     return { type: DmNhomTaiSanCoDinhUpdate, item };
 }
 
+// export const SelectAdapter_DmNhomTaiSanCoDinh = {
+//     ajax: false,
+//     getAll: getdmNhomTaiSanCoDinhAll,
+//     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
+//     condition: { kichHoat: 1 },
+// }
+
 export const SelectAdapter_DmNhomTaiSanCoDinh = {
-    ajax: false,
-    getAll: getdmNhomTaiSanCoDinhAll,
-    processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
-    condition: { kichHoat: 1 },
+    ajax: true,
+    url: function (params) {
+        let page = params.page || 1;
+        return `/api/danh-muc/nhom-tai-san-co-dinh/page/${page}/20`;
+    },
+    data: params => ({ condition: params.term }),
+    processResults: function (response, params) {
+        params.page = params.page || 1;
+        return {
+            results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, ten: item.ten, text: `${item.ma}: ${item.ten}` })) : [],
+            pagination: {
+                more: params.page < response.page.pageTotal
+            }
+        };
+    },
+    getOne: getDmNhomTaiSanCoDinh,
+    processResultOne: response => response && ({ value: response.ma, text: `${response.ma}:${response.ten}` }),
 };

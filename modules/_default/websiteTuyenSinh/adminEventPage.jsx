@@ -28,7 +28,7 @@ class adminEventPage extends React.Component {
     }
 
     getPage = (pageNumber, pageSize, pageCondition) => {
-        this.props.getEventInPage(pageNumber, pageSize, pageCondition, page => {
+        this.props.getEventInPage(pageNumber, pageSize, pageCondition, () => {
         });
     }
 

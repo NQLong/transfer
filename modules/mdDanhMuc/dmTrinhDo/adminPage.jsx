@@ -2,21 +2,21 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getDmTrinhDoAll, createDmTrinhDo, updateDmTrinhDo, deleteDmTrinhDo } from './redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormCheckbox  } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
 
 class EditModal extends AdminModal {
     modal = React.createRef();
     state = { kichHoat: true }
 
     onShow = (item) => {
-        let { ma, ten, tenTiengAnh, vietTat, vietTatTiengAnh, kichHoat } = item ? item : { ma: null, ten: '', tenTiengAnh: '', vietTat: '', vietTatTiengAnh: '', kichHoat: 1 };
-        
+        let { ma, tenTiengAnh, vietTat, vietTatTiengAnh, kichHoat } = item ? item : { ma: null, tenTiengAnh: '', vietTat: '', vietTatTiengAnh: '', kichHoat: 1 };
+
         this.ma.value(ma);
         this.ten.value(tenTiengAnh);
         this.vietTat.value(vietTat);
         this.vietTatTiengAnh.value(vietTatTiengAnh);
         this.kichHoat.value(kichHoat);
-        this.setState({kichHoat});
+        this.setState({ kichHoat });
 
         $(this.modal).attr('data-ma', ma).modal('show');
     };
@@ -70,7 +70,7 @@ class EditModal extends AdminModal {
                     onChange={() => !readOnly && this.setState({ kichHoat: !this.state.kichHoat })} />
             </div>
         }
-        )
+        );
     }
 }
 

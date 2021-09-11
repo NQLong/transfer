@@ -19,7 +19,7 @@ class SectionApplyForm extends React.Component {
                     T.get(url, ({ error, item }) => {
                         if (error) {
                             T.notify('Lấy dữ liệu form bị lỗi!', 'danger');
-                            console.error('GET: ' + url + '.', data.error);
+                            console.error('GET: ' + url + '.', error);
                         } else if (item) {
                             this.setState({ selectedForm: { value: item.id, label: item.title.viText(), isLocked: item.isLocked, active: item.active } });
                         }
@@ -160,6 +160,6 @@ class SectionApplyForm extends React.Component {
     }
 }
 
-const mapStateToProps = state => ({});
+const mapStateToProps = () => ({});
 const mapActionToProps = { updateForm };
 export default connect(mapStateToProps, mapActionToProps, null, { forwardRef: true })(SectionApplyForm);

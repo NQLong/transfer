@@ -3,7 +3,6 @@ import T from 'view/js/common';
 // Reducer ------------------------------------------------------------------------------------------------------------
 const dmKhcnLinhVucKhoaHocGetAll = 'dmKhcnLinhVucKhoaHoc:GetAll';
 const dmKhcnLinhVucKhoaHocGetPage = 'dmKhcnLinhVucKhoaHoc:GetPage';
-const dmKhcnLinhVucKhoaHocUpdate = 'dmKhcnLinhVucKhoaHoc:Update';
 
 export default function dmKhcnLinhVucKhoaHocReducer(state = null, data) {
     switch (data.type) {
@@ -17,7 +16,7 @@ export default function dmKhcnLinhVucKhoaHocReducer(state = null, data) {
 }
 
 export function getDmKhcnLinhVucKhoaHoc(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/khcn-linh-vuc-khoa-hoc/${ma}`;
         T.get(url, { ma }, data => {
             if (data.error) {

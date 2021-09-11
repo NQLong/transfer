@@ -120,7 +120,6 @@ class DmDienChinhSachPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmDienChinhSach:write'),
-            permissionDelete = currentPermissions.includes('dmDienChinhSach:delete'),
             permission = this.getUserPermission('dmDienChinhSach', ['write', 'delete']);
         let table = 'Không có dữ liệu!',
             items = this.props.dmDienChinhSach && this.props.dmDienChinhSach.items ? this.props.dmDienChinhSach.items : [];
@@ -133,19 +132,19 @@ class DmDienChinhSachPage extends AdminPage {
                         <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
                         <th style={{ width: '100%' }} nowrap='true'>Tên</th>
                         <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>    
+                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='number' style={{ textAlign: 'right' }} content={index + 1} />
-                        <TableCell type='link' style={{ textAlign: 'center' }} content={item.ma ? item.ma : ''} 
-                            onClick = {e => this.edit(e, item)} />
+                        <TableCell type='link' style={{ textAlign: 'center' }} content={item.ma ? item.ma : ''}
+                            onClick={e => this.edit(e, item)} />
                         <TableCell type='text' content={item.ten ? item.ten : ''} />
-                        <TableCell type='checkbox' style={{ textAlign: 'center' }} content={item.kichHoat} permission={permissionWrite} 
-                            onChange={e => permissionWrite && this.changeActive(item)} />
-                        <TableCell type='buttons' style={{ textAlign: 'center' }} contetn={item} permission={permission} 
-                            onEdit={e => this.edit(e, item)} onDelete={e => this.delete(e, item)} /> 
+                        <TableCell type='checkbox' style={{ textAlign: 'center' }} content={item.kichHoat} permission={permissionWrite}
+                            onChange={() => permissionWrite && this.changeActive(item)} />
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} contetn={item} permission={permission}
+                            onEdit={e => this.edit(e, item)} onDelete={e => this.delete(e, item)} />
                     </tr>
                 )
             });
@@ -224,7 +223,7 @@ class DmDienChinhSachPage extends AdminPage {
 //                                 <td>{item.ten}</td>
 //                                 <td className='toggle' style={{ textAlign: 'center' }}>
 //                                     <label>
-//                                         <input type='checkbox' checked={item.kichHoat == '1' ? true : false} onChange={e => permissionWrite && this.changeActive(item)} />
+//                                         <input type='checkbox' checked={item.kichHoat == '1' ? true : false} onChange={() => permissionWrite && this.changeActive(item)} />
 //                                         <span className='button-indecator' />
 //                                     </label>
 //                                 </td>

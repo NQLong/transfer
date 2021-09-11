@@ -65,7 +65,7 @@ class EditModal extends AdminModal {
 				<FormTextBox type='text' className='col-12' ref={e => this.maTaiKhoan = e} label='Mã tài khoản' readOnly={readOnly} placeholder='Mã tài khoản' />
 				<FormTextBox type='text' className='col-12' ref={e => this.maHieu = e} label='Mã hiệu' readOnly={readOnly} placeholder='Mã hiệu' />
 			</div>
-		})
+		});
 
 
 	}
@@ -81,7 +81,7 @@ class dmLoaiTaiSanCoDinhPage extends AdminPage {
 
 	getPage = (pageNumber, pageSize, pageCondition) => {
 		this.setState({ searching: true });
-		this.props.getDmLoaiTaiSanCoDinhPage(pageNumber, pageSize, pageCondition, (page) => {
+		this.props.getDmLoaiTaiSanCoDinhPage(pageNumber, pageSize, pageCondition, () => {
 			this.setState({ searching: false });
 		});
 	};

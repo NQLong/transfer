@@ -2,18 +2,16 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getDmTangBhxhAll, deleteDmTangBhxh, createDmTangBhxh, updateDmTangBhxh } from './reduxTangBhxh';
 import { Link } from 'react-router-dom';
-import AdminSearchBox from 'view/component/AdminSearchBox';
-import { OverlayLoading } from 'view/component/Pagination';
 import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
 
 class EditModal extends AdminModal {
-    state = { kichHoat: true};
+    state = { kichHoat: true };
     modal = React.createRef();
 
     onShow = (item) => {
         let { ma, moTa, kichHoat } = item ? item : { ma: '', moTa: '', kichHoat: true };
-        
-        this.setState({kichHoat });
+
+        this.setState({ kichHoat });
         this.ma.value(ma);
         this.moTa.value(moTa);
         this.kichHoat.value(kichHoat);
@@ -55,10 +53,10 @@ class EditModal extends AdminModal {
             body: <div className='row'>
                 <FormTextBox type='text' className='col-md-12' ref={e => this.ma = e} label='Mã' readOnly={readOnly} placeholder='Mã danh mục' required />
                 <FormTextBox type='text' className='col-md-12' ref={e => this.moTa = e} label='Mô tả' placeholder='Mô tả' readOnly={readOnly} required />
-                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }} 
+                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
                     onChange={() => !readOnly && this.setState({ kichHoat: !this.state.kichHoat })} />
             </div>
-        })
+        });
     }
 }
 
@@ -75,7 +73,7 @@ class DmTangBhxhPage extends AdminPage {
     }
 
     changeActive = item => {
-        this.props.updateDmTangBhxh(item.ma, { kichHoat: Number(!item.kichHoat) })
+        this.props.updateDmTangBhxh(item.ma, { kichHoat: Number(!item.kichHoat) });
     }
 
     delete = (e, item) => {

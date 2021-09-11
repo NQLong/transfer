@@ -55,7 +55,7 @@ export function getDmChuongTrinhDaoTaoPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: DmChuongTrinhDaoTaoGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách chương trình đào tạo bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách chương trình đào tạo bị lỗi!', 'danger'));
     };
 }
 
@@ -70,12 +70,12 @@ export function getDmChuongTrinhDaoTaoAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmChuongTrinhDaoTaoGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách chương trình đào tạo bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách chương trình đào tạo bị lỗi!', 'danger'));
     };
 }
 
 export function getDmChuongTrinhDaoTao(_id, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/chuong-trinh-dao-tao/item/${_id}`;
         T.get(url, data => {
             if (data.error) {
@@ -99,7 +99,7 @@ export function createDmChuongTrinhDaoTao(item, done) {
                 dispatch(getDmChuongTrinhDaoTaoPage());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo chương trình đào tạo bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo chương trình đào tạo bị lỗi!', 'danger'));
     };
 }
 
@@ -114,7 +114,7 @@ export function deleteDmChuongTrinhDaoTao(_id) {
                 T.alert('Khoa đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmChuongTrinhDaoTaoPage());
             }
-        }, error => T.notify('Xóa chương trình đào tạo bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa chương trình đào tạo bị lỗi!', 'danger'));
     };
 }
 
@@ -130,7 +130,7 @@ export function updateDmChuongTrinhDaoTao(_id, changes, done) {
                 T.notify('Cập nhật thông tin chương trình đào tạo thành công!', 'success');
                 dispatch(getDmChuongTrinhDaoTaoPage());
             }
-        }, error => T.notify('Cập nhật thông tin chương trình đào tạo bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin chương trình đào tạo bị lỗi!', 'danger'));
     };
 }
 

@@ -55,7 +55,7 @@ export function getDmKinhPhiNuocNgoaiPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: DmKinhPhiNuocNgoaiGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách ca học bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách ca học bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -70,12 +70,12 @@ export function getDmKinhPhiNuocNgoaiAll(condition, done) {
                 if (done) done(data.items);
                 dispatch({ type: DmKinhPhiNuocNgoaiGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách kinh phí đi nước ngoài bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách kinh phí đi nước ngoài bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
 export function getDmKinhPhiNuocNgoai(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/kinh-phi-nuoc-ngoai/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -99,7 +99,7 @@ export function createDmKinhPhiNuocNgoai(item, done) {
                 dispatch(getDmKinhPhiNuocNgoaiAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo kinh phí đi nước ngoài bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Tạo kinh phí đi nước ngoài bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -114,7 +114,7 @@ export function deleteDmKinhPhiNuocNgoai(ma) {
                 T.alert('Danh mục đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmKinhPhiNuocNgoaiAll());
             }
-        }, error => T.notify('Xóa kinh phí đi nước ngoài bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Xóa kinh phí đi nước ngoài bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -130,7 +130,7 @@ export function updateDmKinhPhiNuocNgoai(ma, changes, done) {
                 T.notify('Cập nhật thông tin kinh phí đi nước ngoài thành công!', 'success');
                 dispatch(getDmKinhPhiNuocNgoaiAll());
             }
-        }, error => T.notify('Cập nhật thông tin kinh phí đi nước ngoài bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Cập nhật thông tin kinh phí đi nước ngoài bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 

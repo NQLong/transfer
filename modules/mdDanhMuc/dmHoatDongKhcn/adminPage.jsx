@@ -105,21 +105,20 @@ class DmHoatDongKhcnPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmHoatDongKhcn:write'),
-            permissionDelete = currentPermissions.includes('dmHoatDongKhcn:delete'),
             permission = this.getUserPermission('dmHoatDongKhcn', ['write', 'delete']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmHoatDongKhcn && this.props.dmHoatDongKhcn.page ?
             this.props.dmHoatDongKhcn.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có dữ liệu!';
         if (list && list.length > 0) {
             table = renderTable({
-                getDataSource: () => list, stickyHead: fasle, 
+                getDataSource: () => list, stickyHead: false,
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
                         <th style={{ width: 'auto' }}>Mã</th>
                         <th style={{ width: '60%' }} nowrap='true'>Tên danh mục hoạt động KH&CN</th>
                         <th style={{ width: '40%' }} nowrap='true'>Ghi chú</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>    
+                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
@@ -128,7 +127,7 @@ class DmHoatDongKhcnPage extends AdminPage {
                         <TableCell type='text' content={item.ma ? item.ma : ''} />
                         <TableCell type='text' content={item.ten ? item.ten : ''} />
                         <TableCell type='text' content={item.ghiChu ? item.ghiChu : ''} />
-                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} 
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={e => this.edit(e, item)} onDelete={e => this.delete(e, item)} />
                     </tr>
                 )

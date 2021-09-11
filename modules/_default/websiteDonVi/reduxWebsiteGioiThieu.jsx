@@ -95,7 +95,7 @@ export function getWebsiteGioiThieuPage(pageNumber, pageSize, pageCondition, don
                 if (done) done(data.page);
                 dispatch({ type: WebsiteGioiThieuGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách giới thiệu website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách giới thiệu website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -110,7 +110,7 @@ export function getWebsiteGioiThieuAll(maDonVi, done) {
                 if (done) done(data.items);
                 dispatch({ type: WebsiteGioiThieuGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách giới thiệu website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách giới thiệu website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -141,7 +141,7 @@ export function createWebsiteGioiThieu(item, done) {
                 dispatch(getWebsiteGioiThieuAll(item.maDonVi));
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo giới thiệu website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+        }, (error) => T.notify('Tạo giới thiệu website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -156,7 +156,7 @@ export function deleteWebsiteGioiThieu(maDonVi, ma) {
                 T.alert('Mục giới thiệu Website đơn vị đã xóa thành công!', 'success', false, 800);
                 dispatch(getWebsiteGioiThieuAll(maDonVi));
             }
-        }, error => T.notify('Xóa giới thiệu website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+        }, (error) => T.notify('Xóa giới thiệu website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -173,7 +173,7 @@ export function updateWebsiteGioiThieu(maDonVi, ma, changes, done) {
                 if (done) done(data.items);
                 dispatch(getWebsiteGioiThieuAll(maDonVi));
             }
-        }, error => T.notify('Cập nhật thông tin giới thiệu website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+        }, (error) => T.notify('Cập nhật thông tin giới thiệu website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -188,7 +188,7 @@ export function swapWebsiteGioiThieu(maDonVi, ma, thuTu, isMoveUp, done) {
                 dispatch(getWebsiteGioiThieuAll(maDonVi));
                 done && done();
             }
-        }, error => T.notify('Thay đổi vị trí mục giới thiệu khoa bị lỗi!', 'danger'));
+        }, () => T.notify('Thay đổi vị trí mục giới thiệu khoa bị lỗi!', 'danger'));
     };
 }
 
@@ -208,7 +208,7 @@ export function getWebsiteGioiThieuHinhAll(condition, done) {
                 if (done) done(data.items);
                 dispatch({ type: WebsiteGioiThieuHinhGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách hình giới thiệu website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách hình giới thiệu website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -223,12 +223,12 @@ export function getWebsiteGioiThieuHinhAllById(maWebsiteGioiThieu, done) {
                 if (done) done(data.items);
                 dispatch({ type: WebsiteGioiThieuHinhGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách hình giới thiệu website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách hình giới thiệu website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
 export function getWebsiteGioiThieuHinh(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/website/intro/image/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -253,7 +253,7 @@ export function createWebsiteGioiThieuHinh(item, done) {
                 dispatch(getWebsiteGioiThieu(item.maWebsiteGioiThieu));
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo hình giới thiệu website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+        }, (error) => T.notify('Tạo hình giới thiệu website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -268,7 +268,7 @@ export function deleteWebsiteGioiThieuHinh(item) {
                 T.alert('Hình giới thiệu Website đơn vị đã xóa thành công!', 'success', false, 800);
                 dispatch(getWebsiteGioiThieu(item.maWebsiteGioiThieu));
             }
-        }, error => T.notify('Xóa hình giới thiệu website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+        }, (error) => T.notify('Xóa hình giới thiệu website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -285,7 +285,7 @@ export function updateWebsiteGioiThieuHinh(maWebsiteGioiThieu, ma, changes, done
                 if (done) done(data.items);
                 dispatch(getWebsiteGioiThieu(maWebsiteGioiThieu));
             }
-        }, error => T.notify('Cập nhật thông tin hình giới thiệu website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+        }, (error) => T.notify('Cập nhật thông tin hình giới thiệu website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -300,7 +300,7 @@ export function swapWebsiteGioiThieuHinh(maWebsiteGioiThieu, ma, thuTu, isMoveUp
                 if (done) done(data.items);
                 dispatch(getWebsiteGioiThieu(maWebsiteGioiThieu));
             }
-        }, error => T.notify('Thay đổi vị trí hình giới thiệu khoa bị lỗi!', 'danger'));
+        }, () => T.notify('Thay đổi vị trí hình giới thiệu khoa bị lỗi!', 'danger'));
     };
 }
 
@@ -315,7 +315,7 @@ export function getThongTinGioiThieu(maDonVi, done) {
                 if (done) done(data.items);
                 dispatch({ type: WebsiteGioiThieuHomeDv, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách giới thiệu website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách giới thiệu website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 

@@ -57,7 +57,7 @@ export function getDmChauPage(pageNumber, pageSize, pageCondition, done) {
                 if (done) done(data.page);
                 dispatch({ type: DmChauGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách châu bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách châu bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -72,12 +72,12 @@ export function getDmChauAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmChauGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách châu bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách châu bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
 export function getDmChau(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/chau/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -101,7 +101,7 @@ export function createDmChau(dmChau, done) {
                 dispatch(getDmChauAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo mới một châu bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Tạo mới một châu bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -116,7 +116,7 @@ export function updateDmChau(ma, changes, done) {
                 done && done(data.item);
                 dispatch(getDmChauAll());
             }
-        }, error => T.notify('Cập nhật dữ liệu châu bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Cập nhật dữ liệu châu bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -132,7 +132,7 @@ export function deleteDmChau(ma, done) {
                 dispatch(getDmChauAll());
             }
             done && done();
-        }, error => T.notify('Xóa châu bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa châu bị lỗi!', 'danger'));
     };
 }
 

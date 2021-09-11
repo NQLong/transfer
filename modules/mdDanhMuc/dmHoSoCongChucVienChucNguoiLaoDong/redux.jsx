@@ -53,12 +53,12 @@ export function getDmHoSoCcvcNldAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmHoSoCcvcNldGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách Hồ sơ công chức viên chức - người lao động bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách Hồ sơ công chức viên chức - người lao động bị lỗi!', 'danger'));
     };
 }
 
 export function getDmHoSoCcvcNld(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/ho-so-cong-chuc-vien-chuc-nguoi-lao-dong/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -82,7 +82,7 @@ export function createDmHoSoCcvcNld(item, done) {
                 dispatch(getDmHoSoCcvcNldAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo Hồ sơ công chức viên chức - người lao động bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo Hồ sơ công chức viên chức - người lao động bị lỗi!', 'danger'));
     };
 }
 
@@ -98,7 +98,7 @@ export function deleteDmHoSoCcvcNld(ma, done) {
                 dispatch(getDmHoSoCcvcNldAll());
             }
             done && done(data.error);
-        }, error => T.notify('Xóa Hồ sơ công chức viên chức - người lao động bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa Hồ sơ công chức viên chức - người lao động bị lỗi!', 'danger'));
     };
 }
 
@@ -114,7 +114,7 @@ export function updateDmHoSoCcvcNld(ma, changes, done) {
                 dispatch(getDmHoSoCcvcNldAll());
             }
             done && done(data.error);
-        }, error => T.notify('Cập nhật thông tin Hồ sơ công chức viên chức - người lao động bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin Hồ sơ công chức viên chức - người lao động bị lỗi!', 'danger'));
     };
 }
 

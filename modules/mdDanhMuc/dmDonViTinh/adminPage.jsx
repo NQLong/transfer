@@ -99,7 +99,7 @@ class dmDonViTinhAdminPage extends AdminPage {
             <TableCell type='buttons' content={item} permission={permission} onEdit={this.edit} onDelete={this.delete} />
           </tr>
         ),
-      })
+      });
     }
 
     return (

@@ -64,12 +64,12 @@ module.exports = app => {
                         }
                     });
                 });
-            }).then(adminUser => {
+            }).then(() => {
                 app.model.fwUserRole.get({ email: app.defaultAdminEmail, roleId: app.adminRole.id }, (error, userRole) => {
                     if (error) {
                         console.log(' - Error: Cannot get default Admin user\'s role!');
                     } else if (userRole == null) {
-                        app.model.fwUserRole.create({ email: app.defaultAdminEmail, roleId: app.adminRole.id }, (error, userRole) => {
+                        app.model.fwUserRole.create({ email: app.defaultAdminEmail, roleId: app.adminRole.id }, (error,) => {
                             if (error) {
                                 console.log(' - Error: Create Admin user\'s role!');
                             } else {
@@ -89,7 +89,7 @@ module.exports = app => {
                         roles.forEach(role => {
                             if (role.name != 'admin') {
                                 const testEmail = role.name.toLowerCase().replaceAll(' ', '_') + '@hcmussh.edu.vn';
-                                app.model.fwUser.get({ email: testEmail }, (error, testUser) => {
+                                app.model.fwUser.get({ email: testEmail }, (error,) => {
                                     if (error) {
                                         console.log('Error: Get test user by email!', error);
                                     }

@@ -181,7 +181,7 @@ class DmNganhDaoTaoPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmNganhDaoTao:write'),
-            permissionDelete = currentPermissions.includes('dmNganhDaoTao:delete'),
+            // permissionDelete = currentPermissions.includes('dmNganhDaoTao:delete'),
             permission = this.getUserPermission('dmNganhDaoTao', ['write', 'delete']);
 
         const { pageNumber, pageSize, pageTotal, totalItem, list } = this.props.dmNganhDaoTao && this.props.dmNganhDaoTao.page ?
@@ -189,7 +189,7 @@ class DmNganhDaoTaoPage extends AdminPage {
         let table = 'Không có ngành đào tạo!';
         if (list && list.length > 0) {
             table = renderTable({
-                getDataSource: () => list, stickyHead: false, 
+                getDataSource: () => list, stickyHead: false,
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
@@ -202,12 +202,12 @@ class DmNganhDaoTaoPage extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index} >
                         <TableCell type='number' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                        <TableCell type='link' content={T.language.parse(item.ten, true).vi} 
-                            onClick = {e => this.edit(e, item)} />
+                        <TableCell type='link' content={T.language.parse(item.ten, true).vi}
+                            onClick={e => this.edit(e, item)} />
                         <TableCell type='text' content={this.mapperDonVi[item.maDonVi] ? this.mapperDonVi[item.maDonVi] : ''} />
                         <TableCell type='checkbox' style={{ textAlign: 'center' }} content={item.kichHoat} permission={permissionWrite}
                             onChange={() => permissionWrite && this.changeActive(item)} />
-                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} 
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={e => this.edit(e, item)} onDelete={e => this.delete(e, item)} />
                     </tr>
                 )
@@ -309,7 +309,7 @@ export default connect(mapStateToProps, mapActionsToProps)(DmNganhDaoTaoPage);
 //                                 <td>{this.mapperDonVi[item.maDonVi] ? this.mapperDonVi[item.maDonVi] : ''}</td>
 //                                 <td className='toggle' style={{ textAlign: 'center' }}>
 //                                     <label>
-//                                         <input type='checkbox' checked={item.kichHoat} onChange={e => permissionWrite && this.changeActive(item)} />
+//                                         <input type='checkbox' checked={item.kichHoat} onChange={() => permissionWrite && this.changeActive(item)} />
 //                                         <span className='button-indecator' />
 //                                     </label>
 //                                 </td>

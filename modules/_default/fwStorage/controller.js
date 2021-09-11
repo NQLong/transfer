@@ -26,7 +26,7 @@ module.exports = app => {
             body.path = files.assets[0].originalFilename;
             body.userUpload = req.session.user.lastName + ' ' + req.session.user.firstName;
             body.maDonVi = req.session.user.maDonVi;
-            app.fs.rename(files.assets[0].path, app.path.join(app.documentPath, body.path), error => {
+            app.fs.rename(files.assets[0].path, app.path.join(app.documentPath, body.path), () => {
                 app.model.fwStorage.get({ path: body.path }, (error, itemCheck) => {
                     if (itemCheck) {
                         res.send({ error: 'Đã tồn tại tệp tin trùng tên trong hệ thống.' });

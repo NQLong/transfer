@@ -130,7 +130,7 @@ class DmChauPage extends AdminPage {
             permissionWrite = currentPermissions.includes('dmChau:write'),
             permissionDelete = currentPermissions.includes('dmChau:delete'),
             permission = this.getUserPermission('dmChau', ['write', 'delete']);
-            
+
         let table = 'Không có dữ liệu!',
             items = this.props.dmChau && this.props.dmChau.items;
         if (items && items.length > 0) {
@@ -143,16 +143,16 @@ class DmChauPage extends AdminPage {
                         <th style={{ width: '100%' }} nowrap='true'>Territory</th>
                         <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
                         <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
-                    </tr>    
+                    </tr>
                 ),
                 renderRow: (item, index) => (
-                    <tr key={index}> 
+                    <tr key={index}>
                         <TableCell type='text' content={item.ma ? item.ma : ''} />
-                        <TableCell type="link" content={item.ten ? item.ten : ''} onClick = {e => this.edit(e, item)} />
+                        <TableCell type="link" content={item.ten ? item.ten : ''} onClick={e => this.edit(e, item)} />
                         <TableCell type='text' content={item.territory ? item.territory : ''} />
-                        <TableCell type='checkbox' content={item.kichHoat} permission={permissionWrite} 
-                            onChange={e => permissionWrite && this.changeActive(item)} />
-                        <TableCell type='buttons' content={item} permission={permission} onEdit={e => this.edit(e, item)} 
+                        <TableCell type='checkbox' content={item.kichHoat} permission={permissionWrite}
+                            onChange={() => permissionWrite && this.changeActive(item)} />
+                        <TableCell type='buttons' content={item} permission={permission} onEdit={e => this.edit(e, item)}
                             onDelete={e => permissionDelete && this.delete(e, item)} />
                     </tr>
                 )

@@ -23,7 +23,6 @@ class GioiThieuSection extends React.Component {
         const gioiThieu = this.state.gioiThieu ? this.state.gioiThieu : [];
         let title_list = [];
         let content_list = [];
-        let carousel = [];
         gioiThieu.map((item, index) => {
             title_list.push(<li key={index} className={(item.trongSo == 1 ? 'col-5' : 'col-10') + ' text-center border gtkhoa-cate gtkhoa-cate-1'} role='presentation'><button href={'#' + index} aria-controls='first' role='tab'
                 data-toggle='tab' className={index == 0 ? 'active' : ''}>{T.language.parse(item.ten)}</button></li>);

@@ -1,4 +1,3 @@
-import React from 'react';
 import { AdminPage } from 'view/component/AdminPage';
 
 export class QTForm extends AdminPage {

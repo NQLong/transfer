@@ -29,7 +29,7 @@ module.exports = app => {
                     debugUser ? resolve(debugUser) : reject(error ? error : 'Debug user is not available!'));
             })).then(debugUser => {
                 console.log(` - Debug as ${debugUser.email}!`);
-                app.updateSessionUser(req, debugUser, _ => res.send({}));
+                app.updateSessionUser(req, debugUser, () => res.send({}));
             }).catch(error => res.send({ error }));
         });
     }
@@ -48,11 +48,11 @@ module.exports = app => {
                                 if (error || user == null) {
                                     res.send({ error: 'System has errors!' });
                                 } else {
-                                    app.updateSessionUser(req, user, _ => res.send({ user }));
+                                    app.updateSessionUser(req, user, () => res.send({ user }));
                                 }
                             });
                         } else {
-                            app.updateSessionUser(req, user, _ => res.send({ user }));
+                            app.updateSessionUser(req, user, () => res.send({ user }));
                         }
                     });
                 } else {
@@ -60,7 +60,7 @@ module.exports = app => {
                         if (error) {
                             res.send({ error: 'System has errors!' });
                         } else if (user) {
-                            app.updateSessionUser(req, user, _ => res.send({ user }));
+                            app.updateSessionUser(req, user, () => res.send({ user }));
                         }
                     });
                 }

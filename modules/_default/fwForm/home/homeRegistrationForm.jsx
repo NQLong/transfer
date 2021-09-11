@@ -79,7 +79,6 @@ class RegisterElement extends React.Component {
         const item = this.props.element ? this.props.element : {
             id: '', content: '', active: 0, typeName: '', typeValue: [], rowNum: 3, speakDuration: 30
         },
-            user = this.props.user || {},
             questionContent =
                 <div className='row'>
                     <div className='col-xs'>

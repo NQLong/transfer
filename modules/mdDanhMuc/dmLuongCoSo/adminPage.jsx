@@ -113,7 +113,7 @@ class dmLuongCoSoPage extends AdminPage {
 
     getPage = (pageNumber, pageSize, pageCondition) => {
         this.setState({ searching: true });
-        this.props.getDmLuongCoSoPage(pageNumber, pageSize, pageCondition, page => {
+        this.props.getDmLuongCoSoPage(pageNumber, pageSize, pageCondition, () => {
             this.setState({ searching: false });
         });
     }
@@ -132,7 +132,6 @@ class dmLuongCoSoPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmLuongCoSo:write'),
-            permissionDelete = currentPermissions.includes('dmLuongCoSo:delete'),
             permission = this.getUserPermission('dmLuongCoSo', ['write', 'delete']);
 
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmLuongCoSo && this.props.dmLuongCoSo.page ?
@@ -141,7 +140,7 @@ class dmLuongCoSoPage extends AdminPage {
         list.sort((a, b) => b.hieuLucTu - a.hieuLucTu);
         if (list && list.length > 0) {
             table = renderTable({
-                getDataSource: () => list, stickyHead: false, 
+                getDataSource: () => list, stickyHead: false,
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
@@ -155,12 +154,12 @@ class dmLuongCoSoPage extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index} >
                         <TableCell type='number' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                        <TableCell type='link' style={{textAlign: 'right'}} content={item.mucLuong.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')} 
-                            onClick = {e => this.edit(e, item)} />
+                        <TableCell type='link' style={{ textAlign: 'right' }} content={item.mucLuong.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                            onClick={e => this.edit(e, item)} />
                         <TableCell type='text' content={T.dateToText(item.hieuLucTu, 'dd/mm/yyyy')} />
                         <TableCell type='text' content={item.hieuLucDen ? T.dateToText(item.hieuLucDen, 'dd/mm/yyyy') : ''} />
                         <TableCell type='text' content={item.nghiDinhChinhPhu ? item.nghiDinhChinhPhu : ''} />
-                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} 
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={e => this.edit(e, item)} onDelete={e => this.delete(e, item)} />
                     </tr>
                 )

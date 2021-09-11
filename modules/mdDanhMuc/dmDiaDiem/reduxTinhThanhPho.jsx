@@ -27,7 +27,7 @@ export function getDMTinhThanhPhoAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmTinhThanhPhoGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách tỉnh thành phố bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách tỉnh thành phố bị lỗi!', 'danger'));
     };
 }
 
@@ -45,7 +45,7 @@ export function getDMTinhThanhPhoPage(pageNumber, pageSize, pageCondition, done)
                 if (done) done(data.page);
                 dispatch({ type: DmTinhThanhPhoGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách tỉnh / thành phố bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách tỉnh / thành phố bị lỗi!', 'danger'));
     };
 }
 
@@ -66,7 +66,7 @@ export function updateDMTinhThanhPho(ma, changes, done) {
 }
 
 export function createMultiDMTinhThanhPho(multiDMTinhThanhPho, isOverride, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/danh-muc/tinh-thanh-pho/multiple';
         T.post(url, { multiDMTinhThanhPho, isOverride }, data => {
             done && done(data.error, data.item);
@@ -102,7 +102,7 @@ export function deleteDMTinhThanhPho(ma) {
                 T.alert('Xoá thành công!', 'success', false, 800);
                 dispatch(getDMTinhThanhPhoPage());
             }
-        }, error => T.notify('Xóa thông tin tỉnh / thành phố bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa thông tin tỉnh / thành phố bị lỗi!', 'danger'));
     };
 }
 

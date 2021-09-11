@@ -56,7 +56,7 @@ class EditModal extends AdminModal {
                 <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }} 
                     onChange={() => !readOnly && this.setState({ kichHoat: !this.state.kichHoat })} />
             </div>
-        })
+        });
     }
 }
 
@@ -103,7 +103,7 @@ class DmGiamBhxhPage extends AdminPage {
                     <TableCell type='buttons' content={item} permission={permission} onEdit={this.edit} onDelete={this.delete}></TableCell>
                 </tr>
             ),
-        })
+        });
 
 
         return (

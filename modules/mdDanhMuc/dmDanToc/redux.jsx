@@ -57,7 +57,7 @@ export function getDmDanTocPage(pageNumber, pageSize, pageCondition, done) {
                 if (done) done(data.page);
                 dispatch({ type: DmDanTocGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách ca học bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách ca học bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -72,12 +72,12 @@ export function getDmDanTocAll(condition, done) {
                 if (done) done(data.items);
                 dispatch({ type: DmDanTocGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách dân tộc bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách dân tộc bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
 export function getDmDanToc(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/dan-toc/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -101,7 +101,7 @@ export function createDmDanToc(item, done) {
                 dispatch(getDmDanTocPage());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo dân tộc bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Tạo dân tộc bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -116,7 +116,7 @@ export function deleteDmDanToc(ma) {
                 T.alert('Danh mục đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmDanTocPage());
             }
-        }, error => T.notify('Xóa dân tộc bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Xóa dân tộc bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -132,7 +132,7 @@ export function updateDmDanToc(ma, changes, done) {
                 T.notify('Cập nhật thông tin dân tộc thành công!', 'success');
                 dispatch(getDmDanTocPage());
             }
-        }, error => T.notify('Cập nhật thông tin dân tộc bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Cập nhật thông tin dân tộc bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 

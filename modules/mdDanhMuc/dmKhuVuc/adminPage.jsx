@@ -5,7 +5,7 @@ import { getDmChauAll, SelectAdapter_DmChau } from 'modules/mdDanhMuc/dmChau/red
 import Pagination, { OverlayLoading } from 'view/component/Pagination';
 import AdminSearchBox from 'view/component/AdminSearchBox';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormSelect, FormCheckbox } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
 import { Select } from 'view/component/Input';
 
 class EditModal extends AdminModal {
@@ -34,7 +34,7 @@ class EditModal extends AdminModal {
             maChau: this.maChau.getFormVal().data,
             kichHoat: Number(this.state.kichHoat),
         };
-        if (changes.ma == "") {
+        if (changes.ma == '') {
             T.notify('Hãy điền đầy đủ thông tin trước khi lưu!', 'danger');
             this.ma.focus();
         }

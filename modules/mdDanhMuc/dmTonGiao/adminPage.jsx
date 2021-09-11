@@ -121,7 +121,7 @@ class DmTonGiaoPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmTonGiao:write'),
-            permissionDelete = currentPermissions.includes('dmTonGiao:delete'),
+            // permissionDelete = currentPermissions.includes('dmTonGiao:delete'),
             permission = this.getUserPermission('dmTonGiao', ['write', 'delete']);
 
         let { pageNumber, pageSize, pageTotal, totalItem, list } = this.props.dmTonGiao && this.props.dmTonGiao.page ?
@@ -141,13 +141,13 @@ class DmTonGiaoPage extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='number' style={{ textAlign: 'right'}} content={(pageNumber - 1) * pageSize + index + 1} />
-                        <TableCell type='link' style={{ textAlign: 'center'}} content={item.ma ? item.ma : ''} 
-                            onClick = {e => this.edit(e, item)} />
+                        <TableCell type='number' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
+                        <TableCell type='link' style={{ textAlign: 'center' }} content={item.ma ? item.ma : ''}
+                            onClick={e => this.edit(e, item)} />
                         <TableCell type='text' content={item.ten ? item.ten : ''} />
                         <TableCell type='checkbox' style={{ textAlign: 'center' }} content={item.kichHoat} permission={permissionWrite}
                             onChange={() => permissionWrite && this.changeActive(item)} />
-                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} 
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={e => this.edit(e, item)} onDelete={e => this.delete(e, item)} />
                     </tr>
                 )

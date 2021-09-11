@@ -55,7 +55,7 @@ export function getDmNghiemThuXepLoaiKhcnPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: DmNghiemThuXepLoaiKhcnGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách nghiệm thu xếp loại KHCN bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách nghiệm thu xếp loại KHCN bị lỗi!', 'danger'));
     };
 }
 
@@ -70,12 +70,12 @@ export function getDmNghiemThuXepLoaiKhcnAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmNghiemThuXepLoaiKhcnGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách nghiệm thu xếp loại KHCN bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách nghiệm thu xếp loại KHCN bị lỗi!', 'danger'));
     };
 }
 
 export function getDmNghiemThuXepLoaiKhcn(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/nghiem-thu-xep-loai-khcn/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -100,7 +100,7 @@ export function createDmNghiemThuXepLoaiKhcn(item, done) {
                 dispatch(getDmNghiemThuXepLoaiKhcnAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo nghiệm thu xếp loại KHCN bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo nghiệm thu xếp loại KHCN bị lỗi!', 'danger'));
     };
 }
 
@@ -115,7 +115,7 @@ export function deleteDmNghiemThuXepLoaiKhcn(ma) {
                 T.alert('Danh mục đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmNghiemThuXepLoaiKhcnAll());
             }
-        }, error => T.notify('Xóa nghiệm thu xếp loại KHCN bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa nghiệm thu xếp loại KHCN bị lỗi!', 'danger'));
     };
 }
 
@@ -131,7 +131,7 @@ export function updateDmNghiemThuXepLoaiKhcn(ma, changes, done) {
                 T.notify('Cập nhật thông tin nghiệm thu xếp loại KHCN thành công!', 'success');
                 dispatch(getDmNghiemThuXepLoaiKhcnAll());
             }
-        }, error => T.notify('Cập nhật thông tin nghiệm thu xếp loại KHCN bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin nghiệm thu xếp loại KHCN bị lỗi!', 'danger'));
     };
 }
 

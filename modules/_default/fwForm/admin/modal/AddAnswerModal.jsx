@@ -100,7 +100,7 @@ class AddAnswerModal extends React.Component {
         e.preventDefault();
     };
 
-    fillDefaultValue = (e) => {
+    fillDefaultValue = () => {
 
     };
 
@@ -218,6 +218,6 @@ class AddAnswerModal extends React.Component {
     }
 }
 
-const mapStateToProps = state => ({});
+const mapStateToProps = () => ({});
 const mapActionsToProps = { addAnswer, createUser, updateUser, searchUserFromSystem };
 export default connect(mapStateToProps, mapActionsToProps, null, { forwardRef: true })(AddAnswerModal);

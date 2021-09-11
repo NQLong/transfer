@@ -56,7 +56,7 @@ export function getDmNguonKinhPhiTrongNuocPage(pageNumber, pageSize, pageConditi
                 if (done) done(data.page);
                 dispatch({ type: DmNguonKinhPhiTrongNuocGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách nguồn kinh phí trong nước bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách nguồn kinh phí trong nước bị lỗi!', 'danger'));
     };
 }
 
@@ -71,12 +71,12 @@ export function getDmNguonKinhPhiTrongNuocAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmNguonKinhPhiTrongNuocGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách nguồn kinh phí trong nước bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách nguồn kinh phí trong nước bị lỗi!', 'danger'));
     };
 }
 
 export function getDmNguonKinhPhiTrongNuoc(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/nguon-kinh-phi-trong-nuoc/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -100,7 +100,7 @@ export function createDmNguonKinhPhiTrongNuoc(item, done) {
                 dispatch(getDmNguonKinhPhiTrongNuocPage());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo nguồn kinh phí trong nước bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo nguồn kinh phí trong nước bị lỗi!', 'danger'));
     };
 }
 
@@ -115,7 +115,7 @@ export function deleteDmNguonKinhPhiTrongNuoc(ma) {
                 T.alert('Danh mục đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmNguonKinhPhiTrongNuocPage());
             }
-        }, error => T.notify('Xóa nguồn kinh phí trong nước bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa nguồn kinh phí trong nước bị lỗi!', 'danger'));
     };
 }
 
@@ -131,7 +131,7 @@ export function updateDmNguonKinhPhiTrongNuoc(ma, changes, done) {
                 T.notify('Cập nhật thông tin nguồn kinh phí trong nước thành công!', 'success');
                 dispatch(getDmNguonKinhPhiTrongNuocPage());
             }
-        }, error => T.notify('Cập nhật thông tin nguồn kinh phí trong nước bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin nguồn kinh phí trong nước bị lỗi!', 'danger'));
     };
 }
 

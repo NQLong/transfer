@@ -4,7 +4,7 @@ import { getDmKhenThuongPage, createDmKhenThuong, getDmKhenThuongAll, updateDmKh
 import { Link } from 'react-router-dom';
 import AdminSearchBox from 'view/component/AdminSearchBox';
 import { AdminPage, TableCell, renderTable } from 'view/component/AdminPage';
-import Pagination, { OverlayLoading } from 'view/component/Pagination';
+import { OverlayLoading } from 'view/component/Pagination';
 
 class EditModal extends React.Component {
     state = { active: true };
@@ -119,13 +119,12 @@ class DmKhenThuongPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmKhenThuong:write'),
-            permissionDelete = currentPermissions.includes('dmKhenThuong:delete'),
             permission = this.getUserPermission('dmKhenThuong', ['write', 'delete']);
         let table = 'Không có danh sách khen thưởng!',
             items = this.props.dmKhenThuong && this.props.dmKhenThuong.items ? this.props.dmKhenThuong.items : [];
         if (items.length > 0) {
             table = renderTable({
-                getDataSource: () => items, stickyHead: false, 
+                getDataSource: () => items, stickyHead: false,
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
@@ -140,7 +139,7 @@ class DmKhenThuongPage extends AdminPage {
                         <TableCell type='text' content={item.ten ? item.ten : ''} />
                         <TableCell type='checkbox' style={{ textAlign: 'center' }} content={item.kichHoat} permission={permissionWrite}
                             onChange={() => permissionWrite && this.changeActive(item)} />
-                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} 
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={e => this.edit(e, item)} onDelete={e => this.delete(e, item)} />
                     </tr>
                 )
@@ -151,7 +150,7 @@ class DmKhenThuongPage extends AdminPage {
             <main className='app-content'>
                 <div className='app-title'>
                     <h1><i className='fa fa-list-alt' /> Danh mục Khen thưởng</h1>
-                    <AdminSearchBox ref={this.searchBox} getPage={this.props.getDmKhenThuongPage} 
+                    <AdminSearchBox ref={this.searchBox} getPage={this.props.getDmKhenThuongPage}
                         setSearching={value => this.setState({ searching: value })} />
                     {/* <ul className='app-breadcrumb breadcrumb'>
                         <Link to='/user'><i className='fa fa-home fa-lg' /></Link>
@@ -164,7 +163,7 @@ class DmKhenThuongPage extends AdminPage {
                     {!this.state.searching ? table : <OverlayLoading text='Đang tải..' />}
                     <EditModal ref={this.modal} readOnly={!permissionWrite}
                         createDmKhenThuong={this.props.createDmKhenThuong} updateDmKhenThuong={this.props.updateDmKhenThuong} />
-                    
+
                     {/* <Pagination name={'pageDmKhenThuong'} pageNumber={1} pageSize={1} pageTotal={1} totalItem={1} 
                         style={{ marginLeft: '70px' }} getPage={this.searchBox.current && this.searchBox.current.getPage} /> */}
 

@@ -57,7 +57,7 @@ export function getDmPhanLoaiVienChucPage(pageNumber, pageSize, pageCondition, d
                 if (done) done(data.page);
                 dispatch({ type: DmPhanLoaiVienChucGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách phân loại viên chức bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách phân loại viên chức bị lỗi!', 'danger'));
     };
 }
 
@@ -72,12 +72,12 @@ export function getDmPhanLoaiVienChucAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmPhanLoaiVienChucGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách phân loại viên chức bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách phân loại viên chức bị lỗi!', 'danger'));
     };
 }
 
 export function getDmPhanLoaiVienChuc(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/phan-loai-vien-chuc/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -101,7 +101,7 @@ export function createDmPhanLoaiVienChuc(dmPhanLoaiVienChuc, done) {
                 dispatch(getDmPhanLoaiVienChucPage());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo mới một phân loại viên chức bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo mới một phân loại viên chức bị lỗi!', 'danger'));
     };
 }
 
@@ -132,6 +132,6 @@ export function deleteDmPhanLoaiVienChuc(ma, done) {
                 dispatch(getDmPhanLoaiVienChucPage());
             }
             done && done();
-        }, error => T.notify('Xóa phân loại viên chức bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa phân loại viên chức bị lỗi!', 'danger'));
     };
 }

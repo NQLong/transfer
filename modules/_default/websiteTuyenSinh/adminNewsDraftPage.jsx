@@ -82,7 +82,7 @@ class NewsWaitApprovalPage extends React.Component {
 
     changeActive(item) {
         T.confirm('Bài viết chờ duyệt', 'Bạn có chắc bạn muốn duyệt bài viết này?', 'warning', true,
-            isConfirm => isConfirm && this.props.draftToNews(item.id, done => {
+            isConfirm => isConfirm && this.props.draftToNews(item.id, () => {
                 this.props.getDraftAdmissionNewsInPage(null, null, { isDraftApproved: 1, isTranslated: { $ne: 'in progress' } }, data => {
                     this.setState({ ...data });
                 });

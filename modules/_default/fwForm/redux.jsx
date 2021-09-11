@@ -67,7 +67,7 @@ export function getFormInPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: GET_PAGE, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách bảng câu hỏi bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách bảng câu hỏi bị lỗi!', 'danger'));
     };
 }
 
@@ -82,12 +82,12 @@ export function getForm(id, done) {
                 dispatch({ type: GET, item: data.item });
                 done && done(data);
             }
-        }, error => T.notify('Lấy bảng câu hỏi bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy bảng câu hỏi bị lỗi!', 'danger'));
     };
 }
 
 export function createForm(done) {
-    return dispatch => {
+    return () => {
         const url = '/api/form';
         const data = {
             title: JSON.stringify({ vi: 'Đề thi mới', en: 'New exam' }),
@@ -100,12 +100,12 @@ export function createForm(done) {
             } else {
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo bảng câu hỏi bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo bảng câu hỏi bị lỗi!', 'danger'));
     };
 }
 
 export function duplicateForm(id, title, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/form-duplicate/${id}`;
         T.post(url, { title }, data => {
             if (data.error) {
@@ -130,7 +130,7 @@ export function updateForm(id, changes, done) {
                 dispatch({ type: UPDATE, item: data.item });
                 done && done();
             }
-        }, error => T.notify('Cập nhật thông tin bảng câu hỏi bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin bảng câu hỏi bị lỗi!', 'danger'));
     };
 }
 
@@ -145,7 +145,7 @@ export function swapForm(id, isMoveUp) {
                 T.notify('Thay đổi thứ tự bảng câu hỏi thành công!', 'info');
                 dispatch(getFormInPage());
             }
-        }, error => T.notify('Thay đổi thứ tự bảng câu hỏi bị lỗi!', 'danger'));
+        }, () => T.notify('Thay đổi thứ tự bảng câu hỏi bị lỗi!', 'danger'));
     };
 }
 
@@ -160,12 +160,12 @@ export function deleteForm(id) {
                 T.alert('Đề thi được xóa thành công!', 'error', false, 800);
                 dispatch(getFormInPage());
             }
-        }, error => T.notify('Xóa bảng câu hỏi bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa bảng câu hỏi bị lỗi!', 'danger'));
     };
 }
 
 export function deleteFile(formId, type, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/form-media';
         T.delete(url, { formId, type }, data => {
             if (data.error) {
@@ -190,7 +190,7 @@ export function homeGetForm(id, done) {
                 dispatch({ type: GET, item: data.item });
                 done && done(data.item, data.payment);
             }
-        }, error => T.notify('Lấy bảng câu hỏi bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy bảng câu hỏi bị lỗi!', 'danger'));
     };
 }
 
@@ -205,7 +205,7 @@ export function homeGetInstruction(id, paymentId, done) {
                 dispatch({ type: GET, item: data.item });
                 done && done(data.item);
             }
-        }, error => T.notify('Lấy clip hướng dẫn bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy clip hướng dẫn bị lỗi!', 'danger'));
     };
 }
 
@@ -220,7 +220,7 @@ export function homeTestForm(id, done) {
                 dispatch({ type: GET, item: data.item });
                 done && done(data.item);
             }
-        }, error => T.notify('Lấy bảng câu hỏi bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy bảng câu hỏi bị lỗi!', 'danger'));
     };
 }
 
@@ -236,6 +236,6 @@ export function getFormInPageByUser(pageNumber, pageSize, isNew, pageCondition, 
                 if (done) done(data);
                 dispatch({ type: isNew ? GET_PAGE_NEW_BY_USER : GET_PAGE_BY_USER, userPage: data.page });
             }
-        }, error => T.notify('Lấy danh sách bảng câu hỏi bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách bảng câu hỏi bị lỗi!', 'danger'));
     };
 }

@@ -58,7 +58,7 @@ export function getDmPhongAll(condition, done) {
                 if (done) done(data.items);
                 dispatch({ type: DmPhongGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách phòng học bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách phòng học bị lỗi!', 'danger'));
     };
 }
 
@@ -75,12 +75,12 @@ export function getDmPhongPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: DmPhongGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách phòng học bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách phòng học bị lỗi!', 'danger'));
     };
 }
 
 export function getDmPhong(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/phong/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -105,7 +105,7 @@ export function createDmPhong(item, done) {
                 dispatch(getDmPhongAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo phòng học bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo phòng học bị lỗi!', 'danger'));
     };
 }
 
@@ -120,7 +120,7 @@ export function deleteDmPhong(ma) {
                 T.alert('Xoá thành công!', 'success', false, 800);
                 dispatch(getDmPhongAll());
             }
-        }, error => T.notify('Xóa phòng học bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa phòng học bị lỗi!', 'danger'));
     };
 }
 
@@ -136,7 +136,7 @@ export function updateDmPhong(ma, changes, done) {
                 T.notify('Cập nhật thông tin phòng học thành công!', 'success');
                 dispatch(getDmPhongAll());
             }
-        }, error => T.notify('Cập nhật thông tin phòng học bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin phòng học bị lỗi!', 'danger'));
     };
 }
 export function createDmPhongByUpload(item, done) {
@@ -150,7 +150,7 @@ export function createDmPhongByUpload(item, done) {
                 if (done) done(data);
                 T.notify('Import dữ liệu thành công!', 'success');
             }
-        }, error => T.notify('Tạo phòng học bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo phòng học bị lỗi!', 'danger'));
     };
 }
 

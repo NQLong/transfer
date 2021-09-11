@@ -2,7 +2,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getEventByUser } from './redux';
 import SectionSideBar from 'view/component/SectionSideBar';
-import { Link } from 'react-router-dom';
 
 const texts = {
     vi: {

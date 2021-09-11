@@ -43,7 +43,7 @@ module.exports = app => {
         if (req.params.id != null) {
             app.model.fwContact.get({ id: req.params.id }, (error, item) => {
                 if (item) {
-                    app.model.fwContact.update({ id: req.body.id }, { read: 1 }, error => { });
+                    app.model.fwContact.update({ id: req.body.id }, { read: 1 }, () => { });
                     item.read = 1;
                     app.io.emit('contact-changed', item);
                 }
@@ -65,7 +65,7 @@ module.exports = app => {
 
     // Home -----------------------------------------------------------------------------------------------------------------------------------------
     app.post('/api/contact', (req, res) => {
-        const { name, email, subject, message } = req.body.contact;
+        const { name, subject, message } = req.body.contact;
         if (name == null || subject == null || message == null) {
             res.send({ error: 'Thông tin bạn gửi không hợp lệ!' });
         } else {

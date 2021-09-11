@@ -118,7 +118,7 @@ class DmNhomTaiSanCoDinhPage extends AdminPage {
 
     getPage = (pageNumber, pageSize, pageCondition) => {
         this.setState({ searching: true });
-        this.props.getDmNhomTaiSanCoDinhPage(pageNumber, pageSize, pageCondition, (page) => {
+        this.props.getDmNhomTaiSanCoDinhPage(pageNumber, pageSize, pageCondition, () => {
             this.setState({ searching: false });
         });
     }
@@ -137,7 +137,7 @@ class DmNhomTaiSanCoDinhPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmNhomTaiSanCoDinh:write'),
-            permissionDelete = currentPermissions.includes('dmNhomTaiSanCoDinh:delete'),
+            // permissionDelete = currentPermissions.includes('dmNhomTaiSanCoDinh:delete'),
             permission = this.getUserPermission('dmNhomTaiSanCoDinh', ['write', 'delete']);
 
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmNhomTaiSanCoDinh && this.props.dmNhomTaiSanCoDinh.page ?
@@ -145,7 +145,7 @@ class DmNhomTaiSanCoDinhPage extends AdminPage {
         let table = 'Không có danh sách nhóm tài sản cố định!';
         if (list && list.length > 0) {
             table = renderTable({
-                getDataSource: () => list, stickyHead: false, 
+                getDataSource: () => list, stickyHead: false,
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
@@ -159,11 +159,11 @@ class DmNhomTaiSanCoDinhPage extends AdminPage {
                     <tr key={index} >
                         <TableCell type='text' style={{ textAlign: 'right' }} content={item.ma ? item.ma : ''} />
                         <TableCell type='link' style={{ textAlign: 'left' }} content={item.ten ? item.ten : ''} />
-                        <TableCell type='date' style={{ textAlign: 'center' }} 
+                        <TableCell type='date' style={{ textAlign: 'center' }}
                             content={item.ngayBienBan != null ? dateFormat(item.ngayBienBan, 'dd/mm/yyyy') : null} />
-                        <TableCell type='text' style={{ textAlign: 'center' }} 
+                        <TableCell type='text' style={{ textAlign: 'center' }}
                             content={item.daIn == 1 ? '*' : null} />
-                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} 
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={e => this.edit(e, item)} onDelete={e => this.delete(e, item)} />
                     </tr>
                 )

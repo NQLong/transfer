@@ -53,7 +53,7 @@ export function getDmTinhTrangHonNhanAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmTinhTrangHonNhanAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách tình trạng hôn nhân bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách tình trạng hôn nhân bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
     };
 }
 
@@ -70,7 +70,7 @@ export function getDmTinhTrangHonNhanPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: DmTinhTrangHonNhanGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách tình trạng hôn nhân bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách tình trạng hôn nhân bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
     };
 }
 
@@ -103,7 +103,7 @@ export function createDmTinhTrangHonNhan(item, done) {
                 dispatch(getDmTinhTrangHonNhanAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo tình trạng hôn nhân bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
+        }, (error) => T.notify('Tạo tình trạng hôn nhân bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
     };
 }
 
@@ -118,7 +118,7 @@ export function deleteDmTinhTrangHonNhan(ma) {
                 T.alert('Khoa đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmTinhTrangHonNhanAll());
             }
-        }, error => T.notify('Xóa tình trạng hôn nhân bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
+        }, (error) => T.notify('Xóa tình trạng hôn nhân bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
     };
 }
 
@@ -134,7 +134,7 @@ export function updateDmTinhTrangHonNhan(ma, changes, done) {
                 T.notify('Cập nhật thông tin tình trạng hôn nhân thành công!', 'success');
                 dispatch(getDmTinhTrangHonNhanAll());
             }
-        }, error => T.notify('Cập nhật thông tin tình trạng hôn nhân bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
+        }, (error) => T.notify('Cập nhật thông tin tình trạng hôn nhân bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
     };
 }
 

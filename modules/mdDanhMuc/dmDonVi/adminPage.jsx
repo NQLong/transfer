@@ -176,10 +176,10 @@ class DmDonViPage extends AdminPage {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmDonVi:write'),
             permissionUpload = currentPermissions.includes('dmDonVi:upload'),
-            permissionDelete = currentPermissions.includes('dmDonVi:delete'),
+            // permissionDelete = currentPermissions.includes('dmDonVi:delete'),
             permission = this.getUserPermission('dmDonVi', ['write', 'delete']);
-        const { pageNumber, pageSize, pageTotal, totalItem, list} = this.props.dmDonVi && this.props.dmDonVi.page ?
-            this.props.dmDonVi.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0 , list: null};
+        const { pageNumber, pageSize, pageTotal, totalItem, list } = this.props.dmDonVi && this.props.dmDonVi.page ?
+            this.props.dmDonVi.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null };
         let table = 'Không có danh sách đơn vị!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -192,19 +192,19 @@ class DmDonViPage extends AdminPage {
                         <th style={{ width: '50%' }}>Tên tiếng Anh</th>
                         <th style={{ width: 'auto' }} nowrap='true'>Mã PL</th>
                         <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>    
+                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='link' style={{ textAlign: 'right' }} content={item.ma ? item.ma : ''} 
+                        <TableCell type='link' style={{ textAlign: 'right' }} content={item.ma ? item.ma : ''}
                             onClick={e => this.edit(e, item)} />
                         <TableCell type='text' content={item.ten ? item.ten : ''} />
                         <TableCell type='text' content={item.tenTiengAnh ? item.tenTiengAnh : ''} />
                         <TableCell type='text' style={{ textAlign: 'right' }} content={item.maPl ? item.maPl : ''} />
-                        <TableCell type='checkbox' style={{ textAlign: 'center' }} content={item.kichHoat} permission={permissionWrite} 
+                        <TableCell type='checkbox' style={{ textAlign: 'center' }} content={item.kichHoat} permission={permissionWrite}
                             onChange={() => permissionWrite && this.changeActive(item)} />
-                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} 
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={e => this.edit(e, item)} onDelete={e => this.delete(e, item)} />
                     </tr>
                 )

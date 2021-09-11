@@ -55,7 +55,7 @@ export function getDmCaHocPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: DmCaHocGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách ca học bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách ca học bị lỗi!', 'danger'));
     };
 }
 
@@ -70,12 +70,12 @@ export function getDmCaHocAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmCaHocGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách ca học bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách ca học bị lỗi!', 'danger'));
     };
 }
 
 export function getDmCaHoc(_id, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/ca-hoc/item/${_id}`;
         T.get(url, data => {
             if (data.error) {
@@ -99,7 +99,7 @@ export function createDmCaHoc(item, done) {
                 dispatch(getDmCaHocAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo ca học bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo ca học bị lỗi!', 'danger'));
     };
 }
 
@@ -114,7 +114,7 @@ export function deleteDmCaHoc(_id) {
                 T.alert('Khoa đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmCaHocAll());
             }
-        }, error => T.notify('Xóa ca học bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa ca học bị lỗi!', 'danger'));
     };
 }
 
@@ -130,7 +130,7 @@ export function updateDmCaHoc(_id, changes, done) {
                 T.notify('Cập nhật thông tin ca học thành công!', 'success');
                 dispatch(getDmCaHocAll());
             }
-        }, error => T.notify('Cập nhật thông tin ca học bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin ca học bị lỗi!', 'danger'));
     };
 }
 

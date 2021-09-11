@@ -55,7 +55,7 @@ export function getDmCapDeTaiPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: DmCapDeTaiGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách cấp đề tài bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách cấp đề tài bị lỗi!', 'danger'));
     };
 }
 
@@ -70,12 +70,12 @@ export function getDmCapDeTaiAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmCapDeTaiGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách cấp đề tài bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách cấp đề tài bị lỗi!', 'danger'));
     };
 }
 
 export function getDmCapDeTai(maCap, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/cap-de-tai/item/${maCap}`;
         T.get(url, { maCap }, data => {
             if (data.error) {
@@ -99,7 +99,7 @@ export function createDmCapDeTai(item, done) {
                 dispatch(getDmCapDeTaiAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo cấp đề tài bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo cấp đề tài bị lỗi!', 'danger'));
     };
 }
 
@@ -115,7 +115,7 @@ export function deleteDmCapDeTai(maCap, done) {
                 dispatch(getDmCapDeTaiAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Xóa cấp đề tài bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa cấp đề tài bị lỗi!', 'danger'));
     };
 }
 
@@ -132,7 +132,7 @@ export function updateDmCapDeTai(maCap, changes, done) {
                 dispatch(getDmCapDeTaiAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Cập nhật thông tin cấp đề tài bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin cấp đề tài bị lỗi!', 'danger'));
     };
 }
 

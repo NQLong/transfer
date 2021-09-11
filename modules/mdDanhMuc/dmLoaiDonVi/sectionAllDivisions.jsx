@@ -12,18 +12,6 @@ const styleString = '1px solid #b3b3b3', borderStyle = {
     borderTopRightRadius: '5px',
     borderBottomRightRadius: '5px'
 };
-const texts = {
-    vi: {
-        division: 'Các đơn vị trong trường',
-        department: 'Bộ môn',
-        lab: 'Phòng thí nghiệm',
-    },
-    en: {
-        division: 'Divisions',
-        department: 'Department',
-        lab: 'Lab',
-    }
-};
 class SectionAllDivision extends React.Component {
     state = { division: [] };
     loading = false;
@@ -47,8 +35,7 @@ class SectionAllDivision extends React.Component {
     }
 
     render() {
-        const language = T.language(texts),
-            elements = [];
+        const elements = [];
         (this.state.division ? this.state.division : []).forEach((item, index) => {
             let duongDan = item.duongDan ? item.duongDan.toLowerCase().trim() : '/',
                 isExternalLink = duongDan.startsWith('http://') || duongDan.startsWith('https://'),

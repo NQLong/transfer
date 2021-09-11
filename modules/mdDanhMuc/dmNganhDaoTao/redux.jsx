@@ -101,7 +101,7 @@ export function deleteDmNganhDaoTao(_id) {
                 T.alert('Ngành đào tạo đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmNganhDaoTaoPage());
             }
-        }, error => T.notify('Xóa ngành đào tạo bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa ngành đào tạo bị lỗi!', 'danger'));
     };
 }
 
@@ -118,12 +118,12 @@ export function updateDmNganhDaoTao(_id, changes, done) {
                 dispatch(changeDmNganhDaoTao(changes));
                 dispatch(getDmNganhDaoTaoPage());
             }
-        }, error => T.notify('Cập nhật thông tin ngành đào tạo bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin ngành đào tạo bị lỗi!', 'danger'));
     };
 }
 
 export function getDmNganhDaoTao(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/nganh-dao-Tao/item/${ma}`;
         T.get(url, data => {
             if (data.error) {

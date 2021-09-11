@@ -53,7 +53,7 @@ class EditModal extends AdminModal {
         }
         );
     }
-};
+}
 
 class DanhMucTinhTrangThietBi extends AdminPage {
     modal = React.createRef();

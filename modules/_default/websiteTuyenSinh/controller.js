@@ -48,7 +48,7 @@ module.exports = app => {
                             const categoryFilter = categories.map(item => item.id.toString());
                             let newList = [];
                             page.list.filter(item => {
-                                documentJson = JSON.parse(item.documentJson);
+                                let documentJson = JSON.parse(item.documentJson);
                                 const found = documentJson.categories.some(r => categoryFilter.includes(r));
                                 if (found) newList.push(item);
                             });

@@ -101,7 +101,7 @@ export function deleteDmLuongDiNuocNgoai(ma) {
                 T.alert('Lương đi nước ngoài đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmLuongDiNuocNgoaiPage());
             }
-        }, error => T.notify('Xóa lương đi nước ngoài bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Xóa lương đi nước ngoài bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -118,7 +118,7 @@ export function updateDmLuongDiNuocNgoai(ma, changes, done) {
                 dispatch(changeDmLuongDiNuocNgoai(changes));
                 dispatch(getDmLuongDiNuocNgoaiPage());
             }
-        }, error => T.notify('Cập nhật thông tin lương đi nước ngoài bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Cập nhật thông tin lương đi nước ngoài bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 

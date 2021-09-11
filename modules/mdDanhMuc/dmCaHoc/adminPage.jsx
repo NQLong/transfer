@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { createDmCaHoc, getDmCaHocAll, updateDmCaHoc, deleteDmCaHoc } from './redux';
 import { Link } from 'react-router-dom';
 import Editor from 'view/component/CkEditor4';
-import { AdminPage, TableCell, renderTable, AdminModal } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, } from 'view/component/AdminPage';
 
 class EditModal extends React.Component {
     state = { kichHoat: true };
@@ -208,9 +208,9 @@ class dmCaHocAdminPage extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='number' content={index + 1} style={{ textAlign: 'right' }}/>
-                        <TableCell type='link' onClick={e => this.edit(e, item)} content={item.ten}/>
-                        <TableCell type='text' content={`${item.thoiGianBatDau} - ${item.thoiGianKetThuc}`} dateFormat/>
+                        <TableCell type='number' content={index + 1} style={{ textAlign: 'right' }} />
+                        <TableCell type='link' onClick={e => this.edit(e, item)} content={item.ten} />
+                        <TableCell type='text' content={`${item.thoiGianBatDau} - ${item.thoiGianKetThuc}`} dateFormat />
                         <TableCell type='checkbox' content={item.kichHoat} permission={permissionWrite} onChanged={() => permissionWrite && this.changeActive(item)} />
                         <TableCell type='buttons' content={item} permission={permission} onEdit={this.edit} onDelete={this.delete}></TableCell>
                     </tr>

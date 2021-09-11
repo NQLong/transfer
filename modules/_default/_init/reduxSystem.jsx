@@ -24,7 +24,7 @@ export function saveSystemState(changes, done) {
                 T.notify('Lưu thông tin hệ thống thành công!', 'success');
                 dispatch({ type: UPDATE_SYSTEM_STATE, state: data });
             }
-        }, error => T.notify('Lưu thông tin hệ thống bị lỗi!', 'danger'));
+        }, () => T.notify('Lưu thông tin hệ thống bị lỗi!', 'danger'));
     };
 }
 
@@ -46,11 +46,11 @@ export function createFooterItem(changes, done) {
 }
 
 export function getFooter(done) {
-    return (dispatch, getState) => {
+    return () => {
         const url = '/system/footer';
         T.get(url, data => {
             if (done) done(data);
-        }, error => {
+        }, () => {
             T.notify('Lấy thông tin hệ thống bị lỗi!', 'danger');
             if (done) done();
         });
@@ -71,14 +71,14 @@ export function getFooterSystem(done) {
                 });
             }
             if (done) done(data);
-        }, error => {
+        }, () => {
             T.notify('Lấy thông tin hệ thống bị lỗi!', 'danger');
             if (done) done();
         });
     };
 }
 export function updateFooterItem(id, changes) {
-    return (dispatch, getState) => {
+    return (dispatch,) => {
         const url = '/api/system/footer';
         T.put(url, { id, changes }, data => {
             if (data.error) {
@@ -88,7 +88,7 @@ export function updateFooterItem(id, changes) {
                 dispatch(getFooterSystem());
                 T.notify('Cập nhật dữ liệu thành công!', 'success');
             }
-        }, error => {
+        }, () => {
             T.notify('Lấy thông tin hệ thống bị lỗi!', 'danger');
         });
     };
@@ -106,7 +106,7 @@ export function swapFooterItem(id, priority, done) {
                 dispatch(getFooterSystem());
             }
             done && done();
-        }, error => T.notify('Thay đổi thứ tự menu bị lỗi!', 'danger'));
+        }, () => T.notify('Thay đổi thứ tự menu bị lỗi!', 'danger'));
     };
 }
 
@@ -134,7 +134,7 @@ export function getSystemState(done) {
                 dispatch({ type: UPDATE_SYSTEM_STATE, state: data });
             }
             if (done) done(data);
-        }, error => {
+        }, () => {
             T.notify('Lấy thông tin hệ thống bị lỗi!', 'danger');
             if (done) done();
         });
@@ -142,7 +142,7 @@ export function getSystemState(done) {
 }
 
 export function login(data, done) {
-    return dispatch => {
+    return () => {
         T.post('/login', data, res => {
             if (res.error) {
                 done({ error: res.error ? res.error : '' });
@@ -152,7 +152,7 @@ export function login(data, done) {
                     window.location = '/user';
                 }
             }
-        }, error => {
+        }, () => {
             done({ error: 'Đăng nhập gặp lỗi!' });
         });
     };
@@ -167,7 +167,7 @@ export function logout(config) {
     return dispatch => {
         T.confirm(config.title, config.message, true, isConfirm => {
             isConfirm && T.post('/logout', {},
-                data => {
+                () => {
                     dispatch({ type: UPDATE_SYSTEM_STATE, state: { user: null } });
                     const pathname = window.location.pathname;
                     if (pathname.startsWith('/user')) {
@@ -200,7 +200,7 @@ export function updateProfile(changes) {
                 });
                 dispatch(getSystemState());
             }
-        }, error => T.notify('Cập nhật thông tin cá nhân của bạn bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin cá nhân của bạn bị lỗi!', 'danger'));
     };
 }
 
@@ -213,7 +213,7 @@ export function register(data, done) {
         } else {
             done({ user: res.user });
         }
-    }, error => done({ error: 'Đăng ký gặp lỗi!' }));
+    }, () => done({ error: 'Đăng ký gặp lỗi!' }));
 }
 
 export function forgotPassword(email, onSuccess, onError) {
@@ -222,7 +222,7 @@ export function forgotPassword(email, onSuccess, onError) {
 
 
 export function getSystemEmails(done) {
-    T.get('/api/email/all', done, error => T.notify('Lấy thông tin email bị lỗi!', 'danger'));
+    T.get('/api/email/all', done, () => T.notify('Lấy thông tin email bị lỗi!', 'danger'));
 }
 
 export function saveSystemEmails(type, email) {
@@ -234,7 +234,7 @@ export function saveSystemEmails(type, email) {
         } else {
             T.notify('Lưu thông tin email thành công!', 'success');
         }
-    }, error => T.notify('Lưu thông tin email bị lỗi!', 'danger'));
+    }, () => T.notify('Lưu thông tin email bị lỗi!', 'danger'));
 }
 
 export function updateSystemState(state) {
@@ -242,7 +242,7 @@ export function updateSystemState(state) {
 }
 
 export function clearSession(sessionName, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/clear-session';
         T.delete(url, { sessionName }, () => done && done());
     };

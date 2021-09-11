@@ -55,7 +55,7 @@ export function getDmMucDichNuocNgoaiPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: DmMucDichNuocNgoaiGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách ca học bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách ca học bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -70,12 +70,12 @@ export function getDmMucDichNuocNgoaiAll(condition, done) {
                 if (done) done(data.items);
                 dispatch({ type: DmMucDichNuocNgoaiGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách mục đích nước ngoài bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách mục đích nước ngoài bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
 export function getDmMucDichNuocNgoai(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/muc-dich-nuoc-ngoai/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -99,7 +99,7 @@ export function createDmMucDichNuocNgoai(item, done) {
                 dispatch(getDmMucDichNuocNgoaiAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo mục đích nước ngoài bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Tạo mục đích nước ngoài bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -114,7 +114,7 @@ export function deleteDmMucDichNuocNgoai(ma) {
                 T.alert('Danh mục đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmMucDichNuocNgoaiAll());
             }
-        }, error => T.notify('Xóa mục đích nước ngoài bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Xóa mục đích nước ngoài bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -130,7 +130,7 @@ export function updateDmMucDichNuocNgoai(ma, changes, done) {
                 T.notify('Cập nhật thông tin mục đích nước ngoài thành công!', 'success');
                 dispatch(getDmMucDichNuocNgoaiAll());
             }
-        }, error => T.notify('Cập nhật thông tin mục đích nước ngoài bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Cập nhật thông tin mục đích nước ngoài bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 

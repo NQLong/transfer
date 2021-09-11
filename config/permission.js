@@ -138,14 +138,13 @@ module.exports = app => {
                     if (error || user == null) {
                         res.send({ error: 'System has errors!' });
                     } else {
-                        app.updateSessionUser(req, user, sessionUser => checkPermissions(req, res, next, permissions));
+                        app.updateSessionUser(req, user, () => checkPermissions(req, res, next, permissions));
                     }
                 });
             } else {
                 checkPermissions(req, res, next, permissions);
             }
         },
-
         has: (req, success, fail, ...permissions) => {
             if (typeof fail == 'string') {
                 permissions.unshift(fail);
@@ -155,9 +154,9 @@ module.exports = app => {
                 const personId = req.cookies.personId || '003379';
                 app.model.fwUser.get({ shcc: personId }, (error, user) => {
                     if (error || user == null) {
-                        res.send({ error: 'System has errors!' });
+                        fail && fail({ error: 'System has errors!' });
                     } else {
-                        app.updateSessionUser(req, user, sessionUser => responseWithPermissions(req, success, fail, permissions));
+                        app.updateSessionUser(req, user, () => responseWithPermissions(req, success, fail, permissions));
                     }
                 });
             } else {

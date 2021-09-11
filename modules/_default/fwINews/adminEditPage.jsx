@@ -49,7 +49,7 @@ class EditModal extends React.Component {
 			setTimeout(() => this.textEditor.current.html(display), 250);
 		} else if (type === 'news') {
 			this.setState({ news: JSON.parse(payload) });
-		} else if (type = 'image') {
+		} else if (type == 'image') {
 			this.imageBox.current.setData('iNews:' + ((item && id) ? (id + '_' + new Date().getTime()) : 'fnew'), payload);
 		}
 
@@ -97,8 +97,7 @@ class EditModal extends React.Component {
 		if (!width) {
 			$('#comWidth').focus();
 		} else if (!data.payload) {
-			if (data.type === 'text') {
-			} else if (data.type === 'image') {
+			if (data.type === 'image') {
 				$('#comImage').focus();
 			} else if (data.type === 'news') {
 				$('#comNews').select2('focus');
@@ -435,7 +434,7 @@ class adminINewsEdit extends React.Component {
 				mailSubject: title,
 				mailHtml: html,
 				mailAttachments: attachments
-			}, data => {
+			}, () => {
 				T.notify('Newsletter được gửi thành công', 'success');
 				this.setState({ sending: false });
 			});
@@ -462,8 +461,8 @@ class adminINewsEdit extends React.Component {
 		let iNewsView = 'Không có thành phần';
 		const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [];
 		const permissionWrite = currentPermissions.includes('inews:write'),
-			permissionRead = currentPermissions.includes('inews:read'),
-			permissionDelete = currentPermissions.includes('inews:delete');
+			permissionRead = currentPermissions.includes('inews:read');
+		// permissionDelete = currentPermissions.includes('inews:delete');
 		if (this.state.iNewsComs.length > 0) {
 			iNewsView =
 				<div className='row'>

@@ -9,7 +9,7 @@ export default function videoReducer(state = null, data) {
         case VideoGetPage:
             return Object.assign({}, state, { page: data.page });
 
-        case VideoUpdate:
+        case VideoUpdate: {
             let updatedPage = Object.assign({}, state.page),
                 updatedItem = data.item;
             for (let i = 0, n = updatedPage.list.length; i < n; i++) {
@@ -19,6 +19,7 @@ export default function videoReducer(state = null, data) {
                 }
             }
             return state;
+        }
 
         default:
             return state;
@@ -40,7 +41,7 @@ export function getVideoInPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: VideoGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách video bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách video bị lỗi!', 'danger'));
     };
 }
 
@@ -55,7 +56,7 @@ export function createVideo(video, done) {
                 dispatch(getVideoInPage());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo video bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo video bị lỗi!', 'danger'));
     };
 }
 
@@ -71,7 +72,7 @@ export function updateVideo(id, changes, done) {
                 done && done();
                 dispatch(getVideoInPage());
             }
-        }, error => T.notify('Cập nhật thông tin video bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin video bị lỗi!', 'danger'));
     };
 }
 
@@ -86,7 +87,7 @@ export function deleteVideo(id) {
                 T.alert('Video được xóa thành công!', 'success', false, 800);
                 dispatch(getVideoInPage());
             }
-        }, error => T.notify('Xóa video bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa video bị lỗi!', 'danger'));
     };
 }
 
@@ -97,7 +98,7 @@ export function changeVideo(video) {
 
 // USER ---------------------------------------------------------------------------------------------------------------------------------------------
 export function getVideo(id, done) {
-    return dispatch => {
+    return () => {
         const url = '/home/video/' + id;
         T.get(url, data => {
             if (data.error) {
@@ -106,6 +107,6 @@ export function getVideo(id, done) {
             } else {
                 done(data.item);
             }
-        }, error => T.notify('Lấy video bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy video bị lỗi!', 'danger'));
     };
 }

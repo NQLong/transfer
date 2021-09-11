@@ -175,7 +175,7 @@ class adminUploadPage extends React.Component {
     };
 
     updateTableData = (dataEditModal) => {
-        this.setState((state, props) => {
+        this.setState((state,) => {
             this.state.allBuilding.forEach(building => {
                 if (building.ma == dataEditModal.changes.toaNha) {
                     dataEditModal.changes.toaNha = building.ma;
@@ -275,8 +275,8 @@ class adminUploadPage extends React.Component {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmPhong:write'),
             permissionDelete = currentPermissions.includes('dmPhong:delete');
-        const { pageNumber, pageSize, pageTotal, totalItem } = this.props.dmPhong && this.props.dmPhong.page ?
-            this.props.dmPhong.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0 };
+        // const { pageNumber, pageSize, pageTotal, totalItem } = this.props.dmPhong && this.props.dmPhong.page ?
+        //     this.props.dmPhong.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0 };
         let table = null;
         let listToaNha = this.props.dmToaNha && this.props.dmToaNha.items ? this.props.dmToaNha.items : [];
 

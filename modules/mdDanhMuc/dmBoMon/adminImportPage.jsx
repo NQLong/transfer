@@ -32,7 +32,7 @@ class EditModal extends React.Component {
     }
 
     show = (index, item) => {
-        let { ma, ten, tenTiengAnh, maDv, qdThanhLap, qdXoaTen, kichHoat, ghiChu } = item ? item : { ma: '', ten: '', tenTiengAnh: '', maDv: '', qdThanhLap: '', qdXoaTen: '', kichHoat: 0, ghiChu: '' };
+        let { ma, ten, tenTiengAnh, maDv, qdThanhLap, qdXoaTen, ghiChu } = item ? item : { ma: '', ten: '', tenTiengAnh: '', maDv: '', qdThanhLap: '', qdXoaTen: '', kichHoat: 0, ghiChu: '' };
 
         $('#ma').val(ma),
             $('#ten').val(ten),
@@ -230,8 +230,8 @@ class DmBoMonImportPage extends AdminPage {
                     <tr key={index}>
                         <TableCell type='number' content={index + 1} />
                         <TableCell type='text' content={item.ma ? item.ma : ''} onEdit={(e) => this.showEdit(e, index, item)} />
-                        <TableCell type='text' content={item.ten ? item.ten : ''} style={{ whiteSpace: 'nowrap' }} /> 
-                        <TableCell type='text' content={item.tenTiengAnh ? item.tenTiengAnh : ''} style={{ whiteSpace: 'nowrap' }} /> 
+                        <TableCell type='text' content={item.ten ? item.ten : ''} style={{ whiteSpace: 'nowrap' }} />
+                        <TableCell type='text' content={item.tenTiengAnh ? item.tenTiengAnh : ''} style={{ whiteSpace: 'nowrap' }} />
                         <TableCell type='text' content={item.maDv ? item.maDv : ''} style={{ whiteSpace: 'nowrap' }} />
                         <TableCell type='text' content={item.qdThanhLap ? item.qdThanhLap : ''} style={{ whiteSpace: 'nowrap' }} />
                         <TableCell type='text' content={item.qdXoaTen ? item.qdXoaTen : ''} style={{ whiteSpace: 'nowrap' }} />
@@ -399,6 +399,6 @@ class DmBoMonImportPage extends AdminPage {
 //     }
 //}
 
-const mapStateToProps = state => ({});
+const mapStateToProps = () => ({});
 const mapActionsToProps = { createMultiDmBoMon };
 export default connect(mapStateToProps, mapActionsToProps)(DmBoMonImportPage);

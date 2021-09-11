@@ -82,7 +82,7 @@ export function getAllTestimonys(done) {
                 if (done) done(data.items);
                 dispatch({ type: TestimonyGetAll, items: data.items });
             }
-        }, error => T.notify('Lấy danh sách testimony bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách testimony bị lỗi!', 'danger'));
     };
 }
 
@@ -97,7 +97,7 @@ export function createTestimony(title, done) {
                 dispatch(getAllTestimonys());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo testimony bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo testimony bị lỗi!', 'danger'));
     };
 }
 
@@ -114,7 +114,7 @@ export function updateTestimony(_id, changes, done) {
                 dispatch(getAllTestimonys());
                 done && done();
             }
-        }, error => T.notify('Cập nhật thông tin testimony bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin testimony bị lỗi!', 'danger'));
     };
 }
 
@@ -129,7 +129,7 @@ export function deleteTestimony(_id) {
                 T.alert('nhân viên được xóa thành công!', 'error', false, 800);
                 dispatch(getAllTestimonys());
             }
-        }, error => T.notify('Xóa testimony bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa testimony bị lỗi!', 'danger'));
     };
 }
 
@@ -146,7 +146,7 @@ export function getTestimonyItem(_id, done) {
                 if (done) done({ item: data.item });
                 dispatch({ type: TestimonyUpdate, item: data.item });
             }
-        }, error => T.notify('Lấy testimony bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy testimony bị lỗi!', 'danger'));
     };
 }
 
@@ -168,7 +168,7 @@ export function swapTestimonyInGroup(index, isMoveUp) {
 
 
 export function getTestimonyByUser(_id, done) {
-    return dispatch => {
+    return () => {
         const url = '/home/testimony/' + _id;
         T.get(url, data => {
             if (data.error) {
@@ -177,6 +177,6 @@ export function getTestimonyByUser(_id, done) {
             } else {
                 if (done) done(data.item);
             }
-        }, error => T.notify('Lấy testimony bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy testimony bị lỗi!', 'danger'));
     };
 }

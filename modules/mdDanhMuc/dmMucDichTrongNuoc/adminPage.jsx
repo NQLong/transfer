@@ -114,14 +114,13 @@ class DmMucDichTrongNuocPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmMucDichTrongNuoc:write'),
-            permissionDelete = currentPermissions.includes('dmMucDichTrongNuoc:delete'),
             permission = this.getUserPermission('dmMucDichTrongNuoc', ['write', 'delete']);
         let table = 'Không có danh sách!',
             items = this.props.dmMucDichTrongNuoc && this.props.dmMucDichTrongNuoc.items ? this.props.dmMucDichTrongNuoc.items : [];
         if (items && items.length > 0) {
             items.sort((a, b) => (a.ma < b.ma) ? -1 : 1);
             table = renderTable({
-                getDataSource: () => items, stickyHead: false, 
+                getDataSource: () => items, stickyHead: false,
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto' }}>Mã</th>
@@ -133,11 +132,11 @@ class DmMucDichTrongNuocPage extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index} >
                         <TableCell type='text' style={{ textAlign: 'center' }} content={item.ma ? item.ma : ''} />
-                        <TableCell type='link' content={item.moTa ? item.moTa : ''} 
-                            onClick = {e => this.edit(e, item)} />
+                        <TableCell type='link' content={item.moTa ? item.moTa : ''}
+                            onClick={e => this.edit(e, item)} />
                         <TableCell type='checkbox' style={{ textAlign: 'center' }} content={item.kichHoat} permission={permissionWrite}
                             onChange={() => permissionWrite && this.changeActive(item)} />
-                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} 
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={e => this.edit(e, item)} onDelete={e => this.delete(e, item)} />
                     </tr>
                 )
@@ -220,7 +219,7 @@ export default connect(mapStateToProps, mapActionsToProps)(DmMucDichTrongNuocPag
 //                                 <td><a href='#' onClick={e => this.edit(e, item)}>{item.moTa}</a></td>
 //                                 <td className='toggle' style={{ textAlign: 'center' }}>
 //                                     <label>
-//                                         <input type='checkbox' checked={item.kichHoat} onChange={e => permissionWrite && this.changeActive(item)} />
+//                                         <input type='checkbox' checked={item.kichHoat} onChange={() => permissionWrite && this.changeActive(item)} />
 //                                         <span className='button-indecator' />
 //                                     </label>
 //                                 </td>

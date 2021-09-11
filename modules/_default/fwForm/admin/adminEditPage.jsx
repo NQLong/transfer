@@ -269,7 +269,7 @@ class FormEditPage extends React.Component {
         e.preventDefault();
     };
 
-    removeQuestion = (e, item, index) => {
+    removeQuestion = (e, item,) => {
         T.confirm('Xóa Câu hỏi', `Bạn có chắc bạn muốn xóa câu hỏi <strong>${item.title ? item.title.viText() : 'này'}</strong>?`, true, isConfirm => {
             if (isConfirm) {
                 this.props.deleteQuestion(item.id, this.state.item.id, () => {
@@ -288,14 +288,8 @@ class FormEditPage extends React.Component {
     };
 
     render() {
-        const route = T.routeMatcher('/user/form/edit/:formId'), formId = route.parse(window.location.pathname).formId;
         const currentPermission = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [];
         const readOnly = !currentPermission.contains('form:write');
-        const item = this.state.item ? this.state.item : {
-            id: '', title: '', maxRegisterUsers: -1, image: '/img/avatar.png',
-            createdDate: new Date(), startRegister: '', stopRegister: '', active: false, isLocked: false
-        };
-
         const questionList = this.props.question && this.props.question.questions ? this.props.question.questions : [];
         const questionTable = questionList && questionList.length ? (
             <table className='table table-hover table-bordered'>

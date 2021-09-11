@@ -139,7 +139,7 @@ class DmLinhVucKinhDoanhPage extends React.Component {
                                 <td>{item.moTa}</td>
                                 <td className='toggle' style={{ textAlign: 'center' }}>
                                     <label>
-                                        <input type='checkbox' checked={item.kichHoat} onChange={e => permissionWrite && this.changeActive(item)} />
+                                        <input type='checkbox' checked={item.kichHoat} onChange={() => permissionWrite && this.changeActive(item)} />
                                         <span className='button-indecator' />
                                     </label>
                                 </td>

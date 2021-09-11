@@ -57,7 +57,7 @@ export function getDmBoMonPage(pageNumber, pageSize, pageCondition, done) {
                 if (done) done(data.page);
                 dispatch({ type: DmBoMonGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách bộ môn bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách bộ môn bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -72,12 +72,12 @@ export function getDmBoMonAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmBoMonGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách bộ môn bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách bộ môn bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
 export function getDmBoMon(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/dm-bo-mon/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -93,7 +93,7 @@ export function getDmBoMon(ma, done) {
 }
 
 export function getmaDonVi(done) {
-    return dispatch => {
+    return () => {
         const url = '/api/dm-bo-mon/donVi';
         T.get(url, data => {
             if (data.error) {
@@ -120,7 +120,7 @@ export function createDmBoMon(item, done) {
                 dispatch(getDmBoMonPage());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo bộ môn bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Tạo bộ môn bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -135,7 +135,7 @@ export function deleteDmBoMon(ma) {
                 T.alert('Bộ môn đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmBoMonPage());
             }
-        }, error => T.notify('Xóa Bộ môn bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Xóa Bộ môn bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -152,7 +152,7 @@ export function updateDmBoMon(ma, changes, done) {
                 dispatch(changeDmBoMon(changes));
                 dispatch(getDmBoMonPage());
             }
-        }, error => T.notify('Cập nhật bộ môn bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Cập nhật bộ môn bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -161,7 +161,7 @@ export function changeDmBoMon(item) {
 }
 
 export function createMultiDmBoMon(dmBoMon, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/dm-bo-mon/multiple';
         T.post(url, { dmBoMon }, data => {
             if (data.error && data.error.length) {

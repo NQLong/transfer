@@ -47,7 +47,7 @@ module.exports = app => {
             const srcPath = req.session.dmDonViImage,
                 imageLink = '/img/dmDonVi/' + (new Date().getTime()).toString().slice(-8) + app.path.extname(srcPath),
                 destPath = app.path.join(app.publicPath, imageLink);
-            app.fs.rename(srcPath, destPath, err => {
+            app.fs.rename(srcPath, destPath, () => {
                 data.image = imageLink;
                 app.model.dmDonVi.create(data, (error, item) => res.send({ error, item }));
             });

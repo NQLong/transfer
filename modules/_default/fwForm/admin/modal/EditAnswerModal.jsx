@@ -38,6 +38,7 @@ class EditAnswerModal extends React.Component {
     save = (e, item) => {
         const questionList = this.props.questions ? this.props.questions : [];
         let record = this.state.item.record;
+        let i = 0;
         if (i == questionList.length) {
             const changes = { record };
             this.props.updateAnswer(item.id, changes, () => {

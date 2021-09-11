@@ -161,7 +161,7 @@ class AdminPage extends React.Component {
                                 <td style={{ textAlign: 'center' }}>{item.tiLe}</td>
                                 <td className='toggle' style={{ textAlign: 'center' }}>
                                     <label>
-                                        <input type='checkbox' checked={item.kichHoat == '1' ? true : false} onChange={e => permissionWrite && this.changeActive(item)} />
+                                        <input type='checkbox' checked={item.kichHoat == '1' ? true : false} onChange={() => permissionWrite && this.changeActive(item)} />
                                         <span className='button-indecator' />
                                     </label>
                                 </td>

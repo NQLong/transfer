@@ -53,7 +53,7 @@ export function getDmHinhThucKyLuatAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmHinhThucKyLuatGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách hình thức kỷ luật bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách hình thức kỷ luật bị lỗi!', 'danger'));
     };
 }
 
@@ -70,12 +70,12 @@ export function getDmHinhThucKyLuatPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: DmhinhThucKyLuatGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách hình thức kỷ luật bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách hình thức kỷ luật bị lỗi!', 'danger'));
     };
 }
 
 export function getDmHinhThucKyLuat(_id, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/dm-hinh-thuc-ky-luat/item/${_id}`;
         T.get(url, data => {
             if (data.error) {
@@ -103,7 +103,7 @@ export function createDmHinhThucKyLuat(item, done) {
                 dispatch(getDmHinhThucKyLuatAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo hình thức kỷ luật bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo hình thức kỷ luật bị lỗi!', 'danger'));
     };
 }
 
@@ -118,7 +118,7 @@ export function deleteDmHinhThucKyLuat(ma) {
                 T.alert('Hình thức kỷ luật đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmHinhThucKyLuatAll());
             }
-        }, error => T.notify('Xóa hình thức kỷ luật bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa hình thức kỷ luật bị lỗi!', 'danger'));
     };
 }
 
@@ -134,7 +134,7 @@ export function updateDmHinhThucKyLuat(ma, changes, done) {
                 T.notify('Cập nhật thông tin hình thức kỷ luật thành công!', 'success');
                 dispatch(getDmHinhThucKyLuatAll());
             }
-        }, error => T.notify('Cập nhật thông tin hình thức kỷ luật bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin hình thức kỷ luật bị lỗi!', 'danger'));
     };
 }
 

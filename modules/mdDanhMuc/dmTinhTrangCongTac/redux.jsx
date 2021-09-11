@@ -57,7 +57,7 @@ export function getDmTinhTrangCongTacPage(pageNumber, pageSize, pageCondition, d
                 if (done) done(data.page);
                 dispatch({ type: DmTinhTrangCongTacGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách tình trạng công tác bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách tình trạng công tác bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
     };
 }
 
@@ -72,7 +72,7 @@ export function getDmTinhTrangCongTacAll(condition, done) {
                 if (done) done(data.items);
                 dispatch({ type: DmTinhTrangCongTacGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách tình trạng công tác bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách tình trạng công tác bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
     };
 }
 
@@ -102,7 +102,7 @@ export function createDmTinhTrangCongTac(dmTinhTrangCongTac, done) {
                 dispatch(getDmTinhTrangCongTacAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo mới một tình trạng công tác bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
+        }, (error) => T.notify('Tạo mới một tình trạng công tác bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
     };
 }
 
@@ -118,7 +118,7 @@ export function updateDmTinhTrangCongTac(ma, changes, done) {
                 done && done(data.item);
                 dispatch(getDmTinhTrangCongTacAll());
             }
-        }, error => T.notify('Cập nhật dữ liệu tình trạng công tác bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
+        }, (error) => T.notify('Cập nhật dữ liệu tình trạng công tác bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
     };
 }
 

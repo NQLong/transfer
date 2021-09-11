@@ -56,7 +56,7 @@ export function getDmLinhVucKinhDoanhPage(pageNumber, pageSize, pageCondition, d
                 if (done) done(data.page);
                 dispatch({ type: DmLinhVucKinhDoanhGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách lĩnh vực kinh doanh bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách lĩnh vực kinh doanh bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -71,12 +71,12 @@ export function getDmLinhVucKinhDoanhAll(condition, done) {
                 if (done) done(data.items);
                 dispatch({ type: DmLinhVucKinhDoanhGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách lĩnh vực kinh doanh bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách lĩnh vực kinh doanh bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
 export function getDmLinhVucKinhDoanh(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/linh-vuc-kinh-doanh/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -100,7 +100,7 @@ export function createDmLinhVucKinhDoanh(item, done) {
                 dispatch(getDmLinhVucKinhDoanhPage());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo lĩnh vực kinh doanh bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Tạo lĩnh vực kinh doanh bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -115,7 +115,7 @@ export function deleteDmLinhVucKinhDoanh(ma) {
                 T.alert('Danh mục đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmLinhVucKinhDoanhPage());
             }
-        }, error => T.notify('Xóa lĩnh vực kinh doanh bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Xóa lĩnh vực kinh doanh bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -131,7 +131,7 @@ export function updateDmLinhVucKinhDoanh(ma, changes, done) {
                 T.notify('Cập nhật thông tin lĩnh vực kinh doanh thành công!', 'success');
                 dispatch(getDmLinhVucKinhDoanhPage());
             }
-        }, error => T.notify('Cập nhật thông tin lĩnh vực kinh doanh bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Cập nhật thông tin lĩnh vực kinh doanh bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 

@@ -120,7 +120,7 @@ class DmTrinhDoNgoaiNguPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmTrinhDoNgoaiNgu:write'),
-            permissionDelete = currentPermissions.includes('dmTrinhDoNgoaiNgu:delete'),
+            // permissionDelete = currentPermissions.includes('dmTrinhDoNgoaiNgu:delete'),
             permission = this.getUserPermission('dmTrinhDoNgoaiNgu', ['write', 'delete']);
 
         let table = 'Không có dữ liệu!',
@@ -139,11 +139,11 @@ class DmTrinhDoNgoaiNguPage extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='number' content={item.ma ? item.ma : ''} />
-                        <TableCell type='link' content={item.ten ? item.ten : ''} 
-                            onClick = {e => this.edit(e, item)} />
+                        <TableCell type='link' content={item.ten ? item.ten : ''}
+                            onClick={e => this.edit(e, item)} />
                         <TableCell type='checkbox' style={{ textAlign: 'center' }} content={item.kichHoat} permission={permissionWrite}
                             onChange={() => permissionWrite && this.changeActive(item)} />
-                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} 
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={e => this.edit(e, item)} onDelete={e => this.delete(e, item)} />
                     </tr>
                 )
