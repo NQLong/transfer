@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { getDmQuocGiaPage, deleteDmQuocGia, createDmQuocGia, updateDmQuocGia, createDmQuocGiaByUpload } from './redux';
 import FileBox from 'view/component/FileBox';
 import { Link } from 'react-router-dom';
+import { AdminPage, TableCell, renderTable } from 'view/component/AdminPage';
 
 class EditModal extends React.Component {
     modal = React.createRef();
@@ -128,7 +129,7 @@ class EditModal extends React.Component {
     }
 }
 
-class adminUploadPage extends React.Component {
+class adminUploadPage extends AdminPage {
     modal = React.createRef();
     state = { dmQuocGia: [] };
 
@@ -188,51 +189,39 @@ class adminUploadPage extends React.Component {
 
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permissionWrite = currentPermissions.includes('dmQuocGia:write');
+            permissionWrite = currentPermissions.includes('dmQuocGia:write'), 
+            permission = this.getUserPermission('dmQuocGia', ['write', 'delete']);
         let table = null;
         if (this.state.dmQuocGia && this.state.dmQuocGia.length > 0) {
-            table = (
-                <table className='table table-hover table-bordered'>
-                    <thead>
-                        <tr>
-                            <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                            <th style={{ width: 'auto' }}>Mã</th>
-                            <th style={{ width: '50%' }} nowrap='true'>Tên quốc gia</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Code alpha</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Tên viết tắt</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Mã khu vực</th>
-                            <th style={{ width: '50%' }}>Tên khác</th>
-                            <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {this.state.dmQuocGia.map((item, index) => (
-                            <tr key={index}>
-                                <td style={{ textAlign: 'right' }}>{index + 1}</td>
-                                <td>{item.maCode}</td>
-                                <td>
-                                    <a href='#' onClick={e => this.edit(e, item)}>{item.tenQuocGia}{item.country ? ` (${item.country})` : ''}</a>
-                                </td>
-                                <td>{item.codeAlpha}</td>
-                                <td>{item.shortenName}</td>
-                                <td>{item.maKhuVuc}</td>
-                                <td>{item.tenKhac && item.tenKhac.length > 0 ? item.tenKhac.toString().replaceAll(',', ', ') : ''}</td>
-                                <td style={{ textAlign: 'center' }}>
-                                    <div className='btn-group'>
-                                        <a className='btn btn-primary' href='#' onClick={e => this.edit(e, item)}>
-                                            <i className='fa fa-lg fa-edit' />
-                                        </a>
-                                        {permissionWrite &&
-                                            <a className='btn btn-danger' href='#' onClick={e => this.delete(e, item)}>
-                                                <i className='fa fa-trash-o fa-lg' />
-                                            </a>}
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            );
+            table = renderTable({
+                getDataSource: () => this.state.dmQuocGia, stickyHead: false,
+                renderHead: () => (
+                    <tr>
+                        <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
+                        <th style={{ width: 'auto' }}>Mã</th>
+                        <th style={{ width: '50%' }} nowrap='true'>Tên quốc gia</th>
+                        <th style={{ width: 'auto' }} nowrap='true'>Code alpha</th>
+                        <th style={{ width: 'auto' }} nowrap='true'>Tên viết tắt</th>
+                        <th style={{ width: 'auto' }} nowrap='true'>Mã khu vực</th>
+                        <th style={{ width: '50%' }}>Tên khác</th>
+                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                    </tr>
+                ),
+                renderRow: (item, index) => (
+                    <tr key={index}>
+                        <TableCell type='number' style={{ textAlign: 'right'}} content={index + 1} />
+                        <TableCell type='text' content={item.maCode ? item.maCode : ''} />
+                        <TableCell type='link' content={<b>{item.tenQuocGia} {item.country ? `(${item.country})` : ''}</b>}
+                            onClick = {e => this.edit(e, item)} />
+                        <TableCell type='number' content={item.codeAlpha ? item.codeAlpha : ''} />
+                        <TableCell type='text' content={item.shortenName ? item.shortenName : ''} />
+                        <TableCell type='text' content={item.maKhuVuc ? item.maKhuVuc : ''} />
+                        <TableCell type='text' content={item.tenKhac && item.tenKhac.length > 0 ? item.tenKhac.toString().replaceAll(',', ', ') : ''} />
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} 
+                            onEdit={e => this.edit(e, item)} onDelete={e => this.delete(e, item)} />
+                    </tr>
+                )
+            });
         }
         return (
             <main className='app-content'>
@@ -266,3 +255,142 @@ class adminUploadPage extends React.Component {
 const mapStateToProps = state => ({ system: state.system, categoryRoom: state.categoryRoom, categoryBuilding: state.categoryBuilding });
 const mapActionsToProps = { getDmQuocGiaPage, deleteDmQuocGia, createDmQuocGia, updateDmQuocGia, createDmQuocGiaByUpload };
 export default connect(mapStateToProps, mapActionsToProps)(adminUploadPage);
+
+// class adminUploadPage extends React.Component {
+//     modal = React.createRef();
+//     state = { dmQuocGia: [] };
+
+//     componentDidMount() {
+//         T.ready('/user/category');
+//     }
+
+//     edit = (e, item) => {
+//         e.preventDefault();
+//         this.modal.current.show(item);
+//     };
+
+//     delete = (e, item) => {
+//         e.preventDefault();
+//         let indexDelete;
+//         T.confirm('Xóa danh mục quốc gia', 'Bạn có chắc bạn muốn xóa quốc gia này?', true, isConfirm =>
+//             isConfirm && this.setState(state => {
+//                 state.dmQuocGia.forEach((data, index) => {
+//                     if (data.maCode == item.maCode) {
+//                         indexDelete = index;
+//                     }
+//                 });
+//                 state.dmQuocGia.splice(indexDelete, 1);
+//                 return state;
+//             }));
+//     }
+
+//     updateTableData = (dataEditModal) => {
+//         this.setState((state,) => {
+//             state.dmQuocGia.forEach(data => {
+//                 if (data.maCode == dataEditModal.changes.maCode) {
+//                     data.tenQuocGia = dataEditModal.changes.tenQuocGia;
+//                     data.country = dataEditModal.changes.country;
+//                     data.shortenName = dataEditModal.changes.shortenName;
+//                     data.codeAlpha = dataEditModal.changes.codeAlpha;
+//                     data.maKhuVuc = dataEditModal.changes.maKhuVuc;
+//                     data.tenKhac = dataEditModal.changes.tenKhac;
+//                 }
+//             });
+//             return state;
+//         });
+//     }
+
+//     onSuccess = (data) => {
+//         this.setState({ dmQuocGia: data.dmQuocGia });
+//     }
+
+//     save = () => {
+//         let dataImport = this.state.dmQuocGia;
+//         if (dataImport && dataImport.length > 0) {
+//             this.props.createDmQuocGiaByUpload(dataImport, () => {
+//                 T.notify('Cập nhật thành công!', 'success');
+//                 this.props.history.push('/user/danh-muc/quoc-gia');
+//             });
+//         }
+//     }
+
+//     render() {
+//         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
+//             permissionWrite = currentPermissions.includes('dmQuocGia:write');
+//         let table = null;
+//         if (this.state.dmQuocGia && this.state.dmQuocGia.length > 0) {
+//             table = (
+//                 <table className='table table-hover table-bordered'>
+//                     <thead>
+//                         <tr>
+//                             <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
+//                             <th style={{ width: 'auto' }}>Mã</th>
+//                             <th style={{ width: '50%' }} nowrap='true'>Tên quốc gia</th>
+//                             <th style={{ width: 'auto' }} nowrap='true'>Code alpha</th>
+//                             <th style={{ width: 'auto' }} nowrap='true'>Tên viết tắt</th>
+//                             <th style={{ width: 'auto' }} nowrap='true'>Mã khu vực</th>
+//                             <th style={{ width: '50%' }}>Tên khác</th>
+//                             <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+//                         </tr>
+//                     </thead>
+//                     <tbody>
+//                         {this.state.dmQuocGia.map((item, index) => (
+//                             <tr key={index}>
+//                                 <td style={{ textAlign: 'right' }}>{index + 1}</td>
+//                                 <td>{item.maCode}</td>
+//                                 <td>
+//                                     <a href='#' onClick={e => this.edit(e, item)}>{item.tenQuocGia}{item.country ? ` (${item.country})` : ''}</a>
+//                                 </td>
+//                                 <td>{item.codeAlpha}</td>
+//                                 <td>{item.shortenName}</td>
+//                                 <td>{item.maKhuVuc}</td>
+//                                 <td>{item.tenKhac && item.tenKhac.length > 0 ? item.tenKhac.toString().replaceAll(',', ', ') : ''}</td>
+//                                 <td style={{ textAlign: 'center' }}>
+//                                     <div className='btn-group'>
+//                                         <a className='btn btn-primary' href='#' onClick={e => this.edit(e, item)}>
+//                                             <i className='fa fa-lg fa-edit' />
+//                                         </a>
+//                                         {permissionWrite &&
+//                                             <a className='btn btn-danger' href='#' onClick={e => this.delete(e, item)}>
+//                                                 <i className='fa fa-trash-o fa-lg' />
+//                                             </a>}
+//                                     </div>
+//                                 </td>
+//                             </tr>
+//                         ))}
+//                     </tbody>
+//                 </table>
+//             );
+//         }
+//         return (
+//             <main className='app-content'>
+//                 <div className='app-title'>
+//                     <h1><i className='fa fa-list-alt' /> Danh mục Quốc gia: Upload</h1>
+//                 </div>
+//                 <div style={{ marginTop: '2%' }} className='row tile'>
+//                     <FileBox ref={this.fileBox} postUrl='/api/danh-muc/quoc-gia/upload' uploadType='DmQuocGiaFile' userData='dmQuocGiaImportData' style={{ width: '100%', backgroundColor: '#fdfdfd' }}
+//                         success={this.onSuccess} ajax={true} />
+//                 </div>
+
+//                 {table ? <div style={{ marginTop: '2%' }} className='row tile'>{table}</div> : null}
+//                 <EditModal dataChanges={this.updateTableData} ref={this.modal} readOnly={!permissionWrite} />
+//                 <Link to='/user/danh-muc/quoc-gia/' className='btn btn-secondary btn-circle' style={{ position: 'fixed', lefft: '10px', bottom: '10px' }}>
+//                     <i className='fa fa-lg fa-reply' />
+//                 </Link>
+//                 {permissionWrite && (
+//                     <React.Fragment>
+//                         <a href='/download/template/QuocGia.xlsx' className='btn btn-success btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px' }}>
+//                             <i className='fa fa-download' />
+//                         </a>
+//                         <button type='button' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.save}>
+//                             <i className='fa fa-lg fa-save' />
+//                         </button>
+//                     </React.Fragment>)}
+//             </main>
+//         );
+//     }
+// }
+
+// const mapStateToProps = state => ({ system: state.system, categoryRoom: state.categoryRoom, categoryBuilding: state.categoryBuilding });
+// const mapActionsToProps = { getDmQuocGiaPage, deleteDmQuocGia, createDmQuocGia, updateDmQuocGia, createDmQuocGiaByUpload };
+// export default connect(mapStateToProps, mapActionsToProps)(adminUploadPage);
