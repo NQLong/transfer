@@ -49,6 +49,7 @@ class EditModal extends AdminModal {
         const readOnly = this.props.readOnly;
         return this.renderModal({
             title: this.ma ? 'Cập nhật' : 'Tạo mới',
+            size: 'large',
             body: <div className='row'>
                 <FormTextBox type='text' className='col-12 col-md-6' ref={e => this.ma = e} label='Mã khu vực' readOnly={readOnly} placeholder='Mã khu vực' required />
                 <FormTextBox type='text' className='col-12 col-md-6' ref={e => this.ten = e} label='Tên khu vực' readOnly={readOnly} placeholder='Tên khu vực' required />

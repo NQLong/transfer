@@ -28,9 +28,14 @@ class EditModal extends AdminModal {
             };
         
         if (changes.ma == '') {
-            T.notify('Mã danh mục bị trống', 'danger');
+            T.notify('Mã giảm BHXH bị trống', 'danger');
             this.ma.focus();
-        } else {
+        }
+        else if (changes.moTa == '') {
+            T.notify('Mô tả BHXH bị trống', 'danger');
+            this.ma.focus();
+        }
+        else {
             if (ma) {
                 this.props.updateDmGiamBhxh(ma, changes);
             } else {
@@ -43,9 +48,10 @@ class EditModal extends AdminModal {
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
-            title: this.ma ? 'Cập nhật thông tin' : 'Tạo mới thông tin',
+            title: this.ma ? 'Cập nhật giảm BHXH' : 'Tạo mới giảm BHXH',
+            size: 'large',
             body: <div className='row'>
-                <FormTextBox type='text' className='col-md-12' ref={e => this.ma = e} label='Mã' readOnly={readOnly} placeholder='Mã danh mục' required />
+                <FormTextBox type='text' className='col-md-12' ref={e => this.ma = e} label='Mã' readOnly={readOnly} placeholder='Mã giảm BHXH' required />
                 <FormTextBox type='text' className='col-md-12' ref={e => this.moTa = e} label='Mô tả' placeholder='Mô tả' readOnly={readOnly} required />
                 <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }} 
                     onChange={() => !readOnly && this.setState({ kichHoat: !this.state.kichHoat })} />
@@ -103,7 +109,7 @@ class DmGiamBhxhPage extends AdminPage {
         return (
             <main className='app-content'>
                 <div className='app-title'>
-                    <h1><i className='fa fa-list-alt' /> Danh mục Giảm Bảo hiểm xã hội</h1>
+                    <h1><i className='fa fa-list-alt' />  Giảm Bảo hiểm xã hội</h1>
                 </div>
                 <div className='tile'>{table}
                     <EditModal ref={this.modal} readOnly={!permissionWrite}

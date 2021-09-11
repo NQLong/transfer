@@ -4,96 +4,64 @@ import { getDmQuanHeChuHoPage, createDmQuanHeChuHo, updateDmQuanHeChuHo, deleteD
 import Pagination, { OverlayLoading } from 'view/component/Pagination';
 import AdminSearchBox from 'view/component/AdminSearchBox';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
 
-class EditModal extends React.Component {
+class EditModal extends AdminModal {
     modal = React.createRef();
-    state = { active: false }
+    state = { kichHoat: true }
 
-    componentDidMount() {
-        $(document).ready(() => {
-            $(this.modal.current).on('shown.bs.modal', () => $('#dmQuanHeChuHoMa').focus());
-        });
-    }
-
-    show = (item) => {
+    onShow = (item) => {
         let { ma, ten, kichHoat } = item ? item : { ma: null, ten: '', kichHoat: 1 };
-        $('#dmQuanHeChuHoMa').val(ma);
-        $('#dmQuanHeChuHoTen').val(ten);
-        $(this.modal.current).find('.modal-title').html(item ? 'Cập nhật quan hệ chủ hộ' : 'Tạo mới quan hệ chủ hộ');
-        this.setState({ active: kichHoat == 1 });
+        
+        this.ma.value(ma);
+        this.ten.value(ten);
+        this.kichHoat.value(kichHoat);
+        this.setState({ kichHoat});
 
-        $(this.modal.current).attr('data-ma', ma).modal('show');
+        $(this.modal).attr('data-ma', ma).modal('show');
     };
 
-    save = (e) => {
-        e.preventDefault();
-        const maQuanHeChuHo = $(this.modal.current).attr('data-ma'),
+    onSubmit = () => {
+        const maQuanHeChuHo = $(this.modal).attr('data-ma'),
             changes = {
-                ma: $('#dmQuanHeChuHoMa').val().trim(),
-                ten: $('#dmQuanHeChuHoTen').val().trim(),
-                kichHoat: this.state.active ? 1 : 0,
+                ma: this.ma.value().trim(),
+                ten: this.ten.value().trim(),
+                kichHoat: Number(this.kichHoat.value()),
             };
         if (changes.ma == '') {
             T.notify('Mã quan hệ chủ hộ bị trống!', 'danger');
-            $('#dmQuanHeChuHoMa').focus();
-        } else if (changes.tenQuocGia == '') {
+            this.ma.focus();
+        } else if (changes.ten == '') {
             T.notify('Tên quan hệ chủ hộ bị trống!', 'danger');
-            $('#dmQuanHeChuHoTen').focus();
+            this.ten.focus();
         } else {
             if (maQuanHeChuHo) {
                 if (typeof this.state.ImportIndex == 'number') changes.ImportIndex = this.state.ImportIndex;
                 this.props.update(maQuanHeChuHo, changes, () => {
                     T.notify('Cập nhật quan hệ chủ hộ thành công!', 'success');
-                    $(this.modal.current).modal('hide');
+                    $(this.modal).modal('hide');
                 });
             } else {
                 this.props.create(changes, () => {
                     T.notify('Tạo mới quan hệ chủ hộ thành công!', 'success');
-                    $(this.modal.current).modal('hide');
+                    $(this.modal).modal('hide');
                 });
             }
         }
     };
 
-    render() {
+    render = () => {
         const readOnly = this.props.readOnly;
-        return (
-            <div className='modal' tabIndex='-1' role='dialog' ref={this.modal}>
-                <form className='modal-dialog' role='document' onSubmit={this.save}>
-                    <div className='modal-content'>
-                        <div className='modal-header'>
-                            <h5 className='modal-title'></h5>
-                            <button type='button' className='close' data-dismiss='modal' aria-label='Close'>
-                                <span aria-hidden='true'>&times;</span>
-                            </button>
-                        </div>
-                        <div className='modal-body'>
-                            <div className='form-group'>
-                                <label htmlFor='dmQuanHeChuHoMa'>Mã quan hệ chủ hộ</label>
-                                <input className='form-control' id='dmQuanHeChuHoMa' placeholder='Mã quan hệ chủ hộ' type='text' auto-focus='' readOnly={readOnly} />
-                            </div>
-                            <div className='form-group'>
-                                <label htmlFor='dmQuanHeChuHoTen'>Tên quan hệ</label>
-                                <input className='form-control' id='dmQuanHeChuHoTen' placeholder='Tên' type='text' readOnly={readOnly} />
-                            </div>
-                            <div style={{ display: 'inline-flex', width: '100%', margin: 0 }}>
-                                <label htmlFor='dmDonViKichHoat'>Kích hoạt: </label>&nbsp;&nbsp;
-                                <div className='toggle'>
-                                    <label>
-                                        <input type='checkbox' id='dmDonViKichHoat' checked={this.state.active} onChange={() => !readOnly && this.setState({ active: !this.state.active })} />
-                                        <span className='button-indecator' />
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div className='modal-footer'>
-                            <button type='button' className='btn btn-secondary' data-dismiss='modal'>Đóng</button>
-                            {!readOnly && <button type='submit' className='btn btn-primary'>Lưu</button>}
-                        </div>
-                    </div>
-                </form>
+        return this.renderModal({
+            title: this.ma ? 'Tạo mới quan hệ chủ hộ' : 'Cập nhật quan hệ chủ hộ',
+            size: 'large',
+            body: <div className='row'>
+                <FormTextBox type='text' className='col-12' ref={e => this.ma = e} label='Mã quan hệ chủ hộ' readOnly={readOnly} placeholder='Mã quan hệ chủ hộ' required />
+                <FormTextBox type='text' className='col-12' ref={e => this.ten = e} label='Tên quan hệ' readOnly={readOnly} placeholder='Tên quan hệ' required />
+                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
+                    onChange={() => !readOnly && this.setState({ kichHoat: !this.state.kichHoat })} />
             </div>
+        }
         );
     }
 }
@@ -123,45 +91,37 @@ class dmQuanHeChuHoPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmQuanHeChuHo:write'),
-            permissionDelete = currentPermissions.includes('dmQuanHeChuHo:delete'),
             permission = this.getUserPermission('dmQuanHeChuHo', ['write', 'delete']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmQuanHeChuHo && this.props.dmQuanHeChuHo.page ?
             this.props.dmQuanHeChuHo.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list };
-        let table = 'Không có dữ liệu!';
-        if (list && list.length > 0) {
-            table = renderTable({
-                getDataSource: () => list, stickyHead: false,
-                renderHead: () => (
-                    <tr>
-                        <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
-                        <th style={{ width: '100%' }} nowrap='true'>Tên</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
-                    </tr>),
-                renderRow: (item, index) => (
-                    <tr key={index}>
-                        <TableCell type='number' content={(pageNumber - 1) * pageSize + index + 1} style={{ textAlign: 'right' }} />
-                        <TableCell type='link' content={item.ma} onClick={(e) => this.edit(e, item)} />
-                        <TableCell type='text' content={item.ten} />
-                        <TableCell type='checkbox' content={item.kichHoat} permission={permissionWrite} onChanged={() => permissionWrite && this.changeActive(item)} />
-                        <TableCell type='buttons' content={item} permission={permission} onEdit={this.edit} onDelete={this.delete} />
-                    </tr>
-                ),
-            });
-        }
+
+        const table = renderTable({
+            getDataSource: () => list, stickyHead: false,
+            renderHead: () => (
+                <tr>
+                    <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
+                    <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
+                    <th style={{ width: '100%' }} nowrap='true'>Tên</th>
+                    <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
+                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                </tr>),
+            renderRow: (item, index) => (
+                <tr key={index}>
+                    <TableCell type='number' content={(pageNumber - 1) * pageSize + index + 1} style={{ textAlign: 'right' }} />
+                    <TableCell type='link' content={item.ma} onClick={(e) => this.edit(e, item)} />
+                    <TableCell type='text' content={item.ten} />
+                    <TableCell type='checkbox' content={item.kichHoat} permission={permissionWrite} onChanged={() => permissionWrite && this.changeActive(item)} />
+                    <TableCell type='buttons' content={item} permission={permission} onEdit={this.edit} onDelete={this.delete} />
+                </tr>
+            ),
+        });
+
 
         return (
             <main className='app-content'>
                 <div className='app-title'>
                     <h1><i className='fa fa-list-alt' /> Danh mục Quan hệ chủ hộ</h1>
                     <AdminSearchBox ref={this.searchBox} getPage={this.props.getDmQuanHeChuHoPage} setSearching={value => this.setState({ searching: value })} />
-                    <ul className='app-breadcrumb breadcrumb'>
-                        <Link to='/user'><i className='fa fa-home fa-lg' /></Link>
-                        &nbsp;/&nbsp;
-                        <Link to='/user/category'>Danh mục</Link>
-                        &nbsp;/&nbsp;Quan hệ chủ hộ
-                    </ul>
                 </div>
                 <div className='tile'>
                     {!this.state.searching ? table : <OverlayLoading text='Đang tải..' />}

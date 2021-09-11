@@ -33,7 +33,10 @@ class EditModal extends AdminModal {
         if (changes.ma == '') {
             T.notify('Mã danh mục bị trống', 'danger');
             this.ma.focus();
-        } 
+        } else if (changes.moTa == '') {
+            T.notify('Mô tả bị trống', 'danger');
+            this.msoTa.focus();
+        }
         else {
             if (ma) {
                 this.props.updateDmTangBhxh(ma, changes);
@@ -47,7 +50,8 @@ class EditModal extends AdminModal {
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
-            title: this.ma ? 'Cập nhật thông tin' : 'Tạo mới thông tin',
+            title: this.ma ? 'Cập nhật tăng BHXH' : 'Tạo mới tăng BHXH',
+            size: 'large',
             body: <div className='row'>
                 <FormTextBox type='text' className='col-md-12' ref={e => this.ma = e} label='Mã' readOnly={readOnly} placeholder='Mã danh mục' required />
                 <FormTextBox type='text' className='col-md-12' ref={e => this.moTa = e} label='Mô tả' placeholder='Mô tả' readOnly={readOnly} required />

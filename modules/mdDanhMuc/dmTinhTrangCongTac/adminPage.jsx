@@ -2,82 +2,52 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getDmTinhTrangCongTacAll, createDmTinhTrangCongTac, updateDmTinhTrangCongTac, deleteDmTinhTrangCongTac } from './redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
 
-class EditModal extends React.Component {
+class EditModal extends AdminModal {
     modal = React.createRef();
     state = { kichHoat: true }
 
-    componentDidMount() {
-        $(document).ready(() => {
-            $(this.modal.current).on('shown.bs.modal', () => $('#dmTinhTrangCongTacTen').focus());
-        });
-    }
+    onShow = (item) => {
+        let { ma, ten, kichHoat } = item ? item : { ma: null, ten: '', kichHoat: 1 };
 
-    show = (item) => {
-        let { ma, ten, kichHoat } = item ? item : { ma: null, ten: '', kichHoat: true };
-        $('#dmTinhTrangCongTacTen').val(ten);
+        this.ten.value(ten);
+        this.kichHoat.value(kichHoat);
+        this.setState({ kichHoat});
 
-        $(this.modal.current).find('.modal-title').html(item ? 'Cập nhật tình trạng công tác' : 'Tạo mới tình trạng công tác');
-        this.setState({ kichHoat });
-
-        $(this.modal.current).attr('data-ma', ma).modal('show');
+        $(this.modal).attr('data-ma', ma).modal('show');
     };
 
-    save = (e) => {
-        e.preventDefault();
-        const ma = $(this.modal.current).attr('data-ma'),
+    onSubmit = () => {
+        const ma = $(this.modal).attr('data-ma'),
             changes = {
-                ten: $('#dmTinhTrangCongTacTen').val().trim(),
-                kichHoat: Number(this.state.kichHoat),
+                ten: this.ten.value().trim(),
+                kichHoat: Number(this.kichHoat.value()),
             };
-        if ($('#dmTinhTrangCongTacTen').val() == '') {
+         if (changes.ten == '') {
             T.notify('Tên tình trạng công tác bị trống!', 'danger');
-            $('#dmTinhTrangCongTacTen').focus();
+            this.ten.focus();
         } else {
             if (ma) {
                 this.props.update(ma, changes);
             } else {
                 this.props.create(changes);
             }
-            $(this.modal.current).modal('hide');
+            $(this.modal).modal('hide');
+
         }
     };
 
-    render() {
+    render = () => {
         const readOnly = this.props.readOnly;
-        return (
-            <div className='modal' tabIndex='-1' role='dialog' ref={this.modal}>
-                <form className='modal-dialog' role='document' onSubmit={this.save}>
-                    <div className='modal-content'>
-                        <div className='modal-header'>
-                            <h5 className='modal-title'></h5>
-                            <button type='button' className='close' data-dismiss='modal' aria-label='Close'>
-                                <span aria-hidden='true'>&times;</span>
-                            </button>
-                        </div>
-                        <div className='modal-body'>
-                            <div className='form-group'>
-                                <label htmlFor='dmTinhTrangCongTacTen'>Tên tình trạng công tác</label>
-                                <input className='form-control' id='dmTinhTrangCongTacTen' placeholder='Tên tình trạng công tác' type='text' readOnly={readOnly} />
-                            </div>
-                            <div style={{ display: 'inline-flex', width: '100%', margin: 0 }}>
-                                <label htmlFor='dmTinhTrangCongTacKichHoat'>Kích hoạt: </label>&nbsp;&nbsp;
-                                <div className='toggle'>
-                                    <label>
-                                        <input type='checkbox' id='dmTinhTrangCongTacKichHoat' checked={this.state.kichHoat} onChange={() => !readOnly && this.setState({ kichHoat: !this.state.kichHoat })} />
-                                        <span className='button-indecator' />
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div className='modal-footer'>
-                            <button type='button' className='btn btn-secondary' data-dismiss='modal'>Đóng</button>
-                            {!readOnly && <button type='submit' className='btn btn-primary'>Lưu</button>}
-                        </div>
-                    </div>
-                </form>
+        return this.renderModal({
+            title: this.ma ? 'Tạo mới tình trạng công tác' : 'Cập nhật tình trạng công tác',
+            body: <div className='row'>
+                <FormTextBox type='text' className='col-12' ref={e => this.ten = e} label='Tên tình trạng công tác' readOnly={readOnly} placeholder='Tên tình trạng công tác' required />
+                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
+                    onChange={() => !readOnly && this.setState({ kichHoat: !this.state.kichHoat })} />
             </div>
+        }
         );
     }
 }
@@ -106,41 +76,34 @@ class dmTinhTrangCongTacPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmTinhTrangCongTac:write'),
-            permissionDelete = currentPermissions.includes('dmTinhTrangCongTac:delete'),
             permission = this.getUserPermission('dmTinhTrangCongTac', ['write', 'delete']);
-        let table = 'Không có dữ liệu!',
-            items = this.props.dmTinhTrangCongTac && this.props.dmTinhTrangCongTac.items;
-        if (items && items.length > 0) {
-            table = renderTable({
-                getDataSource: () => items, stickyHead: false,
-                renderHead: () => (
-                    <tr>
-                        <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                        <th style={{ width: '100%' }} nowrap='true'>Tên tình trạng công tác</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
-                    </tr>),
-                renderRow: (item, index) => (
-                    <tr key={index}>
-                        <TableCell type='number' content={index + 1} style={{ textAlign: 'right' }} />
-                        <TableCell type='link' content={item.ten} onClick={(e) => this.edit(e, item)} />
-                        <TableCell type='checkbox' content={item.kichHoat} permission={permissionWrite} onChanged={() => permissionWrite && this.changeActive(item)} />
-                        <TableCell type='buttons' content={item} permission={permission} onEdit={this.edit} onDelete={this.delete} />
-                    </tr>
-                ),
-            });
-        }
+
+        let items = this.props.dmTinhTrangCongTac && this.props.dmTinhTrangCongTac.items;
+
+        const table = renderTable({
+            getDataSource: () => items, stickyHead: false,
+            renderHead: () => (
+                <tr>
+                    <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
+                    <th style={{ width: '100%' }} nowrap='true'>Tên tình trạng công tác</th>
+                    <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
+                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                </tr>),
+            renderRow: (item, index) => (
+                <tr key={index}>
+                    <TableCell type='number' content={index + 1} style={{ textAlign: 'right' }} />
+                    <TableCell type='link' content={item.ten} onClick={(e) => this.edit(e, item)} />
+                    <TableCell type='checkbox' content={item.kichHoat} permission={permissionWrite} onChanged={() => permissionWrite && this.changeActive(item)} />
+                    <TableCell type='buttons' content={item} permission={permission} onEdit={this.edit} onDelete={this.delete} />
+                </tr>
+            ),
+        });
+
 
         return (
             <main className='app-content'>
                 <div className='app-title'>
                     <h1><i className='fa fa-list-alt' /> Danh mục Tình trạng công tác</h1>
-                    <ul className='app-breadcrumb breadcrumb'>
-                        <Link to='/user'><i className='fa fa-home fa-lg' /></Link>
-                        &nbsp;/&nbsp;
-                        <Link to='/user/category'>Danh mục</Link>
-                        &nbsp;/&nbsp;Tình trạng công tác
-                    </ul>
                 </div>
                 <div className='tile'>{table}</div>
                 <EditModal ref={this.modal} readOnly={!permissionWrite} create={this.props.createDmTinhTrangCongTac} update={this.props.updateDmTinhTrangCongTac} />

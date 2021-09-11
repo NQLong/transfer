@@ -46,6 +46,7 @@ class EditModal extends AdminModal {
     const readOnly = this.props.readOnly;
     return this.renderModal({
       title: 'Đơn vị tính',
+      size: 'large',
       body: <div className='row'>
         <FormTextBox type='text' className='col-12 col-sm-6' ref={e => this.ma = e} label='Mã đơn vị tính' readOnly={readOnly} placeholder='Mã Đối tượng cán bộ' required />
         <FormTextBox type='text' className='col-12 col-sm-6' ref={e => this.ten = e} label='Tên đơn vị tính' readOnly={readOnly} placeholder='Tên Đối tượng cán bộ' required />
@@ -77,7 +78,6 @@ class dmDonViTinhAdminPage extends AdminPage {
   render() {
     const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
       permissionWrite = currentPermissions.includes('dmDonViTinh:write'),
-      permissionDelete = currentPermissions.includes('dmDonViTinh:delete'),
       permission = this.getUserPermission('dmDonViTinh', ['write', 'delete']);
     const { pageNumber, pageSize, pageTotal, totalItem, list } =
       this.props.dmDonViTinh && this.props.dmDonViTinh.page ?
