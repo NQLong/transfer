@@ -103,8 +103,8 @@ class NewsPage extends React.Component {
 
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permissionWrite = currentPermissions.includes('news:write'),
-            permissionRead = currentPermissions.includes('news:draft');
+            permissionWrite = currentPermissions.includes('news:write');
+        // permissionRead = currentPermissions.includes('news:draft');
         const { pageNumber, pageSize, pageTotal, totalItem } = this.state ?
             this.state : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0 };
         let table = <div>Không có bài viết!</div>, category = [{ id: 0, text: 'Tất cả' }];
