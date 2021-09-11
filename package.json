@@ -13,9 +13,8 @@
         "webpack-server": "webpack-dev-server --mode development --open --color",
         "build": "webpack --mode production",
         "prepare": "husky install",
-        "create-hook": "husky add .husky/pre-commit \"npm test\"",
-        "lint:jsx:fix": "npm run lint:jsx --  --fix",
-        "lint:jsx": "eslint . --ext .jsx,.js --ignore-path .gitignore"
+        "lint:fix": "npm run lint --  --fix",
+        "lint": "eslint . --ext .jsx,.js --ignore-path .gitignore"
     },
     "db": {
         "owner": "DEV_HCMUSSH",
@@ -136,11 +135,6 @@
         "socket.io-redis": "^5.4.0",
         "source-map-loader": "^1.1.1",
         "xlsx": "^0.15.6"
-    },
-    "husky": {
-        "hooks": {
-            "pre-commit": "lint-staged"
-        }
     },
     "lint-staged": {
         "*{.jsx,.js}": [
