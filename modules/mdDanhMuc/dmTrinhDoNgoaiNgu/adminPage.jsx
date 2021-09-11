@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getDmTrinhDoNgoaiNguAll, createDmTrinhDoNgoaiNgu, updateDmTrinhDoNgoaiNgu, deleteDmTrinhDoNgoaiNgu } from './redux';
 import { Link } from 'react-router-dom';
+import { AdminPage, TableCell, renderTable } from 'view/component/AdminPage';
 
 class EditModal extends React.Component {
     modal = React.createRef();
@@ -95,7 +96,7 @@ class EditModal extends React.Component {
     }
 }
 
-class AdminPage extends React.Component {
+class DmTrinhDoNgoaiNguPage extends AdminPage {
     modal = React.createRef();
 
     componentDidMount() {
@@ -119,59 +120,46 @@ class AdminPage extends React.Component {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmTrinhDoNgoaiNgu:write'),
-            permissionDelete = currentPermissions.includes('dmTrinhDoNgoaiNgu:delete');
+            permissionDelete = currentPermissions.includes('dmTrinhDoNgoaiNgu:delete'),
+            permission = this.getUserPermission('dmTrinhDoNgoaiNgu', ['write', 'delete']);
+
         let table = 'Không có dữ liệu!',
             items = this.props.dmTrinhDoNgoaiNgu && this.props.dmTrinhDoNgoaiNgu.items;
         if (items && items.length > 0) {
-            table = (
-                <table className='table table-hover table-bordered table-responsive'>
-                    <thead>
-                        <tr>
-                            <th style={{ width: 'auto' }}>Mã</th>
-                            <th style={{ width: '100%' }}>Tên</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                            <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {items.map((item, index) => (
-                            <tr key={index}>
-                                <td>{item.ma}</td>
-                                <td><a href='#' onClick={e => this.edit(e, item)}>{item.ten}</a></td>
-                                <td className='toggle' style={{ textAlign: 'center' }}>
-                                    <label>
-                                        <input type='checkbox' checked={item.kichHoat == '1' ? true : false} onChange={() => permissionWrite && this.changeActive(item)} />
-                                        <span className='button-indecator' />
-                                    </label>
-                                </td>
-                                <td style={{ textAlign: 'center' }}>
-                                    <div className='btn-group' style={{ display: 'flex' }}>
-                                        <a className='btn btn-primary' href='#' onClick={e => this.edit(e, item)}>
-                                            <i className='fa fa-lg fa-edit' />
-                                        </a>
-                                        {permissionDelete &&
-                                            <a className='btn btn-danger' href='#' onClick={e => this.delete(e, item)}>
-                                                <i className='fa fa-lg fa-trash' />
-                                            </a>}
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            );
+            table = renderTable({
+                getDataSource: () => items, stickyHead: false,
+                renderHead: () => (
+                    <tr>
+                        <th style={{ width: 'auto' }}>Mã</th>
+                        <th style={{ width: '100%' }}>Tên</th>
+                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
+                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                    </tr>
+                ),
+                renderRow: (item, index) => (
+                    <tr key={index}>
+                        <TableCell type='number' content={item.ma ? item.ma : ''} />
+                        <TableCell type='link' content={item.ten ? item.ten : ''} 
+                            onClick = {e => this.edit(e, item)} />
+                        <TableCell type='checkbox' style={{ textAlign: 'center' }} content={item.kichHoat} permission={permissionWrite}
+                            onChange={() => permissionWrite && this.changeActive(item)} />
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} 
+                            onEdit={e => this.edit(e, item)} onDelete={e => this.delete(e, item)} />
+                    </tr>
+                )
+            });
         }
 
         return (
             <main className='app-content'>
                 <div className='app-title'>
                     <h1><i className='fa fa-list-alt' /> Danh mục Trình độ ngoại ngữ</h1>
-                    <ul className='app-breadcrumb breadcrumb'>
+                    {/* <ul className='app-breadcrumb breadcrumb'>
                         <Link to='/user'><i className='fa fa-home fa-lg' /></Link>
                         &nbsp;/&nbsp;
                         <Link to='/user/category'>Danh mục</Link>
                         &nbsp;/&nbsp;Trình độ ngoại ngữ
-                    </ul>
+                    </ul> */}
                 </div>
                 <div className='tile'>{table}</div>
                 {permissionWrite &&
@@ -189,4 +177,100 @@ class AdminPage extends React.Component {
 
 const mapStateToProps = state => ({ system: state.system, dmTrinhDoNgoaiNgu: state.dmTrinhDoNgoaiNgu });
 const mapActionsToProps = { getDmTrinhDoNgoaiNguAll, createDmTrinhDoNgoaiNgu, updateDmTrinhDoNgoaiNgu, deleteDmTrinhDoNgoaiNgu };
-export default connect(mapStateToProps, mapActionsToProps)(AdminPage);
+export default connect(mapStateToProps, mapActionsToProps)(DmTrinhDoNgoaiNguPage);
+
+// class AdminPage extends React.Component {
+//     modal = React.createRef();
+
+//     componentDidMount() {
+//         this.props.getDmTrinhDoNgoaiNguAll();
+//         T.ready('/user/category');
+//     }
+
+//     edit = (e, item) => {
+//         e.preventDefault();
+//         this.modal.current.show(item);
+//     };
+
+//     delete = (e, item) => {
+//         e.preventDefault();
+//         T.confirm('Trình độ ngoại ngữ', 'Bạn có chắc bạn muốn xóa trình độ ngoại ngữ này?', 'warning', true, isConfirm =>
+//             isConfirm && this.props.deleteDmTrinhDoNgoaiNgu(item.ma));
+//     };
+
+//     changeActive = item => this.props.updateDmTrinhDoNgoaiNgu(item.ma, { kichHoat: item.kichHoat == 1 ? 0 : 1 });
+
+//     render() {
+//         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
+//             permissionWrite = currentPermissions.includes('dmTrinhDoNgoaiNgu:write'),
+//             permissionDelete = currentPermissions.includes('dmTrinhDoNgoaiNgu:delete');
+//         let table = 'Không có dữ liệu!',
+//             items = this.props.dmTrinhDoNgoaiNgu && this.props.dmTrinhDoNgoaiNgu.items;
+//         if (items && items.length > 0) {
+//             table = (
+//                 <table className='table table-hover table-bordered table-responsive'>
+//                     <thead>
+//                         <tr>
+//                             <th style={{ width: 'auto' }}>Mã</th>
+//                             <th style={{ width: '100%' }}>Tên</th>
+//                             <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
+//                             <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+//                         </tr>
+//                     </thead>
+//                     <tbody>
+//                         {items.map((item, index) => (
+//                             <tr key={index}>
+//                                 <td>{item.ma}</td>
+//                                 <td><a href='#' onClick={e => this.edit(e, item)}>{item.ten}</a></td>
+//                                 <td className='toggle' style={{ textAlign: 'center' }}>
+//                                     <label>
+//                                         <input type='checkbox' checked={item.kichHoat == '1' ? true : false} onChange={() => permissionWrite && this.changeActive(item)} />
+//                                         <span className='button-indecator' />
+//                                     </label>
+//                                 </td>
+//                                 <td style={{ textAlign: 'center' }}>
+//                                     <div className='btn-group' style={{ display: 'flex' }}>
+//                                         <a className='btn btn-primary' href='#' onClick={e => this.edit(e, item)}>
+//                                             <i className='fa fa-lg fa-edit' />
+//                                         </a>
+//                                         {permissionDelete &&
+//                                             <a className='btn btn-danger' href='#' onClick={e => this.delete(e, item)}>
+//                                                 <i className='fa fa-lg fa-trash' />
+//                                             </a>}
+//                                     </div>
+//                                 </td>
+//                             </tr>
+//                         ))}
+//                     </tbody>
+//                 </table>
+//             );
+//         }
+
+//         return (
+//             <main className='app-content'>
+//                 <div className='app-title'>
+//                     <h1><i className='fa fa-list-alt' /> Danh mục Trình độ ngoại ngữ</h1>
+//                     <ul className='app-breadcrumb breadcrumb'>
+//                         <Link to='/user'><i className='fa fa-home fa-lg' /></Link>
+//                         &nbsp;/&nbsp;
+//                         <Link to='/user/category'>Danh mục</Link>
+//                         &nbsp;/&nbsp;Trình độ ngoại ngữ
+//                     </ul>
+//                 </div>
+//                 <div className='tile'>{table}</div>
+//                 {permissionWrite &&
+//                     <button type='button' className='btn btn-primary btn-circle' style={{ zIndex: 100, position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.edit}>
+//                         <i className='fa fa-lg fa-plus' />
+//                     </button>}
+//                 <EditModal ref={this.modal} readOnly={!permissionWrite} create={this.props.createDmTrinhDoNgoaiNgu} update={this.props.updateDmTrinhDoNgoaiNgu} />
+//                 <Link to='/user/category' className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>
+//                     <i className='fa fa-lg fa-reply' />
+//                 </Link>
+//             </main>
+//         );
+//     }
+// }
+
+// const mapStateToProps = state => ({ system: state.system, dmTrinhDoNgoaiNgu: state.dmTrinhDoNgoaiNgu });
+// const mapActionsToProps = { getDmTrinhDoNgoaiNguAll, createDmTrinhDoNgoaiNgu, updateDmTrinhDoNgoaiNgu, deleteDmTrinhDoNgoaiNgu };
+// export default connect(mapStateToProps, mapActionsToProps)(AdminPage);
