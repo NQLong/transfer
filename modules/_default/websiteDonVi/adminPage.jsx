@@ -130,7 +130,7 @@ class AdminPage extends React.Component {
                                 <td><a href={item.website} target='__blank' className='text-success'>{item.website}</a></td>
                                 <td className='toggle' style={{ textAlign: 'center' }}>
                                     <label>
-                                        <input type='checkbox' checked={item.kichHoat} onChange={e => this.changeActive(item, index)} />
+                                        <input type='checkbox' checked={item.kichHoat} onChange={() => this.changeActive(item, index)} />
                                         <span className='button-indecator' />
                                     </label>
                                 </td>

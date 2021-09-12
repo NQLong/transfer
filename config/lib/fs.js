@@ -50,7 +50,7 @@ module.exports = app => {
     if (done) done();
   };
 
-  app.parseArgToString = (arguments) => {
+  app.parseArgToString = function () {
     let returnString = '';
     for (let i = 0; i < arguments.length; i++) {
       returnString += arguments[i] + (i < arguments.length - 1 ? ', ' : '');

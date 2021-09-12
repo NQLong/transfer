@@ -125,7 +125,7 @@ module.exports = app => {
                             } else {
                                 image += '?t=' + (new Date().getTime()).toString().slice(-8);
                                 delete dataItem.ma;
-                                model.update(conditions, { image }, (error, item) => {
+                                model.update(conditions, { image }, (error,) => {
                                     if (dataName == 'user') {
                                         dataItem = app.clone(dataItem, { password: '' });
                                         if (req.session.user && req.session.user.id == dataItem.id) {
@@ -254,7 +254,7 @@ module.exports = app => {
                             } else {
                                 image += '?t=' + (new Date().getTime()).toString().slice(-8);
                                 dataItem.image = image;
-                                model.update(conditions, dataItem, (error, item) => {
+                                model.update(conditions, dataItem, (error,) => {
                                     if (dataName == 'user') {
                                         dataItem = app.clone(dataItem, { password: '' });
                                         if (req.session.user && req.session.user.shcc == dataItem.id) {

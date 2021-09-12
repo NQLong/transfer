@@ -55,7 +55,7 @@ export function getDmChucDanhKhoaHocPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: DmChucDanhKhoaHocGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách ca học bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách ca học bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -70,12 +70,12 @@ export function getDmChucDanhKhoaHocAll(condition, done) {
                 if (done) done(data.items);
                 dispatch({ type: DmChucDanhKhoaHocGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách chức danh khoa học bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách chức danh khoa học bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
 export function getDmChucDanhKhoaHoc(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/chuc-danh-khoa-hoc/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -99,7 +99,7 @@ export function createDmChucDanhKhoaHoc(item, done) {
                 dispatch(getDmChucDanhKhoaHocAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo chức danh khoa học bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Tạo chức danh khoa học bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -114,7 +114,7 @@ export function deleteDmChucDanhKhoaHoc(ma) {
                 T.alert('Khoa đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmChucDanhKhoaHocAll());
             }
-        }, error => T.notify('Xóa chức danh khoa học bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Xóa chức danh khoa học bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -131,7 +131,7 @@ export function updateDmChucDanhKhoaHoc(ma, changes, done) {
                 T.notify('Cập nhật thông tin chức danh khoa học thành công!', 'success');
                 dispatch(getDmChucDanhKhoaHocAll());
             }
-        }, error => T.notify('Cập nhật thông tin chức danh khoa học bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Cập nhật thông tin chức danh khoa học bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 

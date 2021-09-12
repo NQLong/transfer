@@ -57,7 +57,7 @@ module.exports = app => {
                         } else if (item) {
                             solveAnItem(index + 1);
                         } else {
-                            app.model.setting.create({ key, value }, (error, item) => {
+                            app.model.setting.create({ key, value }, (error,) => {
                                 if (error) {
                                     console.error(`Init setting (${key}, ${value}) has errors!`);
                                 } else {

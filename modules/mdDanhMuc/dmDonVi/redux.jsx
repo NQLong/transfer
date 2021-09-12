@@ -60,7 +60,7 @@ export function getDmDonViPage(pageNumber, pageSize, pageCondition, done) {
                 if (done) done(data.page);
                 dispatch({ type: DmDonViGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách đơn vị trường đại học bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách đơn vị trường đại học bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -75,12 +75,12 @@ export function getDmDonViAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmDonViGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách đơn vị trường đại học bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách đơn vị trường đại học bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
 export function getDmDonVi(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/don-vi/item/${ma}`;
         T.get(url, { ma }, data => {
             if (data.error) {
@@ -105,7 +105,7 @@ export function createDmDonVi(item, done) {
                 dispatch(getDmDonViPage());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo đơn vị trường đại học bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Tạo đơn vị trường đại học bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -120,7 +120,7 @@ export function deleteDmDonVi(ma) {
                 T.alert('Khoa đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmDonViPage());
             }
-        }, error => T.notify('Xóa đơn vị trường đại học bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Xóa đơn vị trường đại học bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -136,7 +136,7 @@ export function updateDmDonVi(ma, changes, done) {
                 T.notify('Cập nhật thông tin đơn vị trường đại học thành công!', 'success');
                 dispatch(getDmDonViPage());
             }
-        }, error => T.notify('Cập nhật thông tin đơn vị trường đại học bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Cập nhật thông tin đơn vị trường đại học bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -145,7 +145,7 @@ export function changeDmDonVi(item) {
 }
 
 export function uploadDmDonVi(upload, history) {
-    return dispatch => {
+    return () => {
         const url = '/api/danh-muc/don-vi/upload';
         T.post(url, { upload }, data => {
             if (data.error.length == 0) {
@@ -168,7 +168,7 @@ export function getDmDonViFaculty(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmDonViGetAllFaculty, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách khoa bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách khoa bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 

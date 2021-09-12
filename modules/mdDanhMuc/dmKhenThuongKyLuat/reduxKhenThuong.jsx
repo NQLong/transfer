@@ -53,7 +53,7 @@ export function getDmKhenThuongAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmKhenThuongGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách khen thưởng bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách khen thưởng bị lỗi!', 'danger'));
     };
 }
 
@@ -70,12 +70,12 @@ export function getDmKhenThuongPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: DmKhenThuongGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách khen thưởng bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách khen thưởng bị lỗi!', 'danger'));
     };
 }
 
 export function getDmKhenThuong(_id, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/dm-khen-thuong/item/${_id}`;
         T.get(url, data => {
             if (data.error) {
@@ -103,7 +103,7 @@ export function createDmKhenThuong(item, done) {
                 dispatch(getDmKhenThuongAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo khen thưởng bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo khen thưởng bị lỗi!', 'danger'));
     };
 }
 
@@ -118,7 +118,7 @@ export function deleteDmKhenThuong(ma) {
                 T.alert('Khen thưởng đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmKhenThuongAll());
             }
-        }, error => T.notify('Xóa khen thưởng bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa khen thưởng bị lỗi!', 'danger'));
     };
 }
 
@@ -134,7 +134,7 @@ export function updateDmKhenThuong(ma, changes, done) {
                 T.notify('Cập nhật thông tin khen thưởng thành công!', 'success');
                 dispatch(getDmKhenThuongAll());
             }
-        }, error => T.notify('Cập nhật thông tin khen thưởng bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin khen thưởng bị lỗi!', 'danger'));
     };
 }
 

@@ -5,6 +5,7 @@ import { changeRole } from 'modules/_default/fwRole/redux';
 import { updateSystemState, logout } from 'modules/_default/_init/reduxSystem';
 import { SelectAdapter_FwUser, switchUser } from 'modules/_default/fwUser/reduxUser';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
+import { AdminPage, } from 'view/component/AdminPage';
 
 import { Select } from './Input';
 
@@ -58,76 +59,105 @@ class DebugModal extends React.Component {
     }
 }
 
-class AdminHeader extends React.Component {
-    debugModal = React.createRef();
+class AdminHeader extends AdminPage {
+    componentDidMount() {
+        T.showSearchBox = (onSearchHide = null) => {
+            this.searchBox && $(this.searchBox).parent().css('display', 'flex');
+            this.advancedSearch && $(this.advancedSearch).css('display', onSearchHide ? 'flex' : 'none');
+            if (onSearchHide && typeof onSearchHide == 'function') {
+                T.onAdvanceSearchHide = onSearchHide;
+            } else {
+                T.onAdvanceSearchHide = null;
+            }
+        };
+        T.setTextSearchBox = (searchText) => {
+            this.searchBox && $(this.searchBox).val(searchText);
+        };
+        T.hideSearchBox = () => {
+            this.searchBox && $(this.searchBox).parent().css('display', 'none');
+            this.advancedSearch && $(this.advancedSearch).css('display', 'none');
+        };
+        T.clearSearchBox = () => {
+            if (this.searchBox) this.searchBox.value = '';
+        };
+        T.socket.on('receive-notification', (email, notifyItem) => {
+            const user = this.props.system && this.props.system.user ? this.props.system.user : {};
+            if (user.email && user.email == email) {
+                this.props.addNotification(notifyItem);
+            }
+        });
+    }
+
+    willUnmount = () => {
+        T.socket.off('receive-notification');
+    }
+
+    search = (e) => e.preventDefault() || T.onSearch && T.onSearch(this.searchBox.value);
+
+    onAdvanceSearch = (e) => {
+        e.preventDefault();
+        if ($('.app-advance-search')) {
+            // Close advance search
+            if ($('.app-advance-search').hasClass('show')) {
+                T.onAdvanceSearchHide && T.onAdvanceSearchHide();
+            }
+
+            $('.app-advance-search').toggleClass('show');
+        }
+    }
+
+    showContact = (e, contactId) => {
+        e.preventDefault();
+        this.props.getContact(contactId, contact => this.contactModal.show(contact));
+    }
+
+    showDebugModal = e => {
+        e.preventDefault();
+        this.debugModal.show();
+    }
 
     logout = (e) => {
         e.preventDefault();
         this.props.logout();
     }
 
-    debugAsRole = (e, role) => {
-        this.props.changeRole(role, user => this.props.updateSystemState({ user }));
-        e.preventDefault();
-    }
-
-    genClassName = (_id) => {
-        if (this.props.system && this.props.system.user) {
-            const roles = this.props.system.user.roles;
-            return roles && roles.contains(_id) ? 'btn btn-success' : 'btn btn-light';
-        } else {
-            return 'btn btn-light';
-        }
-    }
-    showDebugModal = e => {
-        e.preventDefault();
-        this.debugModal.current.show();
-    }
-
     render() {
         const isDebug = this.props.system && this.props.system.isDebug,
-            isAdmin = this.props.system && this.props.system.user &&
-                this.props.system.user.email.indexOf('@hcmut.edu.vn') != -1;
-        return (
-            <>
-                <header className='app-header' style={{ backgroundColor: 'rgb(48, 53, 145)' }}>
-                    <Link className='app-header__logo' to='/user' style={{ backgroundColor: 'rgb(48, 53, 100)' }}>HCMUSSH</Link>
-                    <a className='app-sidebar__toggle' href='#' data-toggle='sidebar' aria-label='Hide Sidebar' />
-                    <ul className='app-nav'>
-                        {this.props.system && this.props.system.isDebug && this.props.system.roles && this.props.system.roles.length ? (
-                            <li className='dropdown'>
-                                <a className='app-nav__item' href='#' data-toggle='dropdown' aria-label='Show notifications'>
-                                    Debug as &nbsp;<span style={{ color: '#1488db' }}>{(this.props.system.user ? this.props.system.user.roles : []).map(role => role.name.toUpperCase()).toString()}</span>
-                                </a>
-                                <ul className='app-notification dropdown-menu dropdown-menu-right'>
-                                    {this.props.system.roles.map((item, index) =>
-                                        <li key={index} className='app-notification__title' style={{ width: '100%', backgroundColor: 'rgb(48, 53, 145)' }}>
-                                            <a href='#' style={{ color: 'white', width: '100%', display: 'block' }} onClick={(e) => this.debugAsRole(e, item)}>{item.name}</a>
-                                        </li>
-                                    )}
-                                </ul>
-                            </li>
-                        ) : ''}
-                        {isDebug || isAdmin ?
-                            <li className='app-nav__item'>
-                                <a href='#' style={{ color: 'white' }} onClick={this.showDebugModal}>Switch user</a>
-                            </li> : null}
-                        <li>
-                            <Link className='app-nav__item' to='/user'>
-                                <i className='fa fa-user fa-lg' />
-                            </Link>
-                        </li>
-                        <li>
-                            <a className='app-nav__item' href='#' onClick={this.logout}>
-                                <i className='fa fa-power-off fa-lg' style={{ color: 'red' }} />
-                            </a>
-                        </li>
-                    </ul>
-                </header>
-                <DebugModal key={2} ref={this.debugModal} switchUser={this.props.switchUser} updateSystemState={this.props.updateSystemState} />
-            </>
-
-        );
+            isAdmin = this.props.system && this.props.system.user && this.props.system.user.roles.some(role => role.name == 'admin');
+        return [
+            <header key={0} className='app-header'>
+                <Link className='app-header__logo' to='/user'>HCMUT</Link>
+                <a className='app-sidebar__toggle' href='#' data-toggle='sidebar' aria-label='Hide Sidebar' />
+                <ul className='app-nav'>
+                    {isAdmin || isDebug ?
+                        <li className='app-nav__item'>
+                            <a href='#' style={{ color: 'white' }} onClick={this.showDebugModal}>Switch user</a>
+                        </li> : null}
+                    <li className='app-search' style={{ display: 'none' }}>
+                        <input ref={e => this.searchBox = e} className='app-search__input' type='search' placeholder='Tìm kiếm' onKeyUp={e => e.keyCode == 13 && this.search(e)} />
+                        <button className='app-search__button' onClick={this.search}><i className='fa fa-search' /></button>
+                    </li>
+                    <li ref={e => this.advancedSearch = e} style={{ display: 'none' }} onClick={this.onAdvanceSearch}>
+                        <a className='app-nav__item' href='#'>
+                            <i className='fa fa-search-plus fa-lg' />
+                        </a>
+                    </li>
+                    {/* <SectionNotification showContact={this.showContact}/> */}
+                    <li>
+                        <Link className='app-nav__item' to='/user'>
+                            <i className='fa fa-user fa-lg' />
+                        </Link>
+                    </li>
+                    <li>
+                        <a className='app-nav__item' href='#' onClick={this.logout}>
+                            <i className='fa fa-power-off fa-lg' style={{ color: 'red' }} />
+                        </a>
+                    </li>
+                </ul>
+            </header>,
+            // <ContactModal key={1} ref={e => this.contactModal = e} />,
+            <DebugModal key={2} ref={e => this.debugModal = e} switchUser={this.props.switchUser} updateSystemState={this.props.updateSystemState} />
+        ];
     }
 }
 

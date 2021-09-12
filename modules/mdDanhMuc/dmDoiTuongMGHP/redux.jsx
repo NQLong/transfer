@@ -57,7 +57,7 @@ export function getDmDoiTuongMghpPage(pageNumber, pageSize, pageCondition, done)
                 if (done) done(data.page);
                 dispatch({ type: DmDoiTuongMghpGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách đối tượng bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách đối tượng bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -72,12 +72,12 @@ export function getDmDoiTuongMghpAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmDoiTuongMghpGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách đối tượng bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách đối tượng bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
 export function getDmDoiTuongMghp(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/doi-tuong-mghp/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -101,7 +101,7 @@ export function createDmDoiTuongMghp(dmDoiTuongMGHP, done) {
                 dispatch(getDmDoiTuongMghpAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo mới một đối tượng bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Tạo mới một đối tượng bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -116,7 +116,7 @@ export function updateDmDoiTuongMghp(ma, changes, done) {
                 done && done(data.item);
                 dispatch(getDmDoiTuongMghpAll());
             }
-        }, error => T.notify('Cập nhật dữ liệu đối tượng MGHP bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Cập nhật dữ liệu đối tượng MGHP bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -132,6 +132,6 @@ export function deleteDmDoiTuongMghp(ma, done) {
                 dispatch(getDmDoiTuongMghpAll());
             }
             done && done();
-        }, error => T.notify('Xóa châu bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa châu bị lỗi!', 'danger'));
     };
 }

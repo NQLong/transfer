@@ -5,6 +5,7 @@ import { getDmBenhVienPage, createDmBenhVien, updateDmBenhVien, deleteDmBenhVien
 import { getDmTuyenBenhVienAll } from './reduxTuyenBenhVien';
 import Pagination, { OverlayLoading } from 'view/component/Pagination';
 import AdminSearchBox from 'view/component/AdminSearchBox';
+import { AdminPage, TableCell, renderTable } from 'view/component/AdminPage';
 
 class EditModal extends React.Component {
     modal = React.createRef();
@@ -114,11 +115,11 @@ class EditModal extends React.Component {
     }
 }
 
-class dmBenhVienPage extends React.Component {
+class dmBenhVienPage extends AdminPage {
     state = { searching: false };
     searchBox = React.createRef();
     modal = React.createRef();
-    tuyenMapper = null;
+    // tuyenMapper = null;
     tuyenOptions = [];
 
     componentDidMount() {
@@ -156,51 +157,30 @@ class dmBenhVienPage extends React.Component {
             this.props.dmBenhVien.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có dữ liệu!';
         if (list && list.length > 0 && this.tuyenMapper) {
-            table = (
-                <table className='table table-hover table-bordered table-responsive'>
-                    <thead>
-                        <tr>
-                            <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
-                            <th style={{ width: '40%' }} nowrap='true'>Tên</th>
-                            <th style={{ width: '30%' }} nowrap='true'>Địa chỉ</th>
-                            <th style={{ width: '30%' }} nowrap='true'>Tên tuyến</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                            <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {list.map((item, index) => (
-                            <tr key={index}>
-                                <td style={{ textAlign: 'right' }}>{(pageNumber - 1) * pageSize + index + 1}</td>
-                                <td style={{ textAlign: 'center' }}>{item.ma}</td>
-                                <td><a href='#' onClick={e => this.edit(e, item)}>{item.ten}</a></td>
-                                <td>{item.diaChi}</td>
-                                <td>{this.tuyenMapper[item.maTuyen] ? this.tuyenMapper[item.maTuyen] : ''}</td>
-                                <td className='toggle' style={{ textAlign: 'center' }}>
-                                    <label>
-                                        <input type='checkbox' checked={item.kichHoat} onChange={e => permissionWrite && this.changeActive(item)} />
-                                        <span className='button-indecator' />
-                                    </label>
-                                </td>
-                                <td style={{ textAlign: 'center' }}>
-                                    <div className='btn-group' style={{ display: 'flex' }}>
-                                        <a className='btn btn-primary' href='#' onClick={e => this.edit(e, item)}>
-                                            <i className='fa fa-lg fa-edit' />
-                                        </a>
-                                        {permissionDelete &&
-                                            <a className='btn btn-danger' href='#' onClick={e => this.delete(e, item)}>
-                                                <i className='fa fa-lg fa-trash' />
-                                            </a>}
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            );
+            table = renderTable({
+                getDataSource: () => list, stickyHead: false,
+                renderHead: () => (
+                    <tr>
+                        <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
+                        <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
+                        <th style={{ width: '40%' }} nowrap='true'>Tên</th>
+                        <th style={{ width: '30%' }} nowrap='true'>Địa chỉ</th>
+                        <th style={{ width: '30%' }} nowrap='true'>Tên tuyến</th>
+                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
+                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                    </tr>),
+                renderRow: (item, index) => (
+                    <tr key={index}>
+                        <TableCell type='number' content={(pageNumber - 1) * pageSize + index + 1}/>
+                        <TableCell type='text' content={item.ma}/>
+                        <TableCell type='link' content={T.language.parse(item.ten, true).vi} onClick={() => this.modal.current.show(item)}/>
+                        <TableCell type='text' content={T.language.parse(item.diaChi, true).vi} style={{ whiteSpace: 'nowrap' }}/>
+                        <TableCell type='text' content={T.language.parse(this.tuyenMapper[item.maTuyen] ? this.tuyenMapper[item.maTuyen] : '', true).vi} style={{ whiteSpace: 'nowrap' }}/>
+                        <TableCell type='checkbox' content={item.kichHoat} permissions={permissionWrite} onChanged={() => permissionWrite && this.changeActive(item)} />
+                        <TableCell type='buttons' content={item} permission={permissionDelete} onEdit={this.edit} onDelete={this.delete}></TableCell>
+                    </tr>)
+            });
         }
-
         return (
             <main className='app-content'>
                 <div className='app-title'>

@@ -98,9 +98,9 @@ module.exports = app => {
             if (err) {
                 console.error('Get unit website has errors!');
             } else if (dvWebsites) {
-                handleCreateDefault = (index = 0) => {
+                const handleCreateDefault = (index = 0) => {
                     if (index < dvWebsites.length) {
-                        dvWebsite = dvWebsites[index];
+                        let dvWebsite = dvWebsites[index];
                         app.model.fwMenu.get({ link: '/' + dvWebsite.shortname }, (error, menu) => {
                             if (error) {
                                 console.error('Get menu by link has errors!');

@@ -1,6 +1,5 @@
 //TEMPLATES: home|admin|unit
 
-import React from 'react';
 import Loadable from 'react-loadable';
 import Loading from 'view/component/Loading';
 import SectionContact from './sectionContact';

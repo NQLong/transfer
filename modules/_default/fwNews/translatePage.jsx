@@ -18,7 +18,7 @@ class NewsWaitApprovalPage extends React.Component {
     }
 
     render() {
-        const { pageNumber, pageSize, pageTotal, totalItem, list, pageCondition } = this.props.news && this.props.news.draft ?
+        const { pageNumber, pageSize, pageTotal, totalItem, list, } = this.props.news && this.props.news.draft ?
             this.props.news.draft : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: [], pageCondition: {} };
         let table = 'Không có tin tức!';
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [];

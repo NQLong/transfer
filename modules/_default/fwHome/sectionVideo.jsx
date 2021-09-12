@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-duplicate-props */
 import React from 'react';
 import { connect } from 'react-redux';
 import { getVideo } from './redux/reduxVideo';

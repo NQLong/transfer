@@ -53,7 +53,7 @@ export function getDmCoSoAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmCoSoGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách cơ sở trường đại học bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách cơ sở trường đại học bị lỗi!', 'danger'));
     };
 }
 
@@ -70,12 +70,12 @@ export function getDmCoSoPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: DmCoSoGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách cơ sở trường đại học bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách cơ sở trường đại học bị lỗi!', 'danger'));
     };
 }
 
 export function getDmCoSo(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/co-so/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -100,7 +100,7 @@ export function createDmCoSo(item, done) {
                 dispatch(getDmCoSoAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo cơ sở trường đại học bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo cơ sở trường đại học bị lỗi!', 'danger'));
     };
 }
 
@@ -115,7 +115,7 @@ export function deleteDmCoSo(ma) {
                 T.alert('Khoa đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmCoSoAll());
             }
-        }, error => T.notify('Xóa cơ sở trường đại học bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa cơ sở trường đại học bị lỗi!', 'danger'));
     };
 }
 
@@ -131,7 +131,7 @@ export function updateDmCoSo(ma, changes, done) {
                 T.notify('Cập nhật thông tin cơ sở trường đại học thành công!', 'success');
                 dispatch(getDmCoSoAll());
             }
-        }, error => T.notify('Cập nhật thông tin cơ sở trường đại học bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin cơ sở trường đại học bị lỗi!', 'danger'));
     };
 }
 

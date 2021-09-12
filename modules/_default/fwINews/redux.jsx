@@ -23,7 +23,7 @@ T.initPage('inewsPage');
 
 export function getINewsPage(pageNumber, pageSize, done) {
     const page = T.updatePage('inewsPage', pageNumber, pageSize);
-    return dispatch => {
+    return (dispatch) => {
         const url = `/api/inews/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, data => {
             if (data.error) {
@@ -33,12 +33,12 @@ export function getINewsPage(pageNumber, pageSize, done) {
                 dispatch({ type: INewsGetPage, page: data.page });
                 done && done(data.page);
             }
-        }, error => T.notify('Lấy danh sách iNews bị lỗi !', 'danger'));
+        }, () => T.notify('Lấy danh sách iNews bị lỗi !', 'danger'));
     };
 }
 
 export function getInews(inewsId, done) {
-    return dispatch => {
+    return (dispatch) => {
         const url = `/api/inews/item/${inewsId}`;
         T.get(url, data => {
             if (data.error) {
@@ -48,12 +48,12 @@ export function getInews(inewsId, done) {
                 dispatch({ type: INewsGet, item: data.item, list: data.list });
                 done && done(data.item, data.list);
             }
-        }, error => T.notify('Lấy iNews bị lỗi !', 'danger'));
+        }, () => T.notify('Lấy iNews bị lỗi !', 'danger'));
     };
 }
 
 export function createInews(done) {
-    return dispatch => {
+    return () => {
         const url = '/api/inews';
         T.post(url, { title: 'Tiêu đề mới' }, data => {
             if (data.error) {
@@ -62,12 +62,12 @@ export function createInews(done) {
             } else {
                 done && done(data);
             }
-        }, error => T.notify('Tạo mới iNews bị lỗi !', 'danger'));
+        }, () => T.notify('Tạo mới iNews bị lỗi !', 'danger'));
     };
 }
 
 export function updateInews(id, changes, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/inews';
         T.put(url, { ...changes, id }, data => {
             if (data.error) {
@@ -77,12 +77,12 @@ export function updateInews(id, changes, done) {
                 T.notify('Cập nhật iNews thành công !', 'success');
                 done && done();
             }
-        }, error => T.notify('Cập nhật iNews bị lỗi !', 'danger'));
+        }, () => T.notify('Cập nhật iNews bị lỗi !', 'danger'));
     };
 }
 
 export function deleteInews(id, done) {
-    return dispatch => {
+    return (dispatch) => {
         const url = '/api/inews';
         T.delete(url, { id }, data => {
             if (data.error) {
@@ -93,12 +93,12 @@ export function deleteInews(id, done) {
                 dispatch(getINewsPage());
                 done && done();
             }
-        }, error => T.notify('Xoá iNews bị lỗi !', 'danger'));
+        }, () => T.notify('Xoá iNews bị lỗi !', 'danger'));
     };
 }
 
 export function createInewsItem(inewsId, changes, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/inewsItem';
         T.post(url, { inewsId, ...changes }, data => {
             if (data.error) {
@@ -108,12 +108,12 @@ export function createInewsItem(inewsId, changes, done) {
                 T.notify('Tạo iNews item thành công !', 'success');
                 done && done(data.item);
             }
-        }, error => T.notify('Tạo iNews item bị lỗi !', 'danger'));
+        }, () => T.notify('Tạo iNews item bị lỗi !', 'danger'));
     };
 }
 
 export function updateInewsItem(item, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/inewsItem';
         const { id, ...changes } = item;
         T.put(url, { id, changes }, data => {
@@ -124,12 +124,12 @@ export function updateInewsItem(item, done) {
                 T.notify('Cập nhật iNews item thành công !', 'success');
                 done && done(data.item);
             }
-        }, error => T.notify('Cập nhật iNews item bị lỗi !', 'danger'));
+        }, () => T.notify('Cập nhật iNews item bị lỗi !', 'danger'));
     };
 }
 
 export function deleteInewsItem(item, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/inewsItem';
         T.delete(url, { item }, data => {
             if (data.error) {
@@ -139,12 +139,12 @@ export function deleteInewsItem(item, done) {
                 T.notify('Xoá iNews item thành công !', 'success');
                 done && done(data.item);
             }
-        }, error => T.notify('Xoá iNews item bị lỗi !', 'danger'));
+        }, () => T.notify('Xoá iNews item bị lỗi !', 'danger'));
     };
 }
 
 export function swapinewsItem(id, inewsId, isMoveUp, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/inewsItem/swap';
         T.put(url, { id, inewsId, isMoveUp }, data => {
             if (data.error) {
@@ -152,6 +152,6 @@ export function swapinewsItem(id, inewsId, isMoveUp, done) {
             } else {
                 done && done();
             }
-        }, error => T.notify('Thay iNews item bị lỗi !', 'danger'));
+        }, () => T.notify('Thay iNews item bị lỗi !', 'danger'));
     };
 }

@@ -55,7 +55,7 @@ export function getDmLoaiHinhNghienCuuPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: DmLoaiHinhNghienCuuGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách loại hình nghiên cứu bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách loại hình nghiên cứu bị lỗi!', 'danger'));
     };
 }
 
@@ -74,12 +74,12 @@ export function getDmLoaiHinhNghienCuuAll(condition, done) {
                 if (done) done(data.items);
                 dispatch({ type: DmLoaiHinhNghienCuuGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách loại hình nghiên cứu bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách loại hình nghiên cứu bị lỗi!', 'danger'));
     };
 }
 
 export function getDmLoaiHinhNghienCuu(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/loai-hinh-nghien-cuu/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -104,7 +104,7 @@ export function createDmLoaiHinhNghienCuu(item, done) {
                 dispatch(getDmLoaiHinhNghienCuuAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo loại hình nghiên cứu bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo loại hình nghiên cứu bị lỗi!', 'danger'));
     };
 }
 
@@ -119,7 +119,7 @@ export function deleteDmLoaiHinhNghienCuu(ma) {
                 T.alert('Danh mục đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmLoaiHinhNghienCuuAll());
             }
-        }, error => T.notify('Xóa loại hình nghiên cứu bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa loại hình nghiên cứu bị lỗi!', 'danger'));
     };
 }
 
@@ -135,7 +135,7 @@ export function updateDmLoaiHinhNghienCuu(ma, changes, done) {
                 T.notify('Cập nhật thông tin loại hình nghiên cứu thành công!', 'success');
                 dispatch(getDmLoaiHinhNghienCuuAll());
             }
-        }, error => T.notify('Cập nhật thông tin loại hình nghiên cứu bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin loại hình nghiên cứu bị lỗi!', 'danger'));
     };
 }
 

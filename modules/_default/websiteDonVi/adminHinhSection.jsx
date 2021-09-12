@@ -1,6 +1,5 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
 import { getWebsiteHinhAll, createWebsiteHinh, updateWebsiteHinh, deleteWebsiteHinh, swapWebsiteHinh } from './reduxWebsiteHinh';
 import { getDvWebsite } from './redux';
 import ImageBox from 'view/component/ImageBox';
@@ -15,7 +14,7 @@ class WebsitHinhItemModal extends React.Component {
     }
 
     show = (item, maDv) => {
-        let { ma, maDonVi, image, link, thuTu, kichHoat } = item ? item : { ma: null, maDonVi: null, image: '/img/avatar.png', link: '', thuTu: null, kichHoat: 0 };
+        let { ma, maDonVi, image, link, } = item ? item : { ma: null, maDonVi: null, image: '/img/avatar.png', link: '', thuTu: null, kichHoat: 0 };
         let tieuDe = item && item.tieuDe ? T.language.parse(item.tieuDe, true) : JSON.stringify({ vi: '', en: '' });
         $('#imageTitleVi').val(tieuDe.vi);
         $('#imageTitleEn').val(tieuDe.en);

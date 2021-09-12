@@ -97,11 +97,11 @@ class EditModal extends React.Component {
 							</div>
 							<div className='form-group'>
 								<label htmlFor='maTinhThanhPho'>Tên tỉnh/thành </label>
-								<select className='form-control' id='maTinhThanhPho' className='form-control input-md'></select>
+								<select className='form-control' id='maTinhThanhPho'></select>
 							</div>
 							<div className='form-group'>
 								<label htmlFor='maQuanHuyen'>Tên quận/huyện</label>
-								<select className='form-control' id='maQuanHuyen' className='form-control input-md'></select>
+								<select className='form-control' id='maQuanHuyen' ></select>
 							</div>
 							<div className='form-group'>
 								<label htmlFor='tenPhuongXa'>Tên phường/xã</label>
@@ -194,7 +194,7 @@ class DmPhuongXaPage extends React.Component {
 							<th style={{ width: '100%' }} nowrap='true'>Tên phường/xã</th>
 							<th style={{ width: 'auto' }} nowrap='true'>Tên quận/huyện</th>
 							<th style={{ width: 'auto' }} nowrap='true'>Tên tỉnh/thành phố</th>
-							<th style={{ width: 'auto' }} nowrap='true' nowrap='true'>Kích hoạt</th>
+							<th style={{ width: 'auto' }} nowrap='true' >Kích hoạt</th>
 							<th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
 						</tr>
 					</thead>

@@ -57,7 +57,7 @@ export function getDmQuanHeChuHoPage(pageNumber, pageSize, pageCondition, done) 
                 if (done) done(data.page);
                 dispatch({ type: DmQuanHeChuHoGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách quan hệ chủ hộ bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách quan hệ chủ hộ bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -72,12 +72,12 @@ export function getDmQuanHeChuHoAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmQuanHeChuHoGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách quan hệ chủ hộ bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách quan hệ chủ hộ bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
 export function getDmQuanHeChuHo(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/quan-he-chu-ho/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -101,7 +101,7 @@ export function createDmQuanHeChuHo(dmQuanHeChuHo, done) {
                 dispatch(getDmQuanHeChuHoPage());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo mới một quan hệ chủ hộ bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Tạo mới một quan hệ chủ hộ bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -116,7 +116,7 @@ export function updateDmQuanHeChuHo(ma, changes, done) {
                 done && done(data.item);
                 dispatch(getDmQuanHeChuHoPage());
             }
-        }, error => T.notify('Cập nhật dữ liệu quan hệ chủ hộ bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Cập nhật dữ liệu quan hệ chủ hộ bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -132,6 +132,6 @@ export function deleteDmQuanHeChuHo(ma, done) {
                 dispatch(getDmQuanHeChuHoPage());
             }
             done && done();
-        }, error => T.notify('Xóa quan hệ chủ hộ bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa quan hệ chủ hộ bị lỗi!', 'danger'));
     };
 }

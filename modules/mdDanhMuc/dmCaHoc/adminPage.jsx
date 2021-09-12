@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { createDmCaHoc, getDmCaHocAll, updateDmCaHoc, deleteDmCaHoc } from './redux';
 import { Link } from 'react-router-dom';
 import Editor from 'view/component/CkEditor4';
+import { AdminPage, TableCell, renderTable, } from 'view/component/AdminPage';
 
 class EditModal extends React.Component {
     state = { kichHoat: true };
@@ -166,7 +167,7 @@ class EditModal extends React.Component {
     }
 }
 
-class AdminPage extends React.Component {
+class dmCaHocAdminPage extends AdminPage {
     modal = React.createRef();
 
     componentDidMount() {
@@ -190,49 +191,31 @@ class AdminPage extends React.Component {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmCaHoc:write'),
-            permissionDelete = currentPermissions.includes('dmCaHoc:delete');
+            permission = this.getUserPermission('dmCaHoc', ['write', 'delete']);
         let table = 'Không có dữ liệu ca học!',
             items = this.props.dmCaHoc && this.props.dmCaHoc.items ? this.props.dmCaHoc.items : [];
         if (items.length > 0) {
-            table = (
-                <table className='table table-hover table-bordered'>
-                    <thead>
-                        <tr>
-                            <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                            <td style={{ width: '40%' }}>Giờ học</td>
-                            <td style={{ width: '60%' }}>Thời gian</td>
-                            <td style={{ width: 'auto' }} nowrap='true'>Kích hoạt</td>
-                            <td style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {items.map((item, index) => (
-                            <tr key={index}>
-                                <td style={{ textAlign: 'right' }}>{index + 1}</td>
-                                <td><a href='#' onClick={e => this.edit(e, item)}>{item.ten}</a></td>
-                                <td>{`${item.thoiGianBatDau} - ${item.thoiGianKetThuc}`}</td>
-                                <td className='toggle' style={{ textAlign: 'center' }}>
-                                    <label>
-                                        <input type='checkbox' checked={item.kichHoat} onChange={e => permissionWrite && this.changeActive(item)} />
-                                        <span className='button-indecator' />
-                                    </label>
-                                </td>
-                                <td style={{ textAlign: 'center' }}>
-                                    <div className='btn-group'>
-                                        <a className='btn btn-primary' href='#' onClick={e => this.edit(e, item)}>
-                                            <i className='fa fa-lg fa-edit' />
-                                        </a>
-                                        {permissionDelete &&
-                                            <a className='btn btn-danger' href='#' onClick={e => this.delete(e, item)}>
-                                                <i className='fa fa-trash-o fa-lg' />
-                                            </a>}
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            );
+            table = renderTable({
+                getDataSource: () => items, stickyHead: false,
+                renderHead: () => (
+                    <tr>
+                        <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
+                        <th style={{ width: '40%' }}>Giờ học</th>
+                        <th style={{ width: '60%' }}>Thời gian</th>
+                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
+                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                    </tr>
+                ),
+                renderRow: (item, index) => (
+                    <tr key={index}>
+                        <TableCell type='number' content={index + 1} style={{ textAlign: 'right' }} />
+                        <TableCell type='link' onClick={e => this.edit(e, item)} content={item.ten} />
+                        <TableCell type='text' content={`${item.thoiGianBatDau} - ${item.thoiGianKetThuc}`} dateFormat />
+                        <TableCell type='checkbox' content={item.kichHoat} permission={permissionWrite} onChanged={() => permissionWrite && this.changeActive(item)} />
+                        <TableCell type='buttons' content={item} permission={permission} onEdit={this.edit} onDelete={this.delete}></TableCell>
+                    </tr>
+                )
+            });
         }
 
         return (
@@ -263,4 +246,4 @@ class AdminPage extends React.Component {
 
 const mapStateToProps = state => ({ system: state.system, dmCaHoc: state.dmCaHoc });
 const mapActionsToProps = { getDmCaHocAll, createDmCaHoc, updateDmCaHoc, deleteDmCaHoc };
-export default connect(mapStateToProps, mapActionsToProps)(AdminPage);
+export default connect(mapStateToProps, mapActionsToProps)(dmCaHocAdminPage);

@@ -7,21 +7,7 @@ import inView from 'in-view';
 const linkFormat = '/tin-tuc/',
     idFormat = '/news/item/';
 
-const texts = {
-    vi: {
-        noNewsTitle: 'Không có tin tức',
-        newsTitle: 'Tin tức mới',
-        view: 'Lượt xem',
-        viewAll: 'Xem tất cả',
-    },
-    en: {
-        noNewsTitle: 'No latest news!',
-        newsTitle: 'Latest news',
-        view: 'View',
-        viewAll: 'View All'
 
-    }
-};
 
 class NewsListView extends React.Component {
     state = { view: 'grid', list: [], category: { vi: ' ', en: ' ' } };
@@ -144,10 +130,10 @@ class NewsListView extends React.Component {
             <div className='col-12' style={{ paddingBottom: '2rem' }}>
                 <h3 style={{ display: 'inline' }}><b>{language.toUpperCase()}</b></h3>
                 <div className='btn-group view-btn-group' style={{ marginBottom: '20px', right: '15px', position: 'absolute' }}>
-                    <button className='view-btn btn btn-primary' onClick={e => this.changeView('list')}>
+                    <button className='view-btn btn btn-primary' onClick={() => this.changeView('list')}>
                         <i className='fa fa-list'></i>
                     </button>
-                    <button className='view-btn btn btn-primary active' onClick={e => this.changeView('grid')}>
+                    <button className='view-btn btn btn-primary active' onClick={() => this.changeView('grid')}>
                         <i className='fa fa-th-large'></i>
                     </button>
                 </div>

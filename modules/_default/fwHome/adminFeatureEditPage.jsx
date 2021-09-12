@@ -22,7 +22,7 @@ class TestimonyModal extends React.Component {
     }
 
 
-    show = (selectedItem, index) => {
+    show = (selectedItem,) => {
         let { id, image, content, link } = selectedItem ? selectedItem : { id: null, featureId: null, image: null, content: '', link: '' };
         content = T.language.parse(content, true);
         if (id) $('#image').css('display', 'block');

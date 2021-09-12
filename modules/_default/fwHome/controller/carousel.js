@@ -110,9 +110,9 @@ module.exports = app => {
                 const nextPriority = isMoveUp ? (parseInt(priority) - 1) : (parseInt(priority) + 1);
                 app.model.homeCarouselItem.get({ carouselId: carouselId, priority: nextPriority }, (error, item) => {
                     if (item) {
-                        app.model.homeCarouselItem.update({ carouselId: carouselId, priority: nextPriority }, { priority: maxPriority + 1 }, (err1, item1) => {
+                        app.model.homeCarouselItem.update({ carouselId: carouselId, priority: nextPriority }, { priority: maxPriority + 1 }, (err1,) => {
                             if (!err1) {
-                                app.model.homeCarouselItem.update({ carouselId: carouselId, priority: target }, { priority: nextPriority }, (err2, item2) => {
+                                app.model.homeCarouselItem.update({ carouselId: carouselId, priority: target }, { priority: nextPriority }, (err2,) => {
                                     if (!err2) {
                                         app.model.homeCarouselItem.update({ carouselId: carouselId, priority: maxPriority + 1 }, { priority: target }, (err3, item3) => res.send(item3));
                                     }

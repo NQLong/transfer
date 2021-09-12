@@ -190,7 +190,7 @@ module.exports = app => {
 
     app.delete('/api/question', app.permission.check('form:write'), (req, res) => {
         const { id } = req.body;
-        app.model.fwQuestion.delete({ id }, (error, _) => {
+        app.model.fwQuestion.delete({ id }, (error,) => {
             res.send({ error });
         });
     });

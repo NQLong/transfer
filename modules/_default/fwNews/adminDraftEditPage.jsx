@@ -27,7 +27,7 @@ class RejectModal extends React.Component {
                     isTranslated: 'ready'
                 };
             $(this.modal.current).modal('hide');
-            this.props.updateDraftNews(id, changes, done => {
+            this.props.updateDraftNews(id, changes, () => {
                 this.props.pushUrl();
             });
         } else {
@@ -211,7 +211,7 @@ class DraftNewsEditPage extends React.Component {
         if ($('#neNewsEnTitle').val() && $('#neNewsEnAbstract').val() && $('#neNewsEnAbstract').val()) {
             newDraft.isTranslated = 'done';
         }
-        this.props.updateDraftNews(this.state.draftId, newDraft, data => { });
+        this.props.updateDraftNews(this.state.draftId, newDraft, () => { });
 
     }
 

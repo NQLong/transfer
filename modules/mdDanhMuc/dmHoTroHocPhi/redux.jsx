@@ -55,7 +55,7 @@ export function getDmHoTroHocPhiPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: DmHoTroHocPhiGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách hỗ trợ học phí bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách hỗ trợ học phí bị lỗi!', 'danger'));
     };
 }
 
@@ -70,12 +70,12 @@ export function getDmHoTroHocPhiAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmHoTroHocPhiGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách hỗ trợ học phí bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách hỗ trợ học phí bị lỗi!', 'danger'));
     };
 }
 
 export function getDmHoTroHocPhi(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/ho-tro-hoc-phi/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -99,7 +99,7 @@ export function createDmHoTroHocPhi(item, done) {
                 dispatch(getDmHoTroHocPhiAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo hỗ trợ học phí bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo hỗ trợ học phí bị lỗi!', 'danger'));
     };
 }
 
@@ -114,7 +114,7 @@ export function deleteDmHoTroHocPhi(ma) {
                 T.alert('Danh mục đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmHoTroHocPhiAll());
             }
-        }, error => T.notify('Xóa hỗ trợ học phí bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa hỗ trợ học phí bị lỗi!', 'danger'));
     };
 }
 
@@ -130,7 +130,7 @@ export function updateDmHoTroHocPhi(ma, changes, done) {
                 T.notify('Cập nhật thông tin hỗ trợ học phí thành công!', 'success');
                 dispatch(getDmHoTroHocPhiAll());
             }
-        }, error => T.notify('Cập nhật thông tin hỗ trợ học phí bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin hỗ trợ học phí bị lỗi!', 'danger'));
     };
 }
 

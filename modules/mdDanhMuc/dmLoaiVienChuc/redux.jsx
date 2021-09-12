@@ -55,7 +55,7 @@ export function getDmLoaiVienChucAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmLoaiVienChucGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách loại viên chức bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách loại viên chức bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -71,12 +71,12 @@ export function getDmLoaiVienChucPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: DmLoaiVienChucGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách loại viên chức bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách loại viên chức bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
 export function getDmLoaiVienChuc(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/loai-vien-chuc/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -103,7 +103,7 @@ export function createDmLoaiVienChuc(item, done) {
                 dispatch(getDmLoaiVienChucAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo loại viên chức bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Tạo loại viên chức bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -118,7 +118,7 @@ export function deleteDmLoaiVienChuc(ma) {
                 T.alert('Loại viên chức đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmLoaiVienChucAll());
             }
-        }, error => T.notify('Xóa loại viên chức bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Xóa loại viên chức bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -134,7 +134,7 @@ export function updateDmLoaiVienChuc(ma, changes, done) {
                 T.notify('Cập nhật loại viên chức thành công!', 'success');
                 dispatch(getDmLoaiVienChucAll());
             }
-        }, error => T.notify('Cập nhật loại viên chức bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Cập nhật loại viên chức bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 

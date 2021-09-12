@@ -55,7 +55,7 @@ export function getDmNgachCdnnPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: DmNgachCdnnGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách chức danh nghề nghiệp bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách chức danh nghề nghiệp bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -70,12 +70,12 @@ export function getDmNgachCdnnAll(condition, done) {
                 if (done) done(data.items);
                 dispatch({ type: DmNgachCdnnGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách chức danh nghề nghiệp bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách chức danh nghề nghiệp bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
 export function getDmNgachCdnn(id, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/ngach-cdnn/item/${id}`;
         T.get(url, data => {
             if (data.error) {
@@ -99,7 +99,7 @@ export function createDmNgachCdnn(item, done) {
                 dispatch(getDmNgachCdnnAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo chức danh nghề nghiệp bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Tạo chức danh nghề nghiệp bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -114,7 +114,7 @@ export function deleteDmNgachCdnn(id) {
                 T.alert('Chức danh nghề nghiệp đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmNgachCdnnAll());
             }
-        }, error => T.notify('Xóa chức danh nghề nghiệp bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Xóa chức danh nghề nghiệp bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -130,7 +130,7 @@ export function updateDmNgachCdnn(id, changes, done) {
                 T.notify('Cập nhật thông tin chức danh nghề nghiệp thành công!', 'success');
                 dispatch(getDmNgachCdnnAll());
             }
-        }, error => T.notify('Cập nhật thông tin chức danh nghề nghiệp bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Cập nhật thông tin chức danh nghề nghiệp bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 

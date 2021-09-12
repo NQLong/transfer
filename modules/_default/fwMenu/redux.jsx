@@ -21,7 +21,7 @@ export function getAll() {
             } else {
                 dispatch({ type: MenuGetAll, items: data.items });
             }
-        }, error => T.notify('Lấy menu bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy menu bị lỗi!', 'danger'));
     };
 }
 
@@ -36,7 +36,7 @@ export function createMenu(id, done) {
                 dispatch(getAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo menu bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo menu bị lỗi!', 'danger'));
     };
 }
 
@@ -53,7 +53,7 @@ export function updateMenu(id, changes, done) {
                 dispatch(getAll());
                 done && done();
             }
-        }, error => T.notify('Cập nhật menu bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật menu bị lỗi!', 'danger'));
     };
 }
 
@@ -68,7 +68,7 @@ export function updateMenuPriorities(changes) {
                 T.notify('Cập nhật menu thành công!', 'success');
                 dispatch(getAll());
             }
-        }, error => T.notify('Thay đổi vị trí menus bị lỗi!', 'danger'));
+        }, () => T.notify('Thay đổi vị trí menus bị lỗi!', 'danger'));
     };
 }
 
@@ -83,20 +83,20 @@ export function deleteMenu(id) {
                 T.alert('Xóa menu thành công!', 'error', false, 800);
                 dispatch(getAll());
             }
-        }, error => T.notify('Xóa menu bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa menu bị lỗi!', 'danger'));
     };
 }
 
 
 export function getMenu(menuId, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/menu/item/${menuId}`;
         T.get(url, data => done(data), error => done({ error }));
     };
 }
 
 export function createComponent(parentId, component, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/menu/component';
         T.post(url, { parentId, component }, data => {
             if (data.error) {
@@ -106,12 +106,12 @@ export function createComponent(parentId, component, done) {
                 T.notify('Tạo mới thành phần trang thành công!', 'success');
                 done(data);
             }
-        }, error => T.notify('Tạo thành phần trang bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo thành phần trang bị lỗi!', 'danger'));
     };
 }
 
 export function updateComponent(id, changes, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/menu/component';
         T.put(url, { id, changes }, data => {
             if (data.error) {
@@ -121,12 +121,12 @@ export function updateComponent(id, changes, done) {
                 T.notify('Cập nhật component thành công!', 'success');
                 done(data);
             }
-        }, error => T.notify('Cập nhật thành phần trang bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thành phần trang bị lỗi!', 'danger'));
     };
 }
 
 export function updateComponentPriorities(changes, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/menu/component/priorities/';
         T.put(url, { changes }, data => {
             if (data.error) {
@@ -136,12 +136,12 @@ export function updateComponentPriorities(changes, done) {
                 T.notify('Cập nhật component thành công!', 'success');
                 done();
             }
-        }, error => T.notify('Thay đổi vị trí component bị lỗi!', 'danger'));
+        }, () => T.notify('Thay đổi vị trí component bị lỗi!', 'danger'));
     };
 }
 
 export function deleteComponent(id, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/menu/component';
         T.delete(url, { id }, data => {
             if (data.error) {
@@ -151,12 +151,12 @@ export function deleteComponent(id, done) {
                 T.notify('Xóa thành phần thành công!', 'success');
                 if (done) done(data);
             }
-        }, error => T.notify('Xóa thành phần trang bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa thành phần trang bị lỗi!', 'danger'));
     };
 }
 
 export function getComponentViews(type, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/menu/component/type/${type}`;
         T.get(url, data => {
             if (data.error) {
@@ -165,15 +165,15 @@ export function getComponentViews(type, done) {
             } else {
                 done(data.items);
             }
-        }, error => T.notify('Lấy menu bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy menu bị lỗi!', 'danger'));
     };
 }
 
 export function buildMenu() {
-    return dispatch => {
+    return () => {
         const url = '/api/menu/build';
         T.put(url, () => T.notify('Cập nhật menu thành công!', 'info'),
-            error => T.notify('Cập nhật menu bị lỗi!', 'danger'));
+            () => T.notify('Cập nhật menu bị lỗi!', 'danger'));
     };
 }
 // division menu Actions ------------------------------------------------------------------------------------------------------------
@@ -187,7 +187,7 @@ export function divisionMenuGetAll(maDonVi, maWebsite) {
             } else {
                 dispatch({ type: MenuGetAll, items: data.items });
             }
-        }, error => T.notify('Lấy menu bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy menu bị lỗi!', 'danger'));
     };
 }
 
@@ -202,12 +202,12 @@ export function createDivisionMenu(id, maDonVi, maWebsite, done) {
                 dispatch(divisionMenuGetAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo menu bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo menu bị lỗi!', 'danger'));
     };
 }
 
 export function updateDivisionMenu(id, changes, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/menu';
         T.put(url, { id, changes }, data => {
             if (data.error) {
@@ -218,12 +218,12 @@ export function updateDivisionMenu(id, changes, done) {
                 T.notify('Cập nhật menu thành công!', 'success');
                 done && done();
             }
-        }, error => T.notify('Cập nhật menu bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật menu bị lỗi!', 'danger'));
     };
 }
 
 export function updateDivisionMenuPriorities(changes, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/menu/priorities';
         T.put(url, { changes }, data => {
             if (data.error) {
@@ -233,7 +233,7 @@ export function updateDivisionMenuPriorities(changes, done) {
                 done && done();
                 T.notify('Cập nhật menu thành công!', 'success');
             }
-        }, error => T.notify('Thay đổi vị trí menus bị lỗi!', 'danger'));
+        }, () => T.notify('Thay đổi vị trí menus bị lỗi!', 'danger'));
     };
 }
 
@@ -248,13 +248,13 @@ export function deleteDivisionMenu(id, maDonVi) {
                 T.alert('Xóa menu thành công!', 'error', false, 800);
                 dispatch(divisionMenuGetAll(maDonVi));
             }
-        }, error => T.notify('Xóa menu bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa menu bị lỗi!', 'danger'));
     };
 }
 
 // home Actions ------------------------------------------------------------------------------------------------------------
 export function divisionHomeMenuGetAll(maDonVi, maWebsite, done) {
-    return dispatch => {
+    return () => {
         const url = `/home/dvWebsite/menu/${maDonVi}`;
         T.get(url, { maWebsite }, data => {
             if (data.error) {
@@ -263,12 +263,12 @@ export function divisionHomeMenuGetAll(maDonVi, maWebsite, done) {
             } else {
                 done && done(data);
             }
-        }, error => T.notify('Lấy menu bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy menu bị lỗi!', 'danger'));
     };
 }
 
 export function homeMenuGet(link, done) {
-    return dispatch => {
+    return () => {
         const url = '/home/menu';
         T.get(url, { link }, data => {
             if (data.error) {
@@ -277,6 +277,6 @@ export function homeMenuGet(link, done) {
             } else {
                 done && done(data);
             }
-        }, error => T.notify('Lấy menu bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy menu bị lỗi!', 'danger'));
     };
 }

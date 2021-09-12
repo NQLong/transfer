@@ -34,10 +34,8 @@ class SectionLogo extends React.Component {
             }
         });
         setTimeout(() => {
-            let i = 0;
             $('.ftco-animate').waypoint(function (direction) {
                 if (direction === 'down' && !$(this.element).hasClass('ftco-animated')) {
-                    i++;
                     $(this.element).addClass('item-animate');
                     setTimeout(function () {
 

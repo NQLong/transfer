@@ -100,7 +100,7 @@ class DraftNewsEditPage extends React.Component {
             isDraftApproved: 1,
             isUnitApproved: 1,
         };
-        this.props.updateTranslateDraftNews(this.state.draftId, newDraft, data => { });
+        this.props.updateTranslateDraftNews(this.state.draftId, newDraft, () => { });
 
     }
 

@@ -381,9 +381,6 @@ export class MenuEditPage extends React.Component {
                 mainStyle.backgroundColor = '#90caf9';
             } else if (component.viewType == 'all news') {
                 mainStyle.backgroundColor = '#8c9eff';
-            } else if (component.viewType == 'all events') {
-                mainStyle.backgroundColor = '#82b1ff';
-                component.viewName = '';
             } else if (component.viewType == 'last news') {
                 mainStyle.backgroundColor = '#ffccbc';
                 component.viewName = '';
@@ -437,11 +434,11 @@ export class MenuEditPage extends React.Component {
                     <div className='tile-body row'>
                         <div className='form-group col-md-6'>
                             <label className='control-label'>Menu (Tiếng Việt)</label>
-                            <input className='form-control' type='text' placeholder='Menu (Tiếng Việt)' id='menuViTitle' defaultValue={title.vi !== 'Tên menu' ? title.vi : ''} placeholder='Tên menu' autoFocus={true} readOnly={!permissionWrite} />
+                            <input className='form-control' type='text' placeholder='Menu (Tiếng Việt)' id='menuViTitle' defaultValue={title.vi !== 'Tên menu' ? title.vi : ''} autoFocus={true} readOnly={!permissionWrite} />
                         </div>
                         <div className='form-group col-md-6'>
                             <label className='control-label'>Menu (Tiếng Anh)</label>
-                            <input className='form-control' type='text' placeholder='Menu (Tiếng Anh)' id='menuEnTitle' defaultValue={title.en !== 'Tên menu' ? title.en : ''} placeholder='Menu name' readOnly={!permissionWrite} />
+                            <input className='form-control' type='text' placeholder='Menu (Tiếng Anh)' id='menuEnTitle' defaultValue={title.en !== 'Tên menu' ? title.en : ''} readOnly={!permissionWrite} />
                         </div>
                         <div className='form-group col-md-6'>
                             <label className='control-label'>

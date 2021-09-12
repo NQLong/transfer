@@ -1,89 +1,89 @@
 export function createQtDaoTaoStaff(data, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/staff/qt-dao-tao';
         T.post(url, { data }, res => {
             if (res.error) {
-                T.notify('Thêm thông tin quá trình đào tạo bị lỗi' , 'danger');
+                T.notify('Thêm thông tin quá trình đào tạo bị lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
                 T.notify('Thêm thông tin quá trình đào tạo thành công!', 'info');
                 if (done) done(res);
             }
-        }, error => T.notify('Thêm thông tin quá trình đào tạo bị lỗi' , 'danger'));
+        }, () => T.notify('Thêm thông tin quá trình đào tạo bị lỗi', 'danger'));
     };
 }
 
 export function updateQtDaoTaoStaff(id, changes, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/staff/qt-dao-tao';
         T.put(url, { id, changes }, data => {
             if (data.error) {
-                T.notify('Cập nhật thông tin quá trình đào tạo bị lỗi' , 'danger');
+                T.notify('Cập nhật thông tin quá trình đào tạo bị lỗi', 'danger');
                 console.error('PUT: ' + url + '. ' + data.error);
             } else if (data.item) {
                 T.notify('Cập nhật thông tin quá trình đào tạo thành công!', 'info');
                 if (done) done();
             }
-        }, error => T.notify('Cập nhật thông tin quá trình đào tạo bị lỗi' , 'danger'));
+        }, () => T.notify('Cập nhật thông tin quá trình đào tạo bị lỗi', 'danger'));
     };
 }
 
 export function deleteQtDaoTaoStaff(id, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/staff/qt-dao-tao';
         T.delete(url, { id }, data => {
             if (data.error) {
-                T.notify('Xóa thông tin quá trình đào tạo bị lỗi' , 'danger');
+                T.notify('Xóa thông tin quá trình đào tạo bị lỗi', 'danger');
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
                 T.alert('Thông tin quá trình đào tạo được xóa thành công!', 'info', false, 800);
                 if (done) done();
             }
-        }, error => T.notify('Xóa thông tin quá trình đào tạo bị lỗi' , 'danger'));
+        }, () => T.notify('Xóa thông tin quá trình đào tạo bị lỗi', 'danger'));
     };
 }
 
 export function createQtDaoTaoStaffUser(data, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/user/staff/qt-dao-tao';
         T.post(url, { data }, res => {
             if (res.error) {
-                T.notify('Thêm thông tin quá trình đào tạo bị lỗi' , 'danger');
+                T.notify('Thêm thông tin quá trình đào tạo bị lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
                 T.notify('Thêm thông tin quá trình đào tạo thành công!', 'info');
                 if (done) done(res);
             }
-        }, error => T.notify('Thêm thông tin quá trình đào tạo bị lỗi' , 'danger'));
+        }, () => T.notify('Thêm thông tin quá trình đào tạo bị lỗi', 'danger'));
     };
 }
 
 export function updateQtDaoTaoStaffUser(id, changes, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/user/staff/qt-dao-tao';
         T.put(url, { id, changes }, data => {
             if (data.error) {
-                T.notify('Cập nhật thông tin quá trình đào tạo bị lỗi' , 'danger');
+                T.notify('Cập nhật thông tin quá trình đào tạo bị lỗi', 'danger');
                 console.error('PUT: ' + url + '. ' + data.error);
             } else if (data.item) {
                 T.notify('Cập nhật thông tin quá trình đào tạo thành công!', 'info');
                 if (done) done();
             }
-        }, error => T.notify('Cập nhật thông tin quá trình đào tạo bị lỗi' , 'danger'));
+        }, () => T.notify('Cập nhật thông tin quá trình đào tạo bị lỗi', 'danger'));
     };
 }
 
 export function deleteQtDaoTaoStaffUser(id, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/user/staff/qt-dao-tao';
         T.delete(url, { id }, data => {
             if (data.error) {
-                T.notify('Xóa thông tin quá trình đào tạo bị lỗi' , 'danger');
+                T.notify('Xóa thông tin quá trình đào tạo bị lỗi', 'danger');
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
                 T.alert('Thông tin quá trình đào tạo được xóa thành công!', 'info', false, 800);
                 done && done();
             }
-        }, error => T.notify('Xóa thông tin quá trình đào tạo bị lỗi' , 'danger'));
+        }, () => T.notify('Xóa thông tin quá trình đào tạo bị lỗi', 'danger'));
     };
 }

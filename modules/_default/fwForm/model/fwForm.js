@@ -1,4 +1,3 @@
-const keys = ['ID'];
 const obj2Db = { 'title': 'TITLE', 'image': 'IMAGE', 'description': 'DESCRIPTION', 'active': 'ACTIVE', 'isLocked': 'IS_LOCKED', 'priority': 'PRIORITY', 'maxRegisteredUsers': 'MAX_REGISTERED_USERS', 'createdDate': 'CREATED_DATE', 'startRegister': 'START_REGISTER', 'stopRegister': 'STOP_REGISTER', 'id': 'ID' };
 
 // eslint-disable-next-line no-unused-vars

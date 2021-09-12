@@ -180,7 +180,7 @@ class NewsEditPage extends React.Component {
             });
         } else {
             newDraft.isDraftApproved = 1;
-            this.props.createDraftNews(newDraft, result => { this.getData(); });
+            this.props.createDraftNews(newDraft, () => { this.getData(); });
         }
     };
     render() {

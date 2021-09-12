@@ -53,7 +53,7 @@ export function getDmLoaiDonViAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmLoaiDonViGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách loại đơn vị trường đại học bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách loại đơn vị trường đại học bị lỗi!', 'danger'));
     };
 }
 
@@ -70,12 +70,12 @@ export function getDmLoaiDonViPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: DmLoaiDonViGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách loại đơn vị trường đại học bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách loại đơn vị trường đại học bị lỗi!', 'danger'));
     };
 }
 
 export function getDmLoaiDonVi(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/dm-loai-don-vi/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -91,7 +91,7 @@ export function getDmLoaiDonVi(ma, done) {
 }
 
 export function getDonViById(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/dm-don-vi/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -119,7 +119,7 @@ export function createDmLoaiDonVi(item, done) {
                 dispatch(getDmLoaiDonViAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo loại đơn vị trường đại học bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo loại đơn vị trường đại học bị lỗi!', 'danger'));
     };
 }
 
@@ -134,7 +134,7 @@ export function deleteDmLoaiDonVi(ma) {
                 T.alert('Khoa đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmLoaiDonViAll());
             }
-        }, error => T.notify('Xóa loại đơn vị trường đại học bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa loại đơn vị trường đại học bị lỗi!', 'danger'));
     };
 }
 
@@ -150,7 +150,7 @@ export function updateDmLoaiDonVi(ma, changes, done) {
                 T.notify('Cập nhật thông tin loại đơn vị trường đại học thành công!', 'success');
                 dispatch(getDmLoaiDonViAll());
             }
-        }, error => T.notify('Cập nhật thông tin loại đơn vị trường đại học bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin loại đơn vị trường đại học bị lỗi!', 'danger'));
     };
 }
 

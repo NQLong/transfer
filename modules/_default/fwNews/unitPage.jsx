@@ -65,7 +65,7 @@ class UnitNewsPage extends React.Component {
                 { isUnitApproved: 0, status: 'userSendRequest' }));
 
     }
-    changeDraftReady(item, index) {
+    changeDraftReady(item,) {
         T.confirm('Bài viết đơn vị', 'Bạn có chắc bạn muốn đăng bài viết này lên tin tức cấp trường?', 'warning', true, isConfirm => isConfirm && this.props.updateUnitDraftNews(item.id, { isDraftApproved: 1 }));
     }
 

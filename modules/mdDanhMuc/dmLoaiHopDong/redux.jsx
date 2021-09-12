@@ -53,7 +53,7 @@ export function getdmLoaiHopDongAll(condition, done) {
                 if (done) done(data.items);
                 dispatch({ type: DmLoaiDonViGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách loại hợp đồng bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách loại hợp đồng bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -70,12 +70,12 @@ export function getDmLoaiHopDongPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: DmLoaiDonViGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách loại hợp đồng bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách loại hợp đồng bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
 export function getDmLoaiHopDong(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/loai-hop-dong/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -103,7 +103,7 @@ export function createDmLoaiHopdong(item, done) {
                 dispatch(getdmLoaiHopDongAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo loại hợp đồng bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Tạo loại hợp đồng bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -118,7 +118,7 @@ export function deleteDmLoaiHopDong(ma) {
                 T.alert('Khoa đã xóa thành công!', 'success', false, 800);
                 dispatch(getdmLoaiHopDongAll());
             }
-        }, error => T.notify('Xóa loại hợp đồng bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Xóa loại hợp đồng bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -134,7 +134,7 @@ export function updateDmLoaiHopDong(ma, changes, done) {
                 T.notify('Cập nhật thông tin loại hợp đồng thành công!', 'success');
                 dispatch(getdmLoaiHopDongAll());
             }
-        }, error => T.notify('Cập nhật thông tin loại hợp đồng bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Cập nhật thông tin loại hợp đồng bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 

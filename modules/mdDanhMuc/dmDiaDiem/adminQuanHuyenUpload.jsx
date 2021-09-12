@@ -157,7 +157,7 @@ class DmQuanHuyenUploadPage extends React.Component {
 	};
 
 	updateTableData = (dataEditModal) => {
-		this.setState((state, props) => {
+		this.setState((state,) => {
 			this.state.allTinhThanhPho.forEach(tinhThanhPho => {
 				if (tinhThanhPho.ma == dataEditModal.changes.maTinhThanhPho) {
 					dataEditModal.changes.maTinhThanhPho = tinhThanhPho.ma;
@@ -193,8 +193,8 @@ class DmQuanHuyenUploadPage extends React.Component {
 	render() {
 		const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
 			permissionWrite = currentPermissions.includes('dmQuanHuyen:write'),
-			permissionDelete = currentPermissions.includes('dmQuanHuyen:delete'),
-			permissionUpload = currentPermissions.includes('dmQuanHuyen:upload');
+			permissionDelete = currentPermissions.includes('dmQuanHuyen:delete');
+		// permissionUpload = currentPermissions.includes('dmQuanHuyen:upload');
 
 		const pageNumber = 1, pageSize = 50, totalItem = this.state.numberOfPhuongXa, pageTotal = totalItem / pageSize;
 		let table = null;

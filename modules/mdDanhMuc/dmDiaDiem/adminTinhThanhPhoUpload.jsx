@@ -152,6 +152,6 @@ class DMTinhThanhPhoImportPage extends React.Component {
     }
 }
 
-const mapStateToProps = state => ({});
+const mapStateToProps = () => ({});
 const mapActionsToProps = { createMultiDMTinhThanhPho };
 export default connect(mapStateToProps, mapActionsToProps)(DMTinhThanhPhoImportPage);

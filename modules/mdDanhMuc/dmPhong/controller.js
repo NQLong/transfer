@@ -47,7 +47,7 @@ module.exports = app => {
     app.post('/api/danh-muc/phong/createFromFile', app.permission.check('dmPhong:write'), (req, res) => {
         let dataUpload = req.body.item;
         for (let i = 0; i < dataUpload.length; i++) {
-            app.model.dmPhong.createMulti(dataUpload[i], (error, data) => {
+            app.model.dmPhong.createMulti(dataUpload[i], (error) => {
                 if (error) {
                     res.send({ error });
                 }
@@ -78,7 +78,7 @@ module.exports = app => {
             const workbook = app.excel.create();
             const parseLanguage = (text, getAll) => {
                 let obj = {};
-                try { obj = JSON.parse(text); } catch { }
+                try { obj = JSON.parse(text); } catch (e) { console.error(e); }
                 if (obj.vi == null) obj.vi = text;
                 if (obj.en == null) obj.en = text;
                 return getAll ? obj : obj[T.language()];

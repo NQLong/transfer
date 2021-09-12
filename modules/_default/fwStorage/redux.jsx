@@ -53,7 +53,7 @@ export function getFwStorageAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: FwStorageGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách lưu trữ bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách lưu trữ bị lỗi!', 'danger'));
     };
 }
 
@@ -70,12 +70,12 @@ export function getFwStoragePage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: FwStorageGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách lưu trữ bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách lưu trữ bị lỗi!', 'danger'));
     };
 }
 
 export function getFwStorage(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/storage/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -91,7 +91,7 @@ export function getFwStorage(ma, done) {
 }
 
 export function getDonViById(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/dm-don-vi/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -119,7 +119,7 @@ export function createFwStorage(item, done) {
                 dispatch(getFwStorageAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo lưu trữ bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo lưu trữ bị lỗi!', 'danger'));
     };
 }
 
@@ -134,7 +134,7 @@ export function deleteStorage(id) {
                 T.alert('Xóa lưu trữ thành công!', 'success', false, 800);
                 dispatch(getFwStoragePage());
             }
-        }, error => T.notify('Xóa lưu trữ bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa lưu trữ bị lỗi!', 'danger'));
     };
 }
 
@@ -150,7 +150,7 @@ export function updateStorage(id, changes, done) {
                 T.notify('Cập nhật lưu trữ thành công!', 'success');
                 dispatch(getFwStoragePage());
             }
-        }, error => T.notify('Cập nhật thông tin lưu trữ bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin lưu trữ bị lỗi!', 'danger'));
     };
 }
 
@@ -174,7 +174,7 @@ export const SelectAdapter_FwStorage = {
 };
 
 export function getStorageItem(id, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/storage/item/${id}`;
         T.get(url, data => {
             if (data.error) {

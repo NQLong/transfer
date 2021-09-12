@@ -24,7 +24,7 @@ export class TableCell extends React.Component { // type = number | date | link 
             let url = this.props.url ? this.props.url.trim() : '',
                 onClick = this.props.onClick;
             if (onClick) {
-                return <td className={className} style={{ ...style }} rowSpan={rowSpan}><a href='#' onClick={onClick}>{content}</a></td>;
+                return <td className={className} style={{ ...style }} rowSpan={rowSpan}><a href='#' onClick={e => e.preventDefault() || onClick(e)}>{content}</a></td>;
             } else {
                 return url.startsWith('http://') || url.startsWith('https://') ?
                     <td className={className} style={{ textAlign: 'left', ...style }} rowSpan={rowSpan}><a href={url} target='_blank' rel='noreferrer' style={contentStyle}>{content}</a></td> :
@@ -244,19 +244,59 @@ class FormNumberBox extends React.Component {
             </div>);
     }
 }
+class FormYearBox extends React.Component {
+    state = { value: '' };
+
+    value = function (value) {
+        if (arguments.length) {
+            this.setState({ value: value.toString() });
+        } else {
+            return this.state.value.includes('_') ? '' : this.state.value;
+        }
+    }
+
+    focus = () => this.input.getInputDOMNode().focus()
+
+    handleChange = event => {
+        event.preventDefault && event.preventDefault();
+        this.setState({ value: event.target.value }, () => {
+            this.props.onChange && this.props.onChange(this.state.value);
+        });
+    }
+
+    render() {
+        let { smallText = '', label = '', placeholder = '', className = '', style = {}, readOnly = false, required = false } = this.props,
+            readOnlyText = this.state.value;
+        let displayElement = '';
+        if (label) {
+            displayElement = <><label onClick={() => this.focus()}>{label}{!readOnly && required ? <span style={{ color: 'red' }}> *</span> : ''}</label>{readOnly ? <>: <b>{readOnlyText}</b></> : ''}</>;
+        } else {
+            displayElement = readOnly ? <b>{readOnlyText}</b> : '';
+        }
+
+        return (
+            <div className={'form-group ' + (className || '')} style={style}>
+                {displayElement}
+                <InputMask ref={e => this.input = e} className='form-control' mask={'2099'} onChange={this.handleChange} style={{ display: readOnly ? 'none' : '' }}
+                    formatChars={{ '2': '[12]', '0': '[09]', '1': '[01]', '3': '[0-3]', '9': '[0-9]', '5': '[0-5]', 'h': '[0-2]' }}
+                    value={this.state.value} readOnly={readOnly} placeholder={placeholder || label} />
+                {smallText ? <small>{smallText}</small> : null}
+            </div>);
+    }
+}
 
 export class FormTextBox extends React.Component {
     state = { value: '' };
 
     value = function (text) {
         if (arguments.length) {
-            if (this.props.type == 'number') {
+            if (this.props.type == 'number' || this.props.type == 'year') {
                 this.input.value(text);
             } else {
                 this.setState({ value: text });
             }
         } else {
-            if (this.props.type == 'number') {
+            if (this.props.type == 'number' || this.props.type == 'year') {
                 return this.input.value();
             }
             return this.state.value;
@@ -268,9 +308,11 @@ export class FormTextBox extends React.Component {
     render() {
         let { type = 'text', smallText = '', label = '', placeholder = '', className = '', style = {}, readOnly = false, onChange = null, required = false } = this.props,
             readOnlyText = this.state.value;
-        type = type.toLowerCase(); // type = text | number | email | password | phone
+        type = type.toLowerCase(); // type = text | number | email | password | phone | year
         if (type == 'number') {
             return <FormNumberBox ref={e => this.input = e} {...this.props} />;
+        } else if (type == 'year') {
+            return <FormYearBox ref={e => this.input = e} {...this.props} />;
         } else {
             const properties = {
                 type,
@@ -711,7 +753,7 @@ export class AdminPage extends React.Component {
         return permission;
     }
 
-    renderPage = ({ icon, title, subTitle, header, breadcrumb, advanceSearch, content, backRoute, onCreate, onSave, onExport, onImport }) => {
+    renderPage = ({ icon, title, subTitle, header, breadcrumb, content, backRoute, onCreate, onSave, onExport, onImport }) => {
         if (breadcrumb == null) breadcrumb = [];
 
         let right = 10, createButton, saveButton, exportButton, importButton;
@@ -745,10 +787,10 @@ export class AdminPage extends React.Component {
                         {breadcrumb.map((item, index) => <span key={index}>&nbsp;/&nbsp;{item}</span>)}
                     </ul>
                 </div>
-                <div className='app-advance-search'>
+                {/* <div className='app-advance-search'>
                     <h5>Tìm kiếm nâng cao</h5>
                     <div style={{ width: '100%' }}>{advanceSearch}</div>
-                </div>
+                </div> */}
                 {content}
                 {backRoute ? <CirclePageButton type='back' to={backRoute} /> : null}
                 {importButton} {exportButton} {saveButton} {createButton}

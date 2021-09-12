@@ -17,7 +17,7 @@ class WebsiteGioiThieuItemModal extends React.Component {
     }
 
     show = (item, maWebsite) => {
-        let { ma, maWebsiteGioiThieu, image, link, thuTu } = item ? item : { ma: null, maWebsiteGioiThieu: null, image: '/img/upload.png', link: '', thuTu: null };
+        let { ma, image, link, } = item ? item : { ma: null, maWebsiteGioiThieu: null, image: '/img/upload.png', link: '', thuTu: null };
         $(this.btnSave.current).data('ma', ma).data('maWebsiteGioiThieu', maWebsite);
         $('#imageLink').data('link', link).val(link);
         this.setState({ image: image ? image : '', ma: ma });

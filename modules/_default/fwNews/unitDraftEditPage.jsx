@@ -134,7 +134,7 @@ class UnitDraftNewsEditPage extends React.Component {
             delete newDraft.editorId;
             delete newDraft.editorName;
         }
-        this.props.updateUnitDraftNews(this.state.draftId, newDraft, data => { });
+        this.props.updateUnitDraftNews(this.state.draftId, newDraft, () => { });
 
     }
 
@@ -313,5 +313,5 @@ class UnitDraftNewsEditPage extends React.Component {
 }
 
 const mapStateToProps = state => ({ system: state.system, news: state.news });
-const mapActionsToProps = { getUnitDraftNews, checkLink, updateUnitDraftNews, getDmDonViFaculty, getDmDonViFaculty };
+const mapActionsToProps = { getUnitDraftNews, checkLink, updateUnitDraftNews, getDmDonViFaculty };
 export default connect(mapStateToProps, mapActionsToProps)(UnitDraftNewsEditPage);

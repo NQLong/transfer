@@ -21,12 +21,12 @@ export function getAllSubMenu(done) {
                 done && done(data.items);
                 dispatch({ type: SubMenuGetAll, items: data.items });
             }
-        }, error => T.notify('Lấy menu phụ bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy menu phụ bị lỗi!', 'danger'));
     };
 }
 
 export function createSubMenu(submenu, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/submenu';
         T.post(url, { submenu }, data => {
             if (data.error) {
@@ -36,7 +36,7 @@ export function createSubMenu(submenu, done) {
                 //dispatch(getAllSubMenu());
                 done && done(data);
             }
-        }, error => T.notify('Tạo menu phụ bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo menu phụ bị lỗi!', 'danger'));
     };
 }
 
@@ -53,7 +53,7 @@ export function updateSubMenu(id, changes, done) {
                 dispatch(getAllSubMenu());
                 done && done();
             }
-        }, error => T.notify('Cập nhật menu phụ bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật menu phụ bị lỗi!', 'danger'));
     };
 }
 
@@ -68,7 +68,7 @@ export function deleteSubMenu(id) {
                 T.alert('Xóa menu phụ thành công!', 'error', false, 800);
                 dispatch(getAllSubMenu());
             }
-        }, error => T.notify('Xóa menu phụ bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa menu phụ bị lỗi!', 'danger'));
     };
 }
 
@@ -84,6 +84,6 @@ export function swapSubMenu(id, priority, done) {
                 dispatch(getAllSubMenu());
             }
             done && done();
-        }, error => T.notify('Thay đổi thứ tự việc làm bị lỗi!', 'danger'));
+        }, () => T.notify('Thay đổi thứ tự việc làm bị lỗi!', 'danger'));
     };
 }

@@ -4,6 +4,7 @@ import { PageName, createDmQuocGia, getDmQuocGiaPage, updateDmQuocGia, deleteDmQ
 import Pagination, { OverlayLoading } from 'view/component/Pagination';
 import AdminSearchBox from 'view/component/AdminSearchBox';
 import { Link } from 'react-router-dom';
+import { AdminPage, TableCell, renderTable } from 'view/component/AdminPage';
 
 class EditModal extends React.Component {
     modal = React.createRef();
@@ -129,7 +130,7 @@ class EditModal extends React.Component {
     }
 }
 
-class AdminPage extends React.Component {
+class DmQuocGiaPage extends AdminPage {
     state = { searching: false };
     searchBox = React.createRef();
     modal = React.createRef();
@@ -152,53 +153,39 @@ class AdminPage extends React.Component {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmQuocGia:write'),
-            permissionDelete = currentPermissions.includes('dmQuocGia:delete');
-        const { pageNumber, pageSize, pageTotal, totalItem } = this.props.dmQuocGia && this.props.dmQuocGia.page ?
-            this.props.dmQuocGia.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0 };
+            // permissionDelete = currentPermissions.includes('dmQuocGia:delete'),
+            permission = this.getUserPermission('dmQuocGia', ['write', 'delete']);
+        const { pageNumber, pageSize, pageTotal, totalItem, list } = this.props.dmQuocGia && this.props.dmQuocGia.page ?
+            this.props.dmQuocGia.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null };
         let table = 'Không có dữ liệu quốc gia!';
-        if (this.props.dmQuocGia && this.props.dmQuocGia.page && this.props.dmQuocGia.page.list && this.props.dmQuocGia.page.list.length > 0) {
-            table = (
-                <table className='table table-hover table-bordered'>
-                    <thead>
-                        <tr>
-                            <th style={{ width: 'auto' }}>Mã</th>
-                            <th style={{ width: '40%' }} nowrap='true'>Tên quốc gia</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Code alpha</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Tên viết tắt</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Mã khu vực</th>
-                            <th style={{ width: '60%' }}>Tên khác</th>
-                            <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {this.props.dmQuocGia.page.list.map((item, index) => (
-                            <tr key={index}>
-                                <td>{item.maCode}</td>
-                                <td>
-                                    <a href='#' onClick={e => this.edit(e, item)}>
-                                        {item.tenQuocGia}{item.country ? ` (${item.country})` : ''}
-                                    </a>
-                                </td>
-                                <td>{item.codeAlpha}</td>
-                                <td>{item.shortenName}</td>
-                                <td>{item.maKhuVuc}</td>
-                                <td>{item.tenKhac && item.tenKhac.length > 0 ? item.tenKhac.toString().replaceAll(',', ', ') : ''}</td>
-                                <td style={{ textAlign: 'center' }}>
-                                    <div className='btn-group'>
-                                        <a className='btn btn-primary' href='#' onClick={e => this.edit(e, item)}>
-                                            <i className='fa fa-lg fa-edit' />
-                                        </a>
-                                        {permissionDelete &&
-                                            <a className='btn btn-danger' href='#' onClick={e => this.delete(e, item)}>
-                                                <i className='fa fa-trash-o fa-lg' />
-                                            </a>}
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            );
+        if (list && list.length > 0) {
+            table = renderTable({
+                getDataSource: () => list, stickyHead: false,
+                renderHead: () => (
+                    <tr>
+                        <th style={{ width: 'auto' }}>Mã</th>
+                        <th style={{ width: '40%' }} nowrap='true'>Tên quốc gia</th>
+                        <th style={{ width: 'auto' }} nowrap='true'>Code alpha</th>
+                        <th style={{ width: 'auto' }} nowrap='true'>Tên viết tắt</th>
+                        <th style={{ width: 'auto' }} nowrap='true'>Mã khu vực</th>
+                        <th style={{ width: '60%' }}>Tên khác</th>
+                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                    </tr>
+                ),
+                renderRow: (item, index) => (
+                    <tr key={index}>
+                        <TableCell type='text' content={item.maCode ? item.maCode : ''} />
+                        <TableCell type='link' content={<b>{item.tenQuocGia} {item.country ? `(${item.country})` : ''}</b>}
+                            onClick={e => this.edit(e, item)} />
+                        <TableCell type='number' content={item.codeAlpha ? item.codeAlpha : ''} />
+                        <TableCell type='text' content={item.shortenName ? item.shortenName : ''} />
+                        <TableCell type='text' content={item.maKhuVuc ? item.maKhuVuc : ''} />
+                        <TableCell type='text' content={item.tenKhac && item.tenKhac.length > 0 ? item.tenKhac.toString().replaceAll(',', ', ') : ''} />
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
+                            onEdit={e => this.edit(e, item)} onDelete={e => this.delete(e, item)} />
+                    </tr>
+                )
+            });
         }
 
         return (
@@ -206,11 +193,11 @@ class AdminPage extends React.Component {
                 <div className='app-title'>
                     <h1><i className='fa fa-list-alt' /> Danh mục Quốc gia</h1>
                     <AdminSearchBox ref={this.searchBox} getPage={this.props.getDmQuocGiaPage} setSearching={value => this.setState({ searching: value })} />
-                    <ul className='app-breadcrumb breadcrumb'>
+                    {/* <ul className='app-breadcrumb breadcrumb'>
                         <Link to='/user'><i className='fa fa-home fa-lg' /></Link>&nbsp;/&nbsp;
                         <Link to='/user/category'>Danh mục</Link>
                         &nbsp;/&nbsp;Quốc gia
-                    </ul>
+                    </ul> */}
                 </div>
                 <div className='tile'>
                     {!this.state.searching ? table : <OverlayLoading text='Đang tải..' />}
@@ -236,4 +223,113 @@ class AdminPage extends React.Component {
 
 const mapStateToProps = state => ({ system: state.system, dmQuocGia: state.dmQuocGia });
 const mapActionsToProps = { getDmQuocGiaPage, createDmQuocGia, updateDmQuocGia, deleteDmQuocGia };
-export default connect(mapStateToProps, mapActionsToProps)(AdminPage);
+export default connect(mapStateToProps, mapActionsToProps)(DmQuocGiaPage);
+
+// class AdminPage extends React.Component {
+//     state = { searching: false };
+//     searchBox = React.createRef();
+//     modal = React.createRef();
+
+//     componentDidMount() {
+//         T.ready('/user/category', () => this.searchBox.current.getPage());
+//     }
+
+//     edit = (e, item) => {
+//         e.preventDefault();
+//         this.modal.current.show(item);
+//     };
+
+//     delete = (e, item) => {
+//         e.preventDefault();
+//         T.confirm('Xóa danh mục quốc gia', 'Bạn có chắc bạn muốn xóa quốc gia này?', true, isConfirm =>
+//             isConfirm && this.props.deleteDmQuocGia(item.maCode));
+//     }
+
+//     render() {
+//         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
+//             permissionWrite = currentPermissions.includes('dmQuocGia:write'),
+//             permissionDelete = currentPermissions.includes('dmQuocGia:delete');
+//         const { pageNumber, pageSize, pageTotal, totalItem } = this.props.dmQuocGia && this.props.dmQuocGia.page ?
+//             this.props.dmQuocGia.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0 };
+//         let table = 'Không có dữ liệu quốc gia!';
+//         if (this.props.dmQuocGia && this.props.dmQuocGia.page && this.props.dmQuocGia.page.list && this.props.dmQuocGia.page.list.length > 0) {
+//             table = (
+//                 <table className='table table-hover table-bordered'>
+//                     <thead>
+//                         <tr>
+//                             <th style={{ width: 'auto' }}>Mã</th>
+//                             <th style={{ width: '40%' }} nowrap='true'>Tên quốc gia</th>
+//                             <th style={{ width: 'auto' }} nowrap='true'>Code alpha</th>
+//                             <th style={{ width: 'auto' }} nowrap='true'>Tên viết tắt</th>
+//                             <th style={{ width: 'auto' }} nowrap='true'>Mã khu vực</th>
+//                             <th style={{ width: '60%' }}>Tên khác</th>
+//                             <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+//                         </tr>
+//                     </thead>
+//                     <tbody>
+//                         {this.props.dmQuocGia.page.list.map((item, index) => (
+//                             <tr key={index}>
+//                                 <td>{item.maCode}</td>
+//                                 <td>
+//                                     <a href='#' onClick={e => this.edit(e, item)}>
+//                                         {item.tenQuocGia}{item.country ? ` (${item.country})` : ''}
+//                                     </a>
+//                                 </td>
+//                                 <td>{item.codeAlpha}</td>
+//                                 <td>{item.shortenName}</td>
+//                                 <td>{item.maKhuVuc}</td>
+//                                 <td>{item.tenKhac && item.tenKhac.length > 0 ? item.tenKhac.toString().replaceAll(',', ', ') : ''}</td>
+//                                 <td style={{ textAlign: 'center' }}>
+//                                     <div className='btn-group'>
+//                                         <a className='btn btn-primary' href='#' onClick={e => this.edit(e, item)}>
+//                                             <i className='fa fa-lg fa-edit' />
+//                                         </a>
+//                                         {permissionDelete &&
+//                                             <a className='btn btn-danger' href='#' onClick={e => this.delete(e, item)}>
+//                                                 <i className='fa fa-trash-o fa-lg' />
+//                                             </a>}
+//                                     </div>
+//                                 </td>
+//                             </tr>
+//                         ))}
+//                     </tbody>
+//                 </table>
+//             );
+//         }
+
+//         return (
+//             <main className='app-content'>
+//                 <div className='app-title'>
+//                     <h1><i className='fa fa-list-alt' /> Danh mục Quốc gia</h1>
+//                     <AdminSearchBox ref={this.searchBox} getPage={this.props.getDmQuocGiaPage} setSearching={value => this.setState({ searching: value })} />
+//                     <ul className='app-breadcrumb breadcrumb'>
+//                         <Link to='/user'><i className='fa fa-home fa-lg' /></Link>&nbsp;/&nbsp;
+//                         <Link to='/user/category'>Danh mục</Link>
+//                         &nbsp;/&nbsp;Quốc gia
+//                     </ul>
+//                 </div>
+//                 <div className='tile'>
+//                     {!this.state.searching ? table : <OverlayLoading text='Đang tải..' />}
+//                     <EditModal ref={this.modal} readOnly={!permissionWrite}
+//                         createDmQuocGia={this.props.createDmQuocGia} updateDmQuocGia={this.props.updateDmQuocGia} />
+//                     <Pagination name={PageName} style={{ marginLeft: '70px', marginBottom: '5px' }} pageNumber={pageNumber} pageSize={pageSize} pageTotal={pageTotal} totalItem={totalItem}
+//                         getPage={this.searchBox.current && this.searchBox.current.getPage} />
+//                     <Link to='/user/category' className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>
+//                         <i className='fa fa-lg fa-reply' />
+//                     </Link>
+//                     {permissionWrite && <Link to='/user/danh-muc/quoc-gia/upload' className='btn btn-success btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px' }}>
+//                         <i className='fa fa-lg fa-cloud-upload' />
+//                     </Link>}
+//                     {permissionWrite &&
+//                         <button type='button' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.edit}>
+//                             <i className='fa fa-lg fa-plus' />
+//                         </button>}
+//                 </div>
+//             </main>
+//         );
+//     }
+// }
+
+// const mapStateToProps = state => ({ system: state.system, dmQuocGia: state.dmQuocGia });
+// const mapActionsToProps = { getDmQuocGiaPage, createDmQuocGia, updateDmQuocGia, deleteDmQuocGia };
+// export default connect(mapStateToProps, mapActionsToProps)(AdminPage);

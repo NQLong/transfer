@@ -58,7 +58,7 @@ export function getDmGioiTinhPage(pageNumber, pageSize, pageCondition, done) {
                 if (done) done(data.page);
                 dispatch({ type: DmGioiTinhGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách giới tính bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách giới tính bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -73,7 +73,7 @@ export function getDmGioiTinhAll(condition, done) {
                 if (done) done(data.items);
                 dispatch({ type: DmGioiTinhGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách giới tính bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách giới tính bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -104,7 +104,7 @@ export function createDmGioiTinh(dmGioiTinh, done) {
                 dispatch(getDmGioiTinhAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo mới một giới tính bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Tạo mới một giới tính bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -120,7 +120,7 @@ export function updateDmGioiTinh(ma, changes, done) {
                 done && done(data.item);
                 dispatch(getDmGioiTinhAll());
             }
-        }, error => T.notify('Cập nhật dữ liệu giới tính bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Cập nhật dữ liệu giới tính bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -136,7 +136,7 @@ export function deleteDmGioiTinh(ma, done) {
                 dispatch(getDmGioiTinhAll());
             }
             done && done();
-        }, error => T.notify('Xóa giới tính bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa giới tính bị lỗi!', 'danger'));
     };
 }
 

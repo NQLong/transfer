@@ -53,7 +53,7 @@ export function getDmLoaiTaiSanCoDinhAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmLoaiTaiSanCoDinhGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách loại tài sản cố định bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách loại tài sản cố định bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -71,12 +71,12 @@ export function getDmLoaiTaiSanCoDinhPage(pageNumber, pageSize, pageCondition, d
                 if (done) done(data.page);
                 dispatch({ type: DmLoaiTaiSanCoDinhGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách loại tài sản cố định bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách loại tài sản cố định bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
 export function getDmLoaiTaiSanCoDinh(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/loai-tai-san-co-dinh/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -104,7 +104,7 @@ export function createDmLoaiTaiSanCoDinh(item, done) {
                 dispatch(getDmLoaiTaiSanCoDinhPage());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo loại tài sản cố định bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Tạo loại tài sản cố định bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -120,7 +120,7 @@ export function deleteDmLoaiTaiSanCoDinh(ma, done) {
                 dispatch(getDmLoaiTaiSanCoDinhPage());
             }
             done && done();
-        }, error => T.notify('Xóa loại tài sản cố định bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Xóa loại tài sản cố định bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -136,7 +136,7 @@ export function updateDmLoaiTaiSanCoDinh(ma, changes, done) {
                 T.notify('Cập nhật thông tin loại tài sản cố định thành công!', 'success');
                 dispatch(getDmLoaiTaiSanCoDinhPage());
             }
-        }, error => T.notify('Cập nhật thông tin loại tài sản cố định bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Cập nhật thông tin loại tài sản cố định bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 

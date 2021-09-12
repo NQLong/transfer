@@ -194,7 +194,7 @@ class FormPage extends React.Component {
                     {!readOnly ?
                         <button type='button' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.create}>
                             <i className='fa fa-lg fa-plus' />
-                        </button> : nulls}
+                        </button> : null}
                     <CopyModal ref={this.copyModal} duplicateForm={this.props.duplicateForm} getFormInPage={this.props.getFormInPage} />
                 </div>
             </main>

@@ -30,7 +30,7 @@ export function getDmHoatDongKhcnPage(pageNumber, pageSize, pageCondition, done)
                 if (done) done(data.page);
                 dispatch({ type: DmHoatDongKhcnPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách danh mục hoạt động KH&CN bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách danh mục hoạt động KH&CN bị lỗi!', 'danger'));
     };
 }
 
@@ -45,12 +45,12 @@ export function getDmHoatDongKhcnAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmHoatDongKhcnAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách danh mục hoạt động KH&CN bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách danh mục hoạt động KH&CN bị lỗi!', 'danger'));
     };
 }
 
 export function getDmHoatDongKhcn(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/khcn/dm-hoat-dong-khcn/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -75,7 +75,7 @@ export function createDmHoatDongKhcn(dmHoatDongKhcn, done) {
                 if (done) done(data);
                 dispatch(getDmHoatDongKhcnPage());
             }
-        }, error => T.notify('Tạo mới một danh mục hoạt động KH&CN bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo mới một danh mục hoạt động KH&CN bị lỗi!', 'danger'));
     };
 }
 
@@ -107,7 +107,7 @@ export function deleteDmHoatDongKhcn(ma, done) {
                 dispatch(getDmHoatDongKhcnPage());
             }
             done && done();
-        }, error => T.notify('Xóa danh mục hoạt động KH&CN bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa danh mục hoạt động KH&CN bị lỗi!', 'danger'));
     };
 }
 

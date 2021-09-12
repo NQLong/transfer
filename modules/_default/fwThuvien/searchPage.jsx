@@ -77,7 +77,7 @@ class searchPage extends React.Component {
                         </div>
                         <div className='form-group' style={{ paddingLeft: 15, paddingTop: 10 }}>
                             <button className='btn btn-primary' style={{ borderRadius: 3, backgroundColor: '#0139A6' }}
-                                type='button' onClick={e => this.search()}>
+                                type='button' onClick={() => this.search()}>
                                 Tìm kiếm
                             </button>
                         </div>

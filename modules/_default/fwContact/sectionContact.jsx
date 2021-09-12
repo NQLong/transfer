@@ -90,8 +90,8 @@ class SectionContact extends React.Component {
 
     render() {
         const language = T.language(texts);
-        let { address, mobile, email, map, linkMap } = this.props.system ? this.props.system : { map: '', linkMap: '' };
-        address = T.language.parse(address);
+        let { map, linkMap } = this.props.system ? this.props.system : { map: '', linkMap: '' };
+        // address = T.language.parse(address);
         return (
             <section className='contact-section ftco-degree-bg' style={{ padding: '5em 0' }}>
                 <div className='container'>
@@ -126,8 +126,8 @@ class SectionContact extends React.Component {
                                     <textarea name='message' className='form-control' style={{ fontSize: '17px' }} ref={this.message} cols='30' rows='7' placeholder={language.message} />
                                 </div>
                                 <div className='form-group'>
-                                    <button onClick={this.sendMessage} type='submit' className='btn btn' style={{ fontSize: '17px' }}
-                                        style={{ backgroundColor: '#313591', borderRadius: 10, borderWidth: '0px', padding: '15px 30px', color: 'white' }}>{language.sendMessage}</button>
+                                    <button onClick={this.sendMessage} type='submit' className='btn btn'
+                                        style={{ fontSize: '17px', backgroundColor: '#313591', borderRadius: 10, borderWidth: '0px', padding: '15px 30px', color: 'white' }}>{language.sendMessage}</button>
                                 </div>
                             </form>
                         </div>

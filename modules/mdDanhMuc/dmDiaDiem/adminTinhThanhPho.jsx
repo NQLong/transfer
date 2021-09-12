@@ -38,7 +38,7 @@ export class EditModal extends React.Component {
             $('dmTinhThanhPhoMa').focus();
         }
         if (ma) {
-            this.props.update({ ma }, changes, (error, item) => {
+            this.props.update({ ma }, changes, (error,) => {
                 if (error) {
                     T.notify(error.message ? error.message : `Cập nhật tỉnh/thành phố ${changes.ten} bị lỗi!`, 'danger');
                 } else {
@@ -47,7 +47,7 @@ export class EditModal extends React.Component {
                 }
             });
         } else {
-            this.props.create(changes, (error, item) => {
+            this.props.create(changes, (error,) => {
                 if (error) {
                     T.notify(error.message ? error.message : `Tạo mới tỉnh/thành phố ${changes.ten} bị lỗi!`, 'danger');
                 } else {

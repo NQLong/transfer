@@ -57,7 +57,7 @@ export function getDmNghiCongTacPage(pageNumber, pageSize, pageCondition, done) 
                 if (done) done(data.page);
                 dispatch({ type: DmNghiCongTacGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách nghỉ công tác bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách nghỉ công tác bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -72,12 +72,12 @@ export function getDmNghiCongTacAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmNghiCongTacGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách nghỉ công tác bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách nghỉ công tác bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
 export function getDmNghiCongTac(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/nghi-cong-tac/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -101,7 +101,7 @@ export function createDmNghiCongTac(dmNghiCongTac, done) {
                 dispatch(getDmNghiCongTacAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo mới một nghỉ công tác bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Tạo mới một nghỉ công tác bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -116,7 +116,7 @@ export function updateDmNghiCongTac(ma, changes, done) {
                 done && done(data.item);
                 dispatch(getDmNghiCongTacAll());
             }
-        }, error => T.notify('Cập nhật dữ liệu nghỉ công tác bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Cập nhật dữ liệu nghỉ công tác bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -132,6 +132,6 @@ export function deleteDmNghiCongTac(ma, done) {
                 dispatch(getDmNghiCongTacAll());
             }
             done && done();
-        }, error => T.notify('Xóa nghỉ công tác bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa nghỉ công tác bị lỗi!', 'danger'));
     };
 }

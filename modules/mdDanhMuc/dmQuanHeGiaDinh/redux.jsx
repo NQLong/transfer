@@ -57,7 +57,7 @@ export function getDmQuanHeGiaDinhPage(pageNumber, pageSize, pageCondition, done
                 if (done) done(data.page);
                 dispatch({ type: DmQuanHeGiaDinhGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách quan hệ gia đình bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách quan hệ gia đình bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -72,12 +72,12 @@ export function getDmQuanHeGiaDinhAll(condition, done) {
                 if (done) done(data.items);
                 dispatch({ type: DmQuanHeGiaDinhGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách quan hệ gia đình bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách quan hệ gia đình bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
 export function getDmQuanHeGiaDinh(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/quan-he-gia-dinh/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -102,7 +102,7 @@ export function createDmQuanHeGiaDinh(dmQuanHeGiaDinh, done) {
                 dispatch(getDmQuanHeGiaDinhPage());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo mới một quan hệ gia đình bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Tạo mới một quan hệ gia đình bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -118,7 +118,7 @@ export function updateDmQuanHeGiaDinh(ma, changes, done) {
                 done && done(data.item);
                 dispatch(getDmQuanHeGiaDinhPage());
             }
-        }, error => T.notify('Cập nhật dữ liệu quan hệ gia đình bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Cập nhật dữ liệu quan hệ gia đình bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -134,7 +134,7 @@ export function deleteDmQuanHeGiaDinh(ma, done) {
                 dispatch(getDmQuanHeGiaDinhPage());
             }
             done && done();
-        }, error => T.notify('Xóa quan hệ gia đình bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa quan hệ gia đình bị lỗi!', 'danger'));
     };
 }
 

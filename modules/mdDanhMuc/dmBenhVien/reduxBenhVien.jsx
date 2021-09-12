@@ -57,7 +57,7 @@ export function getDmBenhVienPage(pageNumber, pageSize, pageCondition, done) {
                 if (done) done(data.page);
                 dispatch({ type: DmBenhVienGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách bệnh viện bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách bệnh viện bị lỗi!', 'danger'));
     };
 }
 
@@ -72,12 +72,12 @@ export function getDmBenhVienAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmBenhVienGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách bệnh viện bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách bệnh viện bị lỗi!', 'danger'));
     };
 }
 
 export function getDmBenhVien(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/benh-vien/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -102,7 +102,7 @@ export function createDmBenhVien(dmBenhVien, done) {
                 dispatch(getDmBenhVienPage());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo mới một bệnh viện bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo mới một bệnh viện bị lỗi!', 'danger'));
     };
 }
 
@@ -134,12 +134,12 @@ export function deleteDmBenhVien(ma, done) {
                 dispatch(getDmBenhVienPage());
             }
             done && done();
-        }, error => T.notify('Xóa bệnh viện bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa bệnh viện bị lỗi!', 'danger'));
     };
 }
 
 export function createMultiDmBenhVien(dmBenhVien, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/danh-muc/benh-vien/multiple';
         T.post(url, { dmBenhVien }, data => {
             if (data.error) {
@@ -148,6 +148,6 @@ export function createMultiDmBenhVien(dmBenhVien, done) {
                 T.notify(`Cập nhật ${data && data.items ? data.items.length + ' ' : ''} bệnh viện thành công!`, 'success');
             }
             done && done();
-        }, error => T.notify('Upload thông tin bệnh viện có lỗi!', 'danger'));
+        }, () => T.notify('Upload thông tin bệnh viện có lỗi!', 'danger'));
     };
 }

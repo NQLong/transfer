@@ -55,7 +55,7 @@ export function getDmNgachLuongPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: DmNgachLuongGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách ngạch lương bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách ngạch lương bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -70,12 +70,12 @@ export function getDmNgachLuongAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmNgachLuongGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách ngạch lương bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách ngạch lương bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
 export function getDmNgachLuong(id, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/ngach-luong/item/${id}`;
         T.get(url, data => {
             if (data.error) {
@@ -99,7 +99,7 @@ export function createDmNgachLuong(item, done) {
                 dispatch(getDmNgachLuongAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo ngạch lương bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Tạo ngạch lương bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -114,7 +114,7 @@ export function deleteDmNgachLuong(idNgach, bac) {
                 T.alert('Khoa đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmNgachLuongAll());
             }
-        }, error => T.notify('Xóa ngạch lương bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Xóa ngạch lương bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -130,7 +130,7 @@ export function updateDmNgachLuong(idNgach, bac, changes, done) {
                 T.notify('Cập nhật thông tin ngạch lương thành công!', 'success');
                 dispatch(getDmNgachLuongAll());
             }
-        }, error => T.notify('Cập nhật thông tin ngạch lương bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Cập nhật thông tin ngạch lương bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 

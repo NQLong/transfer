@@ -58,7 +58,7 @@ export function getDmKhuVucPage(pageNumber, pageSize, pageCondition, done) {
                 if (done) done(data.page);
                 dispatch({ type: DmKhuVucGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách khu vực bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách khu vực bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -73,7 +73,7 @@ export function getDmKhuVucAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmKhuVucGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách khu vực bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách khu vực bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 

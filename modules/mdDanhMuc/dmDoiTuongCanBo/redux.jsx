@@ -53,7 +53,7 @@ export function getDmDoiTuongCanBoAll(condition, done) {
                 if (done) done(data.items);
                 dispatch({ type: DmDoiTuongCanBoGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách đối tượng cán bộ bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách đối tượng cán bộ bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -70,12 +70,12 @@ export function getDmDoiTuongCanBoPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: DmDoiTuongCanBoGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách đối tượng cán bộ bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách đối tượng cán bộ bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
 export function getDmDoiTuongCanBo(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/doi-tuong-can-bo/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -103,7 +103,7 @@ export function createDmDoiTuongCanBo(item, done) {
                 dispatch(getDmDoiTuongCanBoAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo đối tượng cán bộ bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Tạo đối tượng cán bộ bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -118,7 +118,7 @@ export function deleteDmDoiTuongCanBo(ma) {
                 T.alert('Khoa đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmDoiTuongCanBoAll());
             }
-        }, error => T.notify('Xóa đối tượng cán bộ bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Xóa đối tượng cán bộ bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -134,7 +134,7 @@ export function updateDmDoiTuongCanBo(ma, changes, done) {
                 T.notify('Cập nhật thông tin đối tượng cán bộ thành công!', 'success');
                 dispatch(getDmDoiTuongCanBoAll());
             }
-        }, error => T.notify('Cập nhật thông tin đối tượng cán bộ bị lỗi' + (error.error.message && (':<br>' + data.error.message)), 'danger'));
+        }, (error) => T.notify('Cập nhật thông tin đối tượng cán bộ bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 

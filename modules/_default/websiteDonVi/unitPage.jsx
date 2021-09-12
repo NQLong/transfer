@@ -13,25 +13,25 @@ class UnitPage extends React.Component {
         isOpen: false, lengthImageGt: 0,
     }
     componentDidMount() {
-        this.props.getWebsiteHinhDonVi(this.props.website.maDonVi, result => {
+        this.props.getWebsiteHinhDonVi(this.props.website.maDonVi, () => {
             this.getImage();
         });
-        this.props.getThongTinGioiThieu(this.props.website.maDonVi, result => {
+        this.props.getThongTinGioiThieu(this.props.website.maDonVi, () => {
             this.getImageGioiThieu();
         });
     }
 
-    componentWillUpdate(nextProps, nextState) {
-        if ($('#carousel-gt').hasClass('owl-loaded') && (nextState.hoverItem != this.state.hoverItem)) {
-            $('#carousel-gt').removeClass('owl-loaded owl-drag owl-hidden');
-            $('#carousel-gt').find('.owl-nav').remove();
-            $('#carousel-gt').find('.owl-dots').remove();
-            $('#carousel-gt').find('.owl-stage-outer').children().unwrap();
-            $('#carousel-gt').find('.owl-stage').children().unwrap();
-            $('#carousel-gt').find('.owl-item').children().unwrap();
-            $('#carousel-gt').removeData();
-        }
-    }
+    // componentWillUpdate(nextProps, nextState) {
+    //     if ($('#carousel-gt').hasClass('owl-loaded') && (nextState.hoverItem != this.state.hoverItem)) {
+    //         $('#carousel-gt').removeClass('owl-loaded owl-drag owl-hidden');
+    //         $('#carousel-gt').find('.owl-nav').remove();
+    //         $('#carousel-gt').find('.owl-dots').remove();
+    //         $('#carousel-gt').find('.owl-stage-outer').children().unwrap();
+    //         $('#carousel-gt').find('.owl-stage').children().unwrap();
+    //         $('#carousel-gt').find('.owl-item').children().unwrap();
+    //         $('#carousel-gt').removeData();
+    //     }
+    // }
     componentDidUpdate(prevProps, prevState) {
         let checkLength = prevProps.dvWebsiteGioiThieu && prevProps.dvWebsiteGioiThieu.homeDv.length ? prevProps.dvWebsiteGioiThieu.homeDv[this.state.hoverItem].hinhAnh.length : 0;
         if (prevState.hoverItem != this.state.hoverItem && checkLength != 0) {
@@ -100,8 +100,8 @@ class UnitPage extends React.Component {
     }
 
     render() {
-        const { photoIndex, isOpen } = this.state;
-        let listImage = this.props.dvWebsiteGioiThieu && this.props.dvWebsiteGioiThieu.homeDv.length ? this.props.dvWebsiteGioiThieu.homeDv[this.state.hoverItem].hinhAnh.map(item => item.image) : [];
+        // const { photoIndex, isOpen } = this.state;
+        // let listImage = this.props.dvWebsiteGioiThieu && this.props.dvWebsiteGioiThieu.homeDv.length ? this.props.dvWebsiteGioiThieu.homeDv[this.state.hoverItem].hinhAnh.map(item => item.image) : [];
         return (
             <div>
                 <div className='first-component' >

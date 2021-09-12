@@ -95,11 +95,11 @@ class UnitNewsWaitApprovalPage extends React.Component {
         this.reject.current.onlyShow(item.rejectionReason);
     }
 
-    changeActive(item, index) {
+    changeActive(item,) {
         this.props.updateUnitDraftNews(item.id, { isUnitApproved: 1 });
     }
 
-    changeStatus = (item, index) => {
+    changeStatus = (item,) => {
         T.confirm('Tin tức', 'Bạn có chắc bạn muốn gửi bản viết cho cấp trên?', 'warning', true,
             isConfirm => isConfirm && this.props.updateUnitDraftNews(item.id, { status: 'userSendRequest', rejectionReason: '' }));
     }

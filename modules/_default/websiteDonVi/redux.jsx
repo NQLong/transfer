@@ -59,7 +59,7 @@ export function getDvWebsitePage(pageNumber, pageSize, pageCondition, done) {
                 if (done) done(data.page);
                 dispatch({ type: DvWebsiteGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -75,12 +75,12 @@ export function getDvWebsiteAll(condition, done) {
                 if (done) done(data.items);
                 dispatch({ type: DvWebsiteGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
 export function getDvWebsite(shortname, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/website/item/${shortname}`;
         T.get(url, data => {
             if (data.error) {
@@ -105,7 +105,7 @@ export function createDvWebsite(item, done) {
                 dispatch(getDvWebsitePage());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+        }, (error) => T.notify('Tạo website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -120,7 +120,7 @@ export function deleteDvWebsite(shortname) {
                 T.alert('Website đơn vị đã xóa thành công!', 'success', false, 800);
                 dispatch(getDvWebsitePage());
             }
-        }, error => T.notify('Xóa website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+        }, (error) => T.notify('Xóa website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -137,7 +137,7 @@ export function updateDvWebsite(shortname, changes, done) {
                 if (done) done(data.items);
                 dispatch(getDvWebsitePage());
             }
-        }, error => T.notify('Cập nhật thông tin website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+        }, (error) => T.notify('Cập nhật thông tin website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 

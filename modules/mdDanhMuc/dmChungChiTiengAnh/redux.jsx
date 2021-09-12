@@ -55,7 +55,7 @@ export function getDmChungChiTiengAnhPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: DmChungChiTiengAnhGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách chứng chỉ tiếng Anh bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách chứng chỉ tiếng Anh bị lỗi!', 'danger'));
     };
 }
 
@@ -70,12 +70,12 @@ export function getDmChungChiTiengAnhAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmChungChiTiengAnhGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách chứng chỉ tiếng Anh bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách chứng chỉ tiếng Anh bị lỗi!', 'danger'));
     };
 }
 
 export function getDmChungChiTiengAnh(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/chung-chi-tieng-anh/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -99,7 +99,7 @@ export function createDmChungChiTiengAnh(item, done) {
                 dispatch(getDmChungChiTiengAnhAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo chứng chỉ tiếng Anh bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo chứng chỉ tiếng Anh bị lỗi!', 'danger'));
     };
 }
 
@@ -114,7 +114,7 @@ export function deleteDmChungChiTiengAnh(ma) {
                 T.alert('Khoa đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmChungChiTiengAnhAll());
             }
-        }, error => T.notify('Xóa chứng chỉ tiếng Anh bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa chứng chỉ tiếng Anh bị lỗi!', 'danger'));
     };
 }
 
@@ -130,7 +130,7 @@ export function updateDmChungChiTiengAnh(ma, changes, done) {
                 T.notify('Cập nhật thông tin chứng chỉ tiếng Anh thành công!', 'success');
                 dispatch(getDmChungChiTiengAnhAll());
             }
-        }, error => T.notify('Cập nhật thông tin chứng chỉ tiếng Anh bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin chứng chỉ tiếng Anh bị lỗi!', 'danger'));
     };
 }
 

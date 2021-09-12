@@ -1,9 +1,8 @@
 module.exports = app => {
-    const nodemailer = require('nodemailer'),
-        sgMail = require('@sendgrid/mail');
+    const sgMail = require('@sendgrid/mail');
 
     app.email = {
-        sendEmail: (mailFrom, mailFromPassword, mailTo, mailCc, mailSubject, mailText, mailHtml, mailAttachments, successCallback, errorCallback) => {
+        sendEmail: (mailFrom, mailFromPassword, mailTo, mailCc, mailSubject, mailText, mailHtml, mailAttachments, successCallback) => {
             sgMail.setApiKey(app.apiKeySendGrid);
             const msg = {
                 to: mailTo, // Change to your recipient

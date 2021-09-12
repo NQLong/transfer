@@ -55,7 +55,7 @@ module.exports = app => {
                 res.send({ error: errorList });
             } else {
                 const currentItem = dataUpload[i];
-                app.model.dmTaiKhoanKeToan.create(currentItem, (error, _) => {
+                app.model.dmTaiKhoanKeToan.create(currentItem, (error) => {
                     if (error) errorList.push(error);
                 });
             }

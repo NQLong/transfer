@@ -58,7 +58,7 @@ export function getAnswerInPage(eventId, formId, pageNumber, pageSize, done) {
 }
 
 export function getAnswer(id, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/answer/item/${id}`;
         T.get(url, data => {
             if (data.error) {
@@ -71,7 +71,7 @@ export function getAnswer(id, done) {
 }
 
 export function searchUserFromSystem(email, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/user-search/${email}`;
         T.get(url, data => {
             done && done(data);
@@ -92,7 +92,7 @@ export function addAnswer(newData, eventId, formId, done) {
                 dispatch(getAnswerInPage(eventId, formId));
                 done && done(data.item);
             }
-        }, error => T.notify('Thêm câu trả lời bị lỗi!', 'danger'));
+        }, () => T.notify('Thêm câu trả lời bị lỗi!', 'danger'));
     };
 }
 
@@ -123,7 +123,7 @@ export function deleteAnswer(id, eventId, formId, done) {
                 done && done();
                 dispatch(getAnswerInPage(eventId, formId));
             }
-        }, error => T.alert('Xoá câu trả lời bị lỗi!', 'error'));
+        }, () => T.alert('Xoá câu trả lời bị lỗi!', 'error'));
     };
 }
 
@@ -137,7 +137,7 @@ export function deleteManyAnswerByAdmin(postId, done) {
             if (done) done(data);
             T.notify('Xoá câu trả lời thành công!', 'success');
         }
-    }, error => T.notify('Xoá câu trả lời bị lỗi!', 'danger'));
+    }, () => T.notify('Xoá câu trả lời bị lỗi!', 'danger'));
 }
 
 // Actions (user) -----------------------------------------------------------------------------------------------------
@@ -154,12 +154,12 @@ export function addAnswerByUser(newData, done) {
                 done && done();
                 dispatch({ type: CLEAR_TEMPLATE_ANSWER });
             }
-        }, error => T.notify('Nộp bài thi bị lỗi!', 'danger'));
+        }, () => T.notify('Nộp bài thi bị lỗi!', 'danger'));
     };
 }
 
 export function countAnswer(eventId, formId, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/answer/count/${eventId}/${formId}`;
         T.get(url, data => {
             if (data.error) {
@@ -172,14 +172,14 @@ export function countAnswer(eventId, formId, done) {
 }
 
 export function clearParticipantsSession() {
-    return dispatch => {
+    return () => {
         const url = '/api/answer/clear-participants-session';
         T.delete(url);
     };
 }
 
 export function checkHasAnswered(formId, eventId, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/answer/check';
         T.post(url, { formId, eventId }, data => {
             if (data.error) {

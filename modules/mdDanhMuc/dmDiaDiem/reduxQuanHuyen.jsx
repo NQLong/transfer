@@ -53,7 +53,7 @@ export function getDmQuanHuyenAll(done) {
 				if (done) done(data.items);
 				dispatch({ type: DmQuanHuyenGetAll, items: data.items ? data.items : [] });
 			}
-		}, error => T.notify('Lấy danh sách quận huyện bị lỗi!', 'danger'));
+		}, () => T.notify('Lấy danh sách quận huyện bị lỗi!', 'danger'));
 	};
 }
 
@@ -71,12 +71,12 @@ export function getDmQuanHuyenPage(pageNumber, pageSize, pageCondition, done) {
 				if (done) done(data.page);
 				dispatch({ type: DmQuanHuyenGetPage, page: data.page });
 			}
-		}, error => T.notify('Lấy danh sách quận huyện bị lỗi!', 'danger'));
+		}, () => T.notify('Lấy danh sách quận huyện bị lỗi!', 'danger'));
 	};
 }
 
 export function getDmQuanHuyen(ma, done) {
-	return dispatch => {
+	return () => {
 		const url = `/api/danh-muc/quan-huyen/item/${ma}`;
 		T.get(url, data => {
 			if (data.error) {
@@ -104,7 +104,7 @@ export function createDmQuanHuyen(item, done) {
 				if (done) done(data);
 				T.notify('Tạo thông tin quận huyện thành công!', 'success');
 			}
-		}, error => T.notify('Tạo thông tin quận huyện bị lỗi!', 'danger'));
+		}, () => T.notify('Tạo thông tin quận huyện bị lỗi!', 'danger'));
 	};
 }
 
@@ -119,7 +119,7 @@ export function deleteDmQuanHuyen(maQuanHuyen) {
 				T.alert('Xoá thành công!', 'success', false, 800);
 				dispatch(getDmQuanHuyenPage());
 			}
-		}, error => T.notify('Xóa thông tin quận huyện bị lỗi!', 'danger'));
+		}, () => T.notify('Xóa thông tin quận huyện bị lỗi!', 'danger'));
 	};
 }
 
@@ -135,7 +135,7 @@ export function updateDmQuanHuyen(maQuanHuyen, changes, done) {
 				T.notify('Cập nhật thông tin quận huyện thành công!', 'success');
 				dispatch(getDmQuanHuyenPage());
 			}
-		}, error => T.notify('Cập nhật thông tin quận huyện bị lỗi!', 'danger'));
+		}, () => T.notify('Cập nhật thông tin quận huyện bị lỗi!', 'danger'));
 	};
 }
 
@@ -151,7 +151,7 @@ export function createDmQuanHuyenByUpload(item, done) {
 				if (done) done(data);
 				T.notify('Import dữ liệu thành công!', 'success');
 			}
-		}, error => T.notify('Tạo thông tin quận huyện bị lỗi!', 'danger'));
+		}, () => T.notify('Tạo thông tin quận huyện bị lỗi!', 'danger'));
 	};
 }
 

@@ -21,11 +21,11 @@ module.exports = (app) => {
         }
 
         // Get user info
-        let firstname = 'firstname', lastname = 'lastname';
-        if (profile && profile.name) {
-            if (profile.name.givenName) firstname = profile.name.givenName;
-            if (profile.name.familyName) lastname = profile.name.familyName;
-        }
+        // let firstname = 'firstname', lastname = 'lastname';
+        // if (profile && profile.name) {
+        //     if (profile.name.givenName) firstname = profile.name.givenName;
+        //     if (profile.name.familyName) lastname = profile.name.familyName;
+        // }
 
         // Return Google user
         app.model.fwUser.get({ email }, (error, user) => {
@@ -61,6 +61,6 @@ module.exports = (app) => {
     // Do Google login callback action
     app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/login-fail' }), (req, res) => {
         console.log('successRedirect', req.user);
-        app.updateSessionUser(req, req.user, sessionUser => res.redirect('/user'));
+        app.updateSessionUser(req, req.user, () => res.redirect('/user'));
     });
 };

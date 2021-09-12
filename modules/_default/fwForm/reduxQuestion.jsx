@@ -12,10 +12,10 @@ export default function questionReducer(state = {}, data) {
 
           case GET_QUESTIONS_PAGE: {
                let list = state.list ? state.list : [];
-               let pageNumber = data.from;
-               for (let i = 0; i < data.list.length; i++, from++) {
-                    list[from] = data.list[i];
-               }
+               // let pageNumber = data.from;
+               // for (let i = 0; i < data.list.length; i++, from++) {
+               //      list[from] = data.list[i];
+               // }
 
                return Object.assign({}, state, { list, totalItem: data.totalItem });
           }

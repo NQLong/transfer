@@ -30,7 +30,7 @@ export function getDanhSachTinhTrangThietBi(pageNumber, pageSize, pageCondition,
                 if (done) done(data.page);
                 dispatch({ type: GET_PAGE, page: data.page });
             }
-        }, error => T.notify(`Lấy danh sách ${LABEL} bị lỗi` + (error.error.message && (':<br>' + error.message)), 'danger'));
+        }, (error) => T.notify(`Lấy danh sách ${LABEL} bị lỗi` + (error.error.message && (':<br>' + error.message)), 'danger'));
     };
 }
 

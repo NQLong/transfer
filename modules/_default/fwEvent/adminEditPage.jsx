@@ -5,7 +5,7 @@ import { countAnswer } from '../fwForm/reduxAnswer';
 import { Link, withRouter } from 'react-router-dom';
 import ImageBox from 'view/component/ImageBox';
 import Editor from 'view/component/CkEditor4';
-import SelectApplyForm from '../fwForm/sectionApplyForm';
+// import SelectApplyForm from '../fwForm/sectionApplyForm';
 import { Select } from 'view/component/Input';
 
 const languageOption = [
@@ -160,7 +160,7 @@ class EventEditPage extends React.Component {
             });
         }
         else {
-            this.props.createDraftEvent(newDraft, result => {
+            this.props.createDraftEvent(newDraft, () => {
                 this.getData();
             });
         }
@@ -350,14 +350,14 @@ class EventEditPage extends React.Component {
                                         <textarea defaultValue='' id='evEventViAbstract' placeholder='Tóm tắt sự kiện'
                                             style={{ border: 'solid 1px #eee', width: '100%', minHeight: '100px', padding: '12px' }} readOnly={readOnly} />
                                         <label className='control-label'>Nội dung sự kiện</label>
-                                        <Editor ref={this.viEditor} height='400px' placeholder='Nội dung sự kiện' height={600} uploadUrl='/user/upload?category=event' readOnly={readOnly} />
+                                        <Editor ref={this.viEditor} placeholder='Nội dung sự kiện' height={600} uploadUrl='/user/upload?category=event' readOnly={readOnly} />
                                     </div>
                                     <div id='jobsEnTab' className='tab-pane fade'>
                                         <label className='control-label'>Event abstract</label>
                                         <textarea defaultValue='' id='evEventEnAbstract' placeholder='Event abstracts' readOnly={readOnly}
                                             style={{ border: 'solid 1px #eee', width: '100%', minHeight: '100px', padding: '12px' }} />
                                         <label className='control-label'>Event content</label>
-                                        <Editor ref={this.enEditor} height='400px' placeholder='Event content' height={600} uploadUrl='/user/upload?category=event' readOnly={readOnly} />
+                                        <Editor ref={this.enEditor} placeholder='Event content' height={600} uploadUrl='/user/upload?category=event' readOnly={readOnly} />
                                     </div>
                                 </div>
                             </div>

@@ -61,7 +61,7 @@ export function getDmDonViTinhPage(pageNumber, pageSize, pageCondition, done) {
         if (done) done(data.page);
         dispatch({ type: DmDonViTinhGetPage, page: data.page });
       }
-    }, (error) => T.notify('Lấy danh sách đơn vị tính bị lỗi' + (error.error.message && ':<br>' + data.error.message), 'danger'));
+    }, (error) => T.notify('Lấy danh sách đơn vị tính bị lỗi' + (error.error.message && ':<br>' + error.error.message), 'danger'));
   };
 }
 
@@ -76,12 +76,12 @@ export function getDmDonViTinhAll(done) {
         if (done) done(data.items);
         dispatch({ type: DmDonViTinhGetAll, items: data.items ? data.items : [] });
       }
-    }, (error) => T.notify('Lấy danh sách đơn vị tính bị lỗi' + (error.error.message && ':<br>' + data.error.message), 'danger'));
+    }, (error) => T.notify('Lấy danh sách đơn vị tính bị lỗi' + (error.error.message && ':<br>' + error.error.message), 'danger'));
   };
 }
 
 export function getDmDonViTinh(ma, done) {
-  return (dispatch) => {
+  return () => {
     const url = `/api/danh-muc/don-vi-tinh/item/${ma}`;
     T.get(url, (data) => {
       if (data.error) {
@@ -105,7 +105,7 @@ export function createDmDonViTinh(item, done) {
         dispatch(getDmDonViTinhPage());
         if (done) done(data);
       }
-    }, (error) => T.notify('Tạo đơn vị tính bị lỗi' + (error.error.message && ':<br>' + data.error.message), 'danger'));
+    }, (error) => T.notify('Tạo đơn vị tính bị lỗi' + (error.error.message && ':<br>' + error.error.message), 'danger'));
   };
 }
 
@@ -121,7 +121,7 @@ export function updateDmDonViTinh(ma, changes, done) {
         T.notify('Cập nhật thông tin đơn vị tính thành công!', 'success');
         dispatch(getDmDonViTinhPage());
       }
-    }, (error) => T.notify('Cập nhật thông tin đơn vị tính bị lỗi' + (error.error.message && ':<br>' + data.error.message), 'danger'));
+    }, (error) => T.notify('Cập nhật thông tin đơn vị tính bị lỗi' + (error.error.message && ':<br>' + error.error.message), 'danger'));
   };
 }
 
@@ -136,7 +136,7 @@ export function deleteDmDonViTinh(ma) {
         T.alert('Khoa đã xóa thành công!', 'success', false, 800);
         dispatch(getDmDonViTinhPage());
       }
-    }, (error) => T.notify('Xóa đơn vị tính bị lỗi' + (error.error.message && ':<br>' + data.error.message), 'danger'));
+    }, (error) => T.notify('Xóa đơn vị tính bị lỗi' + (error.error.message && ':<br>' + error.error.message), 'danger'));
   };
 }
 
@@ -153,7 +153,7 @@ export function createDmDonViTinhByUpload(item, done) {
       }
       dispatch(getDmDonViTinhPage());
       if (done) done(data);
-    }, (error) => T.notify('Tạo danh mục đơn vị tính bị lỗi!', 'danger'));
+    }, () => T.notify('Tạo danh mục đơn vị tính bị lỗi!', 'danger'));
   };
 }
 

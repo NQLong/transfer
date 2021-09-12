@@ -55,7 +55,7 @@ export function getDmTangBhxhPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: DmTangBhxhGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách tăng Bảo hiểm xã hội bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách tăng Bảo hiểm xã hội bị lỗi!', 'danger'));
     };
 }
 
@@ -70,12 +70,12 @@ export function getDmTangBhxhAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: DmTangBhxhGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách tăng Bảo hiểm xã hội bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách tăng Bảo hiểm xã hội bị lỗi!', 'danger'));
     };
 }
 
 export function getDmTangBhxh(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/tang-bao-hiem-xa-hoi/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
@@ -99,7 +99,7 @@ export function createDmTangBhxh(item, done) {
                 dispatch(getDmTangBhxhAll());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo tăng Bảo hiểm xã hội bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo tăng Bảo hiểm xã hội bị lỗi!', 'danger'));
     };
 }
 
@@ -114,7 +114,7 @@ export function deleteDmTangBhxh(ma) {
                 T.alert('Danh mục đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmTangBhxhAll());
             }
-        }, error => T.notify('Xóa tăng Bảo hiểm xã hội bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa tăng Bảo hiểm xã hội bị lỗi!', 'danger'));
     };
 }
 
@@ -128,9 +128,10 @@ export function updateDmTangBhxh(ma, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật thông tin tăng Bảo hiểm xã hội thành công!', 'success');
+                done && done(data.error);
                 dispatch(getDmTangBhxhAll());
             }
-        }, error => T.notify('Cập nhật thông tin tăng Bảo hiểm xã hội bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin tăng Bảo hiểm xã hội bị lỗi!', 'danger'));
     };
 }
 

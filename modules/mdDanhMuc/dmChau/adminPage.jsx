@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getDmChauAll, createDmChau, updateDmChau, deleteDmChau } from './redux';
 import { Link } from 'react-router-dom';
+import { AdminPage, TableCell, renderTable } from 'view/component/AdminPage';
 
 class EditModal extends React.Component {
     modal = React.createRef();
@@ -103,7 +104,7 @@ class EditModal extends React.Component {
     }
 }
 
-class AdminPage extends React.Component {
+class DmChauPage extends AdminPage {
     modal = React.createRef();
 
     componentDidMount() {
@@ -127,61 +128,47 @@ class AdminPage extends React.Component {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmChau:write'),
-            permissionDelete = currentPermissions.includes('dmChau:delete');
+            permissionDelete = currentPermissions.includes('dmChau:delete'),
+            permission = this.getUserPermission('dmChau', ['write', 'delete']);
+
         let table = 'Không có dữ liệu!',
             items = this.props.dmChau && this.props.dmChau.items;
         if (items && items.length > 0) {
-            table = (
-                <table className='table table-hover table-bordered table-responsive'>
-                    <thead>
-                        <tr>
-                            <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
-                            <th style={{ width: '100%' }} nowrap='true'>Tên</th>
-                            <th style={{ width: '100%' }} nowrap='true'>Territory</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                            <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {items.map((item, index) => (
-                            <tr key={index}>
-                                <td>{item.ma}</td>
-                                <td><a href='#' onClick={e => this.edit(e, item)}>{item.ten}</a></td>
-                                <td>{item.territory}</td>
-                                <td className='toggle' style={{ textAlign: 'center' }}>
-                                    <label>
-                                        <input type='checkbox' checked={item.kichHoat == '1' ? true : false} onChange={e => permissionWrite && this.changeActive(item)} />
-                                        <span className='button-indecator' />
-                                    </label>
-                                </td>
-                                <td style={{ textAlign: 'center' }}>
-                                    <div className='btn-group' style={{ display: 'flex' }}>
-                                        <a className='btn btn-primary' href='#' onClick={e => this.edit(e, item)}>
-                                            <i className='fa fa-lg fa-edit' />
-                                        </a>
-                                        {permissionDelete &&
-                                            <a className='btn btn-danger' href='#' onClick={e => this.delete(e, item)}>
-                                                <i className='fa fa-lg fa-trash' />
-                                            </a>}
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            );
+            table = renderTable({
+                getDataSource: () => items, stickyHead: false,
+                renderHead: () => (
+                    <tr>
+                        <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
+                        <th style={{ width: '100%' }} nowrap='true'>Tên</th>
+                        <th style={{ width: '100%' }} nowrap='true'>Territory</th>
+                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
+                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                    </tr>
+                ),
+                renderRow: (item, index) => (
+                    <tr key={index}>
+                        <TableCell type='text' content={item.ma ? item.ma : ''} />
+                        <TableCell type="link" content={item.ten ? item.ten : ''} onClick={e => this.edit(e, item)} />
+                        <TableCell type='text' content={item.territory ? item.territory : ''} />
+                        <TableCell type='checkbox' content={item.kichHoat} permission={permissionWrite}
+                            onChange={() => permissionWrite && this.changeActive(item)} />
+                        <TableCell type='buttons' content={item} permission={permission} onEdit={e => this.edit(e, item)}
+                            onDelete={e => permissionDelete && this.delete(e, item)} />
+                    </tr>
+                )
+            });
         }
 
         return (
             <main className='app-content'>
                 <div className='app-title'>
                     <h1><i className='fa fa-list-alt' /> Danh mục Châu</h1>
-                    <ul className='app-breadcrumb breadcrumb'>
+                    {/* <ul className='app-breadcrumb breadcrumb'>
                         <Link to='/user'><i className='fa fa-home fa-lg' /></Link>
                         &nbsp;/&nbsp;
                         <Link to='/user/category'>Danh mục</Link>
                         &nbsp;/&nbsp;Châu
-                    </ul>
+                    </ul> */}
                 </div>
                 <div className='tile'>{table}</div>
                 <EditModal ref={this.modal} readOnly={!permissionWrite} create={this.props.createDmChau} update={this.props.updateDmChau} />
@@ -199,4 +186,4 @@ class AdminPage extends React.Component {
 
 const mapStateToProps = state => ({ system: state.system, dmChau: state.dmChau });
 const mapActionsToProps = { getDmChauAll, createDmChau, updateDmChau, deleteDmChau };
-export default connect(mapStateToProps, mapActionsToProps)(AdminPage);
+export default connect(mapStateToProps, mapActionsToProps)(DmChauPage);

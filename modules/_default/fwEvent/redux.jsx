@@ -67,13 +67,13 @@ export function getEventInPage(pageNumber, pageSize, pageCondition, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: EventGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách sự kiện bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách sự kiện bị lỗi!', 'danger'));
     };
 }
 
 export function getEventByCategoryAdmin(category, pageNumber, pageSize, done) {
-    const page = T.updatePage('pageEventTuyenSinh', pageNumber, pageSize);
-    return dispatch => {
+    // const page = T.updatePage('pageEventTuyenSinh', pageNumber, pageSize);
+    return () => {
         if (typeof (pageNumber) == 'function') {
             done = pageNumber;
             pageNumber = null;
@@ -89,7 +89,7 @@ export function getEventByCategoryAdmin(category, pageNumber, pageSize, done) {
             } else {
                 done && done(data.page);
             }
-        }, error => T.notify(language.getNewsInPageByUserError, 'danger'));
+        }, () => T.notify(language.getNewsInPageByUserError, 'danger'));
     };
 }
 export function getDraftEventInPage(pageNumber, pageSize, done) {
@@ -104,10 +104,10 @@ export function getDraftEventInPage(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: EventGetDraftPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách tin tức bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách tin tức bị lỗi!', 'danger'));
     };
 }
-export function draftToEvent(draftEventId, done) {
+export function draftToEvent(draftEventId,) {
     return dispatch => {
         const url = '/api/draft-event/toEvent/' + draftEventId;
         T.get(url, data => {
@@ -119,7 +119,7 @@ export function draftToEvent(draftEventId, done) {
                 dispatch(getDraftEventInPage());
                 dispatch(getEventInPage());
             }
-        }, error => T.notify('Thao tác bị lỗi bị lỗi!', 'danger'));
+        }, () => T.notify('Thao tác bị lỗi bị lỗi!', 'danger'));
     };
 }
 
@@ -134,7 +134,7 @@ export function createEvent(done) {
                 dispatch(getEventInPage());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo sự kiện bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo sự kiện bị lỗi!', 'danger'));
     };
 }
 export function createDraftEventDefault(done) {
@@ -204,7 +204,7 @@ export function updateEvent(id, changes, done) {
                 dispatch(getEventInPage());
                 done && done();
             }
-        }, error => T.notify('Cập nhật thông tin sự kiện bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin sự kiện bị lỗi!', 'danger'));
     };
 }
 
@@ -221,7 +221,7 @@ export function updateDraftEvent(id, changes, done) {
                 dispatch(getDraftEventInPage());
                 done && done();
             }
-        }, error => T.notify('Cập nhật thông tin bản nháp sự kiện bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin bản nháp sự kiện bị lỗi!', 'danger'));
     };
 }
 
@@ -236,7 +236,7 @@ export function swapEvent(id, isMoveUp) {
                 T.notify('Thay đổi thứ tự sự kiện thành công!', 'success');
                 dispatch(getEventInPage());
             }
-        }, error => T.notify('Thay đổi thứ tự sự kiện bị lỗi!', 'danger'));
+        }, () => T.notify('Thay đổi thứ tự sự kiện bị lỗi!', 'danger'));
     };
 }
 
@@ -251,7 +251,7 @@ export function deleteEvent(id) {
                 T.alert('Sự kiện được xóa thành công!', 'error', false, 800);
                 dispatch(getEventInPage());
             }
-        }, error => T.notify('Xóa sự kiện bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa sự kiện bị lỗi!', 'danger'));
     };
 }
 
@@ -266,7 +266,7 @@ export function deleteDraftEvent(id) {
                 T.alert('Người dùng được xóa thành công!', 'error', false, 800);
                 dispatch(getDraftEventInPage());
             }
-        }, error => T.notify('Xóa sự kiện bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa sự kiện bị lỗi!', 'danger'));
     };
 }
 
@@ -283,7 +283,7 @@ export function getEvent(id, done) {
                 T.get(url2, draft => {
                     if (done) done(data);
                     dispatch({ type: EventGet, item: data.item, categories: data.categories, docDraftUser: draft });
-                }, error => T.notify('Lấy danh sách tin tức bị lỗi!', 'danger'));
+                }, () => T.notify('Lấy danh sách tin tức bị lỗi!', 'danger'));
             }
         }, error => done({ error }));
     };
@@ -331,7 +331,7 @@ export function getEventInPageByEditor(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: EventGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách sự kiện bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách sự kiện bị lỗi!', 'danger'));
     };
 }
 
@@ -347,7 +347,7 @@ export function getDraftEventInPageByEditor(pageNumber, pageSize, done) {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: EventGetDraftPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách sự kiện bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách sự kiện bị lỗi!', 'danger'));
     };
 }
 
@@ -377,7 +377,7 @@ export function swapEventByEditor(id, isMoveUp) {
                 T.notify('Thay đổi thứ tự sự kiện thành công!', 'success');
                 dispatch(getEventInPageByEditor());
             }
-        }, error => T.notify('Thay đổi thứ tự sự kiện bị lỗi!', 'danger'));
+        }, () => T.notify('Thay đổi thứ tự sự kiện bị lỗi!', 'danger'));
     };
 }
 
@@ -392,7 +392,7 @@ export function changeEventActiveByEditor(id, active) {
                 T.notify('Thay đổi trạng thái sự kiện thành công!', 'success');
                 dispatch(getEventInPageByEditor());
             }
-        }, error => T.notify('Thay đổi trạng thái sự kiện bị lỗi!', 'danger'));
+        }, () => T.notify('Thay đổi trạng thái sự kiện bị lỗi!', 'danger'));
     };
 }
 
@@ -414,7 +414,7 @@ const language = T.language(texts);
 
 export function getEventInPageByUser(pageNumber, pageSize, done) {
     const page = T.updatePage('homeEventList', pageNumber, pageSize);
-    return dispatch => {
+    return () => {
         const url = '/event/page/' + page.pageNumber + '/' + page.pageSize;
         T.get(url, data => {
             if (data.error) {
@@ -424,11 +424,11 @@ export function getEventInPageByUser(pageNumber, pageSize, done) {
                 done && done(data);
                 // dispatch({ type: GET_EVENT_IN_PAGE_BY_USER, page: data.page });
             }
-        }, error => T.notify(language.getNewsInPageByUserError, 'danger'));
+        }, () => T.notify(language.getNewsInPageByUserError, 'danger'));
     };
 }
 export function getEventInPageByCategory(pageNumber, pageSize, category, done) {
-    return dispatch => {
+    return () => {
         const url = `/event/page/${pageNumber}/${pageSize}/${category}`;
         T.get(url, data => {
             if (data.error) {
@@ -437,7 +437,7 @@ export function getEventInPageByCategory(pageNumber, pageSize, category, done) {
             } else {
                 done && done(data);
             }
-        }, error => T.notify(language.getNewsInPageByUserError, 'danger'));
+        }, () => T.notify(language.getNewsInPageByUserError, 'danger'));
     };
 }
 
@@ -452,7 +452,7 @@ export function getEventByUser(eventId, eventLink, done) {
                 dispatch({ type: GET_EVENT_BY_USER, item: data.item });
                 done && done(data);
             }
-        }, error => T.notify(language.getNewsByUserError, 'danger'));
+        }, () => T.notify(language.getNewsByUserError, 'danger'));
     };
 }
 
@@ -466,21 +466,21 @@ export function getEventFeed() {
             } else {
                 dispatch({ type: EventFeed, list: data.page.list });
             }
-        }, error => T.notify(language.getNewsFeedError, 'danger'));
+        }, () => T.notify(language.getNewsFeedError, 'danger'));
     };
 }
 
 export function checkLink(id, link) {
-    return dispatch => {
+    return () => {
         const url = '/event/item/check-link';
         T.put(url, { id, link }, data => {
             if (data.error) {
                 T.notify('Link không hợp lệ!', 'danger');
-                console.error('PUT: ' + url + '.', error);
+                console.error('PUT: ' + url + '.', data.error);
             } else {
                 T.notify('Link hợp lệ!', 'success');
             }
-        }, error => T.notify('Kiểm tra Link bị lỗi!', 'danger'));
+        }, () => T.notify('Kiểm tra Link bị lỗi!', 'danger'));
     };
 }
 

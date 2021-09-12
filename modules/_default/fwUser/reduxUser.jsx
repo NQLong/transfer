@@ -67,7 +67,7 @@ export function getUserPage(pageNumber, pageSize, pageCondition, done) {
                 if (done) done(data.page);
                 dispatch({ type: UserGetPage, page: data.page });
             }
-        }, error => T.notify('Lấy danh sách người dùng bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách người dùng bị lỗi!', 'danger'));
     };
 }
 
@@ -82,12 +82,12 @@ export function getUserAll(done) {
                 if (done) done(data.items);
                 dispatch({ type: UserGetAll, items: data.items ? data.items : [] });
             }
-        }, error => T.notify('Lấy danh sách người dùng bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách người dùng bị lỗi!', 'danger'));
     };
 }
 
 export function switchUser(personId) {
-    return dispatch => {
+    return () => {
         const url = '/api/debug/switch-user';
         T.post(url, { personId }, data => {
             if (data.error) {
@@ -101,7 +101,7 @@ export function switchUser(personId) {
 }
 
 export function getUser(email, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/user/item/${email}`;
         T.get(url, data => {
             if (data.error) {
@@ -126,7 +126,7 @@ export function createUser(user, done) {
                 dispatch(getUserPage());
                 if (done) done(data);
             }
-        }, error => T.notify('Tạo mới một người dùng bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo mới một người dùng bị lỗi!', 'danger'));
     };
 }
 
@@ -158,7 +158,7 @@ export function deleteUser(email, done) {
                 dispatch(getUserPage());
             }
             done && done();
-        }, error => T.notify('Xóa người dùng bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa người dùng bị lỗi!', 'danger'));
     };
 }
 

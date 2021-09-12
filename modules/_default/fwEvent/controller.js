@@ -30,7 +30,7 @@ module.exports = app => {
     app.get('/api/event/page/:pageNumber/:pageSize', (req, res) => {//TODO
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
-        condition = { statement: null };
+        let condition = { statement: null };
         if (req.query.condition) {
             if (typeof (req.query.condition) == 'object') {
                 if (req.query.condition.searchText) {

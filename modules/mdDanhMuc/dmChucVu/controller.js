@@ -11,6 +11,7 @@ module.exports = app => {
         { name: 'dmChucVu:delete' },
     );
     app.get('/user/danh-muc/chuc-vu', app.permission.check('dmChucVu:read'), app.templates.admin);
+    app.get('/user/danh-muc/chuc-vu/upload', app.permission.check('staff:login'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/danh-muc/chuc-vu/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
@@ -91,33 +92,60 @@ module.exports = app => {
     });
 
     // Hook uploadHooks -----------------------------------------------------------------------------------------------------------------------------
-    const dmChucVuImportData = (req, fields, files, params, done) => {
-        if (fields.userData && fields.userData[0] && fields.userData[0] == 'dmChucVuImportData' && files.DmChucVuFile && files.DmChucVuFile.length > 0) {
-            const srcPath = files.DmChucVuFile[0].path;
-            app.excel.readFile(srcPath, workbook => {
-                if (workbook) {
-                    const worksheet = workbook.getWorksheet(1), element = [], totalRow = worksheet.lastRow.number;
-                    const handleUpload = (index = 2) => {
-                        const value = worksheet.getRow(index).values;
-                        if (value.length == 0 || index == totalRow + 1) {
-                            app.deleteFile(srcPath);
-                            done({ element });
-                        } else {
-                            element.push({
-                                ma: value[1], ten: value[2], phuCap: value[3], kichHoat: value[4], ghiChu: value[5],
-                            });
-                            handleUpload(index + 1);
-                        }
-                    };
-                    handleUpload();
-                } else {
+    const dmChucVuImportData = (fields, files, done) => {
+        let worksheet = null;
+        new Promise((resolve, reject) => {
+            if (fields.userData && fields.userData[0] && fields.userData[0] == 'DmChucVuFile' && files.DmChucVuFile && files.DmChucVuFile.length) {
+                const srcPath = files.DmChucVuFile[0].path;
+                const workbook = app.excel.create();
+                workbook.xlsx.readFile(srcPath).then(() => {
                     app.deleteFile(srcPath);
-                    done({ error: 'Error' });
+                    worksheet = workbook.getWorksheet(1);
+                    worksheet ? resolve() : reject('Invalid excel file!');
+                });
+            }
+        }).then(() => {
+            let index = 1,
+                items = [];
+            while (true) {
+                index++;
+                let ma = worksheet.getCell('A' + index).value;
+                if (ma) {
+                    ma = ma.toString().trim();
+                    let ten = worksheet.getCell('B' + index).value ? worksheet.getCell('B' + index).value.toString().trim() : '',
+                        phuCap = worksheet.getCell('C' + index).value ? worksheet.getCell('C' + index).value.toString().trim() : '',
+                        kichHoat = worksheet.getCell('D' + index).value ? worksheet.getCell('D' + index).value.toString().trim() : '',
+                        ghiChu = worksheet.getCell('E' + index).value ? worksheet.getCell('E' + index).value.toString().trim() : '';
+                    phuCap = Number(phuCap) || 0;
+                    kichHoat = Number(kichHoat) || 0;
+
+                    items.push({ ma, ten, phuCap, kichHoat, ghiChu });
+                } else {
+                    done({ items });
+                    break;
                 }
-            });
-        }
+            }
+        }).catch(error => done({ error }));
     };
 
-    app.uploadHooks.add('dmChucVuImportData', (req, fields, files, params, done) =>
-        app.permission.has(req, () => dmChucVuImportData(req, fields, files, params, done), done, 'dmChucVu:write'));
+    app.uploadHooks.add('DmChucVuFile', (req, fields, files, params, done) => {
+        app.permission.has(req, () => dmChucVuImportData(fields, files, done), done, 'dmChucVu:write');
+    }
+    );
+
+    // Download Template ---------------------------------------------------------------------------------------------------------------------------------
+    app.get('/api/danh-muc/chuc-vu/download-template', app.permission.check('staff:login'), (req, res) => {
+        const workBook = app.excel.create();
+        const ws = workBook.addWorksheet('Danh_muc_chuc_vu_Template');
+        const defaultColumns = [
+            { header: 'MÃ CHỨC VỤ', key: 'ma', width: 15 },
+            { header: 'TÊN CHỨC VỤ', key: 'ten', width: 50 },
+            { header: 'PHỤ CẤP', key: 'phuCap', width: 15 },
+            { header: 'KÍCH HOẠT', key: 'kichHoat', width: 15 },
+            { header: 'GHI CHÚ', key: 'ghiChu', width: 50 },
+        ];
+        ws.columns = defaultColumns;
+        ws.getRow(1).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', horizontal: 'center' };
+        app.excel.attachment(workBook, res, 'Danh_muc_chuc_vu_Template.xlsx');
+    });
 };

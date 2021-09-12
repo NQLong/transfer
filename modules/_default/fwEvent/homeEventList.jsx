@@ -1,9 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { getEventByUser, getEventInPageByUser } from './redux';
-import SectionSideBar from 'view/component/SectionSideBar';
 import { Link } from 'react-router-dom';
-import Pagination from 'view/component/Pagination';
 
 const texts = {
     vi: {

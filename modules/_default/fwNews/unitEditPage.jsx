@@ -128,7 +128,7 @@ class UnitNewsEditPage extends React.Component {
         if ($('#neNewsEnTitle').val() && $('#neNewsEnAbstract').val() && $('#neNewsEnAbstract').val()) {
             newDraft.isTranslated = 'done';
         }
-        this.props.updateUnitDraftNews(this.state.item.id, newDraft, result => {
+        this.props.updateUnitDraftNews(this.state.item.id, newDraft, () => {
         });
     }
 

@@ -4,47 +4,40 @@ import { getDmLoaiTaiSanCoDinhPage, createDmLoaiTaiSanCoDinh, updateDmLoaiTaiSan
 import Pagination, { OverlayLoading } from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
 import AdminSearchBox from 'view/component/AdminSearchBox';
+import { AdminModal, AdminPage, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
 
-class EditModal extends React.Component {
+class EditModal extends AdminModal {
 	modal = React.createRef();
 
-	componentDidMount() {
-		$(document).ready(() => {
-			$(this.modal.current).on('shown.bs.modal', () => $('#dmLoaiTaiSanCoDinhMa').focus());
-		});
-	}
-
-	show = (item) => {
+	onShow = (item) => {
 		let { ma, ten, maNhom, maTaiKhoan, maHieu, donViTinh } = item ? item : { ma: null, ten: '', maNhom: '', maTaiKhoan: '', maHieu: '', donViTinh: '' };
-		$('#dmLoaiTaiSanCoDinhMa').val(ma);
-		$('#dmLoaiTaiSanCoDinhTen').val(ten);
-		$('#dmLoaiTaiSanCoDinhDonViTinh').val(donViTinh ? donViTinh.toString() : '');
-		$('#dmLoaiTaiSanCoDinhMaNhom').val(maNhom ? maNhom.toString() : '');
-		$('#dmLoaiTaiSanCoDinhMaTaiKhoan').val(maTaiKhoan ? maTaiKhoan.toString() : '');
-		$('#dmLoaiTaiSanCoDinhMaHieu').val(maHieu ? maHieu.toString() : '');
-		$(this.modal.current)
-			.find('.modal-title')
-			.html(item ? 'Cập nhật loại tài sản cố định' : 'Tạo mới loại tài sản cố định');
-		$(this.modal.current).attr('data-ma', ma).modal('show');
+
+		this.ma.value(ma);
+		this.ten.value(ten);
+		this.donViTinh.value(donViTinh.toString());
+		this.maNhom.value(maNhom.toString());
+		this.maTaiKhoan.value(maTaiKhoan.toString());
+		this.maHieu.value(maHieu.toString());
+
+		$(this.modal).attr('data-ma', ma).modal('show');
 	};
 
-	save = (e) => {
-		e.preventDefault();
-		const maLoaiTaiSanCoDinh = $(this.modal.current).attr('data-ma'),
+	onSubmit = () => {
+		const maLoaiTaiSanCoDinh = $(this.modal).attr('data-ma'),
 			changes = {
-				ma: $('#dmLoaiTaiSanCoDinhMa').val().trim(),
-				ten: $('#dmLoaiTaiSanCoDinhTen').val().trim(),
-				donViTinh: $('#dmLoaiTaiSanCoDinhDonViTinh').val().trim(),
-				maNhom: $('#dmLoaiTaiSanCoDinhMaNhom').val().trim(),
-				maTaiKhoan: $('#dmLoaiTaiSanCoDinhMaTaiKhoan').val().trim(),
-				maHieu: $('#dmLoaiTaiSanCoDinhMaHieu').val().trim(),
+				ma: this.ma.value().trim(),
+				ten: this.ten.value().trim(),
+				donViTinh: this.donViTinh.value().trim(),
+				maNhom: this.maNhom.value().trim(),
+				maTaiKhoan: this.maTaiKhoan.value().trim(),
+				maHieu: this.maHieu.value().trim(),
 			};
 		if (changes.ma == '') {
 			T.notify('Mã loại tài sản cố định bị trống!', 'danger');
-			$('#dmLoaiTaiSanCoDinhMa').focus();
+			this.ma.focus();
 		} else if (changes.ten == '') {
 			T.notify('Tên loại tài sản cố định bị trống!', 'danger');
-			$('#dmLoaiTaiSanCoDinhTen').focus();
+			this.ten.focus();
 		} else {
 			if (maLoaiTaiSanCoDinh) {
 				this.props.update(maLoaiTaiSanCoDinh, changes, () => {
@@ -55,60 +48,30 @@ class EditModal extends React.Component {
 					T.notify('Tạo mới loại tài sản cố định!', 'success');
 				});
 			}
-			$(this.modal.current).modal('hide');
+			$(this.modal).modal('hide');
 		}
 	};
 
-	render() {
+	render = () => {
 		const readOnly = this.props.readOnly;
-		return (
-			<div className='modal' tabIndex='-1' role='dialog' ref={this.modal}>
-				<form className='modal-dialog' role='document' autoComplete='off' onSubmit={this.save}>
-					<div className='modal-content'>
-						<div className='modal-header'>
-							<h5 className='modal-title'></h5>
-							<button type='button' className='close' data-dismiss='modal' aria-label='Close'>
-								<span aria-hidden='true'>&times;</span>
-							</button>
-						</div>
-						<div className='modal-body'>
-							<div className='form-group'>
-								<label htmlFor='dmLoaiTaiSanCoDinhMa'>  Mã loại tài sản cố định </label>
-								<input className='form-control' id='dmLoaiTaiSanCoDinhMa' placeholder='Mã loại tài sản cố định' type='text' />
-							</div>
-							<div className='form-group'>
-								<label className='control-label' htmlFor='dmLoaiTaiSanCoDinhTen'> Tên loại tài sản cố định </label>
-								<input className='form-control' type='text' placeholder='Tên loại tài sản cố định' id='dmLoaiTaiSanCoDinhTen' />
-							</div>
-							<div className='form-group'>
-								<label htmlFor='dmLoaiTaiSanCoDinhDonViTinh'>Đơn vị tính</label>
-								<input className='form-control' id='dmLoaiTaiSanCoDinhDonViTinh' placeholder='Đơn vị tính' type='text' readOnly={readOnly} />
-							</div>
-							<div className='form-group'>
-								<label htmlFor='dmLoaiTaiSanCoDinhMaTaiKhoan'> Mã tài khoản </label>
-								<input className='form-control' id='dmLoaiTaiSanCoDinhMaTaiKhoan' placeholder='Mã tài khoản' type='text' readOnly={readOnly} />
-							</div>
-							<div className='form-group'>
-								<label htmlFor='dmLoaiTaiSanCoDinhMaNhom'> Mã nhóm tài sản cố định </label>
-								<input className='form-control' id='dmLoaiTaiSanCoDinhMaNhom' placeholder='Mã nhóm tài sản cố định' type='text' readOnly={readOnly} />
-							</div>
-							<div className='form-group'>
-								<label htmlFor='dmLoaiTaiSanCoDinhMaHieu'>Mã hiệu</label>
-								<input className='form-control' id='dmLoaiTaiSanCoDinhMaHieu' placeholder='Mã hiệu' type='text' />
-							</div>
-						</div>
-						<div className='modal-footer'>
-							<button type='button' className='btn btn-secondary' data-dismiss='modal'>Đóng </button>
-							{!readOnly && <button type='submit' className='btn btn-primary'> Lưu </button>}
-						</div>
-					</div>
-				</form>
+		return this.renderModal({
+			title: this.ma ? 'Cập nhật loại tài sản cố định' : 'Tạo mới loại tài sản cố định',
+			size: 'large',
+			body: <div className='row'>
+				<FormTextBox type='text' className='col-12' ref={e => this.ma = e} label='Mã loại tài sản cố định' readOnly={readOnly} placeholder='Mã loại tài sản cố định' required />
+				<FormTextBox type='text' className='col-12' ref={e => this.ten = e} label='Tên' readOnly={readOnly} placeholder='Tên' required />
+				<FormTextBox type='text' className='col-12' ref={e => this.donViTinh = e} label='Đơn vị tính' readOnly={readOnly} placeholder='Đơn vị tính' />
+				<FormTextBox type='text' className='col-12' ref={e => this.maNhom = e} label='Mã nhóm' readOnly={readOnly} placeholder='Mã nhóm' />
+				<FormTextBox type='text' className='col-12' ref={e => this.maTaiKhoan = e} label='Mã tài khoản' readOnly={readOnly} placeholder='Mã tài khoản' />
+				<FormTextBox type='text' className='col-12' ref={e => this.maHieu = e} label='Mã hiệu' readOnly={readOnly} placeholder='Mã hiệu' />
 			</div>
-		);
+		});
+
+
 	}
 }
 
-class dmLoaiTaiSanCoDinhPage extends React.Component {
+class dmLoaiTaiSanCoDinhPage extends AdminPage {
 	state = { searching: false };
 	searchBox = React.createRef();
 	modal = React.createRef();
@@ -118,7 +81,7 @@ class dmLoaiTaiSanCoDinhPage extends React.Component {
 
 	getPage = (pageNumber, pageSize, pageCondition) => {
 		this.setState({ searching: true });
-		this.props.getDmLoaiTaiSanCoDinhPage(pageNumber, pageSize, pageCondition, (page) => {
+		this.props.getDmLoaiTaiSanCoDinhPage(pageNumber, pageSize, pageCondition, () => {
 			this.setState({ searching: false });
 		});
 	};
@@ -137,55 +100,35 @@ class dmLoaiTaiSanCoDinhPage extends React.Component {
 	render() {
 		const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
 			permissionWrite = currentPermissions.includes('dmLoaiTaiSanCoDinh:write'),
-			permissionDelete = currentPermissions.includes('dmLoaiTaiSanCoDinh:delete');
+			permission = this.getUserPermission('dmLoaiTaiSanCoDinh', ['write', 'delete']);
 		let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmLoaiTaiSanCoDinh && this.props.dmLoaiTaiSanCoDinh.page ? this.props.dmLoaiTaiSanCoDinh.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
-		let table = 'Không có dữ liệu!';
-		if (list && list.length > 0) {
-			table = (
-				<table className='table table-hover table-bordered table-responsive'>
-					<thead>
-						<tr>
-							<th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-							<th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}> Mã </th>
-							<th style={{ width: '100%', whiteSpace: 'nowrap', textAlign: 'center' }}> Tên </th>
-							<th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}> Đơn vị tính </th>
-							<th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>	Mã tài khoản </th>
-							<th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>	Mã nhóm	</th>
-							<th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}> Mã hiệu </th>
-							<th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'> Thao tác </th>
-						</tr>
-					</thead>
-					<tbody>
-						{list.map((item, index) => (
-							<tr key={index}>
-								<td style={{ textAlign: 'right' }}> {(pageNumber - 1) * pageSize + index + 1} </td>
-								<td style={{ textAlign: 'right' }}>
-									<a href='#' onClick={(e) => this.edit(e, item)}>
-										{item.ma}
-									</a>
-								</td>
-								<td>{item.ten}</td>
-								<td>{item.donViTinh ? item.donViTinh : ''}</td>
-								<td>{item.maTaiKhoan ? item.maTaiKhoan : ''}</td>
-								<td>{item.maNhom ? item.maNhom : ''}</td>
-								<td>{item.maHieu ? item.maHieu : ''}</td>
-								<td style={{ textAlign: 'center' }}>
-									<div className='btn-group' style={{ display: 'flex' }}>
-										<a className='btn btn-primary' href='#' onClick={(e) => this.edit(e, item)}>
-											<i className='fa fa-lg fa-edit' />
-										</a>
-										{permissionDelete && (
-											<a className='btn btn-danger' href='#' onClick={(e) => this.delete(e, item)}>
-												<i className='fa fa-lg fa-trash' />
-											</a>)}
-									</div>
-								</td>
-							</tr>
-						))}
-					</tbody>
-				</table>
-			);
-		}
+		const table = renderTable({
+			getDataSource: () => list, stickyHead: false,
+			renderHead: () => (
+				<tr>
+					<th style={{ width: 'auto', textAlign: 'center' }}>#</th>
+					<th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}> Mã </th>
+					<th style={{ width: '100%', whiteSpace: 'nowrap', textAlign: 'center' }}> Tên </th>
+					<th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}> Đơn vị tính </th>
+					<th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>	Mã tài khoản </th>
+					<th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>	Mã nhóm	</th>
+					<th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}> Mã hiệu </th>
+					<th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'> Thao tác </th>
+				</tr>),
+			renderRow: (item, index) => (
+				<tr key={index}>
+					<TableCell type='text' content={(pageNumber - 1) * pageSize + index + 1} style={{ textAlign: 'right' }} />
+					<TableCell type='link' content={item.ma} style={{ textAlign: 'right' }} onClick={(e) => this.edit(e, item)} />
+					<TableCell type='text' content={item.ten} />
+					<TableCell type='text' content={item.donViTinh ? item.donViTinh : ''} />
+					<TableCell type='text' content={item.maTaiKhoan ? item.maTaiKhoan : ''} />
+					<TableCell type='text' content={item.maNhom ? item.maNhom : ''} />
+					<TableCell type='text' content={item.maHieu ? item.maHieu : ''} />
+					<TableCell type='checkbox' content={item.kichHoat} permission={permissionWrite} onChanged={() => permissionWrite && this.changeActive(item)} />
+					<TableCell type='buttons' content={item} permission={permission} onEdit={this.edit} onDelete={this.delete} />
+				</tr>
+			),
+		});
 
 		return (
 			<main className='app-content'>

@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getDmNhomMauAll, createDmNhomMau, updateDmNhomMau, deleteDmNhomMau } from './reduxNhomMau';
 import { Link } from 'react-router-dom';
+import { AdminPage, renderTable, TableCell } from 'view/component/AdminPage';
 
 class EditModal extends React.Component {
     modal = React.createRef();
@@ -94,7 +95,9 @@ class EditModal extends React.Component {
     }
 }
 
-class dmNhomMauPage extends React.Component {
+class dmNhomMauPage extends AdminPage {
+    state = { searching: false };
+    searchBox = React.createRef();
     modal = React.createRef();
 
     componentDidMount() {
@@ -122,55 +125,36 @@ class dmNhomMauPage extends React.Component {
         let table = 'Không có dữ liệu!',
             items = this.props.dmNhomMau && this.props.dmNhomMau.items;
         if (items && items.length > 0) {
-            table = (
-                <table className='table table-hover table-bordered table-responsive'>
-                    <thead>
-                        <tr>
-                            <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
-                            <th style={{ width: '100%' }} nowrap='true'>Tên</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                            <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {items.map((item, index) => (
-                            <tr key={index}>
-                                <td>{item.ma}</td>
-                                <td><a href='#' onClick={e => this.edit(e, item)}>{item.ten}</a></td>
-                                <td className='toggle' style={{ textAlign: 'center' }}>
-                                    <label>
-                                        <input type='checkbox' checked={item.kichHoat} onChange={e => permissionWrite && this.changeActive(item)} />
-                                        <span className='button-indecator' />
-                                    </label>
-                                </td>
-                                <td style={{ textAlign: 'center' }}>
-                                    <div className='btn-group' style={{ display: 'flex' }}>
-                                        <a className='btn btn-primary' href='#' onClick={e => this.edit(e, item)}>
-                                            <i className='fa fa-lg fa-edit' />
-                                        </a>
-                                        {permissionDelete &&
-                                            <a className='btn btn-danger' href='#' onClick={e => this.delete(e, item)}>
-                                                <i className='fa fa-lg fa-trash' />
-                                            </a>}
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            );
+            table = renderTable({
+                getDataSource: () => items, stickyHead: false,
+                renderHead: () => (
+                    <tr>
+                        <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
+                        <th style={{ width: '100%' }} nowrap='true'>Tên</th>
+                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
+                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                    </tr>),
+                renderRow: (item, index) => (
+                    <tr key={index}>
+                        <TableCell type='text' content={item.ma}/>
+                        <TableCell type='link' content={T.language.parse(item.ten, true).vi} onClick={() => this.modal.current.show(item)} />
+                        <TableCell type='checkbox' content={item.kichHoat} permission={permissionWrite} onChanged={() => permissionWrite && this.changeActive(item)} />
+                        <TableCell type='buttons' content={item} permission={permissionDelete} onEdit={this.edit} onDelete={this.delete}></TableCell>
+                    </tr>
+                )
+            });
         }
 
         return (
             <main className='app-content'>
                 <div className='app-title'>
                     <h1><i className='fa fa-list-alt' /> Danh mục Nhóm máu</h1>
-                    <ul className='app-breadcrumb breadcrumb'>
+                    {/* <ul className='app-breadcrumb breadcrumb'>
                         <Link to='/user'><i className='fa fa-home fa-lg' /></Link>
                         &nbsp;/&nbsp;
                         <Link to='/user/category'>Danh mục</Link>
                         &nbsp;/&nbsp;Nhóm máu
-                    </ul>
+                    </ul> */}
                 </div>
                 <div className='tile'>{table}</div>
                 <EditModal ref={this.modal} readOnly={!permissionWrite} create={this.props.createDmNhomMau} update={this.props.updateDmNhomMau} />

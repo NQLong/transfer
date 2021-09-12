@@ -3,7 +3,6 @@ module.exports = app => {
     const Docxtemplater = require('docxtemplater');
     const ImageModule = require('docxtemplater-image-module-free');
     const fs = require('fs');
-    const path = require('path');
     // Demo: https://docxtemplater.com/demo
 
     app.docx = {
@@ -19,11 +18,12 @@ module.exports = app => {
 
         errorHandler: (error) => {
             if (error.properties && error.properties.errors instanceof Array) {
-                const errorMessages = error.properties.errors.map(function (error) {
+                throw error.properties.errors.map(function (error) {
                     return error.properties.explanation;
                 }).join('\n');
+            } else {
+                throw error;
             }
-            throw error;
         },
 
         generateFile: (inputFile, data, done) => {
@@ -47,6 +47,7 @@ module.exports = app => {
             opts.fileType = 'docx'; //Or pptx
 
             //Pass your image loader
+            // eslint-disable-next-line no-unused-vars
             opts.getImage = function (tagValue, tagName = 'image') {
                 //tagValue is 'examples/image.png'
                 //tagName is 'image'
@@ -54,6 +55,7 @@ module.exports = app => {
             };
 
             //Pass the function that return image size
+            // eslint-disable-next-line no-unused-vars
             opts.getSize = function (img, tagValue, tagName = 'image') {
                 //img is the image returned by opts.getImage()
                 //tagValue is 'examples/image.png'
@@ -87,7 +89,7 @@ module.exports = app => {
                 doc = new Docxtemplater(zip);
             } catch (error) {
                 // Catch compilation errors (errors caused by the compilation of the template : misplaced tags)
-                errorHandler(error);
+                console.log(error);
             }
 
             //set the templateVariables
@@ -98,7 +100,7 @@ module.exports = app => {
                 doc.render();
             } catch (error) {
                 // Catch rendering errors (errors relating to the rendering of the template : angularParser throws an error)
-                errorHandler(error);
+                console.log(error);
             }
 
             let buf = doc.getZip().generate({ type: 'nodebuffer' });

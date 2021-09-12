@@ -200,11 +200,11 @@ class DraftEventEditPage extends React.Component {
         if (this.props.system.user.permissions.includes('event:write')) {
             delete newDraft.editorId; delete newDraft.editorName;
         }
-        this.props.updateDraftEvent(this.state.draftId, newDraft, data => { });
+        this.props.updateDraftEvent(this.state.draftId, newDraft, () => { });
     }
 
     render() {
-        const currentPermission = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [];
+        // const currentPermission = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [];
         const readOnly = false;
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [];
         const item = this.state.item ? this.state.item : {
@@ -371,14 +371,14 @@ class DraftEventEditPage extends React.Component {
                                         <textarea defaultValue='' className='form-control' id='evEventViAbstract' placeholder='Tóm tắt sự kiện' readOnly={readOnly}
                                             style={{ minHeight: '100px', marginBottom: '12px' }} />
                                         <label className='control-label'>Nội dung sự kiện</label>
-                                        <Editor ref={this.viEditor} height='400px' placeholder='Nội dung sự kiện' height={600} uploadUrl='/user/upload?category=event' readOnly={readOnly} />
+                                        <Editor ref={this.viEditor} placeholder='Nội dung sự kiện' height={600} uploadUrl='/user/upload?category=event' readOnly={readOnly} />
                                     </div>
                                     <div id='jobsEnTab' className='tab-pane fade'>
                                         <label className='control-label'>Event abstract</label>
                                         <textarea defaultValue='' className='form-control' id='evEventEnAbstract' placeholder='Event abstracts' readOnly={readOnly}
                                             style={{ minHeight: '100px', marginBottom: '12px' }} />
                                         <label className='control-label'>Event content</label>
-                                        <Editor ref={this.enEditor} height='400px' placeholder='Event content' height={600} uploadUrl='/user/upload?category=event' readOnly={readOnly} />
+                                        <Editor ref={this.enEditor} placeholder='Event content' height={600} uploadUrl='/user/upload?category=event' readOnly={readOnly} />
                                     </div>
                                 </div>
                             </div>
