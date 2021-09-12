@@ -12,5 +12,9 @@ export default {
             path: '/user/storage',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
+        {
+            path: '/user/storage/category',
+            component: Loadable({ loading: Loading, loader: () => import('./adminCategoryPage') })
+        },
     ],
 }; 

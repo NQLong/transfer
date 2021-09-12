@@ -33,15 +33,13 @@ class EditModal extends React.Component {
 
     show = (index, item) => {
         let { ma, ten, tenTiengAnh, maDv, qdThanhLap, qdXoaTen, ghiChu } = item ? item : { ma: '', ten: '', tenTiengAnh: '', maDv: '', qdThanhLap: '', qdXoaTen: '', kichHoat: 0, ghiChu: '' };
-
-        $('#ma').val(ma),
-            $('#ten').val(ten),
-            $('#tenTiengAnh').val(tenTiengAnh),
-            $('#maDv').val(maDv),
-            $('#qdThanhLap').val(qdThanhLap),
-            $('#qdXoaTen').val(qdXoaTen),
-            $('#ghiChu').val(ghiChu);
-
+        $('#ma').val(ma);
+        $('#ten').val(ten);
+        $('#tenTiengAnh').val(tenTiengAnh);
+        $('#maDv').val(maDv);
+        $('#qdThanhLap').val(qdThanhLap);
+        $('#qdXoaTen').val(qdXoaTen);
+        $('#ghiChu').val(ghiChu);
         this.setState({ index });
         $(this.modal.current).modal('show');
     };

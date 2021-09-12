@@ -56,7 +56,7 @@ export function getDmChucVuPage(pageNumber, pageSize, pageCondition, done) {
                 if (done) done(data.page);
                 dispatch({ type: DmChucVuGetPage, page: data.page });
             }
-        }, (error) => T.notify('Lấy danh sách chức vụ bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
+        }, error => T.notify('Lấy danh sách chức vụ bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
     };
 }
 
@@ -71,7 +71,7 @@ export function getDmChucVuAll(condition, done) {
                 if (done) done(data.items);
                 dispatch({ type: DmChucVuGetAll, items: data.items ? data.items : [] });
             }
-        }, (error) => T.notify('Lấy danh sách chức vụ bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
+        }, error => T.notify('Lấy danh sách chức vụ bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
     };
 }
 
@@ -86,7 +86,7 @@ export function createDmChucVu(item, done) {
                 dispatch(getDmChucVuPage());
                 if (done) done(data);
             }
-        }, (error) => T.notify('Tạo dữ liệu bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
+        }, error => T.notify('Tạo dữ liệu bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
     };
 }
 
@@ -99,7 +99,7 @@ export function deleteDmChucVu(ma) {
             } else {
                 dispatch(getDmChucVuPage());
             }
-        }, (error) => T.notify('Xóa dữ liệu bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
+        }, error => T.notify('Xóa dữ liệu bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
     };
 }
 
@@ -116,7 +116,7 @@ export function updateDmChucVu(ma, changes, done) {
                 done && done(data.item);
                 dispatch(getDmChucVuPage());
             }
-        }, (error) => T.notify('Cập nhật dữ liệu bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+        }, error => T.notify('Cập nhật dữ liệu bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
     };
 }
 
@@ -130,7 +130,7 @@ export function createMultiDmChucVu(dmChucVu, isOverride, done) {
             } else {
                 done && done(data.item);
             }
-        }, (error) => T.notify('Cập nhật dữ liệu bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+        }, error => T.notify('Cập nhật dữ liệu bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
     };
 }
 

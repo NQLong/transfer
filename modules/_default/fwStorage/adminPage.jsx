@@ -4,6 +4,7 @@ import Pagination from 'view/component/Pagination';
 import FileBox from 'view/component/FileBox';
 import T from 'view/js/common.js';
 import { getFwStoragePage, updateStorage, deleteStorage } from './redux';
+import { getAll } from 'modules/_default/_init/reduxCategory';
 import copy from 'copy-to-clipboard';
 
 class FileModal extends React.Component {
@@ -58,7 +59,7 @@ class FileModal extends React.Component {
                 <form className='modal-dialog' role='document' onSubmit={this.save}>
                     <div className='modal-content'>
                         <div className='modal-header'>
-                            <h5 className='modal-title'>Thông tin file</h5>
+                            <h5 className='modal-title'>Thông tin tệp tin</h5>
                             <button type='button' className='close' data-dismiss='modal' aria-label='Close'>
                                 <span aria-hidden='true'>&times;</span>
                             </button>
@@ -97,7 +98,17 @@ class StoragePage extends React.Component {
 
     componentDidMount() {
         T.ready('/user/storage');
-        this.props.getFwStoragePage();
+        this.props.getAll('document', data => {
+            this.props.getFwStoragePage();
+            this.setState({ category: data });
+            // data.forEach(item => {
+            //     const language = JSON.parse(item.title);
+            //     if (language.en == categoryPicker) {
+            //         this.pickerType.current.setText(language.vi);
+            //     }
+            // });
+            // consolke.log(data);
+        });
     }
 
     show = (e, item) => {
@@ -131,7 +142,6 @@ class StoragePage extends React.Component {
             hasUpdate = permissions.includes('storage:write');
         const { pageNumber, pageSize, pageTotal, totalItem, list } = this.props.fwStorage && this.props.fwStorage.page ?
             this.props.fwStorage.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null };
-
         let table = <p>Không có vai trò!</p>;
         if (list && list.length > 0) {
             table = (
@@ -211,5 +221,5 @@ class StoragePage extends React.Component {
 }
 
 const mapStateToProps = state => ({ system: state.system, fwStorage: state.fwStorage });
-const mapActionsToProps = { getFwStoragePage, updateStorage, deleteStorage };
+const mapActionsToProps = { getFwStoragePage, updateStorage, deleteStorage, getAll };
 export default connect(mapStateToProps, mapActionsToProps)(StoragePage);

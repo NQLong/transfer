@@ -24,7 +24,6 @@ export default function categoryReducer(state = [], data) {
             return updateItemState;
         }
 
-
         case CategoryDelete: {
             let deleteItemState = state.slice();
             for (let i = 0; i < deleteItemState.length; i++) {

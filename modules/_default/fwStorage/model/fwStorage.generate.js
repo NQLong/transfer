@@ -1,6 +1,6 @@
-// Table name: FW_STORAGE { id, nameDisplay, path, active, note, userUpload, maDonVi }
+// Table name: FW_STORAGE { id, nameDisplay, path, active, note, userUpload, maDonVi, category }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'nameDisplay': 'NAME_DISPLAY', 'path': 'PATH', 'active': 'ACTIVE', 'note': 'NOTE', 'userUpload': 'USER_UPLOAD', 'maDonVi': 'MA_DON_VI' };
+const obj2Db = { 'id': 'ID', 'nameDisplay': 'NAME_DISPLAY', 'path': 'PATH', 'active': 'ACTIVE', 'note': 'NOTE', 'userUpload': 'USER_UPLOAD', 'maDonVi': 'MA_DON_VI', 'category': 'CATEGORY' };
 
 module.exports = app => {
     app.model.fwStorage = {

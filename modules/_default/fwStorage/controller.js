@@ -7,6 +7,7 @@ module.exports = app => {
 
     );
     app.get('/user/storage', app.permission.check('storage:read'), app.templates.admin);
+    app.get('/user/storage/category', app.permission.check('category:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
 
