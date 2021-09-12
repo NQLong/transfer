@@ -34,7 +34,7 @@ class EditModal extends AdminModal {
                 ten: this.ten.value(),
                 phuCap: this.phuCap.value(),
                 ghiChu: this.ghiChu.value(),
-                kichHoat: this.state.active ? 1 : 0,
+                kichHoat: this.kichHoat.value() ? 1 : 0,
             };
         if (!this.state.ma && !this.ma.value()) {
             T.notify('Mã không được trống!', 'danger');
