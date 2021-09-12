@@ -24,6 +24,8 @@ class EditModal extends AdminModal {
         this.kichHoat.value(kichHoat ? 1 : 0);
     };
 
+    changeKichHoat = value => this.kichHoat.value(value ? 1 : 0) || this.kichHoat.value(value);
+
     onSubmit = (e) => {
         e.preventDefault();
         const
