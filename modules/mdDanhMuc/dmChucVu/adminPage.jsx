@@ -64,7 +64,6 @@ class EditModal extends AdminModal {
 
 class DmChucVuPage extends AdminPage {
     state = { searching: false };
-    searchBox = React.createRef();
 
     componentDidMount() {
         T.ready('/user/category', () => {
