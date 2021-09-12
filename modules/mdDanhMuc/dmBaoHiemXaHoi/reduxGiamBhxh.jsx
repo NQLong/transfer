@@ -128,6 +128,7 @@ export function updateDmGiamBhxh(ma, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật thông tin giảm Bảo hiểm xã hội thành công!', 'success');
+                done && done(data.item);
                 dispatch(getDmGiamBhxhAll());
             }
         }, () => T.notify('Cập nhật thông tin giảm Bảo hiểm xã hội bị lỗi!', 'danger'));

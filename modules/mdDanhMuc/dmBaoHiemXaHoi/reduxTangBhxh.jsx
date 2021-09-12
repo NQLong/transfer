@@ -128,6 +128,7 @@ export function updateDmTangBhxh(ma, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật thông tin tăng Bảo hiểm xã hội thành công!', 'success');
+                done && done(data.error);
                 dispatch(getDmTangBhxhAll());
             }
         }, () => T.notify('Cập nhật thông tin tăng Bảo hiểm xã hội bị lỗi!', 'danger'));
