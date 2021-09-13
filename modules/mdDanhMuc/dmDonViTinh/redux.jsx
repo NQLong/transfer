@@ -102,6 +102,7 @@ export function createDmDonViTinh(item, done) {
         T.notify('Tạo đơn vị tính bị lỗi' + (data.error.message && ':<br>' + data.error.message), 'danger');
         console.error(`POST: ${url}.`, data.error);
       } else {
+        T.notify('Tạo mới thông tin đơn vị tính thành công!', 'success');
         dispatch(getDmDonViTinhPage());
         if (done) done(data);
       }
@@ -119,6 +120,7 @@ export function updateDmDonViTinh(ma, changes, done) {
         done && done(data.error);
       } else {
         T.notify('Cập nhật thông tin đơn vị tính thành công!', 'success');
+        done && done(data.item);
         dispatch(getDmDonViTinhPage());
       }
     }, (error) => T.notify('Cập nhật thông tin đơn vị tính bị lỗi' + (error.error.message && ':<br>' + error.error.message), 'danger'));
