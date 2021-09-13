@@ -10,9 +10,6 @@ import { Select } from 'view/component/Input';
 class EditModal extends AdminModal {
 
     componentDidMount() {
-        // $(document).ready(() => setTimeout(() => {
-        //     $(this.modal.current).on('shown.bs.modal', () => $('#ma').focus());
-        // }, 250));
         $(document).ready(() => this.onShow(() => {
             !this.ma.value() ? this.ma.focus() : this.ten.focus();
         }));
@@ -40,7 +37,6 @@ class EditModal extends AdminModal {
             ten: this.ten.value(),
             tenTiengAnh: this.tenTiengAnh.value(), 
             maDv: this.maDv.getFormVal().data,
-            //maDv: this.maDonVi.getFormVal().data,
             qdThanhLap: this.qdThanhLap.value(),
             qdXoaTen: this.qdXoaTen.value(),
             kichHoat: this.kichHoat.value() ? 1 : 0,
@@ -63,11 +59,11 @@ class EditModal extends AdminModal {
         return this.renderModal({
             title: this.state.ma ? 'Cập nhật bộ môn' : 'Tạo mới bộ môn',
             body: <div className='row'>
-                <FormTextBox className='col-md-6' ref={e => this.ma = e} label='Mã bộ môn' 
+                <FormTextBox type='text' className='col-md-6' ref={e => this.ma = e} label='Mã bộ môn' 
                     readOnly={this.state.ma ? true : readOnly} required />
                 <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} 
                     readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
-                    onChange={() => !readOnly && this.setState({ kichHoat: !this.state.kichHoat })} />
+                    onChange={value => this.changeKichHoat(value ? 1 : 0)} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.ten = e} label='Tên bộ môn (tiếng Việt)' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.tenTiengAnh = e} label='Tên bộ môn (tiếng Anh)' readOnly={readOnly} />
                 <div className='col-12 col-md-6'>
