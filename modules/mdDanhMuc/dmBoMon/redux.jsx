@@ -151,6 +151,7 @@ export function updateDmBoMon(ma, changes, done) {
                 T.notify('Cập nhật bộ môn thành công!', 'success');
                 dispatch(changeDmBoMon(changes));
                 dispatch(getDmBoMonPage());
+                done && done(data.item);
             }
         }, (error) => T.notify('Cập nhật bộ môn bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };

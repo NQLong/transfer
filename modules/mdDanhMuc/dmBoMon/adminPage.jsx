@@ -7,16 +7,13 @@ import Pagination from 'view/component/Pagination';
 import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox, FormSelect } from 'view/component/AdminPage';
 
 class EditModal extends AdminModal {
-    state = { active: true, kichHoat: true };
-    // modal = React.createRef();
-    //maDonVi = React.createRef();
 
     componentDidMount() {
         // $(document).ready(() => setTimeout(() => {
         //     $(this.modal.current).on('shown.bs.modal', () => $('#ma').focus());
         // }, 250));
         $(document).ready(() => this.onShow(() => {
-            !this.ma.value() ? this.ma.focus() : this.ten().focus();
+            !this.ma.value() ? this.ma.focus() : this.ten.focus();
         }));
     }
 
@@ -26,30 +23,13 @@ class EditModal extends AdminModal {
         this.ma.value(ma);
         this.ten.value(ten);
         this.tenTiengAnh.value(tenTiengAnh);
-        // this.maDv.setVal(maDv);
-        this.maDonVi.current.setVal(maDv);
-        this.qdThanhLap.val(qdThanhLap);
-        this.qdXoaTen.val(qdXoaTen);
-        this.ghiChu.val(ghiChu);
+
+        this.maDv.value(maDv);
+        this.qdThanhLap.value(qdThanhLap);
+        this.qdXoaTen.value(qdXoaTen);
+        this.ghiChu.value(ghiChu);
         this.kichHoat.value(kichHoat);
-        // $('#ma').val(ma);
-        // $('#ten').val(ten);
-        // $('#tenTiengAnh').val(tenTiengAnh);
-        // this.maDonVi.current.setVal(maDv);
-        // $('#qdThanhLap').val(qdThanhLap);
-        // $('#qdXoaTen').val(qdXoaTen);
-        // $('#ghiChu').val(ghiChu);
-        // if (ma) {
-        //     this.setState({ kichHoat });
-        // } else {
-        //     this.setState({ kichHoat });
-        // }
-        // $('#kichHoat').val(kichHoat);
-
-        // $(this.modal.current).attr('data-id', ma).modal('show');
     }
-
-    // hide = () => $(this.modal.current).modal('hide');
 
     changeKichHoat = value => this.kichHoat.value(value ? 1 : 0) || this.kichHoat.value(value);
 
@@ -59,38 +39,28 @@ class EditModal extends AdminModal {
             ma: this.ma.value(),
             ten: this.ten.value(),
             tenTiengAnh: this.tenTiengAnh.value(), 
-            maDv: this.maDonVi.current.getVal(),
+            maDv: this.maDv.getVal(),
             //maDv: this.maDonVi.getFormVal().data,
             qdThanhLap: this.qdThanhLap.value(),
             qdXoaTen: this.qdXoaTen.value(),
             kichHoat: this.kichHoat.value() ? 1 : 0,
             ghiChu: this.ghiChu.value(),
-            // ma: $('#ma').val().trim(),
-            // ten: $('#ten').val().trim(),
-            // tenTiengAnh: $('#tenTiengAnh').val().trim(),
-            // maDv: this.maDonVi.current.getVal(),
-            // qdThanhLap: $('#qdThanhLap').val().trim(),
-            // qdXoaTen: $('#qdXoaTen').val().trim(),
-            // kichHoat: Number(this.state.kichHoat),
-            // ghiChu: $('#ghiChu').val().trim(),
         };
         if (!this.state.ma && !this.ma.value()) {
             T.notify('Mã bộ môn bị trống!', 'danger');
             this.ma.focus();
-            // $('#ma').focus();
         } else if (changes.maDv == '') {
             T.notify('Mã đơn vị bị trống!', 'danger');
             this.maDv.focus();
-            // this.maDonVi.current.focus();
         } else {
-            this.state.ma ? this.props.updateDmBoMon(this.state.ma, changes, this.hide) : this.props.createDmBoMon(changes, this.hide);
+            this.state.ma ? this.props.update(this.state.ma, changes, this.hide) : this.props.create(changes, this.hide);
         }
         e.preventDefault();
     }
 
     render = () => {
         const readOnly = this.props.readOnly;
-        return (this.renderModal({
+        return this.renderModal({
             title: this.state.ma ? 'Cập nhật bộ môn' : 'Tạo mới bộ môn',
             body: <div className='row'>
                 <FormTextBox className='col-md-6' ref={e => this.ma = e} label='Mã bộ môn' 
@@ -100,13 +70,13 @@ class EditModal extends AdminModal {
                     onChange={() => !readOnly && this.setState({ kichHoat: !this.state.kichHoat })} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.ten = e} label='Tên bộ môn (tiếng Việt)' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.tenTiengAnh = e} label='Tên bộ môn (tiếng Anh)' readOnly={readOnly} />
-                <FormSelect className='col-12 col-md-6' ref={e => this.maDonVi = e} 
+                <FormSelect className='col-12 col-md-6' ref={e => this.maDv = e} 
                     adapter={SelectAdapter_DmDonVi} label='Mã Đơn Vị' required />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.qdThanhLap = e} label='Quyết định thành lập' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.qdXoaTen = e} label='Quyết định xóa tên' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-12' ref={e => this.ghiChu = e} label='Ghi chú' readOnly={readOnly} />
             </div>
-        }));
+        });
     }
 }
 
@@ -163,7 +133,7 @@ class DmBoMonPage extends AdminPage {
                         <TableCell type='checkbox' content={item.kichHoat} permission={permission} 
                             onChanged={() => this.props.updateDmBoMon(item.ma, { kichHoat: Number(!item.kichHoat) })} />
                         <TableCell type='buttons' content={item} permission={permission} 
-                            onEdit={this.modal.show(item)} onDelete={this.delete}></TableCell>
+                            onEdit={() => this.modal.show(item)} onDelete={this.delete}></TableCell>
                     </tr>)
             });
         }
