@@ -15,22 +15,22 @@ class EditModal extends AdminModal {
 
     onShow = (item) => {
         let { ma, ten, kichHoat } = item ? item : { ma: '', ten: '', kichHoat: 1 };
-        
+
         this.setState({ ma, item });
         this.ma.value(ma);
         this.ten.value(ten);
         this.kichHoat.value(kichHoat ? 1 : 0);
 
-        
+
     };
 
-    onSubmit = () => {
-        const
-            changes = {
-                ma: this.ma.value(),
-                ten: this.ten.value(),
-                kichHoat: this.kichHoat.value() ? 1 : 0,
-            };
+    onSubmit = (e) => {
+        e.preventDefault();
+        const changes = {
+            ma: this.ma.value(),
+            ten: this.ten.value(),
+            kichHoat: this.kichHoat.value() ? 1 : 0,
+        };
         if (!this.state.ma && !this.ma.value()) {
             T.notify('Mã không được trống!', 'danger');
             this.ma.focus();
@@ -39,7 +39,7 @@ class EditModal extends AdminModal {
             this.ten.focus();
         } else {
             this.state.ma ? this.props.update(this.state.ma, changes, this.hide) :
-                            this.props.create(changes, this.hide);
+                this.props.create(changes, this.hide);
         }
     };
 
@@ -114,25 +114,25 @@ class dmDanTocAdminPage extends AdminPage {
                     </tr>
                 )
 
-        });
-    }
+            });
+        }
 
         return this.renderPage({
-        icon: 'fa fa-list-alt',
-        title: 'Dân tộc',
-        breadcrumb: [
-            <Link key={0} to='/user/category'>Danh mục</Link>,
-            'Dân tộc'
-        ],
-        content: <>
-            <div className='tile'>{table}</div>
-            <Pagination style={{ marginLeft: '65px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.props.getDmDanTocPage} />
-            <EditModal ref={e => this.modal = e} permission={permission}
-                create={this.props.createDmDanToc} update={this.props.updateDmDanToc} permissions={currentPermissions} />
-        </>,
-        backRoute: '/user/category',
-        onCreate: permission && permission.write ? (e) => this.showModal(e) : null
-    });
+            icon: 'fa fa-list-alt',
+            title: 'Dân tộc',
+            breadcrumb: [
+                <Link key={0} to='/user/category'>Danh mục</Link>,
+                'Dân tộc'
+            ],
+            content: <>
+                <div className='tile'>{table}</div>
+                <Pagination style={{ marginLeft: '65px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.props.getDmDanTocPage} />
+                <EditModal ref={e => this.modal = e} permission={permission}
+                    create={this.props.createDmDanToc} update={this.props.updateDmDanToc} permissions={currentPermissions} />
+            </>,
+            backRoute: '/user/category',
+            onCreate: permission && permission.write ? (e) => this.showModal(e) : null
+        });
     }
 }
 
