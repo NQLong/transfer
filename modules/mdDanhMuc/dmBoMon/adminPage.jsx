@@ -1,16 +1,17 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { createDmBoMon, getDmBoMonPage, updateDmBoMon, deleteDmBoMon } from './redux';
-import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
+import { createDmBoMon, getDmBoMonPage, updateDmBoMon, deleteDmBoMon} from './redux';
+import { SelectAdapter_DmDonVi, getDmDonViAll} from 'modules/mdDanhMuc/dmDonVi/redux';
 import Pagination from 'view/component/Pagination';
 import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
 import { Select } from 'view/component/Input';
 
 class EditModal extends AdminModal {
+    donViMapper = {};
 
     componentDidMount() {
-        $(document).ready(() => this.onShow(() => {
+        $(document).ready(() => this.onShown(() => {
             !this.ma.value() ? this.ma.focus() : this.ten.focus();
         }));
     }
@@ -22,9 +23,9 @@ class EditModal extends AdminModal {
         this.ten.value(ten);
         this.maDv.setVal(maDv);
         this.tenTiengAnh.value(tenTiengAnh);
-        this.qdThanhLap.value(qdThanhLap);
-        this.qdXoaTen.value(qdXoaTen);
-        this.ghiChu.value(ghiChu);
+        this.qdThanhLap.value(qdThanhLap ? qdThanhLap : '');
+        this.qdXoaTen.value(qdXoaTen ? qdXoaTen : '');
+        this.ghiChu.value(ghiChu ? ghiChu : '');
         this.kichHoat.value(kichHoat);
     }
 
@@ -79,9 +80,15 @@ class EditModal extends AdminModal {
 
 class DmBoMonPage extends AdminPage {
     state = { searching: false };
-    donVi = {};
+    donViMapper = {};
 
     componentDidMount() {
+        this.props.getDmDonViAll(items => {
+            if (items) {
+                this.donViMapper = {};
+                items.forEach(item => this.donViMapper[item.ma] = item.ten);
+            }
+        });
         T.ready('/user/category', () => {
             T.onSearch = (searchText) => this.props.getDmBoMonPage(undefined, undefined, searchText || '');
             T.showSearchBox();
@@ -125,7 +132,7 @@ class DmBoMonPage extends AdminPage {
                         <TableCell type='link' content={item.ma ? item.ma : ''} onClick={() => this.modal.show(item)} />
                         <TableCell type='link' content={<b> {item.ten ? item.ten : ''} <br /> {item.tenTiengAnh ? item.tenTiengAnh : ''} </b>} 
                             className={item.qdXoaTen ? 'text-danger' : 'text-primary'} onClick={() => this.modal.show(item)} />
-                        <TableCell type='text' content={item.maDv ? item.maDv : ''} />
+                        <TableCell type='text' content={this.donViMapper && this.donViMapper[item.maDv] ? this.donViMapper[item.maDv] : ''} />
                         <TableCell type='text' content={item.qdThanhLap ? item.qdThanhLap : ''} style={{ whiteSpace: 'nowrap' }} />
                         <TableCell type='checkbox' content={item.kichHoat} permission={permission} 
                             onChanged={() => this.props.updateDmBoMon(item.ma, { kichHoat: Number(!item.kichHoat) })} />
@@ -156,5 +163,5 @@ class DmBoMonPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, dmBoMon: state.dmBoMon, dmDonVi: state.dmDonVi });
-const mapActionsToProps = { createDmBoMon, getDmBoMonPage, SelectAdapter_DmDonVi, updateDmBoMon, deleteDmBoMon };
+const mapActionsToProps = { getDmDonViAll, createDmBoMon, getDmBoMonPage, SelectAdapter_DmDonVi, updateDmBoMon, deleteDmBoMon };
 export default connect(mapStateToProps, mapActionsToProps)(DmBoMonPage);

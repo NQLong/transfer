@@ -161,10 +161,10 @@ export function changeDmBoMon(item) {
     return { type: DmBoMonUpdate, item };
 }
 
-export function createMultiDmBoMon(dmBoMon, done) {
+export function createMultiDmBoMon(dmBoMon, isOverride, done) {
     return () => {
         const url = '/api/dm-bo-mon/multiple';
-        T.post(url, { dmBoMon }, data => {
+        T.post(url, { dmBoMon, isOverride}, data => {
             if (data.error && data.error.length) {
                 T.notify('Cập nhật dữ liệu bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error('PUT: ' + url + '. ' + data.error.toString());
