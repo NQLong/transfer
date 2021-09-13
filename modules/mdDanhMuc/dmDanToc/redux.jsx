@@ -98,6 +98,7 @@ export function createDmDanToc(item, done) {
                 T.notify('Tạo dân tộc bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`POST: ${url}.`, data.error);
             } else {
+                T.notify('Tạo thông tin dân tộc thành công!', 'success');
                 dispatch(getDmDanTocPage());
                 if (done) done(data);
             }
@@ -130,6 +131,7 @@ export function updateDmDanToc(ma, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật thông tin dân tộc thành công!', 'success');
+                done && done(data.item);
                 dispatch(getDmDanTocPage());
             }
         }, (error) => T.notify('Cập nhật thông tin dân tộc bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
