@@ -8,7 +8,6 @@ module.exports = app => {
     app.permission.add(
         { name: 'dmChiBo:read', menu },
         { name: 'dmChiBo:write' },
-        { name: 'dmChiBo:delete' },
     );
     app.get('/user/danh-muc/chi-bo', app.permission.check('dmChiBo:read'), app.templates.admin);
 
@@ -22,8 +21,8 @@ module.exports = app => {
                 statement: 'lower(ma) LIKE :searchText OR lower(ten) LIKE :searchText',
                 parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
             };
-        } 
-        app.model.dmChiBo.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
+        }
+        app.model.dmChiBo.getPage(pageNumber, pageSize, condition, '*', 'ten ASC', (error, page) => res.send({ error, page }));
     });
 
     app.get('/api/danh-muc/chi-bo/all', app.permission.check('user:login'), (req, res) => {
