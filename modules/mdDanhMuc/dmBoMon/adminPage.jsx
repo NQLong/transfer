@@ -3,8 +3,7 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { createDmBoMon, getDmBoMonPage, updateDmBoMon, deleteDmBoMon } from './redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
-import { Select } from 'view/component/Input';
-import Pagination, { OverlayLoading } from 'view/component/Pagination';
+import Pagination from 'view/component/Pagination';
 import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox, FormSelect } from 'view/component/AdminPage';
 
 class EditModal extends AdminModal {
@@ -18,7 +17,7 @@ class EditModal extends AdminModal {
         // }, 250));
         $(document).ready(() => this.onShow(() => {
             !this.ma.value() ? this.ma.focus() : this.ten().focus();
-        }))
+        }));
     }
 
     onShow = (item) => {
