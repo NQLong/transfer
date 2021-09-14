@@ -50,12 +50,11 @@ class EditModal extends AdminModal {
             T.notify('Mã tuyến bệnh viện bị trống!', 'danger');
             this.maTuyen.focus();
         } else {
-            $(this.modal).modal('hide');
             this.state.ma ? this.props.update(this.state.ma, changes, this.hide) : this.props.create(changes, this.hide);
         }
     };
 
-    render() {
+    render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
             title: this.state.ma ? 'Cập nhật bệnh viện' : 'Tạo mới bệnh viện',
@@ -138,7 +137,7 @@ class dmBenhVienPage extends AdminPage {
             ],
             content: <>
                 <div className='tile'>{table}</div>
-                <Pagination style={{ marginLeft: '65px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.props.getDmChucVuPage} />
+                <Pagination style={{ marginLeft: '65px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.props.getDmBenhVienPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createDmBenhVien} update={this.props.updateDmBenhVien} permissions={currentPermissions} />
             </>,
