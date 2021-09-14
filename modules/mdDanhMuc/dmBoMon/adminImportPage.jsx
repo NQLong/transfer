@@ -3,138 +3,81 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import FileBox from 'view/component/FileBox';
 import { createMultiDmBoMon } from './redux';
-import { AdminPage, TableCell, renderTable } from 'view/component/AdminPage';
+import { FormTextBox, renderTable, AdminModal, TableCell, AdminPage, } from 'view/component/AdminPage';
 
-const schema = {
-    ma: { type: 'text', title: 'Mã bộ môn' },
-    ten: { type: 'text', title: 'Tên bộ môn' },
-    tenTiengAnh: { type: 'text', title: 'Tên tiếng Anh bộ môn' },
-    maDv: { type: 'text', title: 'Mã đơn vị' },
-    qdThanhLap: { type: 'text', title: 'QĐ thành lập' },
-    qdXoaTen: { type: 'text', title: 'QĐ xóa tên' },
-    kichHoat: { type: 'number', title: 'Kích hoạt' },
-    ghiChu: { type: 'text', title: 'Ghi chú' },
-};
-
-class EditModal extends React.Component {
+class EditModal extends AdminModal {
     constructor(props) {
         super(props);
         this.state = { index: -1 };
-        this.modal = React.createRef();
-
-        Object.keys(schema).forEach(key => this[key] = React.createRef());
     }
 
     componentDidMount() {
-        $(document).ready(() => {
-            $(this.modal.current).on('hidden.bs.modal', () => this.setState({ index: -1 }));
-        });
+        $(document).ready(() => this.onShown(() => {
+            this.ma.focus();
+        }));
     }
 
-    show = (index, item) => {
+    onShow = (index, item) => {
         let { ma, ten, tenTiengAnh, maDv, qdThanhLap, qdXoaTen, ghiChu } = item ? item : { ma: '', ten: '', tenTiengAnh: '', maDv: '', qdThanhLap: '', qdXoaTen: '', kichHoat: 0, ghiChu: '' };
-        $('#ma').val(ma);
-        $('#ten').val(ten);
-        $('#tenTiengAnh').val(tenTiengAnh);
-        $('#maDv').val(maDv);
-        $('#qdThanhLap').val(qdThanhLap);
-        $('#qdXoaTen').val(qdXoaTen);
-        $('#ghiChu').val(ghiChu);
         this.setState({ index });
-        $(this.modal.current).modal('show');
+        this.ma.value(ma);
+        this.ten.value(ten);
+        this.maDv.value(maDv);
+        this.tenTiengAnh.value(tenTiengAnh);
+        this.qdThanhLap.value(qdThanhLap ? qdThanhLap : '');
+        this.qdXoaTen.value(qdXoaTen ? qdXoaTen : '');
+        this.ghiChu.value(ghiChu ? ghiChu : '');
     };
 
-    save = (e) => {
-        e.preventDefault();
-        const
-            changes = {
-                ma: $('#ma').val().trim(),
-                ten: $('#ten').val().trim(),
-                tenTiengAnh: $('#tenTiengAnh').val().trim(),
-                maDv: $('#maDv').val().trim(),
-                qdThanhLap: $('#qdThanhLap').val().trim(),
-                qdXoaTen: $('#qdXoaTen').val().trim(),
-                ghiChu: $('#ghiChu').val().trim(),
-            };
+    changeKichHoat = value => this.kichHoat.value(value ? 1 : 0) || this.kichHoat.value(value);
+
+    onSubmit = (e) => {
+        const changes = {
+            ma: this.ma.value(),
+            ten: this.ten.value(),
+            tenTiengAnh: this.tenTiengAnh.value(), 
+            maDv: this.maDv.value(),
+            qdThanhLap: this.qdThanhLap.value(),
+            qdXoaTen: this.qdXoaTen.value(),
+            ghiChu: this.ghiChu.value(),
+        };
         if (changes.ma == '') {
             T.notify('Mã bộ môn bị trống!', 'danger');
-            $('#ma').focus();
+            this.ma.focus();
         } else if (changes.maDv == '') {
             T.notify('Mã đơn vị bị trống!', 'danger');
-            $('#maDv').focus();
+            this.maDv.focus();
         } else {
-            this.props.update(this.state.index, changes, () => $(this.modal.current).modal('hide'));
+            this.props.update(this.state.ma, changes, this.hide);
         }
         e.preventDefault();
     };
 
-    render() {
-        return (
-            <div className='modal' tabIndex='-1' role='dialog' ref={this.modal}>
-                <form className='modal-dialog modal-lg' role='document'>
-                    <div className='modal-content'>
-                        <div className='modal-header'>
-                            <h5 className='modal-title'>Cập nhật bộ môn</h5>
-                            <button type='button' className='close' data-dismiss='modal' aria-label='Close'>
-                                <span aria-hidden='true'>&times;</span>
-                            </button>
-                        </div>
-                        <div className='modal-body row'>
-                            <div className='col-md-12'>
-                                <div className='tile'>
-                                    <div className='tile-body'>
-                                        <div className='form-group'>
-                                            <label className='control-label'>Mã bộ môn</label>
-                                            <input className='form-control' type='text' placeholder='Mã bộ môn' id='ma' />
-                                        </div>
-                                        <div className='row'>
-                                            <div className='col-md-6'>
-                                                <div className='form-group'>
-                                                    <label className='control-label'>Tên bộ môn</label>
-                                                    <input className='form-control' type='text' placeholder='Tên bộ môn' id='ten' />
-                                                </div>
-                                            </div>
-                                            <div className='col-md-6'>
-                                                <div className='form-group'>
-                                                    <label className='control-label'>Tên tiếng Anh bộ môn</label>
-                                                    <input className='form-control' type='text' placeholder='Tên tiếng Anh' id='tenTiengAnh' />
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className='form-group'>
-                                            <label className='control-label'>Mã đơn vị</label>
-                                            <input className='form-control' type='text' placeholder='Mã đơn vị' id='maDv' />
-                                        </div>
-                                        <div className='form-group'>
-                                            <label className='control-label'>Quyết định thành lập</label>
-                                            <input className='form-control' type='text' placeholder='QĐ thành lập' id='qdThanhLap' />
-                                        </div>
-                                        <div className='form-group'>
-                                            <label className='control-label'>Quyết định xóa tên</label>
-                                            <input className='form-control' type='text' placeholder='QĐ xóa tên' id='qdXoaTen' />
-                                        </div>
-                                        <div className='form-group'>
-                                            <label className='control-label'>Ghi chú</label>
-                                            <input className='form-control' type='text' placeholder='Ghi chú' id='ghiChu' />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className='modal-footer'>
-                            <button type='button' className='btn btn-secondary' data-dismiss='modal'>Đóng</button>
-                            <button type='submit' className='btn btn-primary' onClick={this.save}>Lưu</button>
-                        </div>
-                    </div>
-                </form>
+    render = () => {
+        return this.renderModal({
+            title: 'Cập nhật bộ môn',
+            body: <div className='row'>
+                <FormTextBox type='text' className='col-md-6' ref={e => this.ma = e} label='Mã bộ môn' 
+                    readOnly={this.props.permission && !this.props.permission.write} />
+                <FormTextBox type='text' className='col-md-6' ref={e => this.ten = e} label='Tên bộ môn (tiếng Việt)' 
+                    readOnly={this.props.permission && !this.props.permission.write} />
+                <FormTextBox type='text' className='col-md-6' ref={e => this.tenTiengAnh = e} label='Tên bộ môn (tiếng Anh)' 
+                    readOnly={this.props.permission && !this.props.permission.write} />
+                <FormTextBox type='text' className='col-md-6' ref={e => this.tenTiengAnh = e} label='Mã đơn vị' 
+                    readOnly={this.props.permission && !this.props.permission.write} />
+                <FormTextBox type='text' className='col-md-6' ref={e => this.qdThanhLap = e} label='Quyết định thành lập' 
+                    readOnly={this.props.permission && !this.props.permission.write} />
+                <FormTextBox type='text' className='col-md-6' ref={e => this.qdXoaTen = e} label='Quyết định xóa tên' 
+                    readOnly={this.props.permission && !this.props.permission.write} />
+                <FormTextBox type='text' className='col-md-12' ref={e => this.ghiChu = e} label='Ghi chú' 
+                    readOnly={this.props.permission && !this.props.permission.write} />
             </div>
-        );
+        });
     }
 }
 
 class DmBoMonImportPage extends AdminPage {
-    state = { dmBoMon: [], message: '', isDisplay: true };
-    modal = React.createRef();
+    state = { dmBoMon: [], message: '', isDisplay: true, displayState: 'import', listBoMon: [] };
 
     componentDidMount() {
         T.ready('/user/category');
@@ -142,15 +85,16 @@ class DmBoMonImportPage extends AdminPage {
 
     onSuccess = (response) => {
         this.setState({
-            dmBoMon: response.element,
-            message: <p className='text-center' style={{ color: 'green' }}>{response.element.length} hàng được tải lên thành công</p>,
-            isDisplay: false
+            dmBoMon: response.items,
+            message: <p className='text-center' style={{ color: 'green' }}>{response.items.length} hàng được tải lên thành công</p>,
+            isDisplay: false,
+            displayState: 'data'
         });
     };
 
     showEdit = (e, index, item) => {
         e.preventDefault();
-        this.modal.current.show(index, item);
+        this.modal.show(index, item);
     };
 
     update = (index, changes, done) => {
@@ -169,10 +113,26 @@ class DmBoMonImportPage extends AdminPage {
     };
 
     save = (e) => {
+        const doSave = (isOverride) => {
+            const data = this.state.dmBoMon;
+            this.props.createMultiDmBoMon(data, isOverride, (error, data) => {
+                if (error) T.notify('Cập nhật dữ liệu bị lỗi!', 'danger');
+                else {
+                    this.setState({ displayState: 'import', dmBoMon: [] });
+                    T.notify(`Cập nhật ${data && data.items ? data.items.length + ' ' : ''} bộ môn thành công!`, 'success');
+                    this.props.history.push('/user/dm-bo-mon');
+                }
+            });
+        };
         e.preventDefault();
-        this.props.createMultiDmBoMon(this.state.dmBoMon, () => {
-            T.notify('Cập nhật thành công!', 'success');
-            this.props.history.push('/user/dm-bo-mon');
+        T.confirm3('Cập nhật dữ liệu', 'Bạn có muốn <b>ghi đè</b> dữ liệu đang có bằng dữ liệu mới không?<br>Nếu không rõ, hãy chọn <b>Không ghi đè</b>!', 'warning', 'Ghi đè', 'Không ghi đè', isOverride => {
+            if (isOverride !== null) {
+                if (isOverride)
+                    T.confirm('Ghi đè dữ liệu', 'Bạn có chắc chắn muốn ghi đè dữ liệu?', 'warning', true, isConfirm => {
+                        if (isConfirm) doSave('TRUE');
+                    });
+                else doSave('FALSE');
+            }
         });
     };
 
@@ -187,26 +147,9 @@ class DmBoMonImportPage extends AdminPage {
         this.setState({ dmBoMon });
     }
 
-    renderFileUpload = () => (
-        <div style={{ display: this.state.isDisplay ? 'block' : 'none' }}>
-            <div className='app-title'>
-                <h1><i className='fa fa-user' /> Tải lên file Danh mục - bộ môn</h1>
-            </div>
-            <div className='row'>
-                <div className='col-12 col-md-6 offset-md-3'>
-                    <div className='tile'>
-                        <div className='tile-body'>
-                            <FileBox ref={this.fileBox} postUrl='/user/upload' uploadType='dmBoMonFile' ajax={true} userData='dmBoMonImportData' style={{ width: '100%', backgroundColor: '#fdfdfd' }} success={this.onSuccess} />
-                            {this.state.message}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    )
-
     render() {
-        const { dmBoMon } = this.state;
+        const { dmBoMon, displayState} = this.state,
+            permission = this.getUserPermission('dmBoMon', ['read', 'write', 'delete']);
         let table = 'Không có dữ liệu!';
         if (dmBoMon && dmBoMon.length > 0) {
             table = renderTable({
@@ -221,7 +164,6 @@ class DmBoMonImportPage extends AdminPage {
                         <th style={{ width: 'auto' }} nowrap='true'>Quyết định thành lập </th>
                         <th style={{ width: 'auto' }} nowrap='true'>Quyết định xóa tên</th>
                         <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        {/* <th style={{ width: 'auto' }}>Ghi chú</th> */}
                         <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
                     </tr>),
                 renderRow: (item, index) => (
@@ -233,169 +175,34 @@ class DmBoMonImportPage extends AdminPage {
                         <TableCell type='text' content={item.maDv ? item.maDv : ''} style={{ whiteSpace: 'nowrap' }} />
                         <TableCell type='text' content={item.qdThanhLap ? item.qdThanhLap : ''} style={{ whiteSpace: 'nowrap' }} />
                         <TableCell type='text' content={item.qdXoaTen ? item.qdXoaTen : ''} style={{ whiteSpace: 'nowrap' }} />
-                        <TableCell type='checkbox' content={item.kichHoat} onChanged={(e) => this.onChangeCheckBox(e, index)} />
-                        <TableCell type='buttons' content={item} onEdit={(e) => this.showEdit(e, index, item)} onDelete={(e) => this.delete(e, index)}></TableCell>
+                        <TableCell type='checkbox' content={item.kichHoat} permission={permission} 
+                            onChanged={e => this.onChangeCheckBox(e, index)} />
+                        <TableCell type='buttons' content={{ ...item, index: index }} permission={permission} 
+                            onEdit={() => this.modal.show({ ...item, index: index })} onDelete={(e) => this.delete(e, index)}></TableCell>
                     </tr>)
             });
         }
 
-        return (
-            <main className='app-content'>
-                {this.renderFileUpload()}
-                {dmBoMon && dmBoMon.length ? <div className='tile'>{table}</div> : null}
+        return this.renderPage({
+            icon: 'fa fa-list-alt',
+            title: 'Import Bộ môn ',
+            breadcrumb: [<Link key={0} to='/user/dm-bo-mon'>Danh mục Bộ môn</Link>, 'Import'],
+            content: <>
+                <FileBox postUrl='/user/upload' uploadType='DmBoMonFile' userData='DmBoMonFile' className='tile' 
+                    accept='.csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'
+                    style={{ width: '50%', margin: '0 auto', display: displayState == 'import' ? 'block' : 'none' }}
+                    ajax={true} success={this.onSuccess} error={this.onError} />
+                <div className='tile' style={{ display: displayState == 'import' ? 'none' : 'block' }}>{table}</div>
+                <EditModal ref={e => this.modal = e} permission={permission} update={this.update} />
+            </>,
+            onSave: displayState == 'data' ? (e) => this.save(e) : null,
+            onImport: displayState == 'data' ? () => this.setState({ displayState: 'import', items: null }) : null,
+            onExport: displayState == 'import' ? () => T.download('/api/dm-bo-mon/download-template') : null,
+            backRoute: '/user/dm-bo-mon',
 
-                <Link to='/user/dm-bo-mon' className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}><i className='fa fa-lg fa-reply' /></Link>
-                <button type='button' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.save}>
-                    <i className='fa fa-lg fa-save' />
-                </button>
-                <EditModal ref={this.modal} update={this.update} />
-            </main>
-        );
+        });
     }
 }
-// class DmBoMonImportPage extends React.Component {
-//     state = { dmBoMon: [], message: '', isDisplay: true };
-//     modal = React.createRef();
-
-//     componentDidMount() {
-//         T.ready('/user/category');
-//     }
-
-//     onSuccess = (response) => {
-//         this.setState({
-//             dmBoMon: response.element,
-//             message: <p className='text-center' style={{ color: 'green' }}>{response.element.length} hàng được tải lên thành công</p>,
-//             isDisplay: false
-//         });
-//     };
-
-//     showEdit = (e, index, item) => {
-//         e.preventDefault();
-//         this.modal.current.show(index, item);
-//     };
-
-//     update = (index, changes, done) => {
-//         const dmBoMon = this.state.dmBoMon, currentValue = dmBoMon[index];
-//         const updateValue = Object.assign({}, currentValue, changes);
-//         dmBoMon.splice(index, 1, updateValue);
-//         this.setState({ dmBoMon });
-//         done && done();
-//     };
-
-//     delete = (e, index) => {
-//         e.preventDefault();
-//         const dmBoMon = this.state.dmBoMon;
-//         dmBoMon.splice(index, 1);
-//         this.setState({ dmBoMon });
-//     };
-
-//     save = (e) => {
-//         e.preventDefault();
-//         this.props.createMultiDmBoMon(this.state.dmBoMon, () => {
-//             T.notify('Cập nhật thành công!', 'success');
-//             this.props.history.push('/user/dm-bo-mon');
-//         });
-//     };
-
-//     showUpload = (e) => {
-//         e.preventDefault();
-//         this.setState({ isDisplay: true });
-//     }
-
-//     onChangeCheckBox = (e, index) => {
-//         let { dmBoMon } = this.state;
-//         dmBoMon[index].kichHoat = dmBoMon[index].kichHoat === 1 ? 0 : 1;
-//         this.setState({ dmBoMon });
-//     }
-
-//     renderFileUpload = () => (
-//         <div style={{ display: this.state.isDisplay ? 'block' : 'none' }}>
-//             <div className='app-title'>
-//                 <h1><i className='fa fa-user' /> Tải lên file Danh mục - bộ môn</h1>
-//             </div>
-//             <div className='row'>
-//                 <div className='col-12 col-md-6 offset-md-3'>
-//                     <div className='tile'>
-//                         <div className='tile-body'>
-//                             <FileBox ref={this.fileBox} postUrl='/user/upload' uploadType='dmBoMonFile' ajax={true} userData='dmBoMonImportData' style={{ width: '100%', backgroundColor: '#fdfdfd' }} success={this.onSuccess} />
-//                             {this.state.message}
-//                         </div>
-//                     </div>
-//                 </div>
-//             </div>
-//         </div>
-//     )
-
-//     render() {
-//         const { dmBoMon } = this.state;
-//         let table = 'Không có dữ liệu!';
-//         if (dmBoMon && dmBoMon.length > 0) {
-//             table = (
-//                 <table className='table table-hover table-bordered table-responsive' style={{ maxHeight: '600px', overflow: 'scroll' }}>
-//                     <thead>
-//                         <tr>
-//                             <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-//                             <th style={{ width: 'auto' }}>Mã bộ môn </th>
-//                             <th style={{ width: '50%' }}>Tên bộ môn </th>
-//                             <th style={{ width: '50%' }}>Tên tiếng Anh</th>
-//                             <th style={{ width: 'auto' }} nowrap='true'>Mã đơn vị </th>
-//                             <th style={{ width: 'auto' }} nowrap='true'>Quyết định thành lập </th>
-//                             <th style={{ width: 'auto' }} nowrap='true'>Quyết định xóa tên</th>
-//                             <td style={{ width: 'auto' }} nowrap='true'>Kích hoạt</td>
-//                             {/* <th style={{ width: 'auto' }}>Ghi chú</th> */}
-//                             <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
-//                         </tr>
-//                     </thead>
-//                     <tbody>
-//                         {dmBoMon.map((item, index) => (
-//                             <tr key={index}>
-//                                 <td style={{ textAlign: 'right' }}>{index + 1}</td>
-//                                 <td>
-//                                     <a href='#' onClick={(e) => this.showEdit(e, index, item)}>{item.ma}</a>
-//                                 </td>
-//                                 <td nowrap='true'>{item.ten ? item.ten : ''}</td>
-//                                 <td nowrap='true'>{item.tenTiengAnh ? item.tenTiengAnh : ''}</td>
-//                                 <td nowrap='true'>{item.maDv ? item.maDv : ''}</td>
-//                                 <td nowrap='true'>{item.qdThanhLap ? item.qdThanhLap : ''}</td>
-//                                 <td nowrap='true'>{item.qdXoaTen ? item.qdXoaTen : ''}</td>
-//                                 <td className='toggle' style={{ textAlign: 'center' }}>
-//                                     <label>
-//                                         <input type='checkbox' checked={item.kichHoat} onChange={(e) => this.onChangeCheckBox(e, index)} />
-//                                         <span className='button-indecator' />
-//                                     </label>
-//                                 </td>
-//                                 {/* <td nowrap='true'>{item.ghiChu ? item.ghiChu : ''}</td> */}
-//                                 <td style={{ textAlign: 'center' }}>
-//                                     <div className='btn-group'>
-//                                         <a className='btn btn-primary' href='#' onClick={e => this.showEdit(e, index, item)}>
-//                                             <i className='fa fa-lg fa-edit' />
-//                                         </a>
-//                                         <a className='btn btn-danger' href='#' onClick={e => this.delete(e, index)}>
-//                                             <i className='fa fa-trash-o fa-lg' />
-//                                         </a>
-//                                     </div>
-//                                 </td>
-//                             </tr>
-//                         ))}
-//                     </tbody>
-//                 </table>
-//             );
-//         }
-
-//         return (
-//             <main className='app-content'>
-//                 {this.renderFileUpload()}
-//                 {dmBoMon && dmBoMon.length ? <div className='tile'>{table}</div> : null}
-
-//                 <Link to='/user/dm-bo-mon' className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}><i className='fa fa-lg fa-reply' /></Link>
-//                 <button type='button' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.save}>
-//                     <i className='fa fa-lg fa-save' />
-//                 </button>
-//                 <EditModal ref={this.modal} update={this.update} />
-//             </main>
-//         );
-//     }
-//}
 
 const mapStateToProps = () => ({});
 const mapActionsToProps = { createMultiDmBoMon };

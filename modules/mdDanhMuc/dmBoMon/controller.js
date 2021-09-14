@@ -67,31 +67,64 @@ module.exports = app => {
     });
 
     // Hook--------------------------------------------------------------------------------------------------------------------------------------------------------
-    app.uploadHooks.add('dmBoMonImportData', (req, fields, files, params, done) =>
-        app.permission.has(req, () => dmBoMonImportData(req, fields, files, params, done), done, 'dmBoMon:upload'));
 
-    const dmBoMonImportData = (req, fields, files, params, done) => {
-        if (fields.userData && fields.userData[0] && fields.userData[0] == 'dmBoMonImportData' && files.dmBoMonFile && files.dmBoMonFile.length > 0) {
-            const srcPath = files.dmBoMonFile[0].path;
-            app.excel.readFile(srcPath, workbook => {
-                if (workbook) {
-                    const worksheet = workbook.getWorksheet(1), element = [], totalRow = worksheet.lastRow.number;
-                    const handleUpload = (index = 2) => {
-                        const value = worksheet.getRow(index).values;
-                        if (value.length == 0 || index == totalRow + 1) {
-                            app.deleteFile(srcPath);
-                            done({ element });
-                        } else {
-                            element.push({ ma: value[1], ten: value[2], tenTiengAnh: value[3], maDv: value[4], qdThanhLap: value[5], qdXoaTen: value[6], kichHoat: value[7], ghiChu: value[8] });
-                            handleUpload(index + 1);
-                        }
-                    };
-                    handleUpload();
-                } else {
+    const dmBoMonImportData = (fields, files, done) => {
+        let worksheet = null;
+        new Promise((resolve, reject) => {
+            if (fields.userData && fields.userData[0] && fields.userData[0] == 'DmBoMonFile' && files.DmBoMonFile && files.DmBoMonFile.length) {
+                const srcPath = files.DmBoMonFile[0].path;
+                const workbook = app.excel.create();
+                workbook.xlsx.readFile(srcPath).then(() => {
                     app.deleteFile(srcPath);
-                    done({ error: 'Error' });
+                    worksheet = workbook.getWorksheet(1);
+                    worksheet ? resolve() : reject('Invalid excel file!');
+                });
+            }
+        }).then(() => {
+            let index = 1,
+                items = [];
+            while (true) {
+                index++;
+                let ma = worksheet.getCell('A' + index).value;
+                if (ma) {
+                    ma = ma.toString().trim();
+                    let ten = worksheet.getCell('B' + index).value ? worksheet.getCell('B' + index).value.toString().trim() : '',
+                        tenTiengAnh = worksheet.getCell('C' + index).value ? worksheet.getCell('C' + index).value.toString().trim() : '',
+                        maDv = worksheet.getCell('D' + index).value ? worksheet.getCell('D' + index).value.toString().trim() : '',
+                        qdThanhLap = worksheet.getCell('E' + index).value ? worksheet.getCell('E' + index).value.toString().trim() : '',
+                        qdXoaTen = worksheet.getCell('F' + index).value ? worksheet.getCell('F' + index).value.toString().trim() : '',
+                        kichHoat = worksheet.getCell('G' + index).value ? worksheet.getCell('G' + index).value.toString().trim() : '',
+                        ghiChu = worksheet.getCell('H' + index).value ? worksheet.getCell('H' + index).value.toString().trim() : '';
+                    kichHoat = Number(kichHoat) || 0;
+
+                    items.push({ ma, ten, tenTiengAnh, maDv, qdThanhLap, qdXoaTen, kichHoat, ghiChu});
+                } else {
+                    done({ items });
+                    break;
                 }
-            });
-        }
+            }
+        }).catch(error => done({ error }));
     };
+    app.uploadHooks.add('DmBoMonFile', (req, fields, files, params, done) => {
+        app.permission.has(req, () => dmBoMonImportData(fields, files, done), done, 'dmBoMon:write');
+    });
+
+    // Download Template ---------------------------------------------------------------------------------------------------------------------------------
+    app.get('/api/dm-bo-mon/download-template', app.permission.check('staff:login'), (req, res) => {
+        const workBook = app.excel.create();
+        const ws = workBook.addWorksheet('Danh_muc_bo_mon_Template');
+        const defaultColumns = [
+            { header: 'MÃ BỘ MÔN', key: 'ma', width: 15 },
+            { header: 'TÊN BỘ MÔN (TIẾNG VIỆT)', key: 'ten', width: 50 },
+            { header: 'TÊN BỘ MÔN (TIẾNG ANH)', key: 'tenTiengAnh', width: 50 },
+            { header: 'MÃ ĐƠN VỊ', key: 'maDv', width: 15 },
+            { header: 'QUYẾT ĐỊNH THÀNH LẬP', key: 'qdThanhLap', width: 30 },
+            { header: 'QUYẾT ĐỊNH XÓA TÊN', key: 'qdXoaTen', width: 30 },
+            { header: 'KÍCH HOẠT', key: 'kichHoat', width: 15 },
+            { header: 'GHI CHÚ', key: 'ghiChu', width: 50 },
+        ];
+        ws.columns = defaultColumns;
+        ws.getRow(1).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', horizontal: 'center' };
+        app.excel.attachment(workBook, res, 'Danh_muc_bo_mon_Template.xlsx');
+    });
 };
