@@ -20,9 +20,9 @@ class EditModal extends AdminModal {
         let { ma, ten, tenTiengAnh, maDv, qdThanhLap, qdXoaTen, kichHoat, ghiChu } = item ? item : { ma: '', ten: '', tenTiengAnh: '', maDv: '', qdThanhLap: '', qdXoaTen: '', kichHoat: false, ghiChu: '' };
         this.setState({ma, item});
         this.ma.value(ma);
-        this.ten.value(ten);
+        this.ten.value(ten ? ten : '');
         this.maDv.setVal(maDv);
-        this.tenTiengAnh.value(tenTiengAnh);
+        this.tenTiengAnh.value(tenTiengAnh ? tenTiengAnh : '');
         this.qdThanhLap.value(qdThanhLap ? qdThanhLap : '');
         this.qdXoaTen.value(qdXoaTen ? qdXoaTen : '');
         this.ghiChu.value(ghiChu ? ghiChu : '');
