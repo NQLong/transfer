@@ -2,18 +2,24 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { createDmBoMon, getDmBoMonPage, updateDmBoMon, deleteDmBoMon} from './redux';
-import { SelectAdapter_DmDonVi, getDmDonViAll} from 'modules/mdDanhMuc/dmDonVi/redux';
+import { getDmDonViAll} from 'modules/mdDanhMuc/dmDonVi/redux';
 import Pagination from 'view/component/Pagination';
-import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
-import { Select } from 'view/component/Input';
+import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox, FormSelect} from 'view/component/AdminPage';
 
 class EditModal extends AdminModal {
-    donViMapper = {};
+    DonViTable = [];
 
     componentDidMount() {
         $(document).ready(() => this.onShown(() => {
             !this.ma.value() ? this.ma.focus() : this.ten.focus();
         }));
+        this.props.getDataSelect(items => {
+            if (items) {
+                this.DonViTable = [];
+                items.forEach(item => this.DonViTable.push({ 'id': item.ma, 'text': item.ten }));
+            }
+        });
+
     }
 
     onShow = (item) => {
@@ -21,7 +27,7 @@ class EditModal extends AdminModal {
         this.setState({ma, item});
         this.ma.value(ma);
         this.ten.value(ten ? ten : '');
-        this.maDv.setVal(maDv);
+        this.maDv.value(maDv);
         this.tenTiengAnh.value(tenTiengAnh ? tenTiengAnh : '');
         this.qdThanhLap.value(qdThanhLap ? qdThanhLap : '');
         this.qdXoaTen.value(qdXoaTen ? qdXoaTen : '');
@@ -37,7 +43,7 @@ class EditModal extends AdminModal {
             ma: this.ma.value(),
             ten: this.ten.value(),
             tenTiengAnh: this.tenTiengAnh.value(), 
-            maDv: this.maDv.getFormVal().data,
+            maDv: this.maDv.value(),
             qdThanhLap: this.qdThanhLap.value(),
             qdXoaTen: this.qdXoaTen.value(),
             kichHoat: this.kichHoat.value() ? 1 : 0,
@@ -67,9 +73,7 @@ class EditModal extends AdminModal {
                     onChange={value => this.changeKichHoat(value ? 1 : 0)} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.ten = e} label='Tên bộ môn (tiếng Việt)' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.tenTiengAnh = e} label='Tên bộ môn (tiếng Anh)' readOnly={readOnly} />
-                <div className='col-12 col-md-6'>
-                    <Select ref={e => this.maDv = e} adapter={SelectAdapter_DmDonVi} label='Mã đơn vị' required />
-                </div>
+                <FormSelect className='col-12 col-md-6' ref={e => this.maDv = e} data={this.DonViTable} label='Mã đơn vị' required />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.qdThanhLap = e} label='Quyết định thành lập' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.qdXoaTen = e} label='Quyết định xóa tên' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-12' ref={e => this.ghiChu = e} label='Ghi chú' readOnly={readOnly} />
@@ -152,7 +156,7 @@ class DmBoMonPage extends AdminPage {
                 <div className='tile'>{table}</div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} 
                     getPage={this.props.getDmBoMonPage} />
-                <EditModal ref={e => this.modal = e} permission={permission}
+                <EditModal ref={e => this.modal = e} permission={permission} getDataSelect = {this.props.getDmDonViAll}
                     create={this.props.createDmBoMon} update={this.props.updateDmBoMon} permissions={currentPermissions} />
             </>,
             backRoute: '/user/category',
@@ -163,5 +167,5 @@ class DmBoMonPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, dmBoMon: state.dmBoMon, dmDonVi: state.dmDonVi });
-const mapActionsToProps = { getDmDonViAll, createDmBoMon, getDmBoMonPage, SelectAdapter_DmDonVi, updateDmBoMon, deleteDmBoMon };
+const mapActionsToProps = { getDmDonViAll, createDmBoMon, getDmBoMonPage, updateDmBoMon, deleteDmBoMon };
 export default connect(mapStateToProps, mapActionsToProps)(DmBoMonPage);
