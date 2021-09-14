@@ -99,6 +99,7 @@ export function createDmNghiCongTac(dmNghiCongTac, done) {
                 console.error(`POST: ${url}.`, data.error);
             } else {
                 dispatch(getDmNghiCongTacAll());
+                T.notify('Tạo mới nghỉ công tác thành công!', 'success');
                 if (done) done(data);
             }
         }, (error) => T.notify('Tạo mới một nghỉ công tác bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
@@ -114,6 +115,7 @@ export function updateDmNghiCongTac(ma, changes, done) {
                 console.error(`PUT: ${url}.`, data.error);
             } else {
                 done && done(data.item);
+                T.notify('Cập nhật nghỉ công tác thành công!', 'success');
                 dispatch(getDmNghiCongTacAll());
             }
         }, (error) => T.notify('Cập nhật dữ liệu nghỉ công tác bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
@@ -131,7 +133,7 @@ export function deleteDmNghiCongTac(ma, done) {
                 T.alert('Xóa nghỉ công tác thành công!', 'success', false, 800);
                 dispatch(getDmNghiCongTacAll());
             }
-            done && done();
+            done && done(data.item);
         }, () => T.notify('Xóa nghỉ công tác bị lỗi!', 'danger'));
     };
 }

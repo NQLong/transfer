@@ -100,7 +100,6 @@ class DmNgachCdnnPage extends AdminPage {
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } =
             this.props.dmNgachCdnn && this.props.dmNgachCdnn.page ?
                 this.props.dmNgachCdnn.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: '', list: [] };
-        console.log(pageCondition);
         const table = !(list && list.length > 0) ? 'Không có dữ liệu Ngạch chức năng nghề nghiệp' :
             renderTable({
                 getDataSource: () => list, stickyHead: false,

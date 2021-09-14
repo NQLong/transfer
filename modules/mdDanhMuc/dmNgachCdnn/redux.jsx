@@ -56,7 +56,7 @@ export function getDmNgachCdnnPage(pageNumber, pageSize, pageCondition, done) {
                 if (done) done(data.page);
                 dispatch({ type: DmNgachCdnnGetPage, page: data.page });
             }
-        });
+        }, () => T.notify('Lấy danh sách chức danh nghề nghiệp bị lỗi!', 'danger'));
     };
 }
 

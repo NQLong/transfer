@@ -97,6 +97,7 @@ export function createDmNguonKinhPhiTrongNuoc(item, done) {
                 T.notify('Tạo nguồn kinh phí trong nước bị lỗi!', 'danger');
                 console.error(`POST: ${url}.`, data.error);
             } else {
+                T.notify('Tạo mới thông tin nguồn kinh phí trong nước thành công!', 'success');
                 dispatch(getDmNguonKinhPhiTrongNuocPage());
                 if (done) done(data);
             }
@@ -129,6 +130,7 @@ export function updateDmNguonKinhPhiTrongNuoc(ma, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật thông tin nguồn kinh phí trong nước thành công!', 'success');
+                done && done(data.item);
                 dispatch(getDmNguonKinhPhiTrongNuocPage());
             }
         }, () => T.notify('Cập nhật thông tin nguồn kinh phí trong nước bị lỗi!', 'danger'));
