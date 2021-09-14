@@ -1,17 +1,24 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { getDmKhuVucPage, createDmKhuVuc, updateDmKhuVuc, deleteDmKhuVuc } from './redux';
-import { getDmChauAll, SelectAdapter_DmChau } from 'modules/mdDanhMuc/dmChau/redux';
+import { getDmChauAll } from 'modules/mdDanhMuc/dmChau/redux';
 import Pagination from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
-import { Select } from 'view/component/Input';
+import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormCheckbox, FormSelect } from 'view/component/AdminPage';
 
 class EditModal extends AdminModal {
+    chauTable = [];
     componentDidMount() {
         $(document).ready(() => this.onShown(() => {
             !this.ma.value() ? this.ma.focus() : this.ten.focus();
         }));
+        this.props.getDataSelect(items => {
+            if (items) {
+                this.chauTable = [];
+                items.forEach(item => this.chauTable.push({ 'id': item.ma, 'text': item.ten }));
+            }
+
+        });
     }
 
     onShow = (item) => {
@@ -19,10 +26,12 @@ class EditModal extends AdminModal {
         this.setState({ ma, item });
         this.ma.value(ma);
         this.ten.value(ten);
-        this.territory.value(territory);
-        this.kichHoat.value(kichHoat);
-        this.maChau.setVal(maChau);
+        this.territory.value(territory ? territory : '');
+        this.kichHoat.value(kichHoat ? 1 : 0);
+        this.maChau.value(maChau);
     };
+
+    changeKichHoat = value => this.kichHoat.value(value ? 1 : 0) || this.kichHoat.value(value);
 
     onSubmit = (e) => {
         e.preventDefault();
@@ -30,7 +39,7 @@ class EditModal extends AdminModal {
             ma: this.ma.value(),
             ten: this.ten.value(),
             territory: this.territory.value(),
-            maChau: this.maChau.getFormVal().data,
+            maChau: this.maChau.value(),
             kichHoat: this.kichHoat.value() ? 1 : 0,
         };
         if (!this.state.ma && !this.ma.value()) {
@@ -44,7 +53,7 @@ class EditModal extends AdminModal {
             this.territory.focus();
         }
         else {
-            this.state.ma ? this.props.update({ma: this.state.ma}, changes, this.hide) : this.props.create(changes, this.hide);
+            this.state.ma ? this.props.update({ ma: this.state.ma }, changes, this.hide) : this.props.create(changes, this.hide);
         }
     };
 
@@ -57,11 +66,9 @@ class EditModal extends AdminModal {
                 <FormTextBox type='text' className='col-12 col-md-6' ref={e => this.ma = e} label='Mã khu vực' readOnly={this.state.ma ? true : readOnly} placeholder='Mã khu vực' required />
                 <FormTextBox type='text' className='col-12 col-md-6' ref={e => this.ten = e} label='Tên khu vực' readOnly={readOnly} placeholder='Tên khu vực' required />
                 <FormTextBox type='text' className='col-12 col-md-6' ref={e => this.territory = e} label='Tên tiếng Anh' readOnly={readOnly} placeholder='Tên tiếng Anh' required />
-                <div className='col-12 col-md-6'>
-                    <Select ref={e => this.maChau = e} adapter={SelectAdapter_DmChau} label='Châu' required />
-                </div>
+                <FormSelect className='col-12 col-md-6' ref={e => this.maChau = e} data={this.chauTable} label='Châu' required />
                 <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
-                    onChange={() => !readOnly && this.setState({ kichHoat: !this.state.kichHoat })} />
+                    onChange={value => this.changeKichHoat(value ? 1 : 0)} />
             </div>
         }
         );
@@ -125,8 +132,8 @@ class dmKhuVucAdminPage extends AdminPage {
                         <TableCell type='link' content={item.ten ? item.ten : ''} onClick={() => this.modal.show(item)} />
                         <TableCell type='text' content={item.territory ? item.territory : ''} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={this.chauMapper && this.chauMapper[item.maChau] ? this.chauMapper[item.maChau] : ''} />
-                        <TableCell type='checkbox' content={item.kichHoat} permission={permission}
-                            onChanged={value => this.props.updateDmKhuVuc({ma: item.ma}, { kichHoat: value ? 1 : 0 })} />
+                        <TableCell type='checkbox' content={item.kichHoat} permission={permission} 
+                            onChanged={value => this.props.updateDmKhuVuc({ ma: item.ma }, { kichHoat: value ? 1 : 0 })} />
                         <TableCell type='buttons' content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={this.delete} />
                     </tr>
@@ -144,7 +151,7 @@ class dmKhuVucAdminPage extends AdminPage {
             content: <>
                 <div className='tile'>{table}</div>
                 <Pagination style={{ marginLeft: '65px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.props.getDmKhuVucPage} />
-                <EditModal ref={e => this.modal = e} permission={permission}
+                <EditModal ref={e => this.modal = e} permission={permission} getDataSelect={this.props.getDmChauAll}
                     create={this.props.createDmKhuVuc} update={this.props.updateDmKhuVuc} permissions={currentPermissions} />
             </>,
             backRoute: '/user/category',

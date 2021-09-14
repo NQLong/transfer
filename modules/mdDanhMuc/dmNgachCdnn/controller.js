@@ -14,10 +14,16 @@ module.exports = app => {
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/danh-muc/ngach-cdnn/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
-        const pageNumber = parseInt(req.params.pageNumber),
+        let pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
-        app.model.dmNgachCdnn.getPage(pageNumber, pageSize, {}, (error, page) =>
-            res.send({ error, page }));
+        let searchTerm = { statement: null };
+        if (req.query.condition) {
+            searchTerm = {
+                statement: 'lower(ma) LIKE :searchText OR lower(ten) LIKE :searchText',
+                parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
+            };
+        }
+        app.model.dmNgachCdnn.getPage(pageNumber, pageSize, searchTerm, (error, page) => res.send({ error, page }));
     });
 
     app.get('/api/danh-muc/ngach-cdnn/all', app.permission.check('user:login'), (req, res) => {

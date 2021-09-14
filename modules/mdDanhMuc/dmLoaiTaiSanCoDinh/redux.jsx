@@ -102,6 +102,7 @@ export function createDmLoaiTaiSanCoDinh(item, done) {
                 console.error(`POST: ${url}.`, data.error);
             } else {
                 dispatch(getDmLoaiTaiSanCoDinhPage());
+                T.notify('Tạo mới thông tin loại tài sản cố định thành công!', 'success');
                 if (done) done(data);
             }
         }, (error) => T.notify('Tạo loại tài sản cố định bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
@@ -134,6 +135,7 @@ export function updateDmLoaiTaiSanCoDinh(ma, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật thông tin loại tài sản cố định thành công!', 'success');
+                done && done(data.item);
                 dispatch(getDmLoaiTaiSanCoDinhPage());
             }
         }, (error) => T.notify('Cập nhật thông tin loại tài sản cố định bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
