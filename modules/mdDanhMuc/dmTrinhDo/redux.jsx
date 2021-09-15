@@ -99,6 +99,7 @@ export function createDmTrinhDo(dmTrinhDo, done) {
                 console.error(`POST: ${url}.`, data.error);
             } else {
                 dispatch(getDmTrinhDoAll());
+                T.notify('Tạo mới dữ liệu trình độ thành công!', 'success');
                 if (done) done(data);
             }
         }, () => T.notify('Tạo mới một trình độ bị lỗi!', 'danger'));
@@ -114,6 +115,7 @@ export function updateDmTrinhDo(ma, changes, done) {
                 console.error(`PUT: ${url}.`, data.error);
             } else {
                 done && done(data.item);
+                T.notify('Cập nhật dữ liệu trình độ thành công!', 'success');
                 dispatch(getDmTrinhDoAll());
             }
         }, () => T.notify('Cập nhật dữ liệu trình độ bị lỗi!', 'danger'));
