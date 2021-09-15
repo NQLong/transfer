@@ -58,16 +58,17 @@ export function getDmHinhThucKyLuatAll(done) {
 }
 
 T.initPage('pageDmHinhThucKyLuat');
-export function getDmHinhThucKyLuatPage(pageNumber, pageSize, done) {
-    const page = T.updatePage('pageDmHinhThucKyLuat', pageNumber, pageSize);
+export function getDmHinhThucKyLuatPage(pageNumber, pageSize, pageCondition, done) {
+    const page = T.updatePage('pageDmHinhThucKyLuat', pageNumber, pageSize, pageCondition);
     return dispatch => {
         const url = `/api/dm-hinh-thuc-ky-luat/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, data => {
+        T.get(url, { condition: page.pageCondition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách hình thức kỷ luật bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                if (done) done(data.page);                
                 dispatch({ type: DmhinhThucKyLuatGetPage, page: data.page });
             }
         }, () => T.notify('Lấy danh sách hình thức kỷ luật bị lỗi!', 'danger'));
@@ -100,7 +101,8 @@ export function createDmHinhThucKyLuat(item, done) {
                 }
                 console.error(`POST: ${url}.`, data.error);
             } else {
-                dispatch(getDmHinhThucKyLuatAll());
+                T.notify('Tạo hình thức kỷ luật thành công!', 'success');
+                dispatch(getDmHinhThucKyLuatPage());
                 if (done) done(data);
             }
         }, () => T.notify('Tạo hình thức kỷ luật bị lỗi!', 'danger'));
@@ -116,7 +118,7 @@ export function deleteDmHinhThucKyLuat(ma) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('Hình thức kỷ luật đã xóa thành công!', 'success', false, 800);
-                dispatch(getDmHinhThucKyLuatAll());
+                dispatch(getDmHinhThucKyLuatPage());
             }
         }, () => T.notify('Xóa hình thức kỷ luật bị lỗi!', 'danger'));
     };
@@ -132,7 +134,8 @@ export function updateDmHinhThucKyLuat(ma, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật thông tin hình thức kỷ luật thành công!', 'success');
-                dispatch(getDmHinhThucKyLuatAll());
+                done && done(data.item);
+                dispatch(getDmHinhThucKyLuatPage());
             }
         }, () => T.notify('Cập nhật thông tin hình thức kỷ luật bị lỗi!', 'danger'));
     };
