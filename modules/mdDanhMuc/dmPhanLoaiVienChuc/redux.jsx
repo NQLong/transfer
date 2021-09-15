@@ -43,7 +43,7 @@ export default function dmPhanLoaiVienChucReducer(state = null, data) {
 }
 
 // Actions ------------------------------------------------------------------------------------------------------------
-T.initPage('dmPhanLoaiVienChucPage', true);
+T.initPage('dmPhanLoaiVienChucPage');
 export function getDmPhanLoaiVienChucPage(pageNumber, pageSize, pageCondition, done) {
     const page = T.updatePage('dmPhanLoaiVienChucPage', pageNumber, pageSize, pageCondition);
     return dispatch => {
@@ -99,6 +99,7 @@ export function createDmPhanLoaiVienChuc(dmPhanLoaiVienChuc, done) {
                 console.error(`POST: ${url}.`, data.error);
             } else {
                 dispatch(getDmPhanLoaiVienChucPage());
+                T.notify('Tạo mới dữ liệu phân loại viên chức thành công!', 'success');
                 if (done) done(data);
             }
         }, () => T.notify('Tạo mới một phân loại viên chức bị lỗi!', 'danger'));
@@ -114,6 +115,7 @@ export function updateDmPhanLoaiVienChuc(ma, changes, done) {
                 console.error(`PUT: ${url}.`, data.error);
             } else {
                 done && done(data.item);
+                T.notify('Cập nhật dữ liệu phân loại viên chức thành công!', 'success');
                 dispatch(getDmPhanLoaiVienChucPage());
             }
         }, () => T.notify('Cập nhật dữ liệu phân loại viên chức bị lỗi!', 'danger'));
