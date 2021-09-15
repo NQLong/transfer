@@ -129,6 +129,7 @@ export function updateDmCoSo(ma, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật thông tin cơ sở trường đại học thành công!', 'success');
+                done && done(data.item);
                 dispatch(getDmCoSoAll());
             }
         }, () => T.notify('Cập nhật thông tin cơ sở trường đại học bị lỗi!', 'danger'));

@@ -15,8 +15,14 @@ module.exports = app => {
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/danh-muc/dien-chinh-sach/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize),
-            condition = req.query.condition ? req.query.condition : {};
+            pageSize = parseInt(req.params.pageSize);
+        let condition = { statement: null };
+        if (req.query.condition) {
+            condition = {
+                statement: 'lower(ma) LIKE :searchText OR lower(ten) LIKE :searchText',
+                parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
+            };
+        }
         app.model.dmDienChinhSach.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
     });
 
