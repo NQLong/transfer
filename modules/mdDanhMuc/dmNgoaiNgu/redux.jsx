@@ -58,16 +58,17 @@ export function getDmNgoaiNguAll(condition, done) {
 }
 
 T.initPage('pageDmNgoaiNgu');
-export function getDmNgoaiNguPage(pageNumber, pageSize, done) {
-    const page = T.updatePage('pageDmNgoaiNgu', pageNumber, pageSize);
+export function getDmNgoaiNguPage(pageNumber, pageSize, pageCondition, done) {
+    const page = T.updatePage('pageDmNgoaiNgu', pageNumber, pageSize, pageCondition);
     return dispatch => {
         const url = `/api/danh-muc/ngoai-ngu/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, data => {
+        T.get(url, { condition: page.pageCondition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách ngoại ngữ bị lỗi!', 'danger');
                 console.error(`GET ${url}. ${data.error}`);
             } else {
-                if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                if (done) done(data.page);                     
                 dispatch({ type: DmNgoaiNguGetPage, page: data.page });
             }
         }, () => T.notify('Lấy danh sách ngoại ngữ bị lỗi!', 'danger'));
@@ -98,7 +99,7 @@ export function createDmNgoaiNgu(item, done) {
                 console.error(`POST: ${url}.`, data.error);
             } else {
                 T.notify('Tạo ngoại ngữ thành công!', 'success');
-                dispatch(getDmNgoaiNguAll());
+                dispatch(getDmNgoaiNguPage());
                 if (done) done(data);
             }
         }, () => T.notify('Tạo ngoại ngữ bị lỗi!', 'danger'));
@@ -114,7 +115,7 @@ export function deleteDmNgoaiNgu(ma) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('Tổ chức cơ sở xuất bản đã xóa thành công!', 'success', false, 800);
-                dispatch(getDmNgoaiNguAll());
+                dispatch(getDmNgoaiNguPage());
             }
         }, () => T.notify('Xóa tổ chức cơ sở xuất bản bị lỗi!', 'danger'));
     };
@@ -130,7 +131,8 @@ export function updateDmNgoaiNgu(ma, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật ngoại ngữ thành công!', 'success');
-                dispatch(getDmNgoaiNguAll());
+                done && done(data.item);
+                dispatch(getDmNgoaiNguPage());
             }
         }, () => T.notify('Cập nhật ngoại ngữ bị lỗi!', 'danger'));
     };

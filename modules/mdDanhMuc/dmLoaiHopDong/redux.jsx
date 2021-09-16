@@ -58,20 +58,20 @@ export function getdmLoaiHopDongAll(condition, done) {
 }
 
 T.initPage('pageDmLoaiHopDong');
-export function getDmLoaiHopDongPage(pageNumber, pageSize, done) {
-    const page = T.updatePage('pageDmLoaiHopDong', pageNumber, pageSize);
+export function getDmLoaiHopDongPage(pageNumber, pageSize, pageCondition, done) {
+    const page = T.updatePage('pageDmLoaiHopDong', pageNumber, pageSize, pageCondition);
     return dispatch => {
         const url = `/api/danh-muc/loai-hop-dong/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, data => {
+        T.get(url, { condition: page.pageCondition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách loại hợp đồng bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                if (done) done(data.page);                
                 dispatch({ type: DmLoaiDonViGetPage, page: data.page });
             }
-        }, (error) => T.notify('Lấy danh sách loại hợp đồng bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
-    };
+        }, (error) => T.notify('Lấy danh sách lĩnh vực kinh doanh bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));    };
 }
 
 export function getDmLoaiHopDong(ma, done) {
@@ -100,7 +100,8 @@ export function createDmLoaiHopdong(item, done) {
                 }
                 console.error(`POST: ${url}.`, data.error);
             } else {
-                dispatch(getdmLoaiHopDongAll());
+                T.notify('Tạo lọai hợp đồng thành công!', 'success');
+                dispatch(getDmLoaiHopDongPage());
                 if (done) done(data);
             }
         }, (error) => T.notify('Tạo loại hợp đồng bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
@@ -115,8 +116,8 @@ export function deleteDmLoaiHopDong(ma) {
                 T.notify('Xóa danh mục  bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
-                T.alert('Khoa đã xóa thành công!', 'success', false, 800);
-                dispatch(getdmLoaiHopDongAll());
+                T.alert('Loại hợp đồng đã xóa thành công!', 'success', false, 800);
+                dispatch(getDmLoaiHopDongPage());
             }
         }, (error) => T.notify('Xóa loại hợp đồng bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
@@ -132,7 +133,8 @@ export function updateDmLoaiHopDong(ma, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật thông tin loại hợp đồng thành công!', 'success');
-                dispatch(getdmLoaiHopDongAll());
+                dispatch(getDmLoaiHopDongPage());
+                done && done(data.item);
             }
         }, (error) => T.notify('Cập nhật thông tin loại hợp đồng bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
