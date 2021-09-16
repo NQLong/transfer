@@ -47,17 +47,16 @@ class EditModal extends AdminModal {
 
     changeKichHoat = value => this.kichHoat.value(value ? 1 : 0) || this.kichHoat.value(value);
 
-
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
             title: this.state.ma ? 'Cập nhật châu' : 'Tạo mới châu',
             body: <div className = 'row'>
-               <FormTextBox type='text' className='col-md-6' ref={e => this.ma = e} label='Mã châu' 
+               <FormTextBox type='text' className='col-md-12' ref={e => this.ma = e} label='Mã châu' 
                     readOnly={this.state.ma ? true : readOnly} required />
-                <FormTextBox type='text' className='col-md-6' ref={e => this.ten = e} label='Tên châu' 
+                <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên châu' 
                     readOnly={readOnly} required />
-                <FormTextBox type='text' className='col-md-6' ref={e => this.territory = e} label='Territory' 
+                <FormTextBox type='text' className='col-md-12' ref={e => this.territory = e} label='Territory' 
                     readOnly={readOnly} required />
                 <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} 
                     readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
@@ -76,9 +75,9 @@ class DmChauPage extends AdminPage {
         });
     }
 
-    showModal = (e, item) => {
+    showModal = (e) => {
         e.preventDefault();
-        this.modal.show(item);
+        this.modal.show();
     };
 
     delete = (e, item) => {
@@ -96,7 +95,6 @@ class DmChauPage extends AdminPage {
             this.props.dmChau.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null };
     
         let table = 'Không có dữ liệu!';
-            //items = this.props.dmChau && this.props.dmChau.items;
         if (list && list.length > 0) {
             table = renderTable({
                 getDataSource: () => list, stickyHead: false,
@@ -112,12 +110,13 @@ class DmChauPage extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' content={item.ma ? item.ma : ''} />
-                        <TableCell type="link" content={item.ten ? item.ten : ''} onClick={e => this.edit(e, item)} />
+                        <TableCell type="link" content={item.ten ? item.ten : ''} 
+                            onClick={() => this.modal.show(item)} />
                         <TableCell type='text' content={item.territory ? item.territory : ''} />
                         <TableCell type='checkbox' content={item.kichHoat} permission={permission}
                             onChanged={() => this.props.updateDmChau(item.ma, { kichHoat: item.kichHoat == 1 ? 0 : 1 })} />
-                        <TableCell type='buttons' content={item} permission={permission} onEdit={e => this.edit(e, item)}
-                            onDelete={e => this.delete(e, item)} />
+                        <TableCell type='buttons' content={item} permission={permission} 
+                            onEdit={() => this.modal.show(item)} onDelete={e => this.delete(e, item)} />
                     </tr>
                 )
             });

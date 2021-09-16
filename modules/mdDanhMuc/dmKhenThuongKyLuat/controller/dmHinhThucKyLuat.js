@@ -16,7 +16,14 @@ module.exports = app => {
     app.get('/api/dm-hinh-thuc-ky-luat/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
-        app.model.dmHinhThucKyLuat.getPage(pageNumber, pageSize, {}, (error, page) => res.send({ error, page }));
+        let condition = { statement: null };
+        if (req.query.condition) {
+            condition = {
+                statement: 'lower(ma) LIKE :searchText OR lower(dien_giai) LIKE :searchText',
+                parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
+            };
+        }
+        app.model.dmHinhThucKyLuat.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
     });
 
     app.get('/api/dm-hinh-thuc-ky-luat/all', app.permission.check('user:login'), (req, res) => {
