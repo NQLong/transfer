@@ -126,7 +126,7 @@ class AdminHeader extends AdminPage {
             isAdmin = this.props.system && this.props.system.user && this.props.system.user.roles.some(role => role.name == 'admin');
         return [
             <header key={0} className='app-header'>
-                <Link className='app-header__logo' to='/user'>HCMUT</Link>
+                <Link className='app-header__logo' to='/user'>HCMUSSH</Link>
                 <a className='app-sidebar__toggle' href='#' data-toggle='sidebar' aria-label='Hide Sidebar' />
                 <ul className='app-nav'>
                     {isAdmin || isDebug ?

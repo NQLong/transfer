@@ -6,90 +6,6 @@ import Editor from 'view/component/CkEditor4';
 import { AdminPage, TableCell, renderTable } from 'view/component/AdminPage';
 import AdminSearchBox from 'view/component/AdminSearchBox';
 import { OverlayLoading } from 'view/component/Pagination';
-// class EditModal extends AdminModal {
-//     state = { active: true };
-//     modal = React.createRef();
-//     editorVi = React.createRef();
-//     editorEn = React.createRef();
-
-//     componentDidMount() {
-//         $(document).ready(() => setTimeout(() => {
-//             $(this.modal.current).on('shown.bs.modal', () => {
-//                 $('a[href=\'#dmCoSoTabVi\']').tab('show');
-//                 $('#dmCoSoNameVi').focus();
-//             });
-//         }, 250));
-//     }
-//     onShow = (item) => {
-//         const { ma, ten, diaChi, tenVietTat, moTa, kichHoat } = item ? item : { ma: null, ten: '', diaChi: '', tenVietTat: '', moTa: '', kichHoat: true };
-//         const name = T.language.parse(ten, true);
-//         const address = T.language.parse(diaChi, true);
-//         const abbreviation = T.language.parse(tenVietTat, true);
-//         const description = T.language.parse(moTa, true);
-
-//         $('#dmCoSoNameVi').val(name.vi);
-//         $('#dmCoSoNameEn').val(name.en);
-//         $('#dmCoSoAddressVi').val(address.vi);
-//         $('#dmCoSoAddressEn').val(address.en);
-//         $('#dmCoSoAbbreviationVi').val(abbreviation.vi);
-//         $('#dmCoSoAbbreviationEn').val(abbreviation.en);
-//         this.editorVi.current.html(description.vi);
-//         this.editorEn.current.html(description.en);
-//         this.setState({ active: kichHoat == 1 });
-
-//         $(this.modal.current).attr('data-ma', ma).modal('show');
-//     }
-//     onSubmit = (e) => {
-//         e.preventDefault();
-//         const maCoSo = $(this.modal.current).attr('data-ma'),
-//             changes = {
-//                 ten: { vi: $('#dmCoSoNameVi').val().trim(), en: $('#dmCoSoNameEn').val().trim() },
-//                 diaChi: { vi: $('#dmCoSoAddressVi').val().trim(), en: $('#dmCoSoAddressEn').val().trim() },
-//                 tenVietTat: { vi: $('#dmCoSoAbbreviationVi').val().trim(), en: $('#dmCoSoAbbreviationEn').val().trim() },
-//                 moTa: { vi: this.editorVi.current.html(), en: this.editorEn.current.html() },
-//                 kichHoat: this.state.active ? '1' : '0',
-//             };
-
-//         if (changes.ten.vi == '') {
-//             T.notify('Tên cơ sở bị trống!', 'danger');
-//             $('a[href=\'#dmCoSoTabVi\']').tab('show');
-//             $('#dmCoSoNameVi').focus();
-//         } else if (changes.ten.en == '') {
-//             T.notify('Tên cơ sở bị trống!', 'danger');
-//             $('a[href=\'#dmCoSoTabEn\']').tab('show');
-//             $('#dmCoSoNameEn').focus();
-//         } else {
-//             changes.ten = JSON.stringify(changes.ten);
-//             changes.diaChi = JSON.stringify(changes.diaChi);
-//             changes.tenVietTat = JSON.stringify(changes.tenVietTat);
-//             changes.moTa = JSON.stringify(changes.moTa);
-//             if (maCoSo) {
-//                 this.props.updateDmCoSo(maCoSo, changes);
-//             } else {
-//                 this.props.createDmCoSo(changes);
-//             }
-//             $(this.modal.current).modal('hide');
-//         }
-//     }
-//     render = () => {
-//         const readOnly = this.props.readOnly;
-//         return this.renderModal({
-//             title: this.state.ma ? 'Cập nhật chức vụ' : 'Tạo mới cơ sơ',
-//             body: <div className='row'>
-//                 <FormTextBox className='col-md-12' ref={e => this.ma = e} label='Mã' readOnly={this.state.ma ? true : readOnly} required />
-//                 <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên' readOnly={readOnly} required />
-//                 {this.state.listChucVu.length > 1 ?
-//                     <FormSelect ref={e => this.loaiChucVu = e} className='col-md-12' minimumResultsForSearch={-1} label='Loại chức vụ' data={this.state.listChucVu} readOnly={readOnly} required />
-//                     : null
-//                 }
-//                 <FormTextBox type='number' className='col-md-12' ref={e => this.phuCap = e} label='Phụ cấp' readOnly={readOnly} step={0.01} />
-//                 <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} onChange={value => this.changeKichHoat(value ? 1 : 0)} />
-//                 <FormTextBox type='text' className='col-md-12' ref={e => this.ghiChu = e} label='Ghi chú' readOnly={readOnly} />
-//             </div>,
-//         });
-//     }
-
-// }
 class EditModal extends React.Component {
     state = { active: true };
     modal = React.createRef();
@@ -292,7 +208,7 @@ class DmCoSoPage extends AdminPage {
         return (
             <main className='app-content'>
                 <div className='app-title'>
-                    <h1><i className='fa fa-users' /> Cán bộ</h1>
+                    <h1><i className='fa fa-users' /> Cơ sở</h1>
                     <AdminSearchBox ref={this.searchBox} getPage={this.props.getStaffPage} setSearching={value => this.setState({ searching: value })} />
                 </div>
                 <div className='tile'>
