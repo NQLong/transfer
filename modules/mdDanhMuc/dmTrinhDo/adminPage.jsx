@@ -5,69 +5,66 @@ import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
 
 class EditModal extends AdminModal {
-    modal = React.createRef();
-    state = { kichHoat: true }
-
+    componentDidMount() {
+        $(document).ready(() => this.onShown(() => {
+            !this.ma.value() ? this.ma.focus() : this.ten.focus();
+        }));
+    }
+    
     onShow = (item) => {
-        let { ma, tenTiengAnh, vietTat, vietTatTiengAnh, kichHoat } = item ? item : { ma: null, tenTiengAnh: '', vietTat: '', vietTatTiengAnh: '', kichHoat: 1 };
-
+        let { ma,ten, tenTiengAnh, vietTat, vietTatTiengAnh, kichHoat } = item ? item : { ma: '', ten: '', tenTiengAnh: '', vietTat: '', vietTatTiengAnh: '', kichHoat: 1 };
+        this.setState({ ma, item });
         this.ma.value(ma);
-        this.ten.value(tenTiengAnh);
-        this.vietTat.value(vietTat);
-        this.vietTatTiengAnh.value(vietTatTiengAnh);
-        this.kichHoat.value(kichHoat);
-        this.setState({ kichHoat });
-
-        $(this.modal).attr('data-ma', ma).modal('show');
+        this.ten.value(ten);
+        this.tenTiengAnh.value(tenTiengAnh);
+        this.vietTat.value(vietTat ? vietTat : '');
+        this.vietTatTiengAnh.value(vietTatTiengAnh ? vietTatTiengAnh : '');
+        this.kichHoat.value(kichHoat ? 1 : 0);
     };
 
-    onSubmit = () => {
-        const maTrinhDo = $(this.modal).attr('data-ma'),
-            changes = {
-                ma: this.ma.value().trim(),
-                ten: this.ten.value().trim(),
-                tenTiengAnh: this.ten.value().trim(),
-                vietTat: this.vietTat.value().trim(),
-                vietTatTiengAnh: this.vietTatTiengAnh.value().trim(),
+    onSubmit = (e) => {
+        e.preventDefault();
+        const changes = {
+                ma: this.ma.value(),
+                ten: this.ten.value(),
+                tenTiengAnh: this.tenTiengAnh.value(),
+                vietTat: this.vietTat.value(),
+                vietTatTiengAnh: this.vietTatTiengAnh.value(),
                 kichHoat: Number(this.kichHoat.value()),
             };
-        if (changes.ma == '') {
-            T.notify('Mã trình độ bị trống!', 'danger');
+        if (!this.state.ma && !this.ma.value()) {
+            T.notify('Mã trình độ không được trống!', 'danger');
             this.ma.focus();
         } else if (changes.ten == '') {
-            T.notify('Tên trình độ bị trống!', 'danger');
+            T.notify('Tên trình độ không được trống!', 'danger');
             this.ten.focus();
         } else if (changes.tenTiengAnh == '') {
-            T.notify('Tên trình độ tiếng Anh bị trống!', 'danger');
+            T.notify('Tên trình độ tiếng Anh không được trống!', 'danger');
             this.tenTiengAnh.focus();
         } else {
-            if (maTrinhDo) {
+            if (this.state.ma) {
                 if (typeof this.state.ImportIndex == 'number') changes.ImportIndex = this.state.ImportIndex;
-                this.props.update(maTrinhDo, changes, () => {
-                    T.notify('Cập nhật trình độ thành công!', 'success');
-                    $(this.modal).modal('hide');
-                });
+                this.props.update(this.state.ma, changes, this.hide);
             } else {
-                this.props.create(changes, () => {
-                    T.notify('Tạo mới trình độ thành công!', 'success');
-                    $(this.modal).modal('hide');
-                });
+                this.props.create(changes, this.hide);
             }
         }
     };
 
+    changeKichHoat = value => this.kichHoat.value(value ? 1 : 0) || this.kichHoat.value(value);
+
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
-            title: this.ma ? 'Tạo mới trình độ' : 'Cập nhật trình độ',
+            title: this.state.ma ? 'Tạo mới trình độ' : 'Cập nhật trình độ',
             body: <div className='row'>
-                <FormTextBox type='text' className='col-12' ref={e => this.ma = e} label='Mã trình độ' readOnly={readOnly} placeholder='Mã trình độ' required />
+                <FormTextBox type='text' className='col-12' ref={e => this.ma = e} label='Mã trình độ' readOnly={this.state.ma ? true : readOnly} placeholder='Mã trình độ' required />
                 <FormTextBox type='text' className='col-12' ref={e => this.ten = e} label='Tên trình độ' readOnly={readOnly} placeholder='Tên trình độ' required />
                 <FormTextBox type='text' className='col-12' ref={e => this.tenTiengAnh = e} label='Tên trình độ tiếng Anh' readOnly={readOnly} placeholder='Tên trình độ tiếng Anh' required />
                 <FormTextBox type='text' className='col-12' ref={e => this.vietTat = e} label='Tên viết tắt' readOnly={readOnly} placeholder='Tên viết tắt' />
                 <FormTextBox type='text' className='col-12' ref={e => this.vietTatTiengAnh = e} label='Tên viết tắt tiếng Anh' readOnly={readOnly} placeholder='Tên viết tắt Tiếng Anh' />
                 <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
-                    onChange={() => !readOnly && this.setState({ kichHoat: !this.state.kichHoat })} />
+                    onChange={value => this.changeKichHoat(value ? 1 : 0)} />
             </div>
         }
         );
@@ -75,74 +72,74 @@ class EditModal extends AdminModal {
 }
 
 class dmTrinhDoAdminPage extends AdminPage {
-    modal = React.createRef();
 
     componentDidMount() {
         T.ready('/user/category', () => this.props.getDmTrinhDoAll());
     }
 
-    edit = (e, item) => {
+    showModal = (e) => {
         e.preventDefault();
-        this.modal.current.show(item);
-    };
+        this.modal.show();
+    }
 
     delete = (e, item) => {
+        T.confirm('Xóa Trình độ', `Bạn có chắc bạn muốn xóa Trình độ ${item.ten ? `<b>${item.ten}</b>` : 'này'}?`, 'warning', true, isConfirm => {
+            isConfirm && this.props.deleteDmTrinhDo(item.ma, error => {
+                if (error) T.notify(error.message ? error.message : `Xoá Trình độ ${item.ten} bị lỗi!`, 'danger');
+                else T.alert(`Xoá Trình độ ${item.ten} thành công!`, 'success', false, 800);
+            });
+        });
         e.preventDefault();
-        T.confirm('Trình độ', 'Bạn có chắc bạn muốn xóa trình độ này?', 'warning', true, isConfirm =>
-            isConfirm && this.props.deleteDmTrinhDo(item.ma));
-    };
-
-    changeActive = item => this.props.updateDmTrinhDo(item.ma, { kichHoat: item.kichHoat == 1 ? 0 : 1 });
+    }
 
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permissionWrite = currentPermissions.includes('dmTrinhDo:write'),
-            permission = this.getUserPermission('dmTrinhDo', ['write', 'delete']);
+            permission = this.getUserPermission('dmTrinhDo', ['read', 'write', 'delete']);
         let items = this.props.dmTrinhDo && this.props.dmTrinhDo.items ? this.props.dmTrinhDo.items : [];
 
-        const table = renderTable({
-            getDataSource: () => items, stickyHead: false,
-            renderHead: () => (
-                <tr>
-                    <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
-                    <th style={{ width: '100%' }}>Tên</th>
-                    <th style={{ width: '100%' }} nowrap='true'>Tên tiếng Anh</th>
-                    <th style={{ width: '100%' }} nowrap='true'>Viết tắt</th>
-                    <th style={{ width: '100%' }} nowrap='true'>Viết tắt tiếng Anh</th>
-                    <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
-                </tr>),
-            renderRow: (item, index) => (
-                <tr key={index}>
-                    <TableCell type='text' content={item.ma} style={{ textAlign: 'center' }} />
-                    <TableCell type='link' content={item.ten} onClick={e => this.edit(e, item)} />
-                    <TableCell type='text' content={item.tenTiengAnh} />
-                    <TableCell type='text' content={item.vietTat} />
-                    <TableCell type='text' content={item.vietTatTiengAnh} />
-                    <TableCell type='checkbox' content={item.kichHoat} permission={permissionWrite} onChanged={() => permissionWrite && this.changeActive(item)} />
-                    <TableCell type='buttons' content={item} permission={permission} onEdit={this.edit} onDelete={this.delete} />
-                </tr>
-            ),
-        });
+        const table = !(items && items.length > 0) ? 'Không có dữ liệu trình độ' :
+            renderTable({
+                getDataSource: () => items, stickyHead: false,
+                renderHead: () => (
+                    <tr>
+                        <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
+                        <th style={{ width: '100%' }}>Tên</th>
+                        <th style={{ width: '100%' }} nowrap='true'>Tên tiếng Anh</th>
+                        <th style={{ width: '100%' }} nowrap='true'>Viết tắt</th>
+                        <th style={{ width: '100%' }} nowrap='true'>Viết tắt tiếng Anh</th>
+                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
+                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                    </tr>),
+                renderRow: (item, index) => (
+                    <tr key={index}>
+                        <TableCell type='text' content={item.ma} style={{ textAlign: 'center' }} />
+                        <TableCell type='link' content={item.ten} onClick={() => this.modal.show(item)} />
+                        <TableCell type='text' content={item.tenTiengAnh} />
+                        <TableCell type='text' content={item.vietTat} />
+                        <TableCell type='text' content={item.vietTatTiengAnh} />
+                        <TableCell type='checkbox' content={item.kichHoat} permission={permission}
+                            onChanged={value => this.props.updateDmTrinhDo(item.ma, { kichHoat: value ? 1 : 0, })} />
+                        <TableCell type='buttons' content={item} permission={permission}
+                            onEdit={() => this.modal.show(item)} onDelete={this.delete} />
+                    </tr>
+                ),
+            });
 
-
-        return (
-            <main className='app-content'>
-                <div className='app-title'>
-                    <h1><i className='fa fa-list-alt' /> Danh mục Trình độ</h1>
-                </div>
+        return this.renderPage({
+            icon: 'fa fa-list-alt',
+            title: 'Trình độ',
+            breadcrumb: [
+                <Link key={0} to='/user/category'>Danh mục</Link>,
+                'Trình độ'
+            ],
+            content: <>
                 <div className='tile'>{table}</div>
-                <EditModal ref={this.modal} readOnly={!permissionWrite}
-                    create={this.props.createDmTrinhDo} update={this.props.updateDmTrinhDo} />
-                {permissionWrite &&
-                    <button type='button' className='btn btn-primary btn-circle' style={{ zIndex: 100, position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.edit}>
-                        <i className='fa fa-lg fa-plus' />
-                    </button>}
-                <Link to='/user/category' className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>
-                    <i className='fa fa-lg fa-reply' />
-                </Link>
-            </main>
-        );
+                <EditModal ref={e => this.modal = e} permission={permission}
+                    create={this.props.createDmTrinhDo} update={this.props.updateDmTrinhDo} permissions={currentPermissions} />
+            </>,
+            backRoute: '/user/category',
+            onCreate: permission && permission.write ? (e) => this.showModal(e) : null
+        });
     }
 }
 
