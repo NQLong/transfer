@@ -98,6 +98,7 @@ export function createDmQuanHeChuHo(dmQuanHeChuHo, done) {
                 T.notify(data.error.message ? data.error.message : 'Tạo mới một quan hệ chủ hộ bị lỗi!', 'danger');
                 console.error(`POST: ${url}.`, data.error);
             } else {
+                T.notify('Tạo mới dữ liệu quan hệ chủ hộ thành công' , 'success');
                 dispatch(getDmQuanHeChuHoPage());
                 if (done) done(data);
             }
@@ -114,6 +115,7 @@ export function updateDmQuanHeChuHo(ma, changes, done) {
                 console.error(`PUT: ${url}.`, data.error);
             } else {
                 done && done(data.item);
+                T.notify('Cập nhật dữ liệu quan hệ chủ hộ thành công' , 'success');
                 dispatch(getDmQuanHeChuHoPage());
             }
         }, (error) => T.notify('Cập nhật dữ liệu quan hệ chủ hộ bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
