@@ -607,7 +607,7 @@ export class FormDatePicker extends React.Component {
 }
 
 export class FormImageBox extends React.Component {
-    setData = data => this.imageBox.setData(data);
+    setData = (userData, image) => this.imageBox.setData(userData, image);
 
     render() {
         let { label = '', className = '', style = {}, readOnly = false, postUrl = '/user/upload', uploadType = '', image = null, onDelete = null, onSuccess = null } = this.props;

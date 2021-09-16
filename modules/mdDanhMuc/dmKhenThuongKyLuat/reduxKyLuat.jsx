@@ -58,16 +58,17 @@ export function getDmKyLuatAll(done) {
 }
 
 T.initPage('pageDmKyLuat');
-export function getDmKyLuatPage(pageNumber, pageSize, done) {
-    const page = T.updatePage('pageDmKyLuat', pageNumber, pageSize);
+export function getDmKyLuatPage(pageNumber, pageSize, pageCondition, done) {
+    const page = T.updatePage('pageDmKyLuat', pageNumber, pageSize, pageCondition);
     return dispatch => {
         const url = `/api/dm-ky-luat/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, data => {
+        T.get(url, { condition: page.pageCondition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách hình thức kỷ luật bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                if (done) done(data.page);
                 dispatch({ type: DmKyLuatGetPage, page: data.page });
             }
         }, () => T.notify('Lấy danh sách hình thức kỷ luật bị lỗi!', 'danger'));
@@ -100,7 +101,8 @@ export function createDmKyLuat(item, done) {
                 }
                 console.error(`POST: ${url}.`, data.error);
             } else {
-                dispatch(getDmKyLuatAll());
+                T.notify('Tạo khen thưởng thành công!', 'success');
+                dispatch(getDmKyLuatPage());
                 if (done) done(data);
             }
         }, () => T.notify('Tạo hình thức kỷ luật bị lỗi!', 'danger'));
@@ -115,8 +117,8 @@ export function deleteDmKyLuat(ma) {
                 T.notify('Xóa hình thức kỷ luật bị lỗi!', 'danger');
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
-                T.alert('Khoa đã xóa thành công!', 'success', false, 800);
-                dispatch(getDmKyLuatAll());
+                T.alert('Xóa hình thức thành công!', 'success', false, 800);
+                dispatch(getDmKyLuatPage());
             }
         }, () => T.notify('Xóa hình thức kỷ luật bị lỗi!', 'danger'));
     };
@@ -132,7 +134,8 @@ export function updateDmKyLuat(ma, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật thông tin hình thức kỷ luật thành công!', 'success');
-                dispatch(getDmKyLuatAll());
+                done && done(data.item);
+                dispatch(getDmKyLuatPage());
             }
         }, () => T.notify('Cập nhật thông tin hình thức kỷ luật bị lỗi!', 'danger'));
     };

@@ -71,11 +71,11 @@ class EditModal extends AdminModal {
                 <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} 
                     readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
                     onChange={value => this.changeKichHoat(value ? 1 : 0)} />
-                <FormTextBox type='text' className='col-md-6' ref={e => this.ten = e} label='Tên bộ môn (tiếng Việt)' readOnly={readOnly} />
-                <FormTextBox type='text' className='col-md-6' ref={e => this.tenTiengAnh = e} label='Tên bộ môn (tiếng Anh)' readOnly={readOnly} />
-                <FormSelect className='col-12 col-md-6' ref={e => this.maDv = e} data={this.DonViTable} label='Mã đơn vị' required />
-                <FormTextBox type='text' className='col-md-6' ref={e => this.qdThanhLap = e} label='Quyết định thành lập' readOnly={readOnly} />
-                <FormTextBox type='text' className='col-md-6' ref={e => this.qdXoaTen = e} label='Quyết định xóa tên' readOnly={readOnly} />
+                <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên bộ môn (tiếng Việt)' readOnly={readOnly} />
+                <FormTextBox type='text' className='col-md-12' ref={e => this.tenTiengAnh = e} label='Tên bộ môn (tiếng Anh)' readOnly={readOnly} />
+                <FormSelect className='col-md-12' ref={e => this.maDv = e} data={this.DonViTable} label='Mã đơn vị' required />
+                <FormTextBox type='text' className='col-md-12' ref={e => this.qdThanhLap = e} label='Quyết định thành lập' readOnly={readOnly} />
+                <FormTextBox type='text' className='col-12' ref={e => this.qdXoaTen = e} label='Quyết định xóa tên' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-12' ref={e => this.ghiChu = e} label='Ghi chú' readOnly={readOnly} />
             </div>
         });
