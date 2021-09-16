@@ -43,19 +43,20 @@ export default function DmMucDichTrongNuocReducer(state = null, data) {
 
 // Actions ------------------------------------------------------------------------------------------------------------
 T.initPage('pageDmMucDichTrongNuoc');
-export function getDmMucDichTrongNuocPage(pageNumber, pageSize, done) {
-    const page = T.updatePage('pageDmMucDichTrongNuoc', pageNumber, pageSize);
+export function getDmMucDichTrongNuocPage(pageNumber, pageSize, pageCondition, done) {
+    const page = T.updatePage('pageDmMucDichTrongNuoc', pageNumber, pageSize, pageCondition);
     return dispatch => {
         const url = `/api/danh-muc/muc-dich-trong-nuoc/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, data => {
+        T.get(url, { condition: page.pageCondition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách mục đích đi công tác trong nước bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                if (done) done(data.page);                
                 dispatch({ type: DmMucDichTrongNuocGetPage, page: data.page });
             }
-        }, (error) => T.notify('Lấy danh sách ca học bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+        }, (error) => T.notify('Lấy danh sách mục đích đi công tác trong nước bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 
@@ -96,7 +97,8 @@ export function createDmMucDichTrongNuoc(item, done) {
                 T.notify('Tạo mục đích đi công tác trong nước bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`POST: ${url}.`, data.error);
             } else {
-                dispatch(getDmMucDichTrongNuocAll());
+                T.notify('Tạo mục đích đi công tác trong nướcthành công!', 'success');
+                dispatch(getDmMucDichTrongNuocPage());
                 if (done) done(data);
             }
         }, (error) => T.notify('Tạo mục đích đi công tác trong nước bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
@@ -112,7 +114,7 @@ export function deleteDmMucDichTrongNuoc(ma) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('Danh mục đã xóa thành công!', 'success', false, 800);
-                dispatch(getDmMucDichTrongNuocAll());
+                dispatch(getDmMucDichTrongNuocPage());
             }
         }, (error) => T.notify('Xóa mục đích đi công tác trong nước bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
@@ -128,7 +130,8 @@ export function updateDmMucDichTrongNuoc(ma, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật thông tin mục đích đi công tác trong nước thành công!', 'success');
-                dispatch(getDmMucDichTrongNuocAll());
+                done && done(data.item);
+                dispatch(getDmMucDichTrongNuocPage());
             }
         }, (error) => T.notify('Cập nhật thông tin mục đích đi công tác trong nước bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
