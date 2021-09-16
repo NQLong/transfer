@@ -97,6 +97,7 @@ export function createDmCaHoc(item, done) {
                 console.error(`POST: ${url}.`, data.error);
             } else {
                 dispatch(getDmCaHocAll());
+                T.notify('Tạo mới thông tin ca học thành công!', 'success');
                 if (done) done(data);
             }
         }, () => T.notify('Tạo ca học bị lỗi!', 'danger'));
@@ -129,6 +130,7 @@ export function updateDmCaHoc(_id, changes, done) {
             } else {
                 T.notify('Cập nhật thông tin ca học thành công!', 'success');
                 dispatch(getDmCaHocAll());
+                done && done(data.item);
             }
         }, () => T.notify('Cập nhật thông tin ca học bị lỗi!', 'danger'));
     };
