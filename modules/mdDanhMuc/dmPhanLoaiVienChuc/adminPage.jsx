@@ -21,7 +21,8 @@ class EditModal extends AdminModal {
         this.kichHoat.value(kichHoat);
     };
 
-    onSubmit = () => {
+    onSubmit = (e) => {
+        e.preventDefault();
         const changes = {
             ma: this.ma.value(),
             ten: this.ten.value(),
@@ -78,7 +79,7 @@ class dmPhanLoaiVienChucPage extends AdminPage {
         T.confirm('Xóa Phân loại viên chức', `Bạn có chắc bạn muốn xóa Phân loại viên chức ${item.ten ? `<b>${item.ten}</b>` : 'này'}?`, 'warning', true, isConfirm => {
             isConfirm && this.props.deleteDmPhanLoaiVienChuc(item.ma, error => {
                 if (error) T.notify(error.message ? error.message : `Xoá Phân loại viên chức ${item.ten} bị lỗi!`, 'danger');
-                else T.alert(`Xoá Phân loại viên chức ${item.moTa} thành công!`, 'success', false, 800);
+                else T.alert(`Xoá Phân loại viên chức ${item.ten} thành công!`, 'success', false, 800);
             });
         });
         e.preventDefault();

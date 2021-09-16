@@ -14,17 +14,17 @@ module.exports = app => {
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/danh-muc/linh-vuc-kinh-doanh/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
-        const pageNumber = parseInt(req.params.pageNumber),
+        let pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
-            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        app.model.dmLinhVucKinhDoanh.searchPage(pageNumber, pageSize, searchTerm, (error, page) => {
-            if (error || page == null) {
-                res.send({ error });
-            } else {
-                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
-                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, list } });
-            }
-        });
+            condition = { statement: null };
+        console.log(req.query.condition);
+        if (req.query.condition) {
+            condition = {
+                statement: 'lower(ten) LIKE :searchText OR lower(mo_ta) LIKE :searchText',
+                parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
+            };
+        }
+        app.model.dmLinhVucKinhDoanh.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
     });
 
     app.get('/api/danh-muc/linh-vuc-kinh-doanh/all', app.permission.check('user:login'), (req, res) => {
