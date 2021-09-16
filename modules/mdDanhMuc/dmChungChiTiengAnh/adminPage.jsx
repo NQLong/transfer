@@ -12,13 +12,13 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        let { ma, ten, moTaVi, moTaEn, kichHoat } = item ? item : { ma: '', ten: '', moTaVi: '', moTaEn: '', kichHoat: true };
+        let { ma, ten, moTa, kichHoat } = item ? item : { ma: '', ten: '', moTa: '', kichHoat: true };
 
         this.setState({ ma, ten, item });
-
+        let mo_ta =  JSON.parse(moTa);
         this.ten.value(ten);
-        this.moTaVi.value(moTaVi ? moTaVi : '');
-        this.moTaEn.value(moTaEn ? moTaEn : '');
+        this.moTaVi.value(mo_ta.vi ? mo_ta.vi : '');
+        this.moTaEn.value(mo_ta.en ? mo_ta.en : '');
         this.kichHoat.value(kichHoat ? 1 : 0);
     }
 
@@ -59,6 +59,7 @@ class EditModal extends AdminModal {
             },];
         return this.renderModal({
             title: 'Chứng chỉ tiếng anh',
+            size: 'large',
             body: <div className='row'>
                 <FormTextBox className='col-12 col-sm-12' type='text' ref={e => this.ten = e} label='Tên chứng chỉ tiếng anh' placeholder='Tên chứng chỉ tiếng anh' readOnly={readOnly} required />
                 <div style={{ position: 'absolute', top: '16px', right: '8px' }}><FormCheckbox style={{ display: 'inline-flex', width: '100%', margin: 0 }} ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly}
