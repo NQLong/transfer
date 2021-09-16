@@ -16,9 +16,7 @@ class EditModal extends AdminModal {
         let { ma, ten, moTa , kichHoat, thoiGianBatDau, thoiGianKetThuc } = item ? item : { ma: '', ten: '', moTa: '', thoiGianBatDau: '', thoiGianKetThuc: '', kichHoat: true };
 
         this.setState({ ma, ten, item });
-        let mo_ta = {};
-        if (moTa) 
-            mo_ta = JSON.parse(moTa);
+        let mo_ta = !moTa ? {} : JSON.parse(moTa);
         this.ten.value(ten);
         this.moTaVi.value(mo_ta.vi ? mo_ta.vi : '');
         this.moTaEn.value(mo_ta.en ? mo_ta.en : '');
