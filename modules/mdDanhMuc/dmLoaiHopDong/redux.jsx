@@ -71,7 +71,7 @@ export function getDmLoaiHopDongPage(pageNumber, pageSize, pageCondition, done) 
                 if (done) done(data.page);                
                 dispatch({ type: DmLoaiDonViGetPage, page: data.page });
             }
-        }, (error) => T.notify('Lấy danh sách lĩnh vực kinh doanh bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));    };
+        }, (error) => T.notify('Lấy danh sách loại hợp đồng bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));    };
 }
 
 export function getDmLoaiHopDong(ma, done) {
