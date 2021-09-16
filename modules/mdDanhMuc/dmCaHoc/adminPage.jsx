@@ -2,196 +2,135 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { createDmCaHoc, getDmCaHocAll, updateDmCaHoc, deleteDmCaHoc } from './redux';
 import { Link } from 'react-router-dom';
-import Editor from 'view/component/CkEditor4';
-import { AdminPage, TableCell, renderTable, } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, AdminModal, FormEditor, FormTextBox, FormCheckbox, FormTabs, FormSelect, } from 'view/component/AdminPage';
 
-class EditModal extends React.Component {
-    state = { kichHoat: true };
-    modal = React.createRef();
-    editorVi = React.createRef();
-    editorEn = React.createRef();
+class EditModal extends AdminModal {
 
     componentDidMount() {
-        $(document).ready(() => setTimeout(() => {
-            $(this.modal.current).on('shown.bs.modal', () => {
-                $('a[href=\'#dmCaHocTabVi\']').tab('show');
-                $('#dmCaHocTen').focus();
-            });
-        }, 250));
+        $(document).ready(() => this.onShown(() => {
+            this.ten.focus();
+        }));
     }
 
-    show = (item) => {
-        let { ma, ten, moTa, kichHoat, thoiGianBatDau, thoiGianKetThuc } = item ? item : { ma: '', ten: '', moTa: '', thoiGianBatDau: '', thoiGianKetThuc: '', kichHoat: true };
+    onShow = (item) => {
+        let { ma, ten, moTa , kichHoat, thoiGianBatDau, thoiGianKetThuc } = item ? item : { ma: '', ten: '', moTa: '', thoiGianBatDau: '', thoiGianKetThuc: '', kichHoat: true };
 
-        $('#dmCaHocTen').val(ten);
-        moTa = T.language.parse(moTa, true);
-        $('#dmCaHocThoiGianBatDauHours').val(thoiGianBatDau.split(':')[0]);
-        $('#dmCaHocThoiGianBatDauHours').select2({ minimumResultsForSearch: -1 }).trigger('change');
-        $('#dmCaHocThoiGianBatDauMinutes').val(thoiGianBatDau.split(':')[1]);
-        $('#dmCaHocThoiGianBatDauMinutes').select2({ minimumResultsForSearch: -1 }).trigger('change');
-        $('#dmCaHocThoiGianKetThucHours').val(thoiGianKetThuc.split(':')[0]);
-        $('#dmCaHocThoiGianKetThucHours').select2({ minimumResultsForSearch: -1 }).trigger('change');
-        $('#dmCaHocThoiGianKetThucMinutes').val(thoiGianKetThuc.split(':')[1]);
-        $('#dmCaHocThoiGianKetThucMinutes').select2({ minimumResultsForSearch: -1 }).trigger('change');
-        this.editorVi.current.html(moTa.vi);
-        this.editorEn.current.html(moTa.en);
-        this.setState({ kichHoat });
+        this.setState({ ma, ten, item });
+        let mo_ta = {};
+        if (moTa) 
+            mo_ta = JSON.parse(moTa);
+        this.ten.value(ten);
+        this.moTaVi.value(mo_ta.vi ? mo_ta.vi : '');
+        this.moTaEn.value(mo_ta.en ? mo_ta.en : '');
+        this.kichHoat.value(kichHoat ? 1 : 0);
+        this.gioBatDau.value(thoiGianBatDau.split(':')[0]);
+        this.phutBatDau.value(thoiGianBatDau.split(':')[1]);
+        this.gioKetThuc.value(thoiGianKetThuc.split(':')[0]);
+        this.phutKetThuc.value(thoiGianKetThuc.split(':')[1]);
 
-        $(this.modal.current).attr('data-id', ma).modal('show');
     }
 
-    hide = () => $(this.modal.current).modal('hide')
-
-    save = e => {
+    onSubmit = (e) => {
         e.preventDefault();
-        const ma = $(this.modal.current).attr('data-id'),
-            changes = {
-                ten: $('#dmCaHocTen').val(),
-                moTa: JSON.stringify({ vi: this.editorVi.current.html(), en: this.editorEn.current.html() }),
-                thoiGianBatDau: `${$('#dmCaHocThoiGianBatDauHours').val()}:${$('#dmCaHocThoiGianBatDauMinutes').val()}`,
-                thoiGianKetThuc: `${$('#dmCaHocThoiGianKetThucHours').val()}:${$('#dmCaHocThoiGianKetThucMinutes').val()}`,
-                kichHoat: Number(this.state.kichHoat),
-            };
-
-        if (changes.ten == '') {
+        const changes = {
+            ten: this.ten.value(),
+            moTa: JSON.stringify({ vi: this.moTaVi.value(), en: this.moTaEn.value() }),
+            thoiGianBatDau: `${this.gioBatDau.value()}:${this.phutBatDau.value()}`,
+            thoiGianKetThuc: `${this.gioKetThuc.value()}:${this.phutKetThuc.value()}`,
+            kichHoat: Number(this.kichHoat.value()),
+        };
+        
+        if (!this.state.ten && !this.ten.value()) {
             T.notify('Tên ca học bị trống!', 'danger');
-            $('#dmctdtTenVi').focus();
+            this.ten.focus();
         } else {
-            if (ma) {
-                this.props.updateDmCaHoc(ma, changes);
-            } else {
-                this.props.createDmCaHoc(changes);
-            }
-            $(this.modal.current).modal('hide');
+            this.state.ten ? this.props.update(this.state.ma, changes, this.hide) :
+                this.props.create(changes, this.hide);
         }
     }
+
+    changeKichHoat = value => this.kichHoat.value(value ? 1 : 0) || this.kichHoat.value(value);
+
     generateOption = limitList => {
         const array = Array(limitList);
         const result = [];
         for (let i = 0; i < array.length; i++) {
-            result.push(<option key={i} value={i / 10 < 1 ? `0${i}` : i}>{i / 10 < 1 ? `0${i}` : i}</option>);
+            result.push(i / 10 < 1 ? `0${i}` : i);
         }
         return result;
     }
 
-    render() {
+    render = () => {
         const readOnly = this.props.readOnly;
         const hours = this.generateOption(24),
             minutes = this.generateOption(60);
-        return (
-            <div className='modal' tabIndex='-1' role='dialog' ref={this.modal}>
-                <form className='modal-dialog modal-lg' role='document' onSubmit={this.save}>
-                    <div className='modal-content'>
-                        <div className='modal-header'>
-                            <h5 className='modal-title'>Giờ học</h5>
-                            <button type='button' className='close' data-dismiss='modal' aria-label='Close'>
-                                <span aria-hidden='true'>&times;</span>
-                            </button>
-                        </div>
-                        <div className='modal-body'>
-                            <ul className='nav nav-tabs'>
-                                <li className='nav-item'>
-                                    <a className='nav-link active show' data-toggle='tab' href='#dmCaHocTabVi'>Việt Nam</a>
-                                </li>
-                                <li className='nav-item'>
-                                    <a className='nav-link' data-toggle='tab' href='#dmCaHocTabEn'>English</a>
-                                </li>
-
-                                <div style={{ position: 'absolute', top: '16px', right: '8px' }}>
-                                    <div style={{ display: 'inline-flex', width: '100%', margin: 0 }}>
-                                        <label htmlFor='dmCaHocKichHoat'>Kích hoạt: </label>&nbsp;&nbsp;
-                                        <div className='toggle'>
-                                            <label>
-                                                <input type='checkbox' id='dmCaHocKichHoat' checked={this.state.kichHoat} onChange={() => !readOnly && this.setState({ kichHoat: !this.state.kichHoat })} />
-                                                <span className='button-indecator' />
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </ul>
-
-                            <div className='tab-content' style={{ marginTop: 8 }}>
-                                <div className='form-group'>
-                                    <label htmlFor='dmCaHocTen'>Tên giờ học</label>
-                                    <input className='form-control' id='dmCaHocTen' type='text' placeholder='Tên giờ học' readOnly={readOnly} />
-                                </div>
-                                <div id='dmCaHocTabVi' className='tab-pane fade show active'>
-                                    <div className='form-group'>
-                                        <label>Mô tả</label>
-                                        <Editor ref={this.editorVi} placeholder='Mô tả' readOnly={readOnly} />
-                                    </div>
-                                </div>
-
-                                <div id='dmCaHocTabEn' className='tab-pane fade'>
-                                    <div className='form-group'>
-                                        <label>Description</label>
-                                        <Editor ref={this.editorEn} placeholder='Description' readOnly={readOnly} />
-                                    </div>
-                                </div>
-                                <div className='form-group row'>
-                                    <div className='col-md-6'>
-                                        <label className='control-label'>Thời gian bắt đầu</label>
-                                        <div className='row'>
-                                            <div className='col-md-5'>
-                                                <select className='form-control' id='dmCaHocThoiGianBatDauHours'>{hours}</select>
-                                            </div>
-                                            <div className='col-md-1'>:</div>
-                                            <div className='col-md-6'>
-                                                <select className='form-control' id='dmCaHocThoiGianBatDauMinutes'>{minutes}</select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className='col-md-6'>
-                                        <label className='control-label'>Thời gian kết thúc</label>
-                                        <div className='row'>
-                                            <div className='col-md-5'>
-                                                <select className='form-control' id='dmCaHocThoiGianKetThucHours'>{hours}</select>
-                                            </div>
-                                            <div className='col-md-1'>:</div>
-                                            <div className='col-md-6'>
-                                                <select className='form-control' id='dmCaHocThoiGianKetThucMinutes'>{minutes}</select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className='modal-footer'>
-                            <button type='button' className='btn btn-secondary' data-dismiss='modal'>Đóng</button>
-                            {!readOnly && <button type='submit' className='btn btn-primary'>Lưu</button>}
-                        </div>
+        let viEnTabs = [
+            {
+                title: 'English',
+                component: <div style={{ marginTop: 8 }}>
+                    <FormEditor className='col-md-12' ref={e => this.moTaEn = e} label='Description' height='200px' />
+                </div>
+            },
+            {
+                title: 'Tiếng Việt',
+                component: <div style={{ marginTop: 8 }}>
+                    <FormEditor className='col-md-12' ref={e => this.moTaVi = e} label='Mô tả' height='200px' />
+                </div>
+            },];
+        return this.renderModal({
+            title: this.state.ten ? 'Cập nhật Giờ học' : 'Tạo mới Giờ học',
+            size: 'large',
+            body: <div className='row'>
+                <FormTextBox className='col-md-12' type='text' ref={e => this.ten = e} label='Tên giờ học' placeholder='Tên giờ học' readOnly={readOnly} required />
+                <div style={{ position: 'absolute', top: '16px', right: '8px' }}>
+                    <FormCheckbox style={{ display: 'inline-flex', width: '100%', margin: 0 }} ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly}
+                        onChange={value => this.changeKichHoat(value ? 1 : 0)} /></div>
+                <FormTabs tabClassName='col-md-12' tabs={viEnTabs} />
+                <div className='col-md-6'>
+                    <label className='control-label'>Thời gian bắt đầu</label>
+                    <div className='row'>
+                        <FormSelect className='col-md-3' ref={e => this.gioBatDau = e} data={hours} />
+                        <div className='col-md-1'>:</div>
+                        <FormSelect className='col-md-3' ref={e => this.phutBatDau = e} data={minutes} />
                     </div>
-                </form>
+                </div>
+                <div className='col-md-6'>
+                <label className='control-label'>Thời gian kết thúc</label>
+                    <div className='row'>
+                        <FormSelect className='col-md-3' ref={e => this.gioKetThuc = e} data={hours} />
+                        <div className='col-md-1'>:</div>
+                        <FormSelect className='col-md-3' ref={e => this.phutKetThuc = e} data={minutes} />
+                    </div>
+                </div>
             </div>
-        );
+        });
     }
 }
 
 class dmCaHocAdminPage extends AdminPage {
-    modal = React.createRef();
 
     componentDidMount() {
-        this.props.getDmCaHocAll();
-        T.ready('/user/category');
+        T.ready('/user/category', () => this.props.getDmCaHocAll());
     }
 
-    edit = (e, item) => {
+    showModal = (e) => {
         e.preventDefault();
-        this.modal.current.show(item);
-    };
+        this.modal.show();
+    }
 
     delete = (e, item) => {
+        T.confirm('Xóa giờ học', `Bạn có chắc bạn muốn xóa giờ học ${item.ten ? `<b>${item.ten}</b>` : 'này'}?`, 'warning', true, isConfirm => {
+            isConfirm && this.props.deleteDmCaHoc(item.ma, error => {
+                if (error) T.notify(error.message ? error.message : `Xoá giờ học ${item.ten} bị lỗi!`, 'danger');
+                else T.alert(`Xoá giờ học ${item.ten} thành công!`, 'success', false, 800);
+            });
+        });
         e.preventDefault();
-        T.confirm('Xóa danh mục ca học', 'Bạn có chắc bạn muốn xóa ca học này?', true, isConfirm =>
-            isConfirm && this.props.deleteDmCaHoc(item.ma));
     }
-
-    changeActive = item => this.props.updateDmCaHoc(item.ma, { kichHoat: Number(!item.kichHoat) })
 
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permissionWrite = currentPermissions.includes('dmCaHoc:write'),
-            permission = this.getUserPermission('dmCaHoc', ['write', 'delete']);
+            permission = this.getUserPermission('dmCaHoc', ['read', 'write', 'delete']);
         let table = 'Không có dữ liệu ca học!',
             items = this.props.dmCaHoc && this.props.dmCaHoc.items ? this.props.dmCaHoc.items : [];
         if (items.length > 0) {
@@ -209,38 +148,32 @@ class dmCaHocAdminPage extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='number' content={index + 1} style={{ textAlign: 'right' }} />
-                        <TableCell type='link' onClick={e => this.edit(e, item)} content={item.ten} />
+                        <TableCell type='link' onClick={() => this.modal.show(item)} content={item.ten} />
                         <TableCell type='text' content={`${item.thoiGianBatDau} - ${item.thoiGianKetThuc}`} dateFormat />
-                        <TableCell type='checkbox' content={item.kichHoat} permission={permissionWrite} onChanged={() => permissionWrite && this.changeActive(item)} />
-                        <TableCell type='buttons' content={item} permission={permission} onEdit={this.edit} onDelete={this.delete}></TableCell>
+                        <TableCell type='checkbox' content={item.kichHoat} permission={permission}
+                            onChanged={value => this.props.updateDmCaHoc(item.ma, { kichHoat: value ? 1 : 0, })} />
+                        <TableCell type='buttons' content={item} permission={permission}
+                            onEdit={() => this.modal.show(item)} onDelete={this.delete}></TableCell>
                     </tr>
                 )
             });
         }
 
-        return (
-            <main className='app-content'>
-                <div className='app-title'>
-                    <h1><i className='fa fa-list-alt' /> Danh mục Giờ học</h1>
-                    <ul className='app-breadcrumb breadcrumb'>
-                        <Link to='/user'><i className='fa fa-home fa-lg' /></Link>
-                        &nbsp;/&nbsp;
-                        <Link to='/user/category'>Danh mục</Link>
-                        &nbsp;/&nbsp;Giờ học
-                    </ul>
-                </div>
+        return this.renderPage({
+            icon: 'fa fa-list-alt',
+            title: 'Giờ học',
+            breadcrumb: [
+                <Link key={0} to='/user/category'>Danh mục</Link>,
+                'Giờ học'
+            ],
+            content: <>
                 <div className='tile'>{table}</div>
-                <EditModal ref={this.modal} readOnly={!permissionWrite}
-                    createDmCaHoc={this.props.createDmCaHoc} updateDmCaHoc={this.props.updateDmCaHoc} />
-                <Link to='/user/category' className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>
-                    <i className='fa fa-lg fa-reply' />
-                </Link>
-                {permissionWrite &&
-                    <button type='button' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.edit}>
-                        <i className='fa fa-lg fa-plus' />
-                    </button>}
-            </main>
-        );
+                <EditModal ref={e => this.modal = e} permission={permission}
+                    create={this.props.createDmCaHoc} update={this.props.updateDmCaHoc} permissions={currentPermissions} />
+            </>,
+            backRoute: '/user/category',
+            onCreate: permission && permission.write ? (e) => this.showModal(e) : null
+        });
     }
 }
 
