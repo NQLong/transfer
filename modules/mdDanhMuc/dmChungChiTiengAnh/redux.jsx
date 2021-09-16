@@ -97,6 +97,7 @@ export function createDmChungChiTiengAnh(item, done) {
                 console.error(`POST: ${url}.`, data.error);
             } else {
                 dispatch(getDmChungChiTiengAnhAll());
+                T.notify('Tạo mới thông tin chứng chỉ tiếng Anh thành công!', 'success');
                 if (done) done(data);
             }
         }, () => T.notify('Tạo chứng chỉ tiếng Anh bị lỗi!', 'danger'));
@@ -129,6 +130,7 @@ export function updateDmChungChiTiengAnh(ma, changes, done) {
             } else {
                 T.notify('Cập nhật thông tin chứng chỉ tiếng Anh thành công!', 'success');
                 dispatch(getDmChungChiTiengAnhAll());
+                done && done(data.item);
             }
         }, () => T.notify('Cập nhật thông tin chứng chỉ tiếng Anh bị lỗi!', 'danger'));
     };
