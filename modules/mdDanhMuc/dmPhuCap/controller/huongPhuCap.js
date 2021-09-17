@@ -14,9 +14,16 @@ module.exports = app => {
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/danh-muc/huong-phu-cap/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
-        const pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize);
-        app.model.dmHuongPhuCap.getPage(pageNumber, pageSize, {}, (error, page) => res.send({ error, page }));
+        let pageNumber = parseInt(req.params.pageNumber),
+            pageSize = parseInt(req.params.pageSize),
+            condition = { statement: null };
+        if (req.query.condition) {
+            condition = {
+                statement: 'lower(ma) LIKE :searchText OR lower(ten) LIKE :searchText',
+                parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
+            };
+        }
+        app.model.dmHuongPhuCap.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
     });
 
     app.get('/api/danh-muc/huong-phu-cap/all', app.permission.check('user:login'), (req, res) => {
