@@ -14,9 +14,17 @@ module.exports = app => {
 
     // APIs ----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/danh-muc/tinh-trang-hon-nhan/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
-        const pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize);
-        app.model.dmTinhTrangHonNhan.getPage(pageNumber, pageSize, {}, (error, page) => {
+        let pageNumber = parseInt(req.params.pageNumber),
+            pageSize = parseInt(req.params.pageSize),
+            condition = { statement: null };
+        if (req.query.condition) {
+            condition = {
+                statement: 'lower(ma) LIKE :searchText OR lower(ten) LIKE :searchText',
+                parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
+            };
+        }
+
+        app.model.dmTinhTrangHonNhan.getPage(pageNumber, pageSize, condition, (error, page) => {
             res.send({ error, page });
         });
     });
