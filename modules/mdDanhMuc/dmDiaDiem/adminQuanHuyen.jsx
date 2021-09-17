@@ -2,111 +2,67 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getDmQuanHuyenAll, getDmQuanHuyenPage, deleteDmQuanHuyen, createDmQuanHuyen, updateDmQuanHuyen } from './reduxQuanHuyen';
 import { getDMTinhThanhPhoAll } from './reduxTinhThanhPho';
-import Pagination, { OverlayLoading } from 'view/component/Pagination';
-import AdminSearchBox from 'view/component/AdminSearchBox';
+import Pagination from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
+import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox, FormSelect } from 'view/component/AdminPage';
 
-class EditModal extends React.Component {
+class EditModal extends AdminModal {
 	state = { kichHoat: 1 };
-	modal = React.createRef();
 
 	componentDidMount() {
-		$(document).ready(() => setTimeout(() => {
-			$(this.modal.current).on('shown.bs.modal', () => $('#maQuanHuyen').focus());
-		}, 250));
+		$(document).ready(() => this.onShown(() => {
+            !this.maQuanHuyen.value() ? this.maQuanHuyen.focus() : this.tenQuanHuyen.focus();
+        }));
 	}
 
-	show = (item) => {
+	onShow = (item) => {
 		let { maQuanHuyen, maTinhThanhPho, tenQuanHuyen, kichHoat } = item ?
 			item : { maQuanHuyen: '', maTinhThanhPho: '', tenQuanHuyen: '', kichHoat: 1 };
-		$('#maQuanHuyen').val(maQuanHuyen ? maQuanHuyen : '');
-		$('#tenQuanHuyen').val(tenQuanHuyen ? tenQuanHuyen : '');
-		$('#maTinhThanhPho')
-			.select2({ placeholder: 'Chọn tỉnh thành phố', data: this.props.tinhOptions })
-			.val(maTinhThanhPho ? maTinhThanhPho : '')
-			.trigger('change');
-		this.setState({ kichHoat });
-
-		$(this.modal.current).attr('data-id', maQuanHuyen).modal('show');
+        this.setState({ kichHoat});
+        this.maQuanHuyen.value(maQuanHuyen);
+        this.tenQuanHuyen.value(tenQuanHuyen);
+        this.maTinhThanhPho.value(maTinhThanhPho);
+        this.kichHoat.value(kichHoat ? 1 : 0);
 	};
 
-	hide = () => $(this.modal.current).modal('hide');
+	changeKichHoat = value => this.kichHoat.value(value ? 1 : 0) || this.kichHoat.value(value);
 
-	save = (e) => {
+	onSubmit = (e) => {
 		e.preventDefault();
-		const maQuanHuyen = $(this.modal.current).attr('data-id'),
+		const 
 			changes = {
-				maQuanHuyen: $('#maQuanHuyen').val(),
-				maTinhThanhPho: $('#maTinhThanhPho').val(),
-				tenQuanHuyen: $('#tenQuanHuyen').val(),
+				maQuanHuyen: this.maQuanHuyen.value(),
+				maTinhThanhPho: this.maTinhThanhPho.value(),
+				tenQuanHuyen: this.tenQuanHuyen.value(),
 				kichHoat: this.state.kichHoat,
 			};
 		if (changes.maTinhThanhPho == '') {
 			T.notify('Mã tỉnh thành phố bị trống!', 'danger');
-			$('#maTinhThanhPho').focus();
+			this.maTinhThanhPho.focus();
 		} else if (changes.tenQuanHuyen == null) {
 			T.notify('Tên quận huyện bị trống!', 'danger');
-			$('#tenQuanHuyen').focus();
+			this.tenQuanHuyen.focus();
 		} else {
-			if (maQuanHuyen) {
-				this.props.updateDmQuanHuyen(maQuanHuyen, changes);
-			} else {
-				this.props.createDmQuanHuyen(changes);
-			}
-			$(this.modal.current).modal('hide');
+			this.state.maQuanHuyen ? this.props.update(this.state.maQuanHuyen, changes, this.hide) : this.props.create(changes, this.hide);
 		}
 	}
 
-	render() {
+	render = () => {
 		const readOnly = this.props.readOnly;
-		return (
-			<div className='modal' role='dialog' ref={this.modal}>
-				<form className='modal-dialog' role='document' onSubmit={this.save}>
-					<div className='modal-content'>
-						<div className='modal-header'>
-							<h5 className='modal-title'>Thông tin danh mục Quận Huyện</h5>
-							<button type='button' className='close' data-dismiss='modal' aria-label='Close'>
-								<span aria-hidden='true'>&times;</span>
-							</button>
-						</div>
-						<div className='modal-body'>
-							<div className='form-group'>
-								<label htmlFor='maQuanHuyen'>Mã quận/huyện</label>
-								<input className='form-control' id='maQuanHuyen' type='text' placeholder='Mã quận huyện' maxLength={3} readOnly={readOnly} />
-							</div>
-							<div className='form-group'>
-								<label htmlFor='dmKinhPhiNuocNgoaiGhiChu'>Tên quận/huyện</label>
-								<input className='form-control' id='tenQuanHuyen' type='text' placeholder='Tên quận huyện' readOnly={readOnly} />
-							</div>
-							<div className='form-group'>
-								<label htmlFor='maTinhThanhPho'>Tên tỉnh/thành </label>
-								<select className='form-control' id='maTinhThanhPho'></select>
-							</div>
-							<div className='form-group' style={{ display: 'inline-flex', margin: 0 }}>
-								<label htmlFor='dmQuanHuyenActive'>Kích hoạt: </label>&nbsp;&nbsp;
-								<div className='toggle'>
-									<label>
-										<input type='checkbox' id='dmQuanHuyenActive' checked={this.state.kichHoat} onChange={() => !readOnly && this.setState({ kichHoat: Number(!this.state.kichHoat) })} />
-										<span className='button-indecator' />
-									</label>
-								</div>
-							</div>
-						</div>
-						<div className='modal-footer'>
-							<button type='button' className='btn btn-secondary' data-dismiss='modal'>Đóng</button>
-							{!readOnly && <button type='submit' className='btn btn-primary'>Lưu</button>}
-						</div>
-					</div>
-				</form>
-			</div>
-		);
+		return this.renderModal({
+			title: this.state.ma ? 'Cập nhật Quận Huyện' : 'Tạo mới Quận Huyện',
+            body: <div className='row'>
+                <FormTextBox className='col-md-12' ref={e => this.maQuanHuyen = e} label='Mã quận/huyện' placeholder='Mã quận huyện' maxLength={3} readOnly={this.state.ma ? true : readOnly} required />
+                <FormTextBox type='text' className='col-md-12' ref={e => this.tenQuanHuyen = e} label='Tên quận/huyện' placeholder='Tên quận huyện' readOnly={readOnly} required />
+                <FormSelect className='col-md-12' label='Tên tỉnh thành' ref={e => this.maTinhThanhPho = e} data={this.props.tinhOptions} required /> 
+                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} onChange={value => this.changeKichHoat(value ? 1 : 0)} />
+            </div>
+		});
 	}
 }
 
-class DmQuanHuyenPage extends React.Component {
+class DmQuanHuyenPage extends AdminPage {
 	state = { searching: false };
-	searchBox = React.createRef();
-	modal = React.createRef();
 	tinhMapper = null;
 	tinhOptions = [];
 
@@ -121,15 +77,18 @@ class DmQuanHuyenPage extends React.Component {
 				this.tinhMapper = mapper;
 			}
 		});
-		T.ready('/user/category', () => this.searchBox.current.getPage());
+
+		T.ready('/user/category', () => {
+            T.onSearch = (searchText) => this.props.getDmQuanHuyenPage(undefined, undefined, searchText || '');
+            T.showSearchBox();
+            this.props.getDmQuanHuyenPage();
+        });
 	}
 
-	edit = (e, item) => {
+	showModal = (e) => {
 		e.preventDefault();
-		this.modal.current.show(item);
+		this.modal.show();
 	};
-
-	changeActive = item => this.props.updateDmQuanHuyen(item.maQuanHuyen, { kichHoat: Number(!item.kichHoat) });
 
 	delete = (e, item) => {
 		e.preventDefault();
@@ -139,86 +98,51 @@ class DmQuanHuyenPage extends React.Component {
 
 	render() {
 		const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-			permissionWrite = currentPermissions.includes('dmQuanHuyen:write'),
-			permissionDelete = currentPermissions.includes('dmQuanHuyen:delete'),
-			permissionUpload = currentPermissions.includes('dmQuanHuyen:upload');
+			permission = this.getUserPermission('dmChucVu', ['read', 'write', 'delete']);
 		const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmQuanHuyen && this.props.dmQuanHuyen.page ?
 			this.props.dmQuanHuyen.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
 		let table = 'Không có thông tin quận huyện!';
 		if (list && list.length > 0 && this.tinhMapper) {
-			table = (
-				<table className='table table-hover table-bordered'>
-					<thead>
-						<tr>
+			table = renderTable({
+				getDataSource: () => list, stickyHead: false,
+				renderHead: () => (
+					<tr>
 							<th style={{ width: 'auto' }}>Mã</th>
 							<th style={{ width: '50%' }}>Tên quận/huyện</th>
 							<th style={{ width: '50%' }} nowrap='true'>Tỉnh/thành phố</th>
 							<th style={{ width: 'auto' }} nowrap='true' >Kích hoạt</th>
 							<th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
-						</tr>
-					</thead>
-					<tbody>
-						{list.map((item, index) => (
-							<tr key={index}>
-								<td style={{ whiteSpace: 'nowrap' }}>{item.maQuanHuyen}</td>
-								<td><a href='#' onClick={e => this.edit(e, item)}>{item.tenQuanHuyen}</a></td>
-								<td style={{ whiteSpace: 'nowrap' }}>{this.tinhMapper[item.maTinhThanhPho] ? this.tinhMapper[item.maTinhThanhPho] : ''}</td>
-
-								<td className='toggle' style={{ textAlign: 'center' }}>
-									<label>
-										<input type='checkbox' checked={item.kichHoat == '1' ? true : false} onChange={() => permissionWrite && this.changeActive(item)} />
-										<span className='button-indecator' />
-									</label>
-								</td>
-								<td style={{ textAlign: 'center' }}>
-									<div className='btn-group'>
-										<a className='btn btn-primary' href='#' onClick={e => this.edit(e, item)}>
-											<i className='fa fa-lg fa-edit' />
-										</a>
-										{permissionDelete &&
-											<a className='btn btn-danger' href='#' onClick={e => this.delete(e, item)}>
-												<i className='fa fa-trash-o fa-lg' />
-											</a>}
-									</div>
-								</td>
-							</tr>
-						))}
-					</tbody>
-				</table>
-			);
+					</tr>
+				),
+				renderRow: (item, index) => (
+                    <tr key={index}>
+						<TableCell type='text' content={item.maQuanHuyen} />
+                        <TableCell type='link' content={item.tenQuanHuyen} onClick={() => this.modal.show(item)} />
+                        <TableCell type='text' content={this.tinhMapper[item.maTinhThanhPho] ? this.tinhMapper[item.maTinhThanhPho] : ''} />
+                        <TableCell type='checkbox' content={item.kichHoat} permission={permission}
+                            onChanged={value => this.props.updateDmChucVu(item.ma, { kichHoat: value ? 1 : 0, })} />
+                        <TableCell type='buttons' content={item} permission={permission}
+                            onEdit={() => this.modal.show(item)} onDelete={this.delete} />
+                    </tr>)
+			});
 		}
-		return (
-			<main className='app-content'>
-				<div className='app-title'>
-					<h1><i className='fa fa-list-alt' /> Danh mục Quận Huyện</h1>
-					<AdminSearchBox ref={this.searchBox} getPage={this.props.getDmQuanHuyenPage} setSearching={value => this.setState({ searching: value })} />
-					<ul className='app-breadcrumb breadcrumb'>
-						<Link to='/user'><i className='fa fa-home fa-lg' /></Link>
-						&nbsp;/&nbsp;
-						<Link to='/user/category'>Danh mục</Link>
-						&nbsp;/&nbsp;Quận huyện
-					</ul>
-				</div>
-				<div className='tile'>
-					{!this.state.searching ? table : <OverlayLoading text='Đang tải..' />}
-					<EditModal ref={this.modal} readOnly={!permissionWrite} tinhOptions={this.tinhOptions}
-						createDmQuanHuyen={this.props.createDmQuanHuyen} updateDmQuanHuyen={this.props.updateDmQuanHuyen} />
-					<Pagination name='pageDmQuanHuyen' style={{ marginLeft: '70px', marginBottom: '5px' }} pageNumber={pageNumber} pageSize={pageSize} pageTotal={pageTotal} totalItem={totalItem} pageCondition={pageCondition}
-						getPage={this.searchBox.current && this.searchBox.current.getPage} />
-					{permissionUpload &&
-						<Link to='/user/danh-muc/quan-huyen/upload' className='btn btn-success btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px' }}>
-							<i className='fa fa-lg fa-cloud-upload' />
-						</Link>}
-					{permissionWrite &&
-						<button type='button' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.edit}>
-							<i className='fa fa-lg fa-plus' />
-						</button>}
-					<Link to='/user/category' className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>
-						<i className='fa fa-lg fa-reply' />
-					</Link>
-				</div>
-			</main>
-		);
+		return this.renderPage({
+            icon: 'fa fa-list-alt',
+            title: 'Danh mục Quận Huyện',
+            breadcrumb: [
+                <Link key={0} to='/user/category'>Danh mục</Link>,
+                'Danh mục Quận Huyện'
+            ],
+            content: <>
+                <div className='tile'>{table}</div>
+                <Pagination style={{ marginLeft: '65px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.props.getDmQuanHuyenPage} />
+                <EditModal ref={e => this.modal = e} permission={permission}
+                    create={this.props.createDmQuanHuyen} update={this.props.updateDmQuanHuyen} permissions={currentPermissions} />
+            </>,
+            backRoute: '/user/category',
+            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+            onImport: permission && permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/danh-muc/quan-huyen/upload') : null
+        });
 	}
 }
 

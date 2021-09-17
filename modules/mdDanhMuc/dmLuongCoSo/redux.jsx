@@ -99,6 +99,7 @@ export function createDmLuongCoSo(dmLuongCoSo, done) {
                 T.notify(data.error.message ? data.error.message : 'Tạo mới một lương cơ sở bị lỗi!', 'danger');
                 console.error(`POST: ${url}.`, data.error);
             } else {
+                T.notify('Tạo mới một lương cơ sở thành công!', 'success');
                 dispatch(getDmLuongCoSoPage());
                 if (done) done(data);
             }
@@ -114,6 +115,7 @@ export function updateDmLuongCoSo(ma, changes, done) {
                 T.notify('Cập nhật dữ liệu lương cơ sở bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`PUT: ${url}.`, data.error);
             } else {
+                T.notify('Cập nhật dữ liệu lương cơ sở thành công!', 'success');
                 done && done(data.item);
                 dispatch(getDmLuongCoSoPage());
             }

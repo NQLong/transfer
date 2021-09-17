@@ -84,6 +84,7 @@ export function createDmLuongDiNuocNgoai(item, done) {
                 console.error(`POST ${url}. ${data.error}`);
             } else {
                 if (done) done(data.items);
+                T.notify('Tạo mới thông tin lương đi nước ngoài thành công!', 'success');
                 dispatch(getDmLuongDiNuocNgoaiPage());
             }
         });
@@ -116,6 +117,7 @@ export function updateDmLuongDiNuocNgoai(ma, changes, done) {
             } else {
                 T.notify('Cập nhật thông tin lương đi nước ngoài thành công!', 'success');
                 dispatch(changeDmLuongDiNuocNgoai(changes));
+                done && done(data.item);
                 dispatch(getDmLuongDiNuocNgoaiPage());
             }
         }, (error) => T.notify('Cập nhật thông tin lương đi nước ngoài bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));

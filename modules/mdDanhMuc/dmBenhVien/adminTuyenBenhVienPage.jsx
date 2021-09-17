@@ -2,112 +2,76 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getDmTuyenBenhVienAll, createDmTuyenBenhVien, updateDmTuyenBenhVien, deleteDmTuyenBenhVien } from './reduxTuyenBenhVien';
 import { Link } from 'react-router-dom';
-import { AdminPage, renderTable, TableCell } from 'view/component/AdminPage';
+import Pagination from 'view/component/Pagination';
+import { AdminPage, AdminModal, renderTable, TableCell, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
 
-class EditModal extends React.Component {
-    modal = React.createRef();
+class EditModal extends AdminModal {
     state = { kichHoat: true, visible: true }
 
     componentDidMount() {
-        $(document).ready(() => {
-            $(this.modal.current).on('shown.bs.modal', () => $('#dmTuyenBenhVienMa').focus());
-        });
+        $(document).ready(() => setTimeout(() => {
+            !this.ma.value() ? this.ma.focus() : this.ten.focus();
+        }));
     }
 
-    show = (item) => {
+    onShow = (item) => {
         let { ma, ten, kichHoat } = item ? item : { ma: null, ten: '', kichHoat: true };
-        $('#dmTuyenBenhVienMa').val(ma);
-        $('#dmTuyenBenhVienTen').val(ten);
-
-        $(this.modal.current).find('.modal-title').html(item ? 'Cập nhật tuyến bệnh viện' : 'Tạo mới tuyến bệnh viện');
-        this.setState({ kichHoat, visible: false });
-
-        $(this.modal.current).attr('data-ma', ma).modal('show');
+        this.setState({ ma, item });
+        this.ma.value(ma);
+        this.ten.value(ten);
+        this.kichHoat.value(kichHoat ? 1 : 0);
     };
 
-    save = (e) => {
+    changeKichHoat = value => this.kichHoat.value(value ? 1 : 0) || this.kichHoat.value(value);
+
+    onSubmit = (e) => {
         e.preventDefault();
-        const maTuyenBenhVien = $(this.modal.current).attr('data-ma'),
+        const 
             changes = {
-                ma: $('#dmTuyenBenhVienMa').val().trim(),
-                ten: $('#dmTuyenBenhVienTen').val().trim(),
-                kichHoat: Number(this.state.kichHoat),
+                ma: this.ma.value(),
+                ten: this.ten.value(),
+                kichHoat: this.kichHoat.value() ? 1 : 0,
             };
         if (changes.ma == '') {
             T.notify('Mã tuyến bệnh viện bị trống!', 'danger');
-            $('#dmTuyenBenhVienMa').focus();
+            this.ma.focus();
         } else if ($('#dmTuyenBenhVienTen').val() == '') {
             T.notify('Tên tuyến bệnh viện bị trống!', 'danger');
-            $('#dmTuyenBenhVienTen').focus();
+            this.ten.focus();
         } else if (changes.ma.length != 2) {
             this.setState({ visible: true });
         } else {
-            if (maTuyenBenhVien) {
-                this.props.update(maTuyenBenhVien, changes);
-            } else {
-                this.props.create(changes);
-            }
-            $(this.modal.current).modal('hide');
+            this.state.ma ? this.props.update(this.state.ma, changes, this.hide) : this.props.create(changes, this.hide);
         }
     };
 
-    render() {
+    render = () => {
         const readOnly = this.props.readOnly;
-        let help = this.state.visible ? <small id='maHelp' className='form-text text-muted'>Mã tuyến bệnh viện chỉ gồm 2 kí tự</small> : null;
-        return (
-            <div className='modal' tabIndex='-1' role='dialog' ref={this.modal}>
-                <form className='modal-dialog' role='document' onSubmit={this.save}>
-                    <div className='modal-content'>
-                        <div className='modal-header'>
-                            <h5 className='modal-title'></h5>
-                            <button type='button' className='close' data-dismiss='modal' aria-label='Close'>
-                                <span aria-hidden='true'>&times;</span>
-                            </button>
-                        </div>
-                        <div className='modal-body'>
-                            <div className='form-group'>
-                                <label htmlFor='dmTuyenBenhVienMa'>Mã tuyến bệnh viện</label>
-                                <input className='form-control' id='dmTuyenBenhVienMa' placeholder='Mã tuyến bệnh viện' type='text' auto-focus='' readOnly={readOnly} />
-                                {help}
-                            </div>
-                            <div className='form-group'>
-                                <label htmlFor='dmTuyenBenhVienTen'>Tên tuyến bệnh viện</label>
-                                <input className='form-control' id='dmTuyenBenhVienTen' placeholder='Tên tuyến bệnh viện' type='text' readOnly={readOnly} />
-                            </div>
-                            <div style={{ display: 'inline-flex', width: '100%', margin: 0 }}>
-                                <label htmlFor='dmTuyenBenhVienKichHoat'>Kích hoạt: </label>&nbsp;&nbsp;
-                                <div className='toggle'>
-                                    <label>
-                                        <input type='checkbox' id='dmTuyenBenhVienKichHoat' checked={this.state.kichHoat} onChange={() => !readOnly && this.setState({ kichHoat: !this.state.kichHoat })} />
-                                        <span className='button-indecator' />
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div className='modal-footer'>
-                            <button type='button' className='btn btn-secondary' data-dismiss='modal'>Đóng</button>
-                            {!readOnly && <button type='submit' className='btn btn-primary'>Lưu</button>}
-                        </div>
-                    </div>
-                </form>
+        return this.renderModal({
+            title: this.state.ma ? 'Cập nhật tuyến bệnh viện' : 'Tạo mới tuyến bệnh viện',
+            body: <div className='row'>
+                <FormTextBox type='text' className='col-md-12' ref={e => this.ma = e} label='Mã Tuyến Bệnh Viện' readOnly={this.state.ma ? true : readOnly} required />
+                <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên Tuyến Bệnh Viện' readOnly={readOnly} required />
+                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} onChange={value => this.changeKichHoat(value ? 1 : 0)} />
             </div>
-        );
+        });
     }
 }
 
 class dmTuyenBenhVienPage extends AdminPage {
     state = { searching: false };
-    searchBox = React.createRef();
-    modal = React.createRef();
 
     componentDidMount() {
-        this.props.getDmTuyenBenhVienAll();
-        T.ready('/user/category');
+        T.ready('/user/category', () => {
+            T.onSearch = (searchText) => this.props.getDmTuyenBenhVienAll(undefined, undefined, searchText || '');
+            T.showSearchBox();
+            this.props.getDmTuyenBenhVienAll();
+        });
     }
 
-    edit = (e, item) => {
+    showModal = (e) => {
         e.preventDefault();
-        this.modal.current.show(item);
+        this.modal.show();
     };
 
     delete = (e, item) => {
@@ -121,7 +85,10 @@ class dmTuyenBenhVienPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmTuyenBenhVien:write'),
-            permissionDelete = currentPermissions.includes('dmTuyenBenhVien:delete');
+            permissionDelete = currentPermissions.includes('dmTuyenBenhVien:delete'),
+            permission = this.getUserPermission('dmTuyenBenhVien', ['read', 'write', 'delete']);
+            let { pageNumber, pageSize, pageTotal, totalItem, pageCondition} = this.props.dmTuyenBenhVien && this.props.dmTuyenBenhVien.page ?
+                this.props.dmTuyenBenhVien.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}};
         let table = 'Không có dữ liệu!',
             items = this.props.dmTuyenBenhVien && this.props.dmTuyenBenhVien.items;
         if (items && items.length > 0) {
@@ -137,7 +104,7 @@ class dmTuyenBenhVienPage extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' content={item.ma} />
-                        <TableCell type='link' content={T.language.parse(item.ten, true).vi} onClick={() => this.modal.current.show(item)} />
+                        <TableCell type='link' content={T.language.parse(item.ten, true).vi} onClick={() => this.modal.show(item)} />
                         <TableCell type='checkbox' content={item.kichHoat} permission={permissionWrite} onChanged={() => permissionWrite && this.changeActive(item)} />
                         <TableCell type='buttons' content={item} permission={permissionDelete} onEdit={this.edit} onDelete={this.delete}></TableCell>
                     </tr>
@@ -145,29 +112,23 @@ class dmTuyenBenhVienPage extends AdminPage {
             });
         }
 
-        return (
-            <main className='app-content'>
-                <div className='app-title'>
-                    <h1><i className='fa fa-list-alt' /> Danh mục Tuyến bệnh viện</h1>
-                    {/* <ul className='app-breadcrumb breadcrumb'>
-                        <Link to='/user'><i className='fa fa-home fa-lg' /></Link>
-                        &nbsp;/&nbsp;
-                        <Link to='/user/category'>Danh mục</Link>
-                        &nbsp;/&nbsp;Tuyến bệnh viện
-                    </ul> */}
-                </div>
+        return this.renderPage({
+                icon: 'fa fa-list-alt',
+                title: 'Danh mục Tuyến Bệnh viện',
+                breadcrumb: [
+                    <Link key={0} to='/user/category'>Danh mục</Link>,
+                    'Danh mục Tuyến Bệnh viện'
+                ], 
+                content: <>
                 <div className='tile'>{table}</div>
-                <EditModal ref={this.modal} readOnly={!permissionWrite}
-                    create={this.props.createDmTuyenBenhVien} update={this.props.updateDmTuyenBenhVien} />
-                <Link to='/user/category' className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>
-                    <i className='fa fa-lg fa-reply' />
-                </Link>
-                {permissionWrite &&
-                    <button type='button' className='btn btn-primary btn-circle' style={{ zIndex: 100, position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.edit}>
-                        <i className='fa fa-lg fa-plus' />
-                    </button>}
-            </main>
-        );
+                <Pagination style={{ marginLeft: '65px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.props.getDmTuyenBenhVienAll} />
+                <EditModal ref={e => this.modal = e} permission={permission}
+                    create={this.props.createDmBenhVien} update={this.props.updateDmBenhVien} permissions={currentPermissions} />
+            </>,
+            backRoute: '/user/category',
+            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+            onImport: permission && permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/danh-muc/benh-vien/upload') : null
+        });
     }
 }
 

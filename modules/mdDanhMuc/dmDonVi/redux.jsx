@@ -102,6 +102,7 @@ export function createDmDonVi(item, done) {
             if (data.error) {
                 console.error(`POST: ${url}.`, data.error);
             } else {
+                T.notify('Tạo đơn vị trường đại học thành công!', 'success');
                 dispatch(getDmDonViPage());
                 if (done) done(data);
             }
@@ -117,7 +118,7 @@ export function deleteDmDonVi(ma) {
                 T.notify('Xóa danh mục  bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
-                T.alert('Khoa đã xóa thành công!', 'success', false, 800);
+                T.alert('Danh mục đơn vị đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmDonViPage());
             }
         }, (error) => T.notify('Xóa đơn vị trường đại học bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
@@ -134,6 +135,7 @@ export function updateDmDonVi(ma, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật thông tin đơn vị trường đại học thành công!', 'success');
+                done && done(data.item);
                 dispatch(getDmDonViPage());
             }
         }, (error) => T.notify('Cập nhật thông tin đơn vị trường đại học bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));

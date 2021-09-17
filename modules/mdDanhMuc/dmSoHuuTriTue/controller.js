@@ -1,16 +1,16 @@
 module.exports = app => {
-    // const menu = {
-    //     parentMenu: app.parentMenu.category,
-    //     menus: {
-    //         2103: { title: 'Sở hữu trí tuệ', link: '/user/danh-muc/so-huu-tri-tue' },
-    //     },
-    // };
-    // app.permission.add(
-    //     { name: 'dmSoHuuTriTue:read', menu },
-    //     { name: 'dmSoHuuTriTue:write' },
-    //     { name: 'dmSoHuuTriTue:delete' },
-    // );
-    // app.get('/user/danh-muc/so-huu-tri-tue', app.permission.check('dmSoHuuTriTue:read'), app.templates.admin);
+    const menu = {
+        parentMenu: app.parentMenu.category,
+        menus: {
+            2103: { title: 'Sở hữu trí tuệ', link: '/user/danh-muc/so-huu-tri-tue' },
+        },
+    };
+    app.permission.add(
+        { name: 'dmSoHuuTriTue:read', menu },
+        { name: 'dmSoHuuTriTue:write' },
+        { name: 'dmSoHuuTriTue:delete' },
+    );
+    app.get('/user/danh-muc/so-huu-tri-tue', app.permission.check('dmSoHuuTriTue:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/danh-muc/so-huu-tri-tue/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {

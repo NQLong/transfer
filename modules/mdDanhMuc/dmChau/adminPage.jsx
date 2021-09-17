@@ -1,120 +1,83 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getDmChauAll, createDmChau, updateDmChau, deleteDmChau } from './redux';
+import { getDmChauAll, createDmChau, updateDmChau, deleteDmChau, getDmChauPage} from './redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable } from 'view/component/AdminPage';
+import Pagination from 'view/component/Pagination';
+import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox} from 'view/component/AdminPage';
 
-class EditModal extends React.Component {
-    modal = React.createRef();
+class EditModal extends AdminModal {
     state = { active: false }
 
     componentDidMount() {
-        $(document).ready(() => {
-            $(this.modal.current).on('shown.bs.modal', () => $('#dmChauMa').focus());
-        });
+        $(document).ready(() => this.onShown(() => {
+            !this.ma.value() ? this.ma.focus() : this.ten.focus();
+        }));
     }
 
-    show = (item) => {
-        let { ma, ten, territory, kichHoat } = item ? item : { ma: null, ten: '', territory: '', kichHoat: 1 };
-        $('#dmChauMa').val(ma);
-        $('#dmChauTen').val(ten);
-        $('#dmChauTerritory').val(territory);
-        $(this.modal.current).find('.modal-title').html(item ? 'Cập nhật châu' : 'Tạo mới châu');
-        this.setState({ active: kichHoat == 1 });
-
-        $(this.modal.current).attr('data-ma', ma).modal('show');
+    onShow = (item) => {
+        let { ma, ten, territory, kichHoat } = item ? item : { ma: '', ten: '', territory: '', kichHoat: 1 };
+        this.setState({ma, item});
+        this.ma.value(ma);
+        this.ten.value(ten);
+        this.territory.value(territory);
+        this.kichHoat.value(kichHoat);
     };
 
-    save = (e) => {
-        e.preventDefault();
-        const maChau = $(this.modal.current).attr('data-ma'),
-            changes = {
-                ma: $('#dmChauMa').val().trim(),
-                ten: $('#dmChauTen').val().trim(),
-                territory: $('#dmChauTerritory').val().trim(),
-                kichHoat: this.state.active ? 1 : 0,
-            };
+    onSubmit = (e) => {
+        const changes = {
+            ma: this.ma.value(),
+            ten: this.ten.value(), 
+            territory: this.territory.value(),
+            kichHoat: this.kichHoat.value() ? 1 : 0,
+        };
         if (changes.ma == '') {
             T.notify('Mã châu bị trống!', 'danger');
-            $('#dmChauMa').focus();
+            this.ma.focus();
         } else if (changes.ten == '') {
             T.notify('Tên châu bị trống!', 'danger');
-            $('#dmChauTen').focus();
+            this.ten.focus();
         } else if (changes.territory == '') {
             T.notify('Territory bị trống!', 'danger');
-            $('#dmChauTerritory').focus();
+            this.territory.focus();
         } else {
-            if (maChau) {
-                this.props.update(maChau, changes, () => {
-                    T.notify('Cập nhật châu thành công!', 'success');
-                    $(this.modal.current).modal('hide');
-                });
-            } else {
-                this.props.create(changes, () => {
-                    T.notify('Tạo mới châu thành công!', 'success');
-                    $(this.modal.current).modal('hide');
-                });
-            }
+            this.state.ma ? this.props.update(this.state.ma, changes, this.hide) : this.props.create(changes, this.hide);
         }
+        e.preventDefault();
     };
 
-    render() {
+    changeKichHoat = value => this.kichHoat.value(value ? 1 : 0) || this.kichHoat.value(value);
+
+    render = () => {
         const readOnly = this.props.readOnly;
-        return (
-            <div className='modal' tabIndex='-1' role='dialog' ref={this.modal}>
-                <form className='modal-dialog' role='document' onSubmit={this.save}>
-                    <div className='modal-content'>
-                        <div className='modal-header'>
-                            <h5 className='modal-title'></h5>
-                            <button type='button' className='close' data-dismiss='modal' aria-label='Close'>
-                                <span aria-hidden='true'>&times;</span>
-                            </button>
-                        </div>
-                        <div className='modal-body'>
-                            <div className='form-group'>
-                                <label htmlFor='dmChauMa'>Mã châu</label>
-                                <input className='form-control' id='dmChauMa' placeholder='Mã châu' type='text' auto-focus='' readOnly={readOnly} />
-                            </div>
-                            <div className='form-group'>
-                                <label htmlFor='dmChauTen'>Tên châu</label>
-                                <input className='form-control' id='dmChauTen' placeholder='Tên châu' type='text' readOnly={readOnly} />
-                            </div>
-                            <div className='form-group'>
-                                <label htmlFor='dmChauTerritory'>Territory</label>
-                                <input className='form-control' id='dmChauTerritory' placeholder='Territory' type='text' readOnly={readOnly} />
-                            </div>
-                            <div style={{ display: 'inline-flex', width: '100%', margin: 0 }}>
-                                <label htmlFor='dmChauKichHoat'>Kích hoạt: </label>&nbsp;&nbsp;
-                                        <div className='toggle'>
-                                    <label>
-                                        <input type='checkbox' id='dmChauKichHoat' checked={this.state.active} onChange={() => !readOnly && this.setState({ active: !this.state.active })} />
-                                        <span className='button-indecator' />
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div className='modal-footer'>
-                            <button type='button' className='btn btn-secondary' data-dismiss='modal'>Đóng</button>
-                            {!readOnly && <button type='submit' className='btn btn-primary'>Lưu</button>}
-                        </div>
-                    </div>
-                </form>
+        return this.renderModal({
+            title: this.state.ma ? 'Cập nhật châu' : 'Tạo mới châu',
+            body: <div className = 'row'>
+               <FormTextBox type='text' className='col-md-12' ref={e => this.ma = e} label='Mã châu' 
+                    readOnly={this.state.ma ? true : readOnly} required />
+                <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên châu' 
+                    readOnly={readOnly} required />
+                <FormTextBox type='text' className='col-md-12' ref={e => this.territory = e} label='Territory' 
+                    readOnly={readOnly} required />
+                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} 
+                    readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
+                    onChange={value => this.changeKichHoat(value ? 1 : 0)} />
             </div>
-        );
+        });
     }
 }
 
 class DmChauPage extends AdminPage {
-    modal = React.createRef();
-
     componentDidMount() {
-        this.props.getDmChauAll();
-        T.ready('/user/category');
+        T.ready('/user/category', () => {
+            T.onSearch = (searchText) => this.props.getDmChauPage(undefined, undefined, searchText || '');
+            T.showSearchBox();
+            this.props.getDmChauPage();
+        });
     }
 
-    edit = (e, item) => {
+    showModal = (e) => {
         e.preventDefault();
-        this.modal.current.show(item);
+        this.modal.show();
     };
 
     delete = (e, item) => {
@@ -127,15 +90,14 @@ class DmChauPage extends AdminPage {
 
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permissionWrite = currentPermissions.includes('dmChau:write'),
-            permissionDelete = currentPermissions.includes('dmChau:delete'),
-            permission = this.getUserPermission('dmChau', ['write', 'delete']);
-
-        let table = 'Không có dữ liệu!',
-            items = this.props.dmChau && this.props.dmChau.items;
-        if (items && items.length > 0) {
+            permission = this.getUserPermission('dmChau', ['read', 'write', 'delete']);
+        const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmChau && this.props.dmChau.page ?
+            this.props.dmChau.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null };
+    
+        let table = 'Không có dữ liệu!';
+        if (list && list.length > 0) {
             table = renderTable({
-                getDataSource: () => items, stickyHead: false,
+                getDataSource: () => list, stickyHead: false,
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
@@ -148,42 +110,38 @@ class DmChauPage extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' content={item.ma ? item.ma : ''} />
-                        <TableCell type="link" content={item.ten ? item.ten : ''} onClick={e => this.edit(e, item)} />
+                        <TableCell type="link" content={item.ten ? item.ten : ''} 
+                            onClick={() => this.modal.show(item)} />
                         <TableCell type='text' content={item.territory ? item.territory : ''} />
-                        <TableCell type='checkbox' content={item.kichHoat} permission={permissionWrite}
-                            onChange={() => permissionWrite && this.changeActive(item)} />
-                        <TableCell type='buttons' content={item} permission={permission} onEdit={e => this.edit(e, item)}
-                            onDelete={e => permissionDelete && this.delete(e, item)} />
+                        <TableCell type='checkbox' content={item.kichHoat} permission={permission}
+                            onChanged={() => this.props.updateDmChau(item.ma, { kichHoat: item.kichHoat == 1 ? 0 : 1 })} />
+                        <TableCell type='buttons' content={item} permission={permission} 
+                            onEdit={() => this.modal.show(item)} onDelete={e => this.delete(e, item)} />
                     </tr>
                 )
             });
         }
 
-        return (
-            <main className='app-content'>
-                <div className='app-title'>
-                    <h1><i className='fa fa-list-alt' /> Danh mục Châu</h1>
-                    {/* <ul className='app-breadcrumb breadcrumb'>
-                        <Link to='/user'><i className='fa fa-home fa-lg' /></Link>
-                        &nbsp;/&nbsp;
-                        <Link to='/user/category'>Danh mục</Link>
-                        &nbsp;/&nbsp;Châu
-                    </ul> */}
-                </div>
+        return this.renderPage({
+            icon: 'fa fa-list-alt',
+            title: 'Danh mục Châu',
+            breadcrumb: [
+                <Link key={0} to='/user/category'>Danh mục</Link>,
+                'Danh mục Châu'
+            ],
+            content: <>
                 <div className='tile'>{table}</div>
-                <EditModal ref={this.modal} readOnly={!permissionWrite} create={this.props.createDmChau} update={this.props.updateDmChau} />
-                <Link to='/user/category' className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>
-                    <i className='fa fa-lg fa-reply' />
-                </Link>
-                {permissionWrite &&
-                    <button type='button' className='btn btn-primary btn-circle' style={{ zIndex: 100, position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.edit}>
-                        <i className='fa fa-lg fa-plus' />
-                    </button>}
-            </main>
-        );
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} 
+                    getPage={this.props.getDmBoMonPage} />
+                <EditModal ref={e => this.modal = e} permission={permission} 
+                    create={this.props.createDmChau} update={this.props.updateDmChau} permissions={currentPermissions} />
+            </>,
+            backRoute: '/user/category',
+            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+        });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, dmChau: state.dmChau });
-const mapActionsToProps = { getDmChauAll, createDmChau, updateDmChau, deleteDmChau };
+const mapActionsToProps = { getDmChauAll, createDmChau, updateDmChau, deleteDmChau, getDmChauPage};
 export default connect(mapStateToProps, mapActionsToProps)(DmChauPage);

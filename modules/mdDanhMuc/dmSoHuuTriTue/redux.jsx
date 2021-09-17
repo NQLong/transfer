@@ -97,8 +97,9 @@ export function createDmSoHuuTriTue(item, done) {
                 console.error(`POST: ${url}.`, data.error);
                 if (done) done(data.error);
             } else {
+                T.notify('Tạo mới thông tin sở hữu trí tuệ thành công!', 'success');
                 dispatch(getDmSoHuuTriTueAll());
-                if (done) done();
+                if (done) done(data);
             }
         }, () => T.notify('Tạo sở hữu trí tuệ bị lỗi!', 'danger'));
     };
