@@ -98,6 +98,7 @@ export function createDmQuocGia(item, done) {
                 T.notify('Tạo Quốc gia bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`POST: ${url}.`, data.error);
             } else {
+                T.notify('Tạo Quốc gia thành công!', 'success');
                 dispatch(getDmQuocGiaPage());
                 if (done) done(data);
             }
@@ -115,6 +116,7 @@ export function updateDmQuocGia(maCode, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật thông tin Quốc gia thành công!', 'success');
+                done && done(data.item);
                 dispatch(getDmQuocGiaPage());
             }
         }, (error) => T.notify('Cập nhật thông tin Quốc gia bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
@@ -148,6 +150,7 @@ export function createDmQuocGiaByUpload(item, done) {
             if (data.error) {
                 console.error(`POST: ${url}.`, data.error);
             }
+            T.notify('Tạo danh mục quốc gia thành công!', 'success');
             dispatch(getDmQuocGiaPage());
             if (done) done(data);
 
