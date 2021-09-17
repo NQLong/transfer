@@ -3,136 +3,71 @@ import { connect } from 'react-redux';
 import { getDmPhuongXaPage, deleteDmPhuongXa, createDmPhuongXa, updateDmPhuongXa } from './reduxPhuongXa';
 import { getDMTinhThanhPhoAll } from './reduxTinhThanhPho';
 import { getDmQuanHuyenAll } from './reduxQuanHuyen';
-import AdminSearchBox from 'view/component/AdminSearchBox';
-import Pagination, { OverlayLoading } from 'view/component/Pagination';
+import Pagination from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
+import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox, FormSelect } from 'view/component/AdminPage';
 
-class EditModal extends React.Component {
+class EditModal extends AdminModal {
 	state = { kichHoat: 1 };
-	modal = React.createRef();
-
 	componentDidMount() {
-		$(document).ready(() => setTimeout(() => {
-			$(this.modal.current).on('shown.bs.modal', () => $('#maPhuongXa').focus());
-		}, 250));
-		$('#maTinhThanhPho').select2({ minimumResultsForSearch: -1 });
-		$('#maQuanHuyen').select2({ minimumResultsForSearch: -1 });
+		$(document).ready(() => this.onShown(() => {
+            !this.maPhuongXa.value() ? this.maPhuongXa.focus() : this.tenPhuongXa.focus();
+        }));
+		// this.maTinhThanhPho.select2({ minimumResultsForSearch: -1 });
+		// this.maQuanHuyen.select2({ minimumResultsForSearch: -1 });
 	}
 
-	show = (item) => {
-		let { maPhuongXa, maQuanHuyen, tenPhuongXa, kichHoat } = item ? item : { maPhuongXa: '', maQuanHuyen: '', tenPhuongXa: '', kichHoat: 1 };
-		$('#maPhuongXa').val(maPhuongXa);
-		$('#tenPhuongXa').val(tenPhuongXa);
-
-		$('#maTinhThanhPho').select2({
-			placeholder: 'Chọn tỉnh thành phố',
-			data: this.props.tinhOptions
-		}).val(item ? this.props.quanHuyenOptions.filter(e => e.id == maQuanHuyen)[0].maTinhThanhPho : '').trigger('change');
-
-		$('#maQuanHuyen').select2({
-			placeholder: 'Chọn quận huyện',
-			data: item ? this.props.quanHuyenOptions.filter(e => e.maTinhThanhPho == this.props.quanHuyenOptions.filter(e => e.id == maQuanHuyen)[0].maTinhThanhPho) : []
-		}).val(maQuanHuyen).trigger('change');
-
-		$('#maTinhThanhPho').on('select2:select', (e) => {
-			let selectedData = e.params.data;
-			$('#maQuanHuyen').empty();
-			const quanHuyenOptionsByTinh = this.props.quanHuyenOptions.filter(item => item.maTinhThanhPho === selectedData.id);
-			$('#maQuanHuyen').select2({
-				placeholder: 'Chọn quận huyện',
-				data: quanHuyenOptionsByTinh
-			}).val('').trigger('change');
-		});
+	onShow = (item) => {
+		let { maPhuongXa, maQuanHuyen, maTinhThanhPho, tenPhuongXa, kichHoat } = item ? item : { maPhuongXa: '', maQuanHuyen: '', maTinhThanhPho: '', tenPhuongXa: '', kichHoat: 1 };
+		this.maPhuongXa.value(maPhuongXa);
+		this.tenPhuongXa.value(tenPhuongXa);
+		this.maTinhThanhPho.value(maTinhThanhPho);
+		this.maQuanHuyen.value(maQuanHuyen);
 		this.setState({ kichHoat });
-		$(this.modal.current).attr('data-id', maPhuongXa).modal('show');
 	};
 
-	hide = () => $(this.modal.current).modal('hide');
+	changeKichHoat = value => this.kichHoat.value(value ? 1 : 0) || this.kichHoat.value(value);
 
-	save = (e) => {
+	onSubmit = (e) => {
 		e.preventDefault();
-		const maPhuongXa = $(this.modal.current).attr('data-id'),
+		const 
 			changes = {
-				maPhuongXa: $('#maPhuongXa').val(),
-				maQuanHuyen: $('#maQuanHuyen').val(),
-				tenPhuongXa: $('#tenPhuongXa').val(),
+				maPhuongXa: this.maPhuongXa.value(),
+				maQuanHuyen: this.maQuanHuyen.value(),
+				tenPhuongXa: this.maPhuongXa.value(),
 				kichHoat: this.state.kichHoat,
 			};
-		if ($('#maPhuongXa').val() == '') {
+		if (this.maPhuongXa.value() == '') {
 			T.notify('Mã phường xã bị trống!', 'danger');
-			$('#maPhuongXa').focus();
-		} else if ($('#select2-maQuanHuyen-container').text() == 'Chọn quận huyện') {
+			this.maPhuongXa.focus();
+		} else if (this.maQuanHuyen == 'Chọn quận huyện') {
 			T.notify('Tên quận huyện bị trống!', 'danger');
-			$('#maQuanHuyen').focus();
-		} else if ($('#tenPhuongXa').val() == '') {
+			this.maQuanHuyen.focus();
+		} else if (this.tenPhuongXa.val() == '') {
 			T.notify('Tên phường xã bị trống!', 'danger');
-			$('#tenPhuongXa').focus();
+			this.tenPhuongXa.focus();
 		} else {
-			if (maPhuongXa) {
-				this.props.updateDmPhuongXa(maPhuongXa, changes);
-			} else {
-				this.props.createDmPhuongXa(changes);
-			}
-			$(this.modal.current).modal('hide');
+			this.state.ma ? this.props.update(this.state.ma, changes, this.hide) : this.props.create(changes, this.hide);
 		}
 	};
 
-	render() {
+	render = () => { 
 		const readOnly = this.props.readOnly;
-		return (
-			<div className='modal' role='dialog' ref={this.modal}>
-				<form className='modal-dialog' role='document' onSubmit={this.save}>
-					<div className='modal-content'>
-						<div className='modal-header'>
-							<h5 className='modal-title'>Thông tin danh mục Phường Xã</h5>
-							<button type='button' className='close' data-dismiss='modal' aria-label='Close'>
-								<span aria-hidden='true'>&times;</span>
-							</button>
-						</div>
-
-						<div className='modal-body'>
-							<div className='form-group'>
-								<label htmlFor='maQuanHuyen'>Mã phường/xã</label>
-								<input className='form-control' id='maPhuongXa' type='text' placeholder='Mã phường xã' maxLength={5} readOnly={readOnly} />
-							</div>
-							<div className='form-group'>
-								<label htmlFor='maTinhThanhPho'>Tên tỉnh/thành </label>
-								<select className='form-control' id='maTinhThanhPho'></select>
-							</div>
-							<div className='form-group'>
-								<label htmlFor='maQuanHuyen'>Tên quận/huyện</label>
-								<select className='form-control' id='maQuanHuyen' ></select>
-							</div>
-							<div className='form-group'>
-								<label htmlFor='tenPhuongXa'>Tên phường/xã</label>
-								<input className='form-control' id='tenPhuongXa' type='text' placeholder='Tên phường xã' readOnly={readOnly} />
-							</div>
-							<div className='form-group' style={{ display: 'inline-flex', margin: 0 }}>
-								<label htmlFor='dmPhuongXaActive'>Kích hoạt: </label>&nbsp;&nbsp;
-								<div className='toggle'>
-									<label>
-										<input type='checkbox' id='dmPhuongXaActive' checked={this.state.kichHoat}
-											onChange={() => !readOnly && this.setState({ kichHoat: Number(!this.state.kichHoat) })} />
-										<span className='button-indecator' />
-									</label>
-								</div>
-							</div>
-						</div>
-						<div className='modal-footer'>
-							<button type='button' className='btn btn-secondary' data-dismiss='modal'>Đóng</button>
-							{!readOnly && <button type='submit' className='btn btn-primary'>Lưu</button>}
-						</div>
-					</div>
-				</form>
+		return this.renderModal({
+			title: this.state.maPhuongXa ? 'Cập nhật phường xã' : 'Tạo mới phường xã',
+			body: <div className='row'>
+				<FormTextBox className='col-md-12' lable='Mã phường/xã' ref={e => this.maPhuongXa = e} readOnly={this.state.maPhuongXa ? true : readOnly} placeholder='Mã phường xã' required />
+				<FormSelect className='col-md-12' label='Tên tỉnh thành' ref={e => this.maTinhThanhPho =  e} data={this.props.tinhOptions} required /> 
+				<FormSelect className='col-md-12' label='Tên quận huyện' ref={e => this.maQuanHuyen = e} data={this.maTinhThanhPho ? this.props.quanHuyenOptions : []} required /> 
+				<FormTextBox className='col-md-12' label='Tên phường/xã' ref={e => this.tenPhuongXa = e} readOnly={readOnly} placeholder='Tên phường xã' required />
+				<FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} onChange={value => this.changeKichHoat(value ? 1 : 0)} />
 			</div>
-		);
+		});
 	}
 }
 
-class DmPhuongXaPage extends React.Component {
+class DmPhuongXaPage extends AdminPage {
 	state = { searching: false };
-	searchBox = React.createRef();
-	modal = React.createRef();
 	tinhMapper = null;
 	tinhOptions = [];
 	quanHuyenMapper = null;
@@ -161,15 +96,17 @@ class DmPhuongXaPage extends React.Component {
 			}
 		});
 
-		T.ready('/user/category', () => this.searchBox.current.getPage());
+		T.ready('/user/category', () => {
+            T.onSearch = (searchText) => this.props.getDmPhuongXaPage(undefined, undefined, searchText || '');
+            T.showSearchBox();
+            this.props.getDmPhuongXaPage();
+        });
 	}
 
-	edit = (e, item) => {
+	showModal = (e) => {
 		e.preventDefault();
-		this.modal.current.show(item);
+		this.modal.show();
 	};
-
-	changeActive = item => this.props.updateDmPhuongXa(item.maPhuongXa, { kichHoat: Number(!item.kichHoat) });
 
 	delete = (e, item) => {
 		e.preventDefault();
@@ -179,88 +116,52 @@ class DmPhuongXaPage extends React.Component {
 
 	render() {
 		const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-			permissionWrite = currentPermissions.includes('dmPhuongXa:write'),
-			permissionDelete = currentPermissions.includes('dmPhuongXa:delete'),
-			permissionUpload = currentPermissions.includes('dmPhuongXa:upload');
+			permission = this.getUserPermission('dmChucVu', ['read', 'write', 'delete']);
 		const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmPhuongXa && this.props.dmPhuongXa.page ?
 			this.props.dmPhuongXa.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
 		let table = 'Không có thông tin phường/xã!';
 		if (list && list.length > 0 && this.quanHuyenMapper) {
-			table = (
-				<table className='table table-hover table-bordered'>
-					<thead>
-						<tr>
-							<th style={{ width: 'auto' }} nowrap='true'>Mã phường/xã</th>
-							<th style={{ width: '100%' }} nowrap='true'>Tên phường/xã</th>
-							<th style={{ width: 'auto' }} nowrap='true'>Tên quận/huyện</th>
-							<th style={{ width: 'auto' }} nowrap='true'>Tên tỉnh/thành phố</th>
-							<th style={{ width: 'auto' }} nowrap='true' >Kích hoạt</th>
-							<th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
-						</tr>
-					</thead>
-					<tbody>
-						{list.map((item, index) => (
-							<tr key={index}>
-								<td>{item.maPhuongXa}</td>
-								<td><a href='#' onClick={e => this.edit(e, item)}>{item.tenPhuongXa}</a></td>
-								<td style={{ whiteSpace: 'nowrap' }}>{this.quanHuyenMapper[item.maQuanHuyen] ? this.quanHuyenMapper[item.maQuanHuyen] : ''}</td>
-								<td style={{ whiteSpace: 'nowrap' }}>{this.tinhMapper[this.quanHuyenOptions.filter(e => e.id == item.maQuanHuyen)[0].maTinhThanhPho]}</td>
-								<td className='toggle' style={{ textAlign: 'center' }}>
-									<label>
-										<input type='checkbox' checked={item.kichHoat == '1' ? true : false}
-											onChange={() => permissionWrite && this.changeActive(item)} />
-										<span className='button-indecator' />
-									</label>
-								</td>
-								<td style={{ textAlign: 'center' }}>
-									<div className='btn-group'>
-										<a className='btn btn-primary' href='#' onClick={e => this.edit(e, item)}>
-											<i className='fa fa-lg fa-edit' />
-										</a>
-										{permissionDelete &&
-											<a className='btn btn-danger' href='#' onClick={e => this.delete(e, item)}>
-												<i className='fa fa-trash-o fa-lg' />
-											</a>}
-									</div>
-								</td>
-							</tr>
-						))}
-					</tbody>
-				</table>
-			);
+			table = renderTable({
+				getDataSource: () => list, stickyHead: false,
+                renderHead: () => (
+                    <tr>
+                        <th style={{ width: 'auto' }} nowrap='true'>Mã phường/xã</th>
+						<th style={{ width: '100%' }} nowrap='true'>Tên phường/xã</th>
+						<th style={{ width: 'auto' }} nowrap='true'>Tên quận/huyện</th>
+						<th style={{ width: 'auto' }} nowrap='true'>Tên tỉnh/thành phố</th>
+						<th style={{ width: 'auto' }} nowrap='true' >Kích hoạt</th>
+						<th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                    </tr>),
+                renderRow: (item, index) => (
+                    <tr key={index}>
+                        <TableCell type='text' content={item.maPhuongXa} />
+                        <TableCell type='link' content={item.tenPhuongXa} onClick={() => this.modal.show(item)} />
+                        <TableCell type='text' content={this.quanHuyenMapper[item.maQuanHuyen] ? this.quanHuyenMapper[item.maQuanHuyen] : ''} />
+                        <TableCell type='text' content={this.tinhMapper[this.quanHuyenOptions.filter(e => e.id == item.maQuanHuyen)[0].maTinhThanhPho]} />
+						<TableCell type='checkbox' content={item.kichHoat} permission={permission}
+                            onChanged={value => this.props.updateDmChucVu(item.ma, { kichHoat: value ? 1 : 0, })} />
+                        <TableCell type='buttons' content={item} permission={permission}
+                            onEdit={() => this.modal.show(item)} onDelete={this.delete} />
+                    </tr>)
+			});
 		}
-		return (
-			<main className='app-content'>
-				<div className='app-title'>
-					<h1><i className='fa fa-list-alt' /> Danh mục Phường Xã</h1>
-					<AdminSearchBox ref={this.searchBox} getPage={this.props.getDmPhuongXaPage} setSearching={value => this.setState({ searching: value })} />
-					<ul className='app-breadcrumb breadcrumb'>
-						<Link to='/user'><i className='fa fa-home fa-lg' /></Link>
-						&nbsp;/&nbsp;
-						<Link to='/user/category'>Danh mục</Link>
-						&nbsp;/&nbsp;Phường xã
-					</ul>
-				</div>
-				<div className='tile'>
-					{!this.state.searching ? table : <OverlayLoading text='Đang tải..' />}
-					<EditModal ref={this.modal} readOnly={!permissionWrite} tinhOptions={this.tinhOptions} quanHuyenOptions={this.quanHuyenOptions}
-						createDmPhuongXa={this.props.createDmPhuongXa} updateDmPhuongXa={this.props.updateDmPhuongXa} />
-					<Pagination name='pageDmPhuongXa' style={{ marginLeft: '70px', marginBottom: '5px' }} pageNumber={pageNumber} pageSize={pageSize} pageTotal={pageTotal} totalItem={totalItem} pageCondition={pageCondition}
-						getPage={this.searchBox.current && this.searchBox.current.getPage} />
-					{permissionUpload &&
-						<Link to='/user/danh-muc/phuong-xa/upload' className='btn btn-success btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px' }}>
-							<i className='fa fa-lg fa-cloud-upload' />
-						</Link>}
-					{permissionWrite &&
-						<button type='button' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.edit}>
-							<i className='fa fa-lg fa-plus' />
-						</button>}
-					<Link to='/user/category' className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>
-						<i className='fa fa-lg fa-reply' />
-					</Link>
-				</div>
-			</main>
-		);
+		return this.renderPage({
+			icon: 'fa fa-list-alt',
+            title: 'Danh mục Phường xã',
+            breadcrumb: [
+                <Link key={0} to='/user/category'>Danh mục</Link>,
+                'Danh mục Phường xã'
+            ],
+            content: <>
+                <div className='tile'>{table}</div>
+                <Pagination style={{ marginLeft: '65px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.props.getDmPhuongXaPage} />
+                <EditModal ref={e => this.modal = e} permission={permission}
+                    create={this.props.createDmPhuongXa} update={this.props.updateDmPhuongXa} permissions={currentPermissions} />
+            </>,
+            backRoute: '/user/category',
+            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+            onImport: permission && permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/danh-muc/phuong-xa/upload') : null
+		});
 	}
 }
 
