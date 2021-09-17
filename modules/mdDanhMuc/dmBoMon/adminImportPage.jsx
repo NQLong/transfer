@@ -48,7 +48,7 @@ class EditModal extends AdminModal {
             T.notify('Mã đơn vị bị trống!', 'danger');
             this.maDv.focus();
         } else {
-            this.props.update(this.state.ma, changes, this.hide);
+            this.props.update(this.state.index, changes, this.hide);
         }
         e.preventDefault();
     };
@@ -199,7 +199,6 @@ class DmBoMonImportPage extends AdminPage {
             onImport: displayState == 'data' ? () => this.setState({ displayState: 'import', items: null }) : null,
             onExport: displayState == 'import' ? () => T.download('/api/dm-bo-mon/download-template') : null,
             backRoute: '/user/dm-bo-mon',
-
         });
     }
 }
