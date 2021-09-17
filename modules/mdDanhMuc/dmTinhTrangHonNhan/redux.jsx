@@ -58,16 +58,17 @@ export function getDmTinhTrangHonNhanAll(done) {
 }
 
 T.initPage('pageDmTinhTrangHonNhan');
-export function getDmTinhTrangHonNhanPage(pageNumber, pageSize, done) {
-    const page = T.updatePage('pageDmTinhTrangHonNhan', pageNumber, pageSize);
+export function getDmTinhTrangHonNhanPage(pageNumber, pageSize, pageCondition, done) {
+    const page = T.updatePage('pageDmTinhTrangHonNhan', pageNumber, pageSize, pageCondition);
     return dispatch => {
         const url = `/api/danh-muc/tinh-trang-hon-nhan/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, data => {
+        T.get(url, { condition: page.pageCondition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách tình trạng hôn nhân bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                if (done) done(data.page);                
                 dispatch({ type: DmTinhTrangHonNhanGetPage, page: data.page });
             }
         }, (error) => T.notify('Lấy danh sách tình trạng hôn nhân bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
@@ -96,11 +97,12 @@ export function createDmTinhTrangHonNhan(item, done) {
         T.post(url, { item }, data => {
             if (data.error) {
                 if (data.error.errorNum == 1) {
-                    return T.notify('Tạo tình trạng hôn nhân không được trùng mã' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                    return T.notify('Tạo tình trạng hôn nhân không được trùng mã ' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 }
                 console.error(`POST: ${url}.`, data.error);
             } else {
-                dispatch(getDmTinhTrangHonNhanAll());
+                T.notify('Tạo tình trạng hôn nhân thành công!', 'success');
+                dispatch(getDmTinhTrangHonNhanPage());
                 if (done) done(data);
             }
         }, (error) => T.notify('Tạo tình trạng hôn nhân bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
@@ -112,11 +114,11 @@ export function deleteDmTinhTrangHonNhan(ma) {
         const url = '/api/danh-muc/tinh-trang-hon-nhan';
         T.delete(url, { ma }, data => {
             if (data.error) {
-                T.notify('Xóa danh mục  bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                T.notify('Xóa tình trạng hôn nhân bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
-                T.alert('Khoa đã xóa thành công!', 'success', false, 800);
-                dispatch(getDmTinhTrangHonNhanAll());
+                T.alert('Xóa tình trạng hôn nhân thành công!', 'success', false, 800);
+                dispatch(getDmTinhTrangHonNhanPage());
             }
         }, (error) => T.notify('Xóa tình trạng hôn nhân bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
     };
@@ -132,7 +134,8 @@ export function updateDmTinhTrangHonNhan(ma, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật thông tin tình trạng hôn nhân thành công!', 'success');
-                dispatch(getDmTinhTrangHonNhanAll());
+                done && done(data.item);
+                dispatch(getDmTinhTrangHonNhanPage());
             }
         }, (error) => T.notify('Cập nhật thông tin tình trạng hôn nhân bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
     };

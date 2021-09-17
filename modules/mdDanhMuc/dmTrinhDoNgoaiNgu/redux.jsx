@@ -98,7 +98,8 @@ export function createDmTrinhDoNgoaiNgu(dmTrinhDoNgoaiNgu, done) {
                 T.notify(data.error.message ? data.error.message : 'Tạo mới một trình độ ngoại ngữ bị lỗi!', 'danger');
                 console.error(`POST: ${url}.`, data.error);
             } else {
-                dispatch(getDmTrinhDoNgoaiNguAll());
+                T.notify('Tạo mới một trình độ ngoại ngữ thành công!', 'success');
+                dispatch(getDmTrinhDoNgoaiNguPage());
                 if (done) done(data);
             }
         }, () => T.notify('Tạo mới một trình độ ngoại ngữ bị lỗi!', 'danger'));
@@ -113,8 +114,9 @@ export function updateDmTrinhDoNgoaiNgu(ma, changes, done) {
                 T.notify('Cập nhật dữ liệu trình độ ngoại ngữ bị lỗi!', 'danger');
                 console.error(`PUT: ${url}.`, data.error);
             } else {
+                T.notify('Cập nhật dữ liệu trình độ ngoại ngữ thành công!', 'success');
                 done && done(data.item);
-                dispatch(getDmTrinhDoNgoaiNguAll());
+                dispatch(getDmTrinhDoNgoaiNguPage());
             }
         }, () => T.notify('Cập nhật dữ liệu trình độ ngoại ngữ bị lỗi!', 'danger'));
     };
@@ -129,7 +131,7 @@ export function deleteDmTrinhDoNgoaiNgu(ma, done) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('Xóa trình độ ngoại ngữ thành công!', 'success', false, 800);
-                dispatch(getDmTrinhDoNgoaiNguAll());
+                dispatch(getDmTrinhDoNgoaiNguPage());
             }
             done && done();
         }, () => T.notify('Xóa trình độ ngoại ngữ bị lỗi!', 'danger'));
