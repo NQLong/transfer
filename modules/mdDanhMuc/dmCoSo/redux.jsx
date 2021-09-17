@@ -97,6 +97,7 @@ export function createDmCoSo(item, done) {
             if (data.error) {
                 console.error(`POST: ${url}.`, data.error);
             } else {
+                T.notify('Tạo cơ sở trường đại học thành công!', 'success');
                 dispatch(getDmCoSoAll());
                 if (done) done(data);
             }
@@ -112,7 +113,7 @@ export function deleteDmCoSo(ma) {
                 T.notify('Xóa danh mục  bị lỗi!', 'danger');
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
-                T.alert('Khoa đã xóa thành công!', 'success', false, 800);
+                T.alert('Xóa cơ sở trường đại học thành công!', 'success', false, 800);
                 dispatch(getDmCoSoAll());
             }
         }, () => T.notify('Xóa cơ sở trường đại học bị lỗi!', 'danger'));
