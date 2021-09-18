@@ -1,108 +1,72 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { PageName, createDmNguonVon, getDmNguonVonPage, updateDmNguonVon, deleteDmNguonVon } from './redux';
-import Pagination, { OverlayLoading } from 'view/component/Pagination';
-import AdminSearchBox from 'view/component/AdminSearchBox';
+import { createDmNguonVon, getDmNguonVonPage, updateDmNguonVon, deleteDmNguonVon } from './redux';
+import Pagination from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
+import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox } from 'view/component/AdminPage';
 
-class EditModal extends React.Component {
-  modal = React.createRef();
+class EditModal extends AdminModal {
 
   componentDidMount() {
-    $(() =>
-      setTimeout(() => {
-        $(this.modal.current).on('shown.bs.modal', () => $('#dmNguonVonMaNguonVon').focus());
-      }, 250)
-    );
+    $(document).ready(() => this.onShown(() => {
+      !this.ma.value() ? this.ma.focus() : this.tenNguonVon.focus();
+  }));
   }
 
-  show = (item) => {
+  onShow = (item) => {
     let { ma, tenNguonVon } = item ? item : { ma: '', tenNguonVon: '' };
-    $('#dmNguonVonMaNguonVon').val(ma);
-    $('#dmNguonVonTenNguonVon').val(tenNguonVon);
-
-    let thisModal = $(this.modal.current).attr('data-id', ma);
-    thisModal.modal('show');
-    $(window).one('keyup', (event) => {
-      if (event.keyUp === 27) {
-        thisModal.modal('hide');
-      }
-    });
+    this.ma.value(ma);
+    this.ma.value(tenNguonVon);
   };
 
-  hide = () => $(this.modal.current).modal('hide');
+  changeKichHoat = value => this.kichHoat.value(value ? 1 : 0) || this.kichHoat.value(value);
 
-  save = (e) => {
+  onSubmit = (e) => {
     e.preventDefault();
-    const ma = $(this.modal.current).attr('data-id'),
+    const 
       changes = {
-        ma: $('#dmNguonVonMaNguonVon').val().trim().toUpperCase(),
-        tenNguonVon: $('#dmNguonVonTenNguonVon').val().trim(),
+        ma: this.ma.value().trim().toUpperCase(),
+        tenNguonVon: this.tenNguonVon.value().trim(),
       };
 
     if (changes.ma == '') {
       T.notify('Mã nguồn vốn bị trống!', 'danger');
-      $('#dmNguonVonMaNguonVon').focus();
+      this.ma.focus();
     } else if (changes.tenNguonVon == '') {
       T.notify('Tên nguồn vốn bị trống!', 'danger');
-      $('#dmNguonVonTenNguonVon').focus();
+      this.tenNguonVon.focus();
     } else {
-      if (ma) {
-        this.props.updateDmNguonVon(ma, changes);
-      } else {
-        this.props.createDmNguonVon(changes);
-      }
-      $(this.modal.current).modal('hide');
+      this.state.ma ? this.props.update(this.state.ma, changes, this.hide) : this.props.create(changes, this.hide);
     }
   };
 
-  render() {
+  render = () => {
     const readOnly = this.props.readOnly;
-    return (
-      <div className='modal' tabIndex='-1' role='dialog' ref={this.modal}>
-        <form className='modal-dialog modal-lg' role='document' onSubmit={this.save}>
-          <div className='modal-content'>
-            <div className='modal-header'>
-              <h5 className='modal-title'>Nguồn Vốn</h5>
-              <button type='button' className='close' data-dismiss='modal' aria-label='Close'>
-                <span aria-hidden='true'>&times;</span>
-              </button>
-            </div>
-            <div className='modal-body'>
-              <div className='form-group row'>
-                <div className='col-12 col-sm-6'>
-                  <label htmlFor='dmNguonVonMaNguonVon'>Mã nguồn vốn</label>
-                  <input className='form-control' id='dmNguonVonMaNguonVon' type='text' placeholder='Mã nguồn vốn' readOnly={readOnly} style={{ textTransform: 'uppercase' }} />
-                </div>
-                <div className='col-12 col-sm-6'>
-                  <label htmlFor='dmNguonVonTenNguonVon'>Tên nguồn vốn</label>
-                  <input className='form-control' id='dmNguonVonTenNguonVon' type='text' placeholder='Tên nguồn vốn' readOnly={readOnly} />
-                </div>
-              </div>
-            </div>
-            <div className='modal-footer'>
-              <button type='button' className='btn btn-secondary' data-dismiss='modal'>Đóng</button>
-              {!readOnly && <button type='submit' className='btn btn-primary'>Lưu</button>}
-            </div>
-          </div>
-        </form>
+    return (this.renderModal({
+      title: this.state.ma ? 'Cập nhật nguồn vốn' : 'Tạo mới nguồn vốn',
+      body: <div className='row'>
+          <FormTextBox className='col-md-12' ref={e => this.ma = e} label='Mã Nguồn Vốn' placeholder='Mã nguồn vốn' readOnly={this.state.ma ? true : readOnly} style={{ textTransform: 'uppercase' }} required />
+          <FormTextBox type='text' className='col-md-12' ref={e => this.tenNguonVon = e} label='Tên Nguồn Vốn' readOnly={readOnly} required />
+          <FormTextBox type='number' className='col-md-12' ref={e => this.phuCap = e} label='Phụ cấp' readOnly={readOnly} step={0.01} />
       </div>
-    );
+    }));
   }
 }
 
-class AdminPage extends React.Component {
+class DmNguonVonPage extends AdminPage {
   state = { searching: false };
-  searchBox = React.createRef();
-  modal = React.createRef();
 
   componentDidMount() {
-    T.ready('/user/category', () => this.searchBox.current.getPage());
+    T.ready('/user/category', () => {
+      T.onSearch = (searchText) => this.props.getDmNguonVonPage(undefined, undefined, searchText || '');
+      T.showSearchBox();
+      this.props.getDmNguonVonPage();
+    });
   }
 
-  edit = (e, item) => {
+  showModal = (e) => {
     e.preventDefault();
-    this.modal.current.show(item);
+    this.modal.show();
   };
 
   delete = (e, item) => {
@@ -113,73 +77,47 @@ class AdminPage extends React.Component {
 
   render() {
     const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-      permissionWrite = currentPermissions.includes('dmNguonVon:write'),
-      permissionDelete = currentPermissions.includes('dmNguonVon:delete');
+    permission = this.getUserPermission('dmChucVu', ['read', 'write', 'delete']);
     const { pageNumber, pageSize, pageTotal, totalItem } = this.props.dmNguonVon && this.props.dmNguonVon.page ? this.props.dmNguonVon.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0 };
     let table = 'Không có dữ liệu nguồn vốn!';
     if (this.props.dmNguonVon && this.props.dmNguonVon.page && this.props.dmNguonVon.page.list && this.props.dmNguonVon.page.list.length > 0) {
-      table = (
-        <table className='table table-hover table-bordered'>
-          <thead>
+      table = renderTable({
+        getDataSource: () => this.props.dmNguonVon.page.list, stickyHead: false,
+        renderHead: () => (
             <tr>
               <th style={{ width: 'auto' }}>Mã</th>
               <th style={{ width: '40%' }} nowrap='true'>Tên nguồn vốn</th>
               <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            {this.props.dmNguonVon.page.list.map((item, index) => (
-              <tr key={index}>
-                <td>{item.ma}</td>
-                <td><a href='#' onClick={(e) => this.edit(e, item)}>{item.tenNguonVon}</a></td>
-                <td style={{ textAlign: 'center' }}>
-                  <div className='btn-group'>
-                    <a className='btn btn-primary' href='#' onClick={(e) => this.edit(e, item)}>
-                      <i className='fa fa-lg fa-edit' />
-                    </a>
-                    {permissionDelete && (
-                      <a className='btn btn-danger' href='#' onClick={(e) => this.delete(e, item)}>
-                        <i className='fa fa-trash-o fa-lg' />
-                      </a>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      );
+            </tr>),
+        renderRow: (item, index) => (
+            <tr key={index}>
+                <TableCell type='text' content={item.ma ? item.ma : ''} />
+                <TableCell type='link' content={item.tenNguonVon ? item.tenNguonVon : ''} onClick={() => this.modal.show(item)} />
+                <TableCell type='buttons' content={item} permission={permission}
+                    onEdit={() => this.modal.show(item)} onDelete={this.delete} />
+            </tr>)
+      });
     }
 
-    return (
-      <main className='app-content'>
-        <div className='app-title'>
-          <h1><i className='fa fa-list-alt' /> Danh mục Nguồn Vốn</h1>
-          <AdminSearchBox ref={this.searchBox} getPage={this.props.getDmNguonVonPage} setSearching={(value) => this.setState({ searching: value })} />
-          <ul className='app-breadcrumb breadcrumb'>
-            <Link to='/user'><i className='fa fa-home fa-lg' /></Link>&nbsp;/&nbsp;
-            <Link to='/user/category'>Danh mục</Link>&nbsp;/&nbsp;Nguồn Vốn
-          </ul>
-        </div>
-        <div className='tile'>
-          {!this.state.searching ? table : <OverlayLoading text='Đang tải..' />}
-          <EditModal ref={this.modal} readOnly={!permissionWrite} createDmNguonVon={this.props.createDmNguonVon} updateDmNguonVon={this.props.updateDmNguonVon} />
-          <Pagination name={PageName} style={{ marginLeft: '70px', marginBottom: '5px' }} pageNumber={pageNumber} pageSize={pageSize} pageTotal={pageTotal} totalItem={totalItem}
-            getPage={this.searchBox.current && this.searchBox.current.getPage} />
-          <Link to='/user/category' className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>
-            <i className='fa fa-lg fa-reply' />
-          </Link>
-          {permissionWrite && (
-            <button type='button' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.edit}>
-              <i className='fa fa-lg fa-plus' />
-            </button>
-          )}
-        </div>
-      </main>
-    );
+    return this.renderPage({
+      icon: 'fa fa-list-alt',
+      title: 'Danh mục Nguồn Vốn',
+      breadcrumb: [
+          <Link key={0} to='/user/category'>Danh mục</Link>,
+          'Danh mục Nguồn Vốn'
+      ],
+      content: <>
+          <div className='tile'>{table}</div>
+          <Pagination style={{ marginLeft: '65px' }} {...{ pageNumber, pageSize, pageTotal, totalItem }} getPage={this.props.getDmNguonVonPage} />
+          <EditModal ref={e => this.modal = e} permission={permission}
+              create={this.props.createDmNguonVon} update={this.props.updateDmNguonVon} permissions={currentPermissions} />
+      </>,
+      backRoute: '/user/category',
+      onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+    });
   }
 }
 
 const mapStateToProps = (state) => ({ system: state.system, dmNguonVon: state.dmNguonVon });
 const mapActionsToProps = { getDmNguonVonPage, createDmNguonVon, updateDmNguonVon, deleteDmNguonVon };
-export default connect(mapStateToProps, mapActionsToProps)(AdminPage);
+export default connect(mapStateToProps, mapActionsToProps)(DmNguonVonPage);
