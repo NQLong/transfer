@@ -2,96 +2,71 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getDmLoaiVienChucAll, updateDmLoaiVienChuc, createDmLoaiVienChuc, deleteDmLoaiVienChuc } from './redux';
 import { Link } from 'react-router-dom';
+import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
 
-class EditModal extends React.Component {
+class EditModal extends AdminModal {
     state = { active: true };
-    modal = React.createRef();
 
     componentDidMount() {
-        $(document).ready(() => setTimeout(() => {
-            $(this.modal.current).on('shown.bs.modal', () => $('#dmLoaiVienChucMa').focus());
-        }, 250));
+        $(document).ready(() => this.onShown(() => {
+            !this.ma.value() ? this.ma.focus() : this.ten.focus();
+        }));
     }
 
-    show = (item) => {
+    onShow = (item) => {
         let { ma, moTa, kichHoat } = item ? item : { ma: '', moTa: '', kichHoat: true };
-        $('#dmLoaiVienChucMa').val(ma);
-        $('#dmLoaiVienChucMota').val(moTa);
+        this.ma.value(ma);
+        this.moTa.value(moTa);
         this.setState({ active: kichHoat == 1 });
-        $(this.modal.current).attr('data-id', ma).modal('show');
     }
 
-    hide = () => $(this.modal.current).modal('hide');
+    changeKichHoat = value => this.kichHoat.value(value ? 1 : 0) || this.kichHoat.value(value);
 
-    save = (e) => {
+    onSubmit = (e) => {
         e.preventDefault();
-        const ma = $(this.modal.current).attr('data-id'),
+        const 
             changes = {
-                ma: $('#dmLoaiVienChucMa').val().trim(),
-                moTa: $('#dmLoaiVienChucMota').val().trim(),
+                ma: this.ma.value().trim(),
+                moTa: this.moTa.value().trim(),
                 kichHoat: this.state.active ? 1 : 0,
             };
         if (changes.ma == '') {
             T.notify('Mã bị trống!', 'danger');
-            $('#dmLoaiVienChucMa').focus();
+            this.ma.focus();
         } else {
-            if (ma) {
-                this.props.updateDmLoaiVienChuc(ma, changes);
-            } else {
-                this.props.createDmLoaiVienChuc(changes);
-            }
-            $(this.modal.current).modal('hide');
+            this.state.ma ? this.props.update(this.state.ma, changes, this.hide) : this.props.create(changes, this.hide);
         }
         e.preventDefault();
     }
 
-    render() {
+
+    render = () => {
         const readOnly = this.props.readOnly;
-        return (
-            <div className='modal' tabIndex='-1' role='dialog' ref={this.modal}>
-                <form className='modal-dialog' role='document' onSubmit={this.save}>
-                    <div className='modal-content'>
-                        <div className='modal-header'>
-                            <h5 className='modal-title'>Thông tin loại viên chức</h5>
-                            <button type='button' className='close' data-dismiss='modal' aria-label='Close'>
-                                <span aria-hidden='true'>&times;</span>
-                            </button>
-                        </div>
-                        <div className='modal-body'>
-                            <div className='form-group'>
-                                <label htmlFor='dmLoaiVienChucMa'>Mã loại viên chức</label>
-                                <input className='form-control' id='dmLoaiVienChucMa' type='text' placeholder='Mã loại viên chức' readOnly={readOnly} />
-                            </div>
-                            <div className='form-group'>
-                                <label htmlFor='dmLoaiVienChucMota'>Mô tả</label>
-                                <input className='form-control' id='dmLoaiVienChucMota' type='text' placeholder='Mô tả' readOnly={readOnly} />
-                            </div>
-                        </div>
-                        <div className='modal-footer'>
-                            <button type='button' className='btn btn-secondary' data-dismiss='modal'>Đóng</button>
-                            {!readOnly && <button type='submit' className='btn btn-primary'>Lưu</button>}
-                        </div>
-                    </div>
-                </form>
+        return (this.renderModal({
+            title: this.state.ma ? 'Cập nhật Loại viên chức' : 'Tạo mới Loại viên chức',
+            body: <div className='row'>
+                <FormTextBox className='col-md-12' ref={e => this.ma = e} label='Mã loại viên chức' placeholder='Mã loại viên chức' readOnly={this.state.ma ? true : readOnly} required />
+                <FormTextBox type='text' className='col-md-12' ref={e => this.moTa = e} label='Mô tả' readOnly={readOnly} />
+                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} onChange={value => this.changeKichHoat(value ? 1 : 0)} />
             </div>
-        );
+        }));
     }
 }
 
-class AdminPage extends React.Component {
-    modal = React.createRef();
+class DmLoaiVienChucPage extends AdminPage {
 
     componentDidMount() {
-        T.ready('/user/category');
-        this.props.getDmLoaiVienChucAll();
+        T.ready('/user/category', () => {
+            T.onSearch = (searchText) => this.props.getDmLoaiVienChucAll(undefined, undefined, searchText || '');
+            T.showSearchBox();
+            this.props.getDmLoaiVienChucAll();
+        });
     }
 
-    edit = (e, item) => {
+    showModal = (e) => {
         e.preventDefault();
-        this.modal.current.show(item);
+        this.modal.show();
     }
-
-    changeActive = item => this.props.updateDmLoaiVienChuc(item.ma, { kichHoat: item.kichHoat == 1 ? 0 : 1 });
 
     delete = (e, item) => {
         e.preventDefault();
@@ -101,77 +76,48 @@ class AdminPage extends React.Component {
 
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permissionWrite = currentPermissions.includes('dmLoaiVienChuc:write'),
-            permissionDelete = currentPermissions.includes('dmLoaiVienChuc:delete');
+            permission = this.getUserPermission('dmLoaiVienChuc', ['read', 'write', 'delete']);
         let table = 'Không có loại viên chức!',
             items = this.props.dmLoaiVienChuc && this.props.dmLoaiVienChuc.items ? this.props.dmLoaiVienChuc.items : [];
         if (items.length > 0) {
-            table = (
-                <table className='table table-hover table-bordered'>
-                    <thead>
-                        <tr>
-                            <th style={{ width: 'auto' }} nowrap='true'>Mã </th>
-                            <th style={{ width: '100%' }}>Mô tả</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                            <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {items.map((item, index) => (
-                            <tr key={index}>
-                                <td>
-                                    <a href='#' onClick={e => this.edit(e, item)}>{item.ma}</a>
-                                </td>
-                                <td>{item.moTa}</td>
-                                <td className='toggle' style={{ textAlign: 'center' }}>
-                                    <label>
-                                        <input type='checkbox' checked={item.kichHoat} onChange={() => permissionWrite && this.changeActive(item)} />
-                                        <span className='button-indecator' />
-                                    </label>
-                                </td>
-                                <td style={{ textAlign: 'center' }}>
-                                    <div className='btn-group'>
-                                        <a className='btn btn-primary' href='#' onClick={e => this.edit(e, item)}>
-                                            <i className='fa fa-lg fa-edit' />
-                                        </a>
-                                        {!permissionDelete ? null :
-                                            <a className='btn btn-danger' href='#' onClick={e => this.delete(e, item)}>
-                                                <i className='fa fa-trash-o fa-lg' />
-                                            </a>}
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            );
+            table = renderTable({
+                getDataSource: () => items, stickyHead: false,
+                renderHead: () => (
+                    <tr>
+                        <th style={{ width: 'auto' }} nowrap='true'>Mã </th>
+                        <th style={{ width: '100%' }}>Mô tả</th>
+                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
+                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                    </tr>),
+                renderRow: (item, index) => (
+                    <tr key={index}>
+                        <TableCell type='link' content={item.ma ? item.ma : ''} onClick={() => this.modal.show(item)} />
+                        <TableCell type='text' content={item.moTa} />
+                        <TableCell type='checkbox' content={item.kichHoat} permission={permission}
+                            onChanged={value => this.props.updateDmLoaiVienChuc(item.ma, { kichHoat: value ? 1 : 0, })} />
+                        <TableCell type='buttons' content={item} permission={permission}
+                            onEdit={() => this.modal.show(item)} onDelete={this.delete} />
+                    </tr>)
+            });
         }
-        return (
-            <main className='app-content'>
-                <div className='app-title'>
-                    <h1><i className='fa fa-list-alt' /> Danh mục Loại viên chức</h1>
-                    <ul className='app-breadcrumb breadcrumb'>
-                        <Link to='/user'><i className='fa fa-home fa-lg' /></Link>
-                        &nbsp;/&nbsp;
-                        <Link to='/user/category'>Danh mục</Link>
-                        &nbsp;/&nbsp;Loại viên chức
-                    </ul>
-                </div>
+        return this.renderPage({
+            icon: 'fa fa-list-alt',
+            title: 'Danh mục Loại Viên Chức',
+            breadcrumb: [
+                <Link key={0} to='/user/category'>Danh mục</Link>,
+                'Danh mục Loại viên chức'
+            ],
+            content: <>
                 <div className='tile'>{table}</div>
-                <EditModal ref={this.modal} readOnly={!permissionWrite}
-                    createDmLoaiVienChuc={this.props.createDmLoaiVienChuc} updateDmLoaiVienChuc={this.props.updateDmLoaiVienChuc} />
-                <Link to='/user/category' className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>
-                    <i className='fa fa-lg fa-reply' />
-                </Link>
-                {permissionWrite &&
-                    <button type='button' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.edit}>
-                        <i className='fa fa-lg fa-plus' />
-                    </button>}
-            </main>
-        );
+                <EditModal ref={e => this.modal = e} permission={permission}
+                    create={this.props.createDmLoaiVienChuc} update={this.props.updateDmLoaiVienChuc} permissions={currentPermissions} />
+            </>,
+            backRoute: '/user/category',
+            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+        });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, dmLoaiVienChuc: state.dmLoaiVienChuc });
 const mapActionsToProps = { getDmLoaiVienChucAll, updateDmLoaiVienChuc, createDmLoaiVienChuc, deleteDmLoaiVienChuc };
-export default connect(mapStateToProps, mapActionsToProps)(AdminPage);
+export default connect(mapStateToProps, mapActionsToProps)(DmLoaiVienChucPage);
