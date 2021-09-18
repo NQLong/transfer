@@ -47,13 +47,13 @@ export function getDmLoaiDonViAll(done) {
         const url = '/api/dm-loai-don-vi/all';
         T.get(url, data => {
             if (data.error) {
-                T.notify('Lấy danh sách loại đơn vị trường đại học bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                T.notify('Lấy danh sách loại đơn vị bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (done) done(data.items);
                 dispatch({ type: DmLoaiDonViGetAll, items: data.items ? data.items : [] });
             }
-        }, () => T.notify('Lấy danh sách loại đơn vị trường đại học bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách loại đơn vị bị lỗi!', 'danger'));
     };
 }
 
@@ -64,13 +64,13 @@ export function getDmLoaiDonViPage(pageNumber, pageSize, done) {
         const url = `/api/dm-loai-don-vi/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, data => {
             if (data.error) {
-                T.notify('Lấy danh sách loại đơn vị trường đại học bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                T.notify('Lấy danh sách loại đơn vị bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: DmLoaiDonViGetPage, page: data.page });
             }
-        }, () => T.notify('Lấy danh sách loại đơn vị trường đại học bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách loại đơn vị bị lỗi!', 'danger'));
     };
 }
 
@@ -79,7 +79,7 @@ export function getDmLoaiDonVi(ma, done) {
         const url = `/api/dm-loai-don-vi/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
-                T.notify('Lấy thông tin loại đơn vị trường đại học bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                T.notify('Lấy thông tin loại đơn vị bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (done) done(data.item);
@@ -95,7 +95,7 @@ export function getDonViById(ma, done) {
         const url = `/dm-don-vi/${ma}`;
         T.get(url, data => {
             if (data.error) {
-                T.notify('Lấy thông tin loại đơn vị trường đại học bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                T.notify('Lấy thông tin loại đơn vị bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (done) done(data.items);
@@ -112,14 +112,15 @@ export function createDmLoaiDonVi(item, done) {
         T.post(url, { item }, data => {
             if (data.error) {
                 if (data.error.errorNum == 1) {
-                    return T.notify('Tạo loại đơn vị trường đại học không được trùng mã' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                    return T.notify('Tạo loại đơn vị không được trùng mã' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 }
                 console.error(`POST: ${url}.`, data.error);
             } else {
+                T.alert('Tạo mới loại đơn vị thành công!', 'success', false, 800);
                 dispatch(getDmLoaiDonViAll());
                 if (done) done(data);
             }
-        }, () => T.notify('Tạo loại đơn vị trường đại học bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo loại đơn vị bị lỗi: ', 'danger'));
     };
 }
 
@@ -131,10 +132,10 @@ export function deleteDmLoaiDonVi(ma) {
                 T.notify('Xóa danh mục  bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
-                T.alert('Khoa đã xóa thành công!', 'success', false, 800);
+                T.alert('Xóa loại đơn vị thành công!', 'success', false, 800);
                 dispatch(getDmLoaiDonViAll());
             }
-        }, () => T.notify('Xóa loại đơn vị trường đại học bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa loại đơn vị bị lỗi: ', 'danger'));
     };
 }
 
@@ -143,14 +144,15 @@ export function updateDmLoaiDonVi(ma, changes, done) {
         const url = '/api/dm-loai-don-vi';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
-                T.notify('Cập nhật thông loại đơn vị trường đại học bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                T.notify('Cập nhật thông loại đơn vị bị lỗi ' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`PUT: ${url}.`, data.error);
                 done && done(data.error);
             } else {
-                T.notify('Cập nhật thông tin loại đơn vị trường đại học thành công!', 'success');
+                T.notify('Cập nhật thông tin loại đơn vị thành công!', 'success');
+                done && done(data.item);
                 dispatch(getDmLoaiDonViAll());
             }
-        }, () => T.notify('Cập nhật thông tin loại đơn vị trường đại học bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin loại đơn vị bị lỗi!', 'danger'));
     };
 }
 

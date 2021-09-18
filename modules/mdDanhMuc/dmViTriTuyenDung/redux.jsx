@@ -43,16 +43,17 @@ export default function DmViTriTuyenDungReducer(state = null, data) {
 
 // Actions ------------------------------------------------------------------------------------------------------------
 T.initPage('pageDmViTriTuyenDung');
-export function getDmViTriTuyenDungPage(pageNumber, pageSize, done) {
-    const page = T.updatePage('pageDmViTriTuyenDung', pageNumber, pageSize);
+export function getDmViTriTuyenDungPage(pageNumber, pageSize, pageCondition, done) {
+    const page = T.updatePage('pageDmViTriTuyenDung', pageNumber, pageSize, pageCondition);
     return dispatch => {
         const url = `/api/danh-muc/vi-tri-tuyen-dung/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, data => {
+        T.get(url, { condition: page.pageCondition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách vị trí tuyển dụng bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                if (done) done(data.page);                
                 dispatch({ type: DmViTriTuyenDungGetPage, page: data.page });
             }
         }, () => T.notify('Lấy danh sách vị trí tuyển dụng bị lỗi!', 'danger'));
@@ -96,7 +97,8 @@ export function createDmViTriTuyenDung(item, done) {
                 T.notify('Tạo vị trí tuyển dụng bị lỗi!', 'danger');
                 console.error(`POST: ${url}.`, data.error);
             } else {
-                dispatch(getDmViTriTuyenDungAll());
+                T.notify('Tạo vị trí tuyển dụng thành công!', 'success');
+                dispatch(getDmViTriTuyenDungPage());
                 if (done) done(data);
             }
         }, () => T.notify('Tạo vị trí tuyển dụng bị lỗi!', 'danger'));
@@ -112,7 +114,7 @@ export function deleteDmViTriTuyenDung(ma) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('Danh mục đã xóa thành công!', 'success', false, 800);
-                dispatch(getDmViTriTuyenDungAll());
+                dispatch(getDmViTriTuyenDungPage());
             }
         }, () => T.notify('Xóa vị trí tuyển dụng bị lỗi!', 'danger'));
     };
@@ -128,7 +130,8 @@ export function updateDmViTriTuyenDung(ma, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật thông tin vị trí tuyển dụng thành công!', 'success');
-                dispatch(getDmViTriTuyenDungAll());
+                done && done(data.item);
+                dispatch(getDmViTriTuyenDungPage());
             }
         }, () => T.notify('Cập nhật thông tin vị trí tuyển dụng bị lỗi!', 'danger'));
     };

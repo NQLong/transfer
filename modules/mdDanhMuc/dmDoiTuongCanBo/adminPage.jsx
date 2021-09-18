@@ -1,89 +1,93 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import {createDmDoiTuongCanBo, getDmDoiTuongCanBoAll, updateDmDoiTuongCanBo, deleteDmDoiTuongCanBo } from './redux';
+import { createDmDoiTuongCanBo, getDmDoiTuongCanBoAll, updateDmDoiTuongCanBo, deleteDmDoiTuongCanBo } from './redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormRichTextBox, FormCheckbox } from 'view/component/AdminPage';
 
 class EditModal extends AdminModal {
-    state = { kichHoat: true };
-    modal = React.createRef();
+
+    componentDidMount() {
+        $(document).ready(() => this.onShown(() => {
+            !this.ma.value() ? this.ma.focus() : this.ten.focus();
+        }));
+    }
 
     onShow = (item) => {
-        let { ma, ten, kichHoat, ghiChu } = item ? item : { ma: null, ten: '', kichHoat: 1, ghiChu: '' };
+        let { ma, ten, kichHoat, ghiChu } = item ? item : { ma: '', ten: '', kichHoat: 1, ghiChu: '' };
 
-        this.setState({ kichHoat });
+        this.setState({ ma, kichHoat });
+
         this.ma.value(ma);
         this.ten.value(ten);
-        this.kichHoat.value(kichHoat);
-        this.ghiChu.value(ghiChu);
-
-        $(this.modal).attr('data-id', ma).modal('show');
+        this.kichHoat.value(kichHoat ? 1 : 0);
+        this.ghiChu.value(ghiChu ? ghiChu : '');
     }
 
-    hide = () => $(this.modal).modal('hide');
+    onSubmit = (e) => {
+        e.preventDefault();
+        const changes = {
+            ma: this.ma.value(),
+            ten: this.ten.value(),
+            ghiChu: this.ghiChu.value(),
+            kichHoat: this.kichHoat.value() ? 1 : 0
+        };
 
-    onSubmit = () => {
-        const ma = $(this.modal).attr('data-id'),
-            changes = {
-                ten: this.ten.value(),
-                ma: this.ma.value(),
-                ghiChu: this.ghiChu.value(),
-                kichHoat: Number(this.state.kichHoat)
-            };
-
-        if (changes.ten == '') {
-            T.notify('Tên đối tượng cán bộ bị trống!', 'danger');
+        if (!this.state.ma && !this.ma.value()) {
+            T.notify('Mã không được trống!', 'danger');
+            this.ma.focus();
+        }
+        else if (!changes.ten) {
+            T.notify('Tên không được trống', 'danger');
             this.ten.focus();
-        } else {
-            if (ma) {
-                this.props.updateDmDoiTuongCanBo(ma, changes);
-            } else {
-                this.props.createDmDoiTuongCanBo(changes);
-            }
-            $(this.modal).modal('hide');
+        }
+        else {
+            this.state.ma ? this.props.update(this.state.ma, changes, this.hide) :
+                this.props.create(changes, this.hide);
         }
     }
+
+    changeKichHoat = value => this.kichHoat.value(value ? 1 : 0) || this.kichHoat.value(value);
 
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
-            title: 'Đối tượng cán bộ',
+            title: this.state.ma ? 'Cập nhật đối tượng cán bộ' : 'Tạo mới đối tượng cán bộ',
             size: 'large',
             body: <div className='row'>
-                <FormTextBox type='text' className='col-md-12' ref={e => this.ma = e} label='Mã Đối tượng cán bộ' readOnly={readOnly} placeholder='Mã Đối tượng cán bộ' required />
-                <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên Đối tượng cán bộ' readOnly={readOnly} placeholder='Tên Đối tượng cán bộ' required />
+                <FormTextBox type='text' className='col-md-12' ref={e => this.ma = e} label='Mã' readOnly={this.state.ma ? true : readOnly} placeholder='Mã' required />
+                <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên' readOnly={readOnly} placeholder='Tên' required />
                 <FormRichTextBox className='col-md-12' ref={e => this.ghiChu = e} style={{ minHeight: 40 }} label='Ghi chú' placeholder='Ghi chú' readOnly={readOnly} />
                 <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
-                    onChange={() => !readOnly && this.setState({ kichHoat: !this.state.kichHoat })} />
+                    onChange={value => this.changeKichHoat(value ? 1 : 0)} />
             </div>
         });
     }
 }
 
 class dmDoiTuongCanBoAdminPage extends AdminPage {
-    modal = React.createRef();
 
     componentDidMount() {
         T.ready('/user/category', () => this.props.getDmDoiTuongCanBoAll());
     }
 
-    edit = (e, item) => {
+    showModal = (e) => {
         e.preventDefault();
-        this.modal.current.show(item);
+        this.modal.show();
     }
 
-    changeActive = item => this.props.updateDmDoiTuongCanBo(item.ma, { ma: item.ma, kichHoat: item.kichHoat == '1' ? '0' : '1' });
-
     delete = (e, item) => {
+        T.confirm('Xóa thông tin đối tượng cán bộ', `Bạn có chắc bạn muốn xóa đôi tượng cán bộ ${item.ten ? `<b>${item.ten}</b>` : 'này'}?`, 'warning', true, isConfirm => {
+            isConfirm && this.props.deleteDmDoiTuongCanBo(item.ma, error => {
+                if (error) T.notify(error.message ? error.message : `Xoá đối tượng cán bộ ${item.ten} bị lỗi!`, 'danger');
+                else T.alert(`Xoá đối tượng cán bộ ${item.ma} thành công!`, 'success', false, 800);
+            });
+        });
         e.preventDefault();
-        T.confirm('Xóa danh mục đối tượng cán bộ', 'Bạn có chắc bạn muốn xóa đối tượng cán bộ này?', true, isConfirm =>
-            isConfirm && this.props.deleteDmDoiTuongCanBo(item.ma));
     }
 
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permissionWrite = currentPermissions.includes('dmDoiTuongCanBo:write'),
-            permission = this.getUserPermission('dmDoiTuongCanBo', ['write', 'delete']);
+            permission = this.getUserPermission('dmDoiTuongCanBo', ['read', 'write', 'delete']);
         let table = 'Không có danh sách đối tượng cán bộ!',
             items = this.props.dmDoiTuongCanBo && this.props.dmDoiTuongCanBo.items ? this.props.dmDoiTuongCanBo.items : [];
         if (items && items.length > 0) {
@@ -100,33 +104,33 @@ class dmDoiTuongCanBoAdminPage extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type="text" content={item.ma} style={{ textAlign: 'right' }} />
-                        <TableCell type='link' content={item.ten} onClick={e => this.edit(e, item)} />
+                        <TableCell type="text" content={item.ma ? item.ma : ''} style={{ textAlign: 'right' }} />
+                        <TableCell type='link' content={item.ten} onClick={() => this.modal.show(item)} />
                         <TableCell type='text' content={item.ghiChu} />
-                        <TableCell type='checkbox' content={item.kichHoat} permission={permissionWrite} onChanged={() => permissionWrite && this.changeActive(item)} />
-                        <TableCell type='buttons' content={item} permission={permission} onEdit={this.edit} onDelete={this.delete}></TableCell>
+                        <TableCell type='checkbox' content={item.kichHoat} permission={permission}
+                            onChanged={value => this.props.updateDmDoiTuongCanBo(item.ma, { kichHoat: value ? 1 : 0, })} />
+                        <TableCell type='buttons' content={item} permission={permission}
+                            onEdit={() => this.modal.show(item)} onDelete={this.delete}></TableCell>
                     </tr>
                 )
             });
         }
 
-        return (
-            <main className='app-content'>
-                <div className='app-title'>
-                    <h1><i className='fa fa-list-alt' /> Danh mục Đối tượng cán bộ</h1>
-                </div>
+        return this.renderPage({
+            icon: 'fa fa-list-alt',
+            title: 'Đối tượng cán bộ',
+            breadcrumb: [
+                <Link key={0} to='/user/category'>Danh mục</Link>,
+                'Đối tượng cán bộ'
+            ],
+            content: <>
                 <div className='tile'>{table}</div>
-                <EditModal ref={this.modal} readOnly={!permissionWrite}
-                    createDmDoiTuongCanBo={this.props.createDmDoiTuongCanBo} updateDmDoiTuongCanBo={this.props.updateDmDoiTuongCanBo} />
-                {permissionWrite &&
-                    <button type='button' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.edit}>
-                        <i className='fa fa-lg fa-plus' />
-                    </button>}
-                <Link to='/user/category' className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>
-                    <i className='fa fa-lg fa-reply' />
-                </Link>
-            </main>
-        );
+                <EditModal ref={e => this.modal = e} permission={permission}
+                    create={this.props.createDmDoiTuongCanBo} update={this.props.updateDmDoiTuongCanBo} permissions={currentPermissions} />
+            </>,
+            backRoute: '/user/category',
+            onCreate: permission && permission.write ? (e) => this.showModal(e) : null
+        });
     }
 }
 

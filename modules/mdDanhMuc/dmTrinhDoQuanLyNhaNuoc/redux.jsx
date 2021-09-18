@@ -43,16 +43,17 @@ export default function DmTrinhDoQuanLyNhaNuocReducer(state = null, data) {
 
 // Actions ------------------------------------------------------------------------------------------------------------
 T.initPage('pageDmTrinhDoQuanLyNhaNuoc');
-export function getDmTrinhDoQuanLyNhaNuocPage(pageNumber, pageSize, done) {
-    const page = T.updatePage('pageDmTrinhDoQuanLyNhaNuoc', pageNumber, pageSize);
+export function getDmTrinhDoQuanLyNhaNuocPage(pageNumber, pageSize, pageCondition, done) {
+    const page = T.updatePage('pageDmTrinhDoQuanLyNhaNuoc', pageNumber, pageSize, pageCondition);
     return dispatch => {
         const url = `/api/danh-muc/trinh-do-quan-ly-nha-nuoc/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, data => {
+        T.get(url, { condition: page.pageCondition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách trình độ quản lý nhà nước bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                if (done) done(data.page);
                 dispatch({ type: DmTrinhDoQuanLyNhaNuocGetPage, page: data.page });
             }
         }, () => T.notify('Lấy danh sách chức vụ bị lỗi!', 'danger'));
@@ -83,6 +84,7 @@ export function createDmTrinhDoQuanLyNhaNuoc(item, done) {
                 console.error(`POST: ${url}.`, data.error);
             } else {
                 dispatch(getDmTrinhDoQuanLyNhaNuocPage());
+                T.notify('Tạo mới dữ liệu thành công!', 'success');
                 if (done) done(data);
             }
         }, () => T.notify('Tạo dữ liệu bị lỗi!', 'danger'));
@@ -96,6 +98,7 @@ export function deleteDmTrinhDoQuanLyNhaNuoc(ma) {
             if (data.error) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
+                T.alert('Xoá Trình độ quản lý nhà nước thành công!', 'success', false, 800);
                 dispatch(getDmTrinhDoQuanLyNhaNuocPage());
             }
         }, () => T.notify('Xóa dữ liệu bị lỗi!', 'danger'));

@@ -44,9 +44,7 @@ export function createTinhTrangThietBi(tinhTrangThietBi, done) {
             } else {
                 T.notify(`Tạo mới ${LABEL} thành công`, 'success');
                 dispatch(getDanhSachTinhTrangThietBi());
-                if (done) {
-                    done(data.error, data.item);
-                }
+                if (done) done(data);
             }
         });
     };

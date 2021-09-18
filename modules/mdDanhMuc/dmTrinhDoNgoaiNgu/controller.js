@@ -13,9 +13,15 @@ module.exports = app => {
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/danh-muc/trinh-do-ngoai-ngu/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
-        const pageNumber = parseInt(req.params.pageNumber),
+        let pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
-            condition = req.query.condition ? req.query.condition : {};
+            condition = { statement: null };
+        if (req.query.condition) {
+            condition = {
+                statement: 'lower(ma) LIKE :searchText OR lower(ten) LIKE :searchText',
+                parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
+            };
+        }        
         app.model.dmTrinhDoNgoaiNgu.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
     });
 

@@ -83,6 +83,7 @@ export function createDmNganhDaoTao(item, done) {
                 T.notify('Tạo ngành đào tạo bị lỗi!', 'danger');
                 console.error(`POST ${url}. ${data.error}`);
             } else {
+                T.notify('Tạo ngành đào tạo thành công!', 'success');
                 if (done) done(data.items);
                 dispatch(getDmNganhDaoTaoPage());
             }
@@ -117,6 +118,7 @@ export function updateDmNganhDaoTao(_id, changes, done) {
                 T.notify('Cập nhật thông tin ngành đào tạo thành công!', 'success');
                 dispatch(changeDmNganhDaoTao(changes));
                 dispatch(getDmNganhDaoTaoPage());
+                done && done(data.item);
             }
         }, () => T.notify('Cập nhật thông tin ngành đào tạo bị lỗi!', 'danger'));
     };

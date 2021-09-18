@@ -43,16 +43,17 @@ export default function DmPhuCapReducer(state = null, data) {
 
 // Actions ------------------------------------------------------------------------------------------------------------
 T.initPage('pageDmPhuCap');
-export function getDmPhuCapPage(pageNumber, pageSize, done) {
-    const page = T.updatePage('pageDmPhuCap', pageNumber, pageSize);
+export function getDmPhuCapPage(pageNumber, pageSize, pageCondition, done) {
+    const page = T.updatePage('pageDmPhuCap', pageNumber, pageSize, pageCondition);
     return dispatch => {
         const url = `/api/danh-muc/phu-cap/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, data => {
+        T.get(url, { condition: page.pageCondition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách phụ cấp bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                if (done) done(data.page);                
                 dispatch({ type: DmPhuCapGetPage, page: data.page });
             }
         }, () => T.notify('Lấy danh sách phụ cấp bị lỗi!', 'danger'));
@@ -96,7 +97,8 @@ export function createDmPhuCap(item, done) {
                 T.notify('Tạo phụ cấp bị lỗi!', 'danger');
                 console.error(`POST: ${url}.`, data.error);
             } else {
-                dispatch(getDmPhuCapAll());
+                T.notify('Tạo phụ cấp thành công!', 'success');
+                dispatch(getDmPhuCapPage());
                 if (done) done(data);
             }
         }, () => T.notify('Tạo phụ cấp bị lỗi!', 'danger'));
@@ -112,7 +114,7 @@ export function deleteDmPhuCap(ma) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('Danh mục đã xóa thành công!', 'success', false, 800);
-                dispatch(getDmPhuCapAll());
+                dispatch(getDmPhuCapPage());
             }
         }, () => T.notify('Xóa phụ cấp bị lỗi!', 'danger'));
     };
@@ -128,7 +130,8 @@ export function updateDmPhuCap(ma, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật thông tin phụ cấp thành công!', 'success');
-                dispatch(getDmPhuCapAll());
+                done && done(data.item);
+                dispatch(getDmPhuCapPage());
             }
         }, () => T.notify('Cập nhật thông tin phụ cấp bị lỗi!', 'danger'));
     };

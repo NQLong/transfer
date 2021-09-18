@@ -14,29 +14,6 @@ module.exports = (app, config) => {
             logout: config.rootUrl,
         });
 
-
-    // Handle the login action of cas
-    app.get('/auth/cas', (req, res, next) => {
-        if (req.session.casUserInfo) {
-            if (req.session.user == null) { // Just login
-                req.session.user = req.session.casUserInfo;
-                console.log('req.session.casUserInfo', req.session.casUserInfo);
-
-                app.model.fwUser.get({ email: req.session.casUser + '@hcmut.edu.vn' }, (error, user) => {
-                    if (error || user == null) {
-                        cas.logout(req, res);
-                    } else {
-                        app.updateSessionUser(req, user, () => res.redirect('/user'));
-                    }
-                });
-            } else {
-                res.redirect('/user');
-            }
-        } else {
-            cas.bounce(req, res, next);
-        }
-    });
-
     app.casLogout = (req, res) => {
         console.log('TODO: detroy', req.session.st);
         try {

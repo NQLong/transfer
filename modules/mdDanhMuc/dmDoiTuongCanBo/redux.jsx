@@ -100,6 +100,7 @@ export function createDmDoiTuongCanBo(item, done) {
                 }
                 console.error(`POST: ${url}.`, data.error);
             } else {
+                T.notify('Tạo thông tin đối tượng cán bộ thành công!', 'success');
                 dispatch(getDmDoiTuongCanBoAll());
                 if (done) done(data);
             }
@@ -131,6 +132,7 @@ export function updateDmDoiTuongCanBo(ma, changes, done) {
                 console.error(`PUT: ${url}.`, data.error);
                 done && done(data.error);
             } else {
+                done && done(data.item);
                 T.notify('Cập nhật thông tin đối tượng cán bộ thành công!', 'success');
                 dispatch(getDmDoiTuongCanBoAll());
             }

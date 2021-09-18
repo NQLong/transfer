@@ -1,152 +1,153 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getDmNgachCdnnAll, createDmNgachCdnn, deleteDmNgachCdnn, updateDmNgachCdnn } from './redux';
+import { getDmNgachCdnnPage, createDmNgachCdnn, deleteDmNgachCdnn, updateDmNgachCdnn } from './redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
-import T from 'view/js/common';
+import Pagination from 'view/component/Pagination';
 
 class EditModal extends AdminModal {
-    state = {kichHoat: true };
-    modal = React.createRef();
+    componentDidMount() {
+        $(document).ready(() => this.onShown(() => {
+            !this.ma.value() ? this.ma.focus() : this.ten.focus();
+        }));
+    }
 
     onShow = (item) => {
-        const { id, ma, maSoCdnn, ten, nhom, kichHoat } = item ? item : { id: null, ma: '', maSoCdnn: '', ten: '', nhom: '', kichHoat: true};
-        
+        const { id, ma, maSoCdnn, ten, nhom, kichHoat } = item ? item : { id: '', ma: '', maSoCdnn: '', ten: '', nhom: '', kichHoat: true };
+        this.setState({ id, ma, item });
         this.ma.value(ma);
         this.maSoCdnn.value(maSoCdnn);
         this.ten.value(ten);
-        this.nhom.value(nhom);
-        this.kichHoat.value(kichHoat);
-
-        this.setState({kichHoat});
-
-        $(this.modal).attr('data-id', id).modal('show');
+        this.nhom.value(nhom ? nhom : '');
+        this.kichHoat.value(kichHoat ? 1 : 0);
     }
 
-    hide = () => $(this.modal).modal('hide')
-
-    onSubmit = () => {
-        const id = $(this.modal).attr('data-id'),
-            changes = {
-                ma: this.ma.value().trim(),
-                maSoCdnn: this.maSoCdnn.value().trim(),
-                ten: this.ten.value().trim(),
-                nhom: this.nhom.value().trim(),
-                kichHoat: Number(this.kichHoat.value())
-            };
-        if (changes.ten == '') {
-            T.notify('Tên ngạch chức danh nghề nghiệp bị trống!', 'danger');
+    onSubmit = (e) => {
+        e.preventDefault();
+        const changes = {
+            ma: this.ma.value(),
+            maSoCdnn: this.maSoCdnn.value(),
+            ten: this.ten.value(),
+            nhom: this.nhom.value(),
+            kichHoat: this.kichHoat.value() ? 1 : 0
+        };
+        console.log(this.state.id);
+        if (!this.state.ma && !this.ma.value()) {
+            T.notify('Mã không được trống!', 'danger');
+            this.ma.focus();
+        } else if (!changes.ten) {
+            T.notify('Tên không được trống!', 'danger');
             this.ten.focus();
         }
-        else if (changes.ma == '') {
-            T.notify('Mã ngạch chức danh nghề nghiệp bị trống!', 'danger');
-            this.ma.focus();
-        }
-        else if (changes.maSoCdnn == '') {
-            T.notify('Mã số chức danh nghề nghiệp bị trống!', 'danger');
+        else if (!changes.maSoCdnn) {
+            T.notify('Mã số chức danh nghề nghiệp không được trống!', 'danger');
             this.maSoCdnn.focus();
         }
         else {
-            if (id) {
-                this.props.updateDmNgachCdnn(id, changes);
-            } else {
-                this.props.createDmNgachCdnn(changes);
-            }
-            $(this.modal).modal('hide');
+            this.state.ma ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
         }
     }
+
+    changeKichHoat = value => this.kichHoat.value(value ? 1 : 0) || this.kichHoat.value(value);
 
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
-            title: this.ma ? 'Cập nhật ngạch chức năng nghề nghiệp' : 'Tạo mới ngạch chức năng nghề nghiệp',
+            title: this.state.ma ? 'Cập nhật ngạch chức năng nghề nghiệp' : 'Tạo mới ngạch chức năng nghề nghiệp',
             size: 'large',
-            body: <div className ='row'>
-                <FormTextBox type='text' className='col-12' ref={e => this.ma = e} label='Mã' readOnly={readOnly} placeholder='Mã' required />
+            body: <div className='row'>
+                <FormTextBox type='text' className='col-12' ref={e => this.ma = e} label='Mã' readOnly={this.state.ma ? true : readOnly} placeholder='Mã' required />
                 <FormTextBox type='text' className='col-12' ref={e => this.maSoCdnn = e} label='Mã số ngạch CDNN' readOnly={readOnly} placeholder='Mã số ngạch CDNN' required />
-                <FormTextBox type='text' className='col-12' ref={e => this.ten = e} label='Tên ngạch' readOnly={readOnly} placeholder='Tên ngạch' required /> 
-                <FormTextBox type='text' className='col-12' ref={e => this.nhom = e} label='Nhóm ngạch' readOnly={readOnly} placeholder='Nhóm ngạch'/>
+                <FormTextBox type='text' className='col-12' ref={e => this.ten = e} label='Tên ngạch' readOnly={readOnly} placeholder='Tên ngạch' required />
+                <FormTextBox type='text' className='col-12' ref={e => this.nhom = e} label='Nhóm ngạch' readOnly={readOnly} placeholder='Nhóm ngạch' />
                 <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
-                    onChange={() => !readOnly && this.setState({ kichHoat: !this.state.kichHoat })} />
-            </div> 
+                    onChange={value => this.changeKichHoat(value ? 1 : 0)} />
+            </div>
         }
         );
     }
 }
 
 class DmNgachCdnnPage extends AdminPage {
-    modal = React.createRef();
+    state = { searching: false };
 
     componentDidMount() {
-       T.ready('/user/category', () =>  this.props.getDmNgachCdnnAll());
+        T.ready('/user/category', () => {
+            T.onSearch = (searchText) => this.props.getDmNgachCdnnPage(undefined, undefined, searchText || '');
+            T.showSearchBox();
+            this.props.getDmNgachCdnnPage();
+        });
     }
 
-    edit = (e, item) => {
+    showModal = (e) => {
         e.preventDefault();
-        this.modal.current.show(item);
+        this.modal.show();
     }
 
     delete = (e, item) => {
+        T.confirm('Xóa Ngạch chức năng nghề nghiệp', `Bạn có chắc bạn muốn xóa Ngạch chức năng nghề nghiệp ${item.ten ? `<b>${item.ten}</b>` : 'này'}?`, 'warning', true, isConfirm => {
+            isConfirm && this.props.deleteDmNgachCdnn(item.id, error => {
+                if (error) T.notify(error.message ? error.message : `Xoá Ngạch chức năng nghề nghiệp ${item.ten} bị lỗi!`, 'danger');
+                else T.alert(`Xoá Ngạch chức năng nghề nghiệp ${item.ten} thành công!`, 'success', false, 800);
+            });
+        });
         e.preventDefault();
-        T.confirm('Xóa danh mục ngạch chức danh nghề nghiệp', 'Bạn có chắc bạn muốn xóa ngạch chức danh nghề nghiệp này?', true, isConfirm =>
-            isConfirm && this.props.deleteDmNgachCdnn(item.id));
     }
-
-    changeKichHoat = item => this.props.updateDmNgachCdnn(item.id, { kichHoat: Number(!item.kichHoat) })
-
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permissionWrite = currentPermissions.includes('dmNgachCdnn:write'),
-            permission = this.getUserPermission('dmNgachCdnn', ['write', 'delete']);
+            permission = this.getUserPermission('dmNgachCdnn', ['read', 'write', 'delete']);
 
-        let items = this.props.dmNgachCdnn && this.props.dmNgachCdnn.items ? this.props.dmNgachCdnn.items : [];
+        const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } =
+            this.props.dmNgachCdnn && this.props.dmNgachCdnn.page ?
+                this.props.dmNgachCdnn.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: '', list: [] };
+        const table = !(list && list.length > 0) ? 'Không có dữ liệu Ngạch chức năng nghề nghiệp' :
+            renderTable({
+                getDataSource: () => list, stickyHead: false,
+                renderHead: () => (
+                    <tr>
+                        <th style={{ width: 'auto' }}>#</th>
+                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Mã</th>
+                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Mã số CDNN</th>
+                        <th style={{ width: '50%' }}>Tên ngạch</th>
+                        <th style={{ width: '50%' }}>Nhóm ngạch</th>
+                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
+                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                    </tr>),
+                renderRow: (item, index) => (
+                    <tr key={index}>
+                        <TableCell type='number' content={index + 1} style={{ textAlign: 'right' }} />
+                        <TableCell type='link' content={item.ma} style={{ textAlign: 'right' }} onClick={() => this.modal.show(item)} />
+                        <TableCell type='text' content={item.maSoCdnn} />
+                        <TableCell type='text' content={item.ten} />
+                        <TableCell type='text' content={item.nhom} />
+                        <TableCell type='checkbox' content={item.kichHoat} permission={permission}
+                            onChanged={value => this.props.updateDmNgachCdnn(item.id, { kichHoat: value ? 1 : 0, })} />
+                        <TableCell type='buttons' content={item} permission={permission}
+                            onEdit={() => this.modal.show(item)} onDelete={this.delete} />
+                    </tr>
+                ),
+            });
 
-        const table = renderTable({
-            getDataSource: () => items, stickyHead: false,
-            renderHead: () => (
-                <tr>
-                    <th style={{ width: 'auto' }}>#</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Mã</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Mã số CDNN</th>
-                    <th style={{ width: '50%' }}>Tên ngạch</th>
-                    <th style={{ width: '50%' }}>Nhóm ngạch</th>
-                    <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
-                </tr>),
-            renderRow: (item, index) => (
-                <tr key={index}>
-                    <TableCell type='number' content={index + 1} style={{ textAlign: 'right' }} />
-                    <TableCell type='link' content={item.ma} style={{ textAlign: 'right' }} onClick={(e) => this.edit(e, item)} />
-                    <TableCell type='text' content={item.maSoCdnn} />
-                    <TableCell type='text' content={item.ten} />
-                    <TableCell type='text' content={item.nhom} />
-                    <TableCell type='checkbox' content={item.kichHoat} permission={permissionWrite} onChanged={() => permissionWrite && this.changeActive(item)} />
-                    <TableCell type='buttons' content={item} permission={permission} onEdit={this.edit} onDelete={this.delete} />
-                </tr>
-            ),
-        });
 
-
-        return (
-            <main className='app-content'>
-                <div className='app-title'>
-                    <h1><i className='fa fa-list-alt' /> Danh mục Ngạch chức danh nghề nghiệp</h1>
-                </div>
-                <div className='tile'>{table}</div>
-                <EditModal ref={this.modal} readOnly={!permissionWrite}
-                    createDmNgachCdnn={this.props.createDmNgachCdnn} updateDmNgachCdnn={this.props.updateDmNgachCdnn} />
-                {permissionWrite && (
-                    <button type='button' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.edit}>
-                        <i className='fa fa-lg fa-plus' />
-                    </button>)}
-                <Link to='/user/category' className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>
-                    <i className='fa fa-lg fa-reply' />
-                </Link>
-            </main>
-        );
+            return this.renderPage({
+                icon: 'fa fa-list-alt',
+                title: 'Ngạch chức năng nghề nghiệp',
+                breadcrumb: [
+                    <Link key={0} to='/user/category'>Danh mục</Link>,
+                    'Ngạch chức năng nghề nghiệp'
+                ],
+                content: <>
+                    <div className='tile'>{table}</div>
+                    <Pagination style={{ marginLeft: '65px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.props.getDmNgachCdnnPage} />
+                    <EditModal ref={e => this.modal = e} permission={permission}
+                        create={this.props.createDmNgachCdnn} update={this.props.updateDmNgachCdnn} permissions={currentPermissions} />
+                </>,
+                backRoute: '/user/category',
+                onCreate: permission && permission.write ? (e) => this.showModal(e) : null
+            });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, dmNgachCdnn: state.dmNgachCdnn });
-const mapActionsToProps = { getDmNgachCdnnAll, createDmNgachCdnn, deleteDmNgachCdnn, updateDmNgachCdnn };
+const mapActionsToProps = { getDmNgachCdnnPage, createDmNgachCdnn, deleteDmNgachCdnn, updateDmNgachCdnn };
 export default connect(mapStateToProps, mapActionsToProps)(DmNgachCdnnPage);

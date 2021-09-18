@@ -98,7 +98,8 @@ export function createDmChau(dmChau, done) {
                 T.notify(data.error.message ? data.error.message : 'Tạo mới một châu bị lỗi!', 'danger');
                 console.error(`POST: ${url}.`, data.error);
             } else {
-                dispatch(getDmChauAll());
+                T.notify('Tạo mới một châu thành công!', 'success');
+                dispatch(getDmChauPage());
                 if (done) done(data);
             }
         }, (error) => T.notify('Tạo mới một châu bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
@@ -113,8 +114,9 @@ export function updateDmChau(ma, changes, done) {
                 T.notify('Cập nhật dữ liệu châu bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`PUT: ${url}.`, data.error);
             } else {
+                T.notify('Cập nhật dữ liệu châu thành công!', 'success');
                 done && done(data.item);
-                dispatch(getDmChauAll());
+                dispatch(getDmChauPage());
             }
         }, (error) => T.notify('Cập nhật dữ liệu châu bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
@@ -129,7 +131,7 @@ export function deleteDmChau(ma, done) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('Xóa châu thành công!', 'success', false, 800);
-                dispatch(getDmChauAll());
+                dispatch(getDmChauPage());
             }
             done && done();
         }, () => T.notify('Xóa châu bị lỗi!', 'danger'));

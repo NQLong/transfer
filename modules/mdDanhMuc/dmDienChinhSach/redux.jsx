@@ -98,7 +98,8 @@ export function createDmDienChinhSach(dmDienChinhSach, done) {
                 T.notify(data.error.message ? data.error.message : 'Tạo mới một diện chính sách bị lỗi!', 'danger');
                 console.error(`POST: ${url}.`, data.error);
             } else {
-                dispatch(getDmDienChinhSachAll());
+                T.notify('Tạo diện chính sách thành công!', 'success');
+                dispatch(getDmDienChinhSachPage());
                 if (done) done(data);
             }
         }, (error) => T.notify('Tạo mới một diện chính sách bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
@@ -113,8 +114,9 @@ export function updateDmDienChinhSach(ma, changes, done) {
                 T.notify('Cập nhật dữ liệu diện chính sách bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`PUT: ${url}.`, data.error);
             } else {
+                T.notify('Cập nhật diện chính sách thành công!', 'success');
                 done && done(data.item);
-                dispatch(getDmDienChinhSachAll());
+                dispatch(getDmDienChinhSachPage());
             }
         }, (error) => T.notify('Cập nhật dữ liệu diện chính sách bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
@@ -129,7 +131,7 @@ export function deleteDmDienChinhSach(ma, done) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('Xóa diện chính sách thành công!', 'success', false, 800);
-                dispatch(getDmDienChinhSachAll());
+                dispatch(getDmDienChinhSachPage());
             }
             done && done();
         }, () => T.notify('Xóa diện chính sách bị lỗi!', 'danger'));

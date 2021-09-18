@@ -97,6 +97,7 @@ export function createDmLinhVucKinhDoanh(item, done) {
                 T.notify('Tạo lĩnh vực kinh doanh bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`POST: ${url}.`, data.error);
             } else {
+                T.notify('Tạo lĩnh vực kinh doanh thành công!', 'success');
                 dispatch(getDmLinhVucKinhDoanhPage());
                 if (done) done(data);
             }
@@ -130,6 +131,7 @@ export function updateDmLinhVucKinhDoanh(ma, changes, done) {
             } else {
                 T.notify('Cập nhật thông tin lĩnh vực kinh doanh thành công!', 'success');
                 dispatch(getDmLinhVucKinhDoanhPage());
+                done && done(data.item);
             }
         }, (error) => T.notify('Cập nhật thông tin lĩnh vực kinh doanh bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };

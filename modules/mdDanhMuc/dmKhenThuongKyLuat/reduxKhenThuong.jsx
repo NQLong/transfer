@@ -58,16 +58,17 @@ export function getDmKhenThuongAll(done) {
 }
 
 T.initPage('pageDmKhenThuong');
-export function getDmKhenThuongPage(pageNumber, pageSize, done) {
-    const page = T.updatePage('pageDmKhenThuong', pageNumber, pageSize);
+export function getDmKhenThuongPage(pageNumber, pageSize, pageCondition, done) {
+    const page = T.updatePage('pageDmKhenThuong', pageNumber, pageSize, pageCondition);
     return dispatch => {
         const url = `/api/dm-khen-thuong/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, data => {
+        T.get(url, { condition: page.pageCondition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách khen thưởng bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                if (done) done(data.page);
                 dispatch({ type: DmKhenThuongGetPage, page: data.page });
             }
         }, () => T.notify('Lấy danh sách khen thưởng bị lỗi!', 'danger'));
@@ -100,7 +101,8 @@ export function createDmKhenThuong(item, done) {
                 }
                 console.error(`POST: ${url}.`, data.error);
             } else {
-                dispatch(getDmKhenThuongAll());
+                T.notify('Tạo khen thưởng thành công!', 'success');
+                dispatch(getDmKhenThuongPage());
                 if (done) done(data);
             }
         }, () => T.notify('Tạo khen thưởng bị lỗi!', 'danger'));
@@ -116,7 +118,7 @@ export function deleteDmKhenThuong(ma) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('Khen thưởng đã xóa thành công!', 'success', false, 800);
-                dispatch(getDmKhenThuongAll());
+                dispatch(getDmKhenThuongPage());
             }
         }, () => T.notify('Xóa khen thưởng bị lỗi!', 'danger'));
     };
@@ -132,7 +134,8 @@ export function updateDmKhenThuong(ma, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật thông tin khen thưởng thành công!', 'success');
-                dispatch(getDmKhenThuongAll());
+                done && done(data.item);
+                dispatch(getDmKhenThuongPage());
             }
         }, () => T.notify('Cập nhật thông tin khen thưởng bị lỗi!', 'danger'));
     };

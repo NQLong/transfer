@@ -102,6 +102,7 @@ export function createDmHocSdh(changes, done) {
                 T.notify('Tạo học Sau đại học bị lỗi' + (data.error.message && ':<br>' + data.error.message), 'danger');
                 console.error(`POST: ${url}.`, data.error);
             } else {
+                T.notify('Tạo mới thông tin học Sau đại học thành công!', 'success');
                 dispatch(getDmHocSdhPage());
                 if (done) done(data);
             }
@@ -119,6 +120,7 @@ export function updateDmHocSdh(ma, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật thông tin học Sau đại học thành công!', 'success');
+                done && done(data.item);
                 dispatch(getDmHocSdhPage());
             }
         }, (error) => T.notify('Cập nhật thông tin học Sau đại học bị lỗi' + (error.error.message && ':<br>' + error.error.message), 'danger'));
