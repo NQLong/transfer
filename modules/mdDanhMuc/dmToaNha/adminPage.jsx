@@ -4,79 +4,68 @@ import { getDmToaNhaAll, createDmToaNha, updateDmToaNha, deleteDmToaNha } from '
 import { getDmCoSoAll } from 'modules/mdDanhMuc/dmCoSo/redux';
 import Editor from 'view/component/CkEditor4';
 import { Link } from 'react-router-dom';
+import { AdminPage, AdminModal, TableCell, renderTable } from 'view/component/AdminPage';
 
-class EditModal extends React.Component {
+class EditModal extends AdminModal {
     state = { active: true };
-    modal = React.createRef();
-    editorVi = React.createRef();
-    editorEn = React.createRef();
+    editorVi = '';
+    editorEn = '';
 
     componentDidMount() {
-        $(document).ready(() => setTimeout(() => {
-            $(this.modal.current).on('shown.bs.modal', () => {
-                $('a[href=\'#dmToaNhaTabVi\']').tab('show');
-                $('#dmToaNhaNameVi').focus();
-            });
-            $('#categoryCampus').select2({ minimumResultsForSearch: -1 });
-        }, 250));
+        $(document).ready(() => this.onShown(() => {
+            !this.ma.value() ? this.ma.focus() : this.ten.focus();
+        }));
     }
 
-    show = (item) => {
+    onShow = (item) => {
         let { ma, ten, moTa, coSo, kichHoat } = item ? item : { ma: null, ten: '', moTa: '', coSo: null, kichHoat: true };
         ten = T.language.parse(ten, true);
         moTa = T.language.parse(moTa, true);
 
-        $('#dmToaNhaNameVi').val(ten.vi);
-        $('#dmToaNhaNameEn').val(ten.en);
-        this.editorVi.current.html(moTa.vi);
-        this.editorEn.current.html(moTa.en);
-        $('#dmToaNhaCampus').val(coSo ? item.coSo : '');
-        $('#dmToaNhaCampus').select2({ minimumResultsForSearch: -1 }).trigger('change');
+        this.ma.value(ma);
+        this.tenvi.value(ten.vi);
+        this.tenen.value(ten.en);
+        this.editorVi = moTa.vi;
+        this.editorEn = moTa.en;
+        this.coso.value(coSo ? item.coSo : '');
         this.setState({ active: kichHoat == 1 });
-
-        $(this.modal.current).attr('data-id', ma).modal('show');
     };
 
-    save = e => {
+    changeKichHoat = value => this.kichHoat.value(value ? 1 : 0) || this.kichHoat.value(value);
+
+    onSubmit = (e) => {
         e.preventDefault();
-        const ma = $(this.modal.current).attr('data-id'),
+        const 
             changes = {
-                ten: { vi: $('#dmToaNhaNameVi').val().trim(), en: $('#dmToaNhaNameEn').val().trim() },
-                moTa: { vi: this.editorVi.current.html(), en: this.editorEn.current.html() },
-                coSo: $('#dmToaNhaCampus').val(),
+                ten: { vi: this.tenvi.value(), en: this.tenen.value() },
+                moTa: { vi: this.editorVi, en: this.editorEn },
+                coSo: this.coso.value(),
                 kichHoat: this.state.active ? '1' : '0',
             };
         if (changes.ten.vi == '') {
             T.notify('Tên tòa nhà bị trống!', 'danger');
-            $('a[href=\'#dmToaNhaTabVi\']').tab('show');
-            $('#dmToaNhaNameVi').focus();
+            this.tenvi.focus();
         } else if (changes.ten.en == '') {
             T.notify('Tên tòa nhà bị trống!', 'danger');
-            $('a[href=\'#dmToaNhaTabEn\']').tab('show');
-            $('#dmToaNhaNameEn').focus();
+            this.tenen.focus();
         } else if (changes.coSo == null) {
             T.notify('Cơ sở chưa được chọn!', 'danger');
         } else {
             changes.ten = JSON.stringify(changes.ten);
             changes.moTa = JSON.stringify(changes.moTa);
-            if (ma) {
-                this.props.updateDmToaNha(ma, changes);
-            } else {
-                this.props.createDmToaNha(changes);
-            }
-            $(this.modal.current).modal('hide');
+            this.state.ma ? this.props.update(this.state.ma, changes, this.hide) : this.props.create(changes, this.hide);
         }
     }
 
-    render() {
+    render = () => {
         const readOnly = this.props.readOnly;
         let campuses = this.props.campuses, campusList = null;
         if (typeof (campuses) == 'object') { campuses = Object.values(campuses); }
-        campusList = campuses.map(item => <option key={item.ma} value={item.ma}>{T.language.parse(item.ten, true).vi}</option>);
+        campusList = [];
 
         return (
             <div className='modal' tabIndex='-1' role='dialog' ref={this.modal}>
-                <form className='modal-dialog modal-lg' role='document' onSubmit={this.save}>
+                <form className='modal-dialog modal-lg' role='document' onSubmit={this.onSubmit}>
                     <div className='modal-content'>
                         <div className='modal-header'>
                             <h5 className='modal-title'>Thông tin tòa nhà</h5>
@@ -144,8 +133,7 @@ class EditModal extends React.Component {
     }
 }
 
-class DmToaNhaPage extends React.Component {
-    modal = React.createRef();
+class DmToaNhaPage extends AdminPage {
 
     componentDidMount() {
         T.ready('/user/category');
@@ -153,9 +141,9 @@ class DmToaNhaPage extends React.Component {
         this.props.getDmToaNhaAll();
     }
 
-    edit = (e, item) => {
+    showModal = (e) => {
         e.preventDefault();
-        this.modal.current.show(item);
+        this.modal.show();
     }
 
     changeActive = item => this.props.updateDmToaNha(item.ma, { kichHoat: item.kichHoat == '1' ? '0' : '1' });
@@ -168,77 +156,50 @@ class DmToaNhaPage extends React.Component {
 
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permissionWrite = currentPermissions.includes('dmToaNha:write'),
-            permissionDelete = currentPermissions.includes('dmToaNha:delete');
+            permission = this.getUserPermission('dmToaNha', ['read', 'write', 'delete']);
         let table = 'Không có tòa nhà!';
         let coSoList = this.props.categoryCampus && this.props.categoryCampus.items ? this.props.categoryCampus.items : [];
         if (typeof (coSoList) == 'object') { coSoList = Object.values(coSoList); }
 
         if (this.props.dmToaNha && this.props.dmToaNha.items && this.props.dmToaNha.items.length > 0) {
-            table = (
-                <table className='table table-hover table-bordered'>
-                    <thead>
-                        <tr>
-                            <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                            <th style={{ width: '50%' }}>Tòa nhà</th>
-                            <th style={{ width: '50%' }}>Cơ sở</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                            <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {this.props.dmToaNha.items.map((item, index) => (
-                            <tr key={index}>
-                                <td style={{ textAlign: 'right' }}>{index + 1}</td>
-                                <td><a href='#' onClick={e => this.edit(e, item)}>{T.language.parse(item.ten, true).vi}</a></td>
-                                <td>{coSoList.find(coSo => coSo.ma == item.coSo) ? T.language.parse(coSoList.find(coSo => coSo.ma == item.coSo).ten, true).vi : ''}</td>
-                                <td className='toggle' style={{ textAlign: 'center' }}>
-                                    <label>
-                                        <input type='checkbox' checked={item.kichHoat == '1' ? true : false} onChange={() => permissionWrite && this.changeActive(item)} />
-                                        <span className='button-indecator' />
-                                    </label>
-                                </td>
-                                <td style={{ textAlign: 'center' }}>
-                                    <div className='btn-group'>
-                                        <a className='btn btn-primary' href='#' onClick={e => this.edit(e, item)}>
-                                            <i className='fa fa-lg fa-edit' />
-                                        </a>
-                                        {permissionDelete &&
-                                            <a className='btn btn-danger' href='#' onClick={e => this.delete(e, item)}>
-                                                <i className='fa fa-trash-o fa-lg' />
-                                            </a>}
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            );
+            table = renderTable({
+                getDataSource: () => this.props.dmToaNha.items, stickyHead: false,
+                renderHead: () => (
+                    <tr>
+                        <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
+                        <th style={{ width: '50%' }}>Tòa nhà</th>
+                        <th style={{ width: '50%' }}>Cơ sở</th>
+                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
+                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                    </tr>),
+                renderRow: (item, index) => (
+                    <tr key={index}>
+                        <TableCell type='text' content={index + 1} />
+                        <TableCell type='link' content={item.tenvi} onClick={() => this.modal.show(item)} />
+                        <TableCell type='text' content={coSoList.find(coSo => coSo.ma == item.coSo) ? T.language.parse(coSoList.find(coSo => coSo.ma == item.coSo).ten, true).vi : ''} />
+                        <TableCell type='checkbox' content={item.kichHoat} permission={permission}
+                            onChanged={value => this.props.updateDmToaNha(item.ma, { kichHoat: value ? 1 : 0, })} />
+                        <TableCell type='buttons' content={item} permission={permission}
+                            onEdit={() => this.modal.show(item)} onDelete={this.delete} />
+                    </tr>)
+            });
         }
 
-        return (
-            <main className='app-content'>
-                <div className='app-title'>
-                    <h1><i className='fa fa-list-alt' /> Danh mục Tòa nhà</h1>
-                    <ul className='app-breadcrumb breadcrumb'>
-                        <Link to='/user'><i className='fa fa-home fa-lg' /></Link>
-                        &nbsp;/&nbsp;
-                        <Link to='/user/category'>Danh mục</Link>
-                        &nbsp;/&nbsp;Tòa nhà
-                    </ul>
-                </div>
+        return this.renderPage({
+            icon: 'fa fa-list-alt',
+            title: 'Danh mục Tòa nhà',
+            breadcrumb: [
+                <Link key={0} to='/user/category'>Danh mục</Link>,
+                'Danh mục Tòa nhà'
+            ],
+            content: <>
                 <div className='tile'>{table}</div>
-                <EditModal ref={this.modal} readOnly={!permissionWrite} campuses={this.props.categoryCampus && this.props.categoryCampus.items ? this.props.categoryCampus.items : []}
-                    createDmToaNha={this.props.createDmToaNha} updateDmToaNha={this.props.updateDmToaNha} />
-                <Link to='/user/category' className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>
-                    <i className='fa fa-lg fa-reply' />
-                </Link>
-                {permissionWrite &&
-                    <button type='button' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.edit}>
-                        <i className='fa fa-lg fa-plus' />
-                    </button>}
-            </main>
-        );
+                <EditModal ref={e => this.modal = e} permission={permission}
+                    create={this.props.createDmToaNha} update={this.props.updateDmToaNha} permissions={currentPermissions} />
+            </>,
+            backRoute: '/user/category',
+            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+        });
     }
 }
 
