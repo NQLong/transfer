@@ -2,25 +2,22 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getDmNgachLuongAll, createDmNgachLuong, deleteDmNgachLuong, updateDmNgachLuong } from './redux';
 import { SelectAdapter_DmNgachCdnn } from 'modules/mdDanhMuc/dmNgachCdnn/redux';
-import { NumberInput, Select } from 'view/component/Input';
 import { Link } from 'react-router-dom';
+import { AdminPage, AdminModal, FormTextBox, FormCheckbox, FormSelect } from 'view/component/AdminPage';
 
-class EditModal extends React.Component {
+class EditModal extends AdminModal {
     state = { vuotKhung: false }
-    modal = React.createRef();
-    maSoCdnn = React.createRef();
-    bac = React.createRef();
-    heSo = React.createRef();
+    maSoCdnn = '';
+    bac = '';
+    heSo = '';
 
     componentDidMount() {
-        $(document).ready(() => setTimeout(() => {
-            $(this.modal.current).on('shown.bs.modal', () => {
-                this.state.vuotKhung ? this.heSo.current.focus() : this.bac.current.focus();
-            });
-        }, 250));
+        $(document).ready(() => this.onShown(() => {
+            !this.state.vuotKhung ? this.heSo.focus() : this.bac.focus();
+        }));
     }
 
-    show = (item) => {
+    onShow = (item) => {
         // const { idNgach, bac, heSo } = item ? item : { idNgach: '', bac: 1, heSo: 0 };
         let idNgach = '', bac = '', heSo = '';
         if (item) {
@@ -33,99 +30,62 @@ class EditModal extends React.Component {
             }
         }
 
-        this.maSoCdnn.current.setVal(idNgach);
-        this.bac.current.setVal(bac);
-        this.heSo.current.setVal(heSo);
-
-        this.setState({ vuotKhung: bac === 0 }, () => {
-            $(this.modal.current).attr('data-bac', bac).attr('data-idNgach', idNgach).modal('show');
-        });
+        this.maSoCdnn.value(idNgach);
+        this.bac.value(bac);
+        this.heSo.value(heSo);
     }
-    hide = () => $(this.modal.current).modal('hide')
 
-    save = (e) => {
+    onSubmit = (e) => {
         e.preventDefault();
-        const modal = $(this.modal.current),
-            idNgach = modal.attr('data-idNgach'),
-            bac = modal.attr('data-bac'),
+        const 
+            idNgach = this.idNgach,
+            bac = this.bac,
             changes = {
-                idNgach: Number(this.maSoCdnn.current.getVal()),
-                bac: this.state.vuotKhung ? 0 : this.bac.current.getVal(),
-                heSo: this.heSo.current.getVal(),
+                idNgach: Number(this.maSoCdnn.getVal()),
+                bac: this.state.vuotKhung ? 0 : this.bac.getVal(),
+                heSo: this.heSo.getVal(),
             };
         if (changes.idNgach == '') {
             T.notify('Vui lòng chọn ngạch!', 'danger');
-            this.maSoCdnn.current.focus();
+            this.maSoCdnn.focus();
         } else if (this.state.vuotKhung == false && changes.bac == '') {
             T.notify('Bậc lương bị trống!', 'danger');
-            this.bac.current.focus();
+            this.bac.focus();
         } else if (changes.heSo == '') {
             T.notify('Hệ số lương bị trống!', 'danger');
-            this.heSo.current.focus();
+            this.heSo.focus();
         } else {
-            if (idNgach && bac) {
-                this.props.update(idNgach, bac, changes);
-            } else {
-                this.props.create(changes);
-            }
-            modal.modal('hide');
+            idNgach && bac ? this.props.update(idNgach, bac, changes, this.hide) : this.props.create(changes, this.hide);
         }
     }
 
-    render() {
-        const readOnly = this.props.readOnly;
-        return (
-            <div className='modal' tabIndex='-1' role='dialog' ref={this.modal}>
-                <form className='modal-dialog' role='document' onSubmit={this.save}>
-                    <div className='modal-content'>
-                        <div className='modal-header'>
-                            <h5 className='modal-title'>Ngạch lương hệ số</h5>
-                            <button type='button' className='close' data-dismiss='modal' aria-label='Close'>
-                                <span aria-hidden='true'>&times;</span>
-                            </button>
-                        </div>
-                        <div className='modal-body'>
-                            <div className='form-group'>
-                                <Select ref={this.maSoCdnn} required adapter={SelectAdapter_DmNgachCdnn} label='Chức danh nghề nghiệp' disabled={readOnly} />
-                            </div>
-                            <div className='form-group' style={{ display: 'inline-flex', margin: 0 }}>
-                                <label htmlFor='dmNgachLuongVuotKhung'>Vượt khung: </label>&nbsp;&nbsp;
-                                <div className='toggle'>
-                                    <label>
-                                        <input type='checkbox' id='dmNgachLuongVuotKhung' checked={this.state.vuotKhung} onChange={() => !readOnly && this.setState({ vuotKhung: !this.state.vuotKhung })} />
-                                        <span className='button-indecator' />
-                                    </label>
-                                </div>
-                            </div>
-                            <div className='form-group' style={{ display: this.state.vuotKhung ? 'none' : 'block' }}>
-                                <NumberInput ref={this.bac} label='Bậc lương' disabled={readOnly} min={0} max={1000} step={1} />
-                            </div>
-                            <div className='form-group'>
-                                <NumberInput ref={this.heSo} required label={this.state.vuotKhung ? 'Phần trăm vượt khung (%)' : 'Hệ số lương'} disabled={readOnly} min={0} max={1000} step='any' />
-                            </div>
-                        </div>
-                        <div className='modal-footer'>
-                            <button type='button' className='btn btn-secondary' data-dismiss='modal'>Đóng</button>
-                            {!readOnly && <button type='submit' className='btn btn-primary'>Lưu</button>}
-                        </div>
-                    </div>
-                </form>
+    render = () => {
+        const readOnly = this.props.readOnly; 
+        return (this.renderModal({
+            title: this.state.ma ? 'Cập nhật Ngạch lương' : 'Tạo mới Ngạch lương',
+            body: <div className='row'>
+                <FormSelect className='col-md-12' ref={this.maSoCdnn} required adapter={SelectAdapter_DmNgachCdnn} label='Chức danh nghề nghiệp' disabled={readOnly} />
+                <FormCheckbox className='col-md-6' ref={e => this.state.vuotKhung = e} label='Vượt khung' isSwitch={true} readOnly={readOnly} onChange={() => !readOnly && this.setState({ vuotKhung: !this.state.vuotKhung })} />
+                <FormTextBox type='number' className='col-md-12' ref={this.bac} label='Bậc lương' disabled={readOnly} min={0} max={1000} step={1}  />
+                <FormTextBox type='number' className='col-md-12' ref={this.heSo} required label={this.state.vuotKhung ? 'Phần trăm vượt khung (%)' : 'Hệ số lương'} disabled={readOnly} min={0} max={1000} step='any' /> 
             </div>
-        );
+        }));
     }
 }
 
-class AdminPage extends React.Component {
-    modal = React.createRef();
+class DmNgachLuongPage extends AdminPage {
 
     componentDidMount() {
-        this.props.getDmNgachLuongAll();
-        T.ready('/user/category');
+        T.ready('/user/category', () => {
+            T.onSearch = (searchText) => this.props.getDmNgachLuongAll(undefined, undefined, searchText || '');
+            T.showSearchBox();
+            this.props.getDmNgachLuongAll();
+        });
     }
 
-    edit = (e, item) => {
+    showModal = (e) => {
         e.preventDefault();
-        this.modal.current.show(item);
+        this.modal.show();
     }
 
     delete = (e, idNgach, bac) => {
@@ -137,7 +97,8 @@ class AdminPage extends React.Component {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmNgachLuong:write'),
-            permissionDelete = currentPermissions.includes('dmNgachLuong:delete');
+            permissionDelete = currentPermissions.includes('dmNgachLuong:delete'),
+            permission = this.getUserPermission('dmNgachLuong', ['read', 'write', 'delete']);
         let table = 'Không có danh sách ngạch lương!',
             items = this.props.dmNgachLuong && this.props.dmNgachLuong.items ? this.props.dmNgachLuong.items : [];
         if (items.length > 0) {
@@ -243,32 +204,24 @@ class AdminPage extends React.Component {
             );
         }
 
-        return (
-            <main className='app-content'>
-                <div className='app-title'>
-                    <h1><i className='fa fa-list-alt' /> Danh mục Ngạch lương</h1>
-                    <ul className='app-breadcrumb breadcrumb'>
-                        <Link to='/user'><i className='fa fa-home fa-lg' /></Link>
-                        &nbsp;/&nbsp;
-                        <Link to='/user/category'>Danh mục</Link>
-                        &nbsp;/&nbsp;Ngạch lương
-                    </ul>
-                </div>
+        return this.renderPage({
+            icon: 'fa fa-list-alt',
+            title: 'Danh mục Ngạch Lương',
+            breadcrumb: [
+                <Link key={0} to='/user/category'>Danh mục</Link>,
+                'Danh mục Ngạch Lương'
+            ],
+            content: <>
                 <div className='tile'>{table}</div>
-                <EditModal ref={this.modal} readOnly={!permissionWrite}
-                    create={this.props.createDmNgachLuong} update={this.props.updateDmNgachLuong} />
-                {/* {permissionWrite && (
-                    <button type='button' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.edit}>
-                        <i className='fa fa-lg fa-plus' />
-                    </button>)} */}
-                <Link to='/user/category' className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>
-                    <i className='fa fa-lg fa-reply' />
-                </Link>
-            </main>
-        );
+                <EditModal ref={e => this.modal = e} permission={permission}
+                    create={this.props.createDmNgachLuong} update={this.props.updateDmNgachLuong} permissions={currentPermissions} />
+            </>,
+            backRoute: '/user/category',
+            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+        });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, dmNgachLuong: state.dmNgachLuong });
 const mapActionsToProps = { getDmNgachLuongAll, createDmNgachLuong, deleteDmNgachLuong, updateDmNgachLuong };
-export default connect(mapStateToProps, mapActionsToProps)(AdminPage);
+export default connect(mapStateToProps, mapActionsToProps)(DmNgachLuongPage);
