@@ -62,6 +62,8 @@ export default class MenuPage extends React.Component {
                 itemView = <fwNews.Section.SectionAdmission item={item} />;
             } else if (item.viewType == 'tin tức chung' && item.detail && JSON.parse(item.detail).viewTypeDisplay == 'Template 3') {
                 itemView = <fwNews.Section.SectionHighLightNews item={item} />;
+            } else if (item.viewType == 'tin tức chung' && item.detail && JSON.parse(item.detail).viewTypeDisplay == 'Template 4') {
+                itemView = <fwNews.Section.SectionInsight item={item} />;
             } else if (item.viewType == 'thư viện' && item.detail && JSON.parse(item.detail).viewTypeDisplay == 'Tìm kiếm') {
                 itemView = <fwThuVien.Section.SectionSearch item={item} />;
             } else if (item.viewType == 'thư viện' && item.detail && JSON.parse(item.detail).viewTypeDisplay == 'Giới thiệu sách') {

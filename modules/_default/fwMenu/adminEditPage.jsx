@@ -63,7 +63,7 @@ export class ComponentModal extends React.Component {
             'all jobs', 'notification', 'admission',
         ];
         if (selectedType == 'tin tức chung') {
-            this.viewTypeDisplay.setItems(['Template 1', 'Template 2', 'Template 3']);
+            this.viewTypeDisplay.setItems(['Template 1', 'Template 2', 'Template 3', 'Template 4']);
             $('#comDisplay').css('display', 'block');
             $('#titleCom').css('display', 'block');
             $('#divLinkSeeAll').css('display', 'block');
