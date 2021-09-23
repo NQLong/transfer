@@ -47,7 +47,7 @@ class SectionInsight extends React.Component {
                         <div className='col-lg-4 col-12 px-0 py-2'>
                             <Link to={newsList[0].link ? '/tin-tuc/' + newsList[0].link : '/news/item/' + newsList[0].id}
                                 className='block-20'
-                                style={{ backgroundImage: `url(${newsList[0].image})`, backgroundSize: 'cover', borderRadius: '5px', height: '21vw' }} />
+                                style={{ backgroundImage: `url(${newsList[0].image})`, backgroundSize: 'cover', borderRadius: '5px', height: width > 991 ? '21vw' : null }} />
                         </div>
                         <div className='col-lg-4 col-12 pt-3 pt-lg-0' style={{ borderRight: width > 990 ? '1px solid grey' : 0 }}>
                             <Link to={newsList[0].link ? '/tin-tuc/' + newsList[0].link : '/news/item/' + newsList[0].id}
@@ -103,9 +103,10 @@ class SectionInsight extends React.Component {
         }
         return (
             <section data-aos='fade-up' className='row p-3'>
-                <div className='col-12 homeBorderLeft'>
+                {!!language && <div className='col-12 homeBorderLeft'>
                     <h3 className='homeTitle' style={{ color: '#0139A6', margin: 0 }}><strong>{language}</strong></h3>
-                </div>
+                </div>}
+
                 {news}
             </section>);
     }
