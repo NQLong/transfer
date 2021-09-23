@@ -32,6 +32,9 @@ class searchPage extends React.Component {
         this.searchScope.setOption({ value: '11', text: 'TV ĐH Khoa học Xã hội & Nhân văn' });
 
     }
+    onChange = (key) => {
+        if (key == 'Enter') this.search();
+    }
     search = () => {
         if ($('#tab2:visible').attr('id')) {
             if (this.keyword2.val()) {
@@ -60,9 +63,9 @@ class searchPage extends React.Component {
                                     <Select label='    ' ref={e => this.searchType = e} data={keyword} hideSearchBox={true} />
                                 </div>
                                 <div className='col-md-6 col-lg-4'>
-                                    <TextInput ref={e => this.keyword1 = e} label='   ' placeholder='Nhập từ khóa' disabled={false} />
+                                    <TextInput ref={e => this.keyword1 = e} label='   ' placeholder='Nhập từ khóa' disabled={false} onKeyPress={e => this.onChange(e.key)} />
                                 </div>
-                                <div className='col-md-6 col-lg-4' >
+                                <div className='col-md-6 col-lg-4'>
                                     <Select label='   ' ref={e => this.searchScope = e} data={libraries} />
                                 </div>
                             </div>
@@ -70,7 +73,7 @@ class searchPage extends React.Component {
                         <div className='tab-pane fade' id='tab2'>
                             <div className='form-group row' style={{ paddingTop: 10 }}>
                                 <div className='col-md-6'>
-                                    <TextInput ref={e => this.keyword2 = e} label='  ' placeholder='Nhập từ khóa' disabled={false} />
+                                    <TextInput ref={e => this.keyword2 = e} label='  ' placeholder='Nhập từ khóa' disabled={false} onKeyPress={e => this.onChange(e.key)} />
                                 </div>
                             </div>
 
