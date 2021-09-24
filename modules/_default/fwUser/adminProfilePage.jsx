@@ -310,7 +310,7 @@ class ProfilePage extends QTForm {
             }
         });
     }
-
+      
     getData = (shcc) => {
         if (shcc) {
             this.props.userGetStaff(shcc, data => {
