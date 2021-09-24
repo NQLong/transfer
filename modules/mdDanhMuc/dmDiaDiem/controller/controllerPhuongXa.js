@@ -32,6 +32,16 @@ module.exports = app => {
 		app.model.dmPhuongXa.getAll((error, items) => res.send({ error, items }));
 	});
 
+	app.get('/api/danh-muc/phuong-xa/all/:maQuanHuyen', (req, res) => {
+		const searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+		const condition = {
+			statement: 'lower(tenPhuongXa) LIKE :searchTerm AND maQuanHuyen LIKE :maQuanHuyen AND kichHoat = 1',
+			parameter: { searchTerm: `%${searchTerm.toLowerCase()}%`, maQuanHuyen: req.params.maQuanHuyen },
+		};
+
+		app.model.dmPhuongXa.getAll(condition, '*', 'tenPhuongXa', (error, items) => res.send({ error, items }));
+	});
+
 	app.get('/api/danh-muc/phuong-xa/item/:maPhuongXa', app.permission.check('user:login'), (req, res) => {
 		app.model.dmPhuongXa.get(req.params.maPhuongXa, (error, item) => res.send({ error, item }));
 	});

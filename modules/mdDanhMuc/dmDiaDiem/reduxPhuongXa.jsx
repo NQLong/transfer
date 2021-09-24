@@ -163,3 +163,11 @@ export const SelectAdapter_DmPhuongXa = {
 	processResults: response => ({ results: response ? response.map(item => ({ value: item.maPhuongXa, text: item.maPhuongXa + ': ' + item.tenPhuongXa, maQuanHuyen: item.maQuanHuyen })) : [] }),
 	condition: { kichHoat: 1 },
 };
+
+export const ajaxSelectPhuongXa = (maQuanHuyen) => ({
+	ajax: false,
+	url: `/api/danh-muc/phuong-xa/all/${maQuanHuyen}`,
+	data: params => ({ condition: params.term }),
+	processResults: data => ({ results: data && data.items ? data.items.map(item => ({ id: item.maPhuongXa, text: item.tenPhuongXa })) : [] }),
+	fetchOne: (id, done) => (getDmPhuongXa(id, (item) => done && done({ id: item.maPhuongXa, text: item.tenPhuongXa })))()
+});

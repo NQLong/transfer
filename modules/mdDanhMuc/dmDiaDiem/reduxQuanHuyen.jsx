@@ -84,7 +84,7 @@ export function getDmQuanHuyen(ma, done) {
 				console.error(`GET: ${url}.`, data.error);
 			} else {
 				if (done) done(data.item);
-				T.notify('Lấy thông tin quận huyện thành công!', 'success');
+				// T.notify('Lấy thông tin quận huyện thành công!', 'success');
 			}
 		}, error => {
 			console.error(`GET: ${url}.`, error);
@@ -165,3 +165,11 @@ export const SelectAdapter_DmQuanHuyen = {
 	processResults: response => ({ results: response ? response.map(item => ({ value: item.maQuanHuyen, text: item.maQuanHuyen + ': ' + item.tenQuanHuyen, maTinhThanhPho: item.maTinhThanhPho })) : [] }),
 	condition: { kichHoat: 1 },
 };
+
+export const ajaxSelectQuanHuyen = (maTinhThanhPho) => ({
+	ajax: false,
+	url: `/api/danh-muc/quan-huyen/all/${maTinhThanhPho}`,
+	data: params => ({ condition: params.term }),
+	processResults: data => ({ results: data && data.items ? data.items.map(item => ({ id: item.maQuanHuyen, text: item.tenQuanHuyen })) : [] }),
+	fetchOne: (id, done) => (getDmQuanHuyen(id, (item) => done && done({ id: item.maQuanHuyen, text: item.tenQuanHuyen })))()
+});
