@@ -336,7 +336,7 @@ class ProfilePage extends QTForm {
     };
 
     setVal = (data = {}) => {
-        const { cmnd = '', cmndNgayCap = '', cmndNoiCap = '', emailCaNhan = '', noiSinh = '', queQuan = '',
+        const {shcc='', ho='', ten='', biDanh='', cmnd = '', cmndNgayCap = '', cmndNoiCap = '', emailCaNhan = '', noiSinh = '', queQuan = '',
             email = '', dienThoaiCaNhan = '', dienThoaiBaoTin = '', ngaySinh = '',
             maTrinhDoLlct = '', maTrinhDoQlnn = '', maTrinhDoTinHoc = '', hoKhau = '', diaChiHienTai = '', danToc = '', tonGiao = '',
             lyDoONuocNgoai = '', dangONuocNgoai = false, dangVien = false, chucDanh = '', trinhDoPhoThong = '', hocVi = '', chuyenNganh = '', namChucDanh = '', namHocVi = '',
@@ -344,6 +344,10 @@ class ProfilePage extends QTForm {
             soTheDang = '', noiDangDb = '', noiDangCt = '', doanVien = false, ngayVaoDoan = '', noiVaoDoan = '', ngheNghiepCu = '', quocGia = null, hangThuongBinh = '', giaDinhChinhSach = '',
             danhHieu = '', soTruong = '', sucKhoe = '', canNang = '', chieuCao = '' } = data.constructor === ({}).constructor ? data : {};
         this.cmnd.current.setVal(cmnd);
+        this.shcc.current.setVal(shcc);
+        this.ho.current.setVal(ho);
+        this.ten.current.setVal(ten);
+        this.biDanh.current.setVal(biDanh);
         this.cmndNgayCap.current.setVal(cmndNgayCap);
         this.cmndNoiCap.current.setVal(cmndNoiCap);
         this.ngaySinh.current.setVal(ngaySinh);
@@ -401,6 +405,10 @@ class ProfilePage extends QTForm {
     };
 
     getVal = () => ({
+        shcc: this.shcc.current.getFormVal(),
+        ho: this.shcc.current.getFormVal(),
+        ten: this.shcc.current.getFormVal(),
+        biDanh: this.biDanh.current.getFormVal(),
         cmnd: this.cmnd.current.getFormVal(),
         cmndNgayCap: this.cmndNgayCap.current.getFormVal(),
         cmndNoiCap: this.cmndNoiCap.current.getFormVal(),
@@ -634,33 +642,38 @@ class ProfilePage extends QTForm {
                             </div>
                             <div className='form-group col-md-9'>
                                 <div className='row'>
-                                    <div className='form-group col-md-4'><DateInput ref={this.ngaySinh} label='Ngày sinh' required min={new Date(1900, 1, 1).getTime()} max={Date.nextYear(-10).roundDate().getTime()} /></div>
+                                    <div className='form-group col-md-4'><TextInput ref={this.shcc} label='Mã thẻ cán bộ' required placeholder='Nhập mã thẻ cán bộ' maxLength={10} /></div>
+                                    <div className='form-group col-md-4'><TextInput ref={this.ho} label='Họ và tên lót' required maxLength={100} /></div>
+                                    <div className='form-group col-md-4'><TextInput ref={this.ten} label='Tên' required maxLength={30} /></div>
+                                    <div className='form-group col-md-4'><TextInput ref={this.biDanh} label='Bí danh' maxLength={20} /></div>
+                                    <div className='form-group col-md-4'><DateInput ref={this.ngaySinh} label='Ngày sinh' min={new Date(1900, 1, 1).getTime()} max={Date.nextYear(-10).roundDate().getTime()} /></div>
                                     <div className='form-group col-md-4'><Select ref={this.phai} adapter={SelectAdapter_DmGioiTinh} label='Giới tính' required /></div>
-                                    <div className='form-group col-md-4'><Select ref={this.quocGia} adapter={SelectAdapter_DmQuocGia} label='Quốc tịch' required /></div>
-                                    <div className='form-group col-md-4'><Select ref={this.danToc} adapter={SelectAdapter_DmDanToc} label='Dân tộc' required /></div>
-
-                                    <div className='form-group col-md-4'><Select ref={this.tonGiao} adapter={SelectAdapter_DmTonGiao} label='Tôn giáo' required /></div>
-                                    <div className='form-group col-md-4'><TextInput ref={this.dienThoaiCaNhan} label='Số điện thoại cá nhân' maxLength={20} /></div>
                                 </div>
                             </div>
+                            <div className='form-group col-md-4'><TextInput ref={this.cmnd} label='CMND/CCCD' placeholder='Nhập CMND / CCCD' maxLength={15} /></div>
+                            <div className='form-group col-md-4'><DateInput ref={this.cmndNgayCap} label='Ngày cấp' min={new Date(1900, 1, 1).getTime()} max={new Date().getTime()} /></div>
+                            <div className='form-group col-md-4'><TextInput ref={this.cmndNoiCap} label='Nơi cấp CMND/CCCD' placeholder='Nhập nơi cấp cmnd' maxLength={200} /></div>
+                            
+                            <div className='form-group col-md-6'><TextInput ref={this.emailCaNhan} label='Địa chỉ email cá nhân' maxLength={50} /></div>
+                            <div className='form-group col-md-6'><TextInput ref={this.email} label='Địa chỉ email trường' maxLength={50} /></div>
+                            <div className='form-group col-md-4'><TextInput ref={this.dienThoaiCaNhan} label='Số điện thoại cá nhân' maxLength={20} /></div>
                             <div className='form-group col-md-4'><TextInput ref={this.dienThoaiBaoTin} label='Số điện thoại báo tin' maxLength={20} /></div>
-                            <div className='form-group col-md-4'><TextInput ref={this.email} label='Email trường' /></div>
-                            <div className='form-group col-md-4'><TextInput ref={this.emailCaNhan} label='Email cá nhân' /></div>
-                            <div className='form-group col-md-3'><TextInput ref={this.cmnd} label='CMND / CCCD' placeholder='Nhập CMND / CCCD' required maxLength={15} /></div>
-                            <div className='form-group col-md-3'><DateInput ref={this.cmndNgayCap} label='Ngày cấp' required min={new Date(1900, 1, 1).getTime()} max={new Date().getTime()} /></div>
-                            <div className='form-group col-md-6'><TextInput ref={this.cmndNoiCap} label='Nơi cấp' required /></div>
-                            <div className='col-12' />
-                            <div className='form-group col-md-6'><TextInput ref={this.hoKhau} label='Hộ khẩu' required maxLength={200} /></div>
-                            <div className='form-group col-md-6'><TextInput ref={this.diaChiHienTai} label='Địa chỉ hiện tại' required maxLength={200} /></div>
+                            <div className='form-group col-md-4'><TextInput ref={this.soBhxh} label='Số BHXH' /></div>       
+                            <div className='form-group col-md-6'><TextInput ref={this.hoKhau} label='Hộ khẩu' maxLength={200} /></div>
+                            <div className='form-group col-md-6'><TextInput ref={this.diaChiHienTai} label='Địa chỉ hiện tại' maxLength={200} /></div>
+                            <div className='form-group col-12'/>
                             <div className='form-group col-md-6'><TextInput ref={this.noiSinh} label='Nơi sinh' maxLength={200} /></div>
                             <div className='form-group col-md-6'><TextInput ref={this.queQuan} label='Quê quán' maxLength={200} /></div>
-                            <div className='col-12' />
-                            <div className='form-group col-md-3'><TextInput ref={this.soBhxh} label='Số BHXH' /></div>
-                            <div className='form-group col-md-3'><Select ref={this.nhomMau} adapter={SelectAdapter_DmNhomMau} label='Nhóm máu' /></div>
-                            <div className='form-group col-md-3'><TextInput ref={this.soTruong} label='Sở trường' maxLength={100} /></div>
-                            <div className='form-group col-md-3'><TextInput ref={this.sucKhoe} label='Sức khỏe' maxLength={100} /></div>
-                            <div className='form-group col-md-3'><NumberInput ref={this.canNang} label='Cân nặng(kg)' min={0} step={0.1} /></div>
-                            <div className='form-group col-md-3'><NumberInput ref={this.chieuCao} label='Chiều cao(cm)' min={0} step={1} /></div>
+                            <div className='form-group col-xl-3 col-md-6'><Select ref={this.nhomMau} adapter={SelectAdapter_DmNhomMau} label='Nhóm máu' /></div>
+                            <div className='form-group col-xl-3 col-md-6'><Select ref={this.danToc} adapter={SelectAdapter_DmDanToc} label='Dân tộc' required /></div>
+                            <div className='form-group col-xl-3 col-md-6'><Select ref={this.quocGia} adapter={SelectAdapter_DmQuocGia} label='Quốc gia' required /></div>
+                            <div className='form-group col-xl-3 col-md-6'><Select ref={this.tonGiao} adapter={SelectAdapter_DmTonGiao} label='Tôn giáo' required /></div>
+
+                            <div className='form-group col-12'/>
+                            <div className='form-group col-md-4'><TextInput ref={this.sucKhoe} label='Sức khỏe' maxLength={100} /></div>
+                            <div className='form-group col-md-4'><NumberInput ref={this.canNang} label='Cân nặng(kg)' min={0} step={0.1} /></div>
+                            <div className='form-group col-md-4'><NumberInput ref={this.chieuCao} label='Chiều cao(cm)' min={0} step={1} /></div>
+                            <div className='form-group col-md-6'><TextInput ref={this.soTruong} label='Sở trường' maxLength={100} /></div>
                             <div className='form-group col-md-6'><TextInput ref={this.ngheNghiepCu} label='Nghề nghiệp trước khi tuyển dụng' maxLength={100} /></div>
                         </div>
                     </div>,
@@ -733,7 +746,7 @@ class ProfilePage extends QTForm {
                             <div className='tile-footer' style={{ textAlign: 'right' }}>
                                 <button className='btn btn-info' type='button' onClick={e => this.createTrinhDoNN(e)}>
                                     <i className='fa fa-fw fa-lg fa-plus' />Thêm trình độ ngoại ngữ
-                            </button>
+                                </button>
                             </div>
                         </div>
                     </div>,
@@ -756,7 +769,7 @@ class ProfilePage extends QTForm {
                                 <div className='tile-footer' style={{ textAlign: 'right' }}>
                                     <button className='btn btn-info' type='button' onClick={e => this.createQuanHe(e, 0)}>
                                         <i className='fa fa-fw fa-lg fa-plus' />Thêm thông tin người thân
-                                </button>
+                                    </button>
                                 </div>
                             </div>
                             <div className='tab-pane fade' id='infoQuanHe2Content' role='tabpanel' aria-labelledby='infoQuanHe2'>
@@ -767,7 +780,7 @@ class ProfilePage extends QTForm {
                                 <div className='tile-footer' style={{ textAlign: 'right' }}>
                                     <button className='btn btn-info' type='button' onClick={e => this.createQuanHe(e, 1)}>
                                         <i className='fa fa-fw fa-lg fa-plus' />Thêm thông tin người thân
-                                </button>
+                                    </button>
                                 </div>
                             </div>
                         </div>
