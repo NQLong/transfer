@@ -6,6 +6,7 @@ import SectionNewsList from './sectionNewsList';
 import SectionAdmission from './sectionAdmission';
 import SectionNotification from './sectionNotification';
 import SectionHighLightNews from './sectionHighLightNews';
+import SectionInsight from './sectionInsight';
 import news from './redux';
 
 export default {
@@ -30,6 +31,6 @@ export default {
         // { path: '/news/list/:category', component: Loadable({ loading: Loading, loader: () => import('./homeNewsList') }) }
     ],
     Section: {
-        SectionNews, SectionNewsList, SectionAdmission, SectionNotification, SectionHighLightNews
+        SectionNews, SectionNewsList, SectionAdmission, SectionNotification, SectionHighLightNews, SectionInsight
     }
 };

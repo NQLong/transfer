@@ -211,7 +211,7 @@ export default class TextInput extends InputBase {
     }
 
     render = () => this.wrapLabel(
-        <input ref={this.input} className='form-control' value={this.state.value}
+        <input ref={this.input} className='form-control' value={this.state.value} onKeyPress={this.props.onKeyPress ? this.props.onKeyPress : null}
             disabled={this.props.disabled} readOnly={this.props.readOnly} type={this.props.type} placeholder={this.props.placeholder || 'Nhập ' + this.props.label.lowFirstChar()} maxLength={this.props.maxLength}
             onKeyUp={this.props.onKeyUp ? this.props.onKeyUp : this.keyPressed} onBlur={this.onBlur} onChange={this.#handleOnChange} />
     );

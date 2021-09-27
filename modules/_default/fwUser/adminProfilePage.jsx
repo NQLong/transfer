@@ -27,6 +27,7 @@ import { SelectAdapter_DmChucDanhKhoaHoc } from 'modules/mdDanhMuc/dmChucDanhKho
 import { SelectAdapter_DmTrinhDo } from 'modules/mdDanhMuc/dmTrinhDo/redux';
 import TextInput, { DateInput, NumberInput, Select, BooleanInput } from 'view/component/Input';
 import { QTForm } from 'view/component/Form';
+import { ComponentDiaDiem } from 'modules/mdDanhMuc/dmDiaDiem/componentDiaDiem';
 
 const sexMapper = { '01': 'Nam', '02': 'Nữ' };
 
@@ -498,6 +499,11 @@ class ProfilePage extends QTForm {
             isConfirm && this.props.deleteTrinhDoNNStaffUser(item.id, () => this.props.getStaffEdit(this.state.canBo.shcc)));
         e.preventDefault();
     }
+    copyAddress = e => {
+        e.preventDefault();
+        const dataThuongTru = this.diaChiThuongTru.value();
+        this.diaChiHienTai.value(dataThuongTru.maTinhThanhPho, dataThuongTru.maQuanHuyen, dataThuongTru.maPhuongXa, dataThuongTru.soNhaDuong);
+    }
 
     render() {
         const user = this.props.system ? this.props.system.user : {};
@@ -662,6 +668,12 @@ class ProfilePage extends QTForm {
                             <div className='form-group col-md-3'><NumberInput ref={this.canNang} label='Cân nặng(kg)' min={0} step={0.1} /></div>
                             <div className='form-group col-md-3'><NumberInput ref={this.chieuCao} label='Chiều cao(cm)' min={0} step={1} /></div>
                             <div className='form-group col-md-6'><TextInput ref={this.ngheNghiepCu} label='Nghề nghiệp trước khi tuyển dụng' maxLength={100} /></div>
+                            <ComponentDiaDiem ref={e => this.diaChiThuongTru = e} label='Địa chỉ thường trú' className='col-md-12' requiredSoNhaDuong={true} />
+                            <p className='col-md-12'>
+                                Nếu <b>Địa chỉ thường trú</b> là <b>Địa chỉ hiện tại</b> thì&nbsp;<a href='#' onClick={this.copyAddress}>nhấp vào đây</a>.
+                        </p>
+                            <ComponentDiaDiem ref={e => this.diaChiHienTai = e} label='Địa chỉ hiện tại' className='col-md-12' requiredSoNhaDuong={true} />
+
                         </div>
                     </div>,
                     <div className='tile' key={2}>

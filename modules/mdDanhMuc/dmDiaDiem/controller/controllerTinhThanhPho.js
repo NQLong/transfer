@@ -25,6 +25,10 @@ module.exports = app => {
         app.model.dmTinhThanhPho.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
     });
 
+    app.get('/api/danh-muc/tinh-thanh-pho/item/:ma', (req, res) => {
+        app.model.dmTinhThanhPho.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
+    });
+
     app.post('/api/danh-muc/tinh-thanh-pho', app.permission.check('dmTinhThanhPho:write'), (req, res) =>
         app.model.dmTinhThanhPho.create(req.body.dmTinhThanhPho, (error, item) => res.send({ error, item })));
 

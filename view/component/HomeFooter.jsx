@@ -83,7 +83,7 @@ class Footer extends React.Component {
                     <div className='col-sm' key={'13'}>
                         <div className='footer-link'>
                             <h3>{'QUÉT MÃ TƯ VẤN TUYỂN SINH'} <i className='fa fa-angle-down d-md-none'></i></h3>
-                            <img src={qrcode} style={{ height: '100%', width: 500 }} />
+                            <img src={qrcode} style={{ height: 'auto', width: '100%' }} />
                         </div>
                     </div>
                 ];
@@ -177,18 +177,18 @@ class Footer extends React.Component {
                         <h3>{'KẾT NỐI'} <i className='fa fa-angle-down d-md-none'></i></h3>
                         <div className='list-unstyled' style={{ fontWeight: 'bold', fontSize: 16 }}>
                             <li><i className='fa fa fa-phone'></i>
-                                <span target='_blank' className='ml-1' style={{ paddingLeft: '10px', }}>
+                                <span target='_blank' className='ml-1' style={{ paddingLeft: '10px', fontSize: 16 }}>
                                     <a href={'tel:02838293828'}>{'Cơ sở Đinh Tiên Hoàng: 028 38293828, số nội bộ: 111'}</a>
                                 </span></li>
                             <li><i className='fa fa fa-phone'></i>
-                                <span target='_blank' className='ml-1' style={{ paddingLeft: '10px', }}>
+                                <span target='_blank' className='ml-1' style={{ paddingLeft: '10px', fontSize: 16 }}>
                                     <a href={'tel:02837243302'}> {'Cơ sở Thủ Đức: 028 37243302, số nội bộ: 4201'}</a>
                                 </span></li>
                             <li> <i className='fa fa fa-envelope'></i><span target='_blank' className='ml-1' style={{ paddingLeft: '10px', }}>
                                 <a href='mailto:congtacsinhvien@hcmussh.edu.vn'>congtacsinhvien@hcmussh.edu.vn</a>
                             </span></li>
                             <li><i className='icon-facebook-square'></i><span className='ml-1' style={{ paddingLeft: '10px', }}>
-                                <a href='https://www.facebook.com/ctsv.hcmussh'>https://www.facebook.com/ctsv.hcmussh</a>
+                                <a href='https://www.facebook.com/ctsv.hcmussh' target='_blank' rel="noreferrer">https://www.facebook.com/ctsv.hcmussh</a>
                             </span></li>
                         </div>
                     </div>;
@@ -218,8 +218,8 @@ class Footer extends React.Component {
                                 <a href='mailto:era@hcmussh.edu.vn'>era@hcmussh.edu.vn</a>
                             </span></li>
                             <li><i className='icon-facebook-square'></i><span className='ml-1' style={{ paddingLeft: '10px', }}>
-                                <a href='https://www.facebook.com/232430870759910'>
-                                    https://www.facebook.com/232430870759910
+                                <a href='https://www.facebook.com/232430870759910' target='_blank' rel="noreferrer">
+                                    www.facebook.com/232430870759910
                                     </a>
                             </span>
                             </li>
@@ -240,8 +240,8 @@ class Footer extends React.Component {
                                     <a href='mailto:qlkh_da@hcmussh.edu.vn'>qlkh_da@hcmussh.edu.vn</a>
                                 </span></li>
                                 <li><i className='icon-facebook-square'></i><span className='ml-1' style={{ paddingLeft: '10px', }}>
-                                    <a href='https://www.facebook.com/232430870759910'>
-                                        https://www.facebook.com/232430870759910
+                                    <a href='https://www.facebook.com/232430870759910' target='_blank' rel="noreferrer">
+                                        www.facebook.com/232430870759910
                                     </a>
                                 </span>
                                 </li>

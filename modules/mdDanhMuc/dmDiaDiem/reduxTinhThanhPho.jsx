@@ -49,6 +49,22 @@ export function getDMTinhThanhPhoPage(pageNumber, pageSize, pageCondition, done)
     };
 }
 
+export function getDmTinhThanhPho(ma, done) {
+    return () => {
+        const url = `/api/danh-muc/tinh-thanh-pho/item/${ma}`;
+        T.get(url, data => {
+            if (data.error) {
+                T.notify('Lấy thông tin tỉnh thành phố bị lỗi!', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                done && done(data.item);
+            }
+        }, error => {
+            console.error(`GET: ${url}.`, error);
+        });
+    };
+}
+
 export function updateDMTinhThanhPho(ma, changes, done) {
     return dispatch => {
         const url = '/api/danh-muc/tinh-thanh-pho';
@@ -111,4 +127,12 @@ export const SelectAdapter_DmTinhThanhPho = {
     getAll: getDMTinhThanhPhoAll,
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
     condition: { kichHoat: 1 },
+};
+
+export const ajaxSelectTinhThanhPho = {
+    ajax: false,
+    url: '/api/danh-muc/tinh-thanh-pho/all',
+    data: params => ({ condition: params.term }),
+    processResults: data => ({ results: data && data.items ? data.items.filter(item => item.kichHoat).map(item => ({ id: item.ma, text: item.ten })) : [] }),
+    fetchOne: (id, done) => (getDmTinhThanhPho(id, (item) => done && done({ id: item.ma, text: item.ten })))()
 };
