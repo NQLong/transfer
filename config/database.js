@@ -19,12 +19,12 @@ module.exports = async (app, db) => {
     const timeoutPromise = () => new Promise((i, reject) => setTimeout(() => reject(`Timeout in ${timeout}s.`), 1000 * timeout));
 
     Promise.race([app.oracleDB.getConnection({
-        connectString: `(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = ${app.isDebug ? db.host : db.local_host})(PORT = 1521)) (CONNECT_DATA = (SID = ${db.sid})) )`,
+        connectString: `(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = ${db.host})(PORT = 1521)) (CONNECT_DATA = (SID = ${db.sid})) )`,
         user: db.username,
         password: db.password,
     }), timeoutPromise()]).then(connection => {
         if (connection) {
-            console.log(' - The Oracle connection succeeded.');
+            console.log(` - #${process.pid}: The Oracle connection succeeded.`);
             app.dbConnection = connection;
             app.dbConnection.buildCondition = (mapper, condition, seperation, preParam = '') => {
                 if (condition.statement && condition.parameter) {
