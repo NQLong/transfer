@@ -21,7 +21,7 @@ app.debugUrl = 'http://localhost:' + app.port;
 app.mongodb = 'mongodb://localhost:27017/' + packageConfig.dbName;
 app.apiKeySendGrid = packageConfig.email.apiKeySendGrid;
 app.defaultAdminEmail = packageConfig.default.adminEmail;
-if (!app.isDebug && app.fs.existsSync('./asset/config.json')) packageConfig = Object.assign({}, packageConfig, require('../asset/config.json'));
+if (!app.isDebug && app.fs.existsSync('./asset/config.json')) packageConfig = Object.assign({}, packageConfig, require('./asset/config.json'));
 
 app.mailSentName = packageConfig.email.from;
 app.assetPath = app.path.join(__dirname, 'asset');
