@@ -32,8 +32,13 @@ module.exports = app => {
     app.post('/api/danh-muc/tinh-thanh-pho', app.permission.check('dmTinhThanhPho:write'), (req, res) =>
         app.model.dmTinhThanhPho.create(req.body.dmTinhThanhPho, (error, item) => res.send({ error, item })));
 
-    app.get('/api/danh-muc/tinh-thanh-pho/all', app.permission.check('user:login'), (req, res) => {
-        app.model.dmTinhThanhPho.getAll((error, items) => res.send({ error, items }));
+    app.get('/api/danh-muc/tinh-thanh-pho/all', (req, res) => {
+        const searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+        const condition = {
+            statement: 'lower(ten) LIKE :searchTerm',
+            parameter: { searchTerm: `%${searchTerm.toLowerCase()}%` },
+        };
+        app.model.dmTinhThanhPho.getAll(condition, '*', 'ten', (error, items) => res.send({ error, items }));
     });
 
     app.post('/api/danh-muc/tinh-thanh-pho/multiple', app.permission.check('dmTinhThanhPho:write'), (req, res) => {
