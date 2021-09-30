@@ -9,7 +9,6 @@ asset/host.json
 asset/config.json
 asset/menu.txt
 asset/bundle
-asset/db/*.sql
 asset/upload/
 asset/upload/*
 asset/download/*
