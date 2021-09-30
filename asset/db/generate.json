@@ -1,43 +1,4 @@
 {
-    "CHUONG_TRINH_DAO_TAO": {
-        "active": true,
-        "moduleName": "dmChuongTrinhDaoTao",
-        "modelName": "dmChuongTrinhDaoTao",
-        "columns": {
-            "TEN": {
-                "value": "ten",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": false,
-                "size": 256
-            },
-            "MO_TA": {
-                "value": "moTa",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 1000
-            },
-            "KICH_HOAT": {
-                "value": "kichHoat",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "22,0"
-            },
-            "MA": {
-                "value": "ma",
-                "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_414126\".nextval",
-                "nullable": false,
-                "size": "22,0"
-            }
-        },
-        "primaryKeys": [
-            "MA"
-        ],
-        "foreignKeys": []
-    },
     "DM_BENH_VIEN": {
         "active": true,
         "moduleName": "dmBenhVien",
@@ -405,7 +366,46 @@
                 "dataType": "NUMBER",
                 "dataDefault": "1",
                 "nullable": false,
-                "size": "22,0"
+                "size": "1,0"
+            }
+        },
+        "primaryKeys": [
+            "MA"
+        ],
+        "foreignKeys": []
+    },
+    "DM_CHUONG_TRINH_DAO_TAO": {
+        "active": true,
+        "moduleName": "dmChuongTrinhDaoTao",
+        "modelName": "dmChuongTrinhDaoTao",
+        "columns": {
+            "TEN": {
+                "value": "ten",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": false,
+                "size": 256
+            },
+            "MO_TA": {
+                "value": "moTa",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 1000
+            },
+            "KICH_HOAT": {
+                "value": "kichHoat",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "1,0"
+            },
+            "MA": {
+                "value": "ma",
+                "dataType": "NUMBER",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_414126\".nextval",
+                "nullable": false,
+                "size": "1,0"
             }
         },
         "primaryKeys": [
@@ -2084,7 +2084,7 @@
                 "dataType": "NUMBER",
                 "dataDefault": "",
                 "nullable": true,
-                "size": "22,0"
+                "size": "1,0"
             }
         },
         "primaryKeys": [
@@ -2719,7 +2719,7 @@
                 "dataType": "NUMBER",
                 "dataDefault": "",
                 "nullable": true,
-                "size": "22,0"
+                "size": "1,0"
             }
         },
         "primaryKeys": [
