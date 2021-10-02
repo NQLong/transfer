@@ -128,7 +128,13 @@ export function deleteFooterItem(id, done) {
 
 export function getSystemState(done) {
     return dispatch => {
-        const url = '/api/state';
+        const url = '/api/state',
+            hostname = window.location.href;
+        if (hostname.includes('/en') || hostname.includes('/news-en') || hostname.includes('/article')) {
+            T.cookie('language', 'en');
+        } else {
+            T.cookie('language', 'vi');
+        }
         T.get(url, data => {
             if (data) {
                 dispatch({ type: UPDATE_SYSTEM_STATE, state: data });

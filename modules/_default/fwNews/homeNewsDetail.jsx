@@ -11,7 +11,11 @@ class NewsDetail extends React.Component {
 
     componentDidMount() {
         let url = window.location.pathname,
-            params = T.routeMatcher(url.startsWith('/tin-tuc/') ? '/tin-tuc/:link' : (url.startsWith('/news/item/') ? '/news/item/:id' : '/:website/news/item/:id')).parse(url);
+            params = T.routeMatcher(
+                url.startsWith('/tin-tuc/') ? '/tin-tuc/:link'
+                    : (url.startsWith('/news/item/') ? '/news/item/:id'
+                        : (url.startsWith('/news-en/item/') ? '/news-en/item/:id'
+                            : '/article/:link'))).parse(url);
         this.setState({ id: params.id, link: params.link });
     }
 
@@ -43,13 +47,14 @@ class NewsDetail extends React.Component {
             let content = T.language.parse(item.content)
                 .replaceAll('<strong>', '<b style="font-weight: bold;color:black;">')
                 .replaceAll('</strong>', '</b>');
+            console.log(T.language());
             return (
                 <section className='ftco-section ftco-degree-bg'>
                     <div className='container-fluid'>
                         <div className='row'>
                             <div className='col-md-8 ftco-animate'>
                                 <h2 className='mb-3' style={{ fontSize: width < 500 ? '25px' : '30px' }}>
-                                    {item.isTranslate == 1 ? T.language.parse(item.title) : T.language.parse(item.title, true)[item.language]}
+                                    {T.language.parse(item.title)}
                                 </h2>
                                 <div className='row' style={{ justifyContent: 'flex-end', paddingBottom: 10 }}>
                                     <a href='#' onClick={() => { window.open(`http://www.facebook.com/sharer.php?u=${window.location.href}`); }}>

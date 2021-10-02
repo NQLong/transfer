@@ -199,7 +199,7 @@ export function createDivisionMenu(id, maDonVi, maWebsite, done) {
                 T.notify('Tạo menu bị lỗi!', 'danger');
                 console.error(`POST: ${url}. ${data.error}`);
             } else {
-                dispatch(divisionMenuGetAll());
+                dispatch(divisionMenuGetAll(maDonVi, maWebsite));
                 if (done) done(data);
             }
         }, () => T.notify('Tạo menu bị lỗi!', 'danger'));
@@ -237,7 +237,7 @@ export function updateDivisionMenuPriorities(changes, done) {
     };
 }
 
-export function deleteDivisionMenu(id, maDonVi) {
+export function deleteDivisionMenu(id, maDonVi, maWebsite) {
     return dispatch => {
         const url = '/api/menu';
         T.delete(url, { id }, data => {
@@ -246,7 +246,7 @@ export function deleteDivisionMenu(id, maDonVi) {
                 console.error(`DELETE: ${url}. ${data.error}`);
             } else {
                 T.alert('Xóa menu thành công!', 'error', false, 800);
-                dispatch(divisionMenuGetAll(maDonVi));
+                dispatch(divisionMenuGetAll(maDonVi, maWebsite));
             }
         }, () => T.notify('Xóa menu bị lỗi!', 'danger'));
     };

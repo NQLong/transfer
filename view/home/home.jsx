@@ -9,7 +9,6 @@ import { connect, Provider } from 'react-redux';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import thunk from 'redux-thunk';
 import { composeWithDevTools } from 'redux-devtools-extension';
-
 import Loadable from 'react-loadable';
 import Loading from 'view/component/Loading';
 import Loader from 'view/component/Loader';

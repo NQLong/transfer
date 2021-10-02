@@ -78,16 +78,7 @@ class Footer extends React.Component {
                     </div>
                 );
             });
-            if (hostname.includes('tuyensinh')) {
-                footerList = [
-                    <div className='col-sm' key={'13'}>
-                        <div className='footer-link'>
-                            <h3>{'QUÉT MÃ TƯ VẤN TUYỂN SINH'} <i className='fa fa-angle-down d-md-none'></i></h3>
-                            <img src={qrcode} style={{ height: 'auto', width: '100%' }} />
-                        </div>
-                    </div>
-                ];
-            }
+
             footerList.push([
                 <div className='col-sm' key={'13'}>
                     <div className='footer-link'>
@@ -133,17 +124,17 @@ class Footer extends React.Component {
                         </div>
                     </div>
                 </div>
-                /* <div className='col-sm' key={'15'}>
-                    <div className='footer-link'>
-                        <h3>{language.addressTitle} <i className='fa fa-angle-down d-md-none'></i></h3>
-                        <div className='list-unstyled'>
-                            <li><i className='fa fa-map-marker'></i><span className='ml-1' style={{ paddingLeft: '10px', }}>{address}</span></li>
-                            <li><i className='fa fa-map-marker'></i><span className='ml-1' style={{ paddingLeft: '10px', }}>{address2}</span></li>
+            ]);
+            if (hostname.includes('tuyensinh')) {
+                footerList = [
+                    <div className='col-sm' key={'13'}>
+                        <div className='footer-link'>
+                            <h3>{'QUÉT MÃ TƯ VẤN TUYỂN SINH'} <i className='fa fa-angle-down d-md-none'></i></h3>
+                            <img src={qrcode} style={{ height: 'auto', width: '100%' }} />
                         </div>
                     </div>
-                </div> */
-            ]);
-            if (hostname.includes('ctsv')) {
+                ];
+            } else if (hostname.includes('ctsv')) {
                 footerList[0] = <div key={0} className='col-sm'>
                     <div className='footer-link'>
                         <h3>LIÊN KẾT <i className='fa fa-angle-down d-md-none'></i></h3>
@@ -249,30 +240,6 @@ class Footer extends React.Component {
                         </div>
                     </div>;
                 delete footerList[2];
-                // footerList[2] =
-                //     <div className='col-sm' key={'13'}>
-                //         <div className='footer-link'>
-                //             <h3>{language.connect} <i className='fa fa-angle-down d-md-none'></i></h3>
-                //             <div className='list-unstyled'>
-                //                 <img src={'/img/logo-footer.png?t=2000'} style={{ width: '100%', maxWidth: 450 }} />
-                //                 <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', paddingTop: 10, maxWidth: 450 }}>
-                //                     {mobile &&
-                //                         <a target='_blank' href={`tel:02837243302`}>
-                //                             <img src={'/img/social-media-icon/1.png'} style={{ height: 60, cursor: 'pointer' }} />
-                //                         </a>}
-                //                     {youtube && <a target='_blank' href={youtube}>
-                //                         <img src={'/img/social-media-icon/2.png'} style={{ height: 60, }} />
-                //                     </a>}
-                //                     <a target='_blank' href={`https://www.linkedin.com/company/ussh-vnuhcm/`}>
-                //                         <img src={'/img/social-media-icon/3.png'} style={{ height: 60, }} />
-                //                     </a>
-                //                     {facebook && <a target='_blank' href={'https://www.facebook.com/232430870759910'}>
-                //                         <img src={'/img/social-media-icon/4.png'} href={facebook} style={{ height: 60, cursor: 'pointer' }} />
-                //                     </a>}
-                //                 </div>
-                //             </div>
-                //         </div>
-                //     </div>
             } else if (hostname.includes('thuvien')) {
                 footerList[1] = <div className='col-sm' key={'12'}>
                     <div className='footer-link'>
@@ -290,6 +257,91 @@ class Footer extends React.Component {
                         </ul>
                     </div>
                 </div>;
+            } else if (hostname.includes('en')) {
+                footerList[0] = <div className='col-sm' key={'1'}>
+                    <div className='footer-link'>
+                        <h3>{'Study at USSH VNUHCM'} <i className='fa fa-angle-down d-md-none'></i></h3>
+                        <ul className='list-unstyled' style={{ display: 'none' }}>
+                            <li>
+                                <a target='_blank' href='https://www.facebook.com/Libussh' rel="noreferrer">Undergraduate Programs</a>
+                            </li>
+                            <li>
+                                <a target='_blank' href='https://hcmussh.edu.vn/tin-tuc/lien-lac' rel="noreferrer">Postgraduate Programs</a>
+                            </li>
+                            <li>
+                                <a target='_blank' href='https://hcmussh.edu.vn/tin-tuc/vi-tri-tv' rel="noreferrer">PhD Programs</a>
+                            </li>
+                            <li>
+                                <a target='_blank' href='https://hcmussh.edu.vn/tin-tuc/vi-tri-tv' rel="noreferrer">Short term Courses</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>;
+                footerList[1] = <div className='col-sm' key={'2'}>
+                    <div className='footer-link'>
+                        <h3>{'Student Life'} <i className='fa fa-angle-down d-md-none'></i></h3>
+                        <ul className='list-unstyled' style={{ display: 'none' }}>
+                            <li>
+                                <a target='_blank' href='https://www.facebook.com/Libussh' rel="noreferrer">Future Students</a>
+                            </li>
+                            <li>
+                                <a target='_blank' href='https://hcmussh.edu.vn/tin-tuc/lien-lac' rel="noreferrer">Student Community</a>
+                            </li>
+                            <li>
+                                <a target='_blank' href='https://hcmussh.edu.vn/tin-tuc/vi-tri-tv' rel="noreferrer">International Students</a>
+                            </li>
+                            <li>
+                                <a target='_blank' href='https://hcmussh.edu.vn/tin-tuc/vi-tri-tv' rel="noreferrer">Social Clubs</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>;
+                footerList[2] = <div className='col-sm' key={'3'}>
+                    <div className='footer-link'>
+                        <h3>{'About'} <i className='fa fa-angle-down d-md-none'></i></h3>
+                        <ul className='list-unstyled' style={{ display: 'none' }}>
+                            <li>
+                                <a target='_blank' href='https://www.facebook.com/Libussh' rel="noreferrer">Offices</a>
+                            </li>
+                            <li>
+                                <a target='_blank' href='https://hcmussh.edu.vn/tin-tuc/lien-lac' rel="noreferrer">Faculties</a>
+                            </li>
+                            <li>
+                                <a target='_blank' href='https://hcmussh.edu.vn/tin-tuc/vi-tri-tv' rel="noreferrer">Centers</a>
+                            </li>
+                            <li>
+                                <a target='_blank' href='https://hcmussh.edu.vn/tin-tuc/vi-tri-tv' rel="noreferrer">Partners</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>;
+                footerList[3] = <div className='col-sm' key={'4'}>
+                    <div className='footer-link'>
+                        <h3>Get in touch<i className='fa fa-angle-down d-md-none'></i></h3>
+                        <div className='list-unstyled' style={{ fontWeight: 'bold', fontSize: 16 }}>
+                            <img src={'/img/logo-footer.png?t=2000'}
+                                onClick={() => window.open('http://hcmussh.edu.vn/', '_blank')}
+                                style={{ width: '100%', maxWidth: 450, cursor: 'pointer' }} />
+                            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', paddingTop: 10, maxWidth: 450 }}>
+                                {mobile &&
+                                    <a target='_blank' href={`tel:${mobile}`} rel="noreferrer">
+                                        <img src={'/img/social-media-icon/1.png?t=1'} style={{ height: 50, cursor: 'pointer' }} />
+                                    </a>}
+                                {youtube && <a target='_blank' href={youtube} rel="noreferrer">
+                                    <img src={'/img/social-media-icon/2.png?t=1'} style={{ height: 50, }} />
+                                </a>}
+                                <a target='_blank' href={'https://www.linkedin.com/company/ussh-vnuhcm/'} rel="noreferrer">
+                                    <img src={'/img/social-media-icon/3.png?t=1'} style={{ height: 50, }} />
+                                </a>
+                                {facebook && <a target='_blank' href={facebook} rel="noreferrer">
+                                    <img src={'/img/social-media-icon/4.png?t=1'} href={facebook} style={{ height: 50, cursor: 'pointer' }} />
+                                </a>}
+                            </div>
+                        </div>
+                    </div>
+                </div>;
+                //  ;
+                // console.log(footerList);
             }
         }
         return (

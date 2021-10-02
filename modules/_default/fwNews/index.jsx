@@ -26,8 +26,10 @@ export default {
         { path: '/user/news/draft/translate/edit/:draftId', component: Loadable({ loading: Loading, loader: () => import('./translateEditPage') }) },
         { path: '/user/news/draft/translate', component: Loadable({ loading: Loading, loader: () => import('./translatePage') }) },
         { path: '/news/item/:newsId', component: Loadable({ loading: Loading, loader: () => import('./homeNewsDetail') }) },
+        { path: '/news-en/item/:newsId', component: Loadable({ loading: Loading, loader: () => import('./homeNewsDetail') }) },
         // { path: '/:websiteDv/news/item/:newsId', component: Loadable({ loading: Loading, loader: () => import('./homeNewsDetail') }) },
         { path: '/tin-tuc/:link', component: Loadable({ loading: Loading, loader: () => import('./homeNewsDetail') }) },
+        { path: '/article/:link', component: Loadable({ loading: Loading, loader: () => import('./homeNewsDetail') }) },
         // { path: '/news/list/:category', component: Loadable({ loading: Loading, loader: () => import('./homeNewsList') }) }
     ],
     Section: {

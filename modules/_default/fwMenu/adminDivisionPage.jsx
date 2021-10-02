@@ -70,7 +70,7 @@ class MenuPage extends React.Component {
     }
 
     delete = (e, item) => {
-        T.confirm('Xóa menu', 'Bạn có chắc bạn muốn xóa menu này?', true, isConfirm => isConfirm && this.props.deleteDivisionMenu(item.id, this.state.maDonVi));
+        T.confirm('Xóa menu', 'Bạn có chắc bạn muốn xóa menu này?', true, isConfirm => isConfirm && this.props.deleteDivisionMenu(item.id, this.state.maDonVi, this.state.shortname));
         e.preventDefault();
     }
 

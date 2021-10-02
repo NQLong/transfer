@@ -548,7 +548,7 @@ export function getNewsByAdmission(pageNumber, pageSize, done) {
         if (!pageSize) pageSize = 25;
         const categoryType = 2;
         const url = `/news/page/${pageNumber}/${pageSize}/${categoryType}`;
-        T.get(url, {}, data => {
+        T.get(url, { language: T.language() }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách tin tức bị lỗi!', 'danger');
                 console.error('GET: ' + url + '.', data.error);
@@ -571,7 +571,7 @@ export function getNewsByNotification(pageNumber, pageSize, done) {
         if (!pageSize) pageSize = 25;
         const categoryType = 1;
         const url = `/news/page/${pageNumber}/${pageSize}/${categoryType}`;
-        T.get(url, {}, data => {
+        T.get(url, { language: T.language() }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách tin tức bị lỗi!', 'danger');
                 console.error('GET: ' + url + '.', data.error);
@@ -594,7 +594,7 @@ export function getNewsByNews(pageNumber, pageSize, done) {
         if (!pageSize) pageSize = 25;
         const categoryType = 3;
         const url = `/news/page/${pageNumber}/${pageSize}/${categoryType}`;
-        T.get(url, {}, data => {
+        T.get(url, { language: T.language() }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách tin tức bị lỗi!', 'danger');
                 console.error('GET: ' + url + '.', data.error);
@@ -624,7 +624,7 @@ export function getNewsInPageByUser(pageNumber, pageSize) {
     return dispatch => {
         const page = T.updatePage('homeNewsList', pageNumber, pageSize);
         const url = '/news/page/' + page.pageNumber + '/' + page.pageSize;
-        T.get(url, data => {
+        T.get(url, { language: T.language() }, data => {
             if (data.error) {
                 T.notify(language.getNewsInPageByUserError, 'danger');
                 console.error('GET: ' + url + '.', data.error);
@@ -667,7 +667,7 @@ export function getNewsByCategoriId(category, pageNumber, pageSize, done) {
         if (!pageNumber) pageNumber = 1;
         if (!pageSize) pageSize = 25;
         const url = `/news/page/${page.pageNumber}/${page.pageSize}/${category}`;
-        T.get(url, {}, data => {
+        T.get(url, { language: T.language() }, data => {
             if (data.error) {
                 T.notify(language.getNewsInPageByUserError, 'danger');
                 console.error('GET: ' + url + '.', data.error);
@@ -690,7 +690,7 @@ export function getNewsByCategory(pageNumber, pageSize, category, done) {
         if (!pageNumber) pageNumber = 1;
         if (!pageSize) pageSize = 25;
         const url = `/news/page/${page.pageNumber}/${page.pageSize}/${category}`;
-        T.get(url, {}, data => {
+        T.get(url, { language: T.language() }, data => {
             if (data.error) {
                 T.notify(language.getNewsInPageByUserError, 'danger');
                 console.error('GET: ' + url + '.', data.error);
@@ -732,7 +732,7 @@ export function getNewsFeed(maDonVi) {
 export function getNewsFeedByCategory(type) {
     return dispatch => {
         const url = `/news/page/1/20/${type}`;
-        T.get(url, data => {
+        T.get(url, { language: T.language() }, data => {
             if (data.error) {
                 T.notify(language.getNewsFeedError, 'danger');
                 console.error('GET: ' + url + '.', data.error);

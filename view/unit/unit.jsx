@@ -40,8 +40,8 @@ class App extends React.Component {
     loader = React.createRef();
     loginModal = React.createRef();
     state = { routes: [] };
-
     componentDidMount() {
+
         const done = () => {
             if ($(this.loader.current).length > 0 && this.props.system && this.props.system.menus) { // Finished loading
                 this.loader.current.isShown() && this.loader.current.hide();

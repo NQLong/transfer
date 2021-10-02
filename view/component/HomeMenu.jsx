@@ -243,7 +243,7 @@ class HomeMenu extends React.Component {
                     <div className='d-flex align-items-center'>
                         {user &&
                             <a href='/user' target='_blank' style={{ color: '#0139a6', fontWeight: 'bold', fontSize: '0.9vw', paddingLeft: 5 }}>
-                                <span>TRANG CÁ NHÂN</span>
+                                <span>{language.adminPage}</span>
                             </a>
                         }
                         <a href='#' onClick={this.logout} className='nav-link' style={{ color: '#0139a6', padding: '0 10px', fontWeight: 'bold', fontSize: '0.9vw' }}>

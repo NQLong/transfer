@@ -71,7 +71,7 @@ class SectionSideBar extends React.Component {
                     this.setState({
                         recentNews: {
                             vi: { recentNews: 'Thông báo mới' },
-                            en: { recentNews: 'Recent notifications' },
+                            en: { recentNews: 'Lastest News' },
                         }
                     });
                     this.props.getNewsFeedByCategory(1);
@@ -79,7 +79,7 @@ class SectionSideBar extends React.Component {
                     this.setState({
                         recentNews: {
                             vi: { recentNews: 'Tin tuyển sinh mới' },
-                            en: { recentNews: 'Recent enrollment news' },
+                            en: { recentNews: 'Lastest News' },
                         }
                     }); this.props.getNewsFeedByCategory(2);
                 } else {
@@ -89,6 +89,19 @@ class SectionSideBar extends React.Component {
                 this.props.getNewsFeed(maDonVi);
             }
         });
+    }
+
+    getLink = (item) => {
+        const language = T.language();
+        if (language == 'vi' && item.link) {
+            return ('/tin-tuc/' + item.link);
+        } else if (language == 'vi' && !item.link) {
+            return ('/news/item/' + item.id);
+        } else if (language == 'en' && item.linkEn) {
+            return ('/article/' + item.link);
+        } else if (language == 'en' && !item.linkEn) {
+            return ('/news-en/item/' + item.id);
+        }
     }
 
     render() {
@@ -111,19 +124,13 @@ class SectionSideBar extends React.Component {
             );
         });
         const recentNews = (this.props.news && this.props.news.newsFeed ? this.props.news.newsFeed : []).map((item, index) => {
-            const link = item.link ? '/tin-tuc/' + item.link : '/news/item/' + item.id;
             return (
                 <div key={index} className='block-21 mb-4 d-flex'>
-                    <a href={link} className='blog-img' style={{ backgroundImage: `url('${item.image}')` }} />
+                    <a href={this.getLink(item)} className='blog-img' style={{ backgroundImage: `url('${item.image}')` }} />
                     <div className='text'>
                         <h3 className='heading text-justify'>
-                            <a href={link}
+                            <a href={this.getLink(item)}
                                 style={{ display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden', paddingLeft: 10 }}>{T.language.parse(item.title)}</a></h3>
-                        {/* <div className='meta'>
-                            <div><a href='#'>
-                                <span className='icon-calendar' />&nbsp; {T.dateToText(item.createdDate)}
-                            </a></div>
-                        </div> */}
                     </div>
                 </div>
             );
