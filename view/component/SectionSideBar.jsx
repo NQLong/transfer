@@ -46,12 +46,16 @@ class SectionSideBar extends React.Component {
         }
     }
     componentDidMount() {
-        const route = T.routeMatcher('/news/item/:newsId'),
-            newsId = this.props.newsId ? this.props.newsId
-                : route.parse(window.location.pathname) ?
-                    route.parse(window.location.pathname).newsId : null,
+        let url = window.location.pathname,
+            route = T.routeMatcher(
+                url.startsWith('/tin-tuc/') ? '/tin-tuc/:link'
+                    : (url.startsWith('/news/item/') ? '/news/item/:id'
+                        : (url.startsWith('/news-en/item/') ? '/news-en/item/:id'
+                            : '/article/:link')));
+        const newsId = this.props.newsId ? this.props.newsId
+            : route.parse(window.location.pathname) ?
+                route.parse(window.location.pathname).newsId : null,
             maDonVi = this.props.maDonVi ? this.props.maDonVi : 0;
-
         if (newsId) this.getData(newsId, maDonVi); else
             this.props.getEventFeed();
     }
@@ -83,9 +87,10 @@ class SectionSideBar extends React.Component {
                         }
                     }); this.props.getNewsFeedByCategory(2);
                 } else {
-                    this.props.getNewsFeed(maDonVi);
+                    this.props.getNewsFeedByCategory(categories[0]);
                 }
             } else {
+                console.log('maDonVi', 2);
                 this.props.getNewsFeed(maDonVi);
             }
         });

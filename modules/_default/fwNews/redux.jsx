@@ -718,8 +718,8 @@ export function getNewsByUser(newsId, newsLink, done) {
 
 export function getNewsFeed(maDonVi) {
     return dispatch => {
-        const url = '/news/page/1/' + T.newsFeedPageSize;
-        T.get(url, { maDonVi }, data => {
+        const url = '/news/page/1/10';
+        T.get(url, { maDonVi, language: T.language() }, data => {
             if (data.error) {
                 T.notify(language.getNewsFeedError, 'danger');
                 console.error('GET: ' + url + '.', data.error);

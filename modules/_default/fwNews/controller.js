@@ -91,16 +91,16 @@ module.exports = app => {
                 title = news.title;
                 abstract = news.abstract;
             }
-            data = data.replace('<title>USSH VNUHCM</title>',
+            data = data.replace('<title>TRƯỜNG ĐẠI HỌC KHOA HỌC XÃ HỘI VÀ NHÂN VĂN - ĐHQG TP.HCM</title>',
                 `<title>${(title || '').replaceAll('\'', '')}</title>
-                <meta property='og:url' content='${app.rootUrl + req.originalUrl}' />
-                <meta property='og:type' content='article' />
-                <meta property="og:image:height" content="470">
-                <meta property="og:image:width" content="619">
-                <meta property='og:title' content='${(title || '').replaceAll('\'', '')}' />
-                <meta property='og:description' content='${(abstract || '').replaceAll('\'', '')}' />
-                <meta property='og:image' content='${app.rootUrl + news.image}' />
-                <meta property='donVi' content=${news.maDonVi} />`);
+            <meta property='og:url' content='${app.rootUrl + req.originalUrl}' />
+            <meta property='og:type' content='article' />
+            <meta property="og:image:height" content="470">
+            <meta property="og:image:width" content="619">
+            <meta property='og:title' content='${(title || '').replaceAll('\'', '')}' />
+            <meta property='og:description' content='${(abstract || '').replaceAll('\'', '')}' />
+            <meta property='og:image' content='${app.rootUrl + news.image}' />
+            <meta property='donVi' content='67' />`);
             res.send(data);
         };
         new Promise(resolve => {
@@ -121,7 +121,7 @@ module.exports = app => {
             }
         })).then(news => {
             if (news && news.language == 'vi' && news.isTranslate == 0) { res.redirect('/404.html'); }
-            else if (news && news.maDonVi == 0) app.templates.home(req, { send: (data) => changeMeta(news, data) });
+            // else if (news && news.maDonVi == 0) app.templates.home(req, { send: (data) => changeMeta(news, data) });
             else if (news) app.templates.unit(req, { send: (data) => changeMeta(news, data) });
             else {
                 console.log(route, 'bugs');
@@ -537,9 +537,10 @@ module.exports = app => {
             pageSize = parseInt(req.params.pageSize),
             today = new Date().getTime(),
             user = req.session.user,
-            maDonVi = req.query.maDonVi;
+            maDonVi = req.query.maDonVi,
+            language = req.query.language;
 
-        const condition = {
+        let condition = {
             statement: 'MA_DON_VI = :maDonVi AND ACTIVE = :active AND (START_POST <= :startPost )',
             parameter: { active: 1, startPost: today, maDonVi: maDonVi ? maDonVi : 0 },
         };
@@ -548,6 +549,12 @@ module.exports = app => {
             condition.statement += ' AND IS_INTERNAL = :isInternal';
             condition.parameter.isInternal = 0;
         }
+        if (language == 'en') {
+            condition.statement += ' AND (IS_TRANSLATE =1 OR (IS_TRANSLATE =0 AND LANGUAGE=\'en\'))';
+        } else {
+            condition.statement += ' AND (IS_TRANSLATE =1 OR (IS_TRANSLATE =0 AND LANGUAGE=\'vi\'))';
+        }
+        console.log(condition);
         app.model.fwNews.getPage(pageNumber, pageSize, condition, '*', 'START_POST DESC', (error, page) => {
             const response = {};
             if (error || page == null) {
