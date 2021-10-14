@@ -97,7 +97,7 @@ class NewsWaitApprovalPage extends React.Component {
         let table = 'Không có bài viết!';
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             viewerTranslateType = currentPermissions.includes('news:translate'),
-            viewerWriteType = currentPermissions.includes('news:write'),
+            viewerWriteType = currentPermissions.includes('news:write') || currentPermissions.includes('website:write'),
             viewerDraftType = currentPermissions.includes('news:draft'),
             isAllowedToViewDetail = !viewerTranslateType && (viewerDraftType || viewerWriteType),
             isAdmin = viewerDraftType && viewerTranslateType && viewerWriteType;
@@ -178,6 +178,11 @@ class NewsWaitApprovalPage extends React.Component {
                 </div>
                 <div className='tile'>
                     {table}
+                    <button onClick={() => {
+                        this.props.history.goBack();
+                    }} className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>
+                        <i className='fa fa-lg fa-reply' />
+                    </button>
                     <Pagination name='pageNews'
                         pageNumber={pageNumber} pageSize={pageSize} pageTotal={pageTotal} totalItem={totalItem} pageCondition={pageCondition}
                         getPage={this.props.getDraftNewsInPage} />

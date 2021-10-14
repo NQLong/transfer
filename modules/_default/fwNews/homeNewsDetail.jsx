@@ -16,12 +16,15 @@ class NewsDetail extends React.Component {
                     : (url.startsWith('/news/item/') ? '/news/item/:id'
                         : (url.startsWith('/news-en/item/') ? '/news-en/item/:id'
                             : '/article/:link'))).parse(url);
-        this.setState({ id: params.id, link: params.link });
+        this.setState({
+            id: params.id, link: params.link,
+            type: url.startsWith('/tin-tuc/') || url.startsWith('/news/item/') ? 'vi' : 'en'
+        });
     }
 
     componentDidUpdate() {
         if (this.state.language != T.language()) {
-            this.props.getNewsByUser(this.state.id, this.state.link);
+            this.props.getNewsByUser(this.state.id, this.state.link, this.state.type);
             this.setState({ language: T.language() });
         }
 

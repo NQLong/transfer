@@ -7,6 +7,7 @@ import { Link, withRouter } from 'react-router-dom';
 import ImageBox from 'view/component/ImageBox';
 import Editor from 'view/component/CkEditor4';
 import { Select } from 'view/component/Input';
+import { FormTextBox } from 'view/component/AdminPage';
 
 const languageOption = [
     { value: 'vi', text: 'Tiếng Việt' },
@@ -17,7 +18,7 @@ class NewsEditPage extends React.Component {
     constructor(props) {
         super(props);
         this.state = { item: null, displayCover: 1 };
-        this.newsLink = React.createRef();
+        // this.newsLink = React.createRef();
         this.imageBox = React.createRef();
         this.viEditor = React.createRef();
         this.enEditor = React.createRef();
@@ -29,10 +30,9 @@ class NewsEditPage extends React.Component {
     componentDidMount() {
         T.ready('/user/news/list', () => {
             this.getData();
-            $('#neNewsViTitle').focus();
+            this.neNewsViTitle.focus();
             $('#neNewsCategories').select2();
             $('#neNewsStartPost').datetimepicker(T.dateFormat);
-            // $('#neNewsStopPost').datetimepicker(T.dateFormat);
         });
     }
     componentDidUpdate() {
@@ -58,15 +58,19 @@ class NewsEditPage extends React.Component {
                 let categories = data.categories.map(item => ({ id: item.id, text: T.language.parse(item.text) }));
                 $('#neNewsCategories').select2({ data: categories }).val(data.item.categories).trigger('change');
                 const neNewsStartPost = $('#neNewsStartPost').datetimepicker(T.dateFormat);
-                // const neNewsStopPost = $('#neNewsStopPost').datetimepicker(T.dateFormat);
                 if (data.item.startPost)
                     neNewsStartPost.val(T.dateToText(data.item.startPost, 'dd/mm/yyyy HH:MM')).datetimepicker('update');
-                // if (data.item.stopPost)
-                //     neNewsStopPost.val(T.dateToText(data.item.stopPost, 'dd/mm/yyyy HH:MM')).datetimepicker('update');
                 if (data.item.link) {
-                    $(this.newsLink.current).html(T.rootUrl + '/tin-tuc/' + data.item.link).attr('href', '/tin-tuc/' + data.item.link);
+                    this.neNewsLink.value(data.item.link);
+                    $(this.newsLink).html(T.rootUrl + '/tin-tuc/' + data.item.link).attr('href', '/tin-tuc/' + data.item.link);
                 } else {
-                    $(this.newsLink.current).html('').attr('');
+                    $(this.newsLink).html('').attr('');
+                }
+                if (data.item.linkEn) {
+                    this.neNewsEnLink.value(data.item.linkEn);
+                    $(this.newsEnLink).html(T.rootUrl + '/article/' + data.item.linkEn).attr('href', '/article/' + data.item.link);
+                } else {
+                    $(this.newsEnLink).html('').attr('');
                 }
                 data.image = data.item.image ? data.item.image : '/image/avatar.png';
                 this.imageBox.current.setData('news:' + (data.item.id ? data.item.id : 'new'), data.item.image);
@@ -74,7 +78,8 @@ class NewsEditPage extends React.Component {
                     abstract = T.language.parse(data.item.abstract, true),
                     content = T.language.parse(data.item.content, true);
                 this.language.current.setVal(data.item.language);
-                $('#neNewsViTitle').val(title.vi); $('#neNewsEnTitle').val(title.en);
+                this.neNewsViTitle.value(title.vi);
+                this.neNewsEnTitle.value(title.en);
                 $('#neNewsViAbstract').val(abstract.vi); $('#neNewsEnAbstract').val(abstract.en);
                 this.viEditor.current.html(content.vi); this.enEditor.current.html(content.en);
                 if (data.listAttachment) this.file.current.setVal(data.listAttachment.map(item => ({ value: item.id, text: item.nameDisplay })));
@@ -105,31 +110,32 @@ class NewsEditPage extends React.Component {
         this.setState({ item: Object.assign({}, this.state.item, { displayCover: event.target.checked }) });
     }
     checkLink = (item) => {
-        this.props.checkLink(item.id, $('#neNewsLink').val().trim());
+        this.props.checkLink(item.id, this.neNewsLink.value().trim());
     }
     newsLinkChange = (e) => {
         if (e.target.value) {
-            $(this.newsLink.current).html(T.rootUrl + '/tin-tuc/' + e.target.value).attr('href', '/tin-tuc/' + e.target.value);
+            $(this.newsLink).html(T.rootUrl + '/tin-tuc/' + e.target.value).attr('href', '/tin-tuc/' + e.target.value);
         } else {
-            $(this.newsLink.current).html('').attr('href', '#');
+            $(this.newsLink).html('').attr('href', '#');
+        }
+    }
+    newsEnLinkChange = (e) => {
+        if (e.target.value) {
+            $(this.newsEnLink).html(T.rootUrl + '/article/' + e.target.value).attr('href', '/article/' + e.target.value);
+        } else {
+            $(this.newsEnLink).html('').attr('href', '#');
         }
     }
 
     save = () => {
         const neNewsStartPost = $('#neNewsStartPost').val() ? T.formatDate($('#neNewsStartPost').val()).getTime() : null,
-            // neNewsStopPost = $('#neNewsStopPost').val() ? T.formatDate($('#neNewsStopPost').val()).getTime() : null,
-            isTranslated = $('#neNewsEnTitle').val() && $('#neNewsEnAbstract').val() && this.enEditor.current.html();
-
-        // if (neNewsStopPost && neNewsStartPost > neNewsStopPost) {
-        //     T.notify('Thời gian bắt đầu đăng bài phải trước thời gian dừng đăng bài', 'info')
-        //     $('#neNewsStartPost').focus();
-        //     return;
-        // }
+            isTranslated = this.neNewsEnTitle.value() && $('#neNewsEnAbstract').val() && this.enEditor.current.html();
 
         const changes = {
             categories: $('#neNewsCategories').val().length ? $('#neNewsCategories').val() : ['-1'],
-            title: JSON.stringify({ vi: $('#neNewsViTitle').val(), en: $('#neNewsEnTitle').val() }),
-            link: $('#neNewsLink').val().trim(),
+            title: JSON.stringify({ vi: this.neNewsViTitle.value(), en: this.neNewsEnTitle.value() }),
+            link: this.neNewsLink.value().trim(),
+            linkEn: this.neNewsEnLink.value().trim(),
             active: this.state.item.active ? 1 : 0,
             isInternal: this.state.item.isInternal ? 1 : 0,
             isTranslate: this.state.item.isTranslate ? 1 : 0,
@@ -141,9 +147,8 @@ class NewsEditPage extends React.Component {
         };
         if (!this.state.item.isTranslate) changes.language = this.language.current.getVal() ? this.language.current.getVal() : 'vi';
         if (neNewsStartPost) changes.startPost = neNewsStartPost;
-        // if (neNewsStopPost) changes.stopPost = neNewsStopPost;
         let newDraft = {
-            title: JSON.stringify({ vi: $('#neNewsViTitle').val(), en: $('#neNewsEnTitle').val() }),
+            title: JSON.stringify({ vi: this.neNewsViTitle.value(), en: this.neNewsEnTitle.value() }),
             editorId: this.props.system.user.shcc,
             documentId: this.state.item.id,
             editorName: this.props.system.user.firstName + ' ' + this.props.system.user.lastName,
@@ -154,12 +159,12 @@ class NewsEditPage extends React.Component {
             displayCover: this.state.item.displayCover ? 1 : 0,
         };
         if (this.props.system.user.permissions.includes('news:write') || this.props.system.user.permissions.includes('website:write')) {
-            this.props.adminCheckLink(this.state.item.id, $('#neNewsLink').val().trim(), done => {
-                if ($('#neNewsLink').val().trim() && done.error) {
+            this.props.adminCheckLink(this.state.item.id, this.neNewsLink.value().trim(), done => {
+                if (this.neNewsLink.value().trim() && done.error) {
                     T.notify('Link truyền thông không hợp lệ hoặc đã bị trùng!', 'danger');
                 } else {
                     this.props.updateNews(this.state.item.id, changes, () => {
-                        $('#neNewsLink').val(changes.link);
+                        this.neNewsLink.value(changes.link);
                     });
                 }
             });
@@ -169,12 +174,12 @@ class NewsEditPage extends React.Component {
                 T.notify('Vui lòng chọn danh mục Tuyển sinh!', 'danger');
                 return;
             }
-            this.props.adminCheckLink(this.state.item.id, $('#neNewsLink').val().trim(), done => {
-                if ($('#neNewsLink').val().trim() && done.error) {
+            this.props.adminCheckLink(this.state.item.id, this.neNewsLink.value().trim(), done => {
+                if (this.neNewsLink.value().trim() && done.error) {
                     T.notify('Link truyền thông không hợp lệ hoặc đã bị trùng!', 'danger');
                 } else {
                     this.props.updateNews(this.state.item.id, changes, () => {
-                        $('#neNewsLink').val(changes.link);
+                        this.neNewsLink.value(changes.link);
                     });
                 }
             });
@@ -187,7 +192,7 @@ class NewsEditPage extends React.Component {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [];
         let readOnly = currentPermissions.contains('news:draft')
             && !currentPermissions.contains('news:write')
-            && !currentPermissions.contains('news:tuyensinh');
+            && !currentPermissions.contains('website:write');
         const item = this.state.item ? this.state.item : {
             priority: 1,
             categories: [],
@@ -221,14 +226,8 @@ class NewsEditPage extends React.Component {
                         <div className='tile'>
                             <h3 className='tile-title'>Thông tin chung</h3>
                             <div className='tile-body'>
-                                <div className='form-group'>
-                                    <label className='control-label'>Tên bài viết</label>
-                                    <input className='form-control' type='text' placeholder='Tên bài viết' id='neNewsViTitle' defaultValue={title.vi} readOnly={readOnly} />
-                                </div>
-                                <div className='form-group'>
-                                    <label className='control-label'>News title</label>
-                                    <input className='form-control' type='text' placeholder='News title' id='neNewsEnTitle' defaultValue={title.en} readOnly={readOnly} />
-                                </div>
+                                <FormTextBox ref={e => this.neNewsViTitle = e} label='Tên bài viết' />
+                                <FormTextBox ref={e => this.neNewsEnTitle = e} label='News title' />
                                 <div className='row'>
                                     <div className='col-md-6'>
                                         <div className='form-group'>
@@ -277,7 +276,7 @@ class NewsEditPage extends React.Component {
                                         <optgroup label='Lựa chọn danh mục' />
                                     </select>
                                 </div>
-                                <div className='form-group'>
+                                <div className='form-group' style={{ display: 'none' }}>
                                     <label className='control-label'>Đơn vị</label>
                                     <select ref={this.DonVi} placeholder='Chọn danh mục' multiple={false} className='select2-input' disabled={readOnly}></select>
                                 </div>
@@ -309,16 +308,18 @@ class NewsEditPage extends React.Component {
                         <div className='tile'>
                             <h3 className='tile-title'>Link</h3>
                             <div className='tile-body'>
-                                <div className='form-group'>
+                                {/* <div className='form-group'>
                                     <label className='control-label'>Link mặc định</label><br />
+                                </div> */}
+                                <FormTextBox ref={e => this.neNewsLink = e} label='Link truyền thông' onChange={this.newsLinkChange} />
+                                <FormTextBox ref={e => this.neNewsEnLink = e} label='Link truyền thông tiếng Anh(nếu có)' onChange={this.newsEnLinkChange} />
+                                <div>
                                     <a href={linkDefaultNews} style={{ fontWeight: 'bold' }} target='_blank' rel="noreferrer">{linkDefaultNews}</a>
                                 </div>
-                                <div className='form-group'>
-                                    <label className='control-label'>Link truyền thông</label><br />
-                                    <a href='#' ref={this.newsLink} style={{ fontWeight: 'bold' }} target='_blank' />
-                                    <input className='form-control' id='neNewsLink' type='text' placeholder='Link truyền thông' defaultValue={item.link} readOnly={readOnly}
-                                        onChange={this.newsLinkChange} />
+                                <div>
+                                    <a href='#' ref={e => this.newsLink = e} style={{ fontWeight: 'bold' }} target='_blank' />
                                 </div>
+                                <a href='#' ref={e => this.newsEnLink = e} style={{ fontWeight: 'bold' }} target='_blank' />
                             </div>
                             {readOnly ? '' :
                                 <div className='tile-footer'>
@@ -339,15 +340,9 @@ class NewsEditPage extends React.Component {
                                     <input className='form-control' id='neNewsStartPost' type='text' placeholder='Ngày bắt đầu đăng bài viết' autoComplete='off' defaultValue={item.startPost}
                                         disabled={readOnly} />
                                 </div>
-                                {/* <div className='form-group'>
-                                    <label className='control-label'>Ngày kết thúc đăng bài viết{readOnly && item.stopPost ? ': ' + T.dateToText(item.stopPost, 'dd/mm/yyyy HH:MM') : ''}</label>
-                                    <input className='form-control' id='neNewsStopPost' type='text' placeholder='Ngày kết thúc đăng bài viết' autoComplete='off' defaultValue={item.stopPost}
-                                        disabled={readOnly} />
-                                </div> */}
                             </div>
                         </div>
                     </div>
-
                     <div className='col-md-12'>
                         <div className='tile'>
                             <div className='tile-body'>

@@ -109,7 +109,7 @@ class HomeMenu extends React.Component {
         }
         let submenus = [], header = '', languageToggle = <div />;
         const { user } = this.props.system || {};
-        if (window.location.hostname == 'localhost' || window.location.hostname == 'nvbk.hcmussh.edu.vn')
+        if (window.location.hostname == 'localhost')
             languageToggle = <div className='ml-2'><LanguageSwitch /></div>;
         if (this.props.system && menus) {
             submenus = menus.filter(item => item.parentId).forEach(element => {

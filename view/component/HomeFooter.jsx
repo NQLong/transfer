@@ -258,22 +258,22 @@ class Footer extends React.Component {
                         </ul>
                     </div>
                 </div>;
-            } else if (hostname.includes('/en')) {
+            } else if (hostname.includes('/en') || hostname.includes('/article') || hostname.includes('/news-en')) {
                 footerList[0] = <div className='col-sm' key={'1'}>
                     <div className='footer-link'>
                         <h3>{'Study at USSH VNUHCM'} <i className='fa fa-angle-down d-md-none'></i></h3>
                         <ul className='list-unstyled' style={{ display: 'none' }}>
                             <li>
-                                <a target='_blank' href='https://www.facebook.com/Libussh' rel="noreferrer">Undergraduate Programs</a>
+                                <a target='_blank' href='https://hcmussh.edu.vn/en/undergraduate-programs' rel="noreferrer">Undergraduate Programs</a>
                             </li>
                             <li>
-                                <a target='_blank' href='https://hcmussh.edu.vn/tin-tuc/lien-lac' rel="noreferrer">Postgraduate Programs</a>
+                                <a target='_blank' href='https://hcmussh.edu.vn/en/postgraduate-programs' rel="noreferrer">Postgraduate Programs</a>
                             </li>
                             <li>
-                                <a target='_blank' href='https://hcmussh.edu.vn/tin-tuc/vi-tri-tv' rel="noreferrer">PhD Programs</a>
+                                <a target='_blank' href='https://hcmussh.edu.vn/en/phd-programs' rel="noreferrer">PhD Programs</a>
                             </li>
                             <li>
-                                <a target='_blank' href='https://hcmussh.edu.vn/tin-tuc/vi-tri-tv' rel="noreferrer">Short term Courses</a>
+                                <a target='_blank' href='https://hcmussh.edu.vn/en/international-programs' rel="noreferrer">International Programs</a>
                             </li>
                         </ul>
                     </div>
@@ -283,16 +283,16 @@ class Footer extends React.Component {
                         <h3>{'Student Life'} <i className='fa fa-angle-down d-md-none'></i></h3>
                         <ul className='list-unstyled' style={{ display: 'none' }}>
                             <li>
-                                <a target='_blank' href='https://www.facebook.com/Libussh' rel="noreferrer">Future Students</a>
+                                <a target='_blank' href='https://hcmussh.edu.vn/en/future-students' rel="noreferrer">Future Students</a>
                             </li>
                             <li>
-                                <a target='_blank' href='https://hcmussh.edu.vn/tin-tuc/lien-lac' rel="noreferrer">Student Community</a>
+                                <a target='_blank' href='https://hcmussh.edu.vn/en/student-community' rel="noreferrer">Student Community</a>
                             </li>
                             <li>
-                                <a target='_blank' href='https://hcmussh.edu.vn/tin-tuc/vi-tri-tv' rel="noreferrer">International Students</a>
+                                <a target='_blank' href='https://hcmussh.edu.vn/en/international-students' rel="noreferrer">International Students</a>
                             </li>
                             <li>
-                                <a target='_blank' href='https://hcmussh.edu.vn/tin-tuc/vi-tri-tv' rel="noreferrer">Social Clubs</a>
+                                <a target='_blank' href='https://hcmussh.edu.vn/en/social-clubs' rel="noreferrer">Social Clubs</a>
                             </li>
                         </ul>
                     </div>
@@ -302,16 +302,16 @@ class Footer extends React.Component {
                         <h3>{'About'} <i className='fa fa-angle-down d-md-none'></i></h3>
                         <ul className='list-unstyled' style={{ display: 'none' }}>
                             <li>
-                                <a target='_blank' href='https://www.facebook.com/Libussh' rel="noreferrer">Offices</a>
+                                <a target='_blank' href='https://hcmussh.edu.vn/en/offices' rel="noreferrer">Offices</a>
                             </li>
                             <li>
-                                <a target='_blank' href='https://hcmussh.edu.vn/tin-tuc/lien-lac' rel="noreferrer">Faculties</a>
+                                <a target='_blank' href='https://hcmussh.edu.vn/en/faculties' rel="noreferrer">Faculties</a>
                             </li>
                             <li>
-                                <a target='_blank' href='https://hcmussh.edu.vn/tin-tuc/vi-tri-tv' rel="noreferrer">Centers</a>
+                                <a target='_blank' href='https://hcmussh.edu.vn/en/centers' rel="noreferrer">Centers</a>
                             </li>
                             <li>
-                                <a target='_blank' href='https://hcmussh.edu.vn/tin-tuc/vi-tri-tv' rel="noreferrer">Partners</a>
+                                <a target='_blank' href='https://hcmussh.edu.vn/en/partners' rel="noreferrer">Partners</a>
                             </li>
                         </ul>
                     </div>
