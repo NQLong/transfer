@@ -48,7 +48,7 @@ class NewsDetail extends React.Component {
                 </div>
             ) : null;
             let content = T.language.parse(item.content)
-                .replaceAll('<strong>', '<b style="font-weight: bold;color:black;">')
+                .replaceAll('<strong>', '<b style="font-weight: bold;">')
                 .replaceAll('</strong>', '</b>');
             return (
                 <section className='ftco-section ftco-degree-bg'>
