@@ -43,7 +43,7 @@ module.exports = app => {
 	});
 
 	app.get('/api/danh-muc/phuong-xa/item/:maPhuongXa', app.permission.check('user:login'), (req, res) => {
-		app.model.dmPhuongXa.get(req.params.maPhuongXa, (error, item) => res.send({ error, item }));
+		app.model.dmPhuongXa.get({maPhuongXa: req.params.maPhuongXa}, (error, item) => res.send({ error, item }));
 	});
 
 	app.post('/api/danh-muc/phuong-xa', app.permission.check('dmPhuongXa:write'), (req, res) => {

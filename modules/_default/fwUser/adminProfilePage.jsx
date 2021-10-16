@@ -686,7 +686,7 @@ class ProfilePage extends QTForm {
                             <ComponentDiaDiem ref={e => this.diaChiThuongTru = e} label='Địa chỉ thường trú' className='col-md-12' requiredSoNhaDuong={true} />
                             <p className='col-md-12'>
                                 Nếu <b>Địa chỉ thường trú</b> là <b>Địa chỉ hiện tại</b> thì&nbsp;<a href='#' onClick={this.copyAddress}>nhấp vào đây</a>.
-                        </p>
+                            </p>
                             <ComponentDiaDiem ref={e => this.diaChiHienTai = e} label='Địa chỉ hiện tại' className='col-md-12' requiredSoNhaDuong={true} />
 
                         </div>
