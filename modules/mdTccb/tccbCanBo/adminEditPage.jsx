@@ -1524,8 +1524,6 @@ class CanBoEditPage extends QTForm {
         namChucDanh: this.namChucDanh.current.getFormVal(),
         namHocVi: this.namHocVi.current.getFormVal(),
         trinhDoPhoThong: this.trinhDoPhoThong.current.getFormVal(),
-        noiSinh: this.noiSinh.current.getFormVal(),
-        queQuan: this.queQuan.current.getFormVal()
     })
 
     save = () => {
@@ -1548,9 +1546,9 @@ class CanBoEditPage extends QTForm {
             maTinhNguyenQuan: this.nguyenQuan.value().maTinhThanhPho
         };
         const dcNoiSinh = {
-            maXaNoiSinh: this.NoiSinh.value().maPhuongXa,
-            maHuyenNoiSinh: this.NoiSinh.value().maQuanHuyen,
-            maTinhNoiSinh: this.NoiSinh.value().maTinhThanhPho
+            maXaNoiSinh: this.noiSinh.value().maPhuongXa,
+            maHuyenNoiSinh: this.noiSinh.value().maQuanHuyen,
+            maTinhNoiSinh: this.noiSinh.value().maTinhThanhPho
         };
         this.main.current.classList.add('validated');
         if (data.data) {

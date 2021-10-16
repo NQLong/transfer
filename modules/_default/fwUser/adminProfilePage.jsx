@@ -492,9 +492,9 @@ class ProfilePage extends QTForm {
             maTinhNguyenQuan: this.nguyenQuan.value().maTinhThanhPho
         };
         const dcNoiSinh = {
-            maXaNoiSinh: this.NoiSinh.value().maPhuongXa,
-            maHuyenNoiSinh: this.NoiSinh.value().maQuanHuyen,
-            maTinhNoiSinh: this.NoiSinh.value().maTinhThanhPho
+            maXaNoiSinh: this.noiSinh.value().maPhuongXa,
+            maHuyenNoiSinh: this.noiSinh.value().maQuanHuyen,
+            maTinhNoiSinh: this.noiSinh.value().maTinhThanhPho
         };
         this.main.current.classList.add('validated');
         form.data && this.props.updateStaffUser(Object.assign(form.data, dcThuongTru, dcHienTai, dcNguyenQuan, dcNoiSinh), () => this.main.current.classList.remove('validated'));
