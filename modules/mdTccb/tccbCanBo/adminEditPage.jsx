@@ -1525,7 +1525,7 @@ class CanBoEditPage extends QTForm {
         namHocVi: this.namHocVi.current.getFormVal(),
         trinhDoPhoThong: this.trinhDoPhoThong.current.getFormVal(),
         noiSinh: this.noiSinh.current.getFormVal(),
-        queQuan: this.queQuan.current.getFormVal(),
+        queQuan: this.queQuan.current.getFormVal()
     })
 
     save = () => {
@@ -1560,7 +1560,7 @@ class CanBoEditPage extends QTForm {
                     this.props.history.push(`/user/staff/${data.data.shcc}`);
                 });
             } else {
-                this.props.createStaff(data.data, data => {
+                this.props.createStaff(Object.assign(data.data, dcThuongTru, dcHienTai, dcNguyenQuan, dcNoiSinh), data => {
                     this.props.history.push(`/user/staff/${data.item.shcc}`);
                 });
             }
@@ -2217,26 +2217,26 @@ class CanBoEditPage extends QTForm {
                 <div className='tile'>
                     <h3 className='tile-title'>Thông tin cá nhân</h3>
                     <div className='tile-body row'>
-                        <div className='form-group col-xl-3 col-md-6'><TextInput ref={this.shcc} label='Mã thẻ cán bộ' disabled={readOnly} required placeholder='Nhập mã thẻ cán bộ' maxLength={10} /></div>
-                        <div className='form-group col-xl-4 col-md-6'><TextInput ref={this.ho} label='Họ và tên lót' disabled={readOnly} required maxLength={100} /></div>
-                        <div className='form-group col-xl-3 col-md-6'><TextInput ref={this.ten} label='Tên' disabled={readOnly} required maxLength={30} /></div>
-                        <div className='form-group col-xl-2 col-md-6'><TextInput ref={this.biDanh} label='Bí danh' disabled={readOnly} maxLength={20} /></div>
+                        <div className='form-group col-xl-3 col-md-5'><TextInput ref={this.shcc} label='Mã thẻ cán bộ' disabled={readOnly} required placeholder='Nhập mã thẻ cán bộ' maxLength={10} /></div>
+                        <div className='form-group col-xl-3 col-md-5'><TextInput ref={this.ho} label='Họ và tên lót' disabled={readOnly} required maxLength={100} /></div>
+                        <div className='form-group col-xl-3 col-md-5'><TextInput ref={this.ten} label='Tên' disabled={readOnly} required maxLength={30} /></div>
+                        <div className='form-group col-xl-3 col-md-5'><TextInput ref={this.biDanh} label='Bí danh' disabled={readOnly} maxLength={20} /></div>
                         <div className='form-group col-xl-4 col-md-6'><DateInput ref={this.ngaySinh} label='Ngày sinh' disabled={readOnly} min={new Date(1900, 1, 1).getTime()} max={Date.nextYear(-10).roundDate().getTime()} /></div>
-                        <div className='form-group col-xl-4 col-md-6'><TextInput ref={this.cmnd} label='CMND' placeholder='Nhập CMND / CCCD' disabled={readOnly} maxLength={15} /></div>
+                        <div className='form-group col-xl-4 col-md-6'><TextInput ref={this.dienThoaiCaNhan} label='Số điện thoại cá nhân' disabled={readOnly} maxLength={20} /></div>
+                        <div className='form-group col-xl-4 col-md-6'><TextInput ref={this.dienThoaiBaoTin} label='Số điện thoại báo tin' disabled={readOnly} maxLength={20} /></div>
+                        <div className='form-group col-xl-4 col-md-6'><TextInput ref={this.cmnd} label='CMND / CCCD' placeholder='Nhập CMND / CCCD' disabled={readOnly} maxLength={15} /></div>
                         <div className='form-group col-xl-4 col-md-6'><DateInput ref={this.cmndNgayCap} label='Ngày cấp' disabled={readOnly} min={new Date(1900, 1, 1).getTime()} max={new Date().getTime()} /></div>
-                        <div className='form-group col-xl-4 col-md-6'><TextInput ref={this.cmndNoiCap} label='Nơi cấp cmnd' placeholder='Nhập nơi cấp cmnd' disabled={readOnly} maxLength={200} /></div>
-                        <div className='form-group col-xl-4 col-md-6'><TextInput ref={this.emailCaNhan} label='Địa chỉ email cá nhân' disabled={readOnly} maxLength={50} /></div>
-                        <div className='form-group col-xl-4 col-md-6'><TextInput ref={this.email} label='Địa chỉ email trường' disabled={readOnly} maxLength={50} /></div>
-                        <div className='form-group col-xl-3 col-md-6'><Select ref={this.phai} adapter={SelectAdapter_DmGioiTinh} label='Giới tính' disabled={readOnly} required /></div>
-                        <div className='form-group col-xl-3 col-md-6'><TextInput ref={this.dienThoaiCaNhan} label='Số điện thoại cá nhân' disabled={readOnly} maxLength={20} /></div>
-                        <div className='form-group col-xl-3 col-md-6'><TextInput ref={this.dienThoaiBaoTin} label='Số điện thoại báo tin' disabled={readOnly} maxLength={20} /></div>
-                        <div className='form-group col-xl-3 col-md-6'><Select ref={this.nhomMau} adapter={SelectAdapter_DmNhomMau} label='Nhóm máu' disabled={readOnly} /></div>
-                        <div className='form-group col-xl-3 col-md-6'><Select ref={this.danToc} adapter={SelectAdapter_DmDanToc} label='Dân tộc' required /></div>
-                        <div className='form-group col-xl-3 col-md-6'><Select ref={this.quocGia} adapter={SelectAdapter_DmQuocGia} label='Quốc gia' required /></div>
-                        <div className='form-group col-xl-3 col-md-6'><Select ref={this.tonGiao} adapter={SelectAdapter_DmTonGiao} label='Tôn giáo' required /></div>
-                        <div className='form-group col-xl-3 col-md-6'><TextInput ref={this.soBhxh} label='Số BHXH' /></div>
+                        <div className='form-group col-xl-4 col-md-6'><TextInput ref={this.cmndNoiCap} label='Nơi cấp CMND / CCCD' placeholder='Nhập nơi cấp cmnd' disabled={readOnly} maxLength={200} /></div>
+                        <div className='form-group col-xl-6 col-md-6'><TextInput ref={this.emailCaNhan} label='Địa chỉ email cá nhân' disabled={readOnly} maxLength={50} /></div>
+                        <div className='form-group col-xl-6 col-md-6'><TextInput ref={this.email} label='Địa chỉ email trường' disabled={readOnly} maxLength={50} /></div>
+                        <div className='form-group col-xl-4 col-md-6'><Select ref={this.phai} adapter={SelectAdapter_DmGioiTinh} label='Giới tính' disabled={readOnly} required /></div>
+                        <div className='form-group col-xl-4 col-md-6'><Select ref={this.nhomMau} adapter={SelectAdapter_DmNhomMau} label='Nhóm máu' disabled={readOnly} /></div>
+                        <div className='form-group col-xl-4 col-md-6'><Select ref={this.danToc} adapter={SelectAdapter_DmDanToc} label='Dân tộc' required /></div>
+                        <div className='form-group col-xl-4 col-md-6'><Select ref={this.quocGia} adapter={SelectAdapter_DmQuocGia} label='Quốc gia' required /></div>
+                        <div className='form-group col-xl-4 col-md-6'><Select ref={this.tonGiao} adapter={SelectAdapter_DmTonGiao} label='Tôn giáo' required /></div>
+                        <div className='form-group col-xl-4 col-md-6'><TextInput ref={this.soBhxh} label='Số BHXH' /></div>
+                        <div className='form-group col-12' />
                         <ComponentDiaDiem ref={e => this.nguyenQuan = e} label='Nguyên quán' className='col-md-12' />
-
                         <ComponentDiaDiem ref={e => this.noiSinh = e} label='Nơi sinh' className='col-md-12' />
                         <ComponentDiaDiem ref={e => this.thuongTru = e} label='Địa chỉ thường trú' className='col-md-12' requiredSoNhaDuong={true} />
                         <p className='col-md-12'>

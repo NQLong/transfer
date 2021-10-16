@@ -206,7 +206,7 @@ class ProfilePage extends QTForm {
         this.ngayCbgd = React.createRef();
         this.ngayBienChe = React.createRef();
         this.ngayNghi = React.createRef();
-        this.ngheNghiepTruocTuyenDung = React.createRef();
+        this.ngheNghiepCu = React.createRef();
         this.ngach = React.createRef();
         this.ngachMoi = React.createRef();
         this.heSoLuong = React.createRef();
@@ -223,8 +223,6 @@ class ProfilePage extends QTForm {
         this.maTrinhDoLlct = React.createRef();
         this.maTrinhDoQlnn = React.createRef();
         this.maTrinhDoTinHoc = React.createRef();
-        this.hoKhau = React.createRef();
-        this.diaChiHienTai = React.createRef();
         this.danToc = React.createRef();
         this.quocGia = React.createRef();
         this.tonGiao = React.createRef();
@@ -273,8 +271,6 @@ class ProfilePage extends QTForm {
         this.chuyenNganh = React.createRef();
         this.namChucDanh = React.createRef();
         this.namHocVi = React.createRef();
-        this.noiSinh = React.createRef();
-        this.queQuan = React.createRef();
 
         this.mapperQuanHe = {};
         this.mapperChucVu = {};
@@ -313,7 +309,7 @@ class ProfilePage extends QTForm {
             }
         });
     }
-      
+
     getData = (shcc) => {
         if (shcc) {
             this.props.userGetStaff(shcc, data => {
@@ -339,9 +335,13 @@ class ProfilePage extends QTForm {
     };
 
     setVal = (data = {}) => {
-        const {shcc='', ho='', ten='', biDanh='', cmnd = '', cmndNgayCap = '', cmndNoiCap = '', emailCaNhan = '', noiSinh = '', queQuan = '',
+        const { shcc = '', ho = '', ten = '', biDanh = '', cmnd = '', cmndNgayCap = '', cmndNoiCap = '', emailCaNhan = '',
             email = '', dienThoaiCaNhan = '', dienThoaiBaoTin = '', ngaySinh = '',
-            maTrinhDoLlct = '', maTrinhDoQlnn = '', maTrinhDoTinHoc = '', hoKhau = '', diaChiHienTai = '', danToc = '', tonGiao = '',
+            thuongTruSoNha = '', thuongTruMaXa = '', thuongTruMaHuyen = '', thuongTruMaTinh = '',
+            maXaNoiSinh = '', maHuyenNoiSinh = '', maTinhNoiSinh = '',
+            maXaNguyenQuan = '', maHuyenNguyenQuan = '', maTinhNguyenQuan = '',
+            hienTaiSoNha = '', hienTaiMaXa = '', hienTaiMaHuyen = '', hienTaiMaTinh = '',
+            maTrinhDoLlct = '', maTrinhDoQlnn = '', maTrinhDoTinHoc = '', danToc = '', tonGiao = '',
             lyDoONuocNgoai = '', dangONuocNgoai = false, dangVien = false, chucDanh = '', trinhDoPhoThong = '', hocVi = '', chuyenNganh = '', namChucDanh = '', namHocVi = '',
             phai = '', nhomMau = '', ngayVaoDang = '', ngayVaoDangChinhThuc = '', ngayNhapNgu = '', ngayXuatNgu = '', quanHamCaoNhat = '', soBhxh = '',
             soTheDang = '', noiDangDb = '', noiDangCt = '', doanVien = false, ngayVaoDoan = '', noiVaoDoan = '', ngheNghiepCu = '', quocGia = null, hangThuongBinh = '', giaDinhChinhSach = '',
@@ -377,10 +377,14 @@ class ProfilePage extends QTForm {
         this.maTrinhDoLlct.current.setVal(maTrinhDoLlct);
         this.maTrinhDoQlnn.current.setVal(maTrinhDoQlnn);
         this.maTrinhDoTinHoc.current.setVal(maTrinhDoTinHoc);
-        this.hoKhau.current.setVal(hoKhau);
-        this.diaChiHienTai.current.setVal(diaChiHienTai);
         this.danToc.current.setVal(danToc);
         this.tonGiao.current.setVal(tonGiao);
+
+        this.thuongTru.value(thuongTruMaTinh, thuongTruMaHuyen, thuongTruMaXa, thuongTruSoNha);
+        this.hienTai.value(hienTaiMaTinh, hienTaiMaHuyen, hienTaiMaXa, hienTaiSoNha);
+        this.nguyenQuan.value(maTinhNguyenQuan, maHuyenNguyenQuan, maXaNguyenQuan);
+        this.noiSinh.value(maTinhNoiSinh, maHuyenNoiSinh, maXaNoiSinh);
+
         this.dangONuocNgoai.current.setVal(dangONuocNgoai);
         if (this.state.nuocNgoai) this.lyDoONuocNgoai.current.setVal(lyDoONuocNgoai);
         this.phai.current.setVal(phai);
@@ -403,8 +407,6 @@ class ProfilePage extends QTForm {
         this.namChucDanh.current.setVal(namChucDanh);
         this.namHocVi.current.setVal(namHocVi);
         this.trinhDoPhoThong.current.setVal(trinhDoPhoThong);
-        this.noiSinh.current.setVal(noiSinh);
-        this.queQuan.current.setVal(queQuan);
     };
 
     getVal = () => ({
@@ -433,8 +435,6 @@ class ProfilePage extends QTForm {
         maTrinhDoLlct: this.maTrinhDoLlct.current.getFormVal(),
         maTrinhDoQlnn: this.maTrinhDoQlnn.current.getFormVal(),
         maTrinhDoTinHoc: this.maTrinhDoTinHoc.current.getFormVal(),
-        hoKhau: this.hoKhau.current.getFormVal(),
-        diaChiHienTai: this.diaChiHienTai.current.getFormVal(),
         danToc: this.danToc.current.getFormVal(),
         tonGiao: this.tonGiao.current.getFormVal(),
         dangONuocNgoai: this.dangONuocNgoai.current.getFormVal(),
@@ -459,8 +459,6 @@ class ProfilePage extends QTForm {
         namChucDanh: this.namChucDanh.current.getFormVal(),
         namHocVi: this.namHocVi.current.getFormVal(),
         trinhDoPhoThong: this.trinhDoPhoThong.current.getFormVal(),
-        noiSinh: this.noiSinh.current.getFormVal(),
-        queQuan: this.queQuan.current.getFormVal()
     })
 
     saveCommon = (e) => {
@@ -476,8 +474,30 @@ class ProfilePage extends QTForm {
 
     save = () => {
         const form = this.getFormVal();
+        const dcThuongTru = {
+            thuongTruSoNha: this.thuongTru.value().soNhaDuong,
+            thuongTruMaTinh: this.thuongTru.value().maTinhThanhPho,
+            thuongTruMaHuyen: this.thuongTru.value().maQuanHuyen,
+            thuongTruMaXa: this.thuongTru.value().maPhuongXa
+        };
+        const dcHienTai = {
+            hienTaiSoNha: this.hienTai.value().soNhaDuong,
+            hienTaiMaTinh: this.hienTai.value().maTinhThanhPho,
+            hienTaiMaHuyen: this.hienTai.value().maQuanHuyen,
+            hienTaiMaXa: this.hienTai.value().maPhuongXa
+        };
+        const dcNguyenQuan = {
+            maXaNguyenQuan: this.nguyenQuan.value().maPhuongXa,
+            maHuyenNguyenQuan: this.nguyenQuan.value().maQuanHuyen,
+            maTinhNguyenQuan: this.nguyenQuan.value().maTinhThanhPho
+        };
+        const dcNoiSinh = {
+            maXaNoiSinh: this.NoiSinh.value().maPhuongXa,
+            maHuyenNoiSinh: this.NoiSinh.value().maQuanHuyen,
+            maTinhNoiSinh: this.NoiSinh.value().maTinhThanhPho
+        };
         this.main.current.classList.add('validated');
-        form.data && this.props.updateStaffUser(form.data, () => this.main.current.classList.remove('validated'));
+        form.data && this.props.updateStaffUser(Object.assign(form.data, dcThuongTru, dcHienTai, dcNguyenQuan, dcNoiSinh), () => this.main.current.classList.remove('validated'));
     };
 
     createQuanHe = (e, type) => {
@@ -511,8 +531,8 @@ class ProfilePage extends QTForm {
     }
     copyAddress = e => {
         e.preventDefault();
-        const dataThuongTru = this.diaChiThuongTru.value();
-        this.diaChiHienTai.value(dataThuongTru.maTinhThanhPho, dataThuongTru.maQuanHuyen, dataThuongTru.maPhuongXa, dataThuongTru.soNhaDuong);
+        const dataThuongTru = this.thuongTru.value();
+        this.hienTai.value(dataThuongTru.maTinhThanhPho, dataThuongTru.maQuanHuyen, dataThuongTru.maPhuongXa, dataThuongTru.soNhaDuong);
     }
 
     render() {
@@ -650,7 +670,7 @@ class ProfilePage extends QTForm {
                             </div>
                             <div className='form-group col-md-9'>
                                 <div className='row'>
-                                    <div className='form-group col-md-4'><TextInput ref={this.shcc} label='Mã thẻ cán bộ' required placeholder='Nhập mã thẻ cán bộ' maxLength={10} /></div>
+                                    <div className='form-group col-md-4'><TextInput ref={this.shcc} label='Mã thẻ cán bộ' readOnly placeholder='Nhập mã thẻ cán bộ' maxLength={10} re /></div>
                                     <div className='form-group col-md-4'><TextInput ref={this.ho} label='Họ và tên lót' required maxLength={100} /></div>
                                     <div className='form-group col-md-4'><TextInput ref={this.ten} label='Tên' required maxLength={30} /></div>
                                     <div className='form-group col-md-4'><TextInput ref={this.biDanh} label='Bí danh' maxLength={20} /></div>
@@ -661,34 +681,27 @@ class ProfilePage extends QTForm {
                             <div className='form-group col-md-4'><TextInput ref={this.cmnd} label='CMND/CCCD' placeholder='Nhập CMND / CCCD' maxLength={15} /></div>
                             <div className='form-group col-md-4'><DateInput ref={this.cmndNgayCap} label='Ngày cấp' min={new Date(1900, 1, 1).getTime()} max={new Date().getTime()} /></div>
                             <div className='form-group col-md-4'><TextInput ref={this.cmndNoiCap} label='Nơi cấp CMND/CCCD' placeholder='Nhập nơi cấp cmnd' maxLength={200} /></div>
-                            
                             <div className='form-group col-md-6'><TextInput ref={this.emailCaNhan} label='Địa chỉ email cá nhân' maxLength={50} /></div>
                             <div className='form-group col-md-6'><TextInput ref={this.email} label='Địa chỉ email trường' maxLength={50} /></div>
                             <div className='form-group col-md-4'><TextInput ref={this.dienThoaiCaNhan} label='Số điện thoại cá nhân' maxLength={20} /></div>
                             <div className='form-group col-md-4'><TextInput ref={this.dienThoaiBaoTin} label='Số điện thoại báo tin' maxLength={20} /></div>
-                            <div className='form-group col-md-4'><TextInput ref={this.soBhxh} label='Số BHXH' /></div>       
-                            <div className='form-group col-md-6'><TextInput ref={this.hoKhau} label='Hộ khẩu' maxLength={200} /></div>
-                            <div className='form-group col-md-6'><TextInput ref={this.diaChiHienTai} label='Địa chỉ hiện tại' maxLength={200} /></div>
-                            <div className='form-group col-12'/>
-                            <div className='form-group col-md-6'><TextInput ref={this.noiSinh} label='Nơi sinh' maxLength={200} /></div>
-                            <div className='form-group col-md-6'><TextInput ref={this.queQuan} label='Quê quán' maxLength={200} /></div>
+                            <div className='form-group col-md-4'><TextInput ref={this.soBhxh} label='Số BHXH' /></div>
                             <div className='form-group col-xl-3 col-md-6'><Select ref={this.nhomMau} adapter={SelectAdapter_DmNhomMau} label='Nhóm máu' /></div>
                             <div className='form-group col-xl-3 col-md-6'><Select ref={this.danToc} adapter={SelectAdapter_DmDanToc} label='Dân tộc' required /></div>
                             <div className='form-group col-xl-3 col-md-6'><Select ref={this.quocGia} adapter={SelectAdapter_DmQuocGia} label='Quốc gia' required /></div>
                             <div className='form-group col-xl-3 col-md-6'><Select ref={this.tonGiao} adapter={SelectAdapter_DmTonGiao} label='Tôn giáo' required /></div>
-
-                            <div className='form-group col-12'/>
+                            <div className='form-group col-12' />
+                            <ComponentDiaDiem ref={e => this.nguyenQuan = e} label='Nguyên quán' className='col-md-12' />
+                            <ComponentDiaDiem ref={e => this.noiSinh = e} label='Nơi sinh' className='col-md-12' />
+                            <ComponentDiaDiem ref={e => this.thuongTru = e} label='Địa chỉ thường trú' className='col-md-12' requiredSoNhaDuong={true} />
+                            <p className='col-md-12'>
+                                Nếu <b>Địa chỉ thường trú</b> là <b>Địa chỉ hiện tại</b> thì&nbsp;<a href='#' onClick={this.copyAddress}>nhấp vào đây</a>.
+                            </p>
+                            <ComponentDiaDiem ref={e => this.hienTai = e} label='Địa chỉ hiện tại' className='col-md-12' requiredSoNhaDuong={true} />
                             <div className='form-group col-md-4'><TextInput ref={this.sucKhoe} label='Sức khỏe' maxLength={100} /></div>
                             <div className='form-group col-md-4'><NumberInput ref={this.canNang} label='Cân nặng(kg)' min={0} step={0.1} /></div>
                             <div className='form-group col-md-4'><NumberInput ref={this.chieuCao} label='Chiều cao(cm)' min={0} step={1} /></div>
                             <div className='form-group col-md-6'><TextInput ref={this.soTruong} label='Sở trường' maxLength={100} /></div>
-                            <div className='form-group col-md-6'><TextInput ref={this.ngheNghiepCu} label='Nghề nghiệp trước khi tuyển dụng' maxLength={100} /></div>
-                            <ComponentDiaDiem ref={e => this.diaChiThuongTru = e} label='Địa chỉ thường trú' className='col-md-12' requiredSoNhaDuong={true} />
-                            <p className='col-md-12'>
-                                Nếu <b>Địa chỉ thường trú</b> là <b>Địa chỉ hiện tại</b> thì&nbsp;<a href='#' onClick={this.copyAddress}>nhấp vào đây</a>.
-                            </p>
-                            <ComponentDiaDiem ref={e => this.diaChiHienTai = e} label='Địa chỉ hiện tại' className='col-md-12' requiredSoNhaDuong={true} />
-
                         </div>
                     </div>,
                     <div className='tile' key={2}>
@@ -704,7 +717,7 @@ class ProfilePage extends QTForm {
                             <div className='col-12' />
                             <div className='form-group col-md-4'><DateInput ref={this.ngayBatDauCongTac} label='Ngày bắt đầu công tác' min={new Date(1900, 1, 1).getTime()} max={new Date().getTime()} /></div>
                             <div className='form-group col-md-4'><DateInput ref={this.ngayBienChe} label='Ngày biên chế' min={new Date(1900, 1, 1).getTime()} max={new Date().getTime()} /></div>
-                            <div className='form-group col-md-4'><TextInput ref={this.ngheNghiepTruocTuyenDung} label='Nghế nghiệp trước khi tuyển dụng' maxLength={200} /></div>
+                            <div className='form-group col-md-4'><TextInput ref={this.ngheNghiepCu} label='Nghế nghiệp trước khi tuyển dụng' maxLength={200} /></div>
                             {item.nhaGiaoNhanDan ? renderFieldText('form-group col-md-3', 'Nhà giáo nhân dân', item.nhaGiaoNhanDan, item.nhaGiaoNhanDan) : null}
                             {item.nhaGiaoUuTu ? renderFieldText('form-group col-md-3', 'Nhà giáo ưu tú', item.nhaGiaoUuTu, item.nhaGiaoUuTu) : null}
                             <div className='form-group col-md-6'><Select ref={this.maDonVi} adapter={SelectAdapter_DmDonVi} label='Đơn vị công tác' /> </div>
