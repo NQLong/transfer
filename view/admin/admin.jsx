@@ -40,7 +40,7 @@ class App extends React.Component {
     componentDidMount() {
         const routes = Object.keys(routeMapper).sort().reverse().map(key => routeMapper[key]);
         // T.socket.on('contact-changed', item => store.dispatch(changeContact(item)));
-        T.cookie('language', 'vi');
+        // T.cookie('language', 'vi');
         this.props.getSystemState(() => this.setState({ routes }));
         T.socket.on('user-changed', user => {
             if (this.props.system && this.props.system.user && this.props.system.user._id == user._id) {
