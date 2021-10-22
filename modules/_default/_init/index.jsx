@@ -11,7 +11,7 @@ export default {
     },
     routes: [
         {
-            path: '/user/settings',
+            path: '/user/truyen-thong/settings',
             component: Loadable({ loading: Loading, loader: () => import('./adminSettingsPage') })
         },
         {

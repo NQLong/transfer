@@ -28,7 +28,7 @@ class NewsEditPage extends React.Component {
     }
 
     componentDidMount() {
-        T.ready('/user/news/list', () => {
+        T.ready('/user/truyen-thong', () => {
             this.getData();
             this.neNewsViTitle.focus();
             $('#neNewsCategories').select2();

@@ -1,24 +1,24 @@
 module.exports = app => {
     const menu = {
-        parentMenu: { index: 5000, title: 'Bài viết', icon: 'fa-file' },
+        parentMenu: app.parentMenu.truyenThong,
         menus: {
-            5001: { title: 'Danh mục', link: '/user/news/category' },
-            5002: { title: 'Danh sách bài viết', link: '/user/news/list' },
-            5003: { title: 'Chờ duyệt', link: '/user/news/draft' },
+            5001: { title: 'Danh mục tin tức', link: '/user/news/category', groupIndex: 1, icon: 'fa-list-alt', backgroundColor: '#00b8d4', },
+            5002: { title: 'Danh sách bài viết', link: '/user/news/list', groupIndex: 1, icon: 'fa-file-o', backgroundColor: '#22e5b4', },
+            5003: { title: 'Chờ duyệt', link: '/user/news/draft', groupIndex: 1, icon: 'fa-file-o', backgroundColor: '#a1cc1f', },
         },
     };
     const menuTranslate = {
-        parentMenu: { index: 5000, title: 'Bài viết', icon: 'fa-file' },
+        parentMenu: app.parentMenu.truyenThong,
         menus: {
-            5004: { title: 'Dịch Tiếng Anh', link: '/user/news/draft/translate' },
+            5004: { title: 'Dịch Tiếng Anh', link: '/user/news/draft/translate', groupIndex: 1 },
         }
     };
     const menuUnit = {
-        parentMenu: { index: 5000, title: 'Bài viết', icon: 'fa-file' },
+        parentMenu: app.parentMenu.truyenThong,
         menus: {
-            5005: { title: 'Danh sách bài viết', link: '/user/news/unit/list' },
-            5006: { title: 'Chờ duyệt', link: '/user/news/unit/draft' },
-            5008: { title: 'Danh sách bài viết chính thức', link: '/user/news/list' },
+            5005: { title: 'Danh sách bài viết', link: '/user/news/unit/list', groupIndex: 1, icon: 'fa-file-o', backgroundColor: '#a1cc1f', },
+            5006: { title: 'Chờ duyệt', link: '/user/news/unit/draft', groupIndex: 1, icon: 'fa-file-o', backgroundColor: '#a1cc1f', },
+            5008: { title: 'Danh sách bài viết chính thức', link: '/user/news/list', groupIndex: 1, icon: 'fa-list-alt', backgroundColor: '#00b8d4', },
         }
     };
     app.permission.add(
@@ -30,7 +30,6 @@ module.exports = app => {
         { name: 'unit:read', menu: menuUnit },
         { name: 'unit:write' },
         { name: 'unit:draft' },
-
     );
 
     ['/news/item/:newsId', '/tin-tuc/:link'].forEach(route => app.get(route, (req, res) => {

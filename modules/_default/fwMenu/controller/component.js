@@ -1,7 +1,7 @@
 module.exports = app => {
     const menu = {
-        parentMenu: { index: 2000, title: 'Cấu hình', icon: 'fa-cog' },
-        menus: { 2100: { title: 'Thành phần giao diện', link: '/user/component' } }
+        parentMenu: app.parentMenu.truyenThong,
+        menus: { 2100: { title: 'Thành phần giao diện', link: '/user/component', groupIndex: 0, icon: 'fa-object-group', backgroundColor: '#00897b' } }
     };
     app.permission.add(
         { name: 'component:read', menu },

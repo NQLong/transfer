@@ -22,7 +22,7 @@ class UnitDraftNewsEditPage extends React.Component {
 
     }
     componentDidMount() {
-        T.ready('/user/news/unit/draft', () => {
+        T.ready('/user/truyen-thong', () => {
             this.getData();
             $('#neNewsViTitle').focus();
             $('#neNewsCategories').select2();

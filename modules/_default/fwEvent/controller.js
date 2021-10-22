@@ -1,10 +1,10 @@
 module.exports = app => {
     const menu = {
-        parentMenu: { index: 5100, title: 'Sự kiện', icon: 'fa-star' },
+        parentMenu: app.parentMenu.truyenThong,
         menus: {
-            5101: { title: 'Danh mục', link: '/user/event/category' },
-            5102: { title: 'Sự kiện', link: '/user/event/list' },
-            5103: { title: 'Chờ duyệt', link: '/user/event/draft' },
+            5101: { title: 'Danh mục sự kiện', link: '/user/event/category', groupIndex: 2, icon: 'fa-list-alt', backgroundColor: '#00b8d4', },
+            5102: { title: 'Danh sách sự kiện', link: '/user/event/list', groupIndex: 2, icon: 'fa-file-o', backgroundColor: '#22e5b4' },
+            5103: { title: 'Chờ duyệt', link: '/user/event/draft', groupIndex: 2, icon: 'fa-file-o', backgroundColor: '#a1cc1f', },
         },
     };
     app.permission.add(

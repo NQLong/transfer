@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 
 class adminINews extends React.Component {
 	componentDidMount() {
-		T.ready('/user/inews', () => {
+		T.ready('/user/truyen-thong', () => {
 			this.props.getINewsPage(1, 50);
 		});
 	}

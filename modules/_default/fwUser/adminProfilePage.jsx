@@ -303,7 +303,7 @@ class ProfilePage extends QTForm {
                     let { dienThoai, ngaySinh } = user ? user : { dienThoai: '', ngaySinh: '' };
                     $('#ngaySinh').val(ngaySinh ? T.dateToText(ngaySinh, 'dd/mm/yyyy') : '');
                     $('#dienThoai').val(dienThoai);
-                    this.phai.current.setText(user.phai ? sexMapper[user.phai] || '' : '');
+                    this.phai.current.setText(user.phai ? sexMapper[user.phai] || '01' : '01');
                 }
                 setTimeout(() => {
 
@@ -336,69 +336,68 @@ class ProfilePage extends QTForm {
         }
     };
 
-    setVal = (data = {}) => {
-        const { cmnd = '', cmndNgayCap = '', cmndNoiCap = '', emailCaNhan = '', noiSinh = '', queQuan = '',
-            email = '', dienThoaiCaNhan = '', dienThoaiBaoTin = '', ngaySinh = '',
-            maTrinhDoLlct = '', maTrinhDoQlnn = '', maTrinhDoTinHoc = '', hoKhau = '', diaChiHienTai = '', danToc = '', tonGiao = '',
-            lyDoONuocNgoai = '', dangONuocNgoai = false, dangVien = false, chucDanh = '', trinhDoPhoThong = '', hocVi = '', chuyenNganh = '', namChucDanh = '', namHocVi = '',
-            phai = '', nhomMau = '', ngayVaoDang = '', ngayVaoDangChinhThuc = '', ngayNhapNgu = '', ngayXuatNgu = '', quanHamCaoNhat = '', soBhxh = '',
-            soTheDang = '', noiDangDb = '', noiDangCt = '', doanVien = false, ngayVaoDoan = '', noiVaoDoan = '', ngheNghiepCu = '', quocGia = null, hangThuongBinh = '', giaDinhChinhSach = '',
-            danhHieu = '', soTruong = '', sucKhoe = '', canNang = '', chieuCao = '' } = data.constructor === ({}).constructor ? data : {};
-        this.cmnd.current.setVal(cmnd);
-        this.cmndNgayCap.current.setVal(cmndNgayCap);
-        this.cmndNoiCap.current.setVal(cmndNoiCap);
-        this.ngaySinh.current.setVal(ngaySinh);
-        this.dienThoaiCaNhan.current.setVal(dienThoaiCaNhan);
-        this.dienThoaiBaoTin.current.setVal(dienThoaiBaoTin);
-        this.email.current.setVal(email);
-        this.emailCaNhan.current.setVal(emailCaNhan);
-        this.ngaySinh.current.setVal(ngaySinh);
-        this.doanVien.current.setVal(doanVien);
-        this.dangVien.current.setVal(dangVien);
-
-        this.quocGia.current.setVal(quocGia);
-        if (this.state.doanVien) {
-            this.ngayVaoDoan.current.setVal(ngayVaoDoan);
-            this.noiVaoDoan.current.setVal(noiVaoDoan);
-        }
-        if (this.state.dangVien) {
-            this.ngayVaoDang.current.setVal(ngayVaoDang);
-            this.ngayVaoDangChinhThuc.current.setVal(ngayVaoDangChinhThuc);
-            this.noiDangDb.current.setVal(noiDangDb);
-            this.noiDangCt.current.setVal(noiDangCt);
-            this.soTheDang.current.setVal(soTheDang);
-        }
-        this.maTrinhDoLlct.current.setVal(maTrinhDoLlct);
-        this.maTrinhDoQlnn.current.setVal(maTrinhDoQlnn);
-        this.maTrinhDoTinHoc.current.setVal(maTrinhDoTinHoc);
-        this.hoKhau.current.setVal(hoKhau);
-        this.diaChiHienTai.current.setVal(diaChiHienTai);
-        this.danToc.current.setVal(danToc);
-        this.tonGiao.current.setVal(tonGiao);
-        this.dangONuocNgoai.current.setVal(dangONuocNgoai);
-        if (this.state.nuocNgoai) this.lyDoONuocNgoai.current.setVal(lyDoONuocNgoai);
-        this.phai.current.setVal(phai);
-        this.nhomMau.current.setVal(nhomMau);
-        this.soBhxh.current.setVal(soBhxh);
-        this.quanHamCaoNhat.current.setVal(quanHamCaoNhat);
-        this.ngayNhapNgu.current.setVal(ngayNhapNgu);
-        this.ngayXuatNgu.current.setVal(ngayXuatNgu);
-        this.hangThuongBinh.current.setVal(hangThuongBinh);
-        this.giaDinhChinhSach.current.setVal(giaDinhChinhSach);
-        this.danhHieu.current.setVal(danhHieu);
-        this.soTruong.current.setVal(soTruong);
-        this.sucKhoe.current.setVal(sucKhoe);
-        this.canNang.current.setVal(canNang);
-        this.chieuCao.current.setVal(chieuCao);
-        this.ngheNghiepCu.current.setVal(ngheNghiepCu);
-        this.chucDanh.current.setVal(chucDanh);
-        this.hocVi.current.setVal(hocVi);
-        this.chuyenNganh.current.setVal(chuyenNganh);
-        this.namChucDanh.current.setVal(namChucDanh);
-        this.namHocVi.current.setVal(namHocVi);
-        this.trinhDoPhoThong.current.setVal(trinhDoPhoThong);
-        this.noiSinh.current.setVal(noiSinh);
-        this.queQuan.current.setVal(queQuan);
+    setVal = () => {
+        // const { cmnd = '', cmndNgayCap = '', cmndNoiCap = '', emailCaNhan = '', noiSinh = '', queQuan = '',
+        //     email = '', dienThoaiCaNhan = '', dienThoaiBaoTin = '', ngaySinh = '',
+        //     maTrinhDoLlct = '', maTrinhDoQlnn = '', maTrinhDoTinHoc = '', hoKhau = '', diaChiHienTai = '', danToc = '', tonGiao = '',
+        //     lyDoONuocNgoai = '', dangONuocNgoai = false, dangVien = false, chucDanh = '', trinhDoPhoThong = '', hocVi = '', chuyenNganh = '', namChucDanh = '', namHocVi = '',
+        //     phai = '', nhomMau = '', ngayVaoDang = '', ngayVaoDangChinhThuc = '', ngayNhapNgu = '', ngayXuatNgu = '', quanHamCaoNhat = '', soBhxh = '',
+        //     soTheDang = '', noiDangDb = '', noiDangCt = '', doanVien = false, ngayVaoDoan = '', noiVaoDoan = '', ngheNghiepCu = '', quocGia = null, hangThuongBinh = '', giaDinhChinhSach = '',
+        //     danhHieu = '', soTruong = '', sucKhoe = '', canNang = '', chieuCao = '' } = data.constructor === ({}).constructor ? data : {};
+        // this.cmnd.current.setVal(cmnd);
+        // this.cmndNgayCap.current.setVal(cmndNgayCap);
+        // this.cmndNoiCap.current.setVal(cmndNoiCap);
+        // this.ngaySinh.current.setVal(ngaySinh);
+        // this.dienThoaiCaNhan.current.setVal(dienThoaiCaNhan);
+        // this.dienThoaiBaoTin.current.setVal(dienThoaiBaoTin);
+        // this.email.current.setVal(email);
+        // this.emailCaNhan.current.setVal(emailCaNhan);
+        // this.ngaySinh.current.setVal(ngaySinh);
+        // this.doanVien.current.setVal(doanVien);
+        // this.dangVien.current.setVal(dangVien);
+        // this.quocGia.current.setVal(quocGia);
+        // if (this.state.doanVien) {
+        //     this.ngayVaoDoan.current.setVal(ngayVaoDoan);
+        //     this.noiVaoDoan.current.setVal(noiVaoDoan);
+        // }
+        // if (this.state.dangVien) {
+        //     this.ngayVaoDang.current.setVal(ngayVaoDang);
+        //     this.ngayVaoDangChinhThuc.current.setVal(ngayVaoDangChinhThuc);
+        //     this.noiDangDb.current.setVal(noiDangDb);
+        //     this.noiDangCt.current.setVal(noiDangCt);
+        //     this.soTheDang.current.setVal(soTheDang);
+        // }
+        // this.maTrinhDoLlct.current.setVal(maTrinhDoLlct);
+        // this.maTrinhDoQlnn.current.setVal(maTrinhDoQlnn);
+        // this.maTrinhDoTinHoc.current.setVal(maTrinhDoTinHoc);
+        // this.hoKhau.current.setVal(hoKhau);
+        // this.diaChiHienTai.current.setVal(diaChiHienTai);
+        // this.danToc.current.setVal(danToc);
+        // this.tonGiao.current.setVal(tonGiao);
+        // this.dangONuocNgoai.current.setVal(dangONuocNgoai);
+        // if (this.state.nuocNgoai) this.lyDoONuocNgoai.current.setVal(lyDoONuocNgoai);
+        // this.phai.current.setVal(phai);
+        // this.nhomMau.current.setVal(nhomMau);
+        // this.soBhxh.current.setVal(soBhxh);
+        // this.quanHamCaoNhat.current.setVal(quanHamCaoNhat);
+        // this.ngayNhapNgu.current.setVal(ngayNhapNgu);
+        // this.ngayXuatNgu.current.setVal(ngayXuatNgu);
+        // this.hangThuongBinh.current.setVal(hangThuongBinh);
+        // this.giaDinhChinhSach.current.setVal(giaDinhChinhSach);
+        // this.danhHieu.current.setVal(danhHieu);
+        // this.soTruong.current.setVal(soTruong);
+        // this.sucKhoe.current.setVal(sucKhoe);
+        // this.canNang.current.setVal(canNang);
+        // this.chieuCao.current.setVal(chieuCao);
+        // this.ngheNghiepCu.current.setVal(ngheNghiepCu);
+        // this.chucDanh.current.setVal(chucDanh);
+        // this.hocVi.current.setVal(hocVi);
+        // this.chuyenNganh.current.setVal(chuyenNganh);
+        // this.namChucDanh.current.setVal(namChucDanh);
+        // this.namHocVi.current.setVal(namHocVi);
+        // this.trinhDoPhoThong.current.setVal(trinhDoPhoThong);
+        // this.noiSinh.current.setVal(noiSinh);
+        // this.queQuan.current.setVal(queQuan);
     };
 
     getVal = () => ({
@@ -589,9 +588,9 @@ class ProfilePage extends QTForm {
                 <div className='app-title'>
                     <h1><i className='fa fa-user' /> Thông tin cá nhân</h1>
                 </div>
-                {user && !user.isStaff ? <div className='tile'>
+                {true ? <div className='tile' >
                     <h3 className='tile-title'>Thông tin cá nhân</h3>
-                    <div className='tile-body'>
+                    <div className='tile-body' >
                         <div className='row'>
                             <div className='col-12 col-lg-8 order-2 order-lg-1' style={{ paddingTop: 10 }}>
                                 <div className='form-group'>
@@ -644,7 +643,6 @@ class ProfilePage extends QTForm {
                                     <div className='form-group col-md-4'><Select ref={this.phai} adapter={SelectAdapter_DmGioiTinh} label='Giới tính' required /></div>
                                     <div className='form-group col-md-4'><Select ref={this.quocGia} adapter={SelectAdapter_DmQuocGia} label='Quốc tịch' required /></div>
                                     <div className='form-group col-md-4'><Select ref={this.danToc} adapter={SelectAdapter_DmDanToc} label='Dân tộc' required /></div>
-
                                     <div className='form-group col-md-4'><Select ref={this.tonGiao} adapter={SelectAdapter_DmTonGiao} label='Tôn giáo' required /></div>
                                     <div className='form-group col-md-4'><TextInput ref={this.dienThoaiCaNhan} label='Số điện thoại cá nhân' maxLength={20} /></div>
                                 </div>

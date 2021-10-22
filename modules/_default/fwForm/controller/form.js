@@ -1,6 +1,6 @@
 module.exports = app => {
     const menu = {
-        parentMenu: { index: 5100, title: 'Sự kiện', icon: 'fa-star' },
+        parentMenu: app.parentMenu.truyenThong,
         menus: {
             // 5104: { title: 'Bộ câu hỏi', link: '/user/form/list' },
         }

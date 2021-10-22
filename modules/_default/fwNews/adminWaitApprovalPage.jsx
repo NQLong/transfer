@@ -67,7 +67,7 @@ class NewsWaitApprovalPage extends React.Component {
 
     componentDidMount() {
         this.props.getDraftNewsInPage(null, null, { isDraftApproved: 1, isTranslated: { $ne: 'in progress' } });
-        T.ready();
+        T.ready('/user/truyen-thong');
     }
     create = (e) => {
         this.props.createDraftNewsDefault(data => this.props.history.push('/user/news/draft/edit/' + data.item.id));
@@ -178,11 +178,11 @@ class NewsWaitApprovalPage extends React.Component {
                 </div>
                 <div className='tile'>
                     {table}
-                    <button onClick={() => {
+                    {/* <button onClick={() => {
                         this.props.history.goBack();
                     }} className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>
                         <i className='fa fa-lg fa-reply' />
-                    </button>
+                    </button> */}
                     <Pagination name='pageNews'
                         pageNumber={pageNumber} pageSize={pageSize} pageTotal={pageTotal} totalItem={totalItem} pageCondition={pageCondition}
                         getPage={this.props.getDraftNewsInPage} />

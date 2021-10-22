@@ -185,7 +185,7 @@ class SubMenusPage extends React.Component {
                     ) : null;
                 }) : null}
 
-                {isEditMode ?
+                {/* {isEditMode ?
                     <React.Fragment>
                         <button type='button' className='btn btn-danger btn-circle' title='Ẩn tất cả' style={{ position: 'fixed', right: '200px', bottom: '10px' }} onClick={() => this.selectAllIcons(false)}>
                             <i className='fa fa-lg fa-times' />
@@ -202,7 +202,7 @@ class SubMenusPage extends React.Component {
                     </React.Fragment> :
                     <button type='button' className='btn btn-primary btn-circle' title='Chỉnh sửa giao diện' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={() => this.setState({ mode: 'edit' })}>
                         <i className='fa fa-lg fa-edit' />
-                    </button>}
+                    </button>} */}
             </main>);
     }
 }
