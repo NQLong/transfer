@@ -84,7 +84,6 @@ class DraftNewsEditPage extends React.Component {
             $('#neNewsViTitle').focus();
             $('#neNewsCategories').select2();
             $('#neNewsStartPost').datetimepicker(T.dateFormat);
-            // $('#neNewsStopPost').datetimepicker(T.dateFormat);
         });
     }
     componentDidUpdate() {
@@ -110,11 +109,8 @@ class DraftNewsEditPage extends React.Component {
                 let categories = data.categories.map(item => ({ id: item.id, text: T.language.parse(item.text) }));
                 $('#neNewsCategories').select2({ data: categories }).val(contentNews.categories).trigger('change');
                 const neNewsStartPost = $('#neNewsStartPost').datetimepicker(T.dateFormat);
-                // const neNewsStopPost = $('#neNewsStopPost').datetimepicker(T.dateFormat);
                 if (contentNews.startPost)
                     neNewsStartPost.val(T.dateToText(contentNews.startPost, 'dd/mm/yyyy HH:MM')).datetimepicker('update');
-                // if (contentNews.stopPost)
-                //     neNewsStopPost.val(T.dateToText(contentNews.stopPost, 'dd/mm/yyyy HH:MM')).datetimepicker('update');
                 if (contentNews.link) {
                     $(this.newsLink.current).html(T.rootUrl + '/tin-tuc/' + contentNews.link).attr('href', '/tin-tuc/' + contentNews.link);
                 } else {
@@ -131,8 +127,7 @@ class DraftNewsEditPage extends React.Component {
                 if (data.listAttachment) this.file.current.setVal(data.listAttachment.map(item => ({ value: item.id, text: item.nameDisplay })));
                 this.props.getDmDonViFaculty(items => {
                     $(this.DonVi.current).select2({
-                        data: [{ id: 0, text: 'TRƯỜNG ĐẠI HỌC KHXH & NV' }, ...items.map(item => ({ id: item.ma, text: item.ten }))]
-                        ,
+                        data: [{ id: 0, text: 'TRƯỜNG ĐẠI HỌC KHXH & NV' }, ...items.map(item => ({ id: item.ma, text: item.ten }))],
                         placeholder: 'Chọn đơn vị'
                     }).val(data.item && data.item.maDonVi
                         ? data.item.maDonVi : 0).trigger('change');
@@ -168,17 +163,6 @@ class DraftNewsEditPage extends React.Component {
     }
     save = () => {
         const neNewsStartPost = $('#neNewsStartPost').val() ? T.formatDate($('#neNewsStartPost').val()).getTime() : null;
-        // neNewsStopPost = $('#neNewsStopPost').val() ? T.formatDate($('#neNewsStopPost').val()).getTime() : null;
-
-        if (!neNewsStartPost)
-            return $('#neNewsStartPost').focus();
-
-        // if (neNewsStopPost && neNewsStartPost > neNewsStopPost) {
-        //     T.notify('Thời gian bắt đầu đăng bài phải trước thời gian dừng đăng bài', 'info')
-        //     $('#neNewsStartPost').focus();
-        //     return;
-        // }
-
         const changes = {
             categories: $('#neNewsCategories').val().length ? $('#neNewsCategories').val() : ['-1'],
             title: JSON.stringify({ vi: $('#neNewsViTitle').val(), en: $('#neNewsEnTitle').val() }),
@@ -189,7 +173,6 @@ class DraftNewsEditPage extends React.Component {
 
         };
         if (neNewsStartPost) changes.startPost = neNewsStartPost;
-        // if (neNewsStopPost) changes.stopPost = neNewsStopPost;
 
         let newDraft = {
             title: JSON.stringify({ vi: $('#neNewsViTitle').val(), en: $('#neNewsEnTitle').val() }),
@@ -203,7 +186,6 @@ class DraftNewsEditPage extends React.Component {
             isDraftApproved: 1,
             isUnitApproved: 1,
             maDonVi: this.state.donVi,
-
         };
         if (this.props.system.user.permissions.includes('news:write')) {
             delete newDraft.editorId; delete newDraft.editorName;
@@ -212,7 +194,6 @@ class DraftNewsEditPage extends React.Component {
             newDraft.isTranslated = 'done';
         }
         this.props.updateDraftNews(this.state.draftId, newDraft, () => { });
-
     }
 
     render() {
@@ -299,7 +280,7 @@ class DraftNewsEditPage extends React.Component {
                                     </select>
                                 </div>
                                 <div className='form-group'>
-                                    <label className='control-label'>Đơn vị</label>
+                                    <label className='control-label'>Đơn vị nhận bài viết</label>
                                     <select ref={this.DonVi} placeholder='Chọn danh mục' multiple={false} className='select2-input' disabled={readOnly}></select>
                                 </div>
                                 <div className='form-group'>
@@ -324,7 +305,7 @@ class DraftNewsEditPage extends React.Component {
                                         onChange={this.newsLinkChange} />
                                 </div>
                             </div>
-                            {readOnly ? '' :
+                            {readOnly ? null :
                                 <div className='tile-footer'>
                                     <button className='btn btn-danger' type='button' onClick={() => this.checkLink(item)}>
                                         <i className='fa fa-fw fa-lg fa-check-circle' />Kiểm tra link
@@ -343,11 +324,6 @@ class DraftNewsEditPage extends React.Component {
                                     <input className='form-control' id='neNewsStartPost' type='text' placeholder='Ngày bắt đầu đăng bài viết' defaultValue={item.startPost}
                                         autoComplete='off' disabled={readOnly} />
                                 </div>
-                                {/* <div className='form-group'>
-                                    <label className='control-label'>Ngày kết thúc đăng bài viết</label>
-                                    <input className='form-control' id='neNewsStopPost' type='text' placeholder='Ngày kết thúc đăng bài viết' defaultValue={item.stopPost}
-                                        autoComplete='off' disabled={readOnly} />
-                                </div> */}
                             </div>
                         </div>
                     </div>

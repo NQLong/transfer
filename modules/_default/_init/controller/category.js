@@ -44,7 +44,6 @@ module.exports = app => {
         const user = req.session.user, body = req.body.data;
         if (user && user.maDonVi) {
             body.maDonVi = user.maDonVi;
-            console.log(body);
             app.model.fwCategory.create2(body, (error, item) => {
                 res.send({ error, item });
             });

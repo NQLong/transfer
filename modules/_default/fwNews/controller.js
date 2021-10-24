@@ -81,7 +81,7 @@ module.exports = app => {
         });
     }));
 
-    ['/news-en/item/:newsId'].forEach(route => app.get(route, (req, res) => {
+    ['/news-en/item/:newsId', '/article/:link'].forEach(route => app.get(route, (req, res) => {
         const changeMeta = (news, data) => {
             let title, abstract;
             try {
@@ -91,16 +91,16 @@ module.exports = app => {
                 title = news.title;
                 abstract = news.abstract;
             }
-            data = data.replace('<title>USSH VNUHCM</title>',
+            data = data.replace('<title>TRƯỜNG ĐẠI HỌC KHOA HỌC XÃ HỘI VÀ NHÂN VĂN - ĐHQG TP.HCM</title>',
                 `<title>${(title || '').replaceAll('\'', '')}</title>
-                <meta property='og:url' content='${app.rootUrl + req.originalUrl}' />
-                <meta property='og:type' content='article' />
-                <meta property="og:image:height" content="470">
-                <meta property="og:image:width" content="619">
-                <meta property='og:title' content='${(title || '').replaceAll('\'', '')}' />
-                <meta property='og:description' content='${(abstract || '').replaceAll('\'', '')}' />
-                <meta property='og:image' content='${app.rootUrl + news.image}' />
-                <meta property='donVi' content=${news.maDonVi} />`);
+            <meta property='og:url' content='${app.rootUrl + req.originalUrl}' />
+            <meta property='og:type' content='article' />
+            <meta property="og:image:height" content="470">
+            <meta property="og:image:width" content="619">
+            <meta property='og:title' content='${(title || '').replaceAll('\'', '')}' />
+            <meta property='og:description' content='${(abstract || '').replaceAll('\'', '')}' />
+            <meta property='og:image' content='${app.rootUrl + news.image}' />
+            <meta property='donVi' content=${app.isDebug ? '64' : '67'} />`);
             res.send(data);
         };
         new Promise(resolve => {
@@ -113,15 +113,15 @@ module.exports = app => {
         }).then(news => new Promise(resolve => {
             if (news) {
                 resolve(news);
-            } else if (req.originalUrl.startsWith('/tin-tuc/')) {
-                const idNews = req.originalUrl.substring('/tin-tuc/'.length).split('?')[0];
-                app.model.fwNews.getByLink(idNews, (error, item) => resolve(item));
+            } else if (req.originalUrl.startsWith('/article/')) {
+                const idNews = req.originalUrl.substring('/article/'.length).split('?')[0];
+                app.model.fwNews.getByEnLink(idNews, (error, item) => resolve(item));
             } else {
                 resolve(null);
             }
         })).then(news => {
             if (news && news.language == 'vi' && news.isTranslate == 0) { res.redirect('/404.html'); }
-            else if (news && news.maDonVi == 0) app.templates.home(req, { send: (data) => changeMeta(news, data) });
+            // else if (news && news.maDonVi == 0) app.templates.home(req, { send: (data) => changeMeta(news, data) });
             else if (news) app.templates.unit(req, { send: (data) => changeMeta(news, data) });
             else {
                 console.log(route, 'bugs');
@@ -133,7 +133,7 @@ module.exports = app => {
     app.get('/user/news/category', app.permission.check('category:read'), app.templates.admin);
     app.get('/user/news/list', app.permission.check('news:read'), app.templates.admin);
     app.get('/user/news/edit/:id', app.templates.admin);// TODO
-    app.get('/user/news/draft', app.permission.check('news:read'), app.templates.admin);
+    app.get('/user/news/draft', app.permission.check('news:draft'), app.templates.admin);
     app.get('/user/news/draft/edit/:id', app.permission.check('news:draft'), app.templates.admin);
     app.get('/user/news/unit/list', app.permission.check('unit:draft'), app.templates.admin);
     app.get('/user/news/unit/edit/:id', app.permission.check('unit:draft'), app.templates.admin);
@@ -222,10 +222,15 @@ module.exports = app => {
 
     app.get('/api/draft-news/page/:pageNumber/:pageSize', app.permission.check('news:draft'), (req, res) => {
         const user = req.session.user;
-        const condition = { statement: 'documentType = :documentType', parameter: { documentType: 'news' } };
+        const condition = {
+            statement: 'documentType = :documentType AND maDonVi = :maDonVi',
+            parameter: { documentType: 'news', maDonVi: user.maDonVi }
+        };
         if (!user.permissions.includes('news:write') && !user.permissions.includes('news:draft')) {
             condition.statement += ' AND editorId = :editorId';
             condition.parameter.editorId = user.shcc;
+        } else if (user.permissions.includes('news:write')) {
+            condition.parameter.maDonVi = '0';
         }
 
         const pageNumber = parseInt(req.params.pageNumber), pageSize = parseInt(req.params.pageSize);
@@ -245,7 +250,7 @@ module.exports = app => {
                 app.model.fwDraft.getPage(pageNumber, pageSize, condition, '*', 'lastModified DESC', (error, page) => {
                     const response = {};
                     if (error || page == null) {
-                        response.error = 'Danh sách bài viết không sẵn sàng!';
+                        response.error = 'Danh sách bản nháp không sẵn sàng!';
                     } else {
                         let list = page.list.map(item => app.clone(item, { content: null, donVi: dmDonViMapper[item.maDonVi] }));
                         response.page = app.clone(page, { list });
@@ -326,9 +331,15 @@ module.exports = app => {
         }
     });
 
-    app.post('/api/news/draft', app.permission.check('news:draft'), (req, res) => app.model.fwDraft.create2(req.body, (error, item) => res.send({ error, item })));
+    app.post('/api/news/draft', app.permission.check('news:draft'), (req, res) => {
+        const user = req.session.user;
+        req.body.maDonVi = user.maDonVi;
+        app.model.fwDraft.create2(req.body, (error, item) => res.send({ error, item }));
+    });
 
     app.post('/api/news/unit/draft', app.permission.check('unit:draft'), (req, res) => {
+        const user = req.session.user;
+        req.body.maDonVi = user.maDonVi;
         app.model.fwDraft.create2(req.body, (error, item) => res.send({ error, item }));
     }
     );
@@ -418,9 +429,12 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/draft-news/toNews/:draftId', app.permission.check('news:read'), (req, res) => {
+    app.get('/api/draft-news/toNews/:draftId', app.permission.check('staff:login'), (req, res) => {
         const permissions = req.session.user.permissions,
-            valid = permissions.includes('news:write') || permissions.includes('news:tuyensinh');
+
+            valid = permissions.includes('news:write')
+                || permissions.includes('news:tuyensinh')
+                || permissions.includes('website:write');
         if (valid) {
             app.model.fwDraft.toNews(req.params.draftId, (error, item) => {
                 res.send({ error, item });
@@ -517,8 +531,13 @@ module.exports = app => {
         });
     });
 
-    app.put('/api/draft-news', app.permission.check('news:draft'), (req, res) =>
-        app.model.fwDraft.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })));
+    app.put('/api/draft-news', app.permission.check('news:draft'), (req, res) => {
+        const user = req.session.user;
+        req.body.changes.editorId = user.ma;
+        app.model.fwDraft.update({ id: req.body.id }, req.body.changes, (error, item) => {
+            res.send({ error, item });
+        });
+    });
 
     app.put('/api/unit-draft-news', app.permission.check('unit:draft'), (req, res) => {
         const changes = req.body.changes;
@@ -537,9 +556,10 @@ module.exports = app => {
             pageSize = parseInt(req.params.pageSize),
             today = new Date().getTime(),
             user = req.session.user,
-            maDonVi = req.query.maDonVi;
+            maDonVi = req.query.maDonVi,
+            language = req.query.language;
 
-        const condition = {
+        let condition = {
             statement: 'MA_DON_VI = :maDonVi AND ACTIVE = :active AND (START_POST <= :startPost )',
             parameter: { active: 1, startPost: today, maDonVi: maDonVi ? maDonVi : 0 },
         };
@@ -547,6 +567,11 @@ module.exports = app => {
         if (!user) {
             condition.statement += ' AND IS_INTERNAL = :isInternal';
             condition.parameter.isInternal = 0;
+        }
+        if (language == 'en') {
+            condition.statement += ' AND (IS_TRANSLATE =1 OR (IS_TRANSLATE =0 AND LANGUAGE=\'en\'))';
+        } else {
+            condition.statement += ' AND (IS_TRANSLATE =1 OR (IS_TRANSLATE =0 AND LANGUAGE=\'vi\'))';
         }
         app.model.fwNews.getPage(pageNumber, pageSize, condition, '*', 'START_POST DESC', (error, page) => {
             const response = {};
@@ -585,7 +610,6 @@ module.exports = app => {
                 res.send({ error });
             } else {
                 app.model.fwNews.getNewsPageWithCategory(categoryType, pageNumber, pageSize, condition, '*', 'FN.pinned DESC, FN.startPost DESC', (error, page) => {
-                    // console.log(page);
                     const response = {};
                     if (error || page == null) {
                         console.error('error', error);
@@ -623,9 +647,10 @@ module.exports = app => {
             }
         });
     });
+
     app.get('/news/item/link/:newsLink', (req, res) => app.model.fwNews.readByLink(req.params.newsLink, (error, item) => {
         let listAttachment = [];
-        if (item.attachment) {
+        if (item && item.attachment) {
             const handleGetAttachment = (index) => {
                 if (index == item.attachment.split(',').length) {
                     item.listAttachment = listAttachment;
@@ -637,11 +662,32 @@ module.exports = app => {
                     });
                 }
             };
-            handleGetAttachment(0);
+            if (item) handleGetAttachment(0);
         } else {
             res.send({ error, item });
         }
     }));
+
+    app.get('/news/item/link-en/:newsLink', (req, res) => app.model.fwNews.readByEnLink(req.params.newsLink, (error, item) => {
+        let listAttachment = [];
+        if (item && item.attachment) {
+            const handleGetAttachment = (index) => {
+                if (index == item.attachment.split(',').length) {
+                    item.listAttachment = listAttachment;
+                    res.send({ error, item });
+                } else {
+                    app.model.fwStorage.get({ id: item.attachment.split(',')[index] }, (err, itemStorage) => {
+                        if (itemStorage) listAttachment.push(itemStorage);
+                        handleGetAttachment(index + 1);
+                    });
+                }
+            };
+            if (item) handleGetAttachment(0);
+        } else {
+            res.send({ error, item });
+        }
+    }));
+
     app.put('/news/item/check-link', (req, res) => app.model.fwNews.getByLink(req.body.link, (error, item) => {
         res.send({ error: error ? 'Lỗi hệ thống' : (item == null || item.id == req.body.id) ? null : 'Link không hợp lệ' });
     }));

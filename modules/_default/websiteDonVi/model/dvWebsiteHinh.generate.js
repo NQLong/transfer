@@ -136,9 +136,9 @@ module.exports = app => {
                 { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pMadonvi, pImage, pTieude, pLink, pKichhoat }, done);
         },
 
-        swapThuTu: (pId, pIsMoveUp, pMadonvi, done) => {
-            app.dbConnection.execute('BEGIN dv_website_hinh_swap_thu_tu(:pId, :pIsMoveUp, :pMadonvi); END;',
-                { pId, pIsMoveUp, pMadonvi }, done);
+        swapThuTu: (done) => {
+            app.dbConnection.execute('BEGIN dv_website_hinh_swap_thu_tu(); END;',
+                done);
         },
     };
 };

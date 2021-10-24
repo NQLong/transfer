@@ -117,7 +117,7 @@ export class ComponentModal extends React.Component {
                     }
                 }
                 if (!found) $(this.btnSave.current).data('viewId', '');
-                $('#itemViewItem').select2({ data: items.map(item => ({ id: item.id, text: T.language.parse(item.text ? item.text : item), })), placeholder: 'Chọn danh mục' })
+                $('#itemViewItem').select2({ data: items.map(item => ({ id: item.id, text: item.text ? item.text.viText() : item, })), placeholder: 'Chọn danh mục' })
                     .val(viewItemId).trigger('change');
                 this.setState({ viewType: selectedType, viewItemText, });
             });

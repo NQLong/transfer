@@ -39,7 +39,7 @@ class App extends React.Component {
 
     componentDidMount() {
         // T.socket.on('contact-changed', item => store.dispatch(changeContact(item)));
-
+        T.cookie('language', 'vi');
         T.socket.on('user-changed', user => {
             if (this.props.system && this.props.system.user && this.props.system.user._id == user._id) {
                 store.dispatch(updateSystemState({ user: Object.assign({}, this.props.system.user, user) }));
