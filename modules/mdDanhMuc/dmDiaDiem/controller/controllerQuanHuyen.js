@@ -42,7 +42,7 @@ module.exports = app => {
 	});
 
 	app.get('/api/danh-muc/quan-huyen/item/:maQuanHuyen', app.permission.check('user:login'), (req, res) => {
-		app.model.dmQuanHuyen.get(req.params.maQuanHuyen, (error, item) => res.send({ error, item }));
+		app.model.dmQuanHuyen.get({maQuanHuyen: req.params.maQuanHuyen}, (error, item) => res.send({ error, item }));
 	});
 
 	app.post('/api/danh-muc/quan-huyen', app.permission.check('dmQuanHuyen:write'), (req, res) => {

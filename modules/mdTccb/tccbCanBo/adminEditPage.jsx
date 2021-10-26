@@ -37,6 +37,7 @@ import { createQtUngDungThuongMaiStaff, updateQtUngDungThuongMaiStaff, deleteQtU
 import { createQtLamViecNgoaiStaff, updateQtLamViecNgoaiStaff, deleteQtLamViecNgoaiStaff } from 'modules/_default/qtLamViecNgoai/redux.jsx';
 import { TableCell, renderTable, AdminModal, FormSelect, FormRichTextBox, FormCheckbox, FormTextBox } from 'view/component/AdminPage';
 import { QTForm } from 'view/component/Form';
+import { ComponentDiaDiem } from 'modules/mdDanhMuc/dmDiaDiem/componentDiaDiem';
 
 const dateType = [
     { id: 'yyyy', text: 'yyyy' },
@@ -1259,8 +1260,6 @@ class CanBoEditPage extends QTForm {
         this.maTrinhDoLlct = React.createRef();
         this.maTrinhDoQlnn = React.createRef();
         this.maTrinhDoTinHoc = React.createRef();
-        this.hoKhau = React.createRef();
-        this.diaChiHienTai = React.createRef();
         this.danToc = React.createRef();
         this.quocGia = React.createRef();
         this.tonGiao = React.createRef();
@@ -1288,12 +1287,6 @@ class CanBoEditPage extends QTForm {
         this.ngayXuatNgu = React.createRef();
         this.quanHamCaoNhat = React.createRef();
         this.soBhxh = React.createRef();
-        // this.maTinhNoiSinh = React.createRef();
-        // this.maHuyenNoiSinh = React.createRef();
-        // this.maXaNoiSinh = React.createRef();
-        // this.maTinhNguyenQuan = React.createRef();
-        // this.maHuyenNguyenQuan = React.createRef();
-        // this.maXaNguyenQuan = React.createRef();
         this.ngheNghiepCu = React.createRef();
         this.chucVuKhac = React.createRef();
         this.hangThuongBinh = React.createRef();
@@ -1309,8 +1302,6 @@ class CanBoEditPage extends QTForm {
         this.chuyenNganh = React.createRef();
         this.namChucDanh = React.createRef();
         this.namHocVi = React.createRef();
-        this.noiSinh = React.createRef();
-        this.queQuan = React.createRef();
 
         this.modalNN = React.createRef();
         this.modalHocTapCongTac = React.createRef();
@@ -1362,8 +1353,12 @@ class CanBoEditPage extends QTForm {
 
     setVal = (data = {}) => {
         const { shcc = '', ho = '', ten = '', biDanh = '', cmnd = '', cmndNgayCap = '', cmndNoiCap = '', emailCaNhan = '', email = '', dienThoaiCaNhan = '', dienThoaiBaoTin = '', ngaySinh = '', ngayBatDauCongTac = '', ngayBienChe = '',
-            maChucVu = '', chucVuDang = '', chucVuDoanThe = '', chucVuKiemNhiem = '', maTrinhDoLlct = '', maTrinhDoQlnn = '', maTrinhDoTinHoc = '', hoKhau = '', diaChiHienTai = '', danToc = '', tonGiao = '', chucDanh = '', trinhDoPhoThong = '', hocVi = '', chuyenNganh = '', namChucDanh = '', namHocVi = '',
-            maDonVi = '', lyDoONuocNgoai = '', dangONuocNgoai = false, dangVien = false, phai = '', nhomMau = '', ngayVaoDang = '', ngayVaoDangChinhThuc = '', ngayNhapNgu = '', ngayXuatNgu = '', quanHamCaoNhat = '', soBhxh = '', noiSinh = '', queQuan = '',
+            thuongTruSoNha = '', thuongTruMaXa = '', thuongTruMaHuyen = '', thuongTruMaTinh = '',
+            maXaNoiSinh = '', maHuyenNoiSinh = '', maTinhNoiSinh = '',
+            maXaNguyenQuan = '', maHuyenNguyenQuan = '', maTinhNguyenQuan = '',
+            hienTaiSoNha = '', hienTaiMaXa = '', hienTaiMaHuyen = '', hienTaiMaTinh = '',
+            maChucVu = '', chucVuDang = '', chucVuDoanThe = '', chucVuKiemNhiem = '', maTrinhDoLlct = '', maTrinhDoQlnn = '', maTrinhDoTinHoc = '', danToc = '', tonGiao = '', chucDanh = '', trinhDoPhoThong = '', hocVi = '', chuyenNganh = '', namChucDanh = '', namHocVi = '',
+            maDonVi = '', lyDoONuocNgoai = '', dangONuocNgoai = false, dangVien = false, phai = '', nhomMau = '', ngayVaoDang = '', ngayVaoDangChinhThuc = '', ngayNhapNgu = '', ngayXuatNgu = '', quanHamCaoNhat = '', soBhxh = '',
             soTheDang = '', noiDangDb = '', noiDangCt = '', doanVien = false, ngayVaoDoan = '', noiVaoDoan = '', ngheNghiepCu = '', chucVuKhac = '', quocGia = null, hangThuongBinh = '', giaDinhChinhSach = '', danhHieu = '', soTruong = '', sucKhoe = '', canNang = '', chieuCao = '' } = data.constructor === ({}).constructor ? data : {};
         this.shcc.current.setVal(shcc);
         this.ho.current.setVal(ho);
@@ -1413,8 +1408,6 @@ class CanBoEditPage extends QTForm {
         this.maTrinhDoLlct.current.setVal(maTrinhDoLlct);
         this.maTrinhDoQlnn.current.setVal(maTrinhDoQlnn);
         this.maTrinhDoTinHoc.current.setVal(maTrinhDoTinHoc);
-        this.hoKhau.current.setVal(hoKhau);
-        this.diaChiHienTai.current.setVal(diaChiHienTai);
         this.danToc.current.setVal(danToc);
         this.quocGia.current.setVal(quocGia);
         this.tonGiao.current.setVal(tonGiao);
@@ -1428,6 +1421,7 @@ class CanBoEditPage extends QTForm {
             this.lyDoONuocNgoai.current.setVal(lyDoONuocNgoai);
         }
         // this.ghiChu.current.setVal(ghiChu);
+
         this.phai.current.setVal(phai);
         this.nhomMau.current.setVal(nhomMau);
         this.ngayNhapNgu.current.setVal(ngayNhapNgu);
@@ -1437,16 +1431,12 @@ class CanBoEditPage extends QTForm {
         this.giaDinhChinhSach.current.setVal(giaDinhChinhSach);
         this.danhHieu.current.setVal(danhHieu);
         this.soBhxh.current.setVal(soBhxh);
-        // this.maXaNoiSinh.current.setVal(maXaNoiSinh, data => {
-        //     this.maHuyenNoiSinh.current.setVal(data.maQuanHuyen, data => {
-        //         this.maTinhNoiSinh.current.setVal(data.maTinhThanhPho);
-        //     })
-        // });
-        // this.maXaNguyenQuan.current.setVal(maXaNguyenQuan, data => {
-        //     this.maHuyenNguyenQuan.current.setVal(data.maQuanHuyen, data => {
-        //         this.maTinhNguyenQuan.current.setVal(data.maTinhThanhPho);
-        //     })
-        // });
+
+        this.thuongTru.value(thuongTruMaTinh, thuongTruMaHuyen, thuongTruMaXa, thuongTruSoNha);
+        this.hienTai.value(hienTaiMaTinh, hienTaiMaHuyen, hienTaiMaXa, hienTaiSoNha);
+        this.nguyenQuan.value(maTinhNguyenQuan,maHuyenNguyenQuan, maXaNguyenQuan);
+        this.noiSinh.value(maTinhNoiSinh, maHuyenNoiSinh, maXaNoiSinh);
+
         this.soTruong.current.setVal(soTruong);
         this.sucKhoe.current.setVal(sucKhoe);
         this.canNang.current.setVal(canNang);
@@ -1457,8 +1447,6 @@ class CanBoEditPage extends QTForm {
         this.namChucDanh.current.setVal(namChucDanh);
         this.namHocVi.current.setVal(namHocVi);
         this.trinhDoPhoThong.current.setVal(trinhDoPhoThong);
-        this.noiSinh.current.setVal(noiSinh);
-        this.queQuan.current.setVal(queQuan);
     };
 
     getVal = () => ({
@@ -1504,8 +1492,6 @@ class CanBoEditPage extends QTForm {
         maTrinhDoLlct: this.maTrinhDoLlct.current.getFormVal(),
         maTrinhDoQlnn: this.maTrinhDoQlnn.current.getFormVal(),
         maTrinhDoTinHoc: this.maTrinhDoTinHoc.current.getFormVal(),
-        hoKhau: this.hoKhau.current.getFormVal(),
-        diaChiHienTai: this.diaChiHienTai.current.getFormVal(),
         danToc: this.danToc.current.getFormVal(),
         quocGia: this.quocGia.current.getFormVal(),
         tonGiao: this.tonGiao.current.getFormVal(),
@@ -1526,12 +1512,7 @@ class CanBoEditPage extends QTForm {
         giaDinhChinhSach: this.giaDinhChinhSach.current.getFormVal(),
         danhHieu: this.danhHieu.current.getFormVal(),
         soBhxh: this.soBhxh.current.getFormVal(),
-        // maXaNoiSinh: this.maXaNoiSinh.current.getFormVal(),
-        // maXaNguyenQuan: this.maXaNguyenQuan.current.getFormVal(),
-        // maHuyenNoiSinh: this.maHuyenNoiSinh.current.getFormVal(),
-        // maHuyenNguyenQuan: this.maHuyenNguyenQuan.current.getFormVal(),
-        // maTinhNoiSinh: this.maTinhNoiSinh.current.getFormVal(),
-        // maTinhNguyenQuan: this.maTinhNguyenQuan.current.getFormVal(),
+
         soTruong: this.soTruong.current.getFormVal(),
         sucKhoe: this.sucKhoe.current.getFormVal(),
         canNang: this.canNang.current.getFormVal(),
@@ -1543,21 +1524,41 @@ class CanBoEditPage extends QTForm {
         namChucDanh: this.namChucDanh.current.getFormVal(),
         namHocVi: this.namHocVi.current.getFormVal(),
         trinhDoPhoThong: this.trinhDoPhoThong.current.getFormVal(),
-        noiSinh: this.noiSinh.current.getFormVal(),
-        queQuan: this.queQuan.current.getFormVal(),
     })
 
     save = () => {
         const data = this.getFormVal();
+        const dcThuongTru = {
+            thuongTruSoNha: this.thuongTru.value().soNhaDuong,
+            thuongTruMaTinh: this.thuongTru.value().maTinhThanhPho,
+            thuongTruMaHuyen: this.thuongTru.value().maQuanHuyen,
+            thuongTruMaXa: this.thuongTru.value().maPhuongXa
+        };
+        const dcHienTai = {
+            hienTaiSoNha: this.hienTai.value().soNhaDuong,
+            hienTaiMaTinh: this.hienTai.value().maTinhThanhPho,
+            hienTaiMaHuyen: this.hienTai.value().maQuanHuyen,
+            hienTaiMaXa: this.hienTai.value().maPhuongXa
+        };
+        const dcNguyenQuan = {
+            maXaNguyenQuan: this.nguyenQuan.value().maPhuongXa,
+            maHuyenNguyenQuan: this.nguyenQuan.value().maQuanHuyen,
+            maTinhNguyenQuan: this.nguyenQuan.value().maTinhThanhPho
+        };
+        const dcNoiSinh = {
+            maXaNoiSinh: this.noiSinh.value().maPhuongXa,
+            maHuyenNoiSinh: this.noiSinh.value().maQuanHuyen,
+            maTinhNoiSinh: this.noiSinh.value().maTinhThanhPho
+        };
         this.main.current.classList.add('validated');
         if (data.data) {
             if (this.urlSHCC) {
-                this.props.updateStaff(this.urlSHCC, data.data, () => {
+                this.props.updateStaff(this.urlSHCC, Object.assign(data.data, dcThuongTru, dcHienTai, dcNguyenQuan, dcNoiSinh), () => {
                     this.main.current.classList.remove('validated');
-                    this.props.history.push('/user/staff');
+                    this.props.history.push(`/user/staff/${data.data.shcc}`);
                 });
             } else {
-                this.props.createStaff(data.data, data => {
+                this.props.createStaff(Object.assign(data.data, dcThuongTru, dcHienTai, dcNguyenQuan, dcNoiSinh), data => {
                     this.props.history.push(`/user/staff/${data.item.shcc}`);
                 });
             }
@@ -1832,6 +1833,12 @@ class CanBoEditPage extends QTForm {
         this.props.downloadWordLlkh(this.urlSHCC, data => {
             T.FileSaver(new Blob([new Uint8Array(data.data)]), (this.state.hoTen ? this.state.hoTen + '_' : '') + this.urlSHCC + '_LLKH.docx');
         });
+    }
+
+    copyAddress = e => {
+        e.preventDefault();
+        const dataThuongTru = this.thuongTru.value();
+        this.hienTai.value(dataThuongTru.maTinhThanhPho, dataThuongTru.maQuanHuyen, dataThuongTru.maPhuongXa, dataThuongTru.soNhaDuong);
     }
 
     render() {
@@ -2200,7 +2207,6 @@ class CanBoEditPage extends QTForm {
         });
 
         const voChongText = this.state.phai ? (this.state.phai == '01' ? 'vợ' : 'chồng') : '';
-
         return (
             <main ref={this.main} className='app-content'>
                 <div className='app-title'>
@@ -2209,28 +2215,32 @@ class CanBoEditPage extends QTForm {
                 <div className='tile'>
                     <h3 className='tile-title'>Thông tin cá nhân</h3>
                     <div className='tile-body row'>
-                        <div className='form-group col-xl-3 col-md-6'><TextInput ref={this.shcc} label='Mã thẻ cán bộ' disabled={readOnly} required placeholder='Nhập mã thẻ cán bộ' maxLength={10} /></div>
-                        <div className='form-group col-xl-4 col-md-6'><TextInput ref={this.ho} label='Họ và tên lót' disabled={readOnly} required maxLength={100} /></div>
-                        <div className='form-group col-xl-3 col-md-6'><TextInput ref={this.ten} label='Tên' disabled={readOnly} required maxLength={30} /></div>
-                        <div className='form-group col-xl-2 col-md-6'><TextInput ref={this.biDanh} label='Bí danh' disabled={readOnly} maxLength={20} /></div>
+                        <div className='form-group col-xl-3 col-md-5'><TextInput ref={this.shcc} label='Mã thẻ cán bộ' disabled={readOnly} required placeholder='Nhập mã thẻ cán bộ' maxLength={10} /></div>
+                        <div className='form-group col-xl-3 col-md-5'><TextInput ref={this.ho} label='Họ và tên lót' disabled={readOnly} required maxLength={100} /></div>
+                        <div className='form-group col-xl-3 col-md-5'><TextInput ref={this.ten} label='Tên' disabled={readOnly} required maxLength={30} /></div>
+                        <div className='form-group col-xl-3 col-md-5'><TextInput ref={this.biDanh} label='Bí danh' disabled={readOnly} maxLength={20} /></div>
                         <div className='form-group col-xl-4 col-md-6'><DateInput ref={this.ngaySinh} label='Ngày sinh' disabled={readOnly} min={new Date(1900, 1, 1).getTime()} max={Date.nextYear(-10).roundDate().getTime()} /></div>
-                        <div className='form-group col-xl-4 col-md-6'><TextInput ref={this.cmnd} label='CMND' placeholder='Nhập CMND / CCCD' disabled={readOnly} maxLength={15} /></div>
+                        <div className='form-group col-xl-4 col-md-6'><TextInput ref={this.dienThoaiCaNhan} label='Số điện thoại cá nhân' disabled={readOnly} maxLength={20} /></div>
+                        <div className='form-group col-xl-4 col-md-6'><TextInput ref={this.dienThoaiBaoTin} label='Số điện thoại báo tin' disabled={readOnly} maxLength={20} /></div>
+                        <div className='form-group col-xl-4 col-md-6'><TextInput ref={this.cmnd} label='CMND / CCCD' placeholder='Nhập CMND / CCCD' disabled={readOnly} maxLength={15} /></div>
                         <div className='form-group col-xl-4 col-md-6'><DateInput ref={this.cmndNgayCap} label='Ngày cấp' disabled={readOnly} min={new Date(1900, 1, 1).getTime()} max={new Date().getTime()} /></div>
-                        <div className='form-group col-xl-4 col-md-6'><TextInput ref={this.cmndNoiCap} label='Nơi cấp cmnd' placeholder='Nhập nơi cấp cmnd' disabled={readOnly} maxLength={200} /></div>
-                        <div className='form-group col-xl-4 col-md-6'><TextInput ref={this.emailCaNhan} label='Địa chỉ email cá nhân' disabled={readOnly} maxLength={50} /></div>
-                        <div className='form-group col-xl-4 col-md-6'><TextInput ref={this.email} label='Địa chỉ email trường' disabled={readOnly} maxLength={50} /></div>
-                        <div className='form-group col-xl-3 col-md-6'><Select ref={this.phai} adapter={SelectAdapter_DmGioiTinh} label='Giới tính' disabled={readOnly} required /></div>
-                        <div className='form-group col-xl-3 col-md-6'><TextInput ref={this.dienThoaiCaNhan} label='Số điện thoại cá nhân' disabled={readOnly} maxLength={20} /></div>
-                        <div className='form-group col-xl-3 col-md-6'><TextInput ref={this.dienThoaiBaoTin} label='Số điện thoại báo tin' disabled={readOnly} maxLength={20} /></div>
-                        <div className='form-group col-xl-3 col-md-6'><Select ref={this.nhomMau} adapter={SelectAdapter_DmNhomMau} label='Nhóm máu' disabled={readOnly} /></div>
-                        <div className='form-group col-xl-3 col-md-6'><Select ref={this.danToc} adapter={SelectAdapter_DmDanToc} label='Dân tộc' required /></div>
-                        <div className='form-group col-xl-3 col-md-6'><Select ref={this.quocGia} adapter={SelectAdapter_DmQuocGia} label='Quốc gia' required /></div>
-                        <div className='form-group col-xl-3 col-md-6'><Select ref={this.tonGiao} adapter={SelectAdapter_DmTonGiao} label='Tôn giáo' required /></div>
-                        <div className='form-group col-xl-3 col-md-6'><TextInput ref={this.soBhxh} label='Số BHXH' /></div>
-                        <div className='form-group col-md-6'><TextInput ref={this.hoKhau} label='Hộ khẩu' disabled={readOnly} maxLength={200} /></div>
-                        <div className='form-group col-md-6'><TextInput ref={this.diaChiHienTai} label='Địa chỉ hiện tại' disabled={readOnly} maxLength={200} /></div>
-                        <div className='form-group col-md-6'><TextInput ref={this.noiSinh} label='Nơi sinh' disabled={readOnly} maxLength={200} /></div>
-                        <div className='form-group col-md-6'><TextInput ref={this.queQuan} label='Quê quán' disabled={readOnly} maxLength={200} /></div>
+                        <div className='form-group col-xl-4 col-md-6'><TextInput ref={this.cmndNoiCap} label='Nơi cấp CMND / CCCD' placeholder='Nhập nơi cấp cmnd' disabled={readOnly} maxLength={200} /></div>
+                        <div className='form-group col-xl-6 col-md-6'><TextInput ref={this.emailCaNhan} label='Địa chỉ email cá nhân' disabled={readOnly} maxLength={50} /></div>
+                        <div className='form-group col-xl-6 col-md-6'><TextInput ref={this.email} label='Địa chỉ email trường' disabled={readOnly} maxLength={50} /></div>
+                        <div className='form-group col-xl-4 col-md-6'><Select ref={this.phai} adapter={SelectAdapter_DmGioiTinh} label='Giới tính' disabled={readOnly} required /></div>
+                        <div className='form-group col-xl-4 col-md-6'><Select ref={this.nhomMau} adapter={SelectAdapter_DmNhomMau} label='Nhóm máu' disabled={readOnly} /></div>
+                        <div className='form-group col-xl-4 col-md-6'><Select ref={this.danToc} adapter={SelectAdapter_DmDanToc} label='Dân tộc' required /></div>
+                        <div className='form-group col-xl-4 col-md-6'><Select ref={this.quocGia} adapter={SelectAdapter_DmQuocGia} label='Quốc gia' required /></div>
+                        <div className='form-group col-xl-4 col-md-6'><Select ref={this.tonGiao} adapter={SelectAdapter_DmTonGiao} label='Tôn giáo' required /></div>
+                        <div className='form-group col-xl-4 col-md-6'><TextInput ref={this.soBhxh} label='Số BHXH' /></div>
+                        <div className='form-group col-12' />
+                        <ComponentDiaDiem ref={e => this.nguyenQuan = e} label='Nguyên quán' className='col-md-12' />
+                        <ComponentDiaDiem ref={e => this.noiSinh = e} label='Nơi sinh' className='col-md-12' />
+                        <ComponentDiaDiem ref={e => this.thuongTru = e} label='Địa chỉ thường trú' className='col-md-12' requiredSoNhaDuong={true} />
+                        <p className='col-md-12'>
+                            Nếu <b>Địa chỉ thường trú</b> là <b>Địa chỉ hiện tại</b> thì&nbsp;<a href='#' onClick={this.copyAddress}>nhấp vào đây</a>.
+                        </p>
+                        <ComponentDiaDiem ref={e => this.hienTai = e} label='Địa chỉ hiện tại' className='col-md-12' requiredSoNhaDuong={true} />
                         <div className='form-group col-xl-3 col-md-6'><TextInput ref={this.soTruong} label='Sở trường' disabled={readOnly} maxLength={100} /></div>
                         <div className='form-group col-xl-3 col-md-6'><TextInput ref={this.sucKhoe} label='Sức khỏe' disabled={readOnly} maxLength={100} /></div>
                         <div className='form-group col-xl-3 col-md-6'><NumberInput ref={this.canNang} label='Cân nặng(kg)' disabled={readOnly} min={0} step={0.1} /></div>
