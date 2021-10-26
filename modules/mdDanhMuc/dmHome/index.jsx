@@ -10,6 +10,14 @@ export default {
             component: () => <SubMenusPage menuLink='/user/tccb' menuKey={3000} headerIcon='fa-list-alt' />
         },
         {
+            path: '/user/truyen-thong',
+            component: () => <SubMenusPage menuLink='/user/truyen-thong' menuKey={5000} headerIcon='fa-list-alt' />
+        },
+        {
+            path: '/user/settings',
+            component: () => <SubMenusPage menuLink='/user/settings' menuKey={2000} headerIcon='fa-list-alt' />
+        },
+        {
             path: '/user/category',
             component: () => <SubMenusPage menuLink='/user/category' menuKey={4000} headerIcon='fa-list-alt' />
         },

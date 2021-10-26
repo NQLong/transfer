@@ -61,6 +61,12 @@ module.exports = (app) => {
     // Do Google login callback action
     app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/login-fail' }), (req, res) => {
         console.log('successRedirect', req.user);
-        app.updateSessionUser(req, req.user, () => res.redirect('/user'));
+        // const redirectUrl = req.cookies.userUrl && req.cookies.userUrl.startsWith('/user') ? req.cookies.userUrl : '/user';
+        // const processRoute = req.session.processRoute;
+        app.updateSessionUser(req, req.user, () => {
+            res.redirect('/user');
+            // delete req.session.processRoute;
+        });
+        // app.updateSessionUser(req, req.user, () => res.redirect('/user'));
     });
 };

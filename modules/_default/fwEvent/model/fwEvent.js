@@ -147,6 +147,8 @@ module.exports = app => {
 
     app.model.fwEvent.getByLink = (link, done) => app.model.fwEvent.get({ link }, done);
 
+    app.model.fwEvent.getByEnLink = (linkEn, done) => app.model.fwEvent.get({ linkEn }, done);
+
     app.model.fwEvent.read = (condition, done) => {
         app.model.fwEvent.getAll(condition, (error, items) => {
             if (error) {

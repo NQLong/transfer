@@ -64,6 +64,10 @@ const T = {
                 // setTimeout(() => $('.app-sidebar').animate({ scrollTop: menuItem.offset().top - menuItem.parent().parent().offset().top }), 200);
             }
         }
+        // Update user url
+        const userUrl = window.location.pathname;
+        if (userUrl.startsWith('/user')) T.cookie('userUrl', userUrl);
+
     }, 500)),
 
     url: (url) => url + (url.indexOf('?') === -1 ? '?t=' : '&t=') + new Date().getTime(),

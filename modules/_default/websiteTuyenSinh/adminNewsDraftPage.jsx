@@ -66,7 +66,7 @@ class NewsWaitApprovalPage extends React.Component {
     reject = React.createRef();
 
     componentDidMount() {
-        T.ready('/user/news/draft-admission', () => {
+        T.ready('/user/truyen-thong', () => {
             this.props.getDraftAdmissionNewsInPage(null, null, { isDraftApproved: 1, isTranslated: { $ne: 'in progress' } }, data => {
                 this.setState({ ...data });
             });

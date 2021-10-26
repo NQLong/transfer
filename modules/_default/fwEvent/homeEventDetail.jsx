@@ -52,7 +52,7 @@ class EventDetail extends React.Component {
                 return (<a key={index} href='#' className='tag-cloud-link'>{T.language.parse(categoryItem.text)}</a>);
             });
             let content = T.language.parse(item.content)
-                .replaceAll('<strong>', '<b style="font-weight: bold;color:black;">')
+                .replaceAll('<strong>', '<b style="font-weight: bold;">')
                 .replaceAll('</strong>', '</b>');
 
             return (

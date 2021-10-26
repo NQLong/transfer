@@ -301,7 +301,7 @@ class ProfilePage extends QTForm {
                     let { dienThoai, ngaySinh } = user ? user : { dienThoai: '', ngaySinh: '' };
                     $('#ngaySinh').val(ngaySinh ? T.dateToText(ngaySinh, 'dd/mm/yyyy') : '');
                     $('#dienThoai').val(dienThoai);
-                    this.phai.current.setText(user.phai ? sexMapper[user.phai] || '' : '');
+                    this.phai.current.setText(user.phai ? sexMapper[user.phai] || '01' : '01');
                 }
                 setTimeout(() => {
 
@@ -619,9 +619,9 @@ class ProfilePage extends QTForm {
                 <div className='app-title'>
                     <h1><i className='fa fa-user' /> Thông tin cá nhân</h1>
                 </div>
-                {user && !user.isStaff ? <div className='tile'>
+                {true ? <div className='tile' >
                     <h3 className='tile-title'>Thông tin cá nhân</h3>
-                    <div className='tile-body'>
+                    <div className='tile-body' >
                         <div className='row'>
                             <div className='col-12 col-lg-8 order-2 order-lg-1' style={{ paddingTop: 10 }}>
                                 <div className='form-group'>

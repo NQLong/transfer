@@ -13,8 +13,9 @@ class EventPage extends React.Component {
 
 
     componentDidMount() {
-        this.props.getEventInPage(null, null, {});
-        T.ready();
+        T.ready('/user/truyen-thong', () => {
+            this.props.getEventInPage(null, null, {});
+        });
     }
 
     getPage = (pageNumber, pageSize, pageCondition) => {
