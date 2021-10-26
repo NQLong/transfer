@@ -29,7 +29,7 @@ import TextInput, { DateInput, NumberInput, Select, BooleanInput } from 'view/co
 import { QTForm } from 'view/component/Form';
 import { ComponentDiaDiem } from 'modules/mdDanhMuc/dmDiaDiem/componentDiaDiem';
 
-const sexMapper = { '01': 'Nam', '02': 'Nữ' };
+const genderMapper = { '01': 'Nam', '02': 'Nữ' };
 
 class RelationModal extends React.Component {
     modal = React.createRef();
@@ -303,7 +303,7 @@ class ProfilePage extends QTForm {
                     let { dienThoai, ngaySinh } = user ? user : { dienThoai: '', ngaySinh: '' };
                     $('#ngaySinh').val(ngaySinh ? T.dateToText(ngaySinh, 'dd/mm/yyyy') : '');
                     $('#dienThoai').val(dienThoai);
-                    this.phai.current.setText(user.phai ? sexMapper[user.phai] || '01' : '01');
+                    this.phai.current.setText(user.phai ? genderMapper[user.phai] || '01' : '01');
                 }
                 setTimeout(() => {
 
