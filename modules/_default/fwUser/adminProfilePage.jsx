@@ -33,54 +33,47 @@ import { ComponentDiaDiem } from 'modules/mdDanhMuc/dmDiaDiem/componentDiaDiem';
 const genderMapper = { '01': 'Nam', '02': 'Nữ' };
 
 class RelationModal extends React.Component {
-    modal = React.createRef();
-    hoTen = React.createRef();
-    namSinh = React.createRef();
-    ngheNghiep = React.createRef();
-    noiCongTac = React.createRef();
-    moiQuanHe = React.createRef();
-    diaChi = React.createRef();
 
     componentDidMount() {
         $(document).ready(() => setTimeout(() => {
-            $(this.modal.current).on('shown.bs.modal', () => $(this.hoTen.current).focus());
+            $(this.modal).on('shown.bs.modal', () => $(this.hoTen).focus());
         }, 250));
     }
 
     show = (item, type, shcc) => {
         let { hoTen, moiQuanHe, namSinh, ngheNghiep, noiCongTac, diaChi, id } = item ? item : { hoTen: '', moiQuanHe: '', namSinh: '', ngheNghiep: '', noiCongTac: '', diaChi: '', id: null };
-        this.hoTen.current.setVal(hoTen);
-        this.moiQuanHe.current.setVal(moiQuanHe);
-        this.namSinh.current.setVal(namSinh);
-        this.ngheNghiep.current.setVal(ngheNghiep);
-        this.noiCongTac.current.setVal(noiCongTac);
-        this.diaChi.current.setVal(diaChi);
-        $(this.modal.current).data('id', id).data('shcc', shcc).data('type', type).modal('show');
+        this.hoTen.setVal(hoTen);
+        this.moiQuanHe.setVal(moiQuanHe);
+        this.namSinh.setVal(namSinh);
+        this.ngheNghiep.setVal(ngheNghiep);
+        this.noiCongTac.setVal(noiCongTac);
+        this.diaChi.setVal(diaChi);
+        $(this.modal).data('id', id).data('shcc', shcc).data('type', type).modal('show');
     }
 
     save = (e) => {
         e.preventDefault();
-        const id = $(this.modal.current).data('id'),
-            shcc = $(this.modal.current).data('shcc'),
-            type = $(this.modal.current).data('type'),
+        const id = $(this.modal).data('id'),
+            shcc = $(this.modal).data('shcc'),
+            type = $(this.modal).data('type'),
             changes = {
-                hoTen: this.hoTen.current.getVal(),
-                moiQuanHe: this.moiQuanHe.current.getVal(),
-                namSinh: this.namSinh.current.getVal(),
-                ngheNghiep: this.ngheNghiep.current.getVal(),
-                noiCongTac: this.noiCongTac.current.getVal(),
-                diaChi: this.diaChi.current.getVal()
+                hoTen: this.hoTen.getVal(),
+                moiQuanHe: this.moiQuanHe.getVal(),
+                namSinh: this.namSinh.getVal(),
+                ngheNghiep: this.ngheNghiep.getVal(),
+                noiCongTac: this.noiCongTac.getVal(),
+                diaChi: this.diaChi.getVal()
             };
         if (id) {
             this.props.update(id, changes, shcc, error => {
                 if (error == undefined || error == null) {
-                    $(this.modal.current).modal('hide');
+                    $(this.modal).modal('hide');
                 }
             });
         } else {
             changes.shcc = shcc;
             changes.type = type;
-            this.props.create(changes, shcc, () => $(this.modal.current).modal('hide'));
+            this.props.create(changes, shcc, () => $(this.modal).modal('hide'));
         }
     }
 
@@ -98,13 +91,12 @@ class RelationModal extends React.Component {
                             </button>
                         </div>
                         <div className='modal-body row'>
-                            <div className='form-group col-md-6'><TextInput ref={this.hoTen} label='Họ và tên' required maxLength={250} /></div>
-                            <div className='form-group col-md-6'><Select ref={this.moiQuanHe} adapter={SelectAdapter_DmQuanHeGiaDinh} label='Mối quan hệ' required /></div>
-
-                            <div className='form-group col-md-8'><TextInput ref={this.namSinh} label='Năm sinh' max={Date.nextYear().getTime()} required /></div>
-                            <div className='form-group col-md-4'><TextInput ref={this.ngheNghiep} label='Nghề nghiệp' maxLength={100} /></div>
-                            <div className='form-group col-md-12'><TextInput ref={this.noiCongTac} label='Nơi công tác' maxLength={100} /></div>
-                            <div className='form-group col-md-12'><TextInput ref={this.diaChi} label='Địa chỉ hiện tại' maxLength={200} /></div>
+                            <div className='form-group col-md-6'><TextInput ref={e => this.hoTen = e} label='Họ và tên' required maxLength={250} /></div>
+                            <div className='form-group col-md-6'><Select ref={e => this.moiQuanHe = e} adapter={SelectAdapter_DmQuanHeGiaDinh} label='Mối quan hệ' required /></div>
+                            <div className='form-group col-md-8'><TextInput ref={e => this.namSinh = e} label='Năm sinh' max={Date.nextYear().getTime()} required /></div>
+                            <div className='form-group col-md-4'><TextInput ref={e => this.ngheNghiep = e} label='Nghề nghiệp' maxLength={100} /></div>
+                            <div className='form-group col-md-12'><TextInput ref={e => this.noiCongTac = e} label='Nơi công tác' maxLength={100} /></div>
+                            <div className='form-group col-md-12'><TextInput ref={e => this.diaChi = e} label='Địa chỉ hiện tại' maxLength={200} /></div>
                         </div>
                         <div className='modal-footer'>
                             <button type='button' className='btn btn-secondary' data-dismiss='modal'>Đóng</button>
@@ -118,36 +110,33 @@ class RelationModal extends React.Component {
 }
 
 class TrinhDoNNModal extends React.Component {
-    modal = React.createRef();
-    loaiNgonNgu = React.createRef();
-    trinhDo = React.createRef();
 
     show = (item, shcc) => {
         let { loaiNgonNgu, trinhDo, id } = item ? item : { loaiNgonNgu: null, trinhDo: '', id: null };
-        this.loaiNgonNgu.current.setVal(loaiNgonNgu);
-        this.trinhDo.current.setVal(trinhDo);
-        $(this.modal.current).data('id', id).data('shcc', shcc).modal('show');
+        this.loaiNgonNgu.setVal(loaiNgonNgu);
+        this.trinhDo.setVal(trinhDo);
+        $(this.modal).data('id', id).data('shcc', shcc).modal('show');
     }
 
     save = (e) => {
         e.preventDefault();
-        const id = $(this.modal.current).data('id'),
-            shcc = $(this.modal.current).data('shcc'),
+        const id = $(this.modal).data('id'),
+            shcc = $(this.modal).data('shcc'),
             changes = {
-                loaiNgonNgu: this.loaiNgonNgu.current.getVal(),
-                trinhDo: this.trinhDo.current.getVal()
+                loaiNgonNgu: this.loaiNgonNgu.getVal(),
+                trinhDo: this.trinhDo.getVal()
             };
         if (id) {
             this.props.update(id, changes, error => {
                 if (error == undefined || error == null) {
                     this.props.getData(shcc);
-                    $(this.modal.current).modal('hide');
+                    $(this.modal).modal('hide');
                 }
             });
         } else {
             changes.shcc = shcc;
             this.props.getData(shcc);
-            this.props.create(changes, () => $(this.modal.current).modal('hide'));
+            this.props.create(changes, () => $(this.modal).modal('hide'));
         }
     }
 
@@ -165,8 +154,8 @@ class TrinhDoNNModal extends React.Component {
                             </button>
                         </div>
                         <div className='modal-body row'>
-                            <div className='form-group col-md-6'><Select ref={this.loaiNgonNgu} adapter={SelectAdapter_DmNgoaiNgu} label='Loại ngôn ngữ' required /></div>
-                            <div className='form-group col-md-6'><TextInput ref={this.trinhDo} label='Trình độ' maxLength={100} /></div>
+                            <div className='form-group col-md-6'><Select ref={e => this.loaiNgonNgu = e} adapter={SelectAdapter_DmNgoaiNgu} label='Loại ngôn ngữ' required /></div>
+                            <div className='form-group col-md-6'><TextInput ref={e => this.trinhDo = e} label='Trình độ' maxLength={100} /></div>
                         </div>
                         <div className='modal-footer'>
                             <button type='button' className='btn btn-secondary' data-dismiss='modal'>Đóng</button>
@@ -183,95 +172,6 @@ class ProfilePage extends QTForm {
     constructor(props) {
         super(props);
         this.state = { user: null, canBo: null, doanVien: false, dangVien: false, nuocNgoai: false, ngayNhapNgu: NaN };
-        this.imageBox = React.createRef();
-        this.modalNN = React.createRef();
-
-        this.dienThoai = React.createRef();
-        this.phai = React.createRef();
-
-        this.shcc = React.createRef();
-        this.ho = React.createRef();
-        this.ten = React.createRef();
-        this.biDanh = React.createRef();
-        this.cmnd = React.createRef();
-        this.cmndNgayCap = React.createRef();
-        this.cmndNoiCap = React.createRef();
-        this.ngaySinh = React.createRef();
-        this.email = React.createRef();
-        this.emailCaNhan = React.createRef();
-        this.dienThoaiCaNhan = React.createRef();
-        this.dienThoaiBaoTin = React.createRef();
-        this.ngayBatDauCongTac = React.createRef();
-        this.ngayVao = React.createRef();
-        this.ngayCbgd = React.createRef();
-        this.ngayBienChe = React.createRef();
-        this.ngayNghi = React.createRef();
-        this.ngheNghiepCu = React.createRef();
-        this.ngach = React.createRef();
-        this.ngachMoi = React.createRef();
-        this.heSoLuong = React.createRef();
-        this.bacLuong = React.createRef();
-        this.mocNangLuong = React.createRef();
-        this.ngayHuongLuong = React.createRef();
-        this.tyLeVuotKhung = React.createRef();
-        this.phuCapCongViec = React.createRef();
-        this.ngayPhuCapCongViec = React.createRef();
-        this.maChucVu = React.createRef();
-        this.chucVuDang = React.createRef();
-        this.chucVuDoanThe = React.createRef();
-        this.chucVuKiemNhiem = React.createRef();
-        this.maTrinhDoLlct = React.createRef();
-        this.maTrinhDoQlnn = React.createRef();
-        this.maTrinhDoTinHoc = React.createRef();
-        this.danToc = React.createRef();
-        this.quocGia = React.createRef();
-        this.tonGiao = React.createRef();
-        this.dangVien = React.createRef();
-        this.maDonVi = React.createRef();
-        this.phucLoi = React.createRef();
-        this.nhaGiaoNhanDan = React.createRef();
-        this.nhaGiaoUuTu = React.createRef();
-        this.dangONuocNgoai = React.createRef();
-        this.lyDoONuocNgoai = React.createRef();
-        this.ghiChu = React.createRef();
-        this.phai = React.createRef();
-        this.modal = React.createRef();
-        this.main = React.createRef();
-        this.nhomMau = React.createRef();
-        this.doanVien = React.createRef();
-        this.ngayVaoDoan = React.createRef();
-        this.noiVaoDoan = React.createRef();
-        this.soTheDang = React.createRef();
-        this.ngayVaoDang = React.createRef();
-        this.noiDangDb = React.createRef();
-        this.ngayVaoDangChinhThuc = React.createRef();
-        this.noiDangCt = React.createRef();
-        this.ngayNhapNgu = React.createRef();
-        this.ngayXuatNgu = React.createRef();
-        this.quanHamCaoNhat = React.createRef();
-        this.soBhxh = React.createRef();
-        this.maTinhNoiSinh = React.createRef();
-        this.maHuyenNoiSinh = React.createRef();
-        this.maXaNoiSinh = React.createRef();
-        this.maTinhNguyenQuan = React.createRef();
-        this.maHuyenNguyenQuan = React.createRef();
-        this.maXaNguyenQuan = React.createRef();
-        this.ngheNghiepCu = React.createRef();
-        this.chucVuKhac = React.createRef();
-        this.hangThuongBinh = React.createRef();
-        this.giaDinhChinhSach = React.createRef();
-        this.danhHieu = React.createRef();
-        this.soTruong = React.createRef();
-        this.sucKhoe = React.createRef();
-        this.canNang = React.createRef();
-        this.chieuCao = React.createRef();
-        this.chucDanh = React.createRef();
-        this.hocVi = React.createRef();
-        this.trinhDoPhoThong = React.createRef();
-        this.chuyenNganh = React.createRef();
-        this.namChucDanh = React.createRef();
-        this.namHocVi = React.createRef();
-
         this.mapperQuanHe = {};
         this.mapperChucVu = {};
         this.mapperDonVi = {};
@@ -285,10 +185,8 @@ class ProfilePage extends QTForm {
             if (this.props.system && this.props.system.user) {
                 const user = this.props.system.user;
                 user.image = user.image || '/img/avatar.png';
-                this.imageBox.current.setData('profile', user.image);
-
+                this.imageBox.setData('profile', user.image);
                 this.setState({ user });
-
                 if (user.isStaff) {
                     this.props.getDmQuanHeGiaDinhAll(null, items => items.forEach(item => this.mapperQuanHe[item.ma] = item.ten));
                     this.props.getDmChucVuAll(null, items => items.forEach(item => this.mapperChucVu[item.ma] = item.ten));
@@ -301,7 +199,7 @@ class ProfilePage extends QTForm {
                     let { dienThoai, ngaySinh } = user ? user : { dienThoai: '', ngaySinh: '' };
                     $('#ngaySinh').val(ngaySinh ? T.dateToText(ngaySinh, 'dd/mm/yyyy') : '');
                     $('#dienThoai').val(dienThoai);
-                    this.phai.current.setText(user.phai ? genderMapper[user.phai] || '01' : '01');
+                    this.phai.setText(user.phai ? genderMapper[user.phai] || '01' : '01');
                 }
                 setTimeout(() => {
 
@@ -346,125 +244,131 @@ class ProfilePage extends QTForm {
             phai = '', nhomMau = '', ngayVaoDang = '', ngayVaoDangChinhThuc = '', ngayNhapNgu = '', ngayXuatNgu = '', quanHamCaoNhat = '', soBhxh = '',
             soTheDang = '', noiDangDb = '', noiDangCt = '', doanVien = false, ngayVaoDoan = '', noiVaoDoan = '', ngheNghiepCu = '', quocGia = null, hangThuongBinh = '', giaDinhChinhSach = '',
             danhHieu = '', soTruong = '', sucKhoe = '', canNang = '', chieuCao = '' } = data.constructor === ({}).constructor ? data : {};
-        this.cmnd.current.setVal(cmnd);
-        this.shcc.current.setVal(shcc);
-        this.ho.current.setVal(ho);
-        this.ten.current.setVal(ten);
-        this.biDanh.current.setVal(biDanh);
-        this.cmndNgayCap.current.setVal(cmndNgayCap);
-        this.cmndNoiCap.current.setVal(cmndNoiCap);
-        this.ngaySinh.current.setVal(ngaySinh);
-        this.dienThoaiCaNhan.current.setVal(dienThoaiCaNhan);
-        this.dienThoaiBaoTin.current.setVal(dienThoaiBaoTin);
-        this.email.current.setVal(email);
-        this.emailCaNhan.current.setVal(emailCaNhan);
-        this.ngaySinh.current.setVal(ngaySinh);
-        this.doanVien.current.setVal(doanVien);
-        this.dangVien.current.setVal(dangVien);
+        if (this.state.canBo) {
+            this.cmnd.setVal(cmnd);
+            this.shcc.setVal(shcc);
+            this.ho.setVal(ho);
+            this.ten.setVal(ten);
+            this.biDanh.setVal(biDanh);
+            this.cmndNgayCap.setVal(cmndNgayCap);
+            this.cmndNoiCap.setVal(cmndNoiCap);
+            this.ngaySinh.setVal(ngaySinh);
+            this.dienThoaiCaNhan.setVal(dienThoaiCaNhan);
+            this.dienThoaiBaoTin.setVal(dienThoaiBaoTin);
+            this.email.setVal(email);
+            this.emailCaNhan.setVal(emailCaNhan);
+            this.ngaySinh.setVal(ngaySinh);
+            this.doanVien.setVal(doanVien);
+            this.dangVien.setVal(dangVien);
+            this.quocGia.setVal(quocGia);
 
-        this.quocGia.current.setVal(quocGia);
+            this.maTrinhDoLlct.setVal(maTrinhDoLlct);
+            this.maTrinhDoQlnn.setVal(maTrinhDoQlnn);
+            this.maTrinhDoTinHoc.setVal(maTrinhDoTinHoc);
+            this.danToc.setVal(danToc);
+            this.tonGiao.setVal(tonGiao);
+
+            this.thuongTru.value(thuongTruMaTinh, thuongTruMaHuyen, thuongTruMaXa, thuongTruSoNha);
+            this.hienTai.value(hienTaiMaTinh, hienTaiMaHuyen, hienTaiMaXa, hienTaiSoNha);
+            this.nguyenQuan.value(maTinhNguyenQuan, maHuyenNguyenQuan, maXaNguyenQuan);
+            this.noiSinh.value(maTinhNoiSinh, maHuyenNoiSinh, maXaNoiSinh);
+
+            this.dangONuocNgoai.setVal(dangONuocNgoai);
+            this.phai.setVal(phai);
+            this.nhomMau.setVal(nhomMau);
+            this.soBhxh.setVal(soBhxh);
+            this.quanHamCaoNhat.setVal(quanHamCaoNhat);
+            this.ngayNhapNgu.setVal(ngayNhapNgu);
+            this.ngayXuatNgu.setVal(ngayXuatNgu);
+            this.hangThuongBinh.setVal(hangThuongBinh);
+            this.giaDinhChinhSach.setVal(giaDinhChinhSach);
+            this.danhHieu.setVal(danhHieu);
+            this.soTruong.setVal(soTruong);
+            this.sucKhoe.setVal(sucKhoe);
+            this.canNang.setVal(canNang);
+            this.chieuCao.setVal(chieuCao);
+            this.ngheNghiepCu.setVal(ngheNghiepCu);
+            this.chucDanh.setVal(chucDanh);
+            this.hocVi.setVal(hocVi);
+            this.chuyenNganh.setVal(chuyenNganh);
+            this.namChucDanh.setVal(namChucDanh);
+            this.namHocVi.setVal(namHocVi);
+            this.trinhDoPhoThong.setVal(trinhDoPhoThong);
+        }
+
         if (this.state.doanVien) {
-            this.ngayVaoDoan.current.setVal(ngayVaoDoan);
-            this.noiVaoDoan.current.setVal(noiVaoDoan);
+            this.ngayVaoDoan.setVal(ngayVaoDoan);
+            this.noiVaoDoan.setVal(noiVaoDoan);
         }
-        if (this.state.dangVien) {
-            this.ngayVaoDang.current.setVal(ngayVaoDang);
-            this.ngayVaoDangChinhThuc.current.setVal(ngayVaoDangChinhThuc);
-            this.noiDangDb.current.setVal(noiDangDb);
-            this.noiDangCt.current.setVal(noiDangCt);
-            this.soTheDang.current.setVal(soTheDang);
+        if (this.state.dangVien && this.state.canBo) {
+            console.log(this.state.dangVien);
+            this.ngayVaoDang.setVal(ngayVaoDang);
+            this.ngayVaoDangChinhThuc.setVal(ngayVaoDangChinhThuc);
+            this.noiDangDb.setVal(noiDangDb);
+            this.noiDangCt.setVal(noiDangCt);
+            this.soTheDang.setVal(soTheDang);
         }
-        this.maTrinhDoLlct.current.setVal(maTrinhDoLlct);
-        this.maTrinhDoQlnn.current.setVal(maTrinhDoQlnn);
-        this.maTrinhDoTinHoc.current.setVal(maTrinhDoTinHoc);
-        this.danToc.current.setVal(danToc);
-        this.tonGiao.current.setVal(tonGiao);
 
-        this.thuongTru.value(thuongTruMaTinh, thuongTruMaHuyen, thuongTruMaXa, thuongTruSoNha);
-        this.hienTai.value(hienTaiMaTinh, hienTaiMaHuyen, hienTaiMaXa, hienTaiSoNha);
-        this.nguyenQuan.value(maTinhNguyenQuan, maHuyenNguyenQuan, maXaNguyenQuan);
-        this.noiSinh.value(maTinhNoiSinh, maHuyenNoiSinh, maXaNoiSinh);
+        if (this.state.nuocNgoai && this.state.canBo) this.lyDoONuocNgoai.setVal(lyDoONuocNgoai);
 
-        this.dangONuocNgoai.current.setVal(dangONuocNgoai);
-        if (this.state.nuocNgoai) this.lyDoONuocNgoai.current.setVal(lyDoONuocNgoai);
-        this.phai.current.setVal(phai);
-        this.nhomMau.current.setVal(nhomMau);
-        this.soBhxh.current.setVal(soBhxh);
-        this.quanHamCaoNhat.current.setVal(quanHamCaoNhat);
-        this.ngayNhapNgu.current.setVal(ngayNhapNgu);
-        this.ngayXuatNgu.current.setVal(ngayXuatNgu);
-        this.hangThuongBinh.current.setVal(hangThuongBinh);
-        this.giaDinhChinhSach.current.setVal(giaDinhChinhSach);
-        this.danhHieu.current.setVal(danhHieu);
-        this.soTruong.current.setVal(soTruong);
-        this.sucKhoe.current.setVal(sucKhoe);
-        this.canNang.current.setVal(canNang);
-        this.chieuCao.current.setVal(chieuCao);
-        this.ngheNghiepCu.current.setVal(ngheNghiepCu);
-        this.chucDanh.current.setVal(chucDanh);
-        this.hocVi.current.setVal(hocVi);
-        this.chuyenNganh.current.setVal(chuyenNganh);
-        this.namChucDanh.current.setVal(namChucDanh);
-        this.namHocVi.current.setVal(namHocVi);
-        this.trinhDoPhoThong.current.setVal(trinhDoPhoThong);
     };
 
     getVal = () => ({
-        shcc: this.shcc.current.getFormVal(),
-        ho: this.shcc.current.getFormVal(),
-        ten: this.shcc.current.getFormVal(),
-        biDanh: this.biDanh.current.getFormVal(),
-        cmnd: this.cmnd.current.getFormVal(),
-        cmndNgayCap: this.cmndNgayCap.current.getFormVal(),
-        cmndNoiCap: this.cmndNoiCap.current.getFormVal(),
-        ngaySinh: this.ngaySinh.current.getFormVal(),
-        dienThoaiCaNhan: this.dienThoaiCaNhan.current.getFormVal(),
-        dienThoaiBaoTin: this.dienThoaiBaoTin.current.getFormVal(),
-        email: this.email.current.getFormVal(),
-        quocGia: this.quocGia.current.getFormVal(),
-        emailCaNhan: this.emailCaNhan.current.getFormVal(),
-        doanVien: this.doanVien.current.getFormVal(),
-        dangVien: this.dangVien.current.getFormVal(),
-        ngayVaoDoan: this.state.doanVien ? this.ngayVaoDoan.current.getFormVal() : {},
-        noiVaoDoan: this.state.doanVien ? this.noiVaoDoan.current.getFormVal() : {},
-        soTheDang: this.state.dangVien ? this.soTheDang.current.getFormVal() : {},
-        ngayVaoDang: this.state.dangVien ? this.ngayVaoDang.current.getFormVal() : {},
-        ngayVaoDangChinhThuc: this.state.dangVien ? this.ngayVaoDangChinhThuc.current.getFormVal() : {},
-        noiDangDb: this.state.dangVien ? this.noiDangDb.current.getFormVal() : {},
-        noiDangCt: this.state.dangVien ? this.noiDangCt.current.getFormVal() : {},
-        maTrinhDoLlct: this.maTrinhDoLlct.current.getFormVal(),
-        maTrinhDoQlnn: this.maTrinhDoQlnn.current.getFormVal(),
-        maTrinhDoTinHoc: this.maTrinhDoTinHoc.current.getFormVal(),
-        danToc: this.danToc.current.getFormVal(),
-        tonGiao: this.tonGiao.current.getFormVal(),
-        dangONuocNgoai: this.dangONuocNgoai.current.getFormVal(),
-        lyDoONuocNgoai: this.state.nuocNgoai ? this.lyDoONuocNgoai.current.getFormVal() : '',
-        phai: this.phai.current.getFormVal(),
-        nhomMau: this.nhomMau.current.getFormVal(),
-        soBhxh: this.soBhxh.current.getFormVal(),
-        quanHamCaoNhat: this.quanHamCaoNhat.current.getFormVal(),
-        ngayNhapNgu: this.ngayNhapNgu.current.getFormVal(),
-        ngayXuatNgu: this.ngayXuatNgu.current.getFormVal(),
-        hangThuongBinh: this.hangThuongBinh.current.getFormVal(),
-        giaDinhChinhSach: this.giaDinhChinhSach.current.getFormVal(),
-        danhHieu: this.danhHieu.current.getFormVal(),
-        soTruong: this.soTruong.current.getFormVal(),
-        sucKhoe: this.sucKhoe.current.getFormVal(),
-        canNang: this.canNang.current.getFormVal(),
-        chieuCao: this.chieuCao.current.getFormVal(),
-        ngheNghiepCu: this.ngheNghiepCu.current.getFormVal(),
-        chucDanh: this.chucDanh.current.getFormVal(),
-        hocVi: this.hocVi.current.getFormVal(),
-        chuyenNganh: this.chuyenNganh.current.getFormVal(),
-        namChucDanh: this.namChucDanh.current.getFormVal(),
-        namHocVi: this.namHocVi.current.getFormVal(),
-        trinhDoPhoThong: this.trinhDoPhoThong.current.getFormVal(),
+        shcc: this.shcc.getFormVal(),
+        ho: this.shcc.getFormVal(),
+        ten: this.shcc.getFormVal(),
+        biDanh: this.biDanh.getFormVal(),
+        cmnd: this.cmnd.getFormVal(),
+        cmndNgayCap: this.cmndNgayCap.getFormVal(),
+        cmndNoiCap: this.cmndNoiCap.getFormVal(),
+        ngaySinh: this.ngaySinh.getFormVal(),
+        dienThoaiCaNhan: this.dienThoaiCaNhan.getFormVal(),
+        dienThoaiBaoTin: this.dienThoaiBaoTin.getFormVal(),
+        email: this.email.getFormVal(),
+        quocGia: this.quocGia.getFormVal(),
+        emailCaNhan: this.emailCaNhan.getFormVal(),
+        doanVien: this.doanVien.getFormVal(),
+        dangVien: this.dangVien.getFormVal(),
+        ngayVaoDoan: this.state.doanVien ? this.ngayVaoDoan.getFormVal() : {},
+        noiVaoDoan: this.state.doanVien ? this.noiVaoDoan.getFormVal() : {},
+        soTheDang: this.state.dangVien ? this.soTheDang.getFormVal() : {},
+        ngayVaoDang: this.state.dangVien ? this.ngayVaoDang.getFormVal() : {},
+        ngayVaoDangChinhThuc: this.state.dangVien ? this.ngayVaoDangChinhThuc.getFormVal() : {},
+        noiDangDb: this.state.dangVien ? this.noiDangDb.getFormVal() : {},
+        noiDangCt: this.state.dangVien ? this.noiDangCt.getFormVal() : {},
+        maTrinhDoLlct: this.maTrinhDoLlct.getFormVal(),
+        maTrinhDoQlnn: this.maTrinhDoQlnn.getFormVal(),
+        maTrinhDoTinHoc: this.maTrinhDoTinHoc.getFormVal(),
+        danToc: this.danToc.getFormVal(),
+        tonGiao: this.tonGiao.getFormVal(),
+        dangONuocNgoai: this.dangONuocNgoai.getFormVal(),
+        lyDoONuocNgoai: this.state.nuocNgoai ? this.lyDoONuocNgoai.getFormVal() : '',
+        phai: this.phai.getFormVal(),
+        nhomMau: this.nhomMau.getFormVal(),
+        soBhxh: this.soBhxh.getFormVal(),
+        quanHamCaoNhat: this.quanHamCaoNhat.getFormVal(),
+        ngayNhapNgu: this.ngayNhapNgu.getFormVal(),
+        ngayXuatNgu: this.ngayXuatNgu.getFormVal(),
+        hangThuongBinh: this.hangThuongBinh.getFormVal(),
+        giaDinhChinhSach: this.giaDinhChinhSach.getFormVal(),
+        danhHieu: this.danhHieu.getFormVal(),
+        soTruong: this.soTruong.getFormVal(),
+        sucKhoe: this.sucKhoe.getFormVal(),
+        canNang: this.canNang.getFormVal(),
+        chieuCao: this.chieuCao.getFormVal(),
+        ngheNghiepCu: this.ngheNghiepCu.getFormVal(),
+        chucDanh: this.chucDanh.getFormVal(),
+        hocVi: this.hocVi.getFormVal(),
+        chuyenNganh: this.chuyenNganh.getFormVal(),
+        namChucDanh: this.namChucDanh.getFormVal(),
+        namHocVi: this.namHocVi.getFormVal(),
+        trinhDoPhoThong: this.trinhDoPhoThong.getFormVal(),
     })
 
     saveCommon = (e) => {
         e.preventDefault();
         const sexObject = { 'Nam': '01', 'Nữ': '02' };
-        let phai = this.phai.current.getSelectedItem(),
+        let phai = this.phai.getSelectedItem(),
             ngaySinh = $('#ngaySinh').val() || null,
             changes = { dienThoai: $('#dienThoai').val() };
         if (phai && sexObject[phai]) changes.phai = sexObject[phai];
@@ -496,16 +400,16 @@ class ProfilePage extends QTForm {
             maHuyenNoiSinh: this.noiSinh.value().maQuanHuyen,
             maTinhNoiSinh: this.noiSinh.value().maTinhThanhPho
         };
-        this.main.current.classList.add('validated');
-        form.data && this.props.updateStaffUser(Object.assign(form.data, dcThuongTru, dcHienTai, dcNguyenQuan, dcNoiSinh), () => this.main.current.classList.remove('validated'));
+        this.main.classList.add('validated');
+        form.data && this.props.updateStaffUser(Object.assign(form.data, dcThuongTru, dcHienTai, dcNguyenQuan, dcNoiSinh), () => this.main.classList.remove('validated'));
     };
 
     createQuanHe = (e, type) => {
         e.preventDefault();
-        this.modal.current.show(null, type, this.state.canBo.shcc);
+        this.modal.show(null, type, this.state.canBo.shcc);
     }
     editQuanHe = (e, item) => {
-        this.modal.current.show(item, null, this.state.canBo.shcc);
+        this.modal.show(item, null, this.state.canBo.shcc);
         e.preventDefault();
     }
     deleteQuanHe = (e, item) => {
@@ -516,11 +420,11 @@ class ProfilePage extends QTForm {
 
     createTrinhDoNN = (e) => {
         e.preventDefault();
-        this.modalNN.current.show(null, this.state.canBo.shcc);
+        this.modalNN.show(null, this.state.canBo.shcc);
     }
 
     editTrinhDoNN = (e, item) => {
-        this.modalNN.current.show(item, this.state.canBo.shcc);
+        this.modalNN.show(item, this.state.canBo.shcc);
         e.preventDefault();
     }
 
@@ -580,7 +484,6 @@ class ProfilePage extends QTForm {
         const item = this.state.canBo || {};
         const renderFieldText = (className, label, hasValue, value, noValue = 'Không có thông tin!') =>
             <div className={className}>{label}: <b>{hasValue ? value : noValue}</b></div>;
-        // const roundNumber = num => num ? parseFloat(num).toFixed(2) : '';
         if (itemsNN && itemsNN.length > 0) {
             tableNN = (
                 <table className='table table-hover table-bordered' ref={this.table}>
@@ -615,11 +518,11 @@ class ProfilePage extends QTForm {
             );
         }
         return (
-            <main ref={this.main} className='app-content'>
+            <main ref={e => this.main = e} className='app-content'>
                 <div className='app-title'>
                     <h1><i className='fa fa-user' /> Thông tin cá nhân</h1>
                 </div>
-                {true ? <div className='tile' >
+                {!this.state.canBo ? <div className='tile' >
                     <h3 className='tile-title'>Thông tin cá nhân</h3>
                     <div className='tile-body' >
                         <div className='row'>
@@ -636,7 +539,7 @@ class ProfilePage extends QTForm {
                                 </div>
                                 <div className='form-group' style={{ display: 'inline-flex' }}>
                                     <label className='control-label'>Giới tính:</label>&nbsp;
-                                    <Dropdown ref={this.phai} text='' items={T.sexes} />
+                                    <Dropdown ref={e => this.phai = e} text='' items={T.sexes} />
                                 </div>
                                 <div className='form-group'>
                                     <label className='control-label' htmlFor='dienThoai'>Số điện thoại</label>
@@ -650,7 +553,7 @@ class ProfilePage extends QTForm {
                             <div className='col-12 col-lg-4 order-1 order-lg-2'>
                                 <div className='form-group'>
                                     <label className='control-label'>Hình đại diện</label>
-                                    <ImageBox ref={this.imageBox} postUrl='/user/upload' uploadType='ProfileImage' userData='profile' image={this.state.user && this.state.user.image} />
+                                    <ImageBox ref={e => this.imageBox = e} postUrl='/user/upload' uploadType='ProfileImage' userData='profile' image={this.state.user && this.state.user.image} />
                                 </div>
                             </div>
                         </div>
@@ -666,30 +569,30 @@ class ProfilePage extends QTForm {
                         <div className='tile-body row'>
                             <div className='form-group col-md-3'>
                                 <label>Hình đại diện</label>
-                                <ImageBox ref={this.imageBox} postUrl='/user/upload' uploadType='ProfileImage' userData='profile' image={this.state.user && this.state.user.image} />
+                                <ImageBox ref={e => this.imageBox = e} postUrl='/user/upload' uploadType='ProfileImage' userData='profile' image={this.state.user && this.state.user.image} />
                             </div>
                             <div className='form-group col-md-9'>
                                 <div className='row'>
-                                    <div className='form-group col-md-4'><TextInput ref={this.shcc} label='Mã thẻ cán bộ' readOnly placeholder='Nhập mã thẻ cán bộ' maxLength={10} re /></div>
-                                    <div className='form-group col-md-4'><TextInput ref={this.ho} label='Họ và tên lót' required maxLength={100} /></div>
-                                    <div className='form-group col-md-4'><TextInput ref={this.ten} label='Tên' required maxLength={30} /></div>
-                                    <div className='form-group col-md-4'><TextInput ref={this.biDanh} label='Bí danh' maxLength={20} /></div>
-                                    <div className='form-group col-md-4'><DateInput ref={this.ngaySinh} label='Ngày sinh' min={new Date(1900, 1, 1).getTime()} max={Date.nextYear(-10).roundDate().getTime()} /></div>
-                                    <div className='form-group col-md-4'><Select ref={this.phai} adapter={SelectAdapter_DmGioiTinh} label='Giới tính' required /></div>
+                                    <div className='form-group col-md-4'><TextInput ref={e => this.shcc = e} label='Mã thẻ cán bộ' readOnly placeholder='Nhập mã thẻ cán bộ' maxLength={10} re /></div>
+                                    <div className='form-group col-md-4'><TextInput ref={e => this.ho = e} label='Họ và tên lót' required maxLength={100} /></div>
+                                    <div className='form-group col-md-4'><TextInput ref={e => this.ten = e} label='Tên' required maxLength={30} /></div>
+                                    <div className='form-group col-md-4'><TextInput ref={e => this.biDanh = e} label='Bí danh' maxLength={20} /></div>
+                                    <div className='form-group col-md-4'><DateInput ref={e => this.ngaySinh = e} label='Ngày sinh' min={new Date(1900, 1, 1).getTime()} max={Date.nextYear(-10).roundDate().getTime()} /></div>
+                                    <div className='form-group col-md-4'><Select ref={e => this.phai = e} adapter={SelectAdapter_DmGioiTinh} label='Giới tính' required /></div>
                                 </div>
                             </div>
-                            <div className='form-group col-md-4'><TextInput ref={this.cmnd} label='CMND/CCCD' placeholder='Nhập CMND / CCCD' maxLength={15} /></div>
-                            <div className='form-group col-md-4'><DateInput ref={this.cmndNgayCap} label='Ngày cấp' min={new Date(1900, 1, 1).getTime()} max={new Date().getTime()} /></div>
-                            <div className='form-group col-md-4'><TextInput ref={this.cmndNoiCap} label='Nơi cấp CMND/CCCD' placeholder='Nhập nơi cấp cmnd' maxLength={200} /></div>
-                            <div className='form-group col-md-6'><TextInput ref={this.emailCaNhan} label='Địa chỉ email cá nhân' maxLength={50} /></div>
-                            <div className='form-group col-md-6'><TextInput ref={this.email} label='Địa chỉ email trường' maxLength={50} /></div>
-                            <div className='form-group col-md-4'><TextInput ref={this.dienThoaiCaNhan} label='Số điện thoại cá nhân' maxLength={20} /></div>
-                            <div className='form-group col-md-4'><TextInput ref={this.dienThoaiBaoTin} label='Số điện thoại báo tin' maxLength={20} /></div>
-                            <div className='form-group col-md-4'><TextInput ref={this.soBhxh} label='Số BHXH' /></div>
-                            <div className='form-group col-xl-3 col-md-6'><Select ref={this.nhomMau} adapter={SelectAdapter_DmNhomMau} label='Nhóm máu' /></div>
-                            <div className='form-group col-xl-3 col-md-6'><Select ref={this.danToc} adapter={SelectAdapter_DmDanToc} label='Dân tộc' required /></div>
-                            <div className='form-group col-xl-3 col-md-6'><Select ref={this.quocGia} adapter={SelectAdapter_DmQuocGia} label='Quốc gia' required /></div>
-                            <div className='form-group col-xl-3 col-md-6'><Select ref={this.tonGiao} adapter={SelectAdapter_DmTonGiao} label='Tôn giáo' required /></div>
+                            <div className='form-group col-md-4'><TextInput ref={e => this.cmnd = e} label='CMND/CCCD' placeholder='Nhập CMND / CCCD' maxLength={15} /></div>
+                            <div className='form-group col-md-4'><DateInput ref={e => this.cmndNgayCap = e} label='Ngày cấp' min={new Date(1900, 1, 1).getTime()} max={new Date().getTime()} /></div>
+                            <div className='form-group col-md-4'><TextInput ref={e => this.cmndNoiCap = e} label='Nơi cấp CMND/CCCD' placeholder='Nhập nơi cấp cmnd' maxLength={200} /></div>
+                            <div className='form-group col-md-6'><TextInput ref={e => this.emailCaNhan = e} label='Địa chỉ email cá nhân' maxLength={50} /></div>
+                            <div className='form-group col-md-6'><TextInput ref={e => this.email = e} label='Địa chỉ email trường' maxLength={50} /></div>
+                            <div className='form-group col-md-4'><TextInput ref={e => this.dienThoaiCaNhan = e} label='Số điện thoại cá nhân' maxLength={20} /></div>
+                            <div className='form-group col-md-4'><TextInput ref={e => this.dienThoaiBaoTin = e} label='Số điện thoại báo tin' maxLength={20} /></div>
+                            <div className='form-group col-md-4'><TextInput ref={e => this.soBhxh = e} label='Số BHXH' /></div>
+                            <div className='form-group col-xl-3 col-md-6'><Select ref={e => this.nhomMau = e} adapter={SelectAdapter_DmNhomMau} label='Nhóm máu' /></div>
+                            <div className='form-group col-xl-3 col-md-6'><Select ref={e => this.danToc = e} adapter={SelectAdapter_DmDanToc} label='Dân tộc' required /></div>
+                            <div className='form-group col-xl-3 col-md-6'><Select ref={e => this.quocGia = e} adapter={SelectAdapter_DmQuocGia} label='Quốc gia' required /></div>
+                            <div className='form-group col-xl-3 col-md-6'><Select ref={e => this.tonGiao = e} adapter={SelectAdapter_DmTonGiao} label='Tôn giáo' required /></div>
                             <div className='form-group col-12' />
                             <ComponentDiaDiem ref={e => this.nguyenQuan = e} label='Nguyên quán' className='col-md-12' />
                             <ComponentDiaDiem ref={e => this.noiSinh = e} label='Nơi sinh' className='col-md-12' />
@@ -698,10 +601,10 @@ class ProfilePage extends QTForm {
                                 Nếu <b>Địa chỉ thường trú</b> là <b>Địa chỉ hiện tại</b> thì&nbsp;<a href='#' onClick={this.copyAddress}>nhấp vào đây</a>.
                             </p>
                             <ComponentDiaDiem ref={e => this.hienTai = e} label='Địa chỉ hiện tại' className='col-md-12' requiredSoNhaDuong={true} />
-                            <div className='form-group col-md-4'><TextInput ref={this.sucKhoe} label='Sức khỏe' maxLength={100} /></div>
-                            <div className='form-group col-md-4'><NumberInput ref={this.canNang} label='Cân nặng(kg)' min={0} step={0.1} /></div>
-                            <div className='form-group col-md-4'><NumberInput ref={this.chieuCao} label='Chiều cao(cm)' min={0} step={1} /></div>
-                            <div className='form-group col-md-6'><TextInput ref={this.soTruong} label='Sở trường' maxLength={100} /></div>
+                            <div className='form-group col-md-4'><TextInput ref={e => this.sucKhoe = e} label='Sức khỏe' maxLength={100} /></div>
+                            <div className='form-group col-md-4'><NumberInput ref={e => this.canNang = e} label='Cân nặng(kg)' min={0} step={0.1} /></div>
+                            <div className='form-group col-md-4'><NumberInput ref={e => this.chieuCao = e} label='Chiều cao(cm)' min={0} step={1} /></div>
+                            <div className='form-group col-md-6'><TextInput ref={e => this.soTruong = e} label='Sở trường' maxLength={100} /></div>
                         </div>
                     </div>,
                     <div className='tile' key={2}>
@@ -715,66 +618,66 @@ class ProfilePage extends QTForm {
                             <div className='col-12' />
                             {item.maDonVi ? renderFieldText('form-group col-md-6', 'Đơn vị', true, this.mapperDonVi[item.maDonVi]) : null}
                             <div className='col-12' />
-                            <div className='form-group col-md-4'><DateInput ref={this.ngayBatDauCongTac} label='Ngày bắt đầu công tác' min={new Date(1900, 1, 1).getTime()} max={new Date().getTime()} /></div>
-                            <div className='form-group col-md-4'><DateInput ref={this.ngayBienChe} label='Ngày biên chế' min={new Date(1900, 1, 1).getTime()} max={new Date().getTime()} /></div>
-                            <div className='form-group col-md-4'><TextInput ref={this.ngheNghiepCu} label='Nghế nghiệp trước khi tuyển dụng' maxLength={200} /></div>
+                            <div className='form-group col-md-4'><DateInput ref={e => this.ngayBatDauCongTac = e} label='Ngày bắt đầu công tác' min={new Date(1900, 1, 1).getTime()} max={new Date().getTime()} /></div>
+                            <div className='form-group col-md-4'><DateInput ref={e => this.ngayBienChe = e} label='Ngày biên chế' min={new Date(1900, 1, 1).getTime()} max={new Date().getTime()} /></div>
+                            <div className='form-group col-md-4'><TextInput ref={e => this.ngheNghiepCu = e} label='Nghế nghiệp trước khi tuyển dụng' maxLength={200} /></div>
                             {item.nhaGiaoNhanDan ? renderFieldText('form-group col-md-3', 'Nhà giáo nhân dân', item.nhaGiaoNhanDan, item.nhaGiaoNhanDan) : null}
                             {item.nhaGiaoUuTu ? renderFieldText('form-group col-md-3', 'Nhà giáo ưu tú', item.nhaGiaoUuTu, item.nhaGiaoUuTu) : null}
-                            <div className='form-group col-md-6'><Select ref={this.maDonVi} adapter={SelectAdapter_DmDonVi} label='Đơn vị công tác' /> </div>
-                            <div className='form-group col-md-3'><Select ref={this.maTrinhDoLlct} adapter={SelectAdapter_DmTrinhDoLyLuanChinhTri} label='Trình độ lý luận chính trị' /></div>
-                            <div className='form-group col-md-3'><Select ref={this.maTrinhDoQlnn} adapter={SelectAdapter_DmTrinhDoQuanLyNhaNuoc} label='Trình độ quản lý nhà nước' /></div>
+                            <div className='form-group col-md-6'><Select ref={e => this.maDonVi = e} adapter={SelectAdapter_DmDonVi} label='Đơn vị công tác' /> </div>
+                            <div className='form-group col-md-3'><Select ref={e => this.maTrinhDoLlct = e} adapter={SelectAdapter_DmTrinhDoLyLuanChinhTri} label='Trình độ lý luận chính trị' /></div>
+                            <div className='form-group col-md-3'><Select ref={e => this.maTrinhDoQlnn = e} adapter={SelectAdapter_DmTrinhDoQuanLyNhaNuoc} label='Trình độ quản lý nhà nước' /></div>
                             <div className='col-12' />
-                            <div className='form-group col-md-3'><Select ref={this.maTrinhDoTinHoc} adapter={SelectAdapter_DmTrinhDoTinHoc} label='Trình độ tin học' /></div>
-                            <div className='form-group col-md-4'><Select ref={this.maChucVu} adapter={SelectAdapter_DmChucVu} label='Chức vụ chính quyền' /></div>
-                            <div className='form-group col-md-3'><TextInput ref={this.chucVuDoanThe} label='Chức vụ đoàn thể' maxLength={200} /></div>
+                            <div className='form-group col-md-3'><Select ref={e => this.maTrinhDoTinHoc = e} adapter={SelectAdapter_DmTrinhDoTinHoc} label='Trình độ tin học' /></div>
+                            <div className='form-group col-md-4'><Select ref={e => this.maChucVu = e} adapter={SelectAdapter_DmChucVu} label='Chức vụ chính quyền' /></div>
+                            <div className='form-group col-md-3'><TextInput ref={e => this.chucVuDoanThe = e} label='Chức vụ đoàn thể' maxLength={200} /></div>
                             <div className='col-12' />
-                            <div className='form-group col-md-4'><TextInput ref={this.chucVuKiemNhiem} label='Chức vụ kiêm nhiệm' maxLength={200} /></div>
-                            <div className='form-group col-md-4'><TextInput ref={this.chucVuKhac} label='Chức vụ khác' maxLength={200} /></div>
+                            <div className='form-group col-md-4'><TextInput ref={e => this.chucVuKiemNhiem = e} label='Chức vụ kiêm nhiệm' maxLength={200} /></div>
+                            <div className='form-group col-md-4'><TextInput ref={e => this.chucVuKhac = e} label='Chức vụ khác' maxLength={200} /></div>
                             <div className='col-12' />
-                            <div className='form-group col-md-12'><BooleanInput ref={this.doanVien} label='Đoàn viên:&nbsp;' onChange={value => this.setState({ doanVien: value })} /></div>
+                            <div className='form-group col-md-12'><BooleanInput ref={e => this.doanVien = e} label='Đoàn viên:&nbsp;' onChange={value => this.setState({ doanVien: value })} /></div>
                             <div className='form-group col-md-12' style={{ display: this.state.doanVien ? 'block' : 'none' }}>
                                 <div className='row' >
-                                    <div className='form-group col-md-4'><DateInput ref={this.ngayVaoDoan} label='Ngày vào Đoàn' required min={new Date(1900, 1, 1).getTime()} max={new Date().getTime()} /></div>
-                                    <div className='form-group col-md-8'><TextInput ref={this.noiVaoDoan} label='Nơi vào Đoàn' maxLength={200} required /></div>
+                                    <div className='form-group col-md-4'><DateInput ref={e => this.ngayVaoDoan = e} label='Ngày vào Đoàn' required min={new Date(1900, 1, 1).getTime()} max={new Date().getTime()} /></div>
+                                    <div className='form-group col-md-8'><TextInput ref={e => this.noiVaoDoan = e} label='Nơi vào Đoàn' maxLength={200} required /></div>
                                 </div>
                             </div>
                             <div className='col-12' />
-                            <div className='form-group col-md-12'><BooleanInput ref={this.dangVien} label='Đảng viên:&nbsp;' onChange={value => this.setState({ dangVien: value })} /></div>
+                            <div className='form-group col-md-12'><BooleanInput ref={e => this.dangVien = e} label='Đảng viên:&nbsp;' onChange={value => this.setState({ dangVien: value })} /></div>
                             <div className='form-group col-md-12' style={{ display: this.state.dangVien ? 'block' : 'none' }}>
                                 <div className='row'>
-                                    <div className='form-group col-md-4'><DateInput ref={this.ngayVaoDang} label='Ngày vào Đảng (dự bị)' required min={new Date(1900, 1, 1).getTime()} max={new Date().getTime()} /></div>
-                                    <div className='form-group col-md-8'><TextInput ref={this.noiDangDb} label='Nơi vào Đảng (dự bị)' maxLength={200} /></div>
-                                    <div className='form-group col-md-4'><DateInput ref={this.ngayVaoDangChinhThuc} label='Ngày vào Đảng chính thức' min={new Date(1900, 1, 1).getTime()} max={new Date().getTime()} /></div>
-                                    <div className='form-group col-md-8'><TextInput ref={this.noiDangCt} label='Nơi vào Đảng chính thức' maxLength={200} /></div>
-                                    <div className='form-group col-md-6'><TextInput ref={this.soTheDang} label='Số thẻ Đảng' maxLength={200} /></div>
-                                    <div className='form-group col-md-6'><TextInput ref={this.chucVuDang} label='Chức vụ Đảng' maxLength={200} /></div>
+                                    <div className='form-group col-md-4'><DateInput ref={e => this.ngayVaoDang = e} label='Ngày vào Đảng (dự bị)' required min={new Date(1900, 1, 1).getTime()} max={new Date().getTime()} /></div>
+                                    <div className='form-group col-md-8'><TextInput ref={e => this.noiDangDb = e} label='Nơi vào Đảng (dự bị)' maxLength={200} /></div>
+                                    <div className='form-group col-md-4'><DateInput ref={e => this.ngayVaoDangChinhThuc = e} label='Ngày vào Đảng chính thức' min={new Date(1900, 1, 1).getTime()} max={new Date().getTime()} /></div>
+                                    <div className='form-group col-md-8'><TextInput ref={e => this.noiDangCt = e} label='Nơi vào Đảng chính thức' maxLength={200} /></div>
+                                    <div className='form-group col-md-6'><TextInput ref={e => this.soTheDang = e} label='Số thẻ Đảng' maxLength={200} /></div>
+                                    <div className='form-group col-md-6'><TextInput ref={e => this.chucVuDang = e} label='Chức vụ Đảng' maxLength={200} /></div>
                                 </div>
                             </div>
                             <div className='col-12' />
                             <div className='form-group col-md-12'>
-                                <BooleanInput ref={this.dangONuocNgoai} label='Đang ở nước ngoài:&nbsp;' onChange={value => this.setState({ nuocNgoai: value })} />
+                                <BooleanInput ref={e => this.dangONuocNgoai = e} label='Đang ở nước ngoài:&nbsp;' onChange={value => this.setState({ nuocNgoai: value })} />
                             </div>
                             <div className='form-group col-md-12'>
-                                {this.state.nuocNgoai && <TextInput ref={this.lyDoONuocNgoai} label='Lý do ở nước ngoài' maxLength={200} />}
+                                {this.state.nuocNgoai && <TextInput ref={e => this.lyDoONuocNgoai = e} label='Lý do ở nước ngoài' maxLength={200} />}
                             </div>
-                            <div className='form-group col-md-4'><TextInput ref={this.quanHamCaoNhat} label='Quân hàm cao nhất' /></div>
-                            <div className='form-group col-md-4'><DateInput ref={this.ngayNhapNgu} type='year' label='Năm nhập ngũ (yyyy)' /></div>
-                            <div className='form-group col-md-4'><DateInput ref={this.ngayXuatNgu} type='year' label='Năm xuất ngũ (yyyy)' /></div>
-                            <div className='form-group col-md-4'><TextInput ref={this.hangThuongBinh} label='Hạng thương binn' /></div>
-                            <div className='form-group col-md-4'><TextInput ref={this.giaDinhChinhSach} label='Gia đình chính sách' /></div>
-                            <div className='form-group col-md-4'><TextInput ref={this.danhHieu} label='Danh hiệu' /></div>
+                            <div className='form-group col-md-4'><TextInput ref={e => this.quanHamCaoNhat = e} label='Quân hàm cao nhất' /></div>
+                            <div className='form-group col-md-4'><DateInput ref={e => this.ngayNhapNgu = e} type='year' label='Năm nhập ngũ (yyyy)' /></div>
+                            <div className='form-group col-md-4'><DateInput ref={e => this.ngayXuatNgu = e} type='year' label='Năm xuất ngũ (yyyy)' /></div>
+                            <div className='form-group col-md-4'><TextInput ref={e => this.hangThuongBinh = e} label='Hạng thương binn' /></div>
+                            <div className='form-group col-md-4'><TextInput ref={e => this.giaDinhChinhSach = e} label='Gia đình chính sách' /></div>
+                            <div className='form-group col-md-4'><TextInput ref={e => this.danhHieu = e} label='Danh hiệu' /></div>
                             {item.phucLoi ? renderFieldText('form-group col-12', 'Phúc lợi', item.phucLoi, item.phucLoi) : null}
                         </div>
                     </div>,
                     <div className='tile' key={3}>
                         <h3 className='tile-title'>Trình độ học vấn</h3>
                         <div className='tile-body row'>
-                            <div className='form-group col-xl-4 col-md-6'><Select ref={this.chucDanh} adapter={SelectAdapter_DmChucDanhKhoaHoc} label='Chức danh' /></div>
-                            <div className='form-group col-xl-4 col-md-6'><DateInput ref={this.namHocVi} label='Năm công nhận chức danh' type='year' min={Date.getDateInputDefaultMin()} max={new Date().getTime()} /></div>
-                            <div className='form-group col-xl-4 col-md-6'><Select ref={this.hocVi} adapter={SelectAdapter_DmTrinhDo} label='Học vị' /></div>
-                            <div className='form-group col-xl-4 col-md-6'><DateInput ref={this.namChucDanh} label='Năm công nhận học vị' type='year' min={Date.getDateInputDefaultMin()} max={new Date().getTime()} /></div>
-                            <div className='form-group col-xl-4 col-md-6'><TextInput ref={this.chuyenNganh} label='Chuyên ngành' /></div>
-                            <div className='form-group col-xl-4 col-md-6'><TextInput ref={this.trinhDoPhoThong} label='Trình độ phổ thông' /></div>
+                            <div className='form-group col-xl-4 col-md-6'><Select ref={e => this.chucDanh = e} adapter={SelectAdapter_DmChucDanhKhoaHoc} label='Chức danh' /></div>
+                            <div className='form-group col-xl-4 col-md-6'><DateInput ref={e => this.namHocVi = e} label='Năm công nhận chức danh' type='year' min={Date.getDateInputDefaultMin()} max={new Date().getTime()} /></div>
+                            <div className='form-group col-xl-4 col-md-6'><Select ref={e => this.hocVi = e} adapter={SelectAdapter_DmTrinhDo} label='Học vị' /></div>
+                            <div className='form-group col-xl-4 col-md-6'><DateInput ref={e => this.namChucDanh = e} label='Năm công nhận học vị' type='year' min={Date.getDateInputDefaultMin()} max={new Date().getTime()} /></div>
+                            <div className='form-group col-xl-4 col-md-6'><TextInput ref={e => this.chuyenNganh = e} label='Chuyên ngành' /></div>
+                            <div className='form-group col-xl-4 col-md-6'><TextInput ref={e => this.trinhDoPhoThong = e} label='Trình độ phổ thông' /></div>
                         </div>
                         <div>
                             <p>Trình độ ngoại ngữ {!itemsNN || itemsNN.length == 0 ? <strong>: Không có thông tin</strong> : ''}</p>
@@ -824,8 +727,8 @@ class ProfilePage extends QTForm {
                     <button key={5} type='button' title='Save' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.save}>
                         <i className='fa fa-lg fa-save' />
                     </button>,
-                    <RelationModal key={6} ref={this.modal} create={this.props.createQuanHeStaffUser} update={this.props.updateQuanHeStaffUser} />,
-                    <TrinhDoNNModal key={7} ref={this.modalNN} create={this.props.createTrinhDoNNStaffUser} update={this.props.updateTrinhDoNNStaffUser} getData={this.props.userGetStaff} />
+                    <RelationModal key={6} ref={e => this.modal = e} create={this.props.createQuanHeStaffUser} update={this.props.updateQuanHeStaffUser} />,
+                    <TrinhDoNNModal key={7} ref={e => this.modalNN = e} create={this.props.createTrinhDoNNStaffUser} update={this.props.updateTrinhDoNNStaffUser} getData={this.props.userGetStaff} />
                     ]
                 }
             </main>
