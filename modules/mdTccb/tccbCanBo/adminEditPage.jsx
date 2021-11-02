@@ -1311,7 +1311,7 @@ class CanBoEditPage extends QTForm {
     }
 
     componentDidMount() {
-        T.ready('/user/staff');
+        T.ready('/user/tccb');
         this.getData();
         this.props.getDmQuanHeGiaDinhAll(null, items => {
             items.forEach(item => this.mapperQuanHe[item.ma] = item.ten);
@@ -1434,7 +1434,7 @@ class CanBoEditPage extends QTForm {
 
         this.thuongTru.value(thuongTruMaTinh, thuongTruMaHuyen, thuongTruMaXa, thuongTruSoNha);
         this.hienTai.value(hienTaiMaTinh, hienTaiMaHuyen, hienTaiMaXa, hienTaiSoNha);
-        this.nguyenQuan.value(maTinhNguyenQuan,maHuyenNguyenQuan, maXaNguyenQuan);
+        this.nguyenQuan.value(maTinhNguyenQuan, maHuyenNguyenQuan, maXaNguyenQuan);
         this.noiSinh.value(maTinhNoiSinh, maHuyenNoiSinh, maXaNoiSinh);
 
         this.soTruong.current.setVal(soTruong);

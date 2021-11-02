@@ -862,8 +862,8 @@ module.exports = app => {
     });
 
     // USER APIs ------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/staff-profile/:shcc', checkGetStaffPermission, (req, res) => {
-        app.model.canBo.get({ shcc: req.params.shcc }, (error, canBo) => {
+    app.get('/api/staff-profile/:email', checkGetStaffPermission, (req, res) => {
+        app.model.canBo.get({ email: req.params.email }, (error, canBo) => {
             if (error || canBo == null) {
                 res.send({ error });
             } else {

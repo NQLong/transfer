@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { updateProfile } from '../_init/reduxSystem';
-import Dropdown from 'view/component/Dropdown';
+// import Dropdown from 'view/component/Dropdown';
 import ImageBox from 'view/component/ImageBox';
 import { userGetStaff, updateStaffUser, createQuanHeStaffUser, updateQuanHeStaffUser, deleteQuanHeStaffUser } from 'modules/mdTccb/tccbCanBo/redux';
 // import { Link } from 'react-router-dom';
@@ -29,8 +29,6 @@ import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import TextInput, { DateInput, NumberInput, Select, BooleanInput } from 'view/component/Input';
 import { QTForm } from 'view/component/Form';
 import { ComponentDiaDiem } from 'modules/mdDanhMuc/dmDiaDiem/componentDiaDiem';
-
-const genderMapper = { '01': 'Nam', '02': 'Nữ' };
 
 class RelationModal extends React.Component {
 
@@ -187,33 +185,28 @@ class ProfilePage extends QTForm {
                 user.image = user.image || '/img/avatar.png';
                 this.imageBox.setData('profile', user.image);
                 this.setState({ user });
-                if (user.isStaff) {
+                this.getData(user.email);
+                let { dienThoai, ngaySinh } = user ? user : { dienThoai: '', ngaySinh: '' };
+                $('#ngaySinh').val(ngaySinh ? T.dateToText(ngaySinh, 'dd/mm/yyyy') : '');
+                $('#dienThoai').val(dienThoai);
+                this.phai.setVal(user.phai ? user.phai : '01');
+            }
+        });
+    }
+
+    getData = (email) => {
+
+        if (email) {
+            this.props.userGetStaff(email, data => {
+                if (data.error) {
+                    T.notify('Lấy thông tin cán bộ bị lỗi!', 'danger');
+                } else if (data.item) {
                     this.props.getDmQuanHeGiaDinhAll(null, items => items.forEach(item => this.mapperQuanHe[item.ma] = item.ten));
                     this.props.getDmChucVuAll(null, items => items.forEach(item => this.mapperChucVu[item.ma] = item.ten));
                     this.props.getDmDonViAll(items => items.forEach(item => this.mapperDonVi[item.ma] = item.ten));
                     this.props.getDmNgoaiNguAll({ kichHoat: 1 }, items => {
                         items.forEach(item => this.mapperNgonNgu[item.ma] = item.ten);
                     });
-                    this.getData(user.shcc);
-                } else {
-                    let { dienThoai, ngaySinh } = user ? user : { dienThoai: '', ngaySinh: '' };
-                    $('#ngaySinh').val(ngaySinh ? T.dateToText(ngaySinh, 'dd/mm/yyyy') : '');
-                    $('#dienThoai').val(dienThoai);
-                    this.phai.setText(user.phai ? genderMapper[user.phai] || '01' : '01');
-                }
-                setTimeout(() => {
-
-                }, 250);
-            }
-        });
-    }
-
-    getData = (shcc) => {
-        if (shcc) {
-            this.props.userGetStaff(shcc, data => {
-                if (data.error) {
-                    T.notify('Lấy thông tin cán bộ bị lỗi!', 'danger');
-                } else {
                     this.setState(
                         {
                             canBo: data.item,
@@ -367,12 +360,12 @@ class ProfilePage extends QTForm {
 
     saveCommon = (e) => {
         e.preventDefault();
-        const sexObject = { 'Nam': '01', 'Nữ': '02' };
-        let phai = this.phai.getSelectedItem(),
+        let phai = this.phai.val(),
             ngaySinh = $('#ngaySinh').val() || null,
             changes = { dienThoai: $('#dienThoai').val() };
-        if (phai && sexObject[phai]) changes.phai = sexObject[phai];
+        if (phai) changes.phai = phai;
         if (ngaySinh) changes.ngaySinh = T.formatDate(ngaySinh).getTime();
+        console.log(this.phai.val(), changes);
         this.props.updateProfile(changes);
     }
 
@@ -537,10 +530,9 @@ class ProfilePage extends QTForm {
                                         Email: <span style={{ fontWeight: 'bold' }}>{user ? user.email : ''}</span>
                                     </label>
                                 </div>
-                                <div className='form-group' style={{ display: 'inline-flex' }}>
-                                    <label className='control-label'>Giới tính:</label>&nbsp;
-                                    <Dropdown ref={e => this.phai = e} text='' items={T.sexes} />
-                                </div>
+                                <Select className='form-group col-md-4' ref={e => this.phai = e} adapter={SelectAdapter_DmGioiTinh} label='Giới tính' />
+
+                                {/* </div> */}
                                 <div className='form-group'>
                                     <label className='control-label' htmlFor='dienThoai'>Số điện thoại</label>
                                     <input className='form-control' type='text' placeholder='Số điện thoại' id='dienThoai' />
@@ -585,7 +577,7 @@ class ProfilePage extends QTForm {
                             <div className='form-group col-md-4'><DateInput ref={e => this.cmndNgayCap = e} label='Ngày cấp' min={new Date(1900, 1, 1).getTime()} max={new Date().getTime()} /></div>
                             <div className='form-group col-md-4'><TextInput ref={e => this.cmndNoiCap = e} label='Nơi cấp CMND/CCCD' placeholder='Nhập nơi cấp cmnd' maxLength={200} /></div>
                             <div className='form-group col-md-6'><TextInput ref={e => this.emailCaNhan = e} label='Địa chỉ email cá nhân' maxLength={50} /></div>
-                            <div className='form-group col-md-6'><TextInput ref={e => this.email = e} label='Địa chỉ email trường' maxLength={50} /></div>
+                            <div className='form-group col-md-6'><TextInput ref={e => this.email = e} label='Địa chỉ email trường' maxLength={50} readOnly={true} /></div>
                             <div className='form-group col-md-4'><TextInput ref={e => this.dienThoaiCaNhan = e} label='Số điện thoại cá nhân' maxLength={20} /></div>
                             <div className='form-group col-md-4'><TextInput ref={e => this.dienThoaiBaoTin = e} label='Số điện thoại báo tin' maxLength={20} /></div>
                             <div className='form-group col-md-4'><TextInput ref={e => this.soBhxh = e} label='Số BHXH' /></div>
