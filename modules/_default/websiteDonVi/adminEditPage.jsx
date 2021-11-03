@@ -100,7 +100,7 @@ class AdminEditPage extends React.Component {
                     </div>
                     <ul className='app-breadcrumb breadcrumb'>
                         <Link to='/user'><i className='fa fa-home fa-lg' /></Link>&nbsp;/&nbsp;
-                        <Link to='/user/settings'>Cấu hình</Link>&nbsp;/&nbsp;
+                        {/* <Link to='/user/settings'>Cấu hình</Link>&nbsp;/&nbsp; */}
                         <Link to='/user/website'>Website</Link>&nbsp;/&nbsp;
                         Chỉnh sửa
                     </ul>

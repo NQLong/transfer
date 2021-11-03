@@ -34,6 +34,7 @@ export default class MessagePage extends React.Component {
         } else if (this.state.message) {
             message = this.state.message;
         }
+
         return (
             <div style={{ position: 'absolute', zIndex: '3000', background: '#fff', width: '100%', height: '100%' }}>
                 <div className='central-box'>

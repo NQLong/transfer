@@ -116,7 +116,7 @@ class RolePage extends React.Component {
 
     componentDidMount() {
         this.props.getRolePage();
-        T.ready();
+        T.ready('/user/settings');
     }
 
     createRole = (e) => {

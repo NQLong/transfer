@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3001: { title: 'Danh sách cán bộ', link: '/user/staff' },
+            3001: { title: 'Danh sách cán bộ', link: '/user/staff', icon: 'fa-users', backgroundColor: '#8bc34a', },
         },
     };
 
@@ -862,8 +862,8 @@ module.exports = app => {
     });
 
     // USER APIs ------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/staff-profile/:shcc', checkGetStaffPermission, (req, res) => {
-        app.model.canBo.get({ shcc: req.params.shcc }, (error, canBo) => {
+    app.get('/api/staff-profile/:email', checkGetStaffPermission, (req, res) => {
+        app.model.canBo.get({ email: req.params.email }, (error, canBo) => {
             if (error || canBo == null) {
                 res.send({ error });
             } else {
@@ -1022,10 +1022,19 @@ module.exports = app => {
     app.put('/api/user/staff', app.permission.check('staff:login'), (req, res) => {
         if (req.body.changes && req.session.user) {
             const changes = req.body.changes;
-
-            app.model.canBo.update({ shcc: req.session.user.shcc }, changes, (error, item) => {
-                res.send({ error, item });
+            app.model.canBo.get({ email: req.session.user.email }, (error, canBo) => {
+                if (!canBo) {
+                    changes.email = req.session.user.email;
+                    app.model.canBo.create(changes, (error, item) => {
+                        res.send({ error, item });
+                    });
+                } else {
+                    app.model.canBo.update({ email: req.session.user.email }, changes, (error, item) => {
+                        res.send({ error, item });
+                    });
+                }
             });
+
         } else {
             res.status(400).send({ error: 'Invalid parameter!' });
         }

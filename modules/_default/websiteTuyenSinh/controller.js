@@ -1,10 +1,10 @@
 module.exports = app => {
     const menuTuyenSinh = {
-        parentMenu: { index: 7000, title: 'Tuyển sinh', icon: 'fa-file' },
+        parentMenu: app.parentMenu.truyenThong,
         menus: {
-            7001: { title: 'Bài viết', link: '/user/news/admission' },
-            7002: { title: 'Chờ duyệt bài viết', link: '/user/news/draft-admission' },
-            7003: { title: 'Sự kiện', link: '/user/event/admission' },
+            7001: { title: 'Danh sách bài viết', link: '/user/news/admission', groupIndex: 3, icon: 'fa-list-alt', backgroundColor: '#00b8d4' },
+            7002: { title: 'Danh sách sự kiện', link: '/user/event/admission', groupIndex: 3, icon: 'fa-file-o', backgroundColor: '#22e5b4' },
+            7003: { title: 'Bài viết chờ duyệt', link: '/user/news/draft-admission', groupIndex: 3, icon: 'fa-file-o', backgroundColor: '#a1cc1f', },
             // 7004: { title: 'Chờ duyệt sự kiện', link: '/user/event/draft-admission' },
 
         },

@@ -201,7 +201,7 @@ class StoragePage extends React.Component {
         return (
             <main className='app-content'>
                 <div className='app-title'>
-                    <h1><i className='fa fa-user' /> Dữ liệu lưu trữ hệ thống</h1>
+                    <h1><i className='fa fa-user' /> Tài liệu lưu trữ</h1>
                 </div>
                 <div className='row tile'>{table}</div>
                 <Pagination name='pageFwStorage'

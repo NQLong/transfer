@@ -1,11 +1,17 @@
 module.exports = app => {
     app.permission.add(
         { name: 'dashboard:standard', menu: { parentMenu: { index: 100, title: 'Dashboard', icon: 'fa-dashboard', link: '/user/dashboard' } }, },
-        { name: 'system:settings', menu: { parentMenu: { index: 2000, title: 'Cấu hình', icon: 'fa-cog' }, menus: { 2010: { title: 'Thông tin chung', link: '/user/settings' } } }, },
+        {
+            name: 'system:settings', menu: {
+                parentMenu: app.parentMenu.truyenThong,
+                menus: { 2010: { title: 'Thông tin chung', link: '/user/truyen-thong/settings', groupIndex: 0, icon: 'fa-gear', backgroundColor: '#2962ff' } }
+            },
+        },
     );
 
     app.get('/user/dashboard', app.permission.check('dashboard:standard'), app.templates.admin);
-    app.get('/user/settings', app.permission.check('system:settings'), app.templates.admin);
+    app.get('/user/truyen-thong/settings', app.permission.check('system:settings'), app.templates.admin);
+
 
     // Home -----------------------------------------------------------------------------------------------------------------------------------------
     // '/registered(.htm(l)?)?', '/active-user/:userId', '/forgot-password/:userId/:userToken',
