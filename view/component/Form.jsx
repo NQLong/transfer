@@ -20,7 +20,7 @@ export class QTForm extends AdminPage {
             }
             return { error };
         }
-        formEntries = formEntries.filter(item => item && item[1] && item[1].data !== null && !Number.isNaN(item[1].data) && !item[1].disabled).map(item => [item[0], item[1].data]);
+        formEntries = formEntries.filter(item => item && item[1] && item[1].data !== null && !Number.isNaN(item[1].data) && !item[1].disabled).map(item => [item[0], typeof(item[1].data) == 'string' ? item[1].data.trim() : item[1].data]);
         const data = Object.fromEntries(formEntries);
         return { data };
     };
