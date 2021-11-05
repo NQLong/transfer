@@ -753,7 +753,9 @@ export class AdminPage extends React.Component {
         return permission;
     }
 
-    renderPage = ({ icon, title, subTitle, header, breadcrumb, content, backRoute, onCreate, onSave, onExport, onImport }) => {
+    showAdvanceSearch = () => $(this.advanceSearchBox).addClass('show');
+
+    renderPage = ({ icon, title, subTitle, header, breadcrumb, advanceSearch, content, backRoute, onCreate, onSave, onExport, onImport }) => {
         if (breadcrumb == null) breadcrumb = [];
 
         let right = 10, createButton, saveButton, exportButton, importButton;
@@ -787,10 +789,10 @@ export class AdminPage extends React.Component {
                         {breadcrumb.map((item, index) => <span key={index}>&nbsp;/&nbsp;{item}</span>)}
                     </ul>
                 </div>
-                {/* <div className='app-advance-search'>
+                <div className='app-advance-search' ref={e => this.advanceSearchBox = e}>
                     <h5>Tìm kiếm nâng cao</h5>
                     <div style={{ width: '100%' }}>{advanceSearch}</div>
-                </div> */}
+                </div>
                 {content}
                 {backRoute ? <CirclePageButton type='back' to={backRoute} /> : null}
                 {importButton} {exportButton} {saveButton} {createButton}

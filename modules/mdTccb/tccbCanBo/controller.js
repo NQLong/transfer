@@ -47,7 +47,17 @@ module.exports = app => {
                 };
             }
         }
-
+        if (req.query.filter && req.query.filter.maDonVi) {
+            if (req.query.condition) {
+                condition.statement += ' AND maDonVi = :maDonVi';
+                condition.parameter.maDonVi = req.query.filter.maDonVi;
+            } else {
+                condition.statement = 'maDonVi = :maDonVi';
+                condition.parameter = {
+                    maDonVi: req.query.filter.maDonVi
+                };
+            }
+        }
         app.model.canBo.getPage(pageNumber, pageSize, condition, (error, page) => {
             res.send({ error, page });
         });
