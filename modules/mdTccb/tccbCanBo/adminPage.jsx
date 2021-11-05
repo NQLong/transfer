@@ -20,7 +20,6 @@ class StaffPage extends AdminPage {
             });
 
             this.changeAdvancedSearch(true);
-            this.props.getStaffPage();
         });
     }
 
@@ -101,7 +100,7 @@ class StaffPage extends AdminPage {
                 <div className='tile'>
                     {!this.state.searching ? table : <OverlayLoading text='Đang tải..' />}
                     <Pagination style={{ marginLeft: '70px' }} name={PageName} pageNumber={pageNumber} pageSize={pageSize} pageTotal={pageTotal} totalItem={totalItem} pageCondition={pageCondition}
-                        getPage={this.props.getStaffPage} />
+                        getPage={this.getPage} />
                     {permissionWrite && (
                         <Link to='/user/staff/item/upload' className='btn btn-success btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px' }} >
                             <i className='fa fa-lg fa-cloud-upload' />

@@ -789,7 +789,7 @@ export class AdminPage extends React.Component {
                         {breadcrumb.map((item, index) => <span key={index}>&nbsp;/&nbsp;{item}</span>)}
                     </ul>
                 </div>
-                <div className='app-advance-search'>
+                <div className='app-advance-search' ref={e => this.advanceSearchBox = e}>
                     <h5>Tìm kiếm nâng cao</h5>
                     <div style={{ width: '100%' }}>{advanceSearch}</div>
                 </div>
