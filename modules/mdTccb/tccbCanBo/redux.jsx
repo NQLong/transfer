@@ -50,15 +50,21 @@ export default function staffReducer(state = null, data) {
 // Actions ------------------------------------------------------------------------------------------------------------
 export const PageName = 'staffPage';
 T.initPage(PageName);
-export function getStaffPage(pageNumber, pageSize, pageCondition, done) {
+export function getStaffPage(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    console.log(filter);
     const page = T.updatePage(PageName, pageNumber, pageSize, pageCondition);
     return dispatch => {
         const url = `/api/staff/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition }, data => {
+        T.get(url, { condition: page.pageCondition, filter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách cán bộ bị lỗi', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
+                // if (page.filter) data.page.filter = page.filter;
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 if (done) done(data.page);
                 dispatch({ type: StaffGetPage, page: data.page });
