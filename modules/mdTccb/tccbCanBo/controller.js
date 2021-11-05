@@ -58,7 +58,6 @@ module.exports = app => {
                 };
             }
         }
-        console.log(condition);
         app.model.canBo.getPage(pageNumber, pageSize, condition, (error, page) => {
             res.send({ error, page });
         });
