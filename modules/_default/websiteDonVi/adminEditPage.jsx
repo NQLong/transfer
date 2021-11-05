@@ -12,8 +12,8 @@ class AdminEditPage extends React.Component {
 
     componentDidMount() {
         T.ready('/user/website', () => {
-            const route = T.routeMatcher('/user/website/edit/:shortname'),
-                shortname = route.parse(window.location.pathname).shortname;
+            const route = T.routeMatcher('/user/website/edit/:ma'),
+                shortname = route.parse(window.location.pathname).ma;
             if (shortname) {
                 this.props.getDvWebsite(shortname, data => {
                     if (data) {

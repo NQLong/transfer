@@ -79,9 +79,9 @@ export function getDvWebsiteAll(condition, done) {
     };
 }
 
-export function getDvWebsite(shortname, done) {
+export function getDvWebsite(id, done) {
     return () => {
-        const url = `/api/website/item/${shortname}`;
+        const url = `/api/website/item/${id}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy thông tin website đơn vị bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');

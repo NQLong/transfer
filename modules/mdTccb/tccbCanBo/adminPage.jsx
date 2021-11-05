@@ -5,6 +5,7 @@ import Pagination, { OverlayLoading } from 'view/component/Pagination';
 import AdminSearchBox from 'view/component/AdminSearchBox';
 import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable } from 'view/component/AdminPage';
+// import Select from 're act-select';
 
 class StaffPage extends AdminPage {
     state = { searching: false };
@@ -55,6 +56,12 @@ class StaffPage extends AdminPage {
                     <AdminSearchBox ref={this.searchBox} getPage={this.props.getStaffPage} setSearching={value => this.setState({ searching: value })} />
                 </div>
                 <div className='tile'>
+                    <div className='form-group'>
+                        <label htmlFor='dvWebsiteDonVi'>Đơn vị</label>
+                        {/* <Select ref={this.selectDonVi} id='dvWebsiteDonVi' placeholder='Chọn đơn vị'
+                            onChange={item => this.setState({ donViSelected: item.value })} options={this.props.donViOptions}
+                            value={this.props.donViOptions.filter(({ value }) => value == this.state.donViSelected)} /> */}
+                    </div>
                     {!this.state.searching ? table : <OverlayLoading text='Đang tải..' />}
                     <Pagination name={PageName} pageNumber={pageNumber} pageSize={pageSize} pageTotal={pageTotal} totalItem={totalItem} pageCondition={pageCondition}
                         getPage={this.searchBox.current && this.searchBox.current.getPage} />

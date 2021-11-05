@@ -6,7 +6,7 @@ import { getDvWebsite, updateDvWebsite } from 'modules/_default/websiteDonVi/red
 import ImageBox from 'view/component/ImageBox';
 
 
-class MenuPage extends React.Component {
+class adminDivisionPage extends React.Component {
     state = { showHeaderTitle: 0 };
     imageBox = React.createRef();
     imageBox2 = React.createRef();
@@ -223,4 +223,4 @@ const mapActionsToProps = {
     divisionMenuGetAll, createDivisionMenu, updateDivisionMenuPriorities,
     updateDivisionMenu, deleteDivisionMenu, getDvWebsite, updateDvWebsite, buildMenu
 };
-export default connect(mapStateToProps, mapActionsToProps)(MenuPage);
+export default connect(mapStateToProps, mapActionsToProps)(adminDivisionPage);
