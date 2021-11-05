@@ -56,11 +56,12 @@ class RelationModal extends AdminModal {
     state = {
         id: null,
         shcc: '',
+        type: null
     }
 
-    onShow = (item, shcc) => {
+    onShow = (item, type, shcc) => {
         let { id, hoTen, moiQuanHe, namSinh, ngheNghiep, noiCongTac, diaChi, queQuan } = item ? item : { id: null, hoTen: '', moiQuanHe: '', namSinh: '', ngheNghiep: '', noiCongTac: '', diaChi: '', queQuan: '' };
-        this.setState({ shcc, id });
+        this.setState({ shcc, id, type });
         setTimeout(() => {
             this.hoTen.value(hoTen ? hoTen : '');
             this.moiQuanHe.setVal(moiQuanHe ? moiQuanHe : null);
@@ -75,6 +76,7 @@ class RelationModal extends AdminModal {
     onSubmit = () => {
         const id = this.state.id,
             shcc = this.state.shcc,
+            type = this.state.type,
             changes = {
                 hoTen: this.hoTen.value(),
                 moiQuanHe: this.moiQuanHe.getVal(),
@@ -93,6 +95,7 @@ class RelationModal extends AdminModal {
             });
         } else {
             changes.shcc = shcc;
+            changes.type = type;
             this.props.create(changes, () => {
                 this.props.getData(shcc);
                 this.hide();
@@ -926,7 +929,7 @@ class KyYeuModal extends AdminModal {
                 tenBaiViet: this.tenBaiViet.value(),
                 thoiGian: this.thoiGian.getVal() ? new Date(this.thoiGian.getVal()).getFullYear() : null,
                 tenHoiNghi: this.tenHoiNghi.value(),
-                soHieuIssn: this.soHieuIssn.value(),
+                soHieuIsbn: this.soHieuIsbn.value(),
                 sanPham: this.sanPham.value(),
                 noiToChuc: this.noiToChuc.value(),
                 quocTe: this.quocTe.value()
