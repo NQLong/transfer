@@ -130,16 +130,20 @@ const T = {
         T.cookie(cookieName, initData);
     },
 
-    updatePage: (cookieName, pageNumber, pageSize, pageCondition) => {
+    updatePage: (cookieName, pageNumber, pageSize, pageCondition, filter, advancedSearch) => {
         const updateStatus = {}, oldStatus = T.cookie(cookieName);
         updateStatus[T.pageKeyName.pageNumber] = pageNumber ? pageNumber : oldStatus[T.pageKeyName.pageNumber];
         updateStatus[T.pageKeyName.pageSize] = pageSize ? pageSize : oldStatus[T.pageKeyName.pageSize];
         updateStatus[T.pageKeyName.pageCondition] = pageCondition != null || pageCondition == '' ? pageCondition : oldStatus[T.pageKeyName.pageCondition];
+        updateStatus[T.pageKeyName.filter] = filter ? filter : oldStatus[T.pageKeyName.filter];
+        updateStatus[T.pageKeyName.advancedSearch] = advancedSearch != null ? advancedSearch : oldStatus[T.pageKeyName.advancedSearch];
         T.cookie(cookieName, updateStatus);
         return {
             pageNumber: updateStatus[T.pageKeyName.pageNumber],
             pageSize: updateStatus[T.pageKeyName.pageSize],
             pageCondition: updateStatus[T.pageKeyName.pageCondition],
+            filter: updateStatus[T.pageKeyName.filter],
+            advancedSearch: updateStatus[T.pageKeyName.advancedSearch]
         };
     },
 
