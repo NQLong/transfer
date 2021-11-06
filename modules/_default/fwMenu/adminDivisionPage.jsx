@@ -35,12 +35,12 @@ class adminDivisionPage extends React.Component {
 
     create = (e) => {
         e.preventDefault();
-        this.props.createDivisionMenu(null, this.state.maDonVi, this.state.shortname, data => this.props.history.push('/user/menu/edit/' + this.state.shortname + '/' + data.item.id));
+        this.props.createDivisionMenu(null, this.state.maDonVi, this.state.shortname, data => this.props.history.push('/user/menu/edit/' + this.state.id + '/' + data.item.id));
     }
 
     createChild = (e, item) => {
         e.preventDefault();
-        this.props.createDivisionMenu(item.id, this.state.maDonVi, this.state.shortname, data => this.props.history.push('/user/menu/edit/' + this.state.shortname + '/' + data.item.id));
+        this.props.createDivisionMenu(item.id, this.state.maDonVi, this.state.shortname, data => this.props.history.push('/user/menu/edit/' + this.state.id + '/' + data.item.id));
     }
 
     updateDivisionMenuPriorities = () => {
@@ -100,7 +100,7 @@ class adminDivisionPage extends React.Component {
     renderMenu = (menu, level, hasCreate, hasUpdate, hasDelete) => (
         <li key={menu.id} data-id={menu.id}>
             <div style={{ display: 'inline-flex' }}>
-                <Link to={'/user/menu/edit/' + this.state.shortname + '/' + menu.id} style={{ color: menu.active ? '#009688' : 'gray' }}>
+                <Link to={'/user/menu/edit/' + this.state.id + '/' + menu.id} style={{ color: menu.active ? '#009688' : 'gray' }}>
                     {T.language.parse(menu.title, true).vi}
                 </Link>&nbsp;
                 {menu.link ? <p>(<a href={menu.link}
@@ -116,7 +116,7 @@ class adminDivisionPage extends React.Component {
                     <a href='#' className={menu.active ? 'btn btn-warning' : 'btn btn-secondary'} onClick={e => hasUpdate && this.changeActive(e, menu)}>
                         <i className={'fa fa-lg ' + (menu.active ? 'fa-check' : 'fa-times')} />
                     </a>
-                    <Link to={'/user/menu/edit/' + this.state.shortname + '/' + menu.id} className='btn btn-primary'>
+                    <Link to={'/user/menu/edit/' + this.state.id + '/' + menu.id} className='btn btn-primary'>
                         <i className='fa fa-lg fa-edit' />
                     </Link>
                     {hasDelete ?
@@ -194,7 +194,7 @@ class adminDivisionPage extends React.Component {
                     </div>
                 </div>
 
-                <Link to={'/user/website/edit/' + this.state.shortname} className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>
+                <Link to={'/user/website/edit/' + this.state.id} className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>
                     <i className='fa fa-lg fa-reply' />
                 </Link>
 
