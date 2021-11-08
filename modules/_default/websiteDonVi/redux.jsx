@@ -69,19 +69,22 @@ export function getDvWebsiteAll(condition, done) {
         const url = '/api/website/all';
         T.get(url, { condition }, data => {
             if (data.error) {
-                T.notify('Lấy danh sách website đơn vị bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                console.log(data);
+                // T.notify('Lấy danh sách website đơn vị bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (done) done(data.items);
                 dispatch({ type: DvWebsiteGetAll, items: data.items ? data.items : [] });
             }
-        }, (error) => T.notify('Lấy danh sách website đơn vị bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+        }, (error) => {
+            console.log(error);
+        });
     };
 }
 
-export function getDvWebsite(shortname, done) {
+export function getDvWebsite(id, done) {
     return () => {
-        const url = `/api/website/item/${shortname}`;
+        const url = `/api/website/item/${id}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy thông tin website đơn vị bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');

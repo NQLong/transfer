@@ -16,13 +16,13 @@ export default {
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
         {
-            path: '/user/website/edit/:shortname',
+            path: '/user/website/edit/:ma',
             component: Loadable({ loading: Loading, loader: () => import('./adminEditPage') })
         },
-        {
-            path: '/user/website/edit/:shortname/:ma',
-            component: Loadable({ loading: Loading, loader: () => import('./adminGioiThieuSectionEdit') })
-        },
+        // {
+        //     path: '/user/website/edit/:shortname/:ma',
+        //     component: Loadable({ loading: Loading, loader: () => import('./adminGioiThieuSectionEdit') })
+        // },
         {
             path: '/user/news-donvi/:ma',
             component: Loadable({ loading: Loading, loader: () => import('./adminNewsPage') })

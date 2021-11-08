@@ -78,13 +78,22 @@ class Footer extends React.Component {
                     </div>
                 );
             });
-
+            if (hostname.includes('tuyensinh')) {
+                footerList = [
+                    <div className='col-sm' key={'13'}>
+                        <div className='footer-link'>
+                            <h3>{'QUÉT MÃ TƯ VẤN TUYỂN SINH'} <i className='fa fa-angle-down d-md-none'></i></h3>
+                            <img src={qrcode} style={{ height: 'auto', width: '100%' }} />
+                        </div>
+                    </div>
+                ];
+            }
             footerList.push([
                 <div className='col-sm' key={'13'}>
                     <div className='footer-link'>
                         <h3>{language.connect} <i className='fa fa-angle-down d-md-none'></i></h3>
                         <div className='list-unstyled' style={{ fontWeight: 'bold', fontSize: 16 }}>
-                            <img src={'/img/logo-footer.png?t=2000'}
+                            <img src={'/img/logo-footer.png?t=4000'}
                                 onClick={() => window.open('http://hcmussh.edu.vn/', '_blank')}
                                 style={{ width: '100%', maxWidth: 450, cursor: 'pointer' }} />
                             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', paddingTop: 10, maxWidth: 450 }}>
@@ -116,7 +125,7 @@ class Footer extends React.Component {
                     <div className='footer-link'>
                         <h3>KẾT NỐI VỚI VNUHCM <i className='fa fa-angle-down d-md-none'></i></h3>
                         <div className='list-unstyled' style={{ fontWeight: 'bold', fontSize: 16 }}>
-                            <a href={'https://vnuhcm.edu.vn/'} target='_blank' rel="noreferrer"> <img src={'/img/logo-vnu.png?t=2000'}
+                            <a href={'https://vnuhcm.edu.vn/'} target='_blank' rel="noreferrer"> <img src={'/img/logo-vnu.png?t=4000'}
                                 style={{
                                     width: width < 700 ? '90%' : '82%', paddingTop: 10, maxWidth: 450, cursor: 'pointer',
                                     paddingLeft: width < 700 ? '5%' : 0
@@ -125,16 +134,8 @@ class Footer extends React.Component {
                     </div>
                 </div>
             ]);
-            if (hostname.includes('tuyensinh')) {
-                footerList = [
-                    <div className='col-sm' key={'13'}>
-                        <div className='footer-link'>
-                            <h3>{'QUÉT MÃ TƯ VẤN TUYỂN SINH'} <i className='fa fa-angle-down d-md-none'></i></h3>
-                            <img src={qrcode} style={{ height: 'auto', width: '100%' }} />
-                        </div>
-                    </div>
-                ];
-            } else if (hostname.includes('ctsv')) {
+
+            if (hostname.includes('ctsv')) {
                 footerList[0] = <div key={0} className='col-sm'>
                     <div className='footer-link'>
                         <h3>LIÊN KẾT <i className='fa fa-angle-down d-md-none'></i></h3>
@@ -257,22 +258,22 @@ class Footer extends React.Component {
                         </ul>
                     </div>
                 </div>;
-            } else if (hostname.includes('en')) {
+            } else if (hostname.includes('/en') || hostname.includes('/article') || hostname.includes('/news-en')) {
                 footerList[0] = <div className='col-sm' key={'1'}>
                     <div className='footer-link'>
-                        <h3>{'Study at USSH VNUHCM'} <i className='fa fa-angle-down d-md-none'></i></h3>
+                        <h3>{'TRAINING PROGRAMS'} <i className='fa fa-angle-down d-md-none'></i></h3>
                         <ul className='list-unstyled' style={{ display: 'none' }}>
                             <li>
-                                <a target='_blank' href='https://www.facebook.com/Libussh' rel="noreferrer">Undergraduate Programs</a>
+                                <a target='_blank' href='https://hcmussh.edu.vn/en/undergraduate-programs' rel="noreferrer">Undergraduate Programs</a>
                             </li>
                             <li>
-                                <a target='_blank' href='https://hcmussh.edu.vn/tin-tuc/lien-lac' rel="noreferrer">Postgraduate Programs</a>
+                                <a target='_blank' href='https://hcmussh.edu.vn/en/postgraduate-programs' rel="noreferrer">Postgraduate Programs</a>
                             </li>
                             <li>
-                                <a target='_blank' href='https://hcmussh.edu.vn/tin-tuc/vi-tri-tv' rel="noreferrer">PhD Programs</a>
+                                <a target='_blank' href='https://hcmussh.edu.vn/en/phd-programs' rel="noreferrer">PhD Programs</a>
                             </li>
                             <li>
-                                <a target='_blank' href='https://hcmussh.edu.vn/tin-tuc/vi-tri-tv' rel="noreferrer">Short term Courses</a>
+                                <a target='_blank' href='https://hcmussh.edu.vn/en/international-programs' rel="noreferrer">International Programs</a>
                             </li>
                         </ul>
                     </div>
@@ -282,16 +283,16 @@ class Footer extends React.Component {
                         <h3>{'Student Life'} <i className='fa fa-angle-down d-md-none'></i></h3>
                         <ul className='list-unstyled' style={{ display: 'none' }}>
                             <li>
-                                <a target='_blank' href='https://www.facebook.com/Libussh' rel="noreferrer">Future Students</a>
+                                <a target='_blank' href='https://hcmussh.edu.vn/en/future-students' rel="noreferrer">Future Students</a>
                             </li>
                             <li>
-                                <a target='_blank' href='https://hcmussh.edu.vn/tin-tuc/lien-lac' rel="noreferrer">Student Community</a>
+                                <a target='_blank' href='https://hcmussh.edu.vn/en/student-community' rel="noreferrer">Student Community</a>
                             </li>
                             <li>
-                                <a target='_blank' href='https://hcmussh.edu.vn/tin-tuc/vi-tri-tv' rel="noreferrer">International Students</a>
+                                <a target='_blank' href='https://hcmussh.edu.vn/en/international-students' rel="noreferrer">International Students</a>
                             </li>
                             <li>
-                                <a target='_blank' href='https://hcmussh.edu.vn/tin-tuc/vi-tri-tv' rel="noreferrer">Social Clubs</a>
+                                <a target='_blank' href='https://hcmussh.edu.vn/en/social-clubs' rel="noreferrer">Social Clubs</a>
                             </li>
                         </ul>
                     </div>
@@ -301,25 +302,25 @@ class Footer extends React.Component {
                         <h3>{'About'} <i className='fa fa-angle-down d-md-none'></i></h3>
                         <ul className='list-unstyled' style={{ display: 'none' }}>
                             <li>
-                                <a target='_blank' href='https://www.facebook.com/Libussh' rel="noreferrer">Offices</a>
+                                <a target='_blank' href='https://hcmussh.edu.vn/en/offices' rel="noreferrer">Offices</a>
                             </li>
                             <li>
-                                <a target='_blank' href='https://hcmussh.edu.vn/tin-tuc/lien-lac' rel="noreferrer">Faculties</a>
+                                <a target='_blank' href='https://hcmussh.edu.vn/en/faculties' rel="noreferrer">Faculties</a>
                             </li>
                             <li>
-                                <a target='_blank' href='https://hcmussh.edu.vn/tin-tuc/vi-tri-tv' rel="noreferrer">Centers</a>
+                                <a target='_blank' href='https://hcmussh.edu.vn/en/centers' rel="noreferrer">Centers</a>
                             </li>
                             <li>
-                                <a target='_blank' href='https://hcmussh.edu.vn/tin-tuc/vi-tri-tv' rel="noreferrer">Partners</a>
+                                <a target='_blank' href='https://hcmussh.edu.vn/en/partners' rel="noreferrer">Partners</a>
                             </li>
                         </ul>
                     </div>
                 </div>;
                 footerList[3] = <div className='col-sm' key={'4'}>
                     <div className='footer-link'>
-                        <h3>Get in touch<i className='fa fa-angle-down d-md-none'></i></h3>
+                        <h3>CONTACT DIRECTORY<i className='fa fa-angle-down d-md-none'></i></h3>
                         <div className='list-unstyled' style={{ fontWeight: 'bold', fontSize: 16 }}>
-                            <img src={'/img/logo-footer.png?t=2000'}
+                            <img src={'/img/logo-footer.png?t=4000'}
                                 onClick={() => window.open('http://hcmussh.edu.vn/', '_blank')}
                                 style={{ width: '100%', maxWidth: 450, cursor: 'pointer' }} />
                             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', paddingTop: 10, maxWidth: 450 }}>
@@ -340,8 +341,6 @@ class Footer extends React.Component {
                         </div>
                     </div>
                 </div>;
-                //  ;
-                // console.log(footerList);
             }
         }
         return (

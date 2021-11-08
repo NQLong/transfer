@@ -125,7 +125,7 @@ class AdminPage extends React.Component {
                         {list.map((item, index) => (
                             <tr key={index}>
                                 <td style={{ textAlign: 'right' }}>{(pageNumber - 1) * pageSize + index + 1}</td>
-                                <td style={{ textAlign: 'left' }}><Link to={'/user/website/edit/' + item.shortname}>{item.shortname}</Link></td>
+                                <td style={{ textAlign: 'left' }}><Link to={'/user/website/edit/' + item.id}>{item.shortname}</Link></td>
                                 {/* <td><a href={'/user/website/edit/' + item.shortname} style={{ color: 'black' }}>{item.tenDonVi}</a></td> */}
                                 <td><a href={item.website} target='__blank' className='text-success'>{item.website}</a></td>
                                 <td className='toggle' style={{ textAlign: 'center' }}>
@@ -139,7 +139,7 @@ class AdminPage extends React.Component {
                                         <a href={`/${item.shortname}`} target='__blank' className='btn btn-success'>
                                             <i className='fa fa-lg fa-chrome' style={{ margin: 'unset' }} />
                                         </a>
-                                        <Link className='btn btn-primary' to={`/user/website/edit/${item.shortname}`}>
+                                        <Link className='btn btn-primary' to={`/user/website/edit/${item.id}`}>
                                             <i className='fa fa-lg fa-edit' style={{ margin: 'unset' }} />
                                         </Link>
                                         {permissionDelete &&

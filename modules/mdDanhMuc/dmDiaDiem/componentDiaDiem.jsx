@@ -20,17 +20,17 @@ export class ComponentDiaDiem extends React.Component {
                             if (maPhuongXa) {
                                 this.dmPhuongXa.value(maPhuongXa);
                             } else {
-                                this.dmPhuongXa.clear();
+                                this.dmPhuongXa.value(null);
                                 maPhuongXa = '';
                             }
                         });
                     } else {
-                        this.dmQuanHuyen.clear(); this.dmPhuongXa.clear();
+                        this.dmQuanHuyen.value(null); this.dmPhuongXa.value(null);
                         maQuanHuyen = maPhuongXa = '';
                     }
                 });
             } else {
-                this.dmTinhThanhPho.clear(); this.dmQuanHuyen.clear(); this.dmPhuongXa.clear();
+                this.dmTinhThanhPho.value(null); this.dmQuanHuyen.value(null); this.dmPhuongXa.value(null);
                 maTinhThanhPho = maQuanHuyen = maPhuongXa = '';
             }
             this.soNhaDuong.value(soNhaDuong || '');

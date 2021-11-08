@@ -48,7 +48,7 @@ class SectionNews extends React.Component {
         } else if (language == 'vi' && !item.link) {
             return ('/news/item/' + item.id);
         } else if (language == 'en' && item.linkEn) {
-            return ('/article/' + item.link);
+            return ('/article/' + item.linkEn);
         } else if (language == 'en' && !item.linkEn) {
             return ('/news-en/item/' + item.id);
         }
@@ -78,14 +78,18 @@ class SectionNews extends React.Component {
                                     <div className='col-lg-6 col-12' key={index}>
                                         <Link to={this.getLink(item)} className='block-20' style={{ backgroundImage: `url(${item.image})`, backgroundSize: 'cover', borderRadius: '5px' }}></Link>
                                         <div className='text py-3 d-block w-100 text-justify'>
-                                            <Link tto={this.getLink(item)}><h6 className='homeBody' style={{ color: '#626262' }}><b>{item.isTranslate == 1 ? T.language.parse(item.title) : T.language.parse(item.title, true)[item.language]}</b></h6></Link>
+                                            <Link to={this.getLink(item)}><h6 className='homeBody' style={{ color: '#626262' }}>
+                                                <b>{item.isTranslate == 1 ? T.language.parse(item.title) : T.language.parse(item.title, true)[item.language]}
+                                                </b></h6>
+                                            </Link>
                                         </div>
                                     </div>
                                 );
                             })}
                         </div>
                         <div className='col-12 d-flex justify-content-center'>
-                            <Link to={detail.linkSeeAll} className='btn btn-lg btn-outline-dark px-5 viewAll' style={{ borderRadius: 0 }}>{viewAll}</Link>
+                            <Link to={detail.linkSeeAll} className='btn btn-lg btn-outline-dark px-5 viewAll'
+                                style={{ borderRadius: 0 }}>{viewAll}</Link>
                         </div>
                     </div>
                 </div>

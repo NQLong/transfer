@@ -79,14 +79,14 @@ export function getNewsInPage(pageNumber, pageSize, pageCondition, done) {
         const url = '/api/news/page/' + page.pageNumber + '/' + page.pageSize;
         T.get(url, { condition: page.pageCondition }, data => {
             if (data.error) {
-                T.notify('Lấy danh sách tin tức bị lỗi!', 'danger');
+                // T.notify('Lấy danh sách tin tức bị lỗi!', 'danger');
                 console.error('GET: ' + url + '.', data.error);
             } else {
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 if (done) done(data.page);
                 dispatch({ type: NewsGetNewsInPage, page: data.page, });
             }
-        }, () => T.notify('Lấy danh sách tin tức bị lỗi!', 'danger'));
+        }, (error) => console.log(error));
     };
 }
 
@@ -216,6 +216,7 @@ export function createDraftNewsDefault(done) {
             active: false,
             abstract: JSON.stringify({ vi: '', en: '' }),
             content: JSON.stringify({ vi: '', en: '' }),
+            maDonVi: state.system.user.maDonVi
         }, passValue = {
             title: JSON.stringify({ vi: 'Bản nháp', en: 'Draft' }),
             editorId: state.system.user.shcc,
@@ -701,9 +702,10 @@ export function getNewsByCategory(pageNumber, pageSize, category, done) {
     };
 }
 
-export function getNewsByUser(newsId, newsLink, done) {
+export function getNewsByUser(newsId, newsLink, type, done) {
     return dispatch => {
-        const url = newsId ? '/news/item/id/' + newsId : '/news/item/link/' + newsLink;
+        let url = newsId ? '/news/item/id/' + newsId : '/news/item/link/' + newsLink;
+        if (type == 'en' && !newsId) url = '/news/item/link-en/' + newsLink;
         T.get(url, data => {
             if (data.error) {
                 T.notify(language.getNewsByUserError, 'danger');
@@ -718,8 +720,8 @@ export function getNewsByUser(newsId, newsLink, done) {
 
 export function getNewsFeed(maDonVi) {
     return dispatch => {
-        const url = '/news/page/1/' + T.newsFeedPageSize;
-        T.get(url, { maDonVi }, data => {
+        const url = '/news/page/1/10';
+        T.get(url, { maDonVi, language: T.language() }, data => {
             if (data.error) {
                 T.notify(language.getNewsFeedError, 'danger');
                 console.error('GET: ' + url + '.', data.error);

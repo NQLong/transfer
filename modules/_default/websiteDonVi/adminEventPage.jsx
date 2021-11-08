@@ -133,11 +133,11 @@ class EventPage extends React.Component {
                     {/* <Link to={'/user/news/unit/draft'} className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>
                         <i className='fa fa-lg fa-reply' />
                     </Link> */}
-                    <button onClick={() => {
+                    {/* <button onClick={() => {
                         this.props.history.goBack();
                     }} className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '50px' }}>
                         <i className='fa fa-lg fa-reply' />
-                    </button>
+                    </button> */}
                     {permissionWrite ?
                         <button type='button' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }}
                             onClick={this.create}>

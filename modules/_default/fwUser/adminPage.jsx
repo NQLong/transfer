@@ -240,7 +240,7 @@ class UserPage extends React.Component {
     componentDidMount() {
         this.props.getRoleAll(items => items && items.forEach(role => this.roleMapper[role.id] = role.name));
         T.tooltip();
-        T.ready(() => this.searchBox.current.getPage());
+        T.ready('/user/settings', () => this.searchBox.current.getPage());
     }
 
     edit = (e, item) => {

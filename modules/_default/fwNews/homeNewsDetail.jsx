@@ -16,12 +16,15 @@ class NewsDetail extends React.Component {
                     : (url.startsWith('/news/item/') ? '/news/item/:id'
                         : (url.startsWith('/news-en/item/') ? '/news-en/item/:id'
                             : '/article/:link'))).parse(url);
-        this.setState({ id: params.id, link: params.link });
+        this.setState({
+            id: params.id, link: params.link,
+            type: url.startsWith('/tin-tuc/') || url.startsWith('/news/item/') ? 'vi' : 'en'
+        });
     }
 
     componentDidUpdate() {
         if (this.state.language != T.language()) {
-            this.props.getNewsByUser(this.state.id, this.state.link);
+            this.props.getNewsByUser(this.state.id, this.state.link, this.state.type);
             this.setState({ language: T.language() });
         }
 
@@ -45,9 +48,8 @@ class NewsDetail extends React.Component {
                 </div>
             ) : null;
             let content = T.language.parse(item.content)
-                .replaceAll('<strong>', '<b style="font-weight: bold;color:black;">')
+                .replaceAll('<strong>', '<b style="font-weight: bold;">')
                 .replaceAll('</strong>', '</b>');
-            console.log(T.language());
             return (
                 <section className='ftco-section ftco-degree-bg'>
                     <div className='container-fluid'>

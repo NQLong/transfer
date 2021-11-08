@@ -64,9 +64,14 @@ const T = {
                 // setTimeout(() => $('.app-sidebar').animate({ scrollTop: menuItem.offset().top - menuItem.parent().parent().offset().top }), 200);
             }
         }
+        // Update user url
+        const userUrl = window.location.pathname;
+        if (userUrl.startsWith('/user')) T.cookie('userUrl', userUrl);
+
     }, 500)),
 
     url: (url) => url + (url.indexOf('?') === -1 ? '?t=' : '&t=') + new Date().getTime(),
+
     download: (url, name) => {
         let link = document.createElement('a');
         link.target = '_blank';
@@ -278,7 +283,8 @@ const T = {
 T.socket = T.debug ? io() : io.connect(T.rootUrl, { secure: true });
 
 T.language = texts => {
-    let lg = T.cookie('language');
+    let lg = window.location.pathname.includes('/en')
+        || window.location.pathname.includes('/article') ? 'en' : 'vi';
     if (lg == null || (lg != 'vi' && lg != 'en')) lg = 'vi';
     return texts ? (texts[lg] ? texts[lg] : '') : lg;
 };

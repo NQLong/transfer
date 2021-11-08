@@ -6,7 +6,6 @@ import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, FormSelect } from 'view/component/AdminPage';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 
-
 class StaffPage extends AdminPage {
     state = { searching: false, filter: {} };
 
@@ -17,6 +16,7 @@ class StaffPage extends AdminPage {
             T.showSearchBox(() => {
                 this.maDonVi?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
+                setTimeout(() => this.showAdvanceSearch(), 1000);
             });
 
             this.changeAdvancedSearch(true);

@@ -52,7 +52,7 @@ app.get('/download/:name', (req, res) => {
     if (app.fs.existsSync(path)) {
         res.download(path, fileName);
     } else {
-        res.redirect('/404.html');
+        // res.redirect('/404.html');
     }
 });
 

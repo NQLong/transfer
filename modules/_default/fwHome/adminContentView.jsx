@@ -40,7 +40,7 @@ class ContentPage extends React.Component {
                                 <td style={{ textAlign: 'right' }}>{index + 1}</td>
                                 <td>
                                     <Link to={'/user/content/edit/' + item.id} data-id={item.id}>
-                                        {T.language.parse(item.title)}
+                                        {item.title.viText()}
                                     </Link>
                                 </td>
                                 <td className='toggle' style={{ textAlign: 'center' }}>

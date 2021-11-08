@@ -1,6 +1,6 @@
 const keys = ['ID'];
-const obj2Db = { 'priority': 'PRIORITY', 'title': 'TITLE', 'image': 'IMAGE', 'link': 'LINK', 'active': 'ACTIVE', 'isInternal': 'IS_INTERNAL', 'abstract': 'ABSTRACT', 'content': 'CONTENT', 'createdDate': 'CREATED_DATE', 'startPost': 'START_POST', 'stopPost': 'STOP_POST', 'id': 'ID', 'views': 'VIEWS', 'maDonVi': 'MA_DON_VI', 'isTranslate': 'IS_TRANSLATE', 'language': 'LANGUAGE', 'attachment': 'ATTACHMENT', 'displayCover': 'DISPLAY_COVER', 'pinned': 'PINNED' };
-const obj2DbFilter = { 'priority': 'PRIORITY', 'title': 'TITLE', 'image': 'IMAGE', 'link': 'LINK', 'active': 'ACTIVE', 'isInternal': 'IS_INTERNAL', 'abstract': 'ABSTRACT', 'createdDate': 'CREATED_DATE', 'startPost': 'START_POST', 'stopPost': 'STOP_POST', 'id': 'ID', 'views': 'VIEWS', 'maDonVi': 'MA_DON_VI', 'isTranslate': 'IS_TRANSLATE', 'language': 'LANGUAGE', 'attachment': 'ATTACHMENT', 'displayCover': 'DISPLAY_COVER', 'pinned': 'PINNED' };
+const obj2Db = { 'priority': 'PRIORITY', 'title': 'TITLE', 'image': 'IMAGE', 'link': 'LINK', 'active': 'ACTIVE', 'isInternal': 'IS_INTERNAL', 'abstract': 'ABSTRACT', 'content': 'CONTENT', 'createdDate': 'CREATED_DATE', 'startPost': 'START_POST', 'stopPost': 'STOP_POST', 'id': 'ID', 'views': 'VIEWS', 'maDonVi': 'MA_DON_VI', 'isTranslate': 'IS_TRANSLATE', 'language': 'LANGUAGE', 'attachment': 'ATTACHMENT', 'displayCover': 'DISPLAY_COVER', 'pinned': 'PINNED', 'linkEn': 'LINK_EN' };
+const obj2DbFilter = { 'priority': 'PRIORITY', 'title': 'TITLE', 'image': 'IMAGE', 'link': 'LINK', 'active': 'ACTIVE', 'isInternal': 'IS_INTERNAL', 'abstract': 'ABSTRACT', 'createdDate': 'CREATED_DATE', 'startPost': 'START_POST', 'stopPost': 'STOP_POST', 'id': 'ID', 'views': 'VIEWS', 'maDonVi': 'MA_DON_VI', 'isTranslate': 'IS_TRANSLATE', 'language': 'LANGUAGE', 'attachment': 'ATTACHMENT', 'displayCover': 'DISPLAY_COVER', 'pinned': 'PINNED', 'linkEn': 'LINK_EN' };
 
 module.exports = app => {
     app.model.fwNews.create2 = (data, done) => {
@@ -87,7 +87,15 @@ module.exports = app => {
         });
     };
 
+    app.model.fwNews.readById = (id, done) => app.model.fwNews.read({ id, active: 1 }, done);
+
     app.model.fwNews.getByLink = (link, done) => app.model.fwNews.get({ link }, done);
+
+    app.model.fwNews.getByEnLink = (linkEn, done) => app.model.fwNews.get({ linkEn }, done);
+
+    app.model.fwNews.readByLink = (link, done) => app.model.fwNews.read({ link, active: 1 }, done);
+
+    app.model.fwNews.readByEnLink = (linkEn, done) => app.model.fwNews.read({ linkEn, active: 1 }, done);
 
     app.model.fwNews.read = (condition, done) => {
         app.model.fwNews.getAll(condition, (error, items) => {
@@ -104,10 +112,6 @@ module.exports = app => {
             }
         });
     };
-
-    app.model.fwNews.readById = (id, done) => app.model.fwNews.read({ id, active: 1 }, done);
-
-    app.model.fwNews.readByLink = (link, done) => app.model.fwNews.read({ link, active: 1 }, done);
 
     app.model.fwNews.swapPriority = (id, isMoveUp, done) => {
         app.model.fwNews.get({ id }, (error, item1) => {

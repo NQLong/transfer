@@ -12,8 +12,8 @@ class AdminEditPage extends React.Component {
 
     componentDidMount() {
         T.ready('/user/website', () => {
-            const route = T.routeMatcher('/user/website/edit/:shortname'),
-                shortname = route.parse(window.location.pathname).shortname;
+            const route = T.routeMatcher('/user/website/edit/:ma'),
+                shortname = route.parse(window.location.pathname).ma;
             if (shortname) {
                 this.props.getDvWebsite(shortname, data => {
                     if (data) {
@@ -74,8 +74,9 @@ class AdminEditPage extends React.Component {
             { title: 'Danh mục bài viết', link: '/user/news/category' },
             { title: 'Danh mục sự kiện', link: '/user/event/category' },
             { title: 'Danh mục tệp tin', link: '/user/storage/category' },
-
             { title: 'Thành phần giao diện', link: '/user/component' },
+            { title: 'Bài viết chờ duyệt', link: '/user/news/draft' },
+
         ];
         menus.forEach((item, index) => {
             groupMenus.push(
@@ -99,7 +100,7 @@ class AdminEditPage extends React.Component {
                     </div>
                     <ul className='app-breadcrumb breadcrumb'>
                         <Link to='/user'><i className='fa fa-home fa-lg' /></Link>&nbsp;/&nbsp;
-                        <Link to='/user/settings'>Cấu hình</Link>&nbsp;/&nbsp;
+                        {/* <Link to='/user/settings'>Cấu hình</Link>&nbsp;/&nbsp; */}
                         <Link to='/user/website'>Website</Link>&nbsp;/&nbsp;
                         Chỉnh sửa
                     </ul>

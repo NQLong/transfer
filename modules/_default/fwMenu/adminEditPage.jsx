@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { updateMenu, getMenu, createComponent, updateComponent, updateComponentPriorities, deleteComponent, getComponentViews, homeMenuGet } from './redux';
-import { Link } from 'react-router-dom';
+// import { Link } from 'react-router-dom';
 import Dropdown from 'view/component/Dropdown';
 import { FormSelect } from 'view/component/AdminPage';
 
@@ -117,7 +117,7 @@ export class ComponentModal extends React.Component {
                     }
                 }
                 if (!found) $(this.btnSave.current).data('viewId', '');
-                $('#itemViewItem').select2({ data: items.map(item => ({ id: item.id, text: T.language.parse(item.text ? item.text : item), })), placeholder: 'Chọn danh mục' })
+                $('#itemViewItem').select2({ data: items.map(item => ({ id: item.id, text: item.text ? item.text.viText() : item, })), placeholder: 'Chọn danh mục' })
                     .val(viewItemId).trigger('change');
                 this.setState({ viewType: selectedType, viewItemText, });
             });
@@ -278,12 +278,12 @@ export class MenuEditPage extends React.Component {
             active: this.state.active ? 1 : 0,
         };
 
-        if (this.state.divisionId && changes.link != '#' && !changes.link.startsWith(`/${this.state.divisionId}`)
-            && !changes.link.includes('http')
-        ) {
-            T.alert(`Địa chỉ nhập phải bắt đầu bằng /${this.state.divisionId}  !`, 'error', false, 2000);
-            return;
-        }
+        // if (this.state.divisionId && changes.link != '#' && !changes.link.startsWith(`/${this.state.divisionId}`)
+        //     && !changes.link.includes('http')
+        // ) {
+        //     T.alert(`Địa chỉ nhập phải bắt đầu bằng /${this.state.divisionId}  !`, 'error', false, 2000);
+        //     return;
+        // }
         if (changes.link != '#') this.props.homeMenuGet(changes.link, data => {
             if (data.menu && data.menu.id != this.state.id) {
                 T.alert('Địa chỉ bạn nhập bị trùng, vui lòng nhập lại', 'error', false, 2000);
@@ -470,9 +470,9 @@ export class MenuEditPage extends React.Component {
                     </div>
                 </div>
 
-                <Link to={this.state.divisionId ? '/user/menu/' + this.state.divisionId : '/user/menu'} className='btn btn-secondary btn-circle' style={{ position: 'fixed', lefft: '10px', bottom: '10px' }}>
+                {/* <Link to={this.state.divisionId ? '/user/menu/' + this.state.divisionId : '/user/menu'} className='btn btn-secondary btn-circle' style={{ position: 'fixed', lefft: '10px', bottom: '10px' }}>
                     <i className='fa fa-lg fa-reply' />
-                </Link>
+                </Link> */}
                 {currentPermissions.includes('component:read') ?
                     <button type='button' className='btn btn-info btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }}
                         onClick={() => this.props.history.push('/user/component')}>
