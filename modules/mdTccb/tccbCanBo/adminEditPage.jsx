@@ -2230,11 +2230,11 @@ class CanBoEditPage extends QTForm {
                         <div className='form-group col-xl-4 col-md-6'><TextInput ref={this.cmndNoiCap} label='Nơi cấp CMND / CCCD' placeholder='Nhập nơi cấp cmnd' disabled={readOnly} maxLength={200} /></div>
                         <div className='form-group col-xl-6 col-md-6'><TextInput ref={this.emailCaNhan} label='Địa chỉ email cá nhân' disabled={readOnly} maxLength={50} /></div>
                         <div className='form-group col-xl-6 col-md-6'><TextInput ref={this.email} label='Địa chỉ email trường' disabled={readOnly} maxLength={50} /></div>
-                        <div className='form-group col-xl-4 col-md-6'><Select ref={this.phai} adapter={SelectAdapter_DmGioiTinh} label='Giới tính' disabled={readOnly} required /></div>
+                        <div className='form-group col-xl-4 col-md-6'><Select ref={this.phai} adapter={SelectAdapter_DmGioiTinh} label='Giới tính' disabled={readOnly} /></div>
                         <div className='form-group col-xl-4 col-md-6'><Select ref={this.nhomMau} adapter={SelectAdapter_DmNhomMau} label='Nhóm máu' disabled={readOnly} /></div>
-                        <div className='form-group col-xl-4 col-md-6'><Select ref={this.danToc} adapter={SelectAdapter_DmDanToc} label='Dân tộc' required /></div>
-                        <div className='form-group col-xl-4 col-md-6'><Select ref={this.quocGia} adapter={SelectAdapter_DmQuocGia} label='Quốc gia' required /></div>
-                        <div className='form-group col-xl-4 col-md-6'><Select ref={this.tonGiao} adapter={SelectAdapter_DmTonGiao} label='Tôn giáo' required /></div>
+                        <div className='form-group col-xl-4 col-md-6'><Select ref={this.danToc} adapter={SelectAdapter_DmDanToc} label='Dân tộc' /></div>
+                        <div className='form-group col-xl-4 col-md-6'><Select ref={this.quocGia} adapter={SelectAdapter_DmQuocGia} label='Quốc gia' /></div>
+                        <div className='form-group col-xl-4 col-md-6'><Select ref={this.tonGiao} adapter={SelectAdapter_DmTonGiao} label='Tôn giáo' /></div>
                         <div className='form-group col-xl-4 col-md-6'><TextInput ref={this.soBhxh} label='Số BHXH' /></div>
                         <div className='form-group col-12' />
                         <ComponentDiaDiem ref={e => this.nguyenQuan = e} label='Nguyên quán' className='col-md-12' />
@@ -2280,7 +2280,7 @@ class CanBoEditPage extends QTForm {
                         </div>
                         {this.state.dangVien &&
                             <>
-                                <div className='form-group col-md-4'><DateInput ref={this.ngayVaoDang} label='Ngày vào Đảng (Dự bị)' disabled={readOnly} required min={new Date(1900, 1, 1).getTime()} max={new Date().getTime()} /></div>
+                                <div className='form-group col-md-4'><DateInput ref={this.ngayVaoDang} label='Ngày vào Đảng (Dự bị)' disabled={readOnly} min={new Date(1900, 1, 1).getTime()} max={new Date().getTime()} /></div>
                                 <div className='form-group col-md-8'><TextInput ref={this.noiDangDb} label='Nơi vào Đảng (Dự bị)' disabled={readOnly} maxLength={200} /></div>
                                 <div className='form-group col-md-4'><DateInput ref={this.ngayVaoDangChinhThuc} label='Ngày vào Đảng chính thức' disabled={readOnly} min={new Date(1900, 1, 1).getTime()} max={new Date().getTime()} /></div>
                                 <div className='form-group col-md-8'><TextInput ref={this.noiDangCt} label='Nơi vào Đảng chính thức' disabled={readOnly} maxLength={200} /></div>
