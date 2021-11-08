@@ -174,18 +174,9 @@ export function getDmDonViFaculty(done) {
     };
 }
 
-// export const SelectAdapter_DmDonVi = {
-//     ajax: true,
-//     url: '/api/danh-muc/don-vi/page/1/20',
-//     data: params => ({ condition: params.term }),
-//     processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: `${item.ten}` })) : [] }),
-//     getOne: getDmDonVi,
-//     processResultOne: response => response && ({ value: response.ma, text: response.ten }),
-// };
-
 export const SelectAdapter_DmDonVi = {
     ajax: true,
-    url: '/api/danh-muc/don-vi/page/1/50',
+    url: '/api/danh-muc/don-vi/page/1/20',
     data: params => ({ condition: params.term, kichHoat: 1 }),
     processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.ten })) : [] }),
     fetchOne: (id, done) => (getDmDonVi(id, item => item && done && done({ id: item.ma, text: item.ten })))(),
