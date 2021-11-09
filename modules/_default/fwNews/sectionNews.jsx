@@ -41,19 +41,6 @@ class SectionNews extends React.Component {
         setTimeout(T.ftcoAnimate, 250);
     }
 
-    getLink = (item) => {
-        const language = T.language();
-        if (language == 'vi' && item.link) {
-            return ('/tin-tuc/' + item.link);
-        } else if (language == 'vi' && !item.link) {
-            return ('/news/item/' + item.id);
-        } else if (language == 'en' && item.linkEn) {
-            return ('/article/' + item.linkEn);
-        } else if (language == 'en' && !item.linkEn) {
-            return ('/news-en/item/' + item.id);
-        }
-    }
-
     render() {
         const language = T.language(this.state.category),
             viewAll = T.language(texts).viewAll,
@@ -66,9 +53,9 @@ class SectionNews extends React.Component {
                 <div className='container-fluid'>
                     <div className='row d-flex'>
                         <div className='col-lg-6 col-12'>
-                            <Link to={this.getLink(newsList[0])} className='block-20 block-50' style={{ backgroundImage: `url(${newsList[0].image})`, backgroundSize: 'cover', borderRadius: '5px' }}></Link>
+                            <Link to={T.linkNewsDetail(newsList[0])} className='block-20 block-50' style={{ backgroundImage: `url(${newsList[0].image})`, backgroundSize: 'cover', borderRadius: '5px' }}></Link>
                             <div className='text py-4 d-block w-100 text-justify'>
-                                <Link to={this.getLink(newsList[0])}><h4 className='homeHeading' style={{ color: '#626262' }}><b>{newsList[0].isTranslate == 1 ? T.language.parse(newsList[0].title) : T.language.parse(newsList[0].title, true)[newsList[0].language]}</b></h4></Link>
+                                <Link to={T.linkNewsDetail(newsList[0])}><h4 className='homeHeading' style={{ color: '#626262' }}><b>{newsList[0].isTranslate == 1 ? T.language.parse(newsList[0].title) : T.language.parse(newsList[0].title, true)[newsList[0].language]}</b></h4></Link>
                                 <h6 className='homeBody' style={{ color: '#626262', fontWeight: 'normal' }}>{newsList[0].isTranslate == 1 ? T.language.parse(newsList[0].abstract) : T.language.parse(newsList[0].abstract, true)[newsList[0].language]}</h6>
                             </div>
                         </div>
@@ -76,9 +63,9 @@ class SectionNews extends React.Component {
                             {newsList.slice(1).map((item, index) => {
                                 if (index < 4) return (
                                     <div className='col-lg-6 col-12' key={index}>
-                                        <Link to={this.getLink(item)} className='block-20' style={{ backgroundImage: `url(${item.image})`, backgroundSize: 'cover', borderRadius: '5px' }}></Link>
+                                        <Link to={T.linkNewsDetail(item)} className='block-20' style={{ backgroundImage: `url(${item.image})`, backgroundSize: 'cover', borderRadius: '5px' }}></Link>
                                         <div className='text py-3 d-block w-100 text-justify'>
-                                            <Link to={this.getLink(item)}><h6 className='homeBody' style={{ color: '#626262' }}>
+                                            <Link to={T.linkNewsDetail(item)}><h6 className='homeBody' style={{ color: '#626262' }}>
                                                 <b>{item.isTranslate == 1 ? T.language.parse(item.title) : T.language.parse(item.title, true)[item.language]}
                                                 </b></h6>
                                             </Link>

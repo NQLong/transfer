@@ -277,6 +277,18 @@ const T = {
             data: parseData,
             processResults: response => ({ results: parseResponse(response) }),
         });
+    },
+    linkNewsDetail: (item) => {
+        const language = T.language();
+        if (language == 'vi' && item.link) {
+            return ('/tin-tuc/' + item.link);
+        } else if (language == 'vi' && !item.link) {
+            return ('/news/item/' + item.id);
+        } else if (language == 'en' && item.linkEn) {
+            return ('/article/' + item.linkEn);
+        } else if (language == 'en' && !item.linkEn) {
+            return ('/news-en/item/' + item.id);
+        }
     }
 };
 

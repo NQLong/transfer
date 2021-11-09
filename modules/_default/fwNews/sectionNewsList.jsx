@@ -64,7 +64,7 @@ class NewsListView extends React.Component {
         let newsGridView = [], newsListView = [];
         if (list) {
             newsGridView = list.map((item, index) => {
-                const link = item.link ? linkFormat + item.link : idFormat + item.id;
+                const link = T.linkNewsDetail(item);
                 return (
                     <div key={index} className='col-12 col-sm-6 col-md-4 col-lg-3 d-sm-flex ftco-animate'>
                         <div className='blog-entry align-self-stretch' style={{ width: '100%' }}>
@@ -80,10 +80,6 @@ class NewsListView extends React.Component {
                                     <div>
                                         <a href='#' style={{ color: '#626262' }}>{new Date(item.startPost).getText()}</a>
                                     </div>
-                                    {/* <br />
-                                    <div style={{ color: '#626262' }}>
-                                        Lượt xem: {item.views} <i className='fa fa-eye' />
-                                    </div> */}
                                 </div>
                             </div>
                         </div>

@@ -96,19 +96,6 @@ class SectionSideBar extends React.Component {
         });
     }
 
-    getLink = (item) => {
-        const language = T.language();
-        if (language == 'vi' && item.link) {
-            return ('/tin-tuc/' + item.link);
-        } else if (language == 'vi' && !item.link) {
-            return ('/news/item/' + item.id);
-        } else if (language == 'en' && item.linkEn) {
-            return ('/article/' + item.link);
-        } else if (language == 'en' && !item.linkEn) {
-            return ('/news-en/item/' + item.id);
-        }
-    }
-
     render() {
         const language = T.language(texts);
         const temp = T.language(this.state.recentNews);
@@ -131,10 +118,10 @@ class SectionSideBar extends React.Component {
         const recentNews = (this.props.news && this.props.news.newsFeed ? this.props.news.newsFeed : []).map((item, index) => {
             return (
                 <div key={index} className='block-21 mb-4 d-flex'>
-                    <a href={this.getLink(item)} className='blog-img' style={{ backgroundImage: `url('${item.image}')` }} />
+                    <a href={T.linkNewsDetail(item)} className='blog-img' style={{ backgroundImage: `url('${item.image}')` }} />
                     <div className='text'>
                         <h3 className='heading text-justify'>
-                            <a href={this.getLink(item)}
+                            <a href={T.linkNewsDetail(item)}
                                 style={{ display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden', paddingLeft: 10 }}>{T.language.parse(item.title)}</a></h3>
                     </div>
                 </div>
