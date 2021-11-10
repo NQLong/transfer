@@ -15,7 +15,7 @@ module.exports = app => {
             console.log('Hook: upload division header image => division header image upload');
             const shortname = fields.userData[0].substring(15),
                 srcPath = files.divisionHeader[0].path;
-            let image = '/img/divisionHeader/' + shortname + '_' + (new Date().getTime()).toString().slice(-8) + app.path.extname(srcPath);
+            let image = '/img/divisionHeader/' + shortname.replace('/', '_') + '_' + (new Date().getTime()).toString().slice(-8) + app.path.extname(srcPath);
             app.model.dvWebsite.get({ shortname }, (error, website) => {
                 app.fs.rename(srcPath, app.path.join(app.publicPath, image), error => {
                     if (error) done({ error });
@@ -36,7 +36,7 @@ module.exports = app => {
             console.log('Hook: upload division header mobile image => division header image upload');
             const shortname = fields.userData[0].substring(21),
                 srcPath = files.divisionHeaderMobile[0].path;
-            let image = '/img/divisionHeader/' + shortname + '_' + (new Date().getTime()).toString().slice(-8) + app.path.extname(srcPath);
+            let image = '/img/divisionHeader/' + shortname.replace('/', '_') + '_' + (new Date().getTime()).toString().slice(-8) + app.path.extname(srcPath);
             app.model.dvWebsite.get({ shortname }, (error, website) => {
                 app.fs.rename(srcPath, app.path.join(app.publicPath, image), error => {
                     if (error) done({ error });
