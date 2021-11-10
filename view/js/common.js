@@ -71,6 +71,7 @@ const T = {
     }, 500)),
 
     url: (url) => url + (url.indexOf('?') === -1 ? '?t=' : '&t=') + new Date().getTime(),
+
     download: (url, name) => {
         let link = document.createElement('a');
         link.target = '_blank';
@@ -134,16 +135,20 @@ const T = {
         T.cookie(cookieName, initData);
     },
 
-    updatePage: (cookieName, pageNumber, pageSize, pageCondition) => {
+    updatePage: (cookieName, pageNumber, pageSize, pageCondition, filter, advancedSearch) => {
         const updateStatus = {}, oldStatus = T.cookie(cookieName);
         updateStatus[T.pageKeyName.pageNumber] = pageNumber ? pageNumber : oldStatus[T.pageKeyName.pageNumber];
         updateStatus[T.pageKeyName.pageSize] = pageSize ? pageSize : oldStatus[T.pageKeyName.pageSize];
         updateStatus[T.pageKeyName.pageCondition] = pageCondition != null || pageCondition == '' ? pageCondition : oldStatus[T.pageKeyName.pageCondition];
+        updateStatus[T.pageKeyName.filter] = filter ? filter : oldStatus[T.pageKeyName.filter];
+        updateStatus[T.pageKeyName.advancedSearch] = advancedSearch != null ? advancedSearch : oldStatus[T.pageKeyName.advancedSearch];
         T.cookie(cookieName, updateStatus);
         return {
             pageNumber: updateStatus[T.pageKeyName.pageNumber],
             pageSize: updateStatus[T.pageKeyName.pageSize],
             pageCondition: updateStatus[T.pageKeyName.pageCondition],
+            filter: updateStatus[T.pageKeyName.filter],
+            advancedSearch: updateStatus[T.pageKeyName.advancedSearch]
         };
     },
 
@@ -278,7 +283,8 @@ const T = {
 T.socket = T.debug ? io() : io.connect(T.rootUrl, { secure: true });
 
 T.language = texts => {
-    let lg = T.cookie('language');
+    let lg = window.location.pathname.includes('/en')
+        || window.location.pathname.includes('/article') ? 'en' : 'vi';
     if (lg == null || (lg != 'vi' && lg != 'en')) lg = 'vi';
     return texts ? (texts[lg] ? texts[lg] : '') : lg;
 };

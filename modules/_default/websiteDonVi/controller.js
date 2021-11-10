@@ -12,8 +12,8 @@ module.exports = app => {
         { name: 'website:delete' });
     app.get('/user/website', app.permission.check('website:read'), app.templates.admin);
     app.get('/user/websites', app.permission.check('website:read'), app.templates.admin);
-    app.get('/user/website/edit/:shortname', app.permission.check('website:read'), app.templates.admin);
-    app.get('/user/website/edit/:shortname', app.permission.check('website:read'), app.templates.admin);
+    app.get('/user/website/edit/:ma', app.permission.check('website:read'), app.templates.admin);
+    // app.get('/user/website/edit/:shortname/:ma', app.permission.check('website:read'), app.templates.admin);
     app.get('/user/website/intro/edit/:ma', app.permission.check('website:read'), app.templates.admin);
     app.get('/user/news-donvi/:ma', app.permission.check('website:read'), app.templates.admin);
     app.get('/user/event-donvi/:ma', app.permission.check('website:read'), app.templates.admin);
@@ -41,8 +41,8 @@ module.exports = app => {
         app.model.dvWebsite.getAll(condition, (error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/website/item/:shortname', (req, res) => {
-        app.model.dvWebsite.get({ shortname: req.params.shortname }, (error, item) => {
+    app.get('/api/website/item/:id', (req, res) => {
+        app.model.dvWebsite.get({ id: req.params.id }, (error, item) => {
             res.send({ error, item });
         });
     });

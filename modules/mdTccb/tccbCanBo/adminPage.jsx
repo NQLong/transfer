@@ -2,16 +2,47 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { PageName, getStaffPage, deleteStaff } from './redux';
 import Pagination, { OverlayLoading } from 'view/component/Pagination';
-import AdminSearchBox from 'view/component/AdminSearchBox';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, FormSelect } from 'view/component/AdminPage';
+import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 
 class StaffPage extends AdminPage {
-    state = { searching: false };
-    searchBox = React.createRef();
+    state = { searching: false, filter: {} };
 
     componentDidMount() {
-        T.ready('/user/tccb', () => this.searchBox.current.getPage());
+        T.ready('/user/tccb', () => {
+            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
+            // T.showSearchBox();
+            T.showSearchBox(() => {
+                this.maDonVi?.value('');
+                setTimeout(() => this.changeAdvancedSearch(), 50);
+                setTimeout(() => this.showAdvanceSearch(), 1000);
+            });
+
+            this.changeAdvancedSearch(true);
+        });
+    }
+
+    changeAdvancedSearch = (isInitial = false) => {
+        let { pageNumber, pageSize, pageCondition } = this.props && this.props.staff && this.props.staff.page ? this.props.staff.page : { pageNumber: 1, pageSize: 50, pageCondition: '' };
+
+        const maDonVi = this.maDonVi?.value() || '';
+        const pageFilter = isInitial ? null : { maDonVi };
+        this.setState({ filter: pageFilter });
+        this.getPage(pageNumber, pageSize, pageCondition, (page) => {
+            if (isInitial) {
+                // Initial
+                const filter = page.filter || {};
+                this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
+                T.setTextSearchBox(pageCondition || '');
+                this.maDonVi?.value(filter.maDonVi);
+                if (!$.isEmptyObject(filter) && filter && (filter.maDonVi)) this.showAdvanceSearch();
+            }
+        });
+    }
+
+    getPage = (pageN, pageS, pageC, done) => {
+        this.props.getStaffPage(pageN, pageS, pageC, this.state.filter, done);
     }
 
     delete = (e, item) => {
@@ -21,6 +52,11 @@ class StaffPage extends AdminPage {
     };
 
     changeActive = item => this.props.updateStaff(item.shcc, { kichHoat: item.kichHoat == 1 ? 0 : 1 });
+
+    create = (e) => {
+        e.preventDefault();
+        this.props.history.push('/user/staff/new');
+    };
 
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
@@ -48,27 +84,32 @@ class StaffPage extends AdminPage {
                 </tr>)
         });
 
-        return (
-            <main className='app-content'>
-                <div className='app-title'>
-                    <h1><i className='fa fa-users' /> Cán bộ</h1>
-                    <AdminSearchBox ref={this.searchBox} getPage={this.props.getStaffPage} setSearching={value => this.setState({ searching: value })} />
+        return this.renderPage({
+            icon: 'fa fa-users',
+            title: 'Cán bộ',
+            breadcrumb: [
+                <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
+                'Cán bộ'
+            ],
+            advanceSearch: <>
+                <div className='row'>
+                    <FormSelect ref={e => this.maDonVi = e} className='col-12 col-md-12' label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} multiple={false} allowClear={true} />
                 </div>
+            </>,
+            content: <>
                 <div className='tile'>
                     {!this.state.searching ? table : <OverlayLoading text='Đang tải..' />}
-                    <Pagination name={PageName} pageNumber={pageNumber} pageSize={pageSize} pageTotal={pageTotal} totalItem={totalItem} pageCondition={pageCondition}
-                        getPage={this.searchBox.current && this.searchBox.current.getPage} />
-                    {permissionWrite && (
-                        <Link to='/user/staff/new' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }}>
-                            <i className='fa fa-lg fa-plus' />
-                        </Link>)}
+                    <Pagination style={{ marginLeft: '70px' }} name={PageName} pageNumber={pageNumber} pageSize={pageSize} pageTotal={pageTotal} totalItem={totalItem} pageCondition={pageCondition}
+                        getPage={this.getPage} />
                     {permissionWrite && (
                         <Link to='/user/staff/item/upload' className='btn btn-success btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px' }} >
                             <i className='fa fa-lg fa-cloud-upload' />
                         </Link>)}
                 </div>
-            </main>
-        );
+            </>,
+            backRoute: '/user/tccb',
+            onCreate: permission ? e => this.create(e) : null
+        });
     }
 }
 
