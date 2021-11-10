@@ -57,6 +57,10 @@ module.exports = app => {
         app.model.canBo.get({ shcc: req.params.shcc }, (error, item) => res.send({ error, item }));
     });
 
+    app.get('/api/staff/all', checkGetStaffPermission, (req, res) => {
+        app.model.canBo.getAll((error, items) => res.send({ error, items }));
+    });
+
     app.get('/api/staff/edit/item/:shcc', app.permission.check('staff:read'), (req, res) => {
         app.model.canBo.get({ shcc: req.params.shcc }, (error, canBo) => {
             if (error || canBo == null) {

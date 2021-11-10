@@ -4,6 +4,7 @@ import T from 'view/js/common';
 const TchcHopDongDvtlTnGetAll = 'TchcHopDongDvtlTn:GetAll';
 const TchcHopDongDvtlTnGetPage = 'TchcHopDongDvtlTn:GetPage';
 const TchcHopDongDvtlTnUpdate = 'TchcHopDongDvtlTn:Update';
+const TchcHopDongDvtlTnGet = 'TchcHopDongDvtlTn:Get';
 
 export default function TchcHopDongDvtlTnReducer(state = null, data) {
     switch (data.type) {
@@ -11,6 +12,8 @@ export default function TchcHopDongDvtlTnReducer(state = null, data) {
             return Object.assign({}, state, { items: data.items });
         case TchcHopDongDvtlTnGetPage:
             return Object.assign({}, state, { page: data.page });
+        case TchcHopDongDvtlTnGet:
+            return Object.assign({}, state, { selectedItem: data.item });
         case TchcHopDongDvtlTnUpdate:
             if (state) {
                 let updatedItems = Object.assign({}, state.items),
@@ -43,11 +46,10 @@ export default function TchcHopDongDvtlTnReducer(state = null, data) {
 
 // Actions ------------------------------------------------------------------------------------------------------------
 T.initPage('pageTchcHopDongDvtlTn');
-
 export function getTchcHopDongDvtlTnPage(pageNumber, pageSize, pageCondition, done) {
     const page = T.updatePage('pageTchcHopDongDvtlTn', pageNumber, pageSize, pageCondition);
     return dispatch => {
-        const url = `/api/contract/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/hopDongDvtlTn/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách hợp đồng bị lỗi!', 'danger');
@@ -87,6 +89,21 @@ export function getTchcHopDongDvtlTn(ma, done) {
                 if (done) done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
+    };
+}
+
+export function getTchcHopDongDvtlTnEdit(ma, done) {
+    return dispatch => {
+        const url = `/api/hopDongDvtlTn/edit/item/${ma}`;
+        T.get(url, data => {
+            if (data.error) {
+                T.notify('Lấy thông tin hợp đồng bị lỗi!', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (done) done(data);
+                dispatch({ type: TchcHopDongDvtlTnGet, item: data.item });
+            }
+        }, () => T.notify('Lấy thông tin hợp đồng bị lỗi', 'danger'));
     };
 }
 
@@ -138,4 +155,16 @@ export function updateTchcHopDongDvtlTn(ma, changes, done) {
     };
 }
 
-
+export function downloadWord(ma, done) {
+    return () => {
+        const url = `/user/hopDongDvtlTn/${ma}/word`;
+        T.get(url, data => {
+            if (data.error) {
+                T.notify('Tải file word bị lỗi', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else if (done) {
+                done(data.data);
+            }
+        }, () => T.notify('Tải file word bị lỗi', 'danger'));
+    };
+}
