@@ -255,7 +255,7 @@ class TchcHopDongDvtlTnEditPage extends QTForm {
         };
         const dcNoiSinh = {
             noiSinhMaTinh: this.noiSinh.value().maTinhThanhPho
-        }
+        };
         this.main.current.classList.add('validated');
         if (data.data) {
             if (this.urlMa) {
@@ -263,13 +263,13 @@ class TchcHopDongDvtlTnEditPage extends QTForm {
                     this.props.updateTchcCanBoHopDongDvtlTn(data.data.nguoiDuocThue, Object.assign(data.data, dcThuongTru, dcCuTru, dcNoiSinh), () => {
                         this.main.current.classList.remove('validated');
                         this.props.history.push(`/user/hopDongDvtlTn/${this.urlMa}`);
-                    })
+                    });
                 });
             } else {
                 this.props.createTchcHopDongDvtlTn(data.data, hopDong => {
                     if (this.hiredStaff[hopDong.item.nguoiDuocThue] != null) {
                         if (this.checkSignedDate(hopDong.item.nguoiDuocThue, hopDong.item.hieuLucHopDong)) {
-                            this.props.updateTchcCanBoHopDongDvtlTn(hopDong.item.nguoiDuocThue, Object.assign(data.data, dcThuongTru, dcCuTru, dcNoiSinh))
+                            this.props.updateTchcCanBoHopDongDvtlTn(hopDong.item.nguoiDuocThue, Object.assign(data.data, dcThuongTru, dcCuTru, dcNoiSinh));
                         }
                     }
                     else this.props.createTchcCanBoHopDongDvtlTn(data.data);
