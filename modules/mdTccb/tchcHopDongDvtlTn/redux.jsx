@@ -56,7 +56,7 @@ export function getTchcHopDongDvtlTnPage(pageNumber, pageSize, pageCondition, do
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
-                if (done) done(data.page);                
+                if (done) done(data.page);
                 dispatch({ type: TchcHopDongDvtlTnGetPage, page: data.page });
             }
         }, () => T.notify('Lấy danh sách hợp đồng bị lỗi!', 'danger'));
@@ -123,7 +123,7 @@ export function createTchcHopDongDvtlTn(item, done) {
     };
 }
 
-export function deleteTchcHopDongDvtlTn(ma) {
+export function deleteTchcHopDongDvtlTn(ma, done) {
     return dispatch => {
         const url = '/api/hopDongDvtlTn';
         T.delete(url, { ma }, data => {
@@ -131,9 +131,10 @@ export function deleteTchcHopDongDvtlTn(ma) {
                 T.notify('Xóa hợp đồng bị lỗi!', 'danger');
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
-                T.alert('Danh mục đã xóa thành công!', 'success', false, 800);
+                T.alert('Hợp đồng đã xóa thành công!', 'success', false, 800);
                 dispatch(getTchcHopDongDvtlTnPage());
             }
+            done && done();
         }, () => T.notify('Xóa hợp đồng bị lỗi!', 'danger'));
     };
 }
@@ -149,7 +150,7 @@ export function updateTchcHopDongDvtlTn(ma, changes, done) {
             } else {
                 T.notify('Cập nhật hợp đồng thành công!', 'success');
                 done && done(data.item);
-                dispatch(getTchcHopDongDvtlTnPage());
+                dispatch(getTchcHopDongDvtlTn(ma));
             }
         }, () => T.notify('Cập nhật hợp đồng bị lỗi!', 'danger'));
     };

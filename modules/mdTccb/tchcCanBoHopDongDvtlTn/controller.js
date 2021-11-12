@@ -1,6 +1,6 @@
 module.exports = app => {
     app.permission.add(
-        { name: 'staff:login'},
+        { name: 'staff:login' },
         { name: 'tchcCanBoHopDongDvtlTn:read' },
         { name: 'tchcCanBoHopDongDvtlTn:write' },
         { name: 'tchcCanBoHopDongDvtlTn:delete' },
@@ -10,17 +10,17 @@ module.exports = app => {
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
-    
+
     app.get('/api/canBoHopDongDvtlTn/page/:pageNumber/:pageSize', checkGetStaffPermission, (req, res) => {
         let pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             condition = { statement: null };
-            if (req.query.condition) {
-                condition = {
-                    statement: 'lower(ma) LIKE :searchText OR lower(ten) LIKE :searchText',
-                    parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
-                };
-            }
+        if (req.query.condition) {
+            condition = {
+                statement: 'lower(ma) LIKE :searchText OR lower(ten) LIKE :searchText',
+                parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
+            };
+        }
         app.model.tchcCanBoHopDongDvtlTn.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
     });
 
@@ -29,6 +29,10 @@ module.exports = app => {
     });
 
     app.get('/api/canBoHopDongDvtlTn/item/:shcc', checkGetStaffPermission, (req, res) => {
+        app.model.tchcCanBoHopDongDvtlTn.get({ shcc: req.params.shcc }, (error, item) => res.send({ error, item }));
+    });
+
+    app.get('/api/canBoHopDongDvtlTn/edit/item/:shcc', checkGetStaffPermission, (req, res) => {
         app.model.tchcCanBoHopDongDvtlTn.get({ shcc: req.params.shcc }, (error, item) => res.send({ error, item }));
     });
 

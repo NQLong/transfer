@@ -56,7 +56,7 @@ export function getTchcCanBoHopDongDvtlTnPage(pageNumber, pageSize, pageConditio
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
-                if (done) done(data.page);                
+                if (done) done(data.page);
                 dispatch({ type: TchcCanBoHopDongDvtlTnGetPage, page: data.page });
             }
         }, () => T.notify('Lấy danh sách cán bộ bị lỗi!', 'danger'));
@@ -92,6 +92,21 @@ export function getTchcCanBoHopDongDvtlTn(shcc, done) {
     };
 }
 
+export function getTchcCanBoHopDongDvtlTnEdit(shcc, done) {
+    return dispatch => {
+        const url = `/api/canBoHopDongDvtlTn/edit/item/${shcc}`;
+        T.get(url, data => {
+            if (data.error) {
+                T.notify('Lấy cán bộ bị lỗi!', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (done) done(data.item);
+                dispatch({ type: TchcCanBoHopDongDvtlTnGet, item: data.item });
+            }
+        }, error => console.error(`GET: ${url}.`, error));
+    };
+}
+
 export function createTchcCanBoHopDongDvtlTn(item, done) {
     return dispatch => {
         const url = '/api/canBoHopDongDvtlTn';
@@ -108,7 +123,7 @@ export function createTchcCanBoHopDongDvtlTn(item, done) {
     };
 }
 
-export function deleteTchcCanBoHopDongDvtlTn(shcc) {
+export function deleteTchcCanBoHopDongDvtlTn(shcc, done) {
     return dispatch => {
         const url = '/api/canBoHopDongDvtlTn';
         T.delete(url, { shcc }, data => {
@@ -119,6 +134,7 @@ export function deleteTchcCanBoHopDongDvtlTn(shcc) {
                 T.alert('Danh mục đã xóa thành công!', 'success', false, 800);
                 dispatch(getTchcCanBoHopDongDvtlTnPage());
             }
+            done && done();
         }, () => T.notify('Xóa cán bộ bị lỗi!', 'danger'));
     };
 }
@@ -143,5 +159,5 @@ export function updateTchcCanBoHopDongDvtlTn(shcc, changes, done) {
 export const SelectAdapter_HiredStaff = {
     ajax: false,
     getAll: getTchcCanBoHopDongDvtlTnAll,
-    processResults: response => ({ results: response ? response.map(item => ({ value: item.shcc, text: item.ho + ' ' + item.ten})) : [] }),
+    processResults: response => ({ results: response ? response.map(item => ({ value: item.shcc, text: item.ho + ' ' + item.ten })) : [] }),
 };

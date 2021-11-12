@@ -1360,7 +1360,7 @@ module.exports = app => {
                         tinhMapping = {}, xaMapping = {}, huyenMapping = {}, chucDanhMapping = {}, trinhDoMapping = {}, trinhDoQuanLyNhaNuocMapping = {},
                         trinhDoTinHocMapping = {}, quanHeMapping = {}, ngoaiNguMapping = {};
                     const source = app.path.join(__dirname, 'resource', 'Mau-LLKH.docx');
-
+                        
                     new Promise(resolve => {
                         app.model.dmDanToc.getAll((error, items) => {
                             (items || []).forEach(item => danTocMapping[item.ma] = item.ten);
