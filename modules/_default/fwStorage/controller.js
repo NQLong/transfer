@@ -27,16 +27,20 @@ module.exports = app => {
             body.path = files.assets[0].originalFilename;
             body.userUpload = req.session.user.lastName + ' ' + req.session.user.firstName;
             body.maDonVi = req.session.user.maDonVi;
-            app.fs.rename(files.assets[0].path, app.path.join(app.documentPath, body.path), () => {
-                app.model.fwStorage.get({ path: body.path }, (error, itemCheck) => {
-                    if (itemCheck) {
-                        res.send({ error: 'Đã tồn tại tệp tin trùng tên trong hệ thống.' });
-                    } else {
-                        app.model.fwStorage.create(body, (error, item) => {
-                            res.send({ error, item });
-                        });
-                    }
-                });
+            app.fs.copyFile(files.assets[0].path, app.path.join(app.documentPath, body.path), error => {
+                app.deleteFile(files.assets[0].path);
+                if (error) {
+                    return res.send({ error, x1: files.assets[0].path, x2: app.path.join(app.documentPath, body.path) });
+                } else
+                    app.model.fwStorage.get({ path: body.path }, (error, itemCheck) => {
+                        if (itemCheck) {
+                            res.send({ error: 'Đã tồn tại tệp tin trùng tên trong hệ thống.' });
+                        } else {
+                            app.model.fwStorage.create(body, (error, item) => {
+                                res.send({ error, item });
+                            });
+                        }
+                    });
             });
         });
     });
