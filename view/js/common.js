@@ -277,6 +277,18 @@ const T = {
             data: parseData,
             processResults: response => ({ results: parseResponse(response) }),
         });
+    },
+    linkNewsDetail: (item) => {
+        const language = T.language();
+        if (language == 'vi' && item.link) {
+            return ('/tin-tuc/' + item.link);
+        } else if (language == 'vi' && !item.link) {
+            return ('/news/item/' + item.id);
+        } else if (language == 'en' && item.linkEn) {
+            return ('/article/' + item.linkEn);
+        } else if (language == 'en' && !item.linkEn) {
+            return ('/news-en/item/' + item.id);
+        }
     }
 };
 
@@ -284,12 +296,16 @@ T.socket = T.debug ? io() : io.connect(T.rootUrl, { secure: true });
 
 T.language = texts => {
     let lg = window.location.pathname.includes('/en')
+        || window.location.pathname.includes('/news-en')
         || window.location.pathname.includes('/article') ? 'en' : 'vi';
     if (lg == null || (lg != 'vi' && lg != 'en')) lg = 'vi';
     return texts ? (texts[lg] ? texts[lg] : '') : lg;
 };
 T.language.next = () => {
-    const language = T.cookie('language');
+    let language = window.location.pathname.includes('/en')
+        || window.location.pathname.includes('/news-en')
+        || window.location.pathname.includes('/article') ? 'en' : 'vi';
+    // const language = T.cookie('language');
     return (language == null || language == 'en') ? 'vi' : 'en';
 };
 T.language.current = () => {

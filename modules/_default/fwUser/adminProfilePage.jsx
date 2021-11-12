@@ -57,7 +57,8 @@ const dateType = [
     { id: 0, text: 'Trong nước' },
     { id: 1, text: 'Quốc tế' },
     { id: 2, text: 'Trong và ngoài nước' }
-]; //sexMapper = { '01': 'Nam', '02': 'Nữ' };
+];
+// sexMapper = { '01': 'Nam', '02': 'Nữ' };
 
 class RelationModal extends React.Component {
 
@@ -1254,7 +1255,7 @@ class LamViecNgoaiModal extends AdminModal {
 }
 
 class ProfilePage extends QTForm {
-    constructor (props) {
+    constructor(props) {
         super(props);
         this.state = { user: null, canBo: null, doanVien: false, dangVien: false, nuocNgoai: false, ngayNhapNgu: NaN };
         this.mapperQuanHe = {};

@@ -278,12 +278,12 @@ export class MenuEditPage extends React.Component {
             active: this.state.active ? 1 : 0,
         };
 
-        // if (this.state.divisionId && changes.link != '#' && !changes.link.startsWith(`/${this.state.divisionId}`)
-        //     && !changes.link.includes('http')
-        // ) {
-        //     T.alert(`Địa chỉ nhập phải bắt đầu bằng /${this.state.divisionId}  !`, 'error', false, 2000);
-        //     return;
-        // }
+        if (this.state.divisionId && changes.link != '#' && !changes.link.startsWith(`/${this.state.maWebsite}`)
+            && !changes.link.includes('http')
+        ) {
+            T.alert(`Địa chỉ nhập phải bắt đầu bằng /${this.state.maWebsite}  !`, 'error', false, 2000);
+            return;
+        }
         if (changes.link != '#') this.props.homeMenuGet(changes.link, data => {
             if (data.menu && data.menu.id != this.state.id) {
                 T.alert('Địa chỉ bạn nhập bị trùng, vui lòng nhập lại', 'error', false, 2000);
