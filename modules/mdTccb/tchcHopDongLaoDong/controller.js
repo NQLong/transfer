@@ -57,7 +57,6 @@ module.exports = app => {
     app.get('/user/hopDongLaoDong/:ma/word', app.permission.check('staff:login'), (req, res) => {
         if (req.params && req.params.ma) {
             app.model.tchcHopDongLaoDong.get({ ma: req.params.ma }, (error, hopDong) => {
-                console.log(hopDong);
                 if (error || hopDong == null) {
                     res.send({ error });
                 } else {
@@ -68,7 +67,7 @@ module.exports = app => {
                     const source = app.path.join(__dirname, 'resource', url);
                     new Promise(resolve => {
                         app.model.canBo.getAll((error, items) => {
-                            (items || []).forEach(item => staffMapping[item.shcc] = item.ho + ' ' + item.ten);
+                            (items || []).forEach(item => staffMapping[item.shcc] = item);
                             resolve();
                         });
                     }).then(() => new Promise(resolve => {
@@ -122,15 +121,10 @@ module.exports = app => {
                             resolve();
                         });
                     })).then(() => new Promise(resolve => {
-                        app.model.dmChucDanhKhoaHoc.getAll((error, items) => {
-                            (items || []).forEach(item => kHChucDanhMapping[item.ma] = item.ten);
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
                         const curStaff = staffMapping[hopDong.nguoiDuocThue];
                         const data = {
                             hoTen: curStaff.ho + ' ' + curStaff.ten,
-                            hoTenNguoiKy: staffMapping[hopDong.nguoiKy],
+                            hoTenNguoiKy: staffMapping[hopDong.nguoiKy].ho + ' ' + staffMapping[hopDong.nguoiKy].ten,
                             chucVuNguoiKy: chucVuMapping[hopDong.chucVu],
                             quocTich: curStaff.quocGia ? quocGiaMapping[curStaff.quocGia] : '',
                             danToc: curStaff.danToc ? danTocMapping[curStaff.danToc] : '',
@@ -158,20 +152,18 @@ module.exports = app => {
                             cmndNgayCap: curStaff.cmndNgayCap ? app.date.viDateFormat(new Date(curStaff.cmndNgayCap)) : '',
                             cmndNoiCap: curStaff.cmndNoiCap ? curStaff.cmndNoiCap : '',
 
-                            loaiHopDong: typeContract[hopDong.loaiHopDong],
-                            hieuLucHopDong: app.date.viDateFormat(new Date(hopDong.hieuLucHopDong)),
                             ketThucHopDong: app.date.viDateFormat(new Date(hopDong.ketThucHopDong)),
                             diaDiemLamViec: donViMapping[hopDong.diaDiemLamViec],
                             chucDanhChuyenMon: hopDong.chucDanhChuyenMon ? chucVuMapping[hopDong.chucDanhChuyenMon] : '',
-                            khoaHocChucDanh: curStaff.khoaHocChucDanh ? kHChucDanhMapping[curStaff.khoaHocChucDanh] : '',
-                            khoaHocChuyenNganh: curStaff.khoaHocChuyenNganh ? curStaff.khoaHocChuyenNganh : '',
+                            // khoaHocChucDanh: curStaff.khoaHocChucDanh ? kHChucDanhMapping[curStaff.khoaHocChucDanh] : '',
+                            // khoaHocChuyenNganh: curStaff.khoaHocChuyenNganh ? curStaff.khoaHocChuyenNganh : '',
                             chiuSuPhanCong: hopDong.chiuSuPhanCong,
-                            donViChiTra: hopDong.donViChiTra ? donViMapping[hopDong.donViChiTra] : '',
+                            // donViChiTra: hopDong.donViChiTra ? donViMapping[hopDong.donViChiTra] : '',
                             ngayKyHopDong: app.date.viDateFormat(new Date(hopDong.ngayKyHopDong)),
 
                             heSo: hopDong.heSo ? hopDong.heSo : '',
                             bac: hopDong.bac ? hopDong.bac : '',
-                            tienLuong: hopDong.tienLuong ? hopDong.tienLuong : ''
+                            // tienLuong: hopDong.tienLuong ? hopDong.tienLuong : ''
 
                         };
                         data.cuTru = data.cuTruSoNha + data.cuTruMaXa + data.cuTruMaHuyen + data.cuTruMaTinh;

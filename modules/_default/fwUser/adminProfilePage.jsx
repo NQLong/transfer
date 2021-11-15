@@ -59,7 +59,7 @@ const dateType = [
     { id: 2, text: 'Trong và ngoài nước' }
 ];
 // sexMapper = { '01': 'Nam', '02': 'Nữ' };
-
+ 
 class RelationModal extends React.Component {
 
     componentDidMount() {
@@ -2129,7 +2129,7 @@ class ProfilePage extends QTForm {
         return (
             <main ref={e => this.main = e} className='app-content'>
                 <div className='app-title'>
-                    <h1><i className='fa fa-user' /> Thông tin cá nhân</h1>
+                    <h1><i className='fa fa-user' />Thông tin cán bộ</h1>
                 </div>
                 {!this.state.canBo ? <div className='tile' >
                     <h3 className='tile-title'>Thông tin cá nhân</h3>
@@ -2182,8 +2182,8 @@ class ProfilePage extends QTForm {
                             <div className='form-group col-md-9'>
                                 <div className='row'>
                                     <div className='form-group col-md-4'><TextInput ref={e => this.shcc = e} label='Mã thẻ cán bộ' readOnly placeholder='Nhập mã thẻ cán bộ' maxLength={10} re /></div>
-                                    <div className='form-group col-md-4'><TextInput ref={e => this.ho = e} label='Họ và tên lót' required maxLength={100} /></div>
-                                    <div className='form-group col-md-4'><TextInput ref={e => this.ten = e} label='Tên' required maxLength={30} /></div>
+                                    <div className='form-group col-md-4'><TextInput ref={e => this.ho = e} label='Họ và tên lót' readOnly required maxLength={100} /></div>
+                                    <div className='form-group col-md-4'><TextInput ref={e => this.ten = e} label='Tên' readOnly required maxLength={30} /></div>
                                     <div className='form-group col-md-4'><TextInput ref={e => this.biDanh = e} label='Bí danh' maxLength={20} /></div>
                                     <div className='form-group col-md-4'><DateInput ref={e => this.ngaySinh = e} label='Ngày sinh' min={new Date(1900, 1, 1).getTime()} max={Date.nextYear(-10).roundDate().getTime()} /></div>
                                     <div className='form-group col-md-4'><Select ref={e => this.phai = e} adapter={SelectAdapter_DmGioiTinh} label='Giới tính' required /></div>

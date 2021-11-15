@@ -108,7 +108,6 @@ class TchcHopDongLaoDongEditPage extends QTForm {
     }
 
     setVal = (data = {}) => {
-        console.log(data);
         const {
             ho = '',
             ten = '',
@@ -146,9 +145,8 @@ class TchcHopDongLaoDongEditPage extends QTForm {
         this.danToc.current.setVal(danToc ? danToc : '');
         this.tonGiao.current.setVal(tonGiao ? tonGiao : '');
         this.ngaySinh.current.setVal(ngaySinh ? ngaySinh : '');
-        console.log(maTinhNoiSinh);
         this.noiSinh.value(maTinhNoiSinh);
-        this.email.value(email ? email : '');
+        this.email.current.setVal(email ? email : '');
         this.cuTru.value(hienTaiMaTinh, hienTaiMaHuyen, hienTaiMaXa, hienTaiSoNha);
         this.thuongTru.value(thuongTruMaTinh, thuongTruMaHuyen, thuongTruMaXa, thuongTruSoNha);
 
