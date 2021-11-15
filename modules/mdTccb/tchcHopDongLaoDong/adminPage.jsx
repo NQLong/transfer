@@ -103,11 +103,11 @@ class TchcHopDongLaoDong extends AdminPage {
                 getDataSource: () => list, stickyHead: false,
                 renderHead: () => (
                     <tr>
-                        <th style={{ width: '23%', textAlign: 'center' }}>Số hợp đồng</th>
-                        <th style={{ width: '25%' }}>Tên người được thuê</th>
-                        <th style={{ width: '20%' }}>Loại hợp đồng</th>
-                        <th style={{ width: '10%', textAlign: 'center' }} >Ngày ký</th>
-                        <th style={{ width: '10%', textAlign: 'center' }} >Ngày kết thúc</th>
+                        <th style={{ width: '50%', textAlign: 'center' }}>Số hợp đồng</th>
+                        <th style={{ width: '50%' }}>Tên người được thuê</th>
+                        <th style={{ width: 'auto' }}>Loại hợp đồng</th>
+                        <th style={{ width: 'auto', textAlign: 'center' }} >Ngày ký</th>
+                        <th style={{ width: 'auto', textAlign: 'center' }} >Ngày kết thúc</th>
                         <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
 
                     </tr>
@@ -115,10 +115,10 @@ class TchcHopDongLaoDong extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='link' content={item.soHopDong} style={{ textAlign: 'center' }} url={`/user/hopDongLaoDong/${item.ma}`} />
-                        <TableCell type='text' content={this.hiredStaff && this.hiredStaff[item.nguoiDuocThue] ? this.hiredStaff[item.nguoiDuocThue] : ''} />
-                        <TableCell type='text' content={this.typeContract && this.typeContract[item.loaiHopDong2] ? this.typeContract[item.loaiHopDong2] : ''} />
-                        <TableCell type='date' content={item.ngayKyHopDong} style={{ textAlign: 'center' }} dateFormat='dd/mm/yyyy' />
-                        <TableCell type='date' content={item.ketThucHopDong} style={{ textAlign: 'center' }} dateFormat='dd/mm/yyyy' />
+                        <TableCell type='text' content={this.hiredStaff && this.hiredStaff[item.nguoiDuocThue] ? this.hiredStaff[item.nguoiDuocThue] : ''} style={{ whiteSpace: 'nowrap' }} />
+                        <TableCell type='text' content={this.typeContract && this.typeContract[item.loaiHopDong2] ? this.typeContract[item.loaiHopDong2] : ''} style={{ whiteSpace: 'nowrap' }} />
+                        <TableCell type='date' content={item.ngayKyHopDong} style={{ textAlign: 'center', whiteSpace: 'nowrap' }} dateFormat='dd/mm/yyyy' />
+                        <TableCell type='date' content={item.ketThucHopDong} style={{ textAlign: 'center', whiteSpace: 'nowrap' }} dateFormat='dd/mm/yyyy' />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onDelete={e => this.delete(e, item)} />
                     </tr>

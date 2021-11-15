@@ -104,8 +104,8 @@ class TchcHopDongDvtlTn extends AdminPage {
                 getDataSource: () => list, stickyHead: false,
                 renderHead: () => (
                     <tr>
-                        <th style={{ width: '25%', textAlign: 'center' }}>Số hợp đồng</th>
-                        <th style={{ width: '25%' }}>Tên người được thuê</th>
+                        <th style={{ width: 'auto', textAlign: 'center' }}>Số hợp đồng</th>
+                        <th style={{ width: '100%' }}>Tên người được thuê</th>
                         <th style={{ width: 'auto' }}>Kiểu hợp đồng</th>
                         <th style={{ width: 'auto' }}>Loại hợp đồng</th>
                         <th style={{ width: 'auto' }} >Ngày ký</th>
@@ -117,8 +117,8 @@ class TchcHopDongDvtlTn extends AdminPage {
                     <tr key={index}>
                         <TableCell type='link' content={item.soHopDong} style={{ textAlign: 'center' }} url={`/user/hopDongDvtlTn/${item.ma}`} />
                         <TableCell type='text' content={this.hiredStaff && this.hiredStaff[item.nguoiDuocThue] ? this.hiredStaff[item.nguoiDuocThue] : ''} />
-                        <TableCell type='text' content={item.kieuHopDong == 'DVTL' ? 'Đơn vị trả lương' : 'Trách nhiệm'} style={{ textAlign: 'center' }} />
-                        <TableCell type='text' content={this.typeContract && this.typeContract[item.loaiHopDong] ? this.typeContract[item.loaiHopDong] : ''} />
+                        <TableCell type='text' content={item.kieuHopDong == 'DVTL' ? 'Đơn vị trả lương' : 'Trách nhiệm'} style={{ textAlign: 'center', whiteSpace: 'nowrap' }} />
+                        <TableCell type='text' content={this.typeContract && this.typeContract[item.loaiHopDong] ? this.typeContract[item.loaiHopDong] : ''} style={{ whiteSpace: 'nowrap' }} />
                         <TableCell type='date' content={item.ngayKyHopDong} style={{ textAlign: 'center' }} dateFormat='dd/mm/yyyy' />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onDelete={e => this.delete(e, item)} />
