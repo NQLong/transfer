@@ -62,7 +62,7 @@ module.exports = app => {
                 } else {
                     const staffMapping = {}, typeContract = {}, donViMapping = {},
                         chucVuMapping = {}, quocGiaMapping = {}, danTocMapping = {}, tonGiaoMapping = {},
-                        tinhMapping = {}, xaMapping = {}, huyenMapping = {}, trinhDoMapping = {}, kHChucDanhMapping = {};
+                        tinhMapping = {}, xaMapping = {}, huyenMapping = {}, trinhDoMapping = {};
                     const url = 'Mau-HD-LaoDong.docx';
                     const source = app.path.join(__dirname, 'resource', url);
                     new Promise(resolve => {
