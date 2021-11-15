@@ -25,7 +25,7 @@ import { SelectAdapter_DmNhomMau } from 'modules/mdDanhMuc/dmBenhVien/reduxNhomM
 import { SelectAdapter_DmQuocGia } from 'modules/mdDanhMuc/dmQuocGia/redux';
 import { SelectAdapter_DmChucDanhKhoaHoc } from 'modules/mdDanhMuc/dmChucDanhKhoaHoc/redux';
 import { SelectAdapter_DmTrinhDo } from 'modules/mdDanhMuc/dmTrinhDo/redux';
-import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
+// import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import TextInput, { DateInput, NumberInput, Select, BooleanInput } from 'view/component/Input';
 import { QTForm } from 'view/component/Form';
 import { ComponentDiaDiem } from 'modules/mdDanhMuc/dmDiaDiem/componentDiaDiem';
@@ -2227,11 +2227,10 @@ class ProfilePage extends QTForm {
                             {item.maDonVi ? renderFieldText('form-group col-md-6', 'Đơn vị', true, this.mapperDonVi[item.maDonVi]) : null}
                             <div className='col-12' />
                             <div className='form-group col-md-4'><DateInput ref={e => this.ngayBatDauCongTac = e} label='Ngày bắt đầu công tác' min={new Date(1900, 1, 1).getTime()} max={new Date().getTime()} /></div>
-                            <div className='form-group col-md-4'><DateInput ref={e => this.ngayBienChe = e} label='Ngày biên chế' min={new Date(1900, 1, 1).getTime()} max={new Date().getTime()} /></div>
-                            <div className='form-group col-md-4'><TextInput ref={e => this.ngheNghiepCu = e} label='Nghế nghiệp trước khi tuyển dụng' maxLength={200} /></div>
+                            <div className='form-group col-md-4'><DateInput ref={e => this.ngayBienChe = e} label='Ngày vào biên chế/ tuyển dụng' min={new Date(1900, 1, 1).getTime()} max={new Date().getTime()} /></div>
+                            <div className='form-group col-md-4'><TextInput ref={e => this.ngheNghiepCu = e} label='Nghề nghiệp trước khi tuyển dụng' maxLength={200} /></div>
                             {item.nhaGiaoNhanDan ? renderFieldText('form-group col-md-3', 'Nhà giáo nhân dân', item.nhaGiaoNhanDan, item.nhaGiaoNhanDan) : null}
                             {item.nhaGiaoUuTu ? renderFieldText('form-group col-md-3', 'Nhà giáo ưu tú', item.nhaGiaoUuTu, item.nhaGiaoUuTu) : null}
-                            <div className='form-group col-md-6'><Select ref={e => this.maDonVi = e} adapter={SelectAdapter_DmDonVi} label='Đơn vị công tác' /> </div>
                             <div className='form-group col-md-3'><Select ref={e => this.maTrinhDoLlct = e} adapter={SelectAdapter_DmTrinhDoLyLuanChinhTri} label='Trình độ lý luận chính trị' /></div>
                             <div className='form-group col-md-3'><Select ref={e => this.maTrinhDoQlnn = e} adapter={SelectAdapter_DmTrinhDoQuanLyNhaNuoc} label='Trình độ quản lý nhà nước' /></div>
                             <div className='col-12' />

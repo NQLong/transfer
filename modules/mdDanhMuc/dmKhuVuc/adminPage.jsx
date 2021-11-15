@@ -132,7 +132,7 @@ class dmKhuVucAdminPage extends AdminPage {
                         <TableCell type='link' content={item.ten ? item.ten : ''} onClick={() => this.modal.show(item)} />
                         <TableCell type='text' content={item.territory ? item.territory : ''} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={this.chauMapper && this.chauMapper[item.maChau] ? this.chauMapper[item.maChau] : ''} />
-                        <TableCell type='checkbox' content={item.kichHoat} permission={permission} 
+                        <TableCell type='checkbox' content={item.kichHoat} permission={permission}
                             onChanged={value => this.props.updateDmKhuVuc({ ma: item.ma }, { kichHoat: value ? 1 : 0 })} />
                         <TableCell type='buttons' content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={this.delete} />
