@@ -42,18 +42,18 @@ export default function dmLoaiDonViReducer(state = null, data) {
 }
 
 // Actions ------------------------------------------------------------------------------------------------------------
-export function getdmLoaiHopDongAll(condition, done) {
+export function getdmLoaiHopDongAll(done) {
     return dispatch => {
         const url = '/api/danh-muc/loai-hop-dong/all';
-        T.get(url, { condition }, data => {
+        T.get(url, data => {
             if (data.error) {
-                T.notify('Lấy danh sách loại hợp đồng bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                T.notify('Lấy danh sách loại hợp đồng bị lỗi', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (done) done(data.items);
                 dispatch({ type: DmLoaiDonViGetAll, items: data.items ? data.items : [] });
             }
-        }, (error) => T.notify('Lấy danh sách loại hợp đồng bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+        }, () => T.notify('Lấy danh sách loại hợp đồng bị lỗi', 'danger'));
     };
 }
 
@@ -68,10 +68,11 @@ export function getDmLoaiHopDongPage(pageNumber, pageSize, pageCondition, done) 
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
-                if (done) done(data.page);                
+                if (done) done(data.page);
                 dispatch({ type: DmLoaiDonViGetPage, page: data.page });
             }
-        }, (error) => T.notify('Lấy danh sách loại hợp đồng bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));    };
+        }, (error) => T.notify('Lấy danh sách loại hợp đồng bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+    };
 }
 
 export function getDmLoaiHopDong(ma, done) {

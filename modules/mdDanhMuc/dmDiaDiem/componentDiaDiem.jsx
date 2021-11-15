@@ -14,33 +14,39 @@ export class ComponentDiaDiem extends React.Component {
             if (maTinhThanhPho) {
                 this.setState({ maTinhThanhPho }, () => {
                     this.dmTinhThanhPho.value(maTinhThanhPho);
-                    if (maQuanHuyen) {
-                        this.setState({ maQuanHuyen }, () => {
-                            this.dmQuanHuyen.value(maQuanHuyen);
-                            if (maPhuongXa) {
-                                this.dmPhuongXa.value(maPhuongXa);
-                            } else {
-                                this.dmPhuongXa.value(null);
-                                maPhuongXa = '';
-                            }
-                        });
-                    } else {
-                        this.dmQuanHuyen.value(null); this.dmPhuongXa.value(null);
-                        maQuanHuyen = maPhuongXa = '';
+                    if (!this.props.onlyTinhThanh) {
+                        if (maQuanHuyen) {
+                            this.setState({ maQuanHuyen }, () => {
+                                this.dmQuanHuyen.value(maQuanHuyen);
+                                if (maPhuongXa) {
+                                    this.dmPhuongXa.value(maPhuongXa);
+                                } else {
+                                    this.dmPhuongXa.value(null);
+                                    maPhuongXa = '';
+                                }
+                            });
+                        } else {
+                            this.dmQuanHuyen.value(null); this.dmPhuongXa.value(null);
+                            maQuanHuyen = maPhuongXa = '';
+                        }
                     }
                 });
             } else {
-                this.dmTinhThanhPho.value(null); this.dmQuanHuyen.value(null); this.dmPhuongXa.value(null);
+                this.dmTinhThanhPho.value(null);
+                if (this.props.onlyTinhThanh == false) {
+                    this.dmQuanHuyen.value(null);
+                    this.dmPhuongXa.value(null);
+                }
                 maTinhThanhPho = maQuanHuyen = maPhuongXa = '';
             }
-            this.soNhaDuong.value(soNhaDuong || '');
+            if (this.props.onlyTinhThanh == false) this.soNhaDuong.value(soNhaDuong || '');
             this.setState({ maTinhThanhPho, maQuanHuyen, maPhuongXa });
         } else { // get value
             return ({
                 maTinhThanhPho: this.dmTinhThanhPho.value(),
-                maQuanHuyen: this.dmQuanHuyen.value(),
-                maPhuongXa: this.dmPhuongXa.value(),
-                soNhaDuong: this.soNhaDuong.value(),
+                maQuanHuyen: !this.props.onlyTinhThanh ? this.dmQuanHuyen.value() : null,
+                maPhuongXa: !this.props.onlyTinhThanh ? this.dmPhuongXa.value() : null,
+                soNhaDuong: !this.props.onlyTinhThanh ? this.soNhaDuong.value() : null,
             });
         }
     }
@@ -73,16 +79,16 @@ export class ComponentDiaDiem extends React.Component {
 
     render = () => {
         // const { label, className, style, readOnly = false, requiredTinh = true, requiredHuyen = true, requiredXa = true, requiredSoNhaDuong = false } = this.props;
-        const { label, className, style, readOnly = false, requiredSoNhaDuong = false } = this.props;
+        const { label, className, style, readOnly = false, requiredSoNhaDuong = false, onlyTinhThanh = false } = this.props;
         const { maTinhThanhPho = '', maQuanHuyen = '' } = this.state;
         return (
             <div className={(className || '')} style={style}>
                 <label>{label || ''}:</label>
                 <div className='row'>
-                    <FormSelect ref={e => this.dmTinhThanhPho = e} data={ajaxSelectTinhThanhPho} onChange={value => this.changeTinhThanhPho(value.id)} readOnly={readOnly} className='col-md-4' placeholder='Thành phố / Tỉnh' />
-                    <FormSelect ref={e => this.dmQuanHuyen = e} data={maTinhThanhPho ? ajaxSelectQuanHuyen(maTinhThanhPho) : []} onChange={value => this.changeQuanHuyen(value.id)} readOnly={readOnly} className='col-md-4' placeholder='Quận / Huyện' />
-                    <FormSelect ref={e => this.dmPhuongXa = e} data={maQuanHuyen ? ajaxSelectPhuongXa(maQuanHuyen) : []} onChange={value => this.changePhuongXa(value.id)} readOnly={readOnly} className='col-md-4' placeholder='Phường / Xã' />
-                    <FormTextBox ref={e => this.soNhaDuong = e} type='text' style={{ display: requiredSoNhaDuong ? 'block' : 'none' }} placeholder='Số nhà' readOnly={readOnly} className='col-md-6' />
+                    <FormSelect ref={e => this.dmTinhThanhPho = e} data={ajaxSelectTinhThanhPho} onChange={value => this.changeTinhThanhPho(value.id)} readOnly={readOnly} className={onlyTinhThanh ? 'col-md-12' : 'col-md-4'} placeholder='Thành phố / Tỉnh' />
+                    {!onlyTinhThanh ? <FormSelect ref={e => this.dmQuanHuyen = e} data={maTinhThanhPho ? ajaxSelectQuanHuyen(maTinhThanhPho) : []} onChange={value => this.changeQuanHuyen(value.id)} readOnly={readOnly} className='col-md-4' placeholder='Quận / Huyện' /> : null}
+                    {!onlyTinhThanh ? <FormSelect ref={e => this.dmPhuongXa = e} data={maQuanHuyen ? ajaxSelectPhuongXa(maQuanHuyen) : []} onChange={value => this.changePhuongXa(value.id)} readOnly={readOnly} className='col-md-4' placeholder='Phường / Xã' /> : null}
+                    {!onlyTinhThanh ? <FormTextBox ref={e => this.soNhaDuong = e} type='text' style={{ display: requiredSoNhaDuong ? 'block' : 'none' }} placeholder='Số nhà' readOnly={readOnly} className='col-md-6' /> : null}
                 </div>
             </div>);
     }

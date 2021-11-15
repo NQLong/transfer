@@ -67,6 +67,10 @@ module.exports = app => {
         app.model.canBo.get({ shcc: req.params.shcc }, (error, item) => res.send({ error, item }));
     });
 
+    app.get('/api/staff/all', checkGetStaffPermission, (req, res) => {
+        app.model.canBo.getAll((error, items) => res.send({ error, items }));
+    });
+
     app.get('/api/staff/edit/item/:shcc', app.permission.check('staff:read'), (req, res) => {
         app.model.canBo.get({ shcc: req.params.shcc }, (error, canBo) => {
             if (error || canBo == null) {
@@ -1356,7 +1360,7 @@ module.exports = app => {
                         tinhMapping = {}, xaMapping = {}, huyenMapping = {}, chucDanhMapping = {}, trinhDoMapping = {}, trinhDoQuanLyNhaNuocMapping = {},
                         trinhDoTinHocMapping = {}, quanHeMapping = {}, ngoaiNguMapping = {};
                     const source = app.path.join(__dirname, 'resource', 'Mau-LLKH.docx');
-
+                        
                     new Promise(resolve => {
                         app.model.dmDanToc.getAll((error, items) => {
                             (items || []).forEach(item => danTocMapping[item.ma] = item.ten);
