@@ -107,7 +107,7 @@ module.exports = app => {
                             if (error) {
                                 console.error('Get menu by link has errors!');
                             } else if (menu == null) {
-                                app.model.fwMenu.createDefault(null, dvWebsite.shortname + ' home', '/' + dvWebsite.shortname, 1, dvWebsite.maDonVi, '', () => {
+                                app.model.fwMenu.createDefault(null, dvWebsite.shortname + ' home', '/' + dvWebsite.shortname, 1, dvWebsite.maDonVi, dvWebsite.shortname, () => {
                                     app.buildAppMenus();
                                     handleCreateDefault(index + 1);
                                 });
