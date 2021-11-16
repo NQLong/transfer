@@ -88,7 +88,7 @@ export class ComponentDiaDiem extends React.Component {
                     <FormSelect ref={e => this.dmTinhThanhPho = e} data={ajaxSelectTinhThanhPho} onChange={value => this.changeTinhThanhPho(value.id)} readOnly={readOnly} className={onlyTinhThanh ? 'col-md-12' : 'col-md-4'} placeholder='Thành phố / Tỉnh' />
                     {!onlyTinhThanh ? <FormSelect ref={e => this.dmQuanHuyen = e} data={maTinhThanhPho ? ajaxSelectQuanHuyen(maTinhThanhPho) : []} onChange={value => this.changeQuanHuyen(value.id)} readOnly={readOnly} className='col-md-4' placeholder='Quận / Huyện' /> : null}
                     {!onlyTinhThanh ? <FormSelect ref={e => this.dmPhuongXa = e} data={maQuanHuyen ? ajaxSelectPhuongXa(maQuanHuyen) : []} onChange={value => this.changePhuongXa(value.id)} readOnly={readOnly} className='col-md-4' placeholder='Phường / Xã' /> : null}
-                    {!onlyTinhThanh ? <FormTextBox ref={e => this.soNhaDuong = e} type='text' style={{ display: requiredSoNhaDuong ? 'block' : 'none' }} placeholder='Số nhà' readOnly={readOnly} className='col-md-6' /> : null}
+                    {!onlyTinhThanh ? <FormTextBox ref={e => this.soNhaDuong = e} type='text' style={{ display: requiredSoNhaDuong ? 'block' : 'none' }} placeholder='Số nhà' readOnly={readOnly} className='col-md-12' /> : null}
                 </div>
             </div>);
     }

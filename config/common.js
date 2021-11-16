@@ -75,14 +75,14 @@ module.exports = app => {
             index: 3000, title: 'Tổ chức cán bộ', link: '/user/tccb', icon: 'fa-sort-alpha-asc',
             subMenusRender: false,
         },
+        category: {
+            index: 4000, title: 'Danh mục', link: '/user/category', icon: 'fa-list-alt',
+            subMenusRender: false,
+        },
         truyenThong: {
             index: 5000, title: 'Truyền thông', link: '/user/truyen-thong', icon: 'fa-comments-o',
             subMenusRender: false,
             groups: ['Cấu hình', 'Bài viết', 'Sự kiện', 'Tuyển sinh']
-        },
-        category: {
-            index: 4000, title: 'Danh mục', link: '/user/category', icon: 'fa-list-alt',
-            subMenusRender: false,
         },
         websiteDv: {
             index: 1006, title: 'Website đơn vị', link: '/user/website', icon: 'fa-database',
