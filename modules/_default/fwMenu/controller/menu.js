@@ -1,12 +1,14 @@
 module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.truyenThong,
-        // menus: { 2090: { title: 'Menu', link: '/user/menu', groupIndex: 0, icon: 'fa-bars', backgroundColor: '#00b0ff' } }
+        menus: { 5090: { title: 'Menu', link: '/user/menu', groupIndex: 0, icon: 'fa-bars', backgroundColor: '#00b0ff' } }
     };
     app.permission.add(
-        { name: 'menu:read', menu },
-        { name: 'menu:write', menu },
-        { name: 'menu:delete', menu },
+        { name: 'menu:read', },
+        { name: 'menu:write', },
+        { name: 'menu:delete', },
+        { name: 'menu:manage', menu },
+
     );
 
     app.get('/user/menu/edit/:id', app.permission.check('system:settings'), app.templates.admin);

@@ -126,14 +126,14 @@ module.exports = app => {
                                 delete data.user.menu['5000'].menus['5006'];
                                 delete data.user.menu['5000'].menus['5008'];
 
-                            } else if (data.user && data.user.permissions
-                                && data.user.permissions.includes('unit:write')
-                                && !data.user.permissions.includes('news:write')) {
-                                delete data.user.menu['5000'].menus['5001'];
-                                delete data.user.menu['5000'].menus['5002'];
-                                delete data.user.menu['5000'].menus['5003'];
-
                             }
+                            // else if (data.user && data.user.permissions
+                            //     && data.user.permissions.includes('unit:write')
+                            //     && !data.user.permissions.includes('news:write') && data.user.menu['5000']) {
+                            //     delete data.user.menu['5000'].menus['5001'];
+                            //     delete data.user.menu['5000'].menus['5002'];
+                            //     delete data.user.menu['5000'].menus['5003'];
+                            // }
                             if (data.user && data.user.permissions
                                 && data.user.permissions.includes('website:write')
                                 && !data.user.permissions.includes('news:write')) {
