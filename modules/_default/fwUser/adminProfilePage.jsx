@@ -42,6 +42,7 @@ import { createQtBangPhatMinhStaffUser, updateQtBangPhatMinhStaffUser, deleteQtB
 import { createQtUngDungThuongMaiStaffUser, updateQtUngDungThuongMaiStaffUser, deleteQtUngDungThuongMaiStaffUser } from 'modules/_default/qtUngDungThuongMai/redux.jsx';
 import { createQtLamViecNgoaiStaffUser, updateQtLamViecNgoaiStaffUser, deleteQtLamViecNgoaiStaffUser } from 'modules/_default/qtLamViecNgoai/redux.jsx';
 import Loading from 'view/component/Loading';
+import { SelectAdapter_DmBenhVien } from 'modules/mdDanhMuc/dmBenhVien/reduxBenhVien';
 
 const dateType = [
     { id: 'yyyy', text: 'yyyy' },
@@ -1306,7 +1307,11 @@ class ProfilePage extends QTForm {
     loader = React.createRef();
     constructor(props) {
         super(props);
-        this.state = { user: null, canBo: null, isLoad: true, doanVien: false, phai: '02', dangVien: false, toChucKhac: false, congDoan: false, nuocNgoai: false, nghiThaiSan: false, ngayNhapNgu: NaN };
+        this.state = {
+            user: null, canBo: null, isLoad: true, doanVien: false,
+            phai: '02', dangVien: false, congDoan: false, nuocNgoai: false, nghiThaiSan: false, nghiKhongLuong: false,
+            ngayNhapNgu: NaN
+        };
         this.imageBox = React.createRef();
         this.shcc = React.createRef();
         this.ho = React.createRef();
@@ -1346,15 +1351,20 @@ class ProfilePage extends QTForm {
         this.quocGia = React.createRef();
         this.tonGiao = React.createRef();
         this.dangVien = React.createRef();
-        this.toChucKhac = React.createRef();
         // this.maDonVi = React.createRef();
         this.phucLoi = React.createRef();
         this.nhaGiaoNhanDan = React.createRef();
         this.nhaGiaoUuTu = React.createRef();
         this.dangONuocNgoai = React.createRef();
+        this.doiTuongBoiDuongKienThucQPAN = React.createRef();
         this.lyDoONuocNgoai = React.createRef();
         this.ngayBatDauONuocNgoai = React.createRef();
         this.ngayKetThucONuocNgoai = React.createRef();
+        this.dangNghiThaiSan = React.createRef();
+        this.dangNghiKhongHuongLuong = React.createRef();
+        this.lyDoNghiKhongHuongLuong = React.createRef();
+        this.ngayBatDauNghiKhongHuongLuong = React.createRef();
+        this.ngayKetThucNghiKhongHuongLuong = React.createRef();
         this.dangNghiThaiSan = React.createRef();
         this.ngayBatDauNghiThaiSan = React.createRef();
         this.ngayKetThucNghiThaiSan = React.createRef();
@@ -1388,6 +1398,8 @@ class ProfilePage extends QTForm {
         this.chucDanh = React.createRef();
         this.hocVi = React.createRef();
         this.trinhDoPhoThong = React.createRef();
+        this.noiTotNghiep = React.createRef();
+        this.namTotNghiep = React.createRef();
         this.chuyenNganh = React.createRef();
         this.namChucDanh = React.createRef();
         this.namHocVi = React.createRef();
@@ -1433,10 +1445,10 @@ class ProfilePage extends QTForm {
                         isLoad: false,
                         doanVien: data.item && data.item.doanVien && !data.item.doanVien == 0,
                         congDoan: data.item && data.item.congDoan && !data.item.congDoan == 0,
-                        toChucKhac: data.item && data.item.toChucKhac && !data.item.toChucKhac == 0,
                         dangVien: data.item && data.item.dangVien && data.item.dangVien == 0 ? false : true,
                         nuocNgoai: data.item && data.item.dangONuocNgoai == 0 ? false : true,
                         nghiThaiSan: data.item && data.item.dangNghiThaiSan == 0 ? false : true,
+                        nghiKhongLuong: data.item && data.item.dangNghiKhongHuongLuong == 0 ? false : true,
                         phai: data.item && data.item.phai,
                     }, () => {
                         this.setVal(data.item);
@@ -1457,119 +1469,128 @@ class ProfilePage extends QTForm {
         const { shcc = '', ho = '', ten = '', biDanh = '', cmnd = '', cmndNgayCap = '', cmndNoiCap = '', emailCaNhan = '', email = '', dienThoaiCaNhan = '', dienThoaiBaoTin = '', ngaySinh = '', ngayBatDauCongTacDonVi = '', ngayBatDauCongTac = '', ngayBienChe = '',
             thuongTruSoNha = '', thuongTruMaXa = '', thuongTruMaHuyen = '', thuongTruMaTinh = '',
             maXaNoiSinh = '', maHuyenNoiSinh = '', maTinhNoiSinh = '',
-            maXaNguyenQuan = '', maHuyenNguyenQuan = '', maTinhNguyenQuan = '',
-            hienTaiSoNha = '', hienTaiMaXa = '', hienTaiMaHuyen = '', hienTaiMaTinh = '', toChucKhac = false,
+            maXaNguyenQuan = '', maHuyenNguyenQuan = '', maTinhNguyenQuan = '', noiTotNghiep = '', namTotNghiep = '',
+            hienTaiSoNha = '', hienTaiMaXa = '', hienTaiMaHuyen = '', hienTaiMaTinh = '',
             /*maChucVu = '', chucVuDang = '', chucVuDoanThe = '', chucVuKiemNhiem = '',*/ maTrinhDoLlct = '', maTrinhDoQlnn = '', maTrinhDoTinHoc = '', danToc = '', tonGiao = '', chucDanh = '', trinhDoPhoThong = '', hocVi = '', chuyenNganh = '', namChucDanh = '', namHocVi = '',
-            /*maDonVi = '',*/ lyDoONuocNgoai = '', ngayBatDauONuocNgoai = '', ngayKetThucONuocNgoai = '', dangONuocNgoai = false,
+            /*maDonVi = '',*/ lyDoONuocNgoai = '', ngayBatDauONuocNgoai = '', ngayKetThucONuocNgoai = '', dangONuocNgoai = false, doiTuongBoiDuongKienThucQpan = false,
+            lyDoNghiKhongHuongLuong = '', ngayBatDauNghiKhongHuongLuong = '', ngayKetThucNghiKhongHuongLuong = '', dangNghiKhongHuongLuong = false,
             ngayBatDauNghiThaiSan = '', ngayKetThucNghiThaiSan = '', dangNghiThaiSan = false,
             dangVien = false, phai = '', nhomMau = '', ngayVaoDang = '', ngayVaoDangChinhThuc = '', ngayNhapNgu = '', ngayXuatNgu = '', quanHamCaoNhat = '', soBhxh = '',
-            soTheDang = '', noiDangDb = '', noiDangCt = '', doanVien = false, congDoan = false, ngayVaoCongDoan = '', ngayVaoDoan = '', noiVaoDoan = '', ngheNghiepCu = '', 
+            soTheDang = '', noiDangDb = '', noiDangCt = '', doanVien = false, congDoan = false, ngayVaoCongDoan = '', ngayVaoDoan = '', noiVaoDoan = '', ngheNghiepCu = '',
             /*chucVuKhac = '',*/ quocGia = null, hangThuongBinh = '', giaDinhChinhSach = '', danhHieu = '', soTruong = '', sucKhoe = '', canNang = '', chieuCao = '' } = data.constructor === ({}).constructor ? data : {};
-            
-            this.shcc.current.setVal(shcc);
-            this.phai.current.setVal(phai);
-            this.ho.current.setVal(ho);
-            this.ten.current.setVal(ten);
-            this.biDanh.current.setVal(biDanh);
-            this.cmnd.current.setVal(cmnd);
-            this.cmndNgayCap.current.setVal(cmndNgayCap);
-            this.cmndNoiCap.current.setVal(cmndNoiCap);
-            this.ngaySinh.current.setVal(ngaySinh);
-            this.emailCaNhan.current.setVal(emailCaNhan);
-            this.email.current.setVal(email);
-            this.dienThoaiCaNhan.current.setVal(dienThoaiCaNhan);
-            this.dienThoaiBaoTin.current.setVal(dienThoaiBaoTin);
-            this.ngaySinh.current.setVal(ngaySinh);
-            this.ngayBatDauCongTac.current.setVal(ngayBatDauCongTac);
-            this.ngayBatDauCongTacDonVi.current.setVal(ngayBatDauCongTacDonVi);
 
-            // this.ngayVao.current.setVal(ngayVao);
-            // this.ngayCbgd.current.setVal(ngayCbgd);
-            this.ngayBienChe.current.setVal(ngayBienChe);
-            // this.ngayNghi.current.setVal(ngayNghi);
-            // this.ngach.current.setVal(ngach);
-            // this.ngachMoi.current.setVal(ngachMoi);
-            // this.heSoLuong.current.setVal(heSoLuong && Number(heSoLuong) ? Number(heSoLuong).toFixed(2) : 0);
-            // this.bacLuong.current.setVal(bacLuong);
-            // this.mocNangLuong.current.setVal(mocNangLuong);
-            // this.ngayHuongLuong.current.setVal(ngayHuongLuong);
-            // this.tyLeVuotKhung.current.setVal(tyLeVuotKhung);
-            // this.phuCapCongViec.current.setVal(phuCapCongViec);
-            // this.ngayPhuCapCongViec.current.setVal(ngayPhuCapCongViec);
-            // this.maChucVu.current.setVal(maChucVu);
-            this.doanVien.current.setVal(doanVien);
-            if (this.state.doanVien) {
-                this.ngayVaoDoan.current.setVal(ngayVaoDoan);
-                this.noiVaoDoan.current.setVal(noiVaoDoan);
-            }
-            this.congDoan.current.setVal(congDoan);
-            if (this.state.congDoan) {
-                this.ngayVaoCongDoan.current.setVal(ngayVaoCongDoan);
-            }
-            this.toChucKhac.current.setVal(toChucKhac);
-            this.dangVien.current.setVal(dangVien);
-            this.toChucKhac.current.setVal(toChucKhac);
-            if (this.state.dangVien) {
-                // this.chucVuDang.current.setVal(chucVuDang);
-                this.ngayVaoDang.current.setVal(ngayVaoDang);
-                this.ngayVaoDangChinhThuc.current.setVal(ngayVaoDangChinhThuc);
-                this.noiDangDb.current.setVal(noiDangDb);
-                this.noiDangCt.current.setVal(noiDangCt);
-                this.soTheDang.current.setVal(soTheDang);
-            }
-            // this.chucVuDoanThe.current.setVal(chucVuDoanThe);
-            // this.chucVuKiemNhiem.current.setVal(chucVuKiemNhiem);
-            // this.chucVuKhac.current.setVal(chucVuKhac);
-            this.maTrinhDoLlct.current.setVal(maTrinhDoLlct);
-            this.maTrinhDoQlnn.current.setVal(maTrinhDoQlnn);
-            this.maTrinhDoTinHoc.current.setVal(maTrinhDoTinHoc);
-            this.danToc.current.setVal(danToc);
-            this.quocGia.current.setVal(quocGia);
-            this.tonGiao.current.setVal(tonGiao);
-            this.ngheNghiepCu.current.setVal(ngheNghiepCu);
-            // this.maDonVi.current.setVal(maDonVi);
-            // this.phucLoi.current.setVal(phucLoi);
-            // this.nhaGiaoNhanDan.current.setVal(nhaGiaoNhanDan);
-            // this.nhaGiaoUuTu.current.setVal(nhaGiaoUuTu);
-            this.dangONuocNgoai.current.setVal(dangONuocNgoai);
-            if (this.state.nuocNgoai) {
-                this.lyDoONuocNgoai.current.setVal(lyDoONuocNgoai);
-                this.ngayBatDauONuocNgoai.current.setVal(ngayBatDauONuocNgoai);
-                this.ngayKetThucONuocNgoai.current.setVal(ngayKetThucONuocNgoai);
-            }
-            if (this.state.phai == '02') {
-                this.dangNghiThaiSan.current.setVal(dangNghiThaiSan);
-                if (this.state.nghiThaiSan) {
-                    this.ngayBatDauNghiThaiSan.current.setVal(ngayBatDauNghiThaiSan);
-                    this.ngayKetThucNghiThaiSan.current.setVal(ngayKetThucNghiThaiSan);
-                }
-            }
-            // this.ghiChu.current.setVal(ghiChu);
+        this.shcc.current.setVal(shcc);
+        this.phai.current.setVal(phai);
+        this.ho.current.setVal(ho);
+        this.ten.current.setVal(ten);
+        this.biDanh.current.setVal(biDanh);
+        this.cmnd.current.setVal(cmnd);
+        this.cmndNgayCap.current.setVal(cmndNgayCap);
+        this.cmndNoiCap.current.setVal(cmndNoiCap);
+        this.ngaySinh.current.setVal(ngaySinh);
+        this.emailCaNhan.current.setVal(emailCaNhan);
+        this.email.current.setVal(email);
+        this.dienThoaiCaNhan.current.setVal(dienThoaiCaNhan);
+        this.dienThoaiBaoTin.current.setVal(dienThoaiBaoTin);
+        this.ngaySinh.current.setVal(ngaySinh);
+        this.ngayBatDauCongTac.current.setVal(ngayBatDauCongTac);
+        this.ngayBatDauCongTacDonVi.current.setVal(ngayBatDauCongTacDonVi);
 
-            this.nhomMau.current.setVal(nhomMau);
-            this.ngayNhapNgu.current.setVal(ngayNhapNgu);
-            this.ngayXuatNgu.current.setVal(ngayXuatNgu);
-            this.quanHamCaoNhat.current.setVal(quanHamCaoNhat);
-            this.hangThuongBinh.current.setVal(hangThuongBinh);
-            this.giaDinhChinhSach.current.setVal(giaDinhChinhSach);
-            this.danhHieu.current.setVal(danhHieu);
-            this.soBhxh.current.setVal(soBhxh);
+        // this.ngayVao.current.setVal(ngayVao);
+        // this.ngayCbgd.current.setVal(ngayCbgd);
+        this.ngayBienChe.current.setVal(ngayBienChe);
+        // this.ngayNghi.current.setVal(ngayNghi);
+        // this.ngach.current.setVal(ngach);
+        // this.ngachMoi.current.setVal(ngachMoi);
+        // this.heSoLuong.current.setVal(heSoLuong && Number(heSoLuong) ? Number(heSoLuong).toFixed(2) : 0);
+        // this.bacLuong.current.setVal(bacLuong);
+        // this.mocNangLuong.current.setVal(mocNangLuong);
+        // this.ngayHuongLuong.current.setVal(ngayHuongLuong);
+        // this.tyLeVuotKhung.current.setVal(tyLeVuotKhung);
+        // this.phuCapCongViec.current.setVal(phuCapCongViec);
+        // this.ngayPhuCapCongViec.current.setVal(ngayPhuCapCongViec);
+        // this.maChucVu.current.setVal(maChucVu);
+        this.doanVien.current.setVal(doanVien);
+        if (this.state.doanVien) {
+            this.ngayVaoDoan.current.setVal(ngayVaoDoan);
+            this.noiVaoDoan.current.setVal(noiVaoDoan);
+        }
+        this.congDoan.current.setVal(congDoan);
+        if (this.state.congDoan) {
+            this.ngayVaoCongDoan.current.setVal(ngayVaoCongDoan);
+        }
+        this.dangVien.current.setVal(dangVien);
+        if (this.state.dangVien) {
+            // this.chucVuDang.current.setVal(chucVuDang);
+            this.ngayVaoDang.current.setVal(ngayVaoDang);
+            this.ngayVaoDangChinhThuc.current.setVal(ngayVaoDangChinhThuc);
+            this.noiDangDb.current.setVal(noiDangDb);
+            this.noiDangCt.current.setVal(noiDangCt);
+            this.soTheDang.current.setVal(soTheDang);
+        }
+        // this.chucVuDoanThe.current.setVal(chucVuDoanThe);
+        // this.chucVuKiemNhiem.current.setVal(chucVuKiemNhiem);
+        // this.chucVuKhac.current.setVal(chucVuKhac);
+        this.maTrinhDoLlct.current.setVal(maTrinhDoLlct);
+        this.maTrinhDoQlnn.current.setVal(maTrinhDoQlnn);
+        this.maTrinhDoTinHoc.current.setVal(maTrinhDoTinHoc);
+        this.danToc.current.setVal(danToc);
+        this.quocGia.current.setVal(quocGia);
+        this.tonGiao.current.setVal(tonGiao);
+        this.ngheNghiepCu.current.setVal(ngheNghiepCu);
+        // this.maDonVi.current.setVal(maDonVi);
+        // this.phucLoi.current.setVal(phucLoi);
+        // this.nhaGiaoNhanDan.current.setVal(nhaGiaoNhanDan);
+        // this.nhaGiaoUuTu.current.setVal(nhaGiaoUuTu);
+        this.doiTuongBoiDuongKienThucQPAN.current.setVal(doiTuongBoiDuongKienThucQpan);
+        this.dangONuocNgoai.current.setVal(dangONuocNgoai);
+        if (this.state.nuocNgoai) {
+            this.lyDoONuocNgoai.current.setVal(lyDoONuocNgoai);
+            this.ngayBatDauONuocNgoai.current.setVal(ngayBatDauONuocNgoai);
+            this.ngayKetThucONuocNgoai.current.setVal(ngayKetThucONuocNgoai);
+        }
+        this.dangNghiKhongHuongLuong.current.setVal(dangNghiKhongHuongLuong);
+        if (this.state.nuocNgoai) {
+            this.lyDoNghiKhongHuongLuong.current.setVal(lyDoNghiKhongHuongLuong);
+            this.ngayBatDauNghiKhongHuongLuong.current.setVal(ngayBatDauNghiKhongHuongLuong);
+            this.ngayKetThucNghiKhongHuongLuong.current.setVal(ngayKetThucNghiKhongHuongLuong);
+        }
+        if (this.state.phai == '02') {
+            this.dangNghiThaiSan.current.setVal(dangNghiThaiSan);
+            if (this.state.nghiThaiSan) {
+                this.ngayBatDauNghiThaiSan.current.setVal(ngayBatDauNghiThaiSan);
+                this.ngayKetThucNghiThaiSan.current.setVal(ngayKetThucNghiThaiSan);
+            }
+        }
+        // this.ghiChu.current.setVal(ghiChu);
 
-            this.thuongTru.value(thuongTruMaTinh, thuongTruMaHuyen, thuongTruMaXa, thuongTruSoNha);
-            this.hienTai.value(hienTaiMaTinh, hienTaiMaHuyen, hienTaiMaXa, hienTaiSoNha);
-            this.nguyenQuan.value(maTinhNguyenQuan, maHuyenNguyenQuan, maXaNguyenQuan);
-            this.noiSinh.value(maTinhNoiSinh, maHuyenNoiSinh, maXaNoiSinh);
+        this.nhomMau.current.setVal(nhomMau);
+        this.ngayNhapNgu.current.setVal(ngayNhapNgu);
+        this.ngayXuatNgu.current.setVal(ngayXuatNgu);
+        this.quanHamCaoNhat.current.setVal(quanHamCaoNhat);
+        this.hangThuongBinh.current.setVal(hangThuongBinh);
+        this.giaDinhChinhSach.current.setVal(giaDinhChinhSach);
+        this.danhHieu.current.setVal(danhHieu);
+        this.soBhxh.current.setVal(soBhxh);
 
-            this.soTruong.current.setVal(soTruong);
-            this.sucKhoe.current.setVal(sucKhoe);
-            this.canNang.current.setVal(canNang);
-            this.chieuCao.current.setVal(chieuCao);
-            this.chucDanh.current.setVal(chucDanh);
-            this.hocVi.current.setVal(hocVi);
-            this.chuyenNganh.current.setVal(chuyenNganh);
-            this.namChucDanh.current.setVal(namChucDanh);
-            this.namHocVi.current.setVal(namHocVi);
-            this.trinhDoPhoThong.current.setVal(trinhDoPhoThong);
+        this.thuongTru.value(thuongTruMaTinh, thuongTruMaHuyen, thuongTruMaXa, thuongTruSoNha);
+        this.hienTai.value(hienTaiMaTinh, hienTaiMaHuyen, hienTaiMaXa, hienTaiSoNha);
+        this.nguyenQuan.value(maTinhNguyenQuan, maHuyenNguyenQuan, maXaNguyenQuan);
+        this.noiSinh.value(maTinhNoiSinh, maHuyenNoiSinh, maXaNoiSinh);
+
+        this.soTruong.current.setVal(soTruong);
+        this.sucKhoe.current.setVal(sucKhoe);
+        this.canNang.current.setVal(canNang);
+        this.chieuCao.current.setVal(chieuCao);
+        this.chucDanh.current.setVal(chucDanh);
+        this.hocVi.current.setVal(hocVi);
+        this.chuyenNganh.current.setVal(chuyenNganh);
+        this.namChucDanh.current.setVal(namChucDanh);
+        this.namHocVi.current.setVal(namHocVi);
+        this.trinhDoPhoThong.current.setVal(trinhDoPhoThong);
+        this.noiTotNghiep.current.setVal(noiTotNghiep);
+        this.namTotNghiep.current.setVal(namTotNghiep);
+
     }
 
     getVal = () => ({
@@ -1602,7 +1623,6 @@ class ProfilePage extends QTForm {
         // ngayPhuCapCongViec: this.ngayPhuCapCongViec.current.isEmpty() ? {} : this.ngayPhuCapCongViec.current.getFormVal(),
         // maChucVu: this.maChucVu.current.getFormVal(),
         // chucVuDang: this.state.dangVien ? this.chucVuDang.current.getFormVal() : {},
-        toChucKhac: this.toChucKhac.current.getFormVal(),
         doanVien: this.doanVien.current.getFormVal(),
         ngayVaoDoan: this.state.doanVien ? this.ngayVaoDoan.current.getFormVal() : {},
         congDoan: this.congDoan.current.getFormVal(),
@@ -1627,10 +1647,18 @@ class ProfilePage extends QTForm {
         // phucLoi: this.phucLoi.current.getFormVal(),
         // nhaGiaoNhanDan: this.nhaGiaoNhanDan.current.getFormVal(),
         // nhaGiaoUuTu: this.nhaGiaoUuTu.current.getFormVal(),
+        doiTuongBoiDuongKienThucQpan: this.doiTuongBoiDuongKienThucQPAN.current.getFormVal(),
+        
         dangONuocNgoai: this.dangONuocNgoai.current.getFormVal(),
         lyDoONuocNgoai: this.state.nuocNgoai ? this.lyDoONuocNgoai.current.getFormVal() : {},
         ngayBatDauONuocNgoai: this.state.nuocNgoai ? this.ngayBatDauONuocNgoai.current.getFormVal() : {},
         ngayKetThucONuocNgoai: this.state.nuocNgoai ? this.ngayKetThucONuocNgoai.current.getFormVal() : {},
+
+        dangNghiKhongHuongLuong: this.dangNghiKhongHuongLuong.current.getFormVal(),
+        lyDoNghiKhongHuongLuong: this.state.nghiKhongLuong ? this.lyDoNghiKhongHuongLuong.current.getFormVal() : {},
+        ngayBatDauNghiKhongHuongLuong: this.state.nghiKhongLuong ? this.ngayBatDauNghiKhongHuongLuong.current.getFormVal() : {},
+        ngayKetThucNghiKhongHuongLuong: this.state.nghiKhongLuong ? this.ngayKetThucNghiKhongHuongLuong.current.getFormVal() : {},
+
         dangNghiThaiSan: this.state.nghiThaiSan == '02' ? this.dangNghiThaiSan.current.getFormVal() : {},
         ngayBatDauNghiThaiSan: this.state.nghiThaiSan == '02' ? this.ngayBatDauNghiThaiSan.current.getFormVal() : {},
         ngayKetThucNghiThaiSan: this.state.nghiThaiSan == '02' ? this.ngayKetThucNghiThaiSan.current.getFormVal() : {},
@@ -1656,6 +1684,8 @@ class ProfilePage extends QTForm {
         namChucDanh: this.namChucDanh.current.getFormVal(),
         namHocVi: this.namHocVi.current.getFormVal(),
         trinhDoPhoThong: this.trinhDoPhoThong.current.getFormVal(),
+        noiTotNghiep: this.noiTotNghiep.current.getFormVal(),
+        namTotNghiep: this.namTotNghiep.current.getFormVal(),
     })
 
     saveCommon = (e) => {
@@ -2156,15 +2186,15 @@ class ProfilePage extends QTForm {
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>
                     <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nội dung</th>
                     <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Cấp quyết định</th>
-                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
+                    {/* <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th> */}
                 </tr>),
             renderRow: (item, index) => (
                 <tr key={index}>
                     <TableCell type='number' content={index + 1} />
-                    <TableCell type='link' content={`${T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy')} ${item.ketThuc ? '-' : ''} ${item.ketThuc ? (item.ketThuc == -1 ? 'đến nay' : T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy')) : ''}`} style={{ whiteSpace: 'nowrap' }} onClick={e => this.editKhenThuong(e, item)} />
+                    <TableCell type='text' content={`${T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy')} ${item.ketThuc ? '-' : ''} ${item.ketThuc ? (item.ketThuc == -1 ? 'đến nay' : T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy')) : ''}`} style={{ whiteSpace: 'nowrap' }} onClick={e => this.editKhenThuong(e, item)} />
                     <TableCell type='text' content={item.noiDung} />
                     <TableCell type='text' content={item.capQuyetDinh} />
-                    <TableCell type='buttons' content={item} permission={permission} onEdit={this.editKhenThuong} onDelete={this.deleteKhenThuong}></TableCell>
+                    {/* <TableCell type='buttons' content={item} permission={permission} onEdit={this.editKhenThuong} onDelete={this.deleteKhenThuong}></TableCell> */}
                 </tr>)
         });
 
@@ -2176,15 +2206,15 @@ class ProfilePage extends QTForm {
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>
                     <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Lý do, hình thức kỷ luật</th>
                     <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Cấp quyết định</th>
-                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
+                    {/* <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th> */}
                 </tr>),
             renderRow: (item, index) => (
                 <tr key={index}>
                     <TableCell type='number' content={index + 1} />
-                    <TableCell type='link' content={`${T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy')} ${item.ketThuc ? '-' : ''} ${item.ketThuc ? (item.ketThuc == -1 ? 'đến nay' : T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy')) : ''}`} style={{ whiteSpace: 'nowrap' }} onClick={e => this.editKyLuat(e, item)} />
+                    <TableCell type='text' content={`${T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy')} ${item.ketThuc ? '-' : ''} ${item.ketThuc ? (item.ketThuc == -1 ? 'đến nay' : T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy')) : ''}`} style={{ whiteSpace: 'nowrap' }} onClick={e => this.editKyLuat(e, item)} />
                     <TableCell type='text' content={item.lyDoHinhThuc} />
                     <TableCell type='text' content={item.capQuyetDinh} />
-                    <TableCell type='buttons' content={item} permission={permission} onEdit={this.editKyLuat} onDelete={this.deleteKyLuat}></TableCell>
+                    {/* <TableCell type='buttons' content={item} permission={permission} onEdit={this.editKyLuat} onDelete={this.deleteKyLuat}></TableCell> */}
                 </tr>)
         });
 
@@ -2476,7 +2506,10 @@ class ProfilePage extends QTForm {
                             <div className='form-group col-12' />
                             <h4>Thông tin BHXH - BHYT</h4>
                             <div className='tile-body row'>
-                                <div className='form-group col-md-4'><TextInput ref={this.soBhxh} label='Số Bảo hiểm xã hội' /></div>
+                                <div className='form-group col-md-6'><TextInput ref={this.soBhxh} label='Số Bảo hiểm xã hội' /></div>
+                                <div className='form-group col-md-6'><TextInput ref={this.maTheBHYT} label='Mã thẻ Bảo hiểm y tế' /></div>
+                                <div className='form-group col-md-6'><Select adapter={SelectAdapter_DmBenhVien} ref={this.noiKhamChuaBenhBanDau} label='Nơi khám chữa bệnh ban đầu' /></div>
+                                <div className='form-group col-md-6'><NumberInput ref={this.quyenLoiKhamChuaBenh} label='Quyền lợi khám chữa bệnh (%)' /></div>
                             </div>
                             <div className='form-group col-12' />
                             <h4>Thông tin cá nhân khác</h4>
@@ -2484,8 +2517,8 @@ class ProfilePage extends QTForm {
                                 <div className='form-group col-md-4'><TextInput ref={this.sucKhoe} label='Sức khỏe' disabled={readOnly} maxLength={100} /></div>
                                 <div className='form-group col-md-4'><NumberInput ref={this.canNang} label='Cân nặng(kg)' disabled={readOnly} min={0} step={0.1} /></div>
                                 <div className='form-group col-md-4'><NumberInput ref={this.chieuCao} label='Chiều cao(cm)' disabled={readOnly} min={0} step={1} /></div>
-                                <div className='form-group col-md-6'><TextInput ref={this.soTruong} label='Sở trường' disabled={readOnly} maxLength={100} /></div>
-                                <div className='form-group col-md-6'><TextInput ref={this.ngheNghiepCu} label='Nghề nghiệp trước khi tuyển dụng' disabled={readOnly} maxLength={100} /></div>
+                                <div className='form-group col-md-6'><TextareaInput ref={this.soTruong} label='Sở trường' disabled={readOnly} maxLength={100} /></div>
+                                <div className='form-group col-md-6'><TextareaInput ref={this.ngheNghiepCu} label='Nghề nghiệp trước khi tuyển dụng' disabled={readOnly} maxLength={100} /></div>
 
                             </div>
                         </div>
@@ -2494,11 +2527,11 @@ class ProfilePage extends QTForm {
                             <h3 className='tile-title'>THÔNG TIN CÔNG TÁC</h3>
                             <div className='tile-body row'>
 
-                                {item.maDonVi ? renderFieldText('form-group col-md-12', 'Đơn vị', true, this.mapperDonVi[item.maDonVi]) : null}
+                                {item.maDonVi ? renderFieldText('form-group col-md-6', 'Đơn vị', true, this.mapperDonVi[item.maDonVi]) : null}
+                                <div className='form-group col-md-6'><BooleanInput ref={this.doiTuongBoiDuongKienThucQPAN} label='Đối tượng bồi dưỡng kiến thức Quốc phòng - An ninh:   &nbsp;' disabled={readOnly}/></div>
                                 <div className='form-group col-md-4'><DateInput ref={this.ngayBatDauCongTac} label='Ngày bắt đầu công tác tại trường' disabled={readOnly} min={new Date(1900, 1, 1).getTime()} max={Date.getDateInputDefaultMax()} /></div>
                                 <div className='form-group col-md-4'><DateInput ref={this.ngayBatDauCongTacDonVi} label='Ngày bắt đầu công tác tại đơn vị' disabled={readOnly} min={new Date(1900, 1, 1).getTime()} max={Date.getDateInputDefaultMax()} /></div>
                                 <div className='form-group col-md-4'><DateInput ref={this.ngayBienChe} label='Ngày vào biên chế / tuyển dụng' disabled={readOnly} min={new Date(1900, 1, 1).getTime()} max={new Date().getTime()} /></div>
-                                <div className='form-group col-xl-12 col-md-6'><Select ref={this.chucDanh} adapter={SelectAdapter_DmChucDanhKhoaHoc} label='Chức danh' disabled={readOnly} /></div>
 
 
                                 {item.maChucVu ? renderFieldText('form-group col-md-12', 'Chức vụ chính quyền', true, this.mapperChucVu[item.maChucVu]) : null}
@@ -2535,6 +2568,17 @@ class ProfilePage extends QTForm {
                                     </div>
                                 </div>}
                             </div>
+                            <h4>Chế độ nghỉ không hưởng lương</h4>
+                            <div className='tile-body row'>
+                                <div className='form-group col-md-12'>
+                                    <BooleanInput ref={this.dangNghiKhongHuongLuong} label='Đang nghỉ không hưởng lương:   &nbsp;' disabled={readOnly} onChange={value => this.setState({ nghiKhongLuong: value })} />
+                                </div>
+                                {this.state.nghiKhongLuong && <>
+                                    <div className='form-group col-md-6'><DateInput ref={this.ngayBatDauNghiKhongHuongLuong} label='Ngày bắt đầu nghỉ' disabled={readOnly} min={new Date(1900, 1, 1).getTime()} /></div>
+                                    <div className='form-group col-md-6'><DateInput ref={this.ngayKetThucNghiKhongHuongLuong} label='Ngày kết thúc nghỉ' disabled={readOnly} min={new Date(1900, 1, 1).getTime()} /></div>
+                                    <div className='form-group col-md-12'><TextareaInput ref={this.lyDoNghiKhongHuongLuong} label='Lý do nghỉ' disabled={readOnly} maxLength={200} /></div>
+                                </>}
+                            </div>
                             {/* <div className='form-group col-md-6'><TextInput ref={this.phucLoi} label='Phúc lợi' disabled={readOnly} maxLength={200} /></div>
                         <div className='form-group col-md-6'><TextInput ref={this.ghiChu} label='Ghi chú' disabled={readOnly} maxLength={1000} /></div> */}
                             <div className='form-group col-md-12' />
@@ -2552,7 +2596,7 @@ class ProfilePage extends QTForm {
                         <div className='tile'>
                             <h3 className='tile-title'>CÁC TỔ CHỨC CHÍNH TRỊ - XÃ HỘI</h3>
                             <div className='tile-body row'>
-                                <div className='form-group col-md-6'>
+                                <div className='form-group col-md-12'>
                                     <h4>Đoàn TNCS HCM</h4>
                                     <div className='tile-body row'>
 
@@ -2561,12 +2605,12 @@ class ProfilePage extends QTForm {
                                         </div>
                                         {this.state.doanVien &&
                                             <>
-                                                <div className='form-group col-md-12'><DateInput ref={this.ngayVaoDoan} label='Ngày vào Đoàn' disabled={readOnly} min={new Date(1900, 1, 1).getTime()} max={new Date().getTime()} /></div>
-                                                <div className='form-group col-md-12'><TextInput ref={this.noiVaoDoan} label='Nơi vào Đoàn' disabled={readOnly} maxLength={200} /></div>
+                                                <div className='form-group col-md-4'><DateInput ref={this.ngayVaoDoan} label='Ngày vào Đoàn' disabled={readOnly} min={new Date(1900, 1, 1).getTime()} max={new Date().getTime()} /></div>
+                                                <div className='form-group col-md-8'><TextInput ref={this.noiVaoDoan} label='Nơi vào Đoàn' disabled={readOnly} maxLength={200} /></div>
                                             </>}
                                     </div>
                                 </div>
-                                <div className='form-group col-md-6'>
+                                <div className='form-group col-md-12'>
                                     <h4>Công đoàn</h4>
                                     <div className='tile-body row'>
 
@@ -2575,17 +2619,17 @@ class ProfilePage extends QTForm {
                                         </div>
                                         {this.state.congDoan &&
                                             <>
-                                                <div className='form-group col-md-12'><DateInput ref={this.ngayVaoCongDoan} label='Ngày vào Công đoàn' disabled={readOnly} min={new Date(1900, 1, 1).getTime()} max={new Date().getTime()} /></div>
+                                                <div className='form-group col-md-4'><DateInput ref={this.ngayVaoCongDoan} label='Ngày vào Công đoàn' disabled={readOnly} min={new Date(1900, 1, 1).getTime()} max={new Date().getTime()} /></div>
                                             </>}
                                     </div>
                                 </div>
                             </div>
                             <div className='form-group col-md-12' />
 
-                            <h4>Đảng Cộng sản Việt Nam</h4>
+                            <h4>Đảng viên Đảng Cộng sản Việt Nam</h4>
                             <div className='tile-body row'>
                                 <div className='form-group col-md-4'>
-                                    <BooleanInput ref={this.dangVien} label='Đảng viên đảng CSVN:  &nbsp;' disabled={readOnly} onChange={value => this.setState({ dangVien: value })} />
+                                    <BooleanInput ref={this.dangVien} label='Đảng viên Đảng CSVN:  &nbsp;' disabled={readOnly} onChange={value => this.setState({ dangVien: value })} />
                                 </div>
                                 {this.state.dangVien &&
                                     <>
@@ -2600,10 +2644,6 @@ class ProfilePage extends QTForm {
                             <div className='form-group col-md-12' />
                             <h4>Tổ chức Chính trị - Xã hội nghề nghiệp khác</h4>
                             <div className='tile-body row'>
-                                <div className='form-group col-md-12'>
-                                    <BooleanInput ref={this.toChucKhac} label='Tổ chức Chính trị - Xã hội nghề nghiệp khác:  &nbsp;' disabled={readOnly} onChange={value => this.setState({ toChucKhac: value })} />
-                                </div>
-                                {this.state.toChucKhac &&
                                     <div className='form-group col-md-12'>
                                         <div className='tile-body'>{tableToChucKhac}</div>
                                         <div className='tile-footer' style={{ textAlign: 'right' }}>
@@ -2612,24 +2652,27 @@ class ProfilePage extends QTForm {
                                             </button>
                                         </div>
                                     </div>
-                                }
                             </div>
 
                         </div>
                         <div className='tile'>
-                            <h3 className='tile-title'>Trình độ học vấn</h3>
+                            <h3 className='tile-title'>TRÌNH ĐỘ HỌC VẤN</h3>
                             <div className='tile-body row'>
+                                <div className='form-group col-xl-4 col-md-6'><TextInput ref={this.trinhDoPhoThong} label='Trình độ văn hóa (12/12)' disabled={readOnly} /></div>
+                                <div className='form-group col-xl-4 col-md-6'><TextInput ref={this.noiTotNghiep} label='Nơi tốt nghiệp' disabled={readOnly} /></div>
+                                <div className='form-group col-xl-4 col-md-6'><DateInput ref={this.namTotNghiep} label='Năm tốt nghiệp' disabled={readOnly} type='year' max={new Date().getTime()}/></div>
+                                <div className='form-group col-md-8'><Select ref={this.chucDanh} adapter={SelectAdapter_DmChucDanhKhoaHoc} label='Chức danh' disabled={readOnly} /></div>
+                                <div className='form-group col-md-4'><DateInput ref={this.namChucDanh} label='Năm công nhận chức danh' disabled={readOnly} type='year' max={new Date().getTime()} /></div>
+                                <div className='form-group col-md-4'><Select ref={this.hocVi} adapter={SelectAdapter_DmTrinhDo} label='Trình độ chuyên môn cao nhất' disabled={readOnly} /></div>
+                                <div className='form-group col-md-4'><DateInput ref={this.namHocVi} label='Năm công nhận trình độ chuyên môn cao nhất' disabled={readOnly} type='year' max={new Date().getTime()} /></div>
+                                <div className='form-group col-md-4'><TextInput ref={this.chuyenNganh} label='Chuyên ngành' disabled={readOnly} /></div>
                                 <div className='form-group col-md-4'><Select ref={this.maTrinhDoLlct} adapter={SelectAdapter_DmTrinhDoLyLuanChinhTri} label='Trình độ lý luận chính trị' /></div>
                                 <div className='form-group col-md-4'><Select ref={this.maTrinhDoQlnn} adapter={SelectAdapter_DmTrinhDoQuanLyNhaNuoc} label='Trình độ quản lý nhà nước' /></div>
                                 <div className='form-group col-md-4'><Select ref={this.maTrinhDoTinHoc} adapter={SelectAdapter_DmTrinhDoTinHoc} label='Trình độ tin học' /></div>
-                                <div className='form-group col-xl-4 col-md-6'><DateInput ref={this.namChucDanh} label='Năm công nhận chức danh' disabled={readOnly} type='year' max={new Date().getTime()} /></div>
-                                <div className='form-group col-xl-4 col-md-6'><Select ref={this.hocVi} adapter={SelectAdapter_DmTrinhDo} label='Học vị' disabled={readOnly} /></div>
-                                <div className='form-group col-xl-4 col-md-6'><DateInput ref={this.namHocVi} label='Năm công nhận học vị' disabled={readOnly} type='year' max={new Date().getTime()} /></div>
-                                <div className='form-group col-xl-4 col-md-6'><TextInput ref={this.chuyenNganh} label='Chuyên ngành' disabled={readOnly} /></div>
-                                <div className='form-group col-xl-4 col-md-6'><TextInput ref={this.trinhDoPhoThong} label='Trình độ phổ thông' disabled={readOnly} /></div>
+                                
                             </div>
                             <div>
-                                <p>Trình độ ngoại ngữ {!itemsNN || itemsNN.length == 0 ? <strong>: Không có thông tin</strong> : ''}</p>
+                                <h4>Trình độ ngoại ngữ {!itemsNN || itemsNN.length == 0 ? <strong>: Không có thông tin</strong> : ''}</h4>
                                 <div className='tile-body'>{tableNN}</div>
                                 <div className='tile-footer' style={{ textAlign: 'right' }}>
                                     <button className='btn btn-info' type='button' onClick={e => this.create(e, this.modalNN)}>
@@ -2713,9 +2756,9 @@ class ProfilePage extends QTForm {
                                 {tableKhenThuong}
                             </div>
                             <div className='tile-footer' style={{ textAlign: 'right' }}>
-                                <button className='btn btn-info' type='button' onClick={e => this.create(e, this.modalKhenThuong)}>
+                                {/* <button className='btn btn-info' type='button' onClick={e => this.create(e, this.modalKhenThuong)}>
                                     <i className='fa fa-fw fa-lg fa-plus' />Thêm quá trình
-                                </button>
+                                </button> */}
                             </div>
                         </div>
                         <div className='tile'>
@@ -2724,9 +2767,9 @@ class ProfilePage extends QTForm {
                                 {tableKyLuat}
                             </div>
                             <div className='tile-footer' style={{ textAlign: 'right' }}>
-                                <button className='btn btn-info' type='button' onClick={e => this.create(e, this.modalKyLuat)}>
+                                {/* <button className='btn btn-info' type='button' onClick={e => this.create(e, this.modalKyLuat)}>
                                     <i className='fa fa-fw fa-lg fa-plus' />Thêm quá trình
-                                </button>
+                                </button> */}
                             </div>
                         </div>
                         <div className='tile'>
