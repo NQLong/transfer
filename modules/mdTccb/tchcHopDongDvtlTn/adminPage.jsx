@@ -131,7 +131,7 @@ class TchcHopDongDvtlTn extends AdminPage {
             icon: 'fa fa-list-alt',
             title: 'Hợp đồng Đơn vị trả lương - Trách nhiệm',
             breadcrumb: [
-                <Link key={0} to='/user/tccb'>Danh mục</Link>,
+                <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
                 'Hợp đồng Đơn vị trả lương - Trách nhiệm'
             ],
             content: <>

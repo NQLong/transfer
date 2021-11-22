@@ -46,10 +46,11 @@ class searchPage extends React.Component {
 
     }
     render() {
+        const detail = JSON.parse(this.props?.item?.detail || {});
         return (
             <section data-aos='fade-up' className='row p-3'>
                 <div className='col-12 homeBorderLeft'>
-                    <h3 className='homeTitle' style={{ color: '#0139A6', margin: 0, }}><strong>Tra cứu tài liệu</strong></h3>
+                    <h3 className='homeTitle' style={{ color: '#0139A6', margin: 0, }}><strong>{detail.valueTitleCom || 'Tra cứu tài liệu'}</strong></h3>
                 </div>
                 <div className='col-12' style={{ marginTop: 30 }}>
                     <ul className='nav nav-tabs'>

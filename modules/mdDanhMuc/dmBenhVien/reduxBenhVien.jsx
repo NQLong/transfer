@@ -151,3 +151,11 @@ export function createMultiDmBenhVien(dmBenhVien, done) {
         }, () => T.notify('Upload thông tin bệnh viện có lỗi!', 'danger'));
     };
 }
+
+
+export const SelectAdapter_DmBenhVien = {
+    ajax: false,
+    getAll: getDmBenhVienAll,
+    processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
+    condition: { kichHoat: 1 },
+};

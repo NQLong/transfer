@@ -1329,7 +1329,6 @@ class CanBoEditPage extends QTForm {
         const route = T.routeMatcher('/user/staff/:shcc'),
             shcc = route.parse(window.location.pathname).shcc;
         this.urlSHCC = shcc && shcc != 'new' ? shcc : null;
-        console.log(this.urlSHCC);
         if (this.urlSHCC) {
             this.setState({ create: false });
             this.props.getStaffEdit(shcc, data => {

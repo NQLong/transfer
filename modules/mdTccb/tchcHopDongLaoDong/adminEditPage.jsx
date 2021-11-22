@@ -29,6 +29,7 @@ class TchcHopDongLaoDongEditPage extends QTForm {
         this.ho = React.createRef();
         this.ten = React.createRef();
         this.shcc = React.createRef();
+        this.email = React.createRef();
         this.quocGia = React.createRef();
         this.danToc = React.createRef();
         this.tonGiao = React.createRef();
@@ -115,11 +116,12 @@ class TchcHopDongLaoDongEditPage extends QTForm {
             danToc = '',
             tonGiao = '',
             ngaySinh = '',
-            noiSinhMaTinh = '',
-            cuTruMaTinh = '',
-            cuTruMaHuyen = '',
-            cuTruMaXa = '',
-            cuTruSoNha = '',
+            email = '',
+            maTinhNoiSinh = '',
+            hienTaiMaTinh = '',
+            hienTaiMaHuyen = '',
+            hienTaiMaXa = '',
+            hienTaiSoNha = '',
             thuongTruMaTinh = '',
             thuongTruMaHuyen = '',
             thuongTruMaXa = '',
@@ -143,9 +145,9 @@ class TchcHopDongLaoDongEditPage extends QTForm {
         this.danToc.current.setVal(danToc ? danToc : '');
         this.tonGiao.current.setVal(tonGiao ? tonGiao : '');
         this.ngaySinh.current.setVal(ngaySinh ? ngaySinh : '');
-
-        this.noiSinh.value(noiSinhMaTinh);
-        this.cuTru.value(cuTruMaTinh, cuTruMaHuyen, cuTruMaXa, cuTruSoNha);
+        this.noiSinh.value(maTinhNoiSinh);
+        this.email.current.setVal(email ? email : '');
+        this.cuTru.value(hienTaiMaTinh, hienTaiMaHuyen, hienTaiMaXa, hienTaiSoNha);
         this.thuongTru.value(thuongTruMaTinh, thuongTruMaHuyen, thuongTruMaXa, thuongTruSoNha);
 
         this.hocVanTrinhDo.current.setVal(hocVanTrinhDo ? hocVanTrinhDo : '');
@@ -188,8 +190,9 @@ class TchcHopDongLaoDongEditPage extends QTForm {
         cmndNgayCap: this.cmndNgayCap.current.getFormVal(),
         cmndNoiCap: this.cmndNoiCap.current.getFormVal(),
         dienThoaiCaNhan: this.dienThoaiCaNhan.current.getFormVal(),
-        hopDongCanBo: this.kieuHopDong.current.getFormVal(),
-
+        hopDongCanBo: 'LĐ',
+        email: this.email.current.getFormVal(),
+        hopDongCanBoNgay: this.batDauLamViec.current.getFormVal(),
         nguoiDuocThue: this.shcc.current.getFormVal(),
         soHopDong: this.soHopDong.current.getFormVal(),
         loaiHopDong2: this.loaiHopDong2.current.getFormVal(),
@@ -221,13 +224,13 @@ class TchcHopDongLaoDongEditPage extends QTForm {
             thuongTruMaXa: this.thuongTru.value().maPhuongXa
         };
         const dcCuTru = {
-            cuTruSoNha: this.cuTru.value().soNhaDuong,
-            cuTruMaTinh: this.cuTru.value().maTinhThanhPho,
-            cuTruMaHuyen: this.cuTru.value().maQuanHuyen,
-            cuTruMaXa: this.cuTru.value().maPhuongXa
+            hienTaiMaTinh: this.cuTru.value().soNhaDuong,
+            hienTaiSoNha: this.cuTru.value().maTinhThanhPho,
+            hienTaiMaHuyen: this.cuTru.value().maQuanHuyen,
+            hienTaiMaXa: this.cuTru.value().maPhuongXa
         };
         const dcNoiSinh = {
-            noiSinhMaTinh: this.noiSinh.value().maTinhThanhPho
+            maTinhNoiSinh: this.noiSinh.value().maTinhThanhPho
         };
         this.main.current.classList.add('validated');
         if (data.data) {
@@ -284,6 +287,7 @@ class TchcHopDongLaoDongEditPage extends QTForm {
                         <div className='form-group col-xl-3 col-md-4'><TextInput ref={this.shcc} label='Số hiệu công chức' required /> </div>
                         <div className='form-group col-xl-3 col-md-4'><TextInput ref={this.ho} label='Họ' /> </div>
                         <div className='form-group col-xl-3 col-md-4'><TextInput ref={this.ten} label='Tên' /> </div>
+                        <div className='form-group col-xl-3 col-md-4'><TextInput ref={this.email} label='Email cá nhân' /> </div>
                         <div className='form-group col-xl-4 col-md-4'><TextInput ref={this.cmnd} label='CMND/CCCD' /> </div>
                         <div className='form-group col-xl-4 col-md-4'><DateInput ref={this.cmndNgayCap} label='Ngày cấp' /> </div>
                         <div className='form-group col-xl-4 col-md-4'><TextInput ref={this.cmndNoiCap} label='Nơi cấp' /> </div>

@@ -130,7 +130,7 @@ class TchcHopDongLaoDong extends AdminPage {
             icon: 'fa fa-list-alt',
             title: 'Hợp đồng Lao động',
             breadcrumb: [
-                <Link key={0} to='/user/tccb'>Danh mục</Link>,
+                <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
                 'Hợp đồng Lao động'
             ],
             content: <>

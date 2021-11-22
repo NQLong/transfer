@@ -83,7 +83,7 @@ export class ComponentModal extends React.Component {
         } else if (selectedType == 'thư viện') {
             this.viewTypeDisplay.setItems(['Tìm kiếm', 'Giới thiệu sách', 'CSDL', 'Hỗ trợ']);
             $('#comDisplay').css('display', 'block');
-            $('#titleCom').css('display', 'none');
+            $('#titleCom').css('display', 'block');
             $('#divLinkSeeAll').css('display', 'none');
         } else {
             $('#comDisplay').css('display', 'none');

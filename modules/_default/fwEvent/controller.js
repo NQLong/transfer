@@ -86,7 +86,9 @@ module.exports = app => {
             pageSize = parseInt(req.params.pageSize),
             today = new Date().getTime(),
             user = req.session.user,
-            categoryType = parseInt(req.params.categoryType);
+            categoryType = parseInt(req.params.categoryType),
+            language = req.query.language;
+
         const condition = {
             statement: 'FN.ACTIVE = :active AND (START_POST <= :today )',
             parameter: { active: 1, today }
@@ -94,6 +96,11 @@ module.exports = app => {
         if (!user) {
             condition.statement += ' AND IS_INTERNAL = :isInternal';
             condition.parameter.isInternal = 0;
+        }
+        if (language == 'en') {
+            condition.statement += ' AND (IS_TRANSLATE =1 OR (IS_TRANSLATE =0 AND LANGUAGE=\'en\'))';
+        } else {
+            condition.statement += ' AND (IS_TRANSLATE =1 OR (IS_TRANSLATE =0 AND LANGUAGE=\'vi\'))';
         }
         app.model.fwCategory.get({ id: categoryType }, (error, category) => {
             if (error) {
