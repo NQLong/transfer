@@ -269,7 +269,6 @@ export function userGetStaff(shcc, done) {
     return dispatch => {
         const url = `/api/staff-profile/${shcc}`;
         T.get(url, data => {
-            console.log(data);
             if (data.error) {
                 T.notify('Lấy thông tin cán bộ bị lỗi', 'danger');
                 console.error(`GET: ${url}.`, data.error);
