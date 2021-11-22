@@ -430,7 +430,7 @@ export function getEventInPageByUser(pageNumber, pageSize, done) {
 export function getEventInPageByCategory(pageNumber, pageSize, category, done) {
     return () => {
         const url = `/event/page/${pageNumber}/${pageSize}/${category}`;
-        T.get(url, data => {
+        T.get(url, { language: T.language() }, data => {
             if (data.error) {
                 T.notify(language.getNewsInPageByUserError, 'danger');
                 console.error('GET: ' + url + '.', data.error);

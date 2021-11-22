@@ -45,6 +45,14 @@ class SectionEvent extends React.Component {
         setTimeout(T.ftcoAnimate, 250);
     }
 
+    textDate = (date) => {
+        const page = T.language(),
+            monthEn = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUNE', 'JULY', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+        const monthText = page == 'vi' ?
+            'THÁNG ' + (parseInt(new Date(date).getMonth()) + 1) : monthEn[parseInt(new Date(date).getMonth())];
+        return monthText;
+    }
+
     render() {
         const language = T.language(texts),
             eventList = this.state.list,
@@ -61,12 +69,12 @@ class SectionEvent extends React.Component {
                                     <div className='card border-light shadow' style={{ background: '#fafafa' }}>
                                         <div className='card-body px-0 py-1' >
                                             <h2 className='text-center mb-0 homeHeading' style={{ color: '#0139A6' }}><b>{(new Date(item.startEvent)).getDate()}</b></h2>
-                                            <h5 className='card-text text-center homeHeading' style={{ color: '#0139A6' }}>{'THÁNG ' + (parseInt(new Date(item.startEvent).getMonth()) + 1)}</h5>
+                                            <h5 className='card-text text-center homeHeading' style={{ color: '#0139A6' }}>{this.textDate(item.startEvent)}</h5>
                                         </div>
                                     </div>
                                 </div>
                                 <div className='col-8 col-lg-9 text-justify'>
-                                    <Link to={link}><h5 className='mb-0 homeBody' style={{ color: '#626262' }}><b>{item.isTranslate == 1 ? T.language.parse(item.title) : T.language.parse(item.title, true).vi}</b></h5></Link>
+                                    <Link to={link}><h5 className='mb-0 homeBody' style={{ color: '#626262' }}><b>{T.language.parse(item.title)}</b></h5></Link>
                                     <h5 className='mb-0 homeBody' style={{ color: '#626262' }}> {item.location}</h5>
                                 </div>
                             </div>);
@@ -80,12 +88,12 @@ class SectionEvent extends React.Component {
                                     <div className='card border-light shadow' style={{ background: '#fafafa' }}>
                                         <div className='card-body px-0 py-1' >
                                             <h2 className='text-center mb-0 homeHeading' style={{ color: '#0139A6' }}><b>{(new Date(item.startEvent)).getDate()}</b></h2>
-                                            <h5 className='card-text text-center homeHeading' style={{ color: '#0139A6' }}>{'THÁNG ' + (parseInt(new Date(item.startEvent).getMonth()) + 1)}</h5>
+                                            <h5 className='card-text text-center homeHeading' style={{ color: '#0139A6' }}>{this.textDate(item.startEvent)}</h5>
                                         </div>
                                     </div>
                                 </div>
                                 <div className='col-8 col-lg-9 text-justify'>
-                                    <Link to={link}><h5 className='mb-0 homeBody' style={{ color: '#626262' }}><b>{item.isTranslate == 1 ? T.language.parse(item.title) : T.language.parse(item.title, true).vi}</b></h5></Link>
+                                    <Link to={link}><h5 className='mb-0 homeBody' style={{ color: '#626262' }}><b>{T.language.parse(item.title)}</b></h5></Link>
                                     <h5 className='mb-0 homeBody' style={{ color: '#626262' }}> {item.location}</h5>
                                 </div>
                             </div>);
@@ -106,12 +114,12 @@ class SectionEvent extends React.Component {
                                 <div className='card border-light shadow' style={{ background: '#fafafa' }}>
                                     <div className='card-body px-0 py-1' >
                                         <h2 className='text-center mb-0 homeHeading' style={{ color: '#0139A6' }}><b>{(new Date(item.startEvent)).getDate()}</b></h2>
-                                        <h5 className='card-text text-center homeHeading' style={{ color: '#0139A6' }}>{'THÁNG ' + (parseInt(new Date(item.startEvent).getMonth()) + 1)}</h5>
+                                        <h5 className='card-text text-center homeHeading' style={{ color: '#0139A6' }}>{this.textDate(item.startEvent)}</h5>
                                     </div>
                                 </div>
                             </div>
                             <div className='col-8 col-lg-9 text-justify'>
-                                <Link to={link}><h5 className='mb-0 homeBody' style={{ color: '#626262' }}><b>{item.isTranslate == 1 ? T.language.parse(item.title) : T.language.parse(item.title, true).vi}</b></h5></Link>
+                                <Link to={link}><h5 className='mb-0 homeBody' style={{ color: '#626262' }}><b>{T.language.parse(item.title)}</b></h5></Link>
                                 <h5 className='mb-0 homeBody' style={{ color: '#626262' }}> {item.location}</h5>
                             </div>
                         </div>);
