@@ -1303,7 +1303,6 @@ class LamViecNgoaiModal extends AdminModal {
 }
 
 class ProfilePage extends QTForm {
-    loader = React.createRef();
     constructor(props) {
         super(props);
         this.state = {
@@ -1456,7 +1455,7 @@ class ProfilePage extends QTForm {
                         congDoan: data.item && data.item.congDoan && !data.item.congDoan == 0,
                         doiTuongBoiDuongKienThucQpan: data.item && data.item.doiTuongBoiDuongKienThucQpan && !data.item.doiTuongBoiDuongKienThucQpan == 0,
                         tinhTrangBoiDuong: data.item && data.item.tinhTrangBoiDuong && data.item.tinhTrangBoiDuong == 0 ? false : true,
-                        dangVien: data.item && data.item.dangVien && data.item.dangVien == 0 ? false : true, 
+                        dangVien: data.item && data.item.dangVien && data.item.dangVien == 0 ? false : true,
                         nuocNgoai: data.item && data.item.dangONuocNgoai == 0 ? false : true,
                         nghiThaiSan: data.item && data.item.dangNghiThaiSan == 0 ? false : true,
                         nghiKhongLuong: data.item && data.item.dangNghiKhongHuongLuong == 0 ? false : true,
@@ -1487,11 +1486,11 @@ class ProfilePage extends QTForm {
             ngayHuongLuong = '', tyLeVuotKhung = '',
             /*maChucVu = '', chucVuDang = '', chucVuDoanThe = '', chucVuKiemNhiem = '',*/
             maTrinhDoLlct = '', maTrinhDoQlnn = '', maTrinhDoTinHoc = '', danToc = '', tonGiao = '', chucDanh = '', trinhDoPhoThong = '', hocVi = '', chuyenNganh = '', namChucDanh = '', namHocVi = '',
-            maDonVi = '', lyDoONuocNgoai = '', ngayBatDauONuocNgoai = '', ngayKetThucONuocNgoai = '', dangONuocNgoai = false, 
+            maDonVi = '', lyDoONuocNgoai = '', ngayBatDauONuocNgoai = '', ngayKetThucONuocNgoai = '', dangONuocNgoai = false,
             doiTuongBoiDuongKienThucQpan = false, tinhTrangBoiDuong = false, namBoiDuong = '', khoaBoiDuong = '',
             lyDoNghiKhongHuongLuong = '', ngayBatDauNghiKhongHuongLuong = '', ngayKetThucNghiKhongHuongLuong = '', dangNghiKhongHuongLuong = false,
             ngayBatDauNghiThaiSan = '', ngayKetThucNghiThaiSan = '', dangNghiThaiSan = false,
-            dangVien = false, phai = '', nhomMau = '', ngayVaoDang = '', ngayVaoDangChinhThuc = '', ngayNhapNgu = '', ngayXuatNgu = '', quanHamCaoNhat = '', 
+            dangVien = false, phai = '', nhomMau = '', ngayVaoDang = '', ngayVaoDangChinhThuc = '', ngayNhapNgu = '', ngayXuatNgu = '', quanHamCaoNhat = '',
             soBhxh = '', ngayKetThucBhxh = '', ngayBatDauBhxh = '',
             /*soTheDang = '',*/ noiDangDb = '', noiDangCt = '',
             doanVien = false, congDoan = false, ngayVaoCongDoan = '', noiVaoCongDoan = '',
@@ -1683,8 +1682,8 @@ class ProfilePage extends QTForm {
         // nhaGiaoUuTu: this.nhaGiaoUuTu.current.getFormVal(),
         doiTuongBoiDuongKienThucQpan: this.doiTuongBoiDuongKienThucQpan.current.getFormVal(),
         tinhTrangBoiDuong: this.state.doiTuongBoiDuongKienThucQpan ? this.tinhTrangBoiDuong.current.getFormVal() : 0,
-        namBoiDuong: this.state.tinhTrangBoiDuong && this.doiTuongBoiDuongKienThucQpan  ? this.namBoiDuong.current.getFormVal() : {},
-        
+        namBoiDuong: this.state.tinhTrangBoiDuong && this.state.doiTuongBoiDuongKienThucQpan ? this.namBoiDuong.current.getFormVal() : {},
+
         dangONuocNgoai: this.dangONuocNgoai.current.getFormVal(),
         lyDoONuocNgoai: this.state.nuocNgoai ? this.lyDoONuocNgoai.current.getFormVal() : {},
         ngayBatDauONuocNgoai: this.state.nuocNgoai ? this.ngayBatDauONuocNgoai.current.getFormVal() : {},
@@ -2050,7 +2049,6 @@ class ProfilePage extends QTForm {
             permission.write = true;
             permission.delete = true;
         }
-        console.log(currentPermission);
         let readOnly = !currentPermission.includes('staff:login');
 
         let currentCanBo = this.props.staff && this.props.staff.userItem ? this.props.staff.userItem : [],
@@ -2073,6 +2071,7 @@ class ProfilePage extends QTForm {
             ungDungThuongMai = currentCanBo.ungDungThuongMai ? currentCanBo.ungDungThuongMai : [],
             lamViecNgoai = currentCanBo.lamViecNgoai ? currentCanBo.lamViecNgoai : [];
         const item = this.state.canBo || {};
+        
         const renderFieldText = (className, label, hasValue, value, noValue = 'Không có thông tin!') =>
             <div className={className}>{label}: <b>{hasValue ? value : noValue}</b></div>;
 
@@ -2475,6 +2474,7 @@ class ProfilePage extends QTForm {
                                 <div className='form-group'>
                                     <label className='control-label'>Hình đại diện</label>
                                     <ImageBox ref={e => this.imageBox = e} postUrl='/user/upload' uploadType='ProfileImage' userData='profile' image={this.state.user && this.state.user.image} />
+
                                 </div>
                             </div>
                         </div>
@@ -2496,8 +2496,7 @@ class ProfilePage extends QTForm {
                                     <label className='control-label'>Hình đại diện</label>
                                     <ImageBox ref={e => this.imageBox = e} postUrl='/user/upload' uploadType='ProfileImage' userData='profile' image={this.state.user && this.state.user.image} />
                                 </div>
-
-                                <div className='form-group col-md-9'>
+                               <div className='form-group col-md-9'>
                                     <div className='row'>
                                         <div className='form-group col-md-6'><TextInput ref={this.shcc} label='Mã thẻ cán bộ' placeholder='Mã thẻ cán bộ' disabled={!readOnly} maxLength={10} /></div>
                                         <div className='form-group col-md-6'><Select placeholder='Chọn đơn vị công tác' ref={this.maDonVi} adapter={SelectAdapter_DmDonVi} label='Đơn vị công tác' disabled={!readOnly} /></div>
@@ -2646,7 +2645,7 @@ class ProfilePage extends QTForm {
                                 <div className='form-group col-md-4'><TextInput ref={this.maTheBHYT} label='Mã thẻ Bảo hiểm y tế' /></div>
                                 <div className='form-group col-md-4'><Select adapter={SelectAdapter_DmBenhVien} ref={this.noiKhamChuaBenhBanDau} label='Nơi khám chữa bệnh ban đầu' /></div>
                                 <div className='form-group col-md-4'><NumberInput ref={this.quyenLoiKhamChuaBenh} label='Quyền lợi khám chữa bệnh (%)' /></div>
-                                
+
                                 <div className='form-group col-md-6'><BooleanInput ref={this.doiTuongBoiDuongKienThucQpan} label='Đối tượng bồi dưỡng kiến thức Quốc phòng - An ninh:   &nbsp;' disabled={readOnly} /></div>
                             </div>
                         </div>
