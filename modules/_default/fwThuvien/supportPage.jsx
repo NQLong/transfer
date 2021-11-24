@@ -24,6 +24,7 @@ class SectionSupport extends React.Component {
     }
 
     render() {
+        const detail = JSON.parse(this.props?.item?.detail || {});
         const a = this.state.featureItem.map((item, index) =>
             (<div className='col-lg-6 col-12'
                 style={{ display: 'flex', flexDirection: 'row', paddingTop: 10, alignItems: 'center' }} key={index}>
@@ -36,7 +37,7 @@ class SectionSupport extends React.Component {
         return (
             <section data-aos='fade-up' className='row p-3'>
                 <div className='col-12 homeBorderLeft'>
-                    <h3 className='homeTitle' style={{ color: '#0139A6', margin: 0, }}><strong>Hỗ trợ người sử dụng</strong></h3>
+                    <h3 className='homeTitle' style={{ color: '#0139A6', margin: 0, }}><strong>{detail.valueTitleCom || 'Hỗ trợ người sử dụng'}</strong></h3>
                 </div>
                 <div className='row d-flex'>
                     {a}
