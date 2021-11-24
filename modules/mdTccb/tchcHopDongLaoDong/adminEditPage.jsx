@@ -61,7 +61,7 @@ class TchcHopDongLaoDongEditPage extends QTForm {
         this.hiredStaff = {};
     }
     componentDidMount() {
-        T.ready('/user/hopDongLaoDong');
+        T.ready('/user/tchc/hop-dong-lao-dong');
         this.props.getStaffAll(items => {
             if (items) {
                 this.hiredStaff = {};
@@ -74,7 +74,7 @@ class TchcHopDongLaoDongEditPage extends QTForm {
     }
 
     getData = () => {
-        const route = T.routeMatcher('/user/hopDongLaoDong/:ma'),
+        const route = T.routeMatcher('/user/tchc/hop-dong-lao-dong/:ma'),
             ma = route.parse(window.location.pathname).ma;
         this.urlMa = ma && ma != 'new' ? ma : null;
         if (this.urlMa) {
@@ -238,7 +238,7 @@ class TchcHopDongLaoDongEditPage extends QTForm {
                 this.props.updateTchcHopDongLaoDong(this.urlMa, Object.assign(data.data, dcThuongTru, dcCuTru, dcNoiSinh), () => {
                     this.props.updateStaff(data.data.nguoiDuocThue, Object.assign(data.data, dcThuongTru, dcCuTru, dcNoiSinh), () => {
                         this.main.current.classList.remove('validated');
-                        this.props.history.push(`/user/hopDongLaoDong/${this.urlMa}`);
+                        this.props.history.push(`/user/tchc/hop-dong-lao-dong/${this.urlMa}`);
                     });
                 });
             } else {
@@ -249,7 +249,7 @@ class TchcHopDongLaoDongEditPage extends QTForm {
                         }
                     }
                     else this.props.createStaff(data.data);
-                    this.props.history.push(`/user/hopDongLaoDong/${hopDong.item.ma}`);
+                    this.props.history.push(`/user/tchc/hop-dong-lao-dong/${hopDong.item.ma}`);
                 });
             }
         }
@@ -323,7 +323,7 @@ class TchcHopDongLaoDongEditPage extends QTForm {
                         <div className='form-group col-xl-3 col-md-6'><TextInput ref={this.heSo} label='Hệ số' /></div>
                     </div>
                 </div>
-                <Link to='/user/hopDongLaoDong' className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>
+                <Link to='/user/tchc/hop-dong-lao-dong' className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>
                     <i className='fa fa-lg fa-reply' />
                 </Link>
                 <button type='button' title='Save' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.save}>

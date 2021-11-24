@@ -22,8 +22,8 @@
 [36m@@ -12,7 +12,7 @@[m [mmodule.exports = app => {[m
          { name: 'tchcHopDongDvtlTn:delete' },[m
      );[m
-     app.get('/user/hopDongDvtlTn/:ma', app.permission.check('tchcHopDongDvtlTn:read'), app.templates.admin);[m
-[31m-    app.get('/user/hopDongDvtlTn', app.permission.check('tchcHopDongDvtlTn:read'), app.templates.admin);[m
+     app.get('/user/tchc/hop-dong-dvtl-tn/:ma', app.permission.check('tchcHopDongDvtlTn:read'), app.templates.admin);[m
+[31m-    app.get('/user/tchc/hop-dong-dvtl-tn', app.permission.check('tchcHopDongDvtlTn:read'), app.templates.admin);[m
 [32m+[m[32m    app.get('/user/contact', app.permission.check('tchcHopDongDvtlTn:read'), app.templates.admin);[m
  [m
      // APIs -----------------------------------------------------------------------------------------------------------------------------------------[m

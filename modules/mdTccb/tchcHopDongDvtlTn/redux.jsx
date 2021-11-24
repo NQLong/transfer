@@ -49,7 +49,7 @@ T.initPage('pageTchcHopDongDvtlTn');
 export function getTchcHopDongDvtlTnPage(pageNumber, pageSize, pageCondition, done) {
     const page = T.updatePage('pageTchcHopDongDvtlTn', pageNumber, pageSize, pageCondition);
     return dispatch => {
-        const url = `/api/hopDongDvtlTn/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/tchc/hop-dong-dvtl-tn/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách hợp đồng bị lỗi!', 'danger');
@@ -65,7 +65,7 @@ export function getTchcHopDongDvtlTnPage(pageNumber, pageSize, pageCondition, do
 
 export function getTchcHopDongDvtlTnAll(done) {
     return dispatch => {
-        const url = '/api/hopDongDvtlTn/all';
+        const url = '/api/tchc/hop-dong-dvtl-tn/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách hợp đồng bị lỗi!', 'danger');
@@ -80,7 +80,7 @@ export function getTchcHopDongDvtlTnAll(done) {
 
 export function getTchcHopDongDvtlTn(ma, done) {
     return () => {
-        const url = `/api/hopDongDvtlTn/item/${ma}`;
+        const url = `/api/tchc/hop-dong-dvtl-tn/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy hợp đồng bị lỗi!', 'danger');
@@ -94,7 +94,7 @@ export function getTchcHopDongDvtlTn(ma, done) {
 
 export function getTchcHopDongDvtlTnEdit(ma, done) {
     return dispatch => {
-        const url = `/api/hopDongDvtlTn/edit/item/${ma}`;
+        const url = `/api/tchc/hop-dong-dvtl-tn/edit/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy thông tin hợp đồng bị lỗi!', 'danger');
@@ -109,7 +109,7 @@ export function getTchcHopDongDvtlTnEdit(ma, done) {
 
 export function createTchcHopDongDvtlTn(item, done) {
     return dispatch => {
-        const url = '/api/hopDongDvtlTn';
+        const url = '/api/tchc/hop-dong-dvtl-tn';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo hợp đồng bị lỗi!', 'danger');
@@ -125,7 +125,7 @@ export function createTchcHopDongDvtlTn(item, done) {
 
 export function deleteTchcHopDongDvtlTn(ma, done) {
     return dispatch => {
-        const url = '/api/hopDongDvtlTn';
+        const url = '/api/tchc/hop-dong-dvtl-tn';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa hợp đồng bị lỗi!', 'danger');
@@ -141,7 +141,7 @@ export function deleteTchcHopDongDvtlTn(ma, done) {
 
 export function updateTchcHopDongDvtlTn(ma, changes, done) {
     return dispatch => {
-        const url = '/api/hopDongDvtlTn';
+        const url = '/api/tchc/hop-dong-dvtl-tn';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật hợp đồng bị lỗi!', 'danger');
@@ -158,7 +158,7 @@ export function updateTchcHopDongDvtlTn(ma, changes, done) {
 
 export function downloadWord(ma, done) {
     return () => {
-        const url = `/user/hopDongDvtlTn/${ma}/word`;
+        const url = `/user/tchc/hop-dong-dvtl-tn/${ma}/word`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Tải file word bị lỗi', 'danger');

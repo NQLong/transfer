@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3010: { title: 'Hợp đồng lao động', link: '/user/hopDongLaoDong', icon: 'fa-table', backgroundColor: '#8bc34a', },
+            3010: { title: 'Hợp đồng lao động', link: '/user/tchc/hop-dong-lao-dong', icon: 'fa-table', backgroundColor: '#8bc34a', },
         },
     };
     app.permission.add(
@@ -11,13 +11,13 @@ module.exports = app => {
         { name: 'tchcHopDongLaoDong:write' },
         { name: 'tchcHopDongLaoDong:delete' },
     );
-    app.get('/user/hopDongLaoDong/:ma', app.permission.check('tchcHopDongLaoDong:read'), app.templates.admin);
-    app.get('/user/hopDongLaoDong', app.permission.check('tchcHopDongLaoDong:read'), app.templates.admin);
+    app.get('/user/tchc/hop-dong-lao-dong/:ma', app.permission.check('tchcHopDongLaoDong:read'), app.templates.admin);
+    app.get('/user/tchc/hop-dong-lao-dong', app.permission.check('tchcHopDongLaoDong:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
 
-    app.get('/api/hopDongLaoDong/page/:pageNumber/:pageSize', checkGetStaffPermission, (req, res) => {
+    app.get('/api/tchc/hop-dong-lao-dong/page/:pageNumber/:pageSize', checkGetStaffPermission, (req, res) => {
         let pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             condition = { statement: null };
@@ -30,31 +30,31 @@ module.exports = app => {
         app.model.tchcHopDongLaoDong.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
     });
 
-    app.get('/api/hopDongLaoDong/all', checkGetStaffPermission, (req, res) => {
+    app.get('/api/tchc/hop-dong-lao-dong/all', checkGetStaffPermission, (req, res) => {
         app.model.tchcHopDongLaoDong.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/hopDongLaoDong/item/:ma', checkGetStaffPermission, (req, res) => {
+    app.get('/api/tchc/hop-dong-lao-dong/item/:ma', checkGetStaffPermission, (req, res) => {
         app.model.tchcHopDongLaoDong.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
     });
 
-    app.get('/api/hopDongLaoDong/edit/item/:ma', checkGetStaffPermission, (req, res) => {
+    app.get('/api/tchc/hop-dong-lao-dong/edit/item/:ma', checkGetStaffPermission, (req, res) => {
         app.model.tchcHopDongLaoDong.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
     });
 
-    app.post('/api/hopDongLaoDong', app.permission.check('tchcHopDongLaoDong:write'), (req, res) => {
+    app.post('/api/tchc/hop-dong-lao-dong', app.permission.check('tchcHopDongLaoDong:write'), (req, res) => {
         app.model.tchcHopDongLaoDong.create(req.body.item, (error, item) => res.send({ error, item }));
     });
 
-    app.put('/api/hopDongLaoDong', app.permission.check('tchcHopDongLaoDong:write'), (req, res) => {
+    app.put('/api/tchc/hop-dong-lao-dong', app.permission.check('tchcHopDongLaoDong:write'), (req, res) => {
         app.model.tchcHopDongLaoDong.update({ ma: req.body.ma }, req.body.changes, (error, items) => res.send({ error, items }));
     });
 
-    app.delete('/api/hopDongLaoDong', app.permission.check('tchcHopDongLaoDong:delete'), (req, res) => {
+    app.delete('/api/tchc/hop-dong-lao-dong', app.permission.check('tchcHopDongLaoDong:delete'), (req, res) => {
         app.model.tchcHopDongLaoDong.delete({ ma: req.body.ma }, errors => res.send({ errors }));
     });
 
-    app.get('/user/hopDongLaoDong/:ma/word', app.permission.check('staff:login'), (req, res) => {
+    app.get('/user/tchc/hop-dong-lao-dong/:ma/word', app.permission.check('staff:login'), (req, res) => {
         if (req.params && req.params.ma) {
             app.model.tchcHopDongLaoDong.get({ ma: req.params.ma }, (error, hopDong) => {
                 if (error || hopDong == null) {

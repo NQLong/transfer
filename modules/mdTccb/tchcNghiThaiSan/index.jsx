@@ -9,7 +9,7 @@ export default {
     },
     routes: [
         {
-            path: '/user/nghiThaiSan',
+            path: '/user/qua-trinh/nghi-thai-san',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
     ],

@@ -49,7 +49,7 @@ T.initPage('pageTchcNghiThaiSan');
 export function getTchcNghiThaiSanPage(pageNumber, pageSize, pageCondition, done) {
     const page = T.updatePage('pageTchcNghiThaiSan', pageNumber, pageSize, pageCondition);
     return dispatch => {
-        const url = `/api/nghiThaiSan/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/qua-trinh/nghi-thai-san/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách hợp đồng bị lỗi!', 'danger');
@@ -73,7 +73,7 @@ export function getTchcNghiThaiSanAll(done) {
     // }
 
     return dispatch => {
-        const url = '/api/nghiThaiSan/all';
+        const url = '/api/qua-trinh/nghi-thai-san/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách hợp đồng bị lỗi!', 'danger');
@@ -95,7 +95,7 @@ export function getTchcNghiThaiSanAll(done) {
 
 export function getTchcNghiThaiSan(ma, done) {
     return () => {
-        const url = `/api/nghiThaiSan/item/${ma}`;
+        const url = `/api/qua-trinh/nghi-thai-san/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy hợp đồng bị lỗi!', 'danger');
@@ -109,7 +109,7 @@ export function getTchcNghiThaiSan(ma, done) {
 
 export function getTchcNghiThaiSanEdit(ma, done) {
     return dispatch => {
-        const url = `/api/nghiThaiSan/edit/item/${ma}`;
+        const url = `/api/qua-trinh/nghi-thai-san/edit/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy thông tin hợp đồng bị lỗi!', 'danger');
@@ -124,7 +124,7 @@ export function getTchcNghiThaiSanEdit(ma, done) {
 
 export function createTchcNghiThaiSan(item, done) {
     return dispatch => {
-        const url = '/api/nghiThaiSan';
+        const url = '/api/qua-trinh/nghi-thai-san';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo hợp đồng bị lỗi!', 'danger');
@@ -140,7 +140,7 @@ export function createTchcNghiThaiSan(item, done) {
 
 export function deleteTchcNghiThaiSan(ma, done) {
     return dispatch => {
-        const url = '/api/nghiThaiSan';
+        const url = '/api/qua-trinh/nghi-thai-san';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa hợp đồng bị lỗi!', 'danger');
@@ -156,7 +156,7 @@ export function deleteTchcNghiThaiSan(ma, done) {
 
 export function updateTchcNghiThaiSan(ma, changes, done) {
     return dispatch => {
-        const url = '/api/nghiThaiSan';
+        const url = '/api/qua-trinh/nghi-thai-san';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật hợp đồng bị lỗi!', 'danger');
@@ -173,7 +173,7 @@ export function updateTchcNghiThaiSan(ma, changes, done) {
 
 export function downloadWord(ma, done) {
     return () => {
-        const url = `/user/nghiThaiSan/${ma}/word`;
+        const url = `/user/qua-trinh/nghi-thai-san/${ma}/word`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Tải file word bị lỗi', 'danger');

@@ -114,7 +114,7 @@ class TchcHopDongLaoDong extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='link' content={item.soHopDong} style={{ textAlign: 'center' }} url={`/user/hopDongLaoDong/${item.ma}`} />
+                        <TableCell type='link' content={item.soHopDong} style={{ textAlign: 'center' }} url={`/user/tchc/hop-dong-lao-dong/${item.ma}`} />
                         <TableCell type='text' content={this.hiredStaff && this.hiredStaff[item.nguoiDuocThue] ? this.hiredStaff[item.nguoiDuocThue] : ''} style={{ whiteSpace: 'nowrap' }} />
                         <TableCell type='text' content={this.typeContract && this.typeContract[item.loaiHopDong2] ? this.typeContract[item.loaiHopDong2] : ''} style={{ whiteSpace: 'nowrap' }} />
                         <TableCell type='date' content={item.ngayKyHopDong} style={{ textAlign: 'center', whiteSpace: 'nowrap' }} dateFormat='dd/mm/yyyy' />
@@ -138,7 +138,7 @@ class TchcHopDongLaoDong extends AdminPage {
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getTchcHopDongLaoDongPage} />
                 {permissionWrite && (
-                    <Link to='/user/hopDongLaoDong/new' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }}>
+                    <Link to='/user/tchc/hop-dong-lao-dong/new' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }}>
                         <i className='fa fa-lg fa-plus' />
                     </Link>)}
             </>,

@@ -69,7 +69,7 @@ class TchcHopDongDvtlTnEditPage extends QTForm {
         this.hiredStaff = {};
     }
     componentDidMount() {
-        T.ready('/user/hopDongDvtlTn');
+        T.ready('/user/tchc/hop-dong-dvtl-tn');
         this.props.getTchcCanBoHopDongDvtlTnAll(items => {
             if (items) {
                 this.hiredStaff = {};
@@ -82,7 +82,7 @@ class TchcHopDongDvtlTnEditPage extends QTForm {
     }
 
     getData = () => {
-        const route = T.routeMatcher('/user/hopDongDvtlTn/:ma'),
+        const route = T.routeMatcher('/user/tchc/hop-dong-dvtl-tn/:ma'),
             ma = route.parse(window.location.pathname).ma;
         this.urlMa = ma && ma != 'new' ? ma : null;
         if (this.urlMa) {
@@ -263,7 +263,7 @@ class TchcHopDongDvtlTnEditPage extends QTForm {
                 this.props.updateTchcHopDongDvtlTn(this.urlMa, Object.assign(data.data, dcThuongTru, dcCuTru, dcNoiSinh), () => {
                     this.props.updateTchcCanBoHopDongDvtlTn(data.data.nguoiDuocThue, Object.assign(data.data, dcThuongTru, dcCuTru, dcNoiSinh), () => {
                         this.main.current.classList.remove('validated');
-                        this.props.history.push(`/user/hopDongDvtlTn/${this.urlMa}`);
+                        this.props.history.push(`/user/tchc/hop-dong-dvtl-tn/${this.urlMa}`);
                     });
                 });
             } else {
@@ -274,7 +274,7 @@ class TchcHopDongDvtlTnEditPage extends QTForm {
                         }
                     }
                     else this.props.createTchcCanBoHopDongDvtlTn(data.data);
-                    this.props.history.push(`/user/hopDongDvtlTn/${hopDong.item.ma}`);
+                    this.props.history.push(`/user/tchc/hop-dong-dvtl-tn/${hopDong.item.ma}`);
                 });
             }
         }
@@ -354,7 +354,7 @@ class TchcHopDongDvtlTnEditPage extends QTForm {
                         {!this.state.item || !(this.state.kieu == 'DVTL') ? <div className='form-group col-xl-3 col-md-6'><TextInput ref={this.tienLuong} label='Tiền lương' /></div> : null}
                     </div>
                 </div>
-                <Link to='/user/hopDongDvtlTn' className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>
+                <Link to='/user/tchc/hop-dong-dvtl-tn' className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>
                     <i className='fa fa-lg fa-reply' />
                 </Link>
                 <button type='button' title='Save' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.save}>

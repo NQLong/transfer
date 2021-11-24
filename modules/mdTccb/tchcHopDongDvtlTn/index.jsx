@@ -9,11 +9,11 @@ export default {
     },
     routes: [
         {
-            path: '/user/hopDongDvtlTn/:ma',
+            path: '/user/tchc/hop-dong-dvtl-tn/:ma',
             component: Loadable({ loading: Loading, loader: () => import('./adminEditPage') })
         },
         {
-            path: '/user/hopDongDvtlTn',
+            path: '/user/tchc/hop-dong-dvtl-tn',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
     ],

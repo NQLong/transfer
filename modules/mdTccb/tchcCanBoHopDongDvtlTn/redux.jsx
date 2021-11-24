@@ -49,7 +49,7 @@ T.initPage('pageTchcCanBoHopDongDvtlTn');
 export function getTchcCanBoHopDongDvtlTnPage(pageNumber, pageSize, pageCondition, done) {
     const page = T.updatePage('pageTchcCanBoHopDongDvtlTn', pageNumber, pageSize, pageCondition);
     return dispatch => {
-        const url = `/api/canBoHopDongDvtlTn/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/tchc/can-bo-hop-dong-dvtl-tn/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách cán bộ bị lỗi!', 'danger');
@@ -65,7 +65,7 @@ export function getTchcCanBoHopDongDvtlTnPage(pageNumber, pageSize, pageConditio
 
 export function getTchcCanBoHopDongDvtlTnAll(done) {
     return dispatch => {
-        const url = '/api/canBoHopDongDvtlTn/all';
+        const url = '/api/tchc/can-bo-hop-dong-dvtl-tn/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách cán bộ bị lỗi!', 'danger');
@@ -80,7 +80,7 @@ export function getTchcCanBoHopDongDvtlTnAll(done) {
 
 export function getTchcCanBoHopDongDvtlTn(shcc, done) {
     return () => {
-        const url = `/api/canBoHopDongDvtlTn/item/${shcc}`;
+        const url = `/api/tchc/can-bo-hop-dong-dvtl-tn/item/${shcc}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy cán bộ bị lỗi!', 'danger');
@@ -94,7 +94,7 @@ export function getTchcCanBoHopDongDvtlTn(shcc, done) {
 
 export function getTchcCanBoHopDongDvtlTnEdit(shcc, done) {
     return dispatch => {
-        const url = `/api/canBoHopDongDvtlTn/edit/item/${shcc}`;
+        const url = `/api/tchc/can-bo-hop-dong-dvtl-tn/edit/item/${shcc}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy cán bộ bị lỗi!', 'danger');
@@ -109,7 +109,7 @@ export function getTchcCanBoHopDongDvtlTnEdit(shcc, done) {
 
 export function createTchcCanBoHopDongDvtlTn(item, done) {
     return dispatch => {
-        const url = '/api/canBoHopDongDvtlTn';
+        const url = '/api/tchc/can-bo-hop-dong-dvtl-tn';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo cán bộ bị lỗi!', 'danger');
@@ -125,7 +125,7 @@ export function createTchcCanBoHopDongDvtlTn(item, done) {
 
 export function deleteTchcCanBoHopDongDvtlTn(shcc, done) {
     return dispatch => {
-        const url = '/api/canBoHopDongDvtlTn';
+        const url = '/api/tchc/can-bo-hop-dong-dvtl-tn';
         T.delete(url, { shcc }, data => {
             if (data.error) {
                 T.notify('Xóa cán bộ bị lỗi!', 'danger');
@@ -141,7 +141,7 @@ export function deleteTchcCanBoHopDongDvtlTn(shcc, done) {
 
 export function updateTchcCanBoHopDongDvtlTn(shcc, changes, done) {
     return dispatch => {
-        const url = '/api/canBoHopDongDvtlTn';
+        const url = '/api/tchc/can-bo-hop-dong-dvtl-tn';
         T.put(url, { shcc, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật cán bộ bị lỗi!', 'danger');
