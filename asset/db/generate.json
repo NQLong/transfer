@@ -6754,7 +6754,6 @@
         "primaryKeys": ["SHCC"],
         "foreignKeys": []
     },
-
     "TRINH_DO_NGOAI_NGU": {
         "active": true,
         "moduleName": "trinhDoNgoaiNgu",
@@ -6790,6 +6789,76 @@
             }
         },
         "primaryKeys": ["ID"],
+        "foreignKeys": []
+    },
+    "QT_CHUC_VU": {
+        "active": true,
+        "methods": {
+            "QT_CHUC_VU_SEARCH_PAGE": "searchPage"
+        },
+        "moduleName": "qtChucVu",
+        "modelName": "qtChucVu",
+        "columns": {
+            "STT": {
+                "value": "stt",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": false,
+                "size": "22,0"
+            },
+            "SHCC": {
+                "value": "shcc",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 10
+            },
+            "MA_CHUC_VU": {
+                "value": "maChucVu",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 3
+            },
+            "MA_DON_VI": {
+                "value": "maDonVi",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 20
+            },
+            "SO_QD": {
+                "value": "soQd",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 50
+            },
+            "NGAY_RA_QD": {
+                "value": "ngayRaQd",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "20,0"
+            },
+            "CHUC_VU_CHINH": {
+                "value": "chucVuChinh",
+                "dataType": "NUMBER",
+                "dataDefault": "1",
+                "nullable": true,
+                "size": "1,0"
+            },
+            "MA_BO_MON": {
+                "value": "maBoMon",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 20
+            }
+        },
+        "primaryKeys": [
+            "STT"
+        ],
         "foreignKeys": []
     }
 }
