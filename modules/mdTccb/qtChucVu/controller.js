@@ -1,4 +1,21 @@
 module.exports = app => {
+    const menu = {
+        parentMenu: app.parentMenu.tccb,
+        menus: {
+            3009: { title: 'Quá trình chức vụ', link: '/user/qua-trinh/chuc-vu', icon: 'fa-table', backgroundColor: '#8bc34a', groupIndex: 2},
+        },
+    };
+    app.permission.add(
+        { name: 'staff:login', menu: { parentMenu: { index: 1000, title: 'Thông tin cá nhân', icon: 'fa-user', link: '/user' } }, },
+        { name: 'qtChucVu:read', menu },
+        { name: 'qtChucVu:write' },
+        { name: 'qtChucVu:delete' },
+    );
+    app.get('/user/qua-trinh/chuc-vu/:ma', app.permission.check('qtChucVu:read'), app.templates.admin);
+    app.get('/user/qua-trinh/chuc-vu', app.permission.check('qtChucVu:read'), app.templates.admin);
+        
+    // APIs -----------------------------------------------------------------------------------------------------------------------------------------
+
     app.get('/api/qua-trinh/chuc-vu/page/:pageNumber/:pageSize', app.permission.check('qtChucVu:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
