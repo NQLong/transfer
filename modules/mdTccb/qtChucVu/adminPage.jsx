@@ -42,7 +42,7 @@ class EditModal extends AdminModal {
     onShow = (item) => {
         let { stt, shcc, maChucVu, maDonVi, soQd, ngayRaQd, chucVuChinh, maBoMon } = item ? item : {
             shcc: '', maChucVu: '', maDonVi: '', soQd: '', ngayRaQd: '', chucVuChinh: '', maBoMon: '',
-        }
+        };
         this.setState({ stt, item });
         this.shcc.value(shcc ? shcc : '');
         this.maChucVu.value(maChucVu ? maChucVu : '');
