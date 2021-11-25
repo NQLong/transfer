@@ -28,9 +28,11 @@ class TchcHopDongDvtlTnEditPage extends QTForm {
     constructor (props) {
         super(props);
         this.state = { item: null, kieu: '' };
+
+        //1. Thông tin bên A
+        this.shcc = React.createRef();
         this.ho = React.createRef();
         this.ten = React.createRef();
-        this.shcc = React.createRef();
         this.email = React.createRef();
         this.quocGia = React.createRef();
         this.danToc = React.createRef();

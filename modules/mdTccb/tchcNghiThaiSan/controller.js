@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3015: { title: 'Nghỉ thai sản', link: '/user/qua-trinh/nghi-thai-san', icon: 'fa-table', backgroundColor: '#8bc34a', },
+            3015: { title: 'Nghỉ thai sản', link: '/user/qua-trinh/nghi-thai-san', icon: 'fa-table', backgroundColor: '#8bc34a', groupIndex: 2},
         },
     };
     app.permission.add(

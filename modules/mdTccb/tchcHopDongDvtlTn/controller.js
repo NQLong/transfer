@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3002: { title: 'Hợp đồng đơn vị trả lương - trách nhiệm', link: '/user/tchc/hop-dong-dvtl-tn', icon: 'fa-table', backgroundColor: '#8bc34a', },
+            3002: { title: 'Hợp đồng đơn vị trả lương - trách nhiệm', link: '/user/tchc/hop-dong-dvtl-tn', icon: 'fa-table', backgroundColor: '#8bc34a', groupIndex: 1},
         },
     };
     app.permission.add(
@@ -39,7 +39,20 @@ module.exports = app => {
     });
 
     app.get('/api/tchc/hop-dong-dvtl-tn/edit/item/:ma', checkGetStaffPermission, (req, res) => {
-        app.model.tchcHopDongDvtlTn.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
+        app.model.tchcHopDongDvtlTn.get({ ma: req.params.ma }, (error, hopDongDvtlTn) => 
+            {
+                if (error || hopDongDvtlTn == null) {
+                    res.send({ error });
+                } else {
+                    app.model.tchcCanBoHopDongDvtlTn.get({ shcc: hopDongDvtlTn.shcc }, (error, canBoDvtlTn) => {
+                        if (error || canBoDvtlTn == null) {
+                            res.send({ item: app.clone({ hopDongDvtlTn: hopDongDvtlTn }, { canBoDvtlTn: null }) });
+                        } else {
+                            res.send({ item: app.clone({ hopDongDvtlTn: hopDongDvtlTn }, { canBoDvtlTn: canBoDvtlTn }) });
+                        }
+                    });
+                }
+        });
     });
 
     app.post('/api/tchc/hop-dong-dvtl-tn', app.permission.check('tchcHopDongDvtlTn:write'), (req, res) => {
@@ -56,14 +69,14 @@ module.exports = app => {
 
     app.get('/user/tchc/hop-dong-dvtl-tn/:ma/word', app.permission.check('staff:login'), (req, res) => {
         if (req.params && req.params.ma) {
-            app.model.tchcHopDongDvtlTn.get({ ma: req.params.ma }, (error, hopDong) => {
-                if (error || hopDong == null) {
+            app.model.tchcHopDongDvtlTn.get({ ma: req.params.ma }, (error, hopDongDvtlTn) => {
+                if (error || hopDongDvtlTn == null) {
                     res.send({ error });
                 } else {
                     const signedStaffMapping = {}, hiredStaffMapping = {}, typeContract = {}, donViMapping = {},
                         chucVuMapping = {}, quocGiaMapping = {}, danTocMapping = {}, tonGiaoMapping = {},
                         tinhMapping = {}, xaMapping = {}, huyenMapping = {}, trinhDoMapping = {}, kHChucDanhMapping = {};
-                    const url = hopDong.kieuHopDong == 'DVTL' ? 'Mau-HD-DVTL.docx' : 'Mau-HD-TN.docx';
+                    const url = hopDongDvtlTn.kieuHopDong == 'DVTL' ? 'Mau-HD-DVTL.docx' : 'Mau-HD-TN.docx';
                     const source = app.path.join(__dirname, 'resource', url);
                     new Promise(resolve => {
                         app.model.tchcCanBoHopDongDvtlTn.getAll((error, items) => {
@@ -71,7 +84,7 @@ module.exports = app => {
                             resolve();
                         });
                     }).then(() => new Promise(resolve => {
-                        app.model.canBo.getAll((error, items) => {
+                        app.model.canBoDvtlTn.getAll((error, items) => {
                             (items || []).forEach(item => signedStaffMapping[item.shcc] = item.ho + ' ' + item.ten);
                             resolve();
                         });
@@ -131,11 +144,11 @@ module.exports = app => {
                             resolve();
                         });
                     })).then(() => new Promise(resolve => {
-                        const curStaff = hiredStaffMapping[hopDong.nguoiDuocThue];
+                        const curStaff = hiredStaffMapping[hopDongDvtlTn.nguoiDuocThue];
                         const data = {
                             hoTen: curStaff.ho + ' ' + curStaff.ten,
-                            hoTenNguoiKy: signedStaffMapping[hopDong.nguoiKy],
-                            chucVuNguoiKy: chucVuMapping[hopDong.chucVu],
+                            hoTenNguoiKy: signedStaffMapping[hopDongDvtlTn.nguoiKy],
+                            chucVuNguoiKy: chucVuMapping[hopDongDvtlTn.chucVu],
                             quocTich: curStaff.quocGia ? quocGiaMapping[curStaff.quocGia] : '',
                             danToc: curStaff.danToc ? danTocMapping[curStaff.danToc] : '',
                             tonGiao: curStaff.tonGiao ? tonGiaoMapping[curStaff.tonGiao] : '',
@@ -162,20 +175,20 @@ module.exports = app => {
                             cmndNgayCap: curStaff.cmndNgayCap ? app.date.viDateFormat(new Date(curStaff.cmndNgayCap)) : '',
                             cmndNoiCap: curStaff.cmndNoiCap ? curStaff.cmndNoiCap : '',
 
-                            loaiHopDong: typeContract[hopDong.loaiHopDong],
-                            hieuLucHopDong: app.date.viDateFormat(new Date(hopDong.hieuLucHopDong)),
-                            ketThucHopDong: app.date.viDateFormat(new Date(hopDong.ketThucHopDong)),
-                            diaDiemLamViec: donViMapping[hopDong.diaDiemLamViec],
-                            chucDanhChuyenMon: hopDong.chucDanhChuyenMon ? chucVuMapping[hopDong.chucDanhChuyenMon] : '',
+                            loaiHopDong: typeContract[hopDongDvtlTn.loaiHopDong],
+                            hieuLucHopDong: app.date.viDateFormat(new Date(hopDongDvtlTn.hieuLucHopDong)),
+                            ketThucHopDong: app.date.viDateFormat(new Date(hopDongDvtlTn.ketThucHopDong)),
+                            diaDiemLamViec: donViMapping[hopDongDvtlTn.diaDiemLamViec],
+                            chucDanhChuyenMon: hopDongDvtlTn.chucDanhChuyenMon ? chucVuMapping[hopDongDvtlTn.chucDanhChuyenMon] : '',
                             khoaHocChucDanh: curStaff.khoaHocChucDanh ? kHChucDanhMapping[curStaff.khoaHocChucDanh] : '',
                             khoaHocChuyenNganh: curStaff.khoaHocChuyenNganh ? curStaff.khoaHocChuyenNganh : '',
-                            chiuSuPhanCong: hopDong.chiuSuPhanCong,
-                            donViChiTra: hopDong.donViChiTra ? donViMapping[hopDong.donViChiTra] : '',
-                            ngayKyHopDong: app.date.viDateFormat(new Date(hopDong.ngayKyHopDong)),
+                            chiuSuPhanCong: hopDongDvtlTn.chiuSuPhanCong,
+                            donViChiTra: hopDongDvtlTn.donViChiTra ? donViMapping[hopDongDvtlTn.donViChiTra] : '',
+                            ngayKyHopDong: app.date.viDateFormat(new Date(hopDongDvtlTn.ngayKyHopDong)),
 
-                            heSo: hopDong.heSo ? hopDong.heSo : '',
-                            bac: hopDong.bac ? hopDong.bac : '',
-                            tienLuong: hopDong.tienLuong ? hopDong.tienLuong : ''
+                            heSo: hopDongDvtlTn.heSo ? hopDongDvtlTn.heSo : '',
+                            bac: hopDongDvtlTn.bac ? hopDongDvtlTn.bac : '',
+                            tienLuong: hopDongDvtlTn.tienLuong ? hopDongDvtlTn.tienLuong : ''
 
                         };
                         data.cuTru = data.cuTruSoNha + data.cuTruMaXa + data.cuTruMaHuyen + data.cuTruMaTinh;
