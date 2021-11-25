@@ -79,10 +79,26 @@ export function getStaff(shcc, done) {
             if (data.error) {
                 T.notify('Lấy thông tin cán bộ bị lỗi', 'danger');
                 console.error(`GET: ${url}.`, data.error);
-            } else if (done) {
+            }
+            else if (done) {
                 done(data);
             }
         }, error => console.error(`GET: ${url}.`, error));
+    };
+}
+
+export function getStaffAll(done) {
+    return dispatch => {
+        const url = '/api/staff/all';
+        T.get(url, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách cán bộ bị lỗi!', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (done) done(data.items);
+                dispatch({ type: StaffGetAll, items: data.items ? data.items : [] });
+            }
+        }, () => T.notify('Lấy danh sách cán bộ bị lỗi!', 'danger'));
     };
 }
 

@@ -37,7 +37,7 @@ class EditModal extends AdminModal {
 
     onSubmit = (e) => {
         e.preventDefault();
-        const 
+        const
             idNgach = this.idNgach,
             bac = this.bac,
             changes = {
@@ -60,14 +60,14 @@ class EditModal extends AdminModal {
     }
 
     render = () => {
-        const readOnly = this.props.readOnly; 
+        const readOnly = this.props.readOnly;
         return (this.renderModal({
             title: this.state.ma ? 'Cập nhật Ngạch lương' : 'Tạo mới Ngạch lương',
             body: <div className='row'>
                 <FormSelect className='col-md-12' ref={this.maSoCdnn} required adapter={SelectAdapter_DmNgachCdnn} label='Chức danh nghề nghiệp' disabled={readOnly} />
                 <FormCheckbox className='col-md-6' ref={e => this.state.vuotKhung = e} label='Vượt khung' isSwitch={true} readOnly={readOnly} onChange={() => !readOnly && this.setState({ vuotKhung: !this.state.vuotKhung })} />
-                <FormTextBox type='number' className='col-md-12' ref={this.bac} label='Bậc lương' disabled={readOnly} min={0} max={1000} step={1}  />
-                <FormTextBox type='number' className='col-md-12' ref={this.heSo} required label={this.state.vuotKhung ? 'Phần trăm vượt khung (%)' : 'Hệ số lương'} disabled={readOnly} min={0} max={1000} step='any' /> 
+                <FormTextBox type='number' className='col-md-12' ref={this.bac} label='Bậc lương' disabled={readOnly} min={0} max={1000} step={1} />
+                <FormTextBox type='number' className='col-md-12' ref={this.heSo} required label={this.state.vuotKhung ? 'Phần trăm vượt khung (%)' : 'Hệ số lương'} disabled={readOnly} min={0} max={1000} step='any' />
             </div>
         }));
     }

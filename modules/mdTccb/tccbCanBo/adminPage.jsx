@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { PageName, getStaffPage, deleteStaff } from './redux';
 import Pagination, { OverlayLoading } from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, FormSelect } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, FormSelect, } from 'view/component/AdminPage';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 
 class StaffPage extends AdminPage {
@@ -44,6 +44,9 @@ class StaffPage extends AdminPage {
     getPage = (pageN, pageS, pageC, done) => {
         this.props.getStaffPage(pageN, pageS, pageC, this.state.filter, done);
     }
+    // changeKichHoat = (pageN, pageS, pageC, done) => {
+    //     this.props.getStaffPage(pageN, pageS, pageC, this.state.filter, done);
+    // }
 
     delete = (e, item) => {
         e.preventDefault();
@@ -98,6 +101,10 @@ class StaffPage extends AdminPage {
             </>,
             content: <>
                 <div className='tile'>
+                    {/* <div>
+                        <FormCheckbox style={{ display: 'inline-flex', width: '100%', margin: 0 }} ref={e => this.kichHoat = e} label='Cán bộ thiếu email' isSwitch={true} readOnly={false}
+                            onChange={value => this.changeKichHoat(value ? 1 : 0)} />
+                    </div> */}
                     {!this.state.searching ? table : <OverlayLoading text='Đang tải..' />}
                     <Pagination style={{ marginLeft: '70px' }} name={PageName} pageNumber={pageNumber} pageSize={pageSize} pageTotal={pageTotal} totalItem={totalItem} pageCondition={pageCondition}
                         getPage={this.getPage} />

@@ -60,10 +60,10 @@ export function getDmNgachCdnnPage(pageNumber, pageSize, pageCondition, done) {
     };
 }
 
-export function getDmNgachCdnnAll(condition, done) {
+export function getDmNgachCdnnAll(done) {
     return dispatch => {
         const url = '/api/danh-muc/ngach-cdnn/all';
-        T.get(url, { condition }, data => {
+        T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách chức danh nghề nghiệp bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
