@@ -141,7 +141,7 @@ export function deleteQtChucVu(ma, done) {
 
 export function updateQtChucVu(ma, changes, done) {
     return dispatch => {
-        const url = '/api/qua-trinh/nghi-thai-san';
+        const url = '/api/qua-trinh/chuc-vu';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật chức vụ bị lỗi!', 'danger');
