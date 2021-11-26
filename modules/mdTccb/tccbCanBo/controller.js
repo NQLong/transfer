@@ -221,6 +221,15 @@ module.exports = app => {
                         }
                         resolve();
                     });
+                })).then(() => new Promise(resolve => {
+                    app.model.qtChucVu.getAll({ shcc: canBo.shcc }, (error, chucVu) => {
+                        if (error || chucVu == null) {
+                            result = app.clone(result, { chucVu: null });
+                        } else {
+                            result = app.clone(result, { chucVu });
+                        }
+                        resolve();
+                    });
                 })).then(() => {
                     res.send({ error, item: result });
                 });
@@ -915,6 +924,15 @@ module.exports = app => {
                             result = app.clone(result, { daoTao: null });
                         } else {
                             result = app.clone(result, { daoTao });
+                        }
+                        resolve();
+                    });
+                })).then(() => new Promise(resolve => {
+                    app.model.qtChucVu.getAll({ shcc: canBo.shcc }, (error, chucVu) => {
+                        if (error || chucVu == null) {
+                            result = app.clone(result, { chucVu: null });
+                        } else {
+                            result = app.clone(result, { chucVu });
                         }
                         resolve();
                     });

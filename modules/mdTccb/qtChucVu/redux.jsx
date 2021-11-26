@@ -64,14 +64,6 @@ export function getQtChucVuPage(pageNumber, pageSize, pageCondition, done) {
 }
 
 export function getQtChucVuAll(done) {
-    // let newData = {}, tmpData = [];
-    // let getMergedObjs = (...objs) => {
-    //     Object.fromEntries(
-    //         Object.entries([{}, ...objs].map((e, i, a) => i ? Object.entries(e).map(f => (a[0][f[0]] ? a[0][f[0]].push(...([f[1]].flat())) :
-    //             (a[0][f[0]] = [f[1]].flat()))) : e)[0]).map(e => e.map((f, i) => i ? (f.length > 1 ? f : f[0]) : f)));
-
-    // }
-
     return dispatch => {
         const url = '/api/qua-trinh/chuc-vu/all';
         T.get(url, data => {
@@ -79,13 +71,6 @@ export function getQtChucVuAll(done) {
                 T.notify('Lấy danh sách hợp đồng bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                // data.items.forEach(item => {
-                //     newData[item.ho + ' ' + item.ten] = [];
-                // });
-                // data.items.forEach(item => {
-                //     newData[item.ho + ' ' + item.ten].push(item);
-                // });
-
                 if (done) done(data.items);
                 dispatch({ type: QtChucVuGetAll, items: data.items ? data.items : {} });
             }
@@ -168,6 +153,52 @@ export function updateQtChucVu(ma, changes, done) {
                 dispatch(getQtChucVu(ma));
             }
         }, () => T.notify('Cập nhật chức vụ bị lỗi!', 'danger'));
+    };
+}
+
+//--USER-ACTION-------------------------------------------
+export function createQtChucVuUser(data, done) {
+    return () => {
+        const url = '/api/user/qua-trinh/chuc-vu';
+        T.post(url, { data }, res => {
+            if (res.error) {
+                T.notify('Thêm thông tin quá trình khen thưởng bị lỗi', 'danger');
+                console.error('POST: ' + url + '. ' + res.error);
+            } else {
+                T.notify('Thêm thông tin quá trình khen thưởng thành công!', 'info');
+                if (done) done(res);
+            }
+        }, () => T.notify('Thêm thông tin quá trình khen thưởng bị lỗi', 'danger'));
+    };
+}
+
+export function updateQtChucVuUser(id, changes, done) {
+    return () => {
+        const url = '/api/user/qua-trinh/chuc-vu';
+        T.put(url, { id, changes }, data => {
+            if (data.error) {
+                T.notify('Cập nhật thông tin quá trình khen thưởng bị lỗi', 'danger');
+                console.error('PUT: ' + url + '. ' + data.error);
+            } else if (data.item) {
+                T.notify('Cập nhật thông tin quá trình khen thưởng thành công!', 'info');
+                if (done) done();
+            }
+        }, () => T.notify('Cập nhật thông tin quá trình khen thưởng bị lỗi', 'danger'));
+    };
+}
+
+export function deleteQtChucVuUser(id, done) {
+    return () => {
+        const url = '/api/user/qua-trinh/chuc-vu';
+        T.delete(url, { id }, data => {
+            if (data.error) {
+                T.notify('Xóa thông tin quá trình khen thưởng bị lỗi', 'danger');
+                console.error('DELETE: ' + url + '. ' + data.error);
+            } else {
+                T.alert('Thông tin quá trình khen thưởng được xóa thành công!', 'info', false, 800);
+                done && done();
+            }
+        }, () => T.notify('Xóa thông tin quá trình khen thưởng bị lỗi', 'danger'));
     };
 }
 

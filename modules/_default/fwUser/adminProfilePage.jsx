@@ -17,6 +17,8 @@ import { SelectAdapter_DmTonGiao } from 'modules/mdDanhMuc/dmTonGiao/redux';
 // import { SelectAdapter_DmPhuongXa } from 'modules/mdDanhMuc/dmDiaDiem/reduxPhuongXa';
 import { SelectAdapter_DmQuanHeGiaDinh, getDmQuanHeGiaDinhAll } from 'modules/mdDanhMuc/dmQuanHeGiaDinh/redux';
 import { getDmDonViAll, SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
+import { getDmBoMonAll } from 'modules/mdDanhMuc/dmBoMon/redux';
+
 import { getDmChucVuAll } from 'modules/mdDanhMuc/dmChucVu/redux';
 import { SelectAdapter_DmNhomMau } from 'modules/mdDanhMuc/dmBenhVien/reduxNhomMau';
 import { SelectAdapter_DmQuocGia } from 'modules/mdDanhMuc/dmQuocGia/redux';
@@ -1418,6 +1420,7 @@ class ProfilePage extends QTForm {
         this.mapperQuanHe = {};
         this.mapperChucVu = {};
         this.mapperDonVi = {};
+        this.mapperBoMon = {};
         this.mapperNgonNgu = {};
 
     }
@@ -1435,6 +1438,7 @@ class ProfilePage extends QTForm {
                 this.props.getDmQuanHeGiaDinhAll(null, items => items.forEach(item => this.mapperQuanHe[item.ma] = item.ten));
                 this.props.getDmChucVuAll(null, items => items.forEach(item => this.mapperChucVu[item.ma] = item.ten));
                 this.props.getDmDonViAll(items => items.forEach(item => this.mapperDonVi[item.ma] = item.ten));
+                this.props.getDmBoMonAll(items => items.forEach(item => this.mapperBoMon[item.ma] = item.ten));
                 this.props.getDmNgoaiNguAll({ kichHoat: 1 }, items => {
                     items.forEach(item => this.mapperNgonNgu[item.ma] = item.ten);
                 });
@@ -2054,9 +2058,11 @@ class ProfilePage extends QTForm {
         let currentCanBo = this.props.staff && this.props.staff.userItem ? this.props.staff.userItem : [],
             items = currentCanBo.items ? currentCanBo.items.filter(i => i.type == 0) : [],
             itemsInLaw = currentCanBo.items ? currentCanBo.items.filter(i => i.type == 1) : [],
+            itemOwn = currentCanBo.items ? currentCanBo.items.filter(i => i.type == 2) : [],
             cacToChucCTXHNN = currentCanBo.cacToChucCTXHNN ? currentCanBo.cacToChucCTXHNN : [],
             itemsNN = currentCanBo.trinhDoNN ? currentCanBo.trinhDoNN : [],
             hocTapCongTac = currentCanBo.hocTapCongTac ? currentCanBo.hocTapCongTac : [],
+            chucVu = currentCanBo.chucVu ? currentCanBo.chucVu : [],
             qtDaoTao = currentCanBo.daoTao ? currentCanBo.daoTao : [],
             nuocNgoai = currentCanBo.nuocNgoai ? currentCanBo.nuocNgoai : [],
             khenThuong = currentCanBo.khenThuong ? currentCanBo.khenThuong : [],
@@ -2071,10 +2077,38 @@ class ProfilePage extends QTForm {
             ungDungThuongMai = currentCanBo.ungDungThuongMai ? currentCanBo.ungDungThuongMai : [],
             lamViecNgoai = currentCanBo.lamViecNgoai ? currentCanBo.lamViecNgoai : [];
         const item = this.state.canBo || {};
-        
+        console.log(currentCanBo);
         const renderFieldText = (className, label, hasValue, value, noValue = 'Không có thông tin!') =>
             <div className={className}>{label}: <b>{hasValue ? value : noValue}</b></div>;
 
+        const tableChucVu = renderTable({
+            getDataSource: () => chucVu, stickyHead: false,
+            renderHead: () => (
+                <tr>
+                    <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
+                    <th style={{ width: '60%' }}>Chức vụ</th>
+                    <th style={{ width: '20%' }}>Loại chức vụ</th>
+                    <th style={{ width: '20%' }}>Quyết định</th>
+                </tr>),
+            renderRow: (item, index) => (
+                <tr key={index}>
+                    <TableCell type='text' style={{ textAlign: 'center' }} content={index + 1} />
+                    <TableCell type='text' content={(
+                        <>
+                            <span>{this.mapperChucVu[item.maChucVu]}</span><br />
+                            <span>{item.maDonVi ? 'Đơn vị: ' + this.mapperDonVi[item.maDonVi] : 'Bộ môn/Phòng: ' + this.mapperBoMon[item.tenBoMon]}</span>
+                        </>
+                    )} />
+                    <TableCell type='text' content={item.chucVuChinh ? 'Chức vụ chính' : 'Chức vụ kiêm nhiệm'} />
+                    <TableCell type='text' content={(
+                        <>
+                            <span>Số: {item.soQd}</span><br />
+                            <span>Ngày: <span style={{ color: 'blue' }}>{item.ngayRaQd ? new Date(item.ngayRaQd).ddmmyyyy() : ''}</span></span>
+                        </>
+                    )}
+                    />
+                </tr>)
+        });
         const table = renderTable({
             getDataSource: () => items, stickyHead: false,
             renderHead: () => (
@@ -2099,6 +2133,28 @@ class ProfilePage extends QTForm {
 
         const tableInLaw = renderTable({
             getDataSource: () => itemsInLaw, stickyHead: false,
+            renderHead: () => (
+                <tr>
+                    <th style={{ width: '30%' }}>Họ và tên</th>
+                    <th style={{ width: '20%' }}>Năm sinh</th>
+                    <th style={{ width: '10%' }}>Quan hệ</th>
+                    <th style={{ width: '20%' }}>Nghề nghiệp</th>
+                    <th style={{ width: '20%' }}>Nơi công tác</th>
+                    <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
+                </tr>),
+            renderRow: (item, index) => (
+                <tr key={index}>
+                    <TableCell type='link' content={item.hoTen} onClick={e => this.editQuanHe(e, item)} />
+                    <TableCell type='text' content={T.dateToText(item.namSinh, 'yyyy')} />
+                    <TableCell type='text' content={this.mapperQuanHe[item.moiQuanHe]} />
+                    <TableCell type='text' content={item.ngheNghiep} />
+                    <TableCell type='text' content={item.noiCongTac} />
+                    <TableCell type='buttons' content={item} permission={permission} onEdit={this.editQuanHe} onDelete={this.deleteQuanHe}></TableCell>
+                </tr>)
+        });
+
+        const tableOwn = renderTable({
+            getDataSource: () => itemOwn, stickyHead: false,
             renderHead: () => (
                 <tr>
                     <th style={{ width: '30%' }}>Họ và tên</th>
@@ -2435,7 +2491,7 @@ class ProfilePage extends QTForm {
                 </tr>)
         });
 
-        const voChongText = this.state.phai ? (this.state.phai == '01' ? 'vợ' : 'chồng') : '';
+        const voChongText = this.state.phai ? (this.state.phai == '01' ? 'Vợ' : 'Chồng') : '';
         return (
             <main ref={this.main} className='app-content'>
                 {this.state.isLoad && <Loading />}
@@ -2496,7 +2552,7 @@ class ProfilePage extends QTForm {
                                     <label className='control-label'>Hình đại diện</label>
                                     <ImageBox ref={e => this.imageBox = e} postUrl='/user/upload' uploadType='ProfileImage' userData='profile' image={this.state.user && this.state.user.image} />
                                 </div>
-                               <div className='form-group col-md-9'>
+                                <div className='form-group col-md-9'>
                                     <div className='row'>
                                         <div className='form-group col-md-6'><TextInput ref={this.shcc} label='Mã thẻ cán bộ' placeholder='Mã thẻ cán bộ' disabled={!readOnly} maxLength={10} /></div>
                                         <div className='form-group col-md-6'><Select placeholder='Chọn đơn vị công tác' ref={this.maDonVi} adapter={SelectAdapter_DmDonVi} label='Đơn vị công tác' disabled={!readOnly} /></div>
@@ -2596,15 +2652,27 @@ class ProfilePage extends QTForm {
                             <h3 className='tile-title'>Thông tin người thân</h3>
                             <ul className='nav nav-tabs' id='myTab' role='tablist'>
                                 <li className='nav-item'>
-                                    <a className='nav-link active' id='infoQuanHe1' data-toggle='tab' href='#infoQuanHe1Content' role='tab' aria-controls='infoQuanHe1Content' aria-selected='true'>Về bản thân</a>
+                                    <a className='nav-link active' id='infoQuanHe0' data-toggle='tab' href='#infoQuanHe0Content' role='tab' aria-controls='infoQuanHe0Content' aria-selected='true'>Về gia đình</a>
                                 </li>
                                 <li className='nav-item'>
-                                    <a className='nav-link' id='infoQuanHe2' data-toggle='tab' href='#infoQuanHe2Content' role='tab' aria-controls='infoQuanHe2Content' aria-selected='false'>Về bên {voChongText}</a>
+                                    <a className='nav-link' id='infoQuanHe1' data-toggle='tab' href='#infoQuanHe1Content' role='tab' aria-controls='infoQuanHe1Content' aria-selected='false'>Về bản thân</a>
+                                </li>
+                                <li className='nav-item'>
+                                    <a className='nav-link' id='infoQuanHe2' data-toggle='tab' href='#infoQuanHe2Content' role='tab' aria-controls='infoQuanHe2Content' aria-selected='false'>Về bên {voChongText == 'Vợ' ? 'vợ' : 'chồng'}</a>
                                 </li>
                             </ul>
                             <div className='tab-content' style={{ paddingTop: '10px' }}>
-                                <div className='tab-pane fade show active' id='infoQuanHe1Content' role='tabpanel' aria-labelledby='infoQuanHe1'>
-                                    <p>Cha, mẹ, {voChongText}, các con, anh chị em ruột</p>
+                                <div className='tab-pane fade show active' id='infoQuanHe0Content' role='tabpanel' aria-labelledby='infoQuanHe0'>
+                                    <p>{voChongText}, các con</p>
+                                    <div className='tile-body'>{tableOwn}</div>
+                                    <div className='tile-footer' style={{ textAlign: 'right' }}>
+                                        <button className='btn btn-info' type='button' onClick={e => this.createRelation(e, 2)}>
+                                            <i className='fa fa-fw fa-lg fa-plus' />Thêm thông tin người thân
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className='tab-pane fade' id='infoQuanHe1Content' role='tabpanel' aria-labelledby='infoQuanHe1'>
+                                    <p>Cha, mẹ, anh chị em ruột</p>
                                     <div className='tile-body'>{table}</div>
                                     <div className='tile-footer' style={{ textAlign: 'right' }}>
                                         <button className='btn btn-info' type='button' onClick={e => this.createRelation(e, 0)}>
@@ -2632,7 +2700,15 @@ class ProfilePage extends QTForm {
 
                                 <div className='form-group col-md-6'><DateInput placeholder='Ngày, tháng, năm quyết định tuyển dụng, bổ nhiệm ngạch, chức danh' ref={this.ngayBienChe} label='Ngày vào biên chế / tuyển dụng' disabled={readOnly} min={new Date(1900, 1, 1).getTime()} max={new Date().getTime()} /></div>
                                 <div className='form-group col-md-6'><Select placeholder='Chọn cơ quan, đơn vị ban hành Quyết định tuyển dụng' adapter={SelectAdapter_DmDonVi} ref={this.donViTuyenDung} label='Cơ quan, đơn vị ban hành Quyết định tuyển dụng' disabled={readOnly} /></div>
-
+                                <div className='form-group col-md-12'>
+                                    <p>Chức vụ:</p>
+                                    <div className='tile-body'>{tableChucVu}</div>
+                                    {/* <div className='tile-footer' style={{ textAlign: 'right' }}>
+                                        <button className='btn btn-info' type='button' onClick={e => this.create(e, this.modalNN)}>
+                                            <i className='fa fa-fw fa-lg fa-plus' />Thêm tổ chức tham gia
+                                        </button>
+                                    </div> */}
+                                </div>
                                 <div className='col-md-3 form-group'><NumberInput ref={this.heSoLuong} label='Hệ số lương' disabled={!readOnly} min={0} max={1000} step={0.01} /></div>
                                 <div className='col-md-3 form-group'><NumberInput ref={this.bacLuong} label='Bậc lương' disabled={!readOnly} min={0} max={1000} /></div>
                                 <div className='col-md-3 form-group'><DateInput ref={this.ngayHuongLuong} label='Ngày hưởng lương' disabled={!readOnly} min={new Date(1900, 1, 1).getTime()} max={Date.getDateInputDefaultMax()} /></div>
@@ -2648,26 +2724,6 @@ class ProfilePage extends QTForm {
 
                                 <div className='form-group col-md-6'><BooleanInput ref={this.doiTuongBoiDuongKienThucQpan} label='Đối tượng bồi dưỡng kiến thức Quốc phòng - An ninh:   &nbsp;' disabled={readOnly} /></div>
                             </div>
-                        </div>
-
-
-                        <div className='form-group col-12' />
-
-                        <h4>Thông tin nhân khẩu</h4>
-                        <div className='tile-body row'>
-
-                        </div>
-                        <div className='form-group col-12' />
-                        <h4>Thông tin BHXH - BHYT</h4>
-                        <div className='tile-body row'>
-
-
-                        </div>
-                        <div className='form-group col-12' />
-                        <h4>Thông tin cá nhân khác</h4>
-                        <div className='tile-body row'>
-
-
                         </div>
 
                         <div className='tile'>
@@ -2991,7 +3047,7 @@ class ProfilePage extends QTForm {
 
 const mapStateToProps = state => ({ system: state.system, division: state.division, staff: state.staff });
 const mapActionsToProps = {
-    updateProfile, userGetStaff, getDmQuanHeGiaDinhAll, getDmDonViAll, getDmChucVuAll, updateStaffUser, createQuanHeStaffUser, updateQuanHeStaffUser, deleteQuanHeStaffUser,
+    updateProfile, userGetStaff, getDmQuanHeGiaDinhAll, getDmBoMonAll, getDmDonViAll, getDmChucVuAll, updateStaffUser, createQuanHeStaffUser, updateQuanHeStaffUser, deleteQuanHeStaffUser,
     createTrinhDoNNStaffUser, updateTrinhDoNNStaffUser, deleteTrinhDoNNStaffUser, getDmNgoaiNguAll, createQTHTCTStaffUser, updateQTHTCTStaffUser, deleteQTHTCTStaffUser,
     createQtDaoTaoStaffUser, updateQtDaoTaoStaffUser, deleteQtDaoTaoStaffUser, createQtNuocNgoaiStaffUser, updateQtNuocNgoaiStaffUser, deleteQtNuocNgoaiStaffUser,
     createQtKhenThuongStaffUser, updateQtKhenThuongStaffUser, deleteQtKhenThuongStaffUser, createQtKyLuatStaffUser, updateQtKyLuatStaffUser, deleteQtKyLuatStaffUser,
