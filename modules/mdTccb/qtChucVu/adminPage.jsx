@@ -57,17 +57,17 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        let { shcc, chucVu, donVi, soQd, ngayRaQd, chucVuChinh, boMon } = item ? item : {
-            shcc: '', chucVu: '', donVi: '', soQd: '', ngayRaQd: '', chucVuChinh: '', boMon: '',
+        let { shcc, maChucVu, maDonVi, soQuyetDinh, ngayRaQuyetDinh, chucVuChinh, maBoMon } = item ? item : {
+            shcc: '', maChucVu: '', maDonVi: '', soQuyetDinh: '', ngayRaQuyetDinh: '', chucVuChinh: '', maBoMon: '',
         };
         this.setState({ shcc, item });
         this.shcc.value(shcc ? shcc : '');
-        this.chucVu.value(chucVu ? chucVu : '');
-        this.donVi.value(donVi ? donVi : '');
-        this.soQd.value(soQd ? soQd : '');
-        this.ngayRaQd.value(ngayRaQd ? ngayRaQd : '');
+        this.maChucVu.value(maChucVu ? maChucVu : '');
+        this.maDonVi.value(maDonVi ? maDonVi : '');
+        this.soQuyetDinh.value(soQuyetDinh ? soQuyetDinh : '');
+        this.ngayRaQuyetDinh.value(ngayRaQuyetDinh ? ngayRaQuyetDinh : '');
         this.chucVuChinh.value(chucVuChinh ? 1 : 0);
-        this.boMon.value(boMon ? boMon : '');
+        this.maBoMon.value(maBoMon ? maBoMon : '');
     };
 
     changeKichHoat = (value, target) => target.value(value ? 1 : 0) || target.value(value);
@@ -76,18 +76,18 @@ class EditModal extends AdminModal {
         e.preventDefault();
         const changes = {
             shcc: this.shcc.value(),
-            chucVu: this.chucVu.value(),
-            donVi: this.donVi.value(),
-            soQd: this.soQd.value(),
-            ngayRaQd: this.ngayRaQd.value(),
+            chucVu: this.maChucVu.value(),
+            donVi: this.maDonVi.value(),
+            soQd: this.soQuyetDinh.value(),
+            ngayRaQd: this.ngayRaQuyetDinh.value(),
             chucVuChinh: this.chucVuChinh.value(),
-            boMon: this.boMon.value(),
+            boMon: this.maBoMon.value(),
         };
         if (changes.shcc == '') {
             T.notify('Số hiệu công chức bị trống');
             this.shcc.focus();
         } else {
-            this.state.shcc ? this.props.update(this.state.shcc, changes, this.hide) : this.props.create(changes, this.hide);
+            this.state.shcc ? this.props.update(changes, this.hide) : this.props.create(changes, this.hide);
         }
     }
 
@@ -98,12 +98,12 @@ class EditModal extends AdminModal {
             size: 'large',
             body: <div className='row'>
                 <FormSelect className='col-md-12' ref={e => this.shcc = e} label='Số hiệu công chức' data={this.staffTable} readOnly={readOnly} />
-                <FormSelect className='col-md-4' ref={e => this.chucVu = e} label='Chức vụ' data={this.chucVuTable} readOnly={readOnly} /> 
-                <FormSelect className='col-md-4' ref={e => this.donVi = e} label='Đơn vị' data={this.donViTable} readOnly={readOnly} /> 
-                <FormSelect className='col-md-4' ref={e => this.boMon = e} label='Bộ môn' data={this.boMonTable} readOnly={readOnly} />
+                <FormSelect className='col-md-4' ref={e => this.maChucVu = e} label='Chức vụ' data={this.chucVuTable} readOnly={readOnly} /> 
+                <FormSelect className='col-md-4' ref={e => this.maDonVi = e} label='Đơn vị' data={this.donViTable} readOnly={readOnly} /> 
+                <FormSelect className='col-md-4' ref={e => this.maBoMon = e} label='Bộ môn' data={this.boMonTable} readOnly={readOnly} />
                 <FormCheckbox className='col-md-12' ref={e => this.chucVuChinh = e} label='Chức vụ chính' isSwitch={true} readOnly={readOnly} />
-                <FormTextBox type='text' className='col-md-6' ref={e => this.soQd = e} label='Số quyết định' readOnly={readOnly} />
-                <FormDatePicker className='col-md-6' ref={e => this.ngayRaQd = e} label='Ngày ra quyết định' readOnly={readOnly} />
+                <FormTextBox type='text' className='col-md-6' ref={e => this.soQuyetDinh = e} label='Số quyết định' readOnly={readOnly} />
+                <FormDatePicker className='col-md-6' ref={e => this.ngayRaQuyetDinh = e} label='Ngày ra quyết định' readOnly={readOnly} />
             </div>
         });
     }
