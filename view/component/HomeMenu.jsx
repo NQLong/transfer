@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { logout } from 'modules/_default/_init/reduxSystem';
 import { Link } from 'react-router-dom';
 import LanguageSwitch from './LanguageSwitch';
-import { divisionHomeMenuGetAll, homeMenuGet } from 'modules/_default/fwMenu/redux';
+import { divisionHomeMenuGetAll, homeMenuGet2 } from 'modules/_default/fwMenu/redux';
 import { getDvWebsite, getDvWebsiteAll } from 'modules/_default/websiteDonVi/redux';
 
 const texts = {
@@ -60,9 +60,10 @@ class HomeMenu extends React.Component {
     };
 
     getMenu = (maDonVi) => {
+        const language = $('meta[property=language]').attr('content');
         const path = window.location.pathname,
             link = path.endsWith('/') && path.length > 1 ? path.substring(0, path.length - 1) : path;
-        this.props.homeMenuGet(link, (data) => {
+        this.props.homeMenuGet2(link, maDonVi, language, (data) => {
             if (data.menu || maDonVi) {
                 const condition = {
                     maDonVi: maDonVi ? maDonVi : data.menu.maDonVi, kichHoat: 1
@@ -82,7 +83,8 @@ class HomeMenu extends React.Component {
                     }
                 });
                 if (maDonVi == 39) data = { menu: { maWebsite: 'tuyensinh' } };
-                this.props.divisionHomeMenuGetAll(maDonVi ? maDonVi : data.menu.maDonVi, data.menu ? data.menu.maWebsite : '', data => this.setState({ divisionMenu: data.items }));
+                this.props.divisionHomeMenuGetAll(maDonVi ? maDonVi : data.menu.maDonVi, data.menu ? data.menu.maWebsite : '',
+                    data => this.setState({ divisionMenu: data.items }));
             }
         });
     }
@@ -303,5 +305,5 @@ class HomeMenu extends React.Component {
 }
 
 const mapStateToProps = state => ({ system: state.system });
-const mapActionsToProps = { logout, divisionHomeMenuGetAll, homeMenuGet, getDvWebsite, getDvWebsiteAll };
+const mapActionsToProps = { logout, divisionHomeMenuGetAll, homeMenuGet2, getDvWebsite, getDvWebsiteAll };
 export default connect(mapStateToProps, mapActionsToProps)(HomeMenu);

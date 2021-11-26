@@ -51,7 +51,8 @@ module.exports = app => {
                 <meta property='og:title' content='${(title || '').replaceAll('\'', '')}' />
                 <meta property='og:description' content='${(abstract || '').replaceAll('\'', '')}' />
                 <meta property='og:image' content='${app.rootUrl + news.image}' />
-                <meta property='donVi' content=${news.maDonVi} />`);
+                <meta property='language' content='vi' />
+                <meta property='donVi' content=${news.maDonVi > 0 ? news.maDonVi : '00'} />`);
             res.send(data);
         };
         new Promise(resolve => {
@@ -75,7 +76,7 @@ module.exports = app => {
             else if (news) app.templates.unit(req, { send: (data) => changeMeta(news, data) });
             else {
                 console.log(route, 'bugs');
-                res.redirect('/404.html');
+                // res.redirect('/404.html');
             }
         });
     }));
@@ -99,7 +100,8 @@ module.exports = app => {
             <meta property='og:title' content='${(title || '').replaceAll('\'', '')}' />
             <meta property='og:description' content='${(abstract || '').replaceAll('\'', '')}' />
             <meta property='og:image' content='${app.rootUrl + news.image}' />
-            <meta property='donVi' content=${app.isDebug ? '64' : '67'} />`);
+            <meta property='language' content='en' />
+            <meta property='donVi' content=${news.maDonVi > 0 ? news.maDonVi : '67'} />`);
             res.send(data);
         };
         new Promise(resolve => {

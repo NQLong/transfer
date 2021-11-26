@@ -280,3 +280,17 @@ export function homeMenuGet(link, done) {
         }, () => T.notify('Lấy menu bị lỗi!', 'danger'));
     };
 }
+
+export function homeMenuGet2(link, maDonVi, language, done) {
+    return () => {
+        const url = '/home/menu';
+        T.get(url, { link, maDonVi, language }, data => {
+            if (data.error) {
+                T.notify('Lấy menu bị lỗi!', 'danger');
+                console.error(`GET: ${url}. ${data.error}`);
+            } else {
+                done && done(data);
+            }
+        }, () => T.notify('Lấy menu bị lỗi!', 'danger'));
+    };
+}

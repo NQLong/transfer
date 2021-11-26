@@ -305,8 +305,15 @@ module.exports = app => {
     });
 
     app.get('/home/menu', (req, res) => {
-        const link = req.query.link;
-        app.model.fwMenu.get({ link }, (error, menu) => {
+        const { maDonVi, link, language } = req.query;
+        let condition = {};
+        if (language && maDonVi) {// route from news page
+            condition = {
+                statement: `MA_WEBSITE ${language == 'en' ? 'LIKE' : 'NOT LIKE'} '%${maDonVi == '00' ? 'en' : '/en'}%' AND MA_DON_VI ='${maDonVi}' AND ACTIVE=1 `,
+                parameter: {}
+            };
+        } else condition = { link };
+        app.model.fwMenu.get(condition, (error, menu) => {
             res.send({ error, menu });
         });
     });
