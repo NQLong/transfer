@@ -101,8 +101,8 @@ class EditModal extends AdminModal {
             size: 'large',
             body: <div className='row'>
                 <FormSelect className='col-md-12' ref={e => this.shcc = e} label='Số hiệu công chức' data={this.staffTable} readOnly={readOnly} />
-                <FormSelect className='col-md-4' ref={e => this.chucVu = e} label='Chức vụ' data={this.chucVuTale} readOnly={readOnly} /> 
-                <FormSelect className='col-md-4' ref={e => this.donVi = e} label='Đơn vị' data={this.donViTale} readOnly={readOnly} /> 
+                <FormSelect className='col-md-4' ref={e => this.chucVu = e} label='Chức vụ' data={this.chucVuTable} readOnly={readOnly} /> 
+                <FormSelect className='col-md-4' ref={e => this.donVi = e} label='Đơn vị' data={this.donViTable} readOnly={readOnly} /> 
                 <FormSelect className='col-md-4' ref={e => this.boMon = e} label='Bộ môn' data={this.boMonTable} readOnly={readOnly} />
                 <FormCheckbox className='col-md-12' ref={e => this.chucVuChinh = e} label='Chức vụ chính' isSwitch={true} readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.soQd = e} label='Số quyết định' readOnly={readOnly} />
