@@ -15,12 +15,9 @@ import { getStaffAll } from 'modules/mdTccb/tccbCanBo/redux';
 class EditModal extends AdminModal {
     donViTable = [];
     chucVuTable = [];
-    state = { stt: null };
+    state = { shcc: null };
     componentDidMount() {
 
-        $(document).ready(() => this.onShown(() => {
-            this.shcc.focus();
-        }));
         this.props.getDonVi(items => {
             if (items) {
                 this.donViTable = [];
@@ -53,17 +50,17 @@ class EditModal extends AdminModal {
                 this.staffTable = [];
                 items.forEach(item => this.staffTable.push({
                     'id': item.shcc,
-                    'text': item.shcc
+                    'text': item.shcc + ' - ' + item.ho + ' ' + item.ten
                 }));
             }
         });
     }
 
     onShow = (item) => {
-        let { stt, shcc, chucVu, donVi, soQd, ngayRaQd, chucVuChinh, boMon } = item ? item : {
+        let { shcc, chucVu, donVi, soQd, ngayRaQd, chucVuChinh, boMon } = item ? item : {
             shcc: '', chucVu: '', donVi: '', soQd: '', ngayRaQd: '', chucVuChinh: '', boMon: '',
         };
-        this.setState({ stt, item });
+        this.setState({ shcc, item });
         this.shcc.value(shcc ? shcc : '');
         this.chucVu.value(chucVu ? chucVu : '');
         this.donVi.value(donVi ? donVi : '');
@@ -90,14 +87,14 @@ class EditModal extends AdminModal {
             T.notify('Số hiệu công chức bị trống');
             this.shcc.focus();
         } else {
-            this.state.stt ? this.props.update(this.state.stt, changes, this.hide) : this.props.create(changes, this.hide);
+            this.state.shcc ? this.props.update(this.state.shcc, changes, this.hide) : this.props.create(changes, this.hide);
         }
     }
 
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
-            title: this.state.stt ? 'Cập nhật quá trình chức vụ' : 'Tạo mới quá trình chức vụ',
+            title: this.state.shcc ? 'Cập nhật quá trình chức vụ' : 'Tạo mới quá trình chức vụ',
             size: 'large',
             body: <div className='row'>
                 <FormSelect className='col-md-12' ref={e => this.shcc = e} label='Số hiệu công chức' data={this.staffTable} readOnly={readOnly} />

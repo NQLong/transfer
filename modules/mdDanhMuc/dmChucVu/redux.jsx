@@ -60,10 +60,10 @@ export function getDmChucVuPage(pageNumber, pageSize, pageCondition, done) {
     };
 }
 
-export function getDmChucVuAll(condition, done) {
+export function getDmChucVuAll(done) {
     return dispatch => {
         const url = '/api/danh-muc/chuc-vu/all';
-        T.get(url, { condition }, data => {
+        T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách chức vụ lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
