@@ -144,19 +144,18 @@ class QtChucVu extends AdminPage {
                 getDataSource: () => list, stickyHead: false,
                 renderHead: () => (
                     <tr>
-                        <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        <th style={{ width: '25%', whiteSpace: 'nowrap' }}>Chức vụ</th>
-                        <th style={{ width: '15%', whiteSpace: 'nowrap' }}>Quyết định</th>
-                        <th style={{ width: '5%', textAlign: 'center' }}>Chức vụ chính</th>
+                        <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Cán bộ</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Chức vụ</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Quyết định</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Chức vụ chính</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
-
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' content={index + 1} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                        <TableCell type='text' style={{textAlign:'right'}} content={index + 1} />
+                        <TableCell type='link' onClick = {() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{item.ho + ' ' + item.ten}</span><br />
                                 {item.shcc}
@@ -170,7 +169,7 @@ class QtChucVu extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' content={(
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>Số: {item.soQuyetDinh}</span><br />
                                 <span>Ngày: <span style={{ color: 'blue' }}>{item.ngayRaQuyetDinh ? new Date(item.ngayRaQuyetDinh).ddmmyyyy() : ''}</span></span>
