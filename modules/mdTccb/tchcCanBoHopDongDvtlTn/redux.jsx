@@ -100,7 +100,7 @@ export function getTchcCanBoHopDongDvtlTnEdit(shcc, done) {
                 T.notify('Lấy cán bộ bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                if (done) done(data.item);
+                if (done) done(data);
                 dispatch({ type: TchcCanBoHopDongDvtlTnGet, item: data.item });
             }
         }, error => console.error(`GET: ${url}.`, error));
@@ -159,5 +159,5 @@ export function updateTchcCanBoHopDongDvtlTn(shcc, changes, done) {
 export const SelectAdapter_HiredStaff = {
     ajax: false,
     getAll: getTchcCanBoHopDongDvtlTnAll,
-    processResults: response => ({ results: response ? response.map(item => ({ value: item.shcc, text: item.ho + ' ' + item.ten })) : [] }),
+    processResults: response => ({ results: response ? response.map(item => ({ value: item.shcc, text: item.shcc + ': ' + item.ho + ' ' + item.ten })) : [] }),
 };

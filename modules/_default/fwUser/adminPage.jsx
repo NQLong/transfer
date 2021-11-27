@@ -115,7 +115,7 @@ class UserModal extends React.Component {
             T.notify('Email bị trống!', 'danger');
             $('#userEmail').focus();
         } else if (changes.isStaff && !changes.shcc) {
-            T.notify('Số hiệu công chức bị trống!', 'danger');
+            T.notify('Mã số cán bộ bị trống!', 'danger');
             $('#userShcc').focus();
         } else if (!changes.firstName) {
             T.notify('Tên bị trống!', 'danger');
@@ -190,7 +190,7 @@ class UserModal extends React.Component {
                                     </div>
                                 </div>
                                 <div className='form-group'>
-                                    <input className='form-control' id='userShcc' type='text' placeholder='Số hiệu công chức' style={{ display: this.state.isStaff ? 'block' : 'none' }} readOnly={!permissionWrite} />
+                                    <input className='form-control' id='userShcc' type='text' placeholder='Mã số cán bộ' style={{ display: this.state.isStaff ? 'block' : 'none' }} readOnly={!permissionWrite} />
                                 </div>
                             </div>
                             <div className='col-12 col-md-6'>

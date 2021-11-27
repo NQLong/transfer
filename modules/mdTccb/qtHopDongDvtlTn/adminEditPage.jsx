@@ -1,17 +1,19 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { getStaffAll, SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
+import { getStaffAll, SelectAdapter_FwCanBo, getStaffEdit } from 'modules/mdTccb/tccbCanBo/redux';
+import { SelectAdapter_DmGioiTinh } from 'modules/mdDanhMuc/dmGioiTinh/redux';
+import { getDmChucVuAll } from 'modules/mdDanhMuc/dmChucVu/redux';
 import { getdmLoaiHopDongAll, SelectAdapter_DmLoaiHopDong } from 'modules/mdDanhMuc/dmLoaiHopDong/redux';
 import {
     getTchcCanBoHopDongDvtlTnEdit, createTchcCanBoHopDongDvtlTn, getTchcCanBoHopDongDvtlTnAll,
-    deleteTchcCanBoHopDongDvtlTn, updateTchcCanBoHopDongDvtlTn
+    deleteTchcCanBoHopDongDvtlTn, updateTchcCanBoHopDongDvtlTn, SelectAdapter_HiredStaff
 } from 'modules/mdTccb/tchcCanBoHopDongDvtlTn/redux';
 import { getDmDonViAll, SelectAdapter_DmDonViFaculty } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { getDmNgachCdnnAll } from 'modules/mdDanhMuc/dmNgachCdnn/redux';
 import {
-    getTchcHopDongDvtlTnPage, getTchcHopDongDvtlTnAll, updateTchcHopDongDvtlTn,
-    deleteTchcHopDongDvtlTn, createTchcHopDongDvtlTn, getTchcHopDongDvtlTnEdit, downloadWord
+    getQtHopDongDvtlTnPage, getQtHopDongDvtlTnAll, updateQtHopDongDvtlTn,
+    deleteQtHopDongDvtlTn, createQtHopDongDvtlTn, getQtHopDongDvtlTnEdit, downloadWord
 } from './redux';
 import TextInput, { DateInput, Select } from 'view/component/Input';
 import { QTForm } from 'view/component/Form';
@@ -22,15 +24,22 @@ import { SelectAdapter_DmTrinhDo } from 'modules/mdDanhMuc/dmTrinhDo/redux';
 import { SelectAdapter_DmChucDanhKhoaHoc } from 'modules/mdDanhMuc/dmChucDanhKhoaHoc/redux';
 import { SelectAdapter_DmDanToc } from 'modules/mdDanhMuc/dmDanToc/redux';
 import { SelectAdapter_DmTonGiao } from 'modules/mdDanhMuc/dmTonGiao/redux';
+import { SelectAdapter_DmDienHopDong } from 'modules/mdDanhMuc/dmDienHopDong/redux';
+import Dropdown from 'view/component/Dropdown';
 
+const EnumLoaiCanBo = Object.freeze({
+    1: { text: 'Cán bộ mới' },
+    2: { text: 'Cán bộ cũ' }
+});
 
-class TchcHopDongDvtlTnEditPage extends QTForm {
-    constructor (props) {
+class QtHopDongDvtlTnEditPage extends QTForm {
+    constructor(props) {
         super(props);
-        this.state = { item: null, kieu: '' };
+        this.state = { item: null, kieu: '', canBoCu: false };
 
         //1. Thông tin bên A
         this.shcc = React.createRef();
+        this.selectedShcc = React.createRef();
         this.ho = React.createRef();
         this.ten = React.createRef();
         this.email = React.createRef();
@@ -40,6 +49,7 @@ class TchcHopDongDvtlTnEditPage extends QTForm {
         this.ngaySinh = React.createRef();
         this.chucVu = React.createRef();
         this.hocVanTrinhDo = React.createRef();
+        this.gioiTinh = React.createRef();
         this.hocVanChuyenNganh = React.createRef();
         this.khoaHocChucDanh = React.createRef();
         this.khoaHocChuyenNganh = React.createRef();
@@ -65,18 +75,29 @@ class TchcHopDongDvtlTnEditPage extends QTForm {
         this.heSo = React.createRef();
         this.hieuLucHopDong = React.createRef();
         this.ngayKyHopDong = React.createRef();
+        this.typeFilter = React.createRef();
+
         // this.phanTramHuong = React.createRef();
         this.tienLuong = React.createRef();
 
-        this.hiredStaff = {};
+        this.chucVuMapper = {};
+        this.donViMapper = {};
     }
     componentDidMount() {
-        T.ready('/user/tchc/hop-dong-dvtl-tn');
-        this.props.getTchcCanBoHopDongDvtlTnAll(items => {
+        T.ready('/user/tccb');
+        this.props.getDmChucVuAll(items => {
             if (items) {
-                this.hiredStaff = {};
+                this.chucVuMapper = {};
                 items.forEach(item => {
-                    this.hiredStaff[item.shcc] = item.hopDongCanBoNgay;
+                    this.chucVuMapper[item.ma] = item.ten;
+                });
+            }
+        });
+        this.props.getDmDonViAll(items => {
+            if (items) {
+                this.donViMapper = {};
+                items.forEach(item => {
+                    this.donViMapper[item.ma] = item.ten;
                 });
             }
         });
@@ -84,29 +105,22 @@ class TchcHopDongDvtlTnEditPage extends QTForm {
     }
 
     getData = () => {
-        const route = T.routeMatcher('/user/tchc/hop-dong-dvtl-tn/:ma'),
+        const route = T.routeMatcher('/user/tccb/qua-trinh/hop-dong-dvtl-tn/:ma'),
             ma = route.parse(window.location.pathname).ma;
         this.urlMa = ma && ma != 'new' ? ma : null;
         if (this.urlMa) {
             this.setState({ create: false });
-            this.props.getTchcHopDongDvtlTnEdit(ma, data => {
+            this.props.getQtHopDongDvtlTnEdit(ma, data => {
                 if (data.error) {
                     T.notify('Lấy thông tin hợp đồng bị lỗi!', 'danger');
                 } else {
                     this.setState(
                         {
                             item: data.item,
-                            kieu: data.item.kieuHopDong,
-                            nguoiDuocThue: data.item.nguoiDuocThue,
-                            nguoiKy: data.item.nguoiKy,
+                            canBoDuyet: data.item.canBo,
+                            canBoDuocThue: data.item.canBoDuocThue,
                         }, () => {
-                            this.props.getTchcCanBoHopDongDvtlTnEdit(data.item.nguoiDuocThue, curStaff => {
-                                if (curStaff.error) {
-                                    T.notify('Lấy thông tin cán bộ bị lỗi!', 'danger');
-                                } else {
-                                    this.setVal(Object.assign(data.item, curStaff));
-                                }
-                            });
+                            this.setVal(data.item);
                         });
                 }
             });
@@ -120,45 +134,54 @@ class TchcHopDongDvtlTnEditPage extends QTForm {
 
     setVal = (data = {}) => {
         const {
-            ho = '',
-            ten = '',
-            shcc = '',
-            email = '',
-            quocGia = '',
-            danToc = '',
-            tonGiao = '',
-            ngaySinh = '',
+            shcc = '', ho = '', ten = '',
+            // chucVuDoanThe='',
+            cmnd = '', cmndNgayCap = '', cmndNoiCap = '',
+            cuTruMaHuyen = '', cuTruMaTinh = '', cuTruMaXa = '', cuTruSoNha = '',
+            thuongTruMaHuyen = '', thuongTruMaTinh = '', thuongTruMaXa = '', thuongTruSoNha = '',
+            // nguyenQuanMaTinh = '', 
             noiSinhMaTinh = '',
-            cuTruMaTinh = '',
-            cuTruMaHuyen = '',
-            cuTruMaXa = '',
-            cuTruSoNha = '',
-            thuongTruMaTinh = '',
-            thuongTruMaHuyen = '',
-            thuongTruMaXa = '',
-            thuongTruSoNha = '',
-            hocVanTrinhDo = '',
+            danToc = '', quocGia = '',
+            dienThoai = '',
+            email = '',
+            gioiTinh = '', ngaySinh = '',
             hocVanChuyenNganh = '',
+            hocVanTrinhDo = '',
             khoaHocChucDanh = '',
             khoaHocChuyenNganh = '',
-            cmnd = '',
-            cmndNgayCap = '',
-            cmndNoiCap = '',
-            dienThoai = '',
-            chucVu = '',
-            soHopDong = '', loaiHopDong = '', kieuHopDong = '', nguoiKy
-            = '', batDauLamViec = '', ketThucHopDong = '', ngayKyHopDongTiepTheo = '', diaDiemLamViec = '', chucDanhChuyenMon = '',
-            congViecDuocGiao = '', chiuSuPhanCong = '', donViChiTra = '', /*ngach = '',*/ bac = '', heSo = '', hieuLucHopDong = '', ngayKyHopDong = '',
-            /*phanTramHuong = '',*/ tienLuong = ''
-        } = data.constructor === ({}).constructor ? data : {};
+            tonGiao = '',
+        } = data.canBoDuocThue ? data.canBoDuocThue : {};
+
+        const {
+            bac = '', batDauLamViec = '', chiuSuPhanCong = '', chucDanhChuyenMon = '',
+           congViecDuocGiao = '', diaDiemLamViec = '', donViChiTra = '', heSo = '',
+            tienLuong = '', hieuLucHopDong = '', ketThucHopDong = '', kieuHopDong = '', loaiHopDong = '',
+             ngayKyHopDong = '', ngayKyHdTiepTheo = '', nguoiKy = '',
+             soHopDong = ''
+        } = data.qtHopDongDvtlTn ? data.qtHopDongDvtlTn : {};
+
+        if (data.canBo) {
+            this.nguoiKy.current.setVal(data.canBo.shcc);
+            this.setState({ chucVuNguoiKy: this.chucVuMapper[data.canBo.chucVuDoanThe] + ' - ' + this.donViMapper[data.canBo.maDonVi] });
+        }
+        else {
+            this.nguoiKy.current.setVal('001.0068');
+            this.setState({ chucVuNguoiKy: this.chucVuMapper['006'] + ' - ' + this.donViMapper['68'] });
+
+        }
         this.ho.current.setVal(ho ? ho : '');
         this.ten.current.setVal(ten ? ten : '');
         this.shcc.current.setVal(shcc ? shcc : '');
+
+        this.urlMa && this.selectedShcc.current.setVal(shcc);
         this.email.current.setVal(email ? email : '');
+        this.gioiTinh.current.setVal(gioiTinh ? gioiTinh : '');
         this.quocGia.current.setVal(quocGia ? quocGia : '');
         this.danToc.current.setVal(danToc ? danToc : '');
         this.tonGiao.current.setVal(tonGiao ? tonGiao : '');
         this.ngaySinh.current.setVal(ngaySinh ? ngaySinh : '');
+
+        !this.urlMa && this.typeFilter.current.setText(EnumLoaiCanBo[1]);
 
         this.noiSinh.value(noiSinhMaTinh);
         this.cuTru.value(cuTruMaTinh, cuTruMaHuyen, cuTruMaXa, cuTruSoNha);
@@ -173,13 +196,13 @@ class TchcHopDongDvtlTnEditPage extends QTForm {
         this.cmndNoiCap.current.setVal(cmndNoiCap ? cmndNoiCap : '');
         this.dienThoai.current.setVal(dienThoai ? dienThoai : '');
         this.soHopDong.current.setVal(soHopDong ? soHopDong : '');
-        this.chucVu.current.setVal(chucVu ? chucVu : '');
+        // this.chucVu.current.setVal(chucVu ? chucVu : '');
         this.loaiHopDong.current.setVal(loaiHopDong ? loaiHopDong : '');
         this.kieuHopDong.current.setVal(kieuHopDong);
         this.nguoiKy.current.setVal(nguoiKy ? nguoiKy : '');
         this.batDauLamViec.current.setVal(batDauLamViec ? batDauLamViec : '');
         this.ketThucHopDong.current.setVal(ketThucHopDong ? ketThucHopDong : '');
-        this.ngayKyHopDongTiepTheo.current.setVal(ngayKyHopDongTiepTheo ? ngayKyHopDongTiepTheo : '');
+        this.ngayKyHopDongTiepTheo.current.setVal(ngayKyHdTiepTheo ? ngayKyHdTiepTheo : '');
         this.diaDiemLamViec.current.setVal(diaDiemLamViec ? diaDiemLamViec : '');
         this.chucDanhChuyenMon.current.setVal(chucDanhChuyenMon ? chucDanhChuyenMon : '');
         this.congViecDuocGiao.current.setVal(congViecDuocGiao ? congViecDuocGiao : '');
@@ -204,7 +227,7 @@ class TchcHopDongDvtlTnEditPage extends QTForm {
         danToc: this.danToc.current.getFormVal(),
         tonGiao: this.tonGiao.current.getFormVal(),
         ngaySinh: this.ngaySinh.current.getFormVal(),
-        chucVu: this.chucVu.current.getFormVal(),
+        // chucVu: this.state.chucVuNguoiKy,
         hocVanTrinhDo: this.hocVanTrinhDo.current.getFormVal(),
         hocVanChuyenNganh: this.hocVanChuyenNganh.current.getFormVal(),
         khoaHocChucDanh: this.khoaHocChucDanh.current.getFormVal(),
@@ -242,6 +265,63 @@ class TchcHopDongDvtlTnEditPage extends QTForm {
         if (hieuLucHopDong > this.hiredStaff[shcc]) return true;
         return false;
     }
+
+    autoChucVu = (value) => {
+        if (value) {
+            this.props.getStaffEdit(value, data => {
+                if (data.error) {
+                    T.notify('Lấy thông tin cán bộ đại diện ký bị lỗi!', 'danger');
+                } else if (data.item) {
+                    this.setState({
+                        chucVuNguoiKy: this.chucVuMapper[data.item.chucVuDoanThe] + ' - ' + this.donViMapper[data.item.maDonVi]
+                    });
+                }
+            });
+        }
+    }
+
+    changeCanBo = (value) => {
+        if (value) {
+            this.props.getTchcCanBoHopDongDvtlTnEdit(value, data => {
+                let {
+                    // chucVuDoanThe='',
+                    cmnd = '', cmndNgayCap = '', cmndNoiCap = '',
+                    cuTruMaHuyen = '', cuTruMaTinh = '', cuTruMaXa = '', cuTruSoNha = '',
+                    thuongTruMaHuyen = '', thuongTruMaTinh = '', thuongTruMaXa = '', thuongTruSoNha = '',
+                    // nguyenQuanMaTinh = '', 
+                    noiSinhMaTinh = '',
+                    danToc = '', quocGia = '',
+                    dienThoai = '',
+                    email = '',
+                    gioiTinh = '', ngaySinh = '',
+                    hocVanChuyenNganh = '',
+                    hocVanTrinhDo = '',
+                    khoaHocChucDanh = '',
+                    khoaHocChuyenNganh = '',
+                    tonGiao = '',
+                } = data.item ? data.item : {};
+                this.email.current.setVal(email ? email : '');
+                this.gioiTinh.current.setVal(gioiTinh ? gioiTinh : '');
+                this.quocGia.current.setVal(quocGia ? quocGia : '');
+                this.danToc.current.setVal(danToc ? danToc : '');
+                this.tonGiao.current.setVal(tonGiao ? tonGiao : '');
+                this.ngaySinh.current.setVal(ngaySinh ? ngaySinh : '');
+
+                this.noiSinh.value(noiSinhMaTinh);
+                this.cuTru.value(cuTruMaTinh, cuTruMaHuyen, cuTruMaXa, cuTruSoNha);
+                this.thuongTru.value(thuongTruMaTinh, thuongTruMaHuyen, thuongTruMaXa, thuongTruSoNha);
+
+                this.hocVanTrinhDo.current.setVal(hocVanTrinhDo ? hocVanTrinhDo : '');
+                this.hocVanChuyenNganh.current.setVal(hocVanChuyenNganh ? hocVanChuyenNganh : '');
+                this.khoaHocChucDanh.current.setVal(khoaHocChucDanh ? khoaHocChucDanh : '');
+                this.khoaHocChuyenNganh.current.setVal(khoaHocChuyenNganh ? khoaHocChuyenNganh : '');
+                this.cmnd.current.setVal(cmnd ? cmnd : '');
+                this.cmndNgayCap.current.setVal(cmndNgayCap ? cmndNgayCap : '');
+                this.cmndNoiCap.current.setVal(cmndNoiCap ? cmndNoiCap : '');
+                this.dienThoai.current.setVal(dienThoai ? dienThoai : '');
+            });
+        }
+    }
     save = () => {
         const data = this.getFormVal();
         const dcThuongTru = {
@@ -262,14 +342,14 @@ class TchcHopDongDvtlTnEditPage extends QTForm {
         this.main.current.classList.add('validated');
         if (data.data) {
             if (this.urlMa) {
-                this.props.updateTchcHopDongDvtlTn(this.urlMa, Object.assign(data.data, dcThuongTru, dcCuTru, dcNoiSinh), () => {
+                this.props.updateQtHopDongDvtlTn(this.urlMa, Object.assign(data.data, dcThuongTru, dcCuTru, dcNoiSinh), () => {
                     this.props.updateTchcCanBoHopDongDvtlTn(data.data.nguoiDuocThue, Object.assign(data.data, dcThuongTru, dcCuTru, dcNoiSinh), () => {
                         this.main.current.classList.remove('validated');
-                        this.props.history.push(`/user/tchc/hop-dong-dvtl-tn/${this.urlMa}`);
+                        this.props.history.push(`/user/tccb/qua-trinh/hop-dong-dvtl-tn/${this.urlMa}`);
                     });
                 });
             } else {
-                this.props.createTchcHopDongDvtlTn(data.data, hopDong => {
+                this.props.createQtHopDongDvtlTn(data.data, hopDong => {
                     if (this.hiredStaff[hopDong.item.nguoiDuocThue] != null) {
                         if (this.checkContractDate(hopDong.item.nguoiDuocThue, hopDong.item.hieuLucHopDong)) {
                             this.props.updateTchcCanBoHopDongDvtlTn(hopDong.item.nguoiDuocThue, Object.assign(data.data, dcThuongTru, dcCuTru, dcNoiSinh));
@@ -290,31 +370,48 @@ class TchcHopDongDvtlTnEditPage extends QTForm {
     }
 
     render() {
-        // const currentPermission = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [];
-        //     permission = this.getUserPermission('hopDongDvtlTn');
-        // let currentContract = this.props.tchcHopDongDvtlTn && this.props.tchcHopDongDvtlTn.selectedItem ? this.props.tchcHopDongDvtlTn.selectedItem : [];
-        // let readOnly = !currentPermission.includes('hopDongDvtlTn:write');
-        let readOnly = this.state.item ? true : false;
+        const currentPermission = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [];
+        let readOnly = !currentPermission.includes('qtHopDongDvtlTn:write');
         return (
             <main ref={this.main} className='app-content'>
                 <div className='app-title'>
-                    <h1><i className='fa fa-list' /> Hợp đồng{this.state.item ? `: ${this.state.item.soHopDong}` : ''}</h1>
+                    {this.state.item && this.state.item.canBoDuocThue ? (<>
+                        <h1><i className='fa fa-list' />Hợp đồng cán bộ {`: ${this.state.item.canBoDuocThue.ho}  ${this.state.item.canBoDuocThue.ten}`}</h1>
+                        <p>Số hợp đồng: {this.state.item.qtHopDongDvtlTn.soHopDong}</p>
+                    </>) : <>
+                        <h1><i className='fa fa-list' />Tạo mới hợp đồng</h1>
+                    </>}
                 </div>
                 <div className='tile'>
-                    <h3 className='tile-title'>Thông tin hợp đồng bên trường</h3>
+                    <h3 className='tile-title'>Thông tin hợp đồng phía trường</h3>
                     <div className='tile-body row'>
                         <div className='form-group col-xl-6 col-md-6'><TextInput ref={this.soHopDong} label='Số hợp đồng' readOnly={readOnly} required /> </div>
-                        <div className='form-group col-xl-6 col-md-6'><TextInput ref={this.kieuHopDong} label='Kiểu hợp đồng' required /></div>
-                        <div className='form-group col-xl-6 col-md-6'><Select adapter={SelectAdapter_FwCanBo} ref={this.nguoiKy} label='Người đại diện ký' readOnly={readOnly} required /></div>
-                        <div className='form-group col-xl-6 col-md-6'><Select adapter={SelectAdapter_DmChucVu} ref={this.chucVu} label='Chức vụ' readOnly={readOnly} required /></div>
+                        <div className='form-group col-xl-6 col-md-6'><Select adapter={SelectAdapter_DmDienHopDong} ref={this.kieuHopDong} label='Kiểu hợp đồng' required /></div>
+                        <div className='form-group col-xl-6 col-md-6'><Select adapter={SelectAdapter_FwCanBo} ref={this.nguoiKy} onChange={this.autoChucVu} label='Người đại diện ký' readOnly={readOnly} required /></div>
+                        <div className='form-group col-md-6'>Chức vụ: <><br /><b>{this.state.chucVuNguoiKy}</b></></div>
                     </div>
                 </div>
                 <div className='tile'>
-                    <h3 className='tile-title'>Thông tin cá nhân bên người ký</h3>
+                    {this.urlMa ? <h3 className='tile-title'>Thông tin phía người ký</h3> :
+                        <><h3 className='tile-title' style={{ display: 'flex' }}>Thông tin phía người ký là:&nbsp;&nbsp;
+                            <Dropdown ref={this.typeFilter} items={[...Object.keys(EnumLoaiCanBo).map(key => EnumLoaiCanBo[key].text)]} onSelected={item => item == 'Cán bộ mới' ? this.setState({ canBoCu: false }) : this.setState({ canBoCu: true })} />
+                        </h3></>}
                     <div className='tile-body row'>
-                        <div className='form-group col-xl-3 col-md-4'><TextInput ref={this.shcc} label='Mã số cán bộ' required /> </div>
-                        <div className='form-group col-xl-3 col-md-4'><TextInput ref={this.ho} label='Họ' /> </div>
-                        <div className='form-group col-xl-3 col-md-4'><TextInput ref={this.ten} label='Tên' /> </div>
+                        {(this.state.canBoCu || this.urlMa) ?
+                            <>
+                                <div className='form-group col-xl-5 col-md-6'>
+                                    <Select adapter={SelectAdapter_HiredStaff} label='Chọn cán bộ' ref={this.selectedShcc} onChange={value => this.changeCanBo(value)} required disabled={this.urlMa ? true : readOnly} />
+                                </div>
+                                <div className='form-group col-xl-4 col-md-6'><DateInput ref={this.ngaySinh} label='Ngày sinh' disabled={readOnly} min={new Date(1900, 1, 1).getTime()} max={Date.nextYear(-10).roundDate().getTime()} required /></div>
+                            </> : <>
+                                <div className='form-group col-xl-3 col-md-4'><TextInput ref={this.shcc} label='Mã số cán bộ' required /> </div>
+                                <div className='form-group col-xl-3 col-md-4'><TextInput ref={this.ho} label='Họ' /> </div>
+                                <div className='form-group col-xl-3 col-md-4'><TextInput ref={this.ten} label='Tên' /> </div>
+                                <div className='form-group col-xl-6 col-md-6'><DateInput ref={this.ngaySinh} label='Ngày sinh' /> </div>
+
+                            </>
+                        }
+                        <div className='form-group col-xl-3 col-md-4'><Select adapter={SelectAdapter_DmGioiTinh} ref={this.gioiTinh} label='Giới tính' /> </div>
                         <div className='form-group col-xl-3 col-md-4'><TextInput ref={this.email} label='Email' /> </div>
                         <div className='form-group col-xl-4 col-md-4'><TextInput ref={this.cmnd} label='CMND/CCCD' /> </div>
                         <div className='form-group col-xl-4 col-md-4'><DateInput ref={this.cmndNgayCap} label='Ngày cấp' /> </div>
@@ -324,7 +421,6 @@ class TchcHopDongDvtlTnEditPage extends QTForm {
                         <div className='form-group col-xl-3 col-md-4'><Select adapter={SelectAdapter_DmDanToc} ref={this.danToc} label='Dân tộc' /> </div>
                         <div className='form-group col-xl-3 col-md-4'><Select adapter={SelectAdapter_DmTonGiao} ref={this.tonGiao} label='Tôn giáo' /> </div>
 
-                        <div className='form-group col-xl-6 col-md-6'><DateInput ref={this.ngaySinh} label='Ngày sinh' /> </div>
                         <ComponentDiaDiem ref={e => this.noiSinh = e} label='Nơi sinh' className='col-xl-6 col-md-6' onlyTinhThanh={true} />
                         <ComponentDiaDiem ref={e => this.thuongTru = e} label='Địa chỉ thường trú' className='col-md-12' requiredSoNhaDuong={true} />
                         <p className='col-md-12'>
@@ -356,7 +452,7 @@ class TchcHopDongDvtlTnEditPage extends QTForm {
                         {!this.state.item || !(this.state.kieu == 'DVTL') ? <div className='form-group col-xl-3 col-md-6'><TextInput ref={this.tienLuong} label='Tiền lương' /></div> : null}
                     </div>
                 </div>
-                <Link to='/user/tchc/hop-dong-dvtl-tn' className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>
+                <Link to='/user/tccb/qua-trinh/hop-dong-dvtl-tn' className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>
                     <i className='fa fa-lg fa-reply' />
                 </Link>
                 <button type='button' title='Save' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.save}>
@@ -371,11 +467,11 @@ class TchcHopDongDvtlTnEditPage extends QTForm {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, tchcHopDongDvtlTn: state.tchcHopDongDvtlTn });
+const mapStateToProps = state => ({ system: state.system, qtHopDongDvtlTn: state.qtHopDongDvtlTn });
 const mapActionsToProps = {
     createTchcCanBoHopDongDvtlTn, deleteTchcCanBoHopDongDvtlTn, updateTchcCanBoHopDongDvtlTn, getTchcCanBoHopDongDvtlTnAll,
-    getTchcHopDongDvtlTnPage, getTchcHopDongDvtlTnAll, updateTchcHopDongDvtlTn, getdmLoaiHopDongAll,
-    deleteTchcHopDongDvtlTn, createTchcHopDongDvtlTn, getStaffAll, getTchcCanBoHopDongDvtlTnEdit,
-    getDmDonViAll, getDmNgachCdnnAll, getTchcHopDongDvtlTnEdit, downloadWord
+    getQtHopDongDvtlTnPage, getQtHopDongDvtlTnAll, updateQtHopDongDvtlTn, getdmLoaiHopDongAll,
+    deleteQtHopDongDvtlTn, createQtHopDongDvtlTn, getStaffAll, getStaffEdit, getTchcCanBoHopDongDvtlTnEdit,
+    getDmDonViAll, getDmNgachCdnnAll, getQtHopDongDvtlTnEdit, downloadWord, getDmChucVuAll
 };
-export default connect(mapStateToProps, mapActionsToProps)(TchcHopDongDvtlTnEditPage);
+export default connect(mapStateToProps, mapActionsToProps)(QtHopDongDvtlTnEditPage);

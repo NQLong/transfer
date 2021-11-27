@@ -107,10 +107,10 @@ export function getQtChucVuEdit(ma, done) {
     };
 }
 
-export function createQtChucVu(item, done) {
+export function createQtChucVu(items, done) {
     return dispatch => {
         const url = '/api/qua-trinh/chuc-vu';
-        T.post(url, { item }, data => {
+        T.post(url, { items }, data => {
             if (data.error) {
                 T.notify('Tạo chức vụ bị lỗi!', 'danger');
                 console.error(`POST: ${url}.`, data.error);
@@ -123,10 +123,10 @@ export function createQtChucVu(item, done) {
     };
 }
 
-export function deleteQtChucVu(ma, done) {
+export function deleteQtChucVu(stt) {
     return dispatch => {
         const url = '/api/qua-trinh/chuc-vu';
-        T.delete(url, { ma }, data => {
+        T.delete(url, { stt }, data => {
             if (data.error) {
                 T.notify('Xóa chức vụ bị lỗi!', 'danger');
                 console.error(`DELETE: ${url}.`, data.error);
@@ -134,7 +134,6 @@ export function deleteQtChucVu(ma, done) {
                 T.alert('Chức vụ đã xóa thành công!', 'success', false, 800);
                 dispatch(getQtChucVuPage());
             }
-            done && done();
         }, () => T.notify('Xóa chức vụ bị lỗi!', 'danger'));
     };
 }
@@ -150,7 +149,7 @@ export function updateQtChucVu(ma, changes, done) {
             } else {
                 T.notify('Cập nhật chức vụ thành công!', 'success');
                 done && done(data.item);
-                dispatch(getQtChucVu(ma));
+                dispatch(getQtChucVuPage());
             }
         }, () => T.notify('Cập nhật chức vụ bị lỗi!', 'danger'));
     };

@@ -85,7 +85,7 @@ class EditModal extends AdminModal {
             thoiGianKetThucNghi: this.thoiGianKetThucNghi.value(),
         };
         if (changes.shcc == '') {
-            T.notify('Số hiệu công chức bị trống');
+            T.notify('Mã số cán bộ bị trống');
             this.shcc.focus();
         } else {
             this.state.stt ? this.props.update(this.state.stt, changes, this.hide) : this.props.create(changes, this.hide);
@@ -104,7 +104,7 @@ class EditModal extends AdminModal {
                     onChange={value => this.changeKichHoat(value ? 1 : 0, this.hoSoThaiDuocDuyet)} />
                 <FormTextBox type='text' className='col-md-3' ref={e => this.ho = e} label='Họ' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-3' ref={e => this.ten = e} label='Tên' readOnly={readOnly} />
-                <FormTextBox type='text' className='col-md-3' ref={e => this.shcc = e} label='Số hiệu công chức' readOnly={readOnly} />
+                <FormTextBox type='text' className='col-md-3' ref={e => this.shcc = e} label='Mã số cán bộ' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-3' ref={e => this.soBhxh = e} label='Bảo hiểm xã hội' readOnly={readOnly} />
                 <FormSelect type='text' className='col-md-6' ref={e => this.chucVu = e} data={this.chucVuTable} label='Chức vụ' readOnly={readOnly} />
                 <FormSelect type='text' className='col-md-6' ref={e => this.donVi = e} data={this.donViTable} label='Đơn vị' readOnly={readOnly} />

@@ -164,6 +164,19 @@ export function deleteStaff(shcc, done) {
     };
 }
 
+export function getCanBoKy(shcc, done) {
+    return () => {
+        const url = `/api/can-bo-ky/${shcc}`;
+        T.get(url, data => {
+            if (data.error) {
+                T.notify('Lấy thông tin cán bộ đại diện trường bị lỗi ' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else if (done) {
+                done(data);
+            }
+        }, error => console.error(`GET: ${url}.`, error));
+    };
+}
 //#region quanHeCanBo
 export function createQuanHeCanBo(data, done) {
     return dispatch => {

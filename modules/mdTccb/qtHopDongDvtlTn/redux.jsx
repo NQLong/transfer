@@ -1,20 +1,20 @@
 import T from 'view/js/common';
 
 // Reducer ------------------------------------------------------------------------------------------------------------
-const TchcHopDongDvtlTnGetAll = 'TchcHopDongDvtlTn:GetAll';
-const TchcHopDongDvtlTnGetPage = 'TchcHopDongDvtlTn:GetPage';
-const TchcHopDongDvtlTnUpdate = 'TchcHopDongDvtlTn:Update';
-const TchcHopDongDvtlTnGet = 'TchcHopDongDvtlTn:Get';
+const QtHopDongDvtlTnGetAll = 'QtHopDongDvtlTn:GetAll';
+const QtHopDongDvtlTnGetPage = 'QtHopDongDvtlTn:GetPage';
+const QtHopDongDvtlTnUpdate = 'QtHopDongDvtlTn:Update';
+const QtHopDongDvtlTnGet = 'QtHopDongDvtlTn:Get';
 
-export default function TchcHopDongDvtlTnReducer(state = null, data) {
+export default function QtHopDongDvtlTnReducer(state = null, data) {
     switch (data.type) {
-        case TchcHopDongDvtlTnGetAll:
+        case QtHopDongDvtlTnGetAll:
             return Object.assign({}, state, { items: data.items });
-        case TchcHopDongDvtlTnGetPage:
+        case QtHopDongDvtlTnGetPage:
             return Object.assign({}, state, { page: data.page });
-        case TchcHopDongDvtlTnGet:
+        case QtHopDongDvtlTnGet:
             return Object.assign({}, state, { selectedItem: data.item });
-        case TchcHopDongDvtlTnUpdate:
+        case QtHopDongDvtlTnUpdate:
             if (state) {
                 let updatedItems = Object.assign({}, state.items),
                     updatedPage = Object.assign({}, state.page),
@@ -45,11 +45,11 @@ export default function TchcHopDongDvtlTnReducer(state = null, data) {
 }
 
 // Actions ------------------------------------------------------------------------------------------------------------
-T.initPage('pageTchcHopDongDvtlTn');
-export function getTchcHopDongDvtlTnPage(pageNumber, pageSize, pageCondition, done) {
-    const page = T.updatePage('pageTchcHopDongDvtlTn', pageNumber, pageSize, pageCondition);
+T.initPage('pageQtHopDongDvtlTn');
+export function getQtHopDongDvtlTnPage(pageNumber, pageSize, pageCondition, done) {
+    const page = T.updatePage('pageQtHopDongDvtlTn', pageNumber, pageSize, pageCondition);
     return dispatch => {
-        const url = `/api/tchc/hop-dong-dvtl-tn/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/tccb/qua-trinh/hop-dong-dvtl-tn/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách hợp đồng bị lỗi!', 'danger');
@@ -57,30 +57,30 @@ export function getTchcHopDongDvtlTnPage(pageNumber, pageSize, pageCondition, do
             } else {
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 if (done) done(data.page);
-                dispatch({ type: TchcHopDongDvtlTnGetPage, page: data.page });
+                dispatch({ type: QtHopDongDvtlTnGetPage, page: data.page });
             }
         }, () => T.notify('Lấy danh sách hợp đồng bị lỗi!', 'danger'));
     };
 }
 
-export function getTchcHopDongDvtlTnAll(done) {
+export function getQtHopDongDvtlTnAll(done) {
     return dispatch => {
-        const url = '/api/tchc/hop-dong-dvtl-tn/all';
+        const url = '/api/tccb/qua-trinh/hop-dong-dvtl-tn/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách hợp đồng bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (done) done(data.items);
-                dispatch({ type: TchcHopDongDvtlTnGetAll, items: data.items ? data.items : [] });
+                dispatch({ type: QtHopDongDvtlTnGetAll, items: data.items ? data.items : {} });
             }
         }, () => T.notify('Lấy danh sách hợp đồng bị lỗi!', 'danger'));
     };
 }
 
-export function getTchcHopDongDvtlTn(ma, done) {
+export function getQtHopDongDvtlTn(ma, done) {
     return () => {
-        const url = `/api/tchc/hop-dong-dvtl-tn/item/${ma}`;
+        const url = `/api/tccb/qua-trinh/hop-dong-dvtl-tn/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy hợp đồng bị lỗi!', 'danger');
@@ -92,56 +92,57 @@ export function getTchcHopDongDvtlTn(ma, done) {
     };
 }
 
-export function getTchcHopDongDvtlTnEdit(ma, done) {
+export function getQtHopDongDvtlTnEdit(ma, done) {
     return dispatch => {
-        const url = `/api/tchc/hop-dong-dvtl-tn/edit/item/${ma}`;
+        const url = `/api/tccb/qua-trinh/hop-dong-dvtl-tn/edit/item/${ma}`;
         T.get(url, data => {
+            console.log(data);
             if (data.error) {
                 T.notify('Lấy thông tin hợp đồng bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (done) done(data);
-                dispatch({ type: TchcHopDongDvtlTnGet, item: data.item });
+                dispatch({ type: QtHopDongDvtlTnGet, item: data.item });
             }
         }, () => T.notify('Lấy thông tin hợp đồng bị lỗi', 'danger'));
     };
 }
 
-export function createTchcHopDongDvtlTn(item, done) {
+export function createQtHopDongDvtlTn(item, done) {
     return dispatch => {
-        const url = '/api/tchc/hop-dong-dvtl-tn';
+        const url = '/api/tccb/qua-trinh/hop-dong-dvtl-tn';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo hợp đồng bị lỗi!', 'danger');
                 console.error(`POST: ${url}.`, data.error);
             } else {
                 T.notify('Tạo hợp đồng thành công!', 'success');
-                dispatch(getTchcHopDongDvtlTnPage());
+                dispatch(getQtHopDongDvtlTnPage());
                 if (done) done(data);
             }
         }, () => T.notify('Tạo hợp đồng bị lỗi!', 'danger'));
     };
 }
 
-export function deleteTchcHopDongDvtlTn(ma, done) {
+export function deleteQtHopDongDvtlTn(ma, done) {
     return dispatch => {
-        const url = '/api/tchc/hop-dong-dvtl-tn';
+        const url = '/api/tccb/qua-trinh/hop-dong-dvtl-tn';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa hợp đồng bị lỗi!', 'danger');
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
-                T.alert('Hợp đồng đã xóa thành công!', 'success', false, 800);
-                dispatch(getTchcHopDongDvtlTnPage());
+                T.alert('hợp đồng đã xóa thành công!', 'success', false, 800);
+                dispatch(getQtHopDongDvtlTnPage());
             }
             done && done();
         }, () => T.notify('Xóa hợp đồng bị lỗi!', 'danger'));
     };
 }
 
-export function updateTchcHopDongDvtlTn(ma, changes, done) {
+export function updateQtHopDongDvtlTn(ma, changes, done) {
     return dispatch => {
-        const url = '/api/tchc/hop-dong-dvtl-tn';
+        const url = '/api/tccb/qua-trinh/hop-dong-dvtl-tn';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật hợp đồng bị lỗi!', 'danger');
@@ -150,15 +151,61 @@ export function updateTchcHopDongDvtlTn(ma, changes, done) {
             } else {
                 T.notify('Cập nhật hợp đồng thành công!', 'success');
                 done && done(data.item);
-                dispatch(getTchcHopDongDvtlTn(ma));
+                dispatch(getQtHopDongDvtlTn(ma));
             }
         }, () => T.notify('Cập nhật hợp đồng bị lỗi!', 'danger'));
     };
 }
 
+//--USER-ACTION-------------------------------------------
+export function createQtHopDongDvtlTnUser(data, done) {
+    return () => {
+        const url = '/api/user/qua-trinh/hop-dong-dvtl-tn';
+        T.post(url, { data }, res => {
+            if (res.error) {
+                T.notify('Thêm thông tin quá trình khen thưởng bị lỗi', 'danger');
+                console.error('POST: ' + url + '. ' + res.error);
+            } else {
+                T.notify('Thêm thông tin quá trình khen thưởng thành công!', 'info');
+                if (done) done(res);
+            }
+        }, () => T.notify('Thêm thông tin quá trình khen thưởng bị lỗi', 'danger'));
+    };
+}
+
+export function updateQtHopDongDvtlTnUser(id, changes, done) {
+    return () => {
+        const url = '/api/user/qua-trinh/hop-dong-dvtl-tn';
+        T.put(url, { id, changes }, data => {
+            if (data.error) {
+                T.notify('Cập nhật thông tin quá trình khen thưởng bị lỗi', 'danger');
+                console.error('PUT: ' + url + '. ' + data.error);
+            } else if (data.item) {
+                T.notify('Cập nhật thông tin quá trình khen thưởng thành công!', 'info');
+                if (done) done();
+            }
+        }, () => T.notify('Cập nhật thông tin quá trình khen thưởng bị lỗi', 'danger'));
+    };
+}
+
+export function deleteQtHopDongDvtlTnUser(id, done) {
+    return () => {
+        const url = '/api/user/qua-trinh/hop-dong-dvtl-tn';
+        T.delete(url, { id }, data => {
+            if (data.error) {
+                T.notify('Xóa thông tin quá trình khen thưởng bị lỗi', 'danger');
+                console.error('DELETE: ' + url + '. ' + data.error);
+            } else {
+                T.alert('Thông tin quá trình khen thưởng được xóa thành công!', 'info', false, 800);
+                done && done();
+            }
+        }, () => T.notify('Xóa thông tin quá trình khen thưởng bị lỗi', 'danger'));
+    };
+}
+
 export function downloadWord(ma, done) {
     return () => {
-        const url = `/user/tchc/hop-dong-dvtl-tn/${ma}/word`;
+        const url = `/user/qua-trinh/hop-dong-dvtl-tn/${ma}/word`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Tải file word bị lỗi', 'danger');

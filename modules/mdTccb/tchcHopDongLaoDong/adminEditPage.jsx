@@ -284,7 +284,7 @@ class TchcHopDongLaoDongEditPage extends QTForm {
                 <div className='tile'>
                     <h3 className='tile-title'>Thông tin cá nhân bên người ký</h3>
                     <div className='tile-body row'>
-                        <div className='form-group col-xl-3 col-md-4'><TextInput ref={this.shcc} label='Số hiệu công chức' required /> </div>
+                        <div className='form-group col-xl-3 col-md-4'><TextInput ref={this.shcc} label='Mã số cán bộ' required /> </div>
                         <div className='form-group col-xl-3 col-md-4'><TextInput ref={this.ho} label='Họ' /> </div>
                         <div className='form-group col-xl-3 col-md-4'><TextInput ref={this.ten} label='Tên' /> </div>
                         <div className='form-group col-xl-3 col-md-4'><TextInput ref={this.email} label='Email cá nhân' /> </div>

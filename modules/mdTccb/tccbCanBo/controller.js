@@ -1051,6 +1051,9 @@ module.exports = app => {
         });
     });
 
+    app.get('/api/can-bo-ky/:shcc', checkGetStaffPermission, (req, res) => {
+        app.model.canBo.getCanBoBenA(req.params.shcc, (error, item) => res.send({ error, item }));
+    });
     app.put('/api/user/staff', app.permission.check('staff:login'), (req, res) => {
         if (req.body.changes && req.session.user) {
             const changes = req.body.changes;

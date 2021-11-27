@@ -4,8 +4,8 @@ import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormDatePicker, FormCheckbox, FormSelect } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
-    getQtChucVuPage, getQtChucVuAll, updateQtChucVu,
-    deleteQtChucVu, createQtChucVu
+    getQtHopDongDvtlTnPage, getQtHopDongDvtlTnAll, updateQtHopDongDvtlTn,
+    deleteQtHopDongDvtlTn, createQtHopDongDvtlTn
 } from './redux';
 import { getDmChucVuAll } from 'modules/mdDanhMuc/dmChucVu/redux';
 import { getDmDonViAll } from 'modules/mdDanhMuc/dmDonVi/redux';
@@ -15,7 +15,7 @@ import { getStaffAll } from 'modules/mdTccb/tccbCanBo/redux';
 class EditModal extends AdminModal {
     donViTable = [];
     chucVuTable = [];
-    state = { shcc: null, stt: '' };
+    state = { shcc: null };
     componentDidMount() {
 
         this.props.getDonVi(items => {
@@ -57,10 +57,10 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        let { stt, shcc, maChucVu, maDonVi, soQuyetDinh, ngayRaQuyetDinh, chucVuChinh, maBoMon } = item ? item : { stt: '',
+        let { shcc, maChucVu, maDonVi, soQuyetDinh, ngayRaQuyetDinh, chucVuChinh, maBoMon } = item ? item : {
             shcc: '', maChucVu: '', maDonVi: '', soQuyetDinh: '', ngayRaQuyetDinh: '', chucVuChinh: '', maBoMon: '',
         };
-        this.setState({ shcc, stt, item });
+        this.setState({ shcc, item });
         this.shcc.value(shcc ? shcc : '');
         this.maChucVu.value(maChucVu ? maChucVu : '');
         this.maDonVi.value(maDonVi ? maDonVi : '');
@@ -76,18 +76,18 @@ class EditModal extends AdminModal {
         e.preventDefault();
         const changes = {
             shcc: this.shcc.value(),
-            maChucVu: this.maChucVu.value(),
-            maDonVi: this.maDonVi.value(),
+            chucVu: this.maChucVu.value(),
+            donVi: this.maDonVi.value(),
             soQd: this.soQuyetDinh.value(),
             ngayRaQd: this.ngayRaQuyetDinh.value(),
             chucVuChinh: this.chucVuChinh.value(),
-            maBoMon: this.maBoMon.value(),
+            boMon: this.maBoMon.value(),
         };
         if (changes.shcc == '') {
             T.notify('Mã số cán bộ bị trống');
             this.shcc.focus();
         } else {
-            this.state.shcc ? this.props.update(this.state.stt, changes, this.hide) : this.props.create(changes, this.hide);
+            this.state.shcc ? this.props.update(changes, this.hide) : this.props.create(changes, this.hide);
         }
     }
 
@@ -98,8 +98,8 @@ class EditModal extends AdminModal {
             size: 'large',
             body: <div className='row'>
                 <FormSelect className='col-md-12' ref={e => this.shcc = e} label='Mã số cán bộ' data={this.staffTable} readOnly={readOnly} />
-                <FormSelect className='col-md-4' ref={e => this.maChucVu = e} label='Chức vụ' data={this.chucVuTable} readOnly={readOnly} /> 
-                <FormSelect className='col-md-4' ref={e => this.maDonVi = e} label='Đơn vị' data={this.donViTable} readOnly={readOnly} /> 
+                <FormSelect className='col-md-4' ref={e => this.maChucVu = e} label='Chức vụ' data={this.chucVuTable} readOnly={readOnly} />
+                <FormSelect className='col-md-4' ref={e => this.maDonVi = e} label='Đơn vị' data={this.donViTable} readOnly={readOnly} />
                 <FormSelect className='col-md-4' ref={e => this.maBoMon = e} label='Bộ môn' data={this.boMonTable} readOnly={readOnly} />
                 <FormCheckbox className='col-md-12' ref={e => this.chucVuChinh = e} label='Chức vụ chính' isSwitch={true} readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.soQuyetDinh = e} label='Số quyết định' readOnly={readOnly} />
@@ -109,12 +109,12 @@ class EditModal extends AdminModal {
     }
 }
 
-class QtChucVu extends AdminPage {
+class QtHopDongDvtlTn extends AdminPage {
     componentDidMount() {
         T.ready('/user/tccb', () => {
-            T.onSearch = (searchText) => this.props.getQtChucVuPage(undefined, undefined, searchText || '');
+            T.onSearch = (searchText) => this.props.getQtHopDongDvtlTnPage(undefined, undefined, searchText || '');
             T.showSearchBox();
-            this.props.getQtChucVuPage();
+            this.props.getQtHopDongDvtlTnPage();
         });
     }
 
@@ -125,7 +125,7 @@ class QtChucVu extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa chức vụ', 'Bạn có chắc bạn muốn xóa chức vụ này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtChucVu(item.stt, error => {
+            isConfirm && this.props.deleteQtHopDongDvtlTn(item.stt, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá chức vụ bị lỗi!', 'danger');
                 else T.alert('Xoá chức vụ thành công!', 'success', false, 800);
             });
@@ -135,9 +135,9 @@ class QtChucVu extends AdminPage {
 
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permission = this.getUserPermission('qtChucVu', ['read', 'write', 'delete']);
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtChucVu && this.props.qtChucVu.page ?
-            this.props.qtChucVu.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list };
+            permission = this.getUserPermission('qtHopDongDvtlTn', ['read', 'write', 'delete']);
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtHopDongDvtlTn && this.props.qtHopDongDvtlTn.page ?
+            this.props.qtHopDongDvtlTn.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -146,9 +146,10 @@ class QtChucVu extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        <th style={{ width: '25%', whiteSpace: 'nowrap' }}>Chức vụ</th>
-                        <th style={{ width: '15%', whiteSpace: 'nowrap' }}>Quyết định</th>
-                        <th style={{ width: '5%', textAlign: 'center' }}>Chức vụ chính</th>
+                        <th style={{ width: '45%', whiteSpace: 'nowrap' }}>Số hợp đồng</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Diện hợp đồng</th>
+                        <th style={{ width: '15%', whiteSpace: 'nowrap' }}>Thời gian</th>
+                        <th style={{ width: '25%', whiteSpace: 'nowrap' }}>Cán bộ duyệt hồ sơ</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
 
                     </tr>
@@ -159,28 +160,36 @@ class QtChucVu extends AdminPage {
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{item.ho + ' ' + item.ten}</span><br />
-                                {item.shcc}
+                                <span>Mã số cán bộ: {item.shcc}</span>
                             </>
                         )}
                         />
                         <TableCell type='text' content={(
                             <>
-                                <span>{item.tenChucVu}</span><br />
-                                {item.tenDonVi ? item.tenDonVi : item.tenBoMon}
+                                <span><Link to={'/user/tccb/qua-trinh/hop-dong-dvtl-tn/' + item.ma}>{item.soHopDong}</Link></span><br />
+                                <span>Ngày ký: <span style={{ color: 'blue' }}>{item.ngayKyHopDong ? new Date(item.ngayKyHopDong).ddmmyyyy() : ''}</span></span>
                             </>
                         )}
                         />
+                        <TableCell type='text' content={item.dienHopDong} />
                         <TableCell type='text' content={(
                             <>
-                                <span>Số: {item.soQuyetDinh}</span><br />
-                                <span>Ngày: <span style={{ color: 'blue' }}>{item.ngayRaQuyetDinh ? new Date(item.ngayRaQuyetDinh).ddmmyyyy() : ''}</span></span>
+                                <span style={{ whiteSpace: 'nowrap' }}>Từ ngày: <span style={{ color: 'blue' }}>{item.hieuLucHopDong ? new Date(item.hieuLucHopDong).ddmmyyyy() : ''}</span></span><br />
+                                <span style={{ whiteSpace: 'nowrap' }}>Đến ngày: <span style={{ color: 'blue' }}>{item.ketThucHopDong ? new Date(item.ketThucHopDong).ddmmyyyy() : ''}</span></span>
                             </>
                         )}
                         />
-                        <TableCell type='checkbox' content={item.chucVuChinh} permission={permission}
-                            onChanged={value => this.props.updateQtChucVu({ stt: item.stt }, { chucVuChinh: value ? 1 : 0 })}/>
-                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                            onEdit={() => this.modal.show(item)} onDelete={this.delete} />
+                        <TableCell style={{ whiteSpace: 'nowrap' }} type='text' content={(
+                            <>
+                                <span>{item.hoNguoiKy + ' ' + item.tenNguoiKy}<br /></span>
+                                <Link to={'/user/staff/' + item.shccNguoiKy}>{item.shccNguoiKy}</Link>
+                            </>
+                        )} />
+                        <TableCell type='buttons' content={item} onEdit={`/user/tccb/qua-trinh/hop-dong-dvtl-tn/${item.ma}`} onDelete={this.delete} permission={permission} >
+                            <a href="#" className="btn btn-primary" style={{ width: '45px' }} onClick={e => e.preventDefault() || this.hopDongDownloadWord(item)}>
+                                <i className='fa fa-lg fa-file-word-o' />
+                            </a>
+                        </TableCell>
                     </tr>
                 )
             });
@@ -188,31 +197,32 @@ class QtChucVu extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-list-alt',
-            title: 'Quá trình chức vụ',
+            title: 'Hợp đồng Đơn vị trả lương - trách nhiệm',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
-                'Quá trình chức vụ'
+                'Hợp đồng Đơn vị trả lương - trách nhiệm'
             ],
             content: <>
                 <div className='tile'>{table}</div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                    getPage={this.props.getQtChucVuPage} />
+                    getPage={this.props.getQtHopDongDvtlTnPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
-                    create={this.props.createQtChucVu} update={this.props.updateQtChucVu}
+                    create={this.props.createQtHopDongDvtlTn} update={this.props.updateQtHopDongDvtlTn}
                     getDonVi={this.props.getDmDonViAll} permissions={currentPermissions}
                     getChucVu={this.props.getDmChucVuAll}
                     getBoMon={this.props.getDmBoMonAll}
                     getStaff={this.props.getStaffAll} />
             </>,
             backRoute: '/user/tccb',
-            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+            onCreate: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/tccb/qua-trinh/hop-dong-dvtl-tn/new') : null
+            ,
         });
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtChucVu: state.qtChucVu });
+const mapStateToProps = state => ({ system: state.system, qtHopDongDvtlTn: state.qtHopDongDvtlTn });
 const mapActionsToProps = {
-    getQtChucVuAll, getQtChucVuPage, deleteQtChucVu, getDmDonViAll, createQtChucVu,
-    updateQtChucVu, getDmChucVuAll, getDmBoMonAll, getStaffAll,
+    getQtHopDongDvtlTnAll, getQtHopDongDvtlTnPage, deleteQtHopDongDvtlTn, getDmDonViAll, createQtHopDongDvtlTn,
+    updateQtHopDongDvtlTn, getDmChucVuAll, getDmBoMonAll, getStaffAll,
 };
-export default connect(mapStateToProps, mapActionsToProps)(QtChucVu);
+export default connect(mapStateToProps, mapActionsToProps)(QtHopDongDvtlTn);

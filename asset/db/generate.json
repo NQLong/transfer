@@ -6856,17 +6856,14 @@
                 "size": 20
             }
         },
-        "primaryKeys": [
-            "STT"
-        ],
+        "primaryKeys": ["STT"],
         "foreignKeys": []
     },
-    "TCHC_HOP_DONG_DVTL_TN": {
+    "QT_HOP_DONG_DVTL_TN": {
         "active": true,
-        "moduleName": "tchcHopDongDvtlTn",
-        "modelName": "tchcHopDongDvtlTn",
+        "modelName": "qtHopDongDvtlTn",
         "methods": {
-            "TCHC_HOP_DONG_DVTL_TN_SEARCH_PAGE": "searchPage"
+            "QT_HOP_DONG_DVTL_TN_SEARCH_PAGE": "searchPage"
         },
         "columns": {
             "SO_HOP_DONG": {
@@ -7024,11 +7021,8 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": [
-            "MA"
-        ],
-        "foreignKeys": [],
-        "type": "table"
+        "primaryKeys": ["MA"],
+        "foreignKeys": []
     },
     "DM_DIEN_HOP_DONG": {
         "active": true,
@@ -7057,9 +7051,7 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": [
-            "MA"
-        ],
+        "primaryKeys": ["MA"],
         "foreignKeys": [],
         "type": "table"
     },
@@ -7104,9 +7096,7 @@
                 "size": 10
             }
         },
-        "primaryKeys": [
-            "ID"
-        ],
+        "primaryKeys": ["ID"],
         "foreignKeys": [],
         "type": "table"
     },
@@ -7235,9 +7225,7 @@
                 "size": "20,0"
             }
         },
-        "primaryKeys": [
-            "MA"
-        ],
+        "primaryKeys": ["MA"],
         "foreignKeys": [],
         "type": "table"
     }
