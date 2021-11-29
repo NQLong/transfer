@@ -21,7 +21,7 @@ export default function QtChucVuReducer(state = null, data) {
                     updatedItem = data.item;
                 if (updatedItems) {
                     for (let i = 0, n = updatedItems.length; i < n; i++) {
-                        if (updatedItems[i].ma == updatedItem.ma) {
+                        if (updatedItems[i].stt == updatedItem.stt) {
                             updatedItems.splice(i, 1, updatedItem);
                             break;
                         }
@@ -29,7 +29,7 @@ export default function QtChucVuReducer(state = null, data) {
                 }
                 if (updatedPage) {
                     for (let i = 0, n = updatedPage.list.length; i < n; i++) {
-                        if (updatedPage.list[i].ma == updatedItem.ma) {
+                        if (updatedPage.list[i].stt == updatedItem.stt) {
                             updatedPage.list.splice(i, 1, updatedItem);
                             break;
                         }
@@ -78,9 +78,9 @@ export function getQtChucVuAll(done) {
     };
 }
 
-export function getQtChucVu(ma, done) {
+export function getQtChucVu(stt, done) {
     return () => {
-        const url = `/api/qua-trinh/chuc-vu/item/${ma}`;
+        const url = `/api/qua-trinh/chuc-vu/item/${stt}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy chức vụ bị lỗi!', 'danger');
@@ -92,9 +92,9 @@ export function getQtChucVu(ma, done) {
     };
 }
 
-export function getQtChucVuEdit(ma, done) {
+export function getQtChucVuEdit(stt, done) {
     return dispatch => {
-        const url = `/api/qua-trinh/chuc-vu/edit/item/${ma}`;
+        const url = `/api/qua-trinh/chuc-vu/edit/item/${stt}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy thông tin chức vụ bị lỗi!', 'danger');
@@ -138,10 +138,10 @@ export function deleteQtChucVu(stt) {
     };
 }
 
-export function updateQtChucVu(ma, changes, done) {
+export function updateQtChucVu(stt, changes, done) {
     return dispatch => {
         const url = '/api/qua-trinh/chuc-vu';
-        T.put(url, { ma, changes }, data => {
+        T.put(url, { stt, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật chức vụ bị lỗi!', 'danger');
                 console.error(`PUT: ${url}.`, data.error);
@@ -171,10 +171,10 @@ export function createQtChucVuUser(data, done) {
     };
 }
 
-export function updateQtChucVuUser(id, changes, done) {
+export function updateQtChucVuUser(stt, changes, done) {
     return () => {
         const url = '/api/user/qua-trinh/chuc-vu';
-        T.put(url, { id, changes }, data => {
+        T.put(url, { stt, changes }, data => {
             if (data.error) {
                 T.notify('Cập nhật thông tin quá trình khen thưởng bị lỗi', 'danger');
                 console.error('PUT: ' + url + '. ' + data.error);
@@ -186,10 +186,10 @@ export function updateQtChucVuUser(id, changes, done) {
     };
 }
 
-export function deleteQtChucVuUser(id, done) {
+export function deleteQtChucVuUser(stt, done) {
     return () => {
         const url = '/api/user/qua-trinh/chuc-vu';
-        T.delete(url, { id }, data => {
+        T.delete(url, { stt }, data => {
             if (data.error) {
                 T.notify('Xóa thông tin quá trình khen thưởng bị lỗi', 'danger');
                 console.error('DELETE: ' + url + '. ' + data.error);
@@ -201,9 +201,9 @@ export function deleteQtChucVuUser(id, done) {
     };
 }
 
-export function downloadWord(ma, done) {
+export function downloadWord(stt, done) {
     return () => {
-        const url = `/user/qua-trinh/chuc-vu/${ma}/word`;
+        const url = `/user/qua-trinh/chuc-vu/${stt}/word`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Tải file word bị lỗi', 'danger');

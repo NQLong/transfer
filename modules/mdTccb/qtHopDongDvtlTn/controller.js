@@ -147,4 +147,14 @@ module.exports = app => {
             }
         });
     });
+
+    app.get('/user/qua-trinh/hop-dong-dvtl-tn/:ma/word', app.permission.check('staff:login'), (req, res)  => {
+        if (req.params && req.params.ma) {
+            app.model.tchcHopDongDvtlTn.get({ ma: req.params.ma }, (error, hopDongDvtlTn) => {
+                if (error || hopDongDvtlTn == null) {
+                    res.send({ error });
+                } 
+            });
+        }
+    });
 };

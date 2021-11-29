@@ -145,11 +145,10 @@ class QtHopDongDvtlTn extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        <th style={{ width: '45%', whiteSpace: 'nowrap' }}>Số hợp đồng</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Diện hợp đồng</th>
-                        <th style={{ width: '15%', whiteSpace: 'nowrap' }}>Thời gian</th>
-                        <th style={{ width: '25%', whiteSpace: 'nowrap' }}>Cán bộ duyệt hồ sơ</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Cán bộ</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Số hợp đồng</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ duyệt hồ sơ</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
 
                     </tr>
@@ -164,14 +163,14 @@ class QtHopDongDvtlTn extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' content={(
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span><Link to={'/user/tccb/qua-trinh/hop-dong-dvtl-tn/' + item.ma}>{item.soHopDong}</Link></span><br />
+                                <span>Số: <Link to={'/user/tccb/qua-trinh/hop-dong-dvtl-tn/' + item.ma}>{item.soHopDong}</Link></span><br />
+                                <span>Hợp đồng {item.dienHopDong}</span><br/>
                                 <span>Ngày ký: <span style={{ color: 'blue' }}>{item.ngayKyHopDong ? new Date(item.ngayKyHopDong).ddmmyyyy() : ''}</span></span>
                             </>
                         )}
                         />
-                        <TableCell type='text' content={item.dienHopDong} />
                         <TableCell type='text' content={(
                             <>
                                 <span style={{ whiteSpace: 'nowrap' }}>Từ ngày: <span style={{ color: 'blue' }}>{item.hieuLucHopDong ? new Date(item.hieuLucHopDong).ddmmyyyy() : ''}</span></span><br />

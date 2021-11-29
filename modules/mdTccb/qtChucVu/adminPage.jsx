@@ -155,17 +155,17 @@ class QtChucVu extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{textAlign:'right'}} content={index + 1} />
-                        <TableCell type='link' onClick = {() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{item.ho + ' ' + item.ten}</span><br />
-                                {item.shcc}
+                                <a href='#' onClick={() => this.modal.show(item)}>{item.shcc}</a>
                             </>
                         )}
                         />
                         <TableCell type='text' content={(
                             <>
                                 <span>{item.tenChucVu}</span><br />
-                                {item.tenDonVi ? item.tenDonVi : item.tenBoMon}
+                                {!item.tenBoMon ? (item.tenDonVi ? item.tenDonVi.toUpperCase() : '') : (item.tenBoMon ? item.tenBoMon.toUpperCase(): '')}
                             </>
                         )}
                         />
@@ -177,7 +177,7 @@ class QtChucVu extends AdminPage {
                         )}
                         />
                         <TableCell type='checkbox' content={item.chucVuChinh} permission={permission}
-                            onChanged={value => this.props.updateQtChucVu({ stt: item.stt }, { chucVuChinh: value ? 1 : 0 })}/>
+                            onChanged={value => this.props.updateQtChucVu(item.stt, { chucVuChinh: value ? 1 : 0, })}/>
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={this.delete} />
                     </tr>
