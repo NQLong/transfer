@@ -6861,9 +6861,11 @@
     },
     "QT_HOP_DONG_DVTL_TN": {
         "active": true,
+        "moduleName": "qtHopDongDvtlTn",
         "modelName": "qtHopDongDvtlTn",
         "methods": {
-            "QT_HOP_DONG_DVTL_TN_SEARCH_PAGE": "searchPage"
+            "QT_HOP_DONG_DVTL_TN_SEARCH_PAGE": "searchPage",
+            "DOWNLOAD_HOP_DONG_DVTL_TN": "downWord"
         },
         "columns": {
             "SO_HOP_DONG": {
@@ -7226,6 +7228,72 @@
             }
         },
         "primaryKeys": ["MA"],
+        "foreignKeys": [],
+        "type": "table"
+    },
+    "DM_CHUC_DANH_CHUYEN_MON": {
+        "active": true,
+        "moduleName": "dmChucDanhChuyenMon",
+        "modelName": "dmChucDanhChuyenMon",
+        "columns": {
+            "MA": {
+                "value": "ma",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": false,
+                "size": 20
+            },
+            "TEN": {
+                "value": "ten",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 100
+            },
+            "KICH_HOAT": {
+                "value": "kichHoat",
+                "dataType": "NUMBER",
+                "dataDefault": "1",
+                "nullable": true,
+                "size": "1,0"
+            }
+        },
+        "primaryKeys": [
+            "MA"
+        ],
+        "foreignKeys": [],
+        "type": "table"
+    },
+    "DM_CHUC_DANH_NGHE_NGHIEP": {
+        "active": true,
+        "moduleName": "dmChucDanhNgheNghiep",
+        "modelName": "dmChucDanhNgheNghiep",
+        "columns": {
+            "MA": {
+                "value": "ma",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": false,
+                "size": 20
+            },
+            "TEN": {
+                "value": "ten",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 100
+            },
+            "KICH_HOAT": {
+                "value": "kichHoat",
+                "dataType": "NUMBER",
+                "dataDefault": "1",
+                "nullable": true,
+                "size": "1,0"
+            }
+        },
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     }
