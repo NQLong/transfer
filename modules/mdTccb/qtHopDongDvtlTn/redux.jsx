@@ -203,16 +203,16 @@ export function deleteQtHopDongDvtlTnUser(id, done) {
     };
 }
 
-export function downloadWord(ma, done) {
-    return () => {
-        const url = `/user/qua-trinh/hop-dong-dvtl-tn/${ma}/word`;
-        T.get(url, data => {
-            if (data.error) {
-                T.notify('Tải file word bị lỗi', 'danger');
-                console.error(`GET: ${url}.`, data.error);
-            } else if (done) {
-                done(data.data);
-            }
-        }, () => T.notify('Tải file word bị lỗi', 'danger'));
-    };
+export function downloadHopDongWord(ma, done) {
+    console.log(ma);
+    const url = `api/tccb/qua-trinh/hop-dong-dvtl-tn/download-word/${ma}`;
+    T.get(url, data => {
+        if (data.error) {
+            T.notify('Tải file word bị lỗi', 'danger');
+            console.error(`GET: ${url}.`, data.error);
+        } else if (done) {
+            done(data.data);
+        }
+    }, error => T.notify('Tải file world bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+
 }

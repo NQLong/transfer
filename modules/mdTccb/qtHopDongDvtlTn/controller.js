@@ -148,12 +148,16 @@ module.exports = app => {
         });
     });
 
-    app.get('/user/qua-trinh/hop-dong-dvtl-tn/:ma/word', app.permission.check('staff:login'), (req, res)  => {
+    app.get('/api/tccb/qua-trinh/hop-dong-dvtl-tn/download-word/:ma', app.permission.check('qtHopDongDvtlTn:read'), (req, res) => {
+        console.log('hello');
         if (req.params && req.params.ma) {
-            app.model.tchcHopDongDvtlTn.get({ ma: req.params.ma }, (error, hopDongDvtlTn) => {
-                if (error || hopDongDvtlTn == null) {
+            app.model.qtHopDongDvtlTn.get({ ma: req.params.ma }, (error, item) => {
+                console.log(req.params.ma);
+                if (error || !item) {
                     res.send({ error });
-                } 
+                } else {
+                    console.log(item.rows[0]);
+                }
             });
         }
     });
