@@ -45,7 +45,7 @@ class SectionAllDivision extends React.Component {
                         item.image ? item.image : '/img/avatar.png';
             if (item.maPl == 2) {
                 elements.push(
-                    <div key={index} className='col-12 col-md-3 d-flex ftco-animate' style={{ paddingTop: '20px' }}>
+                    <div key={index} className='col-12 col-md-4 d-flex ftco-animate' style={{ paddingTop: '20px' }}>
                         <div className='align-items-center' style={{ minHeight: '180px', padding: 0, }}>
                             {isExternalLink ? <a href={item.duongDan} target='_blank' rel="noreferrer">
                                 <img style={{ width: '100%', padding: '10px' }} src={image} />
