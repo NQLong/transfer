@@ -1,12 +1,12 @@
 module.exports = app => {
-    const menu = {
-        parentMenu: app.parentMenu.category,
-    };
-    app.permission.add(
-        { name: 'dmNhomTaiSanCoDinh:read', menu },
-        { name: 'dmNhomTaiSanCoDinh:write' },
-        { name: 'dmNhomTaiSanCoDinh:delete' }
-    );
+    // const menu = {
+    //     parentMenu: app.parentMenu.category,
+    // };
+    // app.permission.add(
+    //     { name: 'dmNhomTaiSanCoDinh:read', menu },
+    //     { name: 'dmNhomTaiSanCoDinh:write' },
+    //     { name: 'dmNhomTaiSanCoDinh:delete' }
+    // );
     app.get('/user/danh-muc/nhom-tai-san-co-dinh', app.permission.check('dmNhomTaiSanCoDinh:read'), app.templates.admin);
 
     // APIs ----------------------------------------------------------------------------------------------------------------------------------------
