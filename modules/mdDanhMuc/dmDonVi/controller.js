@@ -84,9 +84,9 @@ module.exports = app => {
     });
 
     // Hook upload images ---------------------------------------------------------------------------------------------------------------------------
-    app.createFolder(
-        app.path.join(app.publicPath, '/img/dmDonVi')
-    );
+    app.createFolder(app.path.join(app.publicPath, '/img/dmDonVi'));
+    app.createFolder(app.path.join(app.publicPath, '/img/dmDonViImage'));
+
 
     const uploadDmDonViImage = (req, fields, files, params, done) => {
         if (fields.userData && fields.userData[0].startsWith('dmDonVi:') && files.DmDonViImage && files.DmDonViImage.length > 0) {
@@ -96,6 +96,47 @@ module.exports = app => {
     };
     app.uploadHooks.add('uploadDmDonViImage', (req, fields, files, params, done) =>
         app.permission.has(req, () => uploadDmDonViImage(req, fields, files, params, done), done, 'dmDonVi:write'));
+
+    //New Data
+    const uploadDmDonViImageDisplay = (req, fields, files, params, done) => {
+        if (fields.userData && fields.userData[0].startsWith('dmDonViImage:') && files.DmDonViImageDisplay && files.DmDonViImageDisplay.length > 0) {
+            console.log('Hook: uploadDmDonViImageDisplay => news image upload');
+            const maDonVi = fields.userData[0].substring(13),
+                srcPath = files.DmDonViImageDisplay[0].path;
+            let image = '/img/dmDonVi/' + maDonVi + '_' + (new Date().getTime()).toString().slice(-8) + app.path.extname(srcPath);
+            app.model.dmDonVi.get({ ma: maDonVi }, (error, donVi) => {
+                app.fs.rename(srcPath, app.path.join(app.publicPath, image), error => {
+                    if (error) done({ error });
+                    else if (donVi) {
+                        if (donVi.imageDisplay) app.deleteFile(app.path.join(app.publicPath, donVi.imageDisplay));
+                        app.model.dmDonVi.update({ ma: maDonVi }, { imageDisplay: image }, (error,) => done({ error, image: image }));
+                    }
+                });
+            });
+        }
+    };
+    app.uploadHooks.add('uploadDmDonViImageDisplay', (req, fields, files, params, done) =>
+        app.permission.has(req, () => uploadDmDonViImageDisplay(req, fields, files, params, done), done, 'dmDonVi:write'));
+
+    const uploadDmDonViImageDisplayTA = (req, fields, files, params, done) => {
+        if (fields.userData && fields.userData[0].startsWith('dmDonViImageTA:') && files.DmDonViImageDisplayTA && files.DmDonViImageDisplayTA.length > 0) {
+            console.log('Hook: uploadDmDonViImageDisplayTA => news image upload');
+            const maDonVi = fields.userData[0].substring(15),
+                srcPath = files.DmDonViImageDisplayTA[0].path;
+            let image = '/img/dmDonVi/' + maDonVi + 'TA_' + (new Date().getTime()).toString().slice(-8) + app.path.extname(srcPath);
+            app.model.dmDonVi.get({ ma: maDonVi }, (error, donVi) => {
+                app.fs.rename(srcPath, app.path.join(app.publicPath, image), error => {
+                    if (error) done({ error });
+                    else if (donVi) {
+                        if (donVi.imageDisplayTa) app.deleteFile(app.path.join(app.publicPath, donVi.imageDisplayTa));
+                        app.model.dmDonVi.update({ ma: maDonVi }, { imageDisplayTa: image }, (error,) => done({ error, image: image }));
+                    }
+                });
+            });
+        }
+    };
+    app.uploadHooks.add('uploadDmDonViImageDisplayTA', (req, fields, files, params, done) =>
+        app.permission.has(req, () => uploadDmDonViImageDisplayTA(req, fields, files, params, done), done, 'dmDonVi:write'));
 
     // Hook ready -----------------------------------------------------------------------------------------------------------------------------------
     app.readyHooks.add('readyDmDonVi', {

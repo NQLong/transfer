@@ -10,6 +10,9 @@ module.exports = app => {
 
     // Upload hook
     app.createFolder(app.path.join(app.publicPath, '/img/divisionHeader'));
+    app.uploadHooks.add('uploadDivisionHeader', (req, fields, files, params, done) =>
+        app.permission.has(req, () => uploadDivisionHeader(req, fields, files, params, done), done, 'menu:write'));
+
     const uploadDivisionHeader = (req, fields, files, params, done) => {
         if (fields.userData && fields.userData[0].startsWith('divisionHeader:') && files.divisionHeader && files.divisionHeader.length > 0) {
             console.log('Hook: upload division header image => division header image upload');
@@ -27,6 +30,7 @@ module.exports = app => {
             });
         }
     };
+
 
     app.uploadHooks.add('uploadDivisionHeaderMobile', (req, fields, files, params, done) =>
         app.permission.has(req, () => uploadDivisionHeaderMobile(req, fields, files, params, done), done, 'menu:write'));
@@ -50,6 +54,4 @@ module.exports = app => {
         }
     };
 
-    app.uploadHooks.add('uploadDivisionHeader', (req, fields, files, params, done) =>
-        app.permission.has(req, () => uploadDivisionHeader(req, fields, files, params, done), done, 'menu:write'));
 };
