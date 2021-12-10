@@ -1,13 +1,13 @@
 module.exports = app => {
-    const menu = {
-        parentMenu: app.parentMenu.category,
-        // menus: { 2200: { title: 'Danh mục hoạt động KH&CN', link: '/user/khcn/dm-hoat-dong-khcn' } },
-    };
-    app.permission.add(
-        { name: 'dmHoatDongKhcn:read', menu },
-        { name: 'dmHoatDongKhcn:write' },
-        { name: 'dmHoatDongKhcn:delete' },
-    );
+    // const menu = {
+    //     parentMenu: app.parentMenu.category,
+    //     // menus: { 2200: { title: 'Danh mục hoạt động KH&CN', link: '/user/khcn/dm-hoat-dong-khcn' } },
+    // };
+    // app.permission.add(
+    //     { name: 'dmHoatDongKhcn:read', menu },
+    //     { name: 'dmHoatDongKhcn:write' },
+    //     { name: 'dmHoatDongKhcn:delete' },
+    // );
     app.get('/user/khcn/dm-hoat-dong-khcn', app.permission.check('dmHoatDongKhcn:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------

@@ -44,7 +44,7 @@ class SectionHighLightNews extends React.Component {
                 <>
                     <div className='col-12 row py-3'>
                         {notificationList.slice(0, 6).map((item, index) => {
-                            const link = item.link ? '/tin-tuc/' + item.link : '/news/item/' + item.id;
+                            const link = T.linkNewsDetail(item);
                             return (
                                 <div key={index} className='col-12 px-0 pb-2 mb-3 text-justify'>
                                     <Link to={link}>
