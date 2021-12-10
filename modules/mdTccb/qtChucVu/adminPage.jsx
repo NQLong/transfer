@@ -5,7 +5,7 @@ import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormDatePic
 import Pagination from 'view/component/Pagination';
 import {
     getQtChucVuPage, getQtChucVuAll, updateQtChucVu,
-    deleteQtChucVu, createQtChucVu
+    deleteQtChucVu, createQtChucVu, getChucVuByShcc
 } from './redux';
 import { getDmChucVuAll } from 'modules/mdDanhMuc/dmChucVu/redux';
 import { getDmDonViAll } from 'modules/mdDanhMuc/dmDonVi/redux';
@@ -72,6 +72,21 @@ class EditModal extends AdminModal {
 
     changeKichHoat = (value, target) => target.value(value ? 1 : 0) || target.value(value);
 
+    checkChucVu = (changes) => {
+        T.confirm('Thông tin chức vụ chính', 'Đây sẽ là chức vụ chính của cán bộ', 'warning', true, isConfirm => {
+            isConfirm && this.props.getQtChucVuAll(changes.shcc, data => {
+                if (data) {
+                    data.forEach(item => {
+                        if (item.chucVuChinh && item.stt != this.state.stt) {
+                            this.props.update(item.stt, { chucVuChinh: 0 });
+                        }
+                    });
+                } 
+                this.state.stt ? this.props.update(this.state.stt, changes, this.hide) : this.props.create(changes, this.hide);
+            });
+        });
+    }
+
     onSubmit = (e) => {
         e.preventDefault();
         const changes = {
@@ -87,7 +102,8 @@ class EditModal extends AdminModal {
             T.notify('Mã số cán bộ bị trống');
             this.shcc.focus();
         } else {
-            this.state.shcc ? this.props.update(this.state.stt, changes, this.hide) : this.props.create(changes, this.hide);
+            !changes.chucVuChinh ? (this.state.stt ? this.props.update(this.state.stt, changes, this.hide) : this.props.create(changes, this.hide)):
+            this.checkChucVuUpdate(changes, this.state, this.hide);
         }
     }
 
@@ -176,8 +192,7 @@ class QtChucVu extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='checkbox' content={item.chucVuChinh} permission={permission}
-                            onChanged={value => this.props.updateQtChucVu(item.stt, { chucVuChinh: value ? 1 : 0, })}/>
+                        <TableCell type='checkbox' content={item.chucVuChinh} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={this.delete} />
                     </tr>
@@ -201,7 +216,8 @@ class QtChucVu extends AdminPage {
                     getDonVi={this.props.getDmDonViAll} permissions={currentPermissions}
                     getChucVu={this.props.getDmChucVuAll}
                     getBoMon={this.props.getDmBoMonAll}
-                    getStaff={this.props.getStaffAll} />
+                    getStaff={this.props.getStaffAll} 
+                    getQtChucVuAll={this.props.getQtChucVuAll}/>
             </>,
             backRoute: '/user/tccb',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
@@ -212,6 +228,6 @@ class QtChucVu extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtChucVu: state.qtChucVu });
 const mapActionsToProps = {
     getQtChucVuAll, getQtChucVuPage, deleteQtChucVu, getDmDonViAll, createQtChucVu,
-    updateQtChucVu, getDmChucVuAll, getDmBoMonAll, getStaffAll,
+    updateQtChucVu, getDmChucVuAll, getDmBoMonAll, getStaffAll, getChucVuByShcc
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtChucVu);

@@ -113,4 +113,8 @@ module.exports = app => {
             res.status(400).send({ error: 'Invalstt parameter!' });
         }
     });
+
+    app.get('/api/qua-trinh/chuc-vu/item/:shcc', app.permission.check('qtChucVu:read'), (req, res) => {
+        app.model.qtChucVu.getAll({ shcc: req.params.shcc }, (error, item) => res.send({ error, item }));
+    });
 };

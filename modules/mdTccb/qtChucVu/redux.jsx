@@ -63,12 +63,12 @@ export function getQtChucVuPage(pageNumber, pageSize, pageCondition, done) {
     };
 }
 
-export function getQtChucVuAll(done) {
+export function getQtChucVuAll(shcc, done) {
     return dispatch => {
         const url = '/api/qua-trinh/chuc-vu/all';
-        T.get(url, data => {
+        T.get(url, { shcc }, data => {
             if (data.error) {
-                T.notify('Lấy danh sách hợp đồng bị lỗi!', 'danger');
+                T.notify('Lấy danh sách chức vụ bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (done) done(data.items);
@@ -152,6 +152,21 @@ export function updateQtChucVu(stt, changes, done) {
                 dispatch(getQtChucVuPage());
             }
         }, () => T.notify('Cập nhật chức vụ bị lỗi!', 'danger'));
+    };
+}
+
+export function getChucVuByShcc(shcc, done) {
+    return dispatch => {
+        const url = `/api/qua-trinh/chuc-vu/item/${shcc}`;
+        T.get(url, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách chức vụ bị lỗi!', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (done) done(data.items);
+                dispatch({ type: QtChucVuGetAll, items: data.items ? data.items : {} });
+            }
+        }, () => T.notify('Lấy danh sách chức vụ bị lỗi!', 'danger'));
     };
 }
 
