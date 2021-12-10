@@ -5,7 +5,7 @@ import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormDatePic
 import Pagination from 'view/component/Pagination';
 import {
     getQtHopDongDvtlTnPage, getQtHopDongDvtlTnAll, updateQtHopDongDvtlTn,
-    deleteQtHopDongDvtlTn, createQtHopDongDvtlTn, hopDongDownloadWord
+    deleteQtHopDongDvtlTn, createQtHopDongDvtlTn
 } from './redux';
 import { getDmChucVuAll } from 'modules/mdDanhMuc/dmChucVu/redux';
 import { getDmDonViAll } from 'modules/mdDanhMuc/dmDonVi/redux';
@@ -123,10 +123,10 @@ class QtHopDongDvtlTn extends AdminPage {
         this.modal.show();
     }
 
-    hopDongDownloadWord = item => {
-        hopDongDownloadWord(item.stt, data => {
-            T.FileSaver(new Blob([new Uint8Array(data.data)]), item.shcc + '_hopdong.docx');
-        });
+    hopDongDownloadWord = () => {
+        // hopDongDownloadWord(item.stt, data => {
+        //     T.FileSaver(new Blob([new Uint8Array(data.data)]), item.shcc + '_hopdong.docx');
+        // });
     }
 
     delete = (e, item) => {
@@ -228,6 +228,6 @@ class QtHopDongDvtlTn extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtHopDongDvtlTn: state.qtHopDongDvtlTn });
 const mapActionsToProps = {
     getQtHopDongDvtlTnAll, getQtHopDongDvtlTnPage, deleteQtHopDongDvtlTn, getDmDonViAll, createQtHopDongDvtlTn,
-    updateQtHopDongDvtlTn, getDmChucVuAll, getDmBoMonAll, getStaffAll, hopDongDownloadWord
+    updateQtHopDongDvtlTn, getDmChucVuAll, getDmBoMonAll, getStaffAll
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtHopDongDvtlTn);

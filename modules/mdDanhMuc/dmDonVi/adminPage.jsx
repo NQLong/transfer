@@ -1,9 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { createDmDonVi, getDmDonViPage, updateDmDonVi, deleteDmDonVi } from './redux';
+import { getDmLoaiDonViAll } from 'modules/mdDanhMuc/dmLoaiDonVi/redux';
 import Pagination from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
-import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox, FormImageBox} from 'view/component/AdminPage';
+import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox, FormImageBox } from 'view/component/AdminPage';
+import { Select } from 'view/component/Input';
 
 class EditModal extends AdminModal {
     state = { active: true };
@@ -15,29 +17,32 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        const { ma, ten, tenTiengAnh, tenVietTat, qdThanhLap, qdXoaTen, maPl, ghiChu, kichHoat, duongDan, image } = item ? item : { ma: null, ten: '', tenTiengAnh: '', tenVietTat: '', qdThanhLap: '', qdXoaTen: '', maPl: '', ghiChu: '', kichHoat: true, duongDan: '', image: null };
-        this.setState({ma, item});
+        const { ma, ten, tenTiengAnh, tenVietTat, qdThanhLap, qdXoaTen, maPl, ghiChu, kichHoat, duongDan, image, imageDisplay, imageDisplayTa } = item ? item : { ma: null, ten: '', tenTiengAnh: '', tenVietTat: '', qdThanhLap: '', qdXoaTen: '', maPl: '', ghiChu: '', kichHoat: true, duongDan: '', image: null, imageDisplay: null, imageDisplayTa: null };
+        this.setState({ ma, item });
         this.ma.value(ma);
         this.ten.value(ten);
+        this.loaiDonVi.setVal(maPl);
         this.tenTiengAnh.value(tenTiengAnh ? tenTiengAnh : '');
         this.tenVietTat.value(tenVietTat ? tenVietTat : '');
         this.qdThanhLap.value(qdThanhLap ? qdThanhLap : '');
         this.qdXoaTen.value(qdXoaTen ? qdXoaTen : '');
-        this.maPl.value(maPl ? maPl : '');
         this.ghiChu.value(ghiChu ? ghiChu : '');
         this.kichHoat.value(kichHoat);
         this.duongDan.value(duongDan ? duongDan : '');
         this.imageBox.setData('dmDonVi:' + (ma ? ma : 'new'), image ? image : '/img/avatar.png');
+        this.imageBox1.setData('dmDonViImage:' + (ma ? ma : 'new'), imageDisplay ? imageDisplay : '/img/avatar.png');
+        this.imageBox2.setData('dmDonViImageTA:' + (ma ? ma : 'new'), imageDisplayTa ? imageDisplayTa : '/img/avatar.png');
+
     }
 
     onSubmit = (e) => {
         const changes = {
-            ma: this.ma.value(), 
+            ma: this.ma.value(),
             ten: this.ten.value(),
             tenTiengAnh: this.tenTiengAnh.value(),
             qdThanhLap: this.qdThanhLap.value(),
             qdXoaTen: this.qdXoaTen.value(),
-            maPl: this.maPl.value(),
+            maPl: this.loaiDonVi.getVal(),
             ghiChu: this.ghiChu.value(),
             kichHoat: this.kichHoat.value() ? 1 : 0,
             duongDan: this.duongDan.value(),
@@ -62,35 +67,44 @@ class EditModal extends AdminModal {
         return this.renderModal({
             title: this.state.ma ? 'Cập nhật đơn vị' : 'Tạo mới đơn vị',
             body: <div className='row'>
-                <FormTextBox type='number' className='col-md-6' ref={e => this.ma = e} label='Mã đơn vị' 
+                <FormTextBox type='number' className='col-md-6' ref={e => this.ma = e} label='Mã đơn vị'
                     readOnly={this.state.ma ? true : readOnly} required />
-                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} 
+                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true}
                     readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
                     onChange={value => this.changeKichHoat(value ? 1 : 0)} />
-                <FormTextBox type='text' className='col-md-6' ref={e => this.ten = e} label='Tên đơn vị' 
+                <FormTextBox type='text' className='col-md-6' ref={e => this.ten = e} label='Tên đơn vị'
                     readOnly={readOnly} required />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.tenTiengAnh = e} label='Tên tiếng Anh' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.tenVietTat = e} label='Tên viết tắt' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.qdThanhLap = e} label='Quyết định thành lập' readOnly={readOnly} />
-                <FormTextBox type='text' className='col-md-6' ref={e => this.maPl = e} label='Mã PL' readOnly={readOnly} />
+                <div className='col-md-6'>
+                    <Select ref={e => this.loaiDonVi = e} data={this.props.loaiDonVi} label='Loại đơn vị' disabled={readOnly} />
+                </div>
                 <FormTextBox type='text' className='col-md-6' ref={e => this.qdXoaTen = e} label='Quyết định xóa tên' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-12' ref={e => this.duongDan = e} label='Đường dẫn' readOnly={readOnly} />
-                <FormImageBox className='col-12' ref={e => this.imageBox = e} 
-                    postUrl='/user/upload' uploadType='DmDonViImage' label = 'Hình ảnh'/>
+                <FormImageBox className='col-12' ref={e => this.imageBox = e}
+                    postUrl='/user/upload' uploadType='DmDonViImage' label='Logo' />
+                <FormImageBox className='col-md-6' ref={e => this.imageBox1 = e}
+                    postUrl='/user/upload' uploadType='DmDonViImageDisplay' label='Hiện thị trang chủ' />
+                <FormImageBox className='col-md-6' ref={e => this.imageBox2 = e}
+                    postUrl='/user/upload' uploadType='DmDonViImageDisplayTA' label='Hiện thị trang Tiếng Anh' />
                 <FormTextBox type='text' className='col-12' ref={e => this.ghiChu = e} label='Ghi chú' readOnly={readOnly} />
             </div>
         });
-    }    
+    }
 }
 
 class DmDonViPage extends AdminPage {
-    state = { searching: false };
+    state = { searching: false, loaiDonVi: [] };
 
     componentDidMount() {
         T.ready('/user/category', () => {
             T.onSearch = (searchText) => this.props.getDmDonViPage(undefined, undefined, searchText || '');
             T.showSearchBox();
             this.props.getDmDonViPage();
+            this.props.getDmLoaiDonViAll(data => {
+                this.setState({ loaiDonVi: data.map(item => ({ value: item.ma, text: item.ten })) });
+            });
         });
     }
 
@@ -151,10 +165,10 @@ class DmDonViPage extends AdminPage {
             ],
             content: <>
                 <div className='tile'>{table}</div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} 
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getDmDonViPage} />
-                <EditModal ref={e => this.modal = e} permission={permission} 
-                    create={this.props.createDmDonVi} update={this.props.updateDmDonVi} permissions={currentPermissions} />
+                {!!this.state.loaiDonVi.length && <EditModal ref={e => this.modal = e} permission={permission} loaiDonVi={this.state.loaiDonVi}
+                    create={this.props.createDmDonVi} update={this.props.updateDmDonVi} permissions={currentPermissions} />}
             </>,
             backRoute: '/user/category',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
@@ -164,5 +178,5 @@ class DmDonViPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, dmDonVi: state.dmDonVi });
-const mapActionsToProps = { getDmDonViPage, createDmDonVi, updateDmDonVi, deleteDmDonVi };
+const mapActionsToProps = { getDmDonViPage, createDmDonVi, updateDmDonVi, deleteDmDonVi, getDmLoaiDonViAll };
 export default connect(mapStateToProps, mapActionsToProps)(DmDonViPage);

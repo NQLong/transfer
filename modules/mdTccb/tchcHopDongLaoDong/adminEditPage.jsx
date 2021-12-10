@@ -10,7 +10,7 @@ import { getDmDonViAll, SelectAdapter_DmDonViFaculty } from 'modules/mdDanhMuc/d
 import { getDmNgachCdnnAll } from 'modules/mdDanhMuc/dmNgachCdnn/redux';
 import {
     getTchcHopDongLaoDongPage, getTchcHopDongLaoDongAll, updateTchcHopDongLaoDong,
-    deleteTchcHopDongLaoDong, createTchcHopDongLaoDong, getTchcHopDongLaoDongEdit, downloadWord
+    deleteTchcHopDongLaoDong, createTchcHopDongLaoDong, getTchcHopDongLaoDongEdit
 } from './redux';
 import TextInput, { DateInput, Select } from 'view/component/Input';
 import { QTForm } from 'view/component/Form';
@@ -255,12 +255,12 @@ class TchcHopDongLaoDongEditPage extends QTForm {
         }
     }
 
-    downloadWord = e => {
-        e.preventDefault();
-        this.props.downloadWord(this.urlMa, data => {
-            T.FileSaver(new Blob([new Uint8Array(data.data)]), this.urlMa + '_2c.docx');
-        });
-    }
+    // downloadWord = e => {
+    //     e.preventDefault();
+    //     this.props.downloadWord(this.urlMa, data => {
+    //         T.FileSaver(new Blob([new Uint8Array(data.data)]), this.urlMa + '_2c.docx');
+    //     });
+    // }
 
     render() {
         // const currentPermission = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [];
@@ -329,7 +329,7 @@ class TchcHopDongLaoDongEditPage extends QTForm {
                 <button type='button' title='Save' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.save}>
                     <i className='fa fa-lg fa-save' />
                 </button>
-                {this.urlMa ? <button type='button' title='Save and export LL2C Word' className='btn btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px', color: 'white', backgroundColor: 'rgb(76, 110, 245)' }} onClick={this.downloadWord}>
+                {this.urlMa ? <button type='button' title='Save and export LL2C Word' className='btn btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px', color: 'white', backgroundColor: 'rgb(76, 110, 245)' }}>
                     <i className='fa fa-lg fa-file-word-o' />
                 </button> : null}
             </main>
@@ -343,6 +343,6 @@ const mapActionsToProps = {
     createStaff, deleteStaff, updateStaff, getStaffAll,
     getTchcHopDongLaoDongPage, getTchcHopDongLaoDongAll, updateTchcHopDongLaoDong, getdmLoaiHopDongAll,
     deleteTchcHopDongLaoDong, createTchcHopDongLaoDong, getStaffEdit,
-    getDmDonViAll, getDmNgachCdnnAll, getTchcHopDongLaoDongEdit, downloadWord
+    getDmDonViAll, getDmNgachCdnnAll, getTchcHopDongLaoDongEdit
 };
 export default connect(mapStateToProps, mapActionsToProps)(TchcHopDongLaoDongEditPage);

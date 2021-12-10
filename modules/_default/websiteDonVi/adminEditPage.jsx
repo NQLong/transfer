@@ -23,11 +23,14 @@ class AdminEditPage extends React.Component {
                         $('#address').val(data.address);
                         $('#phoneNumber').val(data.phoneNumber);
 
-                        this.props.getDmDonVi(data.maDonVi, donVi => this.setState({
-                            shortname, donVi,
-                            kichHoat: data.kichHoat, id: donVi.ma,
-                            image: data.image ? data.image : '/img/hcmussh.png'
-                        }));
+                        this.props.getDmDonVi(data.maDonVi, donVi => {
+                            this.setState({
+                                shortname, donVi,
+                                kichHoat: data.kichHoat,
+                                id: donVi.ma,
+                                image: data.image ? data.image : '/img/hcmussh.png'
+                            });
+                        });
                     } else {
                         this.props.history.push('/user/website');
                     }
