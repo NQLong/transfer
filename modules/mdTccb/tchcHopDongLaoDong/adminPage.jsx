@@ -103,9 +103,10 @@ class TchcHopDongLaoDong extends AdminPage {
                 getDataSource: () => list, stickyHead: false,
                 renderHead: () => (
                     <tr>
-                        <th style={{ width: '50%', textAlign: 'center' }}>Số hợp đồng</th>
-                        <th style={{ width: '50%' }}>Tên người được thuê</th>
-                        <th style={{ width: 'auto' }}>Loại hợp đồng</th>
+                        <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Số hợp đồng</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tên cán bộ được thuê</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Diện hợp đồng</th>
                         <th style={{ width: 'auto', textAlign: 'center' }} >Ngày ký</th>
                         <th style={{ width: 'auto', textAlign: 'center' }} >Ngày kết thúc</th>
                         <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
@@ -114,6 +115,7 @@ class TchcHopDongLaoDong extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
+                        <TableCell type='text' style={{textAlign:'right'}} content={index + 1} />
                         <TableCell type='link' content={item.soHopDong} style={{ textAlign: 'center' }} url={`/user/tchc/hop-dong-lao-dong/${item.ma}`} />
                         <TableCell type='text' content={this.hiredStaff && this.hiredStaff[item.nguoiDuocThue] ? this.hiredStaff[item.nguoiDuocThue] : ''} style={{ whiteSpace: 'nowrap' }} />
                         <TableCell type='text' content={this.typeContract && this.typeContract[item.loaiHopDong2] ? this.typeContract[item.loaiHopDong2] : ''} style={{ whiteSpace: 'nowrap' }} />

@@ -5,7 +5,7 @@ import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormDatePic
 import Pagination from 'view/component/Pagination';
 import {
     getQtHopDongDvtlTnPage, getQtHopDongDvtlTnAll, updateQtHopDongDvtlTn,
-    deleteQtHopDongDvtlTn, createQtHopDongDvtlTn
+    deleteQtHopDongDvtlTn, createQtHopDongDvtlTn, hopDongDownloadWord
 } from './redux';
 import { getDmChucVuAll } from 'modules/mdDanhMuc/dmChucVu/redux';
 import { getDmDonViAll } from 'modules/mdDanhMuc/dmDonVi/redux';
@@ -94,7 +94,7 @@ class EditModal extends AdminModal {
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
-            title: this.state.shcc ? 'Cập nhật quá trình chức vụ' : 'Tạo mới quá trình chức vụ',
+            title: this.state.shcc ? 'Cập nhật quá trình hợp đồng' : 'Tạo mới quá trình hợp đồng',
             size: 'large',
             body: <div className='row'>
                 <FormSelect className='col-md-12' ref={e => this.shcc = e} label='Mã số cán bộ' data={this.staffTable} readOnly={readOnly} />
@@ -123,11 +123,17 @@ class QtHopDongDvtlTn extends AdminPage {
         this.modal.show();
     }
 
+    hopDongDownloadWord = item => {
+        hopDongDownloadWord(item.stt, data => {
+            T.FileSaver(new Blob([new Uint8Array(data.data)]), item.shcc + '_hopdong.docx');
+        });
+    }
+
     delete = (e, item) => {
-        T.confirm('Xóa chức vụ', 'Bạn có chắc bạn muốn xóa chức vụ này?', 'warning', true, isConfirm => {
+        T.confirm('Xóa hợp đồng', 'Bạn có chắc bạn muốn xóa hợp đồng này?', 'warning', true, isConfirm => {
             isConfirm && this.props.deleteQtHopDongDvtlTn(item.stt, error => {
-                if (error) T.notify(error.message ? error.message : 'Xoá chức vụ bị lỗi!', 'danger');
-                else T.alert('Xoá chức vụ thành công!', 'success', false, 800);
+                if (error) T.notify(error.message ? error.message : 'Xoá hợp đồng bị lỗi!', 'danger');
+                else T.alert('Xoá hợp đồng thành công!', 'success', false, 800);
             });
         });
         e.preventDefault();
@@ -222,6 +228,6 @@ class QtHopDongDvtlTn extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtHopDongDvtlTn: state.qtHopDongDvtlTn });
 const mapActionsToProps = {
     getQtHopDongDvtlTnAll, getQtHopDongDvtlTnPage, deleteQtHopDongDvtlTn, getDmDonViAll, createQtHopDongDvtlTn,
-    updateQtHopDongDvtlTn, getDmChucVuAll, getDmBoMonAll, getStaffAll,
+    updateQtHopDongDvtlTn, getDmChucVuAll, getDmBoMonAll, getStaffAll, hopDongDownloadWord
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtHopDongDvtlTn);

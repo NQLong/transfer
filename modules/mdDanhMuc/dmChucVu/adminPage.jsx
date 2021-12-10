@@ -3,22 +3,28 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { getDmChucVuPage, createDmChucVu, deleteDmChucVu, updateDmChucVu } from './redux';
 import Pagination from 'view/component/Pagination';
-import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
+import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox, FormSelect } from 'view/component/AdminPage';
 
 class EditModal extends AdminModal {
-    state = { active: true };
+    state = { active: true , listChucVu : [
+       {id : 1, text :  'Chức vụ chính quyền'},
+       {id : 2, text :  'Chức vụ Đảng'},
+       {id : 3, text :  'Chức vụ Công đoàn'},
+       {id : 4, text :  'Chức vụ Đoàn thanh niên'},
+    ]};
 
     componentDidMount() {
         $(document).ready(() => this.onShown(() => {
             !this.ma.value() ? this.ma.focus() : this.ten.focus();
-        }));
+        }));        
     }
 
     onShow = (item) => {
-        let { ma, ten, kichHoat, phuCap, ghiChu } = item ? item : { ma: '', ten: '', kichHoat: 1, phuCap: '', ghiChu: '' };
+        let { ma, ten, kichHoat, phuCap, ghiChu, loaiChucVu } = item ? item : { ma: '', ten: '', kichHoat: 1, phuCap: '', ghiChu: '', loaiChucVu: '' };
         this.setState({ ma, item });
         this.ma.value(ma);
         this.ten.value(ten);
+        this.loaiChucVu?.value(loaiChucVu);
         this.phuCap.value(phuCap ? phuCap.toFixed(2) : '');
         this.ghiChu.value(ghiChu ? ghiChu : '');
         this.kichHoat.value(kichHoat ? 1 : 0);
@@ -34,6 +40,7 @@ class EditModal extends AdminModal {
                 ten: this.ten.value(),
                 phuCap: this.phuCap.value(),
                 ghiChu: this.ghiChu.value(),
+                loaiChucVu: this.loaiChucVu.value(),
                 kichHoat: this.kichHoat.value() ? 1 : 0,
             };
         if (!this.state.ma && !this.ma.value()) {
@@ -55,6 +62,8 @@ class EditModal extends AdminModal {
                 <FormTextBox className='col-md-12' ref={e => this.ma = e} label='Mã' readOnly={this.state.ma ? true : readOnly} required />
                 <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên' readOnly={readOnly} required />
                 <FormTextBox type='number' className='col-md-12' ref={e => this.phuCap = e} label='Phụ cấp' readOnly={readOnly} step={0.01} />
+                <FormSelect className='col-md-12' ref={e => this.loaiChucVu = e} label='Loại chức vụ' minimumResultsForSearch={-1} 
+                readOnly={readOnly} data = {this.state.listChucVu} required />
                 <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} onChange={value => this.changeKichHoat(value ? 1 : 0)} />
                 <FormTextBox type='text' className='col-md-12' ref={e => this.ghiChu = e} label='Ghi chú' readOnly={readOnly} />
             </div>

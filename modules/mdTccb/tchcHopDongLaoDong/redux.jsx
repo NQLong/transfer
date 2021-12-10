@@ -156,17 +156,3 @@ export function updateTchcHopDongLaoDong(ma, changes, done) {
         }, () => T.notify('Cập nhật hợp đồng bị lỗi!', 'danger'));
     };
 }
-
-export function downloadWord(ma, done) {
-    return () => {
-        const url = `/user/tchc/hop-dong-lao-dong/${ma}/word`;
-        T.get(url, data => {
-            if (data.error) {
-                T.notify('Tải file word bị lỗi', 'danger');
-                console.error(`GET: ${url}.`, data.error);
-            } else if (done) {
-                done(data.data);
-            }
-        }, () => T.notify('Tải file word bị lỗi', 'danger'));
-    };
-}
