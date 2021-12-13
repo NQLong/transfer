@@ -130,5 +130,11 @@ module.exports = app => {
             const sql = 'SELECT COUNT(*) FROM QT_KHEN_THUONG_CA_NHAN' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.dbConnection.execute(sql, parameter, (error, result) => done(error, result));
         },
+
+        searchPage: (pagenumber, pagesize, searchterm, done) => {
+            app.dbConnection.execute('BEGIN :ret:=qt_khen_thuong_ca_nhan_search_page(:pagenumber, :pagesize, :searchterm, :totalitem, :pagetotal); END;',
+                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, pagenumber: { val: pagenumber, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, pagesize: { val: pagesize, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, searchterm, totalitem: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pagetotal: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
+        },
+
     };
 };
