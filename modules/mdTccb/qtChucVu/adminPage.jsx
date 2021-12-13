@@ -60,7 +60,7 @@ class EditModal extends AdminModal {
         let { stt, shcc, maChucVu, maDonVi, soQuyetDinh, ngayRaQuyetDinh, chucVuChinh, maBoMon } = item ? item : { stt: '',
             shcc: '', maChucVu: '', maDonVi: '', soQuyetDinh: '', ngayRaQuyetDinh: '', chucVuChinh: '', maBoMon: '',
         };
-        this.setState({ shcc, stt, item });
+        this.setState({ shcc, stt, item, chucVuChinh });
         this.shcc.value(shcc ? shcc : '');
         this.maChucVu.value(maChucVu ? maChucVu : '');
         this.maDonVi.value(maDonVi ? maDonVi : '');
@@ -73,6 +73,10 @@ class EditModal extends AdminModal {
     changeKichHoat = (value, target) => target.value(value ? 1 : 0) || target.value(value);
 
     checkChucVu = (changes) => {
+        if (changes.chucVuChinh == this.state.chucVuChinh) {
+            this.state.stt ? this.props.update(this.state.stt, changes, this.hide) : this.props.create(changes, this.hide);
+            return;
+        }
         T.confirm('Thông tin chức vụ chính', 'Đây sẽ là chức vụ chính của cán bộ', 'warning', true, isConfirm => {
             isConfirm && this.props.getQtChucVuAll(changes.shcc, data => {
                 if (data) {
@@ -103,11 +107,20 @@ class EditModal extends AdminModal {
             this.shcc.focus();
         } else {
             !changes.chucVuChinh ? (this.state.stt ? this.props.update(this.state.stt, changes, this.hide) : this.props.create(changes, this.hide)):
-            this.checkChucVuUpdate(changes, this.state, this.hide);
+            this.checkChucVu(changes);
         }
     }
 
+    checkChucVuSwitch = () => {
+        if (this.state.chucVuChinh) {
+            return true;
+        } 
+        return false;
+    }
+
     render = () => {
+        console.log(this.chucVuChinh);
+        console.log(this.checkChucVuSwitch());
         const readOnly = this.props.readOnly;
         return this.renderModal({
             title: this.state.shcc ? 'Cập nhật quá trình chức vụ' : 'Tạo mới quá trình chức vụ',
@@ -117,9 +130,10 @@ class EditModal extends AdminModal {
                 <FormSelect className='col-md-4' ref={e => this.maChucVu = e} label='Chức vụ' data={this.chucVuTable} readOnly={readOnly} /> 
                 <FormSelect className='col-md-4' ref={e => this.maDonVi = e} label='Đơn vị' data={this.donViTable} readOnly={readOnly} /> 
                 <FormSelect className='col-md-4' ref={e => this.maBoMon = e} label='Bộ môn' data={this.boMonTable} readOnly={readOnly} />
-                <FormCheckbox className='col-md-12' ref={e => this.chucVuChinh = e} label='Chức vụ chính' isSwitch={true} readOnly={readOnly} />
+                <FormCheckbox className='col-md-12' ref={e => this.chucVuChinh = e} label='Chức vụ chính' isSwitch={true} readOnly={this.checkChucVuSwitch()} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.soQuyetDinh = e} label='Số quyết định' readOnly={readOnly} />
                 <FormDatePicker className='col-md-6' ref={e => this.ngayRaQuyetDinh = e} label='Ngày ra quyết định' readOnly={readOnly} />
+                <FormCheckbox className='col-md-12' ref={e => this.thoiChucVu = e} label='Thôi giữ chức vụ' isSwitch={true} readOnly={readOnly} />
             </div>
         });
     }
