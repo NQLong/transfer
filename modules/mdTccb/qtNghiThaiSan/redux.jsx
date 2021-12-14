@@ -1,20 +1,20 @@
 import T from 'view/js/common';
 
 // Reducer ------------------------------------------------------------------------------------------------------------
-const TchcNghiThaiSanGetAll = 'TchcNghiThaiSan:GetAll';
-const TchcNghiThaiSanGetPage = 'TchcNghiThaiSan:GetPage';
-const TchcNghiThaiSanUpdate = 'TchcNghiThaiSan:Update';
-const TchcNghiThaiSanGet = 'TchcNghiThaiSan:Get';
+const QtNghiThaiSanGetAll = 'QtNghiThaiSan:GetAll';
+const QtNghiThaiSanGetPage = 'QtNghiThaiSan:GetPage';
+const QtNghiThaiSanUpdate = 'QtNghiThaiSan:Update';
+const QtNghiThaiSanGet = 'QtNghiThaiSan:Get';
 
-export default function TchcNghiThaiSanReducer(state = null, data) {
+export default function QtNghiThaiSanReducer(state = null, data) {
     switch (data.type) {
-        case TchcNghiThaiSanGetAll:
+        case QtNghiThaiSanGetAll:
             return Object.assign({}, state, { items: data.items });
-        case TchcNghiThaiSanGetPage:
+        case QtNghiThaiSanGetPage:
             return Object.assign({}, state, { page: data.page });
-        case TchcNghiThaiSanGet:
+        case QtNghiThaiSanGet:
             return Object.assign({}, state, { selectedItem: data.item });
-        case TchcNghiThaiSanUpdate:
+        case QtNghiThaiSanUpdate:
             if (state) {
                 let updatedItems = Object.assign({}, state.items),
                     updatedPage = Object.assign({}, state.page),
@@ -45,9 +45,9 @@ export default function TchcNghiThaiSanReducer(state = null, data) {
 }
 
 // Actions ------------------------------------------------------------------------------------------------------------
-T.initPage('pageTchcNghiThaiSan');
-export function getTchcNghiThaiSanPage(pageNumber, pageSize, pageCondition, done) {
-    const page = T.updatePage('pageTchcNghiThaiSan', pageNumber, pageSize, pageCondition);
+T.initPage('pageQtNghiThaiSan');
+export function getQtNghiThaiSanPage(pageNumber, pageSize, pageCondition, done) {
+    const page = T.updatePage('pageQtNghiThaiSan', pageNumber, pageSize, pageCondition);
     return dispatch => {
         const url = `/api/qua-trinh/nghi-thai-san/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition }, data => {
@@ -57,13 +57,13 @@ export function getTchcNghiThaiSanPage(pageNumber, pageSize, pageCondition, done
             } else {
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 if (done) done(data.page);
-                dispatch({ type: TchcNghiThaiSanGetPage, page: data.page });
+                dispatch({ type: QtNghiThaiSanGetPage, page: data.page });
             }
         }, () => T.notify('Lấy danh sách hợp đồng bị lỗi!', 'danger'));
     };
 }
 
-export function getTchcNghiThaiSanAll(done) {
+export function getQtNghiThaiSanAll(done) {
     // let newData = {}, tmpData = [];
     // let getMergedObjs = (...objs) => {
     //     Object.fromEntries(
@@ -87,13 +87,13 @@ export function getTchcNghiThaiSanAll(done) {
                 // });
 
                 if (done) done(data.items);
-                dispatch({ type: TchcNghiThaiSanGetAll, items: data.items ? data.items : {} });
+                dispatch({ type: QtNghiThaiSanGetAll, items: data.items ? data.items : {} });
             }
         }, () => T.notify('Lấy danh sách hợp đồng bị lỗi!', 'danger'));
     };
 }
 
-export function getTchcNghiThaiSan(ma, done) {
+export function getQtNghiThaiSan(ma, done) {
     return () => {
         const url = `/api/qua-trinh/nghi-thai-san/item/${ma}`;
         T.get(url, data => {
@@ -107,7 +107,7 @@ export function getTchcNghiThaiSan(ma, done) {
     };
 }
 
-export function getTchcNghiThaiSanEdit(ma, done) {
+export function getQtNghiThaiSanEdit(ma, done) {
     return dispatch => {
         const url = `/api/qua-trinh/nghi-thai-san/edit/item/${ma}`;
         T.get(url, data => {
@@ -116,13 +116,13 @@ export function getTchcNghiThaiSanEdit(ma, done) {
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (done) done(data);
-                dispatch({ type: TchcNghiThaiSanGet, item: data.item });
+                dispatch({ type: QtNghiThaiSanGet, item: data.item });
             }
         }, () => T.notify('Lấy thông tin hợp đồng bị lỗi', 'danger'));
     };
 }
 
-export function createTchcNghiThaiSan(item, done) {
+export function createQtNghiThaiSan(item, done) {
     return dispatch => {
         const url = '/api/qua-trinh/nghi-thai-san';
         T.post(url, { item }, data => {
@@ -131,14 +131,14 @@ export function createTchcNghiThaiSan(item, done) {
                 console.error(`POST: ${url}.`, data.error);
             } else {
                 T.notify('Tạo hợp đồng thành công!', 'success');
-                dispatch(getTchcNghiThaiSanPage());
+                dispatch(getQtNghiThaiSanPage());
                 if (done) done(data);
             }
         }, () => T.notify('Tạo hợp đồng bị lỗi!', 'danger'));
     };
 }
 
-export function deleteTchcNghiThaiSan(ma, done) {
+export function deleteQtNghiThaiSan(ma, done) {
     return dispatch => {
         const url = '/api/qua-trinh/nghi-thai-san';
         T.delete(url, { ma }, data => {
@@ -147,14 +147,14 @@ export function deleteTchcNghiThaiSan(ma, done) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('Hợp đồng đã xóa thành công!', 'success', false, 800);
-                dispatch(getTchcNghiThaiSanPage());
+                dispatch(getQtNghiThaiSanPage());
             }
             done && done();
         }, () => T.notify('Xóa hợp đồng bị lỗi!', 'danger'));
     };
 }
 
-export function updateTchcNghiThaiSan(ma, changes, done) {
+export function updateQtNghiThaiSan(ma, changes, done) {
     return dispatch => {
         const url = '/api/qua-trinh/nghi-thai-san';
         T.put(url, { ma, changes }, data => {
@@ -165,7 +165,7 @@ export function updateTchcNghiThaiSan(ma, changes, done) {
             } else {
                 T.notify('Cập nhật hợp đồng thành công!', 'success');
                 done && done(data.item);
-                dispatch(getTchcNghiThaiSan(ma));
+                dispatch(getQtNghiThaiSan(ma));
             }
         }, () => T.notify('Cập nhật hợp đồng bị lỗi!', 'danger'));
     };

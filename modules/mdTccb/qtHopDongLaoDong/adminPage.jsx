@@ -15,7 +15,7 @@ class QtHopDongLaoDongPage extends AdminPage {
     componentDidMount() {
         T.ready('/user/tccb', () => {
             T.onSearch = (searchText) => {
-                if(this.checked) this.props.getQtHopDongLaoDongGroupPage(undefined, undefined, searchText || '');
+                if (this.checked) this.props.getQtHopDongLaoDongGroupPage(undefined, undefined, searchText || '');
                 else this.props.getQtHopDongLaoDongPage(undefined, undefined, searchText || '');
             };
             T.showSearchBox();
@@ -32,6 +32,11 @@ class QtHopDongLaoDongPage extends AdminPage {
         downloadWord(parseInt(item.ma), data => {
             T.FileSaver(new Blob([new Uint8Array(data.data)]), item.shcc + '_hopdong.docx');
         });
+    }
+
+    download = (e) => {
+        e.preventDefault();
+        T.download(T.url('/api/tccb/qua-trinh/hop-dong-lao-dong/download-excel'), 'HDLD.xlsx');
     }
 
     delete = (e, item) => {
@@ -116,7 +121,7 @@ class QtHopDongLaoDongPage extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-list-alt',
+            icon: 'fa fa-file-text-o',
             title: 'Hợp đồng Lao động',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
@@ -129,6 +134,11 @@ class QtHopDongLaoDongPage extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.checked ? this.props.getQtHopDongLaoDongGroupPage : this.props.getQtHopDongLaoDongPage} />
+                {permission.read &&
+                        <button className='btn btn-success btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px' }} onClick={this.download} >
+                            <i className='fa fa-lg fa-print' />
+                        </button>
+                }
             </>,
             backRoute: '/user/tccb',
             onCreate: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/tccb/qua-trinh/hop-dong-lao-dong/new') : null

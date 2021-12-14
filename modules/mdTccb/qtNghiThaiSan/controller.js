@@ -7,12 +7,12 @@ module.exports = app => {
     };
     app.permission.add(
         { name: 'staff:login', menu: { parentMenu: { index: 1000, title: 'Thông tin cá nhân', icon: 'fa-user', link: '/user' } }, },
-        { name: 'tchcNghiThaiSan:read', menu },
-        { name: 'tchcNghiThaiSan:write' },
-        { name: 'tchcNghiThaiSan:delete' },
+        { name: 'qtNghiThaiSan:read', menu },
+        { name: 'qtNghiThaiSan:write' },
+        { name: 'qtNghiThaiSan:delete' },
     );
-    app.get('/user/qua-trinh/nghi-thai-san/:ma', app.permission.check('tchcNghiThaiSan:read'), app.templates.admin);
-    app.get('/user/qua-trinh/nghi-thai-san', app.permission.check('tchcNghiThaiSan:read'), app.templates.admin);
+    app.get('/user/qua-trinh/nghi-thai-san/:ma', app.permission.check('qtNghiThaiSan:read'), app.templates.admin);
+    app.get('/user/qua-trinh/nghi-thai-san', app.permission.check('qtNghiThaiSan:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
@@ -27,30 +27,30 @@ module.exports = app => {
                 parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
             };
         }
-        app.model.tchcNghiThaiSan.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
+        app.model.qtNghiThaiSan.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
     });
 
     app.get('/api/qua-trinh/nghi-thai-san/all', checkGetStaffPermission, (req, res) => {
-        app.model.tchcNghiThaiSan.getAll((error, items) => res.send({ error, items }));
+        app.model.qtNghiThaiSan.getAll((error, items) => res.send({ error, items }));
     });
 
     app.get('/api/qua-trinh/nghi-thai-san/item/:ma', checkGetStaffPermission, (req, res) => {
-        app.model.tchcNghiThaiSan.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
+        app.model.qtNghiThaiSan.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
     });
 
     app.get('/api/qua-trinh/nghi-thai-san/edit/item/:ma', checkGetStaffPermission, (req, res) => {
-        app.model.tchcNghiThaiSan.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
+        app.model.qtNghiThaiSan.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
     });
 
-    app.post('/api/qua-trinh/nghi-thai-san', app.permission.check('tchcNghiThaiSan:write'), (req, res) => {
-        app.model.tchcNghiThaiSan.create(req.body.item, (error, item) => res.send({ error, item }));
+    app.post('/api/qua-trinh/nghi-thai-san', app.permission.check('qtNghiThaiSan:write'), (req, res) => {
+        app.model.qtNghiThaiSan.create(req.body.item, (error, item) => res.send({ error, item }));
     });
 
-    app.put('/api/qua-trinh/nghi-thai-san', app.permission.check('tchcNghiThaiSan:write'), (req, res) => {
-        app.model.tchcNghiThaiSan.update({ ma: req.body.ma }, req.body.changes, (error, items) => res.send({ error, items }));
+    app.put('/api/qua-trinh/nghi-thai-san', app.permission.check('qtNghiThaiSan:write'), (req, res) => {
+        app.model.qtNghiThaiSan.update({ ma: req.body.ma }, req.body.changes, (error, items) => res.send({ error, items }));
     });
 
-    app.delete('/api/qua-trinh/nghi-thai-san', app.permission.check('tchcNghiThaiSan:delete'), (req, res) => {
-        app.model.tchcNghiThaiSan.delete({ ma: req.body.ma }, errors => res.send({ errors }));
+    app.delete('/api/qua-trinh/nghi-thai-san', app.permission.check('qtNghiThaiSan:delete'), (req, res) => {
+        app.model.qtNghiThaiSan.delete({ ma: req.body.ma }, errors => res.send({ errors }));
     });
 };

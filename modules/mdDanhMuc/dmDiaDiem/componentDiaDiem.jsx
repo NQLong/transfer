@@ -39,24 +39,26 @@ export class ComponentDiaDiem extends React.Component {
                 }
                 maTinhThanhPho = maQuanHuyen = maPhuongXa = '';
             }
-            if (this.props.onlyTinhThanh == false) this.soNhaDuong.value(soNhaDuong || '');
+            if (this.props.requiredSoNhaDuong) this.soNhaDuong.value(soNhaDuong || '');
             this.setState({ maTinhThanhPho, maQuanHuyen, maPhuongXa });
         } else { // get value
             return ({
                 maTinhThanhPho: this.dmTinhThanhPho.value(),
                 maQuanHuyen: !this.props.onlyTinhThanh ? this.dmQuanHuyen.value() : null,
                 maPhuongXa: !this.props.onlyTinhThanh ? this.dmPhuongXa.value() : null,
-                soNhaDuong: !this.props.onlyTinhThanh ? this.soNhaDuong.value() : null,
+                soNhaDuong: !this.props.onlyTinhThanh && this.props.requiredSoNhaDuong ? this.soNhaDuong.value() : null,
             });
         }
     }
 
     changeTinhThanhPho = (value) => {
-        if (this.state.maTinhThanhPho != value) {
-            this.setState({ maTinhThanhPho: value }, () => {
-                this.dmQuanHuyen.value(null); this.dmPhuongXa.value(null);
-                this.dmQuanHuyen.focus();
-            });
+        if (!this.props.onlyTinhThanh) {
+            if (this.state.maTinhThanhPho != value) {
+                this.setState({ maTinhThanhPho: value }, () => {
+                    this.dmQuanHuyen.value(null); this.dmPhuongXa.value(null);
+                    this.dmQuanHuyen.focus();
+                });
+            }
         }
     }
 

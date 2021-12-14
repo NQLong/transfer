@@ -21,7 +21,7 @@ require('../../config/database')(app, package.db);
 app.loadModules(false);
 
 const run = () => {
-    // app.model.tchcHopDongVienChuc.getAll({}, (error, result) => {
+    // app.model.qtHopDongVienChuc.getAll({}, (error, result) => {
     //     if (result) {
     //         result.forEach(item => {
     //             app.model.canBo.get({shcc: item.nguoiDuocThue}, (er, canBo) => {
@@ -39,7 +39,7 @@ const run = () => {
         if (result) {
             result.forEach(item => {
                 if (item.hopDongCanBo != 'LĐ') {
-                    app.model.tchcHopDongVienChuc.getAll({ nguoiDuocThue: item.shcc }, (error, output) => {
+                    app.model.qtHopDongVienChuc.getAll({ nguoiDuocThue: item.shcc }, (error, output) => {
                         if (output.length > 0) {
                             let max = 0;
                             let i = 0;
@@ -61,6 +61,6 @@ const run = () => {
 }
 
 app.readyHooks.add('Run tool.hopDong.js', {
-    ready: () => app.dbConnection && app.model && app.model.canBo && app.model.dmDienHopDong && app.model.tchcHopDongVienChuc,
+    ready: () => app.dbConnection && app.model && app.model.canBo && app.model.dmDienHopDong && app.model.qtHopDongVienChuc,
     run,
 });

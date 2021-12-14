@@ -7252,10 +7252,10 @@
         "foreignKeys": [],
         "type": "table"
     },
-    "TCHC_HOP_DONG_VIEN_CHUC": {
+    "QT_HOP_DONG_VIEN_CHUC": {
         "active": true,
-        "moduleName": "tchcHopDongVienChuc",
-        "modelName": "tchcHopDongVienChuc",
+        "moduleName": "qtHopDongVienChuc",
+        "modelName": "qtHopDongVienChuc",
         "columns": {
             "MA": {
                 "value": "ma",

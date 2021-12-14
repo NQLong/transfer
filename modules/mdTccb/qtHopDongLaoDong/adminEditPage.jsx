@@ -36,8 +36,10 @@ const EnumLoaiCanBo = Object.freeze({
 class QtHopDongLaoDongEditPage extends QTForm {
     constructor(props) {
         super(props);
-        this.state = { item: null, ma: null, canBoCu: false, ho: null, ten: null, ngaySinh: null, isLoad: true, isKetThucHd: false , 
-            hdkxdtg: false, thoiGianHd: ''};
+        this.state = {
+            item: null, ma: null, canBoCu: false, ho: null, ten: null, ngaySinh: null, isLoad: true, isKetThucHd: false,
+            hdkxdtg: false, thoiGianHd: '', shcc: ''
+        };
         this.ho = React.createRef();
         this.ten = React.createRef();
         this.selectedShcc = React.createRef();
@@ -127,6 +129,7 @@ class QtHopDongLaoDongEditPage extends QTForm {
                         {
                             item: data.item,
                             isLoad: false,
+                            isKetThucHd: data && data.item && data.item.loaiHopDong != '07' ? true : false,
                         }, () => {
                             this.setVal(data.item);
                         });
@@ -150,6 +153,7 @@ class QtHopDongLaoDongEditPage extends QTForm {
             email = '',
             phai = '',
             maTinhNoiSinh = '',
+            maTinhNguyenQuan = '',
             hienTaiMaTinh = '',
             hienTaiMaHuyen = '',
             hienTaiMaXa = '',
@@ -188,6 +192,7 @@ class QtHopDongLaoDongEditPage extends QTForm {
         this.tonGiao.current.setVal(tonGiao ? tonGiao : '');
         this.ngaySinh.current.setVal(ngaySinh ? ngaySinh : '');
         this.noiSinh.value(maTinhNoiSinh);
+        this.nguyenQuan.value(maTinhNguyenQuan);
         this.email.current.setVal(email ? email : '');
         this.cuTru.value(hienTaiMaTinh, hienTaiMaHuyen, hienTaiMaXa, hienTaiSoNha);
         this.thuongTru.value(thuongTruMaTinh, thuongTruMaHuyen, thuongTruMaXa, thuongTruSoNha);
@@ -259,6 +264,7 @@ class QtHopDongLaoDongEditPage extends QTForm {
         if (value) {
             this.props.getStaffEdit(value, data => {
                 let {
+                    shcc = '',
                     quocGia = '',
                     danToc = '',
                     tonGiao = '',
@@ -266,6 +272,7 @@ class QtHopDongLaoDongEditPage extends QTForm {
                     email = '',
                     phai = '',
                     maTinhNoiSinh = '',
+                    maTinhNguyenQuan = '',
                     hienTaiMaTinh = '',
                     hienTaiMaHuyen = '',
                     hienTaiMaXa = '',
@@ -289,6 +296,7 @@ class QtHopDongLaoDongEditPage extends QTForm {
                 this.ngaySinh.current.setVal(ngaySinh ? ngaySinh : '');
                 this.dienThoaiCaNhan.current.setVal(dienThoaiCaNhan ? dienThoaiCaNhan : '');
                 this.noiSinh.value(maTinhNoiSinh);
+                this.nguyenQuan.value(maTinhNguyenQuan);
                 this.cuTru.value(hienTaiMaTinh, hienTaiMaHuyen, hienTaiMaXa, hienTaiSoNha);
                 this.thuongTru.value(thuongTruMaTinh, thuongTruMaHuyen, thuongTruMaXa, thuongTruSoNha);
 
@@ -297,6 +305,7 @@ class QtHopDongLaoDongEditPage extends QTForm {
                 this.cmnd.current.setVal(cmnd ? cmnd : '');
                 this.cmndNgayCap.current.setVal(cmndNgayCap ? cmndNgayCap : '');
                 this.cmndNoiCap.current.setVal(cmndNoiCap ? cmndNoiCap : '');
+                this.setState({ shcc: shcc });
             });
         }
     }
@@ -304,6 +313,12 @@ class QtHopDongLaoDongEditPage extends QTForm {
         this.setState({ ten: value.trim().toUpperCase() });
     }
 
+    copyAddress = e => {
+        e.preventDefault();
+        const dataThuongTru = this.thuongTru.value();
+        console.log(dataThuongTru);
+        this.cuTru.value(dataThuongTru.maTinhThanhPho, dataThuongTru.maQuanHuyen, dataThuongTru.maPhuongXa, dataThuongTru.soNhaDuong);
+    }
     autoChucVu = (value) => {
         if (value) {
             this.props.getStaffEdit(value, data => {
@@ -326,7 +341,7 @@ class QtHopDongLaoDongEditPage extends QTForm {
                 $('#kyTiepTheo').hide();
 
             } else {
-                data && data.thoiGianHd && this.setState({ thoiGianHd: data.thoiGianHd});
+                data && data.thoiGianHd && this.setState({ thoiGianHd: data.thoiGianHd });
                 this.setState({ isKetThucHd: false, hdkxdtg: false });
                 $('#kyTiepTheo').show();
                 $('#ketThucHd').show();
@@ -334,12 +349,16 @@ class QtHopDongLaoDongEditPage extends QTForm {
         });
     }
 
+
+    newShcc = (value) => {
+        this.setState({ shcc: moment(value) });
+    }
     handleTuNgay = (value) => {
         if (value && !this.state.hdkxdtg && this.state.thoiGianHd) {
             const new_date = moment(value).add(parseInt(this.state.thoiGianHd), 'M');
             this.ketThucHopDong.current.setVal(new_date.valueOf() - 24 * 3600000);
         }
-    } 
+    }
 
     changeNgach = (value) => {
         this.setState({ idNgach: Number(value) });
@@ -353,25 +372,30 @@ class QtHopDongLaoDongEditPage extends QTForm {
     save = () => {
         const data = this.getFormVal();
         const dcThuongTru = {
-            thuongTruSoNha: this.thuongTru.value().soNhaDuong,
             thuongTruMaTinh: this.thuongTru.value().maTinhThanhPho,
             thuongTruMaHuyen: this.thuongTru.value().maQuanHuyen,
-            thuongTruMaXa: this.thuongTru.value().maPhuongXa
+            thuongTruMaXa: this.thuongTru.value().maPhuongXa,
+            thuongTruSoNha: this.thuongTru.value().soNhaDuong
         };
         const dcCuTru = {
-            hienTaiMaTinh: this.cuTru.value().soNhaDuong,
-            hienTaiSoNha: this.cuTru.value().maTinhThanhPho,
+            hienTaiMaTinh: this.cuTru.value().maTinhThanhPho,
             hienTaiMaHuyen: this.cuTru.value().maQuanHuyen,
-            hienTaiMaXa: this.cuTru.value().maPhuongXa
+            hienTaiMaXa: this.cuTru.value().maPhuongXa,
+            hienTaiSoNha: this.cuTru.value().soNhaDuong
         };
         const dcNoiSinh = {
             maTinhNoiSinh: this.noiSinh.value().maTinhThanhPho
         };
+        const dcNguyenQuan = {
+            maTinhNguyenQuan: this.nguyenQuan.value().maTinhThanhPho
+        };
         this.main.current.classList.add('validated');
         if (data.data) {
+            console.log(this.state.shcc);
             if (this.urlMa) {
-                this.props.updateQtHopDongLaoDong(this.urlMa, Object.assign(data.data, dcThuongTru, dcCuTru, dcNoiSinh), () => {
-                    this.props.updateStaff(data.data.nguoiDuocThue, Object.assign(data.data, dcThuongTru, dcCuTru, dcNoiSinh), () => {
+                this.props.updateQtHopDongLaoDong(this.urlMa, Object.assign(data.data, dcThuongTru, dcCuTru, dcNguyenQuan, dcNoiSinh), () => {
+                    console.log(data.data);
+                    this.props.updateStaff(this.state.shcc, Object.assign(data.data, dcThuongTru, dcCuTru, dcNguyenQuan, dcNoiSinh), () => {
                         this.main.current.classList.remove('validated');
                         this.props.history.push(`/user/tccb/qua-trinh/hop-dong-lao-dong/${this.urlMa}`);
                     });
@@ -380,7 +404,7 @@ class QtHopDongLaoDongEditPage extends QTForm {
                 this.props.createQtHopDongLaoDong(data.data, hopDong => {
                     if (this.hiredStaff[hopDong.item.nguoiDuocThue] != null) {
                         if (this.checkSignedDate(hopDong.item.nguoiDuocThue, hopDong.item.batDauLamViec)) {
-                            this.props.updateStaff(hopDong.item.nguoiDuocThue, Object.assign(data.data, dcThuongTru, dcCuTru, dcNoiSinh));
+                            this.props.updateStaff(hopDong.item.nguoiDuocThue, Object.assign(data.data, dcThuongTru, dcCuTru, dcNguyenQuan, dcNoiSinh));
                         }
                     }
                     else this.props.createStaff(data.data);
@@ -407,14 +431,14 @@ class QtHopDongLaoDongEditPage extends QTForm {
                 {this.state.isLoad && <Loading />}
                 <div className='app-title'>
                     {this.state.item && this.state.item.canBoDuocThue ? (<>
-                        <h1><i className='fa fa-list' />Hợp đồng lao động cán bộ {`: ${this.state.item.canBoDuocThue.ho}  ${this.state.item.canBoDuocThue.ten}`}</h1>
+                        <h1><i className='fa fa-file-text-o' /> Hợp đồng lao động {`: ${this.state.item.canBoDuocThue.ho}  ${this.state.item.canBoDuocThue.ten}`}</h1>
                         <p>Số hợp đồng: {this.state.item.qtHopDongLaoDong.soHopDong}</p>
                     </>) : <>
-                        <h1><i className='fa fa-list' />Tạo mới hợp đồng</h1>
+                        <h1><i className='fa fa-file-text-o' /> Tạo mới hợp đồng lao động</h1>
                     </>}
                 </div>
                 <div className='tile'>
-                    <h3 className='tile-title'>Thông tin bên trường</h3>
+                    <h3 className='tile-title'>Thông tin phía trường</h3>
                     <div className='tile-body row'>
                         <div className='form-group col-xl-4 col-md-6'><TextInput ref={this.soHopDong} label='Số hợp đồng' disabled={readOnly} required /> </div>
                         <div className='form-group col-xl-4 col-md-6'><Select adapter={SelectAdapter_FwCanBo} ref={this.nguoiKy} onChange={this.autoChucVu} label='Người đại diện ký' disabled={readOnly} required /></div>
@@ -436,51 +460,52 @@ class QtHopDongLaoDongEditPage extends QTForm {
                                 </div>
                                 <div className='form-group col-xl-4 col-md-6'><DateInput ref={this.ngaySinh} label='Ngày sinh' disabled={readOnly} min={new Date(1900, 1, 1).getTime()} max={Date.nextYear(-10).roundDate().getTime()} required /></div>
                             </> : <>
-                                <div className='form-group col-xl-3 col-md-4'><TextInput disabled={readOnly} ref={this.shcc} label='Mã số cán bộ' required /> </div>
+                                <div className='form-group col-xl-3 col-md-4'><TextInput disabled={readOnly} ref={this.shcc} onChange={this.newShcc} label='Mã số cán bộ' required /> </div>
                                 <div className='form-group col-xl-3 col-md-4'><TextInput disabled={readOnly} ref={this.ho} label='Họ' /> </div>
                                 <div className='form-group col-xl-3 col-md-4'><TextInput disabled={readOnly} ref={this.ten} label='Tên' /> </div>
-                                <div className='form-group col-xl-3 col-md-6'><DateInput  disabled={readOnly} ref={this.ngaySinh} label='Ngày sinh' /> </div>
+                                <div className='form-group col-xl-3 col-md-6'><DateInput disabled={readOnly} ref={this.ngaySinh} label='Ngày sinh' /> </div>
 
                             </>
                         }
-                        <div className='form-group col-xl-4 col-md-4'><TextInput ref={this.cmnd} label='CMND/CCCD' disabled={readOnly}/> </div>
-                        <div className='form-group col-xl-4 col-md-4'><DateInput ref={this.cmndNgayCap} label='Ngày cấp' disabled={readOnly}/> </div>
-                        <div className='form-group col-xl-4 col-md-4'><TextInput ref={this.cmndNoiCap} label='Nơi cấp' disabled={readOnly}/> </div>
-                        <div className='form-group col-xl-2 col-md-4'><Select adapter={SelectAdapter_DmGioiTinh} ref={this.phai} label='Giới tính' disabled={readOnly}/> </div>
-                        <div className='form-group col-xl-5 col-md-4'><TextInput ref={this.email} label='Email cá nhân' disabled={readOnly}/> </div>
+                        <div className='form-group col-xl-4 col-md-4'><TextInput ref={this.cmnd} label='CMND/CCCD' placeholder='Nhập số CMND/CCCD' disabled={readOnly} /> </div>
+                        <div className='form-group col-xl-4 col-md-4'><DateInput ref={this.cmndNgayCap} label='Ngày cấp' disabled={readOnly} /> </div>
+                        <div className='form-group col-xl-4 col-md-4'><TextInput ref={this.cmndNoiCap} label='Nơi cấp' disabled={readOnly} /> </div>
+                        <div className='form-group col-xl-2 col-md-4'><Select adapter={SelectAdapter_DmGioiTinh} ref={this.phai} label='Giới tính' disabled={readOnly} /> </div>
+                        <div className='form-group col-xl-5 col-md-4'><TextInput ref={this.email} label='Email cá nhân' disabled={readOnly} /> </div>
                         <div className='form-group col-xl-5 col-md-4'><TextInput ref={this.dienThoaiCaNhan} label='Điện thoại' disabled={readOnly} /> </div>
                         <div className='form-group col-xl-4 col-md-4'><Select adapter={SelectAdapter_DmQuocGia} ref={this.quocGia} label='Quốc tịch' disabled={readOnly} /> </div>
-                        <div className='form-group col-xl-4 col-md-4'><Select adapter={SelectAdapter_DmDanToc} ref={this.danToc} label='Dân tộc' disabled={readOnly}/> </div>
-                        <div className='form-group col-xl-4 col-md-4'><Select adapter={SelectAdapter_DmTonGiao} ref={this.tonGiao} label='Tôn giáo' disabled={readOnly}/> </div>
+                        <div className='form-group col-xl-4 col-md-4'><Select adapter={SelectAdapter_DmDanToc} ref={this.danToc} label='Dân tộc' disabled={readOnly} /> </div>
+                        <div className='form-group col-xl-4 col-md-4'><Select adapter={SelectAdapter_DmTonGiao} ref={this.tonGiao} label='Tôn giáo' disabled={readOnly} /> </div>
 
                         <ComponentDiaDiem ref={e => this.noiSinh = e} label='Nơi sinh' className='col-xl-6 col-md-6' onlyTinhThanh={true} />
+                        <ComponentDiaDiem ref={e => this.nguyenQuan = e} label='Nguyên quán' className='col-xl-6 col-md-6' onlyTinhThanh={true} />
                         <ComponentDiaDiem ref={e => this.thuongTru = e} label='Địa chỉ thường trú' className='col-md-12' requiredSoNhaDuong={true} />
                         <p className='col-md-12'>
                             Nếu <b>Địa chỉ thường trú</b> là <b>Địa chỉ hiện tại</b> thì&nbsp;<a href='#' onClick={this.copyAddress}>nhấp vào đây</a>.
                         </p>
                         <ComponentDiaDiem ref={e => this.cuTru = e} label='Địa chỉ hiện tại' className='col-md-12' requiredSoNhaDuong={true} />
                         <div className='form-group col-xl-6 col-md-4'><Select adapter={SelectAdapter_DmTrinhDo} disabled={readOnly} ref={this.hocVanTrinhDo} label='Trình độ học vấn' /> </div>
-                        <div className='form-group col-xl-6 col-md-4'><TextInput ref={this.hocVanChuyenNganh} label='Ngành' disabled={readOnly}/> </div>
+                        <div className='form-group col-xl-6 col-md-4'><TextInput ref={this.hocVanChuyenNganh} label='Ngành' disabled={readOnly} /> </div>
                     </div>
                 </div>
                 <div className='tile'>
                     <h3 className='tile-title'>Điều khoản hợp đồng</h3>
                     <div className='tile-body row'>
-                        <div className='form-group col-xl-6 col-md-6'><Select adapter={SelectAdapter_DmLoaiHopDong} ref={this.loaiHopDong} onChange={this.handleLoaiHd} label='Loại hợp đồng lao động' required disabled={readOnly}/></div>
+                        <div className='form-group col-xl-6 col-md-6'><Select adapter={SelectAdapter_DmLoaiHopDong} ref={this.loaiHopDong} onChange={this.handleLoaiHd} label='Loại hợp đồng lao động' required disabled={readOnly} /></div>
                         <div className='form-group col-xl-6 col-md-6'></div>
-                        <div className='form-group col-xl-3 col-md-6'><DateInput ref={this.ngayKyHopDong} label='Ngày ký hợp đồng' min={new Date(1900, 1, 1).getTime()} max={new Date(new Date().getFullYear() + 1, 1, 1).getTime()} required disabled={readOnly}/></div>
-                        <div className='form-group col-xl-3 col-md-6'><DateInput ref={this.batDauLamViec} label='Ngày bắt đầu làm việc' min={new Date(1900, 1, 1).getTime()} max={new Date(new Date().getFullYear() + 1, 1, 1).getTime()} disabled={readOnly} onChange={this.handleTuNgay}  required /></div>
+                        <div className='form-group col-xl-3 col-md-6'><DateInput ref={this.ngayKyHopDong} label='Ngày ký hợp đồng' min={new Date(1900, 1, 1).getTime()} max={new Date(new Date().getFullYear() + 1, 1, 1).getTime()} required disabled={readOnly} /></div>
+                        <div className='form-group col-xl-3 col-md-6'><DateInput ref={this.batDauLamViec} label='Ngày bắt đầu làm việc' min={new Date(1900, 1, 1).getTime()} max={new Date(new Date().getFullYear() + 1, 1, 1).getTime()} disabled={readOnly} onChange={this.handleTuNgay} required /></div>
                         <div className='form-group col-xl-3 col-md-6' id='ketThucHd'><DateInput ref={this.ketThucHopDong} label='Ngày kết thúc hợp đồng' min={new Date(1900, 1, 1).getTime()} max={new Date(new Date().getFullYear() + 4, 1, 1).getTime()} disabled={readOnly} required={this.state.isKetThucHd} /></div>
                         <div className='form-group col-xl-3 col-md-6' id='kyTiepTheo'><DateInput ref={this.ngayKyHopDongTiepTheo} min={new Date(1900, 1, 1).getTime()} max={new Date(new Date().getFullYear() + 1, 1, 1).getTime()} disabled={readOnly} label='Ngày ký hợp đồng tiếp theo' /></div>
                         <div className='form-group col-xl-12 col-md-12'><Select adapter={SelectAdapter_DmDonViFaculty} ref={this.diaDiemLamViec} disabled={readOnly} label='Địa điểm làm việc' /></div>
                         <div className='form-group col-xl-4 col-md-4'><Select adapter={SelectAdapter_DmChucVu} ref={this.chucDanhChuyenMon} disabled={readOnly} label='Chức danh chuyên môn' /></div>
                         <div className='form-group col-xl-4 col-md-4'><TextInput ref={this.congViecDuocGiao} label='Công việc được giao' disabled={readOnly} /></div>
-                        <div className='form-group col-xl-4 col-md-4'><TextInput ref={this.chiuSuPhanCong} label='Chịu sự phân công' disabled={readOnly}/></div>
+                        <div className='form-group col-xl-4 col-md-4'><TextInput ref={this.chiuSuPhanCong} label='Chịu sự phân công' disabled={readOnly} /></div>
                         <div className='form-group col-xl-3 col-md-4'><Select ref={this.ngach} label='Ngạch' adapter={SelectAdapter_DmNgachCdnn} disabled={readOnly} onChange={this.changeNgach} required /></div>
 
                         <div className='form-group col-xl-3 col-md-6'><TextInput ref={this.bac} label='Bậc' disabled={readOnly} /></div>
                         <div className='form-group col-xl-3 col-md-6'><TextInput ref={this.heSo} label='Hệ số' disabled={readOnly} /></div>
-                        <div className='form-group col-xl-3 col-md-4'><TextInput ref={this.phanTramHuong} label='Phần trăm hưởng' disabled={readOnly}/></div>
+                        <div className='form-group col-xl-3 col-md-4'><TextInput ref={this.phanTramHuong} label='Phần trăm hưởng' disabled={readOnly} /></div>
                     </div>
                 </div>
                 <Link to='/user/tccb/qua-trinh/hop-dong-lao-dong' className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>

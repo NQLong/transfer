@@ -2567,8 +2567,8 @@ class ProfilePage extends QTForm {
                                 </div>
                                 <div className='form-group col-md-9'>
                                     <div className='row'>
-                                        <div className='form-group col-md-6'><TextInput ref={this.shcc} label='Mã thẻ cán bộ' placeholder='Mã thẻ cán bộ' disabled={!readOnly} maxLength={10} /></div>
-                                        <div className='form-group col-md-6'><Select placeholder='Chọn đơn vị công tác' ref={this.maDonVi} adapter={SelectAdapter_DmDonVi} label='Đơn vị công tác' disabled={!readOnly} /></div>
+                                        <div className='form-group col-md-3'><TextInput ref={this.shcc} label='Mã thẻ cán bộ' placeholder='Mã thẻ cán bộ' disabled={!readOnly} maxLength={10} /></div>
+                                        <div className='form-group col-md-9'><Select placeholder='Chọn đơn vị công tác' ref={this.maDonVi} adapter={SelectAdapter_DmDonVi} label='Đơn vị công tác' disabled={!readOnly} /></div>
                                         <div className='form-group col-md-4'><TextInput placeholder='Nhập họ và tên lót' ref={this.ho} label='Họ và tên lót' disabled={!readOnly} required maxLength={100} /></div>
                                         <div className='form-group col-md-4'><TextInput placeholder='Nhập tên' ref={this.ten} label='Tên' disabled={!readOnly} required maxLength={30} /></div>
                                         <div className='form-group col-md-4'><TextInput placeholder='Nhập tên gọi khác hay bí danh' ref={this.biDanh} label='Bí danh' maxLength={20} /></div>

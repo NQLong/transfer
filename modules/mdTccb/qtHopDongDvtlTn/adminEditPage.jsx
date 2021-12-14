@@ -13,7 +13,7 @@ import { getDmDonViAll, SelectAdapter_DmDonViFaculty } from 'modules/mdDanhMuc/d
 import { getDmNgachCdnnAll } from 'modules/mdDanhMuc/dmNgachCdnn/redux';
 import {
     getQtHopDongDvtlTnPage, getQtHopDongDvtlTnAll, updateQtHopDongDvtlTn,
-    deleteQtHopDongDvtlTn, createQtHopDongDvtlTn, getQtHopDongDvtlTnEdit, downloadHopDongWord
+    deleteQtHopDongDvtlTn, createQtHopDongDvtlTn, getQtHopDongDvtlTnEdit, downloadWord
 } from './redux';
 import TextInput, { DateInput, Select } from 'view/component/Input';
 import { QTForm } from 'view/component/Form';
@@ -284,6 +284,12 @@ class QtHopDongDvtlTnEditPage extends QTForm {
         }
     }
 
+    copyAddress = e => {
+        e.preventDefault();
+        const dataThuongTru = this.thuongTru.value();
+        this.cuTru.value(dataThuongTru.maTinhThanhPho, dataThuongTru.maQuanHuyen, dataThuongTru.maPhuongXa, dataThuongTru.soNhaDuong);
+    }
+
     changeCanBo = (value) => {
         if (value) {
             this.props.getTchcCanBoHopDongDvtlTnEdit(value, data => {
@@ -366,12 +372,12 @@ class QtHopDongDvtlTnEditPage extends QTForm {
         }
     }
 
-    downloadHopDongWord = e => {
+    downloadWord = e => {
         e.preventDefault();
         let shcc = '';
         shcc = this.selectedShcc.current.getVal();
-        downloadHopDongWord(this.urlMa, data => {
-            T.FileSaver(new Blob([new Uint8Array(data.data)]), shcc + '_2c.docx');
+        downloadWord(this.urlMa, data => {
+            T.FileSaver(new Blob([new Uint8Array(data.data)]), shcc + '_HĐ.docx');
         });
     }
 
@@ -382,10 +388,10 @@ class QtHopDongDvtlTnEditPage extends QTForm {
             <main ref={this.main} className='app-content'>
                 <div className='app-title'>
                     {this.state.item && this.state.item.canBoDuocThue ? (<>
-                        <h1><i className='fa fa-list' />Hợp đồng cán bộ {`: ${this.state.item.canBoDuocThue.ho}  ${this.state.item.canBoDuocThue.ten}`}</h1>
+                        <h1><i className='fa fa-pencil' />Hợp đồng cán bộ {`: ${this.state.item.canBoDuocThue.ho}  ${this.state.item.canBoDuocThue.ten}`}</h1>
                         <p>Số hợp đồng: {this.state.item.qtHopDongDvtlTn.soHopDong}</p>
                     </>) : <>
-                        <h1><i className='fa fa-list' />Tạo mới hợp đồng</h1>
+                        <h1><i className='fa fa-pencil' />Tạo mới hợp đồng</h1>
                     </>}
                 </div>
                 <div className='tile'>
@@ -468,7 +474,7 @@ class QtHopDongDvtlTnEditPage extends QTForm {
                 <button type='button' title='Save' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.save}>
                     <i className='fa fa-lg fa-save' />
                 </button>
-                {this.urlMa ? <button type='button' title='Save and export LL2C Word' className='btn btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px', color: 'white', backgroundColor: 'rgb(76, 110, 245)' }} onClick={this.downloadHopDongWord}>
+                {this.urlMa ? <button type='button' title='Save and export LL2C Word' className='btn btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px', color: 'white', backgroundColor: 'rgb(76, 110, 245)' }} onClick={this.downloadWord}>
                     <i className='fa fa-lg fa-file-word-o' />
                 </button> : null}
             </main>
@@ -482,6 +488,6 @@ const mapActionsToProps = {
     createTchcCanBoHopDongDvtlTn, deleteTchcCanBoHopDongDvtlTn, updateTchcCanBoHopDongDvtlTn, getTchcCanBoHopDongDvtlTnAll,
     getQtHopDongDvtlTnPage, getQtHopDongDvtlTnAll, updateQtHopDongDvtlTn, getdmLoaiHopDongAll,
     deleteQtHopDongDvtlTn, createQtHopDongDvtlTn, getStaffAll, getStaffEdit, getTchcCanBoHopDongDvtlTnEdit,
-    getDmDonViAll, getDmNgachCdnnAll, getQtHopDongDvtlTnEdit, downloadHopDongWord, getDmChucVuAll
+    getDmDonViAll, getDmNgachCdnnAll, getQtHopDongDvtlTnEdit, downloadWord, getDmChucVuAll
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtHopDongDvtlTnEditPage);
