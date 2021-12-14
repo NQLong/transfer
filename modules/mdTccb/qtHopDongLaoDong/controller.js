@@ -54,7 +54,25 @@ module.exports = app => {
     });
 
     app.get('/api/tccb/qua-trinh/hop-dong-lao-dong/edit/item/:ma', checkGetStaffPermission, (req, res) => {
-        app.model.qtHopDongLaoDong.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
+        app.model.qtHopDongLaoDong.get({ ma: req.params.ma }, (error, qtHopDongLaoDong) => {
+            if (error || qtHopDongLaoDong == null) {
+                res.send({ error });
+            } else {
+                app.model.canBo.get({ shcc: qtHopDongLaoDong.nguoiDuocThue }, (error, canBoDuocThue) => {
+                    if (error || canBoDuocThue == null) {
+                        res.send({ error });
+                    } else {
+                        app.model.canBo.get({ shcc: qtHopDongLaoDong.nguoiKy }, (error, canBo) => {
+                            if (error || canBo == null) {
+                                res.send({ item: app.clone({ qtHopDongLaoDong: qtHopDongLaoDong }, { canBoDuocThue: canBoDuocThue }, { canBo: null }) });
+                            } else {
+                                res.send({ item: app.clone({ qtHopDongLaoDong: qtHopDongLaoDong }, { canBoDuocThue: canBoDuocThue }, { canBo: canBo }) });
+                            }
+                        });
+                    }
+                });
+            }
+        });
     });
 
     app.post('/api/tccb/qua-trinh/hop-dong-lao-dong', app.permission.check('qtHopDongLaoDong:write'), (req, res) => {
@@ -76,10 +94,11 @@ module.exports = app => {
                     res.send({ error });
                 }
                 else {
-                    let hopDong = item.rows[0];
+
                     const source = app.path.join(__dirname, 'resource', 'Mau-HD-LaoDong.docx');
 
                     new Promise(resolve => {
+                        let hopDong = item.rows[0];
                         const data = {
                             hoTenNguoiKy: hopDong.hoNguoiKy + ' ' + hopDong.tenNguoiKy,
                             chucVuNguoiKy: hopDong.chucVuNguoiKy,
@@ -90,34 +109,34 @@ module.exports = app => {
                             ngaySinh: hopDong.ngaySinh ? app.date.viDateFormat(new Date(hopDong.ngaySinh)) : '',
                             noiSinh: hopDong.noiSinh ? hopDong.noiSinh : '',
                             nguyenQuan: hopDong.nguyenQuan ? hopDong.nguyenQuan : '',
-                            cuTru: hopDong.soNhaCuTru ? hopDong.soNhaCuTru + ', ' : ''
-                                + hopDong.xaCuTru ? hopDong.xaCuTru + ', ' : ''
-                                    + hopDong.huyenCuTru ? hopDong.huyenCuTru + ', ' : ''
-                                        + hopDong.tinhCuTru ? hopDong.tinhCuTru : '',
-                            thuongTru: hopDong.soNhaThuongTru ? hopDong.soNhaThuongTru + ', ' : ''
-                                + hopDong.xaThuongTru ? hopDong.xaThuongTru + ', ' : ''
-                                    + hopDong.huyenThuongTru ? hopDong.huyenThuongTru + ', ' : ''
-                                        + hopDong.tinhThuongTru ? hopDong.tinhThuongTru : '',
-                            
+                            cuTru: (hopDong.soNhaCuTru ? hopDong.soNhaCuTru + ', ' : '')
+                                + (hopDong.xaCuTru ? hopDong.xaCuTru + ', ' : '')
+                                + (hopDong.huyenCuTru ? hopDong.huyenCuTru + ', ' : '')
+                                + (hopDong.tinhCuTru ? hopDong.tinhCuTru : ''),
+                            thuongTru: (hopDong.soNhaThuongTru ? hopDong.soNhaThuongTru + ', ' : '')
+                                + (hopDong.xaThuongTru ? hopDong.xaThuongTru + ', ' : '')
+                                + (hopDong.huyenThuongTru ? hopDong.huyenThuongTru + ', ' : '')
+                                + (hopDong.tinhThuongTru ? hopDong.tinhThuongTru : ''),
+
                             dienThoai: hopDong.dienThoai ? hopDong.dienThoai : '',
                             hocVanTrinhDo: hopDong.trinhDoHocVan ? hopDong.trinhDoHocVan : '',
                             hocVanChuyenNganh: hopDong.hocVanChuyenNganh ? hopDong.hocVanChuyenNganh : '',
-    
+
                             cmnd: hopDong.cmnd ? hopDong.cmnd : '',
                             cmndNgayCap: hopDong.ngayCap ? app.date.viDateFormat(new Date(hopDong.ngayCap)) : '',
-                            cmndNoiCap: hopDong.noiCap ? hopDong.noiCap : '',
-    
-                            loaiHopDong: hopDong.loaiHopDong ? hopDong.tenLoaiHopDong : '',
+                            cmndNoiCap: hopDong.cmndNoiCap ? hopDong.cmndNoiCap : '',
+
+                            loaiHopDong: hopDong.loaiHopDong ? hopDong.loaiHopDong : '',
                             batDauLamViec: hopDong.batDauLamViec ? app.date.viDateFormat(new Date(hopDong.batDauLamViec)) : '',
                             ketThucHopDong: hopDong.ketThucHopDong ? app.date.viDateFormat(new Date(hopDong.ketThucHopDong)) : '',
                             diaDiemLamViec: hopDong.diaDiemLamViec ? hopDong.diaDiemLamViec : '',
                             chucDanhChuyenMon: hopDong.chucDanhChuyenMon ? hopDong.chucDanhChuyenMon : '',
                             chiuSuPhanCong: hopDong.chiuSuPhanCong ? hopDong.chiuSuPhanCong : '',
-    
+
                             bac: hopDong.bac ? hopDong.bac : '',
                             heSo: hopDong.heSo ? hopDong.heSo : '',
-    
-                            ngayKyHopDong: hopDong.ngayKyHopDong ? hopDong.ngayKyHopDong : ''
+
+                            ngayKyHopDong: hopDong.ngayKyHopDong ? app.date.viDateFormat(new Date(hopDong.ngayKyHopDong)) : ''
                         };
                         resolve(data);
                     }).then((data) => {
@@ -132,5 +151,12 @@ module.exports = app => {
                 }
             });
         }
+    });
+
+    app.get('/api/tccb/qua-trinh/hop-dong-lao-dong/get-truong-phong-tccb', app.permission.check('qtHopDongLaoDong:read'), (req, res) => {
+        app.model.canBo.get({ maChucVu: '003', maDonVi: '30' }, 'shcc', 'shcc DESC', (error, truongPhongTccb) => {
+            res.send({ error, truongPhongTccb });
+
+        });
     });
 };

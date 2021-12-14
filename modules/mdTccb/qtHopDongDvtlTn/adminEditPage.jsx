@@ -85,6 +85,7 @@ class QtHopDongDvtlTnEditPage extends QTForm {
     }
     componentDidMount() {
         T.ready('/user/tccb');
+        this.kieuHopDong.current.focus();
         this.props.getDmChucVuAll(items => {
             if (items) {
                 this.chucVuMapper = {};
@@ -411,22 +412,23 @@ class QtHopDongDvtlTnEditPage extends QTForm {
                                 </div>
                                 <div className='form-group col-xl-4 col-md-6'><DateInput ref={this.ngaySinh} label='Ngày sinh' disabled={readOnly} min={new Date(1900, 1, 1).getTime()} max={Date.nextYear(-10).roundDate().getTime()} required /></div>
                             </> : <>
-                                <div className='form-group col-xl-3 col-md-4'><TextInput ref={this.shcc} label='Mã số cán bộ' required /> </div>
-                                <div className='form-group col-xl-3 col-md-4'><TextInput ref={this.ho} label='Họ' /> </div>
-                                <div className='form-group col-xl-3 col-md-4'><TextInput ref={this.ten} label='Tên' /> </div>
-                                <div className='form-group col-xl-6 col-md-6'><DateInput ref={this.ngaySinh} label='Ngày sinh' /> </div>
+                                <div className='form-group col-xl-3 col-md-4'><TextInput style={{ textTransform: 'uppercase' }} ref={this.shcc} maxLength={10} label='Mã số cán bộ' required /> </div>
+                                <div className='form-group col-xl-3 col-md-6'><TextInput style={{ textTransform: 'uppercase' }} ref={this.ho} maxLength={100} label='Họ và tên lót' required/> </div>
+                                <div className='form-group col-xl-3 col-md-4'><TextInput ref={this.ten} label='Tên' maxLength={20} required /> </div>
+                                <div className='form-group col-xl-3 col-md-4'><DateInput ref={this.ngaySinh} label='Ngày sinh' min={new Date(1900, 1, 1).getTime()} max={Date.nextYear(-10).roundDate().getTime()} required/> </div>
 
                             </>
                         }
-                        <div className='form-group col-xl-3 col-md-4'><Select adapter={SelectAdapter_DmGioiTinh} ref={this.gioiTinh} label='Giới tính' /> </div>
-                        <div className='form-group col-xl-3 col-md-4'><TextInput ref={this.email} label='Email' /> </div>
-                        <div className='form-group col-xl-4 col-md-4'><TextInput ref={this.cmnd} label='CMND/CCCD' /> </div>
-                        <div className='form-group col-xl-4 col-md-4'><DateInput ref={this.cmndNgayCap} label='Ngày cấp' /> </div>
-                        <div className='form-group col-xl-4 col-md-4'><TextInput ref={this.cmndNoiCap} label='Nơi cấp' /> </div>
-                        <div className='form-group col-xl-3 col-md-4'><TextInput ref={this.dienThoai} label='Điện thoại' /> </div>
-                        <div className='form-group col-xl-3 col-md-4'><Select adapter={SelectAdapter_DmQuocGia} ref={this.quocGia} label='Quốc tịch' /> </div>
-                        <div className='form-group col-xl-3 col-md-4'><Select adapter={SelectAdapter_DmDanToc} ref={this.danToc} label='Dân tộc' /> </div>
-                        <div className='form-group col-xl-3 col-md-4'><Select adapter={SelectAdapter_DmTonGiao} ref={this.tonGiao} label='Tôn giáo' /> </div>
+                        <div className='form-group col-xl-4 col-md-4'><TextInput ref={this.cmnd} label='CMND/CCCD' placeholder='Nhập số CMND/CCCD'/> </div>
+                        <div className='form-group col-xl-4 col-md-4'><DateInput ref={this.cmndNgayCap} label='Ngày cấp CMND/CCCD' /> </div>
+                        <div className='form-group col-xl-4 col-md-4'><TextInput ref={this.cmndNoiCap} label='Nơi cấp CMND/CCCD' /> </div>
+                        <div className='form-group col-xl-2 col-md-4'><Select adapter={SelectAdapter_DmGioiTinh} ref={this.gioiTinh} label='Giới tính' /> </div>
+                        <div className='form-group col-xl-5 col-md-4'><TextInput ref={this.email} label='Email' /> </div>
+
+                        <div className='form-group col-xl-5 col-md-4'><TextInput ref={this.dienThoai} label='Điện thoại' maxLength={10}/> </div>
+                        <div className='form-group col-xl-4 col-md-4'><Select adapter={SelectAdapter_DmQuocGia} ref={this.quocGia} label='Quốc tịch' /> </div>
+                        <div className='form-group col-xl-4 col-md-4'><Select adapter={SelectAdapter_DmDanToc} ref={this.danToc} label='Dân tộc' /> </div>
+                        <div className='form-group col-xl-4 col-md-4'><Select adapter={SelectAdapter_DmTonGiao} ref={this.tonGiao} label='Tôn giáo' /> </div>
 
                         <ComponentDiaDiem ref={e => this.noiSinh = e} label='Nơi sinh' className='col-xl-6 col-md-6' onlyTinhThanh={true} />
                         <ComponentDiaDiem ref={e => this.thuongTru = e} label='Địa chỉ thường trú' className='col-md-12' requiredSoNhaDuong={true} />
@@ -453,10 +455,11 @@ class QtHopDongDvtlTnEditPage extends QTForm {
                         <div className='form-group col-xl-4 col-md-4'><Select adapter={SelectAdapter_DmChucVu} ref={this.chucDanhChuyenMon} label='Chức danh chuyên môn' /></div>
                         <div className='form-group col-xl-4 col-md-4'><TextInput ref={this.congViecDuocGiao} label='Công việc được giao' /></div>
                         <div className='form-group col-xl-4 col-md-4'><TextInput ref={this.chiuSuPhanCong} label='Chịu sự phân công' /></div>
-                        {!this.state.item || this.state.kieu == 'DVTL' ? <div className='form-group col-xl-3 col-md-6'><Select adapter={SelectAdapter_DmDonViFaculty} ref={this.donViChiTra} label='Đơn vị chi trả' /></div> : null}
-                        {!this.state.item || this.state.kieu == 'DVTL' ? <div className='form-group col-xl-3 col-md-6'><TextInput ref={this.bac} label='Bậc' /></div> : null}
-                        {!this.state.item || this.state.kieu == 'DVTL' ? <div className='form-group col-xl-3 col-md-6'><TextInput ref={this.heSo} label='Hệ số' /></div> : null}
-                        {!this.state.item || !(this.state.kieu == 'DVTL') ? <div className='form-group col-xl-3 col-md-6'><TextInput ref={this.tienLuong} label='Tiền lương' /></div> : null}
+                        {!this.state.item || this.state.kieu == 'DVTL' ? <div className='form-group col-xl-6 col-md-6'><Select adapter={SelectAdapter_DmDonViFaculty} ref={this.donViChiTra} label='Đơn vị chi trả' /></div> : null}
+                        {!this.state.item || this.state.kieu == 'DVTL' ? <div className='form-group col-xl-6 col-md-6'></div> : null}
+                        {!this.state.item || this.state.kieu == 'DVTL' ? <div className='form-group col-xl-4 col-md-6'><TextInput ref={this.bac} label='Bậc' /></div> : null}
+                        {!this.state.item || this.state.kieu == 'DVTL' ? <div className='form-group col-xl-4 col-md-6'><TextInput ref={this.heSo} label='Hệ số' /></div> : null}
+                        {!this.state.item || !(this.state.kieu == 'DVTL') ? <div className='form-group col-xl-4 col-md-6'><TextInput ref={this.tienLuong} label='Tiền lương' /></div> : null}
                     </div>
                 </div>
                 <Link to='/user/tccb/qua-trinh/hop-dong-dvtl-tn' className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>

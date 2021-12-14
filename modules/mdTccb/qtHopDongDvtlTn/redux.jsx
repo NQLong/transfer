@@ -204,7 +204,6 @@ export function deleteQtHopDongDvtlTnUser(id, done) {
 }
 
 export function downloadHopDongWord(ma, done) {
-    console.log(ma);
     const url = `api/tccb/qua-trinh/hop-dong-dvtl-tn/download-word/${ma}`;
     T.get(url, data => {
         if (data.error) {

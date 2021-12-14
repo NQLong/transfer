@@ -1485,7 +1485,6 @@ class ProfilePage extends QTForm {
     };
 
     setVal = (data = {}) => {
-        console.log(data);
         const { shcc = '', ho = '', ten = '', biDanh = '', cmnd = '', cmndNgayCap = '', cmndNoiCap = '', emailCaNhan = '', email = '', dienThoaiCaNhan = '', dienThoaiBaoTin = '', ngaySinh = '',
             // ngayBatDauCongTacDonVi = '', 
             ngayBatDauCongTac = '', ngayBienChe = '', donViTuyenDung = '',
@@ -2091,37 +2090,38 @@ class ProfilePage extends QTForm {
             ungDungThuongMai = currentCanBo.ungDungThuongMai ? currentCanBo.ungDungThuongMai : [],
             lamViecNgoai = currentCanBo.lamViecNgoai ? currentCanBo.lamViecNgoai : [];
         // const item = this.state.canBo || {};
+
         // const renderFieldText = (className, label, hasValue, value, noValue = 'Không có thông tin!') =>
         //     <div className={className}>{label}: <b>{hasValue ? value : noValue}</b></div>;
 
-        const tableChucVu = renderTable({
-            getDataSource: () => chucVu, stickyHead: false,
-            renderHead: () => (
-                <tr>
-                    <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                    <th style={{ width: '60%' }}>Chức vụ</th>
-                    <th style={{ width: '20%' }}>Loại chức vụ</th>
-                    <th style={{ width: '20%' }}>Quyết định</th>
-                </tr>),
-            renderRow: (item, index) => (
-                <tr key={index}>
-                    <TableCell type='text' style={{ textAlign: 'center' }} content={index + 1} />
-                    <TableCell type='text' content={(
-                        <>
-                            <span>{this.mapperChucVu[item.maChucVu]}</span><br />
-                            <span>{item.maDonVi ? 'Đơn vị: ' + this.mapperDonVi[item.maDonVi] : 'Bộ môn/Phòng: ' + this.mapperBoMon[item.tenBoMon]}</span>
-                        </>
-                    )} />
-                    <TableCell type='text' content={item.chucVuChinh ? 'Chức vụ chính' : 'Chức vụ kiêm nhiệm'} />
-                    <TableCell type='text' content={(
-                        <>
-                            <span>Số: {item.soQd}</span><br />
-                            <span>Ngày: <span style={{ color: 'blue' }}>{item.ngayRaQd ? new Date(item.ngayRaQd).ddmmyyyy() : ''}</span></span>
-                        </>
-                    )}
-                    />
-                </tr>)
-        });
+
+        const chucVuShow = (data) => {
+            let text = data.map((item) => {
+                return <div key={item.stt.toString()} className='form-group col-md-12'><b>{this.mapperChucVu[item.maChucVu]}</b><>{item.maDonVi ? 
+                    ((item.maChucVu != '001' && item.maChucVu != '002') ? ' - ' + this.mapperDonVi[item.maDonVi] : '') : ' - ' + this.mapperBoMon[item.maBoMon]}</> {item.chucVuChinh ? '(Chức vụ chính)' : ''}</div>;
+            });
+            return text;
+        };
+        // const tableChucVu = renderTable({
+        //     getDataSource: () => chucVu, stickyHead: false,
+        //     renderRow: (item, index) => (
+        //         <tr key={index}>
+        //             <TableCell type='text' content={(
+        //                 <>
+        //                     <span>{this.mapperChucVu[item.maChucVu]}</span><br />
+        //                     <span>{item.maDonVi ? 'Đơn vị: ' + this.mapperDonVi[item.maDonVi] : 'Bộ môn/Phòng: ' + this.mapperBoMon[item.maBoMon]}</span>
+        //                 </>
+        //             )} />
+        //             <TableCell type='text' content={item.chucVuChinh ? 'Chức vụ chính' : 'Chức vụ kiêm nhiệm'} />
+        //             <TableCell type='text' content={(
+        //                 <>
+        //                     <span>Số: {item.soQd}</span><br />
+        //                     <span>Ngày: <span style={{ color: 'blue' }}>{item.ngayRaQd ? new Date(item.ngayRaQd).ddmmyyyy() : ''}</span></span>
+        //                 </>
+        //             )}
+        //             />
+        //         </tr>)
+        // });
         const table = renderTable({
             getDataSource: () => items, stickyHead: false,
             renderHead: () => (
@@ -2713,17 +2713,14 @@ class ProfilePage extends QTForm {
 
                                 <div className='form-group col-md-6'><DateInput placeholder='Ngày, tháng, năm quyết định tuyển dụng, bổ nhiệm ngạch, chức danh' ref={this.ngayBienChe} label='Ngày vào biên chế / tuyển dụng' disabled={readOnly} min={new Date(1900, 1, 1).getTime()} max={new Date().getTime()} /></div>
                                 <div className='form-group col-md-6'><Select placeholder='Chọn cơ quan, đơn vị ban hành Quyết định tuyển dụng' adapter={SelectAdapter_DmDonVi} ref={this.donViTuyenDung} label='Cơ quan, đơn vị ban hành Quyết định tuyển dụng' disabled={readOnly} /></div>
-                                <div className='form-group col-md-6'><Select ref={this.chucDanh} adapter={SelectAdapter_DmNgachCdnn} label='Chức danh nghề nghiệp' disabled={readOnly} /></div>
-                                <div className='form-group col-md-3'><Select ref={this.hopDongCanBo} adapter={SelectAdapter_DmDienHopDong} label='Diện hợp đồng' disabled={readOnly} /></div>
-                                <div className='form-group col-md-3'><Select ref={this.loaiHopDong} adapter={SelectAdapter_DmLoaiHopDong} label='Loại hợp đồng' disabled={readOnly} /></div>
+                                <div className='form-group col-md-4'><Select ref={this.chucDanh} adapter={SelectAdapter_DmNgachCdnn} label='Chức danh nghề nghiệp' disabled={readOnly} /></div>
+                                <div className='form-group col-md-4'><Select ref={this.hopDongCanBo} adapter={SelectAdapter_DmDienHopDong} label='Diện hợp đồng' disabled={readOnly} /></div>
+                                <div className='form-group col-md-4'><Select ref={this.loaiHopDong} adapter={SelectAdapter_DmLoaiHopDong} label='Loại hợp đồng' disabled={readOnly} /></div>
                                 <div className='form-group col-md-12'>
-                                    <p>Chức vụ:</p>
-                                    <div className='tile-body'>{tableChucVu}</div>
-                                    {/* <div className='tile-footer' style={{ textAlign: 'right' }}>
-                                        <button className='btn btn-info' type='button' onClick={e => this.create(e, this.modalNN)}>
-                                            <i className='fa fa-fw fa-lg fa-plus' />Thêm tổ chức tham gia
-                                        </button>
-                                    </div> */}
+                                    <div className='tile-body'>
+                                        <p>Chức vụ:</p>
+                                        {chucVuShow(chucVu)}
+                                    </div>
                                 </div>
                                 <div className='col-md-3 form-group'><NumberInput ref={this.heSoLuong} label='Hệ số lương' disabled={!readOnly} min={0} max={1000} step={0.01} /></div>
                                 <div className='col-md-3 form-group'><NumberInput ref={this.bacLuong} label='Bậc lương' disabled={!readOnly} min={0} max={1000} /></div>
@@ -2737,29 +2734,29 @@ class ProfilePage extends QTForm {
                                 <div className='form-group col-md-4'><TextInput ref={this.maTheBhyt} label='Mã thẻ Bảo hiểm y tế' /></div>
                                 <div className='form-group col-md-4'><Select adapter={SelectAdapter_DmBenhVien} ref={this.noiKhamChuaBenhBanDau} label='Nơi khám chữa bệnh ban đầu' /></div>
                                 <div className='form-group col-md-4'><NumberInput ref={this.quyenLoiKhamChuaBenh} label='Quyền lợi khám chữa bệnh (%)' /></div>
-                                    <div className='form-group col-md-6'><BooleanInput ref={this.doiTuongBoiDuongKienThucQpan} label='Đối tượng bồi dưỡng kiến thức Quốc phòng - An ninh:   &nbsp;'
-                                        disabled={readOnly} onChange={value => this.setState({ doiTuongBoiDuongKienThucQpan: value })} /></div>
-                                    {
-                                        this.state.doiTuongBoiDuongKienThucQpan && <>
-                                            <div className='form-group col-md-6'><BooleanInput ref={this.tinhTrangBoiDuong} label='Đã tham gia bồi dưỡng:   &nbsp;'
-                                                disabled={readOnly} onChange={value => this.setState({ tinhTrangBoiDuong: value })} /></div>
-                                            {
-                                                this.state.tinhTrangBoiDuong && <>
-                                                    <div className='form-group col-md-6'><TextInput ref={this.namBoiDuong} label='Năm bồi dưỡng' /></div>
-                                                    <div className='form-group col-md-6'><TextInput ref={this.khoaBoiDuong} label='Khóa bồi dưỡng' /></div>
-                                                </>
-                                            }
-                                        </>
-                                    }
-                                    <div className='form-group col-md-12'>
-                                        <BooleanInput ref={this.dangONuocNgoai} label='Đang ở nước ngoài:   &nbsp;' disabled={readOnly} onChange={value => this.setState({ nuocNgoai: value })} />
-                                    </div>
-                                    {this.state.nuocNgoai && <>
-                                        <div className='form-group col-md-4'><Select ref={this.quocGiaDangO} label='Quốc gia' adapter={SelectAdapter_DmQuocGia} disabled={readOnly} /></div>
-                                        <div className='form-group col-md-4'><DateInput ref={this.ngayBatDauONuocNgoai} label='Ngày bắt đầu' disabled={readOnly} min={new Date(1900, 1, 1).getTime()} /></div>
-                                        <div className='form-group col-md-4'><DateInput ref={this.ngayKetThucONuocNgoai} label='Ngày kết thúc' disabled={readOnly} min={new Date(1900, 1, 1).getTime()} /></div>
-                                        <div className='form-group col-md-12'><TextareaInput ref={this.lyDoONuocNgoai} label='Lý do ở nước ngoài' disabled={readOnly} maxLength={200} /></div>
-                                    </>}
+                                <div className='form-group col-md-6'><BooleanInput ref={this.doiTuongBoiDuongKienThucQpan} label='Đối tượng bồi dưỡng kiến thức Quốc phòng - An ninh:   &nbsp;'
+                                    disabled={readOnly} onChange={value => this.setState({ doiTuongBoiDuongKienThucQpan: value })} /></div>
+                                {
+                                    this.state.doiTuongBoiDuongKienThucQpan && <>
+                                        <div className='form-group col-md-6'><BooleanInput ref={this.tinhTrangBoiDuong} label='Đã tham gia bồi dưỡng:   &nbsp;'
+                                            disabled={readOnly} onChange={value => this.setState({ tinhTrangBoiDuong: value })} /></div>
+                                        {
+                                            this.state.tinhTrangBoiDuong && <>
+                                                <div className='form-group col-md-6'><TextInput ref={this.namBoiDuong} label='Năm bồi dưỡng' /></div>
+                                                <div className='form-group col-md-6'><TextInput ref={this.khoaBoiDuong} label='Khóa bồi dưỡng' /></div>
+                                            </>
+                                        }
+                                    </>
+                                }
+                                <div className='form-group col-md-12'>
+                                    <BooleanInput ref={this.dangONuocNgoai} label='Đang ở nước ngoài:   &nbsp;' disabled={readOnly} onChange={value => this.setState({ nuocNgoai: value })} />
+                                </div>
+                                {this.state.nuocNgoai && <>
+                                    <div className='form-group col-md-4'><Select ref={this.quocGiaDangO} label='Quốc gia' adapter={SelectAdapter_DmQuocGia} disabled={readOnly} /></div>
+                                    <div className='form-group col-md-4'><DateInput ref={this.ngayBatDauONuocNgoai} label='Ngày bắt đầu' disabled={readOnly} min={new Date(1900, 1, 1).getTime()} /></div>
+                                    <div className='form-group col-md-4'><DateInput ref={this.ngayKetThucONuocNgoai} label='Ngày kết thúc' disabled={readOnly} min={new Date(1900, 1, 1).getTime()} /></div>
+                                    <div className='form-group col-md-12'><TextareaInput ref={this.lyDoONuocNgoai} label='Lý do ở nước ngoài' disabled={readOnly} maxLength={200} /></div>
+                                </>}
                                 {this.state.phai == '02' && <>
                                     <div className='form-group col-md-12'>
                                         <BooleanInput ref={this.dangNghiThaiSan} label='Đang nghỉ thai sản:   &nbsp;' disabled={readOnly} onChange={value => this.setState({ nghiThaiSan: value })} />
@@ -2784,7 +2781,7 @@ class ProfilePage extends QTForm {
                         <div className='tile'>
                             <h3 className='tile-title'>Quá trình công tác</h3>
                         </div>
-                    
+
                         <div className='tile'>
                             <h3 className='tile-title'>TRÌNH ĐỘ HỌC VẤN</h3>
                             <div className='tile-body row'>

@@ -5,7 +5,7 @@ import { AdminPage, TableCell, renderTable } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
     getQtHopDongLaoDongPage, getQtHopDongLaoDongAll, updateQtHopDongLaoDong,
-    deleteQtHopDongLaoDong, createQtHopDongLaoDong, getQtHopDongLaoDongGroupPage
+    deleteQtHopDongLaoDong, createQtHopDongLaoDong, getQtHopDongLaoDongGroupPage, downloadWord
 } from './redux';
 
 class QtHopDongLaoDongGroupPage extends AdminPage {
@@ -21,11 +21,11 @@ class QtHopDongLaoDongGroupPage extends AdminPage {
         });
     }
 
-    // hopDongDownloadWord = item => {
-    //     hopDongDownloadWord(item.stt, data => {
-    //         T.FileSaver(new Blob([new Uint8Array(data.data)]), item.shcc + '_hopdong.docx');
-    //     });
-    // }
+    downloadWord = item => {
+        downloadWord(parseInt(item.ma), data => {
+            T.FileSaver(new Blob([new Uint8Array(data.data)]), item.shcc + '_hopdong.docx');
+        });
+    }
 
     delete = (e, item) => {
         T.confirm('Xóa hợp đồng', 'Bạn có chắc bạn muốn xóa hợp đồng này?', 'warning', true, isConfirm => {
@@ -95,7 +95,7 @@ class QtHopDongLaoDongGroupPage extends AdminPage {
                             </>
                         )} />
                         <TableCell type='buttons' content={item} onEdit={`/user/tccb/qua-trinh/hop-dong-lao-dong/${item.ma}`} onDelete={this.delete} permission={permission} >
-                            <a href="#" className="btn btn-primary" style={{ width: '45px' }} onClick={e => e.preventDefault() || this.hopDongDownloadWord(item)}>
+                            <a href="#" className="btn btn-primary" style={{ width: '45px' }} onClick={e => e.preventDefault() || this.downloadWord(item)}>
                                 <i className='fa fa-lg fa-file-word-o' />
                             </a>
                         </TableCell>
@@ -130,6 +130,6 @@ class QtHopDongLaoDongGroupPage extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtHopDongLaoDong: state.qtHopDongLaoDong });
 const mapActionsToProps = {
     getQtHopDongLaoDongAll, getQtHopDongLaoDongPage, deleteQtHopDongLaoDong, createQtHopDongLaoDong,
-    updateQtHopDongLaoDong, getQtHopDongLaoDongGroupPage
+    updateQtHopDongLaoDong, getQtHopDongLaoDongGroupPage, downloadWord
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtHopDongLaoDongGroupPage);

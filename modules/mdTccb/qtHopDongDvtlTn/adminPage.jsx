@@ -164,15 +164,17 @@ class QtHopDongDvtlTn extends AdminPage {
                         <TableCell type='text' content={index + 1} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span>{item.ho + ' ' + item.ten}</span><br />
-                                <span>Mã số cán bộ: {item.shcc}</span>
+                                <a href={'/user/tccb/qua-trinh/hop-dong-dvtl-tn/' + item.ma} >
+                                    <span>{item.ho + ' ' + item.ten}</span><br />
+                                    <span>{item.shcc}</span>
+                                </a>
                             </>
                         )}
                         />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span>Số: <Link to={'/user/tccb/qua-trinh/hop-dong-dvtl-tn/' + item.ma}>{item.soHopDong}</Link></span><br />
-                                <span>Hợp đồng {item.dienHopDong}</span><br/>
+                                <span>Số: {item.soHopDong}</span><br />
+                                <span>Hợp đồng {item.dienHopDong}</span><br />
                                 <span>Ngày ký: <span style={{ color: 'blue' }}>{item.ngayKyHopDong ? new Date(item.ngayKyHopDong).ddmmyyyy() : ''}</span></span>
                             </>
                         )}

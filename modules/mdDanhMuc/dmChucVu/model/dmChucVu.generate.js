@@ -1,6 +1,6 @@
-// Table name: DM_CHUC_VU { ma, ten, phuCap, kichHoat, ghiChu, name, maCu }
+// Table name: DM_CHUC_VU { ma, ten, phuCap, kichHoat, ghiChu }
 const keys = ['MA'];
-const obj2Db = { 'ma': 'MA', 'ten': 'TEN', 'phuCap': 'PHU_CAP', 'kichHoat': 'KICH_HOAT', 'ghiChu': 'GHI_CHU', 'name': 'NAME', 'maCu': 'MA_CU' };
+const obj2Db = { 'ma': 'MA', 'ten': 'TEN', 'phuCap': 'PHU_CAP', 'kichHoat': 'KICH_HOAT', 'ghiChu': 'GHI_CHU'};
 
 module.exports = app => {
     app.model.dmChucVu = {
