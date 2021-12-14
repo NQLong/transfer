@@ -89,7 +89,7 @@ module.exports = app => {
 
     app.get('/api/tccb/qua-trinh/hop-dong-lao-dong/download-word/:ma', app.permission.check('qtHopDongLaoDong:read'), (req, res) => {
         if (req.params && req.params.ma) {
-            app.model.qtHopDongLaoDong.download(req.params.ma, (error, item) => {
+            app.model.qtHopDongLaoDong.downWord(req.params.ma, (error, item) => {
                 if (error || !item) {
                     res.send({ error });
                 }
@@ -218,7 +218,7 @@ module.exports = app => {
                         cells.push({ cell: 'B' + (index + 2), border: '1234', value: item.shcc });
                         cells.push({ cell: 'C' + (index + 2), border: '1234', value: item.ho });
                         cells.push({ cell: 'D' + (index + 2), border: '1234', value: item.ten });
-                        cells.push({ cell: 'E' + (index + 2), border: '1234', value: item.gioiTinh });
+                        cells.push({ cell: 'E' + (index + 2), border: '1234', value: JSON.parse(item.gioiTinh).vi });
                         cells.push({ cell: 'F' + (index + 2), border: '1234', value: item.ngaySinh ? formatDate(item.ngaySinh) : '' });
                         cells.push({ cell: 'G' + (index + 2), border: '1234', value: item.noiSinh });
                         cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.nguyenQuan });

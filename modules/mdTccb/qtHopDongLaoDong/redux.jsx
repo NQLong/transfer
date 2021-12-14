@@ -180,8 +180,8 @@ export function updateQtHopDongLaoDong(ma, changes, done) {
 export function downloadWord(ma, done) {
     const url = `/api/tccb/qua-trinh/hop-dong-lao-dong/download-word/${ma}`;
     T.get(url, data => {
-        if (data.error) {
-            T.notify('Tải file world bị lỗi' + (data.error.message && (':<br>' + data.error)), 'danger');
+         if (data.error) {
+            T.notify('Tải file world bị lỗi', 'danger');
             console.error(`GET: ${url}.`, data.error);
         } else if (done) {
             done(data.data);

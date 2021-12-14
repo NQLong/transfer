@@ -28,8 +28,8 @@ class QtHopDongLaoDongPage extends AdminPage {
         this.props.getQtHopDongLaoDongGroupPage(undefined, undefined, '');
     }
 
-    downloadWord = item => {
-        downloadWord(parseInt(item.ma), data => {
+    downloadWord = (item) => {
+        downloadWord(item.ma, data => {
             T.FileSaver(new Blob([new Uint8Array(data.data)]), item.shcc + '_hopdong.docx');
         });
     }
@@ -150,6 +150,6 @@ class QtHopDongLaoDongPage extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtHopDongLaoDong: state.qtHopDongLaoDong });
 const mapActionsToProps = {
     getQtHopDongLaoDongAll, getQtHopDongLaoDongPage, deleteQtHopDongLaoDong, createQtHopDongLaoDong,
-    updateQtHopDongLaoDong, getQtHopDongLaoDongGroupPage, downloadWord
+    updateQtHopDongLaoDong, getQtHopDongLaoDongGroupPage
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtHopDongLaoDongPage);
