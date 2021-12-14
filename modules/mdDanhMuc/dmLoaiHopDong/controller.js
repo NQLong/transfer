@@ -32,7 +32,7 @@ module.exports = app => {
     });
 
     app.get('/api/danh-muc/loai-hop-dong/item/:ma', app.permission.check('user:login'), (req, res) => {
-        app.model.dmLoaiHopDong.get(req.params.ma, (error, item) => res.send({ error, item }));
+        app.model.dmLoaiHopDong.get({ma : req.params.ma}, (error, item) => res.send({ error, item }));
     });
 
     app.post('/api/danh-muc/loai-hop-dong', app.permission.check('dmLoaiHopDong:write'), (req, res) => {

@@ -39,24 +39,26 @@ export class ComponentDiaDiem extends React.Component {
                 }
                 maTinhThanhPho = maQuanHuyen = maPhuongXa = '';
             }
-            if (this.props.onlyTinhThanh == false) this.soNhaDuong.value(soNhaDuong || '');
+            if (this.props.requiredSoNhaDuong) this.soNhaDuong.value(soNhaDuong || '');
             this.setState({ maTinhThanhPho, maQuanHuyen, maPhuongXa });
         } else { // get value
             return ({
                 maTinhThanhPho: this.dmTinhThanhPho.value(),
                 maQuanHuyen: !this.props.onlyTinhThanh ? this.dmQuanHuyen.value() : null,
                 maPhuongXa: !this.props.onlyTinhThanh ? this.dmPhuongXa.value() : null,
-                soNhaDuong: !this.props.onlyTinhThanh ? this.soNhaDuong.value() : null,
+                soNhaDuong: !this.props.onlyTinhThanh && this.props.requiredSoNhaDuong ? this.soNhaDuong.value() : null,
             });
         }
     }
 
     changeTinhThanhPho = (value) => {
-        if (this.state.maTinhThanhPho != value) {
-            this.setState({ maTinhThanhPho: value }, () => {
-                this.dmQuanHuyen.value(null); this.dmPhuongXa.value(null);
-                this.dmQuanHuyen.focus();
-            });
+        if (!this.props.onlyTinhThanh) {
+            if (this.state.maTinhThanhPho != value) {
+                this.setState({ maTinhThanhPho: value }, () => {
+                    this.dmQuanHuyen.value(null); this.dmPhuongXa.value(null);
+                    this.dmQuanHuyen.focus();
+                });
+            }
         }
     }
 
@@ -88,7 +90,7 @@ export class ComponentDiaDiem extends React.Component {
                     <FormSelect ref={e => this.dmTinhThanhPho = e} data={ajaxSelectTinhThanhPho} onChange={value => this.changeTinhThanhPho(value.id)} readOnly={readOnly} className={onlyTinhThanh ? 'col-md-12' : 'col-md-4'} placeholder='Thành phố / Tỉnh' />
                     {!onlyTinhThanh ? <FormSelect ref={e => this.dmQuanHuyen = e} data={maTinhThanhPho ? ajaxSelectQuanHuyen(maTinhThanhPho) : []} onChange={value => this.changeQuanHuyen(value.id)} readOnly={readOnly} className='col-md-4' placeholder='Quận / Huyện' /> : null}
                     {!onlyTinhThanh ? <FormSelect ref={e => this.dmPhuongXa = e} data={maQuanHuyen ? ajaxSelectPhuongXa(maQuanHuyen) : []} onChange={value => this.changePhuongXa(value.id)} readOnly={readOnly} className='col-md-4' placeholder='Phường / Xã' /> : null}
-                    {!onlyTinhThanh ? <FormTextBox ref={e => this.soNhaDuong = e} type='text' style={{ display: requiredSoNhaDuong ? 'block' : 'none' }} placeholder='Số nhà, đường' readOnly={readOnly} className='col-md-12' /> : null}
+                    {!onlyTinhThanh ? <FormTextBox ref={e => this.soNhaDuong = e} type='text' style={{ display: requiredSoNhaDuong ? 'block' : 'none' }} placeholder='Số nhà, đường' readOnly={readOnly} className='col-md-6' /> : null}
                 </div>
             </div>);
     }

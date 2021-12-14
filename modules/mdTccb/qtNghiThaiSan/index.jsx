@@ -1,11 +1,11 @@
 //TEMPLATES: admin
 import Loadable from 'react-loadable';
 import Loading from 'view/component/Loading';
-import tchcNghiThaiSan from './redux';
+import qtNghiThaiSan from './redux';
 
 export default {
     redux: {
-        tchcNghiThaiSan,
+        qtNghiThaiSan,
     },
     routes: [
         {

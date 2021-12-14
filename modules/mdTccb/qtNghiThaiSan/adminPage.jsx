@@ -4,8 +4,8 @@ import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormCheckbox, FormSelect, FormRichTextBox, FormDatePicker } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
-    getTchcNghiThaiSanPage, getTchcNghiThaiSanAll, updateTchcNghiThaiSan,
-    deleteTchcNghiThaiSan, createTchcNghiThaiSan
+    getQtNghiThaiSanPage, getQtNghiThaiSanAll, updateQtNghiThaiSan,
+    deleteQtNghiThaiSan, createQtNghiThaiSan
 } from './redux';
 import { getDmChucVuAll } from 'modules/mdDanhMuc/dmChucVu/redux';
 import { getDmDonViAll } from 'modules/mdDanhMuc/dmDonVi/redux';
@@ -120,12 +120,12 @@ class EditModal extends AdminModal {
     }
 }
 
-class TchcNghiThaiSan extends AdminPage {
+class QtNghiThaiSan extends AdminPage {
     componentDidMount() {
         T.ready('/user/tccb', () => {
-            T.onSearch = (searchText) => this.props.getTchcNghiThaiSanPage(undefined, undefined, searchText || '');
+            T.onSearch = (searchText) => this.props.getQtNghiThaiSanPage(undefined, undefined, searchText || '');
             T.showSearchBox();
-            this.props.getTchcNghiThaiSanPage();
+            this.props.getQtNghiThaiSanPage();
         });
     }
 
@@ -136,7 +136,7 @@ class TchcNghiThaiSan extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa hợp đồng', `Bạn có chắc bạn muốn xóa hợp đồng ${item.soHopDong ? `<b>${item.soHopDong}</b>` : 'này'}?`, 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteTchcNghiThaiSan(item.stt, error => {
+            isConfirm && this.props.deleteQtNghiThaiSan(item.stt, error => {
                 if (error) T.notify(error.message ? error.message : `Xoá hợp đồng ${item.ten} bị lỗi!`, 'danger');
                 else T.alert(`Xoá hợp đồng ${item.ten} thành công!`, 'success', false, 800);
             });
@@ -146,9 +146,9 @@ class TchcNghiThaiSan extends AdminPage {
 
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permission = this.getUserPermission('tchcNghiThaiSan', ['read', 'write', 'delete']);
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.tchcNghiThaiSan && this.props.tchcNghiThaiSan.page ?
-            this.props.tchcNghiThaiSan.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list };
+            permission = this.getUserPermission('qtNghiThaiSan', ['read', 'write', 'delete']);
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtNghiThaiSan && this.props.qtNghiThaiSan.page ?
+            this.props.qtNghiThaiSan.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -190,9 +190,9 @@ class TchcNghiThaiSan extends AdminPage {
             content: <>
                 <div className='tile'>{table}</div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                    getPage={this.props.getTchcNghiThaiSanPage} />
+                    getPage={this.props.getQtNghiThaiSanPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
-                    create={this.props.createTchcNghiThaiSan} update={this.props.updateTchcNghiThaiSan}
+                    create={this.props.createQtNghiThaiSan} update={this.props.updateQtNghiThaiSan}
                     getDonVi={this.props.getDmDonViAll} permissions={currentPermissions}
                     getChucVu={this.props.getDmChucVuAll} />
             </>,
@@ -202,9 +202,9 @@ class TchcNghiThaiSan extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, tchcNghiThaiSan: state.tchcNghiThaiSan });
+const mapStateToProps = state => ({ system: state.system, qtNghiThaiSan: state.qtNghiThaiSan });
 const mapActionsToProps = {
-    getTchcNghiThaiSanAll, getTchcNghiThaiSanPage, deleteTchcNghiThaiSan, getDmDonViAll, createTchcNghiThaiSan,
-    updateTchcNghiThaiSan, getDmChucVuAll
+    getQtNghiThaiSanAll, getQtNghiThaiSanPage, deleteQtNghiThaiSan, getDmDonViAll, createQtNghiThaiSan,
+    updateQtNghiThaiSan, getDmChucVuAll
 };
-export default connect(mapStateToProps, mapActionsToProps)(TchcNghiThaiSan);
+export default connect(mapStateToProps, mapActionsToProps)(QtNghiThaiSan);

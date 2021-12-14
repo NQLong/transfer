@@ -5,7 +5,7 @@ import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormDatePic
 import Pagination from 'view/component/Pagination';
 import {
     getQtHopDongDvtlTnPage, getQtHopDongDvtlTnAll, updateQtHopDongDvtlTn,
-    deleteQtHopDongDvtlTn, createQtHopDongDvtlTn
+    deleteQtHopDongDvtlTn, createQtHopDongDvtlTn, downloadWord
 } from './redux';
 import { getDmChucVuAll } from 'modules/mdDanhMuc/dmChucVu/redux';
 import { getDmDonViAll } from 'modules/mdDanhMuc/dmDonVi/redux';
@@ -123,15 +123,15 @@ class QtHopDongDvtlTn extends AdminPage {
         this.modal.show();
     }
 
-    hopDongDownloadWord = () => {
-        // hopDongDownloadWord(item.stt, data => {
-        //     T.FileSaver(new Blob([new Uint8Array(data.data)]), item.shcc + '_hopdong.docx');
-        // });
+    downloadWord = (item) => {
+        downloadWord(item.ma, data => {
+            T.FileSaver(new Blob([new Uint8Array(data.data)]), item.shcc + '_hopdong.docx');
+        });
     }
 
     delete = (e, item) => {
         T.confirm('Xóa hợp đồng', 'Bạn có chắc bạn muốn xóa hợp đồng này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtHopDongDvtlTn(item.stt, error => {
+            isConfirm && this.props.deleteQtHopDongDvtlTn(item.ma, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá hợp đồng bị lỗi!', 'danger');
                 else T.alert('Xoá hợp đồng thành công!', 'success', false, 800);
             });
@@ -164,15 +164,17 @@ class QtHopDongDvtlTn extends AdminPage {
                         <TableCell type='text' content={index + 1} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span>{item.ho + ' ' + item.ten}</span><br />
-                                <span>Mã số cán bộ: {item.shcc}</span>
+                                <a href={'/user/tccb/qua-trinh/hop-dong-dvtl-tn/' + item.ma} >
+                                    <span>{item.ho + ' ' + item.ten}</span><br />
+                                    <span>{item.shcc}</span>
+                                </a>
                             </>
                         )}
                         />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span>Số: <Link to={'/user/tccb/qua-trinh/hop-dong-dvtl-tn/' + item.ma}>{item.soHopDong}</Link></span><br />
-                                <span>Hợp đồng {item.dienHopDong}</span><br/>
+                                <span>Số: {item.soHopDong}</span><br />
+                                <span>{item.dienHopDong}</span><br />
                                 <span>Ngày ký: <span style={{ color: 'blue' }}>{item.ngayKyHopDong ? new Date(item.ngayKyHopDong).ddmmyyyy() : ''}</span></span>
                             </>
                         )}
@@ -191,7 +193,7 @@ class QtHopDongDvtlTn extends AdminPage {
                             </>
                         )} />
                         <TableCell type='buttons' content={item} onEdit={`/user/tccb/qua-trinh/hop-dong-dvtl-tn/${item.ma}`} onDelete={this.delete} permission={permission} >
-                            <a href="#" className="btn btn-primary" style={{ width: '45px' }} onClick={e => e.preventDefault() || this.hopDongDownloadWord(item)}>
+                            <a href="#" className="btn btn-primary" style={{ width: '45px' }} onClick={e => e.preventDefault() || this.downloadWord(item)}>
                                 <i className='fa fa-lg fa-file-word-o' />
                             </a>
                         </TableCell>
@@ -201,11 +203,11 @@ class QtHopDongDvtlTn extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-list-alt',
-            title: 'Hợp đồng Đơn vị trả lương - trách nhiệm',
+            icon: 'fa fa-pencil',
+            title: 'Hợp đồng Đơn vị trả lương - Trách nhiệm',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
-                'Hợp đồng Đơn vị trả lương - trách nhiệm'
+                'Hợp đồng Đơn vị trả lương - Trách nhiệm'
             ],
             content: <>
                 <div className='tile'>{table}</div>

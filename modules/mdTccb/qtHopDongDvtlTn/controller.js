@@ -149,14 +149,73 @@ module.exports = app => {
     });
 
     app.get('/api/tccb/qua-trinh/hop-dong-dvtl-tn/download-word/:ma', app.permission.check('qtHopDongDvtlTn:read'), (req, res) => {
-        console.log('hello');
         if (req.params && req.params.ma) {
-            app.model.qtHopDongDvtlTn.get({ ma: req.params.ma }, (error, item) => {
-                console.log(req.params.ma);
+            app.model.qtHopDongDvtlTn.downWord(req.params.ma , (error, item) => {
                 if (error || !item) {
                     res.send({ error });
                 } else {
-                    console.log(item.rows[0]);
+                    let filename = 'Mau-HD-TN.docx';
+                    if (item.kieuHopDong == 'DVTL') filename = 'Mau-HD-DVTL.docx';
+                    const source = app.path.join(__dirname, 'resource', filename);
+
+                    new Promise(resolve => {
+                        let hopDong = item.rows[0];
+                        const data = {
+                            soHopDong: hopDong.soHopDong,
+                            hoTenNguoiKy: hopDong.hoNguoiKy + ' ' + hopDong.tenNguoiKy,
+                            chucVuNguoiKy: hopDong.maChucVuNguoiKy == '003' ? (hopDong.chucVuNguoiKy + ' ' + hopDong.donViNguoiKy) : hopDong.chucVuNguoiKy,
+                            hoTen: hopDong.ho + ' ' + hopDong.ten,
+                            quocTich: hopDong.quocTich ? hopDong.quocTich : '',
+                            tonGiao: hopDong.tonGiao ? hopDong.tonGiao : '',
+                            danToc: hopDong.danToc ? hopDong.danToc : '',
+                            ngaySinh: hopDong.ngaySinh ? app.date.viDateFormat(new Date(hopDong.ngaySinh)) : '',
+                            noiSinh: hopDong.noiSinh ? hopDong.noiSinh : '',
+                            nguyenQuan: hopDong.nguyenQuan ? hopDong.nguyenQuan : '',
+                            cuTru: (hopDong.soNhaCuTru ? hopDong.soNhaCuTru + ', ' : '')
+                                + (hopDong.xaCuTru ? hopDong.xaCuTru + ', ' : '')
+                                + (hopDong.huyenCuTru ? hopDong.huyenCuTru + ', ' : '')
+                                + (hopDong.tinhCuTru ? hopDong.tinhCuTru : ''),
+                            thuongTru: (hopDong.soNhaThuongTru ? hopDong.soNhaThuongTru + ', ' : '')
+                                + (hopDong.xaThuongTru ? hopDong.xaThuongTru + ', ' : '')
+                                + (hopDong.huyenThuongTru ? hopDong.huyenThuongTru + ', ' : '')
+                                + (hopDong.tinhThuongTru ? hopDong.tinhThuongTru : ''),
+
+                            dienThoai: hopDong.dienThoai ? hopDong.dienThoai : '',
+                            hocVanTrinhDo: hopDong.trinhDoHocVan ? hopDong.trinhDoHocVan : '',
+                            hocVanChuyenNganh: hopDong.hocVanChuyenNganh ? hopDong.hocVanChuyenNganh : '',
+
+                            khoaHocChucDanh: hopDong.chucDanhKhoaHoc ? hopDong.chucDanhKhoaHoc : '',
+                            khoaHocChuyenNganh: hopDong.khoaHocChuyenNganh ? hopDong.khoaHocChuyenNganh : '',
+
+                            cmnd: hopDong.cmnd ? hopDong.cmnd : '',
+                            cmndNgayCap: hopDong.ngayCap ? app.date.viDateFormat(new Date(hopDong.ngayCap)) : '',
+                            cmndNoiCap: hopDong.cmndNoiCap ? hopDong.cmndNoiCap : '',
+
+                            loaiHopDong: hopDong.loaiHopDong ? hopDong.loaiHopDong : '',
+                            batDauLamViec: hopDong.batDauLamViec ? app.date.viDateFormat(new Date(hopDong.batDauLamViec)) : '',
+                            ketThucHopDong: hopDong.ketThucHopDong ? app.date.viDateFormat(new Date(hopDong.ketThucHopDong)) : '',
+                            hieuLucHopDong:  hopDong.hieuLucHopDong ? app.date.viDateFormat(new Date(hopDong.hieuLucHopDong)) : '',
+                            diaDiemLamViec: hopDong.diaDiemLamViec ? hopDong.diaDiemLamViec : '',
+                            chucDanhChuyenMon: hopDong.chucDanhChuyenMon ? hopDong.chucDanhChuyenMon : '',
+                            chiuSuPhanCong: hopDong.chiuSuPhanCong ? hopDong.chiuSuPhanCong : '',
+
+                            bac: hopDong.bac ? hopDong.bac : '',
+                            heSo: hopDong.heSo ? hopDong.heSo : '',
+                            
+                            tienLuong: hopDong.tienLuong ? hopDong.tienLuong : '',
+                            donViChiTra: hopDong.donViChiTra ? hopDong.donViChiTra : '',
+                            ngayKyHopDong: hopDong.ngayKyHopDong ? app.date.viDateFormat(new Date(hopDong.ngayKyHopDong)) : ''
+                        };
+                        resolve(data);
+                    }).then((data) => {
+                        app.docx.generateFile(source, data, (error, data) => {
+                            if (error)
+                                res.send({ error });
+                            else {
+                                res.send({ data });
+                            }
+                        });
+                    });
                 }
             });
         }

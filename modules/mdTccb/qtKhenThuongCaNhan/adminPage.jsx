@@ -8,8 +8,8 @@ import {
     deleteQtKhenThuongCaNhan, createQtKhenThuongCaNhan
 } from './redux';
 import { getStaffAll } from 'modules/mdTccb/tccbCanBo/redux';
-import { getDmKhenThuongKyHieuAll } from 'modules/_default/dmKhenThuongKyHieu/redux';
-import { getDmKhenThuongChuThichAll } from 'modules/_default/dmKhenThuongChuThich/redux';
+import { getDmKhenThuongKyHieuAll } from 'modules/mdDanhMuc/dmKhenThuongKyHieu/redux';
+import { getDmKhenThuongChuThichAll } from 'modules/mdDanhMuc/dmKhenThuongChuThich/redux';
 
 class EditModal extends AdminModal {
     state = { shcc: null, id: '' };

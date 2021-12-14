@@ -15,7 +15,7 @@ class QtHopDongLaoDongPage extends AdminPage {
     componentDidMount() {
         T.ready('/user/tccb', () => {
             T.onSearch = (searchText) => {
-                if(this.checked) this.props.getQtHopDongLaoDongGroupPage(undefined, undefined, searchText || '');
+                if (this.checked) this.props.getQtHopDongLaoDongGroupPage(undefined, undefined, searchText || '');
                 else this.props.getQtHopDongLaoDongPage(undefined, undefined, searchText || '');
             };
             T.showSearchBox();
@@ -28,11 +28,15 @@ class QtHopDongLaoDongPage extends AdminPage {
         this.props.getQtHopDongLaoDongGroupPage(undefined, undefined, '');
     }
 
-    hopDongDownloadWord = (item) => {
-        console.log(item);
-        this.props.downloadWord(item.ma, data => {
+    downloadWord = item => {
+        downloadWord(parseInt(item.ma), data => {
             T.FileSaver(new Blob([new Uint8Array(data.data)]), item.shcc + '_hopdong.docx');
         });
+    }
+
+    download = (e) => {
+        e.preventDefault();
+        T.download(T.url('/api/tccb/qua-trinh/hop-dong-lao-dong/download-excel'), 'HDLD.xlsx');
     }
 
     delete = (e, item) => {
@@ -59,8 +63,8 @@ class QtHopDongLaoDongPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                        <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        <th style={{ width: '70%', whiteSpace: 'nowrap' }}>Số hợp đồng</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Cán bộ</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Số hợp đồng</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ duyệt hồ sơ</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
@@ -73,14 +77,14 @@ class QtHopDongLaoDongPage extends AdminPage {
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <a href={'/user/tccb/qua-trinh/hop-dong-lao-dong/' + item.ma}>
-                                    <span>{item.hoBenA + ' ' + item.tenBenA}</span><br />
-                                    <span>Mã thẻ cán bộ: {item.shcc}</span></a>
+                                    <span>{(item.hoBenA ? item.hoBenA : '') + ' ' + (item.tenBenA ? item.tenBenA : '')}</span><br />
+                                    <span>{item.shcc}</span></a>
                             </>
                         )}
                         />
                         <TableCell type='text' content={(
                             <>
-                                <span>Số: {item.soHopDong}</span><br />
+                                <span style={{ whiteSpace: 'nowrap' }}>Số: {item.soHopDong}</span><br />
                                 <span>Ngày ký: <span style={{ color: 'blue' }}>{item.ngayKyHopDong ? new Date(item.ngayKyHopDong).ddmmyyyy() : ''}</span></span>
                             </>
                         )}
@@ -104,12 +108,12 @@ class QtHopDongLaoDongPage extends AdminPage {
                             </>
                         )} />
                         <TableCell type='buttons' content={item} onEdit={`/user/tccb/qua-trinh/hop-dong-lao-dong/${item.ma}`} onDelete={this.delete} permission={permission} >
-                            <a href="#" className="btn btn-primary" style={{ width: '45px' }} onClick={e => e.preventDefault() || this.hopDongDownloadWord(item)}>
+                            {!this.checked && <a href="#" className="btn btn-primary" style={{ width: '45px' }} onClick={e => e.preventDefault() || this.downloadWord(item)}>
                                 <i className='fa fa-lg fa-file-word-o' />
-                            </a>
-                            <Link className='btn btn-success' to={`/user/tccb/qua-trinh/hop-dong-lao-dong/group/${item.shcc}`} style={{ width: '45px' }}>
-                                <i className='fa fa-lg fa-archive' />
-                            </Link>
+                            </a>}
+                            {this.checked && <Link className='btn btn-success' to={`/user/tccb/qua-trinh/hop-dong-lao-dong/group/${item.shcc}`} style={{ width: '45px' }}>
+                                <i className='fa fa-lg fa-compress' />
+                            </Link>}
                         </TableCell>
                     </tr>
                 )
@@ -117,7 +121,7 @@ class QtHopDongLaoDongPage extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-list-alt',
+            icon: 'fa fa-file-text-o',
             title: 'Hợp đồng Lao động',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
@@ -130,6 +134,11 @@ class QtHopDongLaoDongPage extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.checked ? this.props.getQtHopDongLaoDongGroupPage : this.props.getQtHopDongLaoDongPage} />
+                {permission.read &&
+                        <button className='btn btn-success btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px' }} onClick={this.download} >
+                            <i className='fa fa-lg fa-print' />
+                        </button>
+                }
             </>,
             backRoute: '/user/tccb',
             onCreate: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/tccb/qua-trinh/hop-dong-lao-dong/new') : null

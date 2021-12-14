@@ -178,15 +178,29 @@ export function updateQtHopDongLaoDong(ma, changes, done) {
 }
 
 export function downloadWord(ma, done) {
+    const url = `/api/tccb/qua-trinh/hop-dong-lao-dong/download-word/${ma}`;
+    T.get(url, data => {
+        if (data.error) {
+            T.notify('Tải file world bị lỗi' + (data.error.message && (':<br>' + data.error)), 'danger');
+            console.error(`GET: ${url}.`, data.error);
+        } else if (done) {
+            done(data.data);
+        }
+    }, error => T.notify('Tải file world bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+
+}
+
+export function getTruongPhongTccb(done) {
     return () => {
-        const url = `/api/tccb/qua-trinh/hop-dong-lao-dong/download-word/${ma}`;
+        const url = '/api/tccb/qua-trinh/hop-dong-lao-dong/get-truong-phong-tccb';
         T.get(url, data => {
             if (data.error) {
-                T.notify('Tải file world bị lỗi' + (data.error.message && (':<br>' + data.error)), 'danger');
+                T.notify('Lấy thông tin trưởng phòng TCCB bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
-            } else if (done) {
-                done(data.data);
+                done && done();
+            } else {
+                done && done(data);
             }
-        }, error => T.notify('Tải file world bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+        }, error => console.error(`GET: ${url}.`, error));
     };
 }
