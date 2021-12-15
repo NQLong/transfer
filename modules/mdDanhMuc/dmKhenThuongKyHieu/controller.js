@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.category,
         menus: {
-            2113: { title: 'Khen thưởng ký hiệu', link: '/user/danh-muc/khen-thuong-ky-hieu' },
+            2116: { title: 'Khen thưởng ký hiệu', link: '/user/danh-muc/khen-thuong-ky-hieu' },
         },
     };
     app.permission.add(
@@ -34,8 +34,6 @@ module.exports = app => {
 
     app.post('/api/danh-muc/khen-thuong-ky-hieu', app.permission.check('dmKhenThuongKyHieu:write'), (req, res) => {
         let newData = req.body.item;
-        newData.phuCap = newData.phuCap ? parseFloat(newData.phuCap).toFixed(2) : null;
-        newData.kichHoat = newData.kichHoat ? parseInt(newData.kichHoat) : null;
         app.model.dmKhenThuongKyHieu.create(newData, (error, item) => res.send({ error, item }));
     });
 
@@ -47,48 +45,4 @@ module.exports = app => {
     app.delete('/api/danh-muc/khen-thuong-ky-hieu', app.permission.check('dmKhenThuongKyHieu:delete'), (req, res) => {
         app.model.dmKhenThuongKyHieu.delete({ ma: req.body.ma }, error => res.send({ error }));
     });
-
-    app.post('/api/danh-muc/khen-thuong-ky-hieu/multiple', app.permission.check('dmKhenThuongKyHieu:write'), (req, res) => {
-        const isOverride = req.body.isOverride;
-        const data = req.body.dmKhenThuongKyHieu;
-        const dataImported = [];
-        const handleCreate = index => {
-            if (index >= data.length) {
-                res.send({ data: { message: 'Upload success', items: dataImported } });
-            } else {
-                app.model.dmKhenThuongKyHieu.get({ ma: data[index].ma }, (error, item) => {
-                    let currentDate = data[index];
-                    currentDate.phuCap = currentDate.phuCap ? parseFloat(currentDate.phuCap).toFixed(2) : null;
-                    currentDate.kichHoat = currentDate.kichHoat ? parseInt(currentDate.kichHoat) : null;
-                    if (error) {
-                        res.send({ error });
-                    } else if (item) {
-                        if (isOverride == 'TRUE') {
-                            app.model.dmKhenThuongKyHieu.update({ ma: data[index].ma }, currentDate, (error, item) => {
-                                if (error) {
-                                    res.send({ error });
-                                } else {
-                                    dataImported.push(item);
-                                    handleCreate(index + 1);
-                                }
-                            });
-                        } else {
-                            handleCreate(index + 1);
-                        }
-                    } else {
-                        app.model.dmKhenThuongKyHieu.create(currentDate, (error, item) => {
-                            if (error) {
-                                res.send({ error });
-                            } else {
-                                dataImported.push(item);
-                                handleCreate(index + 1);
-                            }
-                        });
-                    }
-                });
-            }
-        };
-        handleCreate(0);
-    });
-
 };
