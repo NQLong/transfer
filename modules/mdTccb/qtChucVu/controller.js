@@ -59,13 +59,13 @@ module.exports = app => {
         app.model.qtChucVu.get({ stt: req.params.stt }, (error, item) => res.send({ error, item }));
     });
 
-    app.post('/api/qua-trinh/chuc-vu', app.permission.check('staff:write'), (req, res) =>
+    app.post('/api/qua-trinh/chuc-vu', app.permission.check('qtChucVu:write'), (req, res) =>
         app.model.qtChucVu.create(req.body.items, (error, item) => res.send({ error, item })));
 
-    app.put('/api/qua-trinh/chuc-vu', app.permission.check('staff:write'), (req, res) =>
+    app.put('/api/qua-trinh/chuc-vu', app.permission.check('qtChucVu:write'), (req, res) =>
         app.model.qtChucVu.update({ stt: req.body.stt }, req.body.changes, (error, item) => res.send({ error, item })));
 
-    app.delete('/api/qua-trinh/chuc-vu', app.permission.check('staff:write'), (req, res) =>
+    app.delete('/api/qua-trinh/chuc-vu', app.permission.check('qtChucVu:write'), (req, res) =>
         app.model.qtChucVu.delete({ stt: req.body.stt }, (error) => res.send(error)));
 
     app.post('/api/user/qua-trinh/chuc-vu', app.permission.check('qtChucVu:login'), (req, res) => {

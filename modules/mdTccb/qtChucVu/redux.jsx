@@ -140,6 +140,7 @@ export function deleteQtChucVu(stt) {
 
 export function updateQtChucVu(stt, changes, done) {
     return dispatch => {
+        console.log(changes);
         const url = '/api/qua-trinh/chuc-vu';
         T.put(url, { stt, changes }, data => {
             if (data.error || changes == null) {

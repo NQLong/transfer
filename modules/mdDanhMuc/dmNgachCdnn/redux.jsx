@@ -144,6 +144,6 @@ export function changeDmNgachCdnn(item) {
 export const SelectAdapter_DmNgachCdnn = {
     ajax: false,
     getAll: getDmNgachCdnnAll,
-    processResults: response => ({ results: response ? response.map(item => ({ value: item.id, text: `${item.maSoCdnn}: ${item.ten}` })) : [] }),
+    processResults: response => ({ results: response ? response.map(item => ({ value: item.id, text: `${item.ma}: ${item.ten}` })) : [] }),
     condition: { kichHoat: 1 },
 };

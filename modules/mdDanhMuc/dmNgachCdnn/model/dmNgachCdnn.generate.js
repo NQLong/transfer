@@ -1,6 +1,6 @@
-// Table name: DM_NGACH_CDNN { ma, maSoCdnn, ten, nhom, id, kichHoat }
+// Table name: DM_NGACH_CDNN { ma, ten, id, kichHoat }
 const keys = ['ID'];
-const obj2Db = { 'ma': 'MA', 'maSoCdnn': 'MA_SO_CDNN', 'ten': 'TEN', 'nhom': 'NHOM', 'id': 'ID', 'kichHoat': 'KICH_HOAT' };
+const obj2Db = { 'ma': 'MA', 'ten': 'TEN', 'id': 'ID', 'kichHoat': 'KICH_HOAT' };
 
 module.exports = app => {
     app.model.dmNgachCdnn = {
