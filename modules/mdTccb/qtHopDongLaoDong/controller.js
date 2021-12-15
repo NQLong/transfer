@@ -228,7 +228,7 @@ module.exports = app => {
                         cells.push({ cell: 'L' + (index + 2), border: '1234', value: item.cmnd });
                         cells.push({ cell: 'M' + (index + 2), border: '1234', value: item.ngayCap ? formatDate(item.ngayCap) : '' });
                         cells.push({ cell: 'N' + (index + 2), border: '1234', value: item.noiCap });
-                        cells.push({ cell: 'O' + (index + 2), border: '1234', value: item.ho + ' ' + item.ten });
+                        cells.push({ cell: 'O' + (index + 2), border: '1234', value: item.hoNguoiKy + ' ' + item.tenNguoiKy });
                         cells.push({ cell: 'P' + (index + 2), border: '1234', value: chucVuNK });
                         cells.push({ cell: 'Q' + (index + 2), border: '1234', value: item.loaiHopDong });
                         cells.push({ cell: 'R' + (index + 2), border: '1234', value: item.soHopDong });
