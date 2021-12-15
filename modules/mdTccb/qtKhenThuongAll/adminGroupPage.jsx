@@ -136,9 +136,9 @@ class EditModal extends AdminModal {
                     null
                 }       
 
-                <FormSelect className='col-md-12' ref={e => this.thanhTich = e} label='Thành tích' data={this.thanhTichTable} readOnly={readOnly} /> 
-                <FormTextBox className='col-md-4' ref={e => this.namDatDuoc = e} label='Năm đạt được (yyyy)' type='year' readOnly={readOnly} />
-                <FormSelect className='col-md-8' ref={e => this.chuThich = e} label='Chú thích' data={this.chuThichTable} readOnly={readOnly} />
+                <FormSelect className='col-md-12' ref={e => this.thanhTich = e} label='Thành tích' data={this.thanhTichTable} readOnly={false} /> 
+                <FormTextBox className='col-md-4' ref={e => this.namDatDuoc = e} label='Năm đạt được (yyyy)' type='year' readOnly={false} />
+                <FormSelect className='col-md-8' ref={e => this.chuThich = e} label='Chú thích' data={this.chuThichTable} readOnly={false} />
             </div>
         });
     }

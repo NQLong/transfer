@@ -223,7 +223,7 @@ class QtKhenThuongAll extends AdminPage {
                                 </>
                             : <>
                                     <span>
-                                        {item.tenBoMon + ' (' + item.tenDonVi + ')'}
+                                        {item.tenBoMon + ' (' + item.tenDonViBoMon + ')'}
                                     </span>
                                 </>
 
