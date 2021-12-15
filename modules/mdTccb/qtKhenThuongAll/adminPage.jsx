@@ -190,11 +190,11 @@ class QtKhenThuongAll extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Loại đối tượng</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Loại đối tượng</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Đối tượng</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm đạt được</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thành tích</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Chú thích</th>
+                        <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Thành tích</th>
+                        <th style={{ width: '20%', whiteSpace: 'nowrap'}}>Chú thích</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
@@ -206,7 +206,7 @@ class QtKhenThuongAll extends AdminPage {
                             item.maLoaiDoiTuong == '01' ? 
                             <>
                                 <span>
-                                    {/* {item.tenLoaiDoiTuong} */}
+                                     {'Trường Đại học Khoa học Xã hội và Nhân Văn, TP. HCM'}
                                 </span>
                             </>
                             :

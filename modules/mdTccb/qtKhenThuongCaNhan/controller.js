@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3011: { title: 'Quá trình khen thưởng cá nhân', link: '/user/tccb/qua-trinh/khen-thuong-ca-nhan', icon: 'fa-pencil', backgroundColor: '#e07b91', groupIndex: 3 },
+            // 3011: { title: 'Quá trình khen thưởng cá nhân', link: '/user/tccb/qua-trinh/khen-thuong-ca-nhan', icon: 'fa-pencil', backgroundColor: '#e07b91', groupIndex: 3 },
         },
     };
     app.permission.add(
