@@ -98,7 +98,7 @@ class EditModal extends AdminModal {
             maChucVu: this.maChucVu.value(),
             maDonVi: this.maDonVi.value(),
             soQd: this.soQuyetDinh.value(),
-            ngayRaQd: this.ngayRaQuyetDinh.value(),
+            ngayRaQd: Number(this.ngayRaQuyetDinh.value()),
             chucVuChinh: this.chucVuChinh.value(),
             maBoMon: this.maBoMon.value(),
         };
@@ -119,8 +119,6 @@ class EditModal extends AdminModal {
     }
 
     render = () => {
-        console.log(this.chucVuChinh);
-        console.log(this.checkChucVuSwitch());
         const readOnly = this.props.readOnly;
         return this.renderModal({
             title: this.state.shcc ? 'Cập nhật quá trình chức vụ' : 'Tạo mới quá trình chức vụ',

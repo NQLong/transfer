@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormDatePicker, FormCheckbox, FormSelect } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable} from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
     getQtHopDongDvtlTnPage, getQtHopDongDvtlTnAll, updateQtHopDongDvtlTn,
@@ -12,102 +12,6 @@ import { getDmDonViAll } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { getDmBoMonAll } from 'modules/mdDanhMuc/dmBoMon/redux';
 import { getStaffAll } from 'modules/mdTccb/tccbCanBo/redux';
 
-class EditModal extends AdminModal {
-    donViTable = [];
-    chucVuTable = [];
-    state = { shcc: null };
-    componentDidMount() {
-
-        this.props.getDonVi(items => {
-            if (items) {
-                this.donViTable = [];
-                items.forEach(item => this.donViTable.push({
-                    'id': item.ma,
-                    'text': item.ten
-                }));
-            }
-        });
-        this.props.getChucVu(items => {
-            if (items) {
-                this.chucVuTable = [];
-                items.forEach(item => this.chucVuTable.push({
-                    'id': item.ma,
-                    'text': item.ten
-                }));
-            }
-        });
-        this.props.getBoMon(items => {
-            if (items) {
-                this.boMonTable = [];
-                items.forEach(item => this.boMonTable.push({
-                    'id': item.ma,
-                    'text': item.ten
-                }));
-            }
-        });
-        this.props.getStaff(items => {
-            if (items) {
-                this.staffTable = [];
-                items.forEach(item => this.staffTable.push({
-                    'id': item.shcc,
-                    'text': item.shcc + ' - ' + item.ho + ' ' + item.ten
-                }));
-            }
-        });
-    }
-
-    onShow = (item) => {
-        let { shcc, maChucVu, maDonVi, soQuyetDinh, ngayRaQuyetDinh, chucVuChinh, maBoMon } = item ? item : {
-            shcc: '', maChucVu: '', maDonVi: '', soQuyetDinh: '', ngayRaQuyetDinh: '', chucVuChinh: '', maBoMon: '',
-        };
-        this.setState({ shcc, item });
-        this.shcc.value(shcc ? shcc : '');
-        this.maChucVu.value(maChucVu ? maChucVu : '');
-        this.maDonVi.value(maDonVi ? maDonVi : '');
-        this.soQuyetDinh.value(soQuyetDinh ? soQuyetDinh : '');
-        this.ngayRaQuyetDinh.value(ngayRaQuyetDinh ? ngayRaQuyetDinh : '');
-        this.chucVuChinh.value(chucVuChinh ? 1 : 0);
-        this.maBoMon.value(maBoMon ? maBoMon : '');
-    };
-
-    changeKichHoat = (value, target) => target.value(value ? 1 : 0) || target.value(value);
-
-    onSubmit = (e) => {
-        e.preventDefault();
-        const changes = {
-            shcc: this.shcc.value(),
-            chucVu: this.maChucVu.value(),
-            donVi: this.maDonVi.value(),
-            soQd: this.soQuyetDinh.value(),
-            ngayRaQd: this.ngayRaQuyetDinh.value(),
-            chucVuChinh: this.chucVuChinh.value(),
-            boMon: this.maBoMon.value(),
-        };
-        if (changes.shcc == '') {
-            T.notify('Mã số cán bộ bị trống');
-            this.shcc.focus();
-        } else {
-            this.state.shcc ? this.props.update(changes, this.hide) : this.props.create(changes, this.hide);
-        }
-    }
-
-    render = () => {
-        const readOnly = this.props.readOnly;
-        return this.renderModal({
-            title: this.state.shcc ? 'Cập nhật quá trình hợp đồng' : 'Tạo mới quá trình hợp đồng',
-            size: 'large',
-            body: <div className='row'>
-                <FormSelect className='col-md-12' ref={e => this.shcc = e} label='Mã số cán bộ' data={this.staffTable} readOnly={readOnly} />
-                <FormSelect className='col-md-4' ref={e => this.maChucVu = e} label='Chức vụ' data={this.chucVuTable} readOnly={readOnly} />
-                <FormSelect className='col-md-4' ref={e => this.maDonVi = e} label='Đơn vị' data={this.donViTable} readOnly={readOnly} />
-                <FormSelect className='col-md-4' ref={e => this.maBoMon = e} label='Bộ môn' data={this.boMonTable} readOnly={readOnly} />
-                <FormCheckbox className='col-md-12' ref={e => this.chucVuChinh = e} label='Chức vụ chính' isSwitch={true} readOnly={readOnly} />
-                <FormTextBox type='text' className='col-md-6' ref={e => this.soQuyetDinh = e} label='Số quyết định' readOnly={readOnly} />
-                <FormDatePicker className='col-md-6' ref={e => this.ngayRaQuyetDinh = e} label='Ngày ra quyết định' readOnly={readOnly} />
-            </div>
-        });
-    }
-}
 
 class QtHopDongDvtlTn extends AdminPage {
     componentDidMount() {
@@ -140,8 +44,7 @@ class QtHopDongDvtlTn extends AdminPage {
     }
 
     render() {
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permission = this.getUserPermission('qtHopDongDvtlTn', ['read', 'write', 'delete']);
+        const permission = this.getUserPermission('qtHopDongDvtlTn', ['read', 'write', 'delete']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtHopDongDvtlTn && this.props.qtHopDongDvtlTn.page ?
             this.props.qtHopDongDvtlTn.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list };
         let table = 'Không có danh sách!';
@@ -213,12 +116,6 @@ class QtHopDongDvtlTn extends AdminPage {
                 <div className='tile'>{table}</div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getQtHopDongDvtlTnPage} />
-                <EditModal ref={e => this.modal = e} permission={permission}
-                    create={this.props.createQtHopDongDvtlTn} update={this.props.updateQtHopDongDvtlTn}
-                    getDonVi={this.props.getDmDonViAll} permissions={currentPermissions}
-                    getChucVu={this.props.getDmChucVuAll}
-                    getBoMon={this.props.getDmBoMonAll}
-                    getStaff={this.props.getStaffAll} />
             </>,
             backRoute: '/user/tccb',
             onCreate: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/tccb/qua-trinh/hop-dong-dvtl-tn/new') : null
