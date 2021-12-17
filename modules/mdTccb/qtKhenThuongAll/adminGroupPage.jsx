@@ -181,11 +181,11 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Loại đối tượng</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Loại đối tượng</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Đối tượng</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm đạt được</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thành tích</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Chú thích</th>
+                        <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Thành tích</th>
+                        <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Chú thích</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
@@ -193,7 +193,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                     <tr key={index}>
                         <TableCell type='text' style={{textAlign:'right'}} content={index + 1} />
                         <TableCell type='text' content={item.tenLoaiDoiTuong} />
-                        <TableCell type='link' onClick = {() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
+                        <TableCell type='link' onClick = {() => this.modal.show(item)} content={(
                             item.maLoaiDoiTuong == '01' ? 
                             <>
                                 <span>
@@ -226,13 +226,13 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                        <TableCell type='text' content={(
                             <>
                                 {item.tenThanhTich}
                             </>
                         )}
                         />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                        <TableCell type='text' content={(
                             <>
                                 {item.tenChuThich}
                             </>

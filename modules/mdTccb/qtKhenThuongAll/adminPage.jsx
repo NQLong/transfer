@@ -235,13 +235,13 @@ class QtKhenThuongAll extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                        <TableCell type='text'  content={(
                             <>
                                 {item.tenThanhTich}
                             </>
                         )}
                         />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                        <TableCell type='text' content={(
                             <>
                                 {item.tenChuThich}
                             </>
