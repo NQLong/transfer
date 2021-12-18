@@ -5,7 +5,7 @@ import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox,
 import Pagination from 'view/component/Pagination';
 import {
     getQtKhenThuongAllPage, getQtKhenThuongAllAll, updateQtKhenThuongAll,
-    deleteQtKhenThuongAll, createQtKhenThuongAll, getQtKhenThuongAllGroupPage,
+    deleteQtKhenThuongAll, createQtKhenThuongAll, getQtKhenThuongAllGroupPage, downloadExcel,
 } from './redux';
 import { getStaffAll } from 'modules/mdTccb/tccbCanBo/redux';
 import { getDmKhenThuongKyHieuAll } from 'modules/mdDanhMuc/dmKhenThuongKyHieu/redux';
@@ -119,7 +119,7 @@ class EditModal extends AdminModal {
         this.setState({doiTuong: value});
     }
     render = () => {
-        const readOnly = this.props.readOnly;
+        const readOnly = this.state.id ? true : this.props.readOnly;
         return this.renderModal({
             title: this.state.id ? 'Cập nhật quá trình khen thưởng' : 'Tạo mới quá trình khen thưởng',
             size: 'large',
@@ -135,9 +135,9 @@ class EditModal extends AdminModal {
                     null
                 }       
 
-                <FormSelect className='col-md-12' ref={e => this.thanhTich = e} label='Thành tích' data={this.thanhTichTable} readOnly={readOnly} /> 
-                <FormTextBox className='col-md-4' ref={e => this.namDatDuoc = e} label='Năm đạt được (yyyy)' type='year' readOnly={readOnly} />
-                <FormSelect className='col-md-8' ref={e => this.chuThich = e} label='Chú thích' data={this.chuThichTable} readOnly={readOnly} />
+                <FormSelect className='col-md-12' ref={e => this.thanhTich = e} label='Thành tích' data={this.thanhTichTable} readOnly={false} /> 
+                <FormTextBox className='col-md-4' ref={e => this.namDatDuoc = e} label='Năm đạt được (yyyy)' type='year' readOnly={false} />
+                <FormSelect className='col-md-8' ref={e => this.chuThich = e} label='Chú thích' data={this.chuThichTable} readOnly={false} />
             </div>
         });
     }
@@ -145,14 +145,29 @@ class EditModal extends AdminModal {
 
 class QtKhenThuongAll extends AdminPage {
     checked = false;
+    curState = '-1';
+    stateTable = [
+        {'id': '-1', 'text': 'Tất cả'}
+    ];
     componentDidMount() {
         T.ready('/user/tccb', () => {
+            this.props.getDmKhenThuongLoaiDoiTuongAll(items => {
+                if (items) {
+                    this.stateTable = [
+                        {'id': '-1', 'text': 'Tất cả'}
+                    ];
+                    items.forEach(item => this.stateTable.push({
+                        'id': item.ma,
+                        'text': item.ten
+                    }));
+                }
+            });
             T.onSearch = (searchText) => {
-                if (this.checked) this.props.getQtKhenThuongAllGroupPage(undefined, undefined, searchText || '');
-                else this.props.getQtKhenThuongAllPage(undefined, undefined, searchText || '');
+                if (this.checked) this.props.getQtKhenThuongAllGroupPage(undefined, undefined, this.curState, searchText || '');
+                else this.props.getQtKhenThuongAllPage(undefined, undefined, this.curState, searchText || '');
             };
             T.showSearchBox();
-            this.props.getQtKhenThuongAllPage(undefined, undefined,'');
+            this.props.getQtKhenThuongAllPage(undefined, undefined, this.curState, '');
         });
     }
 
@@ -161,11 +176,39 @@ class QtKhenThuongAll extends AdminPage {
         this.modal.show();
     }
 
-    groupPage = () => {
-        this.checked = !this.checked;
-        this.props.getQtKhenThuongAllGroupPage(undefined, undefined, '');
+    downloadExcel = (e) => {
+        e.preventDefault();
+        let name = 'khen_thuong', loaiDoiTuong = this.curState, maDoiTuong = '-1';
+        if (loaiDoiTuong == '-1') {
+            name += '_all';
+        }
+        else {
+            if (loaiDoiTuong == '01') {
+                name += '_truong';
+            }
+            else {
+                if (loaiDoiTuong == '02') name += '_canbo_';
+                if (loaiDoiTuong == '03') name += '_donvi_';
+                if (loaiDoiTuong == '04') name += '_bomon_';
+                if (maDoiTuong == '-1') name += 'all';
+                else name += maDoiTuong;
+            }
+        }
+        name += '.xlsx';
+        T.download(T.url(`/api/tccb/qua-trinh/khen-thuong-all/download-excel/${loaiDoiTuong}/${maDoiTuong}`), name);
+        //this.props.downloadExcel('', '')
     }
 
+    changeState = (value) => {
+        this.curState = value;
+        if (this.checked) this.props.getQtKhenThuongAllGroupPage(undefined, undefined, this.curState, '');
+        else this.props.getQtKhenThuongAllPage(undefined, undefined, this.curState, '');
+    }
+
+    groupPage = () => {
+        this.checked = !this.checked;
+        this.props.getQtKhenThuongAllGroupPage(undefined, undefined, this.curState, '');
+    }
     delete = (e, item) => {
         T.confirm('Xóa khen thưởng', 'Bạn có chắc bạn muốn xóa khen thưởng này?', 'warning', true, isConfirm => {
             isConfirm && this.props.deleteQtKhenThuongAll(item.id, error => {
@@ -179,6 +222,7 @@ class QtKhenThuongAll extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('qtKhenThuongAll', ['read', 'write', 'delete']);
+        let loaiDoiTuong = this.curState;
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ? (
             this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.page_gr ?
             this.props.qtKhenThuongAll.page_gr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
@@ -190,18 +234,16 @@ class QtKhenThuongAll extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Loại đối tượng</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Đối tượng</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm đạt được</th>
                         <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Thành tích</th>
-                        <th style={{ width: '20%', whiteSpace: 'nowrap'}}>Chú thích</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Loại đối tượng</th>
+                        <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap'}}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{textAlign:'right'}} content={index + 1} />
-                        <TableCell type='text' content={item.tenLoaiDoiTuong} />
                         <TableCell type='link' onClick = {() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
                             item.maLoaiDoiTuong == '01' ? 
                             <>
@@ -241,18 +283,19 @@ class QtKhenThuongAll extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' content={(
-                            <>
-                                {item.tenChuThich}
-                            </>
-                        )}
-                        />
-                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                            onEdit={() => this.modal.show(item)} onDelete={this.delete} >
-                            {this.checked && <Link className='btn btn-success' to={`/user/tccb/qua-trinh/khen-thuong-all/group_dt/${item.ma}`} style={{ width: '45px' }}>
-                            <i className='fa fa-lg fa-compress' />
-                            </Link>}
-                        </TableCell>
+                        <TableCell type='text' content={item.tenLoaiDoiTuong} />
+                        {
+                            !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
+                                onEdit={() => this.modal.show(item)} onDelete={this.delete} />
+                        }
+                        {
+                            this.checked && 
+                            <TableCell type='buttons' style={{ textAlign: 'center', width: '45px' }} content={item}  permission={permission} >
+                                <Link className='btn btn-success' to={`/user/tccb/qua-trinh/khen-thuong-all/group_dt/${item.maLoaiDoiTuong}/${item.ma}`} >
+                                <i className='fa fa-lg fa-compress' />
+                                </Link>
+                            </TableCell>
+                        }
                     </tr>
                 )
             });
@@ -267,10 +310,11 @@ class QtKhenThuongAll extends AdminPage {
             ],
             content: <>
                 <div className='tile'>
-                    <FormCheckbox label='Hiển thị theo đối tượng' onChange={this.groupPage} />
+                    <FormSelect className='col-md-3' ref={e => this.loaiDoiTuong = e} label='Chọn loại đối tượng' data={this.stateTable} onChange = {item => this.changeState(item.id)} />
+                    <FormCheckbox label='Gom đối tượng' style={{ position: 'absolute', right: '70px', top: '50px'}} onChange={this.groupPage} />
                     {table}
                 </div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition, loaiDoiTuong}}
                     getPage={this.checked ? this.props.getQtKhenThuongAllGroupPage : this.props.getQtKhenThuongAllPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createQtKhenThuongAll} update={this.props.updateQtKhenThuongAll}
@@ -281,8 +325,13 @@ class QtKhenThuongAll extends AdminPage {
                     getDonVi={this.props.getDmDonViAll}
                     getStaff={this.props.getStaffAll} 
                     getDonViItem = {this.props.getDmDonVi}    
-                    getBoMonItem = {this.props.getDmBoMon}
-                />
+                    getBoMonItem = {this.props.getDmBoMon} />
+                {
+                    permission.read &&
+                    <button className='btn btn-success btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px' }} onClick={this.downloadExcel} >
+                        <i className='fa fa-lg fa-print' />
+                    </button>
+                }
             </>,
             backRoute: '/user/tccb',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
@@ -294,6 +343,6 @@ const mapStateToProps = state => ({ system: state.system, qtKhenThuongAll: state
 const mapActionsToProps = {
     getQtKhenThuongAllAll, getQtKhenThuongAllPage, deleteQtKhenThuongAll, createQtKhenThuongAll,
     updateQtKhenThuongAll, getStaffAll, getDmKhenThuongKyHieuAll, getDmKhenThuongChuThichAll, 
-    getDmKhenThuongLoaiDoiTuongAll, getDmBoMonAll, getDmDonViAll, getQtKhenThuongAllGroupPage, getDmDonVi, getDmBoMon,
+    getDmKhenThuongLoaiDoiTuongAll, getDmBoMonAll, getDmDonViAll, getQtKhenThuongAllGroupPage, getDmDonVi, getDmBoMon, downloadExcel,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtKhenThuongAll);

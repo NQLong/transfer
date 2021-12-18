@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox} from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
-    getQtKhenThuongAllPage, getQtKhenThuongAllAll, updateQtKhenThuongAllGroupPageMa,
+    getQtKhenThuongAllPage, getQtKhenThuongAllAll, updateQtKhenThuongAll,
     deleteQtKhenThuongAll, createQtKhenThuongAll, getQtKhenThuongAllGroupPageMa, 
 } from './redux';
 
@@ -102,6 +102,8 @@ class EditModal extends AdminModal {
         this.chuThich.value(maChuThich ? maChuThich : '');
     };
 
+    changeKichHoat = (value, target) => target.value(value ? 1 : 0) || target.value(value);
+
     onSubmit = (e) => {
         e.preventDefault();
         const changes = {
@@ -142,45 +144,19 @@ class EditModal extends AdminModal {
     }
 }
 class QtKhenThuongAllGroupPage extends AdminPage {
-    ma = ''; loaiDoiTuong = '-1';
     componentDidMount() {
         T.ready('/user/tccb', () => {
-            const route = T.routeMatcher('/user/tccb/qua-trinh/khen-thuong-all/group_dt/:loaiDoiTuong/:ma'),
-                params = route.parse(window.location.pathname);
-            this.loaiDoiTuong = params.loaiDoiTuong;
-            this.ma = params.ma;
-            T.onSearch = (searchText) => this.props.getQtKhenThuongAllPage(undefined, undefined, this.loaiDoiTuong, searchText || '');
+            const route = T.routeMatcher('/user/tccb/qua-trinh/khen-thuong-all/group_dt/:ma'),
+                ma = route.parse(window.location.pathname);
+            T.onSearch = (searchText) => this.props.getQtKhenThuongAllPage(undefined, undefined, searchText || '');
             T.showSearchBox();
-            this.props.getQtKhenThuongAllGroupPageMa(undefined, undefined, this.loaiDoiTuong, this.ma);
+            this.props.getQtKhenThuongAllGroupPageMa(undefined, undefined, ma.ma);
         });
     }
 
     showModal = (e) => {
         e.preventDefault();
         this.modal.show();
-    }
-
-    downloadExcel = (e) => {
-        e.preventDefault();
-        let name = 'khen_thuong', loaiDoiTuong = this.loaiDoiTuong, maDoiTuong = this.ma;
-        if (loaiDoiTuong == '-1') {
-            name += '_all';
-        }
-        else {
-            if (loaiDoiTuong == '01') {
-                name += '_truong';
-            }
-            else {
-                if (loaiDoiTuong == '02') name += '_canbo_';
-                if (loaiDoiTuong == '03') name += '_donvi_';
-                if (loaiDoiTuong == '04') name += '_bomon_';
-                if (maDoiTuong == '-1') name += 'all';
-                else name += maDoiTuong;
-            }
-        }
-        name += '.xlsx';
-        T.download(T.url(`/api/tccb/qua-trinh/khen-thuong-all/download-excel/${loaiDoiTuong}/${maDoiTuong}`), name);
-        //this.props.downloadExcel('', '')
     }
 
     delete = (e, item) => {
@@ -196,7 +172,6 @@ class QtKhenThuongAllGroupPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('qtKhenThuongAll', ['read', 'write', 'delete']);
-        let loaiDoiTuong = this.loaiDoiTuong;
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.page ?
             this.props.qtKhenThuongAll.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list };
         let table = 'Không có danh sách!';
@@ -206,21 +181,23 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Loại đối tượng</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Đối tượng</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm đạt được</th>
                         <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Thành tích</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Loại đối tượng</th>
+                        <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Chú thích</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{textAlign:'right'}} content={index + 1} />
+                        <TableCell type='text' content={item.tenLoaiDoiTuong} />
                         <TableCell type='link' onClick = {() => this.modal.show(item)} content={(
                             item.maLoaiDoiTuong == '01' ? 
                             <>
                                 <span>
-                                     {'Trường Đại học Khoa học Xã hội và Nhân Văn, TP. HCM'}
+                                    {/* {item.tenLoaiDoiTuong} */}
                                 </span>
                             </>
                             :
@@ -237,7 +214,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                                 </>
                             : <>
                                     <span>
-                                        {item.tenBoMon + ' (' + item.tenDonViBoMon + ')'}
+                                        {item.tenBoMon + ' (' + item.tenDonVi + ')'}
                                     </span>
                                 </>
 
@@ -255,7 +232,12 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' content={item.tenLoaiDoiTuong} />
+                        <TableCell type='text' content={(
+                            <>
+                                {item.tenChuThich}
+                            </>
+                        )}
+                        />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={this.delete} />
                     </tr>
@@ -272,10 +254,10 @@ class QtKhenThuongAllGroupPage extends AdminPage {
             ],
             content: <>
                 <div className='tile'>{table}</div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition, loaiDoiTuong}}
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getQtKhenThuongAllPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
-                    create={this.props.createQtKhenThuongAll} update={this.props.updateQtKhenThuongAllGroupPageMa}
+                    create={this.props.createQtKhenThuongAll} update={this.props.updateQtKhenThuongAll}
                     getThanhTich={this.props.getDmKhenThuongKyHieuAll} permissions={currentPermissions}
                     getChuThich={this.props.getDmKhenThuongChuThichAll}
                     getLoaiDoiTuong={this.props.getDmKhenThuongLoaiDoiTuongAll}
@@ -285,14 +267,9 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                     getDonViItem = {this.props.getDmDonVi}    
                     getBoMonItem = {this.props.getDmBoMon}
                 />
-                {
-                    permission.read &&
-                    <button className='btn btn-success btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px' }} onClick={this.downloadExcel} >
-                        <i className='fa fa-lg fa-print' />
-                    </button>
-                }
             </>,
             backRoute: '/user/tccb/qua-trinh/khen-thuong-all',
+            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
         });
     }
 }
@@ -300,7 +277,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtKhenThuongAll: state.qtKhenThuongAll });
 const mapActionsToProps = {
     getQtKhenThuongAllAll, getQtKhenThuongAllPage, deleteQtKhenThuongAll, createQtKhenThuongAll,
-    updateQtKhenThuongAllGroupPageMa, getStaffAll, getDmKhenThuongKyHieuAll, getDmKhenThuongChuThichAll, 
+    updateQtKhenThuongAll, getStaffAll, getDmKhenThuongKyHieuAll, getDmKhenThuongChuThichAll, 
     getDmKhenThuongLoaiDoiTuongAll, getDmBoMonAll, getDmDonViAll, getQtKhenThuongAllGroupPageMa, getDmDonVi, getDmBoMon,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtKhenThuongAllGroupPage);
