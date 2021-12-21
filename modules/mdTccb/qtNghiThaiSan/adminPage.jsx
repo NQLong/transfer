@@ -155,7 +155,7 @@ class QtNghiThaiSan extends AdminPage {
                 getDataSource: () => list, stickyHead: false,
                 renderHead: () => (
                     <tr>
-                        <th style={{ width: '10%', textAlign: 'center' }}>SHCC</th>
+                        <th style={{ width: '10%', textAlign: 'center' }}>MSCB</th>
                         <th style={{ width: '15%' }}>Họ</th>
                         <th style={{ width: '10%' }}>Tên</th>
                         <th style={{ width: '10%', textAlign: 'center' }}>Bắt đầu nghỉ</th>

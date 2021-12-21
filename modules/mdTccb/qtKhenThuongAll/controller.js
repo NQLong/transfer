@@ -60,7 +60,7 @@ module.exports = app => {
         if (req.query.ma) {
             condition = {
                 statement: 'ma = :searchText',
-                parameter: { searchText: req.query.ma},
+                parameter: { searchText: req.query.ma },
             };
         }
         app.model.qtKhenThuongAll.getAll(condition, (error, items) => res.send({ error, items }));

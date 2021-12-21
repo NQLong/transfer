@@ -209,11 +209,6 @@ class StoragePage extends React.Component {
                 <button type='button' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.show}>
                     <i className='fa fa-lg fa-plus' />
                 </button>
-                <button onClick={() => {
-                    this.props.history.goBack();
-                }} className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '50px' }}>
-                    <i className='fa fa-lg fa-reply' />
-                </button>
                 <FileModal ref={this.fileModal} onSuccess={this.onSuccess} updateStorage={this.props.updateStorage} />
             </main>
         );
