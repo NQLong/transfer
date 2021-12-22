@@ -29,11 +29,11 @@ const run = () => {
             let listCols = [];
             while (true) {
                 let name = worksheet.getCell(app.excel.numberToExcelColumn(numCols) + '1').value;
-                listCols.push(name);
                 if (name == null) {
-                    numCols--;
+                    numCols -= 1;
                     break;
                 }
+                listCols.push(name);
                 numCols += 1;
             }
             
@@ -47,11 +47,11 @@ const run = () => {
                 // console.log("Row = ", row, "Cell = ", cell, "Key = ", data_key);
                 app.model.canBo.get({shcc: data_key}, (error, data) => {
                     if (data == null) {
-                        console.log("keys", "=", data_key);
+                        // console.log("keys", "=", data_key);
                         sql = 'INSERT INTO TCHC_CAN_BO (';
-                        for (let col = 1; col <= numCols; col++) {
+                        for (let col = 0; col < numCols; col++) {
                             sql += listCols[col];
-                            if (col != numCols) sql += ',';
+                            if (col != numCols - 1) sql += ',';
                             else sql += ') ';
                         }
                         sql += 'VALUES (';
@@ -61,7 +61,7 @@ const run = () => {
                             else data = '';
                             sql += "'" + data + "'";
                             if (col != numCols) sql += ',';
-                            else sql += ')';
+                            else sql += ');';
                         }
                         console.log(sql);
                     }
