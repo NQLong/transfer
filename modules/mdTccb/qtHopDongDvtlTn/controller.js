@@ -150,7 +150,7 @@ module.exports = app => {
 
     app.get('/api/tccb/qua-trinh/hop-dong-dvtl-tn/download-word/:ma', app.permission.check('qtHopDongDvtlTn:read'), (req, res) => {
         if (req.params && req.params.ma) {
-            app.model.qtHopDongDvtlTn.downWord(req.params.ma , (error, item) => {
+            app.model.qtHopDongDvtlTn.download(req.params.ma, (error, item) => {
                 if (error || !item) {
                     res.send({ error });
                 } else {
@@ -194,14 +194,14 @@ module.exports = app => {
                             loaiHopDong: hopDong.loaiHopDong ? hopDong.loaiHopDong : '',
                             batDauLamViec: hopDong.batDauLamViec ? app.date.viDateFormat(new Date(hopDong.batDauLamViec)) : '',
                             ketThucHopDong: hopDong.ketThucHopDong ? app.date.viDateFormat(new Date(hopDong.ketThucHopDong)) : '',
-                            hieuLucHopDong:  hopDong.hieuLucHopDong ? app.date.viDateFormat(new Date(hopDong.hieuLucHopDong)) : '',
+                            hieuLucHopDong: hopDong.hieuLucHopDong ? app.date.viDateFormat(new Date(hopDong.hieuLucHopDong)) : '',
                             diaDiemLamViec: hopDong.diaDiemLamViec ? hopDong.diaDiemLamViec : '',
                             chucDanhChuyenMon: hopDong.chucDanhChuyenMon ? hopDong.chucDanhChuyenMon : '',
                             chiuSuPhanCong: hopDong.chiuSuPhanCong ? hopDong.chiuSuPhanCong : '',
 
                             bac: hopDong.bac ? hopDong.bac : '',
                             heSo: hopDong.heSo ? hopDong.heSo : '',
-                            
+
                             tienLuong: hopDong.tienLuong ? hopDong.tienLuong : '',
                             donViChiTra: hopDong.donViChiTra ? hopDong.donViChiTra : '',
                             ngayKyHopDong: hopDong.ngayKyHopDong ? app.date.viDateFormat(new Date(hopDong.ngayKyHopDong)) : ''
