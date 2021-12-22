@@ -1,22 +1,22 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormCheckbox} from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
     getQtKhenThuongAllPage, getQtKhenThuongAllAll, updateQtKhenThuongAll,
     deleteQtKhenThuongAll, createQtKhenThuongAll, getQtKhenThuongAllGroupPage,
 } from './redux';
-import { getStaffAll } from 'modules/mdTccb/tccbCanBo/redux';
+import { getStaffAll, SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import { getDmKhenThuongKyHieuAll } from 'modules/mdDanhMuc/dmKhenThuongKyHieu/redux';
 import { getDmKhenThuongChuThichAll } from 'modules/mdDanhMuc/dmKhenThuongChuThich/redux';
 import { getDmKhenThuongLoaiDoiTuongAll } from 'modules/mdDanhMuc/dmKhenThuongLoaiDoiTuong/redux';
-import { getDmBoMonAll, getDmBoMon} from 'modules/mdDanhMuc/dmBoMon/redux';
-import { getDmDonViAll, getDmDonVi} from 'modules/mdDanhMuc/dmDonVi/redux';
+import { getDmBoMonAll, getDmBoMon, SelectAdapter_DmBoMon } from 'modules/mdDanhMuc/dmBoMon/redux';
+import { getDmDonViAll, getDmDonVi, SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
+import Loading from 'view/component/Loading';
 
 class EditModal extends AdminModal {
-    doiTuong = ''
-    state = { id: '', doiTuong: ''};
+    state = { id: '', doiTuong: '' };
     componentDidMount() {
         this.props.getLoaiDoiTuong(items => {
             if (items) {
@@ -45,57 +45,21 @@ class EditModal extends AdminModal {
                 }));
             }
         });
-        this.props.getStaff(items => {
-            if (items) {
-                this.staffTable = [];
-                items.forEach(item => this.staffTable.push({
-                    'id': item.shcc,
-                    'text': item.shcc + ' - ' + item.ho + ' ' + item.ten
-                }));
-            }
-        });
-        this.props.getDonVi(items => {
-            if (items) {
-                this.donViTable = [];
-                items.forEach(item => this.donViTable.push({
-                    'id': item.ma,
-                    'text': item.ten
-                }));
-            }
-        });
-        this.props.getBoMon(items => {
-            if (items) {
-                this.boMonTable = [];
-                items.forEach(item => {
-                    this.props.getDonViItem(item.maDv, data => {
-                        if (data) {
-                            this.boMonTable.push({
-                                'id': item.ma,
-                                'text': item.ten + ' (' + data.ten + ')'
-                            });
-                        }
-                    });
-                });
-            }
-        });
     }
 
     onShow = (item) => {
-        let {id, maLoaiDoiTuong, ma, namDatDuoc, maThanhTich, maChuThich} = item ? item : {
-            id : '', maLoaiDoiTuong: '', ma: '', namDatDuoc: '', maThanhTich: '', maChuThich: '',
+        let { id, maLoaiDoiTuong, ma, namDatDuoc, maThanhTich, maChuThich } = item ? item : {
+            id: '', maLoaiDoiTuong: '', ma: '', namDatDuoc: '', maThanhTich: '', maChuThich: '',
         };
-        this.setState({id: id, doiTuong: maLoaiDoiTuong});
-        {
-            this.state.doiTuong == '02' ? 
-            <FormSelect className='col-md-12' ref={e => this.ma = e} label='Mã số cán bộ' data={this.staffTable} /> : 
-            this.state.doiTuong == '03' ?
-            <FormSelect className='col-md-12' ref={e => this.ma = e} label='Mã đơn vị' data={this.donViTable} /> : 
-            this.state.doiTuong == '04' ?
-            <FormSelect className='col-md-12' ref={e => this.ma = e} label='Mã bộ môn (đơn vị)' data={this.boMonTable} /> :
-            null;
-        }       
-        this.loaiDoiTuong.value(maLoaiDoiTuong ? maLoaiDoiTuong : '');     
-        this.ma && this.ma.value(ma ? ma : '');
+        this.setState({
+            id: id, doiTuong: maLoaiDoiTuong
+        });
+
+        this.loaiDoiTuong.value(maLoaiDoiTuong ? maLoaiDoiTuong : '');
+        if (maLoaiDoiTuong == '02') this.maCanBo.value(ma);
+        else if (maLoaiDoiTuong == '03') this.maDonVi.value(ma);
+        else if (maLoaiDoiTuong == '04') this.maBoMon.value(ma);
+
         this.namDatDuoc.value(namDatDuoc ? namDatDuoc : '');
         this.thanhTich.value(maThanhTich ? maThanhTich : '');
         this.chuThich.value(maChuThich ? maChuThich : '');
@@ -108,7 +72,7 @@ class EditModal extends AdminModal {
         const changes = {
             loaiDoiTuong: this.loaiDoiTuong.value(),
             ma: this.ma ? this.ma.value() : '-1',
-            namDatDuoc: this.namDatDuoc.value(), 
+            namDatDuoc: this.namDatDuoc.value(),
             thanhTich: this.thanhTich.value(),
             chuThich: this.chuThich.value(),
         };
@@ -116,26 +80,29 @@ class EditModal extends AdminModal {
     }
 
     onChangeDT = (value) => {
-        this.setState({doiTuong: value});
+        this.setState({ doiTuong: value });
     }
     render = () => {
+        const doiTuong = this.state.doiTuong;
         const readOnly = this.state.id ? true : this.props.readOnly;
         return this.renderModal({
             title: this.state.id ? 'Cập nhật quá trình khen thưởng' : 'Tạo mới quá trình khen thưởng',
             size: 'large',
             body: <div className='row'>
                 <FormSelect className='col-md-4' ref={e => this.loaiDoiTuong = e} label='Loại đối tượng' data={this.loaiDoiTuongTable} readOnly={readOnly} onChange={value => this.onChangeDT(value.id)} />
-                {
-                    this.state.doiTuong == '02' ? 
-                    <FormSelect className='col-md-12' ref={e => this.ma = e} label='Mã số cán bộ' data={this.staffTable} readOnly={readOnly} /> : 
-                    this.state.doiTuong == '03' ?
-                    <FormSelect className='col-md-12' ref={e => this.ma = e} label='Mã đơn vị' data={this.donViTable} readOnly={readOnly} /> : 
-                    this.state.doiTuong == '04' ?
-                    <FormSelect className='col-md-12' ref={e => this.ma = e} label='Mã bộ môn (đơn vị)' data={this.boMonTable} readOnly={readOnly} /> :
-                    null
-                }       
 
-                <FormSelect className='col-md-12' ref={e => this.thanhTich = e} label='Thành tích' data={this.thanhTichTable} readOnly={false} /> 
+                <FormSelect className='col-md-12' ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo}
+                    style={doiTuong == '02' ? {} : { display: 'none' }}
+                    readOnly={readOnly} />
+
+                <FormSelect className='col-md-12' ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi}
+                    style={doiTuong == '03' ? {} : { display: 'none' }}
+                    readOnly={readOnly} />
+                <FormSelect className='col-md-12' ref={e => this.maBoMon = e} label='Bộ môn' data={SelectAdapter_DmBoMon} style={doiTuong == '04' ? {} : { display: 'none' }} readOnly={readOnly} />
+
+
+
+                <FormSelect className='col-md-12' ref={e => this.thanhTich = e} label='Thành tích' data={this.thanhTichTable} readOnly={false} />
                 <FormTextBox className='col-md-4' ref={e => this.namDatDuoc = e} label='Năm đạt được (yyyy)' type='year' readOnly={false} />
                 <FormSelect className='col-md-8' ref={e => this.chuThich = e} label='Chú thích' data={this.chuThichTable} readOnly={false} />
             </div>
@@ -147,14 +114,14 @@ class QtKhenThuongAll extends AdminPage {
     checked = false;
     curState = '-1';
     stateTable = [
-        {'id': '-1', 'text': 'Tất cả'}
+        { 'id': '-1', 'text': 'Tất cả' }
     ];
     componentDidMount() {
         T.ready('/user/tccb', () => {
             this.props.getDmKhenThuongLoaiDoiTuongAll(items => {
                 if (items) {
                     this.stateTable = [
-                        {'id': '-1', 'text': 'Tất cả'}
+                        { 'id': '-1', 'text': 'Tất cả' }
                     ];
                     items.forEach(item => this.stateTable.push({
                         'id': item.ma,
@@ -224,9 +191,9 @@ class QtKhenThuongAll extends AdminPage {
         let loaiDoiTuong = this.curState;
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ? (
             this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.page_gr ?
-            this.props.qtKhenThuongAll.page_gr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
-            : (this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.page ? this.props.qtKhenThuongAll.page : {pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: []});
-        let table = 'Không có danh sách!';
+                this.props.qtKhenThuongAll.page_gr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
+            : (this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.page ? this.props.qtKhenThuongAll.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] });
+        let table = <Loading />;
         if (list && list.length > 0) {
             table = renderTable({
                 getDataSource: () => list, stickyHead: false,
@@ -237,36 +204,35 @@ class QtKhenThuongAll extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm đạt được</th>
                         <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Thành tích</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Loại đối tượng</th>
-                        <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap'}}>Thao tác</th>
+                        <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{textAlign:'right'}} content={index + 1} />
-                        <TableCell type='link' onClick = {() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
-                            item.maLoaiDoiTuong == '01' ? 
-                            <>
-                                <span>
-                                     {'Trường Đại học Khoa học Xã hội và Nhân Văn, TP. HCM'}
-                                </span>
-                            </>
-                            :
-                            item.maLoaiDoiTuong == '02' ? 
-                                <>
-                                    <span>{item.hoCanBo + ' ' + item.tenCanBo}</span><br />
-                                    {item.maCanBo}
-                                </>
-                            : item.maLoaiDoiTuong == '03' ? 
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
+                            item.maLoaiDoiTuong == '01' ?
                                 <>
                                     <span>
-                                        {item.tenDonVi}
+                                        {'Trường Đại học Khoa học Xã hội và Nhân Văn, TP. HCM'}
                                     </span>
                                 </>
-                            : <>
-                                    <span>
-                                        {item.tenBoMon + ' (' + item.tenDonViBoMon + ')'}
-                                    </span>
-                                </>
+                                :
+                                item.maLoaiDoiTuong == '02' ?
+                                    <>
+                                        <span>{item.hoCanBo + ' ' + item.tenCanBo}</span><br />
+                                        {item.maCanBo}
+                                    </>
+                                    : item.maLoaiDoiTuong == '03' ?
+                                        <>
+                                            <span>
+                                                {item.tenDonVi}
+                                            </span>
+                                        </>
+                                        : <>
+                                            <span>{item.tenBoMon}</span> <br />
+                                            {'KHOA ' + item.tenDonViBoMon}
+                                        </>
 
                         )}
                         />
@@ -276,7 +242,7 @@ class QtKhenThuongAll extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text'  content={(
+                        <TableCell type='text' content={(
                             <>
                                 {item.tenThanhTich}
                             </>
@@ -288,10 +254,10 @@ class QtKhenThuongAll extends AdminPage {
                                 onEdit={() => this.modal.show(item)} onDelete={this.delete} />
                         }
                         {
-                            this.checked && 
-                            <TableCell type='buttons' style={{ textAlign: 'center', width: '45px' }} content={item}  permission={permission} >
+                            this.checked &&
+                            <TableCell type='buttons' style={{ textAlign: 'center', width: '45px' }} content={item} permission={permission} >
                                 <Link className='btn btn-success' to={`/user/tccb/qua-trinh/khen-thuong-all/group_dt/${item.maLoaiDoiTuong}/${item.ma}`} >
-                                <i className='fa fa-lg fa-compress' />
+                                    <i className='fa fa-lg fa-compress' />
                                 </Link>
                             </TableCell>
                         }
@@ -309,11 +275,11 @@ class QtKhenThuongAll extends AdminPage {
             ],
             content: <>
                 <div className='tile'>
-                    <FormSelect className='col-md-3' ref={e => this.loaiDoiTuong = e} label='Chọn loại đối tượng' data={this.stateTable} onChange = {item => this.changeState(item.id)} />
-                    <FormCheckbox label='Gom đối tượng' style={{ position: 'absolute', right: '70px', top: '50px'}} onChange={this.groupPage} />
+                    <FormSelect className='col-md-3' ref={e => this.loaiDoiTuong = e} label='Chọn loại đối tượng' data={this.stateTable} onChange={item => this.changeState(item.id)} />
+                    <FormCheckbox label='Gom đối tượng' style={{ position: 'absolute', right: '70px', top: '50px' }} onChange={this.groupPage} />
                     {table}
                 </div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition, loaiDoiTuong}}
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition, loaiDoiTuong }}
                     getPage={this.checked ? this.props.getQtKhenThuongAllGroupPage : this.props.getQtKhenThuongAllPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createQtKhenThuongAll} update={this.props.updateQtKhenThuongAll}
@@ -322,9 +288,9 @@ class QtKhenThuongAll extends AdminPage {
                     getLoaiDoiTuong={this.props.getDmKhenThuongLoaiDoiTuongAll}
                     getBoMon={this.props.getDmBoMonAll}
                     getDonVi={this.props.getDmDonViAll}
-                    getStaff={this.props.getStaffAll} 
-                    getDonViItem = {this.props.getDmDonVi}    
-                    getBoMonItem = {this.props.getDmBoMon} />
+                    getStaff={this.props.getStaffAll}
+                    getDonViItem={this.props.getDmDonVi}
+                    getBoMonItem={this.props.getDmBoMon} />
                 {
                     permission.read &&
                     <button className='btn btn-success btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px' }} onClick={this.downloadExcel} >
@@ -341,7 +307,7 @@ class QtKhenThuongAll extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtKhenThuongAll: state.qtKhenThuongAll });
 const mapActionsToProps = {
     getQtKhenThuongAllAll, getQtKhenThuongAllPage, deleteQtKhenThuongAll, createQtKhenThuongAll,
-    updateQtKhenThuongAll, getStaffAll, getDmKhenThuongKyHieuAll, getDmKhenThuongChuThichAll, 
+    updateQtKhenThuongAll, getStaffAll, getDmKhenThuongKyHieuAll, getDmKhenThuongChuThichAll,
     getDmKhenThuongLoaiDoiTuongAll, getDmBoMonAll, getDmDonViAll, getQtKhenThuongAllGroupPage, getDmDonVi, getDmBoMon,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtKhenThuongAll);
