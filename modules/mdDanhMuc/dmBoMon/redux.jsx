@@ -181,5 +181,6 @@ export const SelectAdapter_DmBoMon = {
     data: params => ({ condition: params.term }),
     processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.ten })) : [] }),
     getOne: getDmBoMon,
+    fetchOne: (ma, done) => (getDmBoMon(ma, item => done && done({ id: item.ma, text: item.ten })))(),
     processResultOne: response => response && ({ value: response.ma, text: response.ma + ': ' + response.ten }),
 };

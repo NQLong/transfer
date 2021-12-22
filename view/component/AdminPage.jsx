@@ -507,6 +507,15 @@ export class FormSelect extends React.Component {
         }
     }
 
+    data = () => {
+        const inputData = $(this.input).select2('data');
+        if (this.props.multiple) {
+            return inputData.map(item => ({ id: item.id, text: item.text }));
+        } else {
+            return { id: inputData[0].id, text: inputData[0].text };
+        }
+    };
+    
     render = () => {
         const { className = '', style = {}, labelStyle = {}, label = '', multiple = false, readOnly = false, required = false } = this.props;
         return (

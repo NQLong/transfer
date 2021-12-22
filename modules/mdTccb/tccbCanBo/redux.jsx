@@ -232,6 +232,7 @@ export const SelectAdapter_FwCanBo = {
     data: params => ({ condition: params.term }),
     processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.shcc, text: `${item.shcc}: ${item.ho} ${item.ten}` })) : [] }),
     getOne: getStaff,
+    fetchOne: (shcc, done) => (getStaff(shcc, ({ item }) => done && done({ id: item.shcc, text: `${item.shcc}: ${item.ho} ${item.ten}` })))(),
     processResultOne: response => response && response.item && ({ value: response.item.shcc, text: `${response.item.shcc}: ${response.item.ho} ${response.item.ten}` }),
 };
 

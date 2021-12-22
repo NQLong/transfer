@@ -13,7 +13,7 @@ export default {
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
         {
-            path: '/user/tccb/qua-trinh/khen-thuong-all/group_dt/:ma',
+            path: '/user/tccb/qua-trinh/khen-thuong-all/group_dt/:loaiDoiTuong/:ma',
             component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
         },
     ],

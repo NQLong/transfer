@@ -155,11 +155,10 @@ class QtNghiThaiSan extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: '30%', textAlign: 'center' }}>Cán bộ</th>
+                        <th style={{ width: '40%', textAlign: 'center' }}>Cán bộ</th>
                         <th style={{ width: '15%', textAlign: 'center' }}>Thời gian nghỉ</th>
                         <th style={{ width: '15%', textAlign: 'center' }}>Thời gian đi làm lại</th>
-                        <th style={{ width: '20%', textAlign: 'center' }}>Thời gian báo tăng bên BHXH</th>
-                        <th style={{ width: '20%', textAlign: 'center' }}>Ghi chú</th>
+                        <th style={{ width: '30%', textAlign: 'center' }}>Ghi chú</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
@@ -173,16 +172,14 @@ class QtNghiThaiSan extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' style={{textAlign:'left'}} content={item.tenChucVu} />
-                        <TableCell type='text' style={{textAlign:'left'}} content={item.tenDonVi} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span style={{ whiteSpace: 'nowrap' }}>Từ ngày: <span style={{ color: 'blue' }}>{item.thoiGianBatDauNghi ? new Date(item.thoiGianBatDauNghi).ddmmyyyy() : ''}</span></span><br />
-                                <span style={{ whiteSpace: 'nowrap' }}>Tới ngày: <span style={{ color: 'blue' }}>{item.thoiGianKetThucNghi ? new Date(item.thoiGianKetThucNghi).ddmmyyyy() : ''}</span></span><br />
+                                <span style={{ whiteSpace: 'nowrap' }}>Từ: <span style={{ color: 'blue' }}>{item.thoiGianBatDauNghi ? new Date(item.thoiGianBatDauNghi).ddmmyyyy() : ''}</span></span><br />
+                                <span style={{ whiteSpace: 'nowrap' }}>Đến: <span style={{ color: 'blue' }}>{item.thoiGianKetThucNghi ? new Date(item.thoiGianKetThucNghi).ddmmyyyy() : ''}</span></span><br />
                             </>
                         )}
                         />
-                        <TableCell type='text' content={<span style={{ color: 'blue' }}>{item.thoiGianDiLamLai ? new Date(item.thoiGianDiLamLai).ddmmyyyy() : ''}</span>} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content= {item.thoiGianDiLamLai ? new Date(item.thoiGianDiLamLai).ddmmyyyy() : ''}/>
                         <TableCell type='text' content={item.ghiChu} />
                         <TableCell type='text' content={item.thoiGianBaoTangBenBhxh} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}

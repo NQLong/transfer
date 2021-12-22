@@ -1,6 +1,6 @@
 // Table name: DM_CHUC_VU { ma, ten, phuCap, kichHoat, ghiChu }
 const keys = ['MA'];
-const obj2Db = { 'ma': 'MA', 'ten': 'TEN', 'phuCap': 'PHU_CAP', 'kichHoat': 'KICH_HOAT', 'ghiChu': 'GHI_CHU'};
+const obj2Db = { 'ma': 'MA', 'ten': 'TEN', 'phuCap': 'PHU_CAP', 'kichHoat': 'KICH_HOAT', 'ghiChu': 'GHI_CHU', 'loaiChucVu': 'LOAI_CHUC_VU'};
 
 module.exports = app => {
     app.model.dmChucVu = {
