@@ -9,6 +9,7 @@ import {
 } from './redux';
 import { getDmChucVuAll } from 'modules/mdDanhMuc/dmChucVu/redux';
 import { getDmDonViAll } from 'modules/mdDanhMuc/dmDonVi/redux';
+import { getStaffAll } from 'modules/mdTccb/tccbCanBo/redux';
 
 class EditModal extends AdminModal {
     donViTable = [];
@@ -16,9 +17,6 @@ class EditModal extends AdminModal {
     state = { stt: null };
     componentDidMount() {
 
-        $(document).ready(() => this.onShown(() => {
-            this.shcc.focus();
-        }));
         this.props.getDonVi(items => {
             if (items) {
                 this.donViTable = [];
@@ -37,24 +35,29 @@ class EditModal extends AdminModal {
                 }));
             }
         });
+        this.props.getStaff(items => {
+            if (items) {
+                this.staffTable = [];
+                items.forEach(item => this.staffTable.push({
+                    'id': item.shcc,
+                    'text': item.shcc + ' - ' + item.ho + ' ' + item.ten
+                }));
+            }
+        });
     }
 
     onShow = (item) => {
-        let { tenChucVu, daNopHoSoThaiSan, tenDonVi, ghiChu, ho, hoSoThaiDuocDuyet, shcc, soBhxh,
-            soThanhDuocNghi, stt, ten, thoiGianBaoTangBenBhxh, thoiGianBatDauNghi, thoiGianDiLamLai,
+        let { daNopHoSoThaiSan, ghiChu, hoSoThaiSanDuocDuyet, shcc, soBhxh,
+            soThanhDuocNghi, stt, thoiGianBaoTangBenBhxh, thoiGianBatDauNghi, thoiGianDiLamLai,
             thoiGianKetThucNghi } = item ? item : {
                 chucVu: '', daNopHoSoThaiSan: '', donVi: '', ghiChu: '', ho: '', hoSoThaiDuocDuyet: '', shcc: '', soBhxh: '',
                 soThanhDuocNghi: '', stt: '', ten: '', thoiGianBaoTangBenBhxh: '', thoiGianBatDauNghi: '', thoiGianDiLamLai: '',
                 thoiGianKetThucNghi: ''
             };
         this.setState({ stt, item });
-        this.ho.value(ho ? ho : '');
-        this.ten.value(ten ? ten : '');
-        this.tenChucVu.value(tenChucVu ? tenChucVu : '');
         this.daNopHoSoThaiSan.value(daNopHoSoThaiSan ? 1 : 0);
-        this.tenDonVi.value(tenDonVi ? tenDonVi : '');
         this.ghiChu.value(ghiChu ? ghiChu : '');
-        this.hoSoThaiDuocDuyet.value(hoSoThaiDuocDuyet ? 1 : 0);
+        this.hoSoThaiSanDuocDuyet.value(hoSoThaiSanDuocDuyet ? hoSoThaiSanDuocDuyet : '');
         this.shcc.value(shcc ? shcc : '');
         this.soBhxh.value(soBhxh ? soBhxh : '');
         this.soThanhDuocNghi.value(soThanhDuocNghi ? soThanhDuocNghi : '');
@@ -69,13 +72,9 @@ class EditModal extends AdminModal {
     onSubmit = (e) => {
         e.preventDefault();
         const changes = {
-            ho: this.ho.value(),
-            ten: this.ten.value(),
-            tenChucVu: this.tenChucVu.value(),
             daNopHoSoThaiSan: this.daNopHoSoThaiSan.value(),
-            tenDonVi: this.tenDonVi.value(),
             ghiChu: this.ghiChu.value(),
-            hoSoThaiDuocDuyet: this.hoSoThaiDuocDuyet.value(),
+            hoSoThaiSanDuocDuyet: this.hoSoThaiSanDuocDuyet.value(),
             shcc: this.shcc.value(),
             soBhxh: this.soBhxh.value(),
             soThanhDuocNghi: this.soThanhDuocNghi.value(),
@@ -98,16 +97,11 @@ class EditModal extends AdminModal {
             title: this.state.stt ? 'Cập nhật nghỉ thai sản' : 'Tạo mới nghỉ thai sản',
             size: 'large',
             body: <div className='row'>
-                <FormCheckbox className='col-md-6' ref={e => this.daNopHoSoThaiSan = e} label='Đã nộp hồ sơ' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
+                <FormSelect type='text' className='col-md-6' ref={e => this.shcc = e} data={this.staffTable} label='Mã thẻ cán bộ' readOnly={readOnly} />
+                <FormCheckbox className='col-md-12' ref={e => this.daNopHoSoThaiSan = e} label='Đã nộp hồ sơ' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
                     onChange={value => this.changeKichHoat(value ? 1 : 0, this.daNopHoSoThaiSan)} />
-                <FormCheckbox className='col-md-6' ref={e => this.hoSoThaiDuocDuyet = e} label='Đã duyệt hồ sơ' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
-                    onChange={value => this.changeKichHoat(value ? 1 : 0, this.hoSoThaiDuocDuyet)} />
-                <FormTextBox type='text' className='col-md-3' ref={e => this.ho = e} label='Họ' readOnly={readOnly} />
-                <FormTextBox type='text' className='col-md-3' ref={e => this.ten = e} label='Tên' readOnly={readOnly} />
-                <FormTextBox type='text' className='col-md-3' ref={e => this.shcc = e} label='Mã số cán bộ' readOnly={readOnly} />
-                <FormTextBox type='text' className='col-md-3' ref={e => this.soBhxh = e} label='Bảo hiểm xã hội' readOnly={readOnly} />
-                <FormSelect type='text' className='col-md-6' ref={e => this.tenChucVu = e} data={this.chucVuTable} label='Chức vụ' readOnly={readOnly} />
-                <FormSelect type='text' className='col-md-6' ref={e => this.tenDonVi = e} data={this.donViTable} label='Đơn vị' readOnly={readOnly} />
+                <FormTextBox className='col-md-6' ref={e => this.hoSoThaiSanDuocDuyet = e} label='Đã duyệt hồ sơ' readOnly={readOnly} />
+                <FormTextBox type='text' className='col-md-6' ref={e => this.soBhxh = e} label='Bảo hiểm xã hội' readOnly={readOnly} />
                 <FormDatePicker className='col-md-3' ref={e => this.thoiGianBatDauNghi = e} label='Thời gian bắt đầu nghỉ' readOnly={readOnly} />
                 <FormDatePicker className='col-md-3' ref={e => this.thoiGianKetThucNghi = e} label='Thời gian kết thúc nghỉ' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-3' ref={e => this.soThanhDuocNghi = e} label='Số tháng được nghỉ' readOnly={readOnly} />
@@ -155,10 +149,11 @@ class QtNghiThaiSan extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: '40%', textAlign: 'center' }}>Cán bộ</th>
+                        <th style={{ width: '30%', textAlign: 'center' }}>Cán bộ</th>
                         <th style={{ width: '15%', textAlign: 'center' }}>Thời gian nghỉ</th>
                         <th style={{ width: '15%', textAlign: 'center' }}>Thời gian đi làm lại</th>
-                        <th style={{ width: '30%', textAlign: 'center' }}>Ghi chú</th>
+                        <th style={{ width: '20%', textAlign: 'center' }}>Thời gian báo tăng bên BHXH</th>
+                        <th style={{ width: '20%', textAlign: 'center' }}>Ghi chú</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
@@ -179,8 +174,9 @@ class QtNghiThaiSan extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content= {item.thoiGianDiLamLai ? new Date(item.thoiGianDiLamLai).ddmmyyyy() : ''}/>
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content= {<span style={{ color: 'blue'}}>{item.thoiGianDiLamLai ? new Date(item.thoiGianDiLamLai).ddmmyyyy() : ''}</span>}/>
                         <TableCell type='text' content={item.ghiChu} />
+                        <TableCell type='text' content={item.thoiGianBaoTangBenBhxh} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={e => this.delete(e, item)} />
                     </tr>
@@ -202,7 +198,8 @@ class QtNghiThaiSan extends AdminPage {
                 <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createQtNghiThaiSan} update={this.props.updateQtNghiThaiSan}
                     getDonVi={this.props.getDmDonViAll} permissions={currentPermissions}
-                    getChucVu={this.props.getDmChucVuAll} />
+                    getChucVu={this.props.getDmChucVuAll}
+                    getStaff={this.props.getStaffAll} />
             </>,
             backRoute: '/user/tccb',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
@@ -213,6 +210,6 @@ class QtNghiThaiSan extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtNghiThaiSan: state.qtNghiThaiSan });
 const mapActionsToProps = {
     getQtNghiThaiSanAll, getQtNghiThaiSanPage, deleteQtNghiThaiSan, getDmDonViAll, createQtNghiThaiSan,
-    updateQtNghiThaiSan, getDmChucVuAll
+    updateQtNghiThaiSan, getDmChucVuAll, getStaffAll
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtNghiThaiSan);
