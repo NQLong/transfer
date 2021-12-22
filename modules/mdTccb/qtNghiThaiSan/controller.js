@@ -18,16 +18,24 @@ module.exports = app => {
     const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
 
     app.get('/api/qua-trinh/nghi-thai-san/page/:pageNumber/:pageSize', checkGetStaffPermission, (req, res) => {
-        let pageNumber = parseInt(req.params.pageNumber),
+        const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
-            condition = { statement: null };
-        if (req.query.condition) {
-            condition = {
-                statement: 'lower(ma) LIKE :searchText OR lower(ten) LIKE :searchText',
-                parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
-            };
-        }
-        app.model.qtNghiThaiSan.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
+            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+        // if (req.query.condition) {
+        //     condition = {
+        //         statement: 'lower(ma) LIKE :searchText OR lower(ten) LIKE :searchText',
+        //         parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
+        //     };
+        // }
+        // app.model.qtNghiThaiSan.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
+        app.model.qtNghiThaiSan.searchPage(pageNumber, pageSize, searchTerm, (error, page) => {
+            if (error || page == null) {
+                res.send({ error });
+            } else {
+                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
+                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, list } });
+            }
+        });
     });
 
     app.get('/api/qua-trinh/nghi-thai-san/all', checkGetStaffPermission, (req, res) => {

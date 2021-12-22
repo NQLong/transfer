@@ -40,7 +40,7 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        let { chucVu, daNopHoSoThaiSan, donVi, ghiChu, ho, hoSoThaiDuocDuyet, shcc, soBhxh,
+        let { tenChucVu, daNopHoSoThaiSan, tenDonVi, ghiChu, ho, hoSoThaiDuocDuyet, shcc, soBhxh,
             soThanhDuocNghi, stt, ten, thoiGianBaoTangBenBhxh, thoiGianBatDauNghi, thoiGianDiLamLai,
             thoiGianKetThucNghi } = item ? item : {
                 chucVu: '', daNopHoSoThaiSan: '', donVi: '', ghiChu: '', ho: '', hoSoThaiDuocDuyet: '', shcc: '', soBhxh: '',
@@ -50,9 +50,9 @@ class EditModal extends AdminModal {
         this.setState({ stt, item });
         this.ho.value(ho ? ho : '');
         this.ten.value(ten ? ten : '');
-        this.chucVu.value(chucVu ? chucVu : '');
+        this.tenChucVu.value(tenChucVu ? tenChucVu : '');
         this.daNopHoSoThaiSan.value(daNopHoSoThaiSan ? 1 : 0);
-        this.donVi.value(donVi ? donVi : '');
+        this.tenDonVi.value(tenDonVi ? tenDonVi : '');
         this.ghiChu.value(ghiChu ? ghiChu : '');
         this.hoSoThaiDuocDuyet.value(hoSoThaiDuocDuyet ? 1 : 0);
         this.shcc.value(shcc ? shcc : '');
@@ -71,9 +71,9 @@ class EditModal extends AdminModal {
         const changes = {
             ho: this.ho.value(),
             ten: this.ten.value(),
-            chucVu: this.chucVu.value(),
+            tenChucVu: this.tenChucVu.value(),
             daNopHoSoThaiSan: this.daNopHoSoThaiSan.value(),
-            donVi: this.donVi.value(),
+            tenDonVi: this.tenDonVi.value(),
             ghiChu: this.ghiChu.value(),
             hoSoThaiDuocDuyet: this.hoSoThaiDuocDuyet.value(),
             shcc: this.shcc.value(),
@@ -106,13 +106,12 @@ class EditModal extends AdminModal {
                 <FormTextBox type='text' className='col-md-3' ref={e => this.ten = e} label='Tên' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-3' ref={e => this.shcc = e} label='Mã số cán bộ' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-3' ref={e => this.soBhxh = e} label='Bảo hiểm xã hội' readOnly={readOnly} />
-                <FormSelect type='text' className='col-md-6' ref={e => this.chucVu = e} data={this.chucVuTable} label='Chức vụ' readOnly={readOnly} />
-                <FormSelect type='text' className='col-md-6' ref={e => this.donVi = e} data={this.donViTable} label='Đơn vị' readOnly={readOnly} />
+                <FormSelect type='text' className='col-md-6' ref={e => this.tenChucVu = e} data={this.chucVuTable} label='Chức vụ' readOnly={readOnly} />
+                <FormSelect type='text' className='col-md-6' ref={e => this.tenDonVi = e} data={this.donViTable} label='Đơn vị' readOnly={readOnly} />
                 <FormDatePicker className='col-md-3' ref={e => this.thoiGianBatDauNghi = e} label='Thời gian bắt đầu nghỉ' readOnly={readOnly} />
                 <FormDatePicker className='col-md-3' ref={e => this.thoiGianKetThucNghi = e} label='Thời gian kết thúc nghỉ' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-3' ref={e => this.soThanhDuocNghi = e} label='Số tháng được nghỉ' readOnly={readOnly} />
                 <FormDatePicker className='col-md-3' ref={e => this.thoiGianDiLamLai = e} label='Thời gian đi làm lại' readOnly={readOnly} />
-
                 <FormRichTextBox type='text' className='col-md-12' ref={e => this.thoiGianBaoTangBenBhxh = e} label='Thời gian báo BHXH' readOnly={readOnly} />
                 <FormRichTextBox type='text' className='col-md-12' ref={e => this.ghiChu = e} label='Ghi chú' readOnly={readOnly} />
             </div>
@@ -155,23 +154,35 @@ class QtNghiThaiSan extends AdminPage {
                 getDataSource: () => list, stickyHead: false,
                 renderHead: () => (
                     <tr>
-                        <th style={{ width: '10%', textAlign: 'center' }}>SHCC</th>
-                        <th style={{ width: '15%' }}>Họ</th>
-                        <th style={{ width: '10%' }}>Tên</th>
-                        <th style={{ width: '10%', textAlign: 'center' }}>Bắt đầu nghỉ</th>
-                        <th style={{ width: '10%', textAlign: 'center' }}>Đi làm lại</th>
-                        <th style={{ width: '20%' }}>Ghi chú</th>
-                        <th style={{ width: '15%', textAlign: 'center' }}>Thao tác</th>
-
+                        <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
+                        <th style={{ width: '35%', textAlign: 'center' }}>Cán bộ</th>
+                        <th style={{ width: '15%', textAlign: 'center' }}>Chức vụ</th>
+                        <th style={{ width: '15%', textAlign: 'center' }}>Đơn vị</th>
+                        <th style={{ width: '10%', textAlign: 'center' }}>Thời gian nghỉ</th>
+                        <th style={{ width: '20%', textAlign: 'center' }}>Ghi chú</th>
+                        <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' content={item.shcc} style={{ textAlign: 'center' }} />
-                        <TableCell type='text' content={item.ho} />
-                        <TableCell type='text' content={item.ten} />
-                        <TableCell type='date' style={{ textAlign: 'center' }} content={item.thoiGianBatDauNghi} dateFormat='dd/mm/yyyy' />
-                        <TableCell type='date' style={{ textAlign: 'center' }} content={item.thoiGianDiLamLai} dateFormat='dd/mm/yyyy' />
+                        <TableCell type='text' style={{textAlign:'right'}} content={index + 1} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                            <>
+                                <span>{item.ho + ' ' + item.ten}</span><br />
+                                <a href='#' onClick={() => this.modal.show(item)}>{item.shcc}</a>
+                            </>
+                        )}
+                        />
+                        <TableCell type='text' style={{textAlign:'left'}} content={item.tenChucVu} />
+                        <TableCell type='text' style={{textAlign:'left'}} content={item.tenDonVi} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                            <>
+                                <span style={{ whiteSpace: 'nowrap' }}>Từ ngày: <span style={{ color: 'blue' }}>{item.thoiGianBatDauNghi ? new Date(item.thoiGianBatDauNghi).ddmmyyyy() : ''}</span></span><br />
+                                <span style={{ whiteSpace: 'nowrap' }}>Tới ngày: <span style={{ color: 'blue' }}>{item.thoiGianKetThucNghi ? new Date(item.thoiGianKetThucNghi).ddmmyyyy() : ''}</span></span><br />
+                                <span style={{ whiteSpace: 'nowrap' }}>Đi làm lại: <span style={{ color: 'blue' }}>{item.thoiGianDiLamLai ? new Date(item.thoiGianDiLamLai).ddmmyyyy() : ''}</span></span><br />
+                            </>
+                        )}
+                        />
                         <TableCell type='text' content={item.ghiChu} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={e => this.delete(e, item)} />
