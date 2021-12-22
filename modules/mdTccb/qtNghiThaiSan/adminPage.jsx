@@ -47,7 +47,7 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        let { tenChucVu, daNopHoSoThaiSan, tenDonVi, ghiChu, hoSoThaiSanDuocDuyet, shcc, soBhxh,
+        let { daNopHoSoThaiSan, ghiChu, hoSoThaiSanDuocDuyet, shcc, soBhxh,
             soThanhDuocNghi, stt, thoiGianBaoTangBenBhxh, thoiGianBatDauNghi, thoiGianDiLamLai,
             thoiGianKetThucNghi } = item ? item : {
                 chucVu: '', daNopHoSoThaiSan: '', donVi: '', ghiChu: '', ho: '', hoSoThaiDuocDuyet: '', shcc: '', soBhxh: '',
@@ -55,9 +55,7 @@ class EditModal extends AdminModal {
                 thoiGianKetThucNghi: ''
             };
         this.setState({ stt, item });
-        this.tenChucVu.value(tenChucVu ? tenChucVu : '');
         this.daNopHoSoThaiSan.value(daNopHoSoThaiSan ? 1 : 0);
-        this.tenDonVi.value(tenDonVi ? tenDonVi : '');
         this.ghiChu.value(ghiChu ? ghiChu : '');
         this.hoSoThaiSanDuocDuyet.value(hoSoThaiSanDuocDuyet ? hoSoThaiSanDuocDuyet : '');
         this.shcc.value(shcc ? shcc : '');
@@ -74,9 +72,7 @@ class EditModal extends AdminModal {
     onSubmit = (e) => {
         e.preventDefault();
         const changes = {
-            tenChucVu: this.tenChucVu.value(),
             daNopHoSoThaiSan: this.daNopHoSoThaiSan.value(),
-            tenDonVi: this.tenDonVi.value(),
             ghiChu: this.ghiChu.value(),
             hoSoThaiSanDuocDuyet: this.hoSoThaiSanDuocDuyet.value(),
             shcc: this.shcc.value(),
@@ -106,8 +102,6 @@ class EditModal extends AdminModal {
                     onChange={value => this.changeKichHoat(value ? 1 : 0, this.daNopHoSoThaiSan)} />
                 <FormTextBox className='col-md-6' ref={e => this.hoSoThaiSanDuocDuyet = e} label='Đã duyệt hồ sơ' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.soBhxh = e} label='Bảo hiểm xã hội' readOnly={readOnly} />
-                <FormSelect type='text' className='col-md-6' ref={e => this.tenChucVu = e} data={this.chucVuTable} label='Chức vụ' readOnly={readOnly} />
-                <FormSelect type='text' className='col-md-6' ref={e => this.tenDonVi = e} data={this.donViTable} label='Đơn vị' readOnly={readOnly} />
                 <FormDatePicker className='col-md-3' ref={e => this.thoiGianBatDauNghi = e} label='Thời gian bắt đầu nghỉ' readOnly={readOnly} />
                 <FormDatePicker className='col-md-3' ref={e => this.thoiGianKetThucNghi = e} label='Thời gian kết thúc nghỉ' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-3' ref={e => this.soThanhDuocNghi = e} label='Số tháng được nghỉ' readOnly={readOnly} />
