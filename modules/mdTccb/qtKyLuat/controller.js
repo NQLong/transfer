@@ -1,9 +1,9 @@
 module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
-        menus: {
-            3017: { title: 'Quá trình kỷ luật', link: '/user/tccb/qua-trinh/ky-luat', icon: 'fa-gift', backgroundColor: '#283dde', groupIndex: 3 },
-        },
+        // menus: {
+        //     3017: { title: 'Quá trình kỷ luật', link: '/user/tccb/qua-trinh/ky-luat', icon: 'fa-gift', backgroundColor: '#283dde', groupIndex: 3 },
+        // },
     };
     app.permission.add(
         { name: 'staff:login', menu: { parentMenu: { index: 1000, title: 'Thông tin cá nhân', icon: 'fa-user', link: '/user' } }, },
