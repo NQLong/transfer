@@ -34,6 +34,10 @@ export default {
             path: '/user/component',
             component: Loadable({ loading: Loading, loader: () => import('./adminComponentPage') })
         },
+        {
+            path: '/incoming-event',
+            component: Loadable({ loading: Loading, loader: () => import('./sectionIncomingEvent') })
+        },
     ],
     Section: {
         SectionCarousel, SectionFeature, SectionVideo, SectionGallery, SectionContent,
