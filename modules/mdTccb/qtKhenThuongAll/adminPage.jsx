@@ -5,7 +5,7 @@ import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox,
 import Pagination from 'view/component/Pagination';
 import {
     getQtKhenThuongAllPage, getQtKhenThuongAllAll, updateQtKhenThuongAll,
-    deleteQtKhenThuongAll, createQtKhenThuongAll, getQtKhenThuongAllGroupPage, downloadExcel,
+    deleteQtKhenThuongAll, createQtKhenThuongAll, getQtKhenThuongAllGroupPage,
 } from './redux';
 import { getStaffAll } from 'modules/mdTccb/tccbCanBo/redux';
 import { getDmKhenThuongKyHieuAll } from 'modules/mdDanhMuc/dmKhenThuongKyHieu/redux';
@@ -196,7 +196,6 @@ class QtKhenThuongAll extends AdminPage {
         }
         name += '.xlsx';
         T.download(T.url(`/api/tccb/qua-trinh/khen-thuong-all/download-excel/${loaiDoiTuong}/${maDoiTuong}`), name);
-        //this.props.downloadExcel('', '')
     }
 
     changeState = (value) => {
@@ -343,6 +342,6 @@ const mapStateToProps = state => ({ system: state.system, qtKhenThuongAll: state
 const mapActionsToProps = {
     getQtKhenThuongAllAll, getQtKhenThuongAllPage, deleteQtKhenThuongAll, createQtKhenThuongAll,
     updateQtKhenThuongAll, getStaffAll, getDmKhenThuongKyHieuAll, getDmKhenThuongChuThichAll, 
-    getDmKhenThuongLoaiDoiTuongAll, getDmBoMonAll, getDmDonViAll, getQtKhenThuongAllGroupPage, getDmDonVi, getDmBoMon, downloadExcel,
+    getDmKhenThuongLoaiDoiTuongAll, getDmBoMonAll, getDmDonViAll, getQtKhenThuongAllGroupPage, getDmDonVi, getDmBoMon,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtKhenThuongAll);
