@@ -407,6 +407,7 @@ export class FormEditor extends React.Component {
 }
 
 export class FormSelect extends React.Component {
+    static defaultProps = { formType: 'selectBox' } 
     state = { valueText: '', hasInit: false };
     hasInit = false;
     componentDidMount() {

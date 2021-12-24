@@ -148,3 +148,12 @@ export const SelectAdapter_DmDanToc = {
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
     condition: { kichHoat: 1 },
 };
+
+export const SelectAdapter_DmDanTocV2 = {
+    ajax: false,
+    data: () => ({ condition: { kichHoat: 1 } }),
+    url: '/api/danh-muc/dan-toc/all',
+    getOne: getDmDanToc,
+    processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.ma, text: item.ten })) : [] }),
+    fetchOne: (ma, done) => (getDmDanToc(ma, item => done && done({ id: item.ma, text: item.ten })))(),
+};
