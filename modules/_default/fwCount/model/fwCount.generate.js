@@ -42,7 +42,6 @@ module.exports = app => {
             condition = app.dbConnection.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
             const sql = 'SELECT ' + app.dbConnection.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT * FROM FW_COUNT' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '') + ') WHERE ROWNUM=1';
-            console.log(sql, parameter);
             app.dbConnection.execute(sql, parameter, (error, resultSet) => done(error, resultSet && resultSet.rows && resultSet.rows.length ? resultSet.rows[0] : null));
         },
 
