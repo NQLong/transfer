@@ -148,3 +148,13 @@ export const SelectAdapter_DmDienHopDong = {
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
     condition: { kichHoat: 1 },
 };
+
+
+export const SelectAdapter_DmDienHopDongV2 = {
+    ajax: false,
+    data: () => ({ condition: {} }),
+    url: '/api/danh-muc/dien-hop-dong/all',
+    getOne: getDmDienHopDong,
+    processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.ma, text: item.ten })) : [] }),
+    fetchOne: (ma, done) => (getDmDienHopDong(ma, item => done && done({ id: item.ma, text: item.ten })))(),
+};

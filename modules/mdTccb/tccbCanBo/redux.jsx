@@ -204,7 +204,7 @@ export function updateQuanHeCanBo(id, changes, done) {
             } else if (data.item) {
                 T.notify('Cập nhật thông tin người thân thành công!', 'info');
                 dispatch(getStaffEdit(data.item.shcc));
-                if (done) done();
+                done && done();
             }
         }, () => T.notify('Cập nhật thông tin người thân bị lỗi', 'danger'));
     };

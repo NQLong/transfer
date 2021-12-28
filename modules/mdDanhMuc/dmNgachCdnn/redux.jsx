@@ -147,3 +147,12 @@ export const SelectAdapter_DmNgachCdnn = {
     processResults: response => ({ results: response ? response.map(item => ({ value: item.id, text: `${item.ma}: ${item.ten}` })) : [] }),
     condition: { kichHoat: 1 },
 };
+
+export const SelectAdapter_DmNgachCdnnV2 = {
+    ajax: false,
+    data: () => ({ condition: { kichHoat: 1 } }),
+    url: '/api/danh-muc/ngach-cdnn/all',
+    getOne: getDmNgachCdnn,
+    processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.ma, text: item.ma + ': ' + item.ten })) : [] }),
+    fetchOne: (ma, done) => (getDmNgachCdnn(ma, item => done && done({ id: item.ma, text: item.ma + ': ' + item.ten })))(),
+};
