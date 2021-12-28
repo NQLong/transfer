@@ -4,11 +4,6 @@ import { getNewsInPageByUser, getNewsByCategory } from './redux';
 import { Link } from 'react-router-dom';
 import inView from 'in-view';
 
-const linkFormat = '/tin-tuc/',
-    idFormat = '/news/item/';
-
-
-
 class NewsListView extends React.Component {
     state = { view: 'grid', list: [], category: { vi: ' ', en: ' ' } };
     loading = false;
@@ -87,7 +82,7 @@ class NewsListView extends React.Component {
                 );
             });
             newsListView = list.map((item, index) => {
-                const link = item.link ? linkFormat + item.link : idFormat + item.id;
+                const link = T.linkNewsDetail(item);
                 return (
                     <div className='col-12 d-flex mb-5 ftco-animate' key={index}>
                         <Link to={link} className='mr-4 blog-img flex-shrink-0' style={{ backgroundImage: `url('${item.image}')`, width: '15vw', height: '11.2vw' }} />

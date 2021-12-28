@@ -1,4 +1,4 @@
-// Table name: DM_CHUC_VU { ma, ten, phuCap, kichHoat, ghiChu }
+// Table name: DM_CHUC_VU { ma, ten, phuCap, kichHoat, ghiChu, loaiChucVu }
 const keys = ['MA'];
 const obj2Db = { 'ma': 'MA', 'ten': 'TEN', 'phuCap': 'PHU_CAP', 'kichHoat': 'KICH_HOAT', 'ghiChu': 'GHI_CHU', 'loaiChucVu': 'LOAI_CHUC_VU'};
 

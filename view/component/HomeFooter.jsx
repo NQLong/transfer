@@ -50,7 +50,7 @@ class Footer extends React.Component {
 
     render() {
         const language = T.language(texts), hostname = window.location.href,
-            qrcode = 'https://hcmussh.edu.vn/static/document/qrcode-tuyensinh.png',
+            // qrcode = 'https://hcmussh.edu.vn/static/document/qrcode-tuyensinh.png',
             width = $(window).width();
 
         let { facebook, youtube, mobile, address, address2, } =
@@ -78,16 +78,16 @@ class Footer extends React.Component {
                     </div>
                 );
             });
-            if (hostname.includes('tuyensinh')) {
-                footerList = [
-                    <div className='col-sm' key={'13'}>
-                        <div className='footer-link'>
-                            <h3>{'QUÉT MÃ TƯ VẤN TUYỂN SINH'} <i className='fa fa-angle-down d-md-none'></i></h3>
-                            <img src={qrcode} style={{ height: 'auto', width: '100%' }} />
-                        </div>
-                    </div>
-                ];
-            }
+            // if (hostname.includes('tuyensinh')) {
+            //     footerList = [
+            //         <div className='col-sm' key={'13'}>
+            //             <div className='footer-link'>
+            //                 <h3>{'QUÉT MÃ TƯ VẤN TUYỂN SINH'} <i className='fa fa-angle-down d-md-none'></i></h3>
+            //                 <img src={qrcode} style={{ height: 'auto', width: '100%' }} />
+            //             </div>
+            //         </div>
+            //     ];
+            // }
             footerList.push([
                 <div className='col-sm' key={'13'}>
                     <div className='footer-link'>

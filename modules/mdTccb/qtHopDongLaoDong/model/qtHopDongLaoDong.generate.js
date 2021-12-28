@@ -1,6 +1,6 @@
-// Table name: QT_HOP_DONG_LAO_DONG { loaiHopDong, soHopDong, nguoiKy, chucVu, nguoiDuocThue, batDauLamViec, ketThucHopDong, ngayKyHdTiepTheo, diaDiemLamViec, chucDanhChuyenMon, congViecDuocGiao, chiuSuPhanCong, ngach, maNgach, bac, heSo, ngayKyHopDong, phanTramHuong, ma }
+// Table name: QT_HOP_DONG_LAO_DONG { loaiHopDong, soHopDong, nguoiKy, chucVu, nguoiDuocThue, batDauLamViec, ketThucHopDong, ngayKyHdTiepTheo, diaDiemLamViec, chucDanhChuyenMon, congViecDuocGiao, chiuSuPhanCong, ngach, maNgach, bac, heSo, ngayKyHopDong, phanTramHuong, ma, thuongTru }
 const keys = ['MA'];
-const obj2Db = { 'loaiHopDong': 'LOAI_HOP_DONG', 'soHopDong': 'SO_HOP_DONG', 'nguoiKy': 'NGUOI_KY', 'chucVu': 'CHUC_VU', 'nguoiDuocThue': 'NGUOI_DUOC_THUE', 'batDauLamViec': 'BAT_DAU_LAM_VIEC', 'ketThucHopDong': 'KET_THUC_HOP_DONG', 'ngayKyHdTiepTheo': 'NGAY_KY_HD_TIEP_THEO', 'diaDiemLamViec': 'DIA_DIEM_LAM_VIEC', 'chucDanhChuyenMon': 'CHUC_DANH_CHUYEN_MON', 'congViecDuocGiao': 'CONG_VIEC_DUOC_GIAO', 'chiuSuPhanCong': 'CHIU_SU_PHAN_CONG', 'ngach': 'NGACH', 'maNgach': 'MA_NGACH', 'bac': 'BAC', 'heSo': 'HE_SO', 'ngayKyHopDong': 'NGAY_KY_HOP_DONG', 'phanTramHuong': 'PHAN_TRAM_HUONG', 'ma': 'MA' };
+const obj2Db = { 'loaiHopDong': 'LOAI_HOP_DONG', 'soHopDong': 'SO_HOP_DONG', 'nguoiKy': 'NGUOI_KY', 'chucVu': 'CHUC_VU', 'nguoiDuocThue': 'NGUOI_DUOC_THUE', 'batDauLamViec': 'BAT_DAU_LAM_VIEC', 'ketThucHopDong': 'KET_THUC_HOP_DONG', 'ngayKyHdTiepTheo': 'NGAY_KY_HD_TIEP_THEO', 'diaDiemLamViec': 'DIA_DIEM_LAM_VIEC', 'chucDanhChuyenMon': 'CHUC_DANH_CHUYEN_MON', 'congViecDuocGiao': 'CONG_VIEC_DUOC_GIAO', 'chiuSuPhanCong': 'CHIU_SU_PHAN_CONG', 'ngach': 'NGACH', 'maNgach': 'MA_NGACH', 'bac': 'BAC', 'heSo': 'HE_SO', 'ngayKyHopDong': 'NGAY_KY_HOP_DONG', 'phanTramHuong': 'PHAN_TRAM_HUONG', 'ma': 'MA', 'thuongTru': 'THUONG_TRU' };
 
 module.exports = app => {
     app.model.qtHopDongLaoDong = {
@@ -136,14 +136,14 @@ module.exports = app => {
                 { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, pagenumber: { val: pagenumber, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, pagesize: { val: pagesize, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, searchterm, totalitem: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pagetotal: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
         },
 
-        downWord: (mahd, done) => {
+        download: (mahd, done) => {
             app.dbConnection.execute('BEGIN :ret:=download_hop_dong_lao_dong(:mahd); END;',
                 { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, mahd }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
         },
 
-        groupPage: (pagenumber, pagesize, searchterm, done) => {
-            app.dbConnection.execute('BEGIN :ret:=qt_hop_dong_lao_dong_group_page(:pagenumber, :pagesize, :searchterm, :totalitem, :pagetotal); END;',
-                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, pagenumber: { val: pagenumber, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, pagesize: { val: pagesize, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, searchterm, totalitem: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pagetotal: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
+        groupPage: (done) => {
+            app.dbConnection.execute('BEGIN :ret:=qt_hop_dong_lao_dong_group_page(); END;',
+                done);
         },
     };
 };

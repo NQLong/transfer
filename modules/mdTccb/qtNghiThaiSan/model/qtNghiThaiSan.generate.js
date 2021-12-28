@@ -1,6 +1,6 @@
-// Table name: QT_NGHI_THAI_SAN { stt, ho, ten, chucVu, donVi, soBhxh, thoiGianBatDauNghi, thoiGianKetThucNghi, thoiGianDiLamLai, ghiChu, thoiGianBaoTangBenBhxh, soThangDuocNghi, daNopHoSoThaiSan, hoSoThaiDuocDuyet, shcc }
-const keys = ['STT'];
-const obj2Db = { 'stt': 'STT', 'ho': 'HO', 'ten': 'TEN', 'chucVu': 'CHUC_VU', 'donVi': 'DON_VI', 'soBhxh': 'SO_BHXH', 'thoiGianBatDauNghi': 'THOI_GIAN_BAT_DAU_NGHI', 'thoiGianKetThucNghi': 'THOI_GIAN_KET_THUC_NGHI', 'thoiGianDiLamLai': 'THOI_GIAN_DI_LAM_LAI', 'ghiChu': 'GHI_CHU', 'thoiGianBaoTangBenBhxh': 'THOI_GIAN_BAO_TANG_BEN_BHXH', 'soThangDuocNghi': 'SO_THANG_DUOC_NGHI', 'daNopHoSoThaiSan': 'DA_NOP_HO_SO_THAI_SAN', 'hoSoThaiDuocDuyet': 'HO_SO_THAI_DUOC_DUYET', 'shcc': 'SHCC' };
+// Table name: QT_NGHI_THAI_SAN { stt, chucVu, donVi, soBhxh, thoiGianBatDauNghi, thoiGianKetThucNghi, thoiGianDiLamLai, ghiChu, thoiGianBaoTangBenBhxh, soThangDuocNghi, daNopHoSoThaiSan, hoSoThaiDuocDuyet, shcc }
+const keys = ['SHCC', 'STT'];
+const obj2Db = { 'stt': 'STT', 'chucVu': 'CHUC_VU', 'donVi': 'DON_VI', 'soBhxh': 'SO_BHXH', 'thoiGianBatDauNghi': 'THOI_GIAN_BAT_DAU_NGHI', 'thoiGianKetThucNghi': 'THOI_GIAN_KET_THUC_NGHI', 'thoiGianDiLamLai': 'THOI_GIAN_DI_LAM_LAI', 'ghiChu': 'GHI_CHU', 'thoiGianBaoTangBenBhxh': 'THOI_GIAN_BAO_TANG_BEN_BHXH', 'soThangDuocNghi': 'SO_THANG_DUOC_NGHI', 'daNopHoSoThaiSan': 'DA_NOP_HO_SO_THAI_SAN', 'hoSoThaiDuocDuyet': 'HO_SO_THAI_DUOC_DUYET', 'shcc': 'SHCC' };
 
 module.exports = app => {
     app.model.qtNghiThaiSan = {

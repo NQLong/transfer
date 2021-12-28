@@ -117,12 +117,12 @@ module.exports = app => {
                     if (error || dataItem == null) {
                         sendResponse({ error: 'Invalid Id!' });
                     } else {
-                        // app.deleteImage(dataItem.image);
                         let image = '/img/' + dataName + '/' + (new Date().getTime()).toString().slice(-8) + app.path.extname(srcPath);
-                        app.fs.rename(srcPath, app.path.join(app.publicPath, image), error => {
+                        app.fs.copyFile(srcPath, app.path.join(app.publicPath, image), error => {
                             if (error) {
                                 sendResponse({ error });
                             } else {
+                                app.deleteFile(srcPath);
                                 image += '?t=' + (new Date().getTime()).toString().slice(-8);
                                 delete dataItem.ma;
                                 model.update(conditions, { image }, (error,) => {
@@ -132,7 +132,6 @@ module.exports = app => {
                                             req.session.user.image = image;
                                         }
                                     }
-                                    // if (error == null) app.io.emit(dataName + '-changed', dataItem);
                                     sendResponse({
                                         error,
                                         item: dataItem,
@@ -141,6 +140,28 @@ module.exports = app => {
                                 });
                             }
                         });
+                        // app.fs.rename(srcPath, app.path.join(app.publicPath, image), error => {
+                        //     if (error) {
+                        //         sendResponse({ error });
+                        //     } else {
+                        //         image += '?t=' + (new Date().getTime()).toString().slice(-8);
+                        //         delete dataItem.ma;
+                        //         model.update(conditions, { image }, (error,) => {
+                        //             if (dataName == 'user') {
+                        //                 dataItem = app.clone(dataItem, { password: '' });
+                        //                 if (req.session.user && req.session.user.id == dataItem.id) {
+                        //                     req.session.user.image = image;
+                        //                 }
+                        //             }
+                        //             // if (error == null) app.io.emit(dataName + '-changed', dataItem);
+                        //             sendResponse({
+                        //                 error,
+                        //                 item: dataItem,
+                        //                 image
+                        //             });
+                        //         });
+                        //     }
+                        // });
                     }
                 });
             } else {

@@ -89,7 +89,7 @@ module.exports = app => {
 
     app.get('/api/tccb/qua-trinh/hop-dong-lao-dong/download-word/:ma', app.permission.check('qtHopDongLaoDong:read'), (req, res) => {
         if (req.params && req.params.ma) {
-            app.model.qtHopDongLaoDong.downWord(req.params.ma, (error, item) => {
+            app.model.qtHopDongLaoDong.download(req.params.ma, (error, item) => {
                 if (error || !item) {
                     res.send({ error });
                 }
