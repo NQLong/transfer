@@ -272,6 +272,19 @@ export class ComponentCaNhan extends React.Component {
                             </button>
                         </div>
                     </div>
+
+                    <div className='form-group col-md-12'/>
+
+                    <FormDatePicker className='col-md-3' type='date-mask' ref={e=> this.namNhapNgu = e} label='Năm nhập ngũ' />
+                    <FormDatePicker className='col-md-3' type='date-mask' ref={e=> this.namXuatNgu = e} label='Năm xuất ngũ' />
+                    <FormTextBox className='col-md-3' ref={e => this.capBacCaoNhat = e} label='Quân hàm/Cấp bậc cao nhất' />
+                    <FormTextBox className='col-md-3' ref={e => this.hangThuongBinh = e} label = 'Hạng thương binh' />
+
+                    <FormTextBox className='col-md-6' ref={e => this.giaDinhChinhSach = e} label = 'Gia đình chính sách' />
+                    <FormTextBox className='col-md-6' ref={e => this.danhHieuPhongTangCaoNhat = e} label='Danh hiệu được phong tặng cao nhất' />
+
+                    
+
                 </div>
             </div>
         );
