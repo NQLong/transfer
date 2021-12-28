@@ -77,7 +77,8 @@ module.exports = app => {
         if (dataId == 'new') {
             let imageLink = app.path.join('/img/video', app.path.basename(srcPath)),
                 sessionPath = app.path.join(app.publicPath, imageLink);
-            app.fs.rename(srcPath, sessionPath, error => {
+            app.fs.copyFile(srcPath, sessionPath, error => {
+                app.deleteFile(srcPath);
                 if (error == null) req.session[dataName + 'Image'] = sessionPath;
                 sendResponse({ error, image: imageLink });
             });
@@ -92,10 +93,11 @@ module.exports = app => {
                             app.deleteImage(dataItem.image);
                         }
                         dataItem.image = '/img/' + dataName + '/' + dataItem.id + app.path.extname(srcPath);
-                        app.fs.rename(srcPath, app.path.join(app.publicPath, dataItem.image), error => {
+                        app.fs.copyFile(srcPath, app.path.join(app.publicPath, dataItem.image), error => {
                             if (error) {
                                 sendResponse({ error });
                             } else {
+                                app.deleteFile(srcPath);
                                 dataItem.image += '?t=' + (new Date().getTime()).toString().slice(-8);
                                 let changes = {};
                                 if (dataItem.title && dataItem.title != '') changes.title = dataItem.title;
@@ -116,7 +118,10 @@ module.exports = app => {
                 });
             } else {
                 const image = '/img/' + dataName + '/' + dataId + app.path.extname(srcPath);
-                app.fs.rename(srcPath, app.path.join(app.publicPath, image), error => sendResponse({ error, image }));
+                app.fs.copyFile(srcPath, app.path.join(app.publicPath, image), error => {
+                    sendResponse({ error, image });
+                    app.deleteFile(srcPath);
+                });
             }
         }
     };

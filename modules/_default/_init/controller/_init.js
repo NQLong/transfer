@@ -104,7 +104,8 @@ module.exports = app => {
         if (conditions == 'new') {
             let imageLink = app.path.join('/img/draft', app.path.basename(srcPath)),
                 sessionPath = app.path.join(app.publicPath, imageLink);
-            app.fs.rename(srcPath, sessionPath, error => {
+            app.fs.copyFile(srcPath, sessionPath, error => {
+                app.deleteFile(srcPath);
                 if (error == null) req.session[dataName + 'Image'] = sessionPath;
                 sendResponse({ error, image: imageLink });
             });
@@ -140,33 +141,14 @@ module.exports = app => {
                                 });
                             }
                         });
-                        // app.fs.rename(srcPath, app.path.join(app.publicPath, image), error => {
-                        //     if (error) {
-                        //         sendResponse({ error });
-                        //     } else {
-                        //         image += '?t=' + (new Date().getTime()).toString().slice(-8);
-                        //         delete dataItem.ma;
-                        //         model.update(conditions, { image }, (error,) => {
-                        //             if (dataName == 'user') {
-                        //                 dataItem = app.clone(dataItem, { password: '' });
-                        //                 if (req.session.user && req.session.user.id == dataItem.id) {
-                        //                     req.session.user.image = image;
-                        //                 }
-                        //             }
-                        //             // if (error == null) app.io.emit(dataName + '-changed', dataItem);
-                        //             sendResponse({
-                        //                 error,
-                        //                 item: dataItem,
-                        //                 image
-                        //             });
-                        //         });
-                        //     }
-                        // });
                     }
                 });
             } else {
                 const image = '/img/' + dataName + '/' + (new Date().getTime()).toString().slice(-8) + app.path.extname(srcPath);
-                app.fs.rename(srcPath, app.path.join(app.publicPath, image), error => sendResponse({ error, image }));
+                app.fs.copyFile(srcPath, app.path.join(app.publicPath, image), error => {
+                    app.deleteFile(srcPath);
+                    sendResponse({ error, image });
+                });
             }
         }
     };
@@ -255,7 +237,8 @@ module.exports = app => {
         if (conditions == 'new') {
             let imageLink = app.path.join('/img/draft', app.path.basename(srcPath)),
                 sessionPath = app.path.join(app.publicPath, imageLink);
-            app.fs.rename(srcPath, sessionPath, error => {
+            app.fs.copyFile(srcPath, sessionPath, error => {
+                app.deleteFile(srcPath);
                 if (error == null) req.session[dataName + 'Image'] = sessionPath;
                 res.send({ error, image: imageLink });
             });
@@ -269,10 +252,11 @@ module.exports = app => {
                     } else {
                         // app.deleteImage(dataItem.image);
                         let image = '/img/' + dataName + '/' + (new Date().getTime()).toString().slice(-8) + app.path.extname(srcPath);
-                        app.fs.rename(srcPath, app.path.join(app.publicPath, image), error => {
+                        app.fs.copyFile(srcPath, app.path.join(app.publicPath, image), error => {
                             if (error) {
                                 res.send({ error });
                             } else {
+                                app.deleteFile(srcPath);
                                 image += '?t=' + (new Date().getTime()).toString().slice(-8);
                                 dataItem.image = image;
                                 model.update(conditions, dataItem, (error,) => {
@@ -290,7 +274,10 @@ module.exports = app => {
                 });
             } else {
                 const image = '/img/' + dataName + '/' + (new Date().getTime()).toString().slice(-8) + app.path.extname(srcPath);
-                app.fs.rename(srcPath, app.path.join(app.publicPath, image), error => res.send({ error, image }));
+                app.fs.copyFile(srcPath, app.path.join(app.publicPath, image), error => {
+                    app.deleteFile(srcPath);
+                    res.send({ error, image });
+                });
             }
         }
     };

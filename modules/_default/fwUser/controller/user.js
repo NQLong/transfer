@@ -298,11 +298,12 @@ module.exports = app => {
                     done({ error: error ? error : 'Invalid email!' });
                 } else {
                     app.deleteImage(user.image);
-                    app.fs.rename(srcPath, userImagePath + '/' + filename, error => {
+                    app.fs.copyFile(srcPath, userImagePath + '/' + filename, error => {
                         if (error) {
                             console.log(error);
                             done({ error });
                         } else {
+                            app.deleteFile(srcPath);
                             filename = '/img/user/' + filename;
                             app.model.fwUser.update({ email }, { image: filename }, error => done({ error, image: filename }));
                         }

@@ -270,8 +270,9 @@ module.exports = app => {
             if (fields.userData == 'logo') {
                 app.deleteImage(app.data.logo);
                 let destPath = '/img/favicon' + app.path.extname(srcPath);
-                app.fs.rename(srcPath, app.path.join(app.publicPath, destPath), error => {
+                app.fs.copyFile(srcPath, app.path.join(app.publicPath, destPath), error => {
                     if (error == null) {
+                        app.deleteFile(srcPath);
                         destPath += '?t=' + (new Date().getTime()).toString().slice(-8);
                         app.model.setting.setValue({ logo: destPath }, error => {
                             if (error == null) app.data.logo = destPath;
@@ -284,8 +285,9 @@ module.exports = app => {
             } else if (fields.userData == 'footer' && files.SettingImage && files.SettingImage.length > 0) {
                 app.deleteImage(app.data.footer);
                 let destPath = '/img/footer' + app.path.extname(srcPath);
-                app.fs.rename(srcPath, app.path.join(app.publicPath, destPath), error => {
+                app.fs.copyFile(srcPath, app.path.join(app.publicPath, destPath), error => {
                     if (error == null) {
+                        app.deleteFile(srcPath);
                         destPath += '?t=' + (new Date().getTime()).toString().slice(-8);
                         app.model.setting.setValue({ footer: destPath }, error => {
                             if (error == null) app.data.footer = destPath;
@@ -298,8 +300,9 @@ module.exports = app => {
             } else if (fields.userData == 'map' && files.SettingImage && files.SettingImage.length > 0) {
                 app.deleteImage(app.data.map);
                 let destPath = '/img/map' + app.path.extname(srcPath);
-                app.fs.rename(srcPath, app.path.join(app.publicPath, destPath), error => {
+                app.fs.copyFile(srcPath, app.path.join(app.publicPath, destPath), error => {
                     if (error == null) {
+                        app.deleteFile(srcPath);
                         destPath += '?t=' + (new Date().getTime()).toString().slice(-8);
                         app.model.setting.setValue({ map: destPath }, error => {
                             if (error == null) app.data.map = destPath;
@@ -312,8 +315,9 @@ module.exports = app => {
             } else if (fields.userData == 'header' && files.SettingImage && files.SettingImage.length > 0) {
                 app.deleteImage(app.data.header);
                 let destPath = '/img/header' + app.path.extname(srcPath);
-                app.fs.rename(srcPath, app.path.join(app.publicPath, destPath), error => {
+                app.fs.copyFile(srcPath, app.path.join(app.publicPath, destPath), error => {
                     if (error == null) {
+                        app.deleteFile(srcPath);
                         destPath += '?t=' + (new Date().getTime()).toString().slice(-8);
                         app.model.setting.setValue({ header: destPath }, error => {
                             if (error == null) app.data.header = destPath;
