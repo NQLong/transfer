@@ -5,6 +5,7 @@ import {  SelectAdapter_DmNgachCdnnV2 } from 'modules/mdDanhMuc/dmNgachCdnn/redu
 import React from 'react';
 import { connect } from 'react-redux';
 import { AdminPage, FormDatePicker, FormSelect, FormTextBox } from 'view/component/AdminPage';
+import ComponentChucVu from '../qtChucVu/componentChucVu';
 
 class ComponentTTCongTac extends AdminPage {
     value(item) {
@@ -14,6 +15,8 @@ class ComponentTTCongTac extends AdminPage {
         this.ngayBienChe.value(item.ngayBienChe ? item.ngayBienChe : '');
         this.donViTuyenDung.value(item.donViTuyenDung ? item.donViTuyenDung : '');
         this.chucDanh.value(item.chucDanh ? item.chucDanh : '');
+        this.componentChucVuChinhQuyen.value(item.chucVu ? item.chucVu : [], 1);
+        this.componentChucVuDoanThe.value(item.chucVu ? item.chucVu : [], 0);
     }
 
     render() {
@@ -29,6 +32,9 @@ class ComponentTTCongTac extends AdminPage {
                     <FormSelect data={SelectAdapter_DmNgachCdnnV2} className='col-md-4' ref={e => this.chucDanh = e} label='Chức danh nghề nghiệp' />
                     <FormSelect data={SelectAdapter_DmDienHopDongV2} className='col-md-4' ref={e => this.dienHopDong = e} label='Diện hợp đồng' />
                     <FormSelect data={SelectAdapter_DmLoaiHopDongV2} className='col-md-4' ref={e => this.loaiHopDong = e} label='Loại hợp đồng' />
+                    <ComponentChucVu ref={e => this.componentChucVuChinhQuyen = e} label='Chức vụ chính quyền'  userEdit={false} />
+                    <ComponentChucVu ref={e => this.componentChucVuDoanThe = e} label='Chức vụ đoàn thể' userEdit={false} />
+
                 </div>
             </div>
         );

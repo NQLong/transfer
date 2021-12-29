@@ -76,9 +76,8 @@ module.exports = app => {
             if (error || canBo == null) {
                 res.send({ error: 'Lỗi khi lấy thông tin cán bộ !' });
             } else {
-                console.log(canBo);
                 app.model.fwUser.get({ email: canBo.email }, (error, user) => {
-                    let result = app.clone(canBo, {image: user.image});
+                    let result = app.clone(canBo, { image: user.image });
                     new Promise(resolve => {
                         app.model.quanHeCanBo.getAll({ shcc: canBo.shcc }, (error, items) => {
                             if (error || items == null) {
@@ -236,7 +235,7 @@ module.exports = app => {
                         res.send({ error, item: result });
                     });
                 });
-               
+
             }
         });
     });

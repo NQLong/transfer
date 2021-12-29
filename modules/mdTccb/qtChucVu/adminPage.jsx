@@ -7,65 +7,29 @@ import {
     getQtChucVuPage, getQtChucVuAll, updateQtChucVu,
     deleteQtChucVu, createQtChucVu, getChucVuByShcc
 } from './redux';
-import { getDmChucVuAll } from 'modules/mdDanhMuc/dmChucVu/redux';
-import { getDmDonViAll } from 'modules/mdDanhMuc/dmDonVi/redux';
-import { getDmBoMonAll } from 'modules/mdDanhMuc/dmBoMon/redux';
-import { getStaffAll } from 'modules/mdTccb/tccbCanBo/redux';
+import { SelectAdapter_DmChucVuV2 } from 'modules/mdDanhMuc/dmChucVu/redux';
+import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
+import { SelectAdapter_DmBoMon } from 'modules/mdDanhMuc/dmBoMon/redux';
+import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 
-class EditModal extends AdminModal {
-    donViTable = [];
-    chucVuTable = [];
+export class EditModal extends AdminModal {
     state = { shcc: null, stt: '' };
     componentDidMount() {
 
-        this.props.getDonVi(items => {
-            if (items) {
-                this.donViTable = [];
-                items.forEach(item => this.donViTable.push({
-                    'id': item.ma,
-                    'text': item.ten
-                }));
-            }
-        });
-        this.props.getChucVu(items => {
-            if (items) {
-                this.chucVuTable = [];
-                items.forEach(item => this.chucVuTable.push({
-                    'id': item.ma,
-                    'text': item.ten
-                }));
-            }
-        });
-        this.props.getBoMon(items => {
-            if (items) {
-                this.boMonTable = [];
-                items.forEach(item => this.boMonTable.push({
-                    'id': item.ma,
-                    'text': item.ten
-                }));
-            }
-        });
-        this.props.getStaff(items => {
-            if (items) {
-                this.staffTable = [];
-                items.forEach(item => this.staffTable.push({
-                    'id': item.shcc,
-                    'text': item.shcc + ' - ' + item.ho + ' ' + item.ten
-                }));
-            }
-        });
     }
 
     onShow = (item) => {
-        let { stt, shcc, maChucVu, maDonVi, soQuyetDinh, ngayRaQuyetDinh, chucVuChinh, maBoMon } = item ? item : { stt: '',
+        let { stt, shcc, maChucVu, maDonVi, soQuyetDinh, ngayRaQuyetDinh, ngayRaQd, soQd, chucVuChinh, maBoMon } = item ? item : {
+            stt: '',
             shcc: '', maChucVu: '', maDonVi: '', soQuyetDinh: '', ngayRaQuyetDinh: '', chucVuChinh: '', maBoMon: '',
+            ngayRaQd: '', soQd: ''
         };
         this.setState({ shcc, stt, item, chucVuChinh });
         this.shcc.value(shcc ? shcc : '');
         this.maChucVu.value(maChucVu ? maChucVu : '');
         this.maDonVi.value(maDonVi ? maDonVi : '');
-        this.soQuyetDinh.value(soQuyetDinh ? soQuyetDinh : '');
-        this.ngayRaQuyetDinh.value(ngayRaQuyetDinh ? ngayRaQuyetDinh : '');
+        this.soQuyetDinh.value(soQd ? soQd : (soQuyetDinh ? soQuyetDinh : ''));
+        this.ngayRaQuyetDinh.value(ngayRaQd ? ngayRaQd : (ngayRaQuyetDinh ? ngayRaQuyetDinh : ''));
         this.chucVuChinh.value(chucVuChinh ? 1 : 0);
         this.maBoMon.value(maBoMon ? maBoMon : '');
     };
@@ -85,7 +49,7 @@ class EditModal extends AdminModal {
                             this.props.update(item.stt, { chucVuChinh: 0 });
                         }
                     });
-                } 
+                }
                 this.state.stt ? this.props.update(this.state.stt, changes, this.hide) : this.props.create(changes, this.hide);
             });
         });
@@ -106,15 +70,15 @@ class EditModal extends AdminModal {
             T.notify('Mã số cán bộ bị trống');
             this.shcc.focus();
         } else {
-            !changes.chucVuChinh ? (this.state.stt ? this.props.update(this.state.stt, changes, this.hide) : this.props.create(changes, this.hide)):
-            this.checkChucVu(changes);
+            !changes.chucVuChinh ? (this.state.stt ? this.props.update(this.state.stt, changes, this.hide) : this.props.create(changes, this.hide)) :
+                this.checkChucVu(changes);
         }
     }
 
     checkChucVuSwitch = () => {
         if (this.state.chucVuChinh) {
             return true;
-        } 
+        }
         return false;
     }
 
@@ -124,10 +88,10 @@ class EditModal extends AdminModal {
             title: this.state.shcc ? 'Cập nhật quá trình chức vụ' : 'Tạo mới quá trình chức vụ',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12' ref={e => this.shcc = e} label='Mã số cán bộ' data={this.staffTable} readOnly={readOnly} />
-                <FormSelect className='col-md-4' ref={e => this.maChucVu = e} label='Chức vụ' data={this.chucVuTable} readOnly={readOnly} /> 
-                <FormSelect className='col-md-4' ref={e => this.maDonVi = e} label='Đơn vị' data={this.donViTable} readOnly={readOnly} /> 
-                <FormSelect className='col-md-4' ref={e => this.maBoMon = e} label='Bộ môn' data={this.boMonTable} readOnly={readOnly} />
+                <FormSelect className='col-md-12' ref={e => this.shcc = e} label='Mã số cán bộ' data={SelectAdapter_FwCanBo} readOnly={readOnly} />
+                <FormSelect className='col-md-4' ref={e => this.maChucVu = e} label='Chức vụ' data={SelectAdapter_DmChucVuV2} readOnly={readOnly} />
+                <FormSelect className='col-md-4' ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} readOnly={readOnly} />
+                <FormSelect className='col-md-4' ref={e => this.maBoMon = e} label='Bộ môn' data={SelectAdapter_DmBoMon} readOnly={readOnly} />
                 <FormCheckbox className='col-md-12' ref={e => this.chucVuChinh = e} label='Chức vụ chính' isSwitch={true} readOnly={this.checkChucVuSwitch()} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.soQuyetDinh = e} label='Số quyết định' readOnly={readOnly} />
                 <FormDatePicker className='col-md-6' ref={e => this.ngayRaQuyetDinh = e} label='Ngày ra quyết định' readOnly={readOnly} />
@@ -162,8 +126,7 @@ class QtChucVu extends AdminPage {
     }
 
     render() {
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permission = this.getUserPermission('qtChucVu', ['read', 'write', 'delete']);
+        const permission = this.getUserPermission('qtChucVu', ['read', 'write', 'delete']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtChucVu && this.props.qtChucVu.page ?
             this.props.qtChucVu.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list };
         let table = 'Không có danh sách!';
@@ -182,7 +145,7 @@ class QtChucVu extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{textAlign:'right'}} content={index + 1} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{item.ho + ' ' + item.ten}</span><br />
@@ -193,7 +156,7 @@ class QtChucVu extends AdminPage {
                         <TableCell type='text' content={(
                             <>
                                 <span>{item.tenChucVu}</span><br />
-                                {!item.tenBoMon ? (item.tenDonVi ? item.tenDonVi.toUpperCase() : '') : (item.tenBoMon ? item.tenBoMon.toUpperCase(): '')}
+                                {!item.tenBoMon ? (item.tenDonVi ? item.tenDonVi.toUpperCase() : '') : (item.tenBoMon ? item.tenBoMon.toUpperCase() : '')}
                             </>
                         )}
                         />
@@ -223,13 +186,10 @@ class QtChucVu extends AdminPage {
                 <div className='tile'>{table}</div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getQtChucVuPage} />
-                <EditModal ref={e => this.modal = e} permission={permission}
+                <EditModal ref={e => this.modal = e}
+                    getQtChucVuAll={this.props.getQtChucVuAll}
                     create={this.props.createQtChucVu} update={this.props.updateQtChucVu}
-                    getDonVi={this.props.getDmDonViAll} permissions={currentPermissions}
-                    getChucVu={this.props.getDmChucVuAll}
-                    getBoMon={this.props.getDmBoMonAll}
-                    getStaff={this.props.getStaffAll} 
-                    getQtChucVuAll={this.props.getQtChucVuAll}/>
+                />
             </>,
             backRoute: '/user/tccb',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
@@ -239,7 +199,7 @@ class QtChucVu extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, qtChucVu: state.qtChucVu });
 const mapActionsToProps = {
-    getQtChucVuAll, getQtChucVuPage, deleteQtChucVu, getDmDonViAll, createQtChucVu,
-    updateQtChucVu, getDmChucVuAll, getDmBoMonAll, getStaffAll, getChucVuByShcc
+    getQtChucVuAll, getQtChucVuPage, deleteQtChucVu, createQtChucVu,
+    updateQtChucVu, getChucVuByShcc
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtChucVu);

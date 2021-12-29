@@ -117,6 +117,7 @@ class ComponentQuanHe extends AdminPage {
                 getDataSource: () => items.filter(i => i.type == type), stickyHead: false,
                 renderHead: () => (
                     <tr>
+                        <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: '30%' }}>Họ và tên</th>
                         <th style={{ width: '20%' }}>Năm sinh</th>
                         <th style={{ width: '10%' }}>Quan hệ</th>
@@ -127,6 +128,7 @@ class ComponentQuanHe extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
+                        <TableCell type='text' content={index + 1} />
                         <TableCell type='link' content={item.hoTen} onClick={e => this.editQuanHe(e, item, type)} />
                         <TableCell type='text' content={T.dateToText(item.namSinh, 'yyyy')} />
                         <TableCell type='text' content={this.mapperQuanHe[item.moiQuanHe]} />

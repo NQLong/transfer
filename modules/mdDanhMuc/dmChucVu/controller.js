@@ -91,6 +91,10 @@ module.exports = app => {
         handleCreate(0);
     });
 
+    app.get('/api/danh-muc/chuc-vu/item/:ma', app.permission.check('user:login'), (req, res) => {
+        app.model.dmChucVu.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
+    });
+
     // Hook uploadHooks -----------------------------------------------------------------------------------------------------------------------------
     const dmChucVuImportData = (fields, files, done) => {
         let worksheet = null;
