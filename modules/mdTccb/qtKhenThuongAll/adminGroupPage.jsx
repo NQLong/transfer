@@ -69,14 +69,19 @@ class EditModal extends AdminModal {
 
     onSubmit = (e) => {
         e.preventDefault();
+        let ma = '-1';
+        if (this.loaiDoiTuong.value() == '02') ma = this.maCanBo.value();
+        if (this.loaiDoiTuong.value() == '03') ma = this.maDonVi.value();
+        if (this.loaiDoiTuong.value() == '04') ma = this.maBoMon.value();
+
         const changes = {
             loaiDoiTuong: this.loaiDoiTuong.value(),
-            ma: this.ma ? this.ma.value() : '-1',
+            ma: ma,
             namDatDuoc: this.namDatDuoc.value(),
             thanhTich: this.thanhTich.value(),
             chuThich: this.chuThich.value(),
         };
-        this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
+        this.props.update(this.state.id, ma, changes, this.hide);
     }
 
     onChangeDT = (value) => {
@@ -84,23 +89,21 @@ class EditModal extends AdminModal {
     }
     render = () => {
         const doiTuong = this.state.doiTuong;
-        const readOnly = this.state.id ? true : this.props.readOnly;
         return this.renderModal({
             title: this.state.id ? 'Cập nhật quá trình khen thưởng' : 'Tạo mới quá trình khen thưởng',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-4' ref={e => this.loaiDoiTuong = e} label='Loại đối tượng' data={this.loaiDoiTuongTable} readOnly={readOnly} onChange={value => this.onChangeDT(value.id)} />
+                <FormSelect className='col-md-4' ref={e => this.loaiDoiTuong = e} label='Loại đối tượng' data={this.loaiDoiTuongTable} readOnly={true}/>
 
                 <FormSelect className='col-md-12' ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo}
                     style={doiTuong == '02' ? {} : { display: 'none' }}
-                    readOnly={readOnly} />
+                    readOnly={true} />
 
                 <FormSelect className='col-md-12' ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi}
                     style={doiTuong == '03' ? {} : { display: 'none' }}
-                    readOnly={readOnly} />
-                <FormSelect className='col-md-12' ref={e => this.maBoMon = e} label='Bộ môn' data={SelectAdapter_DmBoMon} style={doiTuong == '04' ? {} : { display: 'none' }} readOnly={readOnly} />
+                    readOnly={true} />
 
-
+                <FormSelect className='col-md-12' ref={e => this.maBoMon = e} label='Bộ môn' data={SelectAdapter_DmBoMon} style={doiTuong == '04' ? {} : { display: 'none' }} readOnly={true} />
 
                 <FormSelect className='col-md-12' ref={e => this.thanhTich = e} label='Thành tích' data={this.thanhTichTable} readOnly={false} />
                 <FormTextBox className='col-md-4' ref={e => this.namDatDuoc = e} label='Năm đạt được (yyyy)' type='year' readOnly={false} />

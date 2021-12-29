@@ -433,6 +433,8 @@ export class FormSelect extends React.Component {
 
     clear = () => $(this.input).val('').trigger('change') && $(this.input).html('');
 
+    reset = () => $(this.input).val('').trigger('change');
+    
     value = function (value) {
         const dropdownParent = this.props.dropdownParent || $('.modal-body').has(this.input)[0] || $('.tile-body').has(this.input)[0];
         if (arguments.length) {

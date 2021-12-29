@@ -157,9 +157,11 @@ export function createQtKhenThuongAll(items, done) {
                 T.notify('Tạo khen thưởng bị lỗi!', 'danger');
                 console.error(`POST: ${url}.`, data.error);
             } else {
-                T.notify('Tạo khen thưởng thành công!', 'success');
-                dispatch(getQtKhenThuongAllPage());
-                if (done) done(data);
+                if (done) {
+                    T.notify('Tạo khen thưởng thành công!', 'success');
+                    dispatch(getQtKhenThuongAllPage());
+                    done(data);
+                }
             }
         }, () => T.notify('Tạo khen thưởng bị lỗi!', 'danger'));
     };

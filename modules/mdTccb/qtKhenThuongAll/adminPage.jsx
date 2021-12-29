@@ -7,16 +7,17 @@ import {
     getQtKhenThuongAllPage, getQtKhenThuongAllAll, updateQtKhenThuongAll,
     deleteQtKhenThuongAll, createQtKhenThuongAll, getQtKhenThuongAllGroupPage,
 } from './redux';
-import { getStaffAll, SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
+import { getStaffAll } from 'modules/mdTccb/tccbCanBo/redux';
 import { getDmKhenThuongKyHieuAll } from 'modules/mdDanhMuc/dmKhenThuongKyHieu/redux';
 import { getDmKhenThuongChuThichAll } from 'modules/mdDanhMuc/dmKhenThuongChuThich/redux';
 import { getDmKhenThuongLoaiDoiTuongAll } from 'modules/mdDanhMuc/dmKhenThuongLoaiDoiTuong/redux';
-import { getDmBoMonAll, getDmBoMon, SelectAdapter_DmBoMon } from 'modules/mdDanhMuc/dmBoMon/redux';
-import { getDmDonViAll, getDmDonVi, SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
+import { getDmBoMonAll, getDmBoMon } from 'modules/mdDanhMuc/dmBoMon/redux';
+import { getDmDonViAll, getDmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import Loading from 'view/component/Loading';
 
 class EditModal extends AdminModal {
-    state = { id: '', doiTuong: '' };
+    state = { id: '', doiTuong: ''};
+    multiple = false;
     componentDidMount() {
         this.props.getLoaiDoiTuong(items => {
             if (items) {
@@ -47,7 +48,8 @@ class EditModal extends AdminModal {
         });
     }
 
-    onShow = (item) => {
+    onShow = (item, multiple = true) => {
+        this.multiple = multiple;
         let { id, maLoaiDoiTuong, ma, namDatDuoc, maThanhTich, maChuThich } = item ? item : {
             id: '', maLoaiDoiTuong: '', ma: '', namDatDuoc: '', maThanhTich: '', maChuThich: '',
         };
@@ -58,7 +60,7 @@ class EditModal extends AdminModal {
         this.loaiDoiTuong.value(maLoaiDoiTuong ? maLoaiDoiTuong : '');
         if (maLoaiDoiTuong == '02') this.maCanBo.value(ma);
         else if (maLoaiDoiTuong == '03') this.maDonVi.value(ma);
-        else if (maLoaiDoiTuong == '04') this.maBoMon.value(ma);
+        else if (maLoaiDoiTuong == '04') this.maBoMon.value(ma ? ma : '');
 
         this.namDatDuoc.value(namDatDuoc ? namDatDuoc : '');
         this.thanhTich.value(maThanhTich ? maThanhTich : '');
@@ -69,19 +71,41 @@ class EditModal extends AdminModal {
 
     onSubmit = (e) => {
         e.preventDefault();
-        const changes = {
-            loaiDoiTuong: this.loaiDoiTuong.value(),
-            ma: this.ma ? this.ma.value() : '-1',
-            namDatDuoc: this.namDatDuoc.value(),
-            thanhTich: this.thanhTich.value(),
-            chuThich: this.chuThich.value(),
-        };
-        this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
+        let list_ma = [];
+        if (this.loaiDoiTuong.value() == '01') list_ma = ['01'];
+        if (this.loaiDoiTuong.value() == '02') list_ma = this.maCanBo.value();
+        if (this.loaiDoiTuong.value() == '03') list_ma = this.maDonVi.value();
+        if (this.loaiDoiTuong.value() == '04') list_ma = this.maBoMon.value();
+        if (!Array.isArray(list_ma)) {
+            list_ma = [list_ma];
+        }
+        list_ma.forEach((ma, index) => {
+            const changes = {
+                loaiDoiTuong: this.loaiDoiTuong.value(),
+                ma: ma,
+                namDatDuoc: this.namDatDuoc.value(),
+                thanhTich: this.thanhTich.value(),
+                chuThich: this.chuThich.value(),  
+            };
+            if (index == list_ma.length - 1) {
+                this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
+                this.setState({
+                    id: '', doiTuong: ''
+                });
+                this.maCanBo.reset();
+                this.maDonVi.reset();
+                this.maBoMon.reset();
+            }
+            else {
+                this.state.id ? this.props.update(this.state.id, changes) : this.props.create(changes);
+            }
+        });
     }
 
     onChangeDT = (value) => {
         this.setState({ doiTuong: value });
     }
+
     render = () => {
         const doiTuong = this.state.doiTuong;
         const readOnly = this.state.id ? true : this.props.readOnly;
@@ -91,16 +115,17 @@ class EditModal extends AdminModal {
             body: <div className='row'>
                 <FormSelect className='col-md-4' ref={e => this.loaiDoiTuong = e} label='Loại đối tượng' data={this.loaiDoiTuongTable} readOnly={readOnly} onChange={value => this.onChangeDT(value.id)} />
 
-                <FormSelect className='col-md-12' ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo}
+                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={this.props.staffTable}
                     style={doiTuong == '02' ? {} : { display: 'none' }}
                     readOnly={readOnly} />
 
-                <FormSelect className='col-md-12' ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi}
+                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maDonVi = e} label='Đơn vị' data={this.props.donViTable}
                     style={doiTuong == '03' ? {} : { display: 'none' }}
                     readOnly={readOnly} />
-                <FormSelect className='col-md-12' ref={e => this.maBoMon = e} label='Bộ môn' data={SelectAdapter_DmBoMon} style={doiTuong == '04' ? {} : { display: 'none' }} readOnly={readOnly} />
 
-
+                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maBoMon = e} label='Bộ môn' data={this.props.boMonTable} 
+                    style={doiTuong == '04' ? {} : { display: 'none' }} 
+                    readOnly={readOnly} />
 
                 <FormSelect className='col-md-12' ref={e => this.thanhTich = e} label='Thành tích' data={this.thanhTichTable} readOnly={false} />
                 <FormTextBox className='col-md-4' ref={e => this.namDatDuoc = e} label='Năm đạt được (yyyy)' type='year' readOnly={false} />
@@ -116,7 +141,43 @@ class QtKhenThuongAll extends AdminPage {
     stateTable = [
         { 'id': '-1', 'text': 'Tất cả' }
     ];
+    staffTable = [];
+    donViTable = [];
+    boMonTable = [];
     componentDidMount() {
+        this.props.getStaffAll(items => {
+            if (items) {
+                this.staffTable = [];
+                items.forEach(item => this.staffTable.push({
+                    'id': item.shcc,
+                    'text': item.shcc + ' - ' + item.ho + ' ' + item.ten
+                }));
+            }
+        });
+        this.props.getDmDonViAll(items => {
+            if (items) {
+                this.donViTable = [];
+                items.forEach(item => this.donViTable.push({
+                    'id': item.ma,
+                    'text': item.ten
+                }));
+            }
+        });
+        this.props.getDmBoMonAll(items => {
+            if (items) {
+                this.boMonTable = [];
+                items.forEach(item => {
+                    this.props.getDmDonVi(item.maDv, data => {
+                        if (data) {
+                            this.boMonTable.push({
+                                'id': item.ma,
+                                'text': item.ten + ' (KHOA ' + data.ten + ')'
+                            });
+                        }
+                    });
+                });
+            }
+        });
         T.ready('/user/tccb', () => {
             this.props.getDmKhenThuongLoaiDoiTuongAll(items => {
                 if (items) {
@@ -210,7 +271,7 @@ class QtKhenThuongAll extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
-                        <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
+                        <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
                             item.maLoaiDoiTuong == '01' ?
                                 <>
                                     <span>
@@ -251,7 +312,7 @@ class QtKhenThuongAll extends AdminPage {
                         <TableCell type='text' content={item.tenLoaiDoiTuong} />
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                                onEdit={() => this.modal.show(item)} onDelete={this.delete} />
+                                onEdit={() => this.modal.show(item, false)} onDelete={this.delete} />
                         }
                         {
                             this.checked &&
@@ -286,11 +347,9 @@ class QtKhenThuongAll extends AdminPage {
                     getThanhTich={this.props.getDmKhenThuongKyHieuAll} permissions={currentPermissions}
                     getChuThich={this.props.getDmKhenThuongChuThichAll}
                     getLoaiDoiTuong={this.props.getDmKhenThuongLoaiDoiTuongAll}
-                    getBoMon={this.props.getDmBoMonAll}
-                    getDonVi={this.props.getDmDonViAll}
-                    getStaff={this.props.getStaffAll}
-                    getDonViItem={this.props.getDmDonVi}
-                    getBoMonItem={this.props.getDmBoMon} />
+                    staffTable={this.staffTable}
+                    donViTable={this.donViTable}
+                    boMonTable={this.boMonTable}/>
                 {
                     permission.read &&
                     <button className='btn btn-success btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px' }} onClick={this.downloadExcel} >
