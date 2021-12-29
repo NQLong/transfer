@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormCheckbox} from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
     getQtKhenThuongAllPage, getQtKhenThuongAllAll, updateQtKhenThuongAll,
@@ -50,8 +50,8 @@ class EditModal extends AdminModal {
 
     onShow = (item, multiple = true) => {
         this.multiple = multiple;
-        let { id, maLoaiDoiTuong, ma, namDatDuoc, maThanhTich, maChuThich } = item ? item : {
-            id: '', maLoaiDoiTuong: '', ma: '', namDatDuoc: '', maThanhTich: '', maChuThich: '',
+        let { id, maLoaiDoiTuong, ma, namDatDuoc, maThanhTich, maChuThich, diemThiDua } = item ? item : {
+            id: '', maLoaiDoiTuong: '', ma: '', namDatDuoc: '', maThanhTich: '', maChuThich: '', diemThiDua: ''
         };
         this.setState({
             id: id, doiTuong: maLoaiDoiTuong
@@ -65,6 +65,7 @@ class EditModal extends AdminModal {
         this.namDatDuoc.value(namDatDuoc ? namDatDuoc : '');
         this.thanhTich.value(maThanhTich ? maThanhTich : '');
         this.chuThich.value(maChuThich ? maChuThich : '');
+        this.diemThiDua.value(diemThiDua);
     };
 
     changeKichHoat = (value, target) => target.value(value ? 1 : 0) || target.value(value);
@@ -86,6 +87,7 @@ class EditModal extends AdminModal {
                 namDatDuoc: this.namDatDuoc.value(),
                 thanhTich: this.thanhTich.value(),
                 chuThich: this.chuThich.value(),  
+                diemThiDua: this.diemThiDua.value(),
             };
             if (index == list_ma.length - 1) {
                 this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
@@ -130,6 +132,8 @@ class EditModal extends AdminModal {
                 <FormSelect className='col-md-12' ref={e => this.thanhTich = e} label='Thành tích' data={this.thanhTichTable} readOnly={false} />
                 <FormTextBox className='col-md-4' ref={e => this.namDatDuoc = e} label='Năm đạt được (yyyy)' type='year' readOnly={false} />
                 <FormSelect className='col-md-8' ref={e => this.chuThich = e} label='Chú thích' data={this.chuThichTable} readOnly={false} />
+                <FormTextBox className='col-md-4' ref={e => this.diemThiDua = e} type='number' label='Điểm thi đua' readOnly={false} />
+
             </div>
         });
     }
@@ -264,6 +268,7 @@ class QtKhenThuongAll extends AdminPage {
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Đối tượng</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm đạt được</th>
                         <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Thành tích</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Điểm thi đua</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Loại đối tượng</th>
                         <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                     </tr>
@@ -309,6 +314,7 @@ class QtKhenThuongAll extends AdminPage {
                             </>
                         )}
                         />
+                        <TableCell type='text' content={item.diemThiDua} />
                         <TableCell type='text' content={item.tenLoaiDoiTuong} />
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}

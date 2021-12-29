@@ -99,16 +99,16 @@ module.exports = app => {
                 new Promise(resolve => {
                     let cols = [];
                     if (loaiDoiTuong == '-1') {
-                        cols = ['STT', 'LOẠI ĐỐI TƯỢNG', 'ĐỐI TƯỢNG', 'NĂM ĐẠT ĐƯỢC', 'THÀNH TÍCH', 'CHÚ THÍCH'];
+                        cols = ['STT', 'LOẠI ĐỐI TƯỢNG', 'ĐỐI TƯỢNG', 'NĂM ĐẠT ĐƯỢC', 'THÀNH TÍCH', 'CHÚ THÍCH', 'ĐIỂM THI ĐUA'];
                     }
                     if (loaiDoiTuong == '01') {
-                        cols = ['STT', 'NĂM ĐẠT ĐƯỢC', 'THÀNH TÍCH', 'CHÚ THÍCH'];
+                        cols = ['STT', 'NĂM ĐẠT ĐƯỢC', 'THÀNH TÍCH', 'CHÚ THÍCH', 'ĐIỂM THI ĐUA'];
                     }
                     if (loaiDoiTuong == '02') {
-                        cols = ['STT', 'SHCC', 'HỌ', 'TÊN', 'NĂM ĐẠT ĐƯỢC', 'THÀNH TÍCH', 'CHÚ THÍCH'];
+                        cols = ['STT', 'SHCC', 'HỌ', 'TÊN', 'NĂM ĐẠT ĐƯỢC', 'THÀNH TÍCH', 'CHÚ THÍCH', 'ĐIỂM THI ĐUA'];
                     }
                     if (loaiDoiTuong == '03' || loaiDoiTuong == '04') {
-                        cols = ['STT', 'ĐƠN VỊ', 'BỘ MÔN', 'NĂM ĐẠT ĐƯỢC', 'THÀNH TÍCH', 'CHÚ THÍCH'];
+                        cols = ['STT', 'ĐƠN VỊ', 'BỘ MÔN', 'NĂM ĐẠT ĐƯỢC', 'THÀNH TÍCH', 'CHÚ THÍCH', 'ĐIỂM THI ĐUA'];
                     }
                     let cells = [];
                     for (let idx = 0; idx < cols.length; idx++) {
@@ -116,7 +116,7 @@ module.exports = app => {
                         cells.push({cell: chr + '1', value: cols[idx], bold: true, border: '1234'});
                     }
                     page.rows.forEach((item, index) => {
-                        // console.log(item);
+                        // console.log("item = ", item);
                         cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
                         for (let idx = 1; idx < cols.length; idx++) {
                             let chr = String.fromCharCode(65 + idx); // where n is 0, 1, 2 ...                            
@@ -148,6 +148,7 @@ module.exports = app => {
                             if (type == 'NĂM ĐẠT ĐƯỢC') value = item.namDatDuoc;
                             if (type == 'THÀNH TÍCH') value = item.tenThanhTich;
                             if (type == 'CHÚ THÍCH') value = item.tenChuThich;
+                            if (type == 'ĐIỂM THI ĐUA') value = item.diemThiDua;
                             let add = {
                                 cell: chr + (index + 2),
                                 border: '1234',

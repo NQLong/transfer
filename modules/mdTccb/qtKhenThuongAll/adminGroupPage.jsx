@@ -48,8 +48,8 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        let { id, maLoaiDoiTuong, ma, namDatDuoc, maThanhTich, maChuThich } = item ? item : {
-            id: '', maLoaiDoiTuong: '', ma: '', namDatDuoc: '', maThanhTich: '', maChuThich: '',
+        let { id, maLoaiDoiTuong, ma, namDatDuoc, maThanhTich, maChuThich, diemThiDua } = item ? item : {
+            id: '', maLoaiDoiTuong: '', ma: '', namDatDuoc: '', maThanhTich: '', maChuThich: '', diemThiDua: ''
         };
         this.setState({
             id: id, doiTuong: maLoaiDoiTuong
@@ -63,6 +63,7 @@ class EditModal extends AdminModal {
         this.namDatDuoc.value(namDatDuoc ? namDatDuoc : '');
         this.thanhTich.value(maThanhTich ? maThanhTich : '');
         this.chuThich.value(maChuThich ? maChuThich : '');
+        this.diemThiDua.value(diemThiDua);
     };
 
     changeKichHoat = (value, target) => target.value(value ? 1 : 0) || target.value(value);
@@ -80,6 +81,7 @@ class EditModal extends AdminModal {
             namDatDuoc: this.namDatDuoc.value(),
             thanhTich: this.thanhTich.value(),
             chuThich: this.chuThich.value(),
+            diemThiDua: this.diemThiDua.value(),
         };
         this.props.update(this.state.id, ma, changes, this.hide);
     }
@@ -108,6 +110,8 @@ class EditModal extends AdminModal {
                 <FormSelect className='col-md-12' ref={e => this.thanhTich = e} label='Thành tích' data={this.thanhTichTable} readOnly={false} />
                 <FormTextBox className='col-md-4' ref={e => this.namDatDuoc = e} label='Năm đạt được (yyyy)' type='year' readOnly={false} />
                 <FormSelect className='col-md-8' ref={e => this.chuThich = e} label='Chú thích' data={this.chuThichTable} readOnly={false} />
+                <FormTextBox className='col-md-4' ref={e => this.diemThiDua = e} type='number' label='Điểm thi đua' readOnly={false} />
+
             </div>
         });
     }
@@ -180,6 +184,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Đối tượng</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm đạt được</th>
                         <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Thành tích</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Điểm thi đua</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Loại đối tượng</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                     </tr>
@@ -225,6 +230,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                             </>
                         )}
                         />
+                        <TableCell type='text' content={item.diemThiDua} />
                         <TableCell type='text' content={item.tenLoaiDoiTuong} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={this.delete} />
