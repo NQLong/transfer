@@ -10,7 +10,6 @@ import {
 
 class QtHopDongLaoDongPage extends AdminPage {
     checked = false;
-    searchBox = React.createRef();
 
     componentDidMount() {
         T.ready('/user/tccb', () => {
@@ -51,15 +50,15 @@ class QtHopDongLaoDongPage extends AdminPage {
 
     render() {
         const permission = this.getUserPermission('qtHopDongLaoDong', ['read', 'write', 'delete']);
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } =
-            this.checked ?
-                (this.props.qtHopDongLaoDong && this.props.qtHopDongLaoDong.page_gr ? this.props.qtHopDongLaoDong.page_gr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] })
-                : (this.props.qtHopDongLaoDong && this.props.qtHopDongLaoDong.page ? this.props.qtHopDongLaoDong.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] });
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ?
+            (this.props.qtHopDongLaoDong && this.props.qtHopDongLaoDong.page_gr ?
+                this.props.qtHopDongLaoDong.page_gr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list })
+            : (this.props.qtHopDongLaoDong && this.props.qtHopDongLaoDong.page ? this.props.qtHopDongLaoDong.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] });
 
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
-                getDataSource: () => list, stickyHead: false,
+                getDataSource: () => list, stickyHead: true,
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
@@ -67,7 +66,7 @@ class QtHopDongLaoDongPage extends AdminPage {
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Số hợp đồng</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ duyệt hồ sơ</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
+                        <th style={{ width: 'auto', textAlign: 'center',  whiteSpace: 'nowrap' }}>Thao tác</th>
 
                     </tr>
                 ),
@@ -107,14 +106,30 @@ class QtHopDongLaoDongPage extends AdminPage {
                                 <Link to={'/user/staff/' + item.shccNguoiKy}>{item.shccNguoiKy}</Link>
                             </>
                         )} />
-                        <TableCell type='buttons' content={item} onEdit={`/user/tccb/qua-trinh/hop-dong-lao-dong/${item.ma}`} onDelete={this.delete} permission={permission} >
+                        {
+                            !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
+                                onEdit={`/user/tccb/qua-trinh/hop-dong-lao-dong/${item.ma}`} onDelete={this.delete} >
+                                <a href="#" className="btn btn-primary" style={{ width: '45px' }} onClick={e => e.preventDefault() || this.downloadWord(item)}>
+                                    <i className='fa fa-lg fa-file-word-o' />
+                                </a>
+                            </TableCell>
+                        }
+                        {
+                            this.checked &&
+                            <TableCell type='buttons' style={{ textAlign: 'center', width: '45px' }} content={item} permission={permission} >
+                                <Link className='btn btn-success' to={'/user/tccb/qua-trinh/hop-dong-lao-dong/group/' + item.shcc} >
+                                    <i className='fa fa-lg fa-compress' />
+                                </Link>
+                            </TableCell>
+                        }
+                        {/* <TableCell type='buttons' content={item} onEdit={`/user/tccb/qua-trinh/hop-dong-lao-dong/${item.ma}`} onDelete={this.delete} permission={permission} >
                             {!this.checked && <a href="#" className="btn btn-primary" style={{ width: '45px' }} onClick={e => e.preventDefault() || this.downloadWord(item)}>
                                 <i className='fa fa-lg fa-file-word-o' />
                             </a>}
                             {this.checked && <Link className='btn btn-success' to={`/user/tccb/qua-trinh/hop-dong-lao-dong/group/${item.shcc}`} style={{ width: '45px' }}>
                                 <i className='fa fa-lg fa-compress' />
                             </Link>}
-                        </TableCell>
+                        </TableCell> */}
                     </tr>
                 )
             });
@@ -135,9 +150,9 @@ class QtHopDongLaoDongPage extends AdminPage {
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.checked ? this.props.getQtHopDongLaoDongGroupPage : this.props.getQtHopDongLaoDongPage} />
                 {permission.read &&
-                        <button className='btn btn-success btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px' }} onClick={this.download} >
-                            <i className='fa fa-lg fa-print' />
-                        </button>
+                    <button className='btn btn-success btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px' }} onClick={this.download} >
+                        <i className='fa fa-lg fa-print' />
+                    </button>
                 }
             </>,
             backRoute: '/user/tccb',

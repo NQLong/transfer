@@ -38,7 +38,7 @@ export class EditModal extends AdminModal {
 
     checkChucVu = (changes) => {
         if (changes.chucVuChinh == this.state.chucVuChinh) {
-            this.state.stt ? this.props.update(this.state.stt, changes, this.hide) : this.props.create(changes, this.hide);
+            this.state.stt ? this.props.update(false, this.state.stt, changes, this.hide) : this.props.create(changes, this.hide);
             return;
         }
         T.confirm('Thông tin chức vụ chính', 'Đây sẽ là chức vụ chính của cán bộ', 'warning', true, isConfirm => {
@@ -46,16 +46,14 @@ export class EditModal extends AdminModal {
                 if (data) {
                     data.forEach(item => {
                         if (item.chucVuChinh && item.stt != this.state.stt) {
-                            this.props.update(item.stt, { chucVuChinh: 0 });
+                            this.props.update(false, item.stt, { chucVuChinh: 0 });
                         }
                     });
                 }
                 if (this.state.stt) {
-                    this.props.update(this.state.stt, changes, this.hide);
-                    this.props.getData && console.log('hello');
+                    this.props.update(false, this.state.stt, changes, this.hide);
                 } else {
                     this.props.create(changes, this.hide);
-                    this.props.getData && this.props.getData(this.shcc.value());
                 }
             });
         });
@@ -78,7 +76,7 @@ export class EditModal extends AdminModal {
         } else {
             if (!changes.chucVuChinh) {
                 if (this.state.stt) {
-                    this.props.update(this.state.stt, changes, this.hide);
+                    this.props.update(false, this.state.stt, changes, this.hide);
                     this.props.getData && console.log('hello');
                 } else {
                     this.props.create(changes, this.hide);
