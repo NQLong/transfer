@@ -172,7 +172,8 @@ class QtKhenThuongAllGroupPage extends AdminPage {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('qtKhenThuongAll', ['read', 'write', 'delete']);
         let loaiDoiTuong = this.loaiDoiTuong;
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.page ?
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = 
+        this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.page ?
             this.props.qtKhenThuongAll.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {

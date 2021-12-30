@@ -28,15 +28,21 @@ class CanBoPage extends AdminPage {
                         T.notify('Lấy thông tin cán bộ bị lỗi!', 'danger');
                     }
                     else {
-                        this.componentCaNhan.value(data.item);
-                        this.componentTTCongTac.value(data.item);
-                        this.componentTrinhDo.value(data.item);
+                        this.setUp(data.item);
                     }
                 });
             } else {
                 this.setState({ create: true });
             }
         });
+    }
+
+    setUp = (item) => {
+        this.componentCaNhan.value(item);
+        this.componentTTCongTac.value(item);
+        this.componentQuanHe.value(item.items, item.email, item.phai, item.shcc);
+        this.componentTrinhDo.value(item);
+
     }
 
     save = () => {
@@ -46,12 +52,14 @@ class CanBoPage extends AdminPage {
         }
     }
 
+
     render() {
         const item = this.props.staff?.selectedItem;
-        console.log(item);
-        if (item) {
-            this.componentQuanHe?.value(item.items, item.email, item.phai, item.shcc);
-        }
+        // if (item) {
+        //     // this.componentQuanHe.value(item.items, item.email, item.phai, item.shcc);
+        //     this.setUp(item);
+        //     // this.componentTTCongTac.value(item);
+        // }
         return this.renderPage({
             title: `Thông tin cá nhân${item?.shcc ? `: ${item?.ho} ${item?.ten}` : null}`,
             breadcrumb: [
@@ -61,7 +69,7 @@ class CanBoPage extends AdminPage {
             content: <>
                 <ComponentCaNhan ref={e => this.componentCaNhan = e} userEdit={false} />
                 <ComponentQuanHe ref={e => this.componentQuanHe = e} userEdit={false} />
-                <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={false} />
+                <ComponentTTCongTac ref={e => this.componentTTCongTac = e} chucVu={item && item.chucVu ? item.chucVu : []} userEdit={false} />
                 <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={false} />
             </>,
             backRoute: '/user/staff',

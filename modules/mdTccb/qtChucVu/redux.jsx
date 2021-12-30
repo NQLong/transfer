@@ -1,4 +1,5 @@
 import T from 'view/js/common';
+import { getStaffEdit } from '../tccbCanBo/redux';
 
 // Reducer ------------------------------------------------------------------------------------------------------------
 const QtChucVuGetAll = 'QtChucVu:GetAll';
@@ -138,19 +139,17 @@ export function deleteQtChucVu(stt) {
     };
 }
 
-export function updateQtChucVu(stt, changes, done) {
+export function updateQtChucVu(isStaffEdit, stt, changes, done) {
     return dispatch => {
-        console.log(changes);
         const url = '/api/qua-trinh/chuc-vu';
         T.put(url, { stt, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật chức vụ bị lỗi!', 'danger');
-                console.error(`PUT: ${url}.`, data.error);
-                done && done(data.error);
+                console.error('PUT: ' + url + '. ' + data.error);
             } else {
                 T.notify('Cập nhật chức vụ thành công!', 'success');
-                done && done(data.item);
-                dispatch(getQtChucVuPage());
+                isStaffEdit ? (done && done()) : (done && done(data.item));
+                isStaffEdit ? dispatch(getStaffEdit(data.item.shcc)) : dispatch(getQtChucVuPage());
             }
         }, () => T.notify('Cập nhật chức vụ bị lỗi!', 'danger'));
     };

@@ -4,7 +4,6 @@ import { AdminModal, AdminPage, FormCheckbox, FormDatePicker, FormSelect, FormTe
 import { getDmChucVuAll } from 'modules/mdDanhMuc/dmChucVu/redux';
 import { getDmDonViAll } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { getDmBoMonAll } from 'modules/mdDanhMuc/dmBoMon/redux';
-// import { EditModal } from 'modules/mdTccb/qtChucVu/adminPage';
 import { getStaffEdit } from 'modules/mdTccb/tccbCanBo/redux';
 import { getQtChucVuAll, createQtChucVu, updateQtChucVu, deleteQtChucVu } from 'modules/mdTccb/qtChucVu/redux';
 import { SelectAdapter_DmChucVuV2 } from 'modules/mdDanhMuc/dmChucVu/redux';
@@ -37,7 +36,7 @@ class EditModal extends AdminModal {
 
     checkChucVu = (changes) => {
         if (changes.chucVuChinh == this.state.chucVuChinh) {
-            this.state.stt ? this.props.update(this.state.stt, changes, this.hide) : this.props.create(changes, this.hide);
+            this.state.stt ? this.props.update(true, this.state.stt, changes, this.hide) : this.props.create(changes, this.hide);
             return;
         }
         T.confirm('Thông tin chức vụ chính', 'Đây sẽ là chức vụ chính của cán bộ', 'warning', true, isConfirm => {
@@ -45,12 +44,12 @@ class EditModal extends AdminModal {
                 if (data) {
                     data.forEach(item => {
                         if (item.chucVuChinh && item.stt != this.state.stt) {
-                            this.props.update(item.stt, { chucVuChinh: 0 });
+                            this.props.update(true, item.stt, { chucVuChinh: 0 });
                         }
                     });
                 }
                 if (this.state.stt) {
-                    this.props.update(this.state.stt, changes, this.hide);
+                    this.props.update(true, this.state.stt, changes, this.hide);
                     this.props.getData(changes.shcc);
                 } else {
                     this.props.create(changes, this.hide);
@@ -77,10 +76,13 @@ class EditModal extends AdminModal {
         } else {
             if (!changes.chucVuChinh) {
                 if (this.state.stt) {
-                    this.props.update(this.state.stt, changes, this.hide);
-                    this.props.getData(changes.shcc);
+                    this.props.update(true, this.state.stt, changes, error=> {
+                        if (error == undefined || error == null) {
+                            this.props.getData(changes.shcc);
+                            this.hide();
+                        }
+                    });
                 } else {
-                    this.props.create(changes, this.hide);
                     this.props.getData && this.props.getData(changes.shcc);
                 }
             } else
@@ -135,7 +137,7 @@ class ComponentChucVu extends AdminPage {
         this.props.getDmBoMonAll(items => items.forEach(i => this.mapperBoMon[i.ma] = i.ten));
 
     }
-    value(item, type, shcc) {
+    value = (item, type, shcc) =>{
         this.data = item;
         this.type = type;
         this.shcc = shcc;
@@ -143,7 +145,7 @@ class ComponentChucVu extends AdminPage {
 
     showModal = (e, shcc) => {
         e.preventDefault();
-        this.modal.show({shcc: shcc});
+        this.modal.show({ shcc: shcc });
     }
 
     delete = (e, item) => {
@@ -152,7 +154,7 @@ class ComponentChucVu extends AdminPage {
                 if (error) T.notify(error.message ? error.message : 'Xoá chức vụ bị lỗi!', 'danger');
                 else {
                     T.alert('Xoá chức vụ thành công!', 'success', false, 800);
-                    
+
                 }
             });
         });
@@ -162,46 +164,48 @@ class ComponentChucVu extends AdminPage {
 
     render() {
         const permission = this.getUserPermission('staff', ['read', 'write', 'delete']);
-        const renderTableChucVu = (items) => renderTable({
-            getDataSource: () => items, stickyHead: false,
-            renderHead: () => (
-                <tr>
-                    <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                    <th style={{ width: '70%', textAlign: 'center' }}>Chức vụ</th>
-                    <th style={{ width: '30%', textAlign: 'center' }}>Quyết định bổ nhiệm</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Chức vụ chính</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
+        const renderTableChucVu = (items) => (
+            renderTable({
+                getDataSource: () => items, stickyHead: false,
+                renderHead: () => (
+                    <tr>
+                        <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
+                        <th style={{ width: '70%', textAlign: 'center' }}>Chức vụ</th>
+                        <th style={{ width: '30%', textAlign: 'center' }}>Quyết định bổ nhiệm</th>
+                        {this.type == 1 && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Chức vụ chính</th>}
+                        <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
 
-                </tr>
-            ),
-            renderRow: (item, index) => (
-                <tr key={index}>
-                    <TableCell type='text' content={index + 1} />
-                    <TableCell type='text' content={(
-                        this.type == 1 ? <>
-                            <span>{this.mapperChucVu1[item.maChucVu]}</span><br />
-                            <span>{item.maDonVi ? 'Đơn vị: ' + this.mapperDonVi[item.maDonVi] : 'Bộ môn/Phòng: ' + this.mapperBoMon[item.maBoMon]}</span>
-                        </> :
-                            <>
+                    </tr>
+                ),
+                renderRow: (item, index) => (
+                    <tr key={index}>
+                        <TableCell type='text' content={index + 1} />
+                        <TableCell type='text' content={(
+                            this.type == 1 ? <>
                                 <span>{this.mapperChucVu1[item.maChucVu]}</span><br />
-                                <span>{this.loaiChucVuMap[this.mapperChucVu[item.maChucVu]]}</span>
+                                <span>{item.maDonVi ? 'Đơn vị: ' + this.mapperDonVi[item.maDonVi] : 'Bộ môn/Phòng: ' + this.mapperBoMon[item.maBoMon]}</span>
+                            </> :
+                                <>
+                                    <span>{this.mapperChucVu1[item.maChucVu]}</span><br />
+                                    <span>{this.loaiChucVuMap[this.mapperChucVu[item.maChucVu]]}</span>
+                                </>
+
+                        )} />
+                        <TableCell type='text' content={(
+                            <>
+                                <span>Số: {item.soQd}</span><br />
+                                <span>Ngày: <span style={{ color: 'blue' }}>{item.ngayRaQd ? new Date(item.ngayRaQd).ddmmyyyy() : ''}</span></span>
                             </>
+                        )}
+                        />
+                        {this.type == 1 && <TableCell type='checkbox' content={item.chucVuChinh} />}
 
-                    )} />
-                    <TableCell type='text' content={(
-                        <>
-                            <span>Số: {item.soQd}</span><br />
-                            <span>Ngày: <span style={{ color: 'blue' }}>{item.ngayRaQd ? new Date(item.ngayRaQd).ddmmyyyy() : ''}</span></span>
-                        </>
-                    )}
-                    />
-                    <TableCell type='checkbox' content={item.chucVuChinh} />
-
-                    <TableCell type='buttons' content={item} permission={permission} permissionDelete={true}
-                        onEdit={() => this.modal.show(item)}
-                        onDelete={e => this.delete(e, item)}></TableCell>
-                </tr>)
-        });
+                        <TableCell type='buttons' content={item} permission={permission} permissionDelete={true}
+                            onEdit={() => this.modal.show(item)}
+                            onDelete={e => this.delete(e, item)}></TableCell>
+                    </tr>)
+            })
+        );
 
         return (
             <div className='col-md-12 form-group'>
@@ -212,8 +216,8 @@ class ComponentChucVu extends AdminPage {
                         <i className='fa fa-fw fa-lg fa-plus' />Thêm {this.loaiChucVuMap[this.type]}
                     </button>
                 </div>
-                <EditModal ref={e => this.modal = e} 
-                    getQtChucVuAll={this.props.getQtChucVuAll} getData={this.props.getData}
+                <EditModal ref={e => this.modal = e}
+                    getQtChucVuAll={this.props.getQtChucVuAll} getData={this.props.getStaffEdit}
                     create={this.props.createQtChucVu} update={this.props.updateQtChucVu}
                 />
             </div>
