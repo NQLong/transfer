@@ -113,15 +113,15 @@ class EditModal extends AdminModal {
     }
 }
 
-class QtNghiThaiSan extends AdminPage {
-    checked = false
+class QtNghiThaiSanGroupPage extends AdminPage {
     searchBox = React.createRef();
-
     componentDidMount() {
         T.ready('/user/tccb', () => {
+            const route = T.routeMatcher('/user/qua-trinh/nghi-thai-san/group/:shcc'),
+                shcc = route.parse(window.location.pathname);
             T.onSearch = (searchText) => this.props.getQtNghiThaiSanPage(undefined, undefined, searchText || '');
             T.showSearchBox();
-            this.props.getQtNghiThaiSanPage();
+            this.props.getQtNghiThaiSanGroupPage(undefined, undefined, shcc.shcc);
         });
     }
 
@@ -130,16 +130,11 @@ class QtNghiThaiSan extends AdminPage {
         this.modal.show();
     }
 
-    groupPage = () => {
-        this.checked = !this.checked;
-        // this.props.getQtHopDongLaoDongGroupPage(undefined, undefined, '');
-    }
-
     delete = (e, item) => {
-        T.confirm('Xóa hợp đồng', `Bạn có chắc bạn muốn xóa quá trình nghỉ thai sản cho cán bộ ${item.shcc ? `<b>${item.shcc}</b>` : 'này'}?`, 'warning', true, isConfirm => {
+        T.confirm('Xóa hợp đồng', `Bạn có chắc bạn muốn xóa hợp đồng ${item.soHopDong ? `<b>${item.soHopDong}</b>` : 'này'}?`, 'warning', true, isConfirm => {
             isConfirm && this.props.deleteQtNghiThaiSan(item.stt, error => {
-                if (error) T.notify(error.message ? error.message : `Xoá quá trình nghỉ thai sản ${item.ten} bị lỗi!`, 'danger');
-                else T.alert(`Xoá quá trình nghỉ thai sản ${item.ten} thành công!`, 'success', false, 800);
+                if (error) T.notify(error.message ? error.message : `Xoá hợp đồng ${item.ten} bị lỗi!`, 'danger');
+                else T.alert(`Xoá hợp đồng ${item.ten} thành công!`, 'success', false, 800);
             });
         });
         e.preventDefault();
@@ -185,18 +180,8 @@ class QtNghiThaiSan extends AdminPage {
                         <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content= {<span style={{ color: 'blue'}}>{item.thoiGianDiLamLai ? new Date(item.thoiGianDiLamLai).ddmmyyyy() : ''}</span>}/>
                         <TableCell type='text' content={item.ghiChu} />
                         <TableCell type='text' content={item.thoiGianBaoTangBenBhxh} />
-                        {
-                            !this.checked&&<TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={e => this.delete(e, item)} />
-                        }
-                        {
-                            this.checked&&
-                            <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}>
-                                <Link className='btn btn-success' to={`/user/tccb/qua-trinh/nghi-thai-san/group/${item.shcc}`} >
-                                    <i className='fa fa-lg fa-compress' />
-                                </Link>
-                            </TableCell>
-                        }
                     </tr>
                 )
             });
@@ -210,10 +195,7 @@ class QtNghiThaiSan extends AdminPage {
                 'Nghỉ thai sản'
             ],
             content: <>
-                <div className='tile'>
-                    <FormCheckbox label='Hiển thị theo cán bộ' onChange={this.groupPage} />
-                    {table}
-                </div>
+                <div className='tile'>{table}</div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getQtNghiThaiSanPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
@@ -233,4 +215,4 @@ const mapActionsToProps = {
     getQtNghiThaiSanAll, getQtNghiThaiSanPage, deleteQtNghiThaiSan, getDmDonViAll, createQtNghiThaiSan,
     updateQtNghiThaiSan, getDmChucVuAll, getStaffAll, getQtNghiThaiSanGroupPage
 };
-export default connect(mapStateToProps, mapActionsToProps)(QtNghiThaiSan);
+export default connect(mapStateToProps, mapActionsToProps)(QtNghiThaiSanGroupPage);

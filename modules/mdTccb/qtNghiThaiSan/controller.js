@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3015: { title: 'Nghỉ thai sản', link: '/user/qua-trinh/nghi-thai-san', icon: 'fa-bed', backgroundColor: '#617ad4', groupIndex: 2},
+            3015: { title: 'Nghỉ thai sản', link: '/user/tccb/qua-trinh/nghi-thai-san', icon: 'fa-bed', backgroundColor: '#617ad4', groupIndex: 2},
         },
     };
     app.permission.add(
@@ -11,8 +11,8 @@ module.exports = app => {
         { name: 'qtNghiThaiSan:write' },
         { name: 'qtNghiThaiSan:delete' },
     );
-    app.get('/user/qua-trinh/nghi-thai-san/:ma', app.permission.check('qtNghiThaiSan:read'), app.templates.admin);
-    app.get('/user/qua-trinh/nghi-thai-san', app.permission.check('qtNghiThaiSan:read'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/nghi-thai-san/:ma', app.permission.check('qtNghiThaiSan:read'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/nghi-thai-san', app.permission.check('qtNghiThaiSan:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
@@ -29,6 +29,20 @@ module.exports = app => {
         // }
         // app.model.qtNghiThaiSan.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
         app.model.qtNghiThaiSan.searchPage(pageNumber, pageSize, searchTerm, (error, page) => {
+            if (error || page == null) {
+                res.send({ error });
+            } else {
+                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
+                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, list } });
+            }
+        });
+    });
+
+    app.get('/api/tccb/qua-trinh/nghi-thai-san/group/page/:pageNumber/:pageSize', app.permission.check('qtNghiThaiSan:read'), (req, res) => {
+        const pageNumber = parseInt(req.params.pageNumber),
+            pageSize = parseInt(req.params.pageSize),
+            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+        app.model.qtNghiThaiSan.groupPage(pageNumber, pageSize, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {

@@ -5,6 +5,7 @@ const QtNghiThaiSanGetAll = 'QtNghiThaiSan:GetAll';
 const QtNghiThaiSanGetPage = 'QtNghiThaiSan:GetPage';
 const QtNghiThaiSanUpdate = 'QtNghiThaiSan:Update';
 const QtNghiThaiSanGet = 'QtNghiThaiSan:Get';
+const QtNghiThaiSanGetGroupPage = 'QtNghiThaiSan:GetGroupPage';
 
 export default function QtNghiThaiSanReducer(state = null, data) {
     switch (data.type) {
@@ -60,6 +61,24 @@ export function getQtNghiThaiSanPage(pageNumber, pageSize, pageCondition, done) 
                 dispatch({ type: QtNghiThaiSanGetPage, page: data.page });
             }
         }, () => T.notify('Lấy danh sách nghỉ thai sản bị lỗi!', 'danger'));
+    };
+}
+
+T.initPage('groupPageQtNghiThaiSan', true);
+export function getQtNghiThaiSanGroupPage(pageNumber, pageSize, pageCondition, done) {
+    const page = T.updatePage('groupPageQtNghiThaiSan', pageNumber, pageSize, pageCondition);
+    return dispatch => {
+        const url = `/api/tccb/qua-trinh/nghi-thai-san/group/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách nghỉ thai sản theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                done && done(data.page);
+                dispatch({ type: QtNghiThaiSanGetGroupPage, page: data.page });
+            }
+        }, error => console.error(`GET: ${url}.`, error));
     };
 }
 
