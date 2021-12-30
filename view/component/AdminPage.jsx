@@ -407,9 +407,10 @@ export class FormEditor extends React.Component {
 }
 
 export class FormSelect extends React.Component {
-    static defaultProps = { formType: 'selectBox' } 
+    static defaultProps = { formType: 'selectBox' }
     state = { valueText: '', hasInit: false };
     hasInit = false;
+
     componentDidMount() {
         const { label, placeholder } = this.props;
         $(this.input).select2({ placeholder: placeholder || label });
@@ -433,9 +434,7 @@ export class FormSelect extends React.Component {
 
     clear = () => $(this.input).val('').trigger('change') && $(this.input).html('');
 
-    reset = () => $(this.input).val('').trigger('change');
-    
-    value = function (value) {
+    value = function (value, done = null) {
         const dropdownParent = this.props.dropdownParent || $('.modal-body').has(this.input)[0] || $('.tile-body').has(this.input)[0];
         if (arguments.length) {
             this.clear();
@@ -478,6 +477,7 @@ export class FormSelect extends React.Component {
                         });
                         Promise.all(promiseList).then(valueTexts => {
                             // Async set readOnlyText
+                            done && done();
                             this.setState({ valueText: valueTexts.join(', ') });
                         });
                     } else {
@@ -485,17 +485,21 @@ export class FormSelect extends React.Component {
                             data.fetchOne(value, _item => {
                                 const option = new Option(_item.text, _item.id, true, true);
                                 $(this.input).append(option).trigger('change');
+                                done && done();
                                 // Async set readOnlyText
                                 this.setState({ valueText: _item.text });
                             });
                         } else if (value.hasOwnProperty('id') && value.hasOwnProperty('text')) {
                             $(this.input).select2('trigger', 'select', { data: value });
+                            done && done();
                         } else {
                             $(this.input).select2('trigger', 'select', { data: { id: value, text: value } });
+                            done && done();
                         }
                     }
                 } else {
                     $(this.input).val(null).trigger('change');
+                    done && done();
                 }
             }
 
@@ -518,7 +522,7 @@ export class FormSelect extends React.Component {
             return { id: inputData[0].id, text: inputData[0].text };
         }
     };
-    
+
     render = () => {
         const { className = '', style = {}, labelStyle = {}, label = '', multiple = false, readOnly = false, required = false } = this.props;
         return (

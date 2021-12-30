@@ -50,7 +50,13 @@ export class EditModal extends AdminModal {
                         }
                     });
                 }
-                this.state.stt ? this.props.update(this.state.stt, changes, this.hide) : this.props.create(changes, this.hide);
+                if (this.state.stt) {
+                    this.props.update(this.state.stt, changes, this.hide);
+                    this.props.getData && console.log('hello');
+                } else {
+                    this.props.create(changes, this.hide);
+                    this.props.getData && this.props.getData(this.shcc.value());
+                }
             });
         });
     }
@@ -70,7 +76,15 @@ export class EditModal extends AdminModal {
             T.notify('Mã số cán bộ bị trống');
             this.shcc.focus();
         } else {
-            !changes.chucVuChinh ? (this.state.stt ? this.props.update(this.state.stt, changes, this.hide) : this.props.create(changes, this.hide)) :
+            if (!changes.chucVuChinh) {
+                if (this.state.stt) {
+                    this.props.update(this.state.stt, changes, this.hide);
+                    this.props.getData && console.log('hello');
+                } else {
+                    this.props.create(changes, this.hide);
+                    this.props.getData && this.props.getData(changes.shcc);
+                }
+            } else
                 this.checkChucVu(changes);
         }
     }

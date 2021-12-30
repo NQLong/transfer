@@ -7,7 +7,7 @@ import {
     getQtKhenThuongAllPage, getQtKhenThuongAllAll, updateQtKhenThuongAll,
     deleteQtKhenThuongAll, createQtKhenThuongAll, getQtKhenThuongAllGroupPage,
 } from './redux';
-import { getStaffAll } from 'modules/mdTccb/tccbCanBo/redux';
+import { getStaffAll, SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import { getDmKhenThuongKyHieuAll } from 'modules/mdDanhMuc/dmKhenThuongKyHieu/redux';
 import { getDmKhenThuongChuThichAll } from 'modules/mdDanhMuc/dmKhenThuongChuThich/redux';
 import { getDmKhenThuongLoaiDoiTuongAll } from 'modules/mdDanhMuc/dmKhenThuongLoaiDoiTuong/redux';
@@ -117,7 +117,7 @@ class EditModal extends AdminModal {
             body: <div className='row'>
                 <FormSelect className='col-md-4' ref={e => this.loaiDoiTuong = e} label='Loại đối tượng' data={this.loaiDoiTuongTable} readOnly={readOnly} onChange={value => this.onChangeDT(value.id)} />
 
-                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={this.props.staffTable}
+                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo}
                     style={doiTuong == '02' ? {} : { display: 'none' }}
                     readOnly={readOnly} />
 
