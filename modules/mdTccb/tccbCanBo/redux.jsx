@@ -103,7 +103,6 @@ export function getStaffAll(done) {
 }
 
 export function getStaffEdit(shcc, done) {
-    console.log(shcc);
     return dispatch => {
         const url = `/api/staff/edit/item/${shcc}`;
         T.get(url, data => {

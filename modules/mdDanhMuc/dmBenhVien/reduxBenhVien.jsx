@@ -159,3 +159,12 @@ export const SelectAdapter_DmBenhVien = {
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
     condition: { kichHoat: 1 },
 };
+
+export const SelectAdapter_DmBenhVienV2 = {
+    ajax: false,
+    data: () => ({ condition:  { kichHoat: 1 } }),
+    url: '/api/danh-muc/benh-vien/all',
+    processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.ma, text: `${item.ten}` })) : [] }),
+    getOne: getDmBenhVien,
+    fetchOne: (ma, done) => (getDmBenhVien(ma,  item  => done && done({ id: item.ma, text: `${item.ten}` })))(),
+};

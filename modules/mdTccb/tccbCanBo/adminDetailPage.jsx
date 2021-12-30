@@ -10,6 +10,7 @@ import ComponentCaNhan from './componentCaNhan';
 import { AdminPage } from 'view/component/AdminPage';
 import ComponentQuanHe from './componentQuanHe';
 import ComponentTTCongTac from './componentTTCongTac';
+import ComponentTrinhDo from './componentTrinhDo';
 
 class CanBoPage extends AdminPage {
     state = { item: null }
@@ -29,6 +30,7 @@ class CanBoPage extends AdminPage {
                     else {
                         this.componentCaNhan.value(data.item);
                         this.componentTTCongTac.value(data.item);
+                        this.componentTrinhDo.value(data.item);
                     }
                 });
             } else {
@@ -46,6 +48,7 @@ class CanBoPage extends AdminPage {
 
     render() {
         const item = this.props.staff?.selectedItem;
+        console.log(item);
         if (item) {
             this.componentQuanHe?.value(item.items, item.email, item.phai, item.shcc);
         }
@@ -59,6 +62,7 @@ class CanBoPage extends AdminPage {
                 <ComponentCaNhan ref={e => this.componentCaNhan = e} userEdit={false} />
                 <ComponentQuanHe ref={e => this.componentQuanHe = e} userEdit={false} />
                 <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={false} />
+                <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={false} />
             </>,
             backRoute: '/user/staff',
             onSave: this.save,

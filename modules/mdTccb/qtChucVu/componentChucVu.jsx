@@ -151,17 +151,16 @@ class ComponentChucVu extends AdminPage {
             isConfirm && this.props.deleteQtChucVu(item.stt, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá chức vụ bị lỗi!', 'danger');
                 else {
-                    this.props.getData(this.shcc);
                     T.alert('Xoá chức vụ thành công!', 'success', false, 800);
                     
                 }
             });
         });
+        this.props.getData(this.shcc);
         e.preventDefault();
     }
 
     render() {
-        console.log(this.data);
         const permission = this.getUserPermission('staff', ['read', 'write', 'delete']);
         const renderTableChucVu = (items) => renderTable({
             getDataSource: () => items, stickyHead: false,
