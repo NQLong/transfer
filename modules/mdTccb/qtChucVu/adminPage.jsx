@@ -38,7 +38,7 @@ export class EditModal extends AdminModal {
 
     checkChucVu = (changes) => {
         if (changes.chucVuChinh == this.state.chucVuChinh) {
-            this.state.stt ? this.props.update(false, this.state.stt, changes, this.hide) : this.props.create(changes, this.hide);
+            this.state.stt ? this.props.update(false, this.state.stt, changes, this.hide) : this.props.create(false,changes, this.hide);
             return;
         }
         T.confirm('Thông tin chức vụ chính', 'Đây sẽ là chức vụ chính của cán bộ', 'warning', true, isConfirm => {
@@ -53,7 +53,7 @@ export class EditModal extends AdminModal {
                 if (this.state.stt) {
                     this.props.update(false, this.state.stt, changes, this.hide);
                 } else {
-                    this.props.create(changes, this.hide);
+                    this.props.create(false,changes, this.hide);
                 }
             });
         });
@@ -77,10 +77,8 @@ export class EditModal extends AdminModal {
             if (!changes.chucVuChinh) {
                 if (this.state.stt) {
                     this.props.update(false, this.state.stt, changes, this.hide);
-                    this.props.getData && console.log('hello');
                 } else {
-                    this.props.create(changes, this.hide);
-                    this.props.getData && this.props.getData(changes.shcc);
+                    this.props.create(false,changes, this.hide);
                 }
             } else
                 this.checkChucVu(changes);
@@ -129,7 +127,7 @@ class QtChucVu extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa chức vụ', 'Bạn có chắc bạn muốn xóa chức vụ này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtChucVu(item.stt, error => {
+            isConfirm && this.props.deleteQtChucVu(false, item.stt, null, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá chức vụ bị lỗi!', 'danger');
                 else T.alert('Xoá chức vụ thành công!', 'success', false, 800);
             });

@@ -45,19 +45,11 @@ class EditModal extends AdminModal {
                 queQuan: this.queQuan.value()
             };
         if (id) {
-            this.props.update(id, changes, error => {
-                if (error == undefined || error == null) {
-                    this.props.getData(shcc);
-                    this.hide();
-                }
-            });
+            this.props.update(id, changes,this.hide);
         } else {
             changes.shcc = shcc;
             changes.type = type;
-            this.props.create(changes, () => {
-                this.props.getData(shcc);
-                this.hide();
-            });
+            this.props.create(changes, this.hide);
         }
     }
 
@@ -77,7 +69,6 @@ class EditModal extends AdminModal {
 }
 class ComponentQuanHe extends AdminPage {
     state = {};
-    data = [];
     phai = '';
     email = '';
     shcc = '';
@@ -103,14 +94,14 @@ class ComponentQuanHe extends AdminPage {
         this.props.getStaffEdit(this.shcc);
         e.preventDefault();
     }
-    value(item, email, phai, shcc) {
-        this.data = item ? item : [];
+    value(email, phai, shcc) {
         this.phai = phai;
         this.email = email;
         this.shcc = shcc;
     }
 
     render() {
+        const dataQuanHe = this.props.staff?.selectedItem?.items;
         let voChongText = this.phai == '01' ? 'vợ' : 'chồng';
         let permission = this.getUserPermission('staff', ['read', 'write', 'delete']);
         const renderQuanHeTable = (items, type) => (
@@ -160,7 +151,7 @@ class ComponentQuanHe extends AdminPage {
                     <div className='tab-pane fade show active' id='infoQuanHe0Content' role='tabpanel' aria-labelledby='infoQuanHe0'>
                         <p>Gồm {voChongText} và các con</p>
                         <div className='tile-body'>{
-                            renderQuanHeTable(this.data ? this.data.filter(i => i.type == 2) : [], 2)
+                            renderQuanHeTable(dataQuanHe ? dataQuanHe.filter(i => i.type == 2) : [], 2)
                         }</div>
                         <div className='tile-footer' style={{ textAlign: 'right' }}>
                             <button className='btn btn-info' type='button' onClick={e => this.createRelation(e, 2)}>
@@ -171,7 +162,7 @@ class ComponentQuanHe extends AdminPage {
                     <div className='tab-pane fade' id='infoQuanHe1Content' role='tabpanel' aria-labelledby='infoQuanHe1'>
                         <p>Gồm người thân ruột</p>
                         <div className='tile-body'>{
-                            renderQuanHeTable(this.data ? this.data.filter(i => i.type == 0) : [], 0)
+                            renderQuanHeTable(dataQuanHe ? dataQuanHe.filter(i => i.type == 0) : [], 0)
                         }</div>
                         <div className='tile-footer' style={{ textAlign: 'right' }}>
                             <button className='btn btn-info' type='button' onClick={e => this.createRelation(e, 0)}>
@@ -182,7 +173,7 @@ class ComponentQuanHe extends AdminPage {
                     <div className='tab-pane fade' id='infoQuanHe2Content' role='tabpanel' aria-labelledby='infoQuanHe2'>
                         <p>Gồm người thân ruột của {voChongText}</p>
                         <div className='tile-body'>{
-                            renderQuanHeTable(this.data ? this.data.filter(i => i.type == 1) : [], 1)
+                            renderQuanHeTable(dataQuanHe ? dataQuanHe.filter(i => i.type == 1) : [], 1)
                         }</div>
                         <div className='tile-footer' style={{ textAlign: 'right' }}>
                             <button className='btn btn-info' type='button' onClick={e => this.createRelation(e, 1)}>
@@ -192,7 +183,6 @@ class ComponentQuanHe extends AdminPage {
                     </div>
                 </div>
                 <EditModal ref={e => this.modal = e}
-                    getData={this.props.getStaffEdit}
                     mapperQuanHe={this.mapperQuanHe}
                     create={this.props.createQuanHeCanBo}
                     update={this.props.updateQuanHeCanBo} />

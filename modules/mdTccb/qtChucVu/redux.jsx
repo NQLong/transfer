@@ -108,7 +108,7 @@ export function getQtChucVuEdit(stt, done) {
     };
 }
 
-export function createQtChucVu(items, done) {
+export function createQtChucVu(isStaffEdit, items, done) {
     return dispatch => {
         const url = '/api/qua-trinh/chuc-vu';
         T.post(url, { items }, data => {
@@ -117,14 +117,14 @@ export function createQtChucVu(items, done) {
                 console.error(`POST: ${url}.`, data.error);
             } else {
                 T.notify('Tạo chức vụ thành công!', 'success');
-                dispatch(getQtChucVuPage());
-                if (done) done(data);
+                isStaffEdit ? dispatch(getStaffEdit(data.item.shcc)) : dispatch(getQtChucVuPage());
+                isStaffEdit ? (done && done()) : (done && done(data));
             }
         }, () => T.notify('Tạo chức vụ bị lỗi!', 'danger'));
     };
 }
 
-export function deleteQtChucVu(stt) {
+export function deleteQtChucVu(isStaffEdit, stt, shcc = null) {
     return dispatch => {
         const url = '/api/qua-trinh/chuc-vu';
         T.delete(url, { stt }, data => {
@@ -133,7 +133,7 @@ export function deleteQtChucVu(stt) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('Chức vụ đã xóa thành công!', 'success', false, 800);
-                dispatch(getQtChucVuPage());
+                isStaffEdit ? dispatch(getStaffEdit(shcc)) : dispatch(getQtChucVuPage());
             }
         }, () => T.notify('Xóa chức vụ bị lỗi!', 'danger'));
     };

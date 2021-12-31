@@ -159,7 +159,16 @@ export const SelectAdapter_DmChucVu = {
 
 export const SelectAdapter_DmChucVuV2 = {
     ajax: false,
-    data: () => ({ condition: { kichHoat: 1 } }),
+    data: () => ({ condition: { kichHoat: 1, loaiChucVu: 1} }),
+    url: '/api/danh-muc/chuc-vu/all',
+    getOne: getDmChucVu,
+    processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.ma, text: item.ten })) : [] }),
+    fetchOne: (ma, done) => (getDmChucVu(ma, item => done && done({ id: item.ma, text: item.ten })))(),
+};
+
+export const SelectAdapter_DmChucVuV0 = {
+    ajax: false,
+    data: () => ({ condition: { kichHoat: 1, phuCap: 0.00} }),
     url: '/api/danh-muc/chuc-vu/all',
     getOne: getDmChucVu,
     processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.ma, text: item.ten })) : [] }),

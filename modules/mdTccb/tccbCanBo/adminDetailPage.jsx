@@ -69,7 +69,7 @@ class CanBoPage extends AdminPage {
             content: <>
                 <ComponentCaNhan ref={e => this.componentCaNhan = e} userEdit={false} />
                 <ComponentQuanHe ref={e => this.componentQuanHe = e} userEdit={false} />
-                <ComponentTTCongTac ref={e => this.componentTTCongTac = e} chucVu={item && item.chucVu ? item.chucVu : []} userEdit={false} />
+                <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={false} />
                 <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={false} />
             </>,
             backRoute: '/user/staff',

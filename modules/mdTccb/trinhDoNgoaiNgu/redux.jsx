@@ -1,5 +1,7 @@
+import { getStaffEdit } from '../tccbCanBo/redux';
+
 export function createTrinhDoNNStaff(data, done) {
-    return () => {
+    return dispatch => {
         const url = '/api/staff/trinh-do-nn';
         T.post(url, { data }, res => {
             if (res.error) {
@@ -7,14 +9,15 @@ export function createTrinhDoNNStaff(data, done) {
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
                 T.notify('Thêm thông tin trình độ ngoại ngữ thành công!', 'info');
-                if (done) done(res);
+                if (done) done();
+                dispatch(getStaffEdit(res.item.shcc));
             }
         }, () => T.notify('Thêm thông tin trình độ ngoại ngữ bị lỗi', 'danger'));
     };
 }
 
 export function updateTrinhDoNNStaff(id, changes, done) {
-    return () => {
+    return dispatch => {
         const url = '/api/staff/trinh-do-nn';
         T.put(url, { id, changes }, data => {
             if (data.error) {
@@ -23,6 +26,7 @@ export function updateTrinhDoNNStaff(id, changes, done) {
             } else if (data.item) {
                 T.notify('Cập nhật thông tin trình độ ngoại ngữ thành công!', 'info');
                 if (done) done();
+                dispatch(getStaffEdit(data.item.shcc));
             }
         }, () => T.notify('Cập nhật thông tin trình độ ngoại ngữ bị lỗi', 'danger'));
     };

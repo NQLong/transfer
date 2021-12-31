@@ -11,13 +11,10 @@ import ComponentChucVu from '../qtChucVu/componentChucVu';
 import { getStaffEdit } from './redux';
 class ComponentTTCongTac extends AdminPage {
     state = {};
-    chucVu = [];
     shcc = '';
     state = { doiTuongBoiDuong: false, tinhTrangBoiDuong: false, dangONuocNgoai: false, dangNghiTheoCheDo: false, daNghi: false };
 
     value = (item) => {
-        this.chucVu = item.chucVu;
-        console.log(item.chucVu);
         this.shcc = item.shcc;
         this.ngheNghiepCu.value(item.ngheNghiepCu ? item.ngheNghiepCu : '');
         this.ngayBatDauCongTac.value(item.ngayBatDauCongTac ? item.ngayBatDauCongTac : '');
@@ -25,8 +22,8 @@ class ComponentTTCongTac extends AdminPage {
         this.donViTuyenDung.value(item.donViTuyenDung ? item.donViTuyenDung : '');
         this.chucDanh.value(item.chucDanh ? item.chucDanh : '');
 
-        this.componentChucVuDoanThe.value(this.chucVu ? this.chucVu  : [], 0, this.shcc);
-        this.componentChucVuChinhQuyen?.value(this.chucVu ? this.chucVu : [], 1, this.shcc);
+        this.componentChucVuDoanThe.value(0, this.shcc);
+        this.componentChucVuChinhQuyen?.value(1, this.shcc);
 
         this.bacLuong.value(item.bacLuong ? item.bacLuong : '');
         this.heSo.value(item.heSoLuong ? item.heSoLuong : '');
@@ -52,8 +49,6 @@ class ComponentTTCongTac extends AdminPage {
     }
 
     render() {
-        
-
         return (
             <div className='tile'>
                 <h3 className='tile-title'>Thông tin công tác</h3>
