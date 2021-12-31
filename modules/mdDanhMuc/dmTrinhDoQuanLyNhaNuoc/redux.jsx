@@ -60,6 +60,20 @@ export function getDmTrinhDoQuanLyNhaNuocPage(pageNumber, pageSize, pageConditio
     };
 }
 
+export function getDmTrinhDoQuanLyNhaNuoc(ma, done) {
+    return () => {
+        const url = `/api/danh-muc/trinh-do-quan-ly-nha-nuoc/item/${ma}`;
+        T.get(url, data => {
+            if (data.error) {
+                T.notify('Lấy thông tin trình độ quản lý nhà nước bị lỗi!', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (done) done(data.item);
+            }
+        }, error => console.error(`GET: ${url}.`, error));
+    };
+}
+
 export function dmTrinhDoQuanLyNhaNuocGetAll(condition, done) {
     return dispatch => {
         const url = '/api/danh-muc/trinh-do-quan-ly-nha-nuoc/all';
@@ -127,4 +141,13 @@ export const SelectAdapter_DmTrinhDoQuanLyNhaNuoc = {
     getAll: dmTrinhDoQuanLyNhaNuocGetAll,
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
     condition: { kichHoat: 1 },
+};
+
+export const SelectAdapter_DmTrinhDoQuanLyNhaNuocV2 = {
+    ajax: false,
+    data: () => ({ condition:  { kichHoat: 1 } }),
+    url: '/api/danh-muc/trinh-do-quan-ly-nha-nuoc/all',
+    processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.ma, text: `${item.ten}` })) : [] }),
+    getOne: getDmTrinhDoQuanLyNhaNuoc,
+    fetchOne: (ma, done) => (getDmTrinhDoQuanLyNhaNuoc(ma,  item  => done && done({ id: item.ma, text: `${item.ten}` })))(),
 };

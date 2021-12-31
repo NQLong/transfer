@@ -47,8 +47,11 @@ class CanBoPage extends AdminPage {
 
     save = () => {
         const caNhanData = this.componentCaNhan.getAndValidate();
+        const congTacData = this.componentTTCongTac.getAndValidate();
+        const trinhDoData = this.componentTrinhDo.getAndValidate();
         if (this.urlSHCC) {
-            this.props.updateStaff(this.urlSHCC, { ...caNhanData });
+            this.props.updateStaff(this.urlSHCC, { ...caNhanData, ...congTacData, ...trinhDoData });
+
         }
     }
 

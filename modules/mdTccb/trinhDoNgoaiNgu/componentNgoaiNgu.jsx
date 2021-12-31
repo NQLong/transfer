@@ -57,7 +57,6 @@ class ComponentNN extends AdminPage {
     }
 
     value = (shcc) => {
-        console.log(shcc);
         this.shcc = shcc;
     }
 

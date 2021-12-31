@@ -34,7 +34,7 @@ module.exports = app => {
     });
 
     app.get('/api/danh-muc/trinh-do-quan-ly-nha-nuoc/item/:ma', app.permission.check('user:login'), (req, res) => {
-        app.model.dmTrinhDoQuanLyNhaNuoc.get(req.params.ma, (error, item) => res.send({ error, item }));
+        app.model.dmTrinhDoQuanLyNhaNuoc.get({ma: req.params.ma}, (error, item) => res.send({ error, item }));
     });
 
     app.post('/api/danh-muc/trinh-do-quan-ly-nha-nuoc', app.permission.check('dmTrinhDoQuanLyNhaNuoc:write'), (req, res) => {

@@ -144,3 +144,12 @@ export const SelectAdapter_DmTrinhDoTinHoc = {
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
     condition: { kichHoat: 1 },
 };
+
+export const SelectAdapter_DmTrinhDoTinHocV2 = {
+    ajax: false,
+    data: () => ({ condition:  { kichHoat: 1 } }),
+    url: '/api/danh-muc/trinh-do-tin-hoc/all',
+    processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.ma, text: `${item.ten}` })) : [] }),
+    getOne: getDmTrinhDoTinHoc,
+    fetchOne: (ma, done) => (getDmTrinhDoTinHoc(ma,  item  => done && done({ id: item.ma, text: `${item.ten}` })))(),
+};
