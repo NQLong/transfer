@@ -13,6 +13,8 @@ export default function QtNghiThaiSanReducer(state = null, data) {
             return Object.assign({}, state, { items: data.items });
         case QtNghiThaiSanGetPage:
             return Object.assign({}, state, { page: data.page });
+        case QtNghiThaiSanGetGroupPage:
+            return Object.assign({}, state, { page_gr: data.page });
         case QtNghiThaiSanGet:
             return Object.assign({}, state, { selectedItem: data.item });
         case QtNghiThaiSanUpdate:
@@ -22,7 +24,7 @@ export default function QtNghiThaiSanReducer(state = null, data) {
                     updatedItem = data.item;
                 if (updatedItems) {
                     for (let i = 0, n = updatedItems.length; i < n; i++) {
-                        if (updatedItems[i].ma == updatedItem.ma) {
+                        if (updatedItems[i].stt == updatedItem.stt) {
                             updatedItems.splice(i, 1, updatedItem);
                             break;
                         }
@@ -30,7 +32,7 @@ export default function QtNghiThaiSanReducer(state = null, data) {
                 }
                 if (updatedPage) {
                     for (let i = 0, n = updatedPage.list.length; i < n; i++) {
-                        if (updatedPage.list[i].ma == updatedItem.ma) {
+                        if (updatedPage.list[i].stt == updatedItem.stt) {
                             updatedPage.list.splice(i, 1, updatedItem);
                             break;
                         }
@@ -83,14 +85,6 @@ export function getQtNghiThaiSanGroupPage(pageNumber, pageSize, pageCondition, d
 }
 
 export function getQtNghiThaiSanAll(done) {
-    // let newData = {}, tmpData = [];
-    // let getMergedObjs = (...objs) => {
-    //     Object.fromEntries(
-    //         Object.entries([{}, ...objs].map((e, i, a) => i ? Object.entries(e).map(f => (a[0][f[0]] ? a[0][f[0]].push(...([f[1]].flat())) :
-    //             (a[0][f[0]] = [f[1]].flat()))) : e)[0]).map(e => e.map((f, i) => i ? (f.length > 1 ? f : f[0]) : f)));
-
-    // }
-
     return dispatch => {
         const url = '/api/qua-trinh/nghi-thai-san/all';
         T.get(url, data => {
@@ -98,13 +92,6 @@ export function getQtNghiThaiSanAll(done) {
                 T.notify('Lấy danh sách nghỉ thai sản bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                // data.items.forEach(item => {
-                //     newData[item.ho + ' ' + item.ten] = [];
-                // });
-                // data.items.forEach(item => {
-                //     newData[item.ho + ' ' + item.ten].push(item);
-                // });
-
                 if (done) done(data.items);
                 dispatch({ type: QtNghiThaiSanGetAll, items: data.items ? data.items : {} });
             }
@@ -112,9 +99,9 @@ export function getQtNghiThaiSanAll(done) {
     };
 }
 
-export function getQtNghiThaiSan(ma, done) {
+export function getQtNghiThaiSan(stt, done) {
     return () => {
-        const url = `/api/qua-trinh/nghi-thai-san/item/${ma}`;
+        const url = `/api/qua-trinh/nghi-thai-san/item/${stt}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy nghỉ thai sản bị lỗi!', 'danger');
@@ -126,9 +113,9 @@ export function getQtNghiThaiSan(ma, done) {
     };
 }
 
-export function getQtNghiThaiSanEdit(ma, done) {
+export function getQtNghiThaiSanEdit(stt, done) {
     return dispatch => {
-        const url = `/api/qua-trinh/nghi-thai-san/edit/item/${ma}`;
+        const url = `/api/qua-trinh/nghi-thai-san/edit/item/${stt}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy thông tin nghỉ thai sản bị lỗi!', 'danger');
@@ -157,10 +144,10 @@ export function createQtNghiThaiSan(item, done) {
     };
 }
 
-export function deleteQtNghiThaiSan(ma, done) {
+export function deleteQtNghiThaiSan(stt, done) {
     return dispatch => {
         const url = '/api/qua-trinh/nghi-thai-san';
-        T.delete(url, { ma }, data => {
+        T.delete(url, { stt }, data => {
             if (data.error) {
                 T.notify('Xóa nghỉ thai sản bị lỗi!', 'danger');
                 console.error(`DELETE: ${url}.`, data.error);
@@ -173,10 +160,10 @@ export function deleteQtNghiThaiSan(ma, done) {
     };
 }
 
-export function updateQtNghiThaiSan(ma, changes, done) {
+export function updateQtNghiThaiSan(stt, changes, done) {
     return dispatch => {
         const url = '/api/qua-trinh/nghi-thai-san';
-        T.put(url, { ma, changes }, data => {
+        T.put(url, { stt, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật nghỉ thai sản bị lỗi!', 'danger');
                 console.error(`PUT: ${url}.`, data.error);
@@ -184,22 +171,8 @@ export function updateQtNghiThaiSan(ma, changes, done) {
             } else {
                 T.notify('Cập nhật nghỉ thai sản thành công!', 'success');
                 done && done(data.item);
-                dispatch(getQtNghiThaiSan(ma));
+                dispatch(getQtNghiThaiSanPage());
             }
         }, () => T.notify('Cập nhật nghỉ thai sản bị lỗi!', 'danger'));
-    };
-}
-
-export function downloadWord(ma, done) {
-    return () => {
-        const url = `/user/qua-trinh/nghi-thai-san/${ma}/word`;
-        T.get(url, data => {
-            if (data.error) {
-                T.notify('Tải file word bị lỗi', 'danger');
-                console.error(`GET: ${url}.`, data.error);
-            } else if (done) {
-                done(data.data);
-            }
-        }, () => T.notify('Tải file word bị lỗi', 'danger'));
     };
 }

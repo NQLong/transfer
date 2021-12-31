@@ -9,7 +9,7 @@ import {
 } from './redux';
 import { getDmChucVuAll } from 'modules/mdDanhMuc/dmChucVu/redux';
 import { getDmDonViAll } from 'modules/mdDanhMuc/dmDonVi/redux';
-import { getStaffAll } from 'modules/mdTccb/tccbCanBo/redux';
+import { getStaffAll, SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 
 class EditModal extends AdminModal {
     donViTable = [];
@@ -48,10 +48,10 @@ class EditModal extends AdminModal {
 
     onShow = (item) => {
         let { daNopHoSoThaiSan, ghiChu, hoSoThaiSanDuocDuyet, shcc, soBhxh,
-            soThanhDuocNghi, stt, thoiGianBaoTangBenBhxh, thoiGianBatDauNghi, thoiGianDiLamLai,
+            soThangDuocNghi, stt, thoiGianBaoTangBenBhxh, thoiGianBatDauNghi, thoiGianDiLamLai,
             thoiGianKetThucNghi } = item ? item : {
                 chucVu: '', daNopHoSoThaiSan: '', donVi: '', ghiChu: '', ho: '', hoSoThaiDuocDuyet: '', shcc: '', soBhxh: '',
-                soThanhDuocNghi: '', stt: '', ten: '', thoiGianBaoTangBenBhxh: '', thoiGianBatDauNghi: '', thoiGianDiLamLai: '',
+                soThangDuocNghi: '', stt: '', ten: '', thoiGianBaoTangBenBhxh: '', thoiGianBatDauNghi: '', thoiGianDiLamLai: '',
                 thoiGianKetThucNghi: ''
             };
         this.setState({ stt, item });
@@ -60,7 +60,7 @@ class EditModal extends AdminModal {
         this.hoSoThaiSanDuocDuyet.value(hoSoThaiSanDuocDuyet ? hoSoThaiSanDuocDuyet : '');
         this.shcc.value(shcc ? shcc : '');
         this.soBhxh.value(soBhxh ? soBhxh : '');
-        this.soThanhDuocNghi.value(soThanhDuocNghi ? soThanhDuocNghi : '');
+        this.soThangDuocNghi.value(soThangDuocNghi ? soThangDuocNghi : '');
         this.thoiGianBaoTangBenBhxh.value(thoiGianBaoTangBenBhxh ? thoiGianBaoTangBenBhxh : '');
         this.thoiGianBatDauNghi.value(thoiGianBatDauNghi ? thoiGianBatDauNghi : '');
         this.thoiGianDiLamLai.value(thoiGianDiLamLai ? thoiGianDiLamLai : '');
@@ -77,11 +77,11 @@ class EditModal extends AdminModal {
             hoSoThaiSanDuocDuyet: this.hoSoThaiSanDuocDuyet.value(),
             shcc: this.shcc.value(),
             soBhxh: this.soBhxh.value(),
-            soThanhDuocNghi: this.soThanhDuocNghi.value(),
-            thoiGianBaoTangBenBhxh: this.thoiGianBaoTangBenBhxh.value(),
-            thoiGianBatDauNghi: this.thoiGianBatDauNghi.value(),
-            thoiGianDiLamLai: this.thoiGianDiLamLai.value(),
-            thoiGianKetThucNghi: this.thoiGianKetThucNghi.value(),
+            soThangDuocNghi: Number(this.soThangDuocNghi.value()),
+            thoiGianBaoTangBenBhxh: Number(this.thoiGianBaoTangBenBhxh.value()),
+            thoiGianBatDauNghi:  Number(this.thoiGianBatDauNghi.value()),
+            thoiGianDiLamLai:  Number(this.thoiGianDiLamLai.value()),
+            thoiGianKetThucNghi:  Number(this.thoiGianKetThucNghi.value()),
         };
         if (changes.shcc == '') {
             T.notify('Mã số cán bộ bị trống');
@@ -97,14 +97,14 @@ class EditModal extends AdminModal {
             title: this.state.stt ? 'Cập nhật nghỉ thai sản' : 'Tạo mới nghỉ thai sản',
             size: 'large',
             body: <div className='row'>
-                <FormSelect type='text' className='col-md-6' ref={e => this.shcc = e} data={this.staffTable} label='Mã thẻ cán bộ' readOnly={readOnly} />
+                <FormSelect className='col-md-6' ref={e => this.shcc = e} data={SelectAdapter_FwCanBo} label='Mã thẻ cán bộ' readOnly={readOnly} />
                 <FormCheckbox className='col-md-12' ref={e => this.daNopHoSoThaiSan = e} label='Đã nộp hồ sơ' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
                     onChange={value => this.changeKichHoat(value ? 1 : 0, this.daNopHoSoThaiSan)} />
                 <FormTextBox className='col-md-6' ref={e => this.hoSoThaiSanDuocDuyet = e} label='Đã duyệt hồ sơ' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.soBhxh = e} label='Bảo hiểm xã hội' readOnly={readOnly} />
                 <FormDatePicker className='col-md-3' ref={e => this.thoiGianBatDauNghi = e} label='Thời gian bắt đầu nghỉ' readOnly={readOnly} />
                 <FormDatePicker className='col-md-3' ref={e => this.thoiGianKetThucNghi = e} label='Thời gian kết thúc nghỉ' readOnly={readOnly} />
-                <FormTextBox type='text' className='col-md-3' ref={e => this.soThanhDuocNghi = e} label='Số tháng được nghỉ' readOnly={readOnly} />
+                <FormTextBox type='text' className='col-md-3' ref={e => this.soThangDuocNghi = e} label='Số tháng được nghỉ' readOnly={readOnly} />
                 <FormDatePicker className='col-md-3' ref={e => this.thoiGianDiLamLai = e} label='Thời gian đi làm lại' readOnly={readOnly} />
                 <FormRichTextBox type='text' className='col-md-12' ref={e => this.thoiGianBaoTangBenBhxh = e} label='Thời gian báo BHXH' readOnly={readOnly} />
                 <FormRichTextBox type='text' className='col-md-12' ref={e => this.ghiChu = e} label='Ghi chú' readOnly={readOnly} />
@@ -114,14 +114,13 @@ class EditModal extends AdminModal {
 }
 
 class QtNghiThaiSanGroupPage extends AdminPage {
-    searchBox = React.createRef();
     componentDidMount() {
         T.ready('/user/tccb', () => {
-            const route = T.routeMatcher('/user/qua-trinh/nghi-thai-san/group/:shcc'),
+            const route = T.routeMatcher('/user/tccb/qua-trinh/nghi-thai-san/group/:shcc'),
                 shcc = route.parse(window.location.pathname);
             T.onSearch = (searchText) => this.props.getQtNghiThaiSanPage(undefined, undefined, searchText || '');
             T.showSearchBox();
-            this.props.getQtNghiThaiSanGroupPage(undefined, undefined, shcc.shcc);
+            this.props.getQtNghiThaiSanPage(undefined, undefined, shcc.shcc);
         });
     }
 
@@ -188,11 +187,12 @@ class QtNghiThaiSanGroupPage extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-list-alt',
-            title: 'Nghỉ thai sản',
+            icon: 'fa fa-bed',
+            title: 'Nghỉ Thai Sản',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
-                'Nghỉ thai sản'
+                <Link key={1} to='/user/tccb/qua-trinh/nghi-thai-san'>Nghỉ thai sản</Link>,
+                'Nghỉ thai sản theo cán bộ'
             ],
             content: <>
                 <div className='tile'>{table}</div>
@@ -204,7 +204,7 @@ class QtNghiThaiSanGroupPage extends AdminPage {
                     getChucVu={this.props.getDmChucVuAll}
                     getStaff={this.props.getStaffAll} />
             </>,
-            backRoute: '/user/tccb',
+            backRoute: '/user/tccb/qua-trinh/nghi-thai-san',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
         });
     }
