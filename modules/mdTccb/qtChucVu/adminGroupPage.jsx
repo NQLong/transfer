@@ -5,7 +5,7 @@ import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormDatePic
 import Pagination from 'view/component/Pagination';
 import {
     getQtChucVuPage, getQtChucVuAll, updateQtChucVu,
-    deleteQtChucVu, createQtChucVu, getChucVuByShcc, getQtChucVuGroupPage
+    deleteQtChucVu, createQtChucVu, getChucVuByShcc
 } from './redux';
 import { SelectAdapter_DmChucVuV2 } from 'modules/mdDanhMuc/dmChucVu/redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
@@ -111,23 +111,19 @@ export class EditModal extends AdminModal {
     }
 }
 
-class QtChucVu extends AdminPage {
+class QtChucVuGroup extends AdminPage {
     checked = false;
 
     componentDidMount() {
         T.ready('/user/tccb', () => {
-            T.onSearch = (searchText) => {
-                if (this.checked) this.props.getQtChucVuGroupPage(undefined, undefined, searchText || '');
-                else this.props.getQtChucVuPage(undefined, undefined, searchText || '');
-            };
+            const route = T.routeMatcher('/user/tccb/qua-trinh/chuc-vu/group/:shcc'),
+                shcc = route.parse(window.location.pathname);
+            T.onSearch = (searchText) => this.props.getQtChucVuPage(undefined, undefined, searchText || '');
             T.showSearchBox();
-            this.props.getQtChucVuPage(undefined, undefined, '');
+            this.props.getQtChucVuPage(undefined, undefined, shcc.shcc);
         });
     }
-    groupPage = () => {
-        this.checked = !this.checked;
-        this.props.getQtChucVuGroupPage(undefined, undefined, '');
-    }
+
     showModal = (e) => {
         e.preventDefault();
         this.modal.show();
@@ -145,10 +141,8 @@ class QtChucVu extends AdminPage {
 
     render() {
         const permission = this.getUserPermission('qtChucVu', ['read', 'write', 'delete']);
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ?
-            (this.props.qtChucVu && this.props.qtChucVu.page_gr ?
-                this.props.qtChucVu.page_gr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list })
-            : (this.props.qtChucVu && this.props.qtChucVu.page ? this.props.qtChucVu.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] });
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtChucVu && this.props.qtChucVu.page ?
+            this.props.qtChucVu.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -160,7 +154,7 @@ class QtChucVu extends AdminPage {
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Chức vụ</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Quyết định</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Chức vụ chính</th>
-                        <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
+                        <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
@@ -188,18 +182,10 @@ class QtChucVu extends AdminPage {
                         )}
                         />
                         <TableCell type='checkbox' content={item.chucVuChinh} />
-                        {
-                            !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                                onEdit={() => this.modal.show(item)} onDelete={this.delete} >
-                            </TableCell>
-                        }
-                        {
-                            this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}>
-                                <Link className='btn btn-success' to={'/user/tccb/qua-trinh/chuc-vu/group/' + item.shcc} >
-                                    <i className='fa fa-lg fa-compress' />
-                                </Link>
-                            </TableCell>
-                        }
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
+                            onEdit={() => this.modal.show(item)} onDelete={this.delete} >
+                        </TableCell>
+
                     </tr>
                 )
             });
@@ -214,17 +200,15 @@ class QtChucVu extends AdminPage {
             ],
             content: <>
                 <div className='tile'>
-                    <FormCheckbox label='Hiển thị theo cán bộ' onChange={this.groupPage} />
-                    {table}
-                </div>
+                    {table}</div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                    getPage={this.checked ? this.props.getQtChucVuGroupPage : this.props.getQtChucVuPage} />
+                    getPage={this.props.getQtChucVuPage} />
                 <EditModal ref={e => this.modal = e}
                     getQtChucVuAll={this.props.getQtChucVuAll}
                     create={this.props.createQtChucVu} update={this.props.updateQtChucVu}
                 />
             </>,
-            backRoute: '/user/tccb',
+            backRoute: '/user/tccb/qua-trinh/chuc-vu',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
         });
     }
@@ -233,6 +217,6 @@ class QtChucVu extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtChucVu: state.qtChucVu });
 const mapActionsToProps = {
     getQtChucVuAll, getQtChucVuPage, deleteQtChucVu, createQtChucVu,
-    updateQtChucVu, getChucVuByShcc, getQtChucVuGroupPage
+    updateQtChucVu, getChucVuByShcc
 };
-export default connect(mapStateToProps, mapActionsToProps)(QtChucVu);
+export default connect(mapStateToProps, mapActionsToProps)(QtChucVuGroup);

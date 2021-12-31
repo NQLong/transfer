@@ -6,6 +6,7 @@ const QtChucVuGetAll = 'QtChucVu:GetAll';
 const QtChucVuGetPage = 'QtChucVu:GetPage';
 const QtChucVuUpdate = 'QtChucVu:Update';
 const QtChucVuGet = 'QtChucVu:Get';
+const QtChucVuGetGroupPage = 'QtChucVu:GetGroupPage';
 
 export default function QtChucVuReducer(state = null, data) {
     switch (data.type) {
@@ -13,6 +14,8 @@ export default function QtChucVuReducer(state = null, data) {
             return Object.assign({}, state, { items: data.items });
         case QtChucVuGetPage:
             return Object.assign({}, state, { page: data.page });
+        case QtChucVuGetGroupPage:
+            return Object.assign({}, state, { page_gr: data.page_gr });
         case QtChucVuGet:
             return Object.assign({}, state, { selectedItem: data.item });
         case QtChucVuUpdate:
@@ -46,11 +49,11 @@ export default function QtChucVuReducer(state = null, data) {
 }
 
 // Actions ------------------------------------------------------------------------------------------------------------
-T.initPage('pageQtChucVu');
+T.initPage('pageQtChucVu', true);
 export function getQtChucVuPage(pageNumber, pageSize, pageCondition, done) {
     const page = T.updatePage('pageQtChucVu', pageNumber, pageSize, pageCondition);
     return dispatch => {
-        const url = `/api/qua-trinh/chuc-vu/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/tccb/qua-trinh/chuc-vu/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách chức vụ bị lỗi!', 'danger');
@@ -63,10 +66,28 @@ export function getQtChucVuPage(pageNumber, pageSize, pageCondition, done) {
         }, () => T.notify('Lấy danh sách chức vụ bị lỗi!', 'danger'));
     };
 }
+T.initPage('pageGroupQtChucVu', true);
+export function getQtChucVuGroupPage(pageNumber, pageSize, pageCondition, done) {
+    const page = T.updatePage('pageGroupQtChucVu', pageNumber, pageSize, pageCondition);
+    return dispatch => {
+        const url = `/api/tccb/qua-trinh/chuc-vu/group/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách chức vụ theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                console.log(data);
+                if (page.pageCondition) data.page_gr.pageCondition = page.pageCondition;
+                done && done(data.page);
+                dispatch({ type: QtChucVuGetGroupPage, page_gr: data.page });
+            }
+        }, error => console.error(`GET: ${url}.`, error));
+    };
+}
 
 export function getQtChucVuAll(shcc, done) {
     return dispatch => {
-        const url = '/api/qua-trinh/chuc-vu/all';
+        const url = '/api/tccb/qua-trinh/chuc-vu/all';
         T.get(url, { shcc }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách chức vụ bị lỗi!', 'danger');
@@ -81,7 +102,7 @@ export function getQtChucVuAll(shcc, done) {
 
 export function getQtChucVu(stt, done) {
     return () => {
-        const url = `/api/qua-trinh/chuc-vu/item/${stt}`;
+        const url = `/api/tccb/qua-trinh/chuc-vu/item/${stt}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy chức vụ bị lỗi!', 'danger');
@@ -95,7 +116,7 @@ export function getQtChucVu(stt, done) {
 
 export function getQtChucVuEdit(stt, done) {
     return dispatch => {
-        const url = `/api/qua-trinh/chuc-vu/edit/item/${stt}`;
+        const url = `/api/tccb/qua-trinh/chuc-vu/edit/item/${stt}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy thông tin chức vụ bị lỗi!', 'danger');
@@ -110,7 +131,7 @@ export function getQtChucVuEdit(stt, done) {
 
 export function createQtChucVu(isStaffEdit, items, done) {
     return dispatch => {
-        const url = '/api/qua-trinh/chuc-vu';
+        const url = '/api/tccb/qua-trinh/chuc-vu';
         T.post(url, { items }, data => {
             if (data.error) {
                 T.notify('Tạo chức vụ bị lỗi!', 'danger');
@@ -126,7 +147,7 @@ export function createQtChucVu(isStaffEdit, items, done) {
 
 export function deleteQtChucVu(isStaffEdit, stt, shcc = null) {
     return dispatch => {
-        const url = '/api/qua-trinh/chuc-vu';
+        const url = '/api/tccb/qua-trinh/chuc-vu';
         T.delete(url, { stt }, data => {
             if (data.error) {
                 T.notify('Xóa chức vụ bị lỗi!', 'danger');
@@ -141,7 +162,7 @@ export function deleteQtChucVu(isStaffEdit, stt, shcc = null) {
 
 export function updateQtChucVu(isStaffEdit, stt, changes, done) {
     return dispatch => {
-        const url = '/api/qua-trinh/chuc-vu';
+        const url = '/api/tccb/qua-trinh/chuc-vu';
         T.put(url, { stt, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật chức vụ bị lỗi!', 'danger');
@@ -157,7 +178,7 @@ export function updateQtChucVu(isStaffEdit, stt, changes, done) {
 
 export function getChucVuByShcc(shcc, done) {
     return dispatch => {
-        const url = `/api/qua-trinh/chuc-vu/item/${shcc}`;
+        const url = `/api/tccb/qua-trinh/chuc-vu/item/${shcc}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách chức vụ bị lỗi!', 'danger');
