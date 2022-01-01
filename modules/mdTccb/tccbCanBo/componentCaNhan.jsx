@@ -59,7 +59,7 @@ class ComponentCaNhan extends React.Component {
         this.email = item.email;
         this.imageBox.setData('CanBoImage:' + item.email, item.image ? item.image : '/img/avatar.png');
         this.donVi.value(item.maDonVi);
-        this.shcc.value(item.shcc);
+        this.maTheCanBo.value(item.shcc);
         this.ho.value(item.ho ? item.ho : '');
         this.ten.value(item.ten ? item.ten : '');
         this.biDanh.value(item.biDanh ? item.biDanh : '');
@@ -146,7 +146,7 @@ class ComponentCaNhan extends React.Component {
             }
             else {
                 const data = {
-                    shcc: this.getValue(this.shcc),
+                    shcc: this.getValue(this.maTheCanBo),
                     ho: this.getValue(this.ho),
                     ten: this.getValue(this.ten),
                     biDanh: this.getValue(this.biDanh),
@@ -238,7 +238,7 @@ class ComponentCaNhan extends React.Component {
 
                     <div className='col-md-9'>
                         <div className='row'>
-                            <FormTextBox ref={e => this.shcc = e} label='Mã số cán bộ' className='col-md-4' readOnly={this.props.userEdit} required maxLength={10} />
+                            <FormTextBox ref={e => this.maTheCanBo = e} label='Mã số cán bộ' className='col-md-4' readOnly={this.props.userEdit} required maxLength={10} />
                             <FormSelect ref={e => this.donVi = e} label='Đơn vị công tác' className='col-md-8' readOnly={this.props.userEdit} required data={SelectAdapter_DmDonVi} />
 
                         </div>
