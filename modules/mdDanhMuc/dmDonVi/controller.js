@@ -33,7 +33,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/danh-muc/don-vi/all', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/danh-muc/don-vi/all', (req, res) => {
         app.model.dmDonVi.getAll((error, items) => res.send({ error, items }));
     });
 

@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3001: { title: 'Danh sách cán bộ', link: '/user/staff', icon: 'fa-users', backgroundColor: '#8bc34a', groupIndex: 0},
+            3001: { title: 'Danh sách cán bộ', link: '/user/staff', icon: 'fa-users', backgroundColor: '#8bc34a', groupIndex: 0 },
         },
     };
 
@@ -885,7 +885,7 @@ module.exports = app => {
     });
 
     // USER APIs ------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/staff-profile/:email', checkGetStaffPermission, (req, res) => {
+    app.get('/api/staff-profile/:email', (req, res) => {
         app.model.canBo.get({ email: req.params.email }, (error, canBo) => {
             if (error || canBo == null) {
                 res.send({ error });
