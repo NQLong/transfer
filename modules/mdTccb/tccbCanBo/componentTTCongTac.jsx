@@ -15,12 +15,15 @@ class ComponentTTCongTac extends AdminPage {
     state = { doiTuongBoiDuong: false, tinhTrangBoiDuong: false, dangONuocNgoai: false, dangNghiTheoCheDo: false, daNghi: false };
 
     value = (item) => {
+        console.log(item);
         this.shcc = item.shcc;
         this.ngheNghiepCu.value(item.ngheNghiepCu ? item.ngheNghiepCu : '');
         this.ngayBatDauCongTac.value(item.ngayBatDauCongTac ? item.ngayBatDauCongTac : '');
         this.ngayBienChe.value(item.ngayBienChe ? item.ngayBienChe : '');
         this.donViTuyenDung.value(item.donViTuyenDung ? item.donViTuyenDung : '');
         this.chucDanh.value(item.chucDanh ? item.chucDanh : '');
+        this.dienHopDong.value(item.hopDongCanBo ? item.hopDongCanBo : '');
+        this.loaiHopDong.value(item.loaiHopDongCanBo ? item.loaiHopDongCanBo: '');
 
         this.componentChucVuDoanThe.value(0, this.shcc);
         this.componentChucVuChinhQuyen?.value(1, this.shcc);
@@ -29,6 +32,10 @@ class ComponentTTCongTac extends AdminPage {
         this.heSo.value(item.heSoLuong ? item.heSoLuong : '');
         this.ngayHuong.value(item.ngayHuongLuong ? item.ngayHuongLuong : '');
         this.tiLeVuotKhung.value(item.tyLeVuotKhung ? item.tyLeVuotKhung : '');
+
+        this.phuCapChucVu.value(item.phuCap ? item.phuCap : '');
+        this.tiLePhuCapThamNien.value(item.tiLePhuCapThamNien ? item.tiLePhuCapThamNien : '');
+        this.tiLePhuCapUuDai.value(item.tiLePhuCapUuDai ? item.tiLePhuCapUuDai : '');
 
         this.soBhxh.value(item.soBhxh ? item.soBhxh : '');
         this.ngayBatDauBhxh.value(item.ngayBatDauBhxh ? item.ngayBatDauBhxh : '');
@@ -46,6 +53,12 @@ class ComponentTTCongTac extends AdminPage {
 
 
         this.dangONuocNgoai.value(item.dangONuocNgoai ? item.dangONuocNgoai : 0);
+        this.daNghi.value(item.daNghi ? item.daNghi: 0);
+        this.setState({ daNghi: item.daNghi});
+        this.state.daNghi && this.ngayDaNghi.value(item.ngayNghi ? item.ngayNghi : '');
+        this.state.daNghi && this.soHieuDaNghi.value(item.soHieuDaNghi ? item.soHieuDaNghi : '');
+        this.state.daNghi && this.noiDungDaNghi.value(item.noiDungDaNghi ? item.noiDungDaNghi : '');
+        
     }
     getValue = (selector) => {
         const data = selector.value();
@@ -110,29 +123,29 @@ class ComponentTTCongTac extends AdminPage {
             <div className='tile'>
                 <h3 className='tile-title'>Thông tin công tác</h3>
                 <div className='tile-body row'>
-                    <FormTextBox className='col-md-6' ref={e => this.ngheNghiepCu = e} label='Nghề nghiệp trước khi tuyển dụng' />
-                    <FormDatePicker mask='date_mask' className='col-md-6' ref={e => this.ngayBatDauCongTac = e} label='Ngày bắt đầu công tác tại trường' />
-                    <FormDatePicker mask='date_mask' className='col-md-6' ref={e => this.ngayBienChe = e} label='Ngày vào biên chế' />
-                    <FormSelect data={SelectAdapter_DmDonVi} className='col-md-6' ref={e => this.donViTuyenDung = e} label='Đơn vị ban hành Quyết định tuyển dụng' />
-                    <FormSelect data={SelectAdapter_DmNgachCdnnV2} className='col-md-4' ref={e => this.chucDanh = e} label='Chức danh nghề nghiệp' />
-                    <FormSelect data={SelectAdapter_DmDienHopDongV2} className='col-md-4' ref={e => this.dienHopDong = e} label='Diện hợp đồng' />
-                    <FormSelect data={SelectAdapter_DmLoaiHopDongV2} className='col-md-4' ref={e => this.loaiHopDong = e} label='Loại hợp đồng' />
+                    <FormTextBox className='col-md-6' ref={e => this.ngheNghiepCu = e} label='Nghề nghiệp trước khi tuyển dụng' readOnly={this.props.userEdit}/>
+                    <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayBatDauCongTac = e} label='Ngày bắt đầu công tác tại trường' readOnly={this.props.userEdit}/>
+                    <FormDatePicker type='date-mask' className='col-md-4' ref={e => this.ngayBienChe = e} label='Ngày vào biên chế' readOnly={this.props.userEdit}/>
+                    <FormSelect data={SelectAdapter_DmDonVi} className='col-md-8' ref={e => this.donViTuyenDung = e} label='Đơn vị ban hành Quyết định tuyển dụng' readOnly={this.props.userEdit}/>
+                    <FormSelect data={SelectAdapter_DmNgachCdnnV2} className='col-md-4' ref={e => this.chucDanh = e} label='Chức danh nghề nghiệp' readOnly={this.props.userEdit}/>
+                    <FormSelect data={SelectAdapter_DmDienHopDongV2} className='col-md-4' ref={e => this.dienHopDong = e} label='Diện hợp đồng' readOnly={this.props.userEdit}/>
+                    <FormSelect data={SelectAdapter_DmLoaiHopDongV2} className='col-md-4' ref={e => this.loaiHopDong = e} label='Loại hợp đồng' readOnly={this.props.userEdit}/>
 
-                    <ComponentChucVu ref={e => this.componentChucVuChinhQuyen = e} label='Chức vụ chính quyền' userEdit={false} />
-                    <ComponentChucVu ref={e => this.componentChucVuDoanThe = e} label='Chức vụ đoàn thể' userEdit={false} />
+                    <ComponentChucVu ref={e => this.componentChucVuChinhQuyen = e} label='Chức vụ chính quyền:' userEdit={this.props.userEdit} />
+                    <ComponentChucVu ref={e => this.componentChucVuDoanThe = e} label='Chức vụ đoàn thể:' userEdit={this.props.userEdit} />
 
-                    <FormTextBox ref={e => this.bacLuong = e} className='col-md-3' label='Bậc lương' />
-                    <FormTextBox ref={e => this.heSo = e} className='col-md-3' label='Hệ số lương hiện hưởng' />
-                    <FormDatePicker mask='date-mask' ref={e => this.ngayHuong = e} className='col-md-3' label='Ngày hưởng' />
-                    <FormTextBox ref={e => this.tiLeVuotKhung = e} className='col-md-3' label='Tỉ lệ vượt khung' />
+                    <FormTextBox ref={e => this.bacLuong = e} className='col-md-3' label='Bậc lương' readOnly={this.props.userEdit}/>
+                    <FormTextBox ref={e => this.heSo = e} className='col-md-3' label='Hệ số lương hiện hưởng' readOnly={this.props.userEdit} />
+                    <FormDatePicker type='date-mask' ref={e => this.ngayHuong = e} className='col-md-3' label='Ngày hưởng' readOnly={this.props.userEdit}/>
+                    <FormTextBox ref={e => this.tiLeVuotKhung = e} className='col-md-3' label='Tỉ lệ vượt khung' readOnly={this.props.userEdit}/>
 
-                    <FormTextBox ref={e => this.phuCapChucVu = e} className='col-md-4' label='Mức phụ cấp chức vụ' />
-                    <FormTextBox ref={e => this.tiLePhuCapThamNien = e} className='col-md-4' label='Tỉ lệ phụ cấp thâm niên' />
-                    <FormTextBox ref={e => this.tiLePhuCapUuDai = e} className='col-md-4' label='Tỉ lệ phụ cấp ưu đãi' />
+                    <FormTextBox ref={e => this.phuCapChucVu = e} className='col-md-4' label='Mức phụ cấp chức vụ' readOnly={this.props.userEdit}/>
+                    <FormTextBox ref={e => this.tiLePhuCapThamNien = e} className='col-md-4' label='Tỉ lệ phụ cấp thâm niên' readOnly={this.props.userEdit}/>
+                    <FormTextBox ref={e => this.tiLePhuCapUuDai = e} className='col-md-4' label='Tỉ lệ phụ cấp ưu đãi' readOnly={this.props.userEdit}/>
 
                     <FormTextBox ref={e => this.soBhxh = e} className='col-md-4' label='Mã số Bảo hiểm xã hội' />
-                    <FormDatePicker ref={e => this.ngayBatDauBhxh = e} className='col-md-4' label='Từ tháng, năm' mask='month-mask' />
-                    <FormDatePicker ref={e => this.ngayKetThucBhxh = e} className='col-md-4' label='Đến tháng, năm' mask='month-mask' />
+                    <FormDatePicker ref={e => this.ngayBatDauBhxh = e} className='col-md-4' label='Từ tháng, năm' type='month-mask' />
+                    <FormDatePicker ref={e => this.ngayKetThucBhxh = e} className='col-md-4' label='Đến tháng, năm' type='month-mask' />
                     <FormTextBox ref={e => this.soBhyt = e} className='col-md-4' label='Mã thẻ Bảo hiểm y tế' />
                     <FormSelect ref={e => this.noiKhamBenhBanDau = e} className='col-md-8' label='Nơi khám chữa bệnh ban đầu' data={SelectAdapter_DmBenhVienV2} />
                     <div className='form-group col-md-12'></div>
@@ -146,20 +159,20 @@ class ComponentTTCongTac extends AdminPage {
                     <div className='form-group col-md-12'></div>
                     <div className='form-group col-md-12'></div>
 
-                    <FormCheckbox ref={e => this.dangONuocNgoai = e} label='Đang ở nước ngoài' onChange={value => this.setState({ dangONuocNgoai: value })} className='col-md-3' />
-                    {this.state.dangONuocNgoai ? <FormSelect ref={e => this.quocGiaDangO = e} label='Quốc gia' className='col-md-3' data={SelectAdapter_DmQuocGia} /> : null}
-                    {this.state.dangONuocNgoai ? <FormDatePicker mask='date-mask' ref={e => this.ngayBatDauONuocNgoai = e} label='Từ ngày' className='col-md-3' /> : null}
-                    {this.state.dangONuocNgoai ? <FormDatePicker mask='date-mask' ref={e => this.ngayKetThucONuocNgoai = e} label='Đến ngày' className='col-md-3' /> : null}
-                    {this.state.dangONuocNgoai ? <FormRichTextBox ref={e => this.lyDoONuocNgoai = e} label='Lý do/Nội dung' className='col-md-12' /> : <div className='col-md-9'></div>}
+                    <FormCheckbox ref={e => this.dangONuocNgoai = e} label='Đang ở nước ngoài' onChange={value => this.setState({ dangONuocNgoai: value })} className='col-md-3' readOnly={this.props.userEdit}/>
+                    {this.state.dangONuocNgoai ? <FormSelect ref={e => this.quocGiaDangO = e} label='Quốc gia' className='col-md-3' data={SelectAdapter_DmQuocGia} readOnly={this.props.userEdit}/> : null}
+                    {this.state.dangONuocNgoai ? <FormDatePicker type='date-mask' ref={e => this.ngayBatDauONuocNgoai = e} label='Từ ngày' className='col-md-3' readOnly={this.props.userEdit}/> : null}
+                    {this.state.dangONuocNgoai ? <FormDatePicker type='date-mask' ref={e => this.ngayKetThucONuocNgoai = e} label='Đến ngày' className='col-md-3' readOnly={this.props.userEdit}/> : null}
+                    {this.state.dangONuocNgoai ? <FormRichTextBox ref={e => this.lyDoONuocNgoai = e} label='Lý do/Nội dung' className='col-md-12' readOnly={this.props.userEdit}/> : <div className='col-md-9'></div>}
 
-                    <FormCheckbox ref={e => this.dangNghiTheoCheDo = e} label='Đang tạm nghỉ theo chế độ' onChange={value => this.setState({ dangNghiTheoCheDo: value })} className='col-md-3' />
-                    {this.state.dangNghiTheoCheDo ? <FormTextBox ref={e => this.noiNghi = e} label='Nơi nghỉ' className='col-md-3' /> : null}
-                    {this.state.dangNghiTheoCheDo ? <FormDatePicker mask='date-mask' ref={e => this.ngayBatDauNghiTheoCheDo = e} label='Từ ngày' className='col-md-3' /> : null}
-                    {this.state.dangNghiTheoCheDo ? <FormDatePicker mask='date-mask' ref={e => this.ngayKetThucNghiTheoCheDo = e} label='Đến ngày' className='col-md-3' /> : null}
-                    {this.state.dangNghiTheoCheDo ? <FormRichTextBox ref={e => this.lyDoNghiTheoCheDo = e} label='Lý do/Nội dung' className='col-md-12' /> : <div className='col-md-9'></div>}
+                    <FormCheckbox ref={e => this.dangNghiTheoCheDo = e} label='Đang tạm nghỉ theo chế độ' onChange={value => this.setState({ dangNghiTheoCheDo: value })} className='col-md-3' readOnly={this.props.userEdit}/>
+                    {this.state.dangNghiTheoCheDo ? <FormTextBox ref={e => this.noiNghi = e} label='Nơi nghỉ' className='col-md-3' readOnly={this.props.userEdit}/> : null}
+                    {this.state.dangNghiTheoCheDo ? <FormDatePicker type='date-mask' ref={e => this.ngayBatDauNghiTheoCheDo = e} label='Từ ngày' className='col-md-3' readOnly={this.props.userEdit}/> : null}
+                    {this.state.dangNghiTheoCheDo ? <FormDatePicker type='date-mask' ref={e => this.ngayKetThucNghiTheoCheDo = e} label='Đến ngày' className='col-md-3' readOnly={this.props.userEdit}/> : null}
+                    {this.state.dangNghiTheoCheDo ? <FormRichTextBox ref={e => this.lyDoNghiTheoCheDo = e} label='Lý do/Nội dung' className='col-md-12' readOnly={this.props.userEdit}/> : <div className='col-md-9'></div>}
 
                     <FormCheckbox ref={e => this.daNghi = e} label='Đã nghỉ việc/Nghỉ hưu/Chuyển công tác' onChange={value => this.setState({ daNghi: value })} className='col-md-4' />
-                    {this.state.daNghi ? <FormDatePicker mask='date-mask' ref={e => this.ngayDaNghi = e} label='Thời điểm nghỉ' placeholder='Từ ngày, tháng, năm ...' className='col-md-4' /> : null}
+                    {this.state.daNghi ? <FormDatePicker type='date-mask' ref={e => this.ngayDaNghi = e} label='Thời điểm nghỉ' placeholder='Từ ngày, tháng, năm ...' className='col-md-4' /> : null}
                     {this.state.daNghi ? <FormTextBox ref={e => this.soHieuDaNghi = e} label='Số hiệu văn bản' className='col-md-4' /> : null}
                     {this.state.daNghi ? <FormRichTextBox ref={e => this.noiDungDaNghi = e} label='Nội dung' className='col-md-12' /> : <div className='col-md-9'></div>}
                 </div>

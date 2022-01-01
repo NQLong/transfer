@@ -15,7 +15,7 @@ export default function QtChucVuReducer(state = null, data) {
         case QtChucVuGetPage:
             return Object.assign({}, state, { page: data.page });
         case QtChucVuGetGroupPage:
-            return Object.assign({}, state, { page_gr: data.page_gr });
+            return Object.assign({}, state, { page_gr: data.page });
         case QtChucVuGet:
             return Object.assign({}, state, { selectedItem: data.item });
         case QtChucVuUpdate:
@@ -77,9 +77,9 @@ export function getQtChucVuGroupPage(pageNumber, pageSize, pageCondition, done) 
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 console.log(data);
-                if (page.pageCondition) data.page_gr.pageCondition = page.pageCondition;
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 done && done(data.page);
-                dispatch({ type: QtChucVuGetGroupPage, page_gr: data.page });
+                dispatch({ type: QtChucVuGetGroupPage, page: data.page });
             }
         }, error => console.error(`GET: ${url}.`, error));
     };

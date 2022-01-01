@@ -1,37 +1,32 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getStaffEdit } from 'modules/mdTccb/tccbCanBo/redux';
+import { getStaffEdit, userGetStaff } from 'modules/mdTccb/tccbCanBo/redux';
 import { AdminModal, AdminPage, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
 import { getDmNgoaiNguAll, SelectAdapter_DmNgoaiNgu } from 'modules/mdDanhMuc/dmNgoaiNgu/redux';
-import { createTrinhDoNNStaff, updateTrinhDoNNStaff, deleteTrinhDoNNStaff } from './redux';
+import {
+    createTrinhDoNNStaff, updateTrinhDoNNStaff, deleteTrinhDoNNStaff,
+    createTrinhDoNNStaffUser, updateTrinhDoNNStaffUser, deleteTrinhDoNNStaffUser
+} from './redux';
 import { Select } from 'view/component/Input';
 
 class TrinhDoNNModal extends AdminModal {
-    state = {
-        id: null,
-        shcc: '',
-    }
-
     onShow = (item) => {
-        let { id, loaiNgonNgu, trinhDo } = item ? item : { id: null, loaiNgonNgu: null, trinhDo: '' };
-        this.setState({ id });
-        setTimeout(() => {
-            this.loaiNgonNgu.setVal(loaiNgonNgu);
-            this.trinhDo.value(trinhDo);
-        }, 500);
+        let { id, loaiNgonNgu, trinhDo } = item && item.item ? item.item : { id: null, loaiNgonNgu: null, trinhDo: '' };
+        this.setState({ id, email: item.email, item, shcc: item.shcc });
+        this.loaiNgonNgu.setVal(loaiNgonNgu);
+        this.trinhDo.value(trinhDo);
     }
 
     onSubmit = () => {
-        const id = this.state.id,
-            shcc = this.props.shcc,
-            changes = {
-                loaiNgonNgu: this.loaiNgonNgu.getVal(),
-                trinhDo: this.trinhDo.value()
-            };
-        if (id) {
-            this.props.update(id, changes, this.hide);
+        const changes = {
+            shcc: this.state.shcc,
+            email: this.state.email,
+            loaiNgonNgu: this.loaiNgonNgu.getVal(),
+            trinhDo: this.trinhDo.value()
+        };
+        if (this.state.id) {
+            this.props.update(this.state.id, changes, this.hide);
         } else {
-            changes.shcc = shcc;
             this.props.create(changes, this.hide);
         }
     }
@@ -50,30 +45,36 @@ class TrinhDoNNModal extends AdminModal {
 class ComponentNN extends AdminPage {
     mapperNgonNgu = {};
     shcc = '';
+    email = '';
     componentDidMount() {
         this.props.getDmNgoaiNguAll({ kichHoat: 1 }, items => {
             items.forEach(item => this.mapperNgonNgu[item.ma] = item.ten);
         });
     }
 
-    value = (shcc) => {
+    value = (shcc, email) => {
         this.shcc = shcc;
+        this.email = email;
     }
 
-    showModal = (e) => {
+    showModal = (e, item) => {
         e.preventDefault();
-        this.modal.show(null);
+        this.modal.show({item: item, shcc: this.shcc, email: this.email});
     }
 
     deleteTrinhDoNN = (e, item) => {
         T.confirm('Xóa thông tin trình độ ngoại ngữ', 'Bạn có chắc bạn muốn xóa mục này?', true, isConfirm =>
-            isConfirm && this.props.deleteTrinhDoNNStaff(item.id, () => this.props.getStaffEdit(this.shcc)));
+            isConfirm && (this.props.userEdit ? this.props.deleteTrinhDoNNStaffUser(item.id, () => this.props.userGetStaff(this.email)) : this.props.deleteTrinhDoNNStaff(item.id, () => this.props.getStaffEdit(this.shcc))));
         e.preventDefault();
     }
 
     render() {
-        const dataTrinhDoNgoaiNgu = this.props.staff?.selectedItem?.trinhDoNN;
+        const dataTrinhDoNgoaiNgu = this.props.userEdit ? this.props.staff?.userItem?.trinhDoNN : this.props.staff?.selectedItem?.trinhDoNN;
         let permission = this.getUserPermission('staff', ['read', 'write', 'delete']);
+        permission.read = true;
+        permission.write = true;
+        permission.delete = true;
+
         const renderNNTable = (items) => (
             renderTable({
                 getDataSource: () => items, stickyHead: false,
@@ -85,9 +86,9 @@ class ComponentNN extends AdminPage {
                     </tr>),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='link' content={this.mapperNgonNgu[item.loaiNgonNgu]} onClick={() => this.modal.show(item)} />
+                        <TableCell type='link' content={this.mapperNgonNgu[item.loaiNgonNgu]} onClick={e => this.showModal(e, item)} />
                         <TableCell type='text' content={item.trinhDo} />
-                        <TableCell type='buttons' content={item} permission={permission} onEdit={() => this.modal.show(item)} onDelete={this.deleteTrinhDoNN}></TableCell>
+                        <TableCell type='buttons' content={item} permission={permission} onEdit={e => this.showModal(e, item)} onDelete={this.deleteTrinhDoNN}></TableCell>
                     </tr>)
             })
         );
@@ -97,17 +98,19 @@ class ComponentNN extends AdminPage {
                 <p>{this.props.label}</p>
                 <div className='tile-body'>{dataTrinhDoNgoaiNgu ? renderNNTable(dataTrinhDoNgoaiNgu) : renderNNTable([])}</div>
                 <div className='tile-footer' style={{ textAlign: 'right' }}>
-                    <button className='btn btn-info' type='button' onClick={e => this.showModal(e)}>
+                    <button className='btn btn-info' type='button' onClick={e => this.showModal(e, null)}>
                         <i className='fa fa-fw fa-lg fa-plus' />Thêm trình độ ngoại ngữ
                     </button>
                 </div>
-                <TrinhDoNNModal ref={e => this.modal = e} shcc={this.shcc} create={this.props.createTrinhDoNNStaff} update={this.props.updateTrinhDoNNStaff} getData={this.props.getStaffEdit} />
+                <TrinhDoNNModal ref={e => this.modal = e} shcc={this.shcc} email={this.email}
+                    create={this.props.userEdit ? this.props.createTrinhDoNNStaffUser : this.props.createTrinhDoNNStaff}
+                    update={this.props.userEdit ? this.props.updateTrinhDoNNStaffUser : this.props.updateTrinhDoNNStaff} />
             </div>
         );
     }
 }
 const mapStateToProps = state => ({ staff: state.staff, system: state.system });
 const mapActionsToProps = {
-    getStaffEdit, getDmNgoaiNguAll, createTrinhDoNNStaff, updateTrinhDoNNStaff, deleteTrinhDoNNStaff
+    getStaffEdit, userGetStaff, getDmNgoaiNguAll, createTrinhDoNNStaff, updateTrinhDoNNStaff, deleteTrinhDoNNStaff, createTrinhDoNNStaffUser, updateTrinhDoNNStaffUser, deleteTrinhDoNNStaffUser
 };
 export default connect(mapStateToProps, mapActionsToProps, null, { forwardRef: true })(ComponentNN);

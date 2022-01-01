@@ -11,82 +11,42 @@ import { SelectAdapter_DmTonGiaoV2 } from 'modules/mdDanhMuc/dmTonGiao/redux';
 import { SelectAdapter_DmNhomMauV2 } from 'modules/mdDanhMuc/dmBenhVien/reduxNhomMau';
 
 // class ToChucKhacModal extends AdminModal {
-//     state = {
-//         id: null,
-//         email: '',
-//         ngayThamGia: '',
-//         ngayThamGiaType: 'dd/mm/yyyy',
-//     }
-
-//     onShow = (item, email) => {
-//         this.ngayThamGia.clear();
-//         let { id, tenToChuc, ngayThamGiaType, ngayThamGia, moTa } = item ? item : { id: null, tenToChuc: '', ngayThamGiaType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', ngayThamGia: null, ketThuc: null, moTa: '' };
-//         this.setState({ ngayThamGiaType: ngayThamGiaType ? ngayThamGiaType : 'dd/mm/yyyy', email, id, ngayThamGia });
-//         setTimeout(() => {
-//             this.ngayThamGiaType.value(ngayThamGiaType ? ngayThamGiaType : 'dd/mm/yyyy');
-//             if (ketThuc && ketThuc != -1) this.ketThucType.value(ketThucType); else this.ketThucType.value('dd/mm/yyyy');
-//             this.ngayThamGia.setVal(ngayThamGia);
-//             this.tenToChuc.value(tenToChuc);
-//             this.moTa.value(moTa);
-//         }, 500);
+//     onShow = (item) => {
+//         let { ma, tenToChuc, ngayThamGia, moTa } = item && item.item ? item.item : { ma: null, tenToChuc: '', ngayThamGia: null, moTa: '' };
+//         this.setState({ ma, item, shcc: item.shcc, email: item.email });
+//         this.ngayThamGia.value(ngayThamGia);
+//         this.tenToChuc.value(tenToChuc);
+//         this.moTa.value(moTa);
 //     }
 
 //     onSubmit = () => {
-//         const id = this.state.id,
-//             email = this.state.email,
-//             changes = {
+//         const changes = {
+//                 email: this.state.email,
+//                 shcc: this.state.shcc,
 //                 tenToChuc: this.tenToChuc.value(),
-//                 ngayThamGia: this.ngayThamGia.getVal(),
-//                 ngayThamGiaType: this.state.ngayThamGiaType,
+//                 ngayThamGia: this.ngayThamGia.value(),
 //                 moTa: this.moTa.value()
 //             };
-//         if (id) {
-//             this.props.update(id, changes, error => {
-//                 if (error == undefined || error == null) {
-//                     this.props.getData(email);
-//                     this.hide();
-//                 }
-//             });
+//         if (this.state.ma) {
+//             this.props.update(this.state.ma, changes, this.hide);
 //         } else {
-//             changes.email = email;
-//             this.props.create(changes, () => {
-//                 this.props.getData(email);
-//                 this.hide();
-//             });
-//         }
-//     }
-
-//     changeType = (isBatDau, type) => {
-//         if (isBatDau) {
-//             this.setState({ ngayThamGiaType: type });
-//             this.ngayThamGia.setVal(this.state.ngayThamGia);
-//         } else {
-//             this.setState({ ketThucType: type });
-//             if (this.state.ketThuc && this.state.ketThuc != -1) this.ketThuc.setVal(this.state.ketThuc);
-//         }
-//     }
-
-//     changeToDay = (value) => {
-//         this.setState({ toDay: value });
-//         if (value) {
-//             this.ketThuc.clear();
+//             this.props.create(changes, this.hide);
 //         }
 //     }
 
 //     render = () => this.renderModal({
 //         title: 'Tổ chức Chính trị - Xã hội nghề nghiệp tham gia khác',
-//         size: 'large',
 //         body: <div className='row'>
 //             <FormTextBox className='col-md-12' ref={e => this.tenToChuc = e} lable='Tên tổ chức' required />
-//             <div className='form-group col-md-6'><DateInput ref={e => this.ngayThamGia = e} label='Bắt đầu' type={this.state.ngayThamGiaType ? typeMapper[this.state.ngayThamGiaType] : null} /></div>
-//             <FormSelect className='col-md-6' ref={e => this.ngayThamGiaType = e} label='Loại thời gian bắt đầu' data={dateType} onChange={data => this.changeType(true, data.id)} />
-//             <FormRichTextBox className='col-12' ref={e => this.moTa = e} label='Mô tả nội dung công việc tham gia tổ chức' />
+//             <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayThamGia = e} label='Ngày tham gia' />
+//             <FormRichTextBox className='col-md-12' ref={e => this.moTa = e} label='Mô tả' placeholder='Mô tả nội dung công việc tham gia tổ chức' />
 //         </div>,
 //     });
 // }
 
 class ComponentCaNhan extends React.Component {
     state = { image: '' };
+    shcc = ''; email = '';
     componentDidMount() {
 
     }
@@ -95,6 +55,8 @@ class ComponentCaNhan extends React.Component {
         this.setState({ dangVien: item.dangVien });
         this.setState({ doanVien: item.doanVien });
         this.setState({ congDoan: item.congDoan });
+        this.shcc = item.shcc;
+        this.email = item.email;
         this.imageBox.setData('CanBoImage:' + item.email, item.image ? item.image : '/img/avatar.png');
         this.donVi.value(item.maDonVi);
         this.shcc.value(item.shcc);
@@ -162,6 +124,7 @@ class ComponentCaNhan extends React.Component {
     }
 
     getValue = (selector) => {
+        console.log(selector.props.label);
         const data = selector.value();
         const isRequired = selector.props.required;
         if (data || data === 0) return data;
@@ -188,13 +151,13 @@ class ComponentCaNhan extends React.Component {
                     ten: this.getValue(this.ten),
                     biDanh: this.getValue(this.biDanh),
                     phai: this.getValue(this.phai),
-                    ngaySinh: this.getValue(this.ngaySinh).getTime(),
+                    ngaySinh: this.getValue(this.ngaySinh) ? this.getValue(this.ngaySinh).getTime() : '',
                     maTinhNguyenQuan, maHuyenNguyenQuan, maXaNguyenQuan,
                     maTinhNoiSinh, maHuyenNoiSinh, maXaNoiSinh,
                     thuongTruMaTinh, thuongTruMaHuyen, thuongTruMaXa, thuongTruSoNha,
                     hienTaiMaTinh, hienTaiMaHuyen, hienTaiMaXa, hienTaiSoNha,
                     cmnd: this.getValue(this.cmnd),
-                    cmndNgayCap: this.getValue(this.cmndNgayCap).getTime(),
+                    cmndNgayCap: this.getValue(this.cmndNgayCap) ? this.getValue(this.cmndNgayCap).getTime() : '',
                     cmndNoiCap: this.getValue(this.cmndNoiCap),
                     dienThoaiCaNhan: this.getValue(this.soDienThoaiCaNhan),
                     dienThoaiBaoTin: this.getValue(this.soDienThoaiBaoTin),
@@ -238,8 +201,12 @@ class ComponentCaNhan extends React.Component {
         }
     }
 
+    showModal = (e, item) => {
+        e.preventDefault();
+        this.modal.show({ item: item, shcc: this.shcc, email: this.email });
+    }
+
     render = () => {
-        const imageDisplay = !this.props.userEdit ? 'block' : 'none';
         let cacToChucCTXHNN = [];
         const tableToChucKhac = renderTable({
             getDataSource: () => cacToChucCTXHNN, stickyHead: false,
@@ -264,7 +231,7 @@ class ComponentCaNhan extends React.Component {
                 <h3 className='tile-title'>Thông tin cá nhân</h3>
                 <div className='tile-body row'>
                     <div className='form-group col-md-3'>
-                        <FormImageBox ref={e => this.imageBox = e} style={{ display: imageDisplay }} readOnly={this.props.userEdit} label='Hình đại diện'
+                        <FormImageBox ref={e => this.imageBox = e} style={{ display: 'block' }} label='Hình đại diện'
                             postUrl='/user/upload' uploadType='CanBoImage' success={this.imageChanged} />
                     </div>
 
@@ -278,7 +245,7 @@ class ComponentCaNhan extends React.Component {
                     </div>
                     <FormTextBox ref={e => this.ho = e} label='Họ và tên lót' className='col-md-4' readOnly={this.props.userEdit} required maxLength={100} />
                     <FormTextBox ref={e => this.ten = e} label='Tên' className='col-md-4' readOnly={this.props.userEdit} required maxLength={30} />
-                    <FormTextBox ref={e => this.biDanh = e} label='Tên khác (Bí danh)' className='col-md-4' readOnly={this.props.userEdit} maxLength={30} />
+                    <FormTextBox ref={e => this.biDanh = e} label='Tên khác (Bí danh)' className='col-md-4' maxLength={30} />
                     <FormSelect ref={e => this.phai = e} label='Giới tính' className='col-md-4' readOnly={this.props.userEdit} required data={SelectAdapter_DmGioiTinhV2} />
                     <FormDatePicker ref={e => this.ngaySinh = e} type='date-mask' className='col-md-4' label='Ngày sinh' required readOnly={this.props.userEdit} />
                     <div className='form-group col-md-12'></div>
@@ -296,8 +263,8 @@ class ComponentCaNhan extends React.Component {
                     <FormDatePicker ref={e => this.cmndNgayCap = e} type='date-mask' label='Ngày cấp CMND/CCCD' className='col-md-4' readOnly={this.props.userEdit} />
                     <FormTextBox ref={e => this.cmndNoiCap = e} label='Nơi cấp CMND/CCCD' className='col-md-4' readOnly={this.props.userEdit} />
 
-                    <FormTextBox ref={e => this.soDienThoaiCaNhan = e} label='Số điện thoại cá nhân' className='col-md-6' maxLength={10} readOnly={this.props.userEdit} />
-                    <FormTextBox ref={e => this.soDienThoaiBaoTin = e} label='Số điện thoại báo tin' className='col-md-6' maxLength={10} readOnly={this.props.userEdit} />
+                    <FormTextBox ref={e => this.soDienThoaiCaNhan = e} label='Số điện thoại cá nhân' className='col-md-6' maxLength={10} />
+                    <FormTextBox ref={e => this.soDienThoaiBaoTin = e} label='Số điện thoại báo tin' className='col-md-6' maxLength={10} />
 
                     <FormTextBox ref={e => this.emailCaNhan = e} label='Email cá nhân' className='col-md-6' readOnly={this.props.userEdit} />
                     <FormTextBox ref={e => this.emailTruong = e} label='Email trường' className='col-md-6' readOnly={this.props.userEdit} />
@@ -360,6 +327,6 @@ class ComponentCaNhan extends React.Component {
     }
 }
 
-const mapStateToProps = state => ({staff: state.staff, system: state.system });
+const mapStateToProps = state => ({ staff: state.staff, system: state.system });
 const mapActionsToProps = { updateSystemState };
 export default connect(mapStateToProps, mapActionsToProps, null, { forwardRef: true })(ComponentCaNhan);

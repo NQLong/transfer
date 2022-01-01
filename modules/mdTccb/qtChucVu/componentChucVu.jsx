@@ -29,7 +29,7 @@ class EditModal extends AdminModal {
         this.soQuyetDinh.value(soQd ? soQd : (soQuyetDinh ? soQuyetDinh : ''));
         this.ngayRaQuyetDinh.value(ngayRaQd ? ngayRaQd : (ngayRaQuyetDinh ? ngayRaQuyetDinh : ''));
         this.props.type == 1 && this.chucVuChinh.value(chucVuChinh ? 1 : 0);
-        this.props.type == 1 &&  this.maBoMon.value(maBoMon ? maBoMon : '');
+        this.props.type == 1 && this.maBoMon.value(maBoMon ? maBoMon : '');
     };
 
     changeKichHoat = (value, target) => target.value(value ? 1 : 0) || target.value(value);
@@ -102,7 +102,7 @@ class EditModal extends AdminModal {
                 {this.props.type == 1 ? <FormSelect className='col-md-4' ref={e => this.maBoMon = e} label='Bộ môn' data={SelectAdapter_DmBoMon} readOnly={readOnly} /> : null}
                 {this.props.type == 1 ? <FormCheckbox className='col-md-12' ref={e => this.chucVuChinh = e} label='Chức vụ chính' isSwitch={true} readOnly={this.checkChucVuSwitch()} /> : null}
                 <FormTextBox type='text' className='col-md-6' ref={e => this.soQuyetDinh = e} label='Số quyết định' readOnly={readOnly} />
-                <FormDatePicker className='col-md-6' ref={e => this.ngayRaQuyetDinh = e} label='Ngày ra quyết định' readOnly={readOnly} />
+                <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayRaQuyetDinh = e} label='Ngày ra quyết định' readOnly={readOnly} />
                 <FormCheckbox className='col-md-12' ref={e => this.thoiChucVu = e} label='Thôi giữ chức vụ' isSwitch={true} readOnly={readOnly} />
             </div>
         });
@@ -152,7 +152,7 @@ class ComponentChucVu extends AdminPage {
     }
 
     render() {
-        const dataChucVu = this.props.staff?.selectedItem?.chucVu;
+        const dataChucVu = this.props.userEdit ? this.props.staff?.userItem?.chucVu : this.props.staff?.selectedItem?.chucVu;
         const permission = this.getUserPermission('staff', ['read', 'write', 'delete']);
         const renderTableChucVu = (items) => (
             renderTable({
@@ -196,16 +196,35 @@ class ComponentChucVu extends AdminPage {
                     </tr>)
             })
         );
+        const renderChucVuCanBo = (data) => {
+            let text = data.map((item) => {
+                if (this.type)
+                    return <div key={item.stt.toString()} className='form-group col-md-12'><b>{this.mapperChucVu1[item.maChucVu]}</b><>{item.maDonVi ?
+                        ((item.maChucVu != '001' && item.maChucVu != '002') ? ' - ' + this.mapperDonVi[item.maDonVi] : '') : ' - ' + this.mapperBoMon[item.maBoMon]}</> {item.chucVuChinh ? '(Chức vụ chính)' : ''}</div>;
+                else {
+                    return <div key={item.stt.toString()} className='form-group col-md-12'><b>{this.mapperChucVu1[item.maChucVu]}</b></div>;
+                }
+            });
+            return text;
+        };
 
         return (
             <div className='col-md-12 form-group'>
                 <p>{this.props.label}</p>
-                <div className='tile-body'>{dataChucVu ? renderTableChucVu(dataChucVu && this.type == 1 ? dataChucVu.filter(i => this.mapperChucVu[i.maChucVu] == this.type) : dataChucVu.filter(i => this.mapperChucVu[i.maChucVu] != 1)) : null}</div>
-                <div className='tile-footer' style={{ textAlign: 'right' }}>
-                    <button className='btn btn-info' type='button' onClick={e => this.showModal(e, this.shcc)}>
-                        <i className='fa fa-fw fa-lg fa-plus' />Thêm {this.loaiChucVuMap[this.type]}
-                    </button>
-                </div>
+                <div className='tile-body'>{
+                    !this.props.userEdit ? (dataChucVu ? renderTableChucVu(dataChucVu && this.type == 1 ?
+                        dataChucVu.filter(i => this.mapperChucVu[i.maChucVu] == this.type) :
+                        dataChucVu.filter(i => this.mapperChucVu[i.maChucVu] != 1)) : null) : (dataChucVu ? renderChucVuCanBo(dataChucVu && this.type == 1 ?
+                            dataChucVu.filter(i => this.mapperChucVu[i.maChucVu] == this.type) :
+                            dataChucVu.filter(i => this.mapperChucVu[i.maChucVu] != 1)) : null)
+                }</div>
+                {
+                    !this.props.userEdit ? <div className='tile-footer' style={{ textAlign: 'right' }}>
+                        <button className='btn btn-info' type='button' onClick={e => this.showModal(e, this.shcc)}>
+                            <i className='fa fa-fw fa-lg fa-plus' />Thêm {this.loaiChucVuMap[this.type]}
+                        </button>
+                    </div> : null
+                }
                 <EditModal ref={e => this.modal = e} type={this.type}
                     getQtChucVuAll={this.props.getQtChucVuAll} getData={this.props.getStaffEdit}
                     create={this.props.createQtChucVu} update={this.props.updateQtChucVu}
@@ -220,6 +239,7 @@ class ComponentChucVu extends AdminPage {
 
 const mapStateToProps = state => ({ staff: state.staff, system: state.system });
 const mapActionsToProps = {
-    getDmChucVuAll, getDmDonViAll, getDmBoMonAll, getQtChucVuAll, createQtChucVu, updateQtChucVu, deleteQtChucVu, getStaffEdit
+    getDmChucVuAll, getDmDonViAll, getDmBoMonAll, getQtChucVuAll,
+    createQtChucVu, updateQtChucVu, deleteQtChucVu, getStaffEdit
 };
 export default connect(mapStateToProps, mapActionsToProps, null, { forwardRef: true })(ComponentChucVu);

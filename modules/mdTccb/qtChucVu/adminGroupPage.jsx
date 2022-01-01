@@ -112,8 +112,6 @@ export class EditModal extends AdminModal {
 }
 
 class QtChucVuGroup extends AdminPage {
-    checked = false;
-
     componentDidMount() {
         T.ready('/user/tccb', () => {
             const route = T.routeMatcher('/user/tccb/qua-trinh/chuc-vu/group/:shcc'),

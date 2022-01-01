@@ -5,19 +5,17 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { AdminPage, FormRichTextBox, FormSelect, FormTextBox } from 'view/component/AdminPage';
 import ComponentNN from '../trinhDoNgoaiNgu/componentNgoaiNgu';
-import { getStaffEdit } from './redux';
+import { getStaffEdit, userGetStaff } from './redux';
 
 class ComponentTrinhDo extends AdminPage {
     shcc = '';
     value = (item) => {
-        console.log(item);
         this.shcc = item.shcc;
         this.trinhDoPhoThong.value(item.trinhDoPhoThong ? item.trinhDoPhoThong : '');
-        this.ngoaiNgu.value(item.shcc);
+        this.ngoaiNgu.value(item.shcc, item.email);
     }
 
     getValue = (selector) => {
-        console.log(selector.props.label);
         const data = selector.value();
         const isRequired = selector.props.required;
         if (data || data === 0) return data;
@@ -57,7 +55,7 @@ class ComponentTrinhDo extends AdminPage {
                 <h3 className='tile-title'>Thông tin về trình độ</h3>
                 <div className='tile-body row'>
                     <FormTextBox ref={e => this.trinhDoPhoThong = e} label='Trình độ giáo dục phổ thông' className='col-md-6' />
-                    <ComponentNN ref={e => this.ngoaiNgu = e} label='Trình độ ngoại ngữ' />
+                    <ComponentNN ref={e => this.ngoaiNgu = e} label='Trình độ ngoại ngữ' userEdit={this.props.userEdit} />
                     <FormSelect ref={e => this.trinhDoTinHoc = e} label='Trình độ tin học' data={SelectAdapter_DmTrinhDoTinHocV2} className='col-md-6' />
                     <FormTextBox ref={e => this.chungChiTinHoc = e} label='Văn bằng/Chứng chỉ' className='col-md-6' />
 
@@ -82,6 +80,6 @@ class ComponentTrinhDo extends AdminPage {
 
 const mapStateToProps = state => ({ staff: state.staff, system: state.system });
 const mapActionsToProps = {
-    getStaffEdit
+    getStaffEdit, userGetStaff
 };
 export default connect(mapStateToProps, mapActionsToProps, null, { forwardRef: true })(ComponentTrinhDo);

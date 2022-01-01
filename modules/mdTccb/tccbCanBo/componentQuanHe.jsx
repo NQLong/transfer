@@ -2,53 +2,57 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { AdminModal, AdminPage, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
 import { SelectAdapter_DmQuanHeGiaDinh } from 'modules/mdDanhMuc/dmQuanHeGiaDinh/redux';
-import { DateInput, Select } from 'view/component/Input';
+import { Select } from 'view/component/Input';
 import { getDmQuanHeGiaDinhAll } from 'modules/mdDanhMuc/dmQuanHeGiaDinh/redux';
 import {
     getStaffEdit, createStaff, updateStaff,
-    createQuanHeCanBo, updateQuanHeCanBo, deleteQuanHeCanBo
+    createQuanHeCanBo, updateQuanHeCanBo, deleteQuanHeCanBo, createQuanHeStaffUser, updateQuanHeStaffUser, deleteQuanHeStaffUser
 } from './redux';
 class EditModal extends AdminModal {
-    state = {
-        id: null,
-        email: '',
-        type: null,
-        shcc: ''
+    componentDidMount() {
+        $(document).ready(() => this.onShown(() => this.hoTen.focus()));
     }
 
-    onShow = (item, type, email, shcc) => {
-        let { id, hoTen, moiQuanHe, namSinh, ngheNghiep, noiCongTac, diaChi, queQuan } = item ? item : { id: null, hoTen: '', moiQuanHe: '', namSinh: '', ngheNghiep: '', noiCongTac: '', diaChi: '', queQuan: '' };
-        this.setState({ email: email, id, type: type, shcc: shcc });
-        setTimeout(() => {
-            this.hoTen.value(hoTen ? hoTen : '');
-            this.moiQuanHe.setVal(moiQuanHe ? moiQuanHe : null);
-            this.namSinh.setVal(namSinh ? namSinh : null);
-            this.ngheNghiep.value(ngheNghiep ? ngheNghiep : '');
-            this.noiCongTac.value(noiCongTac ? noiCongTac : '');
-            this.diaChi.value(diaChi ? diaChi : '');
-            this.queQuan.value(queQuan ? queQuan : '');
-        }, 500);
+    onShow = (item) => {
+        let { id, hoTen, moiQuanHe, namSinh, ngheNghiep, noiCongTac, diaChi, queQuan } = item && item.item ? item.item : { id: null, hoTen: '', moiQuanHe: '', namSinh: '', ngheNghiep: '', noiCongTac: '', diaChi: '', queQuan: '' };
+
+        this.hoTen.value(hoTen ? hoTen : '');
+        this.moiQuanHe.setVal(moiQuanHe ? moiQuanHe : null);
+        this.namSinh.value(namSinh ? namSinh : '');
+        this.ngheNghiep.value(ngheNghiep ? ngheNghiep : '');
+        this.noiCongTac.value(noiCongTac ? noiCongTac : '');
+        this.diaChi.value(diaChi ? diaChi : '');
+        this.queQuan.value(queQuan ? queQuan : '');
+        this.setState({ item, email: item.email, id, type: item.type, shcc: item.shcc });
+
     }
 
     onSubmit = () => {
-        const id = this.state.id,
-            type = this.state.type,
-            shcc = this.state.shcc,
-            changes = {
-                shcc: this.state.shcc,
-                hoTen: this.hoTen.value(),
-                moiQuanHe: this.moiQuanHe.getVal(),
-                namSinh: this.namSinh.getVal(),
-                ngheNghiep: this.ngheNghiep.value(),
-                noiCongTac: this.noiCongTac.value(),
-                diaChi: this.diaChi.value(),
-                queQuan: this.queQuan.value()
-            };
-        if (id) {
-            this.props.update(id, changes,this.hide);
+        const changes = {
+            email: this.state.email,
+            shcc: this.state.shcc,
+            type: this.state.type,
+            hoTen: this.hoTen.value(),
+            moiQuanHe: this.moiQuanHe.getVal(),
+            namSinh: this.namSinh.value(),
+            ngheNghiep: this.ngheNghiep.value(),
+            noiCongTac: this.noiCongTac.value(),
+            diaChi: this.diaChi.value(),
+            queQuan: this.queQuan.value()
+        };
+        if (changes.hoTen == '') {
+            T.notify('Họ và tên bị trống!', 'danger');
+            this.hoTen.focus();
+        } else if (!changes.moiQuanHe) {
+            T.notify('Mối quan hệ bị trống!', 'danger');
+            this.moiQuanHe.focus();
+        } else if (changes.namSinh == '') {
+            T.notify('Năm sinh bị trống!', 'danger');
+            this.namSinh.focus();
+        }
+        else if (this.state.id) {
+            this.props.update(this.state.id, changes, this.hide);
         } else {
-            changes.shcc = shcc;
-            changes.type = type;
             this.props.create(changes, this.hide);
         }
     }
@@ -57,10 +61,10 @@ class EditModal extends AdminModal {
         title: 'Thông tin quan hệ gia đình',
         size: 'large',
         body: <div className='row'>
-            <FormTextBox className='col-md-6' ref={e => this.hoTen = e} label='Họ tên' />
-            <div className='col-md-6'><Select ref={e => this.moiQuanHe = e} adapter={SelectAdapter_DmQuanHeGiaDinh} label='Mối quan hệ' /></div>
+            <FormTextBox className='col-md-6' ref={e => this.hoTen = e} label='Họ tên' required />
+            <div className='col-md-6'><Select ref={e => this.moiQuanHe = e} adapter={SelectAdapter_DmQuanHeGiaDinh} label='Mối quan hệ' required /></div>
             <FormTextBox className='col-md-8' ref={e => this.ngheNghiep = e} label='Nghề nghiệp' />
-            <div className='col-md-4'><DateInput ref={e => this.namSinh = e} label='Năm sinh (yyyy)' type='year' /></div>
+            <FormTextBox ref={e => this.namSinh = e} type='year' className='form-group col-md-4' label='Năm sinh' required />
             <FormTextBox className='col-md-12' ref={e => this.noiCongTac = e} label='Nơi công tác' />
             <FormTextBox className='col-md-12' ref={e => this.queQuan = e} label='Nguyên quán' />
             <FormTextBox className='col-md-12' ref={e => this.diaChi = e} label='Địa chỉ hiện tại' />
@@ -80,18 +84,17 @@ class ComponentQuanHe extends AdminPage {
 
     createRelation = (e, type) => {
         e.preventDefault();
-        this.modal.show(null, type, this.email, this.shcc);
+        this.modal.show({ item: null, type: type, email: this.email, shcc: this.shcc });
     }
 
     editQuanHe = (e, item, type) => {
-        this.modal.show(item, type, this.email, this.shcc);
+        this.modal.show({ item: item, type: type, email: this.email, shcc: this.shcc });
         e.preventDefault();
     }
 
     deleteQuanHe = (e, item) => {
         T.confirm('Xóa thông tin người thân', 'Bạn có chắc bạn muốn xóa mục này?', true, isConfirm =>
-            isConfirm && this.props.deleteQuanHeCanBo(item.id, this.shcc));
-        this.props.getStaffEdit(this.shcc);
+            isConfirm && (this.props.userEdit ? this.props.deleteQuanHeStaffUser(item.id, this.email) : this.props.deleteQuanHeCanBo(item.id, this.shcc)));
         e.preventDefault();
     }
     value(email, phai, shcc) {
@@ -101,9 +104,13 @@ class ComponentQuanHe extends AdminPage {
     }
 
     render() {
-        const dataQuanHe = this.props.staff?.selectedItem?.items;
+
+        const dataQuanHe = this.props.userEdit ? this.props.staff?.userItem?.items : this.props.staff?.selectedItem?.items;
         let voChongText = this.phai == '01' ? 'vợ' : 'chồng';
-        let permission = this.getUserPermission('staff', ['read', 'write', 'delete']);
+        let permission = this.props.userEdit ? this.getUserPermission('user', ['read', 'write', 'delete']) : this.getUserPermission('staff', ['read', 'write', 'delete']);
+        permission.read = true;
+        permission.write = true;
+        permission.delete = true;
         const renderQuanHeTable = (items, type) => (
             renderTable({
                 getDataSource: () => items.filter(i => i.type == type), stickyHead: false,
@@ -127,12 +134,12 @@ class ComponentQuanHe extends AdminPage {
                         <TableCell type='text' content={item.ngheNghiep} />
                         <TableCell type='text' content={item.diaChi} />
                         <TableCell type='buttons' content={item} permission={permission} permissionDelete={true}
-                        onEdit={e => this.editQuanHe(e, item, type)} 
-                        onDelete={e => this.deleteQuanHe(e, item)}></TableCell>
+                            onEdit={e => this.editQuanHe(e, item, type)}
+                            onDelete={e => this.deleteQuanHe(e, item)}></TableCell>
                     </tr>),
             })
         );
-        
+
         return (
             <div className='tile'>
                 <h3 className='tile-title'>Thông tin người thân</h3>
@@ -184,15 +191,15 @@ class ComponentQuanHe extends AdminPage {
                 </div>
                 <EditModal ref={e => this.modal = e}
                     mapperQuanHe={this.mapperQuanHe}
-                    create={this.props.createQuanHeCanBo}
-                    update={this.props.updateQuanHeCanBo} />
+                    create={this.props.userEdit ? this.props.createQuanHeStaffUser : this.props.createQuanHeCanBo}
+                    update={this.props.userEdit ? this.props.updateQuanHeStaffUser : this.props.updateQuanHeCanBo} />
             </div>
         );
     }
 }
 const mapStateToProps = state => ({ staff: state.staff, system: state.system });
 const mapActionsToProps = {
-    getStaffEdit, updateStaff, createStaff, getDmQuanHeGiaDinhAll,    
-    createQuanHeCanBo, updateQuanHeCanBo, deleteQuanHeCanBo
+    getStaffEdit, updateStaff, createStaff, getDmQuanHeGiaDinhAll,
+    createQuanHeCanBo, updateQuanHeCanBo, deleteQuanHeCanBo, createQuanHeStaffUser, updateQuanHeStaffUser, deleteQuanHeStaffUser
 };
 export default connect(mapStateToProps, mapActionsToProps, null, { forwardRef: true })(ComponentQuanHe);

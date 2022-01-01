@@ -1,6 +1,6 @@
-// Table name: QT_CHUC_VU { stt, shcc, maChucVu, maDonVi, maBoMon, soQd, ngayRaQd, chucVuChinh }
+// Table name: QT_CHUC_VU { stt, shcc, maChucVu, maDonVi, maBoMon, soQd, ngayRaQd, chucVuChinh, thoiChucVu, soQdThoiChucVu, ngayThoiChucVu,  ngayRaQdThoiChucVu}
 const keys = ['STT'];
-const obj2Db = { 'stt': 'STT', 'shcc': 'SHCC', 'maChucVu': 'MA_CHUC_VU', 'maDonVi': 'MA_DON_VI', 'maBoMon': 'MA_BO_MON', 'soQd': 'SO_QD', 'ngayRaQd': 'NGAY_RA_QD', 'chucVuChinh': 'CHUC_VU_CHINH' };
+const obj2Db = { 'stt': 'STT', 'shcc': 'SHCC', 'maChucVu': 'MA_CHUC_VU', 'maDonVi': 'MA_DON_VI', 'maBoMon': 'MA_BO_MON', 'soQd': 'SO_QD', 'ngayRaQd': 'NGAY_RA_QD', 'chucVuChinh': 'CHUC_VU_CHINH', 'thoiChucVu': 'THOI_CHUC_VU', 'soQdThoiChucVu': 'SO_QD_THOI_CHUC_VU', 'ngayThoiChucVu': 'NGAY_THOI_CHUC_VU', 'ngayRaQdThoiChucVu': 'NGAY_RA_QD_THOI_CHUC_VU' };
 
 module.exports = app => {
     app.model.qtChucVu = {

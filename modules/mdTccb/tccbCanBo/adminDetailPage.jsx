@@ -40,7 +40,7 @@ class CanBoPage extends AdminPage {
     setUp = (item) => {
         this.componentCaNhan.value(item);
         this.componentTTCongTac.value(item);
-        this.componentQuanHe.value(item.items, item.email, item.phai, item.shcc);
+        this.componentQuanHe.value(item.email, item.phai, item.shcc);
         this.componentTrinhDo.value(item);
 
     }
@@ -58,11 +58,7 @@ class CanBoPage extends AdminPage {
 
     render() {
         const item = this.props.staff?.selectedItem;
-        // if (item) {
-        //     // this.componentQuanHe.value(item.items, item.email, item.phai, item.shcc);
-        //     this.setUp(item);
-        //     // this.componentTTCongTac.value(item);
-        // }
+        
         return this.renderPage({
             title: `Thông tin cá nhân${item?.shcc ? `: ${item?.ho} ${item?.ten}` : null}`,
             breadcrumb: [
