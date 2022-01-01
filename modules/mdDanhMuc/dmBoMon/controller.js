@@ -26,7 +26,7 @@ module.exports = app => {
         app.model.dmBoMon.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
     });
 
-    app.get('/api/dm-bo-mon/all', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/dm-bo-mon/all', (req, res) => {
         app.model.dmBoMon.getAll((error, items) => res.send({ error, items }));
     });
 
@@ -97,7 +97,7 @@ module.exports = app => {
                         ghiChu = worksheet.getCell('H' + index).value ? worksheet.getCell('H' + index).value.toString().trim() : '';
                     kichHoat = Number(kichHoat) || 0;
 
-                    items.push({ ma, ten, tenTiengAnh, maDv, qdThanhLap, qdXoaTen, kichHoat, ghiChu});
+                    items.push({ ma, ten, tenTiengAnh, maDv, qdThanhLap, qdXoaTen, kichHoat, ghiChu });
                 } else {
                     done({ items });
                     break;

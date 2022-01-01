@@ -266,7 +266,8 @@ module.exports = app => {
         if (conditions.ma == 'new') {
             let imageLink = '/img/' + dataName + '/' + app.path.basename(srcPath),
                 sessionPath = app.path.join(app.publicPath, imageLink);
-            app.fs.rename(srcPath, sessionPath, error => {
+            app.fs.copyFile(srcPath, sessionPath, error => {
+                app.deleteFile(srcPath);
                 if (error == null) req.session[dataName + 'Image'] = sessionPath;
                 sendResponse({ error, image: imageLink });
             });
@@ -279,13 +280,13 @@ module.exports = app => {
                     } else {
                         // app.deleteImage(dataItem.image);
                         dataItem.image = '/img/' + dataName + '/' + (new Date().getTime()).toString().slice(-8) + app.path.extname(srcPath);
-                        app.fs.rename(srcPath, app.path.join(app.publicPath, dataItem.image), error => {
+                        app.fs.copyFile(srcPath, app.path.join(app.publicPath, dataItem.image), error => {
                             if (error) {
                                 sendResponse({ error });
                             } else {
                                 dataItem.image += '?t=' + (new Date().getTime()).toString().slice(-8);
                                 delete dataItem.ma;
-
+                                app.deleteFile(srcPath);
                                 sendResponse({
                                     item: dataItem,
                                     image: dataItem.image,
@@ -296,7 +297,10 @@ module.exports = app => {
                 });
             } else {
                 const image = '/img/' + dataName + '/' + (new Date().getTime()).toString().slice(-8) + app.path.extname(srcPath);
-                app.fs.rename(srcPath, app.path.join(app.publicPath, image), error => sendResponse({ error, image }));
+                app.fs.copyFile(srcPath, app.path.join(app.publicPath, image), error => {
+                    sendResponse({ error, image });
+                    app.deleteFile(srcPath);
+                });
             }
         }
     };

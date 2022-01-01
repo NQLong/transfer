@@ -20,9 +20,10 @@ module.exports = app => {
                 srcPath = files.divisionHeader[0].path;
             let image = '/img/divisionHeader/' + shortname.replace('/', '_') + '_' + (new Date().getTime()).toString().slice(-8) + app.path.extname(srcPath);
             app.model.dvWebsite.get({ shortname }, (error, website) => {
-                app.fs.rename(srcPath, app.path.join(app.publicPath, image), error => {
+                app.fs.copyFile(srcPath, app.path.join(app.publicPath, image), error => {
                     if (error) done({ error });
                     else if (website) {
+                        app.deleteFile(srcPath);
                         if (website.header) app.deleteFile(app.path.join(app.publicPath, website.header));
                         app.model.dvWebsite.update({ shortname }, { header: image }, (error,) => done({ error, image: image }));
                     }
@@ -42,10 +43,10 @@ module.exports = app => {
                 srcPath = files.divisionHeaderMobile[0].path;
             let image = '/img/divisionHeader/' + shortname.replace('/', '_') + '_' + (new Date().getTime()).toString().slice(-8) + app.path.extname(srcPath);
             app.model.dvWebsite.get({ shortname }, (error, website) => {
-                app.fs.rename(srcPath, app.path.join(app.publicPath, image), error => {
+                app.fs.copyFile(srcPath, app.path.join(app.publicPath, image), error => {
                     if (error) done({ error });
                     else if (website) {
-                        // console.log(website.headerMobile, image);
+                        app.deleteFile(srcPath);
                         if (website.headerMobile) app.deleteFile(app.path.join(app.publicPath, website.headerMobile));
                         app.model.dvWebsite.update({ shortname }, { headerMobile: image }, (error,) => done({ error, image: image }));
                     }

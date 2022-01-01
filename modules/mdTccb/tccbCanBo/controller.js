@@ -888,7 +888,7 @@ module.exports = app => {
     });
 
     // USER APIs ------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/staff-profile/:email', checkGetStaffPermission, (req, res) => {
+    app.get('/api/staff-profile/:email', (req, res) => {
         app.model.canBo.get({ email: req.params.email }, (error, canBo) => {
             if (error || canBo == null) {
                 res.send({ error });

@@ -50,7 +50,8 @@ module.exports = app => {
         if (dataId == 'new') {
             let imageLink = app.path.join('/img/logo', app.path.basename(srcPath)),
                 sessionPath = app.path.join(app.publicPath, imageLink);
-            app.fs.rename(srcPath, sessionPath, error => {
+            app.fs.copyFile(srcPath, sessionPath, error => {
+                app.deleteImage(srcPath);
                 if (error == null) req.session[dataName + 'Image'] = sessionPath;
                 sendResponse({ error, image: imageLink });
             });
@@ -64,10 +65,11 @@ module.exports = app => {
                         app.deleteImage(dataItem.image);
                         dataItem.image = app.path.join('/img/logo', app.path.basename(srcPath));
                         let sessionPath = app.path.join(app.publicPath, dataItem.image);
-                        app.fs.rename(srcPath, sessionPath, error => {
+                        app.fs.copyFile(srcPath, sessionPath, error => {
                             if (error) {
                                 sendResponse({ error });
                             } else {
+                                app.deleteFile(srcPath);
                                 dataItem.image += '?t=' + (new Date().getTime()).toString().slice(-8);
                                 model.update && model.update({ id: dataItem.id }, { image: dataItem.image }, (err) => {
                                     if (err == null) app.io.emit(dataName + '-changed', dataItem);
@@ -79,7 +81,10 @@ module.exports = app => {
                 });
             } else {
                 const image = '/img/' + dataName + '/' + dataId + app.path.extname(srcPath);
-                app.fs.rename(srcPath, app.path.join(app.publicPath, image), error => sendResponse({ error, image }));
+                app.fs.copyFile(srcPath, app.path.join(app.publicPath, image), error => {
+                    app.deleteFile(srcPath);
+                    sendResponse({ error, image });
+                });
             }
         }
     };

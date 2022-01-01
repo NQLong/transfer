@@ -33,7 +33,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/danh-muc/don-vi/all', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/danh-muc/don-vi/all', (req, res) => {
         app.model.dmDonVi.getAll((error, items) => res.send({ error, items }));
     });
 
@@ -47,7 +47,8 @@ module.exports = app => {
             const srcPath = req.session.dmDonViImage,
                 imageLink = '/img/dmDonVi/' + (new Date().getTime()).toString().slice(-8) + app.path.extname(srcPath),
                 destPath = app.path.join(app.publicPath, imageLink);
-            app.fs.rename(srcPath, destPath, () => {
+            app.fs.copyFile(srcPath, destPath, () => {
+                app.deleteFile(srcPath);
                 data.image = imageLink;
                 app.model.dmDonVi.create(data, (error, item) => res.send({ error, item }));
             });
@@ -105,9 +106,10 @@ module.exports = app => {
                 srcPath = files.DmDonViImageDisplay[0].path;
             let image = '/img/dmDonVi/' + maDonVi + '_' + (new Date().getTime()).toString().slice(-8) + app.path.extname(srcPath);
             app.model.dmDonVi.get({ ma: maDonVi }, (error, donVi) => {
-                app.fs.rename(srcPath, app.path.join(app.publicPath, image), error => {
+                app.fs.copyFile(srcPath, app.path.join(app.publicPath, image), error => {
                     if (error) done({ error });
                     else if (donVi) {
+                        app.deleteFile(srcPath);
                         if (donVi.imageDisplay) app.deleteFile(app.path.join(app.publicPath, donVi.imageDisplay));
                         app.model.dmDonVi.update({ ma: maDonVi }, { imageDisplay: image }, (error,) => done({ error, image: image }));
                     }
@@ -125,9 +127,10 @@ module.exports = app => {
                 srcPath = files.DmDonViImageDisplayTA[0].path;
             let image = '/img/dmDonVi/' + maDonVi + 'TA_' + (new Date().getTime()).toString().slice(-8) + app.path.extname(srcPath);
             app.model.dmDonVi.get({ ma: maDonVi }, (error, donVi) => {
-                app.fs.rename(srcPath, app.path.join(app.publicPath, image), error => {
+                app.fs.copyFile(srcPath, app.path.join(app.publicPath, image), error => {
                     if (error) done({ error });
                     else if (donVi) {
+                        app.deleteFile(srcPath);
                         if (donVi.imageDisplayTa) app.deleteFile(app.path.join(app.publicPath, donVi.imageDisplayTa));
                         app.model.dmDonVi.update({ ma: maDonVi }, { imageDisplayTa: image }, (error,) => done({ error, image: image }));
                     }
