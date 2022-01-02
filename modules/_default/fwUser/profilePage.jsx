@@ -11,7 +11,10 @@ import ProfileCommon from './componentNotStaff';
 import Loading from 'view/component/Loading';
 
 class ProfileCanBo extends AdminPage {
-    state = { canBo: null, isLoad: true };
+    state = { canBo: false, isLoad: true };
+    // shouldComponentUpdate(nextProps, nextState) {
+    //     return this.state.canBo != nextState.canBo;
+    // }
     componentDidMount() {
         T.ready(() => {
             if (this.props.system && this.props.system.user) {
@@ -33,18 +36,20 @@ class ProfileCanBo extends AdminPage {
     }
 
     setUp = (item) => {
-        this.setState({ canBo: item, isLoad: false });
-        this.componentCaNhan.value(item);
-        this.componentQuanHe.value(item.email, item.phai, item.shcc);
-        this.componentTrinhDo.value(item);
-        this.componentTTCongTac.value(item);
+        this.setState({ canBo: true, isLoad: false }, () => {
+            this.componentCaNhan.value(item);
+            this.componentQuanHe.value(item.email, item.phai, item.shcc);
+            this.componentTrinhDo.value(item);
+            this.componentTTCongTac.value(item);
+        });
+       
     }
 
     save = () => {
         const caNhanData = this.componentCaNhan.getAndValidate();
         const congTacData = this.componentTTCongTac.getAndValidate();
         const trinhDoData = this.componentTrinhDo.getAndValidate();
-        this.emailCanBo && this.props.updateStaffUser(this.emailCanBo, { ...caNhanData, ...trinhDoData, ...congTacData});
+        this.emailCanBo && this.props.updateStaffUser(this.emailCanBo, { ...caNhanData, ...trinhDoData, ...congTacData });
     };
     render = () => {
         const item = this.props.staff?.userItem;
@@ -53,13 +58,13 @@ class ProfileCanBo extends AdminPage {
             content:
                 <>
                     {this.state.isLoad && <Loading />}
-                    {!this.state.canBo && <ProfileCommon ref={e => this.profileCommon = e} />}
-                    {this.state.canBo && <>
-                        <ComponentCaNhan ref={e => this.componentCaNhan = e} userEdit={false} />
-                        <ComponentQuanHe ref={e => this.componentQuanHe = e} userEdit={true} />
-                        <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={true} />
-                        <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={true} />
-                    </>}
+                    {!this.state.canBo ? <ProfileCommon ref={e => this.profileCommon = e} /> :
+                        <>
+                            <ComponentCaNhan ref={e => this.componentCaNhan = e} userEdit={false} />
+                            <ComponentQuanHe ref={e => this.componentQuanHe = e} userEdit={true} />
+                            <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={true} />
+                            <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={true} />
+                        </>}
                 </>,
             onSave: this.state.canBo && this.save,
         });

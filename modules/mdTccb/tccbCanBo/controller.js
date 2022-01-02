@@ -223,11 +223,11 @@ module.exports = app => {
                             resolve();
                         });
                     })).then(() => new Promise(resolve => {
-                        app.model.qtChucVu.getAll({ shcc: canBo.shcc }, (error, chucVu) => {
+                        app.model.qtChucVu.getByShcc(canBo.shcc, (error, chucVu) => {
                             if (error || chucVu == null) {
                                 result = app.clone(result, { chucVu: null });
                             } else {
-                                result = app.clone(result, { chucVu });
+                                result = app.clone(result, { chucVu: chucVu.rows });
                             }
                             resolve();
                         });
@@ -931,11 +931,11 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtChucVu.getAll({ shcc: canBo.shcc }, (error, chucVu) => {
+                    app.model.qtChucVu.getByShcc(canBo.shcc, (error, chucVu) => {
                         if (error || chucVu == null) {
                             result = app.clone(result, { chucVu: null });
                         } else {
-                            result = app.clone(result, { chucVu });
+                            result = app.clone(result, { chucVu: chucVu.rows });
                         }
                         resolve();
                     });

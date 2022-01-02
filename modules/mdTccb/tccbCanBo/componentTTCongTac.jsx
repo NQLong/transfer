@@ -15,7 +15,6 @@ class ComponentTTCongTac extends AdminPage {
     state = { doiTuongBoiDuong: false, tinhTrangBoiDuong: false, dangONuocNgoai: false, dangNghiTheoCheDo: false, daNghi: false };
 
     value = (item) => {
-        console.log(item);
         this.shcc = item.shcc;
         this.ngheNghiepCu.value(item.ngheNghiepCu ? item.ngheNghiepCu : '');
         this.ngayBatDauCongTac.value(item.ngayBatDauCongTac ? item.ngayBatDauCongTac : '');
@@ -25,8 +24,8 @@ class ComponentTTCongTac extends AdminPage {
         this.dienHopDong.value(item.hopDongCanBo ? item.hopDongCanBo : '');
         this.loaiHopDong.value(item.loaiHopDongCanBo ? item.loaiHopDongCanBo: '');
 
-        this.componentChucVuDoanThe.value(0, this.shcc);
-        this.componentChucVuChinhQuyen?.value(1, this.shcc);
+        // this.componentChucVuDoanThe.value(0, this.shcc);
+        this.componentChucVuChinhQuyen.value(1, this.shcc);
 
         this.bacLuong.value(item.bacLuong ? item.bacLuong : '');
         this.heSo.value(item.heSoLuong ? item.heSoLuong : '');
@@ -132,7 +131,7 @@ class ComponentTTCongTac extends AdminPage {
                     <FormSelect data={SelectAdapter_DmLoaiHopDongV2} className='col-md-4' ref={e => this.loaiHopDong = e} label='Loại hợp đồng' readOnly={this.props.userEdit}/>
 
                     <ComponentChucVu ref={e => this.componentChucVuChinhQuyen = e} label='Chức vụ chính quyền:' userEdit={this.props.userEdit} />
-                    <ComponentChucVu ref={e => this.componentChucVuDoanThe = e} label='Chức vụ đoàn thể:' userEdit={this.props.userEdit} />
+                    {/* <ComponentChucVu ref={e => this.componentChucVuDoanThe = e} label='Chức vụ đoàn thể:' userEdit={this.props.userEdit} /> */}
 
                     <FormTextBox ref={e => this.bacLuong = e} className='col-md-3' label='Bậc lương' readOnly={this.props.userEdit}/>
                     <FormTextBox ref={e => this.heSo = e} className='col-md-3' label='Hệ số lương hiện hưởng' readOnly={this.props.userEdit} />

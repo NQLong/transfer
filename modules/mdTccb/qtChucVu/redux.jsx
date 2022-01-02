@@ -178,14 +178,14 @@ export function updateQtChucVu(isStaffEdit, stt, changes, done) {
 
 export function getChucVuByShcc(shcc, done) {
     return dispatch => {
-        const url = `/api/tccb/qua-trinh/chuc-vu/item/${shcc}`;
+        const url = `/api/tccb/qua-trinh/chuc-vu-by-shcc/${shcc}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách chức vụ bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                if (done) done(data.items);
-                dispatch({ type: QtChucVuGetAll, items: data.items ? data.items : {} });
+                if (done) done(data.item);
+                dispatch({ type: QtChucVuGetAll, item: data.item ? data.item : {} });
             }
         }, () => T.notify('Lấy danh sách chức vụ bị lỗi!', 'danger'));
     };

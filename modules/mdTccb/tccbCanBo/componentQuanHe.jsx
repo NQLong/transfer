@@ -104,7 +104,6 @@ class ComponentQuanHe extends AdminPage {
     }
 
     render() {
-
         const dataQuanHe = this.props.userEdit ? this.props.staff?.userItem?.items : this.props.staff?.selectedItem?.items;
         let voChongText = this.phai == '01' ? 'vợ' : 'chồng';
         let permission = this.props.userEdit ? this.getUserPermission('user', ['read', 'write', 'delete']) : this.getUserPermission('staff', ['read', 'write', 'delete']);
