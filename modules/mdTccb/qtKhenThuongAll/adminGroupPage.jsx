@@ -241,7 +241,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-list-alt',
+            icon: 'fa fa-gift',
             title: 'Quá trình khen thưởng',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,

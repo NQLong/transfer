@@ -125,7 +125,7 @@ class QtChucVu extends AdminPage {
                     this.stateTable = [
                         { 'id': '-1', 'text': 'Tất cả' }
                     ];
-                    items.forEach(item => this.stateTable.push({
+                    items.forEach(item => item.loaiChucVu == 1 && this.stateTable.push({
                         'id': item.ma,
                         'text': item.ten
                     }));
@@ -229,8 +229,8 @@ class QtChucVu extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-list-alt',
-            title: 'Quá trình chức vụ',
+            icon: 'fa fa-street-view',
+            title: ' Quá trình chức vụ',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
                 'Quá trình chức vụ'
