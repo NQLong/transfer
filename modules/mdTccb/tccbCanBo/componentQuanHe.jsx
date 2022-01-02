@@ -1,8 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { AdminModal, AdminPage, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
-import { SelectAdapter_DmQuanHeGiaDinh } from 'modules/mdDanhMuc/dmQuanHeGiaDinh/redux';
-import { Select } from 'view/component/Input';
+import { AdminModal, AdminPage, FormSelect, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
+import { SelectAdapter_DmQuanHeGiaDinhV2 } from 'modules/mdDanhMuc/dmQuanHeGiaDinh/redux';
 import { getDmQuanHeGiaDinhAll } from 'modules/mdDanhMuc/dmQuanHeGiaDinh/redux';
 import {
     getStaffEdit, createStaff, updateStaff,
@@ -17,7 +16,7 @@ class EditModal extends AdminModal {
         let { id, hoTen, moiQuanHe, namSinh, ngheNghiep, noiCongTac, diaChi, queQuan } = item && item.item ? item.item : { id: null, hoTen: '', moiQuanHe: '', namSinh: '', ngheNghiep: '', noiCongTac: '', diaChi: '', queQuan: '' };
 
         this.hoTen.value(hoTen ? hoTen : '');
-        this.moiQuanHe.setVal(moiQuanHe ? moiQuanHe : null);
+        this.moiQuanHe.value(moiQuanHe ? moiQuanHe : null);
         this.namSinh.value(namSinh ? namSinh : '');
         this.ngheNghiep.value(ngheNghiep ? ngheNghiep : '');
         this.noiCongTac.value(noiCongTac ? noiCongTac : '');
@@ -33,7 +32,7 @@ class EditModal extends AdminModal {
             shcc: this.state.shcc,
             type: this.state.type,
             hoTen: this.hoTen.value(),
-            moiQuanHe: this.moiQuanHe.getVal(),
+            moiQuanHe: this.moiQuanHe.value(),
             namSinh: this.namSinh.value(),
             ngheNghiep: this.ngheNghiep.value(),
             noiCongTac: this.noiCongTac.value(),
@@ -62,7 +61,7 @@ class EditModal extends AdminModal {
         size: 'large',
         body: <div className='row'>
             <FormTextBox className='col-md-6' ref={e => this.hoTen = e} label='Họ tên' required />
-            <div className='col-md-6'><Select ref={e => this.moiQuanHe = e} adapter={SelectAdapter_DmQuanHeGiaDinh} label='Mối quan hệ' required /></div>
+            <FormSelect className='col-md-6' ref={e => this.moiQuanHe = e} data={SelectAdapter_DmQuanHeGiaDinhV2} label='Mối quan hệ' required />
             <FormTextBox className='col-md-8' ref={e => this.ngheNghiep = e} label='Nghề nghiệp' />
             <FormTextBox ref={e => this.namSinh = e} type='year' className='form-group col-md-4' label='Năm sinh' required />
             <FormTextBox className='col-md-12' ref={e => this.noiCongTac = e} label='Nơi công tác' />
@@ -129,7 +128,7 @@ class ComponentQuanHe extends AdminPage {
                         <TableCell type='text' content={index + 1} />
                         <TableCell type='link' content={item.hoTen} onClick={e => this.editQuanHe(e, item, type)} />
                         <TableCell type='text' content={T.dateToText(item.namSinh, 'yyyy')} />
-                        <TableCell type='text' content={this.mapperQuanHe[item.moiQuanHe]} />
+                        <TableCell type='text' content={item.tenMoiQuanHe} />
                         <TableCell type='text' content={item.ngheNghiep} />
                         <TableCell type='text' content={item.diaChi} />
                         <TableCell type='buttons' content={item} permission={permission} permissionDelete={true}

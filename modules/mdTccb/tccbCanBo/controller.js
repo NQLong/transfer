@@ -79,20 +79,20 @@ module.exports = app => {
                 app.model.fwUser.get({ email: canBo.email }, (error, user) => {
                     let result = app.clone(canBo, { image: user.image });
                     new Promise(resolve => {
-                        app.model.quanHeCanBo.getAll({ shcc: canBo.shcc }, (error, items) => {
+                        app.model.quanHeCanBo.getQhByShcc(canBo.shcc, (error, items) => {
                             if (error || items == null) {
                                 result = app.clone(result, { items: null });
                             } else {
-                                result = app.clone(result, { items });
+                                result = app.clone(result, { items: items.rows });
                             }
                             resolve();
                         });
                     }).then(() => new Promise(resolve => {
-                        app.model.trinhDoNgoaiNgu.getAll({ shcc: canBo.shcc }, (error, trinhDoNN) => {
+                        app.model.trinhDoNgoaiNgu.getTrinhDoNNByShcc(canBo.shcc, (error, trinhDoNN) => {
                             if (error || trinhDoNN == null) {
                                 result = app.clone(result, { trinhDoNN: null });
                             } else {
-                                result = app.clone(result, { trinhDoNN });
+                                result = app.clone(result, { trinhDoNN: trinhDoNN.rows });
                             }
                             resolve();
                         });
@@ -223,11 +223,15 @@ module.exports = app => {
                             resolve();
                         });
                     })).then(() => new Promise(resolve => {
+                        let dataCV = [];
                         app.model.qtChucVu.getByShcc(canBo.shcc, (error, chucVu) => {
                             if (error || chucVu == null) {
                                 result = app.clone(result, { chucVu: null });
                             } else {
-                                result = app.clone(result, { chucVu: chucVu.rows });
+                                chucVu.rows.forEach(i => {
+                                    dataCV.push(Object.assign(i, { lcv: i.loaiChucVu == 1 }));
+                                });
+                                result = app.clone(result, { chucVu: dataCV });
                             }
                             resolve();
                         });
@@ -895,20 +899,20 @@ module.exports = app => {
             } else {
                 let result = app.clone(canBo);
                 new Promise(resolve => {
-                    app.model.quanHeCanBo.getAll({ shcc: canBo.shcc }, (error, items) => {
+                    app.model.quanHeCanBo.getQhByShcc(canBo.shcc, (error, items) => {
                         if (error || items == null) {
                             result = app.clone(result, { items: null });
                         } else {
-                            result = app.clone(result, { items });
+                            result = app.clone(result, { items: items.rows });
                         }
                         resolve();
                     });
                 }).then(() => new Promise(resolve => {
-                    app.model.trinhDoNgoaiNgu.getAll({ shcc: canBo.shcc }, (error, trinhDoNN) => {
+                    app.model.trinhDoNgoaiNgu.getTrinhDoNNByShcc( canBo.shcc , (error, trinhDoNN) => {
                         if (error || trinhDoNN == null) {
                             result = app.clone(result, { trinhDoNN: null });
                         } else {
-                            result = app.clone(result, { trinhDoNN });
+                            result = app.clone(result, { trinhDoNN: trinhDoNN.rows });
                         }
                         resolve();
                     });
@@ -931,11 +935,15 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
+                    let dataCV = [];
                     app.model.qtChucVu.getByShcc(canBo.shcc, (error, chucVu) => {
                         if (error || chucVu == null) {
                             result = app.clone(result, { chucVu: null });
                         } else {
-                            result = app.clone(result, { chucVu: chucVu.rows });
+                            chucVu.rows.forEach(i => {
+                                dataCV.push(Object.assign(i, { lcv: i.loaiChucVu == 1 }));
+                            });
+                            result = app.clone(result, { chucVu: dataCV });
                         }
                         resolve();
                     });

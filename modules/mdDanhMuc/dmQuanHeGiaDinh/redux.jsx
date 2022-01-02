@@ -144,3 +144,13 @@ export const SelectAdapter_DmQuanHeGiaDinh = {
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
     condition: { kichHoat: 1 },
 };
+
+export const SelectAdapter_DmQuanHeGiaDinhV2 = {
+    ajax: true,
+    data: params => ({ condition: params.term }),
+    url: '/api/danh-muc/quan-he-gia-dinh/all',
+    getOne: getDmQuanHeGiaDinh,
+    processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.ma, text: item.ten })) : [] }),
+    fetchOne: (ma, done) => (getDmQuanHeGiaDinh(ma, item => done && done({ id: item.ma, text: item.ten })))(),
+    processResultOne: response => response && response.item && ({ value: response.item.ma, text: response.item.ten }),
+};

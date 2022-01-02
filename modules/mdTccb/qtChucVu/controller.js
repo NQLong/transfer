@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3009: { title: 'Chức Vụ', link: '/user/tccb/qua-trinh/chuc-vu', icon: 'fa-street-view', backgroundColor: '#ebcf34', groupIndex: 3},
+            3009: { title: 'Chức Vụ', link: '/user/tccb/qua-trinh/chuc-vu', icon: 'fa-street-view', backgroundColor: '#ebcf34', groupIndex: 3 },
         },
     };
     app.permission.add(
@@ -13,7 +13,7 @@ module.exports = app => {
     );
     app.get('/user/qua-trinh/chuc-vu/:stt', app.permission.check('qtChucVu:read'), app.templates.admin);
     app.get('/user/qua-trinh/chuc-vu', app.permission.check('qtChucVu:read'), app.templates.admin);
-        
+
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
 
     app.get('/api/tccb/qua-trinh/chuc-vu/page/:pageNumber/:pageSize', app.permission.check('qtChucVu:read'), (req, res) => {
@@ -115,6 +115,8 @@ module.exports = app => {
     });
 
     app.get('/api/tccb/qua-trinh/chuc-vu-by-shcc/:shcc', app.permission.check('staff:login'), (req, res) => {
-        app.model.qtChucVu.getByShcc(req.params.shcc, (error, item) => res.send({ error, item: item.rows }));
+        app.model.qtChucVu.getByShcc(req.params.shcc, (error, item) => {
+            if (item && item.rows.length > 0) res.send({ error, item: item.rows });
+         });
     });
 };

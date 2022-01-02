@@ -18,19 +18,20 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        let { stt, shcc, maChucVu, maDonVi, soQuyetDinh, ngayRaQuyetDinh, ngayRaQd, soQd, chucVuChinh, maBoMon } = item ? item : {
+        let { stt, shcc, maChucVu, maDonVi, soQuyetDinh, ngayRaQuyetDinh, ngayRaQd, soQd, chucVuChinh, maBoMon } = item && item.item ? item.item : {
             stt: '',
             shcc: '', maChucVu: '', maDonVi: '', soQuyetDinh: '', ngayRaQuyetDinh: '', chucVuChinh: '', maBoMon: '',
             ngayRaQd: '', soQd: ''
         };
-        this.setState({ shcc, stt, item, chucVuChinh });
-        this.state.shcc.value(shcc ? shcc : '');
+        this.shcc.value(shcc ? shcc : (item.shcc != '' ? item.shcc : ''));
         this.maChucVu.value(maChucVu ? maChucVu : '');
         this.props.type == 1 && this.maDonVi.value(maDonVi ? maDonVi : '');
         this.soQuyetDinh.value(soQd ? soQd : (soQuyetDinh ? soQuyetDinh : ''));
         this.ngayRaQuyetDinh.value(ngayRaQd ? ngayRaQd : (ngayRaQuyetDinh ? ngayRaQuyetDinh : ''));
         this.props.type == 1 && this.chucVuChinh.value(chucVuChinh ? 1 : 0);
         this.props.type == 1 && this.maBoMon.value(maBoMon ? maBoMon : '');
+        this.setState({ shcc: item.shcc, stt, item, chucVuChinh });
+
     };
 
     changeKichHoat = (value, target) => target.value(value ? 1 : 0) || target.value(value);
@@ -58,20 +59,27 @@ class EditModal extends AdminModal {
         });
     }
 
-    onSubmit = (e) => {
-        e.preventDefault();
+    onSubmit = () => {
         const changes = {
-            shcc: this.state.shcc.value(),
+            shcc: this.shcc.value(),
             maChucVu: this.maChucVu.value(),
-            maDonVi: this.maDonVi.value(),
+            maDonVi: this.props.type ? this.maDonVi.value() : '',
             soQd: this.soQuyetDinh.value(),
             ngayRaQd: Number(this.ngayRaQuyetDinh.value()),
-            chucVuChinh: this.chucVuChinh.value(),
-            maBoMon: this.maBoMon.value(),
+            chucVuChinh: this.props.type ? this.chucVuChinh.value() : 0,
+            maBoMon: this.props.type ? this.maBoMon.value() : '',
         };
-        if (changes.shcc == '') {
-            T.notify('Mã số cán bộ bị trống');
-            this.state.shcc.focus();
+        if (!changes.maChucVu) {
+            T.notify('Chức vụ bị trống!', 'danger');
+            this.maChucVu.focus();
+        }
+        else if (!changes.soQd) {
+            T.notify('Số quyết định bị trống!', 'danger');
+            this.soQuyetDinh.focus();
+        }
+        else if (!changes.ngayRaQd) {
+            T.notify('Ngày ra quyết định bị trống!', 'danger');
+            this.ngayRaQuyetDinh.focus();
         } else {
             if (!changes.chucVuChinh) {
                 if (this.state.stt) {
@@ -92,27 +100,25 @@ class EditModal extends AdminModal {
     }
 
     render = () => {
-
         const readOnly = this.props.readOnly;
         return this.renderModal({
-            title: this.state.shcc ? 'Cập nhật quá trình chức vụ' : 'Tạo mới quá trình chức vụ',
+            title: this.state.stt ? 'Cập nhật quá trình chức vụ' : 'Tạo mới quá trình chức vụ',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12' ref={e => this.state.shcc = e} label='Mã số cán bộ' data={SelectAdapter_FwCanBo} readOnly={readOnly} />
-                <FormSelect className={this.props.type == 1 ? 'col-md-4' : 'col-md-12'} ref={e => this.maChucVu = e} label='Chức vụ' data={this.props.type == 1 ? SelectAdapter_DmChucVuV2 : SelectAdapter_DmChucVuV0} readOnly={readOnly} />
-                {this.props.type == 1 ? <FormSelect className='col-md-4' ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} readOnly={readOnly} /> : null}
-                {this.props.type == 1 ? <FormSelect className='col-md-4' ref={e => this.maBoMon = e} label='Bộ môn' data={SelectAdapter_DmBoMon} readOnly={readOnly} /> : null}
-                {this.props.type == 1 ? <FormCheckbox className='col-md-12' ref={e => this.chucVuChinh = e} label='Chức vụ chính' isSwitch={true} readOnly={this.checkChucVuSwitch()} /> : null}
-                <FormTextBox type='text' className='col-md-6' ref={e => this.soQuyetDinh = e} label='Số quyết định' readOnly={readOnly} />
-                <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayRaQuyetDinh = e} label='Ngày ra quyết định' readOnly={readOnly} />
-                <FormCheckbox className='col-md-12' ref={e => this.thoiChucVu = e} label='Thôi giữ chức vụ' isSwitch={true} readOnly={readOnly} />
+                <FormSelect className='col-md-12' ref={e => this.shcc = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={true} />
+                <FormSelect className={this.props.type ? 'col-md-4' : 'col-md-12'} ref={e => this.maChucVu = e} label='Chức vụ' data={this.props.type == 1 ? SelectAdapter_DmChucVuV2 : SelectAdapter_DmChucVuV0} readOnly={readOnly} required />
+                {this.props.type ? <FormSelect className='col-md-4' ref={e => this.maDonVi = e} label='Đơn vị của chức vụ' data={SelectAdapter_DmDonVi} readOnly={readOnly} /> : null}
+                {this.props.type ? <FormSelect className='col-md-4' ref={e => this.maBoMon = e} label='Bộ môn của chức vụ' data={SelectAdapter_DmBoMon} readOnly={readOnly} /> : null}
+                {this.props.type ? <FormCheckbox className='col-md-12' ref={e => this.chucVuChinh = e} label='Chức vụ chính' isSwitch={true} readOnly={this.checkChucVuSwitch()} /> : null}
+                <FormTextBox type='text' className='col-md-6' ref={e => this.soQuyetDinh = e} label='Số quyết định' readOnly={readOnly} required />
+                <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayRaQuyetDinh = e} label='Ngày ra quyết định' readOnly={readOnly} required />
+                {this.state.stt ? <FormCheckbox className='col-md-12' ref={e => this.thoiChucVu = e} label='Thôi giữ chức vụ' isSwitch={true} readOnly={readOnly} /> : null}
             </div>
         });
     }
 }
 
 class ComponentChucVu extends AdminPage {
-    mapperChucVu = {}; mapperDonVi = {}; mapperBoMon = {}; mapperChucVu1 = {};
     state = { type: '', shcc: '', data: [] }
     loaiChucVuMap = {
         0: 'Chức vụ đoàn thể',
@@ -124,21 +130,15 @@ class ComponentChucVu extends AdminPage {
         6: 'Chức vụ Đoàn Thanh niên - Hội Sinh viên'
     };
 
-    componentDidMount() {
-        // this.props.getDmChucVuAll(items => items.forEach(i => this.mapperChucVu[i.ma] = i.loaiChucVu));
-        // this.props.getDmChucVuAll(items => items.forEach(i => this.mapperChucVu1[i.ma] = i.ten));
-        // this.props.getDmDonViAll(items => items.forEach(i => this.mapperDonVi[i.ma] = i.ten));
-        // this.props.getDmBoMonAll(items => items.forEach(i => this.mapperBoMon[i.ma] = i.ten));
-        // !this.props.userEdit && this.setState({data : this.props.staff?.selectedItem?.chucVu})
-
-    }
     value = (type, shcc) => {
-        this.setState({ type, shcc, data: this.props.userEdit ? this.props.staff?.userItem?.chucVu : this.props.staff?.selectedItem?.chucVu});
+        this.setState({ type: type ? true : false, shcc }, () =>
+            this.setState({ data: this.props.userEdit ? this.props.staff?.userItem?.chucVu.filter(i => i.lcv == this.state.type) : [] })
+        );
     }
 
     showModal = (e, shcc) => {
         e.preventDefault();
-        this.modal.show({ shcc: shcc });
+        this.modal.show({ item: null, shcc: shcc });
     }
 
     delete = (e, item) => {
@@ -154,7 +154,7 @@ class ComponentChucVu extends AdminPage {
     }
 
     render() {
-        let dataChucVu = !this.props.userEdit && this.props.staff?.selectedItem?.chucVu;
+        let dataChucVu = !this.props.userEdit ? this.props.staff?.selectedItem?.chucVu.filter(i => i.lcv == this.state.type) : [];
         const permission = this.getUserPermission('staff', ['read', 'write', 'delete']);
         const renderTableChucVu = (items) => (
             renderTable({
@@ -162,10 +162,10 @@ class ComponentChucVu extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: '70%', textAlign: 'center',  whiteSpace: 'nowrap' }}>Chức vụ</th>
-                        <th style={{ width: '30%', textAlign: 'center',  whiteSpace: 'nowrap' }}>Quyết định bổ nhiệm</th>
+                        <th style={{ width: '70%', textAlign: 'center', whiteSpace: 'nowrap' }}>Chức vụ</th>
+                        <th style={{ width: '30%', textAlign: 'center', whiteSpace: 'nowrap' }}>Quyết định bổ nhiệm</th>
                         {this.state.type == 1 && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Chức vụ chính</th>}
-                        <th style={{ width: 'auto', textAlign: 'center',  whiteSpace: 'nowrap' }}>Thao tác</th>
+                        <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
 
                     </tr>
                 ),
@@ -193,7 +193,7 @@ class ComponentChucVu extends AdminPage {
                         {this.state.type == 1 && <TableCell type='checkbox' content={item.chucVuChinh} />}
 
                         <TableCell type='buttons' content={item} permission={permission} permissionDelete={true}
-                            onEdit={() => this.modal.show(item)}
+                            onEdit={() => this.modal.show({ item: item, shcc: this.state.shcc })}
                             onDelete={e => this.delete(e, item)}></TableCell>
                     </tr>)
             })
@@ -205,18 +205,18 @@ class ComponentChucVu extends AdminPage {
                 <div className='tile-body'>
                     {
                         this.props.userEdit ?
-                        (this.state.data && renderTableChucVu(this.state.data.filter(i => i.loaiChucVu == 1))) 
-                        :
-                        (dataChucVu && renderTableChucVu(dataChucVu.filter(i => i.loaiChucVu == 1)))
+                            (this.state.data && renderTableChucVu(this.state.data))
+                            :
+                            (dataChucVu && renderTableChucVu(dataChucVu))
                     }
                     {
                         !this.props.userEdit ? <div className='tile-footer' style={{ textAlign: 'right' }}>
                             <button className='btn btn-info' type='button' onClick={e => this.showModal(e, this.state.shcc)}>
-                                <i className='fa fa-fw fa-lg fa-plus' />Thêm {this.loaiChucVuMap[this.state.type]}
+                                <i className='fa fa-fw fa-lg fa-plus' />Thêm {this.loaiChucVuMap[this.state.type ? 1 : 0]}
                             </button>
                         </div> : null
                     }
-                    <EditModal ref={e => this.modal = e} type={this.state.type} readOnly={this.props.userEdit}
+                    <EditModal ref={e => this.modal = e} type={this.state.type ? 1 : 0} readOnly={this.props.userEdit}
                         getQtChucVuAll={this.props.getQtChucVuAll} getData={this.props.getStaffEdit}
                         create={this.props.createQtChucVu} update={this.props.updateQtChucVu}
                     />
