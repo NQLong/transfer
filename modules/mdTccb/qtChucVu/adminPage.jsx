@@ -7,7 +7,7 @@ import {
     getQtChucVuPage, getQtChucVuAll, updateQtChucVu,
     deleteQtChucVu, createQtChucVu, getChucVuByShcc, getQtChucVuGroupPage
 } from './redux';
-import { SelectAdapter_DmChucVuV2 } from 'modules/mdDanhMuc/dmChucVu/redux';
+import { SelectAdapter_DmChucVuV2, getDmChucVuAll} from 'modules/mdDanhMuc/dmChucVu/redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_DmBoMon } from 'modules/mdDanhMuc/dmBoMon/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
@@ -113,20 +113,42 @@ export class EditModal extends AdminModal {
 
 class QtChucVu extends AdminPage {
     checked = false;
+    curState = '-1';
+    stateTable = [
+        { 'id': '-1', 'text': 'Tất cả' }
+    ];
 
     componentDidMount() {
         T.ready('/user/tccb', () => {
+            this.props.getDmChucVuAll(items => {
+                if (items) {
+                    this.stateTable = [
+                        { 'id': '-1', 'text': 'Tất cả' }
+                    ];
+                    items.forEach(item => this.stateTable.push({
+                        'id': item.ma,
+                        'text': item.ten
+                    }));
+                }
+            });
             T.onSearch = (searchText) => {
-                if (this.checked) this.props.getQtChucVuGroupPage(undefined, undefined, searchText || '');
-                else this.props.getQtChucVuPage(undefined, undefined, searchText || '');
+                if (this.checked) this.props.getQtChucVuGroupPage(undefined, undefined, this.curState, searchText || '');
+                else this.props.getQtChucVuPage(undefined, undefined, this.curState, searchText || '');
             };
             T.showSearchBox();
-            this.props.getQtChucVuPage(undefined, undefined, '');
+            this.props.getQtChucVuPage(undefined, undefined, this.curState, '');
         });
     }
+
+    changeState = (value) => {
+        this.curState = value;
+        if (this.checked) this.props.getQtChucVuGroupPage(undefined, undefined, this.curState, '');
+        else this.props.getQtChucVuPage(undefined, undefined, this.curState, '');
+    }
+
     groupPage = () => {
         this.checked = !this.checked;
-        this.props.getQtChucVuGroupPage(undefined, undefined, '');
+        this.props.getQtChucVuGroupPage(undefined, undefined, this.curState, '');
     }
     showModal = (e) => {
         e.preventDefault();
@@ -196,7 +218,7 @@ class QtChucVu extends AdminPage {
                         }
                         {
                             this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}>
-                                <Link className='btn btn-success' to={'/user/tccb/qua-trinh/chuc-vu/group/' + item.shcc} >
+                                <Link className='btn btn-success' to={`/user/tccb/qua-trinh/chuc-vu/group_cv/${item.maChucVu}/${item.shcc}`} >
                                     <i className='fa fa-lg fa-compress' />
                                 </Link>
                             </TableCell>
@@ -215,7 +237,8 @@ class QtChucVu extends AdminPage {
             ],
             content: <>
                 <div className='tile'>
-                    <FormCheckbox label='Hiển thị theo cán bộ' onChange={this.groupPage} />
+                    <FormSelect className='col-md-5' ref={e => this.loaiDoiTuong = e} label='Chọn loại chức vụ' data={this.stateTable} onChange={item => this.changeState(item.id)} />
+                    <FormCheckbox label='Hiển thị theo cán bộ' style={{ position: 'absolute', right: '70px', top: '50px' }} onChange={this.groupPage} />
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
@@ -234,6 +257,6 @@ class QtChucVu extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtChucVu: state.qtChucVu });
 const mapActionsToProps = {
     getQtChucVuAll, getQtChucVuPage, deleteQtChucVu, createQtChucVu,
-    updateQtChucVu, getChucVuByShcc, getQtChucVuGroupPage
+    updateQtChucVu, getChucVuByShcc, getQtChucVuGroupPage, getDmChucVuAll,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtChucVu);

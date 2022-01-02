@@ -50,10 +50,11 @@ export default function QtChucVuReducer(state = null, data) {
 
 // Actions ------------------------------------------------------------------------------------------------------------
 T.initPage('pageQtChucVu', true);
-export function getQtChucVuPage(pageNumber, pageSize, pageCondition, done) {
+export function getQtChucVuPage(pageNumber, pageSize, loaiDoiTuong, pageCondition, done) {
     const page = T.updatePage('pageQtChucVu', pageNumber, pageSize, pageCondition);
+    if (!loaiDoiTuong) loaiDoiTuong = '-1';
     return dispatch => {
-        const url = `/api/tccb/qua-trinh/chuc-vu/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/tccb/qua-trinh/chuc-vu/page/${loaiDoiTuong}/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách chức vụ bị lỗi!', 'danger');
@@ -67,16 +68,16 @@ export function getQtChucVuPage(pageNumber, pageSize, pageCondition, done) {
     };
 }
 T.initPage('pageGroupQtChucVu', true);
-export function getQtChucVuGroupPage(pageNumber, pageSize, pageCondition, done) {
+export function getQtChucVuGroupPage(pageNumber, pageSize, loaiDoiTuong, pageCondition, done) {
     const page = T.updatePage('pageGroupQtChucVu', pageNumber, pageSize, pageCondition);
+    if (!loaiDoiTuong) loaiDoiTuong = '-1';
     return dispatch => {
-        const url = `/api/tccb/qua-trinh/chuc-vu/group/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/tccb/qua-trinh/chuc-vu/group/page/${loaiDoiTuong}/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách chức vụ theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                console.log(data);
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 done && done(data.page);
                 dispatch({ type: QtChucVuGetGroupPage, page: data.page });
@@ -85,6 +86,24 @@ export function getQtChucVuGroupPage(pageNumber, pageSize, pageCondition, done) 
     };
 }
 
+T.initPage('groupPageMaQtChucVu', true);
+export function getQtChucVuGroupPageMa(pageNumber, pageSize, loaiDoiTuong, pageCondition, done) {
+    const page = T.updatePage('groupPageMaQtChucVu', pageNumber, pageSize, pageCondition);
+    if (!loaiDoiTuong) loaiDoiTuong = '-1';
+    return dispatch => {
+        const url = `/api/tccb/qua-trinh/chuc-vu/group_cv/page/${loaiDoiTuong}/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách chức vụ theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                done && done(data.page);
+                dispatch({ type: QtChucVuGetPage, page: data.page });
+            }
+        }, error => console.error(`GET: ${url}.`, error));
+    };
+}
 export function getQtChucVuAll(shcc, done) {
     return dispatch => {
         const url = '/api/tccb/qua-trinh/chuc-vu/all';

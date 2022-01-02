@@ -11,8 +11,8 @@ import { getStaffAll, SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/red
 import { getDmKhenThuongKyHieuAll } from 'modules/mdDanhMuc/dmKhenThuongKyHieu/redux';
 import { getDmKhenThuongChuThichAll } from 'modules/mdDanhMuc/dmKhenThuongChuThich/redux';
 import { getDmKhenThuongLoaiDoiTuongAll } from 'modules/mdDanhMuc/dmKhenThuongLoaiDoiTuong/redux';
-import { getDmBoMonAll, getDmBoMon } from 'modules/mdDanhMuc/dmBoMon/redux';
-import { getDmDonViAll, getDmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
+import { getDmBoMonAll, getDmBoMon, SelectAdapter_DmBoMon} from 'modules/mdDanhMuc/dmBoMon/redux';
+import { getDmDonViAll, getDmDonVi, SelectAdapter_DmDonVi} from 'modules/mdDanhMuc/dmDonVi/redux';
 import Loading from 'view/component/Loading';
 
 class EditModal extends AdminModal {
@@ -121,11 +121,11 @@ class EditModal extends AdminModal {
                     style={doiTuong == '02' ? {} : { display: 'none' }}
                     readOnly={readOnly} />
 
-                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maDonVi = e} label='Đơn vị' data={this.props.donViTable}
+                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi}
                     style={doiTuong == '03' ? {} : { display: 'none' }}
                     readOnly={readOnly} />
 
-                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maBoMon = e} label='Bộ môn' data={this.props.boMonTable} 
+                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maBoMon = e} label='Bộ môn' data={SelectAdapter_DmBoMon} 
                     style={doiTuong == '04' ? {} : { display: 'none' }} 
                     readOnly={readOnly} />
 
@@ -268,7 +268,7 @@ class QtKhenThuongAll extends AdminPage {
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Đối tượng</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm đạt được</th>
                         <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Thành tích</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Điểm thi đua</th>
+                        <th style={{ width: 'auto', textAlign: 'right', whiteSpace: 'nowrap' }}>Điểm thi đua</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Loại đối tượng</th>
                         <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                     </tr>
@@ -314,7 +314,7 @@ class QtKhenThuongAll extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' content={item.diemThiDua} />
+                        <TableCell type='text' style={{textAlign:'right'}} content={item.diemThiDua} />
                         <TableCell type='text' content={item.tenLoaiDoiTuong} />
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}

@@ -5,7 +5,7 @@ import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormDatePic
 import Pagination from 'view/component/Pagination';
 import {
     getQtChucVuPage, getQtChucVuAll, updateQtChucVu,
-    deleteQtChucVu, createQtChucVu, getChucVuByShcc
+    deleteQtChucVu, createQtChucVu, getChucVuByShcc, getQtChucVuGroupPageMa
 } from './redux';
 import { SelectAdapter_DmChucVuV2 } from 'modules/mdDanhMuc/dmChucVu/redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
@@ -112,13 +112,16 @@ export class EditModal extends AdminModal {
 }
 
 class QtChucVuGroup extends AdminPage {
+    shcc = ''; loaiDoiTuong = '-1';
     componentDidMount() {
         T.ready('/user/tccb', () => {
-            const route = T.routeMatcher('/user/tccb/qua-trinh/chuc-vu/group/:shcc'),
-                shcc = route.parse(window.location.pathname);
-            T.onSearch = (searchText) => this.props.getQtChucVuPage(undefined, undefined, searchText || '');
+            const route = T.routeMatcher('/user/tccb/qua-trinh/chuc-vu/group_cv/:loaiDoiTuong/:shcc'),
+                params = route.parse(window.location.pathname);
+            this.shcc = params.shcc;
+            this.loaiDoiTuong = params.loaiDoiTuong;
+            T.onSearch = (searchText) => this.props.getQtChucVuPage(undefined, undefined, this.loaiDoiTuong, searchText || '');
             T.showSearchBox();
-            this.props.getQtChucVuPage(undefined, undefined, shcc.shcc);
+            this.props.getQtChucVuGroupPageMa(undefined, undefined, this.loaiDoiTuong, this.shcc);
         });
     }
 
@@ -207,7 +210,7 @@ class QtChucVuGroup extends AdminPage {
                 />
             </>,
             backRoute: '/user/tccb/qua-trinh/chuc-vu',
-            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+            // onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
         });
     }
 }
@@ -215,6 +218,6 @@ class QtChucVuGroup extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtChucVu: state.qtChucVu });
 const mapActionsToProps = {
     getQtChucVuAll, getQtChucVuPage, deleteQtChucVu, createQtChucVu,
-    updateQtChucVu, getChucVuByShcc
+    updateQtChucVu, getChucVuByShcc, getQtChucVuGroupPageMa
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtChucVuGroup);

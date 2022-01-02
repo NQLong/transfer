@@ -16,11 +16,12 @@ module.exports = app => {
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
 
-    app.get('/api/tccb/qua-trinh/chuc-vu/page/:pageNumber/:pageSize', app.permission.check('qtChucVu:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/chuc-vu/page/:loaiDoiTuong/:pageNumber/:pageSize', app.permission.check('qtChucVu:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
+            loaiDoiTuong = req.params.loaiDoiTuong,
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        app.model.qtChucVu.searchPage(pageNumber, pageSize, searchTerm, (error, page) => {
+        app.model.qtChucVu.searchPage(pageNumber, pageSize, loaiDoiTuong, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -30,11 +31,12 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/tccb/qua-trinh/chuc-vu/group/page/:pageNumber/:pageSize', app.permission.check('qtChucVu:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/chuc-vu/group/page/:loaiDoiTuong/:pageNumber/:pageSize', app.permission.check('qtChucVu:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
+            loaiDoiTuong = req.params.loaiDoiTuong,
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        app.model.qtChucVu.groupPage(pageNumber, pageSize, searchTerm, (error, page) => {
+        app.model.qtChucVu.groupPage(pageNumber, pageSize, loaiDoiTuong, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -44,6 +46,20 @@ module.exports = app => {
         });
     });
 
+    app.get('/api/tccb/qua-trinh/chuc-vu/group_cv/page/:loaiDoiTuong/:pageNumber/:pageSize', app.permission.check('qtChucVu:read'), (req, res) => {
+        const pageNumber = parseInt(req.params.pageNumber),
+            pageSize = parseInt(req.params.pageSize),
+            loaiDoiTuong = req.params.loaiDoiTuong,
+            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+        app.model.qtChucVu.groupPageMa(pageNumber, pageSize, loaiDoiTuong, searchTerm, (error, page) => {
+            if (error || page == null) {
+                res.send({ error });
+            } else {
+                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
+                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, list } });
+            }
+        });
+    });
     app.get('/api/tccb/qua-trinh/chuc-vu/all', app.permission.check('qtChucVu:read'), (req, res) => {
         let condition = { statement: null };
         if (req.query.shcc) {
