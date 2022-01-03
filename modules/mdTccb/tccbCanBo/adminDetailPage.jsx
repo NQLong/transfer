@@ -50,8 +50,7 @@ class CanBoPage extends AdminPage {
         const congTacData = this.componentTTCongTac.getAndValidate();
         const trinhDoData = this.componentTrinhDo.getAndValidate();
         if (this.urlSHCC) {
-            this.props.updateStaff(this.urlSHCC, { ...caNhanData, ...congTacData, ...trinhDoData });
-
+            caNhanData && congTacData && trinhDoData && this.props.updateStaff(this.urlSHCC, { ...caNhanData, ...congTacData, ...trinhDoData });
         }
     }
 
@@ -60,7 +59,7 @@ class CanBoPage extends AdminPage {
         const item = this.props.staff?.selectedItem;
         
         return this.renderPage({
-            title: `Thông tin cá nhân${item?.shcc ? `: ${item?.ho} ${item?.ten}` : null}`,
+            title: `Thông tin cá nhân${item?.shcc ? `: ${item?.ho} ${item?.ten}` : ''}`,
             breadcrumb: [
                 <Link key={0} to='/user/staff'>Cán bộ</Link>,
                 'Lý lịch cán bộ',

@@ -148,9 +148,9 @@ export const SelectAdapter_DmQuanHeGiaDinh = {
 export const SelectAdapter_DmQuanHeGiaDinhV2 = {
     ajax: true,
     data: params => ({ condition: params.term }),
-    url: '/api/danh-muc/quan-he-gia-dinh/all',
+    url: '/api/danh-muc/quan-he-gia-dinh/page/1/20',
     getOne: getDmQuanHeGiaDinh,
-    processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.ma, text: item.ten })) : [] }),
+    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.ten })) : [] }),
     fetchOne: (ma, done) => (getDmQuanHeGiaDinh(ma, item => done && done({ id: item.ma, text: item.ten })))(),
-    processResultOne: response => response && response.item && ({ value: response.item.ma, text: response.item.ten }),
+    processResultOne: response => response && ({ value: response.ma, text: `${response.ma}: ${response.ten}` }),
 };

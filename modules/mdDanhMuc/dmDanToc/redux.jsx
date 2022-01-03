@@ -150,10 +150,11 @@ export const SelectAdapter_DmDanToc = {
 };
 
 export const SelectAdapter_DmDanTocV2 = {
-    ajax: false,
-    data: () => ({ condition: { kichHoat: 1 } }),
-    url: '/api/danh-muc/dan-toc/all',
+    ajax: true,
+    data: params => ({ condition: params.term, kichHoat: 1 }),
+    url: '/api/danh-muc/dan-toc/page/1/20',
     getOne: getDmDanToc,
-    processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.ma, text: item.ten })) : [] }),
+    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.ten })) : [] }),
     fetchOne: (ma, done) => (getDmDanToc(ma, item => done && done({ id: item.ma, text: item.ten })))(),
+    processResultOne: response => response && ({ value: response.ma, text: `${response.ma}: ${response.ten}` }),
 };

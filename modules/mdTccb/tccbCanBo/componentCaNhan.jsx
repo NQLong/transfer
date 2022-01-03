@@ -161,7 +161,7 @@ class ComponentCaNhan extends React.Component {
                     cmndNoiCap: this.getValue(this.cmndNoiCap),
                     dienThoaiCaNhan: this.getValue(this.soDienThoaiCaNhan),
                     dienThoaiBaoTin: this.getValue(this.soDienThoaiBaoTin),
-                    email: this.getValue(this.emailTruong),
+                    emailTruong,
                     emailCaNhan: this.getValue(this.emailCaNhan),
                     quocGia: this.getValue(this.quocTich),
                     danToc: this.getValue(this.danToc),
@@ -267,7 +267,7 @@ class ComponentCaNhan extends React.Component {
                     <FormTextBox ref={e => this.soDienThoaiBaoTin = e} label='Số điện thoại báo tin' className='col-md-6' maxLength={10} />
 
                     <FormTextBox ref={e => this.emailCaNhan = e} label='Email cá nhân' className='col-md-6' readOnly={this.props.userEdit} />
-                    <FormTextBox ref={e => this.emailTruong = e} label='Email trường' className='col-md-6' readOnly={this.props.userEdit} />
+                    <FormTextBox ref={e => this.emailTruong = e} label='Email trường' className='col-md-6' readOnly={this.props.userEdit} required/>
 
                     <div className='form-group col-md-12'></div>
 
