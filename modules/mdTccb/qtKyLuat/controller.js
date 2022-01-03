@@ -1,25 +1,37 @@
 module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
-        // menus: {
-        //     3017: { title: 'Quá trình kỷ luật', link: '/user/tccb/qua-trinh/ky-luat', icon: 'fa-gift', backgroundColor: '#283dde', groupIndex: 3 },
-        // },
+        menus: {
+            3017: { title: 'Kỷ luật', link: '/user/tccb/qua-trinh/ky-luat', icon: 'fa-ban', backgroundColor: '#ff0000', groupIndex: 4 },
+        },
     };
     app.permission.add(
         { name: 'staff:login', menu: { parentMenu: { index: 1000, title: 'Thông tin cá nhân', icon: 'fa-user', link: '/user' } }, },
-        { name: 'qtKhenThuongAll:read', menu },
-        { name: 'qtKhenThuongAll:write' },
-        { name: 'qtKhenThuongAll:delete' },
+        { name: 'qtKyLuat:read', menu },
+        { name: 'qtKyLuat:write' },
+        { name: 'qtKyLuat:delete' },
     );
-    app.get('/user/tccb/qua-trinh/ky-luat/:id', app.permission.check('qtKhenThuongAll:read'), app.templates.admin);
-    app.get('/user/tccb/qua-trinh/ky-luat', app.permission.check('qtKhenThuongAll:read'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/ky-luat/:id', app.permission.check('qtKyLuat:read'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/ky-luat', app.permission.check('qtKyLuat:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/tccb/qua-trinh/ky-luat/page/:pageNumber/:pageSize', app.permission.check('qtKhenThuongAll:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/ky-luat/page/:pageNumber/:pageSize', app.permission.check('qtKyLuat:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        app.model.qtKhenThuongAll.searchPage(pageNumber, pageSize, searchTerm, (error, page) => {
+        let arr = req.query.parameter;
+        if (!Array.isArray(arr)) arr = [];
+        let loaiDoiTuong = '-1';
+        if (arr.length > 0) {
+            loaiDoiTuong = '(';
+            for (let idx = 0; idx < arr.length; idx++) {
+                if (typeof arr[idx] == 'string') loaiDoiTuong += '\'' + arr[idx] + '\'';
+                else loaiDoiTuong += '\'' + arr[idx].toString() + '\'';
+                if (idx != arr.length - 1) loaiDoiTuong += ',';
+            }
+            loaiDoiTuong += ')';
+        }
+        app.model.qtKyLuat.searchPage(pageNumber, pageSize, loaiDoiTuong, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -29,11 +41,23 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/tccb/qua-trinh/ky-luat/group/page/:pageNumber/:pageSize', app.permission.check('qtKhenThuongAll:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/ky-luat/group/page/:pageNumber/:pageSize', app.permission.check('qtKyLuat:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        app.model.qtKhenThuongAll.groupPage(pageNumber, pageSize, searchTerm, (error, page) => {
+        let arr = req.query.parameter;
+        if (!Array.isArray(arr)) arr = [];
+        let loaiDoiTuong = '-1';
+        if (arr.length > 0) {
+            loaiDoiTuong = '(';
+            for (let idx = 0; idx < arr.length; idx++) {
+                if (typeof arr[idx] == 'string') loaiDoiTuong += '\'' + arr[idx] + '\'';
+                else loaiDoiTuong += '\'' + arr[idx].toString() + '\'';
+                if (idx != arr.length - 1) loaiDoiTuong += ',';
+            }
+            loaiDoiTuong += ')';
+        }
+        app.model.qtKyLuat.groupPage(pageNumber, pageSize, loaiDoiTuong, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -42,11 +66,12 @@ module.exports = app => {
             }
         });
     });
-    app.get('/api/tccb/qua-trinh/ky-luat/group_dt/page/:pageNumber/:pageSize', app.permission.check('qtKhenThuongAll:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/ky-luat/group_kl/page/:loaiDoiTuong/:pageNumber/:pageSize', app.permission.check('qtKyLuat:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
+            loaiDoiTuong = req.params.loaiDoiTuong,
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        app.model.qtKhenThuongAll.groupPageMa(pageNumber, pageSize, searchTerm, (error, page) => {
+        app.model.qtKyLuat.groupPageMa(pageNumber, pageSize, loaiDoiTuong, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -55,7 +80,7 @@ module.exports = app => {
             }
         });
     });
-    app.get('/api/tccb/qua-trinh/ky-luat/all', app.permission.check('qtKhenThuongAll:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/ky-luat/all', app.permission.check('qtKyLuat:read'), (req, res) => {
         let condition = { statement: null };
         if (req.query.ma) {
             condition = {
@@ -63,22 +88,22 @@ module.exports = app => {
                 parameter: { searchText: req.query.ma},
             };
         }
-        app.model.qtKhenThuongAll.getAll(condition, (error, items) => res.send({ error, items }));
+        app.model.qtKyLuat.getAll(condition, (error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/tccb/qua-trinh/ky-luat/item/:id', app.permission.check('qtKhenThuongAll:read'), (req, res) => {
-        app.model.qtKhenThuongAll.get({ id: req.params.id }, (error, item) => res.send({ error, item }));
+    app.get('/api/tccb/qua-trinh/ky-luat/item/:id', app.permission.check('qtKyLuat:read'), (req, res) => {
+        app.model.qtKyLuat.get({ id: req.params.id }, (error, item) => res.send({ error, item }));
     });
 
     app.post('/api/tccb/qua-trinh/ky-luat', app.permission.check('staff:write'), (req, res) => {
-        app.model.qtKhenThuongAll.create(req.body.items, (error, item) => res.send({ error, item }));
+        app.model.qtKyLuat.create(req.body.items, (error, item) => res.send({ error, item }));
     });
 
     app.put('/api/tccb/qua-trinh/ky-luat', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtKhenThuongAll.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })));
+        app.model.qtKyLuat.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })));
 
     app.delete('/api/tccb/qua-trinh/ky-luat', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtKhenThuongAll.delete({ id: req.body.id }, (error) => res.send(error)));
+        app.model.qtKyLuat.delete({ id: req.body.id }, (error) => res.send(error)));
 
 
     //User Actions:

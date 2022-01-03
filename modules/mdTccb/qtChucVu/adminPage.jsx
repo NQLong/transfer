@@ -154,7 +154,8 @@ class QtChucVu extends AdminPage {
     groupPage = () => {
         let { pageNumber, pageSize } = this.props && this.props.qtChucVu && this.props.qtChucVu.page ? this.props.qtChucVu.page : { pageNumber: 1, pageSize: 50};
         this.checked = !this.checked;
-        this.props.getQtChucVuGroupPage(pageNumber, pageSize, this.curState, this.searchText || '');
+        if (this.checked) this.props.getQtChucVuGroupPage(pageNumber, pageSize, this.curState, this.searchText || '');
+        else this.props.getQtChucVuPage(pageNumber, pageSize, this.curState, this.searchText || '');
     }
     showModal = (e) => {
         e.preventDefault();
@@ -225,7 +226,7 @@ class QtChucVu extends AdminPage {
                         }
                         {
                             this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}>
-                                <Link className='btn btn-success' to={`/user/tccb/qua-trinh/chuc-vu/group_cv/${item.maChucVu}/${item.shcc}`} >
+                                <Link className='btn btn-success' to={`/user/tccb/qua-trinh/chuc-vu/group_cv/-1/${item.shcc}`} >
                                     <i className='fa fa-lg fa-compress' />
                                 </Link>
                             </TableCell>
