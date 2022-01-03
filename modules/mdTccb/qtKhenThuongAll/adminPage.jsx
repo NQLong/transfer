@@ -302,7 +302,7 @@ class QtKhenThuongAll extends AdminPage {
 
                         )}
                         />
-                        <TableCell type='text' content={(
+                        <TableCell type='text' style={{textAlign: 'center' }} content={(
                             <>
                                 {item.namDatDuoc}
                             </>

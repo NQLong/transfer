@@ -59,7 +59,8 @@ class CanBoPage extends AdminPage {
         const item = this.props.staff?.selectedItem;
         
         return this.renderPage({
-            title: `Thông tin cá nhân${item?.shcc ? `: ${item?.ho} ${item?.ten}` : ''}`,
+            icon: 'fa fa-address-card-o',
+            title: `Thông tin cán bộ${item?.shcc ? `: ${item?.ho} ${item?.ten}` : ''}`,
             breadcrumb: [
                 <Link key={0} to='/user/staff'>Cán bộ</Link>,
                 'Lý lịch cán bộ',

@@ -54,6 +54,7 @@ class ProfileCanBo extends AdminPage {
     render = () => {
         const item = this.props.staff?.userItem;
         return this.renderPage({
+            icon: 'fa fa-address-card-o',
             title: `Thông tin cá nhân${item?.shcc ? `: ${item?.ho} ${item?.ten}` : ''}`,
             content:
                 <>
