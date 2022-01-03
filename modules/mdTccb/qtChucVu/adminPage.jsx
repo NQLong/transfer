@@ -115,6 +115,7 @@ class QtChucVu extends AdminPage {
     checked = false;
     curState = [];
     stateTable = [];
+    searchText = '';
     componentDidMount() {
         T.ready('/user/tccb', () => {
             this.props.getDmChucVuAll(items => {
@@ -127,23 +128,33 @@ class QtChucVu extends AdminPage {
                 }
             });
             T.onSearch = (searchText) => {
-                if (this.checked) this.props.getQtChucVuGroupPage(undefined, undefined, this.curState, searchText || '');
-                else this.props.getQtChucVuPage(undefined, undefined, this.curState, searchText || '');
+                this.searchText = searchText;
+                if (this.checked) this.props.getQtChucVuGroupPage(undefined, undefined, this.curState, this.searchText || '');
+                else this.props.getQtChucVuPage(undefined, undefined, this.curState, this.searchText || '');
             };
-            T.showSearchBox();
-            this.props.getQtChucVuPage(undefined, undefined, this.curState, '');
+            T.showSearchBox(() => {
+                this.loaiDoiTuong?.value('');
+                setTimeout(() => this.changeAdvancedSearch(), 50);
+                setTimeout(() => this.showAdvanceSearch(), 1000);
+            });
+            this.changeAdvancedSearch();
+            // T.showSearchBox();
         });
     }
 
-    changeState = () => {
-        this.curState = this.loaiDoiTuong ? this.loaiDoiTuong.value() : [];
-        if (this.checked) this.props.getQtChucVuGroupPage(undefined, undefined, this.curState, '');
-        else this.props.getQtChucVuPage(undefined, undefined, this.curState, '');
+    changeAdvancedSearch = () => {
+        let { pageNumber, pageSize } = this.props && this.props.qtChucVu && this.props.qtChucVu.page ? this.props.qtChucVu.page : { pageNumber: 1, pageSize: 50};
+
+        const loaiDoiTuong = this.loaiDoiTuong?.value() || [];
+        this.curState = loaiDoiTuong;
+        if (this.checked) this.props.getQtChucVuGroupPage(pageNumber, pageSize, this.curState, this.searchText || '');
+        else this.props.getQtChucVuPage(pageNumber, pageSize, this.curState, this.searchText || '');
     }
 
     groupPage = () => {
+        let { pageNumber, pageSize } = this.props && this.props.qtChucVu && this.props.qtChucVu.page ? this.props.qtChucVu.page : { pageNumber: 1, pageSize: 50};
         this.checked = !this.checked;
-        this.props.getQtChucVuGroupPage(undefined, undefined, this.curState, '');
+        this.props.getQtChucVuGroupPage(pageNumber, pageSize, this.curState, this.searchText || '');
     }
     showModal = (e) => {
         e.preventDefault();
@@ -231,10 +242,12 @@ class QtChucVu extends AdminPage {
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
                 'Quá trình chức vụ'
             ],
+            advanceSearch: <>
+                <FormSelect className='col-12 col-md-12' multiple = {true} ref={e => this.loaiDoiTuong = e} label='Chọn loại chức vụ (có thể chọn nhiều loại)' data={this.stateTable} onChange={() => this.changeAdvancedSearch()} allowClear={true} />
+            </>,
             content: <>
                 <div className='tile'>
-                    <FormSelect className='col-md-5' multiple = {true} ref={e => this.loaiDoiTuong = e} label='Chọn loại chức vụ' data={this.stateTable} onChange={item => this.changeState(item.id)} allowClear={true} />
-                    <FormCheckbox label='Hiển thị theo cán bộ' style={{ position: 'absolute', right: '70px', top: '50px' }} onChange={this.groupPage} />
+                    <FormCheckbox label='Hiển thị theo cán bộ' onChange={this.groupPage} />
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition, loaiDoiTuong }}
