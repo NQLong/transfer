@@ -113,18 +113,13 @@ export class EditModal extends AdminModal {
 
 class QtChucVu extends AdminPage {
     checked = false;
-    curState = '-1';
-    stateTable = [
-        { 'id': '-1', 'text': 'Tất cả' }
-    ];
-
+    curState = [];
+    stateTable = [];
     componentDidMount() {
         T.ready('/user/tccb', () => {
             this.props.getDmChucVuAll(items => {
                 if (items) {
-                    this.stateTable = [
-                        { 'id': '-1', 'text': 'Tất cả' }
-                    ];
+                    this.stateTable = [];
                     items.forEach(item => item.loaiChucVu == 1 && this.stateTable.push({
                         'id': item.ma,
                         'text': item.ten
@@ -140,8 +135,8 @@ class QtChucVu extends AdminPage {
         });
     }
 
-    changeState = (value) => {
-        this.curState = value;
+    changeState = () => {
+        this.curState = this.loaiDoiTuong ? this.loaiDoiTuong.value() : [];
         if (this.checked) this.props.getQtChucVuGroupPage(undefined, undefined, this.curState, '');
         else this.props.getQtChucVuPage(undefined, undefined, this.curState, '');
     }
@@ -171,6 +166,7 @@ class QtChucVu extends AdminPage {
             (this.props.qtChucVu && this.props.qtChucVu.page_gr ?
                 this.props.qtChucVu.page_gr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list })
             : (this.props.qtChucVu && this.props.qtChucVu.page ? this.props.qtChucVu.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] });
+        let loaiDoiTuong = this.curState;
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -237,11 +233,11 @@ class QtChucVu extends AdminPage {
             ],
             content: <>
                 <div className='tile'>
-                    <FormSelect className='col-md-5' ref={e => this.loaiDoiTuong = e} label='Chọn loại chức vụ' data={this.stateTable} onChange={item => this.changeState(item.id)} />
+                    <FormSelect className='col-md-5' multiple = {true} ref={e => this.loaiDoiTuong = e} label='Chọn loại chức vụ' data={this.stateTable} onChange={item => this.changeState(item.id)} allowClear={true} />
                     <FormCheckbox label='Hiển thị theo cán bộ' style={{ position: 'absolute', right: '70px', top: '50px' }} onChange={this.groupPage} />
                     {table}
                 </div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition, loaiDoiTuong }}
                     getPage={this.checked ? this.props.getQtChucVuGroupPage : this.props.getQtChucVuPage} />
                 <EditModal ref={e => this.modal = e}
                     getQtChucVuAll={this.props.getQtChucVuAll}

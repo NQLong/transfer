@@ -52,10 +52,11 @@ export default function QtChucVuReducer(state = null, data) {
 T.initPage('pageQtChucVu', true);
 export function getQtChucVuPage(pageNumber, pageSize, loaiDoiTuong, pageCondition, done) {
     const page = T.updatePage('pageQtChucVu', pageNumber, pageSize, pageCondition);
-    if (!loaiDoiTuong) loaiDoiTuong = '-1';
+    if (!loaiDoiTuong) loaiDoiTuong = [];
+    if (!Array.isArray(loaiDoiTuong)) loaiDoiTuong = [loaiDoiTuong];
     return dispatch => {
-        const url = `/api/tccb/qua-trinh/chuc-vu/page/${loaiDoiTuong}/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition }, data => {
+        const url = `/api/tccb/qua-trinh/chuc-vu/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition, parameter: loaiDoiTuong}, data => {
             if (data.error) {
                 T.notify('Lấy danh sách chức vụ bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
@@ -70,10 +71,11 @@ export function getQtChucVuPage(pageNumber, pageSize, loaiDoiTuong, pageConditio
 T.initPage('pageGroupQtChucVu', true);
 export function getQtChucVuGroupPage(pageNumber, pageSize, loaiDoiTuong, pageCondition, done) {
     const page = T.updatePage('pageGroupQtChucVu', pageNumber, pageSize, pageCondition);
-    if (!loaiDoiTuong) loaiDoiTuong = '-1';
+    if (!loaiDoiTuong) loaiDoiTuong = [];
+    if (!Array.isArray(loaiDoiTuong)) loaiDoiTuong = [loaiDoiTuong];    
     return dispatch => {
-        const url = `/api/tccb/qua-trinh/chuc-vu/group/page/${loaiDoiTuong}/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition }, data => {
+        const url = `/api/tccb/qua-trinh/chuc-vu/group/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition, parameter: loaiDoiTuong}, data => {
             if (data.error) {
                 T.notify('Lấy danh sách chức vụ theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
