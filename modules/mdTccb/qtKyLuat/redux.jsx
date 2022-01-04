@@ -49,11 +49,13 @@ export default function QtKyLuatReducer(state = null, data) {
 
 // Actions ------------------------------------------------------------------------------------------------------------
 T.initPage('pageQtKyLuat');
-export function getQtKyLuatPage(pageNumber, pageSize, pageCondition, done) {
+export function getQtKyLuatPage(pageNumber, pageSize, loaiDoiTuong, pageCondition, done) {
     const page = T.updatePage('pageQtKyLuat', pageNumber, pageSize, pageCondition);
+    if (!loaiDoiTuong) loaiDoiTuong = [];
+    if (!Array.isArray(loaiDoiTuong)) loaiDoiTuong = [loaiDoiTuong];
     return dispatch => {
         const url = `/api/tccb/qua-trinh/ky-luat/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition }, data => {
+        T.get(url, { condition: page.pageCondition, parameter: loaiDoiTuong}, data => {
             if (data.error) {
                 T.notify('Lấy danh sách kỷ luật bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
@@ -63,6 +65,45 @@ export function getQtKyLuatPage(pageNumber, pageSize, pageCondition, done) {
                 dispatch({ type: QtKyLuatGetPage, page: data.page });
             }
         }, () => T.notify('Lấy danh sách kỷ luật bị lỗi!', 'danger'));
+    };
+}
+
+T.initPage('groupPageQtKyLuat', true);
+export function getQtKyLuatGroupPage(pageNumber, pageSize, loaiDoiTuong, pageCondition, done) {
+    const page = T.updatePage('groupPageQtKyLuat', pageNumber, pageSize, pageCondition);
+    if (!loaiDoiTuong) loaiDoiTuong = [];
+    if (!Array.isArray(loaiDoiTuong)) loaiDoiTuong = [loaiDoiTuong];
+    return dispatch => {
+        const url = `/api/tccb/qua-trinh/ky-luat/group/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition, parameter: loaiDoiTuong}, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách kỷ luật theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                done && done(data.page);
+                dispatch({ type: QtKyLuatGetGroupPage, page: data.page });
+            }
+        }, error => console.error(`GET: ${url}.`, error));
+    };
+}
+
+T.initPage('groupPageMaQtKyLuat', true);
+export function getQtKyLuatGroupPageMa(pageNumber, pageSize, loaiDoiTuong, pageCondition, done) {
+    const page = T.updatePage('groupPageMaQtKyLuat', pageNumber, pageSize, pageCondition);
+    if (!loaiDoiTuong) loaiDoiTuong = '-1';
+    return dispatch => {
+        const url = `/api/tccb/qua-trinh/ky-luat/group_kl/page/${loaiDoiTuong}/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách kỷ luật theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                done && done(data.page);
+                dispatch({ type: QtKyLuatGetPage, page: data.page });
+            }
+        }, error => console.error(`GET: ${url}.`, error));
     };
 }
 
@@ -78,42 +119,6 @@ export function getQtKyLuatAll(done) {
                 dispatch({ type: QtKyLuatGetAll, items: data.items ? data.items : {} });
             }
         }, () => T.notify('Lấy danh sách kỷ luật bị lỗi!', 'danger'));
-    };
-}
-
-T.initPage('groupPageQtKyLuat', true);
-export function getQtKyLuatGroupPage(pageNumber, pageSize, pageCondition, done) {
-    const page = T.updatePage('groupPageQtKyLuat', pageNumber, pageSize, pageCondition);
-    return dispatch => {
-        const url = `/api/tccb/qua-trinh/ky-luat/group/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition }, data => {
-            if (data.error) {
-                T.notify('Lấy danh sách kỷ luật theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
-                console.error(`GET: ${url}.`, data.error);
-            } else {
-                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
-                done && done(data.page);
-                dispatch({ type: QtKyLuatGetGroupPage, page: data.page });
-            }
-        }, error => console.error(`GET: ${url}.`, error));
-    };
-}
-
-T.initPage('groupPageMaQtKyLuat', true);
-export function getQtKyLuatGroupPageMa(pageNumber, pageSize, pageCondition, done) {
-    const page = T.updatePage('groupPageMaQtKyLuat', pageNumber, pageSize, pageCondition);
-    return dispatch => {
-        const url = `/api/tccb/qua-trinh/ky-luat/group_dt/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition }, data => {
-            if (data.error) {
-                T.notify('Lấy danh sách kỷ luật theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
-                console.error(`GET: ${url}.`, data.error);
-            } else {
-                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
-                done && done(data.page);
-                dispatch({ type: QtKyLuatGetPage, page: data.page });
-            }
-        }, error => console.error(`GET: ${url}.`, error));
     };
 }
 
@@ -154,9 +159,11 @@ export function createQtKyLuat(items, done) {
                 T.notify('Tạo kỷ luật bị lỗi!', 'danger');
                 console.error(`POST: ${url}.`, data.error);
             } else {
-                T.notify('Tạo kỷ luật thành công!', 'success');
-                dispatch(getQtKyLuatPage());
-                if (done) done(data);
+                if (done) {
+                    T.notify('Tạo kỷ luật thành công!', 'success');
+                    dispatch(getQtKyLuatPage());
+                    done(data);
+                }
             }
         }, () => T.notify('Tạo kỷ luật bị lỗi!', 'danger'));
     };
@@ -178,7 +185,7 @@ export function deleteQtKyLuat(id, done) {
     };
 }
 
-export function updateQtKyLuat(id, ma, changes, done) {
+export function updateQtKyLuat(id, changes, done) {
     return dispatch => {
         const url = '/api/tccb/qua-trinh/ky-luat';
         T.put(url, { id, changes }, data => {
@@ -189,7 +196,7 @@ export function updateQtKyLuat(id, ma, changes, done) {
             } else {
                 T.notify('Cập nhật kỷ luật thành công!', 'success');
                 done && done(data.item);
-                dispatch(getQtKyLuatGroupPageMa(undefined, undefined, ma));
+                dispatch(getQtKyLuatPage());
             }
         }, () => T.notify('Cập nhật kỷ luật bị lỗi!', 'danger'));
     };
