@@ -16,11 +16,22 @@ module.exports = app => {
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
 
-    app.get('/api/tccb/qua-trinh/chuc-vu/page/:loaiDoiTuong/:pageNumber/:pageSize', app.permission.check('qtChucVu:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/chuc-vu/page/:pageNumber/:pageSize', app.permission.check('qtChucVu:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
-            loaiDoiTuong = req.params.loaiDoiTuong,
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+        let arr = req.query.parameter;
+        if (!Array.isArray(arr)) arr = [];
+        let loaiDoiTuong = '-1';
+        if (arr.length > 0) {
+            loaiDoiTuong = '(';
+            for (let idx = 0; idx < arr.length; idx++) {
+                if (typeof arr[idx] == 'string') loaiDoiTuong += '\'' + arr[idx] + '\'';
+                else loaiDoiTuong += '\'' + arr[idx].toString() + '\'';
+                if (idx != arr.length - 1) loaiDoiTuong += ',';
+            }
+            loaiDoiTuong += ')';
+        }
         app.model.qtChucVu.searchPage(pageNumber, pageSize, loaiDoiTuong, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -31,11 +42,22 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/tccb/qua-trinh/chuc-vu/group/page/:loaiDoiTuong/:pageNumber/:pageSize', app.permission.check('qtChucVu:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/chuc-vu/group/page/:pageNumber/:pageSize', app.permission.check('qtChucVu:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
-            loaiDoiTuong = req.params.loaiDoiTuong,
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+        let arr = req.query.parameter;
+        if (!Array.isArray(arr)) arr = [];
+        let loaiDoiTuong = '-1';
+        if (arr.length > 0) {
+            loaiDoiTuong = '(';
+            for (let idx = 0; idx < arr.length; idx++) {
+                if (typeof arr[idx] == 'string') loaiDoiTuong += '\'' + arr[idx] + '\'';
+                else loaiDoiTuong += '\'' + arr[idx].toString() + '\'';
+                if (idx != arr.length - 1) loaiDoiTuong += ',';
+            }
+            loaiDoiTuong += ')';
+        }
         app.model.qtChucVu.groupPage(pageNumber, pageSize, loaiDoiTuong, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });

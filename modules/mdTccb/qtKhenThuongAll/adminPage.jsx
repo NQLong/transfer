@@ -145,6 +145,7 @@ class QtKhenThuongAll extends AdminPage {
     stateTable = [
         { 'id': '-1', 'text': 'Tất cả' }
     ];
+    searchText = '';
     staffTable = [];
     donViTable = [];
     boMonTable = [];
@@ -195,11 +196,12 @@ class QtKhenThuongAll extends AdminPage {
                 }
             });
             T.onSearch = (searchText) => {
-                if (this.checked) this.props.getQtKhenThuongAllGroupPage(undefined, undefined, this.curState, searchText || '');
-                else this.props.getQtKhenThuongAllPage(undefined, undefined, this.curState, searchText || '');
+                this.searchText = searchText;
+                if (this.checked) this.props.getQtKhenThuongAllGroupPage(undefined, undefined, this.curState, this.searchText || '');
+                else this.props.getQtKhenThuongAllPage(undefined, undefined, this.curState, this.searchText || '');
             };
             T.showSearchBox();
-            this.props.getQtKhenThuongAllPage(undefined, undefined, this.curState, '');
+            this.props.getQtKhenThuongAllPage(undefined, undefined, this.curState, this.searchText || '');
         });
     }
 
@@ -232,13 +234,14 @@ class QtKhenThuongAll extends AdminPage {
 
     changeState = (value) => {
         this.curState = value;
-        if (this.checked) this.props.getQtKhenThuongAllGroupPage(undefined, undefined, this.curState, '');
-        else this.props.getQtKhenThuongAllPage(undefined, undefined, this.curState, '');
+        if (this.checked) this.props.getQtKhenThuongAllGroupPage(undefined, undefined, this.curState, this.searchText || '');
+        else this.props.getQtKhenThuongAllPage(undefined, undefined, this.curState, this.searchText || '');
     }
 
     groupPage = () => {
         this.checked = !this.checked;
-        this.props.getQtKhenThuongAllGroupPage(undefined, undefined, this.curState, '');
+        if (this.checked) this.props.getQtKhenThuongAllGroupPage(undefined, undefined, this.curState, this.searchText || '');
+        else this.props.getQtKhenThuongAllPage(undefined, undefined, this.curState, this.searchText || '');
     }
     delete = (e, item) => {
         T.confirm('Xóa khen thưởng', 'Bạn có chắc bạn muốn xóa khen thưởng này?', 'warning', true, isConfirm => {
