@@ -124,5 +124,4 @@ export const SelectAdapter_DmKhenThuongLoaiDoiTuong = {
     ajax: false,
     getAll: getDmKhenThuongLoaiDoiTuongAll,
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
-    // condition: { kichHoat: 1 },
 };

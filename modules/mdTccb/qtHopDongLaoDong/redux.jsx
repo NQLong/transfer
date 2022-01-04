@@ -84,6 +84,24 @@ export function getQtHopDongLaoDongGroupPage(pageNumber, pageSize, pageCondition
     };
 }
 
+T.initPage('shccPageQtHopDongLaoDong', true);
+export function getQtHopDongLaoDongShccPage(pageNumber, pageSize, pageCondition, done) {
+    const page = T.updatePage('shccPageQtHopDongLaoDong', pageNumber, pageSize, pageCondition);
+    return dispatch => {
+        const url = `/api/tccb/qua-trinh/hop-dong-lao-dong/groupShcc/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách hợp đồng theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                done && done(data.page);
+                dispatch({ type: QtHopDongLaoDongGetPage, page: data.page });
+            }
+        }, error => console.error(`GET: ${url}.`, error));
+    };
+}
+
 export function getQtHopDongLaoDongAll(done) {
     return dispatch => {
         const url = '/api/tccb/qua-trinh/hop-dong-lao-dong/all';

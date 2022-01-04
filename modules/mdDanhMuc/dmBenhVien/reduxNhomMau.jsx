@@ -144,3 +144,12 @@ export const SelectAdapter_DmNhomMau = {
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
     condition: { kichHoat: 1 },
 };
+
+export const SelectAdapter_DmNhomMauV2 = {
+    ajax: false,
+    data: () => ({ condition: { kichHoat: 1 } }),
+    url: '/api/danh-muc/nhom-mau/all',
+    getOne: getDmNhomMau,
+    processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.ma, text: item.ten })) : [] }),
+    fetchOne: (ma, done) => (getDmNhomMau(ma, item => done && done({ id: item.ma, text: item.ten })))(),
+};

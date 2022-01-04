@@ -1,6 +1,6 @@
-// Table name: QT_KY_LUAT { id, batDau, ketThuc, lyDoHinhThuc, capQuyetDinh, batDauType, ketThucType, shcc }
+// Table name: QT_KY_LUAT { id, batDau, ketThuc, lyDoHinhThuc, capQuyetDinh, batDauType, ketThucType, shcc, diemThiDua}
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'batDau': 'BAT_DAU', 'ketThuc': 'KET_THUC', 'lyDoHinhThuc': 'LY_DO_HINH_THUC', 'capQuyetDinh': 'CAP_QUYET_DINH', 'batDauType': 'BAT_DAU_TYPE', 'ketThucType': 'KET_THUC_TYPE', 'shcc': 'SHCC' };
+const obj2Db = { 'id': 'ID', 'batDau': 'BAT_DAU', 'ketThuc': 'KET_THUC', 'lyDoHinhThuc': 'LY_DO_HINH_THUC', 'capQuyetDinh': 'CAP_QUYET_DINH', 'batDauType': 'BAT_DAU_TYPE', 'ketThucType': 'KET_THUC_TYPE', 'shcc': 'SHCC', 'diemThiDua': 'DIEM_THI_DUA'};
 
 module.exports = app => {
     app.model.qtKyLuat = {
@@ -129,6 +129,11 @@ module.exports = app => {
             const parameter = condition.parameter ? condition.parameter : {};
             const sql = 'SELECT COUNT(*) FROM QT_KY_LUAT' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.dbConnection.execute(sql, parameter, (error, result) => done(error, result));
+        },
+
+        searchPage: (pagenumber, pagesize, loaiDoiTuong, searchterm, done) => {
+            app.dbConnection.execute('BEGIN :ret:=qt_ky_luat_search_page(:pagenumber, :pagesize, :loaiDoiTuong, :searchterm, :totalitem, :pagetotal); END;',
+                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, pagenumber: { val: pagenumber, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, pagesize: { val: pagesize, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, loaiDoiTuong, searchterm, totalitem: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pagetotal: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
         },
     };
 };

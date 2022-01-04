@@ -76,163 +76,170 @@ module.exports = app => {
             if (error || canBo == null) {
                 res.send({ error: 'Lỗi khi lấy thông tin cán bộ !' });
             } else {
-                let result = app.clone(canBo);
-                new Promise(resolve => {
-                    app.model.quanHeCanBo.getAll({ shcc: canBo.shcc }, (error, items) => {
-                        if (error || items == null) {
-                            result = app.clone(result, { items: null });
-                        } else {
-                            result = app.clone(result, { items });
-                        }
-                        resolve();
+                app.model.fwUser.get({ email: canBo.email }, (error, user) => {
+                    let result = app.clone(canBo, { image: user.image });
+                    new Promise(resolve => {
+                        app.model.quanHeCanBo.getQhByShcc(canBo.shcc, (error, items) => {
+                            if (error || items == null) {
+                                result = app.clone(result, { items: null });
+                            } else {
+                                result = app.clone(result, { items: items.rows });
+                            }
+                            resolve();
+                        });
+                    }).then(() => new Promise(resolve => {
+                        app.model.trinhDoNgoaiNgu.getTrinhDoNNByShcc(canBo.shcc, (error, trinhDoNN) => {
+                            if (error || trinhDoNN == null) {
+                                result = app.clone(result, { trinhDoNN: null });
+                            } else {
+                                result = app.clone(result, { trinhDoNN: trinhDoNN.rows });
+                            }
+                            resolve();
+                        });
+                    })).then(() => new Promise(resolve => {
+                        app.model.qtHocTapCongTac.getAll({ shcc: canBo.shcc }, '*', 'batDau ASC', (error, hocTapCongTac) => {
+                            if (error || hocTapCongTac == null) {
+                                result = app.clone(result, { hocTapCongTac: null });
+                            } else {
+                                result = app.clone(result, { hocTapCongTac });
+                            }
+                            resolve();
+                        });
+                    })).then(() => new Promise(resolve => {
+                        app.model.qtDaoTao.getAll({ shcc: canBo.shcc }, '*', 'id ASC', (error, daoTao) => {
+                            if (error || daoTao == null) {
+                                result = app.clone(result, { daoTao: null });
+                            } else {
+                                result = app.clone(result, { daoTao });
+                            }
+                            resolve();
+                        });
+                    })).then(() => new Promise(resolve => {
+                        app.model.qtNuocNgoai.getAll({ shcc: canBo.shcc }, '*', 'batDau ASC', (error, nuocNgoai) => {
+                            if (error || nuocNgoai == null) {
+                                result = app.clone(result, { nuocNgoai: null });
+                            } else {
+                                result = app.clone(result, { nuocNgoai });
+                            }
+                            resolve();
+                        });
+                    })).then(() => new Promise(resolve => {
+                        app.model.qtKhenThuong.getAll({ shcc: canBo.shcc }, '*', 'id ASC', (error, khenThuong) => {
+                            if (error || khenThuong == null) {
+                                result = app.clone(result, { khenThuong: null });
+                            } else {
+                                result = app.clone(result, { khenThuong });
+                            }
+                            resolve();
+                        });
+                    })).then(() => new Promise(resolve => {
+                        app.model.qtKyLuat.getAll({ shcc: canBo.shcc }, '*', 'batDau ASC', (error, kyLuat) => {
+                            if (error || kyLuat == null) {
+                                result = app.clone(result, { kyLuat: null });
+                            } else {
+                                result = app.clone(result, { kyLuat });
+                            }
+                            resolve();
+                        });
+                    })).then(() => new Promise(resolve => {
+                        app.model.qtNghienCuuKhoaHoc.getAll({ shcc: canBo.shcc }, (error, nghienCuuKhoaHoc) => {
+                            if (error || nghienCuuKhoaHoc == null) {
+                                result = app.clone(result, { nghienCuuKhoaHoc: null });
+                            } else {
+                                result = app.clone(result, { nghienCuuKhoaHoc });
+                            }
+                            resolve();
+                        });
+                    })).then(() => new Promise(resolve => {
+                        app.model.qtHuongDanLuanVan.getAll({ shcc: canBo.shcc }, (error, huongDanLuanVan) => {
+                            if (error || huongDanLuanVan == null) {
+                                result = app.clone(result, { huongDanLuanVan: null });
+                            } else {
+                                result = app.clone(result, { huongDanLuanVan });
+                            }
+                            resolve();
+                        });
+                    })).then(() => new Promise(resolve => {
+                        app.model.sachGiaoTrinh.getAll({ shcc: canBo.shcc }, (error, sachGiaoTrinh) => {
+                            if (error || sachGiaoTrinh == null) {
+                                result = app.clone(result, { sachGiaoTrinh: null });
+                            } else {
+                                result = app.clone(result, { sachGiaoTrinh });
+                            }
+                            resolve();
+                        });
+                    })).then(() => new Promise(resolve => {
+                        app.model.qtBaiVietKhoaHoc.getAll({ shcc: canBo.shcc }, '*', 'namXuatBan ASC', (error, baiVietKhoaHoc) => {
+                            if (error || baiVietKhoaHoc == null) {
+                                result = app.clone(result, { baiVietKhoaHoc: null });
+                            } else {
+                                result = app.clone(result, { baiVietKhoaHoc });
+                            }
+                            resolve();
+                        });
+                    })).then(() => new Promise(resolve => {
+                        app.model.qtKyYeu.getAll({ shcc: canBo.shcc }, (error, kyYeu) => {
+                            if (error || kyYeu == null) {
+                                result = app.clone(result, { kyYeu: null });
+                            } else {
+                                result = app.clone(result, { kyYeu });
+                            }
+                            resolve();
+                        });
+                    })).then(() => new Promise(resolve => {
+                        app.model.qtGiaiThuong.getAll({ shcc: canBo.shcc }, (error, giaiThuong) => {
+                            if (error || giaiThuong == null) {
+                                result = app.clone(result, { giaiThuong: null });
+                            } else {
+                                result = app.clone(result, { giaiThuong });
+                            }
+                            resolve();
+                        });
+                    })).then(() => new Promise(resolve => {
+                        app.model.qtBangPhatMinh.getAll({ shcc: canBo.shcc }, (error, bangPhatMinh) => {
+                            if (error || bangPhatMinh == null) {
+                                result = app.clone(result, { bangPhatMinh: null });
+                            } else {
+                                result = app.clone(result, { bangPhatMinh });
+                            }
+                            resolve();
+                        });
+                    })).then(() => new Promise(resolve => {
+                        app.model.qtUngDungThuongMai.getAll({ shcc: canBo.shcc }, (error, ungDungThuongMai) => {
+                            if (error || ungDungThuongMai == null) {
+                                result = app.clone(result, { ungDungThuongMai: null });
+                            } else {
+                                result = app.clone(result, { ungDungThuongMai });
+                            }
+                            resolve();
+                        });
+                    })).then(() => new Promise(resolve => {
+                        app.model.qtLamViecNgoai.getAll({ shcc: canBo.shcc }, (error, lamViecNgoai) => {
+                            if (error || lamViecNgoai == null) {
+                                result = app.clone(result, { lamViecNgoai: null });
+                            } else {
+                                result = app.clone(result, { lamViecNgoai });
+                            }
+                            resolve();
+                        });
+                    })).then(() => new Promise(resolve => {
+                        let dataCV = [];
+                        app.model.qtChucVu.getByShcc(canBo.shcc, (error, chucVu) => {
+                            if (error || chucVu == null) {
+                                result = app.clone(result, { chucVu: null });
+                            } else {
+                                chucVu.rows.forEach(i => {
+                                    dataCV.push(Object.assign(i, { lcv: i.loaiChucVu == 1 }));
+                                });
+                                result = app.clone(result, { chucVu: dataCV });
+                            }
+                            resolve();
+                        });
+                    })).then(() => {
+                        res.send({ error, item: result });
                     });
-                }).then(() => new Promise(resolve => {
-                    app.model.trinhDoNgoaiNgu.getAll({ shcc: canBo.shcc }, (error, trinhDoNN) => {
-                        if (error || trinhDoNN == null) {
-                            result = app.clone(result, { trinhDoNN: null });
-                        } else {
-                            result = app.clone(result, { trinhDoNN });
-                        }
-                        resolve();
-                    });
-                })).then(() => new Promise(resolve => {
-                    app.model.qtHocTapCongTac.getAll({ shcc: canBo.shcc }, '*', 'batDau ASC', (error, hocTapCongTac) => {
-                        if (error || hocTapCongTac == null) {
-                            result = app.clone(result, { hocTapCongTac: null });
-                        } else {
-                            result = app.clone(result, { hocTapCongTac });
-                        }
-                        resolve();
-                    });
-                })).then(() => new Promise(resolve => {
-                    app.model.qtDaoTao.getAll({ shcc: canBo.shcc }, '*', 'id ASC', (error, daoTao) => {
-                        if (error || daoTao == null) {
-                            result = app.clone(result, { daoTao: null });
-                        } else {
-                            result = app.clone(result, { daoTao });
-                        }
-                        resolve();
-                    });
-                })).then(() => new Promise(resolve => {
-                    app.model.qtNuocNgoai.getAll({ shcc: canBo.shcc }, '*', 'batDau ASC', (error, nuocNgoai) => {
-                        if (error || nuocNgoai == null) {
-                            result = app.clone(result, { nuocNgoai: null });
-                        } else {
-                            result = app.clone(result, { nuocNgoai });
-                        }
-                        resolve();
-                    });
-                })).then(() => new Promise(resolve => {
-                    app.model.qtKhenThuong.getAll({ shcc: canBo.shcc }, '*', 'id ASC', (error, khenThuong) => {
-                        if (error || khenThuong == null) {
-                            result = app.clone(result, { khenThuong: null });
-                        } else {
-                            result = app.clone(result, { khenThuong });
-                        }
-                        resolve();
-                    });
-                })).then(() => new Promise(resolve => {
-                    app.model.qtKyLuat.getAll({ shcc: canBo.shcc }, '*', 'batDau ASC', (error, kyLuat) => {
-                        if (error || kyLuat == null) {
-                            result = app.clone(result, { kyLuat: null });
-                        } else {
-                            result = app.clone(result, { kyLuat });
-                        }
-                        resolve();
-                    });
-                })).then(() => new Promise(resolve => {
-                    app.model.qtNghienCuuKhoaHoc.getAll({ shcc: canBo.shcc }, (error, nghienCuuKhoaHoc) => {
-                        if (error || nghienCuuKhoaHoc == null) {
-                            result = app.clone(result, { nghienCuuKhoaHoc: null });
-                        } else {
-                            result = app.clone(result, { nghienCuuKhoaHoc });
-                        }
-                        resolve();
-                    });
-                })).then(() => new Promise(resolve => {
-                    app.model.qtHuongDanLuanVan.getAll({ shcc: canBo.shcc }, (error, huongDanLuanVan) => {
-                        if (error || huongDanLuanVan == null) {
-                            result = app.clone(result, { huongDanLuanVan: null });
-                        } else {
-                            result = app.clone(result, { huongDanLuanVan });
-                        }
-                        resolve();
-                    });
-                })).then(() => new Promise(resolve => {
-                    app.model.sachGiaoTrinh.getAll({ shcc: canBo.shcc }, (error, sachGiaoTrinh) => {
-                        if (error || sachGiaoTrinh == null) {
-                            result = app.clone(result, { sachGiaoTrinh: null });
-                        } else {
-                            result = app.clone(result, { sachGiaoTrinh });
-                        }
-                        resolve();
-                    });
-                })).then(() => new Promise(resolve => {
-                    app.model.qtBaiVietKhoaHoc.getAll({ shcc: canBo.shcc }, '*', 'namXuatBan ASC', (error, baiVietKhoaHoc) => {
-                        if (error || baiVietKhoaHoc == null) {
-                            result = app.clone(result, { baiVietKhoaHoc: null });
-                        } else {
-                            result = app.clone(result, { baiVietKhoaHoc });
-                        }
-                        resolve();
-                    });
-                })).then(() => new Promise(resolve => {
-                    app.model.qtKyYeu.getAll({ shcc: canBo.shcc }, (error, kyYeu) => {
-                        if (error || kyYeu == null) {
-                            result = app.clone(result, { kyYeu: null });
-                        } else {
-                            result = app.clone(result, { kyYeu });
-                        }
-                        resolve();
-                    });
-                })).then(() => new Promise(resolve => {
-                    app.model.qtGiaiThuong.getAll({ shcc: canBo.shcc }, (error, giaiThuong) => {
-                        if (error || giaiThuong == null) {
-                            result = app.clone(result, { giaiThuong: null });
-                        } else {
-                            result = app.clone(result, { giaiThuong });
-                        }
-                        resolve();
-                    });
-                })).then(() => new Promise(resolve => {
-                    app.model.qtBangPhatMinh.getAll({ shcc: canBo.shcc }, (error, bangPhatMinh) => {
-                        if (error || bangPhatMinh == null) {
-                            result = app.clone(result, { bangPhatMinh: null });
-                        } else {
-                            result = app.clone(result, { bangPhatMinh });
-                        }
-                        resolve();
-                    });
-                })).then(() => new Promise(resolve => {
-                    app.model.qtUngDungThuongMai.getAll({ shcc: canBo.shcc }, (error, ungDungThuongMai) => {
-                        if (error || ungDungThuongMai == null) {
-                            result = app.clone(result, { ungDungThuongMai: null });
-                        } else {
-                            result = app.clone(result, { ungDungThuongMai });
-                        }
-                        resolve();
-                    });
-                })).then(() => new Promise(resolve => {
-                    app.model.qtLamViecNgoai.getAll({ shcc: canBo.shcc }, (error, lamViecNgoai) => {
-                        if (error || lamViecNgoai == null) {
-                            result = app.clone(result, { lamViecNgoai: null });
-                        } else {
-                            result = app.clone(result, { lamViecNgoai });
-                        }
-                        resolve();
-                    });
-                })).then(() => new Promise(resolve => {
-                    app.model.qtChucVu.getAll({ shcc: canBo.shcc }, (error, chucVu) => {
-                        if (error || chucVu == null) {
-                            result = app.clone(result, { chucVu: null });
-                        } else {
-                            result = app.clone(result, { chucVu });
-                        }
-                        resolve();
-                    });
-                })).then(() => {
-                    res.send({ error, item: result });
                 });
+
             }
         });
     });
@@ -892,20 +899,20 @@ module.exports = app => {
             } else {
                 let result = app.clone(canBo);
                 new Promise(resolve => {
-                    app.model.quanHeCanBo.getAll({ shcc: canBo.shcc }, (error, items) => {
+                    app.model.quanHeCanBo.getQhByShcc(canBo.shcc, (error, items) => {
                         if (error || items == null) {
                             result = app.clone(result, { items: null });
                         } else {
-                            result = app.clone(result, { items });
+                            result = app.clone(result, { items: items.rows });
                         }
                         resolve();
                     });
                 }).then(() => new Promise(resolve => {
-                    app.model.trinhDoNgoaiNgu.getAll({ shcc: canBo.shcc }, (error, trinhDoNN) => {
+                    app.model.trinhDoNgoaiNgu.getTrinhDoNNByShcc( canBo.shcc , (error, trinhDoNN) => {
                         if (error || trinhDoNN == null) {
                             result = app.clone(result, { trinhDoNN: null });
                         } else {
-                            result = app.clone(result, { trinhDoNN });
+                            result = app.clone(result, { trinhDoNN: trinhDoNN.rows });
                         }
                         resolve();
                     });
@@ -928,11 +935,15 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtChucVu.getAll({ shcc: canBo.shcc }, (error, chucVu) => {
+                    let dataCV = [];
+                    app.model.qtChucVu.getByShcc(canBo.shcc, (error, chucVu) => {
                         if (error || chucVu == null) {
                             result = app.clone(result, { chucVu: null });
                         } else {
-                            result = app.clone(result, { chucVu });
+                            chucVu.rows.forEach(i => {
+                                dataCV.push(Object.assign(i, { lcv: i.loaiChucVu == 1 }));
+                            });
+                            result = app.clone(result, { chucVu: dataCV });
                         }
                         resolve();
                     });
@@ -2239,7 +2250,39 @@ module.exports = app => {
             });
         }
     };
+    // Hook upload images ---------------------------------------------------------------------------------------------------------------------------
+    app.createFolder(app.path.join(app.publicPath, '/img/user/avatar'));
 
+    const uploadCanBoImage = (req, fields, files, params, done) => {
+        if (fields.userData && fields.userData.length && fields.userData[0].startsWith('CanBoImage:') && files.CanBoImage && files.CanBoImage.length) {
+            console.log('Hook: uploadCanBoImage');
+            app.model.fwUser.get({ email: fields.userData[0].substring('CanBoImage:'.length) }, (error, item) => {
+                if (error || item == null) {
+                    done({ error: 'Id không hợp lệ!' });
+                } else {
+                    app.deleteImage(item.image);
+                    let srcPath = files.CanBoImage[0].path,
+                        image = '/img/user/avatar/' + item.ma + app.path.extname(srcPath);
+                    app.fs.rename(srcPath, app.path.join(app.publicPath, image), error => {
+                        if (error) {
+                            done({ error });
+                        } else {
+                            image += '?t=' + (new Date().getTime()).toString().slice(-8);
+                            app.model.fwUser.update({ email: item.email }, { image }, (error, item) => {
+                                if (error == null) {
+                                    app.io.emit('avatar-changed', item);
+                                    req.session.user.image = image;
+                                }
+                                done({ error, item, image });
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    };
+    app.uploadHooks.add('uploadCanBoImage', (req, fields, files, params, done) =>
+        app.permission.has(req, () => uploadCanBoImage(req, fields, files, params, done), done, 'staff:login'));
 
     app.uploadHooks.add('staffData', (req, fields, files, params, done) =>
         app.permission.has(req, () => staffImportData(req, fields, files, params, done), done, 'staff:write'));

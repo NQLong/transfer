@@ -144,3 +144,13 @@ export const SelectAdapter_DmTonGiao = {
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
     condition: { kichHoat: 1 },
 };
+
+export const SelectAdapter_DmTonGiaoV2 = {
+    ajax: true,
+    data: params => ({ condition: params.term, kichHoat: 1 }),
+    url: '/api/danh-muc/ton-giao/page/1/20',
+    getOne: getDmTonGiao,
+    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.ten })) : [] }),
+    fetchOne: (ma, done) => (getDmTonGiao(ma, item => done && done({ id: item.ma, text: item.ten })))(),
+    processResultOne: response => response && ({ value: response.ma, text: `${response.ma}: ${response.ten}` }),
+};

@@ -1,6 +1,6 @@
-// Table name: QT_CHUC_VU { stt, shcc, maChucVu, maDonVi, maBoMon, soQd, ngayRaQd, chucVuChinh }
+// Table name: QT_CHUC_VU { stt, shcc, maChucVu, maDonVi, maBoMon, soQd, ngayRaQd, chucVuChinh, thoiChucVu, soQdThoiChucVu, ngayThoiChucVu,  ngayRaQdThoiChucVu}
 const keys = ['STT'];
-const obj2Db = { 'stt': 'STT', 'shcc': 'SHCC', 'maChucVu': 'MA_CHUC_VU', 'maDonVi': 'MA_DON_VI', 'maBoMon': 'MA_BO_MON', 'soQd': 'SO_QD', 'ngayRaQd': 'NGAY_RA_QD', 'chucVuChinh': 'CHUC_VU_CHINH' };
+const obj2Db = { 'stt': 'STT', 'shcc': 'SHCC', 'maChucVu': 'MA_CHUC_VU', 'maDonVi': 'MA_DON_VI', 'maBoMon': 'MA_BO_MON', 'soQd': 'SO_QD', 'ngayRaQd': 'NGAY_RA_QD', 'chucVuChinh': 'CHUC_VU_CHINH', 'thoiChucVu': 'THOI_CHUC_VU', 'soQdThoiChucVu': 'SO_QD_THOI_CHUC_VU', 'ngayThoiChucVu': 'NGAY_THOI_CHUC_VU', 'ngayRaQdThoiChucVu': 'NGAY_RA_QD_THOI_CHUC_VU' };
 
 module.exports = app => {
     app.model.qtChucVu = {
@@ -131,9 +131,9 @@ module.exports = app => {
             app.dbConnection.execute(sql, parameter, (error, result) => done(error, result));
         },
 
-        searchPage: (pagenumber, pagesize, searchterm, done) => {
-            app.dbConnection.execute('BEGIN :ret:=qt_chuc_vu_search_page(:pagenumber, :pagesize, :searchterm, :totalitem, :pagetotal); END;',
-                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, pagenumber: { val: pagenumber, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, pagesize: { val: pagesize, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, searchterm, totalitem: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pagetotal: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
+        searchPage: (pagenumber, pagesize, loaiDoiTuong, searchterm, done) => {
+            app.dbConnection.execute('BEGIN :ret:=qt_chuc_vu_search_page(:pagenumber, :pagesize, :loaiDoiTuong, :searchterm, :totalitem, :pagetotal); END;',
+                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, pagenumber: { val: pagenumber, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, pagesize: { val: pagesize, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, loaiDoiTuong, searchterm, totalitem: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pagetotal: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
         },
     };
 };

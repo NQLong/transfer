@@ -75,6 +75,22 @@ export function getDmChucVuAll(done) {
     };
 }
 
+export function getDmChucVu(ma, done) {
+    return () => {
+        const url = `/api/danh-muc/chuc-vu/item/${ma}`;
+        T.get(url, data => {
+            if (data.error) {
+                T.notify('Lấy thông tin chức vụ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (done) done(data.item);
+            }
+        }, error => {
+            console.error(`GET: ${url}.`, error);
+        });
+    };
+}
+
 export function createDmChucVu(item, done) {
     return dispatch => {
         const url = '/api/danh-muc/chuc-vu';
@@ -139,4 +155,22 @@ export const SelectAdapter_DmChucVu = {
     getAll: getDmChucVuAll,
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
     condition: { kichHoat: 1 },
+};
+
+export const SelectAdapter_DmChucVuV2 = {
+    ajax: false,
+    data: () => ({ condition: { kichHoat: 1, loaiChucVu: 1} }),
+    url: '/api/danh-muc/chuc-vu/all',
+    getOne: getDmChucVu,
+    processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.ma, text: item.ten })) : [] }),
+    fetchOne: (ma, done) => (getDmChucVu(ma, item => done && done({ id: item.ma, text: item.ten })))(),
+};
+
+export const SelectAdapter_DmChucVuV0 = {
+    ajax: false,
+    data: () => ({ condition: { kichHoat: 1, phuCap: 0.00} }),
+    url: '/api/danh-muc/chuc-vu/all',
+    getOne: getDmChucVu,
+    processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.ma, text: item.ten })) : [] }),
+    fetchOne: (ma, done) => (getDmChucVu(ma, item => done && done({ id: item.ma, text: item.ten })))(),
 };

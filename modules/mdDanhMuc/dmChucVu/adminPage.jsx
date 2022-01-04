@@ -7,10 +7,13 @@ import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbo
 
 class EditModal extends AdminModal {
     state = { active: true , listChucVu : [
-       {id : 1, text :  'Chức vụ chính quyền'},
-       {id : 2, text :  'Chức vụ Đảng'},
-       {id : 3, text :  'Chức vụ Công đoàn'},
-       {id : 4, text :  'Chức vụ Đoàn thanh niên'},
+       {id : 1, text :  'Chức vụ Chính quyền'},
+       {id : 2, text :  'Chức vụ Hội đồng trường'},
+       {id : 3, text :  'Chức vụ Đảng ủy'},
+       {id : 4, text :  'Chức vụ Công đoàn'},
+       {id : 5, text :  'Chức vụ Hội Cựu Chiến binh'},
+       {id : 6, text :  'Chức vụ Đoàn Thanh niên - Hội Sinh viên'},
+
     ]};
 
     componentDidMount() {
@@ -72,6 +75,15 @@ class EditModal extends AdminModal {
 }
 
 class DmChucVuPage extends AdminPage {
+    loaiChucVuMap = {
+        1: 'Chức vụ Chính quyền',
+        2: 'Chức vụ Hội đồng trường',
+        3: 'Chức vụ Đảng ủy',
+        4: 'Chức vụ Công đoàn',
+        5: 'Chức vụ Hội Cựu Chiến binh',
+        6: 'Chức vụ Đoàn Thanh niên - Hội Sinh viên'
+    };
+
     state = { searching: false };
 
     componentDidMount() {
@@ -109,7 +121,8 @@ class DmChucVuPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto' }}>Mã</th>
-                        <th style={{ width: '100%' }}>Tên</th>
+                        <th style={{ width: '50%' }}>Tên</th>
+                        <th style={{ width: '50%' }}>Loại chức vụ</th>
                         <th style={{ width: 'auto' }} nowrap='true'>Phụ cấp</th>
                         <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
                         <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
@@ -118,7 +131,8 @@ class DmChucVuPage extends AdminPage {
                     <tr key={index}>
                         <TableCell type='link' content={item.ma ? item.ma : ''} onClick={() => this.modal.show(item)} />
                         <TableCell type='text' content={item.ten ? item.ten : ''} />
-                        <TableCell type='number' content={item.phuCap ? item.phuCap : 0} />
+                        <TableCell type='text' content={item.loaiChucVu ? this.loaiChucVuMap[item.loaiChucVu] : ''} />
+                        <TableCell type='number' content={item.phuCap ? item.phuCap : ''} />
                         <TableCell type='checkbox' content={item.kichHoat} permission={permission}
                             onChanged={value => this.props.updateDmChucVu(item.ma, { kichHoat: value ? 1 : 0, })} />
                         <TableCell type='buttons' content={item} permission={permission}

@@ -78,15 +78,14 @@ export function getDmGioiTinhAll(condition, done) {
 }
 
 export function getDmGioiTinh(ma, done) {
-    return dispatch => {
+    return () => {
         const url = `/api/danh-muc/gioi-tinh/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy thông tin giới tính bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                if (done) done(data.item);
-                dispatch(changeDmGioiTinh(data.item));
+                done && done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
     };
@@ -149,4 +148,13 @@ export const SelectAdapter_DmGioiTinh = {
     getAll: getDmGioiTinhAll,
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: JSON.parse(item.ten).vi })) : [] }),
     condition: { kichHoat: 1 },
+};
+
+export const SelectAdapter_DmGioiTinhV2 = {
+    ajax: false,
+    data: () => ({ condition: { kichHoat: 1 } }),
+    url: '/api/danh-muc/gioi-tinh/all',
+    getOne: getDmGioiTinh,
+    processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.ma, text: JSON.parse(item.ten).vi })) : [] }),
+    fetchOne: (ma, done) => (getDmGioiTinh(ma, item => done && done({ id: item.ma, text: JSON.parse(item.ten).vi })))(),
 };

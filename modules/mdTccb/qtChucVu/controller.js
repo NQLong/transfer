@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3009: { title: 'Quá trình chức vụ', link: '/user/qua-trinh/chuc-vu', icon: 'fa-street-view', backgroundColor: '#ebcf34', groupIndex: 3},
+            3009: { title: 'Chức Vụ', link: '/user/tccb/qua-trinh/chuc-vu', icon: 'fa-street-view', backgroundColor: '#ebcf34', groupIndex: 3 },
         },
     };
     app.permission.add(
@@ -11,16 +11,28 @@ module.exports = app => {
         { name: 'qtChucVu:write' },
         { name: 'qtChucVu:delete' },
     );
-    app.get('/user/qua-trinh/chuc-vu/:stt', app.permission.check('qtChucVu:read'), app.templates.admin);
-    app.get('/user/qua-trinh/chuc-vu', app.permission.check('qtChucVu:read'), app.templates.admin);
-        
+    app.get('/user/tccb/qua-trinh/chuc-vu/:stt', app.permission.check('qtChucVu:read'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/chuc-vu', app.permission.check('qtChucVu:read'), app.templates.admin);
+
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
 
-    app.get('/api/qua-trinh/chuc-vu/page/:pageNumber/:pageSize', app.permission.check('qtChucVu:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/chuc-vu/page/:pageNumber/:pageSize', app.permission.check('qtChucVu:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        app.model.qtChucVu.searchPage(pageNumber, pageSize, searchTerm, (error, page) => {
+        let arr = req.query.parameter;
+        if (!Array.isArray(arr)) arr = [];
+        let loaiDoiTuong = '-1';
+        if (arr.length > 0) {
+            loaiDoiTuong = '(';
+            for (let idx = 0; idx < arr.length; idx++) {
+                if (typeof arr[idx] == 'string') loaiDoiTuong += '\'' + arr[idx] + '\'';
+                else loaiDoiTuong += '\'' + arr[idx].toString() + '\'';
+                if (idx != arr.length - 1) loaiDoiTuong += ',';
+            }
+            loaiDoiTuong += ')';
+        }
+        app.model.qtChucVu.searchPage(pageNumber, pageSize, loaiDoiTuong, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -30,11 +42,23 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/qua-trinh/chuc-vu/group/page/:pageNumber/:pageSize', app.permission.check('qtChucVu:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/chuc-vu/group/page/:pageNumber/:pageSize', app.permission.check('qtChucVu:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        app.model.qtChucVu.searchPageGroup(pageNumber, pageSize, searchTerm, (error, page) => {
+        let arr = req.query.parameter;
+        if (!Array.isArray(arr)) arr = [];
+        let loaiDoiTuong = '-1';
+        if (arr.length > 0) {
+            loaiDoiTuong = '(';
+            for (let idx = 0; idx < arr.length; idx++) {
+                if (typeof arr[idx] == 'string') loaiDoiTuong += '\'' + arr[idx] + '\'';
+                else loaiDoiTuong += '\'' + arr[idx].toString() + '\'';
+                if (idx != arr.length - 1) loaiDoiTuong += ',';
+            }
+            loaiDoiTuong += ')';
+        }
+        app.model.qtChucVu.groupPage(pageNumber, pageSize, loaiDoiTuong, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -44,7 +68,21 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/qua-trinh/chuc-vu/all', app.permission.check('qtChucVu:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/chuc-vu/group_cv/page/:loaiDoiTuong/:pageNumber/:pageSize', app.permission.check('qtChucVu:read'), (req, res) => {
+        const pageNumber = parseInt(req.params.pageNumber),
+            pageSize = parseInt(req.params.pageSize),
+            loaiDoiTuong = req.params.loaiDoiTuong,
+            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+        app.model.qtChucVu.groupPageMa(pageNumber, pageSize, loaiDoiTuong, searchTerm, (error, page) => {
+            if (error || page == null) {
+                res.send({ error });
+            } else {
+                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
+                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, list } });
+            }
+        });
+    });
+    app.get('/api/tccb/qua-trinh/chuc-vu/all', app.permission.check('qtChucVu:read'), (req, res) => {
         let condition = { statement: null };
         if (req.query.shcc) {
             condition = {
@@ -55,17 +93,17 @@ module.exports = app => {
         app.model.qtChucVu.getAll(condition, (error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/qua-trinh/chuc-vu/item/:stt', app.permission.check('qtChucVu:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/chuc-vu/item/:stt', app.permission.check('qtChucVu:read'), (req, res) => {
         app.model.qtChucVu.get({ stt: req.params.stt }, (error, item) => res.send({ error, item }));
     });
 
-    app.post('/api/qua-trinh/chuc-vu', app.permission.check('qtChucVu:write'), (req, res) =>
+    app.post('/api/tccb/qua-trinh/chuc-vu', app.permission.check('qtChucVu:write'), (req, res) =>
         app.model.qtChucVu.create(req.body.items, (error, item) => res.send({ error, item })));
 
-    app.put('/api/qua-trinh/chuc-vu', app.permission.check('qtChucVu:write'), (req, res) =>
+    app.put('/api/tccb/qua-trinh/chuc-vu', app.permission.check('qtChucVu:write'), (req, res) =>
         app.model.qtChucVu.update({ stt: req.body.stt }, req.body.changes, (error, item) => res.send({ error, item })));
 
-    app.delete('/api/qua-trinh/chuc-vu', app.permission.check('qtChucVu:write'), (req, res) =>
+    app.delete('/api/tccb/qua-trinh/chuc-vu', app.permission.check('qtChucVu:write'), (req, res) =>
         app.model.qtChucVu.delete({ stt: req.body.stt }, (error) => res.send(error)));
 
     app.post('/api/user/qua-trinh/chuc-vu', app.permission.check('qtChucVu:login'), (req, res) => {
@@ -114,7 +152,9 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/qua-trinh/chuc-vu/item/:shcc', app.permission.check('qtChucVu:read'), (req, res) => {
-        app.model.qtChucVu.getAll({ shcc: req.params.shcc }, (error, item) => res.send({ error, item }));
+    app.get('/api/tccb/qua-trinh/chuc-vu-by-shcc/:shcc', app.permission.check('staff:login'), (req, res) => {
+        app.model.qtChucVu.getByShcc(req.params.shcc, (error, item) => {
+            if (item && item.rows.length > 0) res.send({ error, item: item.rows });
+         });
     });
 };

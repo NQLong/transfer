@@ -130,5 +130,10 @@ module.exports = app => {
             const sql = 'SELECT COUNT(*) FROM QUAN_HE_CAN_BO' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.dbConnection.execute(sql, parameter, (error, result) => done(error, result));
         },
+
+        getQhByShcc: (isShcc, done) => {
+            app.dbConnection.execute('BEGIN :ret:=quan_he_gia_dinh_by_shcc(:isShcc); END;',
+            { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, isShcc}, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
+        },
     };
 };

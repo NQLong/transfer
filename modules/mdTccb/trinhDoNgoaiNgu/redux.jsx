@@ -1,5 +1,7 @@
+import { getStaffEdit, userGetStaff } from '../tccbCanBo/redux';
+
 export function createTrinhDoNNStaff(data, done) {
-    return () => {
+    return dispatch => {
         const url = '/api/staff/trinh-do-nn';
         T.post(url, { data }, res => {
             if (res.error) {
@@ -7,14 +9,15 @@ export function createTrinhDoNNStaff(data, done) {
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
                 T.notify('Thêm thông tin trình độ ngoại ngữ thành công!', 'info');
-                if (done) done(res);
+                if (done) done();
+                dispatch(getStaffEdit(res.item.shcc));
             }
         }, () => T.notify('Thêm thông tin trình độ ngoại ngữ bị lỗi', 'danger'));
     };
 }
 
 export function updateTrinhDoNNStaff(id, changes, done) {
-    return () => {
+    return dispatch => {
         const url = '/api/staff/trinh-do-nn';
         T.put(url, { id, changes }, data => {
             if (data.error) {
@@ -23,6 +26,7 @@ export function updateTrinhDoNNStaff(id, changes, done) {
             } else if (data.item) {
                 T.notify('Cập nhật thông tin trình độ ngoại ngữ thành công!', 'info');
                 if (done) done();
+                dispatch(getStaffEdit(data.item.shcc));
             }
         }, () => T.notify('Cập nhật thông tin trình độ ngoại ngữ bị lỗi', 'danger'));
     };
@@ -44,7 +48,7 @@ export function deleteTrinhDoNNStaff(id, done) {
 }
 
 export function createTrinhDoNNStaffUser(data, done) {
-    return () => {
+    return dispatch => {
         const url = '/api/user/staff/trinh-do-nn';
         T.post(url, { data }, res => {
             if (res.error) {
@@ -52,6 +56,7 @@ export function createTrinhDoNNStaffUser(data, done) {
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
                 T.notify('Thêm thông tin trình độ ngoại ngữ thành công!', 'info');
+                dispatch(userGetStaff(data.email));
                 if (done) done(res);
             }
         }, () => T.notify('Thêm thông tin trình độ ngoại ngữ bị lỗi', 'danger'));
@@ -59,7 +64,7 @@ export function createTrinhDoNNStaffUser(data, done) {
 }
 
 export function updateTrinhDoNNStaffUser(id, changes, done) {
-    return () => {
+    return dispatch => {
         const url = '/api/user/staff/trinh-do-nn';
         T.put(url, { id, changes }, data => {
             if (data.error) {
@@ -67,6 +72,7 @@ export function updateTrinhDoNNStaffUser(id, changes, done) {
                 console.error('PUT: ' + url + '. ' + data.error);
             } else if (data.item) {
                 T.notify('Cập nhật thông tin trình độ ngoại ngữ thành công!', 'info');
+                dispatch(userGetStaff(changes.email));
                 if (done) done();
             }
         }, () => T.notify('Cập nhật thông tin trình độ ngoại ngữ bị lỗi', 'danger'));

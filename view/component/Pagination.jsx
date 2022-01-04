@@ -22,31 +22,64 @@ export default class Pagination extends React.Component {
     pageNumberChanged = (e, pageNumber, pageCondition) => {
         if (this.props.done) {
             if (pageCondition) {
-                this.props.getPage(pageNumber, null, pageCondition, this.props.done);
+                if (this.props.loaiDoiTuong) {
+                    this.props.getPage(pageNumber, null, this.props.loaiDoiTuong, pageCondition, this.props.done);
+                } else {
+                    this.props.getPage(pageNumber, null, pageCondition, this.props.done);
+                }
             } else {
-                this.props.getPage(pageNumber, null, this.props.done);
+                if (this.props.loaiDoiTuong) {
+                    this.props.getPage(pageNumber, null, this.props.loaiDoiTuong, '', this.props.done);
+                } else {
+                    this.props.getPage(pageNumber, null, this.props.done);
+                }
             }
         } else {
             if (pageCondition) {
-                this.props.getPage(pageNumber, null, pageCondition);
+                if (this.props.loaiDoiTuong) {
+                    this.props.getPage(pageNumber, null, this.props.loaiDoiTuong, pageCondition);
+                } else {
+                    this.props.getPage(pageNumber, null, pageCondition);
+                }
             } else {
-                this.props.getPage(pageNumber, null);
+                if (this.props.loaiDoiTuong) {
+                    this.props.getPage(pageNumber, null, this.props.loaiDoiTuong, '');
+                } else {
+                    this.props.getPage(pageNumber, null);
+                }
             }
         }
         e.preventDefault();
     }
+
     pageSizeChanged = (pageSize, pageCondition) => {
         if (this.props.done) {
             if (pageCondition) {
-                this.props.getPage(null, pageSize, pageCondition, this.props.done);
+                if (this.props.loaiDoiTuong) {
+                    this.props.getPage(null, pageSize, this.props.loaiDoiTuong, pageCondition, this.props.done);
+                } else {
+                    this.props.getPage(null, pageSize, pageCondition, this.props.done);
+                }
             } else {
-                this.props.getPage(null, pageSize, this.props.done);
+                if (this.props.loaiDoiTuong) {
+                    this.props.getPage(null, pageSize, this.props.loaiDoiTuong, '', this.props.done);
+                } else {
+                    this.props.getPage(null, pageSize, this.props.done);
+                }
             }
         } else {
             if (pageCondition) {
-                this.props.getPage(null, pageSize, pageCondition);
+                if (this.props.loaiDoiTuong) {
+                    this.props.getPage(null, pageSize, this.props.loaiDoiTuong, pageCondition);
+                } else {
+                    this.props.getPage(null, pageSize, pageCondition);
+                }
             } else {
-                this.props.getPage(null, pageSize);
+                if (this.props.loaiDoiTuong) {
+                    this.props.getPage(null, pageSize, this.props.loaiDoiTuong, '');
+                } else {
+                    this.props.getPage(null, pageSize);
+                }
             }
         }
     }

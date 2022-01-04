@@ -14,7 +14,7 @@ export default {
         },
         {
             path: '/user/staff/:shcc',
-            component: Loadable({ loading: Loading, loader: () => import('./adminEditPage') })
+            component: Loadable({ loading: Loading, loader: () => import('./adminDetailPage') })
         },
         {
             path: '/user/staff',
