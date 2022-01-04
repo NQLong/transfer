@@ -56,7 +56,7 @@ module.exports = app => {
     app.put('/api/website', app.permission.check('website:read'), (req, res) => {
         let item = req.body.changes;
         if (item.shortname) item.shortname = item.shortname.toLowerCase();
-        app.model.dvWebsite.update({ shortname: req.body.shortname }, item, (error, item) => res.send({ error, item }));
+        app.model.dvWebsite.update({ shortname: item.shortname }, item, (error, item) => res.send({ error, item }));
     });
 
     app.delete('/api/website', app.permission.check('website:read'), (req, res) => {
