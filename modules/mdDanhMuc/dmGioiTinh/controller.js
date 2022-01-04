@@ -23,7 +23,7 @@ module.exports = app => {
     });
 
     app.get('/api/danh-muc/gioi-tinh/item/:ma', app.permission.check('user:login'), (req, res) => {
-        app.model.dmGioiTinh.get(req.params.ma, (error, item) => res.send({ error, item }));
+        app.model.dmGioiTinh.get({ma: req.params.ma}, (error, item) => res.send({ error, item }));
     });
 
     app.post('/api/danh-muc/gioi-tinh', app.permission.check('dmGioiTinh:write'), (req, res) => {

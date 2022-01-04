@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3010: { title: 'Hợp đồng lao động', link: '/user/tccb/qua-trinh/hop-dong-lao-dong', icon: 'fa-file-text-o', backgroundColor: '#524e4e', groupIndex: 1 },
+            3010: { title: 'Hợp Đồng Lao Động', link: '/user/tccb/qua-trinh/hop-dong-lao-dong', icon: 'fa-file-text-o', backgroundColor: '#524e4e', groupIndex: 1 },
         },
     };
     app.permission.add(
@@ -36,6 +36,20 @@ module.exports = app => {
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
         app.model.qtHopDongLaoDong.groupPage(pageNumber, pageSize, searchTerm, (error, page) => {
+            if (error || page == null) {
+                res.send({ error });
+            } else {
+                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
+                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, list } });
+            }
+        });
+    });
+
+    app.get('/api/tccb/qua-trinh/hop-dong-lao-dong/groupShcc/page/:pageNumber/:pageSize', app.permission.check('qtHopDongLaoDong:read'), (req, res) => {
+        const pageNumber = parseInt(req.params.pageNumber),
+            pageSize = parseInt(req.params.pageSize),
+            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+        app.model.qtHopDongLaoDong.groupPageShcc(pageNumber, pageSize, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {

@@ -144,3 +144,12 @@ export const SelectAdapter_DmTrinhDoLyLuanChinhTri = {
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
     condition: { kichHoat: 1 },
 };
+
+export const SelectAdapter_DmTrinhDoLyLuanChinhTriV2 = {
+    ajax: true,
+    data: params => ({ condition: params.term, kichHoat: 1 }),
+    url: '/api/danh-muc/trinh-do-ly-luan-chinh-tri/page/1/20',
+    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: `${item.ten}` })) : [] }),
+    getOne: getDmTrinhDoLyLuanChinhTri,
+    fetchOne: (ma, done) => (getDmTrinhDoLyLuanChinhTri(ma,  item  => done && done({ id: item.ma, text: `${item.ten}` })))(),
+};
