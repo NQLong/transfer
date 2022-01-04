@@ -1,25 +1,45 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, FormCheckbox } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, FormCheckbox, FormSelect } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
     getQtHopDongLaoDongPage, getQtHopDongLaoDongAll, updateQtHopDongLaoDong,
     deleteQtHopDongLaoDong, createQtHopDongLaoDong, getQtHopDongLaoDongGroupPage, downloadWord
 } from './redux';
+import { getDmDonViAll } from 'modules/mdDanhMuc/dmDonVi/redux';
 
 class QtHopDongLaoDongPage extends AdminPage {
     checked = false;
+    curState = '-1';
+    stateTable = [
+        { 'id': '-1', 'text': 'Tất cả' }
+    ];
 
     componentDidMount() {
         T.ready('/user/tccb', () => {
+            this.props.getDmDonViAll(items => {
+                this.stateTable = [
+                    { 'id': '-1', 'text': 'Tất cả' }
+                ];
+                items.forEach(item => this.stateTable.push({
+                    'id': item.ma,
+                    'text': item.ten
+                }));
+            });
             T.onSearch = (searchText) => {
-                if (this.checked) this.props.getQtHopDongLaoDongGroupPage(undefined, undefined, searchText || '');
-                else this.props.getQtHopDongLaoDongPage(undefined, undefined, searchText || '');
+                if (this.checked) this.props.getQtHopDongLaoDongGroupPage(undefined, undefined, this.curState, searchText || '');
+                else this.props.getQtHopDongLaoDongPage(undefined, undefined, this.curState, searchText || '');
             };
             T.showSearchBox();
-            this.props.getQtHopDongLaoDongPage(undefined, undefined, '');
+            this.props.getQtHopDongLaoDongPage(undefined, undefined, this.curState, '');
         });
+    }
+
+    changeState = (value) => {
+        this.curState = value;
+        if (this.checked) this.props.getQtHopDongLaoDongGroupPage(undefined, undefined, this.curState, '');
+        else this.props.getQtHopDongLaoDongPage(undefined, undefined, this.curState, '');
     }
 
     groupPage = () => {
@@ -144,6 +164,7 @@ class QtHopDongLaoDongPage extends AdminPage {
             ],
             content: <>
                 <div className='tile'>
+                    <FormSelect className='col-md-5' ref={e => this.maDonVi = e} label='Chọn đơn vi' data={this.stateTable} onChange={item => this.changeState(item.id)} />
                     <FormCheckbox label='Hiển thị theo cán bộ' onChange={this.groupPage} />
                     {table}
                 </div>
@@ -165,6 +186,6 @@ class QtHopDongLaoDongPage extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtHopDongLaoDong: state.qtHopDongLaoDong });
 const mapActionsToProps = {
     getQtHopDongLaoDongAll, getQtHopDongLaoDongPage, deleteQtHopDongLaoDong, createQtHopDongLaoDong,
-    updateQtHopDongLaoDong, getQtHopDongLaoDongGroupPage
+    updateQtHopDongLaoDong, getQtHopDongLaoDongGroupPage, getDmDonViAll,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtHopDongLaoDongPage);

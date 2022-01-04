@@ -17,11 +17,12 @@ module.exports = app => {
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
 
-    app.get('/api/tccb/qua-trinh/hop-dong-lao-dong/page/:pageNumber/:pageSize', app.permission.check('qtHopDongLaoDong:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/hop-dong-lao-dong/page/:maDonVi/:pageNumber/:pageSize', app.permission.check('qtHopDongLaoDong:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
+            maDonVi = req.params.maDonVi,
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        app.model.qtHopDongLaoDong.searchPage(pageNumber, pageSize, searchTerm, (error, page) => {
+        app.model.qtHopDongLaoDong.searchPage(pageNumber, pageSize, maDonVi, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -31,11 +32,12 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/tccb/qua-trinh/hop-dong-lao-dong/group/page/:pageNumber/:pageSize', app.permission.check('qtHopDongLaoDong:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/hop-dong-lao-dong/group/page/:maDonVi/:pageNumber/:pageSize', app.permission.check('qtHopDongLaoDong:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
+            maDonVi = req.params.maDonVi,
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        app.model.qtHopDongLaoDong.groupPage(pageNumber, pageSize, searchTerm, (error, page) => {
+        app.model.qtHopDongLaoDong.groupPage(pageNumber, pageSize, maDonVi, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
