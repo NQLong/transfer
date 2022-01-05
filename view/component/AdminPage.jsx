@@ -97,7 +97,7 @@ export function renderTable({
         }
         return <div {...properties}>{table}</div>;
     } else {
-        return emptyTable;
+        return <b>{emptyTable}</b>;
     }
 }
 
@@ -158,7 +158,7 @@ export class FormCheckbox extends React.Component {
     onCheck = () => this.props.readOnly || this.setState({ checked: !this.state.checked }, () => this.props.onChange && this.props.onChange(this.state.checked));
 
     render() {
-        let { className = '', label, style, isSwitch = false, trueClassName = 'text-primary', falseClassName = 'text-secondary', inline = true } = this.props;
+        let { className = '', label, style, isSwitch = false, trueClassName = 'text-primary', falseClassName = 'text', inline = true } = this.props;
         if (style == null) style = {};
         return isSwitch ? (
             <div className={className} style={{ ...style, display: inline ? 'inline-flex' : '' }}>
@@ -172,7 +172,7 @@ export class FormCheckbox extends React.Component {
             <div className={'animated-checkbox ' + className} style={style}>
                 <label>
                     <input type='checkbox' checked={this.state.checked} onChange={this.onCheck} />
-                    <span className={'label-text ' + (this.state.checked ? trueClassName : falseClassName)}>{label}</span>
+                    <span className={'label-text ' +( this.props.readOnly ? 'text-secondary' : (this.state.checked ? trueClassName : falseClassName))}>{label}</span>
                 </label>
             </div>
         );

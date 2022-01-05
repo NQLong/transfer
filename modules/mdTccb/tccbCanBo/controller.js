@@ -957,7 +957,7 @@ module.exports = app => {
                 new Promise(resolve => {
                     app.model.quanHeCanBo.getQhByShcc(canBo.shcc, (error, items) => {
                         if (error || items == null) {
-                            result = app.clone(result, { items: null });
+                            result = app.clone(result, { items: [] });
                         } else {
                             result = app.clone(result, { items: items.rows });
                         }
@@ -966,7 +966,7 @@ module.exports = app => {
                 }).then(() => new Promise(resolve => {
                     app.model.trinhDoNgoaiNgu.getTrinhDoNNByShcc(canBo.shcc, (error, trinhDoNN) => {
                         if (error || trinhDoNN == null) {
-                            result = app.clone(result, { trinhDoNN: null });
+                            result = app.clone(result, { trinhDoNN: [] });
                         } else {
                             result = app.clone(result, { trinhDoNN: trinhDoNN.rows });
                         }
@@ -994,7 +994,7 @@ module.exports = app => {
                     let dataCV = [];
                     app.model.qtChucVu.getByShcc(canBo.shcc, (error, chucVu) => {
                         if (error || chucVu == null) {
-                            result = app.clone(result, { chucVu: null });
+                            result = app.clone(result, { chucVu: [] });
                         } else {
                             chucVu.rows.forEach(i => {
                                 dataCV.push(Object.assign(i, { lcv: i.loaiChucVu == 1 }));
@@ -1015,7 +1015,7 @@ module.exports = app => {
                 })).then(() => new Promise(resolve => {
                     app.model.qtKhenThuongAll.getByShcc(canBo.shcc, (error, khenThuong) => {
                         if (error || khenThuong == null) {
-                            result = app.clone(result, { khenThuong: null });
+                            result = app.clone(result, { khenThuong: [] });
                         } else {
                             result = app.clone(result, { khenThuong: khenThuong.rows });
                         }
@@ -1033,7 +1033,7 @@ module.exports = app => {
                 })).then(() => new Promise(resolve => {
                     app.model.qtNghienCuuKhoaHoc.getAll({ shcc: canBo.shcc }, (error, nghienCuuKhoaHoc) => {
                         if (error || nghienCuuKhoaHoc == null) {
-                            result = app.clone(result, { nghienCuuKhoaHoc: null });
+                            result = app.clone(result, { nghienCuuKhoaHoc: [] });
                         } else {
                             result = app.clone(result, { nghienCuuKhoaHoc });
                         }

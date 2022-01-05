@@ -52,62 +52,62 @@ class ComponentCaNhan extends React.Component {
     }
 
     value = function (item) {
-        this.setState({ dangVien: item.dangVien });
-        this.setState({ doanVien: item.doanVien });
-        this.setState({ congDoan: item.congDoan });
-        this.shcc = item.shcc;
-        this.email = item.email;
-        this.imageBox.setData('CanBoImage:' + item.email, item.image ? item.image : '/img/avatar.png');
-        this.donVi.value(item.maDonVi);
-        this.maTheCanBo.value(item.shcc);
-        this.ho.value(item.ho ? item.ho : '');
-        this.ten.value(item.ten ? item.ten : '');
-        this.biDanh.value(item.biDanh ? item.biDanh : '');
-        this.phai.value(item.phai);
-        this.ngaySinh.value(item.ngaySinh ? item.ngaySinh : '');
-        this.noiSinh.value(item.maTinhNoiSinh, item.maHuyenNoiSinh, item.maXaNoiSinh);
-        this.nguyenQuan.value(item.maTinhNguyenQuan, item.maHuyenNguyenQuan, item.maXaNguyenQuan);
-        this.thuongTru.value(item.thuongTruMaTinh, item.thuongTruMaHuyen, item.thuongTruMaXa, item.thuongTruSoNha);
-        this.hienTai.value(item.hienTaiMaTinh, item.hienTaiMaHuyen, item.hienTaiMaXa, item.hienTaiSoNha);
-        this.cmnd.value(item.cmnd ? item.cmnd : '');
-        this.cmndNgayCap.value(item.cmndNgayCap ? item.cmndNgayCap : '');
-        this.cmndNoiCap.value(item.cmndNoiCap ? item.cmndNoiCap : '');
-        this.soDienThoaiBaoTin.value(item.dienThoaiBaoTin ? item.dienThoaiBaoTin : '');
-        this.soDienThoaiCaNhan.value(item.dienThoaiCaNhan ? item.dienThoaiCaNhan : '');
-        this.emailCaNhan.value(item.emailCaNhan ? item.emailCaNhan : '');
-        this.emailTruong.value(item.email ? item.email : '');
-        this.quocTich.value(item.quocGia);
-        this.danToc.value(item.danToc);
-        this.tonGiao.value(item.tonGiao);
-        this.tinhTrangSucKhoe.value(item.sucKhoe ? item.sucKhoe : '');
-        this.chieuCao.value(item.chieuCao ? item.chieuCao : '');
-        this.canNang.value(item.canNang ? item.canNang : '');
-        this.nhomMau.value(item.nhomMau ? item.nhomMau : '');
-
-        this.soTruong.value(item.soTruong ? item.soTruong : '');
-        this.tuNhanXet.value(item.tuNhanXet ? item.tuNhanXet : '');
-
-        this.doanVien.value(item.doanVien);
-        this.state.doanVien && this.ngayVaoDoan.value(item.ngayVaoDoan ? item.ngayVaoDoan : '');
-        this.state.doanVien && this.noiVaoDoan.value(item.noiVaoDoan ? item.noiVaoDoan : '');
-
-        this.dangVien.value(item.dangVien);
-        this.state.dangVien && this.ngayVaoDang.value(item.ngayVaoDang ? item.ngayVaoDang : '');
-        this.state.dangVien && this.ngayVaoDangCT.value(item.ngayVaoDangChinhThuc ? item.ngayVaoDangChinhThuc : '');
-        this.state.dangVien && this.noiVaoDang.value(item.noiDangDb ? item.noiDangDb : '');
-        this.state.dangVien && this.noiVaoDangCT.value(item.noiDangCt ? item.noiDangCt : '');
-
-        this.congDoan.value(item.congDoan);
-        this.state.congDoan && this.ngayVaoCongDoan.value(item.ngayVaoCongDoan ? item.ngayVaoCongDoan : '');
-        this.state.congDoan && this.noiVaoCongDoan.value(item.noiVaoCongDoan ? item.noiVaoCongDoan : '');
-
-        this.namNhapNgu.value(item.ngayNhapNgu ? item.ngayNhapNgu : '');
-        this.namXuatNgu.value(item.namXuatNgu ? item.namXuatNgu : '');
-        this.capBacCaoNhat.value(item.quanHamCaoNhat ? item.quanHamCaoNhat : '');
-        this.hangThuongBinh.value(item.hangThuongBinh ? item.hangThuongBinh : '');
-        this.giaDinhChinhSach.value(item.giaDinhChinhSach ? item.giaDinhChinhSach : '');
-        this.danhHieuPhongTangCaoNhat.value(item.danhHieu ? item.danhHieu : '');
-
+        this.setState({ dangVien: item.dangVien, doanVien: item.doanVien, congDoan: item.congDoan }, () => {
+            this.shcc = item.shcc;
+            this.email = item.email;
+            this.imageBox.setData('CanBoImage:' + item.email, item.image ? item.image : '/img/avatar.png');
+            this.donVi.value(item.maDonVi);
+            this.maTheCanBo.value(item.shcc);
+            this.ho.value(item.ho ? item.ho : '');
+            this.ten.value(item.ten ? item.ten : '');
+            this.biDanh.value(item.biDanh ? item.biDanh : '');
+            this.phai.value(item.phai);
+            this.ngaySinh.value(item.ngaySinh ? item.ngaySinh : '');
+            this.noiSinh.value(item.maTinhNoiSinh, item.maHuyenNoiSinh, item.maXaNoiSinh);
+            this.nguyenQuan.value(item.maTinhNguyenQuan, item.maHuyenNguyenQuan, item.maXaNguyenQuan);
+            this.thuongTru.value(item.thuongTruMaTinh, item.thuongTruMaHuyen, item.thuongTruMaXa, item.thuongTruSoNha);
+            this.hienTai.value(item.hienTaiMaTinh, item.hienTaiMaHuyen, item.hienTaiMaXa, item.hienTaiSoNha);
+            this.cmnd.value(item.cmnd ? item.cmnd : '');
+            this.cmndNgayCap.value(item.cmndNgayCap ? item.cmndNgayCap : '');
+            this.cmndNoiCap.value(item.cmndNoiCap ? item.cmndNoiCap : '');
+            this.soDienThoaiBaoTin.value(item.dienThoaiBaoTin ? item.dienThoaiBaoTin : '');
+            this.soDienThoaiCaNhan.value(item.dienThoaiCaNhan ? item.dienThoaiCaNhan : '');
+            this.emailCaNhan.value(item.emailCaNhan ? item.emailCaNhan : '');
+            this.emailTruong.value(item.email ? item.email : '');
+            this.quocTich.value(item.quocGia);
+            this.danToc.value(item.danToc);
+            this.tonGiao.value(item.tonGiao);
+            this.tinhTrangSucKhoe.value(item.sucKhoe ? item.sucKhoe : '');
+            this.chieuCao.value(item.chieuCao ? item.chieuCao : '');
+            this.canNang.value(item.canNang ? item.canNang : '');
+            this.nhomMau.value(item.nhomMau ? item.nhomMau : '');
+    
+            this.soTruong.value(item.soTruong ? item.soTruong : '');
+            this.tuNhanXet.value(item.tuNhanXet ? item.tuNhanXet : '');
+    
+            this.doanVien.value(item.doanVien);
+            this.state.doanVien && this.ngayVaoDoan.value(item.ngayVaoDoan ? item.ngayVaoDoan : '');
+            this.state.doanVien && this.noiVaoDoan.value(item.noiVaoDoan ? item.noiVaoDoan : '');
+    
+            this.dangVien.value(item.dangVien);
+            this.state.dangVien && this.ngayVaoDang.value(item.ngayVaoDang ? item.ngayVaoDang : '');
+            this.state.dangVien && this.ngayVaoDangCT.value(item.ngayVaoDangChinhThuc ? item.ngayVaoDangChinhThuc : '');
+            this.state.dangVien && this.noiVaoDang.value(item.noiDangDb ? item.noiDangDb : '');
+            this.state.dangVien && this.noiVaoDangCT.value(item.noiDangCt ? item.noiDangCt : '');
+    
+            this.congDoan.value(item.congDoan);
+            this.state.congDoan && this.ngayVaoCongDoan.value(item.ngayVaoCongDoan ? item.ngayVaoCongDoan : '');
+            this.state.congDoan && this.noiVaoCongDoan.value(item.noiVaoCongDoan ? item.noiVaoCongDoan : '');
+    
+            this.namNhapNgu.value(item.ngayNhapNgu ? item.ngayNhapNgu : '');
+            this.namXuatNgu.value(item.namXuatNgu ? item.namXuatNgu : '');
+            this.capBacCaoNhat.value(item.quanHamCaoNhat ? item.quanHamCaoNhat : '');
+            this.hangThuongBinh.value(item.hangThuongBinh ? item.hangThuongBinh : '');
+            this.giaDinhChinhSach.value(item.giaDinhChinhSach ? item.giaDinhChinhSach : '');
+            this.danhHieuPhongTangCaoNhat.value(item.danhHieu ? item.danhHieu : '');
+    
+        });
+       
     }
 
     imageChanged = (data) => {
