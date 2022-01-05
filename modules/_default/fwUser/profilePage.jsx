@@ -9,12 +9,10 @@ import ComponentTrinhDo from 'modules/mdTccb/tccbCanBo/componentTrinhDo';
 import ComponentTTCongTac from 'modules/mdTccb/tccbCanBo/componentTTCongTac';
 import ProfileCommon from './componentNotStaff';
 import Loading from 'view/component/Loading';
-
+import ComponentKhenThuong from 'modules/mdTccb/qtKhenThuongAll/componentKhenThuong';
+import ComponentNCKH from 'modules/mdTccb/qtNghienCuuKhoaHoc/componentNCKH';
 class ProfileCanBo extends AdminPage {
     state = { canBo: false, isLoad: true };
-    // shouldComponentUpdate(nextProps, nextState) {
-    //     return this.state.canBo != nextState.canBo;
-    // }
     componentDidMount() {
         T.ready(() => {
             if (this.props.system && this.props.system.user) {
@@ -41,8 +39,10 @@ class ProfileCanBo extends AdminPage {
             this.componentQuanHe.value(item.email, item.phai, item.shcc);
             this.componentTrinhDo.value(item);
             this.componentTTCongTac.value(item);
+            this.componentKhenThuong.value(item.shcc);
+            this.componentNCKH.value(item.shcc, item.email);
         });
-       
+
     }
 
     save = () => {
@@ -65,6 +65,8 @@ class ProfileCanBo extends AdminPage {
                             <ComponentQuanHe ref={e => this.componentQuanHe = e} userEdit={true} />
                             <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={true} />
                             <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={true} />
+                            <ComponentKhenThuong ref={e => this.componentKhenThuong = e} userEdit={true} />
+                            <ComponentNCKH ref={e => this.componentNCKH = e} userEdit={true} />
                         </>}
                 </>,
             onSave: this.state.canBo && this.save,

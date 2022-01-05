@@ -11,6 +11,8 @@ import { AdminPage } from 'view/component/AdminPage';
 import ComponentQuanHe from './componentQuanHe';
 import ComponentTTCongTac from './componentTTCongTac';
 import ComponentTrinhDo from './componentTrinhDo';
+import ComponentKhenThuong from '../qtKhenThuongAll/componentKhenThuong';
+import ComponentNCKH from '../qtNghienCuuKhoaHoc/componentNCKH';
 
 class CanBoPage extends AdminPage {
     state = { item: null }
@@ -21,7 +23,6 @@ class CanBoPage extends AdminPage {
                 shcc = route.parse(window.location.pathname).shcc;
             this.urlSHCC = shcc && shcc != 'new' ? shcc : null;
             if (this.urlSHCC) {
-
                 this.setState({ create: false });
                 this.props.getStaffEdit(shcc, data => {
                     if (data.error) {
@@ -42,7 +43,8 @@ class CanBoPage extends AdminPage {
         this.componentTTCongTac.value(item);
         this.componentQuanHe.value(item.email, item.phai, item.shcc);
         this.componentTrinhDo.value(item);
-
+        this.componentKhenThuong.value(item.shcc);
+        this.componentNCKH.value(item.shcc, item.email);
     }
 
     save = () => {
@@ -57,7 +59,6 @@ class CanBoPage extends AdminPage {
 
     render() {
         const item = this.props.staff?.selectedItem;
-        
         return this.renderPage({
             icon: 'fa fa-address-card-o',
             title: `Thông tin cán bộ${item?.shcc ? `: ${item?.ho} ${item?.ten}` : ''}`,
@@ -70,6 +71,8 @@ class CanBoPage extends AdminPage {
                 <ComponentQuanHe ref={e => this.componentQuanHe = e} userEdit={false} />
                 <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={false} />
                 <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={false} />
+                <ComponentKhenThuong ref={e => this.componentKhenThuong = e} userEdit = {false}/>
+                <ComponentNCKH ref={e => this.componentNCKH = e} userEdit = {false} />
             </>,
             backRoute: '/user/staff',
             onSave: this.save,

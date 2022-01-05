@@ -90,7 +90,7 @@ class EditModal extends AdminModal {
                 diemThiDua: this.diemThiDua.value(),
             };
             if (index == list_ma.length - 1) {
-                this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
+                this.state.id ? this.props.update(false, this.state.id, changes, this.hide) : this.props.create(false, changes, this.hide);
                 this.setState({
                     id: '', doiTuong: ''
                 });
@@ -99,7 +99,7 @@ class EditModal extends AdminModal {
                 this.maBoMon.reset();
             }
             else {
-                this.state.id ? this.props.update(this.state.id, changes) : this.props.create(changes);
+                this.state.id ? this.props.update(false, this.state.id, changes) : this.props.create(false, changes);
             }
         });
     }
@@ -245,7 +245,7 @@ class QtKhenThuongAll extends AdminPage {
     }
     delete = (e, item) => {
         T.confirm('Xóa khen thưởng', 'Bạn có chắc bạn muốn xóa khen thưởng này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtKhenThuongAll(item.id, error => {
+            isConfirm && this.props.deleteQtKhenThuongAll(false, item.id, null, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá khen thưởng bị lỗi!', 'danger');
                 else T.alert('Xoá khen thưởng thành công!', 'success', false, 800);
             });

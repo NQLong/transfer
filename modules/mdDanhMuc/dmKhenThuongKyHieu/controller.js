@@ -32,6 +32,10 @@ module.exports = app => {
         app.model.dmKhenThuongKyHieu.getAll(condition, (error, items) => res.send({ error, items }));
     });
 
+    app.get('/api/danh-muc/khen-thuong-ky-hieu/item/:ma', app.permission.check('user:login'), (req, res) => {
+        app.model.dmKhenThuongKyHieu.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
+    });
+
     app.post('/api/danh-muc/khen-thuong-ky-hieu', app.permission.check('dmKhenThuongKyHieu:write'), (req, res) => {
         let newData = req.body.item;
         app.model.dmKhenThuongKyHieu.create(newData, (error, item) => res.send({ error, item }));
