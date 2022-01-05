@@ -78,14 +78,14 @@ class EditModal extends AdminModal {
                 diemThiDua: this.diemThiDua.value(),
             };
             if (index == list_ma.length - 1) {
-                this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
+                this.state.id ? this.props.update(false, this.state.id, changes, this.hide) : this.props.create(false, changes, this.hide);
                 this.setState({
                     id: ''
                 });
                 this.maCanBo.reset();
             }
             else {
-                this.state.id ? this.props.update(this.state.id, changes) : this.props.create(changes);
+                this.state.id ? this.props.update(false, this.state.id, changes) : this.props.create(false, changes);
             }
         });
     }
@@ -165,7 +165,7 @@ class QtKyLuat extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa kỷ luật', 'Bạn có chắc bạn muốn xóa kỷ luật này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtKyLuat(item.id, error => {
+            isConfirm && this.props.deleteQtKyLuat(false, item.id, null, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá kỷ luật bị lỗi!', 'danger');
                 else T.alert('Xoá kỷ luật thành công!', 'success', false, 800);
             });

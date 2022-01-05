@@ -136,7 +136,7 @@ class QtKyLuatGroupPage extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa kỷ luật', 'Bạn có chắc bạn muốn xóa kỷ luật này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtKyLuat(item.id, error => {
+            isConfirm && this.props.deleteQtKyLuat(false, item.id, null, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá kỷ luật bị lỗi!', 'danger');
                 else T.alert('Xoá kỷ luật thành công!', 'success', false, 800);
             });

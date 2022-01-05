@@ -371,7 +371,7 @@ export class FormRichTextBox extends React.Component {
         return (
             <div className={'form-group ' + (className ? className : '')} style={style}>
                 {displayElement}
-                <textarea ref={e => this.input = e} className='form-control' style={{ display: readOnly ? 'none' : 'block' }} placeholder={label ? label : placeholder} value={this.state.value} rows={rows} onChange={e => this.setState({ value: e.target.value }) || onChange && onChange(e)} />
+                <textarea ref={e => this.input = e} className='form-control' style={{ display: readOnly ? 'none' : 'block' }} placeholder={placeholder ? placeholder : label} value={this.state.value} rows={rows} onChange={e => this.setState({ value: e.target.value }) || onChange && onChange(e)} />
             </div>);
     }
 }

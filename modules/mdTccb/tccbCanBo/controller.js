@@ -155,14 +155,15 @@ module.exports = app => {
                                 resolve();
                             });
                         })).then(() => new Promise(resolve => {
-                            app.model.qtKyLuat.getAll({ shcc: canBo.shcc }, '*', 'batDau ASC', (error, kyLuat) => {
+                            app.model.qtKyLuat.getByShcc(canBo.shcc, (error, kyLuat) => {
+                                console.log(kyLuat);
                                 if (error) {
                                     res.send({ error: 'Lỗi khi lấy thông tin quá trình kỷ luật !' });
                                 }
                                 else if (kyLuat == null) {
-                                    result = app.clone(result, { kyLuat: null });
+                                    result = app.clone(result, { kyLuat: [] });
                                 } else {
-                                    result = app.clone(result, { kyLuat });
+                                    result = app.clone(result, { kyLuat: kyLuat.rows });
                                 }
                                 resolve();
                             });
@@ -1022,11 +1023,11 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtKyLuat.getAll({ shcc: canBo.shcc }, (error, kyLuat) => {
+                    app.model.qtKyLuat.getByShcc(canBo.shcc, (error, kyLuat) => {
                         if (error || kyLuat == null) {
-                            result = app.clone(result, { kyLuat: null });
+                            result = app.clone(result, { kyLuat: [] });
                         } else {
-                            result = app.clone(result, { kyLuat });
+                            result = app.clone(result, { kyLuat: kyLuat.rows });
                         }
                         resolve();
                     });

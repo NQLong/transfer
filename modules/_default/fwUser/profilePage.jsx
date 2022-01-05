@@ -11,6 +11,7 @@ import ProfileCommon from './componentNotStaff';
 import Loading from 'view/component/Loading';
 import ComponentKhenThuong from 'modules/mdTccb/qtKhenThuongAll/componentKhenThuong';
 import ComponentNCKH from 'modules/mdTccb/qtNghienCuuKhoaHoc/componentNCKH';
+import ComponentKyLuat from 'modules/mdTccb/qtKyLuat/componentKyLuat';
 class ProfileCanBo extends AdminPage {
     state = { canBo: false, isLoad: true };
     componentDidMount() {
@@ -41,6 +42,7 @@ class ProfileCanBo extends AdminPage {
             this.componentTTCongTac.value(item);
             this.componentKhenThuong.value(item.shcc);
             this.componentNCKH.value(item.shcc, item.email);
+            this.componentKyLuat.value(item.shcc);
         });
 
     }
@@ -67,6 +69,7 @@ class ProfileCanBo extends AdminPage {
                             <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={true} />
                             <ComponentKhenThuong ref={e => this.componentKhenThuong = e} userEdit={true} />
                             <ComponentNCKH ref={e => this.componentNCKH = e} userEdit={true} />
+                            <ComponentKyLuat ref={e => this.componentKyLuat = e} userEdit={true} />
                         </>}
                 </>,
             onSave: this.state.canBo && this.save,

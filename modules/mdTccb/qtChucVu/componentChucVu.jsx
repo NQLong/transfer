@@ -156,7 +156,7 @@ class ComponentChucVu extends AdminPage {
     render() {
         let dataChucVu = !this.props.userEdit ? this.props.staff?.selectedItem?.chucVu.filter(i => i.lcv == this.state.type) : [];
         const permission = this.getUserPermission('staff', ['read', 'write', 'delete']);
-        let display = ((this.state.data || dataChucVu) && (this.state.data.length > 0 || dataChucVu.length > 0)) ? true : false;
+        let display = ((this.state.data && this.state.data.length > 0) || (dataChucVu && dataChucVu.length > 0)) ? true : false;
         const renderTableChucVu = (items) => (
             renderTable({
                 getDataSource: () => items, stickyHead: false,

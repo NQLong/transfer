@@ -31,7 +31,7 @@ export default class Dropdown extends React.Component {
 
     render() {
         const items = this.props.items ? this.props.items : this.state.items,
-            className = this.props.className ? this.props.className + ' dropdown-toggle' : 'dropdown-toggle';
+            className = this.props.readOnly ? 'disabled' : (this.props.className ? this.props.className + ' dropdown-toggle' : 'dropdown-toggle');
         let dropdownItems = items.map((item, index) =>
             <a key={index} className='dropdown-item' href='#' onClick={e => this.select(e, item)}>
                 {item.text ? item.text : item}

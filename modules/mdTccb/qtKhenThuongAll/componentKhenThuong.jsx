@@ -59,7 +59,7 @@ class EditModal extends AdminModal {
                 <FormSelect className='col-md-12' ref={e => this.thanhTich = e} label='Thành tích' data={SelectAdapter_DmKhenThuongKyHieuV2} readOnly={readOnly} required/>
                 <FormTextBox className='col-md-4' ref={e => this.namDatDuoc = e} label='Năm đạt được (yyyy)' type='year' readOnly={readOnly} required/>
                 <FormSelect className='col-md-8' ref={e => this.chuThich = e} label='Chú thích' data={SelectAdapter_DmKhenThuongChuThichV2} readOnly={readOnly} required/>
-                <FormTextBox className='col-md-4' ref={e => this.diemThiDua = e} type='number' label='Điểm thi đua' readOnly={readOnly} />
+                <FormTextBox className='col-md-4' ref={e => this.diemThiDua = e} type='number' label='Điểm khen thưởng' readOnly={readOnly} />
             </div>
         });
     }
@@ -160,6 +160,6 @@ class ComponentKhenThuong extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, staff: state.staff });
 const mapActionsToProps = {
-    getStaffEdit,createQtKhenThuongAll, updateQtKhenThuongAll, deleteQtKhenThuongAll
+    getStaffEdit, createQtKhenThuongAll, updateQtKhenThuongAll, deleteQtKhenThuongAll
 };
 export default connect(mapStateToProps, mapActionsToProps, null, { forwardRef: true })(ComponentKhenThuong);

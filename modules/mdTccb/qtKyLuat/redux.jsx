@@ -1,4 +1,5 @@
 import T from 'view/js/common';
+import { getStaffEdit } from '../tccbCanBo/redux';
 
 // Reducer ------------------------------------------------------------------------------------------------------------
 const QtKyLuatGetAll = 'QtKyLuat:GetAll';
@@ -151,7 +152,7 @@ export function getQtKyLuatEdit(id, done) {
     };
 }
 
-export function createQtKyLuat(items, done) {
+export function createQtKyLuat(isStaffEdit, items, done) {
     return dispatch => {
         const url = '/api/tccb/qua-trinh/ky-luat';
         T.post(url, { items }, data => {
@@ -161,15 +162,15 @@ export function createQtKyLuat(items, done) {
             } else {
                 if (done) {
                     T.notify('Tạo kỷ luật thành công!', 'success');
-                    dispatch(getQtKyLuatPage());
-                    done(data);
+                    isStaffEdit ? dispatch(getStaffEdit(data.item.shcc)) : dispatch(getQtKyLuatPage());
+                    isStaffEdit ? (done && done()) : done(data);
                 }
             }
         }, () => T.notify('Tạo kỷ luật bị lỗi!', 'danger'));
     };
 }
 
-export function deleteQtKyLuat(id, done) {
+export function deleteQtKyLuat(isStaffEdit, id, shcc = null, done) {
     return dispatch => {
         const url = '/api/tccb/qua-trinh/ky-luat';
         T.delete(url, { id }, data => {
@@ -178,14 +179,14 @@ export function deleteQtKyLuat(id, done) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('kỷ luật đã xóa thành công!', 'success', false, 800);
-                dispatch(getQtKyLuatPage());
+                isStaffEdit ? dispatch(getStaffEdit(shcc)) : dispatch(getQtKyLuatPage());
             }
             done && done();
         }, () => T.notify('Xóa kỷ luật bị lỗi!', 'danger'));
     };
 }
 
-export function updateQtKyLuat(id, changes, done) {
+export function updateQtKyLuat(isStaffEdit, id, changes, done) {
     return dispatch => {
         const url = '/api/tccb/qua-trinh/ky-luat';
         T.put(url, { id, changes }, data => {
@@ -195,8 +196,8 @@ export function updateQtKyLuat(id, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật kỷ luật thành công!', 'success');
-                done && done(data.item);
-                dispatch(getQtKyLuatPage());
+                isStaffEdit ? (done && done()) : (done && done(data.item));
+                isStaffEdit ? dispatch(getStaffEdit(data.item.shcc)) :  dispatch(getQtKyLuatPage());
             }
         }, () => T.notify('Cập nhật kỷ luật bị lỗi!', 'danger'));
     };
