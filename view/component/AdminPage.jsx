@@ -172,7 +172,7 @@ export class FormCheckbox extends React.Component {
             <div className={'animated-checkbox ' + className} style={style}>
                 <label>
                     <input type='checkbox' checked={this.state.checked} onChange={this.onCheck} />
-                    <span className={'label-text ' +( this.props.readOnly ? 'text-secondary' : (this.state.checked ? trueClassName : falseClassName))}>{label}</span>
+                    <span className={'label-text ' + (this.props.readOnly ? 'text-secondary' : (this.state.checked ? trueClassName : falseClassName))}>{label}</span>
                 </label>
             </div>
         );

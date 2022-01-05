@@ -24,7 +24,7 @@ class ComponentTTCongTac extends AdminPage {
             this.ngayBatDauCongTac.value(item.ngayBatDauCongTac ? item.ngayBatDauCongTac : '');
             this.ngayBienChe.value(item.ngayBienChe ? item.ngayBienChe : '');
             this.donViTuyenDung.value(item.donViTuyenDung ? item.donViTuyenDung : '');
-            this.chucDanh.value(item.chucDanh ? item.chucDanh : '');
+            this.ngach.value(item.ngach ? item.ngach : '');
             this.dienHopDong.value(item.hopDongCanBo ? item.hopDongCanBo : '');
             this.loaiHopDong.value(item.loaiHopDongCanBo ? item.loaiHopDongCanBo : '');
 
@@ -80,7 +80,7 @@ class ComponentTTCongTac extends AdminPage {
                 ngayBatDauCongTac: this.getValue(this.ngayBatDauCongTac) ? this.getValue(this.ngayBatDauCongTac).getTime() : '',
                 ngayBienChe: this.getValue(this.ngayBienChe) ? this.getValue(this.ngayBienChe).getTime() : '',
                 donViTuyenDung: this.getValue(this.donViTuyenDung),
-                chucDanh: this.getValue(this.chucDanh),
+                ngach: this.getValue(this.ngach),
                 hopDongCanBo: this.getValue(this.dienHopDong),
                 loaiHopDong: this.getValue(this.loaiHopDong),
                 bacLuong: this.getValue(this.bacLuong),
@@ -132,7 +132,7 @@ class ComponentTTCongTac extends AdminPage {
                     <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayBatDauCongTac = e} label='Ngày bắt đầu công tác tại trường' readOnly={this.props.userEdit} />
                     <FormDatePicker type='date-mask' className='col-md-4' ref={e => this.ngayBienChe = e} label='Ngày vào biên chế' readOnly={this.props.userEdit} />
                     <FormSelect data={SelectAdapter_DmDonVi} className='col-md-8' ref={e => this.donViTuyenDung = e} label='Đơn vị ban hành Quyết định tuyển dụng' readOnly={this.props.userEdit} />
-                    <FormSelect data={SelectAdapter_DmNgachCdnnV2} className='col-md-4' ref={e => this.chucDanh = e} label='Chức danh nghề nghiệp' readOnly={this.props.userEdit} />
+                    <FormSelect data={SelectAdapter_DmNgachCdnnV2} className='col-md-4' ref={e => this.ngach = e} label='Chức danh nghề nghiệp' readOnly={this.props.userEdit} />
                     <FormSelect data={SelectAdapter_DmDienHopDongV2} className='col-md-4' ref={e => this.dienHopDong = e} label='Diện hợp đồng' readOnly={this.props.userEdit} />
                     <FormSelect data={SelectAdapter_DmLoaiHopDongV2} className='col-md-4' ref={e => this.loaiHopDong = e} label='Loại hợp đồng' readOnly={this.props.userEdit} />
 
