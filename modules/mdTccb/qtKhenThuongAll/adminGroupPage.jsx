@@ -8,12 +8,12 @@ import {
     deleteQtKhenThuongAll, createQtKhenThuongAll, getQtKhenThuongAllGroupPageMa, 
 } from './redux';
 
-import { getStaffAll, SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
-import { getDmKhenThuongKyHieuAll } from 'modules/mdDanhMuc/dmKhenThuongKyHieu/redux';
-import { getDmKhenThuongChuThichAll } from 'modules/mdDanhMuc/dmKhenThuongChuThich/redux';
+import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
+import { SelectAdapter_DmKhenThuongKyHieuV2 } from 'modules/mdDanhMuc/dmKhenThuongKyHieu/redux';
+import { SelectAdapter_DmKhenThuongChuThichV2 } from 'modules/mdDanhMuc/dmKhenThuongChuThich/redux';
 import { getDmKhenThuongLoaiDoiTuongAll } from 'modules/mdDanhMuc/dmKhenThuongLoaiDoiTuong/redux';
-import { getDmBoMonAll, getDmBoMon, SelectAdapter_DmBoMon} from 'modules/mdDanhMuc/dmBoMon/redux';
-import { getDmDonViAll, getDmDonVi, SelectAdapter_DmDonVi} from 'modules/mdDanhMuc/dmDonVi/redux';
+import { SelectAdapter_DmBoMon} from 'modules/mdDanhMuc/dmBoMon/redux';
+import { SelectAdapter_DmDonVi} from 'modules/mdDanhMuc/dmDonVi/redux';
 
 class EditModal extends AdminModal {
     state = { id: '', doiTuong: '' };
@@ -22,24 +22,6 @@ class EditModal extends AdminModal {
             if (items) {
                 this.loaiDoiTuongTable = [];
                 items.forEach(item => this.loaiDoiTuongTable.push({
-                    'id': item.ma,
-                    'text': item.ten
-                }));
-            }
-        });
-        this.props.getThanhTich(items => {
-            if (items) {
-                this.thanhTichTable = [];
-                items.forEach(item => this.thanhTichTable.push({
-                    'id': item.ma,
-                    'text': item.ten
-                }));
-            }
-        });
-        this.props.getChuThich(items => {
-            if (items) {
-                this.chuThichTable = [];
-                items.forEach(item => this.chuThichTable.push({
                     'id': item.ma,
                     'text': item.ten
                 }));
@@ -107,9 +89,9 @@ class EditModal extends AdminModal {
 
                 <FormSelect className='col-md-12' ref={e => this.maBoMon = e} label='Bộ môn' data={SelectAdapter_DmBoMon} style={doiTuong == '04' ? {} : { display: 'none' }} readOnly={true} />
 
-                <FormSelect className='col-md-12' ref={e => this.thanhTich = e} label='Thành tích' data={this.thanhTichTable} readOnly={false} />
+                <FormSelect className='col-md-12' ref={e => this.thanhTich = e} label='Thành tích' data={SelectAdapter_DmKhenThuongKyHieuV2} readOnly={false} />
                 <FormTextBox className='col-md-4' ref={e => this.namDatDuoc = e} label='Năm đạt được (yyyy)' type='year' readOnly={false} />
-                <FormSelect className='col-md-8' ref={e => this.chuThich = e} label='Chú thích' data={this.chuThichTable} readOnly={false} />
+                <FormSelect className='col-md-8' ref={e => this.chuThich = e} label='Chú thích' data={SelectAdapter_DmKhenThuongChuThichV2} readOnly={false} />
                 <FormTextBox className='col-md-4' ref={e => this.diemThiDua = e} type='number' label='Điểm thi đua' readOnly={false} />
 
             </div>
@@ -155,7 +137,6 @@ class QtKhenThuongAllGroupPage extends AdminPage {
         }
         name += '.xlsx';
         T.download(T.url(`/api/tccb/qua-trinh/khen-thuong-all/download-excel/${loaiDoiTuong}/${maDoiTuong}`), name);
-        //this.props.downloadExcel('', '')
     }
 
     delete = (e, item) => {
@@ -253,14 +234,8 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                     getPage={this.props.getQtKhenThuongAllPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createQtKhenThuongAll} update={this.props.updateQtKhenThuongAllGroupPageMa}
-                    getThanhTich={this.props.getDmKhenThuongKyHieuAll} permissions={currentPermissions}
-                    getChuThich={this.props.getDmKhenThuongChuThichAll}
+                    permissions={currentPermissions}
                     getLoaiDoiTuong={this.props.getDmKhenThuongLoaiDoiTuongAll}
-                    getBoMon={this.props.getDmBoMonAll}
-                    getDonVi={this.props.getDmDonViAll}
-                    getStaff={this.props.getStaffAll} 
-                    getDonViItem = {this.props.getDmDonVi}    
-                    getBoMonItem = {this.props.getDmBoMon}
                 />
                 {
                     permission.read &&
@@ -277,7 +252,6 @@ class QtKhenThuongAllGroupPage extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtKhenThuongAll: state.qtKhenThuongAll });
 const mapActionsToProps = {
     getQtKhenThuongAllAll, getQtKhenThuongAllPage, deleteQtKhenThuongAll, createQtKhenThuongAll,
-    updateQtKhenThuongAllGroupPageMa, getStaffAll, getDmKhenThuongKyHieuAll, getDmKhenThuongChuThichAll, 
-    getDmKhenThuongLoaiDoiTuongAll, getDmBoMonAll, getDmDonViAll, getQtKhenThuongAllGroupPageMa, getDmDonVi, getDmBoMon,
+    updateQtKhenThuongAllGroupPageMa, getDmKhenThuongLoaiDoiTuongAll, getQtKhenThuongAllGroupPageMa,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtKhenThuongAllGroupPage);

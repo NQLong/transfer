@@ -9,8 +9,8 @@ import {
 } from './redux';
 import { DateInput } from 'view/component/Input';
 import { SelectAdapter_FwCanBo} from 'modules/mdTccb/tccbCanBo/redux';
-import { getDmDonViAll, getDmDonVi} from 'modules/mdDanhMuc/dmDonVi/redux';
-import { getDmKyLuatAll} from 'modules/mdDanhMuc/dmKhenThuongKyLuat/reduxKyLuat';
+import { SelectAdapter_DmDonVi} from 'modules/mdDanhMuc/dmDonVi/redux';
+import { SelectAdapter_DmKyLuatV2} from 'modules/mdDanhMuc/dmKhenThuongKyLuat/reduxKyLuat';
 
 const dateType = [
     { id: 'yyyy', text: 'yyyy' },
@@ -32,15 +32,6 @@ class EditModal extends AdminModal {
     };
     multiple = false;
     componentDidMount() {
-        this.props.getKyLuat(items => {
-            if (items) {
-                this.kyLuatTable = [];
-                items.forEach(item => this.kyLuatTable.push({
-                    'id': item.ma,
-                    'text': item.ten
-                }));
-            }
-        });
     }
 
     onShow = (item, multiple = true) => {
@@ -116,7 +107,7 @@ class EditModal extends AdminModal {
             body: <div className='row'>
                 <FormSelect className='col-md-12' multiple = {this.multiple} ref={e => this.maCanBo = e} label='Mã số cán bộ' data={SelectAdapter_FwCanBo} readOnly={readOnly} /> 
 
-                <FormSelect className='col-md-12' ref={e => this.hinhThucKyLuat = e} label='Hình thức kỷ luật' data={this.kyLuatTable} readOnly={false} /> 
+                <FormSelect className='col-md-12' ref={e => this.hinhThucKyLuat = e} label='Hình thức kỷ luật' data={SelectAdapter_DmKyLuatV2} readOnly={false} /> 
 
                 <FormTextBox className='col-md-12' ref={e => this.capQuyetDinh = e} type='text' label='Cấp quyết định' readOnly={false} />
 
@@ -135,19 +126,9 @@ class EditModal extends AdminModal {
 class QtKyLuat extends AdminPage {
     checked = false;
     curState = [];
-    stateTable = [];
     searchText = '';
     componentDidMount() {
         T.ready('/user/tccb', () => {
-            this.props.getDmDonViAll(items => {
-                if (items) {
-                    this.stateTable = [];
-                    items.forEach(item => this.stateTable.push({
-                        'id': item.ma,
-                        'text': item.ten
-                    }));
-                }
-            });
             T.onSearch = (searchText) => {
                 // if (this.checked) this.props.getQtKyLuatGroupPage(undefined, undefined, searchText || '');
                 // else 
@@ -263,7 +244,7 @@ class QtKyLuat extends AdminPage {
                 'Quá trình kỷ luật'
             ],
             advanceSearch: <>
-                <FormSelect className='col-12 col-md-12' multiple = {true} ref={e => this.loaiDoiTuong = e} label='Chọn loại đơn vị (có thể chọn nhiều loại)' data={this.stateTable} onChange={() => this.changeAdvancedSearch()} allowClear={true} />
+                <FormSelect className='col-12 col-md-12' multiple = {true} ref={e => this.loaiDoiTuong = e} label='Chọn loại đơn vị (có thể chọn nhiều loại)' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} />
             </>,
             content: <>
                 <div className='tile'>
@@ -274,10 +255,7 @@ class QtKyLuat extends AdminPage {
                     getPage={this.checked ? this.props.getQtKyLuatGroupPage : this.props.getQtKyLuatPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     permissions={currentPermissions}
-                    create={this.props.createQtKyLuat} update={this.props.updateQtKyLuat}
-                    getKyLuat={this.props.getDmKyLuatAll} 
-                    getDonVi={this.props.getDmDonViAll}
-                    getDonViItem = {this.props.getDmDonVi}    
+                    create={this.props.createQtKyLuat} update={this.props.updateQtKyLuat}  
                 />
             </>,
             backRoute: '/user/tccb',
@@ -289,6 +267,6 @@ class QtKyLuat extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtKyLuat: state.qtKyLuat });
 const mapActionsToProps = {
     getQtKyLuatAll, getQtKyLuatPage, deleteQtKyLuat, createQtKyLuat,
-    updateQtKyLuat, getDmDonViAll, getQtKyLuatGroupPage, getDmDonVi, getDmKyLuatAll, 
+    updateQtKyLuat, getQtKyLuatGroupPage, 
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtKyLuat);

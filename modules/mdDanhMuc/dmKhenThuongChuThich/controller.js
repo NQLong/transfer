@@ -32,7 +32,7 @@ module.exports = app => {
         app.model.dmKhenThuongChuThich.getAll(condition, (error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/danh-muc/khen-thuong-chu-thich/edit/:ma', app.permission.check('user:login'), (req, res) => {
+    app.get('/api/danh-muc/khen-thuong-chu-thich/item/:ma', app.permission.check('user:login'), (req, res) => {
         app.model.dmKhenThuongChuThich.get({ma: req.params.ma}, (error, item) => res.send({ error, item }));
     });
 
