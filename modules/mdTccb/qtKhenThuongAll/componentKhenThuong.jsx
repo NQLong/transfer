@@ -98,7 +98,6 @@ class ComponentKhenThuong extends AdminPage {
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Đối tượng</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm đạt được</th>
                         <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Thành tích</th>
-                        <th style={{ width: 'auto', textAlign: 'right', whiteSpace: 'nowrap' }}>Điểm thi đua</th>
                         <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                     </tr>
                 ),
@@ -125,7 +124,6 @@ class ComponentKhenThuong extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemThiDua} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show({item: item, shcc: item.maCanBo})} onDelete={this.delete} />
                     </tr>

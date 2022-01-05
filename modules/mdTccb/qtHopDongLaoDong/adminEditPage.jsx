@@ -16,7 +16,7 @@ import {
 } from './redux';
 import TextInput, { DateInput, Select } from 'view/component/Input';
 import { QTForm } from 'view/component/Form';
-import { SelectAdapter_DmChucVu, getDmChucVuAll } from 'modules/mdDanhMuc/dmChucVu/redux';
+import { getDmChucVuAll } from 'modules/mdDanhMuc/dmChucVu/redux';
 import { SelectAdapter_DmNgachCdnn } from 'modules/mdDanhMuc/dmNgachCdnn/redux';
 import { SelectAdapter_DmQuocGia } from 'modules/mdDanhMuc/dmQuocGia/redux';
 import { ComponentDiaDiem } from 'modules/mdDanhMuc/dmDiaDiem/componentDiaDiem';
@@ -25,6 +25,7 @@ import { SelectAdapter_DmDanToc } from 'modules/mdDanhMuc/dmDanToc/redux';
 import { SelectAdapter_DmTonGiao } from 'modules/mdDanhMuc/dmTonGiao/redux';
 import Dropdown from 'view/component/Dropdown';
 import Loading from 'view/component/Loading';
+import { SelectAdapter_DmChucDanhChuyenMon } from 'modules/mdDanhMuc/dmChucDanhChuyenMon/redux';
 
 
 const EnumLoaiCanBo = Object.freeze({
@@ -185,6 +186,7 @@ class QtHopDongLaoDongEditPage extends QTForm {
             this.nguoiKy.current.setVal(this.state.truongPhongTccb);
             this.setState({ chucVuNguoiKy: this.chucVuMapper['003'] + ' - ' + this.donViMapper['30'] });
         }
+        console.log(chucDanhChuyenMon);
         this.urlMa && this.selectedShcc.current.setVal(shcc);
         this.phai.current.setVal(phai);
         this.quocGia.current.setVal(quocGia ? quocGia : '');
@@ -235,7 +237,6 @@ class QtHopDongLaoDongEditPage extends QTForm {
         cmndNgayCap: this.cmndNgayCap.current.getFormVal(),
         cmndNoiCap: this.cmndNoiCap.current.getFormVal(),
         dienThoaiCaNhan: this.dienThoaiCaNhan.current.getFormVal(),
-        hopDongCanBo: 'LĐ',
         email: this.email.current.getFormVal(),
         hopDongCanBoNgay: this.batDauLamViec.current.getFormVal(),
         nguoiDuocThue: this.urlMa ? this.selectedShcc.current.getFormVal() : this.shcc.current.getFormVal(),
@@ -247,9 +248,10 @@ class QtHopDongLaoDongEditPage extends QTForm {
         ngayKyHopDongTiepTheo: this.ngayKyHopDongTiepTheo.current.getFormVal(),
         diaDiemLamViec: this.diaDiemLamViec.current.getFormVal(),
         chucDanhChuyenMon: this.chucDanhChuyenMon.current.getFormVal(),
+        chucDanh: this.chucDanhChuyenMon.current.getFormVal(),
         congViecDuocGiao: this.congViecDuocGiao.current.getFormVal(),
         chiuSuPhanCong: this.chiuSuPhanCong.current.getFormVal(),
-        ngach: Number(this.ngach.current.getFormVal()),
+        ngach: this.ngach.current.getFormVal(),
         bac: this.bac.current.getFormVal(),
         heSo: this.heSo.current.getFormVal(),
         ngayKyHopDong: this.ngayKyHopDong.current.getFormVal(),
@@ -391,11 +393,10 @@ class QtHopDongLaoDongEditPage extends QTForm {
         };
         this.main.current.classList.add('validated');
         if (data.data) {
-            console.log(this.state.shcc);
             if (this.urlMa) {
-                this.props.updateQtHopDongLaoDong(this.urlMa, Object.assign(data.data, dcThuongTru, dcCuTru, dcNguyenQuan, dcNoiSinh), () => {
+                this.props.updateQtHopDongLaoDong(this.urlMa, Object.assign(data.data, dcThuongTru, dcCuTru, dcNguyenQuan, dcNoiSinh, {hopDongCanBo: 'LĐ'}), () => {
                     console.log(data.data);
-                    this.props.updateStaff(this.state.shcc, Object.assign(data.data, dcThuongTru, dcCuTru, dcNguyenQuan, dcNoiSinh), () => {
+                    this.props.updateStaff(this.state.shcc, Object.assign(data.data, dcThuongTru, dcCuTru, dcNguyenQuan, dcNoiSinh, {hopDongCanBo: 'LĐ'}), () => {
                         this.main.current.classList.remove('validated');
                         this.props.history.push(`/user/tccb/qua-trinh/hop-dong-lao-dong/${this.urlMa}`);
                     });
@@ -498,14 +499,14 @@ class QtHopDongLaoDongEditPage extends QTForm {
                         <div className='form-group col-xl-3 col-md-6' id='ketThucHd'><DateInput ref={this.ketThucHopDong} label='Ngày kết thúc hợp đồng' min={new Date(1900, 1, 1).getTime()} max={new Date(new Date().getFullYear() + 4, 1, 1).getTime()} disabled={readOnly} required={this.state.isKetThucHd} /></div>
                         <div className='form-group col-xl-3 col-md-6' id='kyTiepTheo'><DateInput ref={this.ngayKyHopDongTiepTheo} min={new Date(1900, 1, 1).getTime()} max={new Date(new Date().getFullYear() + 1, 1, 1).getTime()} disabled={readOnly} label='Ngày ký hợp đồng tiếp theo' /></div>
                         <div className='form-group col-xl-12 col-md-12'><Select adapter={SelectAdapter_DmDonViFaculty} ref={this.diaDiemLamViec} disabled={readOnly} label='Địa điểm làm việc' /></div>
-                        <div className='form-group col-xl-4 col-md-4'><Select adapter={SelectAdapter_DmChucVu} ref={this.chucDanhChuyenMon} disabled={readOnly} label='Chức danh chuyên môn' /></div>
+                        <div className='form-group col-xl-4 col-md-4'><Select adapter={SelectAdapter_DmChucDanhChuyenMon} ref={this.chucDanhChuyenMon} disabled={readOnly} label='Chức danh chuyên môn' /></div>
                         <div className='form-group col-xl-4 col-md-4'><TextInput ref={this.congViecDuocGiao} label='Công việc được giao' disabled={readOnly} /></div>
                         <div className='form-group col-xl-4 col-md-4'><TextInput ref={this.chiuSuPhanCong} label='Chịu sự phân công' disabled={readOnly} /></div>
-                        <div className='form-group col-xl-3 col-md-4'><Select ref={this.ngach} label='Ngạch' adapter={SelectAdapter_DmNgachCdnn} disabled={readOnly} onChange={this.changeNgach} required /></div>
+                        <div className='form-group col-xl-6 col-md-4'><Select ref={this.ngach} label='Ngạch' adapter={SelectAdapter_DmNgachCdnn} disabled={readOnly} onChange={this.changeNgach} required /></div>
 
                         <div className='form-group col-xl-3 col-md-6'><TextInput ref={this.bac} label='Bậc' disabled={readOnly} /></div>
                         <div className='form-group col-xl-3 col-md-6'><TextInput ref={this.heSo} label='Hệ số' disabled={readOnly} /></div>
-                        <div className='form-group col-xl-3 col-md-4'><TextInput ref={this.phanTramHuong} label='Phần trăm hưởng' disabled={readOnly} /></div>
+                        <div className='form-group col-xl-12 col-md-4'><TextInput ref={this.phanTramHuong} label='Phần trăm hưởng' disabled={readOnly} /></div>
                     </div>
                 </div>
                 <Link to='/user/tccb/qua-trinh/hop-dong-lao-dong' className='btn btn-secondary btn-circle' style={{ position: 'fixed', bottom: '10px' }}>

@@ -13,7 +13,7 @@ module.exports = app => {
     app.get('/user/dm-bo-mon/upload', app.permission.check('dmBoMon:write'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/dm-bo-mon/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/dm-bo-mon/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
         let pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             condition = { statement: null };
@@ -26,15 +26,15 @@ module.exports = app => {
         app.model.dmBoMon.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
     });
 
-    app.get('/api/dm-bo-mon/all', (req, res) => {
+    app.get('/api/dm-bo-mon/all', app.permission.check('user:login'), (req, res) => {
         app.model.dmBoMon.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/dm-bo-mon/item/:ma', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/dm-bo-mon/item/:ma', app.permission.check('user:login'), (req, res) => {
         app.model.dmBoMon.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
     });
 
-    app.get('/api/dm-bo-mon/donVi', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/dm-bo-mon/donVi', app.permission.check('user:login'), (req, res) => {
         app.model.dmDonVi.getAll({}, 'ma , ten', (error, item) => res.send({ error, item }));
     });
 

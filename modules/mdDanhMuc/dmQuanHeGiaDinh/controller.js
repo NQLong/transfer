@@ -25,12 +25,12 @@ module.exports = app => {
         app.model.dmQuanHeGiaDinh.getPage(pageNumber, pageSize, condition, '*', 'ma', (error, page) => res.send({ error, page }));
     });
 
-    app.get('/api/danh-muc/quan-he-gia-dinh/all', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/danh-muc/quan-he-gia-dinh/all', app.permission.check('user:login'), (req, res) => {
         const condition = req.query.condition || {};
         app.model.dmQuanHeGiaDinh.getAll(condition, (error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/danh-muc/quan-he-gia-dinh/item/:ma', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/danh-muc/quan-he-gia-dinh/item/:ma', app.permission.check('user:login'), (req, res) => {
         app.model.dmQuanHeGiaDinh.get({ma: req.params.ma}, (error, item) => res.send({ error, item }));
     });
 

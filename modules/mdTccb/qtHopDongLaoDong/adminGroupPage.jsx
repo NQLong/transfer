@@ -16,7 +16,7 @@ class QtHopDongLaoDongGroupPage extends AdminPage {
                 shcc = route.parse(window.location.pathname);
             T.onSearch = (searchText) => this.props.getQtHopDongLaoDongPage(undefined, undefined, searchText || '');
             T.showSearchBox();
-            this.props.getQtHopDongLaoDongPage(undefined, undefined, shcc.shcc);
+            this.props.getQtHopDongLaoDongShccPage(undefined, undefined, shcc.shcc);
         });
     }
 

@@ -17,7 +17,6 @@ import {
 } from './redux';
 import TextInput, { DateInput, Select } from 'view/component/Input';
 import { QTForm } from 'view/component/Form';
-import { SelectAdapter_DmChucVu } from 'modules/mdDanhMuc/dmChucVu/redux';
 import { SelectAdapter_DmQuocGia } from 'modules/mdDanhMuc/dmQuocGia/redux';
 import { ComponentDiaDiem } from 'modules/mdDanhMuc/dmDiaDiem/componentDiaDiem';
 import { SelectAdapter_DmTrinhDo } from 'modules/mdDanhMuc/dmTrinhDo/redux';
@@ -26,6 +25,7 @@ import { SelectAdapter_DmDanToc } from 'modules/mdDanhMuc/dmDanToc/redux';
 import { SelectAdapter_DmTonGiao } from 'modules/mdDanhMuc/dmTonGiao/redux';
 import { SelectAdapter_DmDienHopDong } from 'modules/mdDanhMuc/dmDienHopDong/redux';
 import Dropdown from 'view/component/Dropdown';
+import { SelectAdapter_DmChucDanhChuyenMon } from 'modules/mdDanhMuc/dmChucDanhChuyenMon/redux';
 
 const EnumLoaiCanBo = Object.freeze({
     1: { text: 'Cán bộ mới' },
@@ -85,7 +85,6 @@ class QtHopDongDvtlTnEditPage extends QTForm {
     }
     componentDidMount() {
         T.ready('/user/tccb');
-        this.kieuHopDong.current.focus();
         this.props.getDmChucVuAll(items => {
             if (items) {
                 this.chucVuMapper = {};
@@ -129,6 +128,7 @@ class QtHopDongDvtlTnEditPage extends QTForm {
         }
         else {
             this.setState({ create: true });
+            this.kieuHopDong.current.focus();
             this.setVal();
         }
 
@@ -458,7 +458,7 @@ class QtHopDongDvtlTnEditPage extends QTForm {
                         <div className='form-group col-xl-3 col-md-6'><DateInput ref={this.ketThucHopDong} label='Ngày kết thúc hợp đồng' required /></div>
                         <div className='form-group col-xl-3 col-md-6'><DateInput ref={this.ngayKyHopDongTiepTheo} label='Ngày ký hợp đồng tiếp theo' /></div>
                         <div className='form-group col-xl-12 col-md-12'><Select adapter={SelectAdapter_DmDonViFaculty} ref={this.diaDiemLamViec} label='Địa điểm làm việc' /></div>
-                        <div className='form-group col-xl-4 col-md-4'><Select adapter={SelectAdapter_DmChucVu} ref={this.chucDanhChuyenMon} label='Chức danh chuyên môn' /></div>
+                        <div className='form-group col-xl-4 col-md-4'><Select adapter={SelectAdapter_DmChucDanhChuyenMon} ref={this.chucDanhChuyenMon} label='Chức danh chuyên môn' /></div>
                         <div className='form-group col-xl-4 col-md-4'><TextInput ref={this.congViecDuocGiao} label='Công việc được giao' /></div>
                         <div className='form-group col-xl-4 col-md-4'><TextInput ref={this.chiuSuPhanCong} label='Chịu sự phân công' /></div>
                         {!this.state.item || this.state.kieu == 'DVTL' ? <div className='form-group col-xl-6 col-md-6'><Select adapter={SelectAdapter_DmDonViFaculty} ref={this.donViChiTra} label='Đơn vị chi trả' /></div> : null}

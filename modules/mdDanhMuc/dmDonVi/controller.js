@@ -33,11 +33,11 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/danh-muc/don-vi/all', (req, res) => {
+    app.get('/api/danh-muc/don-vi/all', app.permission.check('user:login'), (req, res) => {
         app.model.dmDonVi.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/danh-muc/don-vi/item/:id', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/danh-muc/don-vi/item/:id', app.permission.check('user:login'), (req, res) => {
         app.model.dmDonVi.get({ ma: req.params.id }, (error, item) => res.send({ error, item }));
     });
 

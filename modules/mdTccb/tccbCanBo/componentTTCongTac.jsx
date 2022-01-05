@@ -176,7 +176,7 @@ class ComponentTTCongTac extends AdminPage {
                     {this.state.dangNghiTheoCheDo ? <FormDatePicker type='date-mask' ref={e => this.ngayKetThucNghiTheoCheDo = e} label='Đến ngày' className='col-md-3' readOnly={this.props.userEdit} /> : null}
                     {this.state.dangNghiTheoCheDo ? <FormRichTextBox ref={e => this.lyDoNghiTheoCheDo = e} label='Lý do/Nội dung' className='col-md-12' readOnly={this.props.userEdit} /> : <div className='col-md-9'></div>}
 
-                    <FormCheckbox ref={e => this.daNghi = e} label='Đã nghỉ việc/Nghỉ hưu/Chuyển công tác' onChange={value => this.setState({ daNghi: value })} className='col-md-4' />
+                    <FormCheckbox ref={e => this.daNghi = e} label='Đã nghỉ việc/Nghỉ hưu/Chuyển công tác' onChange={value => this.setState({ daNghi: value })} readOnly={this.props.userEdit} className='col-md-4' />
                     {this.state.daNghi ? <FormDatePicker type='date-mask' ref={e => this.ngayDaNghi = e} label='Thời điểm nghỉ' placeholder='Từ ngày, tháng, năm ...' className='col-md-4' /> : null}
                     {this.state.daNghi ? <FormTextBox ref={e => this.soHieuDaNghi = e} label='Số hiệu văn bản' className='col-md-4' /> : null}
                     {this.state.daNghi ? <FormRichTextBox ref={e => this.noiDungDaNghi = e} label='Nội dung' className='col-md-12' /> : <div className='col-md-9'></div>}
