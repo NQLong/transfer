@@ -60,6 +60,22 @@ export function getDmKhenThuongChuThichPage(pageNumber, pageSize, pageCondition,
     };
 }
 
+export function getDmKhenThuongChuThich(ma, done) {
+    return () => {
+        const url = `/api/danh-muc/khen-thuong-chu-thich/item/${ma}`;
+        T.get(url, data => {
+            if (data.error) {
+                T.notify('Lấy thông tin khen thưởng chú thích lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (done) done(data.item);
+            }
+        }, error => {
+            console.error(`GET: ${url}.`, error);
+        });
+    };
+}
+
 export function getDmKhenThuongChuThichAll(done) {
     return dispatch => {
         const url = '/api/danh-muc/khen-thuong-chu-thich/all';
@@ -139,4 +155,13 @@ export const SelectAdapter_DmKhenThuongChuThich = {
     getAll: getDmKhenThuongChuThichAll,
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
     // condition: { kichHoat: 1 },
+};
+
+export const SelectAdapter_DmKhenThuongChuThichV2 = {
+    ajax: true,
+    data: params => ({ condition: params.term }),
+    url: '/api/danh-muc/khen-thuong-chu-thich/page/1/20',
+    getOne: getDmKhenThuongChuThich,
+    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.ten })) : [] }),
+    fetchOne: (ma, done) => (getDmKhenThuongChuThich(ma, item => done && done({ id: item.ma, text: item.ten })))(),
 };

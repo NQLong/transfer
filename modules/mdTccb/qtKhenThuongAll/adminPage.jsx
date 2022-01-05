@@ -7,12 +7,12 @@ import {
     getQtKhenThuongAllPage, getQtKhenThuongAllAll, updateQtKhenThuongAll,
     deleteQtKhenThuongAll, createQtKhenThuongAll, getQtKhenThuongAllGroupPage,
 } from './redux';
-import { getStaffAll, SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
-import { getDmKhenThuongKyHieuAll } from 'modules/mdDanhMuc/dmKhenThuongKyHieu/redux';
-import { getDmKhenThuongChuThichAll } from 'modules/mdDanhMuc/dmKhenThuongChuThich/redux';
+import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
+import { SelectAdapter_DmKhenThuongKyHieuV2 } from 'modules/mdDanhMuc/dmKhenThuongKyHieu/redux';
+import { SelectAdapter_DmKhenThuongChuThichV2 } from 'modules/mdDanhMuc/dmKhenThuongChuThich/redux';
 import { getDmKhenThuongLoaiDoiTuongAll } from 'modules/mdDanhMuc/dmKhenThuongLoaiDoiTuong/redux';
-import { getDmBoMonAll, getDmBoMon, SelectAdapter_DmBoMon} from 'modules/mdDanhMuc/dmBoMon/redux';
-import { getDmDonViAll, getDmDonVi, SelectAdapter_DmDonVi} from 'modules/mdDanhMuc/dmDonVi/redux';
+import { SelectAdapter_DmBoMon} from 'modules/mdDanhMuc/dmBoMon/redux';
+import { SelectAdapter_DmDonVi} from 'modules/mdDanhMuc/dmDonVi/redux';
 import Loading from 'view/component/Loading';
 
 class EditModal extends AdminModal {
@@ -23,24 +23,6 @@ class EditModal extends AdminModal {
             if (items) {
                 this.loaiDoiTuongTable = [];
                 items.forEach(item => this.loaiDoiTuongTable.push({
-                    'id': item.ma,
-                    'text': item.ten
-                }));
-            }
-        });
-        this.props.getThanhTich(items => {
-            if (items) {
-                this.thanhTichTable = [];
-                items.forEach(item => this.thanhTichTable.push({
-                    'id': item.ma,
-                    'text': item.ten
-                }));
-            }
-        });
-        this.props.getChuThich(items => {
-            if (items) {
-                this.chuThichTable = [];
-                items.forEach(item => this.chuThichTable.push({
                     'id': item.ma,
                     'text': item.ten
                 }));
@@ -90,7 +72,7 @@ class EditModal extends AdminModal {
                 diemThiDua: this.diemThiDua.value(),
             };
             if (index == list_ma.length - 1) {
-                this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
+                this.state.id ? this.props.update(false, this.state.id, changes, this.hide) : this.props.create(false, changes, this.hide);
                 this.setState({
                     id: '', doiTuong: ''
                 });
@@ -99,7 +81,7 @@ class EditModal extends AdminModal {
                 this.maBoMon.reset();
             }
             else {
-                this.state.id ? this.props.update(this.state.id, changes) : this.props.create(changes);
+                this.state.id ? this.props.update(false, this.state.id, changes) : this.props.create(false, changes);
             }
         });
     }
@@ -129,9 +111,9 @@ class EditModal extends AdminModal {
                     style={doiTuong == '04' ? {} : { display: 'none' }} 
                     readOnly={readOnly} />
 
-                <FormSelect className='col-md-12' ref={e => this.thanhTich = e} label='Thành tích' data={this.thanhTichTable} readOnly={false} />
+                <FormSelect className='col-md-12' ref={e => this.thanhTich = e} label='Thành tích' data={SelectAdapter_DmKhenThuongKyHieuV2} readOnly={false} />
                 <FormTextBox className='col-md-4' ref={e => this.namDatDuoc = e} label='Năm đạt được (yyyy)' type='year' readOnly={false} />
-                <FormSelect className='col-md-8' ref={e => this.chuThich = e} label='Chú thích' data={this.chuThichTable} readOnly={false} />
+                <FormSelect className='col-md-8' ref={e => this.chuThich = e} label='Chú thích' data={SelectAdapter_DmKhenThuongChuThichV2} readOnly={false} />
                 <FormTextBox className='col-md-4' ref={e => this.diemThiDua = e} type='number' label='Điểm thi đua' readOnly={false} />
 
             </div>
@@ -146,43 +128,7 @@ class QtKhenThuongAll extends AdminPage {
         { 'id': '-1', 'text': 'Tất cả' }
     ];
     searchText = '';
-    staffTable = [];
-    donViTable = [];
-    boMonTable = [];
     componentDidMount() {
-        this.props.getStaffAll(items => {
-            if (items) {
-                this.staffTable = [];
-                items.forEach(item => this.staffTable.push({
-                    'id': item.shcc,
-                    'text': item.shcc + ' - ' + item.ho + ' ' + item.ten
-                }));
-            }
-        });
-        this.props.getDmDonViAll(items => {
-            if (items) {
-                this.donViTable = [];
-                items.forEach(item => this.donViTable.push({
-                    'id': item.ma,
-                    'text': item.ten
-                }));
-            }
-        });
-        this.props.getDmBoMonAll(items => {
-            if (items) {
-                this.boMonTable = [];
-                items.forEach(item => {
-                    this.props.getDmDonVi(item.maDv, data => {
-                        if (data) {
-                            this.boMonTable.push({
-                                'id': item.ma,
-                                'text': item.ten + ' (KHOA ' + data.ten + ')'
-                            });
-                        }
-                    });
-                });
-            }
-        });
         T.ready('/user/tccb', () => {
             this.props.getDmKhenThuongLoaiDoiTuongAll(items => {
                 if (items) {
@@ -245,7 +191,7 @@ class QtKhenThuongAll extends AdminPage {
     }
     delete = (e, item) => {
         T.confirm('Xóa khen thưởng', 'Bạn có chắc bạn muốn xóa khen thưởng này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtKhenThuongAll(item.id, error => {
+            isConfirm && this.props.deleteQtKhenThuongAll(false, item.id, null, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá khen thưởng bị lỗi!', 'danger');
                 else T.alert('Xoá khen thưởng thành công!', 'success', false, 800);
             });
@@ -305,7 +251,7 @@ class QtKhenThuongAll extends AdminPage {
 
                         )}
                         />
-                        <TableCell type='text' content={(
+                        <TableCell type='text' style={{textAlign: 'center' }} content={(
                             <>
                                 {item.namDatDuoc}
                             </>
@@ -353,12 +299,9 @@ class QtKhenThuongAll extends AdminPage {
                     getPage={this.checked ? this.props.getQtKhenThuongAllGroupPage : this.props.getQtKhenThuongAllPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createQtKhenThuongAll} update={this.props.updateQtKhenThuongAll}
-                    getThanhTich={this.props.getDmKhenThuongKyHieuAll} permissions={currentPermissions}
-                    getChuThich={this.props.getDmKhenThuongChuThichAll}
+                    permissions={currentPermissions}
                     getLoaiDoiTuong={this.props.getDmKhenThuongLoaiDoiTuongAll}
-                    staffTable={this.staffTable}
-                    donViTable={this.donViTable}
-                    boMonTable={this.boMonTable}/>
+                    />
                 {
                     permission.read &&
                     <button className='btn btn-success btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px' }} onClick={this.downloadExcel} >
@@ -375,7 +318,6 @@ class QtKhenThuongAll extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtKhenThuongAll: state.qtKhenThuongAll });
 const mapActionsToProps = {
     getQtKhenThuongAllAll, getQtKhenThuongAllPage, deleteQtKhenThuongAll, createQtKhenThuongAll,
-    updateQtKhenThuongAll, getStaffAll, getDmKhenThuongKyHieuAll, getDmKhenThuongChuThichAll,
-    getDmKhenThuongLoaiDoiTuongAll, getDmBoMonAll, getDmDonViAll, getQtKhenThuongAllGroupPage, getDmDonVi, getDmBoMon,
+    updateQtKhenThuongAll, getDmKhenThuongLoaiDoiTuongAll, getQtKhenThuongAllGroupPage,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtKhenThuongAll);

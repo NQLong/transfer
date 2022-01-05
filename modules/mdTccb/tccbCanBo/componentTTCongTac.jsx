@@ -15,50 +15,55 @@ class ComponentTTCongTac extends AdminPage {
     state = { doiTuongBoiDuong: false, tinhTrangBoiDuong: false, dangONuocNgoai: false, dangNghiTheoCheDo: false, daNghi: false };
 
     value = (item) => {
-        console.log(item);
-        this.shcc = item.shcc;
-        this.ngheNghiepCu.value(item.ngheNghiepCu ? item.ngheNghiepCu : '');
-        this.ngayBatDauCongTac.value(item.ngayBatDauCongTac ? item.ngayBatDauCongTac : '');
-        this.ngayBienChe.value(item.ngayBienChe ? item.ngayBienChe : '');
-        this.donViTuyenDung.value(item.donViTuyenDung ? item.donViTuyenDung : '');
-        this.chucDanh.value(item.chucDanh ? item.chucDanh : '');
-        this.dienHopDong.value(item.hopDongCanBo ? item.hopDongCanBo : '');
-        this.loaiHopDong.value(item.loaiHopDongCanBo ? item.loaiHopDongCanBo: '');
+        this.setState({
+            doiTuongBoiDuong: item.doiTuongBoiDuongKienThucQpan, tinhTrangBoiDuong: item.tinhTrangBoiDuong,
+            dangONuocNgoai: item.dangONuocNgoai, dangNghiTheoCheDo: item.dangNghiTheoCheDo, daNghi: item.daNghi
+        }, () => {
+            this.shcc = item.shcc;
+            this.ngheNghiepCu.value(item.ngheNghiepCu ? item.ngheNghiepCu : '');
+            this.ngayBatDauCongTac.value(item.ngayBatDauCongTac ? item.ngayBatDauCongTac : '');
+            this.ngayBienChe.value(item.ngayBienChe ? item.ngayBienChe : '');
+            this.donViTuyenDung.value(item.donViTuyenDung ? item.donViTuyenDung : '');
+            this.ngach.value(item.ngach ? item.ngach : '');
+            this.dienHopDong.value(item.hopDongCanBo ? item.hopDongCanBo : '');
+            this.loaiHopDong.value(item.loaiHopDongCanBo ? item.loaiHopDongCanBo : '');
 
-        this.componentChucVuChinhQuyen.value(1, this.shcc);
-        this.componentChucVuDoanThe.value(0, this.shcc);
+            this.componentChucVuChinhQuyen.value(1, this.shcc);
+            this.componentChucVuDoanThe.value(0, this.shcc);
 
-        this.bacLuong.value(item.bacLuong ? item.bacLuong : '');
-        this.heSo.value(item.heSoLuong ? item.heSoLuong : '');
-        this.ngayHuong.value(item.ngayHuongLuong ? item.ngayHuongLuong : '');
-        this.tiLeVuotKhung.value(item.tyLeVuotKhung ? item.tyLeVuotKhung : '');
+            this.bacLuong.value(item.bacLuong ? item.bacLuong : '');
+            this.heSo.value(item.heSoLuong ? item.heSoLuong : '');
+            this.ngayHuong.value(item.ngayHuongLuong ? item.ngayHuongLuong : '');
+            this.tiLeVuotKhung.value(item.tyLeVuotKhung ? item.tyLeVuotKhung : '');
 
-        this.phuCapChucVu.value(item.phuCap ? item.phuCap : '');
-        this.tiLePhuCapThamNien.value(item.tiLePhuCapThamNien ? item.tiLePhuCapThamNien : '');
-        this.tiLePhuCapUuDai.value(item.tiLePhuCapUuDai ? item.tiLePhuCapUuDai : '');
+            this.phuCapChucVu.value(item.phuCap ? item.phuCap : '');
+            this.tiLePhuCapThamNien.value(item.tiLePhuCapThamNien ? item.tiLePhuCapThamNien : '');
+            this.tiLePhuCapUuDai.value(item.tiLePhuCapUuDai ? item.tiLePhuCapUuDai : '');
 
-        this.soBhxh.value(item.soBhxh ? item.soBhxh : '');
-        this.ngayBatDauBhxh.value(item.ngayBatDauBhxh ? item.ngayBatDauBhxh : '');
-        this.ngayKetThucBhxh.value(item.ngayKetThucBhxh ? item.ngayKetThucBhxh : '');
-        this.soBhyt.value(item.maTheBhyt ? item.maTheBhyt : '');
-        this.noiKhamBenhBanDau.value(item.noiKhamChuaBenhBanDau ? item.noiKhamChuaBenhBanDau : '');
+            this.soBhxh.value(item.soBhxh ? item.soBhxh : '');
+            this.ngayBatDauBhxh.value(item.ngayBatDauBhxh ? item.ngayBatDauBhxh : '');
+            this.ngayKetThucBhxh.value(item.ngayKetThucBhxh ? item.ngayKetThucBhxh : '');
+            this.soBhyt.value(item.maTheBhyt ? item.maTheBhyt : '');
+            this.noiKhamBenhBanDau.value(item.noiKhamChuaBenhBanDau ? item.noiKhamChuaBenhBanDau : '');
 
-        this.doiTuongBoiDuong.value(item.doiTuongBoiDuongKienThucQpan ? item.doiTuongBoiDuongKienThucQpan : 0);
-        this.setState({ doiTuongBoiDuong: item.doiTuongBoiDuongKienThucQpan ? item.doiTuongBoiDuongKienThucQpan : 0 });
-        this.state.doiTuongBoiDuong ? this.loaiDoiTuongBoiDuong.value(item.loaiDoiTuongBoiDuong ? item.loaiDoiTuongBoiDuong : '') : null;
-        this.state.doiTuongBoiDuong ? this.tinhTrangBoiDuong.value(item.tinhTrangBoiDuong ? item.tinhTrangBoiDuong : 0) : null;
-        this.state.doiTuongBoiDuong && this.setState({ tinhTrangBoiDuong: item.tinhTrangBoiDuong ? item.tinhTrangBoiDuong : 0 });
-        this.state.doiTuongBoiDuong && this.state.tinhTrangBoiDuong ? this.namBoiDuong.value(item.namBoiDuong ? item.namBoiDuong : '') : null;
-        this.state.doiTuongBoiDuong && this.state.tinhTrangBoiDuong ? this.khoaBoiDuong.value(item.khoaBoiDuong ? item.khoaBoiDuong : '') : null;
+            this.doiTuongBoiDuong.value(item.doiTuongBoiDuongKienThucQpan ? item.doiTuongBoiDuongKienThucQpan : 0);
+            this.state.doiTuongBoiDuong ? this.loaiDoiTuongBoiDuong.value(item.loaiDoiTuongBoiDuong ? item.loaiDoiTuongBoiDuong : '') : null;
+            this.state.doiTuongBoiDuong ? this.tinhTrangBoiDuong.value(item.tinhTrangBoiDuong ? item.tinhTrangBoiDuong : 0) : null;
+            this.state.doiTuongBoiDuong && this.state.tinhTrangBoiDuong ? this.namBoiDuong.value(item.namBoiDuong ? item.namBoiDuong : '') : null;
+            this.state.doiTuongBoiDuong && this.state.tinhTrangBoiDuong ? this.khoaBoiDuong.value(item.khoaBoiDuong ? item.khoaBoiDuong : '') : null;
 
 
-        this.dangONuocNgoai.value(item.dangONuocNgoai ? item.dangONuocNgoai : 0);
-        this.daNghi.value(item.daNghi ? item.daNghi: 0);
-        this.setState({ daNghi: item.daNghi});
-        this.state.daNghi && this.ngayDaNghi.value(item.ngayNghi ? item.ngayNghi : '');
-        this.state.daNghi && this.soHieuDaNghi.value(item.soHieuDaNghi ? item.soHieuDaNghi : '');
-        this.state.daNghi && this.noiDungDaNghi.value(item.noiDungDaNghi ? item.noiDungDaNghi : '');
-        
+            this.dangONuocNgoai.value(item.dangONuocNgoai ? item.dangONuocNgoai : 0);
+            this.state.dangONuocNgoai && this.quocGiaDangO.value(item.quocGiaDangO ? item.quocGiaDangO : '');
+            this.state.dangONuocNgoai && this.ngayBatDauONuocNgoai.value(item.ngayBatDauONuocNgoai ? item.ngayBatDauONuocNgoai : '');
+            this.state.dangONuocNgoai && this.ngayKetThucONuocNgoai.value(item.ngayKetThucONuocNgoai ? item.ngayKetThucONuocNgoai : '');
+            this.state.dangONuocNgoai && this.lyDoONuocNgoai.value(item.lyDoONuocNgoai ? item.lyDoONuocNgoai : '');
+            this.daNghi.value(item.daNghi ? item.daNghi : 0);
+            this.state.daNghi && this.ngayDaNghi.value(item.ngayNghi ? item.ngayNghi : '');
+            this.state.daNghi && this.soHieuDaNghi.value(item.soHieuDaNghi ? item.soHieuDaNghi : '');
+            this.state.daNghi && this.noiDungDaNghi.value(item.noiDungDaNghi ? item.noiDungDaNghi : '');
+        });
+
     }
     getValue = (selector) => {
         const data = selector.value();
@@ -75,12 +80,12 @@ class ComponentTTCongTac extends AdminPage {
                 ngayBatDauCongTac: this.getValue(this.ngayBatDauCongTac) ? this.getValue(this.ngayBatDauCongTac).getTime() : '',
                 ngayBienChe: this.getValue(this.ngayBienChe) ? this.getValue(this.ngayBienChe).getTime() : '',
                 donViTuyenDung: this.getValue(this.donViTuyenDung),
-                chucDanh: this.getValue(this.chucDanh),
+                ngach: this.getValue(this.ngach),
                 hopDongCanBo: this.getValue(this.dienHopDong),
                 loaiHopDong: this.getValue(this.loaiHopDong),
                 bacLuong: this.getValue(this.bacLuong),
                 heSoLuong: this.getValue(this.heSo),
-                ngayHuongLuong: this.getValue(this.ngayHuong) ? this.getValue(this.ngayHuong).getTime() : '' ,
+                ngayHuongLuong: this.getValue(this.ngayHuong) ? this.getValue(this.ngayHuong).getTime() : '',
                 tyLeVuotKhung: this.getValue(this.tiLeVuotKhung),
                 phuCapCongViec: this.getValue(this.phuCapChucVu),
                 tiLePhuCapThamNien: this.getValue(this.tiLePhuCapThamNien),
@@ -104,7 +109,7 @@ class ComponentTTCongTac extends AdminPage {
                 ngayKetThucNghiTheoCheDo: this.state.dangNghiTheoCheDo ? (this.getValue(this.ngayKetThucNghiTheoCheDo) ? this.getValue(this.ngayKetThucNghiTheoCheDo).getTime() : '') : '',
                 lyDoNghiTheoCheDo: this.state.dangNghiTheoCheDo ? this.getValue(this.lyDoNghiTheoCheDo) : '',
                 daNghi: Number(this.getValue(this.daNghi)),
-                thoiDiemNghi: this.state.daNghi ? (this.getValue(this.ngayDaNghi) ? this.getValue(this.ngayDaNghi).getTime() : '')  : '',
+                thoiDiemNghi: this.state.daNghi ? (this.getValue(this.ngayDaNghi) ? this.getValue(this.ngayDaNghi).getTime() : '') : '',
                 soHieuDaNghi: this.state.daNghi ? this.getValue(this.soHieuDaNghi) : '',
                 noiDungDaNghi: this.state.daNghi ? this.getValue(this.noiDungDaNghi) : ''
             };
@@ -123,25 +128,25 @@ class ComponentTTCongTac extends AdminPage {
             <div className='tile'>
                 <h3 className='tile-title'>Thông tin công tác</h3>
                 <div className='tile-body row'>
-                    <FormTextBox className='col-md-6' ref={e => this.ngheNghiepCu = e} label='Nghề nghiệp trước khi tuyển dụng' readOnly={this.props.userEdit}/>
-                    <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayBatDauCongTac = e} label='Ngày bắt đầu công tác tại trường' readOnly={this.props.userEdit}/>
-                    <FormDatePicker type='date-mask' className='col-md-4' ref={e => this.ngayBienChe = e} label='Ngày vào biên chế' readOnly={this.props.userEdit}/>
-                    <FormSelect data={SelectAdapter_DmDonVi} className='col-md-8' ref={e => this.donViTuyenDung = e} label='Đơn vị ban hành Quyết định tuyển dụng' readOnly={this.props.userEdit}/>
-                    <FormSelect data={SelectAdapter_DmNgachCdnnV2} className='col-md-4' ref={e => this.chucDanh = e} label='Chức danh nghề nghiệp' readOnly={this.props.userEdit}/>
-                    <FormSelect data={SelectAdapter_DmDienHopDongV2} className='col-md-4' ref={e => this.dienHopDong = e} label='Diện hợp đồng' readOnly={this.props.userEdit}/>
-                    <FormSelect data={SelectAdapter_DmLoaiHopDongV2} className='col-md-4' ref={e => this.loaiHopDong = e} label='Loại hợp đồng' readOnly={this.props.userEdit}/>
+                    <FormTextBox className='col-md-6' ref={e => this.ngheNghiepCu = e} label='Nghề nghiệp trước khi tuyển dụng' readOnly={this.props.userEdit} />
+                    <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayBatDauCongTac = e} label='Ngày bắt đầu công tác tại trường' readOnly={this.props.userEdit} />
+                    <FormDatePicker type='date-mask' className='col-md-4' ref={e => this.ngayBienChe = e} label='Ngày vào biên chế' readOnly={this.props.userEdit} />
+                    <FormSelect data={SelectAdapter_DmDonVi} className='col-md-8' ref={e => this.donViTuyenDung = e} label='Đơn vị ban hành Quyết định tuyển dụng' readOnly={this.props.userEdit} />
+                    <FormSelect data={SelectAdapter_DmNgachCdnnV2} className='col-md-4' ref={e => this.ngach = e} label='Chức danh nghề nghiệp' readOnly={this.props.userEdit} />
+                    <FormSelect data={SelectAdapter_DmDienHopDongV2} className='col-md-4' ref={e => this.dienHopDong = e} label='Diện hợp đồng' readOnly={this.props.userEdit} />
+                    <FormSelect data={SelectAdapter_DmLoaiHopDongV2} className='col-md-4' ref={e => this.loaiHopDong = e} label='Loại hợp đồng' readOnly={this.props.userEdit} />
 
                     <ComponentChucVu ref={e => this.componentChucVuChinhQuyen = e} label='Chức vụ chính quyền:' userEdit={this.props.userEdit} />
                     <ComponentChucVu ref={e => this.componentChucVuDoanThe = e} label='Chức vụ đoàn thể:' userEdit={this.props.userEdit} />
 
-                    <FormTextBox ref={e => this.bacLuong = e} className='col-md-3' label='Bậc lương' readOnly={this.props.userEdit}/>
+                    <FormTextBox ref={e => this.bacLuong = e} className='col-md-3' label='Bậc lương' readOnly={this.props.userEdit} />
                     <FormTextBox ref={e => this.heSo = e} className='col-md-3' label='Hệ số lương hiện hưởng' readOnly={this.props.userEdit} />
-                    <FormDatePicker type='date-mask' ref={e => this.ngayHuong = e} className='col-md-3' label='Ngày hưởng' readOnly={this.props.userEdit}/>
-                    <FormTextBox ref={e => this.tiLeVuotKhung = e} className='col-md-3' label='Tỉ lệ vượt khung' readOnly={this.props.userEdit}/>
+                    <FormDatePicker type='date-mask' ref={e => this.ngayHuong = e} className='col-md-3' label='Ngày hưởng' readOnly={this.props.userEdit} />
+                    <FormTextBox ref={e => this.tiLeVuotKhung = e} className='col-md-3' label='Tỉ lệ vượt khung' readOnly={this.props.userEdit} />
 
-                    <FormTextBox ref={e => this.phuCapChucVu = e} className='col-md-4' label='Mức phụ cấp chức vụ' readOnly={this.props.userEdit}/>
-                    <FormTextBox ref={e => this.tiLePhuCapThamNien = e} className='col-md-4' label='Tỉ lệ phụ cấp thâm niên' readOnly={this.props.userEdit}/>
-                    <FormTextBox ref={e => this.tiLePhuCapUuDai = e} className='col-md-4' label='Tỉ lệ phụ cấp ưu đãi' readOnly={this.props.userEdit}/>
+                    <FormTextBox ref={e => this.phuCapChucVu = e} className='col-md-4' label='Mức phụ cấp chức vụ' readOnly={this.props.userEdit} />
+                    <FormTextBox ref={e => this.tiLePhuCapThamNien = e} className='col-md-4' label='Tỉ lệ phụ cấp thâm niên' readOnly={this.props.userEdit} />
+                    <FormTextBox ref={e => this.tiLePhuCapUuDai = e} className='col-md-4' label='Tỉ lệ phụ cấp ưu đãi' readOnly={this.props.userEdit} />
 
                     <FormTextBox ref={e => this.soBhxh = e} className='col-md-4' label='Mã số Bảo hiểm xã hội' />
                     <FormDatePicker ref={e => this.ngayBatDauBhxh = e} className='col-md-4' label='Từ tháng, năm' type='month-mask' />
@@ -159,17 +164,17 @@ class ComponentTTCongTac extends AdminPage {
                     <div className='form-group col-md-12'></div>
                     <div className='form-group col-md-12'></div>
 
-                    <FormCheckbox ref={e => this.dangONuocNgoai = e} label='Đang ở nước ngoài' onChange={value => this.setState({ dangONuocNgoai: value })} className='col-md-3' readOnly={this.props.userEdit}/>
-                    {this.state.dangONuocNgoai ? <FormSelect ref={e => this.quocGiaDangO = e} label='Quốc gia' className='col-md-3' data={SelectAdapter_DmQuocGia} readOnly={this.props.userEdit}/> : null}
-                    {this.state.dangONuocNgoai ? <FormDatePicker type='date-mask' ref={e => this.ngayBatDauONuocNgoai = e} label='Từ ngày' className='col-md-3' readOnly={this.props.userEdit}/> : null}
-                    {this.state.dangONuocNgoai ? <FormDatePicker type='date-mask' ref={e => this.ngayKetThucONuocNgoai = e} label='Đến ngày' className='col-md-3' readOnly={this.props.userEdit}/> : null}
-                    {this.state.dangONuocNgoai ? <FormRichTextBox ref={e => this.lyDoONuocNgoai = e} label='Lý do/Nội dung' className='col-md-12' readOnly={this.props.userEdit}/> : <div className='col-md-9'></div>}
+                    <FormCheckbox ref={e => this.dangONuocNgoai = e} label='Đang ở nước ngoài' onChange={value => this.setState({ dangONuocNgoai: value })} className='col-md-3' readOnly={this.props.userEdit} />
+                    {this.state.dangONuocNgoai ? <FormSelect ref={e => this.quocGiaDangO = e} label='Quốc gia' className='col-md-3' data={SelectAdapter_DmQuocGia} readOnly={this.props.userEdit} /> : null}
+                    {this.state.dangONuocNgoai ? <FormDatePicker type='date-mask' ref={e => this.ngayBatDauONuocNgoai = e} label='Từ ngày' className='col-md-3' readOnly={this.props.userEdit} /> : null}
+                    {this.state.dangONuocNgoai ? <FormDatePicker type='date-mask' ref={e => this.ngayKetThucONuocNgoai = e} label='Đến ngày' className='col-md-3' readOnly={this.props.userEdit} /> : null}
+                    {this.state.dangONuocNgoai ? <FormRichTextBox ref={e => this.lyDoONuocNgoai = e} label='Lý do/Nội dung' className='col-md-12' readOnly={this.props.userEdit} /> : <div className='col-md-9'></div>}
 
-                    <FormCheckbox ref={e => this.dangNghiTheoCheDo = e} label='Đang tạm nghỉ theo chế độ' onChange={value => this.setState({ dangNghiTheoCheDo: value })} className='col-md-3' readOnly={this.props.userEdit}/>
-                    {this.state.dangNghiTheoCheDo ? <FormTextBox ref={e => this.noiNghi = e} label='Nơi nghỉ' className='col-md-3' readOnly={this.props.userEdit}/> : null}
-                    {this.state.dangNghiTheoCheDo ? <FormDatePicker type='date-mask' ref={e => this.ngayBatDauNghiTheoCheDo = e} label='Từ ngày' className='col-md-3' readOnly={this.props.userEdit}/> : null}
-                    {this.state.dangNghiTheoCheDo ? <FormDatePicker type='date-mask' ref={e => this.ngayKetThucNghiTheoCheDo = e} label='Đến ngày' className='col-md-3' readOnly={this.props.userEdit}/> : null}
-                    {this.state.dangNghiTheoCheDo ? <FormRichTextBox ref={e => this.lyDoNghiTheoCheDo = e} label='Lý do/Nội dung' className='col-md-12' readOnly={this.props.userEdit}/> : <div className='col-md-9'></div>}
+                    <FormCheckbox ref={e => this.dangNghiTheoCheDo = e} label='Đang tạm nghỉ theo chế độ' onChange={value => this.setState({ dangNghiTheoCheDo: value })} className='col-md-3' readOnly={this.props.userEdit} />
+                    {this.state.dangNghiTheoCheDo ? <FormTextBox ref={e => this.noiNghi = e} label='Nơi nghỉ' className='col-md-3' readOnly={this.props.userEdit} /> : null}
+                    {this.state.dangNghiTheoCheDo ? <FormDatePicker type='date-mask' ref={e => this.ngayBatDauNghiTheoCheDo = e} label='Từ ngày' className='col-md-3' readOnly={this.props.userEdit} /> : null}
+                    {this.state.dangNghiTheoCheDo ? <FormDatePicker type='date-mask' ref={e => this.ngayKetThucNghiTheoCheDo = e} label='Đến ngày' className='col-md-3' readOnly={this.props.userEdit} /> : null}
+                    {this.state.dangNghiTheoCheDo ? <FormRichTextBox ref={e => this.lyDoNghiTheoCheDo = e} label='Lý do/Nội dung' className='col-md-12' readOnly={this.props.userEdit} /> : <div className='col-md-9'></div>}
 
                     <FormCheckbox ref={e => this.daNghi = e} label='Đã nghỉ việc/Nghỉ hưu/Chuyển công tác' onChange={value => this.setState({ daNghi: value })} className='col-md-4' />
                     {this.state.daNghi ? <FormDatePicker type='date-mask' ref={e => this.ngayDaNghi = e} label='Thời điểm nghỉ' placeholder='Từ ngày, tháng, năm ...' className='col-md-4' /> : null}

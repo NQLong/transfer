@@ -1,4 +1,5 @@
 import T from 'view/js/common';
+import { getStaffEdit } from '../tccbCanBo/redux';
 
 // Reducer ------------------------------------------------------------------------------------------------------------
 const QtKhenThuongAllGetAll = 'QtKhenThuongAll:GetAll';
@@ -149,7 +150,7 @@ export function getQtKhenThuongAllEdit(id, done) {
     };
 }
 
-export function createQtKhenThuongAll(items, done) {
+export function createQtKhenThuongAll(isStaffEdit, items, done) {
     return dispatch => {
         const url = '/api/tccb/qua-trinh/khen-thuong-all';
         T.post(url, { items }, data => {
@@ -159,15 +160,15 @@ export function createQtKhenThuongAll(items, done) {
             } else {
                 if (done) {
                     T.notify('Tạo khen thưởng thành công!', 'success');
-                    dispatch(getQtKhenThuongAllPage());
-                    done(data);
+                    isStaffEdit ? dispatch(getStaffEdit(data.item.ma)) : dispatch(getQtKhenThuongAllPage());
+                    isStaffEdit ? (done && done()) : (done && done(data));
                 }
             }
         }, () => T.notify('Tạo khen thưởng bị lỗi!', 'danger'));
     };
 }
 
-export function deleteQtKhenThuongAll(id, done) {
+export function deleteQtKhenThuongAll(isStaffEdit, id, shcc = null) {
     return dispatch => {
         const url = '/api/tccb/qua-trinh/khen-thuong-all';
         T.delete(url, { id }, data => {
@@ -176,14 +177,13 @@ export function deleteQtKhenThuongAll(id, done) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('khen thưởng đã xóa thành công!', 'success', false, 800);
-                dispatch(getQtKhenThuongAllPage());
+                isStaffEdit ? dispatch(getStaffEdit(shcc)) : dispatch(getQtKhenThuongAllPage());
             }
-            done && done();
         }, () => T.notify('Xóa khen thưởng bị lỗi!', 'danger'));
     };
 }
 
-export function updateQtKhenThuongAll(id, changes, done) {
+export function updateQtKhenThuongAll(isStaffEdit, id, changes, done) {
     return dispatch => {
         const url = '/api/tccb/qua-trinh/khen-thuong-all';
         T.put(url, { id, changes }, data => {
@@ -193,8 +193,8 @@ export function updateQtKhenThuongAll(id, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật khen thưởng thành công!', 'success');
-                done && done(data.item);
-                dispatch(getQtKhenThuongAllPage());
+                isStaffEdit ? (done && done()) : (done && done(data.item));
+                isStaffEdit ? dispatch(getStaffEdit(data.item.ma)) : dispatch(getQtKhenThuongAllPage());
             }
         }, () => T.notify('Cập nhật khen thưởng bị lỗi!', 'danger'));
     };

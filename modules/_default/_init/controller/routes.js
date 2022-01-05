@@ -89,6 +89,7 @@ module.exports = app => {
 
         if (app.isDebug) data.isDebug = true;
         if (req.session.user) data.user = req.session.user;
+        
         app.buildAppMenus();
 
         const ready = () => {
