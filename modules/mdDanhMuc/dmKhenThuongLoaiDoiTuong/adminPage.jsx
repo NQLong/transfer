@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { getDmKhenThuongLoaiDoiTuongPage, createDmKhenThuongLoaiDoiTuong, 
-    getDmKhenThuongLoaiDoiTuong, updateDmKhenThuongLoaiDoiTuong, 
+     updateDmKhenThuongLoaiDoiTuong, 
     deleteDmKhenThuongLoaiDoiTuong} 
 from './redux';
 import { Link } from 'react-router-dom';
@@ -127,6 +127,6 @@ class DmKhenThuongLoaiDoiTuongPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, dmKhenThuongLoaiDoiTuong: state.dmKhenThuongLoaiDoiTuong });
 const mapActionsToProps = {getDmKhenThuongLoaiDoiTuongPage, createDmKhenThuongLoaiDoiTuong, 
-    getDmKhenThuongLoaiDoiTuong, updateDmKhenThuongLoaiDoiTuong, 
+     updateDmKhenThuongLoaiDoiTuong, 
     deleteDmKhenThuongLoaiDoiTuong };
 export default connect(mapStateToProps, mapActionsToProps)(DmKhenThuongLoaiDoiTuongPage);

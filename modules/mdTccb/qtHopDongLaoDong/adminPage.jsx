@@ -46,7 +46,7 @@ class QtHopDongLaoDongPage extends AdminPage {
 
         const maDonVi  = this.maDonVi?.value() || [];
         this.curState = maDonVi;
-        if (this.checked) this.props.getQtChucVuGroupPage(pageNumber, pageSize, this.curState, this.searchText || '');
+        if (this.checked) this.props.getQtHopDongLaoDongGroupPage(pageNumber, pageSize, this.curState, this.searchText || '');
         else this.props.getQtHopDongLaoDongPage(pageNumber, pageSize, this.curState, this.searchText || '');
     }
 

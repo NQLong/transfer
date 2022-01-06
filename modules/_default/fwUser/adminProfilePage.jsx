@@ -24,7 +24,9 @@ import { SelectAdapter_DmNhomMau } from 'modules/mdDanhMuc/dmBenhVien/reduxNhomM
 import { SelectAdapter_DmQuocGia } from 'modules/mdDanhMuc/dmQuocGia/redux';
 // import { SelectAdapter_DmChucDanhKhoaHoc } from 'modules/mdDanhMuc/dmChucDanhKhoaHoc/redux';
 import { SelectAdapter_DmTrinhDo } from 'modules/mdDanhMuc/dmTrinhDo/redux';
-import TextInput, { DateInput, NumberInput, Select, BooleanInput, TextareaInput } from 'view/component/Input';
+import TextInput, {NumberInput, BooleanInput, TextareaInput } from 'view/component/Input';
+import {Select} from 'view/component/Input';
+import { DateInput } from 'view/component/Input';
 import { QTForm } from 'view/component/Form';
 import { ComponentDiaDiem } from 'modules/mdDanhMuc/dmDiaDiem/componentDiaDiem';
 import { TableCell, renderTable, AdminModal, FormSelect, FormRichTextBox, FormCheckbox, FormTextBox } from 'view/component/AdminPage';
