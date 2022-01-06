@@ -81,7 +81,7 @@ class DmChucDanhPage extends AdminPage {
 
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permission = this.getUserPermission('dmChucVu', ['read', 'write', 'delete']);
+            permission = this.getUserPermission('dmChucDanhKhoaHoc', ['read', 'write', 'delete']);
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, } = this.props.dmChucDanhKhoaHoc && this.props.dmChucDanhKhoaHoc.page ?
             this.props.dmChucDanhKhoaHoc.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: '' };
         let table = 'Không có danh sách!',

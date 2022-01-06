@@ -71,6 +71,54 @@ export function getDmChucDanhChuyenMonAll(done) {
     };
 }
 
+export function createDmChucDanhChuyenMon(item, done) {
+    return dispatch => {
+        const url = '/api/danh-muc/chuc-danh-chuyen-mon';
+        T.post(url, { item }, data => {
+            if (data.error) {
+                console.error(`POST: ${url}.`, data.error);
+            } else {
+                T.notify('Tạo chức danh chuyên môn thành công!', 'success');
+                dispatch(getDmChucDanhChuyenMonAll());
+                if (done) done(data);
+            }
+        }, () => T.notify('Tạo chức danh chuyên môn bị lỗi!', 'danger'));
+    };
+}
+
+export function deleteDmChucDanhChuyenMon(ma) {
+    return dispatch => {
+        const url = '/api/danh-muc/chuc-danh-chuyen-mon';
+        T.delete(url, { ma }, data => {
+            if (data.error) {
+                T.notify('Xóa danh mục  bị lỗi!', 'danger');
+                console.error(`DELETE: ${url}.`, data.error);
+            } else {
+                T.alert('Xóa chức danh chuyên môn thành công!', 'success', false, 800);
+                dispatch(getDmChucDanhChuyenMonAll());
+            }
+        }, () => T.notify('Xóa chức danh chuyên môn bị lỗi!', 'danger'));
+    };
+}
+
+export function updateDmChucDanhChuyenMon(ma, changes, done) {
+    return dispatch => {
+        const url = '/api/danh-muc/chuc-danh-chuyen-mon';
+        T.put(url, { ma, changes }, data => {
+            if (data.error || changes == null) {
+                T.notify('Cập nhật thông chức danh chuyên môn bị lỗi!', 'danger');
+                console.error(`PUT: ${url}.`, data.error);
+                done && done(data.error);
+            } else {
+                T.notify('Cập nhật thông tin chức danh chuyên môn thành công!', 'success');
+                done && done(data.item);
+                dispatch(getDmChucDanhChuyenMonAll());
+            }
+        }, () => T.notify('Cập nhật thông tin chức danh chuyên môn bị lỗi!', 'danger'));
+    };
+}
+
+
 export const SelectAdapter_DmChucDanhChuyenMon = {
     ajax: false,
     getAll: getDmChucDanhChuyenMonAll,

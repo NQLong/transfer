@@ -69,7 +69,7 @@ module.exports = app => {
         },
         setting: {
             index: 2000, title: 'Cấu hình', link: '/user/settings', icon: 'fa-cog',
-            subMenusRender: false,
+            subMenusRender: false
         },
         tccb: {
             index: 3000, title: 'Tổ chức cán bộ', link: '/user/tccb', icon: 'fa-sort-alpha-asc',

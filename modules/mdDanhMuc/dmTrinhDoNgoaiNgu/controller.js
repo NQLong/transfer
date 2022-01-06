@@ -1,7 +1,7 @@
 module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.category,
-        menus: { 2059: { title: 'Trình độ ngoại ngữ', link: '/user/danh-muc/trinh-do-ngoai-ngu' } },
+        menus: { 75: { title: 'Trình độ ngoại ngữ', link: '/user/danh-muc/trinh-do-ngoai-ngu' } },
     };
     app.permission.add(
         { name: 'dmTrinhDoNgoaiNgu:read', menu },
