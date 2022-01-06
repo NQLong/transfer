@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.category,
         menus: {
-            2113: { title: 'Chức danh chuyên môn', link: '/user/danh-muc/chuc-danh-chuyen-mon' },
+            10: { title: 'Chức danh chuyên môn', link: '/user/danh-muc/chuc-danh-chuyen-mon' },
         },
     };
     app.permission.add(

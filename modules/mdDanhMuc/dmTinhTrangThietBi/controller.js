@@ -3,7 +3,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.category,
         menus: {
-            2989: { title: 'Tình trạng thiết bị', link: '/user/danh-muc/tinh-trang-thiet-bi' },
+            70: { title: 'Tình trạng thiết bị', link: '/user/danh-muc/tinh-trang-thiet-bi' },
         },
     };
 
