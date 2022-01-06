@@ -130,9 +130,9 @@ class QtKyLuat extends AdminPage {
     componentDidMount() {
         T.ready('/user/tccb', () => {
             T.onSearch = (searchText) => {
-                // if (this.checked) this.props.getQtKyLuatGroupPage(undefined, undefined, searchText || '');
-                // else 
-                this.props.getQtKyLuatPage(undefined, undefined, this.curState, searchText || '');
+                this.searchText = searchText;
+                if (this.checked) this.props.getQtKyLuatGroupPage(undefined, undefined, this.curState, this.searchText || '');
+                else this.props.getQtKyLuatPage(undefined, undefined, this.curState, this.searchText || '');
             };
             T.showSearchBox(() => {
                 this.loaiDoiTuong?.value('');

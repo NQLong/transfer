@@ -83,6 +83,7 @@ export function createDmKhenThuongLoaiDoiTuong(item, done) {
                 T.notify('Tạo dữ liệu bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`POST: ${url}.`, data.error);
             } else {
+                T.notify('Tạo mới dữ liệu thành công!', 'success');
                 dispatch(getDmKhenThuongLoaiDoiTuongPage());
                 if (done) done(data);
             }
@@ -97,6 +98,7 @@ export function deleteDmKhenThuongLoaiDoiTuong(ma) {
             if (data.error) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
+                T.notify('Xóa dữ liệu thành công!', 'success');
                 dispatch(getDmKhenThuongLoaiDoiTuongPage());
             }
         }, error => T.notify('Xóa dữ liệu bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));

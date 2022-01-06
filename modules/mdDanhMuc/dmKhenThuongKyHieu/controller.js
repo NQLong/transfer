@@ -11,7 +11,6 @@ module.exports = app => {
         { name: 'dmKhenThuongKyHieu:delete' },
     );
     app.get('/user/danh-muc/khen-thuong-ky-hieu', app.permission.check('dmKhenThuongKyHieu:read'), app.templates.admin);
-    app.get('/user/danh-muc/khen-thuong-ky-hieu/upload', app.permission.check('staff:login'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/danh-muc/khen-thuong-ky-hieu/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
