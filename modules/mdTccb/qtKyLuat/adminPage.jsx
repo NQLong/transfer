@@ -108,7 +108,7 @@ class EditModal extends AdminModal {
             title: this.state.id ? 'Cập nhật quá trình kỷ luật' : 'Tạo mới quá trình kỷ luật',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Mã số cán bộ' data={SelectAdapter_FwCanBo} readOnly={readOnly} />
+                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={readOnly} />
 
                 <FormSelect className='col-md-12' ref={e => this.hinhThucKyLuat = e} label='Hình thức kỷ luật' data={SelectAdapter_DmKyLuatV2} readOnly={false} />
 

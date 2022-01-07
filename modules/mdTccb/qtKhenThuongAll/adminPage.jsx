@@ -146,9 +146,21 @@ class QtKhenThuongAll extends AdminPage {
                 if (this.checked) this.props.getQtKhenThuongAllGroupPage(undefined, undefined, this.curState, this.searchText || '');
                 else this.props.getQtKhenThuongAllPage(undefined, undefined, this.curState, this.searchText || '');
             };
-            T.showSearchBox();
-            this.props.getQtKhenThuongAllPage(undefined, undefined, this.curState, this.searchText || '');
+            T.showSearchBox(() => {
+                this.loaiDoiTuong?.value('');
+                setTimeout(() => this.changeAdvancedSearch(), 50);
+                setTimeout(() => this.showAdvanceSearch(), 1000);
+            });
+            this.changeAdvancedSearch();
         });
+    }
+
+    changeAdvancedSearch = () => {
+        let { pageNumber, pageSize } = this.props && this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.page ? this.props.qtKhenThuongAll.page : { pageNumber: 1, pageSize: 50 };
+        const loaiDoiTuong = this.loaiDoiTuong?.value() || '-1';
+        this.curState = loaiDoiTuong;
+        if (this.checked) this.props.getQtKhenThuongAllGroupPage(pageNumber, pageSize, this.curState, this.searchText || '');
+        else this.props.getQtKhenThuongAllPage(pageNumber, pageSize, this.curState, this.searchText || '');
     }
 
     showModal = (e) => {
@@ -176,12 +188,6 @@ class QtKhenThuongAll extends AdminPage {
         }
         name += '.xlsx';
         T.download(T.url(`/api/tccb/qua-trinh/khen-thuong-all/download-excel/${loaiDoiTuong}/${maDoiTuong}`), name);
-    }
-
-    changeState = (value) => {
-        this.curState = value;
-        if (this.checked) this.props.getQtKhenThuongAllGroupPage(undefined, undefined, this.curState, this.searchText || '');
-        else this.props.getQtKhenThuongAllPage(undefined, undefined, this.curState, this.searchText || '');
     }
 
     groupPage = () => {
@@ -289,10 +295,12 @@ class QtKhenThuongAll extends AdminPage {
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
                 'Quá trình khen thưởng'
             ],
+            advanceSearch: <>
+                <FormSelect className='col-md-3' ref={e => this.loaiDoiTuong = e} label='Chọn loại đối tượng' data={this.stateTable} onChange={() => this.changeAdvancedSearch()} />
+            </>,
             content: <>
                 <div className='tile'>
-                    <FormSelect className='col-md-3' ref={e => this.loaiDoiTuong = e} label='Chọn loại đối tượng' data={this.stateTable} onChange={item => this.changeState(item.id)} />
-                    <FormCheckbox label='Gom đối tượng' style={{ position: 'absolute', right: '70px', top: '50px' }} onChange={this.groupPage} />
+                    <FormCheckbox label='Gom đối tượng' onChange={this.groupPage} />
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition, loaiDoiTuong }}
