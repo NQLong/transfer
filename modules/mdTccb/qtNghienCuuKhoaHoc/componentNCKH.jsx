@@ -4,7 +4,6 @@ import { AdminModal, AdminPage, FormTextBox, renderTable, TableCell } from 'view
 import Dropdown from 'view/component/Dropdown';
 import { DateInput } from 'view/component/Input';
 import { createQtNckhStaff, createQtNckhStaffUser, updateQtNckhStaff, updateQtNckhStaffUser, deleteQtNckhStaff, deleteQtNckhStaffUser } from './redux';
-import { getStaffEdit, userGetStaff } from '../tccbCanBo/redux';
 
 const EnumDateType = Object.freeze({
     0: { text: '' },
@@ -133,10 +132,9 @@ class NckhModal extends AdminModal {
 }
 
 class ComponentNCKH extends AdminPage {
-    state = { shcc: '', email: '', data: [] };
+    state = { shcc: '', email: '' };
     value = (shcc, email) => {
-        this.setState({ shcc: shcc, email: email }, () =>
-            this.setState({ data: this.props.userEdit ? this.props.staff?.userItem?.nghienCuuKhoaHoc : [] }));
+        this.setState({ shcc: shcc, email: email });
     }
 
     showModal = (e, item, shcc, email) => {
@@ -167,8 +165,8 @@ class ComponentNCKH extends AdminPage {
                         <th style={{ width: '100%' }}>Tên đề tài</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Mã số và cấp quản lý</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian thực hiện</th>
-                        <th style={{ width: 'auto' }}>Kinh phí</th>
-                        <th style={{ width: 'auto' }}>Vai trò</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kinh phí</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Vai trò</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian nghiệm thu</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kết quả</th>
                         <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
@@ -188,7 +186,7 @@ class ComponentNCKH extends AdminPage {
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.vaiTro} />
                         <TableCell type='text' style={{ textAlign: 'center' }} content={(
                             <>
-                                <span>{item.ngayNghiemThu && <b>{T.dateToText(item.ngayNghiemThu, item.ngayNghiemThuType ? item.ngayNghiemThuType : 'dd/mm/yyyy')}</b>}</span>
+                                <span>{item.ngayNghiemThu ? <b>{T.dateToText(item.ngayNghiemThu, item.ngayNghiemThuType ? item.ngayNghiemThuType : 'dd/mm/yyyy')}</b> : null}</span>
                             </>
                         )} />
 
@@ -205,10 +203,7 @@ class ComponentNCKH extends AdminPage {
                 <h3 className='tile-title'>Thông tin nghiên cứu khoa học</h3>
                 <div className='tile-body'>
                     {
-                        this.props.userEdit ?
-                            (dataNCKH && renderTableNCKH(dataNCKH))
-                            :
-                            (dataNCKH && renderTableNCKH(dataNCKH))
+                        dataNCKH && renderTableNCKH(dataNCKH)
                     }
                     {<div className='tile-footer' style={{ textAlign: 'right' }}>
                         <button className='btn btn-info' type='button' onClick={e => this.showModal(e, null, this.state.shcc, this.state.email)}>
@@ -219,7 +214,6 @@ class ComponentNCKH extends AdminPage {
                     <NckhModal ref={e => this.modal = e} userEdit={this.props.userEdit}
                         create={this.props.userEdit ? this.props.createQtNckhStaffUser : this.props.createQtNckhStaff}
                         update={this.props.userEdit ? this.props.updateQtNckhStaffUser : this.props.updateQtNckhStaff}
-                        getData={this.props.userEdit ? this.props.userGetStaff : this.props.getStaffEdit}
                     />
                 </div>
             </div>
@@ -230,6 +224,5 @@ class ComponentNCKH extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, staff: state.staff });
 const mapActionsToProps = {
     createQtNckhStaff, createQtNckhStaffUser, updateQtNckhStaff, updateQtNckhStaffUser, deleteQtNckhStaff, deleteQtNckhStaffUser,
-    getStaffEdit, userGetStaff
 };
 export default connect(mapStateToProps, mapActionsToProps, null, { forwardRef: true })(ComponentNCKH);

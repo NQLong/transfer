@@ -15,11 +15,11 @@ class EditModal extends AdminModal {
         let { id, hoTen, tenLuanVan, namTotNghiep, sanPham, bacDaoTao } = item && item.item ? item.item : { id: null, hoTen: '', tenLuanVan: '', namTotNghiep: '', sanPham: '', bacDaoTao: '' };
         this.setState({ shcc: item.shcc, id, email: item.email });
         setTimeout(() => {
-            this.hoTen.value(hoTen);
-            this.tenLuanVan.value(tenLuanVan);
+            this.hoTen.value(hoTen ? hoTen : '');
+            this.tenLuanVan.value(tenLuanVan ? tenLuanVan : '');
             this.namTotNghiep.setVal(new Date(namTotNghiep.toString()));
-            this.sanPham.value(sanPham);
-            this.bacDaoTao.value(bacDaoTao);
+            this.sanPham.value(sanPham ? sanPham : '');
+            this.bacDaoTao.value(bacDaoTao ? bacDaoTao : '');
         }, 500);
     }
 
@@ -93,7 +93,7 @@ class ComponentHDLV extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
                         <th style={{ width: '30%' }}>Họ tên sinh viên</th>
-                        <th style={{ width: '70%', }}>Tên luận văn, luận án</th>
+                        <th style={{ width: '50%', }}>Tên luận văn, luận án</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm tốt nghiệp</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Bậc đào tạo</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Sản phẩm</th>
@@ -106,7 +106,7 @@ class ComponentHDLV extends AdminPage {
                         <TableCell type='text' content={item.tenLuanVan} />
                         <TableCell type='text' content={item.namTotNghiep} style={{ textAlign: 'center' }} />
                         <TableCell type='text' content={item.bacDaoTao} />
-                        <TableCell type='text' content={item.sanPham} />
+                        <TableCell type='text' content={item.sanPham} style={{ whiteSpace: 'nowrap' }}/>
                         <TableCell type='buttons' content={item} permission={permission} onEdit={() => this.modal.show({ item, shcc: this.state.shcc, email: this.state.email })}
                             onDelete={this.deleteHuongDanLuanVan}></TableCell>
                     </tr>)
@@ -129,7 +129,7 @@ class ComponentHDLV extends AdminPage {
                     }
                     <EditModal ref={e => this.modal = e} permission={permission} readOnly={false}
                         create={this.props.userEdit ? this.props.createQtHuongDanLVStaffUser : this.props.createQtHuongDanLVStaff}
-                        update={this.props.userEdit ? this.props.updateQtHuongDanLVStaff : this.props.updateQtHuongDanLVStaffUser}
+                        update={this.props.userEdit ? this.props.updateQtHuongDanLVStaffUser : this.props.updateQtHuongDanLVStaff}
                     />
                 </div>
             </div>

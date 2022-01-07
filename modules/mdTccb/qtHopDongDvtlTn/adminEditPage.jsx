@@ -23,12 +23,12 @@ import { SelectAdapter_DmTrinhDo } from 'modules/mdDanhMuc/dmTrinhDo/redux';
 import { SelectAdapter_DmChucDanhKhoaHoc } from 'modules/mdDanhMuc/dmChucDanhKhoaHoc/redux';
 import { SelectAdapter_DmDanToc } from 'modules/mdDanhMuc/dmDanToc/redux';
 import { SelectAdapter_DmTonGiao } from 'modules/mdDanhMuc/dmTonGiao/redux';
-import { SelectAdapter_DmDienHopDong } from 'modules/mdDanhMuc/dmDienHopDong/redux';
 import Dropdown from 'view/component/Dropdown';
 import moment from 'moment';
 import { SelectAdapter_DmChucDanhChuyenMon } from 'modules/mdDanhMuc/dmChucDanhChuyenMon/redux';
 import { Select } from 'view/component/Input';
 import { DateInput } from 'view/component/Input';
+import { FormSelect } from 'view/component/AdminPage';
 
 const EnumLoaiCanBo = Object.freeze({
     1: { text: 'Cán bộ mới' },
@@ -197,7 +197,7 @@ class QtHopDongDvtlTnEditPage extends QTForm {
         this.soHopDong.current.setVal(soHopDong ? soHopDong : '');
         // this.chucVu.current.setVal(chucVu ? chucVu : '');
         this.loaiHopDong.current.setVal(loaiHopDong ? loaiHopDong : '');
-        this.kieuHopDong.current.setVal(kieuHopDong ? kieuHopDong : '');
+        this.kieuHopDong.current.value(kieuHopDong ? kieuHopDong : (this.state.dienHopDong ? this.state.dienHopDong : ''));
         this.nguoiKy.current.setVal(nguoiKy ? nguoiKy : '');
         this.batDauLamViec.current.setVal(batDauLamViec ? batDauLamViec : '');
         this.ketThucHopDong.current.setVal(ketThucHopDong);
@@ -284,7 +284,7 @@ class QtHopDongDvtlTnEditPage extends QTForm {
     }
 
     handleChangeDienHopDong = (value) => {
-        this.setState({ dienHopDong: value });
+        this.setState({ dienHopDong: value.id });
     }
 
     changeCanBo = (value) => {
@@ -419,7 +419,7 @@ class QtHopDongDvtlTnEditPage extends QTForm {
                     <h3 className='tile-title'>Thông tin hợp đồng phía trường</h3>
                     <div className='tile-body row'>
                         <div className='form-group col-xl-6 col-md-6'><TextInput ref={this.soHopDong} label='Số hợp đồng' readOnly={readOnly} required /> </div>
-                        <div className='form-group col-xl-6 col-md-6'><Select adapter={SelectAdapter_DmDienHopDong} ref={this.kieuHopDong} onChange={value => this.setState({ dienHopDong: value })} label='Diện hợp đồng' required /></div>
+                        <FormSelect className='form-group col-xl-6 col-md-6' data={[{ id: 'DVTL', text: 'Đơn vị trả lương' }, { id: 'TN', text: 'Trách nhiệm' }]} required label='Diện hợp đồng' ref={this.kieuHopDong} onChange={this.handleChangeDienHopDong}/>
                         <div className='form-group col-xl-6 col-md-6'><Select adapter={SelectAdapter_FwCanBo} ref={this.nguoiKy} onChange={this.autoChucVu} label='Người đại diện ký' readOnly={readOnly} required /></div>
                         <div className='form-group col-md-6'>Chức vụ: <><br /><b>{this.state.chucVuNguoiKy}</b></></div>
                     </div>

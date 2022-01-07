@@ -1,5 +1,6 @@
-export function createSachGTStaff(data, done) {
-    return () => {
+import { getStaffEdit, userGetStaff } from '../tccbCanBo/redux';
+export function createSachGTStaff(data, done, isEdit = null) {
+    return dispatch => {
         const url = '/api/staff/sach-giao-trinh';
         T.post(url, { data }, res => {
             if (res.error) {
@@ -7,14 +8,15 @@ export function createSachGTStaff(data, done) {
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
                 T.notify('Thêm thông tin sách, giáo trình thành công!', 'info');
-                if (done) done(res);
+                isEdit ? (done && done()) : (done && done(res));
+                isEdit && dispatch(getStaffEdit(data.shcc));
             }
         }, () => T.notify('Thêm thông tin sách, giáo trình bị lỗi', 'danger'));
     };
 }
 
-export function updateSachGTStaff(id, changes, done) {
-    return () => {
+export function updateSachGTStaff(id, changes, done, isEdit = null) {
+    return dispatch => {
         const url = '/api/staff/sach-giao-trinh';
         T.put(url, { id, changes }, data => {
             if (data.error) {
@@ -22,14 +24,15 @@ export function updateSachGTStaff(id, changes, done) {
                 console.error('PUT: ' + url + '. ' + data.error);
             } else if (data.item) {
                 T.notify('Cập nhật thông tin sách, giáo trình thành công!', 'info');
-                if (done) done();
+                isEdit ? (done && done()) : (done && done(data.item));
+                isEdit && dispatch(getStaffEdit(changes.shcc));
             }
         }, () => T.notify('Cập nhật thông tin sách, giáo trình bị lỗi', 'danger'));
     };
 }
 
-export function deleteSachGTStaff(id, done) {
-    return () => {
+export function deleteSachGTStaff(id, isEdit, shcc = null) {
+    return dispatch => {
         const url = '/api/staff/sach-giao-trinh';
         T.delete(url, { id }, data => {
             if (data.error) {
@@ -37,14 +40,14 @@ export function deleteSachGTStaff(id, done) {
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
                 T.alert('Thông tin sách, giáo trình được xóa thành công!', 'info', false, 800);
-                if (done) done();
+                isEdit && dispatch(getStaffEdit(shcc));
             }
         }, () => T.notify('Xóa thông tin sách, giáo trình bị lỗi', 'danger'));
     };
 }
 
 export function createSachGTStaffUser(data, done) {
-    return () => {
+    return dispatch => {
         const url = '/api/user/staff/sach-giao-trinh';
         T.post(url, { data }, res => {
             if (res.error) {
@@ -53,13 +56,14 @@ export function createSachGTStaffUser(data, done) {
             } else {
                 T.notify('Thêm thông tin sách, giáo trình thành công!', 'info');
                 if (done) done(res);
+                dispatch(userGetStaff(data.email));
             }
         }, () => T.notify('Thêm thông tin sách, giáo trình bị lỗi', 'danger'));
     };
 }
 
 export function updateSachGTStaffUser(id, changes, done) {
-    return () => {
+    return dispatch => {
         const url = '/api/user/staff/sach-giao-trinh';
         T.put(url, { id, changes }, data => {
             if (data.error) {
@@ -68,13 +72,14 @@ export function updateSachGTStaffUser(id, changes, done) {
             } else if (data.item) {
                 T.notify('Cập nhật thông tin sách, giáo trình thành công!', 'info');
                 if (done) done();
+                dispatch(userGetStaff(changes.email));
             }
         }, () => T.notify('Cập nhật thông tin sách, giáo trình bị lỗi', 'danger'));
     };
 }
 
-export function deleteSachGTStaffUser(id, done) {
-    return () => {
+export function deleteSachGTStaffUser(id, email, done) {
+    return dispatch => {
         const url = '/api/user/staff/sach-giao-trinh';
         T.delete(url, { id }, data => {
             if (data.error) {
@@ -83,6 +88,7 @@ export function deleteSachGTStaffUser(id, done) {
             } else {
                 T.alert('Thông tin sách, giáo trình được xóa thành công!', 'info', false, 800);
                 done && done();
+                dispatch(userGetStaff(email));
             }
         }, () => T.notify('Xóa thông tin sách, giáo trình bị lỗi', 'danger'));
     };

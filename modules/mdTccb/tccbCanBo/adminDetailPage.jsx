@@ -16,6 +16,7 @@ import ComponentNCKH from '../qtNghienCuuKhoaHoc/componentNCKH';
 import ComponentKyLuat from '../qtKyLuat/componentKyLuat';
 import ComponentNuocNgoai from '../qtNuocNgoai/componentNuocNgoai';
 import ComponentHDLV from '../qtHuongDanLuanVan/componentHDLV';
+import ComponentSGT from '../sachGiaoTrinh/componentSGT';
 
 class CanBoPage extends AdminPage {
     state = { item: null }
@@ -51,6 +52,7 @@ class CanBoPage extends AdminPage {
         this.componentKyLuat.value(item.shcc);
         this.componentNuocNgoai.value(item.shcc, item.email);
         this.componentHDLV.value(item.shcc, item.email);
+        this.componentSGT.value(item.shcc, item.email);
     }
 
     save = () => {
@@ -77,12 +79,12 @@ class CanBoPage extends AdminPage {
                 <ComponentQuanHe ref={e => this.componentQuanHe = e} userEdit={false} />
                 <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={false} />
                 <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={false} />
-                <ComponentNuocNgoai ref={e => this.componentNuocNgoai = e}  userEdit = {false} />
-                <ComponentKhenThuong ref={e => this.componentKhenThuong = e} userEdit = {false}/>
-                <ComponentKyLuat ref={e => this.componentKyLuat = e}  userEdit = {false} />
-                <ComponentNCKH ref={e => this.componentNCKH = e} userEdit = {false} />
+                <ComponentNuocNgoai ref={e => this.componentNuocNgoai = e} userEdit={false} />
+                <ComponentKhenThuong ref={e => this.componentKhenThuong = e} userEdit={false} />
+                <ComponentKyLuat ref={e => this.componentKyLuat = e} userEdit={false} />
+                <ComponentNCKH ref={e => this.componentNCKH = e} userEdit={false} />
                 <ComponentHDLV ref={e => this.componentHDLV = e} userEdit={false} />
-
+                <ComponentSGT ref={e => this.componentSGT = e} userEdit={false} />
             </>,
             backRoute: '/user/staff',
             onSave: this.save,

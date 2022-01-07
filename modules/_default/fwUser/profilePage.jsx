@@ -14,6 +14,7 @@ import ComponentNCKH from 'modules/mdTccb/qtNghienCuuKhoaHoc/componentNCKH';
 import ComponentKyLuat from 'modules/mdTccb/qtKyLuat/componentKyLuat';
 import ComponentNuocNgoai from 'modules/mdTccb/qtNuocNgoai/componentNuocNgoai';
 import ComponentHDLV from 'modules/mdTccb/qtHuongDanLuanVan/componentHDLV';
+import ComponentSGT from 'modules/mdTccb/sachGiaoTrinh/componentSGT';
 
 class ProfileCanBo extends AdminPage {
     state = { canBo: false, isLoad: true };
@@ -48,6 +49,7 @@ class ProfileCanBo extends AdminPage {
             this.componentKyLuat.value(item.shcc);
             this.componentNuocNgoai.value(item.shcc, item.email);
             this.componentHDLV.value(item.shcc, item.email);
+            this.componentSGT.value(item.shcc, item.email);
         });
 
     }
@@ -77,6 +79,7 @@ class ProfileCanBo extends AdminPage {
                             <ComponentKyLuat ref={e => this.componentKyLuat = e} userEdit={true} />
                             <ComponentNCKH ref={e => this.componentNCKH = e} userEdit={true} />
                             <ComponentHDLV ref={e => this.componentHDLV = e} userEdit={true} />
+                            <ComponentSGT ref={e => this.componentSGT = e} userEdit={true} />
                         </>}
                 </>,
             onSave: this.state.canBo && this.save,

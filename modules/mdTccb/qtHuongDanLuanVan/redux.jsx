@@ -26,7 +26,7 @@ export function updateQtHuongDanLVStaff(id, changes, done, isEdit = null) {
             } else if (data.item) {
                 T.notify('Cập nhật thông tin quá trình hướng dẫn luận văn thành công!', 'info');
                 isEdit ? (done && done()) : (done && done(data.item));
-                isEdit && dispatch(getStaffEdit(data.shcc));
+                isEdit && dispatch(getStaffEdit(changes.shcc));
             }
         }, () => T.notify('Cập nhật thông tin quá trình hướng dẫn luận văn bị lỗi', 'danger'));
     };
