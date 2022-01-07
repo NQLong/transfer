@@ -40,7 +40,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -106,7 +108,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -158,7 +162,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -196,7 +202,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -227,7 +235,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -258,7 +268,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -289,7 +301,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -327,7 +341,9 @@
                 "size": 10
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -358,7 +374,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -410,7 +428,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -448,7 +468,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -486,7 +508,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -538,7 +562,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -569,7 +595,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -600,7 +628,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -631,7 +661,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -669,7 +701,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -714,7 +748,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -815,7 +851,9 @@
                 "size": 300
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -839,7 +877,9 @@
                 "size": 100
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -870,7 +910,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -901,7 +943,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -932,7 +976,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -970,7 +1016,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -1001,7 +1049,9 @@
                 "size": 2000
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -1032,7 +1082,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -1063,7 +1115,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -1108,7 +1162,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -1146,7 +1202,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -1177,7 +1235,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -1201,7 +1261,9 @@
                 "size": 200
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -1225,7 +1287,9 @@
                 "size": 200
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -1249,7 +1313,9 @@
                 "size": 200
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -1280,7 +1346,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -1311,7 +1379,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -1342,7 +1412,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -1366,7 +1438,9 @@
                 "size": 50
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -1397,7 +1471,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -1421,7 +1497,9 @@
                 "size": 20
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -1459,7 +1537,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -1504,7 +1584,9 @@
                 "size": 2
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -1542,7 +1624,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -1573,7 +1657,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -1611,7 +1697,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -1642,7 +1730,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -1673,7 +1763,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -1711,7 +1803,9 @@
                 "size": 3
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -1756,7 +1850,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -1808,7 +1904,9 @@
                 "size": 10
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -1839,7 +1937,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -1884,7 +1984,9 @@
                 "size": "10,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -1922,7 +2024,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -1953,7 +2057,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -1984,7 +2090,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -2022,7 +2130,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -2053,7 +2163,10 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["BAC", "ID_NGACH"],
+        "primaryKeys": [
+            "BAC",
+            "ID_NGACH"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -2098,7 +2211,9 @@
                 "size": "20,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -2136,7 +2251,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -2167,7 +2284,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -2205,7 +2324,9 @@
                 "size": 2000
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -2236,7 +2357,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -2260,7 +2383,9 @@
                 "size": 200
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -2291,7 +2416,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -2329,7 +2456,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -2374,7 +2503,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -2412,7 +2543,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA_PHUONG_XA"],
+        "primaryKeys": [
+            "MA_PHUONG_XA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -2443,7 +2576,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -2474,7 +2609,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -2505,7 +2642,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -2543,7 +2682,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA_QUAN_HUYEN"],
+        "primaryKeys": [
+            "MA_QUAN_HUYEN"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -2609,7 +2750,9 @@
                 "size": 20
             }
         },
-        "primaryKeys": ["MA_CODE"],
+        "primaryKeys": [
+            "MA_CODE"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -2647,7 +2790,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -2678,7 +2823,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -2709,7 +2856,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -2740,7 +2889,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -2771,7 +2922,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -2802,7 +2955,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -2847,7 +3002,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -2878,7 +3035,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -2909,7 +3068,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -2954,7 +3115,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -2985,7 +3148,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -3044,7 +3209,9 @@
                 "size": 4
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -3075,7 +3242,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -3106,7 +3275,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -3137,7 +3308,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -3168,7 +3341,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -3199,7 +3374,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -3237,7 +3414,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -3268,7 +3447,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -3379,7 +3560,9 @@
                 "size": 500
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -3442,7 +3625,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -3498,7 +3683,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -3561,7 +3748,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -3606,7 +3795,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -3644,7 +3835,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -3703,7 +3896,9 @@
                 "size": "5,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -3765,7 +3960,9 @@
                 "size": "20,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -3918,7 +4115,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -4117,7 +4316,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -4141,7 +4342,10 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["CATEGORY_ID", "EVENT_ID"],
+        "primaryKeys": [
+            "CATEGORY_ID",
+            "EVENT_ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -4228,7 +4432,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -4280,7 +4486,9 @@
                 "size": "5,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -4339,7 +4547,10 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["CAROUSEL_ID", "PRIORITY"],
+        "primaryKeys": [
+            "CAROUSEL_ID",
+            "PRIORITY"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -4408,7 +4619,9 @@
                 "size": 1000
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -4453,7 +4666,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -4491,7 +4706,9 @@
                 "size": "5,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -4536,7 +4753,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -4595,7 +4814,9 @@
                 "size": 100
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -4671,7 +4892,9 @@
                 "size": 20
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -4723,7 +4946,9 @@
                 "size": "5,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -4747,7 +4972,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -4813,7 +5040,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -4963,7 +5192,9 @@
                 "size": 200
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -4987,7 +5218,10 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["CATEGORY_ID", "NEWS_ID"],
+        "primaryKeys": [
+            "CATEGORY_ID",
+            "NEWS_ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -5060,7 +5294,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -5112,7 +5348,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -5136,7 +5374,9 @@
                 "size": 1000
             }
         },
-        "primaryKeys": ["KEY"],
+        "primaryKeys": [
+            "KEY"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -5202,7 +5442,9 @@
                 "size": "5,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -5261,7 +5503,9 @@
                 "size": "20,0"
             }
         },
-        "primaryKeys": ["MSSV"],
+        "primaryKeys": [
+            "MSSV"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -5313,7 +5557,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -5424,7 +5670,9 @@
                 "size": 20
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -5448,7 +5696,10 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["EMAIL", "ROLE_ID"],
+        "primaryKeys": [
+            "EMAIL",
+            "ROLE_ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -5528,7 +5779,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -5601,7 +5854,9 @@
                 "size": 100
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -5646,7 +5901,9 @@
                 "size": "20,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -5743,7 +6000,9 @@
                 "size": "20,0"
             }
         },
-        "primaryKeys": ["STT"],
+        "primaryKeys": [
+            "STT"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -5830,7 +6089,9 @@
                 "size": "4,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -5882,7 +6143,9 @@
                 "size": 2
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -5941,7 +6204,9 @@
                 "size": 10
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -6109,7 +6374,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -6265,7 +6532,9 @@
                 "size": 1000
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -6415,7 +6684,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -6474,7 +6745,9 @@
                 "size": 100
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -6540,13 +6813,15 @@
                 "size": 10
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
     "QT_KHEN_THUONG_ALL": {
         "active": true,
-        "moduleName": "mdTccb",
+        "moduleName": "qtKhenThuongAll",
         "modelName": "qtKhenThuongAll",
         "methods": {
             "qt_khen_thuong_all_search_page": "searchPage",
@@ -6604,7 +6879,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -6649,7 +6926,9 @@
                 "size": 10
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -6701,7 +6980,9 @@
                 "size": 10
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -6781,7 +7062,9 @@
                 "size": 100
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -6861,7 +7144,9 @@
                 "size": "1,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -6927,7 +7212,9 @@
                 "size": 200
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -6972,7 +7259,9 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -7080,14 +7369,20 @@
                 "size": "22,0"
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
     "QT_NGHI_THAI_SAN": {
         "active": true,
-        "moduleName": "mdTccb",
+        "moduleName": "qtNghiThaiSan",
         "modelName": "qtNghiThaiSan",
+        "methods": {
+            "qt_nghi_thai_san_search_page": "searchPage",
+            "qt_nghi_thai_san_group_page": "groupPage"
+        },
         "columns": {
             "STT": {
                 "value": "stt",
@@ -7181,7 +7476,10 @@
                 "size": 10
             }
         },
-        "primaryKeys": ["SHCC", "STT"],
+        "primaryKeys": [
+            "SHCC",
+            "STT"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -7268,7 +7566,9 @@
                 "size": 50
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -7320,7 +7620,9 @@
                 "size": 200
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -7403,7 +7705,9 @@
                 "size": 200
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -7483,7 +7787,9 @@
                 "size": 10
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -7528,7 +7834,9 @@
                 "size": 8
             }
         },
-        "primaryKeys": ["MA"],
+        "primaryKeys": [
+            "MA"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -8469,7 +8777,9 @@
                 "size": 50
             }
         },
-        "primaryKeys": ["SHCC"],
+        "primaryKeys": [
+            "SHCC"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -8682,7 +8992,9 @@
                 "size": 10
             }
         },
-        "primaryKeys": ["SHCC"],
+        "primaryKeys": [
+            "SHCC"
+        ],
         "foreignKeys": [],
         "type": "table"
     },
@@ -8720,7 +9032,9 @@
                 "size": 200
             }
         },
-        "primaryKeys": ["ID"],
+        "primaryKeys": [
+            "ID"
+        ],
         "foreignKeys": [],
         "type": "table"
     }
