@@ -8,7 +8,7 @@ import { getDmLoaiHopDong, getdmLoaiHopDongAll, SelectAdapter_DmLoaiHopDong } fr
 import {
     getTchcCanBoHopDongDvtlTnEdit, createTchcCanBoHopDongDvtlTn, getTchcCanBoHopDongDvtlTnAll,
     deleteTchcCanBoHopDongDvtlTn, updateTchcCanBoHopDongDvtlTn, SelectAdapter_HiredStaff
-} from 'modules/mdTccb/tchcCanBoHopDongDvtlTn/redux';
+} from 'modules/mdTccb/tccbCanBoHopDongDvtlTn/redux';
 import { getDmDonViAll, SelectAdapter_DmDonViFaculty } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { getDmNgachCdnnAll } from 'modules/mdDanhMuc/dmNgachCdnn/redux';
 import {

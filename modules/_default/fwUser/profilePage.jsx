@@ -12,6 +12,8 @@ import Loading from 'view/component/Loading';
 import ComponentKhenThuong from 'modules/mdTccb/qtKhenThuongAll/componentKhenThuong';
 import ComponentNCKH from 'modules/mdTccb/qtNghienCuuKhoaHoc/componentNCKH';
 import ComponentKyLuat from 'modules/mdTccb/qtKyLuat/componentKyLuat';
+import ComponentNuocNgoai from 'modules/mdTccb/qtNuocNgoai/componentNuocNgoai';
+
 class ProfileCanBo extends AdminPage {
     state = { canBo: false, isLoad: true };
     componentDidMount() {
@@ -43,6 +45,7 @@ class ProfileCanBo extends AdminPage {
             this.componentKhenThuong.value(item.shcc);
             this.componentNCKH.value(item.shcc, item.email);
             this.componentKyLuat.value(item.shcc);
+            this.componentNuocNgoai.value(item.shcc, item.email);
         });
 
     }
@@ -67,9 +70,10 @@ class ProfileCanBo extends AdminPage {
                             <ComponentQuanHe ref={e => this.componentQuanHe = e} userEdit={true} />
                             <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={true} />
                             <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={true} />
+                            <ComponentNuocNgoai ref={e => this.componentNuocNgoai = e} userEdit={true} />
                             <ComponentKhenThuong ref={e => this.componentKhenThuong = e} userEdit={true} />
-                            <ComponentNCKH ref={e => this.componentNCKH = e} userEdit={true} />
                             <ComponentKyLuat ref={e => this.componentKyLuat = e} userEdit={true} />
+                            <ComponentNCKH ref={e => this.componentNCKH = e} userEdit={true} />
                         </>}
                 </>,
             onSave: this.state.canBo && this.save,

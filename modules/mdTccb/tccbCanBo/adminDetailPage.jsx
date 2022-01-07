@@ -14,6 +14,7 @@ import ComponentTrinhDo from './componentTrinhDo';
 import ComponentKhenThuong from '../qtKhenThuongAll/componentKhenThuong';
 import ComponentNCKH from '../qtNghienCuuKhoaHoc/componentNCKH';
 import ComponentKyLuat from '../qtKyLuat/componentKyLuat';
+import ComponentNuocNgoai from '../qtNuocNgoai/componentNuocNgoai';
 
 class CanBoPage extends AdminPage {
     state = { item: null }
@@ -47,6 +48,7 @@ class CanBoPage extends AdminPage {
         this.componentKhenThuong.value(item.shcc);
         this.componentNCKH.value(item.shcc, item.email);
         this.componentKyLuat.value(item.shcc);
+        this.componentNuocNgoai.value(item.shcc, item.email);
     }
 
     save = () => {
@@ -73,9 +75,11 @@ class CanBoPage extends AdminPage {
                 <ComponentQuanHe ref={e => this.componentQuanHe = e} userEdit={false} />
                 <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={false} />
                 <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={false} />
+                <ComponentNuocNgoai ref={e => this.componentNuocNgoai = e}  userEdit = {false} />
                 <ComponentKhenThuong ref={e => this.componentKhenThuong = e} userEdit = {false}/>
-                <ComponentNCKH ref={e => this.componentNCKH = e} userEdit = {false} />
                 <ComponentKyLuat ref={e => this.componentKyLuat = e}  userEdit = {false} />
+                <ComponentNCKH ref={e => this.componentNCKH = e} userEdit = {false} />
+
             </>,
             backRoute: '/user/staff',
             onSave: this.save,

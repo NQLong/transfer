@@ -122,10 +122,9 @@ class EditModal extends AdminModal {
     }
 }
 class ComponentKyLuat extends AdminPage {
-    state = { shcc: '', data: [] };
+    state = { shcc: ''};
     value = (shcc) => {
-        this.setState({ shcc }, () =>
-            this.setState({ data: this.props.userEdit ? this.props.staff?.userItem?.kyLuat : [] }));
+        this.setState({ shcc });
     }
 
     showModal = (e, item, shcc) => {
