@@ -1,4 +1,4 @@
-// Table name: FW_COUNT { views,name }
+// Table name: FW_COUNT { views, name }
 const keys = [''];
 const obj2Db = { 'views': 'VIEWS', 'name': 'NAME' };
 

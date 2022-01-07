@@ -1,6 +1,6 @@
-// Table name: QT_NUOC_NGOAI { shcc, batDau, ketThuc, noiDung, quocGia, batDauType, ketThucType, id }
+// Table name: QT_NUOC_NGOAI { shcc, batDau, ketThuc, noiDung, quocGia, batDauType, ketThucType, id, kinhPhi, troLaiCongTac, tenCoSo }
 const keys = ['ID'];
-const obj2Db = { 'shcc': 'SHCC', 'batDau': 'BAT_DAU', 'ketThuc': 'KET_THUC', 'noiDung': 'NOI_DUNG', 'quocGia': 'QUOC_GIA', 'batDauType': 'BAT_DAU_TYPE', 'ketThucType': 'KET_THUC_TYPE', 'id': 'ID' };
+const obj2Db = { 'shcc': 'SHCC', 'batDau': 'BAT_DAU', 'ketThuc': 'KET_THUC', 'noiDung': 'NOI_DUNG', 'quocGia': 'QUOC_GIA', 'batDauType': 'BAT_DAU_TYPE', 'ketThucType': 'KET_THUC_TYPE', 'id': 'ID', 'kinhPhi': 'KINH_PHI', 'troLaiCongTac': 'TRO_LAI_CONG_TAC', 'tenCoSo': 'TEN_CO_SO' };
 
 module.exports = app => {
     app.model.qtNuocNgoai = {
