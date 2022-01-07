@@ -150,11 +150,10 @@ class ComponentNuocNgoai extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>
-                        <th style={{ width: '70%' }}>Nội dung</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Quốc gia</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tên cơ sở đào tạo/làm việc</th>
+                        <th style={{ width: '100%' }}>Nội dung</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tên cơ sở đào tạo/làm việc & Quốc gia</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kinh phí</th>
-                        <th style={{ width: '30%', textAlign: 'center' }}>Ngày tiếp nhận trở lại công tác</th>
+                        <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Ngày trở lại công tác</th>
                         <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                     </tr>),
                 renderRow: (item, index) => (
@@ -166,9 +165,13 @@ class ComponentNuocNgoai extends AdminPage {
                         </>}
                             style={{ whiteSpace: 'nowrap' }}
                             onClick={() => this.modal.show({ item: item, shcc: this.state.shcc, email: this.state.email })} />
-                        <TableCell type='text' content={item.noiDung} />
-                        <TableCell type='text' content={item.quocGia} style={{ whiteSpace: 'nowrap' }} />
-                        <TableCell type='text' content={item.tenCoSo} />
+                        <TableCell type='text' content={item.noiDung} style={{ whiteSpace: 'nowrap' }}/>
+                        <TableCell type='text' content={
+                            <>
+                                <span>Tên cơ sở: {item.tenCoSo}</span><br />
+                                <span>Quốc gia: {item.quocGia}</span>
+                            </>
+                            } style={{ whiteSpace: 'nowrap' }} />
                         <TableCell type='text' content={item.kinhPhi} />
                         <TableCell type='text' style={{ textAlign: 'center' }} content={item.troLaiCongTac ? `${T.dateToText(item.troLaiCongTac, 'dd/mm/yyyy')}` : null} />
                         <TableCell type='buttons' content={item} permission={permission} onEdit={() => this.modal.show({ item: item, shcc: this.state.shcc, email: this.state.email })} onDelete={this.deleteNuocNgoai}></TableCell>

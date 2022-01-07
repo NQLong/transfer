@@ -320,7 +320,7 @@ export class FormTextBox extends React.Component {
             const properties = {
                 type,
                 className: 'form-control',
-                placeholder: label || placeholder,
+                placeholder: placeholder || label,
                 value: this.state.value,
                 onChange: e => this.setState({ value: e.target.value }) || (onChange && onChange(e))
             };

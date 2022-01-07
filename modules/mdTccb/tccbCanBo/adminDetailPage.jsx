@@ -15,6 +15,7 @@ import ComponentKhenThuong from '../qtKhenThuongAll/componentKhenThuong';
 import ComponentNCKH from '../qtNghienCuuKhoaHoc/componentNCKH';
 import ComponentKyLuat from '../qtKyLuat/componentKyLuat';
 import ComponentNuocNgoai from '../qtNuocNgoai/componentNuocNgoai';
+import ComponentHDLV from '../qtHuongDanLuanVan/componentHDLV';
 
 class CanBoPage extends AdminPage {
     state = { item: null }
@@ -49,6 +50,7 @@ class CanBoPage extends AdminPage {
         this.componentNCKH.value(item.shcc, item.email);
         this.componentKyLuat.value(item.shcc);
         this.componentNuocNgoai.value(item.shcc, item.email);
+        this.componentHDLV.value(item.shcc, item.email);
     }
 
     save = () => {
@@ -79,6 +81,7 @@ class CanBoPage extends AdminPage {
                 <ComponentKhenThuong ref={e => this.componentKhenThuong = e} userEdit = {false}/>
                 <ComponentKyLuat ref={e => this.componentKyLuat = e}  userEdit = {false} />
                 <ComponentNCKH ref={e => this.componentNCKH = e} userEdit = {false} />
+                <ComponentHDLV ref={e => this.componentHDLV = e} userEdit={false} />
 
             </>,
             backRoute: '/user/staff',

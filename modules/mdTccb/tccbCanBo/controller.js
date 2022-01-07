@@ -156,7 +156,6 @@ module.exports = app => {
                             });
                         })).then(() => new Promise(resolve => {
                             app.model.qtKyLuat.getByShcc(canBo.shcc, (error, kyLuat) => {
-                                console.log(kyLuat);
                                 if (error) {
                                     res.send({ error: 'Lỗi khi lấy thông tin quá trình kỷ luật !' });
                                 }
@@ -180,7 +179,7 @@ module.exports = app => {
                                 resolve();
                             });
                         })).then(() => new Promise(resolve => {
-                            app.model.qtHuongDanLuanVan.getAll({ shcc: canBo.shcc }, (error, huongDanLuanVan) => {
+                            app.model.qtHuongDanLuanVan.getAll({ shcc: canBo.shcc }, '*', 'namTotNghiep DESC', (error, huongDanLuanVan) => {
                                 if (error) {
                                     res.send({ error: 'Lỗi khi lấy thông tin quá trình HDLV !' });
                                 }

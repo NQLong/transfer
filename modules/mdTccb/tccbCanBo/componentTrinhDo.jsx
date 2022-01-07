@@ -54,7 +54,7 @@ class ComponentTrinhDo extends AdminPage {
             <div className='tile'>
                 <h3 className='tile-title'>Thông tin về trình độ</h3>
                 <div className='tile-body row'>
-                    <FormTextBox ref={e => this.trinhDoPhoThong = e} label='Trình độ giáo dục phổ thông' className='col-md-6' />
+                    <FormTextBox ref={e => this.trinhDoPhoThong = e} label='Trình độ giáo dục phổ thông' placeholder='Nhập trình độ phổ thông (Ví dụ: 12/12)' className='col-md-4' />
                     <ComponentNN ref={e => this.ngoaiNgu = e} label='Trình độ ngoại ngữ' userEdit={this.props.userEdit} />
                     <FormSelect ref={e => this.trinhDoTinHoc = e} label='Trình độ tin học' data={SelectAdapter_DmTrinhDoTinHocV2} className='col-md-6' />
                     <FormTextBox ref={e => this.chungChiTinHoc = e} label='Văn bằng/Chứng chỉ' className='col-md-6' />
