@@ -86,7 +86,7 @@ class EditModal extends AdminModal {
             this.tenCoSo.focus();
         }
         else {
-            this.state.id ? this.props.update(this.state.id, changes, this.hide, false) : this.props.create(changes, this.hide, false);
+            this.props.update(this.state.id, changes, this.hide);
         }
     }
 

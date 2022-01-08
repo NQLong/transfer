@@ -311,14 +311,14 @@ class QtKhenThuongAll extends AdminPage {
                     getLoaiDoiTuong={this.props.getDmKhenThuongLoaiDoiTuongAll}
                     />
                 {
-                    permission.read &&
+                    permission.read && !this.checked && 
                     <button className='btn btn-success btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px' }} onClick={this.downloadExcel} >
                         <i className='fa fa-lg fa-print' />
                     </button>
                 }
             </>,
             backRoute: '/user/tccb',
-            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+            onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
         });
     }
 }

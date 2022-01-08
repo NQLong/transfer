@@ -271,7 +271,7 @@ class QtKyLuat extends AdminPage {
                 />
             </>,
             backRoute: '/user/tccb',
-            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+            onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
         });
     }
 }
