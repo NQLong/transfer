@@ -7,7 +7,7 @@ import Dropdown from 'view/component/Dropdown';
 import { DateInput } from 'view/component/Input';
 import { SelectAdapter_FwCanBo } from '../tccbCanBo/redux';
 import { getQtNuocNgoaiPage, deleteQtNuocNgoaiStaff, getQtNuocNgoaiGroupPageMa,
-    updateQtNuocNgoaiStaff }
+    updateQtNuocNgoaiGroupPageMa }
 from './redux';
 import Loading from 'view/component/Loading';
 
@@ -61,7 +61,7 @@ class EditModal extends AdminModal {
             shcc: this.maCanBo.value(),
             tenCoSo: this.tenCoSo.value(),
             kinhPhi: this.kinhPhi.value(),
-            troLaiCongTac: this.troLaiCongTac.value(),
+            troLaiCongTac: Number(this.troLaiCongTac.value()),
             batDauType: this.state.batDauType,
             batDau: this.batDau.getVal(),
             ketThucType: this.state.ketThucType,
@@ -86,7 +86,7 @@ class EditModal extends AdminModal {
             this.tenCoSo.focus();
         }
         else {
-            this.state.id ? this.props.update(this.state.id, changes, this.hide, false) : this.props.create(changes, this.hide, false);
+            this.props.update(this.state.id, changes, this.hide);
         }
     }
 
@@ -169,7 +169,6 @@ class QtNuocNgoaiGroupPage extends AdminPage {
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nội dung</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nơi làm việc</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kinh phí</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày trở lại công tác</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
@@ -186,7 +185,8 @@ class QtNuocNgoaiGroupPage extends AdminPage {
                         <TableCell type='text' content={(
                             <>
                                 <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span></span><br />
-                                <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span></span>
+                                <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span></span> <br/>
+                                <span style={{ whiteSpace: 'nowrap' }}>Trở lại công tác: <span style={{ color: 'blue' }}>{item.troLaiCongTac ? T.dateToText(item.troLaiCongTac, 'dd/mm/yyyy') : ''}</span></span>
                             </>
                         )}
                         />
@@ -206,12 +206,6 @@ class QtNuocNgoaiGroupPage extends AdminPage {
                        <TableCell type='text' content={(
                             <>
                                 {item.kinhPhi ? item.kinhPhi : ''}
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' content={(
-                            <>
-                                {item.troLaiCongTac ? T.dateToText(item.troLaiCongTac, 'dd/mm/yyyy') : ''}
                             </>
                         )}
                         />
@@ -237,11 +231,11 @@ class QtNuocNgoaiGroupPage extends AdminPage {
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition, loaiDoiTuong }}
                     getPage={this.props.getQtNuocNgoaiPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
-                    update={this.props.updateQtNuocNgoaiStaff}
+                    update={this.props.updateQtNuocNgoaiGroupPageMa}
                     permissions={currentPermissions}
                 />
             </>,
-            backRoute: '/user/tccb',
+            backRoute: '/user/tccb/qua-trinh/nuoc-ngoai',
         });
     }
 }
@@ -249,6 +243,6 @@ class QtNuocNgoaiGroupPage extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtNuocNgoai: state.qtNuocNgoai });
 const mapActionsToProps = {
     getQtNuocNgoaiPage, deleteQtNuocNgoaiStaff,
-    updateQtNuocNgoaiStaff, getQtNuocNgoaiGroupPageMa,
+    updateQtNuocNgoaiGroupPageMa, getQtNuocNgoaiGroupPageMa,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtNuocNgoaiGroupPage);

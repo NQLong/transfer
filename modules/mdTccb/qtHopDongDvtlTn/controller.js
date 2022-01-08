@@ -2,11 +2,10 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3002: { title: 'Hợp Đồng Đơn Vị Trả Lương - Trách Nhiệm', link: '/user/tccb/qua-trinh/hop-dong-dvtl-tn', icon: 'fa-pencil', backgroundColor: '#e07b91', groupIndex: 1 },
+            3003: { title: 'Hợp đồng đơn vị trả lương & trách nhiệm', link: '/user/tccb/qua-trinh/hop-dong-dvtl-tn', icon: 'fa-pencil', backgroundColor: '#00897b', groupIndex: 0 },
         },
     };
     app.permission.add(
-        { name: 'staff:login', menu: { parentMenu: { index: 1000, title: 'Thông tin cá nhân', icon: 'fa-user', link: '/user' } }, },
         { name: 'qtHopDongDvtlTn:read', menu },
         { name: 'qtHopDongDvtlTn:write' },
         { name: 'qtHopDongDvtlTn:delete' },

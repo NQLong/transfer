@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormDatePicker, FormCheckbox, FormSelect } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
-    getQtChucVuPage, getQtChucVuAll, updateQtChucVu,
+    getQtChucVuPage, getQtChucVuAll, updateQtChucVuGroupPageMa,
     deleteQtChucVu, createQtChucVu, getChucVuByShcc, getQtChucVuGroupPageMa
 } from './redux';
 import { SelectAdapter_DmChucVuV2 } from 'modules/mdDanhMuc/dmChucVu/redux';
@@ -38,7 +38,7 @@ export class EditModal extends AdminModal {
 
     checkChucVu = (changes) => {
         if (changes.chucVuChinh == this.state.chucVuChinh) {
-            this.state.stt ? this.props.update(false, this.state.stt, changes, this.hide) : this.props.create(false, changes, this.hide);
+            this.state.stt ? this.props.update(this.state.stt, changes, this.hide) : this.props.create(false, changes, this.hide);
             return;
         }
         T.confirm('Thông tin chức vụ chính', 'Đây sẽ là chức vụ chính của cán bộ', 'warning', true, isConfirm => {
@@ -46,12 +46,12 @@ export class EditModal extends AdminModal {
                 if (data) {
                     data.forEach(item => {
                         if (item.chucVuChinh && item.stt != this.state.stt) {
-                            this.props.update(false, item.stt, { chucVuChinh: 0 });
+                            this.props.update(item.stt, { chucVuChinh: 0 });
                         }
                     });
                 }
                 if (this.state.stt) {
-                    this.props.update(false, this.state.stt, changes, this.hide);
+                    this.props.update(this.state.stt, changes, this.hide);
                 } else {
                     this.props.create(false, changes, this.hide);
                 }
@@ -76,7 +76,7 @@ export class EditModal extends AdminModal {
         } else {
             if (!changes.chucVuChinh) {
                 if (this.state.stt) {
-                    this.props.update(false, this.state.stt, changes, this.hide);
+                    this.props.update(this.state.stt, changes, this.hide);
                 } else {
                     this.props.create(false, changes, this.hide);
                 }
@@ -206,7 +206,7 @@ class QtChucVuGroup extends AdminPage {
                     getPage={this.props.getQtChucVuPage} />
                 <EditModal ref={e => this.modal = e}
                     getQtChucVuAll={this.props.getQtChucVuAll}
-                    create={this.props.createQtChucVu} update={this.props.updateQtChucVu}
+                    create={this.props.createQtChucVu} update={this.props.updateQtChucVuGroupPageMa}
                 />
             </>,
             backRoute: '/user/tccb/qua-trinh/chuc-vu',
@@ -218,6 +218,6 @@ class QtChucVuGroup extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtChucVu: state.qtChucVu });
 const mapActionsToProps = {
     getQtChucVuAll, getQtChucVuPage, deleteQtChucVu, createQtChucVu,
-    updateQtChucVu, getChucVuByShcc, getQtChucVuGroupPageMa
+    updateQtChucVuGroupPageMa, getChucVuByShcc, getQtChucVuGroupPageMa
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtChucVuGroup);

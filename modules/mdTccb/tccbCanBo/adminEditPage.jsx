@@ -1323,7 +1323,7 @@ class CanBoEditPage extends QTForm {
     }
 
     getData = () => {
-        const route = T.routeMatcher('/user/staff/:shcc'),
+        const route = T.routeMatcher('/user/tccb/staff/:shcc'),
             shcc = route.parse(window.location.pathname).shcc;
         this.urlSHCC = shcc && shcc != 'new' ? shcc : null;
         if (this.urlSHCC) {
@@ -1555,11 +1555,11 @@ class CanBoEditPage extends QTForm {
             if (this.urlSHCC) {
                 this.props.updateStaff(this.urlSHCC, Object.assign(data.data, dcThuongTru, dcHienTai, dcNguyenQuan, dcNoiSinh), () => {
                     this.main.current.classList.remove('validated');
-                    this.props.history.push(`/user/staff/${data.data.shcc}`);
+                    this.props.history.push(`/user/tccb/staff/${data.data.shcc}`);
                 });
             } else {
                 this.props.createStaff(Object.assign(data.data, dcThuongTru, dcHienTai, dcNguyenQuan, dcNoiSinh), data => {
-                    this.props.history.push(`/user/staff/${data.item.shcc}`);
+                    this.props.history.push(`/user/tccb/staff/${data.item.shcc}`);
                 });
             }
         }

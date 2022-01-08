@@ -57,7 +57,7 @@ class EditModal extends AdminModal {
             email: this.state.email,
             tenCoSo: this.tenCoSo.value(),
             kinhPhi: this.kinhPhi.value(),
-            troLaiCongTac: this.troLaiCongTac.value(),
+            troLaiCongTac: Number(this.troLaiCongTac.value()),
             batDauType: this.state.batDauType,
             batDau: this.batDau.getVal(),
             ketThucType: this.state.ketThucType,

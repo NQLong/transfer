@@ -92,7 +92,7 @@ class QtHopDongDvtlTn extends AdminPage {
                         <TableCell style={{ whiteSpace: 'nowrap' }} type='text' content={(
                             <>
                                 <span>{item.hoNguoiKy + ' ' + item.tenNguoiKy}<br /></span>
-                                <Link to={'/user/staff/' + item.shccNguoiKy}>{item.shccNguoiKy}</Link>
+                                <Link to={'/user/tccb/staff/' + item.shccNguoiKy}>{item.shccNguoiKy}</Link>
                             </>
                         )} />
                         <TableCell type='buttons' content={item} onEdit={`/user/tccb/qua-trinh/hop-dong-dvtl-tn/${item.ma}`} onDelete={this.delete} permission={permission} >
