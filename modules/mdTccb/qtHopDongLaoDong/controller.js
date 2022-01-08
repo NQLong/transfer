@@ -2,11 +2,10 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3010: { title: 'Hợp Đồng Lao Động', link: '/user/tccb/qua-trinh/hop-dong-lao-dong', icon: 'fa-file-text-o', backgroundColor: '#524e4e', groupIndex: 1 },
+            3002: { title: 'Hợp đồng lao động', link: '/user/tccb/qua-trinh/hop-dong-lao-dong', icon: 'fa-file-text-o', backgroundColor: '#00d0ff', groupIndex: 0 },
         },
     };
     app.permission.add(
-        { name: 'staff:login', menu: { parentMenu: { index: 1000, title: 'Thông tin cá nhân', icon: 'fa-user', link: '/user' } }, },
         { name: 'qtHopDongLaoDong:read', menu },
         { name: 'qtHopDongLaoDong:write' },
         { name: 'qtHopDongLaoDong:delete' },

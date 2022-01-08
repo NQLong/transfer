@@ -2,11 +2,10 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3019: { title: 'Đi nước ngoài', link: '/user/tccb/qua-trinh/nuoc-ngoai', icon: 'fa-fighter-jet', backgroundColor: '#99ccff', groupIndex: 4},
+            3019: { title: 'Đi nước ngoài', link: '/user/tccb/qua-trinh/nuoc-ngoai', icon: 'fa-fighter-jet', backgroundColor: '#832694', groupIndex: 1},
         },
     };
     app.permission.add(
-        { name: 'staff:login', menu: { parentMenu: { index: 1000, title: 'Thông tin cá nhân', icon: 'fa-user', link: '/user' } }, },
         { name: 'qtNuocNgoai:read', menu },
         { name: 'qtNuocNgoai:write' },
         { name: 'qtNuocNgoai:delete' },
@@ -104,8 +103,8 @@ module.exports = app => {
                 if (error || item == null) {
                     res.status(400).send({ error: 'Not found!' });
                 } else {
-                    if (item.shcc === req.session.user.shcc) {
-                        const changes = app.clone(req.body.changes, { shcc: req.session.user.shcc });
+                    if (item.shcc === req.cookies.personId) {
+                        const changes = req.body.changes;
                         app.model.qtNuocNgoai.update({ id: req.body.id }, changes, (error, item) => res.send({ error, item }));
                     } else {
                         res.status(400).send({ error: 'Not found!' });
@@ -123,7 +122,7 @@ module.exports = app => {
                 if (error || item == null) {
                     res.status(400).send({ error: 'Not found!' });
                 } else {
-                    if (item.shcc === req.session.user.shcc) {
+                    if (item.shcc === req.cookies.personId) {
                         app.model.qtNuocNgoai.delete({ id: req.body.id }, (error) => res.send(error));
                     } else {
                         res.status(400).send({ error: 'Not found!' });

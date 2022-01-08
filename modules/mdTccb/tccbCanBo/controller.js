@@ -2,20 +2,19 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3001: { title: 'Danh sách cán bộ', link: '/user/staff', icon: 'fa-users', backgroundColor: '#8bc34a', groupIndex: 0 },
+            3001: { title: 'Danh sách cán bộ', link: '/user/tccb/staff', icon: 'fa-users', backgroundColor: '#8bc34a', groupIndex: 0 },
         },
     };
 
     app.permission.add(
-        { name: 'staff:login', menu: { parentMenu: { index: 1000, title: 'Thông tin cá nhân', icon: 'fa-user', link: '/user' } }, },
         { name: 'staff:read', menu },
         { name: 'staff:write' },
         { name: 'staff:delete' },
     );
 
-    app.get('/user/staff/:shcc', app.permission.check('staff:read'), app.templates.admin);
-    app.get('/user/staff', app.permission.check('staff:read'), app.templates.admin);
-    app.get('/user/staff/item/upload', app.permission.check('staff:write'), app.templates.admin);
+    app.get('/user/tccb/staff/:shcc', app.permission.check('staff:read'), app.templates.admin);
+    app.get('/user/tccb/staff', app.permission.check('staff:read'), app.templates.admin);
+    app.get('/user/tccb/staff/item/upload', app.permission.check('staff:write'), app.templates.admin);
 
     app.readyHooks.add('readyUser', {
         ready: () => app.dbConnection != null && app.model != null && app.model.canBo != null && app.model.canBo != null,
@@ -1174,6 +1173,7 @@ module.exports = app => {
         app.model.canBo.getCanBoBenA(req.params.shcc, (error, item) => res.send({ error, item }));
     });
     app.put('/api/user/staff', app.permission.check('staff:login'), (req, res) => {
+        console.log(req.cookies.personId);
         if (req.body.changes && req.session.user) {
             const changes = req.body.changes;
             app.model.canBo.get({ email: req.session.user.email }, (error, canBo) => {
@@ -1209,8 +1209,8 @@ module.exports = app => {
                 if (error || item == null) {
                     res.status(400).send({ error: 'Not found!' });
                 } else {
-                    if (item.shcc === req.session.user.shcc) {
-                        const changes = app.clone(req.body.changes, { shcc: req.session.user.shcc });
+                    if (item.shcc === req.cookies.personId) {
+                        const changes = req.body.changes;
                         app.model.quanHeCanBo.update({ id: req.body.id }, changes, (error, item) => res.send({ error, item }));
                     } else {
                         res.status(400).send({ error: 'Not found!' });
@@ -1228,7 +1228,7 @@ module.exports = app => {
                 if (error || item == null) {
                     res.status(400).send({ error: 'Not found!' });
                 } else {
-                    if (item.shcc === req.session.user.shcc) {
+                    if (item.shcc === req.cookies.personId) {
                         app.model.quanHeCanBo.delete({ id: req.body.id }, (error) => res.send(error));
                     } else {
                         res.status(400).send({ error: 'Not found!' });

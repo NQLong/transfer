@@ -2,11 +2,10 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3017: { title: 'Kỷ luật', link: '/user/tccb/qua-trinh/ky-luat', icon: 'fa-ban', backgroundColor: '#ff0000', groupIndex: 3 },
+            3006: { title: 'Quá trình kỷ luật', link: '/user/tccb/qua-trinh/ky-luat', icon: 'fa-ban', backgroundColor: '#ff0000', groupIndex: 2 },
         },
     };
     app.permission.add(
-        { name: 'staff:login', menu: { parentMenu: { index: 1000, title: 'Thông tin cá nhân', icon: 'fa-user', link: '/user' } }, },
         { name: 'qtKyLuat:read', menu },
         { name: 'qtKyLuat:write' },
         { name: 'qtKyLuat:delete' },
@@ -122,8 +121,8 @@ module.exports = app => {
                 if (error || item == null) {
                     res.status(400).send({ error: 'Not found!' });
                 } else {
-                    if (item.shcc === req.session.user.shcc) {
-                        const changes = app.clone(req.body.changes, { shcc: req.session.user.shcc });
+                    if (item.shcc === req.cookies.personId) {
+                        const changes = req.body.changes;
                         app.model.qtKyLuat.update({ id: req.body.id }, changes, (error, item) => res.send({ error, item }));
                     } else {
                         res.status(400).send({ error: 'Not found!' });
@@ -141,7 +140,7 @@ module.exports = app => {
                 if (error || item == null) {
                     res.status(400).send({ error: 'Not found!' });
                 } else {
-                    if (item.shcc === req.session.user.shcc) {
+                    if (item.shcc === req.cookies.personId) {
                         app.model.qtKyLuat.delete({ id: req.body.id }, (error) => res.send(error));
                     } else {
                         res.status(400).send({ error: 'Not found!' });
