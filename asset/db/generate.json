@@ -1385,6 +1385,39 @@
         "foreignKeys": [],
         "type": "table"
     },
+    "DM_KHEN_THUONG_CAP": {
+        "active": true,
+        "moduleName": "dmKhenThuongCap",
+        "modelName": "dmKhenThuongCap",
+        "columns": {
+            "MA": {
+                "value": "ma",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": false,
+                "size": 2
+            },
+            "TEN": {
+                "value": "ten",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 50
+            },
+            "KICH_HOAT": {
+                "value": "kichHoat",
+                "dataType": "NUMBER",
+                "dataDefault": "1",
+                "nullable": true,
+                "size": "1,0"
+            }
+        },
+        "primaryKeys": [
+            "MA"
+        ],
+        "foreignKeys": [],
+        "type": "table"
+    },
     "DM_KHEN_THUONG_CHU_THICH": {
         "active": true,
         "moduleName": "dmKhenThuongChuThich",
@@ -1466,6 +1499,46 @@
         },
         "primaryKeys": [
             "MA"
+        ],
+        "foreignKeys": [],
+        "type": "table"
+    },
+    "DM_KHEN_THUONG_THI_DUA": {
+        "active": true,
+        "moduleName": "dmKhenThuongThiDua",
+        "modelName": "dmKhenThuongThiDua",
+        "columns": {
+            "ID": {
+                "value": "id",
+                "dataType": "NUMBER",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_492998\".nextval",
+                "nullable": false,
+                "size": "22,0"
+            },
+            "KY_HIEU": {
+                "value": "kyHieu",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 10
+            },
+            "CAP_QUYET_DINH": {
+                "value": "capQuyetDinh",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 2
+            },
+            "DIEM": {
+                "value": "diem",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "22,0"
+            }
+        },
+        "primaryKeys": [
+            "ID"
         ],
         "foreignKeys": [],
         "type": "table"
@@ -3904,6 +3977,13 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": "14,0"
+            },
+            "NAME": {
+                "value": "name",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 10
             }
         },
         "primaryKeys": [],
@@ -5890,6 +5970,34 @@
                 "dataDefault": "1",
                 "nullable": true,
                 "size": "1,0"
+            },
+            "THOI_CHUC_VU": {
+                "value": "thoiChucVu",
+                "dataType": "NUMBER",
+                "dataDefault": "0",
+                "nullable": true,
+                "size": "1,0"
+            },
+            "SO_QD_THOI_CHUC_VU": {
+                "value": "soQdThoiChucVu",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 5
+            },
+            "NGAY_THOI_CHUC_VU": {
+                "value": "ngayThoiChucVu",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "20,0"
+            },
+            "NGAY_RA_QD_THOI_CHUC_VU": {
+                "value": "ngayRaQdThoiChucVu",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "20,0"
             }
         },
         "primaryKeys": [
@@ -6107,7 +6215,8 @@
         "moduleName": "qtHopDongDvtlTn",
         "modelName": "qtHopDongDvtlTn",
         "methods": {
-            "QT_HOP_DONG_DVTL_TN_SEARCH_PAGE": "searchPage"
+            "QT_HOP_DONG_DVTL_TN_SEARCH_PAGE": "searchPage",
+            "download_hop_dong_dvtl_tn": "download"
         },
         "columns": {
             "SO_HOP_DONG": {
@@ -6278,7 +6387,8 @@
         "methods": {
             "QT_HOP_DONG_LAO_DONG_SEARCH_PAGE": "searchPage",
             "DOWNLOAD_HOP_DONG_LAO_DONG": "download",
-            "QT_HOP_DONG_LAO_DONG_GROUP_PAGE": "groupPage"
+            "QT_HOP_DONG_LAO_DONG_GROUP_PAGE": "groupPage",
+            "qt_hop_dong_lao_dong_shcc_group_page": "groupPageShcc"
         },
         "columns": {
             "LOAI_HOP_DONG": {
@@ -6381,17 +6491,17 @@
             },
             "BAC": {
                 "value": "bac",
-                "dataType": "NUMBER",
+                "dataType": "NVARCHAR2",
                 "dataDefault": "",
                 "nullable": true,
-                "size": "2,0"
+                "size": 5
             },
             "HE_SO": {
                 "value": "heSo",
                 "dataType": "NUMBER",
                 "dataDefault": "",
                 "nullable": true,
-                "size": "22,0"
+                "size": "10,2"
             },
             "NGAY_KY_HOP_DONG": {
                 "value": "ngayKyHopDong",
@@ -6711,7 +6821,7 @@
     },
     "QT_KHEN_THUONG_ALL": {
         "active": true,
-        "moduleName": "mdTccb",
+        "moduleName": "qtKhenThuongAll",
         "modelName": "qtKhenThuongAll",
         "methods": {
             "qt_khen_thuong_all_search_page": "searchPage",
@@ -6759,6 +6869,13 @@
                 "dataType": "NUMBER",
                 "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_476591\".nextval",
                 "nullable": false,
+                "size": "22,0"
+            },
+            "DIEM_THI_DUA": {
+                "value": "diemThiDua",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
                 "size": "22,0"
             }
         },
@@ -6900,14 +7017,14 @@
                 "dataType": "NVARCHAR2",
                 "dataDefault": "",
                 "nullable": true,
-                "size": 200
+                "size": 2
             },
             "CAP_QUYET_DINH": {
                 "value": "capQuyetDinh",
                 "dataType": "NVARCHAR2",
                 "dataDefault": "",
                 "nullable": true,
-                "size": 200
+                "size": 50
             },
             "BAT_DAU_TYPE": {
                 "value": "batDauType",
@@ -6929,6 +7046,20 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": 10
+            },
+            "DIEM_THI_DUA": {
+                "value": "diemThiDua",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "22,0"
+            },
+            "NOI_DUNG": {
+                "value": "noiDung",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 100
             }
         },
         "primaryKeys": [
@@ -7246,8 +7377,12 @@
     },
     "QT_NGHI_THAI_SAN": {
         "active": true,
-        "moduleName": "mdTccb",
+        "moduleName": "qtNghiThaiSan",
         "modelName": "qtNghiThaiSan",
+        "methods": {
+            "qt_nghi_thai_san_search_page": "searchPage",
+            "qt_nghi_thai_san_group_page": "groupPage"
+        },
         "columns": {
             "STT": {
                 "value": "stt",
@@ -7408,6 +7543,27 @@
                 "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316670\".nextval",
                 "nullable": false,
                 "size": "22,0"
+            },
+            "KINH_PHI": {
+                "value": "kinhPhi",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "10,0"
+            },
+            "TRO_LAI_CONG_TAC": {
+                "value": "troLaiCongTac",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "20,0"
+            },
+            "TEN_CO_SO": {
+                "value": "tenCoSo",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 50
             }
         },
         "primaryKeys": [
@@ -7474,6 +7630,9 @@
         "active": true,
         "moduleName": "tccbCanBo",
         "modelName": "quanHeCanBo",
+        "methods": {
+            "quan_he_gia_dinh_by_shcc": "getQhByShcc"
+        },
         "columns": {
             "ID": {
                 "value": "id",
@@ -7634,6 +7793,53 @@
         "foreignKeys": [],
         "type": "table"
     },
+    "TCCB_TO_CHUC_KHAC": {
+        "active": true,
+        "moduleName": "tccbToChucKhac",
+        "modelName": "tccbToChucKhac",
+        "columns": {
+            "MA": {
+                "value": "ma",
+                "dataType": "NUMBER",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_490598\".nextval",
+                "nullable": false,
+                "size": "22,0"
+            },
+            "TEN_TO_CHUC": {
+                "value": "tenToChuc",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 50
+            },
+            "NGAY_THAM_GIA": {
+                "value": "ngayThamGia",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "20,0"
+            },
+            "MO_TA": {
+                "value": "moTa",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 100
+            },
+            "SHCC": {
+                "value": "shcc",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 8
+            }
+        },
+        "primaryKeys": [
+            "MA"
+        ],
+        "foreignKeys": [],
+        "type": "table"
+    },
     "TCHC_CAN_BO": {
         "active": true,
         "moduleName": "tccbCanBo",
@@ -7716,13 +7922,6 @@
                 "nullable": true,
                 "size": 6
             },
-            "NGACH_MOI": {
-                "value": "ngachMoi",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 20
-            },
             "HE_SO_LUONG": {
                 "value": "heSoLuong",
                 "dataType": "NUMBER",
@@ -7757,20 +7956,6 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": "5,0"
-            },
-            "PHU_CAP_CONG_VIEC": {
-                "value": "phuCapCongViec",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "10,2"
-            },
-            "NGAY_PHU_CAP_CONG_VIEC": {
-                "value": "ngayPhuCapCongViec",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
             },
             "MA_CHUC_VU": {
                 "value": "maChucVu",
@@ -8464,1473 +8649,137 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": "4,0"
-            }
-        },
-        "primaryKeys": [
-            "SHCC"
-        ],
-        "foreignKeys": [],
-        "type": "table"
-    },
-    "TCHC_CAN_BO_1": {
-        "active": true,
-        "moduleName": "tchcCanBo1",
-        "modelName": "tchcCanBo1",
-        "columns": {
-            "TEN": {
-                "value": "ten",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 30
             },
-            "HO": {
-                "value": "ho",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 100
-            },
-            "PHAI": {
-                "value": "phai",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 2
-            },
-            "DIEN_THOAI_CA_NHAN": {
-                "value": "dienThoaiCaNhan",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 15
-            },
-            "EMAIL": {
-                "value": "email",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 100
-            },
-            "NGAY_SINH": {
-                "value": "ngaySinh",
+            "PHU_CAP_CHUC_VU": {
+                "value": "phuCapChucVu",
                 "dataType": "NUMBER",
                 "dataDefault": "",
                 "nullable": true,
-                "size": "20,0"
+                "size": "10,1"
             },
-            "NGAY_BAT_DAU_CONG_TAC": {
-                "value": "ngayBatDauCongTac",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "NGAY_CBGD": {
-                "value": "ngayCbgd",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "NGAY_BIEN_CHE": {
-                "value": "ngayBienChe",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "NGAY_NGHI": {
-                "value": "ngayNghi",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "NGACH": {
-                "value": "ngach",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 6
-            },
-            "NGACH_MOI": {
-                "value": "ngachMoi",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 20
-            },
-            "HE_SO_LUONG": {
-                "value": "heSoLuong",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "10,2"
-            },
-            "BAC_LUONG": {
-                "value": "bacLuong",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 5
-            },
-            "MOC_NANG_LUONG": {
-                "value": "mocNangLuong",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "NGAY_HUONG_LUONG": {
-                "value": "ngayHuongLuong",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "TY_LE_VUOT_KHUNG": {
-                "value": "tyLeVuotKhung",
+            "TY_LE_PHU_CAP_THAM_NIEN": {
+                "value": "tyLePhuCapThamNien",
                 "dataType": "NUMBER",
                 "dataDefault": "",
                 "nullable": true,
                 "size": "5,0"
             },
-            "PHU_CAP_CONG_VIEC": {
-                "value": "phuCapCongViec",
+            "TY_LE_PHU_CAP_UU_DAI": {
+                "value": "tyLePhuCapUuDai",
                 "dataType": "NUMBER",
                 "dataDefault": "",
                 "nullable": true,
-                "size": "10,2"
+                "size": "5,0"
             },
-            "NGAY_PHU_CAP_CONG_VIEC": {
-                "value": "ngayPhuCapCongViec",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "MA_CHUC_VU": {
-                "value": "maChucVu",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 3
-            },
-            "CHUC_VU_DOAN_THE": {
-                "value": "chucVuDoanThe",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "CHUC_VU_DANG": {
-                "value": "chucVuDang",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "CHUC_VU_KIEM_NHIEM": {
-                "value": "chucVuKiemNhiem",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "MA_TRINH_DO_LLCT": {
-                "value": "maTrinhDoLlct",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 2
-            },
-            "MA_TRINH_DO_QLNN": {
-                "value": "maTrinhDoQlnn",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 2
-            },
-            "MA_TRINH_DO_NN": {
-                "value": "maTrinhDoNn",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 2
-            },
-            "MA_TRINH_DO_TIN_HOC": {
-                "value": "maTrinhDoTinHoc",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 2
-            },
-            "HO_KHAU": {
-                "value": "hoKhau",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "DIA_CHI_HIEN_TAI": {
-                "value": "diaChiHienTai",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "DAN_TOC": {
-                "value": "danToc",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 2
-            },
-            "TON_GIAO": {
-                "value": "tonGiao",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 2
-            },
-            "DANG_VIEN": {
-                "value": "dangVien",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "1,0"
-            },
-            "MA_DON_VI": {
-                "value": "maDonVi",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 20
-            },
-            "PHUC_LOI": {
-                "value": "phucLoi",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "NHA_GIAO_NHAN_DAN": {
-                "value": "nhaGiaoNhanDan",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "4,0"
-            },
-            "NHA_GIAO_UU_TU": {
-                "value": "nhaGiaoUuTu",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "4,0"
-            },
-            "DANG_O_NUOC_NGOAI": {
-                "value": "dangONuocNgoai",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "1,0"
-            },
-            "LY_DO_O_NUOC_NGOAI": {
-                "value": "lyDoONuocNgoai",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "GHI_CHU": {
-                "value": "ghiChu",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 1000
-            },
-            "SHCC": {
-                "value": "shcc",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 10
-            },
-            "EMAIL_CA_NHAN": {
-                "value": "emailCaNhan",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 100
-            },
-            "BI_DANH": {
-                "value": "biDanh",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 20
-            },
-            "DIEN_THOAI_BAO_TIN": {
-                "value": "dienThoaiBaoTin",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 10
-            },
-            "NGHE_NGHIEP_CU": {
-                "value": "ngheNghiepCu",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 100
-            },
-            "CMND": {
-                "value": "cmnd",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 20
-            },
-            "CMND_NGAY_CAP": {
-                "value": "cmndNgayCap",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "CMND_NOI_CAP": {
-                "value": "cmndNoiCap",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "CHUC_VU_KHAC": {
-                "value": "chucVuKhac",
-                "dataType": "VARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 100
-            },
-            "QUOC_GIA": {
-                "value": "quocGia",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 2
-            },
-            "CHUC_DANH": {
-                "value": "chucDanh",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 100
-            },
-            "TRINH_DO_PHO_THONG": {
-                "value": "trinhDoPhoThong",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 50
-            },
-            "HOC_VI": {
-                "value": "hocVi",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 3
-            },
-            "CHUYEN_NGANH": {
-                "value": "chuyenNganh",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "SUC_KHOE": {
-                "value": "sucKhoe",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "CAN_NANG": {
-                "value": "canNang",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "22,0"
-            },
-            "CHIEU_CAO": {
-                "value": "chieuCao",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "22,0"
-            },
-            "NGAY_NHAP_NGU": {
-                "value": "ngayNhapNgu",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "NGAY_XUAT_NGU": {
-                "value": "ngayXuatNgu",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "QUAN_HAM_CAO_NHAT": {
-                "value": "quanHamCaoNhat",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 100
-            },
-            "HANG_THUONG_BINH": {
-                "value": "hangThuongBinh",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 100
-            },
-            "GIA_DINH_CHINH_SACH": {
-                "value": "giaDinhChinhSach",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 100
-            },
-            "DANH_HIEU": {
-                "value": "danhHieu",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "MA_XA_NOI_SINH": {
-                "value": "maXaNoiSinh",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 5
-            },
-            "MA_HUYEN_NOI_SINH": {
-                "value": "maHuyenNoiSinh",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 3
-            },
-            "MA_TINH_NOI_SINH": {
-                "value": "maTinhNoiSinh",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 3
-            },
-            "MA_XA_NGUYEN_QUAN": {
-                "value": "maXaNguyenQuan",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 5
-            },
-            "MA_HUYEN_NGUYEN_QUAN": {
-                "value": "maHuyenNguyenQuan",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 3
-            },
-            "MA_TINH_NGUYEN_QUAN": {
-                "value": "maTinhNguyenQuan",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 3
-            },
-            "NGAY_VAO_DANG": {
-                "value": "ngayVaoDang",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "NGAY_VAO_DANG_CHINH_THUC": {
-                "value": "ngayVaoDangChinhThuc",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "NOI_DANG_DB": {
-                "value": "noiDangDb",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "NOI_DANG_CT": {
-                "value": "noiDangCt",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "NGAY_VAO_DOAN": {
-                "value": "ngayVaoDoan",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "NOI_VAO_DOAN": {
-                "value": "noiVaoDoan",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "SO_THE_DANG": {
-                "value": "soTheDang",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 20
-            },
-            "SO_TRUONG": {
-                "value": "soTruong",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "NHOM_MAU": {
-                "value": "nhomMau",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 10
-            },
-            "SO_BHXH": {
-                "value": "soBhxh",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 20
-            },
-            "DOAN_VIEN": {
-                "value": "doanVien",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "1,0"
-            },
-            "NAM_CHUC_DANH": {
-                "value": "namChucDanh",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "NAM_HOC_VI": {
-                "value": "namHocVi",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "NOI_SINH": {
-                "value": "noiSinh",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "QUE_QUAN": {
-                "value": "queQuan",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "THUONG_TRU_MA_HUYEN": {
-                "value": "thuongTruMaHuyen",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 10
-            },
-            "THUONG_TRU_MA_TINH": {
-                "value": "thuongTruMaTinh",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 10
-            },
-            "THUONG_TRU_MA_XA": {
-                "value": "thuongTruMaXa",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 10
-            },
-            "THUONG_TRU_SO_NHA": {
-                "value": "thuongTruSoNha",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "HIEN_TAI_MA_HUYEN": {
-                "value": "hienTaiMaHuyen",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 10
-            },
-            "HIEN_TAI_MA_TINH": {
-                "value": "hienTaiMaTinh",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 10
-            },
-            "HIEN_TAI_MA_XA": {
-                "value": "hienTaiMaXa",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 10
-            },
-            "HIEN_TAI_SO_NHA": {
-                "value": "hienTaiSoNha",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "HOP_DONG_CAN_BO": {
-                "value": "hopDongCanBo",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 10
-            },
-            "HOP_DONG_CAN_BO_NGAY": {
-                "value": "hopDongCanBoNgay",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "USER_MODIFIED": {
-                "value": "userModified",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 30
-            },
-            "LAST_MODIFIED": {
-                "value": "lastModified",
+            "LOAI_DOI_TUONG_BOI_DUONG": {
+                "value": "loaiDoiTuongBoiDuong",
                 "dataType": "NUMBER",
                 "dataDefault": "",
                 "nullable": true,
                 "size": "10,0"
-            },
-            "NGAY_BAT_DAU_O_NUOC_NGOAI": {
-                "value": "ngayBatDauONuocNgoai",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "NGAY_KET_THUC_O_NUOC_NGOAI": {
-                "value": "ngayKetThucONuocNgoai",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "DANG_NGHI_THAI_SAN": {
-                "value": "dangNghiThaiSan",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "1,0"
-            },
-            "NGAY_BAT_DAU_NGHI_THAI_SAN": {
-                "value": "ngayBatDauNghiThaiSan",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "NGAY_KET_THUC_NGHI_THAI_SAN": {
-                "value": "ngayKetThucNghiThaiSan",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "CONG_DOAN": {
-                "value": "congDoan",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "1,0"
-            },
-            "NGAY_VAO_CONG_DOAN": {
-                "value": "ngayVaoCongDoan",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "TO_CHUC_KHAC": {
-                "value": "toChucKhac",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "1,0"
-            },
-            "MA_THE_BHYT": {
-                "value": "maTheBhyt",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 20
-            },
-            "NOI_KHAM_CHUA_BENH_BAN_DAU": {
-                "value": "noiKhamChuaBenhBanDau",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 5
-            },
-            "QUYEN_LOI_KHAM_CHUA_BENH": {
-                "value": "quyenLoiKhamChuaBenh",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "3,0"
-            },
-            "DANG_NGHI_KHONG_HUONG_LUONG": {
-                "value": "dangNghiKhongHuongLuong",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "1,0"
-            },
-            "NGAY_BAT_DAU_NGHI_KHONG_HUONG_LUONG": {
-                "value": "ngayBatDauNghiKhongHuongLuong",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "NGAY_KET_THUC_NGHI_KHONG_HUONG_LUONG": {
-                "value": "ngayKetThucNghiKhongHuongLuong",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "LY_DO_NGHI_KHONG_HUONG_LUONG": {
-                "value": "lyDoNghiKhongHuongLuong",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "DOI_TUONG_BOI_DUONG_KIEN_THUC_QPAN": {
-                "value": "doiTuongBoiDuongKienThucQpan",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "1,0"
-            }
-        },
-        "primaryKeys": [],
-        "foreignKeys": [],
-        "type": "table"
-    },
-    "TCHC_CAN_BO_2": {
-        "active": true,
-        "moduleName": "tchcCanBo2",
-        "modelName": "tchcCanBo2",
-        "columns": {
-            "TEN": {
-                "value": "ten",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 30
-            },
-            "HO": {
-                "value": "ho",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 100
-            },
-            "PHAI": {
-                "value": "phai",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 2
-            },
-            "DIEN_THOAI_CA_NHAN": {
-                "value": "dienThoaiCaNhan",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 50
-            },
-            "EMAIL": {
-                "value": "email",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 100
-            },
-            "NGAY_SINH": {
-                "value": "ngaySinh",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "NGAY_BAT_DAU_CONG_TAC": {
-                "value": "ngayBatDauCongTac",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "NGAY_CBGD": {
-                "value": "ngayCbgd",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "NGAY_BIEN_CHE": {
-                "value": "ngayBienChe",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "NGAY_NGHI": {
-                "value": "ngayNghi",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "NGACH": {
-                "value": "ngach",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 6
-            },
-            "NGACH_MOI": {
-                "value": "ngachMoi",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 20
-            },
-            "HE_SO_LUONG": {
-                "value": "heSoLuong",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "10,2"
-            },
-            "BAC_LUONG": {
-                "value": "bacLuong",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 5
-            },
-            "MOC_NANG_LUONG": {
-                "value": "mocNangLuong",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "NGAY_HUONG_LUONG": {
-                "value": "ngayHuongLuong",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "TY_LE_VUOT_KHUNG": {
-                "value": "tyLeVuotKhung",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "5,0"
-            },
-            "PHU_CAP_CONG_VIEC": {
-                "value": "phuCapCongViec",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "10,2"
-            },
-            "NGAY_PHU_CAP_CONG_VIEC": {
-                "value": "ngayPhuCapCongViec",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "MA_CHUC_VU": {
-                "value": "maChucVu",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 3
-            },
-            "CHUC_VU_DOAN_THE": {
-                "value": "chucVuDoanThe",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "CHUC_VU_DANG": {
-                "value": "chucVuDang",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "CHUC_VU_KIEM_NHIEM": {
-                "value": "chucVuKiemNhiem",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "MA_TRINH_DO_LLCT": {
-                "value": "maTrinhDoLlct",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 2
-            },
-            "MA_TRINH_DO_QLNN": {
-                "value": "maTrinhDoQlnn",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 2
-            },
-            "MA_TRINH_DO_NN": {
-                "value": "maTrinhDoNn",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 2
-            },
-            "MA_TRINH_DO_TIN_HOC": {
-                "value": "maTrinhDoTinHoc",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 2
-            },
-            "HO_KHAU": {
-                "value": "hoKhau",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "DIA_CHI_HIEN_TAI": {
-                "value": "diaChiHienTai",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "DAN_TOC": {
-                "value": "danToc",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 2
-            },
-            "TON_GIAO": {
-                "value": "tonGiao",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 2
-            },
-            "DANG_VIEN": {
-                "value": "dangVien",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "1,0"
-            },
-            "MA_DON_VI": {
-                "value": "maDonVi",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 20
-            },
-            "PHUC_LOI": {
-                "value": "phucLoi",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "NHA_GIAO_NHAN_DAN": {
-                "value": "nhaGiaoNhanDan",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "4,0"
-            },
-            "NHA_GIAO_UU_TU": {
-                "value": "nhaGiaoUuTu",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "4,0"
-            },
-            "DANG_O_NUOC_NGOAI": {
-                "value": "dangONuocNgoai",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "1,0"
-            },
-            "LY_DO_O_NUOC_NGOAI": {
-                "value": "lyDoONuocNgoai",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "GHI_CHU": {
-                "value": "ghiChu",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 1000
-            },
-            "SHCC": {
-                "value": "shcc",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 10
-            },
-            "EMAIL_CA_NHAN": {
-                "value": "emailCaNhan",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 100
-            },
-            "BI_DANH": {
-                "value": "biDanh",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 20
-            },
-            "DIEN_THOAI_BAO_TIN": {
-                "value": "dienThoaiBaoTin",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 50
-            },
-            "NGHE_NGHIEP_CU": {
-                "value": "ngheNghiepCu",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 100
-            },
-            "CMND": {
-                "value": "cmnd",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 20
-            },
-            "CMND_NGAY_CAP": {
-                "value": "cmndNgayCap",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "CMND_NOI_CAP": {
-                "value": "cmndNoiCap",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "CHUC_VU_KHAC": {
-                "value": "chucVuKhac",
-                "dataType": "VARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 100
-            },
-            "QUOC_GIA": {
-                "value": "quocGia",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 2
-            },
-            "CHUC_DANH": {
-                "value": "chucDanh",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 100
-            },
-            "TRINH_DO_PHO_THONG": {
-                "value": "trinhDoPhoThong",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 50
-            },
-            "HOC_VI": {
-                "value": "hocVi",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 3
-            },
-            "CHUYEN_NGANH": {
-                "value": "chuyenNganh",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "SUC_KHOE": {
-                "value": "sucKhoe",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "CAN_NANG": {
-                "value": "canNang",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "22,0"
-            },
-            "CHIEU_CAO": {
-                "value": "chieuCao",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "22,0"
-            },
-            "NGAY_NHAP_NGU": {
-                "value": "ngayNhapNgu",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "NGAY_XUAT_NGU": {
-                "value": "ngayXuatNgu",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "QUAN_HAM_CAO_NHAT": {
-                "value": "quanHamCaoNhat",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 100
-            },
-            "HANG_THUONG_BINH": {
-                "value": "hangThuongBinh",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 100
-            },
-            "GIA_DINH_CHINH_SACH": {
-                "value": "giaDinhChinhSach",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 100
-            },
-            "DANH_HIEU": {
-                "value": "danhHieu",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "MA_XA_NOI_SINH": {
-                "value": "maXaNoiSinh",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 5
-            },
-            "MA_HUYEN_NOI_SINH": {
-                "value": "maHuyenNoiSinh",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 3
-            },
-            "MA_TINH_NOI_SINH": {
-                "value": "maTinhNoiSinh",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 3
-            },
-            "MA_XA_NGUYEN_QUAN": {
-                "value": "maXaNguyenQuan",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 5
-            },
-            "MA_HUYEN_NGUYEN_QUAN": {
-                "value": "maHuyenNguyenQuan",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 3
-            },
-            "MA_TINH_NGUYEN_QUAN": {
-                "value": "maTinhNguyenQuan",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 3
-            },
-            "NGAY_VAO_DANG": {
-                "value": "ngayVaoDang",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "NGAY_VAO_DANG_CHINH_THUC": {
-                "value": "ngayVaoDangChinhThuc",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "NOI_DANG_DB": {
-                "value": "noiDangDb",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "NOI_DANG_CT": {
-                "value": "noiDangCt",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "NGAY_VAO_DOAN": {
-                "value": "ngayVaoDoan",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "NOI_VAO_DOAN": {
-                "value": "noiVaoDoan",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "SO_THE_DANG": {
-                "value": "soTheDang",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 20
-            },
-            "SO_TRUONG": {
-                "value": "soTruong",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "NHOM_MAU": {
-                "value": "nhomMau",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 10
-            },
-            "SO_BHXH": {
-                "value": "soBhxh",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 20
-            },
-            "DOAN_VIEN": {
-                "value": "doanVien",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "1,0"
-            },
-            "NAM_CHUC_DANH": {
-                "value": "namChucDanh",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "NAM_HOC_VI": {
-                "value": "namHocVi",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "NOI_SINH": {
-                "value": "noiSinh",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "QUE_QUAN": {
-                "value": "queQuan",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "THUONG_TRU_MA_HUYEN": {
-                "value": "thuongTruMaHuyen",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 10
-            },
-            "THUONG_TRU_MA_TINH": {
-                "value": "thuongTruMaTinh",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 10
-            },
-            "THUONG_TRU_MA_XA": {
-                "value": "thuongTruMaXa",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 10
-            },
-            "THUONG_TRU_SO_NHA": {
-                "value": "thuongTruSoNha",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "HIEN_TAI_MA_HUYEN": {
-                "value": "hienTaiMaHuyen",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 10
-            },
-            "HIEN_TAI_MA_TINH": {
-                "value": "hienTaiMaTinh",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 10
-            },
-            "HIEN_TAI_MA_XA": {
-                "value": "hienTaiMaXa",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 10
-            },
-            "HIEN_TAI_SO_NHA": {
-                "value": "hienTaiSoNha",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
             },
             "LOAI_HOP_DONG": {
                 "value": "loaiHopDong",
                 "dataType": "NVARCHAR2",
                 "dataDefault": "",
                 "nullable": true,
-                "size": 10
+                "size": 2
             },
-            "LOAI_HOP_DONG_NGAY": {
-                "value": "loaiHopDongNgay",
+            "DA_NGHI": {
+                "value": "daNghi",
+                "dataType": "NUMBER",
+                "dataDefault": "0",
+                "nullable": true,
+                "size": "1,0"
+            },
+            "SO_HIEU_DA_NGHI": {
+                "value": "soHieuDaNghi",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 20
+            },
+            "NOI_DUNG_DA_NGHI": {
+                "value": "noiDungDaNghi",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 200
+            },
+            "CHUNG_CHI_TIN_HOC": {
+                "value": "chungChiTinHoc",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 100
+            },
+            "CHUNG_CHI_LLCT": {
+                "value": "chungChiLlct",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 100
+            },
+            "NAM_CAP_LLCT": {
+                "value": "namCapLlct",
                 "dataType": "NUMBER",
                 "dataDefault": "",
                 "nullable": true,
                 "size": "20,0"
             },
-            "USER_MODIFIED": {
-                "value": "userModified",
+            "NOI_CAP_LLCT": {
+                "value": "noiCapLlct",
                 "dataType": "NVARCHAR2",
                 "dataDefault": "",
                 "nullable": true,
-                "size": 30
+                "size": 100
             },
-            "LAST_MODIFIED": {
-                "value": "lastModified",
+            "CHUNG_CHI_QLNN": {
+                "value": "chungChiQlnn",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 100
+            },
+            "NAM_CAP_QLNN": {
+                "value": "namCapQlnn",
                 "dataType": "NUMBER",
                 "dataDefault": "",
                 "nullable": true,
-                "size": "10,0"
+                "size": "20,0"
+            },
+            "NOI_CAP_QLNN": {
+                "value": "noiCapQlnn",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 100
+            },
+            "HOC_TAP_HIEN_TAI": {
+                "value": "hocTapHienTai",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 100
+            },
+            "CO_SO_HOC_TAP_HIEN_TAI": {
+                "value": "coSoHocTapHienTai",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 100
+            },
+            "THOI_GIAN_HOC_TAP_HIEN_TAI": {
+                "value": "thoiGianHocTapHienTai",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 50
             }
         },
-        "primaryKeys": [],
+        "primaryKeys": [
+            "SHCC"
+        ],
         "foreignKeys": [],
         "type": "table"
     },

@@ -106,7 +106,7 @@ module.exports = app => {
     app.delete('/api/tccb/qua-trinh/chuc-vu', app.permission.check('qtChucVu:write'), (req, res) =>
         app.model.qtChucVu.delete({ stt: req.body.stt }, (error) => res.send(error)));
 
-    app.post('/api/user/qua-trinh/chuc-vu', app.permission.check('qtChucVu:login'), (req, res) => {
+    app.post('/api/user/qua-trinh/chuc-vu', app.permission.check('staff:login'), (req, res) => {
         if (req.body.data && req.session.user) {
             const data = app.clone(req.body.data, { shcc: req.session.user.shcc });
             app.model.qtChucVu.create(data, (error, item) => res.send({ error, item }));
@@ -121,8 +121,8 @@ module.exports = app => {
                 if (error || item == null) {
                     res.status(400).send({ error: 'Not found!' });
                 } else {
-                    if (item.shcc === req.session.user.shcc) {
-                        const changes = app.clone(req.body.changes, { shcc: req.session.user.shcc });
+                    if (item.shcc === req.cookies.personId) {
+                        const changes = req.body.changes;
                         app.model.qtChucVu.update({ stt: req.body.stt }, changes, (error, item) => res.send({ error, item }));
                     } else {
                         res.status(400).send({ error: 'Not found!' });
@@ -140,7 +140,7 @@ module.exports = app => {
                 if (error || item == null) {
                     res.status(400).send({ error: 'Not found!' });
                 } else {
-                    if (item.shcc === req.session.user.shcc) {
+                    if (item.shcc === req.cookies.personId) {
                         app.model.qtChucVu.delete({ stt: req.body.stt }, (error) => res.send(error));
                     } else {
                         res.status(400).send({ error: 'Not found!' });

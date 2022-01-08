@@ -122,8 +122,8 @@ module.exports = app => {
                 if (error || item == null) {
                     res.status(400).send({ error: 'Not found!' });
                 } else {
-                    if (item.shcc === req.session.user.shcc) {
-                        const changes = app.clone(req.body.changes, { shcc: req.session.user.shcc });
+                    if (item.shcc === req.cookies.personId) {
+                        const changes = req.body.changes;
                         app.model.qtKyLuat.update({ id: req.body.id }, changes, (error, item) => res.send({ error, item }));
                     } else {
                         res.status(400).send({ error: 'Not found!' });
@@ -141,7 +141,7 @@ module.exports = app => {
                 if (error || item == null) {
                     res.status(400).send({ error: 'Not found!' });
                 } else {
-                    if (item.shcc === req.session.user.shcc) {
+                    if (item.shcc === req.cookies.personId) {
                         app.model.qtKyLuat.delete({ id: req.body.id }, (error) => res.send(error));
                     } else {
                         res.status(400).send({ error: 'Not found!' });

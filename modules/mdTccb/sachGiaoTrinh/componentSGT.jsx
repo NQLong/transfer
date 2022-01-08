@@ -120,16 +120,16 @@ class ComponentSGT extends AdminPage {
                     </tr>),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='number' content={index + 1} />
+                        <TableCell type='number' style={{ textAlign: 'right' }} content={index + 1} />
                         <TableCell type='link' content={item.ten} onClick={() => this.modal.show({ email: this.state.email, item: item, shcc: this.state.shcc })} />
                         <TableCell type='text' content={item.theLoai} style={{ whiteSpace: 'nowrap' }} />
                         <TableCell type='text' content={item.nhaSanXuat} style={{ whiteSpace: 'nowrap' }} />
                         <TableCell type='text' content={
                             <>
-                                <span>Năm xuất bản: <b>{item.namSanXuat}</b></span><br />
-                                <span><b>{item.quocTe ? quocTeList[item.quocTe].text : null}</b></span>
+                                <span><b>{item.quocTe ? quocTeList[item.quocTe].text : null}</b></span><br />
+                                <span>Năm: <b>{item.namSanXuat}</b></span>
                             </>
-                        } />
+                        } style={{ whiteSpace: 'nowrap' }}/>
                         <TableCell type='text' content={item.chuBien} style={{ whiteSpace: 'nowrap' }} />
                         <TableCell type='text' content={item.sanPham} style={{ whiteSpace: 'nowrap' }} />
                         <TableCell type='text' content={item.butDanh} style={{ whiteSpace: 'nowrap' }} />
