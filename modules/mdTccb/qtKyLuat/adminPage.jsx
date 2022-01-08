@@ -249,7 +249,7 @@ class QtKyLuat extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-list-alt',
+            icon: 'fa fa-ban',
             title: 'Quá trình kỷ luật',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
