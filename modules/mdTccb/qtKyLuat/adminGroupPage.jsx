@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox} from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
-    getQtKyLuatPage, getQtKyLuatAll, updateQtKyLuat,
+    getQtKyLuatPage, getQtKyLuatAll, updateQtKyLuatGroupPageMa,
     deleteQtKyLuat, getQtKyLuatGroupPageMa, 
 } from './redux';
 import { DateInput } from 'view/component/Input';
@@ -211,7 +211,7 @@ class QtKyLuatGroupPage extends AdminPage {
                     getPage={this.props.getQtKyLuatPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     permissions={currentPermissions}
-                    update={this.props.updateQtKyLuat}
+                    update={this.props.updateQtKyLuatGroupPageMa}
                     getKyLuat={this.props.getDmKyLuatAll} 
                 />
             </>,
@@ -223,6 +223,6 @@ class QtKyLuatGroupPage extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtKyLuat: state.qtKyLuat });
 const mapActionsToProps = {
     getQtKyLuatAll, getQtKyLuatPage, deleteQtKyLuat,
-    updateQtKyLuat, getQtKyLuatGroupPageMa, getDmKyLuatAll,
+    updateQtKyLuatGroupPageMa, getQtKyLuatGroupPageMa, getDmKyLuatAll,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtKyLuatGroupPage);

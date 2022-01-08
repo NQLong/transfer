@@ -203,7 +203,7 @@ export function updateQtKyLuat(isStaffEdit, id, changes, done) {
     };
 }
 
-export function updateQtKyLuatGroup(id, changes, done) {
+export function updateQtKyLuatGroupPageMa(id, changes, done) {
     return dispatch => {
         const url = '/api/tccb/qua-trinh/ky-luat';
         T.put(url, { id, changes }, data => {
@@ -214,7 +214,7 @@ export function updateQtKyLuatGroup(id, changes, done) {
             } else {
                 T.notify('Cập nhật kỷ luật thành công!', 'success');
                 done && done(data.item);
-                dispatch(getQtKyLuatPage());
+                dispatch(getQtKyLuatGroupPageMa(undefined, undefined, '-1', data.shcc));
             }
         }, () => T.notify('Cập nhật kỷ luật bị lỗi!', 'danger'));
     };

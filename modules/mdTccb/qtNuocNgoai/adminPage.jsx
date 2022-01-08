@@ -62,7 +62,7 @@ class EditModal extends AdminModal {
             shcc: this.maCanBo.value(),
             tenCoSo: this.tenCoSo.value(),
             kinhPhi: this.kinhPhi.value(),
-            troLaiCongTac: this.troLaiCongTac.value(),
+            troLaiCongTac: Number(this.troLaiCongTac.value()),
             batDauType: this.state.batDauType,
             batDau: this.batDau.getVal(),
             ketThucType: this.state.ketThucType,
@@ -193,7 +193,6 @@ class QtNuocNgoai extends AdminPage {
                         <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Nội dung</th>
                         <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Nơi làm việc</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kinh phí</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày trở lại công tác</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
@@ -210,7 +209,8 @@ class QtNuocNgoai extends AdminPage {
                         <TableCell type='text' content={(
                             <>
                                 <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span></span><br />
-                                <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span></span>
+                                <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span></span> <br/>
+                                <span style={{ whiteSpace: 'nowrap' }}>Trở lại công tác: <span style={{ color: 'blue' }}>{item.troLaiCongTac ? T.dateToText(item.troLaiCongTac, 'dd/mm/yyyy') : ''}</span></span>
                             </>
                         )}
                         />
@@ -233,12 +233,6 @@ class QtNuocNgoai extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' content={(
-                            <>
-                                {item.troLaiCongTac ? T.dateToText(item.troLaiCongTac, 'dd/mm/yyyy') : ''}
-                            </>
-                        )}
-                        />
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                                 onEdit={() => this.modal.show(item)} onDelete={this.delete} >
@@ -257,7 +251,7 @@ class QtNuocNgoai extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-gift',
+            icon: 'fa fa-fighter-jet',
             title: ' Quá trình nước ngoài',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
