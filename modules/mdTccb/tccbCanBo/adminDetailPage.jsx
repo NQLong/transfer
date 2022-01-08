@@ -23,7 +23,7 @@ class CanBoPage extends AdminPage {
 
     componentDidMount() {
         T.ready('/user/tccb', () => {
-            const route = T.routeMatcher('/user/staff/:shcc'),
+            const route = T.routeMatcher('/user/tccb/staff/:shcc'),
                 shcc = route.parse(window.location.pathname).shcc;
             this.urlSHCC = shcc && shcc != 'new' ? shcc : null;
             if (this.urlSHCC) {

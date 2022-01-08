@@ -2,11 +2,10 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3009: { title: 'Chức Vụ', link: '/user/tccb/qua-trinh/chuc-vu', icon: 'fa-street-view', backgroundColor: '#ebcf34', groupIndex: 2 },
+            3004: { title: 'Quá trình chức vụ', link: '/user/tccb/qua-trinh/chuc-vu', icon: 'fa-street-view', backgroundColor: '#f59e42', color: 'black', groupIndex: 1 },
         },
     };
     app.permission.add(
-        { name: 'staff:login', menu: { parentMenu: { index: 1000, title: 'Thông tin cá nhân', icon: 'fa-user', link: '/user' } }, },
         { name: 'qtChucVu:read', menu },
         { name: 'qtChucVu:write' },
         { name: 'qtChucVu:delete' },
@@ -155,6 +154,6 @@ module.exports = app => {
     app.get('/api/tccb/qua-trinh/chuc-vu-by-shcc/:shcc', app.permission.check('staff:login'), (req, res) => {
         app.model.qtChucVu.getByShcc(req.params.shcc, (error, item) => {
             if (item && item.rows.length > 0) res.send({ error, item: item.rows });
-         });
+        });
     });
 };

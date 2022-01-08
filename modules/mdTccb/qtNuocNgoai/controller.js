@@ -2,11 +2,10 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3019: { title: 'Đi nước ngoài', link: '/user/tccb/qua-trinh/nuoc-ngoai', icon: 'fa-fighter-jet', backgroundColor: '#99ccff', groupIndex: 4},
+            3019: { title: 'Đi nước ngoài', link: '/user/tccb/qua-trinh/nuoc-ngoai', icon: 'fa-fighter-jet', backgroundColor: '#832694', groupIndex: 1},
         },
     };
     app.permission.add(
-        { name: 'staff:login', menu: { parentMenu: { index: 1000, title: 'Thông tin cá nhân', icon: 'fa-user', link: '/user' } }, },
         { name: 'qtNuocNgoai:read', menu },
         { name: 'qtNuocNgoai:write' },
         { name: 'qtNuocNgoai:delete' },

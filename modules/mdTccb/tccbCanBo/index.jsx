@@ -9,15 +9,15 @@ export default {
     },
     routes: [
         {
-            path: '/user/staff/item/upload',
+            path: '/user/tccb/staff/item/upload',
             component: Loadable({ loading: Loading, loader: () => import('./staffImportPage') })
         },
         {
-            path: '/user/staff/:shcc',
+            path: '/user/tccb/staff/:shcc',
             component: Loadable({ loading: Loading, loader: () => import('./adminDetailPage') })
         },
         {
-            path: '/user/staff',
+            path: '/user/tccb/staff',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') }),
         },
         // {

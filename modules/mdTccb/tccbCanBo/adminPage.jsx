@@ -61,7 +61,7 @@ class StaffPage extends AdminPage {
 
     create = (e) => {
         e.preventDefault();
-        this.props.history.push('/user/staff/new');
+        this.props.history.push('/user/tccb/staff/new');
     };
 
     render() {
@@ -84,14 +84,14 @@ class StaffPage extends AdminPage {
             renderRow: (item, index) => (
                 <tr key={index}>
                     <TableCell type='number' content={(pageNumber - 1) * pageSize + index + 1} />
-                    <TableCell type='link' content={item.shcc} url={`/user/staff/${item.shcc}`} style={{ textAlign: 'center' }} />
+                    <TableCell type='link' content={item.shcc} url={`/user/tccb/staff/${item.shcc}`} style={{ textAlign: 'center' }} />
                     <TableCell type='text' content={`${item.ho} ${item.ten}`} style={{ whiteSpace: 'nowrap' }} />
                     <TableCell type='text' content={item.email} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap'}} content={
                         <>
                             <span>{item.maDonVi ? this.dvMapper[item.maDonVi] : null}</span>
                         </>} />
-                    <TableCell type='buttons' content={item} permission={permission} onEdit={`/user/staff/${item.shcc}`} onDelete={this.delete}></TableCell>
+                    <TableCell type='buttons' content={item} permission={permission} onEdit={`/user/tccb/staff/${item.shcc}`} onDelete={this.delete}></TableCell>
                 </tr>)
         });
 
@@ -117,12 +117,12 @@ class StaffPage extends AdminPage {
                     <Pagination style={{ marginLeft: '70px' }} name={PageName} pageNumber={pageNumber} pageSize={pageSize} pageTotal={pageTotal} totalItem={totalItem} pageCondition={pageCondition}
                         getPage={this.getPage} />
                     {permissionWrite && (
-                        <Link to='/user/staff/item/upload' className='btn btn-success btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px' }} >
+                        <Link to='/user/tccb/staff/item/upload' className='btn btn-success btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px' }} >
                             <i className='fa fa-lg fa-cloud-upload' />
                         </Link>)}
                 </div>
             </>,
-            backRoute: '/user/tccb',
+            backRoute: '/user/tccb/staff',
             onCreate: permission ? e => this.create(e) : null
         });
     }
