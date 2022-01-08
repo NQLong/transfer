@@ -147,7 +147,7 @@ export function createQtNuocNgoaiStaff(data, done, isStaffEdit = null) {
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
                 T.notify('Thêm thông tin quá trình đi nước ngoài thành công!', 'info');
-                isStaffEdit && dispatch(getStaffEdit(data.shcc));
+                isStaffEdit ? dispatch(getStaffEdit(data.shcc)) : dispatch(getQtNuocNgoaiPage());
                 isStaffEdit ? (done && done()) : (done && done(data));
             }
         }, () => T.notify('Thêm thông tin quá trình đi nước ngoài bị lỗi', 'danger'));
@@ -164,7 +164,7 @@ export function updateQtNuocNgoaiStaff(id, changes, done, isStaffEdit = null) {
             } else if (data.item) {
                 T.notify('Cập nhật thông tin quá trình đi nước ngoài thành công!', 'info');
                 isStaffEdit ? (done && done()) : (done && done(data.item));
-                isStaffEdit && dispatch(getStaffEdit(data.item.shcc));
+                isStaffEdit ? dispatch(getStaffEdit(data.item.shcc)) : dispatch(getQtNuocNgoaiPage());
             }
         }, () => T.notify('Cập nhật thông tin quá trình đi nước ngoài bị lỗi', 'danger'));
     };
@@ -179,7 +179,7 @@ export function deleteQtNuocNgoaiStaff(id, isStaffEdit, shcc = null) {
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
                 T.alert('Thông tin quá trình đi nước ngoài được xóa thành công!', 'info', false, 800);
-                isStaffEdit && dispatch(getStaffEdit(shcc));
+                isStaffEdit ? dispatch(getStaffEdit(shcc)) : dispatch(getQtNuocNgoaiPage());
             }
         }, () => T.notify('Xóa thông tin quá trình đi nước ngoài bị lỗi', 'danger'));
     };

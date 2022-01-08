@@ -164,32 +164,26 @@ class ComponentNCKH extends AdminPage {
                         <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
                         <th style={{ width: '100%' }}>Tên đề tài</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Mã số và cấp quản lý</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian thực hiện</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kinh phí</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Vai trò</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian nghiệm thu</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kết quả</th>
                         <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                     </tr>),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='number' content={index + 1} />
+                        <TableCell type='number' style={{ textAlign: 'right' }} content={index + 1} />
                         <TableCell type='link' content={item.tenDeTai} onClick={() => this.modal.show({ email: this.state.email, item: item, shcc: this.state.shcc })} />
                         <TableCell type='text' content={item.maSoCapQuanLy} />
                         <TableCell type='text' content={(
                             <>
-                                <span>Từ: <b>{T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy')}</b></span> <br />
-                                {item.ketThuc && <span>Đến: <b>{T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy')}</b></span>}
+                                <span>Bắt đầu: <b>{T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy')}</b></span> <br />
+                                {item.ketThuc && <span>Kết thúc: <b>{T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy')}</b></span>}<br/>
+                                {item.ngayNghiemThu && <span>Nghiệm thu: <b>{T.dateToText(item.ngayNghiemThu, item.ngayNghiemThuType ? item.ngayNghiemThuType : 'dd/mm/yyyy')}</b></span>}
                             </>
-                        )} />
+                        )} style={{ whiteSpace: 'nowrap' }}/>
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.kinhPhi} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.vaiTro} />
-                        <TableCell type='text' style={{ textAlign: 'center' }} content={(
-                            <>
-                                <span>{item.ngayNghiemThu ? <b>{T.dateToText(item.ngayNghiemThu, item.ngayNghiemThuType ? item.ngayNghiemThuType : 'dd/mm/yyyy')}</b> : null}</span>
-                            </>
-                        )} />
-
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.ketQua} />
                         <TableCell type='buttons' content={item} permission={permission}
                             onEdit={() => this.modal.show({ email: this.state.email, item: item, shcc: this.state.shcc })}
