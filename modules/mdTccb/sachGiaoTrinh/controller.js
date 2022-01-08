@@ -18,7 +18,6 @@ module.exports = app => {
     });
 
     app.put('/api/user/staff/sach-giao-trinh', app.permission.check('staff:login'), (req, res) => {
-            console.log(req);
             if (req.body.changes && req.session.user) {
             app.model.sachGiaoTrinh.get({ id: req.body.id }, (error, item) => {
                 if (error || item == null) {

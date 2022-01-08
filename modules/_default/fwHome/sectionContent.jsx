@@ -22,7 +22,7 @@ class sectionContent extends React.Component {
             .replaceAll('<strong>', '<b style="font-weight: bold;">')
             .replaceAll('</strong>', '</b>') : '';
         return (
-            <section className=' ftco-section-2' style={{ padding: 0 }}>
+            <section className=' ftco-section-2 homeContent' style={{ padding: 0 }}>
                 <br />
                 {/* <h4 className='mb-4 text-center'>{title}</h4> */}
                 <div dangerouslySetInnerHTML={{ __html: T.language.parse(content) }} />

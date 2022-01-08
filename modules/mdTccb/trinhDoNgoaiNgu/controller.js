@@ -18,12 +18,14 @@ module.exports = app => {
     });
 
     app.put('/api/user/staff/trinh-do-nn', app.permission.check('staff:login'), (req, res) => {
+        console.log(req);
         if (req.body.changes && req.session.user) {
             app.model.trinhDoNgoaiNgu.get({ id: req.body.id }, (error, item) => {
                 if (error || item == null) {
                     res.status(400).send({ error: 'Not found!' });
                 } else {
                     if (item.shcc === req.session.user.shcc) {
+                        console.log(item.shcc);
                         const changes = app.clone(req.body.changes, { shcc: req.session.user.shcc });
                         app.model.trinhDoNgoaiNgu.update({ id: req.body.id }, changes, (error, item) => res.send({ error, item }));
                     } else {
