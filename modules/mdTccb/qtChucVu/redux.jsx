@@ -197,6 +197,23 @@ export function updateQtChucVu(isStaffEdit, stt, changes, done) {
     };
 }
 
+export function updateQtChucVuGroupPageMa(stt, changes, done) {
+    return dispatch => {
+        const url = '/api/tccb/qua-trinh/chuc-vu';
+        T.put(url, { stt, changes }, data => {
+            if (data.error || changes == null) {
+                T.notify('Cập nhật chức vụ bị lỗi!', 'danger');
+                console.error('PUT: ' + url + '. ' + data.error);
+            } else {
+                T.notify('Cập nhật chức vụ thành công!', 'success');
+                done && done(data.item);
+                dispatch(getQtChucVuGroupPageMa(undefined, undefined, '-1', data.item.shcc));
+            }
+        }, () => T.notify('Cập nhật chức vụ bị lỗi!', 'danger'));
+    };
+}
+
+
 export function getChucVuByShcc(shcc, done) {
     return dispatch => {
         const url = `/api/tccb/qua-trinh/chuc-vu-by-shcc/${shcc}`;
