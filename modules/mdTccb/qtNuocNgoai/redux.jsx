@@ -164,7 +164,23 @@ export function updateQtNuocNgoaiStaff(id, changes, done, isStaffEdit = null) {
             } else if (data.item) {
                 T.notify('Cập nhật thông tin quá trình đi nước ngoài thành công!', 'info');
                 isStaffEdit ? (done && done()) : (done && done(data.item));
-                isStaffEdit ? dispatch(getStaffEdit(data.item.shcc)) : dispatch(getQtNuocNgoaiPage());
+                isStaffEdit ? dispatch(getStaffEdit(data.shcc)) : dispatch(getQtNuocNgoaiPage());
+            }
+        }, () => T.notify('Cập nhật thông tin quá trình đi nước ngoài bị lỗi', 'danger'));
+    };
+}
+
+export function updateQtNuocNgoaiGroupPageMa(id, changes, done) {
+    return dispatch => {
+        const url = '/api/qua-trinh/nuoc-ngoai';
+        T.put(url, { id, changes }, data => {
+            if (data.error) {
+                T.notify('Cập nhật thông tin quá trình đi nước ngoài bị lỗi', 'danger');
+                console.error('PUT: ' + url + '. ' + data.error);
+            } else if (data.item) {
+                T.notify('Cập nhật thông tin quá trình đi nước ngoài thành công!', 'info');
+                done && done(data.item);
+                dispatch(getQtNuocNgoaiGroupPageMa(undefined, undefined, '-1', data.shcc));
             }
         }, () => T.notify('Cập nhật thông tin quá trình đi nước ngoài bị lỗi', 'danger'));
     };
