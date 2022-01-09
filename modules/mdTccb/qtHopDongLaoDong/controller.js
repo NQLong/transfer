@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3002: { title: 'Hợp đồng lao động', link: '/user/tccb/qua-trinh/hop-dong-lao-dong', icon: 'fa-file-text-o', backgroundColor: '#00d0ff', groupIndex: 0 },
+            3002: { title: 'Hợp đồng lao động', link: '/user/tccb/qua-trinh/hop-dong-lao-dong', icon: 'fa-briefcase', backgroundColor: '#1a76b8', groupIndex: 0 },
         },
     };
     app.permission.add(

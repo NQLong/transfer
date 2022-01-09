@@ -113,7 +113,7 @@ class QtHopDongVienChucPage extends AdminPage {
                         />
                         <TableCell type='text' content={(
                             <>
-                                <span style={{ whiteSpace: 'nowrap' }}>Số QĐ: {item.soQuyetDinh}</span><br />
+                                <span style={{ whiteSpace: 'nowrap' }}>Số QĐ: <span style={{ color: 'blue' }}>{item.soQuyetDinh}</span></span><br />
                                 <span>Ngày ký QĐ: <span style={{ color: 'blue' }}>{item.ngayKyQuyetDinh ? new Date(item.ngayKyQuyetDinh).ddmmyyyy() : ''}</span></span>
                             </>
                         )}

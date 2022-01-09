@@ -223,7 +223,7 @@ class QtNghienCuuKhoaHocGroupPage extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-list-alt',
+            icon: 'fa fa-wpexplorer',
             title: 'Quá trình nghiên cứu khoa học',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,

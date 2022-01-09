@@ -122,7 +122,7 @@ class StaffPage extends AdminPage {
                         </Link>)}
                 </div>
             </>,
-            backRoute: '/user/tccb/staff',
+            backRoute: '/user/tccb',
             onCreate: permission ? e => this.create(e) : null
         });
     }

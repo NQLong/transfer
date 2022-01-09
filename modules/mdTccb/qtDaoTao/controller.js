@@ -2,12 +2,11 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3016: { title: 'Đào tạo', link: '/user/tccb/qua-trinh/dao-tao', icon: 'fa-graduation-cap', backgroundColor: '#617ad4', groupIndex: 2},
+            3016: { title: 'Quá trình đào tạo', link: '/user/tccb/qua-trinh/dao-tao', icon: 'fa-graduation-cap', backgroundColor: '#635118', groupIndex: 4},
         },
     };
 
     app.permission.add(
-        { name: 'staff:login', menu: { parentMenu: { index: 1000, title: 'Thông tin cá nhân', icon: 'fa-user', link: '/user' } }, },
         { name: 'qtDaoTao:read', menu },
         { name: 'qtDaoTao:write' },
         { name: 'qtDaoTao:delete' },

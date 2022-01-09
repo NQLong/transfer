@@ -167,7 +167,7 @@ class QtHopDongLaoDongPage extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-file-text-o',
+            icon: 'fa fa-briefcase',
             title: 'Hợp đồng Lao động',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,

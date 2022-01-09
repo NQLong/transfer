@@ -202,6 +202,18 @@ module.exports = app => {
                                 resolve();
                             });
                         })).then(() => new Promise(resolve => {
+                            app.model.tccbToChucKhac.getAll({shcc: canBo.shcc}, (error, toChucKhac) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin tổ chức chính trị - xã hội, nghề nghiệp cán bộ !' });
+                                }
+                                else if (toChucKhac == null) {
+                                    result = app.clone(result, { toChucKhac: null });
+                                } else {
+                                    result = app.clone(result, { toChucKhac });
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
                             app.model.qtBaiVietKhoaHoc.getAll({ shcc: canBo.shcc }, '*', 'namXuatBan ASC', (error, baiVietKhoaHoc) => {
                                 if (error) {
                                     res.send({ error: 'Lỗi khi lấy thông tin bài viết khoa học !' });
@@ -966,6 +978,18 @@ module.exports = app => {
                         resolve();
                     });
                 }).then(() => new Promise(resolve => {
+                    app.model.tccbToChucKhac.getAll({shcc: canBo.shcc}, (error, toChucKhac) => {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin tổ chức chính trị - xã hội, nghề nghiệp cán bộ !' });
+                        }
+                        else if (toChucKhac == null) {
+                            result = app.clone(result, { toChucKhac: null });
+                        } else {
+                            result = app.clone(result, { toChucKhac });
+                        }
+                        resolve();
+                    });
+                })).then(() => new Promise(resolve => {
                     app.model.trinhDoNgoaiNgu.getTrinhDoNNByShcc(canBo.shcc, (error, trinhDoNN) => {
                         if (error) {
                             res.send({ error: 'Lỗi khi lấy thông tin trình độ ngoại ngữ cán bộ !' });

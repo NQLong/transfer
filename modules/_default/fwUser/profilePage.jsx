@@ -70,7 +70,7 @@ class ProfileCanBo extends AdminPage {
                     {this.state.isLoad && <Loading />}
                     {!this.state.canBo ? <ProfileCommon ref={e => this.profileCommon = e} /> :
                         <>
-                            <ComponentCaNhan ref={e => this.componentCaNhan = e} userEdit={false} />
+                            <ComponentCaNhan ref={e => this.componentCaNhan = e} userEdit={false} isStaff={true}/>
                             <ComponentQuanHe ref={e => this.componentQuanHe = e} userEdit={true} />
                             <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={true} />
                             <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={true} />

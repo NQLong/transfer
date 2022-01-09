@@ -218,8 +218,8 @@ class QtNuocNgoaiGroupPage extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-gift',
-            title: ' Quá trình nước ngoài',
+            icon: 'fa fa-fighter-jet',
+            title: ' Quá trình đi nước ngoài',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
                 'Quá trình nước ngoài'

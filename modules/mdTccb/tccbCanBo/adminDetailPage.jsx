@@ -75,7 +75,7 @@ class CanBoPage extends AdminPage {
                 'Lý lịch cán bộ',
             ],
             content: <>
-                <ComponentCaNhan ref={e => this.componentCaNhan = e} userEdit={false} />
+                <ComponentCaNhan ref={e => this.componentCaNhan = e} userEdit={false} isStaff={false}/>
                 <ComponentQuanHe ref={e => this.componentQuanHe = e} userEdit={false} />
                 <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={false} />
                 <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={false} />
@@ -86,7 +86,7 @@ class CanBoPage extends AdminPage {
                 <ComponentHDLV ref={e => this.componentHDLV = e} userEdit={false} />
                 <ComponentSGT ref={e => this.componentSGT = e} userEdit={false} />
             </>,
-            backRoute: '/user/staff',
+            backRoute: '/user/tccb/staff',
             onSave: this.save,
         });
     }

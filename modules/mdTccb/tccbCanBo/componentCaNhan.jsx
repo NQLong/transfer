@@ -2,47 +2,14 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { updateSystemState } from 'modules/_default/_init/reduxSystem';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
-import { FormImageBox, FormTextBox, FormSelect, FormDatePicker, FormRichTextBox, FormCheckbox, renderTable, TableCell } from 'view/component/AdminPage';
+import { FormImageBox, FormTextBox, FormSelect, FormDatePicker, FormRichTextBox, FormCheckbox} from 'view/component/AdminPage';
 import { SelectAdapter_DmGioiTinhV2 } from 'modules/mdDanhMuc/dmGioiTinh/redux';
 import { ComponentDiaDiem } from 'modules/mdDanhMuc/dmDiaDiem/componentDiaDiem';
 import { SelectAdapter_DmQuocGia } from 'modules/mdDanhMuc/dmQuocGia/redux';
 import { SelectAdapter_DmDanTocV2 } from 'modules/mdDanhMuc/dmDanToc/redux';
 import { SelectAdapter_DmTonGiaoV2 } from 'modules/mdDanhMuc/dmTonGiao/redux';
 import { SelectAdapter_DmNhomMauV2 } from 'modules/mdDanhMuc/dmBenhVien/reduxNhomMau';
-
-// class ToChucKhacModal extends AdminModal {
-//     onShow = (item) => {
-//         let { ma, tenToChuc, ngayThamGia, moTa } = item && item.item ? item.item : { ma: null, tenToChuc: '', ngayThamGia: null, moTa: '' };
-//         this.setState({ ma, item, shcc: item.shcc, email: item.email });
-//         this.ngayThamGia.value(ngayThamGia);
-//         this.tenToChuc.value(tenToChuc);
-//         this.moTa.value(moTa);
-//     }
-
-//     onSubmit = () => {
-//         const changes = {
-//                 email: this.state.email,
-//                 shcc: this.state.shcc,
-//                 tenToChuc: this.tenToChuc.value(),
-//                 ngayThamGia: this.ngayThamGia.value(),
-//                 moTa: this.moTa.value()
-//             };
-//         if (this.state.ma) {
-//             this.props.update(this.state.ma, changes, this.hide);
-//         } else {
-//             this.props.create(changes, this.hide);
-//         }
-//     }
-
-//     render = () => this.renderModal({
-//         title: 'Tổ chức Chính trị - Xã hội nghề nghiệp tham gia khác',
-//         body: <div className='row'>
-//             <FormTextBox className='col-md-12' ref={e => this.tenToChuc = e} lable='Tên tổ chức' required />
-//             <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayThamGia = e} label='Ngày tham gia' />
-//             <FormRichTextBox className='col-md-12' ref={e => this.moTa = e} label='Mô tả' placeholder='Mô tả nội dung công việc tham gia tổ chức' />
-//         </div>,
-//     });
-// }
+import ComponentToChucKhac from '../tccbToChucKhac/componentToChucKhac';
 
 class ComponentCaNhan extends React.Component {
     state = { image: '' };
@@ -105,7 +72,8 @@ class ComponentCaNhan extends React.Component {
             this.hangThuongBinh.value(item.hangThuongBinh ? item.hangThuongBinh : '');
             this.giaDinhChinhSach.value(item.giaDinhChinhSach ? item.giaDinhChinhSach : '');
             this.danhHieuPhongTangCaoNhat.value(item.danhHieu ? item.danhHieu : '');
-    
+            
+            this.componentToChucKhac.value(item.shcc, item.email);
         });
        
     }
@@ -207,25 +175,6 @@ class ComponentCaNhan extends React.Component {
     }
 
     render = () => {
-        let cacToChucCTXHNN = [];
-        const tableToChucKhac = renderTable({
-            getDataSource: () => cacToChucCTXHNN, stickyHead: false,
-            renderHead: () => (
-                <tr>
-                    <th style={{ width: '50%' }}>Tên tổ chức</th>
-                    <th style={{ width: '10%' }}>Ngày tham gia</th>
-                    <th style={{ width: '40%' }}>Mô tả nội dung công việc tham gia tổ chức</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
-                </tr>),
-            renderRow: (item, index) => (
-                <tr key={index}>
-                    <TableCell type='link' content={item.tenToChuc} onClick={e => this.editTrinhDoNN(e, item)} />
-                    <TableCell type='date' content={item.ngayThamGia} dateFormat='dd/mm/yyyy' />
-                    <TableCell type='text' content={item.moTa} />
-                    <TableCell type='buttons' content={item} onEdit={this.editTrinhDoNN} onDelete={this.deleteTrinhDoNN}></TableCell>
-                </tr>)
-        });
-
         return (
             <div className='tile'>
                 <h3 className='tile-title'>Thông tin cá nhân</h3>
@@ -300,13 +249,7 @@ class ComponentCaNhan extends React.Component {
                     {this.state.congDoan ? <FormTextBox ref={e => this.noiVaoCongDoan = e} label='Nơi vào Công đoàn' className='col-md-3' readOnly={this.props.userEdit} /> : null}
 
                     <div className='form-group col-md-12'>
-                        <p>Tổ chức Chính trị - Xã hội nghề nghiệp khác</p>
-                        <div className='tile-body'>{tableToChucKhac}</div>
-                        <div className='tile-footer' style={{ textAlign: 'right' }}>
-                            <button className='btn btn-info' type='button' onClick={e => this.create(e, this.modalToChucKhac)}>
-                                <i className='fa fa-fw fa-lg fa-plus' />Thêm tổ chức tham gia
-                            </button>
-                        </div>
+                        <ComponentToChucKhac ref={e => this.componentToChucKhac = e} label='Tổ chức chính trị - xã hội, nghề nghiệp khác' userEdit={this.props.isStaff}/>
                     </div>
 
                     <div className='form-group col-md-12' />
