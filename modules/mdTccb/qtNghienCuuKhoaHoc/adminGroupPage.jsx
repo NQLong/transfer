@@ -184,8 +184,6 @@ class QtNghienCuuKhoaHocGroupPage extends AdminPage {
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Mã số và cấp quản lý</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian thực hiện</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kinh phí</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Vai trò</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày nghiệm thu</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kết quả</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
@@ -200,19 +198,22 @@ class QtNghienCuuKhoaHocGroupPage extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' content={item.tenDeTai} />
+                        <TableCell type='text' content={
+                            <>
+                                <span>{item.tenDeTai}</span><br />
+                                <span>Vai trò: <span style={{ color: 'blue' }}>{item.vaiTro}</span></span>
+                            </>
+                        } />
                         <TableCell type='text' content={item.maSoCapQuanLy} />
                         <TableCell type='text' content={(
                             <>
                                 <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType) : ''}</span></span><br />
                                 <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType) : ''}</span></span> <br />
-                                <span style={{ whiteSpace: 'nowrap' }}>Tổng thời gian: <span style={{ color: 'blue' }}>{item.thoiGian ? item.thoiGian : ''}</span></span>
+                                <span style={{ whiteSpace: 'nowrap' }}>Ngày nghiệm thu: <span style={{ color: 'blue' }}>{item.ngayNghiemThu ? item.ngayNghiemThu : ''}</span></span>
                             </>
                         )}
                         />
                         <TableCell type='text' content={item.kinhPhi} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.vaiTro} />
-                        <TableCell type='text' content={item.ngayNghiemThu} />
                         <TableCell type='text' content={item.ketQua} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={this.delete} >
