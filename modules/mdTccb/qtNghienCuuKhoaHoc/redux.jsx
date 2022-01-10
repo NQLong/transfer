@@ -127,7 +127,7 @@ export function updateQtNghienCuuKhoaHocGroupPageMa(id, changes, done) {
     };
 }
 
-export function createQtNckhStaff(data, done) {
+export function createQtNckhStaff(data, done, isEdit = null) {
     return dispatch => {
         const url = '/api/qua-trinh/nckh';
         T.post(url, { data }, res => {
@@ -136,14 +136,22 @@ export function createQtNckhStaff(data, done) {
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
                 T.notify('Thêm thông tin nghiên cứu khoa học thành công!', 'info');
-                dispatch(getStaffEdit(data.shcc));
-                if (done) done(res);
+                if (done) {
+                    if (isEdit) {
+                        done();
+                        dispatch(getStaffEdit(data.shcc));
+                    }
+                    else {
+                        done(data);
+                        dispatch(getQtNghienCuuKhoaHocPage());
+                    }
+                }     
             }
         }, () => T.notify('Thêm thông tin nghiên cứu khoa học bị lỗi', 'danger'));
     };
 }
 
-export function updateQtNckhStaff(id, changes, done) {
+export function updateQtNckhStaff(id, changes, done, isEdit = null) {
     return dispatch => {
         const url = '/api/qua-trinh/nckh';
         T.put(url, { id, changes }, data => {
@@ -152,14 +160,14 @@ export function updateQtNckhStaff(id, changes, done) {
                 console.error('PUT: ' + url + '. ' + data.error);
             } else if (data.item) {
                 T.notify('Cập nhật thông tin nghiên cứu khoa học thành công!', 'info');
-                dispatch(getStaffEdit(changes.shcc));
-                if (done) done();
+                isEdit ? (done && done()) : (done && done(data.item));
+                isEdit ? dispatch(getStaffEdit(changes.shcc)) : dispatch(getQtNghienCuuKhoaHocPage());      
             }
         }, () => T.notify('Cập nhật thông tin nghiên cứu khoa học bị lỗi', 'danger'));
     };
 }
 
-export function deleteQtNckhStaff(id, shcc, done) {
+export function deleteQtNckhStaff(id, shcc, done, isEdit = null) {
     return dispatch => {
         const url = '/api/qua-trinh/nckh';
         T.delete(url, { id }, data => {
@@ -169,7 +177,7 @@ export function deleteQtNckhStaff(id, shcc, done) {
             } else {
                 T.alert('Thông tin nghiên cứu khoa học được xóa thành công!', 'info', false, 800);
                 if (done) done();
-                dispatch(getStaffEdit(shcc));
+                isEdit ? dispatch(getStaffEdit(shcc)) : dispatch(getQtNghienCuuKhoaHocPage());
             }
         }, () => T.notify('Xóa thông tin nghiên cứu khoa học bị lỗi', 'danger'));
     };
