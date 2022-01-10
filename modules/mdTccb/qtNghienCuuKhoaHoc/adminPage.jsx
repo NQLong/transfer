@@ -226,6 +226,7 @@ class QtNghienCuuKhoaHoc extends AdminPage {
                         <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Tên đề tài, dự án</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Mã số và cấp quản lý</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian thực hiện</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kinh phí</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kết quả</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
@@ -257,6 +258,7 @@ class QtNghienCuuKhoaHoc extends AdminPage {
                             </>
                         )}
                         />
+                        <TableCell type='text' content={item.kinhPhi} />
                         <TableCell type='text' content={item.ketQua} />
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}

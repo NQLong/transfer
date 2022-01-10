@@ -163,10 +163,10 @@ class QtNuocNgoaiGroupPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Cán bộ</th>
+                        <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Cán bộ</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nội dung</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nơi làm việc</th>
+                        <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Nội dung</th>
+                        <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Nơi làm việc</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kinh phí</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>

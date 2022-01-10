@@ -52,21 +52,15 @@ class EditModal extends AdminModal {
             butDanh: this.butDanh.value(),
             quocTe: this.quocTe.value()
         };
-        if (!changes.ten) {
-            T.notify('Tên bị trống!', 'danger');
+        if (!this.ten.value()) {
+            T.notify('Tên sách, giáo trình trống', 'danger');
             this.ten.focus();
-        } else if (!changes.nhaSanXuat) {
-            T.notify('Nhà sản xuất bị trống!', 'danger');
+        } else if (!this.namSanXuat.getVal()) {
+            T.notify('Năm xuất bản trống', 'danger');
+            this.namSanXuat.focus();
+        } else if (!this.nhaSanXuat.value()) {
+            T.notify('Nhà xuất bản trống', 'danger');
             this.nhaSanXuat.focus();
-        } else if (!changes.theLoai) {
-            T.notify('Thể loại bị trống!', 'danger');
-            this.theLoai.focus();
-        } else if (!changes.namSanXuat) {
-            T.notify('Năm xuất bản bị trống!', 'danger');
-            this.theLoai.focus();
-        } else if (!changes.quocTe) {
-            T.notify('Phạm vi xuất bản bị trống!', 'danger');
-            this.quocTe.focus();
         } else this.props.update(this.state.id, changes, this.hide, true);
     }
 
@@ -129,9 +123,9 @@ class SachGiaoTrinhGroupPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thông tin sách</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thông tin xuất bản</th>
+                        <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Cán bộ</th>
+                        <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Thông tin sách</th>
+                        <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Thông tin xuất bản</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thông tin sản phẩm</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Nơi xuất bản</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>

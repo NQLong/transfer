@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormCheckbox, FormRichTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import { createSachGTStaff, updateSachGTStaff, deleteSachGTStaff,
     getSachGiaoTrinhGroupPage, getSachGiaoTrinhPage,
@@ -46,30 +46,43 @@ class EditModal extends AdminModal {
         if (!Array.isArray(list_ma)) {
             list_ma = [list_ma];
         }
-
-        list_ma.forEach((ma, index) => {
-            const changes = {
-                shcc: ma,
-                ten: this.ten.value(),
-                theLoai: this.theLoai.value(),
-                namSanXuat: this.namSanXuat.getVal() ? new Date(this.namSanXuat.getVal()).getFullYear() : null,
-                nhaSanXuat: this.nhaSanXuat.value(),
-                chuBien: this.chuBien.value(),
-                sanPham: this.sanPham.value(),
-                butDanh: this.butDanh.value(),
-                quocTe: this.quocTe.value()
-            };
-            if (index == list_ma.length - 1) {
-                this.state.id ? this.props.update(this.state.id, changes, this.hide, false) : this.props.create(changes, this.hide, false);
-                this.setState({
-                    id: ''
-                });
-                this.maCanBo.reset();
-            }
-            else {
-                this.state.id ? this.props.update(this.state.id, changes, false) : this.props.create(changes, false);
-            }
-        });
+        if (list_ma.length == 0) {
+            T.notify('Danh sách cán bộ trống', 'danger');
+            this.maCanBo.focus();
+        } else if (!this.ten.value()) {
+            T.notify('Tên sách, giáo trình trống', 'danger');
+            this.ten.focus();
+        } else if (!this.namSanXuat.getVal()) {
+            T.notify('Năm xuất bản trống', 'danger');
+            this.namSanXuat.focus();
+        } else if (!this.nhaSanXuat.value()) {
+            T.notify('Nhà xuất bản trống', 'danger');
+            this.nhaSanXuat.focus();
+        } else {
+            list_ma.forEach((ma, index) => {
+                const changes = {
+                    shcc: ma,
+                    ten: this.ten.value(),
+                    theLoai: this.theLoai.value(),
+                    namSanXuat: this.namSanXuat.getVal() ? new Date(this.namSanXuat.getVal()).getFullYear() : null,
+                    nhaSanXuat: this.nhaSanXuat.value(),
+                    chuBien: this.chuBien.value(),
+                    sanPham: this.sanPham.value(),
+                    butDanh: this.butDanh.value(),
+                    quocTe: this.quocTe.value()
+                };
+                if (index == list_ma.length - 1) {
+                    this.state.id ? this.props.update(this.state.id, changes, this.hide, false) : this.props.create(changes, this.hide, false);
+                    this.setState({
+                        id: ''
+                    });
+                    this.maCanBo.reset();
+                }
+                else {
+                    this.state.id ? this.props.update(this.state.id, changes, false) : this.props.create(changes, false);
+                }
+            });
+        }
     }
 
     render = () => {
@@ -78,13 +91,13 @@ class EditModal extends AdminModal {
             title: 'Thông tin sách, giáo trình',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={readOnly} />
-                <FormTextBox className='col-12' ref={e => this.ten = e} label={'Tên sách, giáo trình'} type='text'/>
-                <FormTextBox className='col-6' ref={e => this.theLoai = e} label={'Thể loại'} type='text' />
-                <FormTextBox className='col-6' ref={e => this.nhaSanXuat = e} label={'Nhà sản xuất, số hiệu ISBN'} type='text' />
-                <div className='form-group col-md-6'><DateInput ref={e => this.namSanXuat = e} label='Năm xuất bản' type='year' /></div>
-                <FormTextBox className='col-md-6' ref={e => this.chuBien = e} label={'Chủ biên, đồng chủ biên'} type='text' />
-                <FormTextBox className='col-md-6' ref={e => this.sanPham = e} label={'Sản phẩm'} type='text' />
+                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={readOnly} required />
+                <FormRichTextBox className='col-12' ref={e => this.ten = e} label={'Tên sách, giáo trình'} type='text' required/>
+                <div className='form-group col-md-4'><DateInput ref={e => this.namSanXuat = e} label='Năm xuất bản' type='year' required /></div>
+                <FormTextBox className='col-8' ref={e => this.nhaSanXuat = e} label={'Nhà xuất bản, số hiệu ISBN'} type='text' required />
+                <FormTextBox className='col-4' ref={e => this.theLoai = e} label={'Thể loại'} type='text' />
+                <FormTextBox className='col-md-8' ref={e => this.chuBien = e} label={'Chủ biên, đồng chủ biên'} type='text' />
+                <FormRichTextBox className='col-md-12' ref={e => this.sanPham = e} label={'Sản phẩm'} type='text' />
                 <FormTextBox className='col-md-6' ref={e => this.butDanh = e} label={'Bút danh'} type='text' />
                 <FormSelect className='col-md-6' ref={e => this.quocTe = e} label='Phạm vi xuất bản' data={quocTeList} />
             </div>,
@@ -156,9 +169,9 @@ class SachGiaoTrinh extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thông tin sách</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thông tin xuất bản</th>
+                        <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Cán bộ</th>
+                        <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Thông tin sách</th>
+                        <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Thông tin xuất bản</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thông tin sản phẩm</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Phạm vi xuất bản</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
