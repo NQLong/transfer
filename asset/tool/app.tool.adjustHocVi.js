@@ -25,7 +25,17 @@ const run = () => {
         if (result) {
             result.forEach(canBo => {
                 if (canBo.hocVi == '02') {
-                    console.log(canBo.shcc + ' ' + canBo.hocVi);
+                    app.model.canBo.update({shcc: canBo.shcc}, {tienSi: 1}, (err, out) => {
+                        console.log(canBo.shcc);
+                    })
+                } else if (canBo.hocVi == '03') {
+                    app.model.canBo.update({shcc: canBo.shcc}, {thacSi: 1}, (err, out) => {
+                        console.log(canBo.shcc);
+                    })
+                } else if (canBo.hocVi == '04') {
+                    app.model.canBo.update({shcc: canBo.shcc}, {cuNhan: 1}, (err, out) => {
+                        console.log(canBo.shcc);
+                    })
                 }
 
             });

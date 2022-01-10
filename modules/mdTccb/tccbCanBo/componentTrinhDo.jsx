@@ -13,9 +13,9 @@ class ComponentTrinhDo extends AdminPage {
 
     value = (item) => {
         this.shcc = item.shcc;
-        // this.thacSi.value(item.thacSi ? item.thacSi : 0);
-        // this.tienSi.value(item.tienSi ? item.tienSi : 0);
-        // this.cuNhan.value(item.cuNhan ? item.cuNhan : 0);
+        this.thacSi.value(item.thacSi ? item.thacSi : 0);
+        this.tienSi.value(item.tienSi ? item.tienSi : 0);
+        this.cuNhan.value(item.cuNhan ? item.cuNhan : 0);
         // item.thacSi && this.setState({
         //     thacSi: item.thacSi, batDauThacSiType: daoTao.batDauThacSiType ? daoTao.batDauThacSiType : 'mm/yyyy',
         //     ketThucThacSiType: daoTao.ketThucThacSiType ? daoTao.ketThucThacSiType : 'mm/yyyy'

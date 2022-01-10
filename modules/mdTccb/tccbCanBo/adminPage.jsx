@@ -77,7 +77,6 @@ class StaffPage extends AdminPage {
                     <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Mã số thẻ</th>
                     <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Họ & Tên</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Email</th>
                     <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Đơn vị</th>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                 </tr>),
@@ -85,8 +84,10 @@ class StaffPage extends AdminPage {
                 <tr key={index}>
                     <TableCell type='number' content={(pageNumber - 1) * pageSize + index + 1} />
                     <TableCell type='link' content={item.shcc} url={`/user/tccb/staff/${item.shcc}`} style={{ textAlign: 'center' }} />
-                    <TableCell type='text' content={`${item.ho} ${item.ten}`} style={{ whiteSpace: 'nowrap' }} />
-                    <TableCell type='text' content={item.email} />
+                    <TableCell type='text' content={<>
+                        <span>{`${item.ho} ${item.ten}`}</span><br />
+                        <i>{item.email}</i>
+                        </>} style={{ whiteSpace: 'nowrap' }} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap'}} content={
                         <>
                             <span>{item.maDonVi ? this.dvMapper[item.maDonVi] : null}</span>

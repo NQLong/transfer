@@ -89,9 +89,9 @@ class NckhModal extends AdminModal {
             this.vaiTro.focus();
         }
         else if (this.state.id) {
-            this.props.update(this.state.id, changes, this.hide);
+            this.props.update(this.state.id, changes, this.hide, true);
         } else {
-            this.props.create(changes, this.hide);
+            this.props.create(changes, this.hide, true);
         }
     }
 
@@ -144,7 +144,7 @@ class ComponentNCKH extends AdminPage {
 
     deleteNckh = (e, item) => {
         T.confirm('Xóa thông tin quá trình nghiên cứu khoa học', 'Bạn có chắc bạn muốn xóa quá trình này?', true, isConfirm =>
-            isConfirm && (this.props.userEdit ? this.props.deleteQtNckhStaffUser(item.id, this.state.email) : this.props.deleteQtNckhStaff(item.id, this.state.shcc)));
+            isConfirm && (this.props.userEdit ? this.props.deleteQtNckhStaffUser(item.id, this.state.email) : this.props.deleteQtNckhStaff(item.id, this.state.shcc, true)));
         e.preventDefault();
     }
 
