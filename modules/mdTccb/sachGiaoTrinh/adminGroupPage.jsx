@@ -123,9 +123,9 @@ class SachGiaoTrinhGroupPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thông tin sách</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thông tin xuất bản</th>
+                        <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Cán bộ</th>
+                        <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Thông tin sách</th>
+                        <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Thông tin xuất bản</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thông tin sản phẩm</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Nơi xuất bản</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>

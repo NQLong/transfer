@@ -12,6 +12,7 @@ module.exports = app => {
     );
     app.get('/user/tccb/sach-giao-trinh/:id', app.permission.check('sachGiaoTrinh:read'), app.templates.admin);
     app.get('/user/tccb/sach-giao-trinh', app.permission.check('sachGiaoTrinh:read'), app.templates.admin);
+    app.get('/user/tccb/sach-giao-trinh/group_sgt/:loaiDoiTuong/:ma', app.permission.check('sachGiaoTrinh:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/tccb/sach-giao-trinh/page/:pageNumber/:pageSize', app.permission.check('sachGiaoTrinh:read'), (req, res) => {

@@ -12,6 +12,7 @@ module.exports = app => {
     );
     app.get('/user/tccb/qua-trinh/bai-viet-khoa-hoc/:id', app.permission.check('qtBaiVietKhoaHoc:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/bai-viet-khoa-hoc', app.permission.check('qtBaiVietKhoaHoc:read'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/bai-viet-khoa-hoc/group_bvkh/:loaiDoiTuong/:ma', app.permission.check('qtBaiVietKhoaHoc:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/tccb/qua-trinh/bai-viet-khoa-hoc/page/:pageNumber/:pageSize', app.permission.check('qtBaiVietKhoaHoc:read'), (req, res) => {

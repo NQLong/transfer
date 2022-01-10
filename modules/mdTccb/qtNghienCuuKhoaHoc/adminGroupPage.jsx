@@ -179,9 +179,9 @@ class QtNghienCuuKhoaHocGroupPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tên đề tài, dự án</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Mã số và cấp quản lý</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
+                        <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Tên đề tài, dự án</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Mã số và cấp quản lý</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian thực hiện</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kinh phí</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kết quả</th>
@@ -200,16 +200,15 @@ class QtNghienCuuKhoaHocGroupPage extends AdminPage {
                         />
                         <TableCell type='text' content={
                             <>
-                                <span>{item.tenDeTai}</span><br />
-                                <span>Vai trò: <span style={{ color: 'blue' }}>{item.vaiTro}</span></span>
-                            </>
+                                <span><i>{item.tenDeTai}</i></span><br /><br/>
+                                <span style={{ whiteSpace: 'nowrap' }}>Vai trò: <span style={{ color: 'blue' }}>{item.vaiTro}</span></span>                            </>
                         } />
                         <TableCell type='text' content={item.maSoCapQuanLy} />
                         <TableCell type='text' content={(
                             <>
-                                <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType) : ''}</span></span><br />
-                                <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType) : ''}</span></span> <br />
-                                <span style={{ whiteSpace: 'nowrap' }}>Ngày nghiệm thu: <span style={{ color: 'blue' }}>{item.ngayNghiemThu ? item.ngayNghiemThu : ''}</span></span>
+                                <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span></span><br />
+                                <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span></span> <br />
+                                <span style={{ whiteSpace: 'nowrap' }}>Nghiệm thu: <span style={{ color: 'blue' }}>{item.ngayNghiemThu ? T.dateToText(item.ngayNghiemThu, item.ngayNghiemThuType ? item.ngayNghiemThuType : 'dd/mm/yyyy') : ''}</span></span>
                             </>
                         )}
                         />
