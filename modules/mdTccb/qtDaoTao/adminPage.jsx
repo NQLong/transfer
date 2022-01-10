@@ -53,7 +53,7 @@ class EditModal extends AdminModal {
             T.notify('Mã số cán bộ bị trống');
             this.shcc.focus();
         } else {
-            this.state.stt ? this.props.update(this.state.stt, changes, this.hide) : this.props.create(changes, this.hide);
+            this.state.id ? this.props.update(this.state.stt, changes, this.hide) : this.props.create(changes, this.hide);
         }
     }
 
@@ -155,7 +155,7 @@ class QtDaoTao extends AdminPage {
                         <TableCell type='text' content={item.hinhThuc} />
                         <TableCell type='text' content={item.loaiBangCap} />
                         {
-                            !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
+                            <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                                 onEdit={() => this.modal.show(item)} onDelete={e => this.delete(e, item)} > </TableCell>
                         }
                         {/* {
@@ -172,8 +172,8 @@ class QtDaoTao extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-bed',
-            title: ' đào tạo',
+            icon: 'fa fa-graduation-cap',
+            title: 'Quá trình đào tạo',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
                 'Quá trình đào tạo'

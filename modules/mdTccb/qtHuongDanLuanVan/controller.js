@@ -1,4 +1,40 @@
 module.exports = app => {
+    const menu = {
+        parentMenu: app.parentMenu.tccb,
+        menus: {
+            3017: { title: 'Quá trình hướng dẫn luận văn', link: '/user/tccb/qua-trinh/hdlv', icon: 'fa-chalkboard-teacher', backgroundColor: '#635118', groupIndex: 4},
+        },
+    };
+
+    app.permission.add(
+        { name: 'qtHuongDanLuanVan:read', menu },
+        { name: 'qtHuongDanLuanVan:write' },
+        { name: 'qtHuongDanLuanVan:delete' },
+    );
+    app.get('/user/tccb/qua-trinh/hdlv/:stt', app.permission.check('qtHuongDanLuanVan:read'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/hdlv', app.permission.check('qtHuongDanLuanVan:read'), app.templates.admin);
+    
+    // APIs -----------------------------------------------------------------------------------------------------------------------------------------
+    const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
+    
+    app.get('/api/qua-trinh/hdlv/page/:pageNumber/:pageSize', checkGetStaffPermission, (req, res) => {
+        const pageNumber = parseInt(req.params.pageNumber),
+            pageSize = parseInt(req.params.pageSize);
+        
+        let condition = { statement: null };
+        if (req.query.condition) {
+            condition = {
+                statement: 'lower(shcc) LIKE :searchText',
+                parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
+            };
+        }
+        app.model.qtHuongDanLuanVan.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
+    });
+    
+    app.get('/api/qua-trinh/hdlv/all', checkGetStaffPermission, (req, res) => {
+        app.model.qtHuongDanLuanVan.getAll((error, items) => res.send({ error, items }));
+    });
+
     app.post('/api/qua-trinh/hdlv', app.permission.check('staff:write'), (req, res) =>
         app.model.qtHuongDanLuanVan.create(req.body.data, (error, item) => res.send({ error, item })));
 

@@ -32,11 +32,11 @@ module.exports = app => {
     });
     
     app.get('/api/qua-trinh/dao-tao/all', checkGetStaffPermission, (req, res) => {
-        app.model.qtNghiThaiSan.getAll((error, items) => res.send({ error, items }));
+        app.model.qtDaoTao.getAll((error, items) => res.send({ error, items }));
     });
 
     app.get('/api/qua-trinh/dao-tao/item/:id', checkGetStaffPermission, (req, res) => {
-        app.model.qtNghiThaiSan.get({ stt: req.params.id }, (error, item) => res.send({ error, item }));
+        app.model.qtDaoTao.get({ stt: req.params.id }, (error, item) => res.send({ error, item }));
     });
 
     app.post('/api/qua-trinh/dao-tao', app.permission.check('staff:write'), (req, res) =>
