@@ -72,33 +72,50 @@ class EditModal extends AdminModal {
         if (!Array.isArray(list_ma)) {
             list_ma = [list_ma];
         }
-        list_ma.forEach((ma, index) => {
-            const changes = {
-                shcc: ma,
-                batDau: this.batDau.getVal(),
-                ketThuc: this.ketThuc.getVal(),
-                batDauType: this.state.batDauType,
-                ketThucType: this.state.ketThucType,
-                tenDeTai: this.tenDeTai.value(),
-                maSoCapQuanLy: this.maSoCapQuanLy.value(),
-                kinhPhi: this.kinhPhi.value(),
-                thoiGian: this.thoiGian.value(),
-                vaiTro: this.vaiTro.value(),
-                ketQua: this.ketQua.value(),
-                ngayNghiemThu: this.ngayNghiemThu.getVal(),
-                ngayNghiemThuType: this.state.ngayNghiemThuType,
-            };
-            if (index == list_ma.length - 1) {
-                this.state.id ? this.props.update(this.state.id, changes, this.hide, false) : this.props.create(changes, this.hide, false);
-                this.setState({
-                    id: ''
-                });
-                this.maCanBo.reset();
-            }
-            else {
-                this.state.id ? this.props.update(this.state.id, changes, null, false) : this.props.create(changes, null, false);
-            }
-        });
+        if (list_ma.length == 0) {
+            T.notify('Cán bộ thực hiện đề tài, dự án trống', 'danger');
+            this.maCanBo.focus();
+        } else if (!this.tenDeTai.value()) {
+            T.notify('Tên đề tài, dự án trống', 'danger');
+            this.tenDeTai.focus();
+        } else if (!this.maSoCapQuanLy.value()) {
+            T.notify('Tên đề tài, dự án trống', 'danger');
+            this.maSoCapQuanLy.focus();
+        } else if (!this.batDau.getVal()) {
+            T.notify('Ngày bắt đầu trống', 'danger');
+            this.batDau.focus();
+        } else if (!this.vaiTro.value()) {
+            T.notify('Vai trò bị trống!', 'danger');
+            this.vaiTro.focus();
+        }else {
+            list_ma.forEach((ma, index) => {
+                const changes = {
+                    shcc: ma,
+                    batDau: this.batDau.getVal(),
+                    ketThuc: this.ketThuc.getVal(),
+                    batDauType: this.state.batDauType,
+                    ketThucType: this.state.ketThucType,
+                    tenDeTai: this.tenDeTai.value(),
+                    maSoCapQuanLy: this.maSoCapQuanLy.value(),
+                    kinhPhi: this.kinhPhi.value(),
+                    thoiGian: this.thoiGian.value(),
+                    vaiTro: this.vaiTro.value(),
+                    ketQua: this.ketQua.value(),
+                    ngayNghiemThu: this.ngayNghiemThu.getVal(),
+                    ngayNghiemThuType: this.state.ngayNghiemThuType,
+                };
+                if (index == list_ma.length - 1) {
+                    this.state.id ? this.props.update(this.state.id, changes, this.hide, false) : this.props.create(changes, this.hide, false);
+                    this.setState({
+                        id: ''
+                    });
+                    this.maCanBo.reset();
+                }
+                else {
+                    this.state.id ? this.props.update(this.state.id, changes, null, false) : this.props.create(changes, null, false);
+                }
+            });
+        }
     }
 
     render = () => {
@@ -107,7 +124,7 @@ class EditModal extends AdminModal {
             title: 'Thông tin nghiên cứu khoa học',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={readOnly} />
+                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={readOnly} required/>
                 <FormRichTextBox className='col-12' ref={e => this.tenDeTai = e} label={'Tên đề tài'} type='text' required />
                 <FormRichTextBox className='col-md-12' ref={e => this.maSoCapQuanLy = e} label={'Mã số và cấp quản lý'} type='text' required />
                 <FormTextBox className='col-md-6' ref={e => this.thoiGian = e} label={'Thời gian thực hiện (tháng)'} type='number' />

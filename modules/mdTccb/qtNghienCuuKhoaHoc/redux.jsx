@@ -112,7 +112,7 @@ export function getQtNghienCuuKhoaHocGroupPageMa(pageNumber, pageSize, loaiDoiTu
 
 export function updateQtNghienCuuKhoaHocGroupPageMa(id, changes, done) {
     return dispatch => {
-        const url = '/api/tccb/qua-trinh/nghien-cuu-khoa-hoc';
+        const url = '/api/qua-trinh/nckh';
         T.put(url, { id, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật nghiên cứu khoa học bị lỗi!', 'danger');
