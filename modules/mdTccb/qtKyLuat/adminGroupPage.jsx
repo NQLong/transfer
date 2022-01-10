@@ -193,7 +193,7 @@ class QtKyLuatGroupPage extends AdminPage {
                         />
                         <TableCell type='text' style={{textAlign:'right'}} content={item.diemThiDua} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                            onEdit={() => this.modal.show(item)} onDelete={this.delete} >
+                            onEdit={() => this.modal.show(item, false)} onDelete={this.delete} >
                         </TableCell>
                     </tr>
                 )
