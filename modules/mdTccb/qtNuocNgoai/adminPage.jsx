@@ -70,6 +70,7 @@ class EditModal extends AdminModal {
             quocGia: this.quocGia.value(),
             noiDung: this.noiDung.value()
         };
+
         if (!changes.noiDung) {
             T.notify('Nội dung đi nước ngoài trống', 'danger');
             this.noiDung.focus();
@@ -267,7 +268,7 @@ class QtNuocNgoai extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition, loaiDoiTuong }}
                     getPage={this.checked ? this.props.getQtNuocNgoaiGroupPage : this.props.getQtNuocNgoaiPage} />
-                <EditModal ref={e => this.modal = e} permission={permission}
+                <EditModal ref={e => this.modal = e} permission={permission} 
                     create={this.props.createQtNuocNgoaiStaff} update={this.props.updateQtNuocNgoaiStaff}
                     permissions={currentPermissions}
                 />

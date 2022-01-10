@@ -3,7 +3,7 @@ import { SelectAdapter_DmTrinhDoQuanLyNhaNuocV2 } from 'modules/mdDanhMuc/dmTrin
 import { SelectAdapter_DmTrinhDoTinHocV2 } from 'modules/mdDanhMuc/dmTrinhDoTinHoc/redux';
 import React from 'react';
 import { connect } from 'react-redux';
-import { AdminPage, FormRichTextBox, FormSelect, FormTextBox } from 'view/component/AdminPage';
+import { AdminPage, FormSelect, FormTextBox } from 'view/component/AdminPage';
 import ComponentNN from '../trinhDoNgoaiNgu/componentNgoaiNgu';
 import { getStaffEdit, userGetStaff } from './redux';
 
@@ -69,9 +69,9 @@ class ComponentTrinhDo extends AdminPage {
                     <FormTextBox type='year' ref={e => this.namCapQlnn = e} label='Năm cấp (yyyy)' className='col-md-3'/>
                     <FormTextBox ref={e => this.noiCapQlnn = e} label='Nơi cấp' className='col-md-3' />
 
-                    <FormRichTextBox ref={e => this.hocTapHienTai = e} label='Tình hình học tập, bồi dưỡng hiện tại' className='col-md-6'/>
-                    <FormTextBox ref={e => this.coSoHocTapHienTai = e} label='Tên cơ sở dào tạo' className='col-md-3'/>
-                    <FormTextBox ref={e => this.thoiGianHocTapHienTai = e} label='Thời gian dào tạo' className='col-md-3'/>
+                    <FormTextBox ref={e => this.hocTapHienTai = e} label='Tình hình học tập, bồi dưỡng hiện tại' className='col-md-4'/>
+                    <FormTextBox ref={e => this.coSoHocTapHienTai = e} label='Tên cơ sở đào tạo' className='col-md-4'/>
+                    <FormTextBox ref={e => this.thoiGianHocTapHienTai = e} label='Thời gian đào tạo' className='col-md-4'/>
                 </div>
             </div>
         );

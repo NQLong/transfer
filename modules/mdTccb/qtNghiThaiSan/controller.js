@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3006: { title: 'Quá trình nghỉ thai sản', link: '/user/tccb/qua-trinh/nghi-thai-san', icon: 'fa-bed', backgroundColor: '#617ad4', groupIndex: 3},
+            3015: { title: 'Quá trình nghỉ thai sản', link: '/user/tccb/qua-trinh/nghi-thai-san', icon: 'fa-bed', backgroundColor: '#515659', groupIndex: 1},
         },
     };
     app.permission.add(
@@ -45,7 +45,6 @@ module.exports = app => {
             if (error || page == null) {
                 res.send({ error });
             } else {
-                console.log(page);
                 const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
                 res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, list } });
             }
