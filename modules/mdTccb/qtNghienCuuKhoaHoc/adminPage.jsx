@@ -79,7 +79,7 @@ class EditModal extends AdminModal {
             T.notify('Tên đề tài, dự án trống', 'danger');
             this.tenDeTai.focus();
         } else if (!this.maSoCapQuanLy.value()) {
-            T.notify('Tên đề tài, dự án trống', 'danger');
+            T.notify('Mã số cấp quản lý trống', 'danger');
             this.maSoCapQuanLy.focus();
         } else if (!this.batDau.getVal()) {
             T.notify('Ngày bắt đầu trống', 'danger');

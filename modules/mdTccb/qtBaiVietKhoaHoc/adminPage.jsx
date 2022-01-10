@@ -160,7 +160,6 @@ class QtBaiVietKhoaHoc extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Tác giả</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Bài viết</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tạp chí xuất bản</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Điểm If</th>
@@ -171,8 +170,18 @@ class QtBaiVietKhoaHoc extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
-                        <TableCell type='link' onClick={() => this.modal.show(item, false)} content={item.tenTacGia} />
-                        <TableCell type='text' content={item.tenBaiViet} />
+                        <TableCell type='text' content={(
+                            <>
+                                <span>{item.tenBaiViet}</span> <br/>
+                                <span>Tác giả:
+                                    <a href='#' onClick={() => this.modal.show(item, false)}>
+                                        <span style={{color: 'blue'}}>{' ' + item.tenTacGia} </span>
+                                    </a>
+                                </span>
+
+                            </>
+                            
+                        )} />
                         <TableCell type='text' content={(
                             <>
                                 <span>Tên: <span>{item.tenTapChi}</span> </span> <br/>
