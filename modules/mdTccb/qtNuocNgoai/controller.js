@@ -12,6 +12,7 @@ module.exports = app => {
     );
     app.get('/user/tccb/qua-trinh/nuoc-ngoai/:id', app.permission.check('qtNuocNgoai:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/nuoc-ngoai', app.permission.check('qtNuocNgoai:read'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/nuoc-ngoai/group_nn/:loaiDoiTuong/:ma', app.permission.check('qtNuocNgoai:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/tccb/qua-trinh/nuoc-ngoai/page/:pageNumber/:pageSize', app.permission.check('qtNuocNgoai:read'), (req, res) => {

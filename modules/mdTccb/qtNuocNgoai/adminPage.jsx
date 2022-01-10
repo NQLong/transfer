@@ -30,8 +30,10 @@ class EditModal extends AdminModal {
         batDauType: 'dd/mm/yyyy',
         ketThucType: 'dd/mm/yyyy',
     };
+    multiple = false;
 
-    onShow = (item) => {
+    onShow = (item, multiple = true) => {
+        this.multiple = multiple;
         let { id, shcc, quocGia, noiDung, batDau, batDauType, ketThuc, ketThucType, tenCoSo, kinhPhi, troLaiCongTac } = item ? item : {
             id: '', shcc: '', quocGia: '', noiDung: '', tenCoSo: '', batDau: null, batDauType: '', ketThuc: null, ketThucType: '', kinhPhi: null, troLaiCongTac: ''
         };
@@ -49,45 +51,53 @@ class EditModal extends AdminModal {
             this.troLaiCongTac.value(troLaiCongTac);
             this.batDauType.setText({ text: batDauType ? batDauType : 'dd/mm/yyyy' });
             this.ketThucType.setText({ text: ketThucType ? ketThucType : 'dd/mm/yyyy' });
-            this.batDau.setVal(batDau);
+            this.batDau.setVal(batDau ? batDau : '');
             this.ketThuc.setVal(ketThuc);
             this.quocGia.value(quocGia);
-            this.noiDung.value(noiDung);
+            this.noiDung.value(noiDung ? noiDung : '');
         }, 500);
     };
 
     onSubmit = (e) => {
         e.preventDefault();
-        const changes = {
-            shcc: this.maCanBo.value(),
-            tenCoSo: this.tenCoSo.value(),
-            kinhPhi: this.kinhPhi.value(),
-            troLaiCongTac: Number(this.troLaiCongTac.value()),
-            batDauType: this.state.batDauType,
-            batDau: this.batDau.getVal(),
-            ketThucType: this.state.ketThucType,
-            ketThuc: this.ketThuc.getVal(),
-            quocGia: this.quocGia.value(),
-            noiDung: this.noiDung.value()
-        };
-        if (!changes.noiDung) {
+        let list_ma = this.maCanBo.value();
+        if (!Array.isArray(list_ma)) {
+            list_ma = [list_ma];
+        }
+        if (list_ma.length == 0) {
+            T.notify('Cán bộ đi nước ngoài trống', 'danger');
+            this.maCanBo.focus();
+        } else if (!this.noiDung.value()) {
             T.notify('Nội dung đi nước ngoài trống', 'danger');
             this.noiDung.focus();
-        } else if (changes.noiDung.length > 200) {
-            T.notify('Nội dung đi nước ngoài dài quá 200 ký tự', 'danger');
-            this.noiDung.focus();
-        } else if (!changes.quocGia) {
-            T.notify('Quốc gia đi nước ngoài trống', 'danger');
-            this.quocGia.focus();
-        } else if (!changes.batDau) {
-            T.notify('Thời gian bắt đầu bị trống!', 'danger');
+        } else if (!this.batDau.getVal()) {
+            T.notify('Ngày bắt đầu đi nước ngoài trống', 'danger');
             this.batDau.focus();
-        } else if (!changes.tenCoSo) {
-            T.notify('Cơ sở bị trống!', 'danger');
-            this.tenCoSo.focus();
-        }
-        else {
-            this.state.id ? this.props.update(this.state.id, changes, this.hide, false) : this.props.create(changes, this.hide, false);
+        } else {
+            list_ma.forEach((ma, index) => {
+                const changes = {
+                    shcc: ma,
+                    tenCoSo: this.tenCoSo.value(),
+                    kinhPhi: this.kinhPhi.value(),
+                    troLaiCongTac: Number(this.troLaiCongTac.value()),
+                    batDauType: this.state.batDauType,
+                    batDau: this.batDau.getVal(),
+                    ketThucType: this.state.ketThucType,
+                    ketThuc: this.ketThuc.getVal(),
+                    quocGia: this.quocGia.value(),
+                    noiDung: this.noiDung.value()
+                };
+                if (index == list_ma.length - 1) {
+                    this.state.id ? this.props.update(this.state.id, changes, this.hide, false) : this.props.create(changes, this.hide, false);
+                    this.setState({
+                        id: ''
+                    });
+                    this.maCanBo.reset();
+                }
+                else {
+                    this.state.id ? this.props.update(this.state.id, changes, null, false) : this.props.create(changes, null, false);
+                }
+            });
         }
     }
 
@@ -98,10 +108,10 @@ class EditModal extends AdminModal {
             title: this.state.id ? 'Cập nhật quá trình đi nước ngoài' : 'Tạo mới quá trình đi nước ngoài',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12' ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={!canEdit} />
+                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={!canEdit} required />    
                 <FormRichTextBox className='col-md-12' ref={e => this.noiDung = e} rows={2} readOnly={readOnly} label='Nội dung' placeholder='Nhập nội dung đi nước ngoài (tối đa 200 ký tự)' required maxLength={200} />
-                <FormTextBox className='col-md-12' ref={e => this.quocGia = e} label='Quốc gia' required />
-                <FormTextBox className='col-md-12' ref={e => this.tenCoSo = e} label='Tên cơ sở đào tạo/làm việc' required />
+                <FormTextBox className='col-md-12' ref={e => this.quocGia = e} label='Quốc gia' />
+                <FormTextBox className='col-md-12' ref={e => this.tenCoSo = e} label='Tên cơ sở đào tạo/làm việc'  />
 
                 <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
                     label={
@@ -235,7 +245,7 @@ class QtNuocNgoai extends AdminPage {
                         />
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                                onEdit={() => this.modal.show(item)} onDelete={this.delete} >
+                                onEdit={() => this.modal.show(item, false)} onDelete={this.delete} >
                             </TableCell>
                         }
                         {
