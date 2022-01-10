@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormCheckbox, FormRichTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import { createQtNckhStaff, 
     updateQtNckhStaff, deleteQtNckhStaff, 
@@ -66,41 +66,55 @@ class EditModal extends AdminModal {
         }, 500);
     }
 
-    onSubmit = () => {
-        const changes = {
-            shcc: this.maCanBo.value(),
-            batDau: this.batDau.getVal(),
-            ketThuc: this.ketThuc.getVal(),
-            batDauType: this.state.batDauType,
-            ketThucType: this.state.ketThucType,
-            tenDeTai: this.tenDeTai.value(),
-            maSoCapQuanLy: this.maSoCapQuanLy.value(),
-            kinhPhi: this.kinhPhi.value(),
-            thoiGian: this.thoiGian.value(),
-            vaiTro: this.vaiTro.value(),
-            ketQua: this.ketQua.value(),
-            ngayNghiemThu: this.ngayNghiemThu.getVal(),
-            ngayNghiemThuType: this.state.ngayNghiemThuType,
-        };
-        if (!changes.tenDeTai) {
-            T.notify('Tên đề tài bị trống!', 'danger');
+    onSubmit = (e) => {
+        e.preventDefault();
+        let list_ma = this.maCanBo.value();
+        if (!Array.isArray(list_ma)) {
+            list_ma = [list_ma];
+        }
+        if (list_ma.length == 0) {
+            T.notify('Cán bộ thực hiện đề tài, dự án trống', 'danger');
+            this.maCanBo.focus();
+        } else if (!this.tenDeTai.value()) {
+            T.notify('Tên đề tài, dự án trống', 'danger');
             this.tenDeTai.focus();
-        } else if (!changes.maSoCapQuanLy) {
-            T.notify('Mã số và cấp quản lý bị trống!', 'danger');
+        } else if (!this.maSoCapQuanLy.value()) {
+            T.notify('Mã số cấp quản lý trống', 'danger');
             this.maSoCapQuanLy.focus();
-        }
-        else if (!changes.batDau) {
-            T.notify('Thời gian bắt đầu bị trống!', 'danger');
+        } else if (!this.batDau.getVal()) {
+            T.notify('Ngày bắt đầu trống', 'danger');
             this.batDau.focus();
-        }
-        else if (!changes.vaiTro) {
+        } else if (!this.vaiTro.value()) {
             T.notify('Vai trò bị trống!', 'danger');
             this.vaiTro.focus();
-        }
-        else if (this.state.id) {
-            this.props.update(this.state.id, changes, this.hide);
-        } else {
-            this.props.create(changes, this.hide);
+        }else {
+            list_ma.forEach((ma, index) => {
+                const changes = {
+                    shcc: ma,
+                    batDau: this.batDau.getVal(),
+                    ketThuc: this.ketThuc.getVal(),
+                    batDauType: this.state.batDauType,
+                    ketThucType: this.state.ketThucType,
+                    tenDeTai: this.tenDeTai.value(),
+                    maSoCapQuanLy: this.maSoCapQuanLy.value(),
+                    kinhPhi: this.kinhPhi.value(),
+                    thoiGian: this.thoiGian.value(),
+                    vaiTro: this.vaiTro.value(),
+                    ketQua: this.ketQua.value(),
+                    ngayNghiemThu: this.ngayNghiemThu.getVal(),
+                    ngayNghiemThuType: this.state.ngayNghiemThuType,
+                };
+                if (index == list_ma.length - 1) {
+                    this.state.id ? this.props.update(this.state.id, changes, this.hide, false) : this.props.create(changes, this.hide, false);
+                    this.setState({
+                        id: ''
+                    });
+                    this.maCanBo.reset();
+                }
+                else {
+                    this.state.id ? this.props.update(this.state.id, changes, null, false) : this.props.create(changes, null, false);
+                }
+            });
         }
     }
 
@@ -110,11 +124,11 @@ class EditModal extends AdminModal {
             title: 'Thông tin nghiên cứu khoa học',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={readOnly} />
-                <FormTextBox className='col-12' ref={e => this.tenDeTai = e} label={'Tên đề tài'} type='text' required />
-                <FormTextBox className='col-md-4' ref={e => this.maSoCapQuanLy = e} label={'Mã số và cấp quản lý'} type='text' required />
-                <FormTextBox className='col-md-4' ref={e => this.thoiGian = e} label={'Thời gian thực hiện (tháng)'} type='number' />
-                <FormTextBox className='col-md-4' ref={e => this.kinhPhi = e} label={'Kinh phí'} type='text' />
+                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={readOnly} required/>
+                <FormRichTextBox className='col-12' ref={e => this.tenDeTai = e} label={'Tên đề tài'} type='text' required />
+                <FormRichTextBox className='col-md-12' ref={e => this.maSoCapQuanLy = e} label={'Mã số và cấp quản lý'} type='text' required />
+                <FormTextBox className='col-md-6' ref={e => this.thoiGian = e} label={'Thời gian thực hiện (tháng)'} type='number' />
+                <FormTextBox className='col-md-6' ref={e => this.kinhPhi = e} label={'Kinh phí'} type='text' />
                 <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
                     label={
                         <div style={{ display: 'flex' }}>Thời gian bắt đầu (định dạng:&nbsp; <Dropdown ref={e => this.batDauType = e}
@@ -186,7 +200,7 @@ class QtNghienCuuKhoaHoc extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa nghiên cứu khoa học', 'Bạn có chắc bạn muốn xóa nghiên cứu khoa học này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtNckhStaff(false, item.id, null, error => {
+            isConfirm && this.props.deleteQtNckhStaff(item.id, null, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá nghiên cứu khoa học bị lỗi!', 'danger');
                 else T.alert('Xoá nghiên cứu khoa học thành công!', 'success', false, 800);
             });

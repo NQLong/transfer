@@ -31,12 +31,9 @@ class EditModal extends AdminModal {
         ketThuc: '',
         batDauType: 'dd/mm/yyyy',
         ketThucType: 'dd/mm/yyyy',
-        doiTuong: ''
     };
     multiple = false;
-    componentDidMount() {
-    }
-
+    
     onShow = (item, multiple = true) => {
         this.multiple = multiple;
         this.batDau.clear();
@@ -69,50 +66,55 @@ class EditModal extends AdminModal {
         if (!Array.isArray(list_ma)) {
             list_ma = [list_ma];
         }
-        list_ma.forEach((ma, index) => {
-            const changes = {
-                shcc: ma,
-                lyDoHinhThuc: this.hinhThucKyLuat.value(),
-                capQuyetDinh: this.capQuyetDinh.value(),
-                batDauType: this.state.batDauType,
-                batDau: this.batDau.getVal(),
-                ketThucType: this.state.ketThucType,
-                ketThuc: this.ketThuc.getVal(),
-                diemThiDua: this.diemThiDua.value(),
-            };
-            if (index == list_ma.length - 1) {
-                this.state.id ? this.props.update(false, this.state.id, changes, this.hide) : this.props.create(false, changes, this.hide);
-                this.setState({
-                    id: ''
-                });
-                this.maCanBo.reset();
-            }
-            else {
-                this.state.id ? this.props.update(false, this.state.id, changes) : this.props.create(false, changes);
-            }
-        });
-    }
-
-    changeType = (isBatDau, type) => {
-        if (isBatDau) {
-            this.setState({ batDauType: type });
-            this.batDau.setVal(this.state.batDau);
+        if (list_ma.length == 0) {
+            T.notify('Cán bộ bị trống', 'danger');
+            this.maCanBo.focus();
+        } else if (!this.hinhThucKyLuat.value()) {
+            T.notify('Hình thức kỷ luật trống', 'danger');
+            this.hinhThucKyLuat.focus();
+        } else if (!this.capQuyetDinh.value()) {
+            T.notify('Cấp quyết định trống', 'danger');
+            this.capQuyetDinh.focus();
+        } else if (!this.batDau.getVal()) {
+            T.notify('Ngày bắt đầu trống', 'danger');
+            this.batDau.focus();
         } else {
-            this.setState({ ketThucType: type });
-            this.ketThuc.setVal(this.state.ketThuc);
+            list_ma.forEach((ma, index) => {
+                const changes = {
+                    shcc: ma,
+                    lyDoHinhThuc: this.hinhThucKyLuat.value(),
+                    capQuyetDinh: this.capQuyetDinh.value(),
+                    batDauType: this.state.batDauType,
+                    batDau: this.batDau.getVal(),
+                    ketThucType: this.state.ketThucType,
+                    ketThuc: this.ketThuc.getVal(),
+                    diemThiDua: this.diemThiDua.value(),
+                };
+                if (index == list_ma.length - 1) {
+                    this.state.id ? this.props.update(false, this.state.id, changes, this.hide) : this.props.create(false, changes, this.hide);
+                    this.setState({
+                        id: ''
+                    });
+                    this.maCanBo.reset();
+                }
+                else {
+                    this.state.id ? this.props.update(false, this.state.id, changes) : this.props.create(false, changes);
+                }
+            });
         }
     }
+
     render = () => {
         const readOnly = this.state.id ? true : this.props.readOnly;
         return this.renderModal({
             title: this.state.id ? 'Cập nhật quá trình kỷ luật' : 'Tạo mới quá trình kỷ luật',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={readOnly} />
+                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={readOnly} required />
 
-                <FormSelect className='col-md-12' ref={e => this.hinhThucKyLuat = e} label='Hình thức kỷ luật' data={SelectAdapter_DmKyLuatV2} readOnly={false} />
+                <FormSelect className='col-md-12' ref={e => this.hinhThucKyLuat = e} label='Hình thức kỷ luật' data={SelectAdapter_DmKyLuatV2} readOnly={false} required />
 
-                <FormTextBox className='col-md-12' ref={e => this.capQuyetDinh = e} type='text' label='Cấp quyết định' readOnly={false} />
+                <FormTextBox className='col-md-12' ref={e => this.capQuyetDinh = e} type='text' label='Cấp quyết định' readOnly={false} required />
 
                 <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
                     label={

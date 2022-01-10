@@ -1,10 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormRichTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import { 
-    updateQtNckhStaff, deleteQtNckhStaff, 
+    updateQtNghienCuuKhoaHocGroupPageMa, deleteQtNckhStaff, 
     getQtNghienCuuKhoaHocGroupPageMa, getQtNghienCuuKhoaHocPage } 
 from './redux';
 
@@ -105,11 +105,11 @@ class EditModal extends AdminModal {
             title: 'Thông tin nghiên cứu khoa học',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12' ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={true} />
-                <FormTextBox className='col-12' ref={e => this.tenDeTai = e} label={'Tên đề tài'} type='text' required />
-                <FormTextBox className='col-md-4' ref={e => this.maSoCapQuanLy = e} label={'Mã số và cấp quản lý'} type='text' required />
-                <FormTextBox className='col-md-4' ref={e => this.thoiGian = e} label={'Thời gian thực hiện (tháng)'} type='number' />
-                <FormTextBox className='col-md-4' ref={e => this.kinhPhi = e} label={'Kinh phí'} type='text' />
+                <FormSelect className='col-md-12' ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={true} required />
+                <FormRichTextBox className='col-12' ref={e => this.tenDeTai = e} label={'Tên đề tài'} type='text' required />
+                <FormRichTextBox className='col-md-12' ref={e => this.maSoCapQuanLy = e} label={'Mã số và cấp quản lý'} type='text' required />
+                <FormTextBox className='col-md-6' ref={e => this.thoiGian = e} label={'Thời gian thực hiện (tháng)'} type='number' />
+                <FormTextBox className='col-md-6' ref={e => this.kinhPhi = e} label={'Kinh phí'} type='text' />
                 <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
                     label={
                         <div style={{ display: 'flex' }}>Thời gian bắt đầu (định dạng:&nbsp; <Dropdown ref={e => this.batDauType = e}
@@ -238,7 +238,7 @@ class QtNghienCuuKhoaHocGroupPage extends AdminPage {
                     getPage={this.props.getQtNghienCuuKhoaHocPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     permissions={currentPermissions}
-                    update={this.props.updateQtNckhStaff}
+                    update={this.props.updateQtNghienCuuKhoaHocGroupPageMa}
                 />
             </>,
             backRoute: '/user/tccb/qua-trinh/nghien-cuu-khoa-hoc/',
@@ -248,7 +248,7 @@ class QtNghienCuuKhoaHocGroupPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, qtNghienCuuKhoaHoc: state.qtNghienCuuKhoaHoc });
 const mapActionsToProps = {
-    updateQtNckhStaff, deleteQtNckhStaff, 
+    updateQtNghienCuuKhoaHocGroupPageMa, deleteQtNckhStaff, 
     getQtNghienCuuKhoaHocGroupPageMa, getQtNghienCuuKhoaHocPage,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtNghienCuuKhoaHocGroupPage);

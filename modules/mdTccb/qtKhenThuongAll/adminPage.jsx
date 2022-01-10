@@ -62,28 +62,41 @@ class EditModal extends AdminModal {
         if (!Array.isArray(list_ma)) {
             list_ma = [list_ma];
         }
-        list_ma.forEach((ma, index) => {
-            const changes = {
-                loaiDoiTuong: this.loaiDoiTuong.value(),
-                ma: ma,
-                namDatDuoc: this.namDatDuoc.value(),
-                thanhTich: this.thanhTich.value(),
-                chuThich: this.chuThich.value(),  
-                diemThiDua: this.diemThiDua.value(),
-            };
-            if (index == list_ma.length - 1) {
-                this.state.id ? this.props.update(false, this.state.id, changes, this.hide) : this.props.create(false, changes, this.hide);
-                this.setState({
-                    id: '', doiTuong: ''
-                });
-                this.maCanBo.reset();
-                this.maDonVi.reset();
-                this.maBoMon.reset();
-            }
-            else {
-                this.state.id ? this.props.update(false, this.state.id, changes) : this.props.create(false, changes);
-            }
-        });
+        if (!this.loaiDoiTuong.value()) {
+            T.notify('Loại đối tượng trống', 'danger');
+            this.loaiDoiTuong.focus();
+        } else if (list_ma.length == 0) {
+            T.notify('Danh sách mã số trống', 'danger');
+            if (this.loaiDoiTuong.value() == '02') this.maCanBo.focus();
+            if (this.loaiDoiTuong.value() == '03') this.maDonVi.focus();
+            if (this.loaiDoiTuong.value() == '04') this.maBoMon.focus();
+        } else if (!this.thanhTich.value()) {
+            T.notify('Thành tích trống', 'danger');
+            this.thanhTich.focus();
+        } else {
+            list_ma.forEach((ma, index) => {
+                const changes = {
+                    loaiDoiTuong: this.loaiDoiTuong.value(),
+                    ma: ma,
+                    namDatDuoc: this.namDatDuoc.value(),
+                    thanhTich: this.thanhTich.value(),
+                    chuThich: this.chuThich.value(),  
+                    diemThiDua: this.diemThiDua.value(),
+                };
+                if (index == list_ma.length - 1) {
+                    this.state.id ? this.props.update(false, this.state.id, changes, this.hide) : this.props.create(false, changes, this.hide);
+                    this.setState({
+                        id: '', doiTuong: ''
+                    });
+                    this.maCanBo.reset();
+                    this.maDonVi.reset();
+                    this.maBoMon.reset();
+                }
+                else {
+                    this.state.id ? this.props.update(false, this.state.id, changes) : this.props.create(false, changes);
+                }
+            });
+        }
     }
 
     onChangeDT = (value) => {
@@ -97,21 +110,21 @@ class EditModal extends AdminModal {
             title: this.state.id ? 'Cập nhật quá trình khen thưởng' : 'Tạo mới quá trình khen thưởng',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-4' ref={e => this.loaiDoiTuong = e} label='Loại đối tượng' data={this.loaiDoiTuongTable} readOnly={readOnly} onChange={value => this.onChangeDT(value.id)} />
+                <FormSelect className='col-md-4' ref={e => this.loaiDoiTuong = e} label='Loại đối tượng' data={this.loaiDoiTuongTable} readOnly={readOnly} onChange={value => this.onChangeDT(value.id)} required />
 
                 <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo}
                     style={doiTuong == '02' ? {} : { display: 'none' }}
-                    readOnly={readOnly} />
+                    readOnly={readOnly} required />
 
                 <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi}
                     style={doiTuong == '03' ? {} : { display: 'none' }}
-                    readOnly={readOnly} />
+                    readOnly={readOnly} required />
 
                 <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maBoMon = e} label='Bộ môn' data={SelectAdapter_DmBoMon} 
                     style={doiTuong == '04' ? {} : { display: 'none' }} 
-                    readOnly={readOnly} />
+                    readOnly={readOnly} required />
 
-                <FormSelect className='col-md-12' ref={e => this.thanhTich = e} label='Thành tích' data={SelectAdapter_DmKhenThuongKyHieuV2} readOnly={false} />
+                <FormSelect className='col-md-12' ref={e => this.thanhTich = e} label='Thành tích' data={SelectAdapter_DmKhenThuongKyHieuV2} readOnly={false} required />
                 <FormTextBox className='col-md-4' ref={e => this.namDatDuoc = e} label='Năm đạt được (yyyy)' type='year' readOnly={false} />
                 <FormSelect className='col-md-8' ref={e => this.chuThich = e} label='Chú thích' data={SelectAdapter_DmKhenThuongChuThichV2} readOnly={false} />
                 <FormTextBox className='col-md-4' ref={e => this.diemThiDua = e} type='number' label='Điểm thi đua' readOnly={false} />
