@@ -6087,6 +6087,20 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": "4,0"
+            },
+            "GHI_CHU_HINH_THUC": {
+                "value": "ghiChuHinhThuc",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 100
+            },
+            "GHI_CHU_LOAI_BANG_CAP": {
+                "value": "ghiChuLoaiBangCap",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 100
             }
         },
         "primaryKeys": [
@@ -8775,6 +8789,27 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": 50
+            },
+            "CU_NHAN": {
+                "value": "cuNhan",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "1,0"
+            },
+            "THAC_SI": {
+                "value": "thacSi",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "1,0"
+            },
+            "TIEN_SI": {
+                "value": "tienSi",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "1,0"
             }
         },
         "primaryKeys": [

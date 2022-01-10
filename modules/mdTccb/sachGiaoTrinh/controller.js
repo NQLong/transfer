@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3023: { title: 'Sách giáo trình', link: '/user/tccb/sach-giao-trinh', icon: 'fa-wpexplorer', backgroundColor: '#c400a7', groupIndex: 4 },
+            3023: { title: 'Sách, giáo trình', link: '/user/tccb/sach-giao-trinh', icon: 'fa-book', backgroundColor: '#ccad2f', groupIndex: 4 },
         },
     };
     app.permission.add(

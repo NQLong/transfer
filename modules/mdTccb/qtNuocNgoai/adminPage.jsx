@@ -65,7 +65,7 @@ class EditModal extends AdminModal {
             list_ma = [list_ma];
         }
         if (list_ma.length == 0) {
-            T.notify('Cán bộ đi nước ngoài trống', 'danger');
+            T.notify('Danh sách cán bộ trống', 'danger');
             this.maCanBo.focus();
         } else if (!this.noiDung.value()) {
             T.notify('Nội dung đi nước ngoài trống', 'danger');
@@ -277,7 +277,7 @@ class QtNuocNgoai extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition, loaiDoiTuong }}
                     getPage={this.checked ? this.props.getQtNuocNgoaiGroupPage : this.props.getQtNuocNgoaiPage} />
-                <EditModal ref={e => this.modal = e} permission={permission}
+                <EditModal ref={e => this.modal = e} permission={permission} 
                     create={this.props.createQtNuocNgoaiStaff} update={this.props.updateQtNuocNgoaiStaff}
                     permissions={currentPermissions}
                 />

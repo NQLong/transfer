@@ -221,8 +221,8 @@ class SachGiaoTrinh extends AdminPage {
         }
         
         return this.renderPage({
-            icon: 'fa fa-wpexplorer',
-            title: 'Sách giáo trình',
+            icon: 'fa fa-book',
+            title: 'Sách, giáo trình',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
                 'Sách giáo trình'

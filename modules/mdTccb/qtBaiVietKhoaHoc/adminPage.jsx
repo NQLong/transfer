@@ -215,7 +215,7 @@ class QtBaiVietKhoaHoc extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-ban',
+            icon: 'fa fa-quote-right',
             title: 'Bài viết khoa học',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
