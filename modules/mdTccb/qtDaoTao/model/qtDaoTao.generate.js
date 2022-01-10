@@ -1,6 +1,6 @@
-// Table name: QT_DAO_TAO { shcc, tenTruong, chuyenNganh, batDau, ketThuc, hinhThuc, loaiBangCap, id, batDauType, ketThucType, thoiGian }
+// Table name: QT_DAO_TAO { shcc, tenTruong, chuyenNganh, batDau, ketThuc, hinhThuc, loaiBangCap, id, batDauType, ketThucType, thoiGian, ghiChuHinhThuc, ghiChuLoaiBangCap }
 const keys = ['ID'];
-const obj2Db = { 'shcc': 'SHCC', 'tenTruong': 'TEN_TRUONG', 'chuyenNganh': 'CHUYEN_NGANH', 'batDau': 'BAT_DAU', 'ketThuc': 'KET_THUC', 'hinhThuc': 'HINH_THUC', 'loaiBangCap': 'LOAI_BANG_CAP', 'id': 'ID', 'batDauType': 'BAT_DAU_TYPE', 'ketThucType': 'KET_THUC_TYPE', 'thoiGian': 'THOI_GIAN' };
+const obj2Db = { 'shcc': 'SHCC', 'tenTruong': 'TEN_TRUONG', 'chuyenNganh': 'CHUYEN_NGANH', 'batDau': 'BAT_DAU', 'ketThuc': 'KET_THUC', 'hinhThuc': 'HINH_THUC', 'loaiBangCap': 'LOAI_BANG_CAP', 'id': 'ID', 'batDauType': 'BAT_DAU_TYPE', 'ketThucType': 'KET_THUC_TYPE', 'thoiGian': 'THOI_GIAN', 'ghiChuHinhThuc': 'GHI_CHU_HINH_THUC', 'ghiChuLoaiBangCap': 'GHI_CHU_LOAI_BANG_CAP' };
 
 module.exports = app => {
     app.model.qtDaoTao = {

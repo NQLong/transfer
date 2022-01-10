@@ -15,6 +15,7 @@ class ComponentTTCongTac extends AdminPage {
     state = { doiTuongBoiDuong: false, tinhTrangBoiDuong: false, dangONuocNgoai: false, dangNghiTheoCheDo: false, daNghi: false };
 
     value = (item) => {
+        console.log(item);
         this.setState({
             doiTuongBoiDuong: item.doiTuongBoiDuongKienThucQpan, tinhTrangBoiDuong: item.tinhTrangBoiDuong,
             dangONuocNgoai: item.dangONuocNgoai, dangNghiTheoCheDo: item.dangNghiTheoCheDo, daNghi: item.daNghi
@@ -91,6 +92,8 @@ class ComponentTTCongTac extends AdminPage {
                 tiLePhuCapThamNien: this.getValue(this.tiLePhuCapThamNien),
                 tiLePhuCapUuDai: this.getValue(this.tiLePhuCapUuDai),
                 soBhxh: this.getValue(this.soBhxh),
+                ngayBatDauBhxh: this.getValue(this.ngayBatDauBhxh) ? this.getValue(this.ngayBatDauBhxh).getTime() : '',
+                ngayKetThucBhxh: this.getValue(this.ngayKetThucBhxh) ? this.getValue(this.ngayKetThucBhxh).getTime() : '',
                 maTheBhyt: this.getValue(this.soBhyt),
                 noiKhamChuaBenhBanDau: this.getValue(this.noiKhamBenhBanDau),
                 doiTuongBoiDuongKienThucQpan: Number(this.getValue(this.doiTuongBoiDuong)),
