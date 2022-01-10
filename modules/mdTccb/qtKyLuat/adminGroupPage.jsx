@@ -9,18 +9,20 @@ import {
 } from './redux';
 import { DateInput } from 'view/component/Input';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
-import { getDmKyLuatAll } from 'modules/mdDanhMuc/dmKhenThuongKyLuat/reduxKyLuat';
+import { SelectAdapter_DmKyLuatV2 } from 'modules/mdDanhMuc/dmKhenThuongKyLuat/reduxKyLuat';
+import Dropdown from 'view/component/Dropdown';
 
-
-const dateType = [
-    { id: 'yyyy', text: 'yyyy' },
-    { id: 'mm/yyyy', text: 'mm/yyyy' },
-    { id: 'dd/mm/yyyy', text: 'dd/mm/yyyy' }
-], typeMapper = {
+const EnumDateType = Object.freeze({
+    0: { text: '' },
+    1: { text: 'dd/mm/yyyy' },
+    2: { text: 'mm/yyyy' },
+    3: { text: 'yyyy' },
+}), typeMapper = {
     'yyyy': 'year',
     'mm/yyyy': 'month',
     'dd/mm/yyyy': 'date'
 };
+
 class EditModal extends AdminModal {
     state = { 
         id: '', 
@@ -31,36 +33,25 @@ class EditModal extends AdminModal {
         doiTuong: ''
     };
     multiple = false;
-    componentDidMount() {
-        this.props.getKyLuat(items => {
-            if (items) {
-                this.kyLuatTable = [];
-                items.forEach(item => this.kyLuatTable.push({
-                    'id': item.ma,
-                    'text': item.ten
-                }));
-            }
-        });
-    }
 
     onShow = (item, multiple = true) => {
         this.multiple = multiple;
         this.batDau.clear();
         this.ketThuc.clear();
 
-        let {id, maCanBo, lyDoHinhThuc, capQuyetDinh, batDau, batDauType, ketThuc, ketThucType, diemThiDua} = item ? item : {
-            id : '', maCanBo: '', lyDoHinhThuc: '', capQuyetDinh: '', batDau: '', batDauType: '', ketThuc: '', ketThucType: '', diemThiDua: ''
+        let { id, maCanBo, lyDoHinhThuc, capQuyetDinh, batDau, batDauType, ketThuc, ketThucType, diemThiDua } = item ? item : {
+            id: '', maCanBo: '', lyDoHinhThuc: '', capQuyetDinh: '', batDau: '', batDauType: '', ketThuc: '', ketThucType: '', diemThiDua: ''
         };
-        
-        this.setState({id: id});    
-        this.setState({ batDauType: batDauType ? batDauType : 'dd/mm/yyyy', ketThucType: ketThucType ? ketThucType : 'dd/mm/yyyy'});
+
+        this.setState({ id: id });
+        this.setState({ batDauType: batDauType ? batDauType : 'dd/mm/yyyy', ketThucType: ketThucType ? ketThucType : 'dd/mm/yyyy' });
 
         setTimeout(() => {
             this.maCanBo.value(maCanBo);
             this.hinhThucKyLuat.value(lyDoHinhThuc);
             this.capQuyetDinh.value(capQuyetDinh ? capQuyetDinh : '');
-            this.batDauType.value(batDauType ? batDauType : 'dd/mm/yyyy');
-            this.ketThucType.value(ketThucType ? ketThucType : 'dd/mm/yyyy');
+            this.batDauType.setText({ text: batDauType ? batDauType : 'dd/mm/yyyy' });
+            this.ketThucType.setText({ text: ketThucType ? ketThucType : 'dd/mm/yyyy' });
             this.batDau.setVal(batDau);
             this.ketThuc.setVal(ketThuc);
             this.diemThiDua.value(diemThiDua);
@@ -81,33 +72,46 @@ class EditModal extends AdminModal {
             ketThuc: this.ketThuc.getVal(),
             diemThiDua: this.diemThiDua.value(),
         };
-        this.props.update(this.state.id, changes, this.hide);
+        if (!this.maCanBo.value()) {
+            T.notify('Cán bộ bị trống', 'danger');
+            this.maCanBo.focus();
+        } else if (!this.hinhThucKyLuat.value()) {
+            T.notify('Tên đề tài, dự án trống', 'danger');
+            this.hinhThucKyLuat.focus();
+        } else if (!this.capQuyetDinh.value()) {
+            T.notify('Tên đề tài, dự án trống', 'danger');
+            this.capQuyetDinh.focus();
+        } else if (!this.batDau.getVal()) {
+            T.notify('Ngày bắt đầu trống', 'danger');
+            this.batDau.focus();
+        } else this.props.update(this.state.id, changes, this.hide);
     }
 
-    changeType = (isBatDau, type) => {
-        if (isBatDau) {
-            this.setState({ batDauType: type });
-            this.batDau.setVal(this.state.batDau);
-        } else {
-            this.setState({ ketThucType: type });
-            this.ketThuc.setVal(this.state.ketThuc);
-        }
-    }
     render = () => {
         return this.renderModal({
             title: this.state.id ? 'Cập nhật quá trình kỷ luật' : 'Tạo mới quá trình kỷ luật',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12' ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={true} /> 
+                <FormSelect className='col-md-12' ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={true} required /> 
 
-                <FormSelect className='col-md-12' ref={e => this.hinhThucKyLuat = e} label='Hình thức kỷ luật' data={this.kyLuatTable} readOnly={false} /> 
+                <FormSelect className='col-md-12' ref={e => this.hinhThucKyLuat = e} label='Hình thức kỷ luật' data={SelectAdapter_DmKyLuatV2} readOnly={false} required /> 
 
-                <FormTextBox className='col-md-12' ref={e => this.capQuyetDinh = e} type='text' label='Cấp quyết định' readOnly={false} />
+                <FormTextBox className='col-md-12' ref={e => this.capQuyetDinh = e} type='text' label='Cấp quyết định' readOnly={false} required />
 
-                <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} label='Bắt đầu' type={this.state.batDauType ? typeMapper[this.state.batDauType] : null} /></div>
-                <FormSelect className='col-md-6' ref={e => this.batDauType = e} label='Loại thời gian bắt đầu' data={dateType} onChange={data => this.changeType(true, data.id)} />
-                <div className='form-group col-md-6'><DateInput ref={e => this.ketThuc = e} label='Kết thúc' type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} /></div>
-                <FormSelect className='col-md-6' ref={e => this.ketThucType = e} label='Loại thời gian kết thúc' data={dateType} onChange={data => this.changeType(false, data.id)} />
+                <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
+                    label={
+                        <div style={{ display: 'flex' }}>Thời gian bắt đầu (định dạng:&nbsp; <Dropdown ref={e => this.batDauType = e}
+                            items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
+                            onSelected={item => this.setState({ batDauType: item })} readOnly={false} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
+                    }
+                    type={this.state.batDauType ? typeMapper[this.state.batDauType] : null} readOnly={false} /></div>
+                <div className='form-group col-md-6'><DateInput ref={e => this.ketThuc = e} placeholder='Thời gian kết thúc'
+                    label={
+                        <div style={{ display: 'flex' }}>Thời gian kết thúc (định dạng:&nbsp; <Dropdown ref={e => this.ketThucType = e}
+                            items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
+                            onSelected={item => this.setState({ ketThucType: item })} readOnly={false} />)</div>
+                    }
+                    type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} readOnly={false} /></div>
 
                 <FormTextBox className='col-md-4' ref={e => this.diemThiDua = e} type='number' label='Điểm thi đua' readOnly={false} />
 
@@ -223,6 +227,6 @@ class QtKyLuatGroupPage extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtKyLuat: state.qtKyLuat });
 const mapActionsToProps = {
     getQtKyLuatAll, getQtKyLuatPage, deleteQtKyLuat,
-    updateQtKyLuatGroupPageMa, getQtKyLuatGroupPageMa, getDmKyLuatAll,
+    updateQtKyLuatGroupPageMa, getQtKyLuatGroupPageMa,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtKyLuatGroupPage);
