@@ -65,7 +65,18 @@ class EditModal extends AdminModal {
             chuThich: this.chuThich.value(),
             diemThiDua: this.diemThiDua.value(),
         };
-        this.props.update(this.state.id, ma, changes, this.hide);
+        if (!this.loaiDoiTuong.value()) {
+            T.notify('Loại đối tượng trống', 'danger');
+            this.loaiDoiTuong.focus();
+        } else if (!ma) {
+            T.notify('Danh sách mã số trống', 'danger');
+            if (this.loaiDoiTuong.value() == '02') this.maCanBo.focus();
+            if (this.loaiDoiTuong.value() == '03') this.maDonVi.focus();
+            if (this.loaiDoiTuong.value() == '04') this.maBoMon.focus();
+        } else if (!this.thanhTich.value()) {
+            T.notify('Thành tích trống', 'danger');
+            this.thanhTich.focus();
+        } else this.props.update(this.state.id, ma, changes, this.hide);
     }
 
     onChangeDT = (value) => {

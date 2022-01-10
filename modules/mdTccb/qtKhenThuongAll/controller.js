@@ -13,6 +13,7 @@ module.exports = app => {
     );
     app.get('/user/tccb/qua-trinh/khen-thuong-all/:id', app.permission.check('qtKhenThuongAll:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/khen-thuong-all', app.permission.check('qtKhenThuongAll:read'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/khen-thuong-all/group_dt/:loaiDoiTuong/:ma', app.permission.check('qtKhenThuongAll:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/tccb/qua-trinh/khen-thuong-all/page/:loaiDoiTuong/:pageNumber/:pageSize', app.permission.check('qtKhenThuongAll:read'), (req, res) => {
