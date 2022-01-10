@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormRichTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
     getQtBaiVietKhoaHocPage, updateQtBaiVietKhoaHocGroupPageMa,
@@ -50,20 +50,37 @@ class EditModal extends AdminModal {
         if (!Array.isArray(list_ma)) {
             list_ma = [list_ma];
         }
-        list_ma.forEach((ma) => {
-            const changes = {
-                shcc: ma,
-                tenTacGia: this.tenTacGia.value(),
-                namXuatBan: this.namXuatBan.getVal() ? new Date(this.namXuatBan.getVal()).getFullYear() : null,
-                tenBaiViet: this.tenBaiViet.value(),
-                tenTapChi: this.tenTapChi.value(),
-                soHieuIssn: this.soHieuIssn.value(),
-                sanPham: this.sanPham.value(),
-                diemIf: this.diemIf.value(),
-                quocTe: this.quocTe.value(),
-            };
-            this.props.update(this.state.id, changes, this.hide);
-        });
+        if (list_ma.length == 0) {
+            T.notify('Danh sách cán bộ trống', 'danger');
+            this.maCanBo.focus();
+        } else if (!this.tenTacGia.value()) {
+            T.notify('Tên tác giả trống', 'danger');
+            this.tenTacGia.focus();
+        } else if (!this.tenTapChi.value()) {
+            T.notify('Tên tạp chí trống', 'danger');
+            this.tenTapChi.focus();
+        } else if (!this.soHieuIssn.value()) {
+            T.notify('Số hiệu ISSN trống', 'danger');
+            this.soHieuIssn.focus();
+        } else if (!this.namXuatBan.getVal()) {
+            T.notify('Năm xuất bản trống', 'danger');
+            this.namXuatBan.focus();
+        } else {
+            list_ma.forEach((ma) => {
+                const changes = {
+                    shcc: ma,
+                    tenTacGia: this.tenTacGia.value(),
+                    namXuatBan: this.namXuatBan.getVal() ? new Date(this.namXuatBan.getVal()).getFullYear() : null,
+                    tenBaiViet: this.tenBaiViet.value(),
+                    tenTapChi: this.tenTapChi.value(),
+                    soHieuIssn: this.soHieuIssn.value(),
+                    sanPham: this.sanPham.value(),
+                    diemIf: this.diemIf.value(),
+                    quocTe: this.quocTe.value(),
+                };
+                this.props.update(this.state.id, changes, this.hide);
+            });
+        }
     }
 
     render = () => {
@@ -71,13 +88,13 @@ class EditModal extends AdminModal {
             title: this.state.id ? 'Cập nhật bài viết khoa học' : 'Tạo mới bài viết khoa học',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={true} />
-                <FormTextBox className='col-12' ref={e => this.tenTacGia = e} label={'Tác giả'} type='text'/>
-                <FormTextBox className='col-12' ref={e => this.tenBaiViet = e} label={'Tên bài viết'} type='text'/>
-                <FormTextBox className='col-9' ref={e => this.tenTapChi = e} label={'Tên tạp chí'} type='text'/>
-                <FormTextBox className='col-3' ref={e => this.soHieuIssn = e} label={'Số hiệu ISSN'} type='text'/>
-                <FormTextBox className='col-12' ref={e => this.sanPham = e} label={'Sản phẩm'} type='text'/>
-                <div className='form-group col-md-4'><DateInput ref={e => this.namXuatBan = e} label='Năm xuất bản' type='year' /></div>
+                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={true} required />
+                <FormTextBox className='col-12' ref={e => this.tenTacGia = e} label={'Tác giả'} type='text' required />
+                <FormRichTextBox className='col-12' ref={e => this.tenBaiViet = e} label={'Tên bài viết'} type='text'/>
+                <FormTextBox className='col-9' ref={e => this.tenTapChi = e} label={'Tên tạp chí'} type='text' required />
+                <FormTextBox className='col-3' ref={e => this.soHieuIssn = e} label={'Số hiệu ISSN'} type='text' required/>
+                <FormRichTextBox className='col-12' ref={e => this.sanPham = e} label={'Sản phẩm'} type='text'/>
+                <div className='form-group col-md-4'><DateInput ref={e => this.namXuatBan = e} label='Năm xuất bản' type='year' required /></div>
                 <FormSelect className='col-md-4' ref={e => this.quocTe = e} label='Phạm vi xuất bản' data={quocTeList} />
                 <FormTextBox className='col-4' ref={e => this.diemIf = e} label={'Điểm If'} type='text'/>
             </div>
