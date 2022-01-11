@@ -237,7 +237,7 @@ class QtChucVu extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-street-view',
+            icon: 'fa fa-black-tie',
             title: ' Quá trình chức vụ',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,

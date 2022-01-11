@@ -172,7 +172,7 @@ class QtDaoTao extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-graduation-cap',
+            icon: 'fa fa-podcast',
             title: 'Quá trình đào tạo',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
