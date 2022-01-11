@@ -143,15 +143,15 @@ class SachGiaoTrinhGroupPage extends AdminPage {
                         />
                         <TableCell type='text' content={(
                             <>
-                                <span>Tên: {item.ten}</span><br />
+                                <span>Tên: <i>{item.ten}</i></span><br /> <br/>
                                 <span>Thể loại: <span style={{ color: 'blue' }}>{item.theLoai}</span></span>
                             </>
                         )} 
                         />
                         <TableCell type='text' content={(
                             <>
-                                <span>Nhà xuất bản: {item.nhaSanXuat}</span><br />
-                                <span>Năm xuất bản: <span style={{ color: 'blue' }}>{item.namSanXuat}</span></span> <br />
+                                <span>Nhà xuất bản: <i>{item.nhaSanXuat}</i></span><br />
+                                <span>Năm xuất bản: <span style={{ color: 'blue' }}>{item.namSanXuat}</span></span> <br /> <br/>
                                 <span>Chủ biên: <span style={{ color: 'blue' }}>{item.chuBien}</span></span>
                             </>
                         )} 

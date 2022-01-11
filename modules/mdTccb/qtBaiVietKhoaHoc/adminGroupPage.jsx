@@ -154,7 +154,7 @@ class QtBaiVietKhoaHocGroupPage extends AdminPage {
                         <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
                         <TableCell type='text' content={(
                             <>
-                                <span>{item.tenBaiViet}</span> <br/>
+                                <span><i>{item.tenBaiViet}</i></span> <br/> <br/>
                                 <span>Tác giả:
                                     <a href='#' onClick={() => this.modal.show(item, false)}>
                                         <span style={{color: 'blue'}}>{' ' + item.tenTacGia} </span>
@@ -166,8 +166,8 @@ class QtBaiVietKhoaHocGroupPage extends AdminPage {
                         )} />
                         <TableCell type='text' content={(
                             <>
-                                <span>Tên: <span>{item.tenTapChi}</span> </span> <br/>
-                                <span style={{ whiteSpace: 'nowrap' }}>Số hiệu ISSN: <span style={{ color: 'blue' }}>{item.soHieuIssn}</span> </span> <br/>
+                                <span>Tên: <span><i>{item.tenTapChi}</i></span> </span> <br/>
+                                <span style={{ whiteSpace: 'nowrap' }}>Số hiệu ISSN: <span style={{ color: 'blue' }}>{item.soHieuIssn}</span> </span> <br/> <br/>
                                 <span style={{ whiteSpace: 'nowrap' }}>Năm xuất bản: <span style={{ color: 'blue' }}>{item.namXuatBan}</span> </span>
                             </>
                         )}
