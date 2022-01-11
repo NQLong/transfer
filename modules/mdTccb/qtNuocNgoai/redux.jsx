@@ -126,7 +126,7 @@ export function getQtNuocNgoaiAll(done) {
 
 export function getQtNuocNgoai(id, done) {
     return () => {
-        const url = `/api/tccb/qua-trinh/ky-luat/item/${id}`;
+        const url = `/api/tccb/qua-trinh/nuoc-ngoai/item/${id}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy đi nước ngoài bị lỗi!', 'danger');

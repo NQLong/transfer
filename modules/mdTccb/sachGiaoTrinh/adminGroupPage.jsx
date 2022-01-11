@@ -66,7 +66,7 @@ class EditModal extends AdminModal {
 
     render = () => {
         return this.renderModal({
-            title: 'Thông tin sách, giáo trình',
+            title: this.state.id ? 'Cập nhật sách giáo trình' : 'Tạo mới sách giáo trình',
             size: 'large',
             body: <div className='row'>
                 <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={true} />
@@ -136,7 +136,7 @@ class SachGiaoTrinhGroupPage extends AdminPage {
                         <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
                         <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span>{item.hoCanBo + ' ' + item.tenCanBo}</span><br />
+                                <span>{(item.hoCanBo ? item.hoCanBo : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo : ' ')}</span><br />
                                 {item.shcc}
                             </>
                         )}

@@ -135,7 +135,7 @@ class QtGiaiThuongGroupPage extends AdminPage {
                                 <span><i>{item.noiDung}</i></span> <br/> <br/>
                                 <span>Cán bộ đạt giải:
                                     <a href='#' onClick={() => this.modal.show(item, false)}>
-                                        <span style={{color: 'blue'}}>{' ' + item.hoCanBo + ' ' + item.tenCanBo + ' - ' + item.shcc} </span>
+                                        <span style={{color: 'blue'}}>{' ' + (item.hoCanBo ? item.hoCanBo : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo : ' ') + ' - ' + item.shcc} </span>
                                     </a>
                                 </span>
 

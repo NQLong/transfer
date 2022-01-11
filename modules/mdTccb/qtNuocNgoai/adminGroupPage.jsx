@@ -142,10 +142,10 @@ class QtNuocNgoaiGroupPage extends AdminPage {
     }
 
     delete = (e, item) => {
-        T.confirm('Xóa khen thưởng', 'Bạn có chắc bạn muốn xóa khen thưởng này?', 'warning', true, isConfirm => {
+        T.confirm('Xóa quá trình đi nước ngoài', 'Bạn có chắc bạn muốn xóa quá trình đi nước ngoài này?', 'warning', true, isConfirm => {
             isConfirm && this.props.deleteQtNuocNgoaiGroupPageMa(item.id, item.shcc, error => {
-                if (error) T.notify(error.message ? error.message : 'Xoá khen thưởng bị lỗi!', 'danger');
-                else T.alert('Xoá khen thưởng thành công!', 'success', false, 800);
+                if (error) T.notify(error.message ? error.message : 'Xoá quá trình đi nước ngoài bị lỗi!', 'danger');
+                else T.alert('Xoá quá trình đi nước ngoài thành công!', 'success', false, 800);
             });
         });
         e.preventDefault();
@@ -176,7 +176,7 @@ class QtNuocNgoaiGroupPage extends AdminPage {
                         <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
                         <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span>{item.hoCanBo + ' ' + item.tenCanBo}</span><br />
+                                <span>{(item.hoCanBo ? item.hoCanBo : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo : ' ')}</span><br />
                                 {item.shcc}
                             </>
                         )}
