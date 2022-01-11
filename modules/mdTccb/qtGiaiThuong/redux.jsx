@@ -127,6 +127,22 @@ export function updateQtGiaiThuongGroupPageMa(id, changes, done) {
     };
 }
 
+export function deleteQtGiaiThuongGroupPageMa(id, shcc, done) {
+    return dispatch => {
+        const url = '/api/qua-trinh/giai-thuong';
+        T.delete(url, { id }, data => {
+            if (data.error) {
+                T.notify('Xóa thông tin quá trình giải thưởng bị lỗi', 'danger');
+                console.error('DELETE: ' + url + '. ' + data.error);
+            } else {
+                T.alert('Thông tin quá trình giải thưởng được xóa thành công!', 'info', false, 800);
+                done && done(data.item);
+                dispatch(getQtGiaiThuongGroupPageMa(undefined, undefined, '-1', shcc));
+            }
+        }, () => T.notify('Xóa thông tin quá trình giải thưởng bị lỗi', 'danger'));
+    };
+}
+
 export function createQtGiaiThuongStaff(data, done, isEdit = null) {
     return dispatch => {
         const url = '/api/qua-trinh/giai-thuong';

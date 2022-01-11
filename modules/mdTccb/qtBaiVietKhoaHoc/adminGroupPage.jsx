@@ -5,7 +5,7 @@ import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox,
 import Pagination from 'view/component/Pagination';
 import {
     getQtBaiVietKhoaHocPage, updateQtBaiVietKhoaHocGroupPageMa,
-    deleteQtBaiVietKhoaHocStaff, getQtBaiVietKhoaHocGroupPageMa, 
+    deleteQtBaiVietKhoaHocGroupPageMa, getQtBaiVietKhoaHocGroupPageMa, 
 } from './redux';
 import { DateInput } from 'view/component/Input';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
@@ -123,7 +123,7 @@ class QtBaiVietKhoaHocGroupPage extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa bài viết khoa học', 'Bạn có chắc bạn muốn xóa bài viết khoa học này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtBaiVietKhoaHocStaff(item.id, error => {
+            isConfirm && this.props.deleteQtBaiVietKhoaHocGroupPageMa(item.id, item.shcc, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá bài viết khoa học bị lỗi!', 'danger');
                 else T.alert('Xoá bài viết khoa học thành công!', 'success', false, 800);
             });
@@ -213,7 +213,7 @@ class QtBaiVietKhoaHocGroupPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, qtBaiVietKhoaHoc: state.qtBaiVietKhoaHoc });
 const mapActionsToProps = {
-    getQtBaiVietKhoaHocPage, deleteQtBaiVietKhoaHocStaff,
+    getQtBaiVietKhoaHocPage, deleteQtBaiVietKhoaHocGroupPageMa,
     updateQtBaiVietKhoaHocGroupPageMa, getQtBaiVietKhoaHocGroupPageMa,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtBaiVietKhoaHocGroupPage);

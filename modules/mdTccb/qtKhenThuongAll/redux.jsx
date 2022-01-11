@@ -217,6 +217,22 @@ export function updateQtKhenThuongAllGroupPageMa(id, ma, changes, done) {
     };
 }
 
+export function deleteQtKhenThuongAllGroupPageMa(id, loaiDoiTuong, ma, done) {
+    return dispatch => {
+        const url = '/api/tccb/qua-trinh/khen-thuong-all';
+        T.delete(url, { id }, data => {
+            if (data.error) {
+                T.notify('Xóa khen thưởng bị lỗi!', 'danger');
+                console.error(`DELETE: ${url}.`, data.error);
+            } else {
+                T.alert('khen thưởng đã xóa thành công!', 'success', false, 800);
+                done && done(data.item);
+                dispatch(getQtKhenThuongAllGroupPageMa(undefined, undefined, loaiDoiTuong, ma));
+            }
+        }, () => T.notify('Xóa khen thưởng bị lỗi!', 'danger'));
+    };
+}
+
 //updating: Tien ...
 //--USER-ACTION-------------------------------------------
 export function createQtKhenThuongAllUser(data, done) {

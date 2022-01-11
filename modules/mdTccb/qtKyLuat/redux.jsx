@@ -220,6 +220,22 @@ export function updateQtKyLuatGroupPageMa(id, changes, done) {
     };
 }
 
+export function deleteQtKyLuatGroupPageMa(id, shcc, done) {
+    return dispatch => {
+        const url = '/api/tccb/qua-trinh/ky-luat';
+        T.delete(url, { id }, data => {
+            if (data.error) {
+                T.notify('Xóa kỷ luật bị lỗi!', 'danger');
+                console.error(`DELETE: ${url}.`, data.error);
+            } else {
+                T.alert('kỷ luật đã xóa thành công!', 'success', false, 800);
+                done && done(data.item);
+                dispatch(getQtKyLuatGroupPageMa(undefined, undefined, '-1', shcc));          
+            }
+        }, () => T.notify('Xóa kỷ luật bị lỗi!', 'danger'));
+    };
+}
+
 //USER ACTIONS:
 
 export function createQtKyLuatStaff(data, done) {

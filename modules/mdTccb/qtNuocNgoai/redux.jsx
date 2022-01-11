@@ -186,6 +186,22 @@ export function updateQtNuocNgoaiGroupPageMa(id, changes, done) {
     };
 }
 
+export function deleteQtNuocNgoaiGroupPageMa(id, shcc, done) {
+    return dispatch => {
+        const url = '/api/qua-trinh/nuoc-ngoai';
+        T.delete(url, { id }, data => {
+            if (data.error) {
+                T.notify('Xóa thông tin quá trình đi nước ngoài bị lỗi', 'danger');
+                console.error('DELETE: ' + url + '. ' + data.error);
+            } else {
+                T.alert('Thông tin quá trình đi nước ngoài được xóa thành công!', 'info', false, 800);
+                done && done(data.item);
+                dispatch(getQtNuocNgoaiGroupPageMa(undefined, undefined, '-1', shcc));
+            }
+        }, () => T.notify('Xóa thông tin quá trình đi nước ngoài bị lỗi', 'danger'));
+    };
+}
+
 export function deleteQtNuocNgoaiStaff(id, isStaffEdit, shcc = null) {
     return dispatch => {
         const url = '/api/qua-trinh/nuoc-ngoai';

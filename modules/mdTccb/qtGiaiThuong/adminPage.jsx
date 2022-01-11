@@ -82,8 +82,8 @@ class EditModal extends AdminModal {
                 <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={readOnly} required />
                 <FormRichTextBox className='col-12' ref={e => this.tenGiaiThuong = e} label={'Giải thưởng'} type='text' required/>
                 <FormRichTextBox className='col-12' ref={e => this.noiDung = e} label={'Nội dung giải thưởng'} type='text' />
-                <FormTextBox className='col-9' ref={e => this.noiCap = e} label={'Tên tạp chí'} type='text' />
-                <div className='form-group col-md-3'><DateInput ref={e => this.namCap = e} label='Năm xuất bản' type='year' required /></div>
+                <FormTextBox className='col-9' ref={e => this.noiCap = e} label={'Nơi cấp giải thưởng'} type='text' />
+                <div className='form-group col-md-3'><DateInput ref={e => this.namCap = e} label='Năm đạt giải' type='year' required /></div>
             </div>
         });
     }
@@ -154,7 +154,7 @@ class QtGiaiThuong extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Giải thưởng</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thông tin nhận giải</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nơi cấp, năm cấp</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
@@ -163,7 +163,8 @@ class QtGiaiThuong extends AdminPage {
                         <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
                         <TableCell type='text' content={(
                             <>
-                                <span><i>{item.tenGiaiThuong}</i></span> <br/> <br/>
+                                <span><b>{item.tenGiaiThuong}</b></span> <br/>
+                                <span><i>{item.noiDung}</i></span> <br/> <br/>
                                 <span>Cán bộ đạt giải:
                                     <a href='#' onClick={() => this.modal.show(item, false)}>
                                         <span style={{color: 'blue'}}>{' ' + item.hoCanBo + ' ' + item.tenCanBo + ' - ' + item.shcc} </span>
@@ -175,12 +176,10 @@ class QtGiaiThuong extends AdminPage {
                         )} />
                         <TableCell type='text' content={(
                             <>
-                                <span>Nội dung: <span><i>{item.noiDung}</i></span></span> <br/> <br/>
                                 <span>Nơi cấp giải thưởng: <span><i>{item.noiCap}</i></span></span> <br/> <br/>
                                 <span>Năm cấp giải thưởng: <span style={{color: 'blue'}}>{item.namCap}</span></span> 
 
-                            </>
-                            
+                            </>         
                         )} 
                         />
                         {

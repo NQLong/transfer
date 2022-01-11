@@ -127,6 +127,22 @@ export function updateQtBaiVietKhoaHocGroupPageMa(id, changes, done) {
     };
 }
 
+export function deleteQtBaiVietKhoaHocGroupPageMa(id, shcc, done) {
+    return dispatch => {
+        const url = '/api/qua-trinh/bai-viet-khoa-hoc';
+        T.delete(url, { id }, data => {
+            if (data.error) {
+                T.notify('Xóa thông tin quá trình bài viết khoa học bị lỗi', 'danger');
+                console.error('DELETE: ' + url + '. ' + data.error);
+            } else {
+                T.alert('Thông tin quá trình bài viết khoa học được xóa thành công!', 'info', false, 800);
+                done && done(data.item);
+                dispatch(getQtBaiVietKhoaHocGroupPageMa(undefined, undefined, '-1', shcc));     
+            }
+        }, () => T.notify('Xóa thông tin quá trình bài viết khoa học bị lỗi', 'danger'));
+    };
+}
+
 export function createQtBaiVietKhoaHocStaff(data, done, isEdit = null) {
     return dispatch => {
         const url = '/api/qua-trinh/bai-viet-khoa-hoc';
