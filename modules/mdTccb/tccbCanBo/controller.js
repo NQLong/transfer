@@ -124,6 +124,13 @@ module.exports = app => {
                                 else if (daoTao == null) {
                                     result = app.clone(result, { daoTao: null });
                                 } else {
+                                    daoTao.forEach(item => {
+                                        if (item.loaiBangCap == 'Tiến sĩ') {
+                                            result = app.clone(result, { isTienSi: 1 });
+                                        } else {
+                                            result = app.clone(result, { isTienSi: 0 });
+                                        }
+                                    });
                                     result = app.clone(result, { daoTao });
                                 }
                                 resolve();
@@ -202,7 +209,7 @@ module.exports = app => {
                                 resolve();
                             });
                         })).then(() => new Promise(resolve => {
-                            app.model.tccbToChucKhac.getAll({shcc: canBo.shcc}, (error, toChucKhac) => {
+                            app.model.tccbToChucKhac.getAll({ shcc: canBo.shcc }, (error, toChucKhac) => {
                                 if (error) {
                                     res.send({ error: 'Lỗi khi lấy thông tin tổ chức chính trị - xã hội, nghề nghiệp cán bộ !' });
                                 }
@@ -978,7 +985,7 @@ module.exports = app => {
                         resolve();
                     });
                 }).then(() => new Promise(resolve => {
-                    app.model.tccbToChucKhac.getAll({shcc: canBo.shcc}, (error, toChucKhac) => {
+                    app.model.tccbToChucKhac.getAll({ shcc: canBo.shcc }, (error, toChucKhac) => {
                         if (error) {
                             res.send({ error: 'Lỗi khi lấy thông tin tổ chức chính trị - xã hội, nghề nghiệp cán bộ !' });
                         }

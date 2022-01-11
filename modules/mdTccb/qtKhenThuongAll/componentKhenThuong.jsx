@@ -97,7 +97,7 @@ class ComponentKhenThuong extends AdminPage {
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Đối tượng</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm đạt được</th>
-                        <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Thành tích</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thành tích</th>
                         <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                     </tr>
                 ),

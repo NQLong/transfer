@@ -1,4 +1,5 @@
 import T from 'view/js/common';
+import { getStaffEdit } from '../tccbCanBo/redux';
 
 // Reducer ------------------------------------------------------------------------------------------------------------
 const QtDaoTaoGetAll = 'QtDaoTao:GetAll';
@@ -114,7 +115,7 @@ export function getQtDaoTao(id, done) {
 }
 
 export function createQtDaoTao(data, done) {
-    return () => {
+    return dispatch => {
         const url = '/api/qua-trinh/dao-tao';
         T.post(url, { data }, res => {
             if (res.error) {
@@ -122,7 +123,8 @@ export function createQtDaoTao(data, done) {
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
                 T.notify('Thêm thông tin quá trình đào tạo thành công!', 'info');
-                if (done) done(res);
+                if (done) done();
+                dispatch(getStaffEdit(data.shcc));
             }
         }, () => T.notify('Thêm thông tin quá trình đào tạo bị lỗi', 'danger'));
     };

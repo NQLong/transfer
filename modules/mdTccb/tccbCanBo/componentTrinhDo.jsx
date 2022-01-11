@@ -6,25 +6,24 @@ import { connect } from 'react-redux';
 import { AdminPage, FormCheckbox, FormSelect, FormTextBox } from 'view/component/AdminPage';
 import ComponentNN from '../trinhDoNgoaiNgu/componentNgoaiNgu';
 import { getStaffEdit, userGetStaff } from './redux';
+import HocViDetail from '../qtDaoTao/hocViDetail';
 
 class ComponentTrinhDo extends AdminPage {
-    shcc = '';
-    state = { thacSi: false, batDauThacSiType: 'mm/yyyy', ketThucThacSiType: 'mm/yyyy' };
+    shcc = ''; email = '';
+    state = { thacSi: false, batDauThacSiType: 'mm/yyyy', ketThucThacSiType: 'mm/yyyy', shcc: '', email: '' };
 
     value = (item) => {
-        this.shcc = item.shcc;
+        console.log(item);
+        // this.shcc = item.shcc;
+        // this.email = item.email;
+        this.setState({tienSi: item.tienSi, thacSi: item.thacSi, cuNhan: item.cuNhan, shcc: item.shcc, email: item.email});
         this.thacSi.value(item.thacSi ? item.thacSi : 0);
         this.tienSi.value(item.tienSi ? item.tienSi : 0);
         this.cuNhan.value(item.cuNhan ? item.cuNhan : 0);
-        // item.thacSi && this.setState({
-        //     thacSi: item.thacSi, batDauThacSiType: daoTao.batDauThacSiType ? daoTao.batDauThacSiType : 'mm/yyyy',
-        //     ketThucThacSiType: daoTao.ketThucThacSiType ? daoTao.ketThucThacSiType : 'mm/yyyy'
-        // }, () => {
-        //     this.batDauThacSiType.setText({text: this.state.batDauThacSiType});
-        //     this.ketThucThacSiType.setText({text: this.state.ketThucThacSiType});
-        //     this.batDauThacSi.value(daoTao.batDau ? daoTao.batDau : null);
-        //     this.ketThucThacSi.value(daoTao.ketThuc ? daoTao.ketThuc : null);
-        // });
+        this.state.tienSi && this.hocViTienSi.value(this.state.shcc, this.state.email, item.daoTao.filter(i => i.loaiBangCap === 'Tiến sĩ'));
+        this.state.cuNhan && this.hocViCuNhan.value(this.state.shcc, this.state.email, item.daoTao.filter(i => i.loaiBangCap === 'Cử nhân'));
+        this.state.thacSi && this.hocViThacSi.value(this.state.shcc, this.state.email, item.daoTao.filter(i => i.loaiBangCap === 'Thạc sĩ'));
+    
         this.trinhDoPhoThong.value(item.trinhDoPhoThong ? item.trinhDoPhoThong : '');
         this.ngoaiNgu.value(item.shcc, item.email);
 
@@ -59,6 +58,9 @@ class ComponentTrinhDo extends AdminPage {
         try {
             const data = {
                 trinhDoPhoThong: this.getValue(this.trinhDoPhoThong),
+                cuNhan: this.getValue(this.cuNhan) ? 1 : 0,
+                tienSi: this.getValue(this.tienSi) ? 1 : 0,
+                thacSi: this.getValue(this.thacSi) ? 1 : 0,
                 maTrinhDoTinHoc: this.getValue(this.trinhDoTinHoc),
                 chungChiTinHoc: this.getValue(this.chungChiTinHoc),
                 maTrinhDoLlct: this.getValue(this.lyLuanChinhTri),
@@ -89,9 +91,12 @@ class ComponentTrinhDo extends AdminPage {
                     <FormTextBox ref={e => this.trinhDoPhoThong = e} label='Trình độ giáo dục phổ thông' placeholder='Nhập trình độ phổ thông (Ví dụ: 12/12)' className='form-group col-md-4' />
                     <ComponentNN ref={e => this.ngoaiNgu = e} label='Trình độ ngoại ngữ' userEdit={this.props.userEdit} />
 
-                    <FormCheckbox ref={e => this.cuNhan = e} label='Cử nhân' onChange={value => this.setState({ cuNhan: value })} className='form-group col-md-12' />
-                    <FormCheckbox ref={e => this.thacSi = e} label='Thạc sĩ' onChange={value => this.setState({ thacSi: value })} className='form-group col-md-12' />
-                    <FormCheckbox ref={e => this.tienSi = e} label='Tiến sĩ' onChange={value => this.setState({ tienSi: value })} className='form-group col-md-12' />
+                    <FormCheckbox ref={e => this.cuNhan = e} label='Cử nhân' onChange={value => this.setState({ cuNhan: value })} className='form-group col-md-2'/>
+                    {this.state.cuNhan ? <HocViDetail ref={e => this.hocViCuNhan = e} tenHocVi='Cử nhân' shcc={this.state.shcc} email={this.state.email} tccb={this.props.tccb}/> : <div className='form-group col-md-10'/>}
+                    <FormCheckbox ref={e => this.thacSi = e} label='Thạc sĩ' onChange={value => this.setState({ thacSi: value })} className='form-group col-md-2' />
+                    {this.state.thacSi ? <HocViDetail ref={e => this.hocViThacSi = e} tenHocVi='Thạc sĩ' shcc={this.state.shcc} email={this.state.email} tccb={this.props.tccb}/> : <div className='form-group col-md-10'/>}
+                    <FormCheckbox ref={e => this.tienSi = e} label='Tiến sĩ' onChange={value => this.setState({ tienSi: value })} className='form-group col-md  -2' />
+                    {this.state.tienSi ? <HocViDetail ref={e => this.hocViTienSi = e} tenHocVi='Tiến sĩ' shcc={this.state.shcc} email={this.state.email} tccb={this.props.tccb}/> : <div className='form-group col-md-10'/>}
 
                     <FormSelect ref={e => this.chucDanh = e} label='Chức danh' data={[{ id: '01', text: 'Phó giáo sư' }, { id: '02', text: 'Giáo sư' }]} className='form-group col-md-3' />
                     <FormTextBox ref={e => this.chuyenNganh = e} label='Chuyên ngành chức danh' className='form-group col-md-3' />

@@ -35,7 +35,7 @@ const run = () => {
                 } else if (canBo.hocVi == '04') {
                     app.model.canBo.update({shcc: canBo.shcc}, {cuNhan: 1}, (err, out) => {
                         console.log(canBo.shcc);
-                    })
+                    })                                                                                                         
                 }
 
             });

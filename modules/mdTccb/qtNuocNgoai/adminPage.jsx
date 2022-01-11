@@ -237,9 +237,9 @@ class QtNuocNgoai extends AdminPage {
                             </>
                         )}
                         />
-                       <TableCell type='text' content={(
+                       <TableCell type='number' content={(
                             <>
-                                {item.kinhPhi ? item.kinhPhi : ''}
+                                {item.kinhPhi ? T.numberDisplay(item.kinhPhi) : ''}
                             </>
                         )}
                         />
@@ -268,7 +268,7 @@ class QtNuocNgoai extends AdminPage {
                 'Quá trình nước ngoài'
             ],
             advanceSearch: <>
-                <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.loaiDoiTuong = e} label='Chọn loại đơn vị (có thể chọn nhiều loại)' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} />
+                <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.loaiDoiTuong = e} label='Hiển thị theo đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} />
             </>,
             content: <>
                 <div className='tile'>

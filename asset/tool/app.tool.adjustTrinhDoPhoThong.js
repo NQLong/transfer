@@ -21,12 +21,13 @@ require('../../config/database')(app, package.db);
 app.loadModules(false);
 
 const run = () => {
+    let i = 0;
     app.model.canBo.getAll({}, (error, result) => {
         if (result) {
             result.forEach(canBo => {
-                if (canBo.hocVi || canBo.chucDanh || canBo.chuyenNganh) {
+                if ((canBo.hocVi || canBo.chucDanh || canBo.chuyenNganh) && !canBo.trinhDoPhoThong) {
                     app.model.canBo.update({shcc: canBo.shcc}, {trinhDoPhoThong: '12/12'}, (er, out) => {
-                        console.log(out);
+                        console.log(i++);
                     })
                 }
             });

@@ -145,23 +145,81 @@ export default function QtHuongDanLuanVanReducer(state = null, data) {
 
 // Actions ------------------------------------------------------------------------------------------------------------
 T.initPage('pageQtHuongDanLuanVan');
-export function getQtHuongDanLuanVanPage(pageNumber, pageSize, pageCondition, done) {
+export function getQtHuongDanLuanVanPage(pageNumber, pageSize, loaiDoiTuong, pageCondition, done) {
     const page = T.updatePage('pageQtHuongDanLuanVan', pageNumber, pageSize, pageCondition);
+    if (!loaiDoiTuong) loaiDoiTuong = [];
+    if (!Array.isArray(loaiDoiTuong)) loaiDoiTuong = [loaiDoiTuong];
     return dispatch => {
         const url = `/api/qua-trinh/hdlv/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition }, data => {
+        T.get(url, { condition: page.pageCondition, parameter: loaiDoiTuong}, data => {
             if (data.error) {
-                T.notify('Lấy danh sách quá trình hướng dẫn luận văn sản bị lỗi!', 'danger');
+                T.notify('Lấy danh sách hướng dẫn luận văn bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 if (done) done(data.page);
                 dispatch({ type: QtHuongDanLuanVanGetPage, page: data.page });
             }
-        }, () => T.notify('Lấy danh sách quá trình hướng dẫn luận văn bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách hướng dẫn luận văn bị lỗi!', 'danger'));
     };
 }
 
+T.initPage('groupPageQtHuongDanLuanVan', true);
+export function getQtHuongDanLuanVanGroupPage(pageNumber, pageSize, loaiDoiTuong, pageCondition, done) {
+    const page = T.updatePage('groupPageQtHuongDanLuanVan', pageNumber, pageSize, pageCondition);
+    if (!loaiDoiTuong) loaiDoiTuong = [];
+    if (!Array.isArray(loaiDoiTuong)) loaiDoiTuong = [loaiDoiTuong];
+    return dispatch => {
+        const url = `/api/qua-trinh/hdlv/group/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition, parameter: loaiDoiTuong}, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách hướng dẫn luận văn theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                done && done(data.page);
+                dispatch({ type: QtHuongDanLuanVanGetGroupPage, page: data.page });
+            }
+        }, error => console.error(`GET: ${url}.`, error));
+    };
+}
+
+T.initPage('groupPageMaQtHuongDanLuanVan', true);
+export function getQtHuongDanLuanVanGroupPageMa(pageNumber, pageSize, loaiDoiTuong, pageCondition, done) {
+    const page = T.updatePage('groupPageMaQtHuongDanLuanVan', pageNumber, pageSize, pageCondition);
+    if (!loaiDoiTuong) loaiDoiTuong = '-1';
+    return dispatch => {
+        const url = `/api/qua-trinh/hdlv/group_nckh/page/${loaiDoiTuong}/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách hướng dẫn luận văn theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                done && done(data.page);
+                dispatch({ type: QtHuongDanLuanVanGetPage, page: data.page });
+            }
+        }, error => console.error(`GET: ${url}.`, error));
+    };
+}
+
+
+export function updateQtHuongDanLuanVanGroupPageMa(id, changes, done) {
+    return dispatch => {
+        const url = '/api/qua-trinh/nckh';
+        T.put(url, { id, changes }, data => {
+            if (data.error || changes == null) {
+                T.notify('Cập nhật hướng dẫn luận văn bị lỗi!', 'danger');
+                console.error(`PUT: ${url}.`, data.error);
+                done && done(data.error);
+            } else {
+                T.notify('Cập nhật hướng dẫn luận văn thành công!', 'success');
+                done && done(data.item);
+                dispatch(getQtHuongDanLuanVanGroupPageMa(undefined, undefined, '-1', data.shcc));
+            }
+        }, () => T.notify('Cập nhật hướng dẫn luận văn bị lỗi!', 'danger'));
+    };
+}
 export function getQtHuongDanLuanVanAll(done) {
     return dispatch => {
         const url = '/api/qua-trinh/hdlv/all';

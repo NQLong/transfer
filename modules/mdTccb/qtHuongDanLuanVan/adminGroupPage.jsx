@@ -1,14 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormSelect, FormCheckbox } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormSelect } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
     getQtHuongDanLuanVanPage, getQtHuongDanLuanVanAll, updateQtHuongDanLuanVan,
-    deleteQtHuongDanLuanVan, createQtHuongDanLuanVan, getQtHuongDanLuanVanGroupPage
+    deleteQtHuongDanLuanVan, createQtHuongDanLuanVan, getQtHuongDanLuanVanGroupPageMa
 } from './redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
-import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 
 class EditModal extends AdminModal {
     state = { id: null };
@@ -65,23 +64,17 @@ class EditModal extends AdminModal {
     }
 }
 
-class QtHuongDanLuanVan extends AdminPage {
-    checked = false;
-    curState = [];
-    searchText = '';
+class QtHuongDanLuanVanGroup extends AdminPage {
+    ma = ''; loaiDoiTuong = '-1';
     componentDidMount() {
         T.ready('/user/tccb', () => {
-            T.onSearch = (searchText) => {
-                this.searchText = searchText;
-                if (this.checked) this.props.getQtHuongDanLuanVanGroupPage(undefined, undefined, this.curState, this.searchText || '');
-                else this.props.getQtHuongDanLuanVanPage(undefined, undefined, this.curState, this.searchText || '');
-            };
-            T.showSearchBox(() => {
-                this.loaiDoiTuong?.value('');
-                setTimeout(() => this.changeAdvancedSearch(), 50);
-                setTimeout(() => this.showAdvanceSearch(), 1000);
-            });
-            this.changeAdvancedSearch();
+            const route = T.routeMatcher('/user/tccb/qua-trinh/hdlv/group/:loaiDoiTuong/:ma'),
+                params = route.parse(window.location.pathname);
+            this.loaiDoiTuong = params.loaiDoiTuong;
+            this.ma = params.ma;
+            T.onSearch = (searchText) => this.props.getQtHuongDanLuanVanPage(undefined, undefined, this.loaiDoiTuong, searchText || '');
+            T.showSearchBox();
+            this.props.getQtHuongDanLuanVanGroupPageMa(undefined, undefined, this.loaiDoiTuong, this.ma);
         });
     }
 
@@ -90,26 +83,11 @@ class QtHuongDanLuanVan extends AdminPage {
         this.modal.show();
     }
 
-    changeAdvancedSearch = () => {
-        let { pageNumber, pageSize } = this.props && this.props.qtHuongDanLuanVan && this.props.qtHuongDanLuanVan.page ? this.props.qtHuongDanLuanVan.page : { pageNumber: 1, pageSize: 50 };
-        const loaiDoiTuong = this.loaiDoiTuong?.value() || [];
-        this.curState = loaiDoiTuong;
-        if (this.checked) this.props.getQtHuongDanLuanVanGroupPage(pageNumber, pageSize, this.curState, this.searchText || '');
-        else this.props.getQtHuongDanLuanVanPage(pageNumber, pageSize, this.curState, this.searchText || '');
-    }
-
-    groupPage = () => {
-        let { pageNumber, pageSize } = this.props && this.props.qtHuongDanLuanVan && this.props.qtHuongDanLuanVan.page ? this.props.qtHuongDanLuanVan.page : { pageNumber: 1, pageSize: 50 };
-        this.checked = !this.checked;
-        if (this.checked) this.props.getQtHuongDanLuanVanGroupPage(pageNumber, pageSize, this.curState, this.searchText || '');
-        else this.props.getQtHuongDanLuanVanPage(pageNumber, pageSize, this.curState, this.searchText || '');
-    }
-
     delete = (e, item) => {
-        T.confirm('Xóa nghiên cứu khoa học', 'Bạn có chắc bạn muốn xóa nghiên cứu khoa học này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtNckhStaff(item.id, null, error => {
-                if (error) T.notify(error.message ? error.message : 'Xoá nghiên cứu khoa học bị lỗi!', 'danger');
-                else T.alert('Xoá nghiên cứu khoa học thành công!', 'success', false, 800);
+        T.confirm('Xóa hướng dẫn luận văn', 'Bạn có chắc bạn muốn xóa hướng dẫn luận văn này?', 'warning', true, isConfirm => {
+            isConfirm && this.props.deleteQtHuongDanLuanVan(item.id, null, error => {
+                if (error) T.notify(error.message ? error.message : 'Xoá hướng dẫn luận văn bị lỗi!', 'danger');
+                else T.alert('Xoá hướng dẫn luận văn thành công!', 'success', false, 800);
             });
         });
         e.preventDefault();
@@ -118,10 +96,7 @@ class QtHuongDanLuanVan extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('qtHuongDanLuanVan', ['read', 'write', 'delete']);
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ? (
-            this.props.qtHuongDanLuanVan && this.props.qtHuongDanLuanVan.page_gr ?
-                this.props.qtHuongDanLuanVan.page_gr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
-            : (this.props.qtHuongDanLuanVan && this.props.qtHuongDanLuanVan.page ? this.props.qtHuongDanLuanVan.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] });
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtHuongDanLuanVan && this.props.qtHuongDanLuanVan.page ? this.props.qtHuongDanLuanVan.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -178,16 +153,12 @@ class QtHuongDanLuanVan extends AdminPage {
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
                 'Quá trình hướng dẫn luận văn'
             ],
-            advanceSearch: <>
-                <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.loaiDoiTuong = e} label='Chọn loại đơn vị (có thể chọn nhiều loại)' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} />
-            </>,
             content: <>
                 <div className='tile'>
-                    <FormCheckbox label='Hiển thị theo cán bộ' onChange={this.groupPage} />
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                    getPage={this.checked ? this.props.getQtHuongDanLuanVanGroupPage : this.props.getQtHuongDanLuanVanPage} />
+                    getPage={this.props.getQtNghienCuuKhoaHocPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createQtHuongDanLuanVan} update={this.props.updateQtHuongDanLuanVan}
                     permissions={currentPermissions}
@@ -203,6 +174,6 @@ class QtHuongDanLuanVan extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtHuongDanLuanVan: state.qtHuongDanLuanVan });
 const mapActionsToProps = {
     getQtHuongDanLuanVanAll, getQtHuongDanLuanVanPage, deleteQtHuongDanLuanVan, createQtHuongDanLuanVan,
-    updateQtHuongDanLuanVan, getQtHuongDanLuanVanGroupPage
+    updateQtHuongDanLuanVan, getQtHuongDanLuanVanGroupPageMa
 };
-export default connect(mapStateToProps, mapActionsToProps)(QtHuongDanLuanVan);
+export default connect(mapStateToProps, mapActionsToProps)(QtHuongDanLuanVanGroup);

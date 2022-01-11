@@ -208,7 +208,7 @@ class ComponentCaNhan extends React.Component {
 
                     <div className='form-group col-md-12'></div>
 
-                    <FormTextBox ref={e => this.cmnd = e} label='CMND/CCCD' className='col-md-4' readOnly={this.props.userEdit} required />
+                    <FormTextBox ref={e => this.cmnd = e} label='CMND/CCCD' className='col-md-4' readOnly={this.props.userEdit} />
                     <FormDatePicker ref={e => this.cmndNgayCap = e} type='date-mask' label='Ngày cấp CMND/CCCD' className='col-md-4' readOnly={this.props.userEdit} />
                     <FormTextBox ref={e => this.cmndNoiCap = e} label='Nơi cấp CMND/CCCD' className='col-md-4' readOnly={this.props.userEdit} />
 
@@ -216,7 +216,7 @@ class ComponentCaNhan extends React.Component {
                     <FormTextBox ref={e => this.soDienThoaiBaoTin = e} label='Số điện thoại báo tin' className='col-md-6' maxLength={10} />
 
                     <FormTextBox ref={e => this.emailCaNhan = e} label='Email cá nhân' className='col-md-6' readOnly={this.props.userEdit} />
-                    <FormTextBox ref={e => this.emailTruong = e} label='Email trường' className='col-md-6' readOnly={this.props.userEdit} required/>
+                    <FormTextBox ref={e => this.emailTruong = e} label='Email trường' className='col-md-6' readOnly={this.props.userEdit}/>
 
                     <div className='form-group col-md-12'></div>
 

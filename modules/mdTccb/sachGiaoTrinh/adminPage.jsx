@@ -189,7 +189,7 @@ class SachGiaoTrinh extends AdminPage {
                         />
                         <TableCell type='text' content={(
                             <>
-                                <span>Tên: {item.ten}</span><br />
+                                <span><i>{item.ten}</i></span><br />
                                 <span>Thể loại: <span style={{ color: 'blue' }}>{item.theLoai}</span></span>
                             </>
                         )} 
@@ -204,15 +204,15 @@ class SachGiaoTrinh extends AdminPage {
                         />
                         <TableCell type='text' content={(
                             <>
-                                <span>Tên: {item.sanPham}</span><br />
+                                <span>Sản phẩm: {item.sanPham}</span><br />
                                 <span>Bút danh: <span style={{ color: 'blue' }}>{item.butDanh}</span></span>
                             </>
                         )} 
                         />
                         <TableCell type='text' content={(
-                            item.quocTe == '0' ? <span> Xuất bản trong nước</span>
-                            : item.quocTe == '1' ? <span> Xuất bản quốc tế</span>
-                                : item.quocTe == '2' ? <span> Xuất bản trong và ngoài nước </span>
+                            item.quocTe == '0' ? <span>Trong nước</span>
+                            : item.quocTe == '1' ? <span>Quốc tế</span>
+                                : item.quocTe == '2' ? <span>Trong và ngoài nước </span>
                                     : ''
                         )}
                         />

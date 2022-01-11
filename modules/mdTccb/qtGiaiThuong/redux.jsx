@@ -59,14 +59,14 @@ export function getQtGiaiThuongPage(pageNumber, pageSize, loaiDoiTuong, pageCond
         const url = `/api/tccb/qua-trinh/giai-thuong/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, parameter: loaiDoiTuong}, data => {
             if (data.error) {
-                T.notify('Lấy danh sách bài viết khoa học bị lỗi!', 'danger');
+                T.notify('Lấy danh sách giải thưởng bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 if (done) done(data.page);
                 dispatch({ type: QtGiaiThuongGetPage, page: data.page });
             }
-        }, () => T.notify('Lấy danh sách bài viết khoa học bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách giải thưởng bị lỗi!', 'danger'));
     };
 }
 
@@ -79,7 +79,7 @@ export function getQtGiaiThuongGroupPage(pageNumber, pageSize, loaiDoiTuong, pag
         const url = `/api/tccb/qua-trinh/giai-thuong/group/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, parameter: loaiDoiTuong}, data => {
             if (data.error) {
-                T.notify('Lấy danh sách bài viết khoa học theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                T.notify('Lấy danh sách giải thưởng theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
@@ -98,7 +98,7 @@ export function getQtGiaiThuongGroupPageMa(pageNumber, pageSize, loaiDoiTuong, p
         const url = `/api/tccb/qua-trinh/giai-thuong/group_gt/page/${loaiDoiTuong}/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition }, data => {
             if (data.error) {
-                T.notify('Lấy danh sách bài viết khoa học theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                T.notify('Lấy danh sách giải thưởng theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
@@ -115,15 +115,15 @@ export function updateQtGiaiThuongGroupPageMa(id, changes, done) {
         const url = '/api/qua-trinh/giai-thuong';
         T.put(url, { id, changes }, data => {
             if (data.error || changes == null) {
-                T.notify('Cập nhật bài viết khoa học bị lỗi!', 'danger');
+                T.notify('Cập nhật giải thưởng bị lỗi!', 'danger');
                 console.error(`PUT: ${url}.`, data.error);
                 done && done(data.error);
             } else {
-                T.notify('Cập nhật bài viết khoa học thành công!', 'success');
+                T.notify('Cập nhật giải thưởng thành công!', 'success');
                 done && done(data.item);
                 dispatch(getQtGiaiThuongGroupPageMa(undefined, undefined, '-1', data.shcc));
             }
-        }, () => T.notify('Cập nhật bài viết khoa học bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật giải thưởng bị lỗi!', 'danger'));
     };
 }
 

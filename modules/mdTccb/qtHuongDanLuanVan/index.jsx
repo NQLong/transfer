@@ -12,9 +12,9 @@ export default {
             path: '/user/tccb/qua-trinh/hdlv',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
-        // {
-        //     path: '/user/tccb/qua-trinh/dao-tao/group/:shcc',
-        //     component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
-        // },
+        {
+            path: '/user/tccb/qua-trinh/hdlv/group/:loaiDoiTuong/:ma',
+            component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
+        },
     ],
 };

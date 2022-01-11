@@ -112,7 +112,7 @@ class ComponentTTCongTac extends AdminPage {
                 ngayKetThucNghiTheoCheDo: this.state.dangNghiTheoCheDo ? (this.getValue(this.ngayKetThucNghiTheoCheDo) ? this.getValue(this.ngayKetThucNghiTheoCheDo).getTime() : '') : '',
                 lyDoNghiTheoCheDo: this.state.dangNghiTheoCheDo ? this.getValue(this.lyDoNghiTheoCheDo) : '',
                 daNghi: Number(this.getValue(this.daNghi)),
-                thoiDiemNghi: this.state.daNghi ? (this.getValue(this.ngayDaNghi) ? this.getValue(this.ngayDaNghi).getTime() : '') : '',
+                ngayNghi: this.state.daNghi ? (this.getValue(this.ngayDaNghi) ? this.getValue(this.ngayDaNghi).getTime() : '') : '',
                 soHieuDaNghi: this.state.daNghi ? this.getValue(this.soHieuDaNghi) : '',
                 noiDungDaNghi: this.state.daNghi ? this.getValue(this.noiDungDaNghi) : ''
             };

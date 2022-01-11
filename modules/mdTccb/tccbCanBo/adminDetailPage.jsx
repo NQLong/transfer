@@ -78,7 +78,7 @@ class CanBoPage extends AdminPage {
                 <ComponentCaNhan ref={e => this.componentCaNhan = e} userEdit={false} isStaff={false}/>
                 <ComponentQuanHe ref={e => this.componentQuanHe = e} userEdit={false} />
                 <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={false} />
-                <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={false} />
+                <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={false} tccb={true}/>
                 <ComponentNuocNgoai ref={e => this.componentNuocNgoai = e} userEdit={false} />
                 <ComponentKhenThuong ref={e => this.componentKhenThuong = e} userEdit={false} />
                 <ComponentKyLuat ref={e => this.componentKyLuat = e} userEdit={false} />

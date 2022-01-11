@@ -73,7 +73,7 @@ class ProfileCanBo extends AdminPage {
                             <ComponentCaNhan ref={e => this.componentCaNhan = e} userEdit={false} isStaff={true}/>
                             <ComponentQuanHe ref={e => this.componentQuanHe = e} userEdit={true} />
                             <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={true} />
-                            <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={true} />
+                            <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={true} tccb={false}/>
                             <ComponentNuocNgoai ref={e => this.componentNuocNgoai = e} userEdit={true} />
                             <ComponentKhenThuong ref={e => this.componentKhenThuong = e} userEdit={true} />
                             <ComponentKyLuat ref={e => this.componentKyLuat = e} userEdit={true} />
