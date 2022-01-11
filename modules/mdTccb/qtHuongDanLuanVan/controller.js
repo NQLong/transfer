@@ -13,7 +13,7 @@ module.exports = app => {
     );
     app.get('/user/tccb/qua-trinh/hdlv/:stt', app.permission.check('qtHuongDanLuanVan:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/hdlv', app.permission.check('qtHuongDanLuanVan:read'), app.templates.admin);
-    
+    app.get('/user/tccb/qua-trinh/hdlv/group/:loaiDoiTuong/:ma', app.permission.check('qtHuongDanLuanVan:read'), app.templates.admin);
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
     

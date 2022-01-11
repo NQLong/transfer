@@ -189,7 +189,7 @@ export function getQtHuongDanLuanVanGroupPageMa(pageNumber, pageSize, loaiDoiTuo
     const page = T.updatePage('groupPageMaQtHuongDanLuanVan', pageNumber, pageSize, pageCondition);
     if (!loaiDoiTuong) loaiDoiTuong = '-1';
     return dispatch => {
-        const url = `/api/qua-trinh/hdlv/group_nckh/page/${loaiDoiTuong}/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/qua-trinh/hdlv/group/page/${loaiDoiTuong}/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách hướng dẫn luận văn theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
