@@ -6,7 +6,7 @@ import Pagination from 'view/component/Pagination';
 import Dropdown from 'view/component/Dropdown';
 import { DateInput } from 'view/component/Input';
 import { SelectAdapter_FwCanBo } from '../tccbCanBo/redux';
-import { getQtNuocNgoaiPage, deleteQtNuocNgoaiStaff, getQtNuocNgoaiGroupPageMa,
+import { getQtNuocNgoaiPage, deleteQtNuocNgoaiGroupPageMa, getQtNuocNgoaiGroupPageMa,
     updateQtNuocNgoaiGroupPageMa }
 from './redux';
 import Loading from 'view/component/Loading';
@@ -143,7 +143,7 @@ class QtNuocNgoaiGroupPage extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa khen thưởng', 'Bạn có chắc bạn muốn xóa khen thưởng này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtNuocNgoaiStaff(item.id, false, null, error => {
+            isConfirm && this.props.deleteQtNuocNgoaiGroupPageMa(item.id, item.shcc, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá khen thưởng bị lỗi!', 'danger');
                 else T.alert('Xoá khen thưởng thành công!', 'success', false, 800);
             });
@@ -241,7 +241,7 @@ class QtNuocNgoaiGroupPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, qtNuocNgoai: state.qtNuocNgoai });
 const mapActionsToProps = {
-    getQtNuocNgoaiPage, deleteQtNuocNgoaiStaff,
+    getQtNuocNgoaiPage, deleteQtNuocNgoaiGroupPageMa,
     updateQtNuocNgoaiGroupPageMa, getQtNuocNgoaiGroupPageMa,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtNuocNgoaiGroupPage);

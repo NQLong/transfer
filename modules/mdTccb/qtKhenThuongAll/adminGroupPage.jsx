@@ -5,7 +5,7 @@ import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox}
 import Pagination from 'view/component/Pagination';
 import {
     getQtKhenThuongAllPage, getQtKhenThuongAllAll, updateQtKhenThuongAllGroupPageMa,
-    deleteQtKhenThuongAll, createQtKhenThuongAll, getQtKhenThuongAllGroupPageMa, 
+    deleteQtKhenThuongAllGroupPageMa, createQtKhenThuongAll, getQtKhenThuongAllGroupPageMa, 
 } from './redux';
 
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
@@ -152,7 +152,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa khen thưởng', 'Bạn có chắc bạn muốn xóa khen thưởng này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtKhenThuongAll(false, item.id, null, error => {
+            isConfirm && this.props.deleteQtKhenThuongAllGroupPageMa(item.id, this.loaiDoiTuong, this.ma, null, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá khen thưởng bị lỗi!', 'danger');
                 else T.alert('Xoá khen thưởng thành công!', 'success', false, 800);
             });
@@ -262,7 +262,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, qtKhenThuongAll: state.qtKhenThuongAll });
 const mapActionsToProps = {
-    getQtKhenThuongAllAll, getQtKhenThuongAllPage, deleteQtKhenThuongAll, createQtKhenThuongAll,
+    getQtKhenThuongAllAll, getQtKhenThuongAllPage, deleteQtKhenThuongAllGroupPageMa, createQtKhenThuongAll,
     updateQtKhenThuongAllGroupPageMa, getDmKhenThuongLoaiDoiTuongAll, getQtKhenThuongAllGroupPageMa,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtKhenThuongAllGroupPage);

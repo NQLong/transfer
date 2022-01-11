@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
-import { updateSachGiaoTrinhGroupPageMa, deleteSachGTStaff,
+import { updateSachGiaoTrinhGroupPageMa, deleteSachGiaoTrinhGroupPageMa,
     getSachGiaoTrinhGroupPageMa, getSachGiaoTrinhPage,
 } from './redux';
 
@@ -104,7 +104,7 @@ class SachGiaoTrinhGroupPage extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa sách giáo trình', 'Bạn có chắc bạn muốn xóa sách giáo trình này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteSachGTStaff(false, item.id, null, error => {
+            isConfirm && this.props.deleteSachGiaoTrinhGroupPageMa(item.id, item.shcc, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá sách giáo trình bị lỗi!', 'danger');
                 else T.alert('Xoá sách giáo trình thành công!', 'success', false, 800);
             });
@@ -204,7 +204,7 @@ class SachGiaoTrinhGroupPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, sachGiaoTrinh: state.sachGiaoTrinh });
 const mapActionsToProps = {
-    updateSachGiaoTrinhGroupPageMa, deleteSachGTStaff, 
+    updateSachGiaoTrinhGroupPageMa, deleteSachGiaoTrinhGroupPageMa, 
     getSachGiaoTrinhGroupPageMa, getSachGiaoTrinhPage,
 };
 export default connect(mapStateToProps, mapActionsToProps)(SachGiaoTrinhGroupPage);

@@ -732,8 +732,11 @@ export class AdminModal extends React.Component {
         $(this.modal).on('hidden.bs.modal', () => modalHidden());
     }
 
-    show = (item) => {
-        this.onShow && this.onShow(item);
+    show = (item, multiple = null) => {
+        if (this.onShow) {
+            if (multiple != null) this.onShow(item, multiple);
+            else this.onShow(item);
+        }
         $(this.modal).modal('show');
     }
 

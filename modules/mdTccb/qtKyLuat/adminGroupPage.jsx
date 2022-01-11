@@ -5,7 +5,7 @@ import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox}
 import Pagination from 'view/component/Pagination';
 import {
     getQtKyLuatPage, getQtKyLuatAll, updateQtKyLuatGroupPageMa,
-    deleteQtKyLuat, getQtKyLuatGroupPageMa, 
+    deleteQtKyLuatGroupPageMa, getQtKyLuatGroupPageMa, 
 } from './redux';
 import { DateInput } from 'view/component/Input';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
@@ -140,7 +140,7 @@ class QtKyLuatGroupPage extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa kỷ luật', 'Bạn có chắc bạn muốn xóa kỷ luật này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtKyLuat(false, item.id, null, error => {
+            isConfirm && this.props.deleteQtKyLuatGroupPageMa(item.id, item.shcc, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá kỷ luật bị lỗi!', 'danger');
                 else T.alert('Xoá kỷ luật thành công!', 'success', false, 800);
             });
@@ -226,7 +226,7 @@ class QtKyLuatGroupPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, qtKyLuat: state.qtKyLuat });
 const mapActionsToProps = {
-    getQtKyLuatAll, getQtKyLuatPage, deleteQtKyLuat,
+    getQtKyLuatAll, getQtKyLuatPage, deleteQtKyLuatGroupPageMa,
     updateQtKyLuatGroupPageMa, getQtKyLuatGroupPageMa,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtKyLuatGroupPage);

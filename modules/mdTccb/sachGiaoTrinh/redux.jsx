@@ -127,6 +127,23 @@ export function updateSachGiaoTrinhGroupPageMa(id, changes, done) {
     };
 }
 
+
+export function deleteSachGiaoTrinhGroupPageMa(id, shcc, done) {
+    return dispatch => {
+        const url = '/api/staff/sach-giao-trinh';
+        T.delete(url, { id }, data => {
+            if (data.error) {
+                T.notify('Xóa thông tin sách, giáo trình bị lỗi', 'danger');
+                console.error('DELETE: ' + url + '. ' + data.error);
+            } else {
+                T.alert('Thông tin sách, giáo trình được xóa thành công!', 'info', false, 800);
+                done && done(data.item);
+                dispatch(getSachGiaoTrinhGroupPageMa(undefined, undefined, '-1', shcc));
+            }
+        }, () => T.notify('Xóa thông tin sách, giáo trình bị lỗi', 'danger'));
+    };
+}
+
 export function createSachGTStaff(data, done, isEdit = null) {
     return dispatch => {
         const url = '/api/staff/sach-giao-trinh';

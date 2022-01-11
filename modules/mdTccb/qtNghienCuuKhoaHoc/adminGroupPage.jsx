@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormRichTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import { 
-    updateQtNghienCuuKhoaHocGroupPageMa, deleteQtNckhStaff, 
+    updateQtNghienCuuKhoaHocGroupPageMa, deleteQtNckhGroupPageMa, 
     getQtNghienCuuKhoaHocGroupPageMa, getQtNghienCuuKhoaHocPage } 
 from './redux';
 
@@ -160,7 +160,7 @@ class QtNghienCuuKhoaHocGroupPage extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa nghiên cứu khoa học', 'Bạn có chắc bạn muốn xóa nghiên cứu khoa học này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtNckhStaff(false, item.id, null, error => {
+            isConfirm && this.props.deleteQtNckhGroupPageMa(item.id, item.shcc, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá nghiên cứu khoa học bị lỗi!', 'danger');
                 else T.alert('Xoá nghiên cứu khoa học thành công!', 'success', false, 800);
             });
@@ -247,7 +247,7 @@ class QtNghienCuuKhoaHocGroupPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, qtNghienCuuKhoaHoc: state.qtNghienCuuKhoaHoc });
 const mapActionsToProps = {
-    updateQtNghienCuuKhoaHocGroupPageMa, deleteQtNckhStaff, 
+    updateQtNghienCuuKhoaHocGroupPageMa, deleteQtNckhGroupPageMa, 
     getQtNghienCuuKhoaHocGroupPageMa, getQtNghienCuuKhoaHocPage,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtNghienCuuKhoaHocGroupPage);
