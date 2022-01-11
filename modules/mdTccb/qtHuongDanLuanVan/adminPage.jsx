@@ -7,6 +7,7 @@ import {
     getQtHuongDanLuanVanPage, getQtHuongDanLuanVanAll, updateQtHuongDanLuanVan,
     deleteQtHuongDanLuanVan, createQtHuongDanLuanVan, getQtHuongDanLuanVanGroupPage
 } from './redux';
+import { DateInput } from 'view/component/Input';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 
@@ -17,13 +18,13 @@ class EditModal extends AdminModal {
 
     onShow = (item) => {
         let { shcc, hoTen, tenLuanVan, namTotNghiep, sanPham, bacDaoTao, id } = item ? item : {
-            shcc: '', hoTen: '', tenLuanVan: '', namTotNghiep: '', sanPham: '', bacDaoTao: '', id: ''
+            shcc: '', hoTen: '', tenLuanVan: '', namTotNghiep: null, sanPham: '', bacDaoTao: '', id: ''
         };
         this.setState({ id, item });
         this.shcc.value(shcc ? shcc : '');
         this.hoTen.value(hoTen ? hoTen : '');
         this.tenLuanVan.value(tenLuanVan ? tenLuanVan : '');
-        this.namTotNghiep.value(namTotNghiep ? namTotNghiep : '');
+        if (namTotNghiep) this.namTotNghiep.setVal(new Date(namTotNghiep.toString()));
         this.sanPham.value(sanPham ? sanPham : '');
         this.bacDaoTao.value(bacDaoTao ? bacDaoTao : '');
     };
@@ -36,7 +37,7 @@ class EditModal extends AdminModal {
             shcc: this.shcc.value(),
             hoTen: this.hoTen.value(),
             tenLuanVan: this.tenLuanVan.value(),
-            namTotNghiep: Number(this.tenLuanVan.value()),
+            namTotNghiep: this.namTotNghiep.getVal() ? new Date(this.namTotNghiep.getVal()).getFullYear() : null,
             sanPham: this.sanPham.value(),
             bacDaoTao: this.bacDaoTao.value(),
         };
@@ -44,20 +45,20 @@ class EditModal extends AdminModal {
             T.notify('Mã số cán bộ bị trống');
             this.shcc.focus();
         } else {
-            this.state.id ? this.props.update(this.state.stt, changes, this.hide) : this.props.create(changes, this.hide);
+            this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
         }
     }
 
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
-            title: this.state.stt ? 'Cập nhật quá trình hướng dẫn luận văn' : 'Tạo mới quá trình hướng dẫn luận văn',
+            title: this.state.id ? 'Cập nhật quá trình hướng dẫn luận văn' : 'Tạo mới quá trình hướng dẫn luận văn',
             size: 'large',
             body: <div className='row'>
-                <FormSelect type='text' className='col-md-12' ref={e => this.shcc = e} data={SelectAdapter_FwCanBo} label='Cán bộ' readOnly={readOnly} />
+                <FormSelect type='text' className='col-md-12' ref={e => this.shcc = e} data={SelectAdapter_FwCanBo} label='Cán bộ' readOnly={this.state.id ? true : false} />
                 <FormTextBox type='text' className='col-md-12' ref={e => this.hoTen = e} label='Danh sách họ tên sinh viên, học viên' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-12' ref={e => this.tenLuanVan = e} label='Tên luận văn' readOnly={readOnly} />
-                <FormTextBox type='text' className='col-md-4' ref={e => this.namTotNghiep = e} label='Năm tốt nghiệp' readOnly={readOnly} />
+                <div className='form-group col-md-4'><DateInput ref={e => this.namTotNghiep = e} label='Năm tốt nghiệp' type='year' readOnly={readOnly} /></div>
                 <FormTextBox type='text' className='col-md-4' ref={e => this.sanPham = e} label='Sản phẩm' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-4' ref={e => this.bacDaoTao = e} label='Bậc hướng dẫn luận văn' readOnly={readOnly} />
             </div>
@@ -106,15 +107,14 @@ class QtHuongDanLuanVan extends AdminPage {
     }
 
     delete = (e, item) => {
-        T.confirm('Xóa nghiên cứu khoa học', 'Bạn có chắc bạn muốn xóa nghiên cứu khoa học này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtNckhStaff(item.id, null, error => {
-                if (error) T.notify(error.message ? error.message : 'Xoá nghiên cứu khoa học bị lỗi!', 'danger');
-                else T.alert('Xoá nghiên cứu khoa học thành công!', 'success', false, 800);
+        T.confirm('Xóa hướng dẫn luận văn', 'Bạn có chắc bạn muốn xóa hướng dẫn luận văn này?', 'warning', true, isConfirm => {
+            isConfirm && this.props.deleteQtHuongDanLuanVan(item.id, error => {
+                if (error) T.notify(error.message ? error.message : 'Xoá hướng dẫn luận văn bị lỗi!', 'danger');
+                else T.alert('Xoá hướng dẫn luận văn thành công!', 'success', false, 800);
             });
         });
         e.preventDefault();
     }
-
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('qtHuongDanLuanVan', ['read', 'write', 'delete']);
@@ -140,7 +140,7 @@ class QtHuongDanLuanVan extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
-                        <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
+                        <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{(item.hoCanBo ? item.hoCanBo : '') + ' ' + (item.tenCanBo ? item.tenCanBo : '')}</span><br />
                                 {item.shcc}
@@ -156,7 +156,7 @@ class QtHuongDanLuanVan extends AdminPage {
                         <TableCell type='text' content={item.bacDaoTao} style={{ whiteSpace: 'nowrap' }} />
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                                onEdit={() => this.modal.show(item, false)} onDelete={this.delete} >
+                                onEdit={() => this.modal.show(item)} onDelete={this.delete} >
                             </TableCell>
                         }
                         {
@@ -195,7 +195,7 @@ class QtHuongDanLuanVan extends AdminPage {
                 />
             </>,
             backRoute: '/user/tccb',
-            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+            onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
         });
     }
 }
