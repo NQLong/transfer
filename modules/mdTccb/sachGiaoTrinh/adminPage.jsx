@@ -196,8 +196,8 @@ class SachGiaoTrinh extends AdminPage {
                         />
                         <TableCell type='text' content={(
                             <>
-                                <span>Nhà xuất bản: {item.nhaSanXuat}</span><br />
-                                <span>Năm xuất bản: <span style={{ color: 'blue' }}>{item.namSanXuat}</span></span> <br />
+                                <span>Nhà xuất bản: <i>{item.nhaSanXuat}</i></span><br />
+                                <span>Năm xuất bản: <span style={{ color: 'blue' }}>{item.namSanXuat}</span></span> <br /> <br/>
                                 <span>Chủ biên: <span style={{ color: 'blue' }}>{item.chuBien}</span></span>
                             </>
                         )} 

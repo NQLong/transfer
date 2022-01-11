@@ -220,7 +220,7 @@ class QtKyLuat extends AdminPage {
                         />
                         <TableCell type='text' content={(
                             <>
-                                <span style={{ whiteSpace: 'nowrap' }}>{item.tenKyLuat}</span><br />
+                                <span style={{ whiteSpace: 'nowrap' }}>{item.tenKyLuat}</span><br /> <br/>
                                 <span style={{ whiteSpace: 'nowrap' }}>Thời gian bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType) : ''}</span></span><br />
                                 <span style={{ whiteSpace: 'nowrap' }}>Thời gian kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType) : ''}</span></span>
                             </>
