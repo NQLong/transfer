@@ -134,14 +134,14 @@ class QtNghiViecGroupPage extends AdminPage {
                         />
                         <TableCell type='text' content={(
                             <>
-                                <span><i>{item.soQuyetDinh}</i></span><br />
-                                <span>Diện nghỉ: <span style={{ color: 'blue' }}>{item.dienNghi == 1 ? 'Biên chế' : 'Hợp đồng'}</span></span>
+                                <span>{item.ngayNghi ? T.dateToText(item.ngayNghi, 'dd/mm/yyyy') : ''}</span>
                             </>
                         )}
                         />
                         <TableCell type='text' content={(
                             <>
-                                <span><i>{item.noiDung}</i></span>
+                                <span><i>{item.noiDung}</i></span><br/>
+                                {item.ghiChu ? '(' + item.ghiChu + ')' : null}
                             </>
                         )}
                         />

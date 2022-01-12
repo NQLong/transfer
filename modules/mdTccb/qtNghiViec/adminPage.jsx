@@ -157,7 +157,7 @@ class QtNghiViec extends AdminPage {
                                 <span>{item.hoTen ? item.hoTen : ''}</span>
                         )}
                         />
-                        <TableCell type='text' content={(
+                        <TableCell type='text' style={{  whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span><i>{item.soQuyetDinh}</i></span><br />
                                 <span>Diện nghỉ: <span style={{ color: 'blue' }}>{item.dienNghi == 1 ? 'Biên chế' : 'Hợp đồng'}</span></span>
@@ -172,7 +172,8 @@ class QtNghiViec extends AdminPage {
                         />
                         <TableCell type='text' content={(
                             <>
-                                <span><i>{item.noiDung}</i></span>
+                                <span><i>{item.noiDung}</i></span><br/>
+                                {item.ghiChu ? '(' + item.ghiChu + ')' : null}
                             </>
                         )}
                         />
