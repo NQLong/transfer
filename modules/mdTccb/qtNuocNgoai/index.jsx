@@ -9,12 +9,12 @@ export default {
     },
     routes: [
         {
-            path: '/user/tccb/qua-trinh/nuoc-ngoai',
-            component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
-        },
-        {
             path: '/user/tccb/qua-trinh/nuoc-ngoai/group_nn/:loaiDoiTuong/:ma',
             component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
+        },
+        {
+            path: '/user/tccb/qua-trinh/nuoc-ngoai',
+            component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
     ],
 };

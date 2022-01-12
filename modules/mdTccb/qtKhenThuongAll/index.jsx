@@ -9,12 +9,12 @@ export default {
     },
     routes: [
         {
-            path: '/user/tccb/qua-trinh/khen-thuong-all',
-            component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
-        },
-        {
             path: '/user/tccb/qua-trinh/khen-thuong-all/group_dt/:loaiDoiTuong/:ma',
             component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
+        },
+        {
+            path: '/user/tccb/qua-trinh/khen-thuong-all',
+            component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
     ],
 };

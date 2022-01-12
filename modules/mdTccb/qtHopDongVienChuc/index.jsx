@@ -9,16 +9,16 @@ export default {
     },
     routes: [
         {
-            path: '/user/tccb/qua-trinh/hop-dong-vien-chuc',
-            component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
+            path: '/user/tccb/qua-trinh/hop-dong-vien-chuc/group/:shcc',
+            component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
         },
         {
             path: '/user/tccb/qua-trinh/hop-dong-vien-chuc/:ma',
             component: Loadable({ loading: Loading, loader: () => import('./adminEditPage') })
         },
         {
-            path: '/user/tccb/qua-trinh/hop-dong-vien-chuc/group/:shcc',
-            component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
-        },
+            path: '/user/tccb/qua-trinh/hop-dong-vien-chuc',
+            component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
+        }
     ],
 };

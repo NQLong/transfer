@@ -9,12 +9,12 @@ export default {
     },
     routes: [
         {
-            path: '/user/tccb/qua-trinh/giai-thuong',
-            component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
-        },
-        {
             path: '/user/tccb/qua-trinh/giai-thuong/group_gt/:loaiDoiTuong/:ma',
             component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
+        },
+        {
+            path: '/user/tccb/qua-trinh/giai-thuong',
+            component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
     ],
 };

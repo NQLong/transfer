@@ -1204,7 +1204,6 @@ module.exports = app => {
         app.model.canBo.getCanBoBenA(req.params.shcc, (error, item) => res.send({ error, item }));
     });
     app.put('/api/user/staff', app.permission.check('staff:login'), (req, res) => {
-        console.log(req.cookies.personId);
         if (req.body.changes && req.session.user) {
             const changes = req.body.changes;
             app.model.canBo.get({ email: req.session.user.email }, (error, canBo) => {
@@ -1227,7 +1226,7 @@ module.exports = app => {
 
     app.post('/api/user/staff/quan-he', app.permission.check('staff:login'), (req, res) => {
         if (req.body.data && req.session.user) {
-            const data = app.clone(req.body.data, { shcc: req.session.user.shcc });
+            const data = req.body.data;
             app.model.quanHeCanBo.create(data, (error, item) => res.send({ error, item }));
         } else {
             res.send({ error: 'Invalid parameter!' });

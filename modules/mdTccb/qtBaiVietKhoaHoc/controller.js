@@ -91,7 +91,7 @@ module.exports = app => {
 
     app.post('/api/user/qua-trinh/bai-viet-khoa-hoc', app.permission.check('staff:login'), (req, res) => {
         if (req.body.data && req.session.user) {
-            const data = app.clone(req.body.data, { shcc: req.session.user.shcc });
+            const data = req.body.data;
             app.model.qtBaiVietKhoaHoc.create(data, (error, item) => res.send({ error, item }));
         } else {
             res.send({ error: 'Invalid parameter!' });

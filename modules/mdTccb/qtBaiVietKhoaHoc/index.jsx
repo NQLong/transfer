@@ -9,12 +9,12 @@ export default {
     },
     routes: [
         {
-            path: '/user/tccb/qua-trinh/bai-viet-khoa-hoc',
-            component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
-        },
-        {
             path: '/user/tccb/qua-trinh/bai-viet-khoa-hoc/group_bvkh/:loaiDoiTuong/:ma',
             component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
         },
+        {
+            path: '/user/tccb/qua-trinh/bai-viet-khoa-hoc',
+            component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
+        }
     ],
 };

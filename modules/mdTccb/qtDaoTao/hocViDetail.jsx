@@ -116,7 +116,7 @@ class HocViDetail extends AdminPage {
                         this.modal.show({ item: null, shcc: this.props.shcc, email: this.props.email });
                     }}>Thêm quá trình đào tạo {this.props.tenHocVi}</a>
                     <EditModal ref={e => this.modal = e} hocVi={this.props.tenHocVi} value={this.value}
-                        create={this.props.tccb ? this.props.createQtDaoTao: this.props.createQtDaoTaoStaffUser } />
+                        create={this.props.tccb ? this.props.createQtDaoTao : this.props.createQtDaoTaoStaffUser } />
                 </div>
             )
         );
