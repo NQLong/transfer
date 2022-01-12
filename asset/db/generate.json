@@ -7497,6 +7497,74 @@
         "foreignKeys": [],
         "type": "table"
     },
+    "QT_NGHI_VIEC": {
+        "active": true,
+        "moduleName": "qtNghiViec",
+        "modelName": "qtNghiViec",
+        "columns": {
+            "SHCC": {
+                "value": "shcc",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 10
+            },
+            "HO_TEN": {
+                "value": "hoTen",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 100
+            },
+            "NGAY_NGHI": {
+                "value": "ngayNghi",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "20,0"
+            },
+            "SO_QUYET_DINH": {
+                "value": "soQuyetDinh",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 100
+            },
+            "GHI_CHU": {
+                "value": "ghiChu",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 200
+            },
+            "DIEN_NGHI": {
+                "value": "dienNghi",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "1,0"
+            },
+            "NOI_DUNG": {
+                "value": "noiDung",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 200
+            },
+            "MA": {
+                "value": "ma",
+                "dataType": "NUMBER",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_497802\".nextval",
+                "nullable": false,
+                "size": "22,0"
+            }
+        },
+        "primaryKeys": [
+            "MA"
+        ],
+        "foreignKeys": [],
+        "type": "table"
+    },
     "QT_NUOC_NGOAI": {
         "active": true,
         "moduleName": "qtNuocNgoai",
