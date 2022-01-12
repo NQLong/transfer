@@ -102,7 +102,7 @@ module.exports = app => {
             const data = app.clone(req.body.data, { shcc: req.session.user.shcc });
             app.model.qtHuongDanLuanVan.create(data, (error, item) => res.send({ error, item }));
         } else {
-            res.status(400).send({ error: 'Invalid parameter!' });
+            res.send({ error: 'Invalid parameter!' });
         }
     });
 
@@ -110,18 +110,18 @@ module.exports = app => {
         if (req.body.changes && req.session.user) {
             app.model.qtHuongDanLuanVan.get({ id: req.body.id }, (error, item) => {
                 if (error || item == null) {
-                    res.status(400).send({ error: 'Not found!' });
+                    res.send({ error: 'Not found!' });
                 } else {
-                    if (item.shcc === req.cookies.personId) {
-                        const changes = req.body.changes;
-                        app.model.qtHuongDanLuanVan.update({ id: req.body.id }, changes, (error, item) => res.send({ error, item }));
-                    } else {
-                        res.status(400).send({ error: 'Not found!' });
-                    }
+                    app.model.canBo.get({ shcc: item.shcc }, (e, r) => {
+                        if (e || r == null) res.send({ error: 'Not found!' }); else {
+                            const changes = req.body.changes;
+                            app.model.qtHuongDanLuanVan.update({ id: req.body.id }, changes, (error, item) => res.send({ error, item }));
+                        }
+                    });
                 }
             });
         } else {
-            res.status(400).send({ error: 'Invalid parameter!' });
+            res.send({ error: 'Invalid parameter!' });
         }
     });
 
@@ -129,17 +129,17 @@ module.exports = app => {
         if (req.session.user) {
             app.model.qtHuongDanLuanVan.get({ id: req.body.id }, (error, item) => {
                 if (error || item == null) {
-                    res.status(400).send({ error: 'Not found!' });
+                    res.send({ error: 'Not found!' });
                 } else {
-                    if (item.shcc === req.cookies.personId) {
-                        app.model.qtHuongDanLuanVan.delete({ id: req.body.id }, (error) => res.send(error));
-                    } else {
-                        res.status(400).send({ error: 'Not found!' });
-                    }
+                    app.model.canBo.get({ shcc: item.shcc }, (e, r) => {
+                        if (e || r == null) res.send({ error: 'Not found!' }); else {
+                            app.model.qtHuongDanLuanVan.delete({ id: req.body.id }, (error, item) => res.send({ error, item }));
+                        }
+                    });
                 }
             });
         } else {
-            res.status(400).send({ error: 'Invalid parameter!' });
+            res.send({ error: 'Invalid parameter!' });
         }
     });
 };

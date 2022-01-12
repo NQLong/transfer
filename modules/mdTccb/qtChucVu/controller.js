@@ -105,51 +105,51 @@ module.exports = app => {
     app.delete('/api/tccb/qua-trinh/chuc-vu', app.permission.check('qtChucVu:write'), (req, res) =>
         app.model.qtChucVu.delete({ stt: req.body.stt }, (error) => res.send(error)));
 
-    app.post('/api/user/qua-trinh/chuc-vu', app.permission.check('staff:login'), (req, res) => {
-        if (req.body.data && req.session.user) {
-            const data = app.clone(req.body.data, { shcc: req.session.user.shcc });
-            app.model.qtChucVu.create(data, (error, item) => res.send({ error, item }));
-        } else {
-            res.status(400).send({ error: 'Invalstt parameter!' });
-        }
-    });
+    // app.post('/api/user/qua-trinh/chuc-vu', app.permission.check('staff:login'), (req, res) => {
+    //     if (req.body.data && req.session.user) {
+    //         const data = app.clone(req.body.data, { shcc: req.session.user.shcc });
+    //         app.model.qtChucVu.create(data, (error, item) => res.send({ error, item }));
+    //     } else {
+    //         res.send({ error: 'Invalstt parameter!' });
+    //     }
+    // });
 
-    app.put('/api/user/qua-trinh/chuc-vu', app.permission.check('staff:login'), (req, res) => {
-        if (req.body.changes && req.session.user) {
-            app.model.qtChucVu.get({ stt: req.body.stt }, (error, item) => {
-                if (error || item == null) {
-                    res.status(400).send({ error: 'Not found!' });
-                } else {
-                    if (item.shcc === req.cookies.personId) {
-                        const changes = req.body.changes;
-                        app.model.qtChucVu.update({ stt: req.body.stt }, changes, (error, item) => res.send({ error, item }));
-                    } else {
-                        res.status(400).send({ error: 'Not found!' });
-                    }
-                }
-            });
-        } else {
-            res.status(400).send({ error: 'Invalstt parameter!' });
-        }
-    });
+    // app.put('/api/user/qua-trinh/chuc-vu', app.permission.check('staff:login'), (req, res) => {
+    //     if (req.body.changes && req.session.user) {
+    //         app.model.qtChucVu.get({ stt: req.body.stt }, (error, item) => {
+    //             if (error || item == null) {
+    //                 res.send({ error: 'Not found!' });
+    //             } else {
+    //                 if (item.email === req.session.user.email) {
+    //                     const changes = req.body.changes;
+    //                     app.model.qtChucVu.update({ stt: req.body.stt }, changes, (error, item) => res.send({ error, item }));
+    //                 } else {
+    //                     res.send({ error: 'Not found!' });
+    //                 }
+    //             }
+    //         });
+    //     } else {
+    //         res.send({ error: 'Invalstt parameter!' });
+    //     }
+    // });
 
-    app.delete('/api/user/qua-trinh/chuc-vu', app.permission.check('staff:login'), (req, res) => {
-        if (req.session.user) {
-            app.model.qtChucVu.get({ stt: req.body.stt }, (error, item) => {
-                if (error || item == null) {
-                    res.status(400).send({ error: 'Not found!' });
-                } else {
-                    if (item.shcc === req.cookies.personId) {
-                        app.model.qtChucVu.delete({ stt: req.body.stt }, (error) => res.send(error));
-                    } else {
-                        res.status(400).send({ error: 'Not found!' });
-                    }
-                }
-            });
-        } else {
-            res.status(400).send({ error: 'Invalstt parameter!' });
-        }
-    });
+    // app.delete('/api/user/qua-trinh/chuc-vu', app.permission.check('staff:login'), (req, res) => {
+    //     if (req.session.user) {
+    //         app.model.qtChucVu.get({ stt: req.body.stt }, (error, item) => {
+    //             if (error || item == null) {
+    //                 res.send({ error: 'Not found!' });
+    //             } else {
+    //                 if (item.email === req.session.user.email) {
+    //                     app.model.qtChucVu.delete({ stt: req.body.stt }, (error) => res.send(error));
+    //                 } else {
+    //                     res.send({ error: 'Not found!' });
+    //                 }
+    //             }
+    //         });
+    //     } else {
+    //         res.send({ error: 'Invalstt parameter!' });
+    //     }
+    // });
 
     app.get('/api/tccb/qua-trinh/chuc-vu-by-shcc/:shcc', app.permission.check('staff:login'), (req, res) => {
         app.model.qtChucVu.getByShcc(req.params.shcc, (error, item) => {

@@ -13,7 +13,7 @@ module.exports = app => {
             const data = app.clone(req.body.data, { shcc: req.session.user.shcc });
             app.model.tccbToChucKhac.create(data, (error, item) => res.send({ error, item }));
         } else {
-            res.status(400).send({ error: 'Invalid parameter!' });
+            res.send({ error: 'Invalid parameter!' });
         }
     });
 
@@ -22,19 +22,18 @@ module.exports = app => {
         if (req.body.changes && req.session.user) {
             app.model.tccbToChucKhac.get({ ma: req.body.ma }, (error, item) => {
                 if (error || item == null) {
-                    res.status(400).send({ error: 'Not found!' });
+                    res.send({ error: 'Not found!' });
                 } else {
-                    if (item.shcc === req.cookies.personId) {
-                        console.log(item.shcc);
-                        const changes = req.body.changes;
-                        app.model.tccbToChucKhac.update({ ma: req.body.ma }, changes, (error, item) => res.send({ error, item }));
-                    } else {
-                        res.status(400).send({ error: 'Not found!' });
-                    }
+                    app.model.canBo.get({ shcc: item.shcc }, (e, r) => {
+                        if (e || r == null) res.send({ error: 'Not found!' }); else {
+                            const changes = req.body.changes;
+                            app.model.tccbToChucKhac.update({ ma: req.body.ma }, changes, (error, item) => res.send({ error, item }));
+                        }
+                    });
                 }
             });
         } else {
-            res.status(400).send({ error: 'Invalid parameter!' });
+            res.send({ error: 'Invalid parameter!' });
         }
     });
 
@@ -42,17 +41,17 @@ module.exports = app => {
         if (req.session.user) {
             app.model.tccbToChucKhac.get({ ma: req.body.ma }, (error, item) => {
                 if (error || item == null) {
-                    res.status(400).send({ error: 'Not found!' });
+                    res.send({ error: 'Not found!' });
                 } else {
-                    if (item.shcc === req.cookies.personId) {
-                        app.model.tccbToChucKhac.delete({ ma: req.body.ma }, (error) => res.send(error));
-                    } else {
-                        res.status(400).send({ error: 'Not found!' });
-                    }
+                    app.model.canBo.get({ shcc: item.shcc }, (e, r) => {
+                        if (e || r == null) res.send({ error: 'Not found!' }); else {
+                            app.model.tccbToChucKhac.delete({ ma: req.body.ma }, (error, item) => res.send({ error, item }));
+                        }
+                    });
                 }
             });
         } else {
-            res.status(400).send({ error: 'Invalid parameter!' });
+            res.send({ error: 'Invalid parameter!' });
         }
     });
 };

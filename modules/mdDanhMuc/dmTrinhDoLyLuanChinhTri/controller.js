@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.category,
         menus: {
-            74: { title: 'Trình độ Lý luận chính trị', link: '/user/danh-muc/trinh-do-ly-luan-chinh-tri' },
+            4075: { title: 'Trình độ Lý luận chính trị', link: '/user/danh-muc/trinh-do-ly-luan-chinh-tri' },
         },
     };
     app.permission.add(

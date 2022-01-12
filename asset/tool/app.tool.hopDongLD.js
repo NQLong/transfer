@@ -22,6 +22,7 @@ app.loadModules(false);
 
 const run = () => {
     app.model.canBo.getAll({}, (error, result) => {
+        let i = 0;
         if (result) {
             result.forEach(item => {
                 app.model.qtHopDongLaoDong.getAll({ nguoiDuocThue: item.shcc }, (error, output) => {
@@ -32,8 +33,8 @@ const run = () => {
                             if (item.ketThucHopDong > max) { max = item.ketThucHopDong; i++; }
                         });
                         if (max != 0) {
-                            app.model.canBo.update({ shcc: item.shcc }, { hopDongCanBoNgay: max }, (er, out) => {
-                                console.log(out);
+                            app.model.canBo.update({ shcc: item.shcc }, { hopDongCanBo: 'LĐ', hopDongCanBoNgay: max, loaiHopDong: item.loaiHopDong }, (er, out) => {
+                                console.log(i++);
                             });
                         }
                     }

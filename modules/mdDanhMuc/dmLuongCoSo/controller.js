@@ -1,7 +1,7 @@
 module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.category,
-        menus: { 45: { title: 'Lương cơ sở', link: '/user/danh-muc/luong-co-so' } },
+        menus: { 4046: { title: 'Lương cơ sở', link: '/user/danh-muc/luong-co-so' } },
     };
     app.permission.add(
         { name: 'dmLuongCoSo:read', menu },

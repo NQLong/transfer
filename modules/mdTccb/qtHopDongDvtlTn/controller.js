@@ -66,65 +66,65 @@ module.exports = app => {
     app.delete('/api/tccb/qua-trinh/hop-dong-dvtl-tn', app.permission.check('staff:write'), (req, res) =>
         app.model.qtHopDongDvtlTn.delete({ ma: req.body.ma }, (error) => res.send(error)));
 
-    app.post('/api/user/qua-trinh/hop-dong-dvtl-tn', app.permission.check('staff:login'), (req, res) => {
-        if (req.body.data && req.session.user) {
-            const data = app.clone(req.body.data, { shcc: req.session.user.shcc });
-            app.model.qtHopDongDvtlTn.create(data, (error, item) => res.send({ error, item }));
-        } else {
-            res.status(400).send({ error: 'Invalid parameter!' });
-        }
-    });
+    // app.post('/api/user/qua-trinh/hop-dong-dvtl-tn', app.permission.check('staff:login'), (req, res) => {
+    //     if (req.body.data && req.session.user) {
+    //         const data = app.clone(req.body.data, { shcc: req.session.user.shcc });
+    //         app.model.qtHopDongDvtlTn.create(data, (error, item) => res.send({ error, item }));
+    //     } else {
+    //         res.send({ error: 'Invalid parameter!' });
+    //     }
+    // });
 
-    app.put('/api/user/qua-trinh/hop-dong-dvtl-tn', app.permission.check('staff:login'), (req, res) => {
-        if (req.body.changes && req.session.user) {
-            app.model.qtHopDongDvtlTn.get({ ma: req.body.ma }, (error, item) => {
-                if (error || item == null) {
-                    res.status(400).send({ error: 'Not found!' });
-                } else {
-                    if (item.shcc === req.cookies.personId) {
-                        const changes = req.body.changes;
-                        app.model.qtHopDongDvtlTn.update({ ma: req.body.ma }, changes, (error, item) => res.send({ error, item }));
-                    } else {
-                        res.status(400).send({ error: 'Not found!' });
-                    }
-                }
-            });
-        } else {
-            res.status(400).send({ error: 'Invalid parameter!' });
-        }
-    });
+    // app.put('/api/user/qua-trinh/hop-dong-dvtl-tn', app.permission.check('staff:login'), (req, res) => {
+    //     if (req.body.changes && req.session.user) {
+    //         app.model.qtHopDongDvtlTn.get({ ma: req.body.ma }, (error, item) => {
+    //             if (error || item == null) {
+    //                 res.send({ error: 'Not found!' });
+    //             } else {
+    //                 if (item.email === req.session.user.email) {
+    //                     const changes = req.body.changes;
+    //                     app.model.qtHopDongDvtlTn.update({ ma: req.body.ma }, changes, (error, item) => res.send({ error, item }));
+    //                 } else {
+    //                     res.send({ error: 'Not found!' });
+    //                 }
+    //             }
+    //         });
+    //     } else {
+    //         res.send({ error: 'Invalid parameter!' });
+    //     }
+    // });
 
-    app.delete('/api/user/qua-trinh/hop-dong-dvtl-tn', app.permission.check('staff:login'), (req, res) => {
-        if (req.session.user) {
-            app.model.qtHopDongDvtlTn.get({ ma: req.body.ma }, (error, item) => {
-                if (error || item == null) {
-                    res.status(400).send({ error: 'Not found!' });
-                } else {
-                    if (item.shcc === req.cookies.personId) {
-                        app.model.qtHopDongDvtlTn.delete({ ma: req.body.ma }, (error) => res.send(error));
-                    } else {
-                        res.status(400).send({ error: 'Not found!' });
-                    }
-                }
-            });
-        } else {
-            res.status(400).send({ error: 'Invalid parameter!' });
-        }
-    });
+    // app.delete('/api/user/qua-trinh/hop-dong-dvtl-tn', app.permission.check('staff:login'), (req, res) => {
+    //     if (req.session.user) {
+    //         app.model.qtHopDongDvtlTn.get({ ma: req.body.ma }, (error, item) => {
+    //             if (error || item == null) {
+    //                 res.send({ error: 'Not found!' });
+    //             } else {
+    //                 if (item.email === req.session.user.email) {
+    //                     app.model.qtHopDongDvtlTn.delete({ ma: req.body.ma }, (error) => res.send(error));
+    //                 } else {
+    //                     res.send({ error: 'Not found!' });
+    //                 }
+    //             }
+    //         });
+    //     } else {
+    //         res.send({ error: 'Invalid parameter!' });
+    //     }
+    // });
 
-    app.get('/api/user/qua-trinh/hop-dong-dvtl-tn/item/:ma', app.permission.check('staff:login'), (req, res) => {
-        app.model.qtHopDongDvtlTn.get({ ma: req.params.ma }, (error, item) => {
-            if (error || item == null) {
-                res.send({ error });
-            } else {
-                if (req.session.user.shcc.trim() === item.shcc) {
-                    res.send({ item });
-                } else {
-                    res.status(403).send({ error: 'Lấy thông tin bị lỗi' });
-                }
-            }
-        });
-    });
+    // app.get('/api/user/qua-trinh/hop-dong-dvtl-tn/item/:ma', app.permission.check('staff:login'), (req, res) => {
+    //     app.model.qtHopDongDvtlTn.get({ ma: req.params.ma }, (error, item) => {
+    //         if (error || item == null) {
+    //             res.send({ error });
+    //         } else {
+    //             if (req.session.user.shcc.trim() === item.shcc) {
+    //                 res.send({ item });
+    //             } else {
+    //                 res.status(403).send({ error: 'Lấy thông tin bị lỗi' });
+    //             }
+    //         }
+    //     });
+    // });
     app.get('/api/tccb/qua-trinh/hop-dong-dvtl-tn/edit/item/:ma', app.permission.check('staff:login') && app.permission.check('qtHopDongDvtlTn:read'), (req, res) => {
         app.model.qtHopDongDvtlTn.get({ ma: req.params.ma }, (error, qtHopDongDvtlTn) => {
             if (error || qtHopDongDvtlTn == null) {

@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.category,
         menus: {
-            76: { title: 'Trình độ Quản lý nhà nước', link: '/user/danh-muc/trinh-do-quan-ly-nha-nuoc' },
+            4077: { title: 'Trình độ Quản lý nhà nước', link: '/user/danh-muc/trinh-do-quan-ly-nha-nuoc' },
         },
     };
     app.permission.add(
