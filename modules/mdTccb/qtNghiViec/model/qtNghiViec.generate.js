@@ -1,9 +1,9 @@
-// Table name: QT_NGHI_THAI_SAN { stt, chucVu, donVi, soBhxh, thoiGianBatDauNghi, thoiGianKetThucNghi, thoiGianDiLamLai, ghiChu, thoiGianBaoTangBenBhxh, soThangDuocNghi, daNopHoSoThaiSan, hoSoThaiDuocDuyet, shcc }
-const keys = ['SHCC', 'STT'];
-const obj2Db = { 'stt': 'STT', 'chucVu': 'CHUC_VU', 'donVi': 'DON_VI', 'soBhxh': 'SO_BHXH', 'thoiGianBatDauNghi': 'THOI_GIAN_BAT_DAU_NGHI', 'thoiGianKetThucNghi': 'THOI_GIAN_KET_THUC_NGHI', 'thoiGianDiLamLai': 'THOI_GIAN_DI_LAM_LAI', 'ghiChu': 'GHI_CHU', 'thoiGianBaoTangBenBhxh': 'THOI_GIAN_BAO_TANG_BEN_BHXH', 'soThangDuocNghi': 'SO_THANG_DUOC_NGHI', 'daNopHoSoThaiSan': 'DA_NOP_HO_SO_THAI_SAN', 'hoSoThaiDuocDuyet': 'HO_SO_THAI_DUOC_DUYET', 'shcc': 'SHCC' };
+// Table name: QT_NGHI_VIEC { shcc, hoTen, ngayNghi, soQuyetDinh, ghiChu, dienNghi, noiDung, ma }
+const keys = ['MA'];
+const obj2Db = { 'shcc': 'SHCC', 'hoTen': 'HO_TEN', 'ngayNghi': 'NGAY_NGHI', 'soQuyetDinh': 'SO_QUYET_DINH', 'ghiChu': 'GHI_CHU', 'dienNghi': 'DIEN_NGHI', 'noiDung': 'NOI_DUNG', 'ma': 'MA' };
 
 module.exports = app => {
-    app.model.qtNghiThaiSan = {
+    app.model.qtNghiViec = {
         create: (data, done) => {
             let statement = '', values = '', parameter = {};
             Object.keys(data).forEach(column => {
@@ -17,10 +17,10 @@ module.exports = app => {
             if (statement.length == 0) {
                 done('Data is empty!');
             } else {
-                const sql = 'INSERT INTO QT_NGHI_THAI_SAN (' + statement.substring(2) + ') VALUES (' + values.substring(2) + ')';
+                const sql = 'INSERT INTO QT_NGHI_VIEC (' + statement.substring(2) + ') VALUES (' + values.substring(2) + ')';
                 app.dbConnection.execute(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
-                        app.model.qtNghiThaiSan.get({ rowId: resultSet.lastRowid }, done);
+                        app.model.qtNghiViec.get({ rowId: resultSet.lastRowid }, done);
                     } else {
                         done(error ? error : 'Execute SQL command fail! Sql = ' + sql);
                     }
@@ -41,7 +41,7 @@ module.exports = app => {
             if (orderBy) Object.keys(obj2Db).sort((a, b) => b.length - a.length).forEach(key => orderBy = orderBy.replaceAll(key, obj2Db[key]));
             condition = app.dbConnection.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
-            const sql = 'SELECT ' + app.dbConnection.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT * FROM QT_NGHI_THAI_SAN' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '') + ') WHERE ROWNUM=1';
+            const sql = 'SELECT ' + app.dbConnection.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT * FROM QT_NGHI_VIEC' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '') + ') WHERE ROWNUM=1';
             app.dbConnection.execute(sql, parameter, (error, resultSet) => done(error, resultSet && resultSet.rows && resultSet.rows.length ? resultSet.rows[0] : null));
         },
 
@@ -58,7 +58,7 @@ module.exports = app => {
             if (orderBy) Object.keys(obj2Db).sort((a, b) => b.length - a.length).forEach(key => orderBy = orderBy.replaceAll(key, obj2Db[key]));
             condition = app.dbConnection.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
-            const sql = 'SELECT ' + app.dbConnection.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM QT_NGHI_THAI_SAN' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '');
+            const sql = 'SELECT ' + app.dbConnection.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM QT_NGHI_VIEC' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '');
             app.dbConnection.execute(sql, parameter, (error, resultSet) => done(error, resultSet && resultSet.rows ? resultSet.rows : []));
         },
 
@@ -76,14 +76,14 @@ module.exports = app => {
             condition = app.dbConnection.buildCondition(obj2Db, condition, ' AND ');
             let leftIndex = (pageNumber <= 1 ? 0 : pageNumber - 1) * pageSize,
                 parameter = condition.parameter ? condition.parameter : {};
-            const sql_count = 'SELECT COUNT(*) FROM QT_NGHI_THAI_SAN' + (condition.statement ? ' WHERE ' + condition.statement : '');
+            const sql_count = 'SELECT COUNT(*) FROM QT_NGHI_VIEC' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.dbConnection.execute(sql_count, parameter, (err, res) => {
                 let result = {};
                 let totalItem = res && res.rows && res.rows[0] ? res.rows[0]['COUNT(*)'] : 0;
                 result = { totalItem, pageSize, pageTotal: Math.ceil(totalItem / pageSize) };
                 result.pageNumber = Math.max(1, Math.min(pageNumber, result.pageTotal));
                 leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
-                const sql = 'SELECT ' + app.dbConnection.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT QT_NGHI_THAI_SAN.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM QT_NGHI_THAI_SAN' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
+                const sql = 'SELECT ' + app.dbConnection.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT QT_NGHI_VIEC.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM QT_NGHI_VIEC' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
                 app.dbConnection.execute(sql, parameter, (error, resultSet) => {
                     result.list = resultSet && resultSet.rows ? resultSet.rows : [];
                     done(error, result);
@@ -96,10 +96,10 @@ module.exports = app => {
             changes = app.dbConnection.buildCondition(obj2Db, changes, ', ', 'NEW_');
             if (changes.statement) {
                 const parameter = app.clone(condition.parameter ? condition.parameter : {}, changes.parameter ? changes.parameter : {});
-                const sql = 'UPDATE QT_NGHI_THAI_SAN SET ' + changes.statement + (condition.statement ? ' WHERE ' + condition.statement : '');
+                const sql = 'UPDATE QT_NGHI_VIEC SET ' + changes.statement + (condition.statement ? ' WHERE ' + condition.statement : '');
                 app.dbConnection.execute(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
-                        app.model.qtNghiThaiSan.get({ rowId: resultSet.lastRowid }, done);
+                        app.model.qtNghiViec.get({ rowId: resultSet.lastRowid }, done);
                     } else {
                         done(error);
                     }
@@ -116,7 +116,7 @@ module.exports = app => {
             }
             condition = app.dbConnection.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
-            const sql = 'DELETE FROM QT_NGHI_THAI_SAN' + (condition.statement ? ' WHERE ' + condition.statement : '');
+            const sql = 'DELETE FROM QT_NGHI_VIEC' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.dbConnection.execute(sql, parameter, error => done(error));
         },
 
@@ -127,18 +127,8 @@ module.exports = app => {
             }
             condition = app.dbConnection.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
-            const sql = 'SELECT COUNT(*) FROM QT_NGHI_THAI_SAN' + (condition.statement ? ' WHERE ' + condition.statement : '');
+            const sql = 'SELECT COUNT(*) FROM QT_NGHI_VIEC' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.dbConnection.execute(sql, parameter, (error, result) => done(error, result));
-        },
-
-        searchPage: (pagenumber, pagesize, searchterm, done) => {
-            app.dbConnection.execute('BEGIN :ret:=qt_nghi_thai_san_search_page(:pagenumber, :pagesize, :searchterm, :totalitem, :pagetotal); END;',
-                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, pagenumber: { val: pagenumber, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, pagesize: { val: pagesize, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, searchterm, totalitem: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pagetotal: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
-        },
-
-        groupPage: (pagenumber, pagesize, searchterm, done) => {
-            app.dbConnection.execute('BEGIN :ret:=qt_nghi_thai_san_group_page(:pagenumber, :pagesize, :searchterm, :totalitem, :pagetotal); END;',
-                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, pagenumber: { val: pagenumber, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, pagesize: { val: pagesize, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, searchterm, totalitem: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pagetotal: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
         },
     };
 };
