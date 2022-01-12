@@ -4,7 +4,7 @@ const obj2Db = { 'shcc': 'SHCC', 'batDau': 'BAT_DAU', 'ketThuc': 'KET_THUC', 'no
 
 module.exports = app => {
     app.model.qtNuocNgoai = {
-        create: (data, done) => {    
+        create: (data, done) => {
             let statement = '', values = '', parameter = {};
             Object.keys(data).forEach(column => {
                 if (obj2Db[column]) {
