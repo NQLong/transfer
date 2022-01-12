@@ -1,6 +1,6 @@
-// Table name: QT_KY_LUAT { id, batDau, ketThuc, lyDoHinhThuc, capQuyetDinh, batDauType, ketThucType, shcc, diemThiDua, noiDung}
+// Table name: QT_KY_LUAT { id, batDau, ketThuc, lyDoHinhThuc, capQuyetDinh, batDauType, ketThucType, shcc, diemThiDua, noiDung }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'batDau': 'BAT_DAU', 'ketThuc': 'KET_THUC', 'lyDoHinhThuc': 'LY_DO_HINH_THUC', 'capQuyetDinh': 'CAP_QUYET_DINH', 'batDauType': 'BAT_DAU_TYPE', 'ketThucType': 'KET_THUC_TYPE', 'shcc': 'SHCC', 'diemThiDua': 'DIEM_THI_DUA', 'noiDung': 'NOI_DUNG'};
+const obj2Db = { 'id': 'ID', 'batDau': 'BAT_DAU', 'ketThuc': 'KET_THUC', 'lyDoHinhThuc': 'LY_DO_HINH_THUC', 'capQuyetDinh': 'CAP_QUYET_DINH', 'batDauType': 'BAT_DAU_TYPE', 'ketThucType': 'KET_THUC_TYPE', 'shcc': 'SHCC', 'diemThiDua': 'DIEM_THI_DUA', 'noiDung': 'NOI_DUNG' };
 
 module.exports = app => {
     app.model.qtKyLuat = {
