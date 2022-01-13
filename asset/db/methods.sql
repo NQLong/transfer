@@ -1167,6 +1167,172 @@ END;
 /
 --EndMethod--
 
+CREATE OR REPLACE FUNCTION QT_GIAI_THUONG_GROUP_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER, loaiDoiTuong IN STRING,
+                                               searchTerm IN STRING,
+                                               totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
+AS
+    my_cursor SYS_REFCURSOR;
+    sT        STRING(500) := '%' || lower(searchTerm) || '%';
+BEGIN
+    SELECT COUNT(*)
+    INTO totalItem
+
+    FROM (SELECT *
+          FROM QT_GIAI_THUONG
+          WHERE ID IN (SELECT MAX(ID) FROM (SELECT * FROM QT_GIAI_THUONG ORDER BY SHCC DESC) GROUP BY SHCC)) qtgt
+             LEFT JOIN TCHC_CAN_BO cb on qtgt.SHCC = cb.SHCC
+             LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
+    WHERE (loaiDoiTuong = '-1' OR INSTR(loaiDoiTuong, dv.MA) != 0)
+        AND (searchTerm = ''
+       OR LOWER(cb.SHCC) LIKE sT
+       OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT);
+
+    IF pageNumber < 1 THEN pageNumber := 1; END IF;
+    IF pageSize < 1 THEN pageSize := 1; END IF;
+    pageTotal := CEIL(totalItem / pageSize);
+    pageNumber := LEAST(pageNumber, pageTotal);
+
+    OPEN my_cursor FOR
+        SELECT *
+        FROM (
+                 SELECT qtgt.ID           AS                "id",
+                        qtgt.TEN_GIAI_THUONG    AS "tenGiaiThuong",
+                        qtgt.NOI_DUNG   AS "noiDung",
+                        qtgt.NOI_CAP    AS "noiCap",
+                        qtgt.NAM_CAP    AS "namCap",
+                        qtgt.SHCC AS "shcc",
+
+                        cb.HO              AS                "hoCanBo",
+                        cb.TEN             AS                "tenCanBo",
+
+                        dv.MA              AS                "maDonVi",
+                        dv.TEN             AS                "tenDonVi",
+
+                        ROW_NUMBER() OVER (ORDER BY ID DESC) R
+                FROM (SELECT *
+                      FROM QT_GIAI_THUONG
+                      WHERE ID IN (SELECT MAX(ID) FROM (SELECT * FROM QT_GIAI_THUONG ORDER BY SHCC DESC) GROUP BY SHCC)) qtgt
+                         LEFT JOIN TCHC_CAN_BO cb on qtgt.SHCC = cb.SHCC
+                         LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
+                WHERE (loaiDoiTuong = '-1' OR INSTR(loaiDoiTuong, dv.MA) != 0)
+                    AND (searchTerm = ''
+                   OR LOWER(cb.SHCC) LIKE sT
+                   OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT)
+                ORDER BY qtgt.ID DESC
+             )
+        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
+    RETURN my_cursor;
+
+END;
+/
+--EndMethod--
+
+CREATE OR REPLACE FUNCTION QT_GIAI_THUONG_GROUP_PAGE_MA(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER, loaiDoiTuong IN STRING,
+                                               searchTerm IN STRING,
+                                               totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
+AS
+    my_cursor SYS_REFCURSOR;
+    sT        STRING(500) := '%' || lower(searchTerm) || '%';
+BEGIN
+    SELECT COUNT(*)
+    INTO totalItem
+
+    FROM QT_GIAI_THUONG qtgt
+             LEFT JOIN TCHC_CAN_BO cb on qtgt.SHCC = cb.SHCC
+             LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
+    WHERE (loaiDoiTuong = '-1' OR loaiDoiTuong = dv.MA) AND (qtgt.SHCC = searchTerm);
+
+    IF pageNumber < 1 THEN pageNumber := 1; END IF;
+    IF pageSize < 1 THEN pageSize := 1; END IF;
+    pageTotal := CEIL(totalItem / pageSize);
+    pageNumber := LEAST(pageNumber, pageTotal);
+
+    OPEN my_cursor FOR
+        SELECT *
+        FROM (
+                 SELECT qtgt.ID           AS                "id",
+                        qtgt.TEN_GIAI_THUONG    AS "tenGiaiThuong",
+                        qtgt.NOI_DUNG   AS "noiDung",
+                        qtgt.NOI_CAP    AS "noiCap",
+                        qtgt.NAM_CAP    AS "namCap",
+                        qtgt.SHCC AS "shcc",
+
+                        cb.HO              AS                "hoCanBo",
+                        cb.TEN             AS                "tenCanBo",
+
+                        dv.MA              AS                "maDonVi",
+                        dv.TEN             AS                "tenDonVi",
+
+                        ROW_NUMBER() OVER (ORDER BY ID DESC) R
+                FROM QT_GIAI_THUONG qtgt
+                         LEFT JOIN TCHC_CAN_BO cb on qtgt.SHCC = cb.SHCC
+                         LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
+                WHERE (loaiDoiTuong = '-1' OR loaiDoiTuong = dv.MA) AND (qtgt.SHCC = searchTerm)
+                ORDER BY qtgt.ID DESC
+             )
+        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
+    RETURN my_cursor;
+
+END;
+/
+--EndMethod--
+
+CREATE OR REPLACE FUNCTION QT_GIAI_THUONG_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER, loaiDoiTuong IN STRING,
+                                               searchTerm IN STRING,
+                                               totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
+AS
+    my_cursor SYS_REFCURSOR;
+    sT        STRING(500) := '%' || lower(searchTerm) || '%';
+BEGIN
+    SELECT COUNT(*)
+    INTO totalItem
+
+    FROM QT_GIAI_THUONG qtgt
+             LEFT JOIN TCHC_CAN_BO cb on qtgt.SHCC = cb.SHCC
+             LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
+    WHERE (loaiDoiTuong = '-1' OR INSTR(loaiDoiTuong, dv.MA) != 0)
+        AND (searchTerm = ''
+       OR LOWER(cb.SHCC) LIKE sT
+       OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT);
+
+    IF pageNumber < 1 THEN pageNumber := 1; END IF;
+    IF pageSize < 1 THEN pageSize := 1; END IF;
+    pageTotal := CEIL(totalItem / pageSize);
+    pageNumber := LEAST(pageNumber, pageTotal);
+
+    OPEN my_cursor FOR
+        SELECT *
+        FROM (
+                 SELECT qtgt.ID           AS                "id",
+                        qtgt.TEN_GIAI_THUONG    AS "tenGiaiThuong",
+                        qtgt.NOI_DUNG   AS "noiDung",
+                        qtgt.NOI_CAP    AS "noiCap",
+                        qtgt.NAM_CAP    AS "namCap",
+                        qtgt.SHCC AS "shcc",
+
+                        cb.HO              AS                "hoCanBo",
+                        cb.TEN             AS                "tenCanBo",
+
+                        dv.MA              AS                "maDonVi",
+                        dv.TEN             AS                "tenDonVi",
+
+                        ROW_NUMBER() OVER (ORDER BY ID DESC) R
+                FROM QT_GIAI_THUONG qtgt
+                         LEFT JOIN TCHC_CAN_BO cb on qtgt.SHCC = cb.SHCC
+                         LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
+                WHERE (loaiDoiTuong = '-1' OR INSTR(loaiDoiTuong, dv.MA) != 0)
+                    AND (searchTerm = ''
+                   OR LOWER(cb.SHCC) LIKE sT
+                   OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT)
+                ORDER BY qtgt.ID DESC
+             )
+        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
+    RETURN my_cursor;
+
+END;
+/
+--EndMethod--
+
 CREATE OR REPLACE FUNCTION QT_HOP_DONG_DVTL_TN_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER, searchTerm IN STRING, totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
 AS
     my_cursor SYS_REFCURSOR;
@@ -1723,6 +1889,181 @@ BEGIN
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
     RETURN my_cursor;
 
+END;
+/
+--EndMethod--
+
+CREATE OR REPLACE FUNCTION QT_HUONG_DAN_LUAN_VAN_GROUP_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER,
+                                                 loaiDoiTuong IN STRING,
+                                                 searchTerm IN STRING,
+                                                 totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
+AS
+    my_cursor SYS_REFCURSOR;
+    sT        STRING(500) := '%' || lower(searchTerm) || '%';
+BEGIN
+    SELECT COUNT(*)
+    INTO totalItem
+
+    FROM (SELECT *
+          FROM QT_HUONG_DAN_LUAN_VAN
+          WHERE ID IN (SELECT MAX(ID) FROM (SELECT * FROM QT_HUONG_DAN_LUAN_VAN ORDER BY ID DESC) GROUP BY ID)) hdlv
+             LEFT JOIN TCHC_CAN_BO cb on hdlv.SHCC = cb.SHCC
+             LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
+    WHERE (loaiDoiTuong = '-1' OR INSTR(loaiDoiTuong, dv.MA) != 0)
+      AND (searchTerm = ''
+        OR LOWER(cb.SHCC) LIKE sT
+        OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
+        OR LOWER(hdlv.TEN_LUAN_VAN) LIKE sT
+        OR LOWER(hdlv.SAN_PHAM) LIKE sT);
+
+    IF pageNumber < 1 THEN pageNumber := 1; END IF;
+    IF pageSize < 1 THEN pageSize := 1; END IF;
+    pageTotal := CEIL(totalItem / pageSize);
+    pageNumber := LEAST(pageNumber, pageTotal);
+
+    OPEN my_cursor FOR
+        SELECT *
+        FROM (
+                 SELECT hdlv.ID             AS               "id",
+                        hdlv.SHCC           AS               "shcc",
+                        hdlv.TEN_LUAN_VAN   AS               "tenLuanVan",
+                        hdlv.HO_TEN         AS               "hoTen",
+                        hdlv.NAM_TOT_NGHIEP AS               "namTotNghiep",
+                        hdlv.BAC_DAO_TAO    AS               "bacDaoTao",
+                        hdlv.SAN_PHAM       AS               "sanPham",
+                        cb.HO               AS               "hoCanBo",
+                        cb.TEN              AS               "tenCanBo",
+
+                        dv.MA               AS               "maDonVi",
+                        dv.TEN              AS               "tenDonVi",
+
+                        ROW_NUMBER() OVER (ORDER BY ID DESC) R
+                 FROM (SELECT *
+                       FROM QT_HUONG_DAN_LUAN_VAN
+                       WHERE ID IN (SELECT MAX(ID)
+                                    FROM (SELECT * FROM QT_HUONG_DAN_LUAN_VAN ORDER BY ID DESC)
+                                    GROUP BY ID)) hdlv
+                          LEFT JOIN TCHC_CAN_BO cb on hdlv.SHCC = cb.SHCC
+                          LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
+                 WHERE (loaiDoiTuong = '-1' OR INSTR(loaiDoiTuong, dv.MA) != 0)
+                   AND (searchTerm = ''
+                     OR LOWER(cb.SHCC) LIKE sT
+                     OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
+                     OR LOWER(hdlv.TEN_LUAN_VAN) LIKE sT
+                     OR LOWER(hdlv.SAN_PHAM) LIKE sT)
+                 ORDER BY hdlv.NAM_TOT_NGHIEP DESC
+             )
+        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
+    RETURN my_cursor;
+END;
+/
+--EndMethod--
+
+CREATE OR REPLACE FUNCTION QT_HUONG_DAN_LUAN_VAN_GROUP_PAGE_SHCC(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER,
+                                                      loaiDoiTuong IN STRING,
+                                                      searchTerm IN STRING,
+                                                      totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
+AS
+    my_cursor SYS_REFCURSOR;
+    sT        STRING(500) := '%' || lower(searchTerm) || '%';
+BEGIN
+    SELECT COUNT(*)
+    INTO totalItem
+
+    FROM QT_HUONG_DAN_LUAN_VAN hdlv
+             LEFT JOIN TCHC_CAN_BO cb on hdlv.SHCC = cb.SHCC
+             LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
+    WHERE (loaiDoiTuong = '-1' OR loaiDoiTuong = dv.MA)
+      AND (hdlv.SHCC = searchTerm);
+
+    IF pageNumber < 1 THEN pageNumber := 1; END IF;
+    IF pageSize < 1 THEN pageSize := 1; END IF;
+    pageTotal := CEIL(totalItem / pageSize);
+    pageNumber := LEAST(pageNumber, pageTotal);
+
+    OPEN my_cursor FOR
+        SELECT *
+        FROM (
+                 SELECT hdlv.ID             AS               "id",
+                        hdlv.SHCC           AS               "shcc",
+                        hdlv.TEN_LUAN_VAN   AS               "tenLuanVan",
+                        hdlv.HO_TEN         AS               "hoTen",
+                        hdlv.NAM_TOT_NGHIEP AS               "namTotNghiep",
+                        hdlv.BAC_DAO_TAO    AS               "bacDaoTao",
+                        hdlv.SAN_PHAM       AS               "sanPham",
+                        cb.HO               AS               "hoCanBo",
+                        cb.TEN              AS               "tenCanBo",
+
+                        ROW_NUMBER() OVER (ORDER BY ID DESC) R
+                 FROM QT_HUONG_DAN_LUAN_VAN hdlv
+                          LEFT JOIN TCHC_CAN_BO cb on hdlv.SHCC = cb.SHCC
+                          LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
+                 WHERE (loaiDoiTuong = '-1' OR loaiDoiTuong = dv.MA)
+                   AND (hdlv.SHCC = searchTerm)
+                 ORDER BY hdlv.NAM_TOT_NGHIEP DESC
+             )
+        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
+    RETURN my_cursor;
+END;
+/
+--EndMethod--
+
+CREATE OR REPLACE FUNCTION QT_HUONG_DAN_LUAN_VAN_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER,
+                                                  loaiDoiTuong IN STRING,
+                                                  searchTerm IN STRING,
+                                                  totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
+AS
+    my_cursor SYS_REFCURSOR;
+    sT        STRING(500) := '%' || lower(searchTerm) || '%';
+BEGIN
+    SELECT COUNT(*)
+    INTO totalItem
+
+    FROM QT_HUONG_DAN_LUAN_VAN hdlv
+             LEFT JOIN TCHC_CAN_BO cb on hdlv.SHCC = cb.SHCC
+             LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
+    WHERE (loaiDoiTuong = '-1' OR INSTR(loaiDoiTuong, dv.MA) != 0)
+      AND (searchTerm = ''
+        OR LOWER(cb.SHCC) LIKE sT
+        OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
+        OR LOWER(hdlv.TEN_LUAN_VAN) LIKE sT
+        OR LOWER(hdlv.SAN_PHAM) LIKE sT);
+
+    IF pageNumber < 1 THEN pageNumber := 1; END IF;
+    IF pageSize < 1 THEN pageSize := 1; END IF;
+    pageTotal := CEIL(totalItem / pageSize);
+    pageNumber := LEAST(pageNumber, pageTotal);
+
+    OPEN my_cursor FOR
+        SELECT *
+        FROM (
+                 SELECT hdlv.ID             AS               "id",
+                        hdlv.TEN_LUAN_VAN   AS               "tenLuanVan",
+                        hdlv.HO_TEN         AS               "hoTen",
+                        hdlv.SHCC           as               "shcc",
+                        hdlv.NAM_TOT_NGHIEP AS               "namTotNghiep",
+                        hdlv.BAC_DAO_TAO    AS               "bacDaoTao",
+                        hdlv.SAN_PHAM       AS               "sanPham",
+                        cb.HO               AS               "hoCanBo",
+                        cb.TEN              AS               "tenCanBo",
+
+                        dv.MA               AS               "maDonVi",
+                        dv.TEN              AS               "tenDonVi",
+
+                        ROW_NUMBER() OVER (ORDER BY ID DESC) R
+                 FROM QT_HUONG_DAN_LUAN_VAN hdlv
+                          LEFT JOIN TCHC_CAN_BO cb on hdlv.SHCC = cb.SHCC
+                          LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
+                 WHERE (loaiDoiTuong = '-1' OR INSTR(loaiDoiTuong, dv.MA) != 0)
+                   AND (searchTerm = ''
+                     OR LOWER(cb.SHCC) LIKE sT
+                     OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
+                     OR LOWER(hdlv.TEN_LUAN_VAN) LIKE sT
+                     OR LOWER(hdlv.SAN_PHAM) LIKE sT)
+                 ORDER BY hdlv.NAM_TOT_NGHIEP DESC
+             )
+        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
+    RETURN my_cursor;
 END;
 /
 --EndMethod--
@@ -2595,6 +2936,183 @@ BEGIN
                     ORDER BY nts.THOI_GIAN_BAT_DAU_NGHI DESC, nts.THOI_GIAN_KET_THUC_NGHI DESC
             )
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND  pageNumber * pageSize;
+    RETURN my_cursor;
+
+END;
+/
+--EndMethod--
+
+CREATE OR REPLACE FUNCTION QT_NGHI_VIEC_GROUP_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER, loaiDoiTuong IN STRING,
+                                         searchTerm IN STRING,
+                                         totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
+AS
+    my_cursor SYS_REFCURSOR;
+    sT        STRING(500) := '%' || lower(searchTerm) || '%';
+BEGIN
+    SELECT COUNT(*)
+    INTO totalItem
+
+    FROM (SELECT *
+          FROM QT_NGHI_VIEC
+          WHERE MA IN (SELECT MAX(MA) FROM (SELECT * FROM QT_NGHI_VIEC ORDER BY SHCC DESC) GROUP BY SHCC)) qtnv
+             LEFT JOIN TCHC_CAN_BO cb on qtnv.SHCC = cb.SHCC
+             LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
+    WHERE (loaiDoiTuong = '-1' OR INSTR(loaiDoiTuong, dv.MA) != 0)
+      AND (searchTerm = ''
+        OR LOWER(cb.SHCC) LIKE sT
+        OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
+        OR LOWER(qtnv.HO_TEN) LIKE sT);
+
+    IF pageNumber < 1 THEN pageNumber := 1; END IF;
+    IF pageSize < 1 THEN pageSize := 1; END IF;
+    pageTotal := CEIL(totalItem / pageSize);
+    pageNumber := LEAST(pageNumber, pageTotal);
+
+    OPEN my_cursor FOR
+        SELECT *
+        FROM (
+                 SELECT qtnv.MA            AS                       "ma",
+                        qtnv.HO_TEN        AS                       "hoTen",
+                        qtnv.SHCC          AS                       "shcc",
+                        qtnv.NGAY_NGHI     AS                       "ngayNghi",
+                        qtnv.SO_QUYET_DINH AS                       "soQuyetDinh",
+                        qtnv.NOI_DUNG      AS                       "noiDung",
+                        qtnv.GHI_CHU       AS                       "ghiChu",
+                        qtnv.DIEN_NGHI     AS                       "dienNghi",
+
+                        cb.HO              AS                       "hoCanBo",
+                        cb.TEN             AS                       "tenCanBo",
+
+                        dv.MA              AS                       "maDonVi",
+                        dv.TEN             AS                       "tenDonVi",
+
+                        ROW_NUMBER() OVER (ORDER BY qtnv.NGAY_NGHI DESC) R
+                     FROM (SELECT *
+          FROM QT_NGHI_VIEC
+          WHERE MA IN (SELECT MAX(MA) FROM (SELECT * FROM QT_NGHI_VIEC ORDER BY SHCC DESC) GROUP BY SHCC)) qtnv
+                          LEFT JOIN TCHC_CAN_BO cb on qtnv.SHCC = cb.SHCC
+                          LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
+                 WHERE (loaiDoiTuong = '-1' OR INSTR(loaiDoiTuong, dv.MA) != 0)
+                   AND (searchTerm = ''
+                     OR LOWER(cb.SHCC) LIKE sT
+                     OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
+                     OR LOWER(qtnv.HO_TEN) LIKE sT)
+                 ORDER BY qtnv.NGAY_NGHI DESC
+             )
+        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
+    RETURN my_cursor;
+
+END;
+/
+--EndMethod--
+
+CREATE OR REPLACE FUNCTION QT_NGHI_VIEC_GROUP_PAGE_MA(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER, loaiDoiTuong IN STRING,
+                                           searchTerm IN STRING,
+                                           totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
+AS
+    my_cursor SYS_REFCURSOR;
+BEGIN
+    SELECT COUNT(*)
+    INTO totalItem
+
+    FROM QT_NGHI_VIEC qtnv
+             LEFT JOIN TCHC_CAN_BO cb on qtnv.SHCC = cb.SHCC
+             LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
+    WHERE (loaiDoiTuong = '-1' OR INSTR(loaiDoiTuong, dv.MA) != 0)
+      AND (qtnv.SHCC = searchTerm);
+
+    IF pageNumber < 1 THEN pageNumber := 1; END IF;
+    IF pageSize < 1 THEN pageSize := 1; END IF;
+    pageTotal := CEIL(totalItem / pageSize);
+    pageNumber := LEAST(pageNumber, pageTotal);
+
+    OPEN my_cursor FOR
+        SELECT *
+        FROM (
+                 SELECT qtnv.MA            AS                            "ma",
+                        qtnv.HO_TEN        AS                            "hoTen",
+                        qtnv.SHCC          AS                            "shcc",
+                        qtnv.NGAY_NGHI     AS                            "ngayNghi",
+                        qtnv.SO_QUYET_DINH AS                            "soQuyetDinh",
+                        qtnv.NOI_DUNG      AS                            "noiDung",
+                        qtnv.GHI_CHU       AS                            "ghiChu",
+                        qtnv.DIEN_NGHI     AS                            "dienNghi",
+
+                        cb.HO              AS                            "hoCanBo",
+                        cb.TEN             AS                            "tenCanBo",
+
+                        dv.MA              AS                            "maDonVi",
+                        dv.TEN             AS                            "tenDonVi",
+
+                        ROW_NUMBER() OVER (ORDER BY qtnv.NGAY_NGHI DESC) R
+                 FROM QT_NGHI_VIEC qtnv
+                          LEFT JOIN TCHC_CAN_BO cb on qtnv.SHCC = cb.SHCC
+                          LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
+                 WHERE (loaiDoiTuong = '-1' OR INSTR(loaiDoiTuong, dv.MA) != 0)
+                   AND (qtnv.SHCC = searchTerm)
+                 ORDER BY qtnv.NGAY_NGHI DESC
+             )
+        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
+    RETURN my_cursor;
+
+END;
+/
+--EndMethod--
+
+CREATE OR REPLACE FUNCTION QT_NGHI_VIEC_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER, loaiDoiTuong IN STRING,
+                                         searchTerm IN STRING,
+                                         totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
+AS
+    my_cursor SYS_REFCURSOR;
+    sT        STRING(500) := '%' || lower(searchTerm) || '%';
+BEGIN
+    SELECT COUNT(*)
+    INTO totalItem
+
+    FROM QT_NGHI_VIEC qtnv
+             LEFT JOIN TCHC_CAN_BO cb on qtnv.SHCC = cb.SHCC
+             LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
+    WHERE (loaiDoiTuong = '-1' OR INSTR(loaiDoiTuong, dv.MA) != 0)
+      AND (searchTerm = ''
+        OR LOWER(cb.SHCC) LIKE sT
+        OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
+        OR LOWER(qtnv.HO_TEN) LIKE sT);
+
+    IF pageNumber < 1 THEN pageNumber := 1; END IF;
+    IF pageSize < 1 THEN pageSize := 1; END IF;
+    pageTotal := CEIL(totalItem / pageSize);
+    pageNumber := LEAST(pageNumber, pageTotal);
+
+    OPEN my_cursor FOR
+        SELECT *
+        FROM (
+                 SELECT qtnv.MA            AS                       "ma",
+                        qtnv.HO_TEN        AS                       "hoTen",
+                        qtnv.SHCC          AS                       "shcc",
+                        qtnv.NGAY_NGHI     AS                       "ngayNghi",
+                        qtnv.SO_QUYET_DINH AS                       "soQuyetDinh",
+                        qtnv.NOI_DUNG      AS                       "noiDung",
+                        qtnv.GHI_CHU       AS                       "ghiChu",
+                        qtnv.DIEN_NGHI     AS                       "dienNghi",
+
+                        cb.HO              AS                       "hoCanBo",
+                        cb.TEN             AS                       "tenCanBo",
+
+                        dv.MA              AS                       "maDonVi",
+                        dv.TEN             AS                       "tenDonVi",
+
+                        ROW_NUMBER() OVER (ORDER BY qtnv.NGAY_NGHI DESC) R
+                 FROM QT_NGHI_VIEC qtnv
+                          LEFT JOIN TCHC_CAN_BO cb on qtnv.SHCC = cb.SHCC
+                          LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
+                 WHERE (loaiDoiTuong = '-1' OR INSTR(loaiDoiTuong, dv.MA) != 0)
+                   AND (searchTerm = ''
+                     OR LOWER(cb.SHCC) LIKE sT
+                     OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
+                     OR LOWER(qtnv.HO_TEN) LIKE sT)
+                 ORDER BY qtnv.NGAY_NGHI DESC
+             )
+        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
     RETURN my_cursor;
 
 END;
