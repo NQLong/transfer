@@ -268,7 +268,8 @@ class QtNghienCuuKhoaHoc extends AdminPage {
 
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span><a href='#' onClick={() => this.modal.show(item, false)}>{(item.hoCanBo ? item.hoCanBo : '' )+ ' ' + (item.tenCanBo ? item.tenCanBo : '')}</a></span><br />
+                                {!this.checked ? <span><a href='#' onClick={() => this.modal.show(item, false)}>{(item.hoCanBo ? item.hoCanBo : '' )+ ' ' + (item.tenCanBo ? item.tenCanBo : '')}</a><br /></span> :
+                                <span style={{ color: 'blue' }}>{(item.hoCanBo ? item.hoCanBo : '' )+ ' ' + (item.tenCanBo ? item.tenCanBo : '')}<br/></span>}
                                 {item.shcc + (item.hocViCanBo ? ' - ' + item.hocViCanBo : '')}<br />
 
                             </>
@@ -345,7 +346,7 @@ class QtNghienCuuKhoaHoc extends AdminPage {
             </>,
             backRoute: '/user/tccb',
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
-            onExport: !this.checked ? () => xlsx.writeFile(xlsx.utils.table_to_book(document.querySelector('.table')), this.constructor.name + '.xlsx') : null
+            onExport: () => xlsx.writeFile(xlsx.utils.table_to_book(document.querySelector('.table')), this.constructor.name + '.xlsx')
         });
     }
 }
