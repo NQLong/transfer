@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { AdminModal, AdminPage, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
+import { AdminModal, AdminPage, FormFileBox, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
 import Dropdown from 'view/component/Dropdown';
 import { DateInput } from 'view/component/Input';
 import { createQtNckhStaff, createQtNckhStaffUser, updateQtNckhStaff, updateQtNckhStaffUser, deleteQtNckhStaff, deleteQtNckhStaffUser } from './redux';
@@ -131,6 +131,38 @@ class NckhModal extends AdminModal {
     });
 }
 
+class UploadData extends AdminModal {
+    state = { staff: [], message: '', isDisplay: true, saving: false };
+    // onShow = (item) => {
+
+    // }
+
+    downloadSample = e => {
+        e.preventDefault();
+        T.download(T.url('/api/user/qua-trinh/nckh/download-mau'), 'MauDuLieuNCKH.xlsx');
+    }
+
+    onSuccess = (response) => {
+        if (response && response.item) {
+            T.notify('Upload file success!', 'success');
+        }
+    };
+
+
+    render = () => this.renderModal({
+        title: 'Thông tin nghiên cứu khoa học',
+        size: 'large',
+        body: <div className='row'>
+            <div className='col-12 col-md-10 offset-md-1 tile'>
+                <FormFileBox ref={e => this.upload = e} postUrl='/user/upload' uploadType='NCKHFile' onSuccess={this.onSuccess}/>
+                {this.state.message}
+                <a href='downloadMauDuLieuNCKH' onClick={e => this.downloadSample(e)} className='text-success mt-3 text-center' style={{ display: 'block', width: '100%' }}>Tải file mẫu</a>
+            </div>
+        </div>,
+    })
+
+}
+
 class ComponentNCKH extends AdminPage {
     state = { shcc: '', email: '' };
     value = (shcc, email) => {
@@ -140,6 +172,11 @@ class ComponentNCKH extends AdminPage {
     showModal = (e, item, shcc, email) => {
         e.preventDefault();
         this.modal.show({ item: item, shcc: shcc, email: email });
+    }
+
+    showModalUpload = (e) => {
+        e.preventDefault();
+        this.modalUpload.show({});
     }
 
     deleteNckh = (e, item) => {
@@ -178,10 +215,10 @@ class ComponentNCKH extends AdminPage {
                         <TableCell type='text' content={(
                             <>
                                 <span>Bắt đầu: <b>{T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy')}</b></span> <br />
-                                {item.ketThuc && <span>Kết thúc: <b>{T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy')}</b></span>}<br/>
+                                {item.ketThuc && <span>Kết thúc: <b>{T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy')}</b></span>}<br />
                                 {item.ngayNghiemThu && <span>Nghiệm thu: <b>{T.dateToText(item.ngayNghiemThu, item.ngayNghiemThuType ? item.ngayNghiemThuType : 'dd/mm/yyyy')}</b></span>}
                             </>
-                        )} style={{ whiteSpace: 'nowrap' }}/>
+                        )} style={{ whiteSpace: 'nowrap' }} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.kinhPhi} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.vaiTro} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.ketQua} />
@@ -199,7 +236,10 @@ class ComponentNCKH extends AdminPage {
                     {
                         dataNCKH && renderTableNCKH(dataNCKH)
                     }
-                    {<div className='tile-footer' style={{ textAlign: 'right' }}>
+                    {<div className='tile-footer' style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <button className='btn btn-success' type='button' onClick={e => this.showModalUpload(e, null)}>
+                            <i className='fa fa-fw fa-lg fa-upload' />Upload dữ liệu
+                        </button>
                         <button className='btn btn-info' type='button' onClick={e => this.showModal(e, null, this.state.shcc, this.state.email)}>
                             <i className='fa fa-fw fa-lg fa-plus' />Thêm thông tin nghiên cứu khoa học
                         </button>
@@ -209,6 +249,7 @@ class ComponentNCKH extends AdminPage {
                         create={this.props.userEdit ? this.props.createQtNckhStaffUser : this.props.createQtNckhStaff}
                         update={this.props.userEdit ? this.props.updateQtNckhStaffUser : this.props.updateQtNckhStaff}
                     />
+                    <UploadData ref={e => this.modalUpload = e} />
                 </div>
             </div>
         );
