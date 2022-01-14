@@ -3,10 +3,10 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormRichTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
-import { 
-    updateQtNghienCuuKhoaHocGroupPageMa, deleteQtNckhGroupPageMa, 
-    getQtNghienCuuKhoaHocGroupPageMa, getQtNghienCuuKhoaHocPage } 
-from './redux';
+import {
+    getQtNghienCuuKhoaHocPage, createQtNckhStaffGroup, updateQtNckhStaffGroup, deleteQtNckhStaffGroup
+}
+    from './redux';
 
 import { DateInput } from 'view/component/Input';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
@@ -37,11 +37,11 @@ class EditModal extends AdminModal {
     onShow = (item, multiple = true) => {
         this.multiple = multiple;
         let { id, shcc, batDauType, ketThucType, batDau, ketThuc, tenDeTai, maSoCapQuanLy, kinhPhi, vaiTro, ngayNghiemThu, ketQua, ngayNghiemThuType, thoiGian }
-            = item ? item : 
-            {
-                id: null, shcc: '', batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', batDau: null, ketThuc: null, tenDeTai: '',
-                maSoCapQuanLy: '', kinhPhi: '', vaiTro: '', ngayNghiemThu: null, ketQua: '', ngayNghiemThuType: 'dd/mm/yyyy', thoiGian: null
-            };
+            = item ? item :
+                {
+                    id: null, shcc: '', batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', batDau: null, ketThuc: null, tenDeTai: '',
+                    maSoCapQuanLy: '', kinhPhi: '', vaiTro: '', ngayNghiemThu: null, ketQua: '', ngayNghiemThuType: 'dd/mm/yyyy', thoiGian: null
+                };
         this.setState({
             batDauType: batDauType ? batDauType : 'dd/mm/yyyy',
             ketThucType: ketThuc ? ketThucType : 'dd/mm/yyyy',
@@ -49,7 +49,7 @@ class EditModal extends AdminModal {
             id, batDau, ketThuc, ngayNghiemThu
         });
         setTimeout(() => {
-            this.maCanBo.value(shcc);
+            this.maCanBo.value(shcc ? shcc : this.props.shcc);
             this.batDauType.setText({ text: batDauType ? batDauType : 'dd/mm/yyyy' });
             this.ketThucType.setText({ text: ketThucType ? ketThucType : 'dd/mm/yyyy' });
             this.ngayNghiemThuType.setText({ text: ngayNghiemThuType ? ngayNghiemThuType : 'dd/mm/yyyy' });
@@ -96,7 +96,7 @@ class EditModal extends AdminModal {
             T.notify('Vai trò bị trống!', 'danger');
             this.vaiTro.focus();
         }
-        else this.props.update(this.state.id, changes, this.hide);
+        else this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
 
     }
 
@@ -140,16 +140,17 @@ class EditModal extends AdminModal {
 }
 
 class QtNghienCuuKhoaHocGroupPage extends AdminPage {
-    ma = ''; loaiDoiTuong = '-1';
+    state = { shcc: '' };
     componentDidMount() {
         T.ready('/user/tccb', () => {
-            const route = T.routeMatcher('/user/tccb/qua-trinh/nghien-cuu-khoa-hoc/group_nckh/:loaiDoiTuong/:ma'),
-                params = route.parse(window.location.pathname);
-            this.loaiDoiTuong = params.loaiDoiTuong;
-            this.ma = params.ma;
-            T.onSearch = (searchText) => this.props.getQtNghienCuuKhoaHocPage(undefined, undefined, this.loaiDoiTuong, searchText || '');
+            const route = T.routeMatcher('/user/tccb/qua-trinh/nghien-cuu-khoa-hoc/:shcc'),
+                shcc = route.parse(window.location.pathname);
+            T.onSearch = (searchText) => this.props.getQtNghienCuuKhoaHocPage(undefined, undefined, searchText || '');
             T.showSearchBox();
-            this.props.getQtNghienCuuKhoaHocGroupPageMa(undefined, undefined, this.loaiDoiTuong, this.ma);
+            this.setState({ shcc: shcc.shcc });
+            this.props.getQtNghienCuuKhoaHocPage(undefined, undefined, shcc.shcc, () => {
+                T.updatePage('pageQtNghienCuuKhoaHoc', undefined, undefined, '');
+            });
         });
     }
 
@@ -160,7 +161,7 @@ class QtNghienCuuKhoaHocGroupPage extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa nghiên cứu khoa học', 'Bạn có chắc bạn muốn xóa nghiên cứu khoa học này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtNckhGroupPageMa(item.id, item.shcc, error => {
+            isConfirm && this.props.deleteQtNckhStaffGroup(item.id, item.shcc, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá nghiên cứu khoa học bị lỗi!', 'danger');
                 else T.alert('Xoá nghiên cứu khoa học thành công!', 'success', false, 800);
             });
@@ -191,24 +192,26 @@ class QtNghienCuuKhoaHocGroupPage extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
-                        <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span>{item.hoCanBo + ' ' + item.tenCanBo}</span><br />
-                                {item.shcc}
+                                <a href='#' onClick={e => {e.preventDefault(); this.modal.show(item, false);}}>
+                                    <span>{(item.hoCanBo ? item.hoCanBo : '' )+ ' ' + (item.tenCanBo ? item.tenCanBo : '')}</span><br />
+                                {item.shcc}</a>
                             </>
                         )}
                         />
                         <TableCell type='text' content={
                             <>
-                                <span><i>{item.tenDeTai}</i></span><br /><br/>
-                                <span style={{ whiteSpace: 'nowrap' }}>Vai trò: <span style={{ color: 'blue' }}>{item.vaiTro}</span></span>                            </>
+                                <span><i style={{ textAlign: 'justify', textTransform: 'uppercase' }}>{item.tenDeTai}</i></span><br /><br />
+                                {item.vaiTro ? <span style={{ whiteSpace: 'nowrap' }}>Vai trò: <span style={{ color: 'blue' }}>{item.vaiTro}</span></span> : null}
+                            </>
                         } />
                         <TableCell type='text' content={item.maSoCapQuanLy} />
                         <TableCell type='text' content={(
                             <>
-                                <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span></span><br />
-                                <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span></span> <br />
-                                <span style={{ whiteSpace: 'nowrap' }}>Nghiệm thu: <span style={{ color: 'blue' }}>{item.ngayNghiemThu ? T.dateToText(item.ngayNghiemThu, item.ngayNghiemThuType ? item.ngayNghiemThuType : 'dd/mm/yyyy') : ''}</span></span>
+                                {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
+                                {item.ketThuc ? <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
+                                {item.ngayNghiemThu ? <span style={{ whiteSpace: 'nowrap' }}>Nghiệm thu: <span style={{ color: 'blue' }}>{item.ngayNghiemThu ? T.dateToText(item.ngayNghiemThu, item.ngayNghiemThuType ? item.ngayNghiemThuType : 'dd/mm/yyyy') : ''}</span></span> : null}
                             </>
                         )}
                         />
@@ -224,10 +227,11 @@ class QtNghienCuuKhoaHocGroupPage extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-wpexplorer',
-            title: 'Quá trình nghiên cứu khoa học',
+            title: 'Quá trình nghiên cứu khoa học - Cán bộ',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
-                'Quá trình nghiên cứu khoa học'
+                <Link key={1} to='/user/tccb/qua-trinh/nghien-cuu-khoa-hoc'>Quá trình nghiên cứu khoa học</Link>,
+                'Quá trình nghiên cứu khoa học - Cán bộ'
             ],
             content: <>
                 <div className='tile'>
@@ -236,18 +240,19 @@ class QtNghienCuuKhoaHocGroupPage extends AdminPage {
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getQtNghienCuuKhoaHocPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
-                    permissions={currentPermissions}
-                    update={this.props.updateQtNghienCuuKhoaHocGroupPageMa}
+                    permissions={currentPermissions} shcc={this.state.shcc}
+                    create={this.props.createQtNckhStaffGroup}
+                    update={this.props.updateQtNckhStaffGroup}
                 />
             </>,
-            backRoute: '/user/tccb/qua-trinh/nghien-cuu-khoa-hoc/',
+            backRoute: '/user/tccb/qua-trinh/nghien-cuu-khoa-hoc',
+            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
         });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, qtNghienCuuKhoaHoc: state.qtNghienCuuKhoaHoc });
 const mapActionsToProps = {
-    updateQtNghienCuuKhoaHocGroupPageMa, deleteQtNckhGroupPageMa, 
-    getQtNghienCuuKhoaHocGroupPageMa, getQtNghienCuuKhoaHocPage,
+    getQtNghienCuuKhoaHocPage, createQtNckhStaffGroup, updateQtNckhStaffGroup, deleteQtNckhStaffGroup
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtNghienCuuKhoaHocGroupPage);

@@ -187,11 +187,11 @@ class ComponentNuocNgoai extends AdminPage {
                         dataNuocNgoai && renderNuocNgoaiTable(dataNuocNgoai)
                     }
                     {
-                        <div className='tile-footer' style={{ textAlign: 'right' }}>
+                       !this.props.userEdit ? <div className='tile-footer' style={{ textAlign: 'right' }}>
                             <button className='btn btn-info' type='button' onClick={e => this.showModal(e, null, this.state.shcc, this.state.email)}>
                                 <i className='fa fa-fw fa-lg fa-plus' />Thêm quá trình đi nước ngoài
                             </button>
-                        </div>
+                        </div> : null
                     }
                     <EditModal ref={e => this.modal = e} permission={permission} readOnly={false}
                         create={this.props.userEdit ? this.props.createQtNuocNgoaiStaffUser : this.props.createQtNuocNgoaiStaff} 

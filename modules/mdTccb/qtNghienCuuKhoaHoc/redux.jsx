@@ -50,45 +50,53 @@ export default function QtNghienCuuKhoaHocReducer(state = null, data) {
 }
 
 // Actions ------------------------------------------------------------------------------------------------------------
-T.initPage('pageQtNghienCuuKhoaHoc');
-export function getQtNghienCuuKhoaHocPage(pageNumber, pageSize, loaiDoiTuong, pageCondition, done) {
-    const page = T.updatePage('pageQtNghienCuuKhoaHoc', pageNumber, pageSize, pageCondition);
-    if (!loaiDoiTuong) loaiDoiTuong = [];
-    if (!Array.isArray(loaiDoiTuong)) loaiDoiTuong = [loaiDoiTuong];
+T.initPage('pageQtNghienCuuKhoaHoc', true);
+export function getQtNghienCuuKhoaHocPage(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('pageQtNghienCuuKhoaHoc', pageNumber, pageSize, pageCondition, filter);
+
     return dispatch => {
         const url = `/api/tccb/qua-trinh/nghien-cuu-khoa-hoc/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition, parameter: loaiDoiTuong}, data => {
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách nghiên cứu khoa học bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
-                if (done) done(data.page);
+                if (page.filter) data.page.filter = page.filter;
+                if (page.pageCondition && typeof page.pageCondition == 'string') data.page.pageCondition = page.pageCondition;
+                done && done(data.page);
                 dispatch({ type: QtNghienCuuKhoaHocGetPage, page: data.page });
             }
         }, () => T.notify('Lấy danh sách nghiên cứu khoa học bị lỗi!', 'danger'));
     };
 }
 
-T.initPage('groupPageQtNghienCuuKhoaHoc', true);
-export function getQtNghienCuuKhoaHocGroupPage(pageNumber, pageSize, loaiDoiTuong, pageCondition, done) {
-    const page = T.updatePage('groupPageQtNghienCuuKhoaHoc', pageNumber, pageSize, pageCondition);
-    if (!loaiDoiTuong) loaiDoiTuong = [];
-    if (!Array.isArray(loaiDoiTuong)) loaiDoiTuong = [loaiDoiTuong];
+export function getQtNghienCuuKhoaHocGroupPage(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('pageQtNghienCuuKhoaHoc', pageNumber, pageSize, pageCondition, filter);
+
     return dispatch => {
         const url = `/api/tccb/qua-trinh/nghien-cuu-khoa-hoc/group/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition, parameter: loaiDoiTuong}, data => {
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
-                T.notify('Lấy danh sách nghiên cứu khoa học theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                T.notify('Lấy danh sách nghiên cứu khoa học bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                if (page.filter) data.page.filter = page.filter;
+                if (page.pageCondition && typeof page.pageCondition == 'string') data.page.pageCondition = page.pageCondition;
                 done && done(data.page);
                 dispatch({ type: QtNghienCuuKhoaHocGetGroupPage, page: data.page });
             }
-        }, error => console.error(`GET: ${url}.`, error));
+        }, () => T.notify('Lấy danh sách nghiên cứu khoa học bị lỗi!', 'danger'));
     };
 }
+
 
 T.initPage('groupPageMaQtNghienCuuKhoaHoc', true);
 export function getQtNghienCuuKhoaHocGroupPageMa(pageNumber, pageSize, loaiDoiTuong, pageCondition, done) {
@@ -110,7 +118,30 @@ export function getQtNghienCuuKhoaHocGroupPageMa(pageNumber, pageSize, loaiDoiTu
 }
 
 
-export function updateQtNghienCuuKhoaHocGroupPageMa(id, changes, done) {
+export function createQtNckhStaffGroup(data, done, isEdit = null) {
+    return dispatch => {
+        const url = '/api/qua-trinh/nckh';
+        T.post(url, { data }, res => {
+            if (res.error) {
+                T.notify('Thêm thông tin nghiên cứu khoa học bị lỗi', 'danger');
+                console.error('POST: ' + url + '. ' + res.error);
+            } else {
+                T.notify('Thêm thông tin nghiên cứu khoa học thành công!', 'info');
+                if (done) {
+                    if (isEdit) {
+                        done();
+                        dispatch(getStaffEdit(data.shcc));
+                    }
+                    else {
+                        done(data);
+                        dispatch(getQtNghienCuuKhoaHocPage(undefined, undefined, data.shcc));
+                    }
+                }
+            }
+        }, () => T.notify('Thêm thông tin nghiên cứu khoa học bị lỗi', 'danger'));
+    };
+}
+export function updateQtNckhStaffGroup(id, changes, done) {
     return dispatch => {
         const url = '/api/qua-trinh/nckh';
         T.put(url, { id, changes }, data => {
@@ -121,13 +152,13 @@ export function updateQtNghienCuuKhoaHocGroupPageMa(id, changes, done) {
             } else {
                 T.notify('Cập nhật nghiên cứu khoa học thành công!', 'success');
                 done && done(data.item);
-                dispatch(getQtNghienCuuKhoaHocGroupPageMa(undefined, undefined, '-1', data.shcc));
+                dispatch(getQtNghienCuuKhoaHocPage(undefined, undefined, changes.shcc));
             }
         }, () => T.notify('Cập nhật nghiên cứu khoa học bị lỗi!', 'danger'));
     };
 }
 
-export function deleteQtNckhGroupPageMa(id, shcc, done) {
+export function deleteQtNckhStaffGroup(id, shcc, done) {
     return dispatch => {
         const url = '/api/qua-trinh/nckh';
         T.delete(url, { id }, data => {
@@ -137,7 +168,7 @@ export function deleteQtNckhGroupPageMa(id, shcc, done) {
             } else {
                 T.alert('Thông tin nghiên cứu khoa học được xóa thành công!', 'info', false, 800);
                 done && done(data.item);
-                dispatch(getQtNghienCuuKhoaHocGroupPageMa(undefined, undefined, '-1', shcc));
+                dispatch(getQtNghienCuuKhoaHocPage(undefined, undefined, shcc));
             }
         }, () => T.notify('Xóa thông tin nghiên cứu khoa học bị lỗi', 'danger'));
     };
@@ -161,7 +192,7 @@ export function createQtNckhStaff(data, done, isEdit = null) {
                         done(data);
                         dispatch(getQtNghienCuuKhoaHocPage());
                     }
-                }     
+                }
             }
         }, () => T.notify('Thêm thông tin nghiên cứu khoa học bị lỗi', 'danger'));
     };
@@ -177,7 +208,7 @@ export function updateQtNckhStaff(id, changes, done, isEdit = null) {
             } else if (data.item) {
                 T.notify('Cập nhật thông tin nghiên cứu khoa học thành công!', 'info');
                 isEdit ? (done && done()) : (done && done(data.item));
-                isEdit ? dispatch(getStaffEdit(changes.shcc)) : dispatch(getQtNghienCuuKhoaHocPage());      
+                isEdit ? dispatch(getStaffEdit(changes.shcc)) : dispatch(getQtNghienCuuKhoaHocPage());
             }
         }, () => T.notify('Cập nhật thông tin nghiên cứu khoa học bị lỗi', 'danger'));
     };
