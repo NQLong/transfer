@@ -55,9 +55,9 @@ class EditModal extends AdminModal {
         };
         if (!changes.shcc) {
             T.notify('Chưa chọn cán bộ', 'danger');
-            this.maCanBo.focus();
+            this.shcc.focus();
         } else {
-            this.state.ma ? this.props.update(this.state.ma, changes, this.hide, false) : this.props.create(changes, this.hide, false);
+            this.state.id ? this.props.update(this.state.id, changes, this.hide, false) : this.props.create(changes, this.hide, false);
         }
     }
 
@@ -126,7 +126,7 @@ class QtLuong extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa thông tin lương', 'Bạn có chắc bạn muốn xóa thông tin lương này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtLuongStaff(item.ma, false, null, error => {
+            isConfirm && this.props.deleteQtLuongStaff(item.id, false, null, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá thông tin lương bị lỗi!', 'danger');
                 else T.alert('Xoá thông tin lương thành công!', 'success', false, 800);
             });

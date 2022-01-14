@@ -128,10 +128,10 @@ export function updateQtLuongGroupPageMa(ma, changes, done) {
 }
 
 
-export function deleteQtLuongGroupPageMa(ma, shcc, done) {
+export function deleteQtLuongGroupPageMa(id, shcc, done) {
     return dispatch => {
         const url = '/api/staff/qua-trinh/luong';
-        T.delete(url, { ma }, data => {
+        T.delete(url, { id }, data => {
             if (data.error) {
                 T.notify('Xóa thông tin lương bị lỗi', 'danger');
                 console.error('DELETE: ' + url + '. ' + data.error);
@@ -168,10 +168,10 @@ export function createQtLuongStaff(data, done, isEdit = null) {
     };
 }
 
-export function updateQtLuongStaff(ma, changes, done, isEdit = null) {
+export function updateQtLuongStaff(id, changes, done, isEdit = null) {
     return dispatch => {
         const url = '/api/staff/qua-trinh/luong';
-        T.put(url, { ma, changes }, data => {
+        T.put(url, { id, changes }, data => {
             if (data.error) {
                 T.notify('Cập nhật thông tin lương bị lỗi', 'danger');
                 console.error('PUT: ' + url + '. ' + data.error);
@@ -184,10 +184,10 @@ export function updateQtLuongStaff(ma, changes, done, isEdit = null) {
     };
 }
 
-export function deleteQtLuongStaff(ma, isEdit, shcc = null) {
+export function deleteQtLuongStaff(id, isEdit, shcc = null) {
     return dispatch => {
         const url = '/api/staff/qua-trinh/luong';
-        T.delete(url, { ma }, data => {
+        T.delete(url, { id }, data => {
             if (data.error) {
                 T.notify('Xóa thông tin lương bị lỗi', 'danger');
                 console.error('DELETE: ' + url + '. ' + data.error);
@@ -215,10 +215,10 @@ export function createQtLuongStaffUser(data, done) {
     };
 }
 
-export function updateQtLuongStaffUser(ma, changes, done) {
+export function updateQtLuongStaffUser(id, changes, done) {
     return dispatch => {
         const url = '/api/user/staff/qua-trinh/luong';
-        T.put(url, { ma, changes }, data => {
+        T.put(url, { id, changes }, data => {
             if (data.error) {
                 T.notify('Cập nhật thông tin lương bị lỗi', 'danger');
                 console.error('PUT: ' + url + '. ' + data.error);
@@ -231,10 +231,10 @@ export function updateQtLuongStaffUser(ma, changes, done) {
     };
 }
 
-export function deleteQtLuongStaffUser(ma, email, done) {
+export function deleteQtLuongStaffUser(id, email, done) {
     return dispatch => {
         const url = '/api/user/staff/qua-trinh/luong';
-        T.delete(url, { ma }, data => {
+        T.delete(url, { id }, data => {
             if (data.error) {
                 T.notify('Xóa thông tin lương bị lỗi', 'danger');
                 console.error('DELETE: ' + url + '. ' + data.error);

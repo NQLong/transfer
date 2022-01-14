@@ -85,8 +85,8 @@ module.exports = app => {
         app.model.qtLuong.create(req.body.data, (error, item) => res.send({ error, item })));
 
     app.put('/api/staff/qua-trinh/luong', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtLuong.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item })));
+        app.model.qtLuong.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })));
 
-    app.delete('/api/staff/qua-trinh/luong', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtLuong.delete({ ma: req.body.ma }, (error) => res.send(error)));
+    app.delete('/api/staff/qua-trinh/luong', app.permission.check('staff:write'), (req, res) => {
+        app.model.qtLuong.delete({ id: req.body.id }, (error) => res.send(error));});
 };

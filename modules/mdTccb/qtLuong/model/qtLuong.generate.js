@@ -18,7 +18,6 @@ module.exports = app => {
                 done('Data is empty!');
             } else {
                 const sql = 'INSERT INTO QT_LUONG (' + statement.substring(2) + ') VALUES (' + values.substring(2) + ')';
-                console.log(sql);
                 app.dbConnection.execute(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
                         app.model.qtLuong.get({ rowId: resultSet.lastRowid }, done);
