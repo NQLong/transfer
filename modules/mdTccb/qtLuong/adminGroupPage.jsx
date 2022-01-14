@@ -1,13 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormCheckbox, FormDatePicker } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormDatePicker } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
-    createQtLuongStaff, updateQtLuongStaff, deleteQtLuongStaff,
-    getQtLuongGroupPage, getQtLuongPage,
+    updateQtLuongGroupPageMa, deleteQtLuongGroupPageMa,
+    getQtLuongGroupPageMa, getQtLuongPage,
 } from './redux';
-import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 
 class EditModal extends AdminModal {
@@ -84,23 +83,17 @@ class EditModal extends AdminModal {
     }
 }
 
-class QtLuong extends AdminPage {
-    checked = false;
-    curState = [];
-    searchText = '';
+class QtLuongGroupPage extends AdminPage {
+    ma = ''; loaiDoiTuong = '-1';
     componentDidMount() {
         T.ready('/user/tccb', () => {
-            T.onSearch = (searchText) => {
-                this.searchText = searchText;
-                if (this.checked) this.props.getQtLuongGroupPage(undefined, undefined, this.curState, this.searchText || '');
-                else this.props.getQtLuongPage(undefined, undefined, this.curState, this.searchText || '');
-            };
-            T.showSearchBox(() => {
-                this.loaiDoiTuong?.value('');
-                setTimeout(() => this.changeAdvancedSearch(), 50);
-                setTimeout(() => this.showAdvanceSearch(), 1000);
-            });
-            this.changeAdvancedSearch();
+            const route = T.routeMatcher('/user/tccb/qua-trinh/luong/group/:loaiDoiTuong/:ma'),
+                params = route.parse(window.location.pathname);
+            this.loaiDoiTuong = params.loaiDoiTuong;
+            this.ma = params.ma;
+            T.onSearch = (searchText) => this.props.getQtLuongPage(undefined, undefined, this.loaiDoiTuong, searchText || '');
+            T.showSearchBox();
+            this.props.getQtLuongGroupPageMa(undefined, undefined, this.loaiDoiTuong, this.ma);
         });
     }
 
@@ -109,24 +102,9 @@ class QtLuong extends AdminPage {
         this.modal.show();
     }
 
-    changeAdvancedSearch = () => {
-        let { pageNumber, pageSize } = this.props && this.props.qtLuong && this.props.qtLuong.page ? this.props.qtLuong.page : { pageNumber: 1, pageSize: 50 };
-        const loaiDoiTuong = this.loaiDoiTuong?.value() || [];
-        this.curState = loaiDoiTuong;
-        if (this.checked) this.props.getQtLuongGroupPage(pageNumber, pageSize, this.curState, this.searchText || '');
-        else this.props.getQtLuongPage(pageNumber, pageSize, this.curState, this.searchText || '');
-    }
-
-    groupPage = () => {
-        let { pageNumber, pageSize } = this.props && this.props.qtLuong && this.props.qtLuong.page ? this.props.qtLuong.page : { pageNumber: 1, pageSize: 50 };
-        this.checked = !this.checked;
-        if (this.checked) this.props.getQtLuongGroupPage(pageNumber, pageSize, this.curState, this.searchText || '');
-        else this.props.getQtLuongPage(pageNumber, pageSize, this.curState, this.searchText || '');
-    }
-
     delete = (e, item) => {
         T.confirm('Xóa thông tin lương', 'Bạn có chắc bạn muốn xóa thông tin lương này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtLuongStaff(item.ma, false, null, error => {
+            isConfirm && this.props.deleteQtLuongGroupPageMa(item.ma, item.shcc, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá thông tin lương bị lỗi!', 'danger');
                 else T.alert('Xoá thông tin lương thành công!', 'success', false, 800);
             });
@@ -137,10 +115,7 @@ class QtLuong extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('qtLuong', ['read', 'write', 'delete']);
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ? (
-            this.props.qtLuong && this.props.qtLuong.page_gr ?
-                this.props.qtLuong.page_gr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
-            : (this.props.qtLuong && this.props.qtLuong.page ? this.props.qtLuong.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] });
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtLuong && this.props.qtLuong.page ? this.props.qtLuong.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -148,11 +123,10 @@ class QtLuong extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap', textAlign: 'center' }}>Cán bộ</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Chức danh nghề nghiệp</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap', textAlign: 'center' }}>Thông tin</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Ngày hưởng</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Số hiệu văn bản</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Cán bộ</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thông tin</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số hiệu văn bản</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
@@ -167,16 +141,13 @@ class QtLuong extends AdminPage {
                         )}
                         />
                         <TableCell type='text' style={{  whiteSpace: 'nowrap' }} content={item.chucDanhNgheNghiep}/>
-                        <TableCell type='text' style={{  whiteSpace: 'nowrap' }} content={(
+                        <TableCell type='text' content={(
                             <>
-                                <span><i>Bậc: </i></span> <span>{item.bac}</span> <br/>
-                                <span><i>Hệ số lương: </i></span><span>{item.heSoLuong}</span> <br/>
-                                <span><i>Phụ cấp thâm niên vượt khung: </i></span><span>{item.phuCapThamNienVuotKhung}</span> <br/>
-                                <span><i>Mốc nâng bậc lương: </i></span><span>{item.mocNangBacLuong}</span>
+                                <span>{item.ngayNghi ? T.dateToText(item.ngayNghi, 'dd/mm/yyyy') : ''}</span> <br/>
+                                <span>{('Bậc: ' + item.bac)}</span> <br/>
                             </>
                         )}
                         />
-                        <TableCell type='text' content={item.ngayHuong ? T.dateToText(item.ngayHuong, 'dd/mm/yyyy'): ''} />
                         <TableCell type='text' content={item.soHieuVanBan}/>
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
@@ -196,36 +167,31 @@ class QtLuong extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-money',
+            icon: 'fa fa-sign-out',
             title: 'Quá trình lương',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
                 'Quá trình lương'
             ],
-            advanceSearch: <>
-                <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.loaiDoiTuong = e} label='Chọn loại đơn vị (có thể chọn nhiều loại)' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} />
-            </>,
             content: <>
                 <div className='tile'>
-                    <FormCheckbox label='Hiển thị theo cán bộ' onChange={this.groupPage} />
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                    getPage={this.checked ? this.props.getQtLuongGroupPage : this.props.getQtLuongPage} />
+                    getPage={this.props.getQtLuongPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     permissions={currentPermissions}
-                    create={this.props.createQtLuongStaff} update={this.props.updateQtLuongStaff}
+                    update={this.props.updateQtLuongGroupPageMa}
                 />
             </>,
-            backRoute: '/user/tccb',
-            onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
+            backRoute: '/user/tccb/qua-trinh/luong',
         });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, qtLuong: state.qtLuong });
 const mapActionsToProps = {
-    createQtLuongStaff, updateQtLuongStaff, deleteQtLuongStaff,
-    getQtLuongGroupPage, getQtLuongPage,
+    updateQtLuongGroupPageMa, deleteQtLuongGroupPageMa,
+    getQtLuongGroupPageMa, getQtLuongPage,
 };
-export default connect(mapStateToProps, mapActionsToProps)(QtLuong);
+export default connect(mapStateToProps, mapActionsToProps)(QtLuongGroupPage);

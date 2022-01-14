@@ -1,6 +1,6 @@
 // Table name: QT_LUONG { id, batDau, batDauType, ketThuc, ketThucType, chucDanhNgheNghiep, bac, heSoLuong, phuCapThamNienVuotKhung, ngayHuong, mocNangBacLuong, soHieuVanBan, shcc }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'batDau': 'BAT_DAU', 'batDauType': 'BAT_DAU_TYPE', 'ketThuc': 'KET_THUC', 'ketThucType': 'KET_THUC_TYPE', 'chucDanhNgheNghiep': 'CHUC_DANH_NGHE_NGHIEP', 'bac': 'BAC', 'heSoLuong': 'HE_SO_LUONG', 'phuCapThamNienVuotKhung': 'PHU_CAP_THAM_NIEN_VUOT_KHUNG', 'ngayHuong': 'NGAY_HUONG', 'mocNangBacLuong': 'MOC_NANG_BAC_LUONG', 'soHieuVanBan': 'SO_HIEU_VAN_BAN', 'shcc': 'SHCC' };
+const obj2Db = { 'batDau': 'BAT_DAU', 'batDauType': 'BAT_DAU_TYPE', 'ketThuc': 'KET_THUC', 'ketThucType': 'KET_THUC_TYPE', 'chucDanhNgheNghiep': 'CHUC_DANH_NGHE_NGHIEP', 'bac': 'BAC', 'heSoLuong': 'HE_SO_LUONG', 'phuCapThamNienVuotKhung': 'PHU_CAP_THAM_NIEN_VUOT_KHUNG', 'ngayHuong': 'NGAY_HUONG', 'mocNangBacLuong': 'MOC_NANG_BAC_LUONG', 'soHieuVanBan': 'SO_HIEU_VAN_BAN', 'shcc': 'SHCC', 'id': 'ID' };
 
 module.exports = app => {
     app.model.qtLuong = {
@@ -18,6 +18,7 @@ module.exports = app => {
                 done('Data is empty!');
             } else {
                 const sql = 'INSERT INTO QT_LUONG (' + statement.substring(2) + ') VALUES (' + values.substring(2) + ')';
+                console.log(sql);
                 app.dbConnection.execute(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
                         app.model.qtLuong.get({ rowId: resultSet.lastRowid }, done);

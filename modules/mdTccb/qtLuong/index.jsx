@@ -8,10 +8,10 @@ export default {
         qtLuong,
     },
     routes: [
-        // {
-        //     path: '/user/tccb/qua-trinh/hdlv/group/:loaiDoiTuong/:ma',
-        //     component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
-        // },
+        {
+            path: '/user/tccb/qua-trinh/luong/group/:loaiDoiTuong/:ma',
+            component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
+        },
         {
             path: '/user/tccb/qua-trinh/luong',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })

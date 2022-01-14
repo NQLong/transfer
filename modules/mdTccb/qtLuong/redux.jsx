@@ -95,7 +95,7 @@ export function getQtLuongGroupPageMa(pageNumber, pageSize, loaiDoiTuong, pageCo
     const page = T.updatePage('groupPageMaQtLuong', pageNumber, pageSize, pageCondition);
     if (!loaiDoiTuong) loaiDoiTuong = '-1';
     return dispatch => {
-        const url = `/api/tccb/qua-trinh/luong/group_sgt/page/${loaiDoiTuong}/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/tccb/qua-trinh/luong/group/page/${loaiDoiTuong}/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách lương theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
