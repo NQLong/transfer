@@ -51,16 +51,15 @@ export default function QtNghienCuuKhoaHocReducer(state = null, data) {
 
 // Actions ------------------------------------------------------------------------------------------------------------
 T.initPage('pageQtNghienCuuKhoaHoc', true);
-export function getQtNghienCuuKhoaHocPage(pageNumber, pageSize, pageCondition, filter, done) {
+export function getQtNghienCuuKhoaHocPage(pageNumber, pageSize, pageCondition, mscb, filter, done) {
     if (typeof filter === 'function') {
         done = filter;
         filter = {};
     }
     const page = T.updatePage('pageQtNghienCuuKhoaHoc', pageNumber, pageSize, pageCondition, filter);
-
     return dispatch => {
         const url = `/api/tccb/qua-trinh/nghien-cuu-khoa-hoc/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
+        T.get(url, { condition: page.pageCondition, filter: page.filter, mscb: mscb }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách nghiên cứu khoa học bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);

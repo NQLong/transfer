@@ -172,6 +172,7 @@ class QtNghienCuuKhoaHoc extends AdminPage {
                 this.toYear?.value('');
                 this.loaiHocVi?.value('');
                 this.maDonVi?.value('');
+                this.mulCanBo?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
             if (this.checked) {
@@ -195,7 +196,8 @@ class QtNghienCuuKhoaHoc extends AdminPage {
         const toYear = this.toYear?.value() == '' ? null : this.toYear?.value().getTime();
         const loaiHocVi = this.loaiHocVi?.value() == '' ? '' : this.loaiHocVi?.value().toString();
         const maDonVi = this.maDonVi?.value().toString() || '';
-        const pageFilter = isInitial ? null : { maDonVi, fromYear, toYear, loaiHocVi };
+        const maSoCanBo = this.mulCanBo?.value().toString() || '';
+        const pageFilter = isInitial ? null : { maDonVi, fromYear, toYear, loaiHocVi, maSoCanBo };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
@@ -205,6 +207,7 @@ class QtNghienCuuKhoaHoc extends AdminPage {
                     this.toYear?.value(filter.toYear || '');
                     this.loaiHocVi?.value(filter.loaiHocVi || '');
                     this.maDonVi?.value(filter.maDonVi);
+                    this.mulCanBo?.value(filter.maSoCanBo);
                     if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.loaiCt || filter.maDonVi)) this.showAdvanceSearch();
                 }
             });
@@ -213,7 +216,7 @@ class QtNghienCuuKhoaHoc extends AdminPage {
 
     getPage = (pageN, pageS, pageC, done) => {
         if (this.checked) this.props.getQtNghienCuuKhoaHocGroupPage(pageN, pageS, pageC, this.state.filter, done);
-        else this.props.getQtNghienCuuKhoaHocPage(pageN, pageS, pageC, this.state.filter, done);
+        else this.props.getQtNghienCuuKhoaHocPage(pageN, pageS, pageC, '', this.state.filter, done);
 
     }
 
@@ -243,8 +246,8 @@ class QtNghienCuuKhoaHoc extends AdminPage {
             permission = this.getUserPermission('qtNghienCuuKhoaHoc', ['read', 'write', 'delete']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ? (
             this.props.qtNghienCuuKhoaHoc && this.props.qtNghienCuuKhoaHoc.page_gr ?
-                this.props.qtNghienCuuKhoaHoc.page_gr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
-            : (this.props.qtNghienCuuKhoaHoc && this.props.qtNghienCuuKhoaHoc.page ? this.props.qtNghienCuuKhoaHoc.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] });
+                this.props.qtNghienCuuKhoaHoc.page_gr : { pageNumber: 1, pageSize: 200, pageTotal: 1, totalItem: 0, list })
+            : (this.props.qtNghienCuuKhoaHoc && this.props.qtNghienCuuKhoaHoc.page ? this.props.qtNghienCuuKhoaHoc.page : { pageNumber: 1, pageSize: 200, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] });
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -268,7 +271,7 @@ class QtNghienCuuKhoaHoc extends AdminPage {
 
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                {!this.checked ? <span><a href='#' onClick={() => this.modal.show(item, false)}>{(item.hoCanBo ? item.hoCanBo : '' )+ ' ' + (item.tenCanBo ? item.tenCanBo : '')}</a><br /></span> :
+                                {!this.checked ? <span><a href='#' onClick={(e) => {e.preventDefault(); this.modal.show(item, false);}}>{(item.hoCanBo ? item.hoCanBo : '' )+ ' ' + (item.tenCanBo ? item.tenCanBo : '')}</a><br /></span> :
                                 <span style={{ color: 'blue' }}>{(item.hoCanBo ? item.hoCanBo : '' )+ ' ' + (item.tenCanBo ? item.tenCanBo : '')}<br/></span>}
                                 {item.shcc + (item.hocViCanBo ? ' - ' + item.hocViCanBo : '')}<br />
 
@@ -322,14 +325,15 @@ class QtNghienCuuKhoaHoc extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    {!this.checked ? <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian (nghiệm thu)' onChange={() => this.changeAdvancedSearch()} /> : null}
-                    {!this.checked ? <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian (nghiệm thu)' onChange={() => this.changeAdvancedSearch()} /> : null}
-                    <FormSelect ref={e => this.loaiHocVi = e} label='Loại học vị' className='col-12 col-md-4' data={[
+                    {!this.checked ? <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-3' label='Từ thời gian (nghiệm thu)' onChange={() => this.changeAdvancedSearch()} /> : null}
+                    {!this.checked ? <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-3' label='Đến thời gian (nghiệm thu)' onChange={() => this.changeAdvancedSearch()} /> : null}
+                    <FormSelect ref={e => this.loaiHocVi = e} label='Loại học vị' className='col-12 col-md-3' data={[
                         { id: '04', text: 'Cử nhân' },
                         { id: '03', text: 'Thạc sĩ' },
                         { id: '02', text: 'Tiến sĩ' },
-                    ]} onChange={() => this.changeAdvancedSearch()} multiple={true} allowClear={true} />
-                    <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} />
+                    ]} onChange={() => this.changeAdvancedSearch()} multiple={true} allowClear={true} minimumResultsForSearch={-1}/>
+                    <FormSelect className='col-12 col-md-3' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1}/>
+                    <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1}/>
                 </div>
             </>,
             content: <>

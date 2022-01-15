@@ -145,7 +145,9 @@ class QtNghienCuuKhoaHocGroupPage extends AdminPage {
         T.ready('/user/tccb', () => {
             const route = T.routeMatcher('/user/tccb/qua-trinh/nghien-cuu-khoa-hoc/:shcc'),
                 shcc = route.parse(window.location.pathname);
-            T.onSearch = (searchText) => this.props.getQtNghienCuuKhoaHocPage(undefined, undefined, searchText || '');
+            T.onSearch = (searchText) => {
+                this.props.getQtNghienCuuKhoaHocPage(undefined, undefined, searchText || '', shcc.shcc);
+            };
             T.showSearchBox();
             this.setState({ shcc: shcc.shcc });
             this.props.getQtNghienCuuKhoaHocPage(undefined, undefined, shcc.shcc, () => {
