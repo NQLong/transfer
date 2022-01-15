@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { AdminModal, AdminPage, FormRichTextBox, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
+import FileBox from 'view/component/FileBox';
 import { DateInput } from 'view/component/Input';
 import T from 'view/js/common';
 import { createQtHuongDanLVStaffUser, createQtHuongDanLVStaff, updateQtHuongDanLVStaff, updateQtHuongDanLVStaffUser, deleteQtHuongDanLVStaff, deleteQtHuongDanLVStaffUser } from './redux';
@@ -60,6 +61,92 @@ class EditModal extends AdminModal {
         </div>,
     });
 }
+
+class UploadData extends AdminModal {
+    state = { message: '', displayState: 'import', qtHDLVData: [] };
+
+    downloadSample = e => {
+        e.preventDefault();
+        T.download('/api/qua-trinh/hdlv/download-template');
+    }
+
+    onSuccess = (response) => {
+        if (response.error) {
+            T.notify(response.error, 'danger');
+        } else
+            this.setState({
+                qtHDLVData: response.items,
+                message: <p className='text-center' style={{ color: 'blue' }}>{response.items.length} hàng được tải lên thành công, vui lòng bấm <b>Lưu</b> để chỉnh sửa</p>,
+                displayState: 'data'
+            });
+    };
+
+    onError = () => {
+        T.notify('Quá trình upload dữ liệu bị lỗi!', 'danger');
+    }
+
+    onSubmit = () => {
+        this.state.qtHDLVData.forEach(i => {
+            this.props.create(Object.assign(i,
+                {
+                    shcc: this.props.shcc,
+                    email: this.props.email,
+                    namTotNghiep: parseInt(i.namTotNghiep)
+                }), () => {
+                    this.setState({ message: '', displayState: 'import', qtHDLVData: [] });
+                    this.hide();
+                }, true);
+        });
+    }
+
+    render = () => {
+        const { qtHDLVData, displayState } = this.state;
+
+        const renderData =
+            renderTable({
+                getDataSource: () => qtHDLVData, stickyHead: true,
+                renderHead: () => (
+                    <tr>
+                        <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
+                        <th style={{ width: '30%' }}>Họ tên sinh viên</th>
+                        <th style={{ width: '70%', }}>Tên luận văn, luận án</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm tốt nghiệp</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Bậc đào tạo</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Sản phẩm</th>
+                    </tr>),
+                renderRow: (item, index) => (
+                    <tr key={index}>
+                        <TableCell type='number' style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='link' style={{ whiteSpace: 'nowrap' }} content={item.hoTen} onClick={() => this.modal.show({ item, shcc: this.state.shcc, email: this.state.email })} />
+                        <TableCell type='text' content={item.tenLuanVan} />
+                        <TableCell type='text' content={item.namTotNghiep} style={{ textAlign: 'center' }} />
+                        <TableCell type='text' content={item.bacDaoTao} />
+                        <TableCell type='text' content={item.sanPham} style={{ whiteSpace: 'nowrap' }} />
+                    </tr>)
+            });
+
+        return this.renderModal({
+            title: 'Upload dữ liệu hướng dẫn luận văn',
+            size: 'large',
+            body: <div className='row'>
+                <div className='col-md-12'>
+                    <FileBox postUrl='/user/upload' uploadType='HDLVDataFile' userData='HDLVDataFile' accept='.csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'
+                        style={{ margin: '0 auto', display: displayState == 'import' ? 'block' : 'none' }}
+                        success={this.onSuccess} error={this.onError} />
+                    {this.state.message}
+                    <div style={{ display: displayState == 'import' ? 'none' : 'block' }}>{renderData}</div>
+                    <a href='download-mau-du-lieu-hdlv' onClick={e => this.downloadSample(e)} className='text-success mt-3 text-center' style={{ display: 'block', width: '100%' }}>Tải file mẫu</a>
+                </div>
+            </div>,
+            buttons:
+                <button type='button' className='btn btn-success' onClick={e => { e.preventDefault(); this.setState({ message: '', displayState: 'import', qtHDLVData: [] }); }}>
+                    <i className='fa fa-fw fa-lg fa-refresh' />Tải lại
+                </button>
+        });
+    }
+
+}
+
 class ComponentHDLV extends AdminPage {
     state = { shcc: '', email: '' };
     value = (shcc, email) => {
@@ -69,6 +156,11 @@ class ComponentHDLV extends AdminPage {
     showModal = (e, item, shcc, email) => {
         e.preventDefault();
         this.modal.show({ item: item, shcc: shcc, email: email });
+    }
+
+    showModalUpload = (e) => {
+        e.preventDefault();
+        this.modalUpload.show();
     }
 
     deleteHuongDanLuanVan = (e, item) => {
@@ -93,7 +185,7 @@ class ComponentHDLV extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
                         <th style={{ width: '30%' }}>Họ tên sinh viên</th>
-                        <th style={{ width: '50%', }}>Tên luận văn, luận án</th>
+                        <th style={{ width: '70%', }}>Tên luận văn, luận án</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm tốt nghiệp</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Bậc đào tạo</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Sản phẩm</th>
@@ -106,7 +198,7 @@ class ComponentHDLV extends AdminPage {
                         <TableCell type='text' content={item.tenLuanVan} />
                         <TableCell type='text' content={item.namTotNghiep} style={{ textAlign: 'center' }} />
                         <TableCell type='text' content={item.bacDaoTao} />
-                        <TableCell type='text' content={item.sanPham} style={{ whiteSpace: 'nowrap' }}/>
+                        <TableCell type='text' content={item.sanPham} style={{ whiteSpace: 'nowrap' }} />
                         <TableCell type='buttons' content={item} permission={permission} onEdit={() => this.modal.show({ item, shcc: this.state.shcc, email: this.state.email })}
                             onDelete={this.deleteHuongDanLuanVan}></TableCell>
                     </tr>)
@@ -121,7 +213,10 @@ class ComponentHDLV extends AdminPage {
                         dataHDLV && renderTableHDLV(dataHDLV)
                     }
                     {
-                        <div className='tile-footer' style={{ textAlign: 'right' }}>
+                        <div className='tile-footer' style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <button className='btn btn-success' type='button' onClick={e => this.showModalUpload(e)}>
+                                <i className='fa fa-fw fa-lg fa-upload' />Upload dữ liệu
+                            </button>
                             <button className='btn btn-info' type='button' onClick={e => this.showModal(e, null, this.state.shcc, this.state.email)}>
                                 <i className='fa fa-fw fa-lg fa-plus' />Thêm thông tin hướng dẫn
                             </button>
@@ -131,6 +226,10 @@ class ComponentHDLV extends AdminPage {
                         create={this.props.userEdit ? this.props.createQtHuongDanLVStaffUser : this.props.createQtHuongDanLVStaff}
                         update={this.props.userEdit ? this.props.updateQtHuongDanLVStaffUser : this.props.updateQtHuongDanLVStaff}
                     />
+                    <UploadData ref={e => this.modalUpload = e}
+                        shcc={this.state.shcc} email={this.state.email} userEdit={this.props.userEdit}
+                        create={this.props.userEdit ? this.props.createQtHuongDanLVStaffUser : this.props.createQtHuongDanLVStaff}
+                        renderTable={renderTableHDLV} />
                 </div>
             </div>
         );

@@ -118,6 +118,7 @@ export default class FileBox extends React.Component {
                 if (this.props.complete) this.props.complete();
             },
             success: data => {
+                $(this.box.current).css({ 'background-image': 'url(\'/img/upload.png\')' });
                 this.setState({ isUploading: false });
                 if (this.props.success) this.props.success(data);
             },

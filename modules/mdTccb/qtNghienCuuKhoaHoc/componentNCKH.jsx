@@ -135,26 +135,20 @@ class NckhModal extends AdminModal {
 class UploadData extends AdminModal {
     state = { message: '', displayState: 'import', qtNCKHData: [] };
 
-
-    update = (index, changes, done) => {
-        const qtNCKHData = this.state.qtNCKHData, currentValue = qtNCKHData[index];
-        const updateValue = Object.assign({}, currentValue, changes);
-        qtNCKHData.splice(index, 1, updateValue);
-        this.setState({ qtNCKHData });
-        done && done();
-    };
-
     downloadSample = e => {
         e.preventDefault();
         T.download('/api/qua-trinh/nghien-cuu-khoa-hoc/download-template');
     }
 
     onSuccess = (response) => {
-        this.setState({
-            qtNCKHData: response.items,
-            message: <p className='text-center' style={{ color: 'blue' }}>{response.items.length} hàng được tải lên thành công, vui lòng bấm <b>Lưu</b> để chỉnh sửa</p>,
-            displayState: 'data'
-        });
+        if (response.error) {
+            T.notify(response.error, 'danger');
+        } else
+            this.setState({
+                qtNCKHData: response.items,
+                message: <p className='text-center' style={{ color: 'blue' }}>{response.items.length} hàng được tải lên thành công, vui lòng bấm <b>Lưu</b> để chỉnh sửa</p>,
+                displayState: 'data'
+            });
     };
 
     onError = () => {
@@ -170,7 +164,10 @@ class UploadData extends AdminModal {
                     batDau: (new Date(i.batDau)).getTime(),
                     ketThuc: (new Date(i.ketThuc)).getTime(),
                     ngayNghiemThu: (new Date(i.ngayNghiemThu)).getTime()
-                }), this.hide, true);
+                }), () => {
+                    this.setState({ message: '', displayState: 'import', qtNCKHData: [] });
+                    this.hide();
+                }, true);
         });
     }
 
@@ -189,7 +186,6 @@ class UploadData extends AdminModal {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kinh phí</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Vai trò</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kết quả</th>
-                        {/* <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th> */}
                     </tr>),
                 renderRow: (item, index) => (
                     <tr key={index}>
@@ -206,28 +202,21 @@ class UploadData extends AdminModal {
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.kinhPhi} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.vaiTro} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.ketQua} />
-                        {/* <TableCell type='buttons' content={{ ...item, index: index }} permission={{write: true, delete: true}}
-                            onEdit={() => () => this.modal1.show({ ...item, index: index })}
-                            onDelete={this.deleteNckh}></TableCell> */}
                     </tr>)
             });
 
         return this.renderModal({
-            // style: { position: 'static'},
-            title: 'Thông tin nghiên cứu khoa học',
+            title: 'Upload dữ liệu nghiên cứu khoa học',
             size: 'large',
             body: <div className='row'>
                 <div className='col-md-12'>
                     <FileBox postUrl='/user/upload' uploadType='NCKHDataFile' userData='NCKHDataFile' accept='.csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'
-                        style={{ width: '50%', margin: '0 auto', display: displayState == 'import' ? 'block' : 'none' }}
+                        style={{ margin: '0 auto', display: displayState == 'import' ? 'block' : 'none' }}
                         success={this.onSuccess} error={this.onError} />
                     {this.state.message}
                     <div style={{ display: displayState == 'import' ? 'none' : 'block' }}>{renderData}</div>
-                    <a href='downloadMauDuLieuNCKH' onClick={e => this.downloadSample(e)} className='text-success mt-3 text-center' style={{ display: 'block', width: '100%' }}>Tải file mẫu</a>
+                    <a href='download-mau-du-lieu-nckh' onClick={e => this.downloadSample(e)} className='text-success mt-3 text-center' style={{ display: 'block', width: '100%' }}>Tải file mẫu</a>
                 </div>
-                {/* <NckhModal ref={e => this.modal1 = e}
-                    update={this.update}
-                /> */}
             </div>,
             buttons:
                 <button type='button' className='btn btn-success' onClick={e => { e.preventDefault(); this.setState({ message: '', displayState: 'import', qtNCKHData: [] }); }}>
@@ -251,7 +240,7 @@ class ComponentNCKH extends AdminPage {
 
     showModalUpload = (e) => {
         e.preventDefault();
-        this.modalUpload.show({});
+        this.modalUpload.show();
     }
 
     deleteNckh = (e, item) => {
@@ -312,7 +301,7 @@ class ComponentNCKH extends AdminPage {
                         dataNCKH && renderTableNCKH(dataNCKH)
                     }
                     {<div className='tile-footer' style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <button className='btn btn-success' type='button' onClick={e => this.showModalUpload(e, null)}>
+                        <button className='btn btn-success' type='button' onClick={e => this.showModalUpload(e)}>
                             <i className='fa fa-fw fa-lg fa-upload' />Upload dữ liệu
                         </button>
                         <button className='btn btn-info' type='button' onClick={e => this.showModal(e, null, this.state.shcc, this.state.email)}>
