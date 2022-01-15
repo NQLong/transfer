@@ -213,7 +213,7 @@ export function updateQtNckhStaff(id, changes, done, isEdit = null) {
     };
 }
 
-export function deleteQtNckhStaff(id, shcc, done, isEdit = null) {
+export function deleteQtNckhStaff(id, shcc, isEdit = null) {
     return dispatch => {
         const url = '/api/qua-trinh/nckh';
         T.delete(url, { id }, data => {
@@ -222,7 +222,6 @@ export function deleteQtNckhStaff(id, shcc, done, isEdit = null) {
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
                 T.alert('Thông tin nghiên cứu khoa học được xóa thành công!', 'info', false, 800);
-                if (done) done();
                 isEdit ? dispatch(getStaffEdit(shcc)) : dispatch(getQtNghienCuuKhoaHocPage());
             }
         }, () => T.notify('Xóa thông tin nghiên cứu khoa học bị lỗi', 'danger'));

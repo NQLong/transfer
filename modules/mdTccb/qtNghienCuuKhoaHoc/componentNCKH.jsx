@@ -1,7 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { AdminModal, AdminPage, FormFileBox, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
+import { AdminModal, AdminPage, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
 import Dropdown from 'view/component/Dropdown';
+import FileBox from 'view/component/FileBox';
 import { DateInput } from 'view/component/Input';
 import { createQtNckhStaff, createQtNckhStaffUser, updateQtNckhStaff, updateQtNckhStaffUser, deleteQtNckhStaff, deleteQtNckhStaffUser } from './redux';
 
@@ -132,34 +133,108 @@ class NckhModal extends AdminModal {
 }
 
 class UploadData extends AdminModal {
-    state = { staff: [], message: '', isDisplay: true, saving: false };
-    // onShow = (item) => {
+    state = { message: '', displayState: 'import', qtNCKHData: [] };
 
-    // }
+
+    update = (index, changes, done) => {
+        const qtNCKHData = this.state.qtNCKHData, currentValue = qtNCKHData[index];
+        const updateValue = Object.assign({}, currentValue, changes);
+        qtNCKHData.splice(index, 1, updateValue);
+        this.setState({ qtNCKHData });
+        done && done();
+    };
 
     downloadSample = e => {
         e.preventDefault();
-        T.download(T.url('/api/user/qua-trinh/nckh/download-mau'), 'MauDuLieuNCKH.xlsx');
+        T.download('/api/qua-trinh/nghien-cuu-khoa-hoc/download-template');
     }
 
     onSuccess = (response) => {
-        if (response && response.item) {
-            T.notify('Upload file success!', 'success');
-        }
+        this.setState({
+            qtNCKHData: response.items,
+            message: <p className='text-center' style={{ color: 'blue' }}>{response.items.length} hàng được tải lên thành công, vui lòng bấm <b>Lưu</b> để chỉnh sửa</p>,
+            displayState: 'data'
+        });
     };
 
+    onError = () => {
+        T.notify('Quá trình upload dữ liệu bị lỗi!', 'danger');
+    }
 
-    render = () => this.renderModal({
-        title: 'Thông tin nghiên cứu khoa học',
-        size: 'large',
-        body: <div className='row'>
-            <div className='col-12 col-md-10 offset-md-1 tile'>
-                <FormFileBox ref={e => this.upload = e} postUrl='/user/upload' uploadType='NCKHFile' onSuccess={this.onSuccess}/>
-                {this.state.message}
-                <a href='downloadMauDuLieuNCKH' onClick={e => this.downloadSample(e)} className='text-success mt-3 text-center' style={{ display: 'block', width: '100%' }}>Tải file mẫu</a>
-            </div>
-        </div>,
-    })
+    onSubmit = () => {
+        this.state.qtNCKHData.forEach(i => {
+            this.props.create(Object.assign(i,
+                {
+                    shcc: this.props.shcc,
+                    email: this.props.email,
+                    batDau: (new Date(i.batDau)).getTime(),
+                    ketThuc: (new Date(i.ketThuc)).getTime(),
+                    ngayNghiemThu: (new Date(i.ngayNghiemThu)).getTime()
+                }), this.hide, true);
+        });
+    }
+
+    render = () => {
+        const { qtNCKHData, displayState } = this.state;
+
+        const renderData =
+            renderTable({
+                getDataSource: () => qtNCKHData, stickyHead: true,
+                renderHead: () => (
+                    <tr>
+                        <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
+                        <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Tên đề tài</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Mã số và cấp quản lý</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kinh phí</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Vai trò</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kết quả</th>
+                        {/* <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th> */}
+                    </tr>),
+                renderRow: (item, index) => (
+                    <tr key={index}>
+                        <TableCell type='number' style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='text' content={item.tenDeTai} />
+                        <TableCell type='text' content={item.maSoCapQuanLy} />
+                        <TableCell type='text' content={(
+                            <>
+                                <span>Bắt đầu: <b>{T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy')}</b></span> <br />
+                                {item.ketThuc && <span>Kết thúc: <b>{T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy')}</b></span>}<br />
+                                {item.ngayNghiemThu && <span>Nghiệm thu: <b>{T.dateToText(item.ngayNghiemThu, item.ngayNghiemThuType ? item.ngayNghiemThuType : 'dd/mm/yyyy')}</b></span>}
+                            </>
+                        )} style={{ whiteSpace: 'nowrap' }} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.kinhPhi} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.vaiTro} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.ketQua} />
+                        {/* <TableCell type='buttons' content={{ ...item, index: index }} permission={{write: true, delete: true}}
+                            onEdit={() => () => this.modal1.show({ ...item, index: index })}
+                            onDelete={this.deleteNckh}></TableCell> */}
+                    </tr>)
+            });
+
+        return this.renderModal({
+            // style: { position: 'static'},
+            title: 'Thông tin nghiên cứu khoa học',
+            size: 'large',
+            body: <div className='row'>
+                <div className='col-md-12'>
+                    <FileBox postUrl='/user/upload' uploadType='NCKHDataFile' userData='NCKHDataFile' accept='.csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'
+                        style={{ width: '50%', margin: '0 auto', display: displayState == 'import' ? 'block' : 'none' }}
+                        success={this.onSuccess} error={this.onError} />
+                    {this.state.message}
+                    <div style={{ display: displayState == 'import' ? 'none' : 'block' }}>{renderData}</div>
+                    <a href='downloadMauDuLieuNCKH' onClick={e => this.downloadSample(e)} className='text-success mt-3 text-center' style={{ display: 'block', width: '100%' }}>Tải file mẫu</a>
+                </div>
+                {/* <NckhModal ref={e => this.modal1 = e}
+                    update={this.update}
+                /> */}
+            </div>,
+            buttons:
+                <button type='button' className='btn btn-success' onClick={e => { e.preventDefault(); this.setState({ message: '', displayState: 'import', qtNCKHData: [] }); }}>
+                    <i className='fa fa-fw fa-lg fa-refresh' />Tải lại
+                </button>
+        });
+    }
 
 }
 
@@ -199,7 +274,7 @@ class ComponentNCKH extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                        <th style={{ width: '100%' }}>Tên đề tài</th>
+                        <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Tên đề tài</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Mã số và cấp quản lý</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kinh phí</th>
@@ -249,7 +324,10 @@ class ComponentNCKH extends AdminPage {
                         create={this.props.userEdit ? this.props.createQtNckhStaffUser : this.props.createQtNckhStaff}
                         update={this.props.userEdit ? this.props.updateQtNckhStaffUser : this.props.updateQtNckhStaff}
                     />
-                    <UploadData ref={e => this.modalUpload = e} />
+                    <UploadData ref={e => this.modalUpload = e}
+                        shcc={this.state.shcc} email={this.state.email} userEdit={this.props.userEdit}
+                        create={this.props.userEdit ? this.props.createQtNckhStaffUser : this.props.createQtNckhStaff}
+                        renderTable={renderTableNCKH} />
                 </div>
             </div>
         );
