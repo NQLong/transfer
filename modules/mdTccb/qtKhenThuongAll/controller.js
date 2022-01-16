@@ -48,20 +48,6 @@ module.exports = app => {
             }
         });
     });
-    app.get('/api/tccb/qua-trinh/khen-thuong-all/group_dt/page/:loaiDoiTuong/:pageNumber/:pageSize', app.permission.check('qtKhenThuongAll:read'), (req, res) => {
-        const pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize),
-            loaiDoiTuong = req.params.loaiDoiTuong,
-            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        app.model.qtKhenThuongAll.groupPageMa(pageNumber, pageSize, loaiDoiTuong, searchTerm, (error, page) => {
-            if (error || page == null) {
-                res.send({ error });
-            } else {
-                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
-                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, list } });
-            }
-        });
-    });
     app.get('/api/tccb/qua-trinh/khen-thuong-all/all', app.permission.check('qtKhenThuongAll:read'), (req, res) => {
         let condition = { statement: null };
         if (req.query.ma) {

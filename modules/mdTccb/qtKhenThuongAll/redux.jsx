@@ -156,7 +156,7 @@ export function updateQtKhenThuongAllGroupPageMa(id, ma, changes, done) {
             } else {
                 T.notify('Cập nhật khen thưởng thành công!', 'success');
                 done && done(data.item);
-                dispatch(getQtKhenThuongAllPage(undefined, undefined, ma));
+                dispatch(getQtKhenThuongAllPage(undefined, undefined, '', ma));
             }
         }, () => T.notify('Cập nhật khen thưởng bị lỗi!', 'danger'));
     };
@@ -172,7 +172,7 @@ export function createQtKhenThuongAllGroupPageMa(items, done) {
             } else {
                 if (done) {
                     T.notify('Tạo khen thưởng thành công!', 'success');
-                    dispatch(getQtKhenThuongAllPage(undefined, undefined, data.item.ma));
+                    dispatch(getQtKhenThuongAllPage(undefined, undefined, '', data.item.ma));
                     done && done(data);
                 }
             }
@@ -189,7 +189,7 @@ export function deleteQtKhenThuongAllGroupPageMa(id, ma, done) {
             } else {
                 T.alert('khen thưởng đã xóa thành công!', 'success', false, 800);
                 done && done(data.item);
-                dispatch(getQtKhenThuongAllPage(undefined, undefined, ma));
+                dispatch(getQtKhenThuongAllPage(undefined, undefined, '', ma));
             }
         }, () => T.notify('Xóa khen thưởng bị lỗi!', 'danger'));
     };

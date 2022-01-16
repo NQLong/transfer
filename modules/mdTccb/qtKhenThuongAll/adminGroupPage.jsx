@@ -33,19 +33,23 @@ class EditModal extends AdminModal {
         let { id, maLoaiDoiTuong, ma, namDatDuoc, maThanhTich, maChuThich, diemThiDua } = item ? item : {
             id: '', maLoaiDoiTuong: '', ma: '', namDatDuoc: '', maThanhTich: '', maChuThich: '', diemThiDua: ''
         };
+
+        if (!maLoaiDoiTuong) maLoaiDoiTuong = this.props.loaiDoiTuong;
         this.setState({
             id: id, doiTuong: maLoaiDoiTuong
         });
 
-        this.loaiDoiTuong.value(maLoaiDoiTuong ? maLoaiDoiTuong : '');
-        if (maLoaiDoiTuong == '02') this.maCanBo.value(ma ? ma : this.props.ma);
-        else if (maLoaiDoiTuong == '03') this.maDonVi.value(ma ? ma : this.props.ma);
-        else if (maLoaiDoiTuong == '04') this.maBoMon.value(ma ? ma : this.props.ma);
-
-        this.namDatDuoc.value(namDatDuoc ? namDatDuoc : '');
-        this.thanhTich.value(maThanhTich ? maThanhTich : '');
-        this.chuThich.value(maChuThich ? maChuThich : '');
-        this.diemThiDua.value(diemThiDua);
+        setTimeout(() => {
+            this.loaiDoiTuong.value(maLoaiDoiTuong ? maLoaiDoiTuong : '');
+            if (maLoaiDoiTuong == '02') this.maCanBo.value(ma ? ma : this.props.ma);
+            else if (maLoaiDoiTuong == '03') this.maDonVi.value(ma ? ma : this.props.ma);
+            else if (maLoaiDoiTuong == '04') this.maBoMon.value(ma ? ma : this.props.ma);
+    
+            this.namDatDuoc.value(namDatDuoc ? namDatDuoc : '');
+            this.thanhTich.value(maThanhTich ? maThanhTich : '');
+            this.chuThich.value(maChuThich ? maChuThich : '');
+            this.diemThiDua.value(diemThiDua);
+        }, 100);
     };
 
     changeKichHoat = (value, target) => target.value(value ? 1 : 0) || target.value(value);
@@ -76,7 +80,7 @@ class EditModal extends AdminModal {
         } else if (!this.thanhTich.value()) {
             T.notify('Thành tích trống', 'danger');
             this.thanhTich.focus();
-        } else this.props.update(this.state.id, ma, changes, this.hide);
+        } else this.state.id ? this.props.update(this.state.id, ma, changes, this.hide) : this.props.create(changes, this.hide);
     }
 
     onChangeDT = (value) => {
@@ -100,7 +104,7 @@ class EditModal extends AdminModal {
 
                 <FormSelect className='col-md-12' ref={e => this.maBoMon = e} label='Bộ môn' data={SelectAdapter_DmBoMon} style={doiTuong == '04' ? {} : { display: 'none' }} readOnly={true} />
 
-                <FormSelect className='col-md-12' ref={e => this.thanhTich = e} label='Thành tích' data={SelectAdapter_DmKhenThuongKyHieuV2} readOnly={false} />
+                <FormSelect className='col-md-12' ref={e => this.thanhTich = e} label='Thành tích' data={SelectAdapter_DmKhenThuongKyHieuV2} readOnly={false} required />
                 <FormTextBox className='col-md-4' ref={e => this.namDatDuoc = e} label='Năm đạt được (yyyy)' type='year' readOnly={false} />
                 <FormSelect className='col-md-8' ref={e => this.chuThich = e} label='Chú thích' data={SelectAdapter_DmKhenThuongChuThichV2} readOnly={false} />
                 <FormTextBox className='col-md-4' ref={e => this.diemThiDua = e} type='number' label='Điểm thi đua' readOnly={false} />
@@ -288,7 +292,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                     getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createQtKhenThuongAllGroupPageMa} update={this.props.updateQtKhenThuongAllGroupPageMa}
-                    permissions={currentPermissions} ma = {this.ma}
+                    permissions={currentPermissions} ma = {this.ma} loaiDoiTuong = {this.loaiDoiTuong}
                     getLoaiDoiTuong={this.props.getDmKhenThuongLoaiDoiTuongAll}
                 />
                 {
