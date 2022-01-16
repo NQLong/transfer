@@ -100,7 +100,7 @@ module.exports = app => {
     });
 
     app.put('/api/user/staff/sach-giao-trinh', app.permission.check('staff:login'), (req, res) => {
-            if (req.body.changes && req.session.user) {
+        if (req.body.changes && req.session.user) {
             app.model.sachGiaoTrinh.get({ id: req.body.id }, (error, item) => {
                 if (error || item == null) {
                     res.send({ error: 'Not found!' });
@@ -135,4 +135,73 @@ module.exports = app => {
             res.send({ error: 'Invalid parameter!' });
         }
     });
+
+    app.get('/api/user/sach-giao-trinh/download-template', app.permission.check('staff:login'), (req, res) => {
+        const workBook = app.excel.create();
+        const ws = workBook.addWorksheet('Sach_giao_trinh_Template');
+        const defaultColumns = [
+            { header: 'TÊN SÁCH', key: 'ten', width: 40 },
+            { header: 'NHÀ XUẤT BẢN, ISBN', key: 'nhaSanXuat', width: 20 },
+            { header: 'THỂ LOẠI', key: 'theLoai', width: 15 },
+            { header: 'NĂM XUẤT BẢN (yyyy)', key: 'namSanXuat', width: 25 },
+            { header: '(ĐỒNG) CHỦ BIÊN', key: 'chuBien', width: 20 },
+            { header: 'SẢN PHẨM', key: 'sanPham', width: 15 },
+            { header: 'BÚT DANH', key: 'butDanh', width: 15 },
+            { header: 'PHẠM VI XUẤT BẢN', key: 'quocTe', width: 20, style: {numFmt: '@'}},
+            { header: 'Ghi chú', key: 'ghiChu', width: 50 },
+
+        ];
+        ws.columns = defaultColumns;
+        ws.getRow(1).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', horizontal: 'center' };
+        ws.getCell('I2').value = 'Phạm vi trong nước: Nhập 0';
+        ws.getCell('I3').value = 'Phạm vi quốc tế: Nhập 1';
+        ws.getCell('I4').value = 'Phạm vi trong và ngoài nước: Nhập 2';
+        app.excel.attachment(workBook, res, 'Sach_giao_trinh_Template.xlsx');
+    });
+
+    const sachGTImportData = (fields, files, done) => {
+        let worksheet = null;
+        new Promise((resolve, reject) => {
+            if (fields.userData && fields.userData[0] && fields.userData[0] == 'SGTDataFile' && files.SGTDataFile && files.SGTDataFile.length) {
+                const srcPath = files.SGTDataFile[0].path;
+                const workbook = app.excel.create();
+                workbook.xlsx.readFile(srcPath).then(() => {
+                    app.deleteFile(srcPath);
+                    worksheet = workbook.getWorksheet(1);
+                    worksheet ? resolve() : reject('File dữ liệu không hợp lệ!');
+                });
+            }
+        }).then(() => {
+            let index = 1,
+                items = [];
+            while (true) {
+                index++;
+                let flag = worksheet.getCell('A' + index).value;
+                if (flag) {
+                    let ten = worksheet.getCell('A' + index).value ? worksheet.getCell('A' + index).value.toString().trim() : '',
+                        nhaSanXuat = worksheet.getCell('B' + index).value ? worksheet.getCell('B' + index).value.toString().trim() : '',
+                        theLoai = worksheet.getCell('C' + index).value ? worksheet.getCell('C' + index).value.toString().trim() : '',
+                        namSanXuat = worksheet.getCell('D' + index).value ? worksheet.getCell('D' + index).value.toString().trim() : '',
+                        chuBien = worksheet.getCell('E' + index).value ? worksheet.getCell('E' + index).value.toString().trim() : '',
+                        sanPham = worksheet.getCell('F' + index).value ? worksheet.getCell('F' + index).value.toString().trim() : '',
+                        butDanh = worksheet.getCell('G' + index).value ? worksheet.getCell('G' + index).value.toString().trim() : '',
+                        quocTe = worksheet.getCell('H' + index).value ? worksheet.getCell('H' + index).value : '';
+                    if (quocTe != '0' && quocTe != '1' && quocTe != '2') {
+                        done({ error: 'Sai định dạng cột phạm vi xuất bản' });
+                    }
+                    else if (namSanXuat.length != 4) {
+                        done({ error: 'Sai định dạng cột năm sản xuất' });
+                    }
+                    else items.push({ ten, nhaSanXuat, namSanXuat, chuBien, theLoai, sanPham, butDanh, quocTe: parseInt(quocTe) });
+                } else {
+                    done({ items });
+                    break;
+                }
+            }
+
+        }).catch(error => done({ error }));
+    };
+
+    app.uploadHooks.add('SGTDataFile', (req, fields, files, params, done) =>
+        app.permission.has(req, () => sachGTImportData(fields, files, done), done, 'staff:login'));
 };

@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3018: { title: 'Quá trình hướng dẫn luận văn', link: '/user/tccb/qua-trinh/hdlv', icon: 'fa-university', backgroundColor: '#488a37', groupIndex: 4},
+            3018: { title: 'Quá trình hướng dẫn luận văn', link: '/user/tccb/qua-trinh/hdlv', icon: 'fa-university', backgroundColor: '#488a37', groupIndex: 4 },
         },
     };
 
@@ -16,7 +16,7 @@ module.exports = app => {
     app.get('/user/tccb/qua-trinh/hdlv/group/:loaiDoiTuong/:ma', app.permission.check('qtHuongDanLuanVan:read'), app.templates.admin);
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
-    
+
     app.get('/api/qua-trinh/hdlv/page/:pageNumber/:pageSize', checkGetStaffPermission, (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
@@ -83,7 +83,7 @@ module.exports = app => {
             }
         });
     });
-    
+
     app.get('/api/qua-trinh/hdlv/all', checkGetStaffPermission, (req, res) => {
         app.model.qtHuongDanLuanVan.getAll((error, items) => res.send({ error, items }));
     });
@@ -141,5 +141,60 @@ module.exports = app => {
         } else {
             res.send({ error: 'Invalid parameter!' });
         }
+    });
+
+    const qtHDLVImportData = (fields, files, done) => {
+        let worksheet = null;
+        new Promise((resolve, reject) => {
+            if (fields.userData && fields.userData[0] && fields.userData[0] == 'HDLVDataFile' && files.HDLVDataFile && files.HDLVDataFile.length) {
+                const srcPath = files.HDLVDataFile[0].path;
+                const workbook = app.excel.create();
+                workbook.xlsx.readFile(srcPath).then(() => {
+                    app.deleteFile(srcPath);
+                    worksheet = workbook.getWorksheet(1);
+                    worksheet ? resolve() : reject('File dữ liệu không hợp lệ!');
+                });
+            }
+        }).then(() => {
+            let index = 1,
+                items = [];
+            while (true) {
+                index++;
+                let flag = worksheet.getCell('A' + index).value;
+                if (flag) {
+                    let hoTen = worksheet.getCell('A' + index).value ? worksheet.getCell('A' + index).value.toString().trim() : '',
+                        tenLuanVan = worksheet.getCell('B' + index).value ? worksheet.getCell('B' + index).value.toString().trim() : '',
+                        bacDaoTao = worksheet.getCell('C' + index).value ? worksheet.getCell('C' + index).value.toString().trim() : '',
+                        namTotNghiep = worksheet.getCell('D' + index).value ? worksheet.getCell('D' + index).value.toString(): '',
+                        sanPham = worksheet.getCell('E' + index).value ? worksheet.getCell('E' + index).value.toString().trim() : '';
+                    if (namTotNghiep.length != 4) {
+                        done({ error: 'Sai định dạng cột năm tốt nghiệp' });
+                    } 
+                    else items.push({ hoTen, tenLuanVan, bacDaoTao, namTotNghiep, sanPham });
+                } else {
+                    done({ items });
+                    break;
+                }
+            }
+
+        }).catch(error => done({ error }));
+    };
+
+    app.uploadHooks.add('HDLVDataFile', (req, fields, files, params, done) =>
+        app.permission.has(req, () => qtHDLVImportData(fields, files, done), done, 'staff:login'));
+
+    app.get('/api/qua-trinh/hdlv/download-template', app.permission.check('staff:login'), (req, res) => {
+        const workBook = app.excel.create();
+        const ws = workBook.addWorksheet('Qua_trinh_HDLV_Template');
+        const defaultColumns = [
+            { header: 'HỌ VÀ TÊN SINH VIÊN', key: 'hoTen', width: 40 },
+            { header: 'TÊN LUẬN VĂN/LUẬN ÁN', key: 'tenLuanVan', width: 40 },
+            { header: 'BẬC ĐÀO TẠO', key: 'bacDaoTao', width: 20 },
+            { header: 'NĂM TỐT NGHIỆP (yyyy)', key: 'namTotNghiep', width: 30 },
+            { header: 'SẢN PHẨM', key: 'sanPham', width: 20 },
+        ];
+        ws.columns = defaultColumns;
+        ws.getRow(1).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', horizontal: 'center' };
+        app.excel.attachment(workBook, res, 'Qua_trinh_HDLV_Template.xlsx');
     });
 };
