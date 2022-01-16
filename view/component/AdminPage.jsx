@@ -548,6 +548,7 @@ export class FormDatePicker extends React.Component {
         'time-mask': '39/19/2099 h9:59',
         'date-mask': '39/19/2099',
         'month-mask': '19/2099',
+        'year-mask': '2099',
         'date-month': '39/19'
     };
 
@@ -555,6 +556,7 @@ export class FormDatePicker extends React.Component {
         'time-mask': 'dd/mm/yyyy HH:MM',
         'date-mask': 'dd/mm/yyyy',
         'month-mask': 'mm/yyyy',
+        'year-mask': 'yyyy',
         'date-month': 'dd/mm'
     };
 
@@ -581,7 +583,7 @@ export class FormDatePicker extends React.Component {
                 if (date == null || Number.isNaN(date.getTime())) return '';
                 return date;
             } else if (type.endsWith('-mask')) {
-                const date = T.formatDate((type == 'month-mask' ? '01/' : '') + this.state.value);
+                const date = T.formatDate((type == 'month-mask' ? '01/' : (type == 'year-mask' ? '01/01/' : '')) + this.state.value);
                 if (date == null || Number.isNaN(date.getTime())) return '';
                 return date;
             } else {

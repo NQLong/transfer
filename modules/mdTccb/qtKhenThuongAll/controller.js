@@ -16,32 +16,35 @@ module.exports = app => {
     app.get('/user/tccb/qua-trinh/khen-thuong-all/group_dt/:loaiDoiTuong/:ma', app.permission.check('qtKhenThuongAll:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/tccb/qua-trinh/khen-thuong-all/page/:loaiDoiTuong/:pageNumber/:pageSize', app.permission.check('qtKhenThuongAll:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/khen-thuong-all/page/:pageNumber/:pageSize', app.permission.check('qtKhenThuongAll:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
-            loaiDoiTuong = req.params.loaiDoiTuong,
-            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        app.model.qtKhenThuongAll.searchPage(pageNumber, pageSize, loaiDoiTuong, searchTerm, (error, page) => {
+            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '',
+            ma = req.query.ma ? req.query.ma : '';
+        const { fromYear, toYear, loaiDoiTuong } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1' };
+        app.model.qtKhenThuongAll.searchPage(pageNumber, pageSize, loaiDoiTuong, ma, fromYear, toYear, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
                 const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
-                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, list } });
+                const pageCondition = searchTerm;
+                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
             }
         });
     });
 
-    app.get('/api/tccb/qua-trinh/khen-thuong-all/group/page/:loaiDoiTuong/:pageNumber/:pageSize', app.permission.check('qtKhenThuongAll:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/khen-thuong-all/group/page/:pageNumber/:pageSize', app.permission.check('qtKhenThuongAll:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
-            loaiDoiTuong = req.params.loaiDoiTuong,
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        app.model.qtKhenThuongAll.groupPage(pageNumber, pageSize, loaiDoiTuong, searchTerm, (error, page) => {
+        const { fromYear, toYear, loaiDoiTuong } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1' };
+        app.model.qtKhenThuongAll.groupPage(pageNumber, pageSize, loaiDoiTuong, fromYear, toYear, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
                 const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
-                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, list } });
+                const pageCondition = searchTerm;
+                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
             }
         });
     });
@@ -117,7 +120,6 @@ module.exports = app => {
                         cells.push({cell: chr + '1', value: cols[idx], bold: true, border: '1234'});
                     }
                     page.rows.forEach((item, index) => {
-                        // console.log("item = ", item);
                         cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
                         for (let idx = 1; idx < cols.length; idx++) {
                             let chr = String.fromCharCode(65 + idx); // where n is 0, 1, 2 ...                            
