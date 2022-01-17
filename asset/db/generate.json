@@ -1,4 +1,37 @@
 {
+    "DM_BANG_DAO_TAO": {
+        "active": true,
+        "moduleName": "dmBangDaoTao",
+        "modelName": "dmBangDaoTao",
+        "columns": {
+            "TEN": {
+                "value": "ten",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 50
+            },
+            "KICH_HOAT": {
+                "value": "kichHoat",
+                "dataType": "NUMBER",
+                "dataDefault": "1",
+                "nullable": true,
+                "size": "1,0"
+            },
+            "MA": {
+                "value": "ma",
+                "dataType": "NUMBER",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_501261\".nextval",
+                "nullable": false,
+                "size": "22,0"
+            }
+        },
+        "primaryKeys": [
+            "MA"
+        ],
+        "foreignKeys": [],
+        "type": "table"
+    },
     "DM_BENH_VIEN": {
         "active": true,
         "moduleName": "dmBenhVien",
@@ -954,13 +987,6 @@
         "moduleName": "dmHinhThucDaoTao",
         "modelName": "dmHinhThucDaoTao",
         "columns": {
-            "MA": {
-                "value": "ma",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": false,
-                "size": 2
-            },
             "TEN": {
                 "value": "ten",
                 "dataType": "NVARCHAR2",
@@ -974,6 +1000,13 @@
                 "dataDefault": "1",
                 "nullable": true,
                 "size": "1,0"
+            },
+            "MA": {
+                "value": "ma",
+                "dataType": "NUMBER",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_489958\".nextval",
+                "nullable": false,
+                "size": "22,0"
             }
         },
         "primaryKeys": [
@@ -3207,6 +3240,46 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": 4
+            }
+        },
+        "primaryKeys": [
+            "MA"
+        ],
+        "foreignKeys": [],
+        "type": "table"
+    },
+    "DM_TRINH_DO_DAO_TAO": {
+        "active": true,
+        "moduleName": "dmTrinhDoDaoTao",
+        "modelName": "dmTrinhDoDaoTao",
+        "columns": {
+            "LOAI": {
+                "value": "loai",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "22,0"
+            },
+            "TEN": {
+                "value": "ten",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 255
+            },
+            "KICH_HOAT": {
+                "value": "kichHoat",
+                "dataType": "NUMBER",
+                "dataDefault": "1",
+                "nullable": true,
+                "size": "1,0"
+            },
+            "MA": {
+                "value": "ma",
+                "dataType": "NUMBER",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_501085\".nextval",
+                "nullable": false,
+                "size": "22,0"
             }
         },
         "primaryKeys": [
@@ -6197,6 +6270,13 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": 100
+            },
+            "TRINH_DO": {
+                "value": "trinhDo",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 50
             }
         },
         "primaryKeys": [
