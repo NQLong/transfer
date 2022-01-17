@@ -1,4 +1,37 @@
 {
+    "DM_BANG_DAO_TAO": {
+        "active": true,
+        "moduleName": "dmBangDaoTao",
+        "modelName": "dmBangDaoTao",
+        "columns": {
+            "TEN": {
+                "value": "ten",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 50
+            },
+            "KICH_HOAT": {
+                "value": "kichHoat",
+                "dataType": "NUMBER",
+                "dataDefault": "1",
+                "nullable": true,
+                "size": "1,0"
+            },
+            "MA": {
+                "value": "ma",
+                "dataType": "NUMBER",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_501261\".nextval",
+                "nullable": false,
+                "size": "22,0"
+            }
+        },
+        "primaryKeys": [
+            "MA"
+        ],
+        "foreignKeys": [],
+        "type": "table"
+    },
     "DM_BENH_VIEN": {
         "active": true,
         "moduleName": "dmBenhVien",
@@ -954,13 +987,6 @@
         "moduleName": "dmHinhThucDaoTao",
         "modelName": "dmHinhThucDaoTao",
         "columns": {
-            "MA": {
-                "value": "ma",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": false,
-                "size": 2
-            },
             "TEN": {
                 "value": "ten",
                 "dataType": "NVARCHAR2",
@@ -974,6 +1000,13 @@
                 "dataDefault": "1",
                 "nullable": true,
                 "size": "1,0"
+            },
+            "MA": {
+                "value": "ma",
+                "dataType": "NUMBER",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_489958\".nextval",
+                "nullable": false,
+                "size": "22,0"
             }
         },
         "primaryKeys": [
@@ -3207,6 +3240,46 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": 4
+            }
+        },
+        "primaryKeys": [
+            "MA"
+        ],
+        "foreignKeys": [],
+        "type": "table"
+    },
+    "DM_TRINH_DO_DAO_TAO": {
+        "active": true,
+        "moduleName": "dmTrinhDoDaoTao",
+        "modelName": "dmTrinhDoDaoTao",
+        "columns": {
+            "LOAI": {
+                "value": "loai",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "22,0"
+            },
+            "TEN": {
+                "value": "ten",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 255
+            },
+            "KICH_HOAT": {
+                "value": "kichHoat",
+                "dataType": "NUMBER",
+                "dataDefault": "1",
+                "nullable": true,
+                "size": "1,0"
+            },
+            "MA": {
+                "value": "ma",
+                "dataType": "NUMBER",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_501085\".nextval",
+                "nullable": false,
+                "size": "22,0"
             }
         },
         "primaryKeys": [
@@ -6197,6 +6270,13 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": 100
+            },
+            "TRINH_DO": {
+                "value": "trinhDo",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 50
             }
         },
         "primaryKeys": [
@@ -7432,8 +7512,7 @@
         },
         "primaryKeys": [
             "ID"
-        ],
-        "foreignKeys": [],
+    ],"foreignKeys": [],
         "type": "table"
     },
     "QT_LUONG": {
@@ -7441,13 +7520,6 @@
         "moduleName": "qtLuong",
         "modelName": "qtLuong",
         "columns": {
-            "ID": {
-                "value": "id",
-                "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_498900\".nextval",
-                "nullable": false,
-                "size": "22,0"
-            },
             "BAT_DAU": {
                 "value": "batDau",
                 "dataType": "NUMBER",
@@ -7531,6 +7603,13 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": 10
+            },
+            "ID": {
+                "value": "id",
+                "dataType": "NUMBER",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_498900\".nextval",
+                "nullable": false,
+                "size": "22,0"
             }
         },
         "primaryKeys": [
@@ -7674,6 +7753,118 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": "22,0"
+            },
+            "SO_VAN_BAN": {
+                "value": "soVanBan",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 20
+            },
+            "BAT_DAU": {
+                "value": "batDau",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "20,0"
+            },
+            "BAT_DAU_TYPE": {
+                "value": "batDauType",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 10
+            },
+            "KET_THUC": {
+                "value": "ketThuc",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "20,0"
+            },
+            "KET_THUC_TYPE": {
+                "value": "ketThucType",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 10
+            },
+            "THOI_GIAN_DI_LAM": {
+                "value": "thoiGianDiLam",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "20,0"
+            },
+            "SO_THONG_BAO": {
+                "value": "soThongBao",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 30
+            },
+            "TONG_THOI_GIAN": {
+                "value": "tongThoiGian",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 20
+            },
+            "THOI_GIAN_TRO_LAI_CONG_TAC": {
+                "value": "thoiGianTroLaiCongTac",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 20
+            },
+            "THONG_BAO_SO": {
+                "value": "thongBaoSo",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 30
+            },
+            "THAM_GIA_BHXH": {
+                "value": "thamGiaBhxh",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 1
+            },
+            "GHI_CHU": {
+                "value": "ghiChu",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 200
+            },
+            "THOI_GIAN_BAO_GIAM": {
+                "value": "thoiGianBaoGiam",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 100
+            },
+            "THOI_GIAN_BAO_TANG": {
+                "value": "thoiGianBaoTang",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 100
+            },
+            "HO": {
+                "value": "ho",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 30
+            },
+            "TEN": {
+                "value": "ten",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 10
             }
         },
         "primaryKeys": [

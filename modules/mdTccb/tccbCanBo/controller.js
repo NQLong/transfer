@@ -117,21 +117,14 @@ module.exports = app => {
                                 resolve();
                             });
                         })).then(() => new Promise(resolve => {
-                            app.model.qtDaoTao.getAll({ shcc: canBo.shcc }, '*', 'id ASC', (error, daoTao) => {
+                            app.model.qtDaoTao.getByShcc(canBo.shcc, (error, daoTao) => {
                                 if (error) {
                                     res.send({ error: 'Lỗi khi lấy thông tin đào tạo cán bộ !' });
                                 }
                                 else if (daoTao == null) {
                                     result = app.clone(result, { daoTao: null });
                                 } else {
-                                    daoTao.forEach(item => {
-                                        if (item.loaiBangCap == 'Tiến sĩ') {
-                                            result = app.clone(result, { isTienSi: 1 });
-                                        } else {
-                                            result = app.clone(result, { isTienSi: 0 });
-                                        }
-                                    });
-                                    result = app.clone(result, { daoTao });
+                                    result = app.clone(result, { daoTao: daoTao.rows });
                                 }
                                 resolve();
                             });
@@ -1021,14 +1014,14 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtDaoTao.getAll({ shcc: canBo.shcc }, '*', 'id ASC', (error, daoTao) => {
+                    app.model.qtDaoTao.getByShcc(canBo.shcc, (error, daoTao) => {
                         if (error) {
                             res.send({ error: 'Lỗi khi lấy thông tin đào tạo cán bộ !' });
                         }
                         else if (daoTao == null) {
                             result = app.clone(result, { daoTao: null });
                         } else {
-                            result = app.clone(result, { daoTao });
+                            result = app.clone(result, { daoTao: daoTao.rows });
                         }
                         resolve();
                     });
