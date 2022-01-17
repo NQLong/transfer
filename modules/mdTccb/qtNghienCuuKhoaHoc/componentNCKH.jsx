@@ -146,7 +146,7 @@ class UploadData extends AdminModal {
         } else
             this.setState({
                 qtNCKHData: response.items,
-                message: <p className='text-center' style={{ color: 'blue' }}>{response.items.length} hàng được tải lên thành công, vui lòng bấm <b>Lưu</b> để chỉnh sửa</p>,
+                message: <p className='text-center' style={{ color: 'blue' }}>{response.items.length} hàng được tải lên thành công</p>,
                 displayState: 'data'
             });
     };
@@ -215,12 +215,14 @@ class UploadData extends AdminModal {
                         success={this.onSuccess} error={this.onError} />
                     {this.state.message}
                     <div style={{ display: displayState == 'import' ? 'none' : 'block' }}>{renderData}</div>
-                    <a href='download-mau-du-lieu-nckh' onClick={e => this.downloadSample(e)} className='text-success mt-3 text-center' style={{ display: 'block', width: '100%' }}>Tải file mẫu</a>
                 </div>
             </div>,
+            isShowSubmit: displayState == 'data',
             buttons:
-                <button type='button' className='btn btn-success' onClick={e => { e.preventDefault(); this.setState({ message: '', displayState: 'import', qtNCKHData: [] }); }}>
-                    <i className='fa fa-fw fa-lg fa-refresh' />Tải lại
+                displayState != 'import' ? <button type='button' className='btn btn-warning' onClick={e => { e.preventDefault(); this.setState({ message: '', displayState: 'import', qtHDLVData: [] }); }}>
+                    <i className='fa fa-fw fa-lg fa-refresh' />Upload lại
+                </button> : <button type='button' className='btn btn-success' onClick={e => { e.preventDefault(); this.downloadSample(e); }}>
+                    <i className='fa fa-fw fa-lg fa-file-excel-o' />Tải file excel mẫu
                 </button>
         });
     }
