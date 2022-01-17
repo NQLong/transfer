@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { AdminModal, AdminPage, FormSelect, FormTextBox } from 'view/component/AdminPage';
+import { AdminModal, AdminPage, FormSelect, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
 import Dropdown from 'view/component/Dropdown';
 import { DateInput } from 'view/component/Input';
 import { getStaffEdit, SelectAdapter_FwCanBo, userGetStaff } from '../tccbCanBo/redux';
@@ -94,31 +94,72 @@ class HocViDetail extends AdminPage {
         this.setState({ shcc, email });
     }
     render = () => {
-        let dataDaoTao = this.props.tccb ? this.props.staff?.selectedItem?.daoTao?.filter(i => i.loaiBangCap === this.props.tenHocVi) :
-            this.props.staff?.userItem?.daoTao?.filter(i => i.loaiBangCap === this.props.tenHocVi);
-        const renderHocVi = (items) => {
-            return (
-                <>
-                    <div className='form-group col-md-10' />
-                    <span className='form-group col-md-3'>Thời gian: {<b>{T.dateToText(items[0].batDau, items[0].batDauType)} - {T.dateToText(items[0].ketThuc, items[0].ketThucType)}</b>}</span>
-                    <span className='form-group col-md-3'>Chuyên ngành: {<b>{items[0].chuyenNganh}</b>}</span>
-                    <span className='form-group col-md-3'>Năm hoàn thành: {<b>{items[0].thoiGian}</b>}</span>
-                    <span className='form-group col-md-3'>Cơ sở công nhận: {<b>{items[0].tenTruong}</b>}</span>
-
-                </>
-            );
+        let dataDaoTao = this.props.tccb ? this.props.staff?.selectedItem?.daoTao?.filter(i => i.tenTrinhDo === this.props.tenHocVi) :
+            this.props.staff?.userItem?.daoTao?.filter(i => i.tenTrinhDo === this.props.tenHocVi);
+        const permission = {
+            write: true,
+            read: true,
+            delete: true
         };
+        const renderHocVi = (items) => (
+            renderTable({
+                getDataSource: () => items,
+                stickyHead: false,
+                renderHead: () => (
+                    <tr>
+                        <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Chuyên ngành đào tạo {this.props.hocVi}</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tên cơ sở đào tạo</th>
+                        {/* <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Hình thức</th> */}
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>
+                        {/* <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kinh phí</th> */}
+                        {/* <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Kết quả</th> */}
+                        <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
+                    </tr>
+                ),
+                renderRow: (item, index) => (
+                    <tr key={index}>
+                        <TableCell type='number' style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='text' style={{}} content={item.chuyenNganh} />
+                        <TableCell type='text' style={{}} content={item.tenCoSoDaoTao} />
+                        {/* <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.hinhThuc ? item.tenHinhThuc : ''} /> */}
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={<>
+                            {item.batDau && <span>Từ: <span style={{ color: 'blue' }}>{T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy')}</span><br /></span>}
+                            {item.ketThuc && <span>Đến: <span style={{ color: 'blue' }}>{T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy')}</span></span>}
+                        </>} />
+                        {/* <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.kinhPhi ? item.kinhPhi : ''} /> */}
+                        {/* <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={<>
+                            {item.loaiBangCap && <span style={{ color: 'blue' }}>{item.tenLoaiBangCap}<br /></span>}
+                            {item.trinhDo && <span>Kết quả: <span style={{ color: 'blue' }}>{item.tenTrinhDo ? item.tenTrinhDo : item.trinhDo}<br /></span></span>}
+                        </>} /> */}
+                        <TableCell type='buttons' content={item} permission={permission}
+                            onEdit={() => this.modal.show({ email: this.state.email, item: item, shcc: this.state.shcc })}
+                            onDelete={this.delete}></TableCell>
+                    </tr>
+                )
+            })
+        );
         return (
-            (dataDaoTao && dataDaoTao.length > 0) ? renderHocVi(dataDaoTao) : (
-                <div className='form-group col-md-10'>
-                    <a href='#' onClick={e => {
-                        e.preventDefault();
-                        this.modal.show({ item: null, shcc: this.props.shcc, email: this.props.email });
-                    }}>Thêm quá trình đào tạo {this.props.tenHocVi}</a>
+            <div className='col-md-12 form-group' style={this.props.style}>
+                <div className='tile-body'>{dataDaoTao && renderHocVi(dataDaoTao)}</div>
+                    <div className='tile-footer' style={{ textAlign: 'right' }}>
+                        <button className='btn btn-info' type='button' onClick={e => this.showModal(e, null)}>
+                            <i className='fa fa-fw fa-lg fa-plus' />Thêm quá trình đào tạo {this.props.tenHocVi}
+                        </button>
+                    </div>
                     <EditModal ref={e => this.modal = e} hocVi={this.props.tenHocVi} value={this.value}
-                        create={this.props.tccb ? this.props.createQtDaoTao : this.props.createQtDaoTaoStaffUser } />
-                </div>
-            )
+                        create={this.props.tccb ? this.props.createQtDaoTao : this.props.createQtDaoTaoStaffUser} />
+            </div>
+            // (dataDaoTao && dataDaoTao.length > 0) ? renderHocVi(dataDaoTao) : (
+            //     <div className='form-group col-md-10'>
+            //         <a href='#' onClick={e => {
+            //             e.preventDefault();
+            //             this.modal.show({ item: null, shcc: this.props.shcc, email: this.props.email });
+            //         }}>Thêm quá trình đào tạo {this.props.tenHocVi}</a>
+            //         <EditModal ref={e => this.modal = e} hocVi={this.props.tenHocVi} value={this.value}
+            //             create={this.props.tccb ? this.props.createQtDaoTao : this.props.createQtDaoTaoStaffUser} />
+            //     </div>
+            // )
         );
     }
 }

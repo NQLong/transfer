@@ -91,12 +91,12 @@ class ComponentTrinhDo extends AdminPage {
                     <FormTextBox ref={e => this.trinhDoPhoThong = e} label='Trình độ giáo dục phổ thông' placeholder='Nhập trình độ phổ thông (Ví dụ: 12/12)' className='form-group col-md-4' />
                     <ComponentNN ref={e => this.ngoaiNgu = e} label='Trình độ ngoại ngữ' userEdit={this.props.userEdit} />
 
-                    <FormCheckbox ref={e => this.cuNhan = e} label='Cử nhân' onChange={value => this.setState({ cuNhan: value })} className='form-group col-md-2'/>
-                    {this.state.cuNhan ? <HocViDetail ref={e => this.hocViCuNhan = e} tenHocVi='Cử nhân' shcc={this.state.shcc} email={this.state.email} tccb={this.props.tccb}/> : <div className='form-group col-md-10'/>}
-                    <FormCheckbox ref={e => this.thacSi = e} label='Thạc sĩ' onChange={value => this.setState({ thacSi: value })} className='form-group col-md-2' />
-                    {this.state.thacSi ? <HocViDetail ref={e => this.hocViThacSi = e} tenHocVi='Thạc sĩ' shcc={this.state.shcc} email={this.state.email} tccb={this.props.tccb}/> : <div className='form-group col-md-10'/>}
-                    <FormCheckbox ref={e => this.tienSi = e} label='Tiến sĩ' onChange={value => this.setState({ tienSi: value })} className='form-group col-md  -2' />
-                    {this.state.tienSi ? <HocViDetail ref={e => this.hocViTienSi = e} tenHocVi='Tiến sĩ' shcc={this.state.shcc} email={this.state.email} tccb={this.props.tccb}/> : <div className='form-group col-md-10'/>}
+                    <FormCheckbox ref={e => this.cuNhan = e} label='Cử nhân' onChange={value => this.setState({ cuNhan: value })} className='form-group col-md-12'/>
+                   <HocViDetail ref={e => this.hocViCuNhan = e} tenHocVi='Cử nhân' shcc={this.state.shcc} email={this.state.email} tccb={this.props.tccb} style={{ display: this.state.cuNhan ? 'block' : 'none'}}/>
+                    <FormCheckbox ref={e => this.thacSi = e} label='Thạc sĩ' onChange={value => this.setState({ thacSi: value })} className='form-group col-md-12'/>
+                    <HocViDetail ref={e => this.hocViThacSi = e} tenHocVi='Thạc sĩ' shcc={this.state.shcc} email={this.state.email} tccb={this.props.tccb} style={{ display: this.state.thacSi ? 'block' : 'none'}}/>
+                    <FormCheckbox ref={e => this.tienSi = e} label='Tiến sĩ' onChange={value => this.setState({ tienSi: value })} className='form-group col-md-12'  />
+                    <HocViDetail ref={e => this.hocViTienSi = e} tenHocVi='Tiến sĩ' shcc={this.state.shcc} email={this.state.email} tccb={this.props.tccb} style={{ display: this.state.tienSi ? 'block' : 'none'}}/>
 
                     <FormSelect ref={e => this.chucDanh = e} label='Chức danh' data={[{ id: '01', text: 'Phó giáo sư' }, { id: '02', text: 'Giáo sư' }]} className='form-group col-md-3' />
                     <FormTextBox ref={e => this.chuyenNganh = e} label='Chuyên ngành chức danh' className='form-group col-md-3' />

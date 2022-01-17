@@ -26,7 +26,7 @@ const EnumDateType = Object.freeze({
     'dd/mm/yyyy': 'date'
 };
 
-class EditModal extends AdminModal {
+export class EditModal extends AdminModal {
     state = {
         id: null,
         item: null,
