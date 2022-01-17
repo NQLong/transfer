@@ -221,6 +221,8 @@ class QtKhenThuongAll extends AdminPage {
     downloadExcel = (e) => {
         e.preventDefault();
         let name = 'khen_thuong', loaiDoiTuong = this.curState, maDoiTuong = '-1';
+        const fromYear = this.fromYear?.value() == '' ? '$$$$' : this.fromYear?.value();
+        const toYear = this.toYear?.value() == '' ? '$$$$' : this.toYear?.value();
         if (loaiDoiTuong == '-1') {
             name += '_all';
         }
@@ -236,8 +238,9 @@ class QtKhenThuongAll extends AdminPage {
                 else name += maDoiTuong;
             }
         }
+        name += '_' + fromYear + '-' + toYear;
         name += '.xlsx';
-        T.download(T.url(`/api/tccb/qua-trinh/khen-thuong-all/download-excel/${loaiDoiTuong}/${maDoiTuong}`), name);
+        T.download(T.url(`/api/tccb/qua-trinh/khen-thuong-all/download-excel/${loaiDoiTuong}/${maDoiTuong}/${fromYear}/${toYear}`), name);
     }
 
     delete = (e, item) => {
