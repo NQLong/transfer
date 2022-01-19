@@ -205,7 +205,7 @@ class QtHocTapCongTacGroupPage extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-calendar',
-            title: 'Quá trình học tập, công tác',
+            title: 'Quá trình học tập, công tác - Cán bộ',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
                 <Link key={0} to='/user/tccb'>Quá trình học tập, công tác</Link>,

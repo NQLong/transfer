@@ -19,6 +19,7 @@ import ComponentHDLV from '../qtHuongDanLuanVan/componentHDLV';
 import ComponentSGT from '../sachGiaoTrinh/componentSGT';
 import ComponentDaoTao from '../qtDaoTao/componentDaoTao';
 import ComponentLuong from '../qtLuong/componentLuong';
+import ComponentBaoHiemXaHoi from '../qtBaoHiemXaHoi/componentBaoHiemXaHoi';
 
 class CanBoPage extends AdminPage {
     state = { item: null }
@@ -57,6 +58,7 @@ class CanBoPage extends AdminPage {
         this.componentHDLV.value(item.shcc, item.email);
         this.componentSGT.value(item.shcc, item.email);
         this.componentLuong.value(item.shcc, item.email);
+        this.componentBaoHiemXaHoi.value(item.shcc, item.email);
     }
 
     save = () => {
@@ -85,6 +87,7 @@ class CanBoPage extends AdminPage {
                 <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={false} tccb={true}/>
                 <ComponentDaoTao ref={e => this.componentDaoTao = e} userEdit={false} tccb={true}/>
                 <ComponentLuong ref={e => this.componentLuong = e} userEdit={false} />
+                <ComponentBaoHiemXaHoi ref={e => this.componentBaoHiemXaHoi = e} userEdit={false} />
                 <ComponentNuocNgoai ref={e => this.componentNuocNgoai = e} userEdit={false} />
                 <ComponentKhenThuong ref={e => this.componentKhenThuong = e} userEdit={false} />
                 <ComponentKyLuat ref={e => this.componentKyLuat = e} userEdit={false} />
