@@ -92,13 +92,16 @@ class QtHocTapCongTacGroupPage extends AdminPage {
     ma = ''; loaiDoiTuong = '-1';
     componentDidMount() {
         T.ready('/user/tccb', () => {
-            const route = T.routeMatcher('/user/tccb/qua-trinh/htct/group/:loaiDoiTuong/:ma'),
+            const route = T.routeMatcher('/user/tccb/qua-trinh/hoc-tap-cong-tac/:ma'),
                 params = route.parse(window.location.pathname);
-            this.loaiDoiTuong = params.loaiDoiTuong;
             this.ma = params.ma;
-            T.onSearch = (searchText) => this.props.getQtHocTapCongTacPage(undefined, undefined, this.loaiDoiTuong, searchText || '');
+            T.onSearch = (searchText) => {
+                this.props.getQtHocTapCongTacPage(undefined, undefined, searchText || '', this.ma);
+            };
             T.showSearchBox();
-            this.props.getQtHocTapCongTacGroupPageMa(undefined, undefined, this.loaiDoiTuong, this.ma);
+            this.props.getQtHocTapCongTacPage(undefined, undefined, this.ma, () => {
+                T.updatePage('pageQtHocTapCongTac', undefined, undefined, '');
+            });
         });
     }
 
@@ -139,7 +142,7 @@ class QtHocTapCongTacGroupPage extends AdminPage {
                         <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
                         <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span>{(item.ho ? item.ho : ' ') + ' ' + (item.ten ? item.ten : ' ')}</span><br />
+                                <span>{(item.hoCanBo ? item.hoCanBo: ' ') + ' ' + (item.tenCanBo ? item.tenC : ' ')}</span><br />
                                 {item.shcc}
                             </> 
                         )}
@@ -153,15 +156,8 @@ class QtHocTapCongTacGroupPage extends AdminPage {
                         />
                         <TableCell type='text' content={item.noiDung}/>
                         {
-                            !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
+                            <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                                 onEdit={() => this.modal.show(item)} onDelete={this.delete} >
-                            </TableCell>
-                        }
-                        {
-                            this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}>
-                                <Link className='btn btn-success' to={`/user/tccb/qua-trinh/htct/group/-1/${item.shcc}`} >
-                                    <i className='fa fa-lg fa-compress' />
-                                </Link>
                             </TableCell>
                         }
                     </tr>
@@ -187,7 +183,7 @@ class QtHocTapCongTacGroupPage extends AdminPage {
                     update={this.props.updateQtHocTapCongTacGroupPageMa}
                 />
             </>,
-            backRoute: '/user/tccb/qua-trinh/htct',
+            backRoute: '/user/tccb/qua-trinh/hoc-tap-cong-tac',
         });
     }
 }

@@ -13,30 +13,40 @@ module.exports = app => {
     );
     app.get('/user/tccb/qua-trinh/dao-tao/:stt', app.permission.check('qtDaoTao:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/dao-tao', app.permission.check('qtDaoTao:read'), app.templates.admin);
-
+    app.get('/user/tccb/qua-trinh/dao-tao/:ma', app.permission.check('qtHocTapCongTac:read'), app.templates.admin);
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
 
     app.get('/api/qua-trinh/dao-tao/page/:pageNumber/:pageSize', checkGetStaffPermission, (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize);
-        
-        let condition = { statement: null };
-        if (req.query.condition) {
-            condition = {
-                statement: 'lower(shcc) LIKE :searchText',
-                parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
-            };
-        }
-        app.model.qtDaoTao.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
+            pageSize = parseInt(req.params.pageSize),
+            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+        const { fromYear, toYear, list_shcc, list_dv } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1' };
+        app.model.qtDaoTao.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, searchTerm, (error, page) => {
+            if (error || page == null) {
+                res.send({ error });
+            } else {
+                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
+                const pageCondition = searchTerm;
+                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
+            }
+        });
     });
     
-    app.get('/api/qua-trinh/dao-tao/all', checkGetStaffPermission, (req, res) => {
-        app.model.qtDaoTao.getAll((error, items) => res.send({ error, items }));
-    });
-
-    app.get('/api/qua-trinh/dao-tao/item/:id', checkGetStaffPermission, (req, res) => {
-        app.model.qtDaoTao.get({ stt: req.params.id }, (error, item) => res.send({ error, item }));
+    app.get('/api/tccb/qua-trinh/dao-tao/group/page/:pageNumber/:pageSize', app.permission.check('qtDaoTao:read'), (req, res) => {
+        const pageNumber = parseInt(req.params.pageNumber),
+            pageSize = parseInt(req.params.pageSize),
+            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+        const { fromYear, toYear, list_shcc, list_dv } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1' };
+        app.model.qtDaoTao.groupPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, searchTerm, (error, page) => {
+            if (error || page == null) {
+                res.send({ error });
+            } else {
+                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
+                const pageCondition = searchTerm;
+                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
+            }
+        });
     });
 
     app.post('/api/qua-trinh/dao-tao', app.permission.check('staff:write'), (req, res) =>
