@@ -6,8 +6,8 @@ import Pagination from 'view/component/Pagination';
 import Dropdown from 'view/component/Dropdown';
 import { DateInput } from 'view/component/Input';
 import {
-    getQtHocTapCongTacPage, updateQtHocTapCongTac,
-    deleteQtHocTapCongTac, createQtHocTapCongTac, getQtHocTapCongTacGroupPage,
+    getQtHocTapCongTacPage, updateQtHocTapCongTacStaff,
+    deleteQtHocTapCongTacStaff, createQtHocTapCongTacStaff, getQtHocTapCongTacGroupPage,
 } from './redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import { SelectAdapter_DmDonVi} from 'modules/mdDanhMuc/dmDonVi/redux';
@@ -192,10 +192,10 @@ class QtHocTapCongTac extends AdminPage {
     }
 
     delete = (e, item) => {
-        T.confirm('Xóa quá trình đi nước ngoài', 'Bạn có chắc bạn muốn xóa quá trình đi nước ngoài này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtHocTapCongTac(item.id, false, null, error => {
-                if (error) T.notify(error.message ? error.message : 'Xoá quá trình đi nước ngoài bị lỗi!', 'danger');
-                else T.alert('Xoá quá trình đi nước ngoài thành công!', 'success', false, 800);
+        T.confirm('Xóa quá trình học tập, công tác', 'Bạn có chắc bạn muốn xóa quá trình học tập, công tác này?', 'warning', true, isConfirm => {
+            isConfirm && this.props.deleteQtHocTapCongTacStaff(item.id, false, null, error => {
+                if (error) T.notify(error.message ? error.message : 'Xoá quá trình học tập, công tác bị lỗi!', 'danger');
+                else T.alert('Xoá quá trình học tập, công tác thành công!', 'success', false, 800);
             });
         });
         e.preventDefault();
@@ -283,7 +283,7 @@ class QtHocTapCongTac extends AdminPage {
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition, loaiDoiTuong }}
                     getPage={this.checked ? this.props.getQtHocTapCongTacGroupPage : this.props.getQtHocTapCongTacPage} />
                 <EditModal ref={e => this.modal = e} permission={permission} 
-                    create={this.props.createQtHocTapCongTac} update={this.props.updateQtHocTapCongTac}
+                    create={this.props.createQtHocTapCongTacStaff} update={this.props.updateQtHocTapCongTacStaff}
                     permissions={currentPermissions}
                 />
             </>,
@@ -295,7 +295,7 @@ class QtHocTapCongTac extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, qtHocTapCongTac: state.qtHocTapCongTac });
 const mapActionsToProps = {
-    getQtHocTapCongTacPage, deleteQtHocTapCongTac, createQtHocTapCongTac,
-    updateQtHocTapCongTac, getQtHocTapCongTacGroupPage,
+    getQtHocTapCongTacPage, deleteQtHocTapCongTacStaff, createQtHocTapCongTacStaff,
+    updateQtHocTapCongTacStaff, getQtHocTapCongTacGroupPage,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtHocTapCongTac);

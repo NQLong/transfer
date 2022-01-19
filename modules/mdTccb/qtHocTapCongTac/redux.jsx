@@ -95,9 +95,9 @@ export function getQtHocTapCongTacGroupPage(pageNumber, pageSize, pageCondition,
     };
 }
 
-export function createQtHocTapCongTac(data, done, isEdit = null) {
+export function createQtHocTapCongTacStaff(data, done, isEdit = null) {
     return dispatch => {
-        const url = '/api/tccb/qua-trinh/hoc-tap-cong-tac';
+        const url = '/api/qua-trinh/htct';
         T.post(url, { data }, res => {
             if (res.error) {
                 T.notify('Tạo học tập, công tác bị lỗi!', 'danger');
@@ -119,9 +119,9 @@ export function createQtHocTapCongTac(data, done, isEdit = null) {
     };
 }
 
-export function deleteQtHocTapCongTac(id, shcc, idEdit = null) {
+export function deleteQtHocTapCongTacStaff(id, shcc, idEdit = null) {
     return dispatch => {
-        const url = '/api/tccb/qua-trinh/hoc-tap-cong-tac';
+        const url = '/api/qua-trinh/htct';
         T.delete(url, { id }, data => {
             if (data.error) {
                 T.notify('Xóa học tập, công tác bị lỗi!', 'danger');
@@ -134,9 +134,9 @@ export function deleteQtHocTapCongTac(id, shcc, idEdit = null) {
     };
 }
 
-export function updateQtHocTapCongTac(id, changes, done, isEdit = null) {
+export function updateQtHocTapCongTacStaff(id, changes, done, isEdit = null) {
     return dispatch => {
-        const url = '/api/tccb/qua-trinh/hoc-tap-cong-tac';
+        const url = '/api/qua-trinh/htct';
         T.put(url, { id, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật học tập, công tác bị lỗi!', 'danger');
@@ -153,7 +153,7 @@ export function updateQtHocTapCongTac(id, changes, done, isEdit = null) {
 
 export function updateQtHocTapCongTacGroupPageMa(id, shcc, changes, done) {
     return dispatch => {
-        const url = '/api/tccb/qua-trinh/hoc-tap-cong-tac';
+        const url = '/api/qua-trinh/htct';
         T.put(url, { id, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật học tập, công tác bị lỗi!', 'danger');
@@ -170,7 +170,7 @@ export function updateQtHocTapCongTacGroupPageMa(id, shcc, changes, done) {
 
 export function createQtHocTapCongTacGroupPageMa(data, done) {
     return dispatch => {
-        const url = '/api/tccb/qua-trinh/hoc-tap-cong-tac';
+        const url = '/api/qua-trinh/htct';
         T.post(url, { data }, res => {
             if (res.error) {
                 T.notify('Tạo học tập, công tác bị lỗi!', 'danger');
@@ -187,7 +187,7 @@ export function createQtHocTapCongTacGroupPageMa(data, done) {
 }
 export function deleteQtHocTapCongTacGroupPageMa(id, ma, done) {
     return dispatch => {
-        const url = '/api/tccb/qua-trinh/hoc-tap-cong-tac';
+        const url = '/api/qua-trinh/htct';
         T.delete(url, { id }, data => {
             if (data.error) {
                 T.notify('Xóa học tập, công tác bị lỗi!', 'danger');
@@ -198,51 +198,6 @@ export function deleteQtHocTapCongTacGroupPageMa(id, ma, done) {
                 dispatch(getQtHocTapCongTacPage(undefined, undefined, undefined, ma));
             }
         }, () => T.notify('Xóa học tập, công tác bị lỗi!', 'danger'));
-    };
-}
-
-export function createQTHTCTStaff(data, done) {
-    return () => {
-        const url = '/api/qua-trinh/htct';
-        T.post(url, { data }, res => {
-            if (res.error) {
-                T.notify('Thêm thông tin quá trình học tập, công tác bị lỗi', 'danger');
-                console.error('POST: ' + url + '. ' + res.error);
-            } else {
-                T.notify('Thêm thông tin quá trình học tập, công tác thành công!', 'info');
-                if (done) done(res);
-            }
-        }, () => T.notify('Thêm thông tin quá trình học tập, công tác bị lỗi', 'danger'));
-    };
-}
-
-export function updateQTHocTapCongTacStaff(id, changes, done) {
-    return () => {
-        const url = '/api/qua-trinh/htct';
-        T.put(url, { id, changes }, data => {
-            if (data.error) {
-                T.notify('Cập nhật thông tin quá trình học tập, công tác bị lỗi', 'danger');
-                console.error('PUT: ' + url + '. ' + data.error);
-            } else if (data.item) {
-                T.notify('Cập nhật thông tin quá trình học tập, công tác thành công!', 'info');
-                if (done) done();
-            }
-        }, () => T.notify('Cập nhật thông tin quá trình học tập, công tác bị lỗi', 'danger'));
-    };
-}
-
-export function deleteQTHocTapCongTacStaff(id, done) {
-    return () => {
-        const url = '/api/qua-trinh/htct';
-        T.delete(url, { id }, data => {
-            if (data.error) {
-                T.notify('Xóa thông tin quá trình học tập, công tác bị lỗi', 'danger');
-                console.error('DELETE: ' + url + '. ' + data.error);
-            } else {
-                T.alert('Thông tin quá trình học tập, công tác được xóa thành công!', 'info', false, 800);
-                if (done) done();
-            }
-        }, () => T.notify('Xóa thông tin quá trình học tập, công tác bị lỗi', 'danger'));
     };
 }
 
