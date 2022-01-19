@@ -129,6 +129,18 @@ module.exports = app => {
                                 resolve();
                             });
                         })).then(() => new Promise(resolve => {
+                            app.model.qtLuong.getAll({shcc: canBo.shcc}, '*', 'ngayHuong ASC', (error, luong) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin đào tạo cán bộ !' });
+                                }
+                                else if (luong == null) {
+                                    result = app.clone(result, { luong: null });
+                                } else {
+                                    result = app.clone(result, { luong});
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
 
                             app.model.qtNuocNgoai.getAll({ shcc: canBo.shcc }, '*', 'batDau ASC', (error, nuocNgoai) => {
                                 if (error) {
@@ -1022,6 +1034,18 @@ module.exports = app => {
                             result = app.clone(result, { daoTao: null });
                         } else {
                             result = app.clone(result, { daoTao: daoTao.rows });
+                        }
+                        resolve();
+                    });
+                })).then(() => new Promise(resolve => {
+                    app.model.qtLuong.getAll({shcc: canBo.shcc}, '*', 'ngayHuong ASC', (error, luong) => {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin đào tạo cán bộ !' });
+                        }
+                        else if (luong == null) {
+                            result = app.clone(result, { luong: null });
+                        } else {
+                            result = app.clone(result, { luong});
                         }
                         resolve();
                     });

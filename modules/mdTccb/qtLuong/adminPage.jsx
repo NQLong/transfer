@@ -3,17 +3,34 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormCheckbox, FormDatePicker } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
+import { DateInput } from 'view/component/Input';
+import Dropdown from 'view/component/Dropdown';
 import {
     createQtLuongStaff, updateQtLuongStaff, deleteQtLuongStaff,
     getQtLuongGroupPage, getQtLuongPage,
 } from './redux';
+
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 
+const EnumDateType = Object.freeze({
+    0: { text: '' },
+    1: { text: 'dd/mm/yyyy' },
+    2: { text: 'mm/yyyy' },
+    3: { text: 'yyyy' },
+}), typeMapper = {
+    'yyyy': 'year',
+    'mm/yyyy': 'month',
+    'dd/mm/yyyy': 'date'
+};
 class EditModal extends AdminModal {
     state = {
         id: null,
-    }
+        batDau: '',
+        ketThuc: '',
+        batDauType: 'dd/mm/yyyy',
+        ketThucType: 'dd/mm/yyyy',
+    };
 
     onShow = (item) => {
         let { id, batDau, batDauType, ketThuc, ketThucType, chucDanhNgheNghiep, bac, heSoLuong, 
@@ -21,13 +38,18 @@ class EditModal extends AdminModal {
                 id: '', batDau: '', batDauType: '', ketThuc: '', ketThucType: '', chucDanhNgheNghiep: '', bac: '', heSoLuong: '', 
                 phuCapThamNienVuotKhung: '', ngayHuong: '', mocNangBacLuong: '', soHieuVanBan: '', shcc: ''
         };
-        this.setState({ id });
+        this.setState({
+            id, batDauType: batDauType ? batDauType : 'dd/mm/yyyy',
+            ketThucType: ketThucType ? ketThucType : 'dd/mm/yyyy',
+            item, batDau, ketThuc
+        });
+
         setTimeout(() => {
             this.shcc.value(shcc);
-            this.batDau.value(batDau);
-            this.batDauType.value(batDauType);
-            this.ketThuc.value(ketThuc);
-            this.ketThucType.value(ketThucType);
+            this.batDau.setVal(batDau);
+            this.ketThuc.setVal(ketThuc);
+            this.batDauType.setText({ text: batDauType ? batDauType : 'dd/mm/yyyy' });
+            this.ketThucType.setText({ text: ketThucType ? ketThucType : 'dd/mm/yyyy' });
             this.chucDanhNgheNghiep.value(chucDanhNgheNghiep);
             this.bac.value(bac);
             this.heSoLuong.value(heSoLuong);
@@ -41,10 +63,10 @@ class EditModal extends AdminModal {
     onSubmit = () => {
         const changes = {
             shcc: this.shcc.value(),
-            batDau: Number(this.batDau.value()),
-            batDauType: this.batDauType.value(),
-            ketThuc: Number(this.ketThuc.value()),
-            ketThucType: this.ketThucType.value(),
+            batDauType: this.state.batDauType,
+            batDau: this.batDau.getVal(),
+            ketThucType: this.state.ketThucType,
+            ketThuc: this.ketThuc.getVal(),
             chucDanhNgheNghiep: this.chucDanhNgheNghiep.value(),
             bac: this.bac.value(),
             heSoLuong: this.heSoLuong.value(),
@@ -57,17 +79,17 @@ class EditModal extends AdminModal {
             T.notify('Chưa chọn cán bộ', 'danger');
             this.shcc.focus();
         } else {
-            this.state.id ? this.props.update(this.state.id, changes, this.hide, false) : this.props.create(changes, this.hide, false);
+            this.state.id ? this.props.update(this.state.id, changes, this.hide, true) : this.props.create(changes, this.hide, true);
         }
     }
 
     render = () => {
-        const readOnly = this.state.ma ? true : this.props.readOnly;
+        const readOnly = this.props.readOnly;
         return this.renderModal({
-            title: this.state.ma ? 'Cập nhật thông tin lương' : 'Tạo mới thông tin lương',
+            title: this.state.id ? 'Cập nhật thông tin lương' : 'Tạo mới thông tin lương',
             size: 'large',
             body: <div className='row'>
-                <FormSelect type='text' className='col-md-12' ref={e => this.shcc = e} data={SelectAdapter_FwCanBo} label='Cán bộ' readOnly={this.state.id ? true : false} />
+                <FormSelect className='col-md-12' ref={e => this.shcc = e} data={SelectAdapter_FwCanBo} label='Cán bộ' readOnly={this.state.id ? true : false} />
                 <FormTextBox type='text' className='col-md-4' ref={e => this.chucDanhNgheNghiep = e} label='Chức danh nghề nghiệp' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-4' ref={e => this.bac = e} label='Bậc' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-4' ref={e => this.heSoLuong = e} label='Hệ số lương' readOnly={readOnly} />
@@ -75,10 +97,20 @@ class EditModal extends AdminModal {
                 <FormDatePicker className='col-md-6' ref={e => this.ngayHuong = e} label="Ngày hưởng" readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.mocNangBacLuong = e} label='Mốc nâng bậc lương' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.soHieuVanBan = e} label='Số hiệu văn bản' readOnly={readOnly} />
-                <FormDatePicker className='col-md-6' ref={e => this.batDau = e} label="Bắt đầu" readOnly={readOnly} />
-                <FormTextBox type='text' className='col-md-6' ref={e => this.batDauType = e} label='Kiêủ bắt đầu' readOnly={readOnly} />
-                <FormDatePicker className='col-md-6' ref={e => this.ketThuc = e} label="Kết thúc" readOnly={readOnly} />
-                <FormTextBox type='text' className='col-md-6' ref={e => this.ketThucType = e} label='Kiêủ kết thúc' readOnly={readOnly} />
+                <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
+                    label={
+                        <div style={{ display: 'flex' }}>Thời gian bắt đầu (định dạng:&nbsp; <Dropdown ref={e => this.batDauType = e}
+                            items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
+                            onSelected={item => this.setState({ batDauType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
+                    }
+                    type={this.state.batDauType ? typeMapper[this.state.batDauType] : null} readOnly={readOnly} /></div>
+                <div className='form-group col-md-6'><DateInput ref={e => this.ketThuc = e} placeholder='Thời gian kết thúc'
+                    label={
+                        <div style={{ display: 'flex' }}>Thời gian kết thúc (định dạng:&nbsp; <Dropdown ref={e => this.ketThucType = e}
+                            items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
+                            onSelected={item => this.setState({ ketThucType: item })} readOnly={readOnly} />)</div>
+                    }
+                    type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} readOnly={readOnly} /></div>
             </div>,
         });
     }
@@ -148,10 +180,10 @@ class QtLuong extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap', textAlign: 'center' }}>Cán bộ</th>
+                        <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Cán bộ</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Chức danh nghề nghiệp</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap', textAlign: 'center' }}>Thông tin</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Ngày hưởng</th>
+                        <th style={{ width: '70%', whiteSpace: 'nowrap', textAlign: 'center' }}>Thông tin</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thời gian</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Số hiệu văn bản</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
@@ -176,7 +208,14 @@ class QtLuong extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' content={item.ngayHuong ? T.dateToText(item.ngayHuong, 'dd/mm/yyyy'): ''} />
+                        {!this.checked && <TableCell type='text' content={(
+                            <>
+                                <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /> </span>
+                                <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span><br /> <br/> </span>
+                                <span style={{ whiteSpace: 'nowrap' }}>Ngày hưởng: <span style={{ color: 'blue' }}>{item.ngayNghiemThu ? T.dateToText(item.ngayHuong, 'dd/mm/yyyy') : ''}</span></span>
+                            </>
+                        )}
+                        />}
                         <TableCell type='text' content={item.soHieuVanBan}/>
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}

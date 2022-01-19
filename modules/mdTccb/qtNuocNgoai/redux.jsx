@@ -164,7 +164,7 @@ export function updateQtNuocNgoaiStaff(id, changes, done, isStaffEdit = null) {
             } else if (data.item) {
                 T.notify('Cập nhật thông tin quá trình đi nước ngoài thành công!', 'info');
                 isStaffEdit ? (done && done()) : (done && done(data.item));
-                isStaffEdit ? dispatch(getStaffEdit(data.shcc)) : dispatch(getQtNuocNgoaiPage());
+                isStaffEdit ? dispatch(getStaffEdit(changes.shcc)) : dispatch(getQtNuocNgoaiPage());
             }
         }, () => T.notify('Cập nhật thông tin quá trình đi nước ngoài bị lỗi', 'danger'));
     };
