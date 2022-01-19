@@ -5,7 +5,7 @@ import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormRichText
 import Pagination from 'view/component/Pagination';
 import {
     updateQtHocTapCongTacGroupPageMa, deleteQtHocTapCongTacGroupPageMa,
-    getQtHocTapCongTacGroupPageMa, getQtHocTapCongTacPage,
+    getQtHocTapCongTacPage,
 } from './redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import { DateInput } from 'view/component/Input';
@@ -81,8 +81,8 @@ class EditModal extends AdminModal {
                             onSelected={item => this.setState({ ketThucType: item })} />)</div>
                     }
                     type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} />
-                </div> 
-                <FormRichTextBox type='text' className='col-md-12' ref={e => this.noiDung = e} label={'Nội dung'} />  
+                </div>
+                <FormRichTextBox type='text' className='col-md-12' ref={e => this.noiDung = e} label={'Nội dung'} />
             </div>,
         });
     }
@@ -142,19 +142,19 @@ class QtHocTapCongTacGroupPage extends AdminPage {
                         <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
                         <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span>{(item.hoCanBo ? item.hoCanBo: ' ') + ' ' + (item.tenCanBo ? item.tenC : ' ')}</span><br />
+                                <span>{(item.hoCanBo ? item.hoCanBo : ' ') + ' ' + (item.tenCanBo ? item.tenC : ' ')}</span><br />
                                 {item.shcc}
-                            </> 
-                        )}
-                        />
-                        <TableCell type='text' style={{  whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <span><i>Bắt đầu: </i></span><span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span> <br/>
-                                <span><i>Kết thúc: </i></span><span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span> <br/>
                             </>
                         )}
                         />
-                        <TableCell type='text' content={item.noiDung}/>
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                            <>
+                                <span><i>Bắt đầu: </i></span><span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span> <br />
+                                <span><i>Kết thúc: </i></span><span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span> <br />
+                            </>
+                        )}
+                        />
+                        <TableCell type='text' content={item.noiDung} />
                         {
                             <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                                 onEdit={() => this.modal.show(item)} onDelete={this.delete} >
@@ -191,6 +191,6 @@ class QtHocTapCongTacGroupPage extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtHocTapCongTac: state.qtHocTapCongTac });
 const mapActionsToProps = {
     updateQtHocTapCongTacGroupPageMa, deleteQtHocTapCongTacGroupPageMa,
-    getQtHocTapCongTacGroupPageMa, getQtHocTapCongTacPage,
+    getQtHocTapCongTacPage,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtHocTapCongTacGroupPage);

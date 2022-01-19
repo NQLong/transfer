@@ -24,26 +24,25 @@ import { SelectAdapter_DmNhomMau } from 'modules/mdDanhMuc/dmBenhVien/reduxNhomM
 import { SelectAdapter_DmQuocGia } from 'modules/mdDanhMuc/dmQuocGia/redux';
 // import { SelectAdapter_DmChucDanhKhoaHoc } from 'modules/mdDanhMuc/dmChucDanhKhoaHoc/redux';
 import { SelectAdapter_DmTrinhDo } from 'modules/mdDanhMuc/dmTrinhDo/redux';
-import TextInput, {NumberInput, BooleanInput, TextareaInput } from 'view/component/Input';
-import {Select} from 'view/component/Input';
+import TextInput, { NumberInput, BooleanInput, TextareaInput } from 'view/component/Input';
+import { Select } from 'view/component/Input';
 import { DateInput } from 'view/component/Input';
 import { QTForm } from 'view/component/Form';
 import { ComponentDiaDiem } from 'modules/mdDanhMuc/dmDiaDiem/componentDiaDiem';
 import { TableCell, renderTable, AdminModal, FormSelect, FormRichTextBox, FormCheckbox, FormTextBox } from 'view/component/AdminPage';
-import { createQTHTCTStaffUser, updateQTHTCTStaffUser, deleteQTHTCTStaffUser } from 'modules/mdTccb/qtHocTapCongTac/redux.jsx';
-import { createQtDaoTaoStaffUser, updateQtDaoTaoStaffUser, deleteQtDaoTaoStaffUser } from 'modules/mdTccb/qtDaoTao/redux.jsx';
-import { createQtNuocNgoaiStaffUser, updateQtNuocNgoaiStaffUser, deleteQtNuocNgoaiStaffUser } from 'modules/mdTccb/qtNuocNgoai/redux.jsx';
-import { createQtKhenThuongStaffUser, updateQtKhenThuongStaffUser, deleteQtKhenThuongStaffUser } from 'modules/mdTccb/qtKhenThuong/redux.jsx';
-import { createQtKyLuatStaffUser, updateQtKyLuatStaffUser, deleteQtKyLuatStaffUser } from 'modules/mdTccb/qtKyLuat/redux.jsx';
-import { createQtNckhStaffUser, updateQtNckhStaffUser, deleteQtNckhStaffUser } from 'modules/mdTccb/qtNghienCuuKhoaHoc/redux.jsx';
-import { createQtHuongDanLVStaffUser, updateQtHuongDanLVStaffUser, deleteQtHuongDanLVStaffUser } from 'modules/mdTccb/qtHuongDanLuanVan/redux.jsx';
-import { createSachGTStaffUser, updateSachGTStaffUser, deleteSachGTStaffUser } from 'modules/mdTccb/sachGiaoTrinh/redux.jsx';
-import { createQtBaiVietKhoaHocStaffUser, updateQtBaiVietKhoaHocStaffUser, deleteQtBaiVietKhoaHocStaffUser } from 'modules/mdTccb/qtBaiVietKhoaHoc/redux.jsx';
-import { createQtKyYeuStaffUser, updateQtKyYeuStaffUser, deleteQtKyYeuStaffUser } from 'modules/mdTccb/qtKyYeu/redux.jsx';
-import { createQtGiaiThuongStaffUser, updateQtGiaiThuongStaffUser, deleteQtGiaiThuongStaffUser } from 'modules/mdTccb/qtGiaiThuong/redux.jsx';
-import { createQtBangPhatMinhStaffUser, updateQtBangPhatMinhStaffUser, deleteQtBangPhatMinhStaffUser } from 'modules/mdTccb/qtBangPhatMinh/redux.jsx';
-import { createQtUngDungThuongMaiStaffUser, updateQtUngDungThuongMaiStaffUser, deleteQtUngDungThuongMaiStaffUser } from 'modules/mdTccb/qtUngDungThuongMai/redux.jsx';
-import { createQtLamViecNgoaiStaffUser, updateQtLamViecNgoaiStaffUser, deleteQtLamViecNgoaiStaffUser } from 'modules/mdTccb/qtLamViecNgoai/redux.jsx';
+import { createQtDaoTaoStaffUser, updateQtDaoTaoStaffUser, deleteQtDaoTaoStaffUser } from 'modules/mdTccb/qtDaoTao/redux';
+import { createQtNuocNgoaiStaffUser, updateQtNuocNgoaiStaffUser, deleteQtNuocNgoaiStaffUser } from 'modules/mdTccb/qtNuocNgoai/redux';
+import { createQtKhenThuongStaffUser, updateQtKhenThuongStaffUser, deleteQtKhenThuongStaffUser } from 'modules/mdTccb/qtKhenThuong/redux';
+import { createQtKyLuatStaffUser, updateQtKyLuatStaffUser, deleteQtKyLuatStaffUser } from 'modules/mdTccb/qtKyLuat/redux';
+import { createQtNckhStaffUser, updateQtNckhStaffUser, deleteQtNckhStaffUser } from 'modules/mdTccb/qtNghienCuuKhoaHoc/redux';
+import { createQtHuongDanLVStaffUser, updateQtHuongDanLVStaffUser, deleteQtHuongDanLVStaffUser } from 'modules/mdTccb/qtHuongDanLuanVan/redux';
+import { createSachGTStaffUser, updateSachGTStaffUser, deleteSachGTStaffUser } from 'modules/mdTccb/sachGiaoTrinh/redux';
+import { createQtBaiVietKhoaHocStaffUser, updateQtBaiVietKhoaHocStaffUser, deleteQtBaiVietKhoaHocStaffUser } from 'modules/mdTccb/qtBaiVietKhoaHoc/redux';
+import { createQtKyYeuStaffUser, updateQtKyYeuStaffUser, deleteQtKyYeuStaffUser } from 'modules/mdTccb/qtKyYeu/redux';
+import { createQtGiaiThuongStaffUser, updateQtGiaiThuongStaffUser, deleteQtGiaiThuongStaffUser } from 'modules/mdTccb/qtGiaiThuong/redux';
+import { createQtBangPhatMinhStaffUser, updateQtBangPhatMinhStaffUser, deleteQtBangPhatMinhStaffUser } from 'modules/mdTccb/qtBangPhatMinh/redux';
+import { createQtUngDungThuongMaiStaffUser, updateQtUngDungThuongMaiStaffUser, deleteQtUngDungThuongMaiStaffUser } from 'modules/mdTccb/qtUngDungThuongMai/redux';
+import { createQtLamViecNgoaiStaffUser, updateQtLamViecNgoaiStaffUser, deleteQtLamViecNgoaiStaffUser } from 'modules/mdTccb/qtLamViecNgoai/redux';
 import Loading from 'view/component/Loading';
 import { SelectAdapter_DmBenhVien } from 'modules/mdDanhMuc/dmBenhVien/reduxBenhVien';
 import { SelectAdapter_DmNgachCdnn } from 'modules/mdDanhMuc/dmNgachCdnn/redux';
@@ -1824,9 +1823,9 @@ class ProfilePage extends QTForm {
         this.modalHocTapCongTac.show(item, this.state.canBo.email);
     }
 
-    deleteHocTapCongTac = (e, item) => {
-        T.confirm('Xóa thông tin quá trình học tập công tác', 'Bạn có chắc bạn muốn xóa quá trình này?', true, isConfirm =>
-            isConfirm && this.props.deleteQTHTCTStaffUser(item.id, () => this.props.userGetStaff(this.state.canBo.email)));
+    deleteHocTapCongTac = (e) => {
+        // T.confirm('Xóa thông tin quá trình học tập công tác', 'Bạn có chắc bạn muốn xóa quá trình này?', true, isConfirm =>
+        //     isConfirm && this.props.deleteQTHTCTStaffUser(item.id, () => this.props.userGetStaff(this.state.canBo.email)));
         e.preventDefault();
     }
 
@@ -2099,7 +2098,7 @@ class ProfilePage extends QTForm {
 
         const chucVuShow = (data) => {
             let text = data.map((item) => {
-                return <div key={item.stt.toString()} className='form-group col-md-12'><b>{this.mapperChucVu[item.maChucVu]}</b><>{item.maDonVi ? 
+                return <div key={item.stt.toString()} className='form-group col-md-12'><b>{this.mapperChucVu[item.maChucVu]}</b><>{item.maDonVi ?
                     ((item.maChucVu != '001' && item.maChucVu != '002') ? ' - ' + this.mapperDonVi[item.maDonVi] : '') : ' - ' + this.mapperBoMon[item.maBoMon]}</> {item.chucVuChinh ? '(Chức vụ chính)' : ''}</div>;
             });
             return text;
@@ -2989,7 +2988,7 @@ class ProfilePage extends QTForm {
                         }
                         <RelationModal ref={e => this.modal = e} create={this.props.createQuanHeStaffUser} update={this.props.updateQuanHeStaffUser} getData={this.props.userGetStaff} />,
                         <TrinhDoNNModal ref={e => this.modalNN = e} create={this.props.createTrinhDoNNStaffUser} update={this.props.updateTrinhDoNNStaffUser} getData={this.props.userGetStaff} />,
-                        <HocTapCongTacModal ref={e => this.modalHocTapCongTac = e} create={this.props.createQTHTCTStaffUser} update={this.props.updateQTHTCTStaffUser} getData={this.props.userGetStaff} />,
+                        <HocTapCongTacModal ref={e => this.modalHocTapCongTac = e} getData={this.props.userGetStaff} />,
                         <DaoTaoModal ref={e => this.modalDaoTao = e} create={this.props.createQtDaoTaoStaffUser} update={this.props.updateQtDaoTaoStaffUser} getData={this.props.userGetStaff} />,
                         <NuocNgoaiModal ref={e => this.modalNuocNgoai = e} create={this.props.createQtNuocNgoaiStaffUser} update={this.props.updateQtNuocNgoaiStaffUser} getData={this.props.userGetStaff} />,
                         <KhenThuongModal ref={e => this.modalKhenThuong = e} create={this.props.createQtKhenThuongStaffUser} update={this.props.updateQtKhenThuongStaffUser} getData={this.props.userGetStaff} />,
@@ -3013,7 +3012,7 @@ class ProfilePage extends QTForm {
 const mapStateToProps = state => ({ system: state.system, division: state.division, staff: state.staff });
 const mapActionsToProps = {
     updateProfile, userGetStaff, getDmQuanHeGiaDinhAll, getDmBoMonAll, getDmDonViAll, getDmChucVuAll, updateStaffUser, createQuanHeStaffUser, updateQuanHeStaffUser, deleteQuanHeStaffUser,
-    createTrinhDoNNStaffUser, updateTrinhDoNNStaffUser, deleteTrinhDoNNStaffUser, getDmNgoaiNguAll, createQTHTCTStaffUser, updateQTHTCTStaffUser, deleteQTHTCTStaffUser,
+    createTrinhDoNNStaffUser, updateTrinhDoNNStaffUser, deleteTrinhDoNNStaffUser, getDmNgoaiNguAll,
     createQtDaoTaoStaffUser, updateQtDaoTaoStaffUser, deleteQtDaoTaoStaffUser, createQtNuocNgoaiStaffUser, updateQtNuocNgoaiStaffUser, deleteQtNuocNgoaiStaffUser,
     createQtKhenThuongStaffUser, updateQtKhenThuongStaffUser, deleteQtKhenThuongStaffUser, createQtKyLuatStaffUser, updateQtKyLuatStaffUser, deleteQtKyLuatStaffUser,
     createQtNckhStaffUser, updateQtNckhStaffUser, deleteQtNckhStaffUser, createQtHuongDanLVStaffUser, updateQtHuongDanLVStaffUser, deleteQtHuongDanLVStaffUser,

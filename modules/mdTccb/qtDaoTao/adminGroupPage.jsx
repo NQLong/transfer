@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
-    updateQtDaoTaoGroupPageMa, deleteQtDaoTaoGroupPageMa,
     getQtDaoTaoPage,
 } from './redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
@@ -34,7 +33,7 @@ class EditModal extends AdminModal {
             batDauType, ketThucType, thoiGian, trinhDo, kinhPhi } = item ? item : {
                 shcc: '', tenTruong: '', chuyenNganh: '', batDau: '', ketThuc: '', hinhThuc: '', loaiBangCap: '', id: '',
                 batDauType: '', ketThucType: '', thoiGian: '', trinhDo: '', kinhPhi: ''
-                };
+            };
         this.setState({ shcc, id });
         setTimeout(() => {
             this.maCanBo.value(shcc ? shcc : '');
@@ -79,7 +78,7 @@ class EditModal extends AdminModal {
             title: this.state.ma ? 'Cập nhật thông tin quá trình đào tạo' : 'Tạo mới thông tin quá trình đào tạo',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12'  multiple={this.multiple} ref={e => this.maCanBo = e} data={SelectAdapter_FwCanBo} label='Mã thẻ cán bộ' readOnly={readOnly} required/>
+                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} data={SelectAdapter_FwCanBo} label='Mã thẻ cán bộ' readOnly={readOnly} required />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.tenTruong = e} label='Tên trường' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.chuyenNganh = e} label='Chuyên ngành' readOnly={readOnly} />
                 <FormSelect className='col-md-6' ref={e => this.hinhThuc = e} data={SelectAdapter_DmHinhThucDaoTaoV2} label='Hình thức' readOnly={readOnly} />
@@ -160,7 +159,7 @@ class QtDaoTaoGroupPage extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                         <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
                         <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{(item.hoCanBo ? item.hoCanBo : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo : ' ')}</span><br />
@@ -204,7 +203,6 @@ class QtDaoTaoGroupPage extends AdminPage {
                     getPage={this.props.getQtDaoTaoPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     permissions={currentPermissions}
-                    update={this.props.updateQtDaoTaoGroupPageMa}
                 />
             </>,
             backRoute: '/user/tccb/qua-trinh/dao-tao',
@@ -214,7 +212,6 @@ class QtDaoTaoGroupPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, qtDaoTao: state.qtDaoTao });
 const mapActionsToProps = {
-    updateQtDaoTaoGroupPageMa, deleteQtDaoTaoGroupPageMa,
     getQtDaoTaoPage
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtDaoTaoGroupPage);
