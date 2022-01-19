@@ -1,5 +1,4 @@
-import { SelectAdapter_DmTrinhDoLyLuanChinhTriV2 } from 'modules/mdDanhMuc/dmTrinhDoLyLuanChinhTri/redux';
-import { SelectAdapter_DmTrinhDoQuanLyNhaNuocV2 } from 'modules/mdDanhMuc/dmTrinhDoQuanLyNhaNuoc/redux';
+import { SelectApdaterDmTrinhDoDaoTaoFilter } from 'modules/mdDanhMuc/dmTrinhDoDaoTao/redux';
 import { SelectAdapter_DmTrinhDoTinHocV2 } from 'modules/mdDanhMuc/dmTrinhDoTinHoc/redux';
 import React from 'react';
 import { connect } from 'react-redux';
@@ -9,40 +8,44 @@ import { getStaffEdit, userGetStaff } from './redux';
 import HocViDetail from '../qtDaoTao/hocViDetail';
 
 class ComponentTrinhDo extends AdminPage {
-    shcc = ''; email = '';
+    // shcc = ''; email = '';
     state = { thacSi: false, batDauThacSiType: 'mm/yyyy', ketThucThacSiType: 'mm/yyyy', shcc: '', email: '' };
 
     value = (item) => {
         console.log(item);
         // this.shcc = item.shcc;
-        // this.email = item.email;
-        this.setState({tienSi: item.tienSi, thacSi: item.thacSi, cuNhan: item.cuNhan, shcc: item.shcc, email: item.email});
-        this.thacSi.value(item.thacSi ? item.thacSi : 0);
-        this.tienSi.value(item.tienSi ? item.tienSi : 0);
-        this.cuNhan.value(item.cuNhan ? item.cuNhan : 0);
-        this.state.tienSi && this.hocViTienSi.value(this.state.shcc, this.state.email, item.daoTao.filter(i => i.loaiBangCap === 'Tiến sĩ'));
-        this.state.cuNhan && this.hocViCuNhan.value(this.state.shcc, this.state.email, item.daoTao.filter(i => i.loaiBangCap === 'Cử nhân'));
-        this.state.thacSi && this.hocViThacSi.value(this.state.shcc, this.state.email, item.daoTao.filter(i => i.loaiBangCap === 'Thạc sĩ'));
-    
-        this.trinhDoPhoThong.value(item.trinhDoPhoThong ? item.trinhDoPhoThong : '');
-        this.ngoaiNgu.value(item.shcc, item.email);
+        // this.state.email = item.email;
+        this.setState({ tienSi: item.tienSi, thacSi: item.thacSi, cuNhan: item.cuNhan, shcc: item.shcc, email: item.email }, () => {
+            this.thacSi.value(item.thacSi ? item.thacSi : 0);
+            this.tienSi.value(item.tienSi ? item.tienSi : 0);
+            this.cuNhan.value(item.cuNhan ? item.cuNhan : 0);
+            this.state.tienSi && this.hocViTienSi.value(item.shcc, item.email, '4', '4');
+            this.state.cuNhan && this.hocViCuNhan.value(item.shcc, item.email, '3', '1');
+            this.state.thacSi && this.hocViThacSi.value(item.shcc, item.email, '4', '3');
 
-        this.trinhDoTinHoc.value(item.maTrinhDoTinHoc);
-        this.chungChiTinHoc.value(item.chungChiTinHoc ? item.chungChiTinHoc : '');
+            this.trinhDoPhoThong.value(item.trinhDoPhoThong ? item.trinhDoPhoThong : '');
+            this.ngoaiNgu.value(item.shcc, item.email);
 
-        this.chungChiLyLuanChinhTri.value(item.chungChiLlct ? item.chungChiLlct : '');
-        this.lyLuanChinhTri.value(item.maTrinhDoLlct);
-        this.namCapCcLyLuan.value(item.namCapLlct ? item.namCapLlct : '');
-        this.noiCapCcLyLuan.value(item.noiCapLlct ? item.noiCapLlct : '');
+            this.trinhDoTinHoc.value(item.maTrinhDoTinHoc);
+            this.chungChiTinHoc.value(item.chungChiTinHoc ? item.chungChiTinHoc : '');
+            if (item.llct) {
+                this.trinhDoLLCT.value(item.llct.trinhDo ? item.llct.trinhDo : '');
+                this.namCapCcLyLuan.value((item.llct.batDau ? 'Từ ' + T.dateToText(item.llct.batDau, item.llct.batDauType) : '') +  ' - ' + (item.llct.ketThuc ? 'Đến ' + T.dateToText(item.llct.ketThuc, item.llct.ketThucType) : ''));
+                this.noiCapCcLyLuan.value(item.llct.tenCoSoDaoTao ? item.llct.tenCoSoDaoTao : '');
+            }
 
-        this.quanLyNnaNuoc.value(item.maTrinhDoQlnn ? item.maTrinhDoQlnn : '');
-        this.namCapQlnn.value(item.namCapQlnn ? item.namCapQlnn : '');
-        this.chungChiQuanLyNhaNuoc.value(item.chungChiQlnn ? item.chungChiQlnn : '');
-        this.noiCapQlnn.value(item.noiCapQlnn ? item.noiCapQlnn : '');
+            if (item.qlnn) {
+                this.quanLyNhaNuoc.value(item.qlnn.trinhDo ? item.qlnn.trinhDo : '');
+                this.namCapQlnn.value((item.qlnn.batDau ? 'Từ ' + T.dateToText(item.qlnn.batDau, item.qlnn.batDauType) : '') +  (item.qlnn.ketThuc ? ' - ' + 'Đến ' + T.dateToText(item.qlnn.ketThuc, item.qlnn.ketThucType ? item.qlnn.ketThucType : 'dd/mm/yyyy') : ''));
+                this.noiCapQlnn.value(item.qlnn.tenCoSoDaoTao ? item.qlnn.tenCoSoDaoTao : '');
+            }
+            
 
-        this.hocTapHienTai.value(item.hocTapHienTai ? item.hocTapHienTai : '');
-        this.coSoHocTapHienTai.value(item.coSoHocTapHienTai ? item.coSoHocTapHienTai : '');
-        this.thoiGianHocTapHienTai.value(item.thoiGianHocTapHienTai ? item.thoiGianHocTapHienTai : '');
+            this.hocTapHienTai.value(item.hocTapHienTai ? item.hocTapHienTai : '');
+            this.coSoHocTapHienTai.value(item.coSoHocTapHienTai ? item.coSoHocTapHienTai : '');
+            this.thoiGianHocTapHienTai.value(item.thoiGianHocTapHienTai ? item.thoiGianHocTapHienTai : '');
+        });
+
 
     }
 
@@ -64,10 +67,10 @@ class ComponentTrinhDo extends AdminPage {
                 maTrinhDoTinHoc: this.getValue(this.trinhDoTinHoc),
                 chungChiTinHoc: this.getValue(this.chungChiTinHoc),
                 maTrinhDoLlct: this.getValue(this.lyLuanChinhTri),
-                chungChiLlct: this.getValue(this.chungChiLyLuanChinhTri),
+                chungChiLlct: this.getValue(this.trinhDoLLCT),
                 namCapLlct: this.getValue(this.namCapCcLyLuan) ? this.getValue(this.namCapCcLyLuan) : '',
                 noiCapLlct: this.getValue(this.noiCapCcLyLuan),
-                maTrinhDoQlnn: this.getValue(this.quanLyNnaNuoc),
+                maTrinhDoQlnn: this.getValue(this.quanLyNhaNuoc),
                 chungChiQlnn: this.getValue(this.chungChiQuanLyNhaNuoc),
                 namCapQlnn: this.getValue(this.namCapQlnn) ? this.getValue(this.namCapQlnn) : '',
                 noiCapQlnn: this.getValue(this.noiCapQlnn),
@@ -91,34 +94,41 @@ class ComponentTrinhDo extends AdminPage {
                     <FormTextBox ref={e => this.trinhDoPhoThong = e} label='Trình độ giáo dục phổ thông' placeholder='Nhập trình độ phổ thông (Ví dụ: 12/12)' className='form-group col-md-4' />
                     <ComponentNN ref={e => this.ngoaiNgu = e} label='Trình độ ngoại ngữ' userEdit={this.props.userEdit} />
 
-                    <FormCheckbox ref={e => this.cuNhan = e} label='Cử nhân' onChange={value => this.setState({ cuNhan: value })} className='form-group col-md-12'/>
-                   <HocViDetail ref={e => this.hocViCuNhan = e} tenHocVi='Cử nhân' shcc={this.state.shcc} email={this.state.email} tccb={this.props.tccb} style={{ display: this.state.cuNhan ? 'block' : 'none'}}/>
-                    <FormCheckbox ref={e => this.thacSi = e} label='Thạc sĩ' onChange={value => this.setState({ thacSi: value })} className='form-group col-md-12'/>
-                    <HocViDetail ref={e => this.hocViThacSi = e} tenHocVi='Thạc sĩ' shcc={this.state.shcc} email={this.state.email} tccb={this.props.tccb} style={{ display: this.state.thacSi ? 'block' : 'none'}}/>
-                    <FormCheckbox ref={e => this.tienSi = e} label='Tiến sĩ' onChange={value => this.setState({ tienSi: value })} className='form-group col-md-12'  />
-                    <HocViDetail ref={e => this.hocViTienSi = e} tenHocVi='Tiến sĩ' shcc={this.state.shcc} email={this.state.email} tccb={this.props.tccb} style={{ display: this.state.tienSi ? 'block' : 'none'}}/>
+                    <FormCheckbox ref={e => this.cuNhan = e} label='Cử nhân' onChange={value =>
+                        this.setState({ cuNhan: value }, () => this.hocViCuNhan.value(this.state.shcc, this.state.email, '3', '1'))
+                    } className='form-group col-md-12' />
+                    <HocViDetail ref={e => this.hocViCuNhan = e} tenHocVi='Cử nhân' shcc={this.state.shcc} email={this.state.email}
+                        tccb={this.props.tccb} style={{ display: this.state.cuNhan ? 'block' : 'none' }} />
+
+                    <FormCheckbox ref={e => this.thacSi = e} label='Thạc sĩ' onChange={value =>
+                        this.setState({ thacSi: value }, () => this.hocViCuNhan.value(this.state.shcc, this.state.email, '4', '3'))
+                    } className='form-group col-md-12' />
+                    <HocViDetail ref={e => this.hocViThacSi = e} tenHocVi='Thạc sĩ' shcc={this.state.shcc} email={this.state.email}
+                        tccb={this.props.tccb} style={{ display: this.state.thacSi ? 'block' : 'none' }} />
+
+                    <FormCheckbox ref={e => this.tienSi = e} label='Tiến sĩ' onChange={value => this.setState({ tienSi: value }, () => this.hocViTienSi.value(this.state.shcc, this.state.email, '4', '4'))} className='form-group col-md-12' />
+                    <HocViDetail ref={e => this.hocViTienSi = e} tenHocVi='Tiến sĩ' shcc={this.state.shcc} email={this.state.email}
+                        tccb={this.props.tccb} style={{ display: this.state.tienSi ? 'block' : 'none' }} />
 
                     <FormSelect ref={e => this.chucDanh = e} label='Chức danh' data={[{ id: '01', text: 'Phó giáo sư' }, { id: '02', text: 'Giáo sư' }]} className='form-group col-md-3' />
                     <FormTextBox ref={e => this.chuyenNganh = e} label='Chuyên ngành chức danh' className='form-group col-md-3' />
                     <FormTextBox type='year' ref={e => this.namChucDanh = e} label='Năm công nhận chức danh' className='form-group col-md-3' />
                     <FormTextBox ref={e => this.coSoChucDanh = e} label='Cơ sở giáo dục công nhận' className='form-group col-md-3' />
-                    <div className='form-group col-md-12'/>
+                    <div className='form-group col-md-12' />
 
                     <FormSelect ref={e => this.trinhDoTinHoc = e} label='Trình độ tin học' data={SelectAdapter_DmTrinhDoTinHocV2} className='form-group col-md-3' />
-                    <FormTextBox ref={e => this.chungChiTinHoc = e} label='Chứng chỉ tin học' className='form-group col-md-3' /> <div className='form-group col-md-6'/>
-                    <div className='form-group col-md-12'/>
+                    <FormTextBox ref={e => this.chungChiTinHoc = e} label='Chứng chỉ tin học' className='form-group col-md-3' /> <div className='form-group col-md-6' />
+                    <div className='form-group col-md-12' />
 
-                    <FormSelect ref={e => this.lyLuanChinhTri = e} label='Trình độ lý luận chính trị' data={SelectAdapter_DmTrinhDoLyLuanChinhTriV2} className='form-group col-md-3' />
-                    <FormTextBox ref={e => this.chungChiLyLuanChinhTri = e} label='Chứng chỉ LLCT' className='form-group col-md-3' />
-                    <FormTextBox type='year' ref={e => this.namCapCcLyLuan = e} label='Năm cấp chứng chỉ LLCT' className='form-group col-md-3' />
-                    <FormTextBox ref={e => this.noiCapCcLyLuan = e} label='Nơi cấp chứng chỉ LLCT' className='form-group col-md-3' />
-                    <div className='form-group col-md-12'/>
+                    <FormSelect ref={e => this.trinhDoLLCT = e} label='Trình độ LLCT' data={SelectApdaterDmTrinhDoDaoTaoFilter('7')} className='form-group col-md-4' readOnly />
+                    <FormTextBox ref={e => this.namCapCcLyLuan = e} label='Thời gian' className='form-group col-md-4' readOnly />
+                    <FormTextBox ref={e => this.noiCapCcLyLuan = e} label='Nơi cấp' className='form-group col-md-4 ' readOnly />
+                    <div className='form-group col-md-12' />
 
-                    <FormSelect ref={e => this.quanLyNnaNuoc = e} label='Trình độ quản lý nhà nước' data={SelectAdapter_DmTrinhDoQuanLyNhaNuocV2} className='form-group col-md-3' />
-                    <FormTextBox ref={e => this.chungChiQuanLyNhaNuoc = e} label='Chứng chỉ QLNN' className='form-group col-md-3' />
-                    <FormTextBox type='year' ref={e => this.namCapQlnn = e} label='Năm cấp chứng chỉ QLNN' className='form-group col-md-3' />
-                    <FormTextBox ref={e => this.noiCapQlnn = e} label='Nơi cấp chứng chỉ QLNN' className='form-group col-md-3' />
-                    <div className='form-group col-md-12'/>
+                    <FormSelect ref={e => this.quanLyNhaNuoc = e} label='Trình độ QLNN' data={SelectApdaterDmTrinhDoDaoTaoFilter('8')} className='form-group col-md-4' readOnly/>
+                    <FormTextBox ref={e => this.namCapQlnn = e} label='Thời gian' className='form-group col-md-4' readOnly/>
+                    <FormTextBox ref={e => this.noiCapQlnn = e} label='Nơi cấp  ' className='form-group col-md-4' readOnly/>
+                    <div className='form-group col-md-12' />
 
                     <FormTextBox ref={e => this.hocTapHienTai = e} label='Tình hình học tập, bồi dưỡng hiện tại' className='form-group col-md-4' />
                     <FormTextBox ref={e => this.coSoHocTapHienTai = e} label='Tên cơ sở đào tạo' className='form-group col-md-4' />

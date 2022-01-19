@@ -1,9 +1,12 @@
+import { SelectApdater_DmBangDaoTao } from 'modules/mdDanhMuc/dmBangDaoTao/redux';
+import { SelectAdapter_DmHinhThucDaoTaoV2 } from 'modules/mdDanhMuc/dmHinhThucDaoTao/redux';
+import { SelectApdaterDmTrinhDoDaoTaoFilter } from 'modules/mdDanhMuc/dmTrinhDoDaoTao/redux';
 import React from 'react';
 import { connect } from 'react-redux';
-import { AdminModal, AdminPage, FormSelect, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
+import { AdminModal, AdminPage, FormRichTextBox, FormSelect, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
 import Dropdown from 'view/component/Dropdown';
 import { DateInput } from 'view/component/Input';
-import { getStaffEdit, SelectAdapter_FwCanBo, userGetStaff } from '../tccbCanBo/redux';
+import { getStaffEdit, userGetStaff } from '../tccbCanBo/redux';
 import { createQtDaoTao, createQtDaoTaoStaffUser } from './redux';
 
 const EnumDateType = Object.freeze({
@@ -16,86 +19,133 @@ const EnumDateType = Object.freeze({
     'mm/yyyy': 'month',
     'dd/mm/yyyy': 'date'
 };
+
+const chuyenNganhSupportText = {
+    5: 'Ngoại ngữ',
+    6: 'Tin học',
+    7: 'Lý luận chính trị',
+    8: 'Quản lý nhà nước'
+};
 class EditModal extends AdminModal {
-    state = { shcc: '', email: '' };
-    componentDidMount() {
+    state = {
+        id: null,
+        item: null,
+        shcc: '',
+        email: '',
+        batDau: '',
+        ketThuc: '',
+        loaiBangCap: '',
+        batDauType: 'dd/mm/yyyy',
+        ketThucType: 'dd/mm/yyyy',
     }
 
     onShow = (item) => {
-        this.setState({ item, shcc: item.shcc, email: item.email, batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy' });
-        this.shcc.value(item.shcc);
-        this.loaiBangCap.value(this.props.hocVi);
-        this.batDauType.setText({ text: 'dd/mm/yyyy' });
-        this.ketThucType.setText({ text: 'dd/mm/yyyy' });
-    };
+        let { id, batDauType, ketThucType, batDau, ketThuc, trinhDo, chuyenNganh, tenCoSoDaoTao, kinhPhi, hinhThuc, loaiBangCap }
+            = item && item.item ? item.item :
+                {
+                    id: null, batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', batDau: null, ketThuc: null, chuyenNganh: '',
+                    tenCoSoDaoTao: '', kinhPhi: '', hinhThuc: '', loaiBangCap: '', trinhDo: ''
+                };
+        this.setState({
+            email: item.email,
+            batDauType: batDauType ? batDauType : 'dd/mm/yyyy',
+            ketThucType: ketThuc ? ketThucType : 'dd/mm/yyyy',
+            shcc: item.shcc, id, batDau, ketThuc, loaiBangCap: loaiBangCap ? loaiBangCap : (item.loaiBangCap ? item.loaiBangCap : ''),
+            item: item.item
+        }, () => {
+            this.loaiBangCap.value(loaiBangCap ? loaiBangCap : (item.loaiBangCap ? item.loaiBangCap : ''));
+            this.trinhDo?.value(trinhDo ? trinhDo : (item.trinhDo ? item.trinhDo : ''));
+            this.chuyenNganh?.value(chuyenNganh ? chuyenNganh : '');
+            this.tenCoSoDaoTao?.value(tenCoSoDaoTao ? tenCoSoDaoTao : '');
+            this.hinhThuc?.value(hinhThuc ? hinhThuc : '');
+            this.batDauType?.setText({ text: batDauType ? batDauType : 'dd/mm/yyyy' });
+            this.ketThucType?.setText({ text: ketThucType ? ketThucType : 'dd/mm/yyyy' });
+            this.batDau?.setVal(batDau ? batDau : '');
+            this.ketThuc?.setVal(ketThuc ? ketThuc : '');
+            this.kinhPhi?.value(kinhPhi ? kinhPhi : '');
+        });
+    }
 
-
-    onSubmit = (e) => {
-        e.preventDefault();
+    onSubmit = () => {
         const changes = {
             shcc: this.state.shcc,
             email: this.state.email,
-            tenTruong: this.tenTruong.value(),
-            chuyenNganh: this.chuyenNganh.value(),
-            batDauType: this.state.batDauType,
             batDau: this.batDau.getVal(),
-            ketThucType: this.state.ketThucType,
             ketThuc: this.ketThuc.getVal(),
+            batDauType: this.state.batDauType,
+            ketThucType: this.state.ketThucType,
+            tenTruong: this.tenCoSoDaoTao.value(),
+            chuyenNganh: this.chuyenNganh.value(),
             hinhThuc: this.hinhThuc.value(),
             loaiBangCap: this.loaiBangCap.value(),
-            thoiGian: this.thoiGian.value(),
+            trinhDo: this.trinhDo.value()
         };
-        if (changes.shcc == '') {
-            T.notify('Mã số cán bộ bị trống');
-            this.shcc.focus();
-        } else {
-            this.props.create(changes, () => {
-                this.props.value(this.state.shcc, this.state.email, [changes]);
-                this.hide();
-            });
-        }
+
+        if (!changes.loaiBangCap) {
+            T.notify('Loại bằng cấp bị trống!', 'danger');
+            this.loaiBangCap.focus();
+        } else if (!changes.chuyenNganh) {
+            T.notify('Nội dung bị trống!', 'danger');
+            this.chuyenNganh.focus();
+        } else this.state.id ? this.props.update(this.state.id, changes, this.hide, true) : this.props.create(changes, this.hide, true);
     }
 
-    render = () => {
-        const readOnly = this.props.readOnly;
-        return this.renderModal({
-            title: 'Thêm quá trình đào tạo ' + this.props.hocVi,
-            size: 'large',
-            body: <div className='row'>
-                <FormSelect type='text' className='col-md-6' ref={e => this.shcc = e} data={SelectAdapter_FwCanBo} label='Cán bộ' readOnly />
-                <FormTextBox type='text' className='col-md-6' ref={e => this.loaiBangCap = e} label='Loại bằng cấp' readOnly />
-                <FormTextBox className='col-md-12' ref={e => this.tenTruong = e} label={'Tên cơ sở đào tạo và cấp bằng ' + this.props.hocVi} placeholder='Nhập rõ tên, quốc gia' readOnly={readOnly} />
-                <FormTextBox className='col-md-12' ref={e => this.chuyenNganh = e} label='Chuyên ngành' readOnly={readOnly} />
-                <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
-                    label={
-                        <div style={{ display: 'flex' }}>Thời gian bắt đầu (định dạng:&nbsp; <Dropdown ref={e => this.batDauType = e}
-                            items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
-                            onSelected={item => this.setState({ batDauType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
-                    }
-                    type={this.state.batDauType ? typeMapper[this.state.batDauType] : null} readOnly={readOnly} /></div>
-                <div className='form-group col-md-6'><DateInput ref={e => this.ketThuc = e} placeholder='Thời gian kết thúc'
-                    label={
-                        <div style={{ display: 'flex' }}>Thời gian kết thúc (định dạng:&nbsp; <Dropdown ref={e => this.ketThucType = e}
-                            items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
-                            onSelected={item => this.setState({ ketThucType: item })} readOnly={readOnly} />)</div>
-                    }
-                    type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} readOnly={readOnly} /></div>
-                <FormTextBox type='text' className='col-md-6' ref={e => this.hinhThuc = e} label='Hình thức' readOnly={readOnly} />
-                <FormTextBox type='year' className='col-md-6' ref={e => this.thoiGian = e} label='Năm hoàn thành' readOnly={readOnly} />
-            </div>
+    handleBang = (value) => {
+        this.setState({ loaiBangCap: value.id }, () => {
+            this.trinhDo?.value(this.state.item?.trinhDo ? this.state.item?.trinhDo : '');
+            this.chuyenNganh?.value(this.state.item?.chuyenNganh ? this.state.item?.chuyenNganh : chuyenNganhSupportText[value.id]);
         });
+
     }
+
+    checkBang = (loaiBangCap) => {
+        return (loaiBangCap != '' && loaiBangCap != '1' && loaiBangCap != '2' && loaiBangCap != '9');
+    };
+
+    render = () => {
+        const displayElement = this.state.loaiBangCap == '' ? 'none' : 'block';
+        return this.renderModal({
+        title: 'Thông tin quá trình đào tạo',
+        size: 'large',
+        body: <div className='row'>
+            <FormSelect className='form-group col-md-4' ref={e => this.loaiBangCap = e} label='Loại bằng cấp' data={SelectApdater_DmBangDaoTao} onChange={this.handleBang} required readOnly/>
+            {
+                (this.state.loaiBangCap != '5' && this.state.loaiBangCap != '9') ?
+                    <FormSelect ref={e => this.trinhDo = e} data={SelectApdaterDmTrinhDoDaoTaoFilter(this.state.loaiBangCap)}
+                        className='col-md-4' style={{ display: this.checkBang(this.state.loaiBangCap) ? 'block' : 'none' }} label='Trình độ' readOnly/>
+                    : 
+                    <FormTextBox ref={e => this.trinhDo = e} className='form-group col-md-4' label='Trình độ/Kết quả' required/>
+            }
+            <FormSelect ref={e => this.hinhThuc = e} className='form-group col-md-4' label='Hình thức' data={SelectAdapter_DmHinhThucDaoTaoV2} style={{ display: displayElement }}/>
+            <FormRichTextBox ref={e => this.chuyenNganh = e} className='form-group col-md-12' label='Chuyên ngành đào tạo' style={{ display: displayElement }} required/>
+            <FormRichTextBox ref={e => this.tenCoSoDaoTao = e} className='form-group col-md-12' label='Tên cơ sở bồi dưỡng, đào tạo' style={{ display: displayElement }}/>
+            <div className='form-group col-md-6' style={{ display: displayElement }}><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
+                label={
+                    <div style={{ display: 'flex' }}>Thời gian bắt đầu (định dạng:&nbsp; <Dropdown ref={e => this.batDauType = e}
+                        items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
+                        onSelected={item => this.setState({ batDauType: item })} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
+                }
+                type={this.state.batDauType ? typeMapper[this.state.batDauType] : null} /></div>
+            <div className='form-group col-md-6' style={{ display: displayElement }}><DateInput ref={e => this.ketThuc = e} placeholder='Thời gian kết thúc'
+                label={
+                    <div style={{ display: 'flex' }}>Thời gian kết thúc (định dạng:&nbsp; <Dropdown ref={e => this.ketThucType = e}
+                        items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
+                        onSelected={item => this.setState({ ketThucType: item })} />)</div>
+                }
+                type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} /></div>
+        </div>
+    });}
 }
 
 class HocViDetail extends AdminPage {
-    state = { shcc: '', email: '' };
+    state = { shcc: '', email: '', loaiBangCap: '', trinhDo: '' };
 
-    value = (shcc, email) => {
-        this.setState({ shcc, email });
+    value = (shcc, email, loaiBangCap, trinhDo) => {
+        this.setState({ shcc, email, loaiBangCap, trinhDo });
     }
     render = () => {
-        let dataDaoTao = this.props.tccb ? this.props.staff?.selectedItem?.daoTao?.filter(i => i.tenTrinhDo === this.props.tenHocVi) :
-            this.props.staff?.userItem?.daoTao?.filter(i => i.tenTrinhDo === this.props.tenHocVi);
+        let dataDaoTao = this.props.tccb ? this.props.staff?.selectedItem?.daoTao?.filter(i => {i.tenTrinhDo === this.props.tenHocVi;}) :
+            this.props.staff?.userItem?.daoTao?.filter(i => {i.tenTrinhDo === this.props.tenHocVi;});
         const permission = {
             write: true,
             read: true,
@@ -103,12 +153,13 @@ class HocViDetail extends AdminPage {
         };
         const renderHocVi = (items) => (
             renderTable({
+                emptyTable: 'Chưa có dữ liệu về quá trình đào tạo ' + this.props.tenHocVi,
                 getDataSource: () => items,
                 stickyHead: false,
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Chuyên ngành đào tạo {this.props.hocVi}</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Chuyên ngành đào tạo {this.props.tenHocVi}</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tên cơ sở đào tạo</th>
                         {/* <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Hình thức</th> */}
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>
@@ -143,7 +194,7 @@ class HocViDetail extends AdminPage {
             <div className='col-md-12 form-group' style={this.props.style}>
                 <div className='tile-body'>{dataDaoTao && renderHocVi(dataDaoTao)}</div>
                     <div className='tile-footer' style={{ textAlign: 'right' }}>
-                        <button className='btn btn-info' type='button' onClick={e => this.showModal(e, null)}>
+                        <button className='btn btn-info' type='button' onClick={e => {e.preventDefault(); this.modal.show({ email: this.state.email, item: null, shcc: this.state.shcc, loaiBangCap: this.state.loaiBangCap, trinhDo: this.state.trinhDo });}}>
                             <i className='fa fa-fw fa-lg fa-plus' />Thêm quá trình đào tạo {this.props.tenHocVi}
                         </button>
                     </div>

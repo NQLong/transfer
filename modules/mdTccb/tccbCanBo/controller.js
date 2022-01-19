@@ -1002,6 +1002,30 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
+                    app.model.qtDaoTao.getTDCT(canBo.shcc , (error, llct) => {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin trình độ lí luận chính trị cán bộ !' });
+                        }
+                        else if (llct == null || llct.rows.length == 0) {
+                            result = app.clone(result, { llct: null });
+                        } else {
+                            result = app.clone(result, { llct: llct.rows[0] });
+                        }
+                        resolve();
+                    });
+                })).then(() => new Promise(resolve => {
+                    app.model.qtDaoTao.getQLNN(canBo.shcc , (error, qlnn) => {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin trình độ quản lý nhà nước cán bộ !' });
+                        }
+                        else if (qlnn == null || qlnn.length == 0) {
+                            result = app.clone(result, { qlnn: null });
+                        } else {
+                            result = app.clone(result, { qlnn: qlnn.rows[0] });
+                        }
+                        resolve();
+                    });
+                })).then(() => new Promise(resolve => {
                     app.model.trinhDoNgoaiNgu.getTrinhDoNNByShcc(canBo.shcc, (error, trinhDoNN) => {
                         if (error) {
                             res.send({ error: 'Lỗi khi lấy thông tin trình độ ngoại ngữ cán bộ !' });
@@ -1009,7 +1033,7 @@ module.exports = app => {
                         else if (trinhDoNN == null) {
                             result = app.clone(result, { trinhDoNN: null });
                         } else {
-                            result = app.clone(result, { trinhDoNN: trinhDoNN.rows });
+                            result = app.clone(result, { trinhDoNN: trinhDoNN.rows[0] });
                         }
                         resolve();
                     });
