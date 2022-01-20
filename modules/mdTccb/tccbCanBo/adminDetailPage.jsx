@@ -19,6 +19,7 @@ import ComponentHDLV from '../qtHuongDanLuanVan/componentHDLV';
 import ComponentSGT from '../sachGiaoTrinh/componentSGT';
 import ComponentDaoTao from '../qtDaoTao/componentDaoTao';
 import ComponentLuong from '../qtLuong/componentLuong';
+import ComponentCongTac from '../qtHocTapCongTac/componentCongTac';
 
 class CanBoPage extends AdminPage {
     state = { item: null }
@@ -47,6 +48,7 @@ class CanBoPage extends AdminPage {
     setUp = (item) => {
         this.componentCaNhan.value(item);
         this.componentTTCongTac.value(item);
+        this.componentCongTac.value(item.shcc, item.email);
         this.componentQuanHe.value(item.email, item.phai, item.shcc);
         this.componentTrinhDo.value(item);
         this.componentDaoTao.value(item.shcc, item.email);
@@ -82,6 +84,7 @@ class CanBoPage extends AdminPage {
                 <ComponentCaNhan ref={e => this.componentCaNhan = e} userEdit={false} isStaff={false}/>
                 <ComponentQuanHe ref={e => this.componentQuanHe = e} userEdit={false} />
                 <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={false} />
+                <ComponentCongTac ref={e => this.componentCongTac = e}  userEdit= {false} />
                 <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={false} tccb={true}/>
                 <ComponentDaoTao ref={e => this.componentDaoTao = e} userEdit={false} tccb={true}/>
                 <ComponentLuong ref={e => this.componentLuong = e} userEdit={false} />

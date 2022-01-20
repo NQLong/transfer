@@ -182,7 +182,7 @@ class QtHocTapCongTac extends AdminPage {
     }
 
     list = (text, i, j) => {
-        let deTais = text.split('??').map(str => <p key={i--} style={{ textTransform: 'uppercase' }}>{j - i}. {str}</p>);
+        let deTais = text.split('??').map(str => <p key={i--}>{j - i}. {str}</p>);
         return deTais;
     }
 
@@ -218,8 +218,8 @@ class QtHocTapCongTac extends AdminPage {
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
                         {!this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Nội dung</th>}
-                        {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quá trình học tập, công tác</th>}
-                        {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách quá trình học tập, công tác</th>}
+                        {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tổng</th>}
+                        {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Các quá trình</th>}
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
@@ -241,7 +241,7 @@ class QtHocTapCongTac extends AdminPage {
                             </>
                         )}
                         />}
-                        {this.checked && <TableCell type='text' content={item.soNoiDung} />}
+                        {this.checked && <TableCell type='text' style={{ textAlign: 'right'}} content={item.soNoiDung} />}
                         {this.checked && <TableCell type='text' content={this.list(item.danhSachNoiDung, item.soNoiDung, item.soNoiDung)} />}
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
@@ -261,7 +261,7 @@ class QtHocTapCongTac extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-fighter-jet',
+            icon: 'fa fa-calendar',
             title: ' Quá trình học tập, công tác',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,

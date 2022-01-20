@@ -1,5 +1,4 @@
 import { SelectApdaterDmTrinhDoDaoTaoFilter } from 'modules/mdDanhMuc/dmTrinhDoDaoTao/redux';
-import { SelectAdapter_DmTrinhDoTinHocV2 } from 'modules/mdDanhMuc/dmTrinhDoTinHoc/redux';
 import React from 'react';
 import { connect } from 'react-redux';
 import { AdminPage, FormCheckbox, FormSelect, FormTextBox } from 'view/component/AdminPage';
@@ -26,8 +25,8 @@ class ComponentTrinhDo extends AdminPage {
             this.trinhDoPhoThong.value(item.trinhDoPhoThong ? item.trinhDoPhoThong : '');
             this.ngoaiNgu.value(item.shcc, item.email);
 
-            this.trinhDoTinHoc.value(item.maTrinhDoTinHoc);
-            this.chungChiTinHoc.value(item.chungChiTinHoc ? item.chungChiTinHoc : '');
+            this.trinhDoTinHoc.value(item.tinHoc?.trinhDo);
+            // this.chungChiTinHoc.value(item.chungChiTinHoc ? item.chungChiTinHoc : '');
             if (item.llct) {
                 this.trinhDoLLCT.value(item.llct.trinhDo ? item.llct.trinhDo : '');
                 this.namCapCcLyLuan.value((item.llct.batDau ? 'Từ ' + T.dateToText(item.llct.batDau, item.llct.batDauType) : '') +  ' - ' + (item.llct.ketThuc ? 'Đến ' + T.dateToText(item.llct.ketThuc, item.llct.ketThucType) : ''));
@@ -116,8 +115,8 @@ class ComponentTrinhDo extends AdminPage {
                     <FormTextBox ref={e => this.coSoChucDanh = e} label='Cơ sở giáo dục công nhận' className='form-group col-md-3' />
                     <div className='form-group col-md-12' />
 
-                    <FormSelect ref={e => this.trinhDoTinHoc = e} label='Trình độ tin học' data={SelectAdapter_DmTrinhDoTinHocV2} className='form-group col-md-3' />
-                    <FormTextBox ref={e => this.chungChiTinHoc = e} label='Chứng chỉ tin học' className='form-group col-md-3' /> <div className='form-group col-md-6' />
+                    <FormSelect ref={e => this.trinhDoTinHoc = e} label='Trình độ tin học' data={SelectApdaterDmTrinhDoDaoTaoFilter('6')} className='form-group col-md-6' readOnly/>
+                    {/* <FormTextBox ref={e => this.chungChiTinHoc = e} label='Chứng chỉ tin học' className='form-group col-md-3' /> <div className='form-group col-md-6' /> */}
                     <div className='form-group col-md-12' />
 
                     <FormSelect ref={e => this.trinhDoLLCT = e} label='Trình độ LLCT' data={SelectApdaterDmTrinhDoDaoTaoFilter('7')} className='form-group col-md-4' readOnly />

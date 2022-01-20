@@ -1,5 +1,5 @@
 import T from 'view/js/common';
-import { getStaffEdit } from '../tccbCanBo/redux';
+import { getStaffEdit, userGetStaff } from '../tccbCanBo/redux';
 
 // Reducer ------------------------------------------------------------------------------------------------------------
 const QtHocTapCongTacGetAll = 'QtHocTapCongTac:GetAll';
@@ -201,8 +201,8 @@ export function deleteQtHocTapCongTacGroupPageMa(id, ma, done) {
     };
 }
 
-export function createQTHocTapCongTacStaffUser(data, done) {
-    return () => {
+export function createQtHocTapCongTacStaffUser(data, done) {
+    return dispatch => {
         const url = '/api/user/qua-trinh/htct';
         T.post(url, { data }, res => {
             if (res.error) {
@@ -211,13 +211,14 @@ export function createQTHocTapCongTacStaffUser(data, done) {
             } else {
                 T.notify('Thêm thông tin quá trình học tập, công tác thành công!', 'info');
                 if (done) done(res);
+                dispatch(userGetStaff(data.email));
             }
         }, () => T.notify('Thêm thông tin quá trình học tập, công tác bị lỗi', 'danger'));
     };
 }
 
-export function updateQTHocTapCongTacStaffUser(id, changes, done) {
-    return () => {
+export function updateQtHocTapCongTacStaffUser(id, changes, done) {
+    return dispatch => {
         const url = '/api/user/qua-trinh/htct';
         T.put(url, { id, changes }, data => {
             if (data.error) {
@@ -226,13 +227,14 @@ export function updateQTHocTapCongTacStaffUser(id, changes, done) {
             } else if (data.item) {
                 T.notify('Cập nhật thông tin quá trình học tập, công tác thành công!', 'info');
                 if (done) done();
+                dispatch(userGetStaff(changes.email));
             }
         }, () => T.notify('Cập nhật thông tin quá trình học tập, công tác bị lỗi', 'danger'));
     };
 }
 
-export function deleteQTHocTapCongTacStaffUser(id, done) {
-    return () => {
+export function deleteQtHocTapCongTacStaffUser(id, email, done) {
+    return dispatch => {
         const url = '/api/user/qua-trinh/htct';
         T.delete(url, { id }, data => {
             if (data.error) {
@@ -241,6 +243,7 @@ export function deleteQTHocTapCongTacStaffUser(id, done) {
             } else {
                 T.alert('Thông tin quá trình học tập, công tác được xóa thành công!', 'info', false, 800);
                 done && done();
+                dispatch(userGetStaff(email));
             }
         }, () => T.notify('Xóa thông tin quá trình học tập, công tác bị lỗi', 'danger'));
     };

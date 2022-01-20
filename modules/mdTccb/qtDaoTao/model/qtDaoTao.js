@@ -15,4 +15,9 @@ module.exports = app => {
         app.dbConnection.execute('BEGIN :ret:=qt_dao_tao_get_trinh_do_qlnn_can_bo(:iShcc); END;',
         { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, iShcc}, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
     };
+
+    app.model.qtDaoTao.getTH = (iShcc, done) => {
+        app.dbConnection.execute('BEGIN :ret:=qt_dao_tao_get_trinh_do_tin_hoc_can_bo(:iShcc); END;',
+        { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, iShcc}, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
+    };
 };
