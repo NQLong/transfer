@@ -1,4 +1,4 @@
-import T from 'view/js/common';
+    import T from 'view/js/common';
 import { getStaffEdit, userGetStaff } from '../tccbCanBo/redux';
 
 // Reducer ------------------------------------------------------------------------------------------------------------
@@ -50,15 +50,22 @@ export default function QtDaoTaoReducer(state = null, data) {
 
 // Actions ------------------------------------------------------------------------------------------------------------
 T.initPage('pageQtDaoTao');
-export function getQtDaoTaoPage(pageNumber, pageSize, pageCondition, done) {
-    const page = T.updatePage('pageQtDaoTao', pageNumber, pageSize, pageCondition);
+export function getQtDaoTaoPage(pageNumber, pageSize, pageCondition, ma, filter, done) {
+    console.log(ma);
+    console.log('Call get page function');
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('pageQtDaoTao', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/qua-trinh/dao-tao/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition }, data => {
+        T.get(url, { condition: page.pageCondition, ma: ma, filter: page.filter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách quá trình đào tạo sản bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
+                if (page.filter) data.page.filter = page.filter;
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 if (done) done(data.page);
                 dispatch({ type: QtDaoTaoGetPage, page: data.page });
@@ -67,23 +74,28 @@ export function getQtDaoTaoPage(pageNumber, pageSize, pageCondition, done) {
     };
 }
 
-// T.initPage('groupPageQtDaoTao', true);
-// export function getQtDaoTaoGroupPage(pageNumber, pageSize, pageCondition, done) {
-//     const page = T.updatePage('groupPageQtDaoTao', pageNumber, pageSize, pageCondition);
-//     return dispatch => {
-//         const url = `/api/tccb/qua-trinh/dao-tao/group/page/${page.pageNumber}/${page.pageSize}`;
-//         T.get(url, { condition: page.pageCondition }, data => {
-//             if (data.error) {
-//                 T.notify('Lấy danh sách nghỉ thai sản theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
-//                 console.error(`GET: ${url}.`, data.error);
-//             } else {
-//                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
-//                 done && done(data.page);
-//                 dispatch({ type: QtDaoTaoGetGroupPage, page: data.page });
-//             }
-//         }, error => console.error(`GET: ${url}.`, error));
-//     };
-// }
+T.initPage('groupPageQtDaoTao', true);
+export function getQtDaoTaoGroupPage(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('groupPageQtDaoTao', pageNumber, pageSize, pageCondition, filter);
+    return dispatch => {
+        const url = `/api/tccb/qua-trinh/dao-tao/group/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách quá trình đào tạo bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (page.filter) data.page.filter = page.filter;
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                done && done(data.page);
+                dispatch({ type: QtDaoTaoGetGroupPage, page: data.page });
+            }
+        }, error => console.error(`GET: ${url}.`, error));
+    };
+}
 
 export function getQtDaoTaoAll(done) {
     return dispatch => {

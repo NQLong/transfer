@@ -171,8 +171,7 @@ class QtHocTapCongTac extends AdminPage {
 
     getPage = (pageN, pageS, pageC, done) => {
         if (this.checked) this.props.getQtHocTapCongTacGroupPage(pageN, pageS, pageC, this.state.filter, done);
-        else this.props.getQtHocTapCongTacPage(pageN, pageS, pageC, '', this.state.filter, done);
-
+        else this.props.getQtHocTapCongTacPage(pageN, pageS, pageC, this.state.filter, done);
     }
 
     groupPage = () => {
@@ -236,8 +235,8 @@ class QtHocTapCongTac extends AdminPage {
                         {!this.checked && <TableCell type='text' content={(
                             <>
                                 <span><i>{item.noiDung ? item.noiDung : ''}</i></span> <br/> <br/>
-                                <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span></span><br />
-                                <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span></span> <br/>
+                                {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br/></span> : null}
+                                {item.ketThuc ? <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span><br/></span> : null}
                             </>
                         )}
                         />}
@@ -250,7 +249,7 @@ class QtHocTapCongTac extends AdminPage {
                         }
                         {
                             this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}>
-                                <Link className='btn btn-success' to={`/user/tccb/qua-trinh/hoc-tap-cong-tac/group_htct/${item.shcc}`} >
+                                <Link className='btn btn-success' to={`/user/tccb/qua-trinh/hoc-tap-cong-tac/${item.shcc}`} >
                                     <i className='fa fa-lg fa-compress' />
                                 </Link>
                             </TableCell>

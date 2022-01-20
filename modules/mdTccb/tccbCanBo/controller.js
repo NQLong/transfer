@@ -167,12 +167,24 @@ module.exports = app => {
                         })).then(() => new Promise(resolve => {
                             app.model.qtLuong.getAll({shcc: canBo.shcc}, '*', 'ngayHuong ASC', (error, luong) => {
                                 if (error) {
-                                    res.send({ error: 'Lỗi khi lấy thông tin đào tạo cán bộ !' });
+                                    res.send({ error: 'Lỗi khi lấy thông tin lương cán bộ !' });
                                 }
                                 else if (luong == null) {
                                     result = app.clone(result, { luong: null });
                                 } else {
                                     result = app.clone(result, { luong});
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
+                            app.model.qtBaoHiemXaHoi.getByShcc(canBo.shcc, (error, baoHiemXaHoi) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin bảo hiểm xã hội cán bộ !' });
+                                }
+                                else if (baoHiemXaHoi == null) {
+                                    result = app.clone(result, { baoHiemXaHoi: null });
+                                } else {
+                                    result = app.clone(result, { baoHiemXaHoi: baoHiemXaHoi.rows});
                                 }
                                 resolve();
                             });
@@ -1118,6 +1130,18 @@ module.exports = app => {
                             result = app.clone(result, { luong: null });
                         } else {
                             result = app.clone(result, { luong});
+                        }
+                        resolve();
+                    });
+                })).then(() => new Promise(resolve => {
+                    app.model.qtBaoHiemXaHoi.getByShcc(canBo.shcc, (error, baoHiemXaHoi) => {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin bảo hiểm xã hội cán bộ !' });
+                        }
+                        else if (baoHiemXaHoi == null) {
+                            result = app.clone(result, { baoHiemXaHoi: null });
+                        } else {
+                            result = app.clone(result, { baoHiemXaHoi: baoHiemXaHoi.rows});
                         }
                         resolve();
                     });
