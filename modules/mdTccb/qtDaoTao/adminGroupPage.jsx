@@ -4,8 +4,7 @@ import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormRichTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
-    updateQtDaoTaoGroupPageMa, deleteQtDaoTaoGroupPageMa,
-    getQtDaoTaoPage,
+    updateQtDaoTao, deleteQtDaoTao, getQtDaoTaoPage,
 } from './redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import { DateInput } from 'view/component/Input';
@@ -13,6 +12,7 @@ import Dropdown from 'view/component/Dropdown';
 import { SelectApdater_DmBangDaoTao } from 'modules/mdDanhMuc/dmBangDaoTao/redux';
 import { SelectAdapter_DmHinhThucDaoTaoV2 } from 'modules/mdDanhMuc/dmHinhThucDaoTao/redux';
 import { SelectApdaterDmTrinhDoDaoTaoFilter } from 'modules/mdDanhMuc/dmTrinhDoDaoTao/redux';
+import T from 'view/js/common';
 
 const chuyenNganhSupportText = {
     5: 'Ngoại ngữ',
@@ -167,7 +167,7 @@ class QtDaoTaoGroupPage extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa thông tin quá trình đào tạo', 'Bạn có chắc bạn muốn xóa thông tin quá trình đào tạo này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtDaoTaoGroupPageMa(item.ma, item.shcc, error => {
+            isConfirm && this.props.deleteQtDaoTao(item.id, item.shcc, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá thông tin quá trình đào tạo bị lỗi!', 'danger');
                 else T.alert('Xoá thông tin quá trình đào tạo thành công!', 'success', false, 800);
             });
@@ -243,7 +243,7 @@ class QtDaoTaoGroupPage extends AdminPage {
                     getPage={this.props.getQtDaoTaoPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     permissions={currentPermissions}
-                    update={this.props.updateQtDaoTaoGroupPageMa}
+                    update={this.props.updateQtDaoTao}
                 />
             </>,
             backRoute: '/user/tccb/qua-trinh/dao-tao',
@@ -253,7 +253,7 @@ class QtDaoTaoGroupPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, qtDaoTao: state.qtDaoTao });
 const mapActionsToProps = {
-    updateQtDaoTaoGroupPageMa, deleteQtDaoTaoGroupPageMa,
+    deleteQtDaoTao, updateQtDaoTao,
     getQtDaoTaoPage
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtDaoTaoGroupPage);
