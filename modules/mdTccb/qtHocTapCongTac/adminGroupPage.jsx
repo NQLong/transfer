@@ -208,7 +208,7 @@ class QtHocTapCongTacGroupPage extends AdminPage {
             title: 'Quá trình học tập, công tác - Cán bộ',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
-                <Link key={0} to='/user/tccb'>Quá trình học tập, công tác</Link>,
+                <Link key={0} to='/user/tccb/qua-trinh/hoc-tap-cong-tac'>Quá trình học tập, công tác</Link>,
                 'Quá trình học tập, công tác - Cán bộ'
             ],
             advanceSearch: <>

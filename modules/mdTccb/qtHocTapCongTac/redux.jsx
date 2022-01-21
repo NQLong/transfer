@@ -201,7 +201,7 @@ export function deleteQtHocTapCongTacGroupPageMa(id, done) {
     };
 }
 
-export function createQTHocTapCongTacStaffUser(data, done) {
+export function createQtHocTapCongTacStaffUser(data, done) {
     return () => {
         const url = '/api/user/qua-trinh/htct';
         T.post(url, { data }, res => {
@@ -216,7 +216,7 @@ export function createQTHocTapCongTacStaffUser(data, done) {
     };
 }
 
-export function updateQTHocTapCongTacStaffUser(id, changes, done) {
+export function updateQtHocTapCongTacStaffUser(id, changes, done) {
     return () => {
         const url = '/api/user/qua-trinh/htct';
         T.put(url, { id, changes }, data => {
@@ -231,7 +231,7 @@ export function updateQTHocTapCongTacStaffUser(id, changes, done) {
     };
 }
 
-export function deleteQTHocTapCongTacStaffUser(id, done) {
+export function deleteQtHocTapCongTacStaffUser(id, done) {
     return () => {
         const url = '/api/user/qua-trinh/htct';
         T.delete(url, { id }, data => {
