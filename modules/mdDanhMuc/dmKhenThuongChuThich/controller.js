@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.category,
         menus: {
-            2401: { title: 'Khen thưởng chú thích', link: '/user/danh-muc/khen-thuong-chu-thich' },
+            4031: { title: 'Khen thưởng chú thích', link: '/user/danh-muc/khen-thuong-chu-thich' },
         },
     };
     app.permission.add(
@@ -30,6 +30,10 @@ module.exports = app => {
     app.get('/api/danh-muc/khen-thuong-chu-thich/all', app.permission.check('user:login'), (req, res) => {
         const condition = req.query.condition || {};
         app.model.dmKhenThuongChuThich.getAll(condition, (error, items) => res.send({ error, items }));
+    });
+
+    app.get('/api/danh-muc/khen-thuong-chu-thich/item/:ma', app.permission.check('user:login'), (req, res) => {
+        app.model.dmKhenThuongChuThich.get({ma: req.params.ma}, (error, item) => res.send({ error, item }));
     });
 
     app.post('/api/danh-muc/khen-thuong-chu-thich', app.permission.check('dmKhenThuongChuThich:write'), (req, res) => {

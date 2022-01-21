@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.category,
         menus: {
-            2400: { title: 'Khen thưởng loại đối tượng', link: '/user/danh-muc/khen-thuong-loai-doi-tuong' },
+            4036: { title: 'Khen thưởng loại đối tượng', link: '/user/danh-muc/khen-thuong-loai-doi-tuong' },
         },
     };
     app.permission.add(
@@ -11,7 +11,6 @@ module.exports = app => {
         { name: 'dmKhenThuongLoaiDoiTuong:delete' },
     );
     app.get('/user/danh-muc/khen-thuong-loai-doi-tuong', app.permission.check('dmKhenThuongLoaiDoiTuong:read'), app.templates.admin);
-    app.get('/user/danh-muc/khen-thuong-loai-doi-tuong/upload', app.permission.check('staff:login'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/danh-muc/khen-thuong-loai-doi-tuong/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {

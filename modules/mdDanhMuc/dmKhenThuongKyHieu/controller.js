@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.category,
         menus: {
-            2116: { title: 'Khen thưởng ký hiệu', link: '/user/danh-muc/khen-thuong-ky-hieu' },
+           4032: { title: 'Khen thưởng ký hiệu', link: '/user/danh-muc/khen-thuong-ky-hieu' },
         },
     };
     app.permission.add(
@@ -11,7 +11,6 @@ module.exports = app => {
         { name: 'dmKhenThuongKyHieu:delete' },
     );
     app.get('/user/danh-muc/khen-thuong-ky-hieu', app.permission.check('dmKhenThuongKyHieu:read'), app.templates.admin);
-    app.get('/user/danh-muc/khen-thuong-ky-hieu/upload', app.permission.check('staff:login'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/danh-muc/khen-thuong-ky-hieu/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
@@ -30,6 +29,10 @@ module.exports = app => {
     app.get('/api/danh-muc/khen-thuong-ky-hieu/all', app.permission.check('user:login'), (req, res) => {
         const condition = req.query.condition || {};
         app.model.dmKhenThuongKyHieu.getAll(condition, (error, items) => res.send({ error, items }));
+    });
+
+    app.get('/api/danh-muc/khen-thuong-ky-hieu/item/:ma', app.permission.check('user:login'), (req, res) => {
+        app.model.dmKhenThuongKyHieu.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
     });
 
     app.post('/api/danh-muc/khen-thuong-ky-hieu', app.permission.check('dmKhenThuongKyHieu:write'), (req, res) => {

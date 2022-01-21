@@ -15,10 +15,11 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        const { ma, ten, kichHoat } = item ? item : { ma: null, ten: '', kichHoat: 0 };
+        const { ma, ten, thoiGian, kichHoat } = item ? item : { ma: null, ten: '', thoiGian: null, kichHoat: 0 };
         this.setState({ma, item});
         this.ma.value(ma ? ma : '');
         this.ten.value(ten);
+        this.thoiGian.value(thoiGian);
         this.kichHoat.value(kichHoat);
     }
 
@@ -27,6 +28,7 @@ class EditModal extends AdminModal {
         const changes = {
             ten: this.ten.value(),
             ma: this.ma.value(),
+            thoiGian: this.thoiGian.value(),
             kichHoat: this.kichHoat.value() ? 1 : 0,
         };
 
@@ -34,6 +36,7 @@ class EditModal extends AdminModal {
             T.notify('Tên loại hợp đồng bị trống!', 'danger');
             this.ten.focus();
         } else {
+            changes.khongXacDinhTh = changes.thoiGian ? 1 : 0;
             this.state.ma ? this.props.update(this.state.ma, changes, this.hide) : this.props.create(changes, this.hide);
         }
     }
@@ -49,6 +52,8 @@ class EditModal extends AdminModal {
                     readOnly={this.state.ma ? true : readOnly} />
                 <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên loại hợp đồng' 
                     readOnly={readOnly} required />
+                <FormTextBox type='number' className='col-md-12' ref={e => this.thoiGian = e} label='Thời gian loại hợp đồng' 
+                    readOnly={readOnly} />
                 <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} 
                     readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
                     onChange={value => this.changeKichHoat(value ? 1 : 0)} />
@@ -71,7 +76,7 @@ class DmLoaiHopDongPage extends AdminPage {
         this.modal.show();
     }
 
-    changeActive = item => this.props.updateDmLoaiHopDong(item.ma, { ma: item.ma, kichHoat: item.kichHoat == 1 ? 0 : 1 });
+    changeActive = item => this.props.updateDmLoaiHopDong(item.ma, { ma: item.ma, kichHoat: item.kichHoat == 1 ? 0 : 1, khongXacDinhTh: item.khongXacDinhTh == 1 ? 0 : 1 });
 
     delete = (e, item) => {
         e.preventDefault();
@@ -91,7 +96,8 @@ class DmLoaiHopDongPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
-                        <th style={{ width: '100%' }}>Tên loại hợp đồng</th>
+                        <th style={{ width: '80%' }}>Tên loại hợp đồng</th>
+                        <th style={{ width: '20%' }}>Thời gian (tháng)</th>
                         <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
                         <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
                     </tr>
@@ -101,6 +107,7 @@ class DmLoaiHopDongPage extends AdminPage {
                         <TableCell type='link' style={{ textAlign: 'right' }} content={item.ma ? item.ma : ''}
                             onClick={() => this.modal.show(item)} />
                         <TableCell type='text' content={item.ten ? item.ten : ''} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={item.thoiGian ? item.thoiGian : ''} />
                         <TableCell type='checkbox' style={{ textAlign: 'center' }} content={item.kichHoat} permission={permission}
                             onChanged={() => this.changeActive(item)} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}

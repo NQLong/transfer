@@ -162,7 +162,8 @@ export class DateInput extends InputBase {
         else if (this.props.type === 'year') dateValue = '01/01/' + dateValue;
 
         const date = T.formatDate(dateValue);
-        if (date == null || Number.isNaN(date.getTime())) return '';
+
+        if (Number.isNaN(date.getTime())) return '';
         return date.getTime();
     }
 

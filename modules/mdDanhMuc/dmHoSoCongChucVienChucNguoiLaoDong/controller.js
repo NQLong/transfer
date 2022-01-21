@@ -1,16 +1,16 @@
 module.exports = app => {
-    const menu = {
-        parentMenu: app.parentMenu.category,
-        menus: {
-            2027: { title: 'Hồ sơ công chức viên chức - Người lao động', link: '/user/danh-muc/ho-so-cong-chuc-vien-chuc-nguoi-lao-dong' },
-        },
-    };
-    app.permission.add(
-        { name: 'dmHoSoCcvcNld:read', menu },
-        { name: 'dmHoSoCcvcNld:write' },
-        { name: 'dmHoSoCcvcNld:delete' },
-    );
-    app.get('/user/danh-muc/ho-so-cong-chuc-vien-chuc-nguoi-lao-dong', app.permission.check('dmHoSoCcvcNld:read'), app.templates.admin);
+    // const menu = {
+    //     parentMenu: app.parentMenu.category,
+    //     menus: {
+    //         28: { title: 'Hồ sơ công chức viên chức - Người lao động', link: '/user/danh-muc/ho-so-cong-chuc-vien-chuc-nguoi-lao-dong' },
+    //     },
+    // };
+    // app.permission.add(
+    //     { name: 'dmHoSoCcvcNld:read', menu },
+    //     { name: 'dmHoSoCcvcNld:write' },
+    //     { name: 'dmHoSoCcvcNld:delete' },
+    // );
+    // app.get('/user/danh-muc/ho-so-cong-chuc-vien-chuc-nguoi-lao-dong', app.permission.check('dmHoSoCcvcNld:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/danh-muc/ho-so-cong-chuc-vien-chuc-nguoi-lao-dong/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {

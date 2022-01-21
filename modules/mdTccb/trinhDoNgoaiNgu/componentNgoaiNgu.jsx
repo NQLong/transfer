@@ -59,7 +59,7 @@ class ComponentNN extends AdminPage {
 
     showModal = (e, item) => {
         e.preventDefault();
-        this.modal.show({item: item, shcc: this.shcc, email: this.email});
+        this.modal.show({ item: item, shcc: this.shcc, email: this.email });
     }
 
     deleteTrinhDoNN = (e, item) => {
@@ -95,16 +95,17 @@ class ComponentNN extends AdminPage {
 
         return (
             <div className='col-md-12 form-group'>
-                <p>{this.props.label}</p>
-                <div className='tile-body'>{dataTrinhDoNgoaiNgu ? renderNNTable(dataTrinhDoNgoaiNgu) : renderNNTable([])}</div>
-                <div className='tile-footer' style={{ textAlign: 'right' }}>
-                    <button className='btn btn-info' type='button' onClick={e => this.showModal(e, null)}>
-                        <i className='fa fa-fw fa-lg fa-plus' />Thêm trình độ ngoại ngữ
-                    </button>
+                <div>{this.props.label}
+                    <div className='tile-body'>{dataTrinhDoNgoaiNgu ? renderNNTable(dataTrinhDoNgoaiNgu) : renderNNTable([])}</div>
+                    <div className='tile-footer' style={{ textAlign: 'right' }}>
+                        <button className='btn btn-info' type='button' onClick={e => this.showModal(e, null)}>
+                            <i className='fa fa-fw fa-lg fa-plus' />Thêm trình độ ngoại ngữ
+                        </button>
+                    </div>
+                    <TrinhDoNNModal ref={e => this.modal = e} shcc={this.shcc} email={this.email}
+                        create={this.props.userEdit ? this.props.createTrinhDoNNStaffUser : this.props.createTrinhDoNNStaff}
+                        update={this.props.userEdit ? this.props.updateTrinhDoNNStaffUser : this.props.updateTrinhDoNNStaff} />
                 </div>
-                <TrinhDoNNModal ref={e => this.modal = e} shcc={this.shcc} email={this.email}
-                    create={this.props.userEdit ? this.props.createTrinhDoNNStaffUser : this.props.createTrinhDoNNStaff}
-                    update={this.props.userEdit ? this.props.updateTrinhDoNNStaffUser : this.props.updateTrinhDoNNStaff} />
             </div>
         );
     }

@@ -97,7 +97,7 @@ export function renderTable({
         }
         return <div {...properties}>{table}</div>;
     } else {
-        return emptyTable;
+        return <b>{emptyTable}</b>;
     }
 }
 
@@ -158,7 +158,7 @@ export class FormCheckbox extends React.Component {
     onCheck = () => this.props.readOnly || this.setState({ checked: !this.state.checked }, () => this.props.onChange && this.props.onChange(this.state.checked));
 
     render() {
-        let { className = '', label, style, isSwitch = false, trueClassName = 'text-primary', falseClassName = 'text-secondary', inline = true } = this.props;
+        let { className = '', label, style, isSwitch = false, trueClassName = 'text-primary', falseClassName = 'text', inline = true } = this.props;
         if (style == null) style = {};
         return isSwitch ? (
             <div className={className} style={{ ...style, display: inline ? 'inline-flex' : '' }}>
@@ -172,7 +172,7 @@ export class FormCheckbox extends React.Component {
             <div className={'animated-checkbox ' + className} style={style}>
                 <label>
                     <input type='checkbox' checked={this.state.checked} onChange={this.onCheck} />
-                    <span className={'label-text ' + (this.state.checked ? trueClassName : falseClassName)}>{label}</span>
+                    <span className={'label-text ' + (this.props.readOnly ? 'text-secondary' : (this.state.checked ? trueClassName : falseClassName))}>{label}</span>
                 </label>
             </div>
         );
@@ -320,7 +320,7 @@ export class FormTextBox extends React.Component {
             const properties = {
                 type,
                 className: 'form-control',
-                placeholder: label || placeholder,
+                placeholder: placeholder || label,
                 value: this.state.value,
                 onChange: e => this.setState({ value: e.target.value }) || (onChange && onChange(e))
             };
@@ -371,7 +371,7 @@ export class FormRichTextBox extends React.Component {
         return (
             <div className={'form-group ' + (className ? className : '')} style={style}>
                 {displayElement}
-                <textarea ref={e => this.input = e} className='form-control' style={{ display: readOnly ? 'none' : 'block' }} placeholder={label ? label : placeholder} value={this.state.value} rows={rows} onChange={e => this.setState({ value: e.target.value }) || onChange && onChange(e)} />
+                <textarea ref={e => this.input = e} className='form-control' style={{ display: readOnly ? 'none' : 'block' }} placeholder={placeholder ? placeholder : label} value={this.state.value} rows={rows} onChange={e => this.setState({ value: e.target.value }) || onChange && onChange(e)} />
             </div>);
     }
 }
@@ -548,6 +548,7 @@ export class FormDatePicker extends React.Component {
         'time-mask': '39/19/2099 h9:59',
         'date-mask': '39/19/2099',
         'month-mask': '19/2099',
+        'year-mask': '2099',
         'date-month': '39/19'
     };
 
@@ -555,6 +556,7 @@ export class FormDatePicker extends React.Component {
         'time-mask': 'dd/mm/yyyy HH:MM',
         'date-mask': 'dd/mm/yyyy',
         'month-mask': 'mm/yyyy',
+        'year-mask': 'yyyy',
         'date-month': 'dd/mm'
     };
 
@@ -581,7 +583,7 @@ export class FormDatePicker extends React.Component {
                 if (date == null || Number.isNaN(date.getTime())) return '';
                 return date;
             } else if (type.endsWith('-mask')) {
-                const date = T.formatDate((type == 'month-mask' ? '01/' : '') + this.state.value);
+                const date = T.formatDate((type == 'month-mask' ? '01/' : (type == 'year-mask' ? '01/01/' : '')) + this.state.value);
                 if (date == null || Number.isNaN(date.getTime())) return '';
                 return date;
             } else {
@@ -732,8 +734,11 @@ export class AdminModal extends React.Component {
         $(this.modal).on('hidden.bs.modal', () => modalHidden());
     }
 
-    show = (item) => {
-        this.onShow && this.onShow(item);
+    show = (item, multiple = null) => {
+        if (this.onShow) {
+            if (multiple != null) this.onShow(item, multiple);
+            else this.onShow(item);
+        }
         $(this.modal).modal('show');
     }
 
@@ -761,11 +766,11 @@ export class AdminModal extends React.Component {
         }
     }
 
-    renderModal = ({ title, body, size, buttons, isLoading = false, submitText = 'Lưu', isShowSubmit = true }) => {
+    renderModal = ({ title, body, size, buttons, isLoading = false, submitText = 'Lưu', isShowSubmit = true, style={} }) => {
         const { readOnly = false } = this.props;
         return (
-            <div className='modal fade' role='dialog' ref={e => this.modal = e}>
-                <form className={'modal-dialog' + (size == 'large' ? ' modal-lg' : (size == 'extra-large' ? ' modal-xl' : ''))} role='document' onSubmit={e => { e.preventDefault() || this.onSubmit && this.submit(e); }}>
+            <div className='modal fade' role='dialog' ref={e => this.modal = e} style={style}>
+                <form className={'modal-dialog' + (size == 'large' ? ' modal-lg' : (size == 'elarge' ? ' modal-xl' : ''))} role='document' onSubmit={e => { e.preventDefault() || this.onSubmit && this.submit(e); }}>
                     <div className='modal-content'>
                         <div className='modal-header'>
                             <h5 className='modal-title'>{title}</h5>

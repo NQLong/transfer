@@ -2,11 +2,10 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3009: { title: 'Chức Vụ', link: '/user/tccb/qua-trinh/chuc-vu', icon: 'fa-street-view', backgroundColor: '#ebcf34', groupIndex: 3 },
+            3004: { title: 'Quá trình chức vụ', link: '/user/tccb/qua-trinh/chuc-vu', icon: 'fa-black-tie', backgroundColor: '#c77a2e', color: 'black', groupIndex: 1 },
         },
     };
     app.permission.add(
-        { name: 'staff:login', menu: { parentMenu: { index: 1000, title: 'Thông tin cá nhân', icon: 'fa-user', link: '/user' } }, },
         { name: 'qtChucVu:read', menu },
         { name: 'qtChucVu:write' },
         { name: 'qtChucVu:delete' },
@@ -106,55 +105,55 @@ module.exports = app => {
     app.delete('/api/tccb/qua-trinh/chuc-vu', app.permission.check('qtChucVu:write'), (req, res) =>
         app.model.qtChucVu.delete({ stt: req.body.stt }, (error) => res.send(error)));
 
-    app.post('/api/user/qua-trinh/chuc-vu', app.permission.check('qtChucVu:login'), (req, res) => {
-        if (req.body.data && req.session.user) {
-            const data = app.clone(req.body.data, { shcc: req.session.user.shcc });
-            app.model.qtChucVu.create(data, (error, item) => res.send({ error, item }));
-        } else {
-            res.status(400).send({ error: 'Invalstt parameter!' });
-        }
-    });
+    // app.post('/api/user/qua-trinh/chuc-vu', app.permission.check('staff:login'), (req, res) => {
+    //     if (req.body.data && req.session.user) {
+    //         const data = req.body.data;
+    //         app.model.qtChucVu.create(data, (error, item) => res.send({ error, item }));
+    //     } else {
+    //         res.send({ error: 'Invalstt parameter!' });
+    //     }
+    // });
 
-    app.put('/api/user/qua-trinh/chuc-vu', app.permission.check('staff:login'), (req, res) => {
-        if (req.body.changes && req.session.user) {
-            app.model.qtChucVu.get({ stt: req.body.stt }, (error, item) => {
-                if (error || item == null) {
-                    res.status(400).send({ error: 'Not found!' });
-                } else {
-                    if (item.shcc === req.session.user.shcc) {
-                        const changes = app.clone(req.body.changes, { shcc: req.session.user.shcc });
-                        app.model.qtChucVu.update({ stt: req.body.stt }, changes, (error, item) => res.send({ error, item }));
-                    } else {
-                        res.status(400).send({ error: 'Not found!' });
-                    }
-                }
-            });
-        } else {
-            res.status(400).send({ error: 'Invalstt parameter!' });
-        }
-    });
+    // app.put('/api/user/qua-trinh/chuc-vu', app.permission.check('staff:login'), (req, res) => {
+    //     if (req.body.changes && req.session.user) {
+    //         app.model.qtChucVu.get({ stt: req.body.stt }, (error, item) => {
+    //             if (error || item == null) {
+    //                 res.send({ error: 'Not found!' });
+    //             } else {
+    //                 if (item.email === req.session.user.email) {
+    //                     const changes = req.body.changes;
+    //                     app.model.qtChucVu.update({ stt: req.body.stt }, changes, (error, item) => res.send({ error, item }));
+    //                 } else {
+    //                     res.send({ error: 'Not found!' });
+    //                 }
+    //             }
+    //         });
+    //     } else {
+    //         res.send({ error: 'Invalstt parameter!' });
+    //     }
+    // });
 
-    app.delete('/api/user/qua-trinh/chuc-vu', app.permission.check('staff:login'), (req, res) => {
-        if (req.session.user) {
-            app.model.qtChucVu.get({ stt: req.body.stt }, (error, item) => {
-                if (error || item == null) {
-                    res.status(400).send({ error: 'Not found!' });
-                } else {
-                    if (item.shcc === req.session.user.shcc) {
-                        app.model.qtChucVu.delete({ stt: req.body.stt }, (error) => res.send(error));
-                    } else {
-                        res.status(400).send({ error: 'Not found!' });
-                    }
-                }
-            });
-        } else {
-            res.status(400).send({ error: 'Invalstt parameter!' });
-        }
-    });
+    // app.delete('/api/user/qua-trinh/chuc-vu', app.permission.check('staff:login'), (req, res) => {
+    //     if (req.session.user) {
+    //         app.model.qtChucVu.get({ stt: req.body.stt }, (error, item) => {
+    //             if (error || item == null) {
+    //                 res.send({ error: 'Not found!' });
+    //             } else {
+    //                 if (item.email === req.session.user.email) {
+    //                     app.model.qtChucVu.delete({ stt: req.body.stt }, (error) => res.send(error));
+    //                 } else {
+    //                     res.send({ error: 'Not found!' });
+    //                 }
+    //             }
+    //         });
+    //     } else {
+    //         res.send({ error: 'Invalstt parameter!' });
+    //     }
+    // });
 
     app.get('/api/tccb/qua-trinh/chuc-vu-by-shcc/:shcc', app.permission.check('staff:login'), (req, res) => {
         app.model.qtChucVu.getByShcc(req.params.shcc, (error, item) => {
             if (item && item.rows.length > 0) res.send({ error, item: item.rows });
-         });
+        });
     });
 };

@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.category,
         menus: {
-            2090: { title: 'Nguồn kinh phí trong nước', link: '/user/danh-muc/nguon-kinh-phi-trong-nuoc' },
+            4056: { title: 'Nguồn kinh phí trong nước', link: '/user/danh-muc/nguon-kinh-phi-trong-nuoc' },
         },
     };
     app.permission.add(

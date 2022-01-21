@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.category,
         menus: {
-            2031: { title: 'Danh sách Đơn vị', link: '/user/danh-muc/don-vi' },
+            4023: { title: 'Danh sách Đơn vị', link: '/user/danh-muc/don-vi' },
         },
     };
     app.permission.add(
@@ -33,11 +33,11 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/danh-muc/don-vi/all', (req, res) => {
+    app.get('/api/danh-muc/don-vi/all', app.permission.check('user:login'), (req, res) => {
         app.model.dmDonVi.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/danh-muc/don-vi/item/:id', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/danh-muc/don-vi/item/:id', app.permission.check('user:login'), (req, res) => {
         app.model.dmDonVi.get({ ma: req.params.id }, (error, item) => res.send({ error, item }));
     });
 
@@ -142,8 +142,8 @@ module.exports = app => {
         app.permission.has(req, () => uploadDmDonViImageDisplayTA(req, fields, files, params, done), done, 'dmDonVi:write'));
 
     // Hook ready -----------------------------------------------------------------------------------------------------------------------------------
-    app.readyHooks.add('readyDmDonVi', {
-        ready: () => app.dbConnection != null && app.model != null && app.model.dmDonVi != null,
-        run: () => app.model.dmDonVi.count((error, numberOfDonVi) => app.data.numberOfDonVi = error ? 0 : numberOfDonVi),
-    });
+    // app.readyHooks.add('readyDmDonVi', {
+    //     ready: () => app.dbConnection != null && app.model != null && app.model.dmDonVi != null,
+    //     run: () => app.model.dmDonVi.count((error, numberOfDonVi) => app.data.numberOfDonVi = error ? 0 : numberOfDonVi),
+    // });
 };

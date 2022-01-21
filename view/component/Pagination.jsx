@@ -3,10 +3,10 @@ import Dropdown from './Dropdown';
 
 export const OverlayLoading = (props) =>
     <React.Fragment>
-        <div className='overlay' style={{ zIndex: 1000 }}>
+        <div className='overlay' style={{ zIndex: 1000, ...props.style }}>
             <div className='m-loader mr-4'>
                 <svg className='m-circular' viewBox='25 25 50 50'>
-                    <circle className='path' cx='50' cy='50' r='20' fill='none' strokeWidth='4' strokeMiterlimit='10'></circle>
+                    <circle className='path' cx='50' cy='50' r='20' fill='none' strokeWidth='4' strokeMiterlimit='10' />
                 </svg>
             </div>
         </div>
@@ -14,74 +14,25 @@ export const OverlayLoading = (props) =>
     </React.Fragment>;
 
 export default class Pagination extends React.Component {
-    constructor(props) {
-        super(props);
-        this.modal = React.createRef();
-    }
-
     pageNumberChanged = (e, pageNumber, pageCondition) => {
-        if (this.props.done) {
-            if (pageCondition) {
-                if (this.props.loaiDoiTuong) {
-                    this.props.getPage(pageNumber, null, this.props.loaiDoiTuong, pageCondition, this.props.done);
-                } else {
-                    this.props.getPage(pageNumber, null, pageCondition, this.props.done);
-                }
-            } else {
-                if (this.props.loaiDoiTuong) {
-                    this.props.getPage(pageNumber, null, this.props.loaiDoiTuong, '', this.props.done);
-                } else {
-                    this.props.getPage(pageNumber, null, this.props.done);
-                }
-            }
-        } else {
-            if (pageCondition) {
-                if (this.props.loaiDoiTuong) {
-                    this.props.getPage(pageNumber, null, this.props.loaiDoiTuong, pageCondition);
-                } else {
-                    this.props.getPage(pageNumber, null, pageCondition);
-                }
-            } else {
-                if (this.props.loaiDoiTuong) {
-                    this.props.getPage(pageNumber, null, this.props.loaiDoiTuong, '');
-                } else {
-                    this.props.getPage(pageNumber, null);
-                }
-            }
-        }
         e.preventDefault();
+        let { done, onSearch } = this.props;
+        if (pageCondition == null) pageCondition = {};
+        onSearch && onSearch(true);
+        this.props.getPage(pageNumber, null, pageCondition, (data) => {
+            onSearch && onSearch(false);
+            done && done(data);
+        });
     }
 
     pageSizeChanged = (pageSize, pageCondition) => {
-        if (this.props.done) {
-            if (pageCondition) {
-                if (this.props.loaiDoiTuong) {
-                    this.props.getPage(null, pageSize, this.props.loaiDoiTuong, pageCondition, this.props.done);
-                } else {
-                    this.props.getPage(null, pageSize, pageCondition, this.props.done);
-                }
-            } else {
-                if (this.props.loaiDoiTuong) {
-                    this.props.getPage(null, pageSize, this.props.loaiDoiTuong, '', this.props.done);
-                } else {
-                    this.props.getPage(null, pageSize, this.props.done);
-                }
-            }
-        } else {
-            if (pageCondition) {
-                if (this.props.loaiDoiTuong) {
-                    this.props.getPage(null, pageSize, this.props.loaiDoiTuong, pageCondition);
-                } else {
-                    this.props.getPage(null, pageSize, pageCondition);
-                }
-            } else {
-                if (this.props.loaiDoiTuong) {
-                    this.props.getPage(null, pageSize, this.props.loaiDoiTuong, '');
-                } else {
-                    this.props.getPage(null, pageSize);
-                }
-            }
-        }
+        let { done, onSearch } = this.props;
+        if (pageCondition == null) pageCondition = {};
+        onSearch && onSearch(true);
+        this.props.getPage(null, pageSize, pageCondition, (data) => {
+            onSearch && onSearch(false);
+            done && done(data);
+        });
     }
 
     render() {
@@ -126,7 +77,7 @@ export default class Pagination extends React.Component {
                     </a>
                 </li> :
                 <li className='page-item'>
-                    <a className='page-link' href='#' aria-label='Next' onClick={e => this.pageNumberChanged(e, this.props.pageTotal)}>
+                    <a className='page-link' href='#' aria-label='Next' onClick={e => this.pageNumberChanged(e, this.props.pageTotal, pageCondition)}>
                         <span aria-hidden='true'>&raquo;</span>
                         <span className='sr-only'>Next</span>
                     </a>
@@ -135,7 +86,7 @@ export default class Pagination extends React.Component {
 
         const style = Object.assign({}, this.props.style ? this.props.style : {}, { width: '100%', display: 'flex', position: 'fixed', bottom: '10px', pointerEvents: 'none' });
         return (
-            <div style={style}>
+            <div className='d-print-none' style={style}>
                 <Dropdown className='btn btn-info' text={this.props.pageSize} items={[25, 50, 100, 200]} onSelected={pageSize => this.pageSizeChanged(pageSize, pageCondition)} />
                 <nav style={{ marginLeft: '10px', pointerEvents: 'auto' }}>
                     <ul className='pagination' style={{ marginBottom: 0 }}>

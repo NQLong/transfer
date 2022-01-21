@@ -75,6 +75,22 @@ export function getDmKhenThuongKyHieuAll(done) {
     };
 }
 
+export function getDmKhenThuongKyHieu(ma, done) {
+    return () => {
+        const url = `/api/danh-muc/khen-thuong-ky-hieu/item/${ma}`;
+        T.get(url, data => {
+            if (data.error) {
+                T.notify('Lấy thông tin khen thưởng ký hiệu lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (done) done(data.item);
+            }
+        }, error => {
+            console.error(`GET: ${url}.`, error);
+        });
+    };
+}
+
 export function createDmKhenThuongKyHieu(item, done) {
     return dispatch => {
         const url = '/api/danh-muc/khen-thuong-ky-hieu';
@@ -83,6 +99,7 @@ export function createDmKhenThuongKyHieu(item, done) {
                 T.notify('Tạo dữ liệu bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`POST: ${url}.`, data.error);
             } else {
+                T.notify('Tạo mới dữ liệu thành công!', 'success');
                 dispatch(getDmKhenThuongKyHieuPage());
                 if (done) done(data);
             }
@@ -97,6 +114,7 @@ export function deleteDmKhenThuongKyHieu(ma) {
             if (data.error) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
+                T.notify('Xóa dữ liệu thành công!', 'success');
                 dispatch(getDmKhenThuongKyHieuPage());
             }
         }, error => T.notify('Xóa dữ liệu bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
@@ -139,4 +157,13 @@ export const SelectAdapter_DmKhenThuongKyHieu = {
     getAll: getDmKhenThuongKyHieuAll,
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
     // condition: { kichHoat: 1 },
+};
+
+export const SelectAdapter_DmKhenThuongKyHieuV2 = {
+    ajax: true,
+    data: params => ({ condition: params.term }),
+    url: '/api/danh-muc/khen-thuong-ky-hieu/page/1/20',
+    getOne: getDmKhenThuongKyHieu,
+    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.ten })) : [] }),
+    fetchOne: (ma, done) => (getDmKhenThuongKyHieu(ma, item => done && done({ id: item.ma, text: item.ten })))(),
 };
