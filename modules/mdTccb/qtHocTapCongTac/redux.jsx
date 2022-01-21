@@ -50,7 +50,7 @@ export default function QtHocTapCongTacReducer(state = null, data) {
 
 // Actions ------------------------------------------------------------------------------------------------------------
 T.initPage('pageQtHocTapCongTac');
-export function getQtHocTapCongTacPage(pageNumber, pageSize, pageCondition, ma, filter, done) {
+export function getQtHocTapCongTacPage(pageNumber, pageSize, pageCondition, filter, done) {
     if (typeof filter === 'function') {
         done = filter;
         filter = {};
@@ -58,7 +58,7 @@ export function getQtHocTapCongTacPage(pageNumber, pageSize, pageCondition, ma, 
     const page = T.updatePage('pageQtHocTapCongTac', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/tccb/qua-trinh/hoc-tap-cong-tac/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition, ma: ma, filter: page.filter }, data => {
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách học tập, công tác bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
@@ -151,7 +151,7 @@ export function updateQtHocTapCongTacStaff(id, changes, done, isEdit = null) {
     };
 }
 
-export function updateQtHocTapCongTacGroupPageMa(id, shcc, changes, done) {
+export function updateQtHocTapCongTacGroupPageMa(id, changes, done) {
     return dispatch => {
         const url = '/api/qua-trinh/htct';
         T.put(url, { id, changes }, data => {
@@ -162,7 +162,7 @@ export function updateQtHocTapCongTacGroupPageMa(id, shcc, changes, done) {
             } else {
                 T.notify('Cập nhật học tập, công tác thành công!', 'success');
                 done && done(data.item);
-                dispatch(getQtHocTapCongTacPage(undefined, undefined, undefined, shcc));
+                dispatch(getQtHocTapCongTacPage());
             }
         }, () => T.notify('Cập nhật học tập, công tác bị lỗi!', 'danger'));
     };
@@ -178,14 +178,14 @@ export function createQtHocTapCongTacGroupPageMa(data, done) {
             } else {
                 if (done) {
                     T.notify('Tạo học tập, công tác thành công!', 'success');
-                    dispatch(getQtHocTapCongTacPage(undefined, undefined, undefined, data.shcc));
+                    dispatch(getQtHocTapCongTacPage());
                     done && done(data);
                 }
             }
         }, () => T.notify('Tạo học tập, công tác bị lỗi!', 'danger'));
     };
 }
-export function deleteQtHocTapCongTacGroupPageMa(id, ma, done) {
+export function deleteQtHocTapCongTacGroupPageMa(id, done) {
     return dispatch => {
         const url = '/api/qua-trinh/htct';
         T.delete(url, { id }, data => {
@@ -195,13 +195,13 @@ export function deleteQtHocTapCongTacGroupPageMa(id, ma, done) {
             } else {
                 T.alert('học tập, công tác đã xóa thành công!', 'success', false, 800);
                 done && done(data.item);
-                dispatch(getQtHocTapCongTacPage(undefined, undefined, undefined, ma));
+                dispatch(getQtHocTapCongTacPage());
             }
         }, () => T.notify('Xóa học tập, công tác bị lỗi!', 'danger'));
     };
 }
 
-export function createQTHocTapCongTacStaffUser(data, done) {
+export function createQtHocTapCongTacStaffUser(data, done) {
     return () => {
         const url = '/api/user/qua-trinh/htct';
         T.post(url, { data }, res => {
@@ -216,7 +216,7 @@ export function createQTHocTapCongTacStaffUser(data, done) {
     };
 }
 
-export function updateQTHocTapCongTacStaffUser(id, changes, done) {
+export function updateQtHocTapCongTacStaffUser(id, changes, done) {
     return () => {
         const url = '/api/user/qua-trinh/htct';
         T.put(url, { id, changes }, data => {
@@ -231,7 +231,7 @@ export function updateQTHocTapCongTacStaffUser(id, changes, done) {
     };
 }
 
-export function deleteQTHocTapCongTacStaffUser(id, done) {
+export function deleteQtHocTapCongTacStaffUser(id, done) {
     return () => {
         const url = '/api/user/qua-trinh/htct';
         T.delete(url, { id }, data => {

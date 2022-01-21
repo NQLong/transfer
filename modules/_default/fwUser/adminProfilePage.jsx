@@ -18,7 +18,6 @@ import { SelectAdapter_DmTonGiao } from 'modules/mdDanhMuc/dmTonGiao/redux';
 import { SelectAdapter_DmQuanHeGiaDinh, getDmQuanHeGiaDinhAll } from 'modules/mdDanhMuc/dmQuanHeGiaDinh/redux';
 import { getDmDonViAll, SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { getDmBoMonAll } from 'modules/mdDanhMuc/dmBoMon/redux';
-
 import { getDmChucVuAll } from 'modules/mdDanhMuc/dmChucVu/redux';
 import { SelectAdapter_DmNhomMau } from 'modules/mdDanhMuc/dmBenhVien/reduxNhomMau';
 import { SelectAdapter_DmQuocGia } from 'modules/mdDanhMuc/dmQuocGia/redux';
@@ -30,19 +29,20 @@ import { DateInput } from 'view/component/Input';
 import { QTForm } from 'view/component/Form';
 import { ComponentDiaDiem } from 'modules/mdDanhMuc/dmDiaDiem/componentDiaDiem';
 import { TableCell, renderTable, AdminModal, FormSelect, FormRichTextBox, FormCheckbox, FormTextBox } from 'view/component/AdminPage';
-import { createQtDaoTaoStaffUser, updateQtDaoTaoStaffUser, deleteQtDaoTaoStaffUser } from 'modules/mdTccb/qtDaoTao/redux';
-import { createQtNuocNgoaiStaffUser, updateQtNuocNgoaiStaffUser, deleteQtNuocNgoaiStaffUser } from 'modules/mdTccb/qtNuocNgoai/redux';
-import { createQtKhenThuongStaffUser, updateQtKhenThuongStaffUser, deleteQtKhenThuongStaffUser } from 'modules/mdTccb/qtKhenThuong/redux';
-import { createQtKyLuatStaffUser, updateQtKyLuatStaffUser, deleteQtKyLuatStaffUser } from 'modules/mdTccb/qtKyLuat/redux';
-import { createQtNckhStaffUser, updateQtNckhStaffUser, deleteQtNckhStaffUser } from 'modules/mdTccb/qtNghienCuuKhoaHoc/redux';
-import { createQtHuongDanLVStaffUser, updateQtHuongDanLVStaffUser, deleteQtHuongDanLVStaffUser } from 'modules/mdTccb/qtHuongDanLuanVan/redux';
-import { createSachGTStaffUser, updateSachGTStaffUser, deleteSachGTStaffUser } from 'modules/mdTccb/sachGiaoTrinh/redux';
-import { createQtBaiVietKhoaHocStaffUser, updateQtBaiVietKhoaHocStaffUser, deleteQtBaiVietKhoaHocStaffUser } from 'modules/mdTccb/qtBaiVietKhoaHoc/redux';
-import { createQtKyYeuStaffUser, updateQtKyYeuStaffUser, deleteQtKyYeuStaffUser } from 'modules/mdTccb/qtKyYeu/redux';
-import { createQtGiaiThuongStaffUser, updateQtGiaiThuongStaffUser, deleteQtGiaiThuongStaffUser } from 'modules/mdTccb/qtGiaiThuong/redux';
-import { createQtBangPhatMinhStaffUser, updateQtBangPhatMinhStaffUser, deleteQtBangPhatMinhStaffUser } from 'modules/mdTccb/qtBangPhatMinh/redux';
-import { createQtUngDungThuongMaiStaffUser, updateQtUngDungThuongMaiStaffUser, deleteQtUngDungThuongMaiStaffUser } from 'modules/mdTccb/qtUngDungThuongMai/redux';
-import { createQtLamViecNgoaiStaffUser, updateQtLamViecNgoaiStaffUser, deleteQtLamViecNgoaiStaffUser } from 'modules/mdTccb/qtLamViecNgoai/redux';
+// import { createQTHTCTStaffUser, updateQTHTCTStaffUser, deleteQTHTCTStaffUser } from 'modules/mdTccb/qtHocTapCongTac/redux.jsx';
+import { createQtDaoTaoStaffUser, updateQtDaoTaoStaffUser, deleteQtDaoTaoStaffUser } from 'modules/mdTccb/qtDaoTao/redux.jsx';
+import { createQtNuocNgoaiStaffUser, updateQtNuocNgoaiStaffUser, deleteQtNuocNgoaiStaffUser } from 'modules/mdTccb/qtNuocNgoai/redux.jsx';
+import { createQtKhenThuongStaffUser, updateQtKhenThuongStaffUser, deleteQtKhenThuongStaffUser } from 'modules/mdTccb/qtKhenThuong/redux.jsx';
+import { createQtKyLuatStaffUser, updateQtKyLuatStaffUser, deleteQtKyLuatStaffUser } from 'modules/mdTccb/qtKyLuat/redux.jsx';
+import { createQtNckhStaffUser, updateQtNckhStaffUser, deleteQtNckhStaffUser } from 'modules/mdTccb/qtNghienCuuKhoaHoc/redux.jsx';
+import { createQtHuongDanLVStaffUser, updateQtHuongDanLVStaffUser, deleteQtHuongDanLVStaffUser } from 'modules/mdTccb/qtHuongDanLuanVan/redux.jsx';
+import { createSachGTStaffUser, updateSachGTStaffUser, deleteSachGTStaffUser } from 'modules/mdTccb/sachGiaoTrinh/redux.jsx';
+import { createQtBaiVietKhoaHocStaffUser, updateQtBaiVietKhoaHocStaffUser, deleteQtBaiVietKhoaHocStaffUser } from 'modules/mdTccb/qtBaiVietKhoaHoc/redux.jsx';
+import { createQtKyYeuStaffUser, updateQtKyYeuStaffUser, deleteQtKyYeuStaffUser } from 'modules/mdTccb/qtKyYeu/redux.jsx';
+import { createQtGiaiThuongStaffUser, updateQtGiaiThuongStaffUser, deleteQtGiaiThuongStaffUser } from 'modules/mdTccb/qtGiaiThuong/redux.jsx';
+import { createQtBangPhatMinhStaffUser, updateQtBangPhatMinhStaffUser, deleteQtBangPhatMinhStaffUser } from 'modules/mdTccb/qtBangPhatMinh/redux.jsx';
+import { createQtUngDungThuongMaiStaffUser, updateQtUngDungThuongMaiStaffUser, deleteQtUngDungThuongMaiStaffUser } from 'modules/mdTccb/qtUngDungThuongMai/redux.jsx';
+import { createQtLamViecNgoaiStaffUser, updateQtLamViecNgoaiStaffUser, deleteQtLamViecNgoaiStaffUser } from 'modules/mdTccb/qtLamViecNgoai/redux.jsx';
 import Loading from 'view/component/Loading';
 import { SelectAdapter_DmBenhVien } from 'modules/mdDanhMuc/dmBenhVien/reduxBenhVien';
 import { SelectAdapter_DmNgachCdnn } from 'modules/mdDanhMuc/dmNgachCdnn/redux';
@@ -175,88 +175,88 @@ class TrinhDoNNModal extends AdminModal {
     });
 }
 
-class HocTapCongTacModal extends AdminModal {
-    state = {
-        id: null,
-        email: '',
-        batDau: '',
-        ketThuc: '',
-        batDauType: 'dd/mm/yyyy',
-        ketThucType: 'dd/mm/yyyy',
-        toDay: false,
-    }
+// class HocTapCongTacModal extends AdminModal {
+//     state = {
+//         id: null,
+//         email: '',
+//         batDau: '',
+//         ketThuc: '',
+//         batDauType: 'dd/mm/yyyy',
+//         ketThucType: 'dd/mm/yyyy',
+//         toDay: false,
+//     }
 
-    onShow = (item, email) => {
-        this.batDau.clear();
-        this.ketThuc.clear();
-        let { id, batDauType, ketThucType, batDau, ketThuc, noiDung } = item ? item : { id: null, batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', batDau: null, ketThuc: null, noiDung: '' };
-        this.setState({ batDauType: batDauType ? batDauType : 'dd/mm/yyyy', ketThucType: ketThuc && ketThuc != -1 ? ketThucType : 'dd/mm/yyyy', email, id, batDau, ketThuc, toDay: ketThuc == -1 ? true : false });
-        setTimeout(() => {
-            this.batDauType.value(batDauType ? batDauType : 'dd/mm/yyyy');
-            if (ketThuc && ketThuc != -1) this.ketThucType.value(ketThucType); else this.ketThucType.value('dd/mm/yyyy');
-            this.batDau.setVal(batDau);
-            if (ketThuc && ketThuc != -1) this.ketThuc.setVal(ketThuc);
-            this.toDay.value(this.state.toDay);
-            this.noiDung.value(noiDung);
-        }, 500);
-    }
+//     onShow = (item, email) => {
+//         this.batDau.clear();
+//         this.ketThuc.clear();
+//         let { id, batDauType, ketThucType, batDau, ketThuc, noiDung } = item ? item : { id: null, batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', batDau: null, ketThuc: null, noiDung: '' };
+//         this.setState({ batDauType: batDauType ? batDauType : 'dd/mm/yyyy', ketThucType: ketThuc && ketThuc != -1 ? ketThucType : 'dd/mm/yyyy', email, id, batDau, ketThuc, toDay: ketThuc == -1 ? true : false });
+//         setTimeout(() => {
+//             this.batDauType.value(batDauType ? batDauType : 'dd/mm/yyyy');
+//             if (ketThuc && ketThuc != -1) this.ketThucType.value(ketThucType); else this.ketThucType.value('dd/mm/yyyy');
+//             this.batDau.setVal(batDau);
+//             if (ketThuc && ketThuc != -1) this.ketThuc.setVal(ketThuc);
+//             this.toDay.value(this.state.toDay);
+//             this.noiDung.value(noiDung);
+//         }, 500);
+//     }
 
-    onSubmit = () => {
-        const id = this.state.id,
-            email = this.state.email,
-            changes = {
-                batDau: this.batDau.getVal(),
-                ketThuc: this.state.toDay ? -1 : this.ketThuc.getVal(),
-                batDauType: this.state.batDauType,
-                ketThucType: this.state.ketThucType,
-                noiDung: this.noiDung.value()
-            };
-        if (id) {
-            this.props.update(id, changes, error => {
-                if (error == undefined || error == null) {
-                    this.props.getData(email);
-                    this.hide();
-                }
-            });
-        } else {
-            changes.email = email;
-            this.props.create(changes, () => {
-                this.props.getData(email);
-                this.hide();
-            });
-        }
-    }
+//     onSubmit = () => {
+//         const id = this.state.id,
+//             email = this.state.email,
+//             changes = {
+//                 batDau: this.batDau.getVal(),
+//                 ketThuc: this.state.toDay ? -1 : this.ketThuc.getVal(),
+//                 batDauType: this.state.batDauType,
+//                 ketThucType: this.state.ketThucType,
+//                 noiDung: this.noiDung.value()
+//             };
+//         if (id) {
+//             this.props.update(id, changes, error => {
+//                 if (error == undefined || error == null) {
+//                     this.props.getData(email);
+//                     this.hide();
+//                 }
+//             });
+//         } else {
+//             changes.email = email;
+//             this.props.create(changes, () => {
+//                 this.props.getData(email);
+//                 this.hide();
+//             });
+//         }
+//     }
 
-    changeType = (isBatDau, type) => {
-        if (isBatDau) {
-            this.setState({ batDauType: type });
-            this.batDau.setVal(this.state.batDau);
-        } else {
-            this.setState({ ketThucType: type });
-            if (this.state.ketThuc && this.state.ketThuc != -1) this.ketThuc.setVal(this.state.ketThuc);
-        }
-    }
+//     changeType = (isBatDau, type) => {
+//         if (isBatDau) {
+//             this.setState({ batDauType: type });
+//             this.batDau.setVal(this.state.batDau);
+//         } else {
+//             this.setState({ ketThucType: type });
+//             if (this.state.ketThuc && this.state.ketThuc != -1) this.ketThuc.setVal(this.state.ketThuc);
+//         }
+//     }
 
-    changeToDay = (value) => {
-        this.setState({ toDay: value });
-        if (value) {
-            this.ketThuc.clear();
-        }
-    }
+//     changeToDay = (value) => {
+//         this.setState({ toDay: value });
+//         if (value) {
+//             this.ketThuc.clear();
+//         }
+//     }
 
-    render = () => this.renderModal({
-        title: 'Thông tin học tập công tác',
-        size: 'large',
-        body: <div className='row'>
-            <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} label='Bắt đầu' type={this.state.batDauType ? typeMapper[this.state.batDauType] : null} /></div>
-            <FormSelect className='col-md-6' ref={e => this.batDauType = e} label='Loại thời gian bắt đầu' data={dateType} onChange={data => this.changeType(true, data.id)} />
-            <div className='form-group col-md-6'><DateInput ref={e => this.ketThuc = e} label='Kết thúc' type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} /></div>
-            <FormSelect className='col-md-6' ref={e => this.ketThucType = e} label='Loại thời gian kết thúc' data={dateType} onChange={data => this.changeType(false, data.id)} />
-            <FormCheckbox className='col-12' label='Vẫn đang tiếp diễn' ref={e => this.toDay = e} onChange={value => this.changeToDay(value)} />
-            <FormRichTextBox className='col-12' ref={e => this.noiDung = e} label='Nội dung' />
-        </div>,
-    });
-}
+//     render = () => this.renderModal({
+//         title: 'Thông tin học tập công tác',
+//         size: 'large',
+//         body: <div className='row'>
+//             <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} label='Bắt đầu' type={this.state.batDauType ? typeMapper[this.state.batDauType] : null} /></div>
+//             <FormSelect className='col-md-6' ref={e => this.batDauType = e} label='Loại thời gian bắt đầu' data={dateType} onChange={data => this.changeType(true, data.id)} />
+//             <div className='form-group col-md-6'><DateInput ref={e => this.ketThuc = e} label='Kết thúc' type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} /></div>
+//             <FormSelect className='col-md-6' ref={e => this.ketThucType = e} label='Loại thời gian kết thúc' data={dateType} onChange={data => this.changeType(false, data.id)} />
+//             <FormCheckbox className='col-12' label='Vẫn đang tiếp diễn' ref={e => this.toDay = e} onChange={value => this.changeToDay(value)} />
+//             <FormRichTextBox className='col-12' ref={e => this.noiDung = e} label='Nội dung' />
+//         </div>,
+//     });
+// }
 
 // class ToChucKhacModal extends AdminModal {
 //     state = {
@@ -2988,21 +2988,21 @@ class ProfilePage extends QTForm {
                         }
                         <RelationModal ref={e => this.modal = e} create={this.props.createQuanHeStaffUser} update={this.props.updateQuanHeStaffUser} getData={this.props.userGetStaff} />,
                         <TrinhDoNNModal ref={e => this.modalNN = e} create={this.props.createTrinhDoNNStaffUser} update={this.props.updateTrinhDoNNStaffUser} getData={this.props.userGetStaff} />,
-                        <HocTapCongTacModal ref={e => this.modalHocTapCongTac = e} getData={this.props.userGetStaff} />,
+                        {/* <HocTapCongTacModal ref={e => this.modalHocTapCongTac = e} create={this.props.createQTHTCTStaffUser} update={this.props.updateQTHTCTStaffUser} getData={this.props.userGetStaff} />, */}
                         <DaoTaoModal ref={e => this.modalDaoTao = e} create={this.props.createQtDaoTaoStaffUser} update={this.props.updateQtDaoTaoStaffUser} getData={this.props.userGetStaff} />,
-                        <NuocNgoaiModal ref={e => this.modalNuocNgoai = e} create={this.props.createQtNuocNgoaiStaffUser} update={this.props.updateQtNuocNgoaiStaffUser} getData={this.props.userGetStaff} />,
-                        <KhenThuongModal ref={e => this.modalKhenThuong = e} create={this.props.createQtKhenThuongStaffUser} update={this.props.updateQtKhenThuongStaffUser} getData={this.props.userGetStaff} />,
-                        <KyLuatModal ref={e => this.modalKyLuat = e} create={this.props.createQtKyLuatStaffUser} update={this.props.updateQtKyLuatStaffUser} getData={this.props.userGetStaff} />,
-                        <NckhModal ref={e => this.modalNckh = e} create={this.props.createQtNckhStaffUser} update={this.props.updateQtNckhStaffUser} getData={this.props.userGetStaff} />,
-                        <HuongDanLvModal ref={e => this.modalHuongDanLv = e} create={this.props.createQtHuongDanLVStaffUser} update={this.props.updateQtHuongDanLVStaffUser} getData={this.props.userGetStaff} />,
-                        <SachGTModal ref={e => this.modalSachGT = e} create={this.props.createSachGTStaffUser} update={this.props.updateSachGTStaffUser} getData={this.props.userGetStaff} />,
-                        <BaiVietKhoaHocModal ref={e => this.modalBaiVietKhoaHoc = e} create={this.props.createQtBaiVietKhoaHocStaffUser} update={this.props.updateQtBaiVietKhoaHocStaffUser} getData={this.props.userGetStaff} />,
-                        <KyYeuModal ref={e => this.modalKyYeu = e} create={this.props.createQtKyYeuStaffUser} update={this.props.updateQtKyYeuStaffUser} getData={this.props.userGetStaff} />,
-                        <GiaiThuongModal ref={e => this.modalGiaiThuong = e} create={this.props.createQtGiaiThuongStaffUser} update={this.props.updateQtGiaiThuongStaffUser} getData={this.props.userGetStaff} />,
-                        <BangPhatMinhModal ref={e => this.modalBangPhatMinh = e} create={this.props.createQtBangPhatMinhStaffUser} update={this.props.updateQtBangPhatMinhStaffUser} getData={this.props.userGetStaff} />,
-                        <UngDungModal ref={e => this.modalUngDung = e} create={this.props.createQtUngDungThuongMaiStaffUser} update={this.props.updateQtUngDungThuongMaiStaffUser} getData={this.props.userGetStaff} />,
-                        <LamViecNgoaiModal ref={e => this.modalLamViecNgoai = e} create={this.props.createQtLamViecNgoaiStaffUser} update={this.props.updateQtLamViecNgoaiStaffUser} getData={this.props.userGetStaff} />
-                    </div>
+            <NuocNgoaiModal ref={e => this.modalNuocNgoai = e} create={this.props.createQtNuocNgoaiStaffUser} update={this.props.updateQtNuocNgoaiStaffUser} getData={this.props.userGetStaff} />,
+            <KhenThuongModal ref={e => this.modalKhenThuong = e} create={this.props.createQtKhenThuongStaffUser} update={this.props.updateQtKhenThuongStaffUser} getData={this.props.userGetStaff} />,
+            <KyLuatModal ref={e => this.modalKyLuat = e} create={this.props.createQtKyLuatStaffUser} update={this.props.updateQtKyLuatStaffUser} getData={this.props.userGetStaff} />,
+            <NckhModal ref={e => this.modalNckh = e} create={this.props.createQtNckhStaffUser} update={this.props.updateQtNckhStaffUser} getData={this.props.userGetStaff} />,
+            <HuongDanLvModal ref={e => this.modalHuongDanLv = e} create={this.props.createQtHuongDanLVStaffUser} update={this.props.updateQtHuongDanLVStaffUser} getData={this.props.userGetStaff} />,
+            <SachGTModal ref={e => this.modalSachGT = e} create={this.props.createSachGTStaffUser} update={this.props.updateSachGTStaffUser} getData={this.props.userGetStaff} />,
+            <BaiVietKhoaHocModal ref={e => this.modalBaiVietKhoaHoc = e} create={this.props.createQtBaiVietKhoaHocStaffUser} update={this.props.updateQtBaiVietKhoaHocStaffUser} getData={this.props.userGetStaff} />,
+            <KyYeuModal ref={e => this.modalKyYeu = e} create={this.props.createQtKyYeuStaffUser} update={this.props.updateQtKyYeuStaffUser} getData={this.props.userGetStaff} />,
+            <GiaiThuongModal ref={e => this.modalGiaiThuong = e} create={this.props.createQtGiaiThuongStaffUser} update={this.props.updateQtGiaiThuongStaffUser} getData={this.props.userGetStaff} />,
+            <BangPhatMinhModal ref={e => this.modalBangPhatMinh = e} create={this.props.createQtBangPhatMinhStaffUser} update={this.props.updateQtBangPhatMinhStaffUser} getData={this.props.userGetStaff} />,
+            <UngDungModal ref={e => this.modalUngDung = e} create={this.props.createQtUngDungThuongMaiStaffUser} update={this.props.updateQtUngDungThuongMaiStaffUser} getData={this.props.userGetStaff} />,
+            <LamViecNgoaiModal ref={e => this.modalLamViecNgoai = e} create={this.props.createQtLamViecNgoaiStaffUser} update={this.props.updateQtLamViecNgoaiStaffUser} getData={this.props.userGetStaff} />
+                    </div >
                 }
             </main>
         );

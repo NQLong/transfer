@@ -9,7 +9,7 @@ export default {
     },
     routes: [
         {
-            path: '/user/tccb/qua-trinh/hoc-tap-cong-tac/:ma',
+            path: '/user/tccb/qua-trinh/hoc-tap-cong-tac/:shcc',
             component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
         },
         {

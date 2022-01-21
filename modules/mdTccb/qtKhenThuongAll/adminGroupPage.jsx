@@ -306,7 +306,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                 }
             </>,
             backRoute: '/user/tccb/qua-trinh/khen-thuong-all',
-            onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
+            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
         });
     }
 }

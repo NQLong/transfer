@@ -17,6 +17,8 @@ import ComponentHDLV from 'modules/mdTccb/qtHuongDanLuanVan/componentHDLV';
 import ComponentSGT from 'modules/mdTccb/sachGiaoTrinh/componentSGT';
 import ComponentDaoTao from 'modules/mdTccb/qtDaoTao/componentDaoTao';
 import ComponentLuong from 'modules/mdTccb/qtLuong/componentLuong';
+import ComponentBaoHiemXaHoi from 'modules/mdTccb/qtBaoHiemXaHoi/componentBaoHiemXaHoi';
+import ComponentKeoDaiCongTac from 'modules/mdTccb/qtKeoDaiCongTac/componentKeoDaiCongTac';
 
 class ProfileCanBo extends AdminPage {
     state = { canBo: false, isLoad: true };
@@ -54,6 +56,8 @@ class ProfileCanBo extends AdminPage {
             this.componentHDLV.value(item.shcc, item.email);
             this.componentSGT.value(item.shcc, item.email);
             this.componentLuong.value(item.shcc, item.email);
+            this.componentBaoHiemXaHoi.value(item.shcc, item.email);
+            this.componentKeoDaiCongTac.value(item.shcc, item.email);
         });
 
     }
@@ -80,6 +84,8 @@ class ProfileCanBo extends AdminPage {
                             <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={true} tccb={false}/>
                             <ComponentDaoTao ref={e => this.componentDaoTao = e} userEdit={true} />
                             <ComponentLuong ref={e => this.componentLuong = e} userEdit={true} />
+                            <ComponentBaoHiemXaHoi ref={e => this.componentBaoHiemXaHoi = e} userEdit={true} />
+                            <ComponentKeoDaiCongTac ref={e => this.componentKeoDaiCongTac = e} userEdit={true} />
                             <ComponentNuocNgoai ref={e => this.componentNuocNgoai = e} userEdit={true} />
                             <ComponentKhenThuong ref={e => this.componentKhenThuong = e} userEdit={true} />
                             <ComponentKyLuat ref={e => this.componentKyLuat = e} userEdit={true} />

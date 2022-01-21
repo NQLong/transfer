@@ -171,8 +171,7 @@ class QtHocTapCongTac extends AdminPage {
 
     getPage = (pageN, pageS, pageC, done) => {
         if (this.checked) this.props.getQtHocTapCongTacGroupPage(pageN, pageS, pageC, this.state.filter, done);
-        else this.props.getQtHocTapCongTacPage(pageN, pageS, pageC, '', this.state.filter, done);
-
+        else this.props.getQtHocTapCongTacPage(pageN, pageS, pageC, this.state.filter, done);
     }
 
     groupPage = () => {
@@ -182,6 +181,7 @@ class QtHocTapCongTac extends AdminPage {
     }
 
     list = (text, i, j) => {
+        if (!text) return '';
         let deTais = text.split('??').map(str => <p key={i--} style={{ textTransform: 'uppercase' }}>{j - i}. {str}</p>);
         return deTais;
     }
@@ -204,7 +204,6 @@ class QtHocTapCongTac extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('qtHocTapCongTac', ['read', 'write', 'delete']);
-        let loaiDoiTuong = this.curState;
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ? (
             this.props.qtHocTapCongTac && this.props.qtHocTapCongTac.page_gr ?
                 this.props.qtHocTapCongTac.page_gr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
@@ -236,8 +235,8 @@ class QtHocTapCongTac extends AdminPage {
                         {!this.checked && <TableCell type='text' content={(
                             <>
                                 <span><i>{item.noiDung ? item.noiDung : ''}</i></span> <br/> <br/>
-                                <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span></span><br />
-                                <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span></span> <br/>
+                                {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br/></span> : null}
+                                {item.ketThuc ? <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span><br/></span> : null}
                             </>
                         )}
                         />}
@@ -280,8 +279,8 @@ class QtHocTapCongTac extends AdminPage {
                     <FormCheckbox label='Hiển thị theo cán bộ' ref={e => this.hienThiTheoCanBo = e} onChange={this.groupPage} />
                     {table}
                 </div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition, loaiDoiTuong }}
-                    getPage={this.checked ? this.props.getQtHocTapCongTacGroupPage : this.props.getQtHocTapCongTacPage} />
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
+                    getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} permission={permission} 
                     create={this.props.createQtHocTapCongTacStaff} update={this.props.updateQtHocTapCongTacStaff}
                     permissions={currentPermissions}
