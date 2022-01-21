@@ -24,8 +24,12 @@ const EnumDateType = Object.freeze({
 
 class EditModal extends AdminModal {
     state = {
-        id: null,
-    }
+        id: '',
+        batDau: '',
+        ketThuc: '',
+        batDauType: 'dd/mm/yyyy',
+        ketThucType: 'dd/mm/yyyy',
+    };    
 
     onShow = (item) => {
         let { id, shcc, noiDung, batDau, batDauType, ketThuc, ketThucType } = item ? item : {
@@ -222,7 +226,7 @@ class QtHocTapCongTacGroupPage extends AdminPage {
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                    getPage={this.props.getQtHocTapCongTacPage} />
+                    getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     permissions={currentPermissions} shcc={this.shcc}
                     create={this.props.createQtHocTapCongTacGroupPageMa} update={this.props.updateQtHocTapCongTacGroupPageMa}

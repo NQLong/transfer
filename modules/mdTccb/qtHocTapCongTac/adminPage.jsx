@@ -23,7 +23,13 @@ const EnumDateType = Object.freeze({
     'dd/mm/yyyy': 'date'
 };
 class EditModal extends AdminModal {
-    state = { id: ''};
+    state = {
+        id: '',
+        batDau: '',
+        ketThuc: '',
+        batDauType: 'dd/mm/yyyy',
+        ketThucType: 'dd/mm/yyyy',
+    };    
     multiple = false;
     componentDidMount() {
     }
