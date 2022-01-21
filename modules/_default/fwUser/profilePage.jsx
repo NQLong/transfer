@@ -51,7 +51,7 @@ class ProfileCanBo extends AdminPage {
             this.componentDaoTao.value(item.shcc, item.email);
             this.componentKhenThuong.value(item.shcc);
             this.componentNCKH.value(item.shcc, item.email);
-            this.componentKyLuat.value(item.shcc);
+            this.componentKyLuat.value(item.shcc, item.email);
             this.componentNuocNgoai.value(item.shcc, item.email);
             this.componentHDLV.value(item.shcc, item.email);
             this.componentSGT.value(item.shcc, item.email);
