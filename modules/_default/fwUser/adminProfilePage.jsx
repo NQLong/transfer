@@ -30,7 +30,7 @@ import { DateInput } from 'view/component/Input';
 import { QTForm } from 'view/component/Form';
 import { ComponentDiaDiem } from 'modules/mdDanhMuc/dmDiaDiem/componentDiaDiem';
 import { TableCell, renderTable, AdminModal, FormSelect, FormRichTextBox, FormCheckbox, FormTextBox } from 'view/component/AdminPage';
-import { createQTHTCTStaffUser, updateQTHTCTStaffUser, deleteQTHTCTStaffUser } from 'modules/mdTccb/qtHocTapCongTac/redux.jsx';
+// import { createQTHTCTStaffUser, updateQTHTCTStaffUser, deleteQTHTCTStaffUser } from 'modules/mdTccb/qtHocTapCongTac/redux.jsx';
 import { createQtDaoTaoStaffUser, updateQtDaoTaoStaffUser, deleteQtDaoTaoStaffUser } from 'modules/mdTccb/qtDaoTao/redux.jsx';
 import { createQtNuocNgoaiStaffUser, updateQtNuocNgoaiStaffUser, deleteQtNuocNgoaiStaffUser } from 'modules/mdTccb/qtNuocNgoai/redux.jsx';
 import { createQtKhenThuongStaffUser, updateQtKhenThuongStaffUser, deleteQtKhenThuongStaffUser } from 'modules/mdTccb/qtKhenThuong/redux.jsx';
@@ -176,88 +176,88 @@ class TrinhDoNNModal extends AdminModal {
     });
 }
 
-class HocTapCongTacModal extends AdminModal {
-    state = {
-        id: null,
-        email: '',
-        batDau: '',
-        ketThuc: '',
-        batDauType: 'dd/mm/yyyy',
-        ketThucType: 'dd/mm/yyyy',
-        toDay: false,
-    }
+// class HocTapCongTacModal extends AdminModal {
+//     state = {
+//         id: null,
+//         email: '',
+//         batDau: '',
+//         ketThuc: '',
+//         batDauType: 'dd/mm/yyyy',
+//         ketThucType: 'dd/mm/yyyy',
+//         toDay: false,
+//     }
 
-    onShow = (item, email) => {
-        this.batDau.clear();
-        this.ketThuc.clear();
-        let { id, batDauType, ketThucType, batDau, ketThuc, noiDung } = item ? item : { id: null, batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', batDau: null, ketThuc: null, noiDung: '' };
-        this.setState({ batDauType: batDauType ? batDauType : 'dd/mm/yyyy', ketThucType: ketThuc && ketThuc != -1 ? ketThucType : 'dd/mm/yyyy', email, id, batDau, ketThuc, toDay: ketThuc == -1 ? true : false });
-        setTimeout(() => {
-            this.batDauType.value(batDauType ? batDauType : 'dd/mm/yyyy');
-            if (ketThuc && ketThuc != -1) this.ketThucType.value(ketThucType); else this.ketThucType.value('dd/mm/yyyy');
-            this.batDau.setVal(batDau);
-            if (ketThuc && ketThuc != -1) this.ketThuc.setVal(ketThuc);
-            this.toDay.value(this.state.toDay);
-            this.noiDung.value(noiDung);
-        }, 500);
-    }
+//     onShow = (item, email) => {
+//         this.batDau.clear();
+//         this.ketThuc.clear();
+//         let { id, batDauType, ketThucType, batDau, ketThuc, noiDung } = item ? item : { id: null, batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', batDau: null, ketThuc: null, noiDung: '' };
+//         this.setState({ batDauType: batDauType ? batDauType : 'dd/mm/yyyy', ketThucType: ketThuc && ketThuc != -1 ? ketThucType : 'dd/mm/yyyy', email, id, batDau, ketThuc, toDay: ketThuc == -1 ? true : false });
+//         setTimeout(() => {
+//             this.batDauType.value(batDauType ? batDauType : 'dd/mm/yyyy');
+//             if (ketThuc && ketThuc != -1) this.ketThucType.value(ketThucType); else this.ketThucType.value('dd/mm/yyyy');
+//             this.batDau.setVal(batDau);
+//             if (ketThuc && ketThuc != -1) this.ketThuc.setVal(ketThuc);
+//             this.toDay.value(this.state.toDay);
+//             this.noiDung.value(noiDung);
+//         }, 500);
+//     }
 
-    onSubmit = () => {
-        const id = this.state.id,
-            email = this.state.email,
-            changes = {
-                batDau: this.batDau.getVal(),
-                ketThuc: this.state.toDay ? -1 : this.ketThuc.getVal(),
-                batDauType: this.state.batDauType,
-                ketThucType: this.state.ketThucType,
-                noiDung: this.noiDung.value()
-            };
-        if (id) {
-            this.props.update(id, changes, error => {
-                if (error == undefined || error == null) {
-                    this.props.getData(email);
-                    this.hide();
-                }
-            });
-        } else {
-            changes.email = email;
-            this.props.create(changes, () => {
-                this.props.getData(email);
-                this.hide();
-            });
-        }
-    }
+//     onSubmit = () => {
+//         const id = this.state.id,
+//             email = this.state.email,
+//             changes = {
+//                 batDau: this.batDau.getVal(),
+//                 ketThuc: this.state.toDay ? -1 : this.ketThuc.getVal(),
+//                 batDauType: this.state.batDauType,
+//                 ketThucType: this.state.ketThucType,
+//                 noiDung: this.noiDung.value()
+//             };
+//         if (id) {
+//             this.props.update(id, changes, error => {
+//                 if (error == undefined || error == null) {
+//                     this.props.getData(email);
+//                     this.hide();
+//                 }
+//             });
+//         } else {
+//             changes.email = email;
+//             this.props.create(changes, () => {
+//                 this.props.getData(email);
+//                 this.hide();
+//             });
+//         }
+//     }
 
-    changeType = (isBatDau, type) => {
-        if (isBatDau) {
-            this.setState({ batDauType: type });
-            this.batDau.setVal(this.state.batDau);
-        } else {
-            this.setState({ ketThucType: type });
-            if (this.state.ketThuc && this.state.ketThuc != -1) this.ketThuc.setVal(this.state.ketThuc);
-        }
-    }
+//     changeType = (isBatDau, type) => {
+//         if (isBatDau) {
+//             this.setState({ batDauType: type });
+//             this.batDau.setVal(this.state.batDau);
+//         } else {
+//             this.setState({ ketThucType: type });
+//             if (this.state.ketThuc && this.state.ketThuc != -1) this.ketThuc.setVal(this.state.ketThuc);
+//         }
+//     }
 
-    changeToDay = (value) => {
-        this.setState({ toDay: value });
-        if (value) {
-            this.ketThuc.clear();
-        }
-    }
+//     changeToDay = (value) => {
+//         this.setState({ toDay: value });
+//         if (value) {
+//             this.ketThuc.clear();
+//         }
+//     }
 
-    render = () => this.renderModal({
-        title: 'Thông tin học tập công tác',
-        size: 'large',
-        body: <div className='row'>
-            <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} label='Bắt đầu' type={this.state.batDauType ? typeMapper[this.state.batDauType] : null} /></div>
-            <FormSelect className='col-md-6' ref={e => this.batDauType = e} label='Loại thời gian bắt đầu' data={dateType} onChange={data => this.changeType(true, data.id)} />
-            <div className='form-group col-md-6'><DateInput ref={e => this.ketThuc = e} label='Kết thúc' type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} /></div>
-            <FormSelect className='col-md-6' ref={e => this.ketThucType = e} label='Loại thời gian kết thúc' data={dateType} onChange={data => this.changeType(false, data.id)} />
-            <FormCheckbox className='col-12' label='Vẫn đang tiếp diễn' ref={e => this.toDay = e} onChange={value => this.changeToDay(value)} />
-            <FormRichTextBox className='col-12' ref={e => this.noiDung = e} label='Nội dung' />
-        </div>,
-    });
-}
+//     render = () => this.renderModal({
+//         title: 'Thông tin học tập công tác',
+//         size: 'large',
+//         body: <div className='row'>
+//             <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} label='Bắt đầu' type={this.state.batDauType ? typeMapper[this.state.batDauType] : null} /></div>
+//             <FormSelect className='col-md-6' ref={e => this.batDauType = e} label='Loại thời gian bắt đầu' data={dateType} onChange={data => this.changeType(true, data.id)} />
+//             <div className='form-group col-md-6'><DateInput ref={e => this.ketThuc = e} label='Kết thúc' type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} /></div>
+//             <FormSelect className='col-md-6' ref={e => this.ketThucType = e} label='Loại thời gian kết thúc' data={dateType} onChange={data => this.changeType(false, data.id)} />
+//             <FormCheckbox className='col-12' label='Vẫn đang tiếp diễn' ref={e => this.toDay = e} onChange={value => this.changeToDay(value)} />
+//             <FormRichTextBox className='col-12' ref={e => this.noiDung = e} label='Nội dung' />
+//         </div>,
+//     });
+// }
 
 // class ToChucKhacModal extends AdminModal {
 //     state = {
@@ -2989,7 +2989,7 @@ class ProfilePage extends QTForm {
                         }
                         <RelationModal ref={e => this.modal = e} create={this.props.createQuanHeStaffUser} update={this.props.updateQuanHeStaffUser} getData={this.props.userGetStaff} />,
                         <TrinhDoNNModal ref={e => this.modalNN = e} create={this.props.createTrinhDoNNStaffUser} update={this.props.updateTrinhDoNNStaffUser} getData={this.props.userGetStaff} />,
-                        <HocTapCongTacModal ref={e => this.modalHocTapCongTac = e} create={this.props.createQTHTCTStaffUser} update={this.props.updateQTHTCTStaffUser} getData={this.props.userGetStaff} />,
+                        {/* <HocTapCongTacModal ref={e => this.modalHocTapCongTac = e} create={this.props.createQTHTCTStaffUser} update={this.props.updateQTHTCTStaffUser} getData={this.props.userGetStaff} />, */}
                         <DaoTaoModal ref={e => this.modalDaoTao = e} create={this.props.createQtDaoTaoStaffUser} update={this.props.updateQtDaoTaoStaffUser} getData={this.props.userGetStaff} />,
                         <NuocNgoaiModal ref={e => this.modalNuocNgoai = e} create={this.props.createQtNuocNgoaiStaffUser} update={this.props.updateQtNuocNgoaiStaffUser} getData={this.props.userGetStaff} />,
                         <KhenThuongModal ref={e => this.modalKhenThuong = e} create={this.props.createQtKhenThuongStaffUser} update={this.props.updateQtKhenThuongStaffUser} getData={this.props.userGetStaff} />,
@@ -3013,7 +3013,7 @@ class ProfilePage extends QTForm {
 const mapStateToProps = state => ({ system: state.system, division: state.division, staff: state.staff });
 const mapActionsToProps = {
     updateProfile, userGetStaff, getDmQuanHeGiaDinhAll, getDmBoMonAll, getDmDonViAll, getDmChucVuAll, updateStaffUser, createQuanHeStaffUser, updateQuanHeStaffUser, deleteQuanHeStaffUser,
-    createTrinhDoNNStaffUser, updateTrinhDoNNStaffUser, deleteTrinhDoNNStaffUser, getDmNgoaiNguAll, createQTHTCTStaffUser, updateQTHTCTStaffUser, deleteQTHTCTStaffUser,
+    createTrinhDoNNStaffUser, updateTrinhDoNNStaffUser, deleteTrinhDoNNStaffUser, getDmNgoaiNguAll,
     createQtDaoTaoStaffUser, updateQtDaoTaoStaffUser, deleteQtDaoTaoStaffUser, createQtNuocNgoaiStaffUser, updateQtNuocNgoaiStaffUser, deleteQtNuocNgoaiStaffUser,
     createQtKhenThuongStaffUser, updateQtKhenThuongStaffUser, deleteQtKhenThuongStaffUser, createQtKyLuatStaffUser, updateQtKyLuatStaffUser, deleteQtKyLuatStaffUser,
     createQtNckhStaffUser, updateQtNckhStaffUser, deleteQtNckhStaffUser, createQtHuongDanLVStaffUser, updateQtHuongDanLVStaffUser, deleteQtHuongDanLVStaffUser,
