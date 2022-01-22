@@ -75,7 +75,7 @@ class QtHuongDanLuanVanGroupPage extends AdminPage {
 
     componentDidMount() {
         T.ready('/user/tccb', () => {
-            const route = T.routeMatcher('/user/tccb/qua-trinh/hdlv/:shcc'),
+            const route = T.routeMatcher('/user/tccb/qua-trinh/hdlv/group/:shcc'),
                 params = route.parse(window.location.pathname);
             this.shcc = params.shcc;
             this.setState({filter: {list_shcc: params.shcc, list_dv: ''}});

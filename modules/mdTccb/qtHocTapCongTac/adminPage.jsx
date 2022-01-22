@@ -255,7 +255,7 @@ class QtHocTapCongTac extends AdminPage {
                         }
                         {
                             this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}>
-                                <Link className='btn btn-success' to={`/user/tccb/qua-trinh/hoc-tap-cong-tac/${item.shcc}`} >
+                                <Link className='btn btn-success' to={`/user/tccb/qua-trinh/hoc-tap-cong-tac/group/${item.shcc}`} >
                                     <i className='fa fa-lg fa-compress' />
                                 </Link>
                             </TableCell>
