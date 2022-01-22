@@ -1,5 +1,5 @@
 import T from 'view/js/common';
-import { getStaffEdit } from '../tccbCanBo/redux';
+import { getStaffEdit, userGetStaff } from '../tccbCanBo/redux';
 
 // Reducer ------------------------------------------------------------------------------------------------------------
 const QtKyLuatGetAll = 'QtKyLuat:GetAll';
@@ -50,37 +50,43 @@ export default function QtKyLuatReducer(state = null, data) {
 
 // Actions ------------------------------------------------------------------------------------------------------------
 T.initPage('pageQtKyLuat');
-export function getQtKyLuatPage(pageNumber, pageSize, loaiDoiTuong, pageCondition, done) {
-    const page = T.updatePage('pageQtKyLuat', pageNumber, pageSize, pageCondition);
-    if (!loaiDoiTuong) loaiDoiTuong = [];
-    if (!Array.isArray(loaiDoiTuong)) loaiDoiTuong = [loaiDoiTuong];
+export function getQtKyLuatPage(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('pageQtKyLuat', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/tccb/qua-trinh/ky-luat/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition, parameter: loaiDoiTuong}, data => {
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
-                T.notify('Lấy danh sách kỷ luật bị lỗi!', 'danger');
+                T.notify('Lấy danh sách quá trình kỷ luật bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
+                if (page.filter) data.page.filter = page.filter;
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 if (done) done(data.page);
                 dispatch({ type: QtKyLuatGetPage, page: data.page });
             }
-        }, () => T.notify('Lấy danh sách kỷ luật bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách quá trình kỷ luật bị lỗi!', 'danger'));
     };
 }
 
 T.initPage('groupPageQtKyLuat', true);
-export function getQtKyLuatGroupPage(pageNumber, pageSize, loaiDoiTuong, pageCondition, done) {
-    const page = T.updatePage('groupPageQtKyLuat', pageNumber, pageSize, pageCondition);
-    if (!loaiDoiTuong) loaiDoiTuong = [];
-    if (!Array.isArray(loaiDoiTuong)) loaiDoiTuong = [loaiDoiTuong];
+export function getQtKyLuatGroupPage(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('groupPageQtKyLuat', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/tccb/qua-trinh/ky-luat/group/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition, parameter: loaiDoiTuong}, data => {
+        T.get(url, { condition: page.pageCondition, filter: page.filter}, data => {
             if (data.error) {
-                T.notify('Lấy danh sách kỷ luật theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                T.notify('Lấy danh sách quá trình kỷ luật bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
+                if (page.filter) data.page.filter = page.filter;
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 done && done(data.page);
                 dispatch({ type: QtKyLuatGetGroupPage, page: data.page });
@@ -89,117 +95,59 @@ export function getQtKyLuatGroupPage(pageNumber, pageSize, loaiDoiTuong, pageCon
     };
 }
 
-T.initPage('groupPageMaQtKyLuat', true);
-export function getQtKyLuatGroupPageMa(pageNumber, pageSize, loaiDoiTuong, pageCondition, done) {
-    const page = T.updatePage('groupPageMaQtKyLuat', pageNumber, pageSize, pageCondition);
-    if (!loaiDoiTuong) loaiDoiTuong = '-1';
-    return dispatch => {
-        const url = `/api/tccb/qua-trinh/ky-luat/group_kl/page/${loaiDoiTuong}/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition }, data => {
-            if (data.error) {
-                T.notify('Lấy danh sách kỷ luật theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
-                console.error(`GET: ${url}.`, data.error);
-            } else {
-                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
-                done && done(data.page);
-                dispatch({ type: QtKyLuatGetPage, page: data.page });
-            }
-        }, error => console.error(`GET: ${url}.`, error));
-    };
-}
-
-export function getQtKyLuatAll(done) {
-    return dispatch => {
-        const url = '/api/tccb/qua-trinh/ky-luat/all';
-        T.get(url, data => {
-            if (data.error) {
-                T.notify('Lấy danh sách kỷ luật bị lỗi!', 'danger');
-                console.error(`GET: ${url}.`, data.error);
-            } else {
-                if (done) done(data.items);
-                dispatch({ type: QtKyLuatGetAll, items: data.items ? data.items : {} });
-            }
-        }, () => T.notify('Lấy danh sách kỷ luật bị lỗi!', 'danger'));
-    };
-}
-
-export function getQtKyLuat(id, done) {
-    return () => {
-        const url = `/api/tccb/qua-trinh/ky-luat/item/${id}`;
-        T.get(url, data => {
-            if (data.error) {
-                T.notify('Lấy kỷ luật bị lỗi!', 'danger');
-                console.error(`GET: ${url}.`, data.error);
-            } else {
-                if (done) done(data.item);
-            }
-        }, error => console.error(`GET: ${url}.`, error));
-    };
-}
-
-export function getQtKyLuatEdit(id, done) {
-    return dispatch => {
-        const url = `/api/tccb/qua-trinh/ky-luat/edit/item/${id}`;
-        T.get(url, data => {
-            if (data.error) {
-                T.notify('Lấy thông tin kỷ luật bị lỗi!', 'danger');
-                console.error(`GET: ${url}.`, data.error);
-            } else {
-                if (done) done(data);
-                dispatch({ type: QtKyLuatGet, item: data.item });
-            }
-        }, () => T.notify('Lấy thông tin kỷ luật bị lỗi', 'danger'));
-    };
-}
-
-export function createQtKyLuat(isStaffEdit, items, done) {
+export function createQtKyLuatStaff(data, done, isEdit = null) {
     return dispatch => {
         const url = '/api/tccb/qua-trinh/ky-luat';
-        T.post(url, { items }, data => {
-            if (data.error) {
-                T.notify('Tạo kỷ luật bị lỗi!', 'danger');
-                console.error(`POST: ${url}.`, data.error);
+        T.post(url, { data }, res => {
+            if (res.error) {
+                T.notify('Tạo quá trình kỷ luật bị lỗi!', 'danger');
+                console.error(`POST: ${url}.`, res.error);
             } else {
                 if (done) {
-                    T.notify('Tạo kỷ luật thành công!', 'success');
-                    isStaffEdit ? dispatch(getStaffEdit(data.item.shcc)) : dispatch(getQtKyLuatPage());
-                    isStaffEdit ? (done && done()) : done(data);
+                    T.notify('Tạo quá trình kỷ luật thành công!', 'success');
+                    if (isEdit) {
+                        done();
+                        dispatch(getStaffEdit(data.shcc));
+                    }
+                    else {
+                        done(data);
+                        dispatch(getQtKyLuatPage());
+                    }
                 }
             }
-        }, () => T.notify('Tạo kỷ luật bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo quá trình kỷ luật bị lỗi!', 'danger'));
     };
 }
 
-export function deleteQtKyLuat(isStaffEdit, id, shcc = null, done) {
+export function deleteQtKyLuatStaff(id, shcc, idEdit = null) {
     return dispatch => {
         const url = '/api/tccb/qua-trinh/ky-luat';
         T.delete(url, { id }, data => {
             if (data.error) {
-                T.notify('Xóa kỷ luật bị lỗi!', 'danger');
+                T.notify('Xóa quá trình kỷ luật bị lỗi!', 'danger');
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
-                T.alert('kỷ luật đã xóa thành công!', 'success', false, 800);
-                isStaffEdit ? dispatch(getStaffEdit(shcc)) : dispatch(getQtKyLuatPage());
+                T.alert('quá trình kỷ luật đã xóa thành công!', 'success', false, 800);
+                idEdit ? dispatch(getStaffEdit(shcc)) : dispatch(getQtKyLuatPage());
             }
-            done && done();
-        }, () => T.notify('Xóa kỷ luật bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa quá trình kỷ luật bị lỗi!', 'danger'));
     };
 }
 
-export function updateQtKyLuat(isStaffEdit, id, changes, done) {
+export function updateQtKyLuatStaff(id, changes, done, isEdit = null) {
     return dispatch => {
         const url = '/api/tccb/qua-trinh/ky-luat';
         T.put(url, { id, changes }, data => {
             if (data.error || changes == null) {
-                T.notify('Cập nhật kỷ luật bị lỗi!', 'danger');
+                T.notify('Cập nhật quá trình kỷ luật bị lỗi!', 'danger');
                 console.error(`PUT: ${url}.`, data.error);
                 done && done(data.error);
             } else {
-                T.notify('Cập nhật kỷ luật thành công!', 'success');
-                isStaffEdit ? (done && done()) : (done && done(data.item));
-                isStaffEdit ? dispatch(getStaffEdit(data.item.shcc)) :  dispatch(getQtKyLuatPage());
+                T.notify('Cập nhật quá trình kỷ luật thành công!', 'success');
+                isEdit ? (done && done()) : (done && done(data.item));
+                isEdit ? dispatch(getStaffEdit(changes.shcc)) : dispatch(getQtKyLuatPage());
             }
-        }, () => T.notify('Cập nhật kỷ luật bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật quá trình kỷ luật bị lỗi!', 'danger'));
     };
 }
 
@@ -208,122 +156,95 @@ export function updateQtKyLuatGroupPageMa(id, changes, done) {
         const url = '/api/tccb/qua-trinh/ky-luat';
         T.put(url, { id, changes }, data => {
             if (data.error || changes == null) {
-                T.notify('Cập nhật kỷ luật bị lỗi!', 'danger');
+                T.notify('Cập nhật quá trình kỷ luật bị lỗi!', 'danger');
                 console.error(`PUT: ${url}.`, data.error);
                 done && done(data.error);
             } else {
-                T.notify('Cập nhật kỷ luật thành công!', 'success');
+                T.notify('Cập nhật quá trình kỷ luật thành công!', 'success');
                 done && done(data.item);
-                dispatch(getQtKyLuatGroupPageMa(undefined, undefined, '-1', data.shcc));
+                dispatch(getQtKyLuatPage());
             }
-        }, () => T.notify('Cập nhật kỷ luật bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật quá trình kỷ luật bị lỗi!', 'danger'));
     };
 }
 
-export function deleteQtKyLuatGroupPageMa(id, shcc, done) {
+export function createQtKyLuatGroupPageMa(data, done) {
+    return dispatch => {
+        const url = '/api/tccb/qua-trinh/ky-luat';
+        T.post(url, { data }, res => {
+            if (res.error) {
+                T.notify('Tạo quá trình kỷ luật bị lỗi!', 'danger');
+                console.error(`POST: ${url}.`, res.error);
+            } else {
+                if (done) {
+                    T.notify('Tạo quá trình kỷ luật thành công!', 'success');
+                    dispatch(getQtKyLuatPage());
+                    done && done(data);
+                }
+            }
+        }, () => T.notify('Tạo quá trình kỷ luật bị lỗi!', 'danger'));
+    };
+}
+export function deleteQtKyLuatGroupPageMa(id, done) {
     return dispatch => {
         const url = '/api/tccb/qua-trinh/ky-luat';
         T.delete(url, { id }, data => {
             if (data.error) {
-                T.notify('Xóa kỷ luật bị lỗi!', 'danger');
+                T.notify('Xóa quá trình kỷ luật bị lỗi!', 'danger');
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
-                T.alert('kỷ luật đã xóa thành công!', 'success', false, 800);
+                T.alert('quá trình kỷ luật đã xóa thành công!', 'success', false, 800);
                 done && done(data.item);
-                dispatch(getQtKyLuatGroupPageMa(undefined, undefined, '-1', shcc));          
+                dispatch(getQtKyLuatPage());
             }
-        }, () => T.notify('Xóa kỷ luật bị lỗi!', 'danger'));
-    };
-}
-
-//USER ACTIONS:
-
-export function createQtKyLuatStaff(data, done) {
-    return () => {
-        const url = '/api/qua-trinh/ky-luat';
-        T.post(url, { data }, res => {
-            if (res.error) {
-                T.notify('Thêm thông tin quá trình kỷ luật bị lỗi', 'danger');
-                console.error('POST: ' + url + '. ' + res.error);
-            } else {
-                T.notify('Thêm thông tin quá trình kỷ luật thành công!', 'info');
-                if (done) done(res);
-            }
-        }, () => T.notify('Thêm thông tin quá trình kỷ luật bị lỗi', 'danger'));
-    };
-}
-
-export function updateQtKyLuatStaff(id, changes, done) {
-    return () => {
-        const url = '/api/qua-trinh/ky-luat';
-        T.put(url, { id, changes }, data => {
-            if (data.error) {
-                T.notify('Cập nhật thông tin quá trình kỷ luật bị lỗi', 'danger');
-                console.error('PUT: ' + url + '. ' + data.error);
-            } else if (data.item) {
-                T.notify('Cập nhật thông tin quá trình kỷ luật thành công!', 'info');
-                if (done) done();
-            }
-        }, () => T.notify('Cập nhật thông tin quá trình kỷ luật bị lỗi', 'danger'));
-    };
-}
-
-export function deleteQtKyLuatStaff(id, done) {
-    return () => {
-        const url = '/api/qua-trinh/ky-luat';
-        T.delete(url, { id }, data => {
-            if (data.error) {
-                T.notify('Xóa thông tin quá trình kỷ luật bị lỗi', 'danger');
-                console.error('DELETE: ' + url + '. ' + data.error);
-            } else {
-                T.alert('Thông tin quá trình kỷ luật được xóa thành công!', 'info', false, 800);
-                if (done) done();
-            }
-        }, () => T.notify('Xóa thông tin quá trình kỷ luật bị lỗi', 'danger'));
+        }, () => T.notify('Xóa quá trình kỷ luật bị lỗi!', 'danger'));
     };
 }
 
 export function createQtKyLuatStaffUser(data, done) {
-    return () => {
+    return dispatch => {
         const url = '/api/user/qua-trinh/ky-luat';
         T.post(url, { data }, res => {
             if (res.error) {
-                T.notify('Thêm thông tin quá trình kỷ luật bị lỗi', 'danger');
+                T.notify('Thêm thông tin quá trình quá trình kỷ luật bị lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
-                T.notify('Thêm thông tin quá trình kỷ luật thành công!', 'info');
+                T.notify('Thêm thông tin quá trình quá trình kỷ luật thành công!', 'info');
                 if (done) done(res);
+                dispatch(userGetStaff(data.email));
             }
-        }, () => T.notify('Thêm thông tin quá trình kỷ luật bị lỗi', 'danger'));
+        }, () => T.notify('Thêm thông tin quá trình quá trình kỷ luật bị lỗi', 'danger'));
     };
 }
 
 export function updateQtKyLuatStaffUser(id, changes, done) {
-    return () => {
+    return dispatch => {
         const url = '/api/user/qua-trinh/ky-luat';
         T.put(url, { id, changes }, data => {
             if (data.error) {
-                T.notify('Cập nhật thông tin quá trình kỷ luật bị lỗi', 'danger');
+                T.notify('Cập nhật thông tin quá trình quá trình kỷ luật bị lỗi', 'danger');
                 console.error('PUT: ' + url + '. ' + data.error);
             } else if (data.item) {
-                T.notify('Cập nhật thông tin quá trình kỷ luật thành công!', 'info');
+                T.notify('Cập nhật thông tin quá trình quá trình kỷ luật thành công!', 'info');
                 if (done) done();
+                dispatch(userGetStaff(changes.email));
             }
-        }, () => T.notify('Cập nhật thông tin quá trình kỷ luật bị lỗi', 'danger'));
+        }, () => T.notify('Cập nhật thông tin quá trình quá trình kỷ luật bị lỗi', 'danger'));
     };
 }
 
-export function deleteQtKyLuatStaffUser(id, done) {
-    return () => {
+export function deleteQtKyLuatStaffUser(id, email, done) {
+    return dispatch => {
         const url = '/api/user/qua-trinh/ky-luat';
         T.delete(url, { id }, data => {
             if (data.error) {
-                T.notify('Xóa thông tin quá trình kỷ luật bị lỗi', 'danger');
+                T.notify('Xóa thông tin quá trình quá trình kỷ luật bị lỗi', 'danger');
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
-                T.alert('Thông tin quá trình kỷ luật được xóa thành công!', 'info', false, 800);
+                T.alert('Thông tin quá trình quá trình kỷ luật được xóa thành công!', 'info', false, 800);
                 done && done();
+                dispatch(userGetStaff(email));
             }
-        }, () => T.notify('Xóa thông tin quá trình kỷ luật bị lỗi', 'danger'));
+        }, () => T.notify('Xóa thông tin quá trình quá trình kỷ luật bị lỗi', 'danger'));
     };
 }

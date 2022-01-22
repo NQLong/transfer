@@ -24,8 +24,12 @@ const EnumDateType = Object.freeze({
 
 class EditModal extends AdminModal {
     state = {
-        id: null,
-    }
+        id: '',
+        batDau: '',
+        ketThuc: '',
+        batDauType: 'dd/mm/yyyy',
+        ketThucType: 'dd/mm/yyyy',
+    };    
 
     onShow = (item) => {
         let { id, shcc, noiDung, batDau, batDauType, ketThuc, ketThucType } = item ? item : {
@@ -103,10 +107,10 @@ class QtHocTapCongTacGroupPage extends AdminPage {
 
     componentDidMount() {
         T.ready('/user/tccb', () => {
-            const route = T.routeMatcher('/user/tccb/qua-trinh/hoc-tap-cong-tac/:shcc'),
+            const route = T.routeMatcher('/user/tccb/qua-trinh/hoc-tap-cong-tac/group/:shcc'),
                 params = route.parse(window.location.pathname);
             this.shcc = params.shcc;
-            this.setState({filter: {list_shcc: params.shcc, list_dv: ''}});
+            this.setState({ filter: { list_shcc: params.shcc, list_dv: '' } });
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
 
             T.showSearchBox(() => {
@@ -180,16 +184,16 @@ class QtHocTapCongTacGroupPage extends AdminPage {
                         <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
                         <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span>{(item.hoCanBo ? item.hoCanBo: ' ') + ' ' + (item.tenCanBo ? item.tenCanBo : ' ')}</span><br />
+                                <span>{(item.hoCanBo ? item.hoCanBo : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo : ' ')}</span><br />
                                 {item.shcc}
-                            </> 
+                            </>
                         )}
                         />
                         <TableCell type='text' content={(
                             <>
-                                <span><i>{item.noiDung ? item.noiDung : ''}</i></span> <br/> <br/>
-                                {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br/></span> : null}
-                                {item.ketThuc ? <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span><br/></span> : null}
+                                <span><i>{item.noiDung ? item.noiDung : ''}</i></span> <br /> <br />
+                                {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
+                                {item.ketThuc ? <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
                             </>
                         )}
                         />
@@ -208,7 +212,7 @@ class QtHocTapCongTacGroupPage extends AdminPage {
             title: 'Quá trình học tập, công tác - Cán bộ',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
-                <Link key={0} to='/user/tccb'>Quá trình học tập, công tác</Link>,
+                <Link key={0} to='/user/tccb/qua-trinh/hoc-tap-cong-tac'>Quá trình học tập, công tác</Link>,
                 'Quá trình học tập, công tác - Cán bộ'
             ],
             advanceSearch: <>
@@ -222,7 +226,7 @@ class QtHocTapCongTacGroupPage extends AdminPage {
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                    getPage={this.props.getQtHocTapCongTacPage} />
+                    getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     permissions={currentPermissions} shcc={this.shcc}
                     create={this.props.createQtHocTapCongTacGroupPageMa} update={this.props.updateQtHocTapCongTacGroupPageMa}

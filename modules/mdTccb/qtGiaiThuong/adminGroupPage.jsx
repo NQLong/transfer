@@ -4,12 +4,10 @@ import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormRichTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
-    getQtGiaiThuongPage, updateQtGiaiThuongGroupPageMa,
-    deleteQtGiaiThuongGroupPageMa, getQtGiaiThuongGroupPageMa,
+    updateQtGiaiThuongGroupPageMa, deleteQtGiaiThuongGroupPageMa,
+    createQtGiaiThuongGroupPageMa, getQtGiaiThuongPage,
 } from './redux';
-import { DateInput } from 'view/component/Input';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
-import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 
 
 class EditModal extends AdminModal {
@@ -18,9 +16,7 @@ class EditModal extends AdminModal {
     };
     multiple = false;
 
-    onShow = (item, multiple = true) => {
-        this.multiple = multiple;
-
+    onShow = (item) => {
         let { id, shcc, tenGiaiThuong, noiDung, noiCap, namCap } = item ? item : {
             id: null, shcc: '', tenGiaiThuong: '', noiDung: null, noiCap: '', namCap: ''
         };
@@ -28,9 +24,9 @@ class EditModal extends AdminModal {
         this.setState({ id: id });
 
         setTimeout(() => {
-            this.maCanBo.value(shcc);
+            this.maCanBo.value(shcc ? shcc : this.props.shcc);
             this.tenGiaiThuong.value(tenGiaiThuong ? tenGiaiThuong : '');
-            if (namCap) this.namCap.setVal(new Date(namCap.toString()));
+            this.namCap.value(namCap ? namCap : '');
             this.noiDung.value(noiDung ? noiDung : '');
             this.noiCap.value(noiCap ? noiCap : '');
         }, 500);
@@ -38,61 +34,87 @@ class EditModal extends AdminModal {
 
     onSubmit = (e) => {
         e.preventDefault();
-        let list_ma = this.maCanBo.value();
-        if (!Array.isArray(list_ma)) {
-            list_ma = [list_ma];
-        }
-        if (list_ma.length == 0) {
-            T.notify('Danh sách cán bộ trống', 'danger');
+        const changes = {
+            shcc: this.maCanBo.value(),
+            tenGiaiThuong: this.tenGiaiThuong.value(),
+            noiDung: this.noiDung.value(),
+            noiCap: this.noiCap.value(),
+            namCap: this.namCap.value(),
+        };
+        if (!changes.shcc) {
+            T.notify('Chưa chọn cán bộ', 'danger');
             this.maCanBo.focus();
         } else if (!this.tenGiaiThuong.value()) {
-            T.notify('Tên tác giả trống', 'danger');
+            T.notify('Tên giải thưởng trống', 'danger');
             this.tenGiaiThuong.focus();
-        } else if (!this.namCap.getVal()) {
-            T.notify('Năm xuất bản trống', 'danger');
+        } else if (!this.namCap.value()) {
+            T.notify('Năm đạt giải trống', 'danger');
             this.namCap.focus();
         } else {
-            list_ma.forEach((ma) => {
-                const changes = {
-                    shcc: ma,
-                    tenGiaiThuong: this.tenGiaiThuong.value(),
-                    noiDung: this.noiDung.value(),
-                    noiCap: this.noiCap.value(),
-                    namCap: this.namCap.getVal() ? new Date(this.namCap.getVal()).getFullYear() : null,
-                };
-                this.props.update(this.state.id, changes, this.hide, false);
-            });
+            this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
         }
     }
 
     render = () => {
-        const readOnly = this.state.id ? true : this.props.readOnly;
+        const readOnly = this.props.readOnly;
         return this.renderModal({
             title: this.state.id ? 'Cập nhật giải thưởng' : 'Tạo mới giải thưởng',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={readOnly} required />
-                <FormRichTextBox className='col-12' ref={e => this.tenGiaiThuong = e} label={'Giải thưởng'} type='text' required/>
-                <FormRichTextBox className='col-12' ref={e => this.noiDung = e} label={'Nội dung giải thưởng'} type='text' />
-                <FormTextBox className='col-9' ref={e => this.noiCap = e} label={'Nơi cấp giải thưởng'} type='text' />
-                <div className='form-group col-md-3'><DateInput ref={e => this.namCap = e} label='Năm đạt giải' type='year' required /></div>
+                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={true} required />
+                <FormRichTextBox className='col-12' ref={e => this.tenGiaiThuong = e} label={'Giải thưởng'} type='text' required readOnly={readOnly}/>
+                <FormRichTextBox className='col-12' ref={e => this.noiDung = e} label={'Nội dung giải thưởng'} type='text' readOnly={readOnly} />
+                <FormTextBox className='col-9' ref={e => this.noiCap = e} label={'Nơi cấp giải thưởng'} type='text' readOnly={readOnly} />
+                <FormTextBox className='col-md-3' ref={e => this.namCap = e} label='Năm đạt giải (yyyy)' type='year' required readOnly={readOnly} />
             </div>
         });
     }
 }
 
 class QtGiaiThuongGroupPage extends AdminPage {
-    ma = ''; loaiDoiTuong = '-1';
+    state = { filter: {} };
+
     componentDidMount() {
         T.ready('/user/tccb', () => {
-            const route = T.routeMatcher('/user/tccb/qua-trinh/giai-thuong/group_gt/:loaiDoiTuong/:ma'),
+            const route = T.routeMatcher('/user/tccb/qua-trinh/giai-thuong/group/:shcc'),
                 params = route.parse(window.location.pathname);
-            this.loaiDoiTuong = params.loaiDoiTuong;
-            this.ma = params.ma;
-            T.onSearch = (searchText) => this.props.getQtGiaiThuongPage(undefined, undefined, this.loaiDoiTuong, searchText || '');
-            T.showSearchBox();
-            this.props.getQtGiaiThuongGroupPageMa(undefined, undefined, this.loaiDoiTuong, this.ma);
+            this.shcc = params.shcc;
+            this.setState({ filter: { list_shcc: params.shcc, list_dv: '' } });
+            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
+
+            T.showSearchBox(() => {
+                this.fromYear?.value('');
+                this.toYear?.value('');
+                setTimeout(() => this.changeAdvancedSearch(), 50);
+            });
+            this.props.getQtGiaiThuongPage(undefined, undefined, undefined, this.state.filter, () => {
+                T.updatePage('pageQtGiaiThuong', undefined, undefined, undefined, this.state.filter);
+            });
         });
+    }
+
+    changeAdvancedSearch = (isInitial = false) => {
+        let { pageNumber, pageSize } = this.props && this.props.qtGiaiThuong && this.props.qtGiaiThuong.page ? this.props.qtGiaiThuong.page : { pageNumber: 1, pageSize: 50 };
+        const fromYear = this.fromYear?.value() == '' ? null : Number(this.fromYear?.value());
+        const toYear = this.toYear?.value() == '' ? null : Number(this.toYear?.value());
+        const list_dv = this.state.filter.list_dv;
+        const list_shcc = this.state.filter.list_shcc;
+        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc };
+        this.setState({ filter: pageFilter }, () => {
+            this.getPage(pageNumber, pageSize, '', (page) => {
+                if (isInitial) {
+                    const filter = page.filter || {};
+                    this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
+                    this.fromYear?.value(filter.fromYear || '');
+                    this.toYear?.value(filter.toYear || '');
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear)) this.showAdvanceSearch();
+                }
+            });
+        });
+    }
+
+    getPage = (pageN, pageS, pageC, done) => {
+        this.props.getQtGiaiThuongPage(pageN, pageS, pageC, this.state.filter, done);
     }
 
     showModal = (e) => {
@@ -102,7 +124,7 @@ class QtGiaiThuongGroupPage extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa giải thưởng', 'Bạn có chắc bạn muốn xóa giải thưởng này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtGiaiThuongGroupPageMa(item.id, item.shcc, error => {
+            isConfirm && this.props.deleteQtGiaiThuongGroupPageMa(item.id, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá giải thưởng bị lỗi!', 'danger');
                 else T.alert('Xoá giải thưởng thành công!', 'success', false, 800);
             });
@@ -134,7 +156,7 @@ class QtGiaiThuongGroupPage extends AdminPage {
                                 <span><b>{item.tenGiaiThuong}</b></span> <br/>
                                 <span><i>{item.noiDung}</i></span> <br/> <br/>
                                 <span>Cán bộ đạt giải:
-                                    <a href='#' onClick={() => this.modal.show(item, false)}>
+                                    <a href='#' onClick={() => this.modal.show(item)}>
                                         <span style={{color: 'blue'}}>{' ' + (item.hoCanBo ? item.hoCanBo : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo : ' ') + ' - ' + item.shcc} </span>
                                     </a>
                                 </span>
@@ -152,7 +174,7 @@ class QtGiaiThuongGroupPage extends AdminPage {
                         )} 
                         />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                            onEdit={() => this.modal.show(item, false)} onDelete={this.delete} >
+                            onEdit={() => this.modal.show(item)} onDelete={this.delete} >
                         </TableCell>
                     </tr>
                 )
@@ -167,27 +189,31 @@ class QtGiaiThuongGroupPage extends AdminPage {
                 'Quá trình giải thưởng'
             ],
             advanceSearch: <>
-                <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.loaiDoiTuong = e} label='Chọn loại đơn vị (có thể chọn nhiều loại)' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} />
+                <div className='row'>
+                    <FormTextBox className='col-md-3' ref={e => this.fromYear = e} label='Từ năm đạt giải(yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
+                    <FormTextBox className='col-md-3' ref={e => this.toYear = e} label='Đến năm đạt giải (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />  
+                </div>
             </>,
             content: <>
                 <div className='tile'>
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                    getPage={this.props.getQtGiaiThuongPage} />
+                    getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
-                    permissions={currentPermissions}
-                    update={this.props.updateQtGiaiThuongGroupPageMa}
+                    permissions={currentPermissions} shcc={this.shcc}
+                    create={this.props.createQtGiaiThuongGroupPageMa} update={this.props.updateQtGiaiThuongGroupPageMa}
                 />
             </>,
             backRoute: '/user/tccb/qua-trinh/giai-thuong',
+            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
         });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, qtGiaiThuong: state.qtGiaiThuong });
 const mapActionsToProps = {
-    getQtGiaiThuongPage, deleteQtGiaiThuongGroupPageMa,
-    updateQtGiaiThuongGroupPageMa, getQtGiaiThuongGroupPageMa,
+    updateQtGiaiThuongGroupPageMa, deleteQtGiaiThuongGroupPageMa,
+    createQtGiaiThuongGroupPageMa, getQtGiaiThuongPage,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtGiaiThuongGroupPage);

@@ -4,10 +4,9 @@ import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormSelect, FormCheckbox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
-    getQtHuongDanLuanVanPage, getQtHuongDanLuanVanAll, updateQtHuongDanLuanVan,
-    deleteQtHuongDanLuanVan, createQtHuongDanLuanVan, getQtHuongDanLuanVanGroupPage
+    getQtHuongDanLuanVanPage, deleteQtHuongDanLuanVanStaff, createQtHuongDanLuanVanStaff,
+    updateQtHuongDanLuanVanStaff, getQtHuongDanLuanVanGroupPage,
 } from './redux';
-import { DateInput } from 'view/component/Input';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 
@@ -15,37 +14,61 @@ class EditModal extends AdminModal {
     state = { id: null };
     componentDidMount() {
     }
-
-    onShow = (item) => {
+    multiple = false;
+    onShow = (item, multiple = true) => {
+        this.multiple = multiple;
         let { shcc, hoTen, tenLuanVan, namTotNghiep, sanPham, bacDaoTao, id } = item ? item : {
             shcc: '', hoTen: '', tenLuanVan: '', namTotNghiep: null, sanPham: '', bacDaoTao: '', id: ''
         };
         this.setState({ id, item });
-        this.shcc.value(shcc ? shcc : '');
-        this.hoTen.value(hoTen ? hoTen : '');
-        this.tenLuanVan.value(tenLuanVan ? tenLuanVan : '');
-        if (namTotNghiep) this.namTotNghiep.setVal(new Date(namTotNghiep.toString()));
-        this.sanPham.value(sanPham ? sanPham : '');
-        this.bacDaoTao.value(bacDaoTao ? bacDaoTao : '');
+        setTimeout(() => {
+            this.shcc.value(shcc ? shcc : '');
+            this.hoTen.value(hoTen ? hoTen : '');
+            this.tenLuanVan.value(tenLuanVan ? tenLuanVan : '');
+            this.namTotNghiep.value(namTotNghiep ? namTotNghiep : '');
+            this.sanPham.value(sanPham ? sanPham : '');
+            this.bacDaoTao.value(bacDaoTao ? bacDaoTao : '');
+        }, 100);
     };
 
     changeKichHoat = (value, target) => target.value(value ? 1 : 0) || target.value(value);
 
     onSubmit = (e) => {
         e.preventDefault();
-        const changes = {
-            shcc: this.shcc.value(),
-            hoTen: this.hoTen.value(),
-            tenLuanVan: this.tenLuanVan.value(),
-            namTotNghiep: this.namTotNghiep.getVal() ? new Date(this.namTotNghiep.getVal()).getFullYear() : null,
-            sanPham: this.sanPham.value(),
-            bacDaoTao: this.bacDaoTao.value(),
-        };
-        if (changes.shcc == '') {
-            T.notify('Mã số cán bộ bị trống');
+        let list_ma = this.shcc.value();
+        if (!Array.isArray(list_ma)) {
+            list_ma = [list_ma];
+        }
+        if (list_ma.length == 0) {
+            T.notify('Danh sách cán bộ trống', 'danger');
             this.shcc.focus();
+        } else if (!this.tenLuanVan.value()) {
+            T.notify('Tên luận văn trống', 'danger');
+            this.tenLuanVan.focus();
+        } else if (!this.namTotNghiep.value()) {
+            T.notify('Năm tốt nghiệp trống', 'danger');
+            this.namTotNghiep.focus();
         } else {
-            this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
+            list_ma.forEach((ma, index) => {
+                const changes = {
+                    shcc: ma,
+                    hoTen: this.hoTen.value(),
+                    tenLuanVan: this.tenLuanVan.value(),
+                    namTotNghiep: this.namTotNghiep.value(),
+                    sanPham: this.sanPham.value(),
+                    bacDaoTao: this.bacDaoTao.value(),
+                };
+                if (index == list_ma.length - 1) {
+                    this.state.id ? this.props.update(this.state.id, changes, this.hide, false) : this.props.create(changes, this.hide, false);
+                    this.setState({
+                        id: ''
+                    });
+                    this.shcc.reset();
+                }
+                else {
+                    this.state.id ? this.props.update(this.state.id, changes, null, false) : this.props.create(changes, null, false);
+                }
+            });
         }
     }
 
@@ -55,10 +78,10 @@ class EditModal extends AdminModal {
             title: this.state.id ? 'Cập nhật quá trình hướng dẫn luận văn' : 'Tạo mới quá trình hướng dẫn luận văn',
             size: 'large',
             body: <div className='row'>
-                <FormSelect type='text' className='col-md-12' ref={e => this.shcc = e} data={SelectAdapter_FwCanBo} label='Cán bộ' readOnly={this.state.id ? true : false} />
+                <FormSelect type='text' className='col-md-12' multiple={this.multiple} ref={e => this.shcc = e} data={SelectAdapter_FwCanBo} label='Cán bộ' readOnly={this.state.id ? true : false} required/>
                 <FormTextBox type='text' className='col-md-12' ref={e => this.hoTen = e} label='Danh sách họ tên sinh viên, học viên' readOnly={readOnly} />
-                <FormTextBox type='text' className='col-md-12' ref={e => this.tenLuanVan = e} label='Tên luận văn' readOnly={readOnly} />
-                <div className='form-group col-md-4'><DateInput ref={e => this.namTotNghiep = e} label='Năm tốt nghiệp' type='year' readOnly={readOnly} /></div>
+                <FormTextBox type='text' className='col-md-12' ref={e => this.tenLuanVan = e} label='Tên luận văn' readOnly={readOnly} required />
+                <FormTextBox className='col-md-4' ref={e => this.namTotNghiep = e} label='Năm tốt nghiệp (yyyy)' type='year' readOnly={false} required />
                 <FormTextBox type='text' className='col-md-4' ref={e => this.sanPham = e} label='Sản phẩm' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-4' ref={e => this.bacDaoTao = e} label='Bậc hướng dẫn luận văn' readOnly={readOnly} />
             </div>
@@ -67,22 +90,25 @@ class EditModal extends AdminModal {
 }
 
 class QtHuongDanLuanVan extends AdminPage {
-    checked = false;
-    curState = [];
-    searchText = '';
+    checked = parseInt(T.cookie('hienThiTheoCanBo')) == 1 ? true : false;
+    state = { filter: {} };
     componentDidMount() {
         T.ready('/user/tccb', () => {
-            T.onSearch = (searchText) => {
-                this.searchText = searchText;
-                if (this.checked) this.props.getQtHuongDanLuanVanGroupPage(undefined, undefined, this.curState, this.searchText || '');
-                else this.props.getQtHuongDanLuanVanPage(undefined, undefined, this.curState, this.searchText || '');
-            };
+            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
-                this.loaiDoiTuong?.value('');
+                this.fromYear?.value('');
+                this.toYear?.value('');
+                this.maDonVi?.value('');
+                this.mulCanBo?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
-                setTimeout(() => this.showAdvanceSearch(), 1000);
             });
-            this.changeAdvancedSearch();
+            if (this.checked) {
+                this.hienThiTheoCanBo.value(true);
+                this.props.getQtHuongDanLuanVanGroupPage();
+            } else {
+                this.props.getQtHuongDanLuanVanPage();
+            }
+            this.changeAdvancedSearch(true);
         });
     }
 
@@ -91,24 +117,50 @@ class QtHuongDanLuanVan extends AdminPage {
         this.modal.show();
     }
 
-    changeAdvancedSearch = () => {
+
+    changeAdvancedSearch = (isInitial = false) => {
         let { pageNumber, pageSize } = this.props && this.props.qtHuongDanLuanVan && this.props.qtHuongDanLuanVan.page ? this.props.qtHuongDanLuanVan.page : { pageNumber: 1, pageSize: 50 };
-        const loaiDoiTuong = this.loaiDoiTuong?.value() || [];
-        this.curState = loaiDoiTuong;
-        if (this.checked) this.props.getQtHuongDanLuanVanGroupPage(pageNumber, pageSize, this.curState, this.searchText || '');
-        else this.props.getQtHuongDanLuanVanPage(pageNumber, pageSize, this.curState, this.searchText || '');
+        const fromYear = this.fromYear?.value() == '' ? null : Number(this.fromYear?.value());
+        const toYear = this.toYear?.value() == '' ? null : Number(this.toYear?.value());
+        const list_dv = this.maDonVi?.value().toString() || '';
+        const list_shcc = this.mulCanBo?.value().toString() || '';
+        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc };
+        this.setState({ filter: pageFilter }, () => {
+            this.getPage(pageNumber, pageSize, '', (page) => {
+                if (isInitial) {
+                    const filter = page.filter || {};
+                    this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
+                    this.fromYear?.value(filter.fromYear || '');
+                    this.toYear?.value(filter.toYear || '');
+                    this.maDonVi?.value(filter.list_dv);
+                    this.mulCanBo?.value(filter.list_shcc);
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.list_shcc || filter.list_dv)) this.showAdvanceSearch();
+                }
+            });
+        });
+    }
+
+    getPage = (pageN, pageS, pageC, done) => {
+        if (this.checked) this.props.getQtHuongDanLuanVanGroupPage(pageN, pageS, pageC, this.state.filter, done);
+        else this.props.getQtHuongDanLuanVanPage(pageN, pageS, pageC, this.state.filter, done);
     }
 
     groupPage = () => {
-        let { pageNumber, pageSize } = this.props && this.props.qtHuongDanLuanVan && this.props.qtHuongDanLuanVan.page ? this.props.qtHuongDanLuanVan.page : { pageNumber: 1, pageSize: 50 };
         this.checked = !this.checked;
-        if (this.checked) this.props.getQtHuongDanLuanVanGroupPage(pageNumber, pageSize, this.curState, this.searchText || '');
-        else this.props.getQtHuongDanLuanVanPage(pageNumber, pageSize, this.curState, this.searchText || '');
+        T.cookie('hienThiTheoCanBo', this.checked ? 1 : 0);
+        this.getPage();
     }
+
+    list = (text, i, j) => {
+        if (!text) return '';
+        let deTais = text.split('??').map(str => <p key={i--} style={{ textTransform: 'uppercase' }}>{j - i}. {str}</p>);
+        return deTais;
+    }
+
 
     delete = (e, item) => {
         T.confirm('Xóa hướng dẫn luận văn', 'Bạn có chắc bạn muốn xóa hướng dẫn luận văn này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtHuongDanLuanVan(item.id, error => {
+            isConfirm && this.props.deleteQtHuongDanLuanVanStaff(item.id, false, null, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá hướng dẫn luận văn bị lỗi!', 'danger');
                 else T.alert('Xoá hướng dẫn luận văn thành công!', 'success', false, 800);
             });
@@ -129,39 +181,45 @@ class QtHuongDanLuanVan extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Họ tên sinh viên</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tên luận văn</th>
-                        <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Năm tốt nghiệp</th>
-                        <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Bậc đào tạo</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
+                        {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số đề tài hướng dẫn</th> }
+                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Họ tên sinh viên</th> }
+                        {this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Danh sách sinh viên</th> }
+                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tên luận văn</th> }
+                        {this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Danh sách luận văn</th> }
+                        {!this.checked && <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Năm tốt nghiệp</th> }
+                        {!this.checked &&  <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Bậc đào tạo</th> } 
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
-                        <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
+                        <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{(item.hoCanBo ? item.hoCanBo : '') + ' ' + (item.tenCanBo ? item.tenCanBo : '')}</span><br />
                                 {item.shcc}
                             </>
                         )}
                         />
-                        <TableCell type='text' content={item.hoTen} />
-                        <TableCell type='text' style={{}} content={<>
+                        {this.checked && <TableCell type='text' content={item.soDeTai} /> }
+                        {!this.checked && <TableCell type='text' content={item.hoTen} /> }
+                        {this.checked && <TableCell type='text' content={this.list(item.danhSachHoTen, item.soDeTai, item.soDeTai)} /> }
+                        {!this.checked && <TableCell type='text' style={{}} content={<>
                             <span><i>{item.tenLuanVan}</i></span><br />
                             {item.sanPham ? <span>Sản phẩm: {item.sanPham ? item.sanPham : ''}</span> : null}
-                        </>} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.namTotNghiep} />
-                        <TableCell type='text' content={item.bacDaoTao} style={{ whiteSpace: 'nowrap' }} />
+                        </>} /> }
+                        {this.checked && <TableCell type='text' content={this.list(item.danhSachDeTai, item.soDeTai, item.soDeTai)} /> }
+                        {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.namTotNghiep} /> }
+                        {!this.checked && <TableCell type='text' content={item.bacDaoTao} style={{ whiteSpace: 'nowrap' }} /> }
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                                onEdit={() => this.modal.show(item)} onDelete={this.delete} >
+                                onEdit={() => this.modal.show(item, false)} onDelete={this.delete} >
                             </TableCell>
                         }
                         {
                             this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}>
-                                <Link className='btn btn-success' to={`/user/tccb/qua-trinh/hdlv/group/-1/${item.shcc}`} >
+                                <Link className='btn btn-success' to={`/user/tccb/qua-trinh/hdlv/group/${item.shcc}`} >
                                     <i className='fa fa-lg fa-compress' />
                                 </Link>
                             </TableCell>
@@ -173,23 +231,28 @@ class QtHuongDanLuanVan extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-university',
-            title: 'Hướng dẫn luận văn',
+            title: 'Quá trình hướng dẫn luận văn',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
                 'Quá trình hướng dẫn luận văn'
             ],
             advanceSearch: <>
-                <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.loaiDoiTuong = e} label='Chọn loại đơn vị (có thể chọn nhiều loại)' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} />
+                <div className='row'>
+                    <FormTextBox className='col-md-3' ref={e => this.fromYear = e} label='Từ năm (năm tốt nghiệp)' type='year' onChange={() => this.changeAdvancedSearch()} />
+                    <FormTextBox className='col-md-3' ref={e => this.toYear = e} label='Đến năm (năm tốt nghiệp))' type='year' onChange={() => this.changeAdvancedSearch()} /> 
+                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1}/>
+                    <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1}/>
+                </div>
             </>,
             content: <>
                 <div className='tile'>
-                    <FormCheckbox label='Hiển thị theo cán bộ' onChange={this.groupPage} />
+                    <FormCheckbox label='Hiển thị theo cán bộ' ref={e => this.hienThiTheoCanBo = e} onChange={this.groupPage} />
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                    getPage={this.checked ? this.props.getQtHuongDanLuanVanGroupPage : this.props.getQtHuongDanLuanVanPage} />
+                    getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
-                    create={this.props.createQtHuongDanLuanVan} update={this.props.updateQtHuongDanLuanVan}
+                    create={this.props.createQtHuongDanLuanVanStaff} update={this.props.updateQtHuongDanLuanVanStaff}
                     permissions={currentPermissions}
 
                 />
@@ -202,7 +265,7 @@ class QtHuongDanLuanVan extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, qtHuongDanLuanVan: state.qtHuongDanLuanVan });
 const mapActionsToProps = {
-    getQtHuongDanLuanVanAll, getQtHuongDanLuanVanPage, deleteQtHuongDanLuanVan, createQtHuongDanLuanVan,
-    updateQtHuongDanLuanVan, getQtHuongDanLuanVanGroupPage
+    getQtHuongDanLuanVanPage, deleteQtHuongDanLuanVanStaff, createQtHuongDanLuanVanStaff,
+    updateQtHuongDanLuanVanStaff, getQtHuongDanLuanVanGroupPage,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtHuongDanLuanVan);

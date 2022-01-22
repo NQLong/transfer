@@ -189,6 +189,18 @@ module.exports = app => {
                                 resolve();
                             });
                         })).then(() => new Promise(resolve => {
+                            app.model.qtKeoDaiCongTac.getByShcc(canBo.shcc, (error, keoDaiCongTac) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin kéo dài công tác cán bộ !' });
+                                }
+                                else if (keoDaiCongTac == null) {
+                                    result = app.clone(result, { keoDaiCongTac: null });
+                                } else {
+                                    result = app.clone(result, { keoDaiCongTac: keoDaiCongTac.rows});
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
 
                             app.model.qtNuocNgoai.getAll({ shcc: canBo.shcc }, '*', 'batDau ASC', (error, nuocNgoai) => {
                                 if (error) {
@@ -1142,6 +1154,18 @@ module.exports = app => {
                             result = app.clone(result, { baoHiemXaHoi: null });
                         } else {
                             result = app.clone(result, { baoHiemXaHoi: baoHiemXaHoi.rows});
+                        }
+                        resolve();
+                    });
+                })).then(() => new Promise(resolve => {
+                    app.model.qtKeoDaiCongTac.getByShcc(canBo.shcc, (error, keoDaiCongTac) => {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin kéo dài công tác cán bộ !' });
+                        }
+                        else if (keoDaiCongTac == null) {
+                            result = app.clone(result, { keoDaiCongTac: null });
+                        } else {
+                            result = app.clone(result, { keoDaiCongTac: keoDaiCongTac.rows});
                         }
                         resolve();
                     });
