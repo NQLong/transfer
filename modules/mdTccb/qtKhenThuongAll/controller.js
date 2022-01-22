@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3013: { title: 'Khen Thưởng', link: '/user/tccb/qua-trinh/khen-thuong-all', icon: 'fa-gift', backgroundColor: '#283dde', groupIndex: 4 },
+            3005: { title: 'Quá trình khen thưởng', link: '/user/tccb/qua-trinh/khen-thuong-all', icon: 'fa-gift', backgroundColor: '#2559ba', groupIndex: 2 },
         },
     };
     app.permission.add(
@@ -13,48 +13,38 @@ module.exports = app => {
     );
     app.get('/user/tccb/qua-trinh/khen-thuong-all/:id', app.permission.check('qtKhenThuongAll:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/khen-thuong-all', app.permission.check('qtKhenThuongAll:read'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/khen-thuong-all/group_dt/:loaiDoiTuong/:ma', app.permission.check('qtKhenThuongAll:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/tccb/qua-trinh/khen-thuong-all/page/:loaiDoiTuong/:pageNumber/:pageSize', app.permission.check('qtKhenThuongAll:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/khen-thuong-all/page/:pageNumber/:pageSize', app.permission.check('qtKhenThuongAll:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
-            loaiDoiTuong = req.params.loaiDoiTuong,
-            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        app.model.qtKhenThuongAll.searchPage(pageNumber, pageSize, loaiDoiTuong, searchTerm, (error, page) => {
+            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '',
+            ma = req.query.ma ? req.query.ma : '';
+        const { fromYear, toYear, loaiDoiTuong } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1' };
+        app.model.qtKhenThuongAll.searchPage(pageNumber, pageSize, loaiDoiTuong, ma, fromYear, toYear, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
                 const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
-                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, list } });
+                const pageCondition = searchTerm;
+                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
             }
         });
     });
 
-    app.get('/api/tccb/qua-trinh/khen-thuong-all/group/page/:loaiDoiTuong/:pageNumber/:pageSize', app.permission.check('qtKhenThuongAll:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/khen-thuong-all/group/page/:pageNumber/:pageSize', app.permission.check('qtKhenThuongAll:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
-            loaiDoiTuong = req.params.loaiDoiTuong,
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        app.model.qtKhenThuongAll.groupPage(pageNumber, pageSize, loaiDoiTuong, searchTerm, (error, page) => {
+        const { fromYear, toYear, loaiDoiTuong } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1' };
+        app.model.qtKhenThuongAll.groupPage(pageNumber, pageSize, loaiDoiTuong, fromYear, toYear, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
                 const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
-                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, list } });
-            }
-        });
-    });
-    app.get('/api/tccb/qua-trinh/khen-thuong-all/group_dt/page/:loaiDoiTuong/:pageNumber/:pageSize', app.permission.check('qtKhenThuongAll:read'), (req, res) => {
-        const pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize),
-            loaiDoiTuong = req.params.loaiDoiTuong,
-            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        app.model.qtKhenThuongAll.groupPageMa(pageNumber, pageSize, loaiDoiTuong, searchTerm, (error, page) => {
-            if (error || page == null) {
-                res.send({ error });
-            } else {
-                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
-                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, list } });
+                const pageCondition = searchTerm;
+                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
             }
         });
     });
@@ -83,14 +73,14 @@ module.exports = app => {
     app.delete('/api/tccb/qua-trinh/khen-thuong-all', app.permission.check('staff:write'), (req, res) =>
         app.model.qtKhenThuongAll.delete({ id: req.body.id }, (error) => res.send(error)));
 
-    app.get('/api/tccb/qua-trinh/khen-thuong-all/download-excel/:loaiDoiTuong/:maDoiTuong', app.permission.check('qtKhenThuongAll:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/khen-thuong-all/download-excel/:loaiDoiTuong/:maDoiTuong/:fromYear/:toYear', app.permission.check('qtKhenThuongAll:read'), (req, res) => {
         const pageNumber = 0,
             pageSize = 1000000,
             loaiDoiTuong = req.params.loaiDoiTuong,
-            maDoiTuong = req.params.maDoiTuong;
-        // console.log("Get ", loaiDoiTuong, ' + ', maDoiTuong);
-        app.model.qtKhenThuongAll.downloadExcel(pageNumber, pageSize, loaiDoiTuong, maDoiTuong, (error, page) => {
-            // console.log("Page = ", page);
+            maDoiTuong = req.params.maDoiTuong,
+            fromYear = req.params.fromYear,
+            toYear = req.params.toYear;
+        app.model.qtKhenThuongAll.downloadExcel(pageNumber, pageSize, loaiDoiTuong, maDoiTuong, fromYear, toYear, (error, page) => {
             if (error) {
                 res.send({ error });
             } else {
@@ -116,7 +106,6 @@ module.exports = app => {
                         cells.push({cell: chr + '1', value: cols[idx], bold: true, border: '1234'});
                     }
                     page.rows.forEach((item, index) => {
-                        // console.log("item = ", item);
                         cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
                         for (let idx = 1; idx < cols.length; idx++) {
                             let chr = String.fromCharCode(65 + idx); // where n is 0, 1, 2 ...                            
@@ -154,16 +143,12 @@ module.exports = app => {
                                 border: '1234',
                                 value: value
                             };
-                            // console.log("Add = ", type, add);
                             cells.push(add);
                         }
                     });
                     resolve(cells);
                 }).then((cells) => {
-                    // console.log("Cells = ", cells);
                     app.excel.write(worksheet, cells);
-                    // app.excel.attachment(workbook, res, 'khenthuong.xlsx');
-                    // if (loaiDoiTuong == '') app.excel.attachment(workbook, res, 'khenthuong.xlsx');
                     let name = 'khen_thuong';
                     if (loaiDoiTuong == '-1') {
                         name += '_all';
@@ -180,12 +165,9 @@ module.exports = app => {
                             else name += maDoiTuong;
                         }
                     }
+                    name += '_' + fromYear + '-' + toYear;
                     name += '.xlsx';
                     app.excel.attachment(workbook, res, name);
-                    // if (loaiDoiTuong == '01') app.excel.attachment(workbook, res, 'khenthuong-truong.xlsx');
-                    // if (loaiDoiTuong == '02') app.excel.attachment(workbook, res, 'khenthuong-canbo-' + maDoiTuong + '.xlsx');
-                    // if (loaiDoiTuong == '03') app.excel.attachment(workbook, res, 'khenthuong-donvi-' + maDoiTuong + '.xlsx');
-                    // if (loaiDoiTuong == '04') app.excel.attachment(workbook, res, 'khenthuong-bomon-' + maDoiTuong + '.xlsx');
                 }).catch((error) => {
                     res.send({ error });
                 });

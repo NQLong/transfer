@@ -4,16 +4,16 @@ import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox} from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
-    getQtKhenThuongAllPage, getQtKhenThuongAllAll, updateQtKhenThuongAllGroupPageMa,
-    deleteQtKhenThuongAll, createQtKhenThuongAll, getQtKhenThuongAllGroupPageMa, 
+    getQtKhenThuongAllPage, updateQtKhenThuongAllGroupPageMa,
+    deleteQtKhenThuongAllGroupPageMa, createQtKhenThuongAllGroupPageMa, 
 } from './redux';
 
-import { getStaffAll, SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
-import { getDmKhenThuongKyHieuAll } from 'modules/mdDanhMuc/dmKhenThuongKyHieu/redux';
-import { getDmKhenThuongChuThichAll } from 'modules/mdDanhMuc/dmKhenThuongChuThich/redux';
+import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
+import { SelectAdapter_DmKhenThuongKyHieuV2 } from 'modules/mdDanhMuc/dmKhenThuongKyHieu/redux';
+import { SelectAdapter_DmKhenThuongChuThichV2 } from 'modules/mdDanhMuc/dmKhenThuongChuThich/redux';
 import { getDmKhenThuongLoaiDoiTuongAll } from 'modules/mdDanhMuc/dmKhenThuongLoaiDoiTuong/redux';
-import { getDmBoMonAll, getDmBoMon, SelectAdapter_DmBoMon} from 'modules/mdDanhMuc/dmBoMon/redux';
-import { getDmDonViAll, getDmDonVi, SelectAdapter_DmDonVi} from 'modules/mdDanhMuc/dmDonVi/redux';
+import { SelectAdapter_DmBoMon} from 'modules/mdDanhMuc/dmBoMon/redux';
+import { SelectAdapter_DmDonVi} from 'modules/mdDanhMuc/dmDonVi/redux';
 
 class EditModal extends AdminModal {
     state = { id: '', doiTuong: '' };
@@ -27,43 +27,29 @@ class EditModal extends AdminModal {
                 }));
             }
         });
-        this.props.getThanhTich(items => {
-            if (items) {
-                this.thanhTichTable = [];
-                items.forEach(item => this.thanhTichTable.push({
-                    'id': item.ma,
-                    'text': item.ten
-                }));
-            }
-        });
-        this.props.getChuThich(items => {
-            if (items) {
-                this.chuThichTable = [];
-                items.forEach(item => this.chuThichTable.push({
-                    'id': item.ma,
-                    'text': item.ten
-                }));
-            }
-        });
     }
 
     onShow = (item) => {
         let { id, maLoaiDoiTuong, ma, namDatDuoc, maThanhTich, maChuThich, diemThiDua } = item ? item : {
             id: '', maLoaiDoiTuong: '', ma: '', namDatDuoc: '', maThanhTich: '', maChuThich: '', diemThiDua: ''
         };
+
+        if (!maLoaiDoiTuong) maLoaiDoiTuong = this.props.loaiDoiTuong;
         this.setState({
             id: id, doiTuong: maLoaiDoiTuong
         });
 
-        this.loaiDoiTuong.value(maLoaiDoiTuong ? maLoaiDoiTuong : '');
-        if (maLoaiDoiTuong == '02') this.maCanBo.value(ma);
-        else if (maLoaiDoiTuong == '03') this.maDonVi.value(ma);
-        else if (maLoaiDoiTuong == '04') this.maBoMon.value(ma);
-
-        this.namDatDuoc.value(namDatDuoc ? namDatDuoc : '');
-        this.thanhTich.value(maThanhTich ? maThanhTich : '');
-        this.chuThich.value(maChuThich ? maChuThich : '');
-        this.diemThiDua.value(diemThiDua);
+        setTimeout(() => {
+            this.loaiDoiTuong.value(maLoaiDoiTuong ? maLoaiDoiTuong : '');
+            if (maLoaiDoiTuong == '02') this.maCanBo.value(ma ? ma : this.props.ma);
+            else if (maLoaiDoiTuong == '03') this.maDonVi.value(ma ? ma : this.props.ma);
+            else if (maLoaiDoiTuong == '04') this.maBoMon.value(ma ? ma : this.props.ma);
+    
+            this.namDatDuoc.value(namDatDuoc ? namDatDuoc : '');
+            this.thanhTich.value(maThanhTich ? maThanhTich : '');
+            this.chuThich.value(maChuThich ? maChuThich : '');
+            this.diemThiDua.value(diemThiDua);
+        }, 100);
     };
 
     changeKichHoat = (value, target) => target.value(value ? 1 : 0) || target.value(value);
@@ -83,7 +69,18 @@ class EditModal extends AdminModal {
             chuThich: this.chuThich.value(),
             diemThiDua: this.diemThiDua.value(),
         };
-        this.props.update(this.state.id, ma, changes, this.hide);
+        if (!this.loaiDoiTuong.value()) {
+            T.notify('Loại đối tượng trống', 'danger');
+            this.loaiDoiTuong.focus();
+        } else if (!ma) {
+            T.notify('Danh sách mã số trống', 'danger');
+            if (this.loaiDoiTuong.value() == '02') this.maCanBo.focus();
+            if (this.loaiDoiTuong.value() == '03') this.maDonVi.focus();
+            if (this.loaiDoiTuong.value() == '04') this.maBoMon.focus();
+        } else if (!this.thanhTich.value()) {
+            T.notify('Thành tích trống', 'danger');
+            this.thanhTich.focus();
+        } else this.state.id ? this.props.update(this.state.id, ma, changes, this.hide) : this.props.create(changes, this.hide);
     }
 
     onChangeDT = (value) => {
@@ -107,9 +104,9 @@ class EditModal extends AdminModal {
 
                 <FormSelect className='col-md-12' ref={e => this.maBoMon = e} label='Bộ môn' data={SelectAdapter_DmBoMon} style={doiTuong == '04' ? {} : { display: 'none' }} readOnly={true} />
 
-                <FormSelect className='col-md-12' ref={e => this.thanhTich = e} label='Thành tích' data={this.thanhTichTable} readOnly={false} />
+                <FormSelect className='col-md-12' ref={e => this.thanhTich = e} label='Thành tích' data={SelectAdapter_DmKhenThuongKyHieuV2} readOnly={false} required />
                 <FormTextBox className='col-md-4' ref={e => this.namDatDuoc = e} label='Năm đạt được (yyyy)' type='year' readOnly={false} />
-                <FormSelect className='col-md-8' ref={e => this.chuThich = e} label='Chú thích' data={this.chuThichTable} readOnly={false} />
+                <FormSelect className='col-md-8' ref={e => this.chuThich = e} label='Chú thích' data={SelectAdapter_DmKhenThuongChuThichV2} readOnly={false} />
                 <FormTextBox className='col-md-4' ref={e => this.diemThiDua = e} type='number' label='Điểm thi đua' readOnly={false} />
 
             </div>
@@ -117,6 +114,7 @@ class EditModal extends AdminModal {
     }
 }
 class QtKhenThuongAllGroupPage extends AdminPage {
+    state = { filter: {} };
     ma = ''; loaiDoiTuong = '-1';
     componentDidMount() {
         T.ready('/user/tccb', () => {
@@ -124,12 +122,42 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                 params = route.parse(window.location.pathname);
             this.loaiDoiTuong = params.loaiDoiTuong;
             this.ma = params.ma;
-            T.onSearch = (searchText) => this.props.getQtKhenThuongAllPage(undefined, undefined, this.loaiDoiTuong, searchText || '');
-            T.showSearchBox();
-            this.props.getQtKhenThuongAllGroupPageMa(undefined, undefined, this.loaiDoiTuong, this.ma);
+            this.setState({filter: {loaiDoiTuong : this.loaiDoiTuong}});
+            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
+            T.showSearchBox(() => {
+                this.fromYear?.value('');
+                this.toYear?.value('');
+                setTimeout(() => this.changeAdvancedSearch(), 50);
+            });
+            this.props.getQtKhenThuongAllPage(undefined, undefined, '', this.ma, this.state.filter, () => {
+                T.updatePage('pageQtKhenThuongAll', undefined, undefined, '', this.state.filter);
+            });
         });
     }
 
+    changeAdvancedSearch = (isInitial = false) => {
+        let { pageNumber, pageSize } = this.props && this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.page ? this.props.qtKhenThuongAll.page : { pageNumber: 1, pageSize: 50 };
+        const fromYear = this.fromYear?.value() == '' ? null : Number(this.fromYear?.value());
+        const toYear = this.toYear?.value() == '' ? null : Number(this.toYear?.value());
+        const loaiDoiTuong = this.state.filter.loaiDoiTuong;
+        const pageFilter = isInitial ? null : { fromYear, toYear, loaiDoiTuong};
+        this.setState({ filter: pageFilter }, () => {
+            this.getPage(pageNumber, pageSize, '', (page) => {
+                if (isInitial) {
+                    const filter = page.filter || {};
+                    this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
+                    this.fromYear?.value(filter.fromYear || '');
+                    this.toYear?.value(filter.toYear || '');
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear)) this.showAdvanceSearch();
+                }
+            });
+        });
+    }
+
+    getPage = (pageN, pageS, pageC, done) => {
+        this.props.getQtKhenThuongAllPage(pageN, pageS, pageC, this.ma, this.state.filter, done);
+
+    }
     showModal = (e) => {
         e.preventDefault();
         this.modal.show();
@@ -138,6 +166,8 @@ class QtKhenThuongAllGroupPage extends AdminPage {
     downloadExcel = (e) => {
         e.preventDefault();
         let name = 'khen_thuong', loaiDoiTuong = this.loaiDoiTuong, maDoiTuong = this.ma;
+        const fromYear = this.fromYear?.value() == '' ? '$$$$' : this.fromYear?.value();
+        const toYear = this.toYear?.value() == '' ? '$$$$' : this.toYear?.value();
         if (loaiDoiTuong == '-1') {
             name += '_all';
         }
@@ -153,14 +183,14 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                 else name += maDoiTuong;
             }
         }
+        name += '_' + fromYear + '-' + toYear;
         name += '.xlsx';
-        T.download(T.url(`/api/tccb/qua-trinh/khen-thuong-all/download-excel/${loaiDoiTuong}/${maDoiTuong}`), name);
-        //this.props.downloadExcel('', '')
+        T.download(T.url(`/api/tccb/qua-trinh/khen-thuong-all/download-excel/${loaiDoiTuong}/${maDoiTuong}/${fromYear}/${toYear}`), name);
     }
 
     delete = (e, item) => {
         T.confirm('Xóa khen thưởng', 'Bạn có chắc bạn muốn xóa khen thưởng này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtKhenThuongAll(item.id, error => {
+            isConfirm && this.props.deleteQtKhenThuongAllGroupPageMa(item.id, this.ma, null, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá khen thưởng bị lỗi!', 'danger');
                 else T.alert('Xoá khen thưởng thành công!', 'success', false, 800);
             });
@@ -171,7 +201,6 @@ class QtKhenThuongAllGroupPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('qtKhenThuongAll', ['read', 'write', 'delete']);
-        let loaiDoiTuong = this.loaiDoiTuong;
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = 
         this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.page ?
             this.props.qtKhenThuongAll.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list };
@@ -242,25 +271,32 @@ class QtKhenThuongAllGroupPage extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-gift',
-            title: 'Quá trình khen thưởng',
+            title: 'Quá trình khen thưởng - ' + (this.loaiDoiTuong == '01' ? 'Trường' : 
+                this.loaiDoiTuong == '02' ? 'Cán bộ' : 
+                this.loaiDoiTuong == '03' ? 'Đơn vị' :
+                'Bộ môn'),
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
-                'Quá trình khen thưởng'
+                <Link key={0} to='/user/tccb/qua-trinh/khen-thuong/all'>Quá trình khen thưởng</Link>,
+                'Quá trình khen thưởng - ' + (this.loaiDoiTuong == '01' ? 'Trường' : 
+                this.loaiDoiTuong == '02' ? 'Cán bộ' : 
+                this.loaiDoiTuong == '03' ? 'Đơn vị' :
+                'Bộ môn')
             ],
+            advanceSearch: <>
+                <div className='row'>
+                    <FormTextBox className='col-md-4' ref={e => this.fromYear = e} label='Năm đạt được (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
+                    <FormTextBox className='col-md-4' ref={e => this.toYear = e} label='Năm đạt được (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />  
+                </div>
+            </>,
             content: <>
                 <div className='tile'>{table}</div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition, loaiDoiTuong}}
-                    getPage={this.props.getQtKhenThuongAllPage} />
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition}}
+                    getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
-                    create={this.props.createQtKhenThuongAll} update={this.props.updateQtKhenThuongAllGroupPageMa}
-                    getThanhTich={this.props.getDmKhenThuongKyHieuAll} permissions={currentPermissions}
-                    getChuThich={this.props.getDmKhenThuongChuThichAll}
+                    create={this.props.createQtKhenThuongAllGroupPageMa} update={this.props.updateQtKhenThuongAllGroupPageMa}
+                    permissions={currentPermissions} ma = {this.ma} loaiDoiTuong = {this.loaiDoiTuong}
                     getLoaiDoiTuong={this.props.getDmKhenThuongLoaiDoiTuongAll}
-                    getBoMon={this.props.getDmBoMonAll}
-                    getDonVi={this.props.getDmDonViAll}
-                    getStaff={this.props.getStaffAll} 
-                    getDonViItem = {this.props.getDmDonVi}    
-                    getBoMonItem = {this.props.getDmBoMon}
                 />
                 {
                     permission.read &&
@@ -270,14 +306,14 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                 }
             </>,
             backRoute: '/user/tccb/qua-trinh/khen-thuong-all',
+            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
         });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, qtKhenThuongAll: state.qtKhenThuongAll });
 const mapActionsToProps = {
-    getQtKhenThuongAllAll, getQtKhenThuongAllPage, deleteQtKhenThuongAll, createQtKhenThuongAll,
-    updateQtKhenThuongAllGroupPageMa, getStaffAll, getDmKhenThuongKyHieuAll, getDmKhenThuongChuThichAll, 
-    getDmKhenThuongLoaiDoiTuongAll, getDmBoMonAll, getDmDonViAll, getQtKhenThuongAllGroupPageMa, getDmDonVi, getDmBoMon,
+    getQtKhenThuongAllPage, deleteQtKhenThuongAllGroupPageMa, createQtKhenThuongAllGroupPageMa,
+    updateQtKhenThuongAllGroupPageMa, getDmKhenThuongLoaiDoiTuongAll,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtKhenThuongAllGroupPage);

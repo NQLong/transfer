@@ -1,6 +1,5 @@
-import { getStaffEdit } from '../tccbCanBo/redux';
-
 import T from 'view/js/common';
+import { getStaffEdit } from '../tccbCanBo/redux';
 
 // Reducer ------------------------------------------------------------------------------------------------------------
 const QtGiaiThuongGetAll = 'QtGiaiThuong:GetAll';
@@ -51,17 +50,20 @@ export default function QtGiaiThuongReducer(state = null, data) {
 
 // Actions ------------------------------------------------------------------------------------------------------------
 T.initPage('pageQtGiaiThuong');
-export function getQtGiaiThuongPage(pageNumber, pageSize, loaiDoiTuong, pageCondition, done) {
-    const page = T.updatePage('pageQtGiaiThuong', pageNumber, pageSize, pageCondition);
-    if (!loaiDoiTuong) loaiDoiTuong = [];
-    if (!Array.isArray(loaiDoiTuong)) loaiDoiTuong = [loaiDoiTuong];
+export function getQtGiaiThuongPage(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('pageQtGiaiThuong', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/tccb/qua-trinh/giai-thuong/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition, parameter: loaiDoiTuong }, data => {
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách giải thưởng bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
+                if (page.filter) data.page.filter = page.filter;
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 if (done) done(data.page);
                 dispatch({ type: QtGiaiThuongGetPage, page: data.page });
@@ -71,17 +73,20 @@ export function getQtGiaiThuongPage(pageNumber, pageSize, loaiDoiTuong, pageCond
 }
 
 T.initPage('groupPageQtGiaiThuong', true);
-export function getQtGiaiThuongGroupPage(pageNumber, pageSize, loaiDoiTuong, pageCondition, done) {
-    const page = T.updatePage('groupPageQtGiaiThuong', pageNumber, pageSize, pageCondition);
-    if (!loaiDoiTuong) loaiDoiTuong = [];
-    if (!Array.isArray(loaiDoiTuong)) loaiDoiTuong = [loaiDoiTuong];
+export function getQtGiaiThuongGroupPage(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('groupPageQtGiaiThuong', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/tccb/qua-trinh/giai-thuong/group/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition, parameter: loaiDoiTuong }, data => {
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
-                T.notify('Lấy danh sách giải thưởng theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                T.notify('Lấy danh sách giải thưởng bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
+                if (page.filter) data.page.filter = page.filter;
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 done && done(data.page);
                 dispatch({ type: QtGiaiThuongGetGroupPage, page: data.page });
@@ -90,25 +95,61 @@ export function getQtGiaiThuongGroupPage(pageNumber, pageSize, loaiDoiTuong, pag
     };
 }
 
-T.initPage('groupPageMaQtGiaiThuong', true);
-export function getQtGiaiThuongGroupPageMa(pageNumber, pageSize, loaiDoiTuong, pageCondition, done) {
-    const page = T.updatePage('groupPageMaQtGiaiThuong', pageNumber, pageSize, pageCondition);
-    if (!loaiDoiTuong) loaiDoiTuong = '-1';
+export function createQtGiaiThuongStaff(data, done, isEdit = null) {
     return dispatch => {
-        const url = `/api/tccb/qua-trinh/giai-thuong/group_gt/page/${loaiDoiTuong}/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition }, data => {
-            if (data.error) {
-                T.notify('Lấy danh sách giải thưởng theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
-                console.error(`GET: ${url}.`, data.error);
+        const url = '/api/qua-trinh/giai-thuong';
+        T.post(url, { data }, res => {
+            if (res.error) {
+                T.notify('Tạo giải thưởng bị lỗi!', 'danger');
+                console.error(`POST: ${url}.`, res.error);
             } else {
-                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
-                done && done(data.page);
-                dispatch({ type: QtGiaiThuongGetPage, page: data.page });
+                if (done) {
+                    T.notify('Tạo giải thưởng thành công!', 'success');
+                    if (isEdit) {
+                        done();
+                        dispatch(getStaffEdit(data.shcc));
+                    }
+                    else {
+                        done(data);
+                        dispatch(getQtGiaiThuongPage());
+                    }
+                }
             }
-        }, error => console.error(`GET: ${url}.`, error));
+        }, () => T.notify('Tạo giải thưởng bị lỗi!', 'danger'));
     };
 }
 
+export function deleteQtGiaiThuongStaff(id, shcc, idEdit = null) {
+    return dispatch => {
+        const url = '/api/qua-trinh/giai-thuong';
+        T.delete(url, { id }, data => {
+            if (data.error) {
+                T.notify('Xóa giải thưởng bị lỗi!', 'danger');
+                console.error(`DELETE: ${url}.`, data.error);
+            } else {
+                T.alert('giải thưởng đã xóa thành công!', 'success', false, 800);
+                idEdit ? dispatch(getStaffEdit(shcc)) : dispatch(getQtGiaiThuongPage());
+            }
+        }, () => T.notify('Xóa giải thưởng bị lỗi!', 'danger'));
+    };
+}
+
+export function updateQtGiaiThuongStaff(id, changes, done, isEdit = null) {
+    return dispatch => {
+        const url = '/api/qua-trinh/giai-thuong';
+        T.put(url, { id, changes }, data => {
+            if (data.error || changes == null) {
+                T.notify('Cập nhật giải thưởng bị lỗi!', 'danger');
+                console.error(`PUT: ${url}.`, data.error);
+                done && done(data.error);
+            } else {
+                T.notify('Cập nhật giải thưởng thành công!', 'success');
+                isEdit ? (done && done()) : (done && done(data.item));
+                isEdit ? dispatch(getStaffEdit(changes.shcc)) : dispatch(getQtGiaiThuongPage());
+            }
+        }, () => T.notify('Cập nhật giải thưởng bị lỗi!', 'danger'));
+    };
+}
 
 export function updateQtGiaiThuongGroupPageMa(id, changes, done) {
     return dispatch => {
@@ -121,81 +162,42 @@ export function updateQtGiaiThuongGroupPageMa(id, changes, done) {
             } else {
                 T.notify('Cập nhật giải thưởng thành công!', 'success');
                 done && done(data.item);
-                dispatch(getQtGiaiThuongGroupPageMa(undefined, undefined, '-1', data.shcc));
+                dispatch(getQtGiaiThuongPage());
             }
         }, () => T.notify('Cập nhật giải thưởng bị lỗi!', 'danger'));
     };
 }
 
-export function deleteQtGiaiThuongGroupPageMa(id, shcc, done) {
-    return dispatch => {
-        const url = '/api/qua-trinh/giai-thuong';
-        T.delete(url, { id }, data => {
-            if (data.error) {
-                T.notify('Xóa thông tin quá trình giải thưởng bị lỗi', 'danger');
-                console.error('DELETE: ' + url + '. ' + data.error);
-            } else {
-                T.alert('Thông tin quá trình giải thưởng được xóa thành công!', 'info', false, 800);
-                done && done(data.item);
-                dispatch(getQtGiaiThuongGroupPageMa(undefined, undefined, '-1', shcc));
-            }
-        }, () => T.notify('Xóa thông tin quá trình giải thưởng bị lỗi', 'danger'));
-    };
-}
-
-export function createQtGiaiThuongStaff(data, done, isEdit = null) {
+export function createQtGiaiThuongGroupPageMa(data, done) {
     return dispatch => {
         const url = '/api/qua-trinh/giai-thuong';
         T.post(url, { data }, res => {
             if (res.error) {
-                T.notify('Thêm thông tin quá trình giải thưởng bị lỗi', 'danger');
-                console.error('POST: ' + url + '. ' + res.error);
+                T.notify('Tạo giải thưởng bị lỗi!', 'danger');
+                console.error(`POST: ${url}.`, res.error);
             } else {
-                T.notify('Thêm thông tin quá trình giải thưởng thành công!', 'info');
                 if (done) {
-                    if (isEdit) {
-                        done();
-                        dispatch(getStaffEdit(data.shcc));
-                    }
-                    else {
-                        done(data);
-                        dispatch(getQtGiaiThuongPage());
-                    }
+                    T.notify('Tạo giải thưởng thành công!', 'success');
+                    dispatch(getQtGiaiThuongPage());
+                    done && done(data);
                 }
             }
-        }, () => T.notify('Thêm thông tin quá trình giải thưởng bị lỗi', 'danger'));
+        }, () => T.notify('Tạo giải thưởng bị lỗi!', 'danger'));
     };
 }
-
-export function updateQtGiaiThuongStaff(id, changes, done, isEdit = null) {
-    return dispatch => {
-        const url = '/api/qua-trinh/giai-thuong';
-        T.put(url, { id, changes }, data => {
-            if (data.error) {
-                T.notify('Cập nhật thông tin quá trình giải thưởng bị lỗi', 'danger');
-                console.error('PUT: ' + url + '. ' + data.error);
-            } else if (data.item) {
-                T.notify('Cập nhật thông tin quá trình giải thưởng thành công!', 'info');
-                isEdit ? (done && done()) : (done && done(data.item));
-                isEdit ? dispatch(getStaffEdit(changes.shcc)) : dispatch(getQtGiaiThuongPage());
-            }
-        }, () => T.notify('Cập nhật thông tin quá trình giải thưởng bị lỗi', 'danger'));
-    };
-}
-
-export function deleteQtGiaiThuongStaff(id, done, isEdit = null) {
+export function deleteQtGiaiThuongGroupPageMa(id, done) {
     return dispatch => {
         const url = '/api/qua-trinh/giai-thuong';
         T.delete(url, { id }, data => {
             if (data.error) {
-                T.notify('Xóa thông tin quá trình giải thưởng bị lỗi', 'danger');
-                console.error('DELETE: ' + url + '. ' + data.error);
+                T.notify('Xóa giải thưởng bị lỗi!', 'danger');
+                console.error(`DELETE: ${url}.`, data.error);
             } else {
-                T.alert('Thông tin quá trình giải thưởng được xóa thành công!', 'info', false, 800);
-                isEdit ? (done && done()) : (done && done(data.item));
+                T.alert('giải thưởng đã xóa thành công!', 'success', false, 800);
+                done && done(data.item);
                 dispatch(getQtGiaiThuongPage());
             }
-        }, () => T.notify('Xóa thông tin quá trình giải thưởng bị lỗi', 'danger'));
+        }, () => T.notify('Xóa giải thưởng bị lỗi!', 'danger'));
     };
 }
 

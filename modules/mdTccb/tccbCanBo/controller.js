@@ -2,20 +2,19 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3001: { title: 'Danh sách cán bộ', link: '/user/staff', icon: 'fa-users', backgroundColor: '#8bc34a', groupIndex: 0 },
+            3001: { title: 'Danh sách cán bộ', link: '/user/tccb/staff', icon: 'fa-users', backgroundColor: '#8bc34a', groupIndex: 0 },
         },
     };
 
     app.permission.add(
-        { name: 'staff:login', menu: { parentMenu: { index: 1000, title: 'Thông tin cá nhân', icon: 'fa-user', link: '/user' } }, },
         { name: 'staff:read', menu },
         { name: 'staff:write' },
         { name: 'staff:delete' },
     );
 
-    app.get('/user/staff/:shcc', app.permission.check('staff:read'), app.templates.admin);
-    app.get('/user/staff', app.permission.check('staff:read'), app.templates.admin);
-    app.get('/user/staff/item/upload', app.permission.check('staff:write'), app.templates.admin);
+    app.get('/user/tccb/staff/:shcc', app.permission.check('staff:read'), app.templates.admin);
+    app.get('/user/tccb/staff', app.permission.check('staff:read'), app.templates.admin);
+    app.get('/user/tccb/staff/item/upload', app.permission.check('staff:write'), app.templates.admin);
 
     app.readyHooks.add('readyUser', {
         ready: () => app.dbConnection != null && app.model != null && app.model.canBo != null && app.model.canBo != null,
@@ -71,173 +70,313 @@ module.exports = app => {
         app.model.canBo.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/staff/edit/item/:shcc', app.permission.check('staff:read'), (req, res) => {
+    app.get('/api/staff/edit/item/:shcc', app.permission.check('staff:read'), async (req, res) => {
         app.model.canBo.get({ shcc: req.params.shcc }, (error, canBo) => {
             if (error || canBo == null) {
                 res.send({ error: 'Lỗi khi lấy thông tin cán bộ !' });
             } else {
                 app.model.fwUser.get({ email: canBo.email }, (error, user) => {
-                    let result = app.clone(canBo, { image: user.image });
-                    new Promise(resolve => {
-                        app.model.quanHeCanBo.getQhByShcc(canBo.shcc, (error, items) => {
-                            if (error || items == null) {
-                                result = app.clone(result, { items: null });
-                            } else {
-                                result = app.clone(result, { items: items.rows });
-                            }
-                            resolve();
+                    if (error || user == null) {
+                        res.send({ error: 'Lỗi khi lấy thông tin cán bộ !' });
+                    } else {
+                        let result = app.clone(canBo, { image: user.image });
+                        new Promise(resolve => {
+                            app.model.quanHeCanBo.getQhByShcc(canBo.shcc, (error, items) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin quan hệ cán bộ !' });
+                                }
+                                else if (items == null) {
+                                    result = app.clone(result, { items: null });
+                                } else {
+                                    result = app.clone(result, { items: items.rows });
+                                }
+                                resolve();
+                            });
+                        }).then(() => new Promise(resolve => {
+                            app.model.trinhDoNgoaiNgu.getTrinhDoNNByShcc(canBo.shcc, (error, trinhDoNN) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin trình độ ngoại ngữ cán bộ !' });
+                                }
+                                else if (trinhDoNN == null) {
+                                    result = app.clone(result, { trinhDoNN: null });
+                                } else {
+                                    result = app.clone(result, { trinhDoNN: trinhDoNN.rows });
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
+                            app.model.qtHocTapCongTac.getAll({ shcc: canBo.shcc }, '*', 'batDau ASC', (error, hocTapCongTac) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin học tập cán bộ !' });
+                                }
+                                else if (hocTapCongTac == null) {
+                                    result = app.clone(result, { hocTapCongTac: null });
+                                } else {
+                                    result = app.clone(result, { hocTapCongTac });
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
+                            app.model.qtDaoTao.getByShcc(canBo.shcc, (error, daoTao) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin đào tạo cán bộ !' });
+                                }
+                                else if (daoTao == null) {
+                                    result = app.clone(result, { daoTao: null });
+                                } else {
+                                    result = app.clone(result, { daoTao: daoTao.rows });
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
+                            app.model.qtDaoTao.getTDCT(canBo.shcc , (error, llct) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin trình độ lí luận chính trị cán bộ !' });
+                                }
+                                else if (llct == null || llct.rows.length == 0) {
+                                    result = app.clone(result, { llct: null });
+                                } else {
+                                    result = app.clone(result, { llct: llct.rows[0] });
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
+                            app.model.qtDaoTao.getQLNN(canBo.shcc , (error, qlnn) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin trình độ quản lý nhà nước cán bộ !' });
+                                }
+                                else if (qlnn == null || qlnn.length == 0) {
+                                    result = app.clone(result, { qlnn: null });
+                                } else {
+                                    result = app.clone(result, { qlnn: qlnn.rows[0] });
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
+                            app.model.qtDaoTao.getTH(canBo.shcc , (error, tinHoc) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin trình độ tin học cán bộ !' });
+                                }
+                                else if (tinHoc == null || tinHoc.length == 0) {
+                                    result = app.clone(result, { tinHoc: null });
+                                } else {
+                                    result = app.clone(result, { tinHoc: tinHoc.rows[0] });
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
+                            app.model.qtLuong.getAll({shcc: canBo.shcc}, '*', 'ngayHuong ASC', (error, luong) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin lương cán bộ !' });
+                                }
+                                else if (luong == null) {
+                                    result = app.clone(result, { luong: null });
+                                } else {
+                                    result = app.clone(result, { luong});
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
+                            app.model.qtBaoHiemXaHoi.getByShcc(canBo.shcc, (error, baoHiemXaHoi) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin bảo hiểm xã hội cán bộ !' });
+                                }
+                                else if (baoHiemXaHoi == null) {
+                                    result = app.clone(result, { baoHiemXaHoi: null });
+                                } else {
+                                    result = app.clone(result, { baoHiemXaHoi: baoHiemXaHoi.rows});
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
+                            app.model.qtKeoDaiCongTac.getByShcc(canBo.shcc, (error, keoDaiCongTac) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin kéo dài công tác cán bộ !' });
+                                }
+                                else if (keoDaiCongTac == null) {
+                                    result = app.clone(result, { keoDaiCongTac: null });
+                                } else {
+                                    result = app.clone(result, { keoDaiCongTac: keoDaiCongTac.rows});
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
+
+                            app.model.qtNuocNgoai.getAll({ shcc: canBo.shcc }, '*', 'batDau ASC', (error, nuocNgoai) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin công tác nước ngoài cán bộ !' });
+                                }
+                                else if (nuocNgoai == null) {
+                                    result = app.clone(result, { nuocNgoai: null });
+                                } else {
+                                    result = app.clone(result, { nuocNgoai });
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
+                            app.model.qtKhenThuongAll.getByShcc(canBo.shcc, (error, khenThuong) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin quá trình khen thưởng !' });
+                                }
+                                else if (khenThuong == null) {
+                                    result = app.clone(result, { khenThuong: [] });
+                                } else {
+                                    result = app.clone(result, { khenThuong: khenThuong.rows });
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
+                            app.model.qtKyLuat.getByShcc(canBo.shcc, (error, kyLuat) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin quá trình kỷ luật !' });
+                                }
+                                else if (kyLuat == null) {
+                                    result = app.clone(result, { kyLuat: [] });
+                                } else {
+                                    result = app.clone(result, { kyLuat: kyLuat.rows });
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
+                            app.model.qtNghienCuuKhoaHoc.getAll({ shcc: canBo.shcc }, (error, nghienCuuKhoaHoc) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin quá trình nghiên cứu khoa học !' });
+                                }
+                                else if (nghienCuuKhoaHoc == null) {
+                                    result = app.clone(result, { nghienCuuKhoaHoc: [] });
+                                } else {
+                                    result = app.clone(result, { nghienCuuKhoaHoc });
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
+                            app.model.qtHuongDanLuanVan.getAll({ shcc: canBo.shcc }, '*', 'namTotNghiep DESC', (error, huongDanLuanVan) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin quá trình HDLV !' });
+                                }
+                                else if (huongDanLuanVan == null) {
+                                    result = app.clone(result, { huongDanLuanVan: null });
+                                } else {
+                                    result = app.clone(result, { huongDanLuanVan });
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
+                            app.model.sachGiaoTrinh.getAll({ shcc: canBo.shcc }, (error, sachGiaoTrinh) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin về sách giáo trình !' });
+                                }
+                                else if (sachGiaoTrinh == null) {
+                                    result = app.clone(result, { sachGiaoTrinh: null });
+                                } else {
+                                    result = app.clone(result, { sachGiaoTrinh });
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
+                            app.model.tccbToChucKhac.getAll({ shcc: canBo.shcc }, (error, toChucKhac) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin tổ chức chính trị - xã hội, nghề nghiệp cán bộ !' });
+                                }
+                                else if (toChucKhac == null) {
+                                    result = app.clone(result, { toChucKhac: null });
+                                } else {
+                                    result = app.clone(result, { toChucKhac });
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
+                            app.model.qtBaiVietKhoaHoc.getAll({ shcc: canBo.shcc }, '*', 'namXuatBan ASC', (error, baiVietKhoaHoc) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin bài viết khoa học !' });
+                                }
+                                else if (baiVietKhoaHoc == null) {
+                                    result = app.clone(result, { baiVietKhoaHoc: null });
+                                } else {
+                                    result = app.clone(result, { baiVietKhoaHoc });
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
+                            app.model.qtKyYeu.getAll({ shcc: canBo.shcc }, (error, kyYeu) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin kỷ yếu !' });
+                                }
+                                else if (kyYeu == null) {
+                                    result = app.clone(result, { kyYeu: null });
+                                } else {
+                                    result = app.clone(result, { kyYeu });
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
+                            app.model.qtGiaiThuong.getAll({ shcc: canBo.shcc }, (error, giaiThuong) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin giải thưởng !' });
+                                }
+                                else if (giaiThuong == null) {
+                                    result = app.clone(result, { giaiThuong: null });
+                                } else {
+                                    result = app.clone(result, { giaiThuong });
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
+                            app.model.qtBangPhatMinh.getAll({ shcc: canBo.shcc }, (error, bangPhatMinh) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin bằng phát minh !' });
+                                }
+                                else if (bangPhatMinh == null) {
+                                    result = app.clone(result, { bangPhatMinh: null });
+                                } else {
+                                    result = app.clone(result, { bangPhatMinh });
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
+                            app.model.qtUngDungThuongMai.getAll({ shcc: canBo.shcc }, (error, ungDungThuongMai) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin ứng dụng thương mại !' });
+                                }
+                                else if (ungDungThuongMai == null) {
+                                    result = app.clone(result, { ungDungThuongMai: null });
+                                } else {
+                                    result = app.clone(result, { ungDungThuongMai });
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
+                            app.model.qtLamViecNgoai.getAll({ shcc: canBo.shcc }, (error, lamViecNgoai) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin quá trình làm việc ngoài trường !' });
+                                }
+                                else if (lamViecNgoai == null) {
+                                    result = app.clone(result, { lamViecNgoai: null });
+                                } else {
+                                    result = app.clone(result, { lamViecNgoai });
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
+                            let dataCV = [];
+                            app.model.qtChucVu.getByShcc(canBo.shcc, (error, chucVu) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin quá trình chức vụ !' });
+                                }
+                                else if (chucVu == null) {
+                                    result = app.clone(result, { chucVu: [] });
+                                } else {
+                                    chucVu.rows.forEach(i => {
+                                        dataCV.push(Object.assign(i, { lcv: i.loaiChucVu == 1 }));
+                                    });
+                                    result = app.clone(result, { chucVu: dataCV });
+                                }
+                                resolve();
+                            });
+                        })).then(() => {
+                            res.send({ error, item: result });
                         });
-                    }).then(() => new Promise(resolve => {
-                        app.model.trinhDoNgoaiNgu.getTrinhDoNNByShcc(canBo.shcc, (error, trinhDoNN) => {
-                            if (error || trinhDoNN == null) {
-                                result = app.clone(result, { trinhDoNN: null });
-                            } else {
-                                result = app.clone(result, { trinhDoNN: trinhDoNN.rows });
-                            }
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.qtHocTapCongTac.getAll({ shcc: canBo.shcc }, '*', 'batDau ASC', (error, hocTapCongTac) => {
-                            if (error || hocTapCongTac == null) {
-                                result = app.clone(result, { hocTapCongTac: null });
-                            } else {
-                                result = app.clone(result, { hocTapCongTac });
-                            }
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.qtDaoTao.getAll({ shcc: canBo.shcc }, '*', 'id ASC', (error, daoTao) => {
-                            if (error || daoTao == null) {
-                                result = app.clone(result, { daoTao: null });
-                            } else {
-                                result = app.clone(result, { daoTao });
-                            }
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.qtNuocNgoai.getAll({ shcc: canBo.shcc }, '*', 'batDau ASC', (error, nuocNgoai) => {
-                            if (error || nuocNgoai == null) {
-                                result = app.clone(result, { nuocNgoai: null });
-                            } else {
-                                result = app.clone(result, { nuocNgoai });
-                            }
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.qtKhenThuong.getAll({ shcc: canBo.shcc }, '*', 'id ASC', (error, khenThuong) => {
-                            if (error || khenThuong == null) {
-                                result = app.clone(result, { khenThuong: null });
-                            } else {
-                                result = app.clone(result, { khenThuong });
-                            }
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.qtKyLuat.getAll({ shcc: canBo.shcc }, '*', 'batDau ASC', (error, kyLuat) => {
-                            if (error || kyLuat == null) {
-                                result = app.clone(result, { kyLuat: null });
-                            } else {
-                                result = app.clone(result, { kyLuat });
-                            }
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.qtNghienCuuKhoaHoc.getAll({ shcc: canBo.shcc }, (error, nghienCuuKhoaHoc) => {
-                            if (error || nghienCuuKhoaHoc == null) {
-                                result = app.clone(result, { nghienCuuKhoaHoc: null });
-                            } else {
-                                result = app.clone(result, { nghienCuuKhoaHoc });
-                            }
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.qtHuongDanLuanVan.getAll({ shcc: canBo.shcc }, (error, huongDanLuanVan) => {
-                            if (error || huongDanLuanVan == null) {
-                                result = app.clone(result, { huongDanLuanVan: null });
-                            } else {
-                                result = app.clone(result, { huongDanLuanVan });
-                            }
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.sachGiaoTrinh.getAll({ shcc: canBo.shcc }, (error, sachGiaoTrinh) => {
-                            if (error || sachGiaoTrinh == null) {
-                                result = app.clone(result, { sachGiaoTrinh: null });
-                            } else {
-                                result = app.clone(result, { sachGiaoTrinh });
-                            }
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.qtBaiVietKhoaHoc.getAll({ shcc: canBo.shcc }, '*', 'namXuatBan ASC', (error, baiVietKhoaHoc) => {
-                            if (error || baiVietKhoaHoc == null) {
-                                result = app.clone(result, { baiVietKhoaHoc: null });
-                            } else {
-                                result = app.clone(result, { baiVietKhoaHoc });
-                            }
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.qtKyYeu.getAll({ shcc: canBo.shcc }, (error, kyYeu) => {
-                            if (error || kyYeu == null) {
-                                result = app.clone(result, { kyYeu: null });
-                            } else {
-                                result = app.clone(result, { kyYeu });
-                            }
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.qtGiaiThuong.getAll({ shcc: canBo.shcc }, (error, giaiThuong) => {
-                            if (error || giaiThuong == null) {
-                                result = app.clone(result, { giaiThuong: null });
-                            } else {
-                                result = app.clone(result, { giaiThuong });
-                            }
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.qtBangPhatMinh.getAll({ shcc: canBo.shcc }, (error, bangPhatMinh) => {
-                            if (error || bangPhatMinh == null) {
-                                result = app.clone(result, { bangPhatMinh: null });
-                            } else {
-                                result = app.clone(result, { bangPhatMinh });
-                            }
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.qtUngDungThuongMai.getAll({ shcc: canBo.shcc }, (error, ungDungThuongMai) => {
-                            if (error || ungDungThuongMai == null) {
-                                result = app.clone(result, { ungDungThuongMai: null });
-                            } else {
-                                result = app.clone(result, { ungDungThuongMai });
-                            }
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        app.model.qtLamViecNgoai.getAll({ shcc: canBo.shcc }, (error, lamViecNgoai) => {
-                            if (error || lamViecNgoai == null) {
-                                result = app.clone(result, { lamViecNgoai: null });
-                            } else {
-                                result = app.clone(result, { lamViecNgoai });
-                            }
-                            resolve();
-                        });
-                    })).then(() => new Promise(resolve => {
-                        let dataCV = [];
-                        app.model.qtChucVu.getByShcc(canBo.shcc, (error, chucVu) => {
-                            if (error || chucVu == null) {
-                                result = app.clone(result, { chucVu: null });
-                            } else {
-                                chucVu.rows.forEach(i => {
-                                    dataCV.push(Object.assign(i, { lcv: i.loaiChucVu == 1 }));
-                                });
-                                result = app.clone(result, { chucVu: dataCV });
-                            }
-                            resolve();
-                        });
-                    })).then(() => {
-                        res.send({ error, item: result });
-                    });
+                    }
                 });
 
             }
@@ -900,7 +1039,10 @@ module.exports = app => {
                 let result = app.clone(canBo);
                 new Promise(resolve => {
                     app.model.quanHeCanBo.getQhByShcc(canBo.shcc, (error, items) => {
-                        if (error || items == null) {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin quan hệ cán bộ !' });
+                        }
+                        else if (items == null) {
                             result = app.clone(result, { items: null });
                         } else {
                             result = app.clone(result, { items: items.rows });
@@ -908,17 +1050,71 @@ module.exports = app => {
                         resolve();
                     });
                 }).then(() => new Promise(resolve => {
-                    app.model.trinhDoNgoaiNgu.getTrinhDoNNByShcc( canBo.shcc , (error, trinhDoNN) => {
-                        if (error || trinhDoNN == null) {
+                    app.model.tccbToChucKhac.getAll({ shcc: canBo.shcc }, (error, toChucKhac) => {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin tổ chức chính trị - xã hội, nghề nghiệp cán bộ !' });
+                        }
+                        else if (toChucKhac == null) {
+                            result = app.clone(result, { toChucKhac: null });
+                        } else {
+                            result = app.clone(result, { toChucKhac });
+                        }
+                        resolve();
+                    });
+                })).then(() => new Promise(resolve => {
+                    app.model.qtDaoTao.getTDCT(canBo.shcc , (error, llct) => {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin trình độ lí luận chính trị cán bộ !' });
+                        }
+                        else if (llct == null || llct.rows.length == 0) {
+                            result = app.clone(result, { llct: null });
+                        } else {
+                            result = app.clone(result, { llct: llct.rows[0] });
+                        }
+                        resolve();
+                    });
+                })).then(() => new Promise(resolve => {
+                    app.model.qtDaoTao.getQLNN(canBo.shcc , (error, qlnn) => {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin trình độ quản lý nhà nước cán bộ !' });
+                        }
+                        else if (qlnn == null || qlnn.length == 0) {
+                            result = app.clone(result, { qlnn: null });
+                        } else {
+                            result = app.clone(result, { qlnn: qlnn.rows[0] });
+                        }
+                        resolve();
+                    });
+                })).then(() => new Promise(resolve => {
+                    app.model.qtDaoTao.getTH(canBo.shcc , (error, tinHoc) => {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin trình độ tin học cán bộ !' });
+                        }
+                        else if (tinHoc == null || tinHoc.length == 0) {
+                            result = app.clone(result, { tinHoc: null });
+                        } else {
+                            result = app.clone(result, { tinHoc: tinHoc.rows[0] });
+                        }
+                        resolve();
+                    });
+                })).then(() => new Promise(resolve => {
+                    app.model.trinhDoNgoaiNgu.getTrinhDoNNByShcc(canBo.shcc, (error, trinhDoNN) => {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin trình độ ngoại ngữ cán bộ !' });
+                        }
+                        else if (trinhDoNN == null) {
                             result = app.clone(result, { trinhDoNN: null });
                         } else {
-                            result = app.clone(result, { trinhDoNN: trinhDoNN.rows });
+                            result = app.clone(result, { trinhDoNN: trinhDoNN.rows[0] });
                         }
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
                     app.model.qtHocTapCongTac.getAll({ shcc: canBo.shcc }, '*', 'batDau ASC', (error, hocTapCongTac) => {
-                        if (error || hocTapCongTac == null) {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin học tập cán bộ !' });
+                        }
+                        else if (hocTapCongTac == null) {
                             result = app.clone(result, { hocTapCongTac: null });
                         } else {
                             result = app.clone(result, { hocTapCongTac });
@@ -926,30 +1122,60 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtDaoTao.getAll({ shcc: canBo.shcc }, (error, daoTao) => {
-                        if (error || daoTao == null) {
+                    app.model.qtDaoTao.getByShcc(canBo.shcc, (error, daoTao) => {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin đào tạo cán bộ !' });
+                        }
+                        else if (daoTao == null) {
                             result = app.clone(result, { daoTao: null });
                         } else {
-                            result = app.clone(result, { daoTao });
+                            result = app.clone(result, { daoTao: daoTao.rows });
                         }
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    let dataCV = [];
-                    app.model.qtChucVu.getByShcc(canBo.shcc, (error, chucVu) => {
-                        if (error || chucVu == null) {
-                            result = app.clone(result, { chucVu: null });
+                    app.model.qtLuong.getAll({shcc: canBo.shcc}, '*', 'ngayHuong ASC', (error, luong) => {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin đào tạo cán bộ !' });
+                        }
+                        else if (luong == null) {
+                            result = app.clone(result, { luong: null });
                         } else {
-                            chucVu.rows.forEach(i => {
-                                dataCV.push(Object.assign(i, { lcv: i.loaiChucVu == 1 }));
-                            });
-                            result = app.clone(result, { chucVu: dataCV });
+                            result = app.clone(result, { luong});
                         }
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtNuocNgoai.getAll({ shcc: canBo.shcc }, (error, nuocNgoai) => {
-                        if (error || nuocNgoai == null) {
+                    app.model.qtBaoHiemXaHoi.getByShcc(canBo.shcc, (error, baoHiemXaHoi) => {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin bảo hiểm xã hội cán bộ !' });
+                        }
+                        else if (baoHiemXaHoi == null) {
+                            result = app.clone(result, { baoHiemXaHoi: null });
+                        } else {
+                            result = app.clone(result, { baoHiemXaHoi: baoHiemXaHoi.rows});
+                        }
+                        resolve();
+                    });
+                })).then(() => new Promise(resolve => {
+                    app.model.qtKeoDaiCongTac.getByShcc(canBo.shcc, (error, keoDaiCongTac) => {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin kéo dài công tác cán bộ !' });
+                        }
+                        else if (keoDaiCongTac == null) {
+                            result = app.clone(result, { keoDaiCongTac: null });
+                        } else {
+                            result = app.clone(result, { keoDaiCongTac: keoDaiCongTac.rows});
+                        }
+                        resolve();
+                    });
+                })).then(() => new Promise(resolve => {
+
+                    app.model.qtNuocNgoai.getAll({ shcc: canBo.shcc }, '*', 'batDau ASC', (error, nuocNgoai) => {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin công tác nước ngoài cán bộ !' });
+                        }
+                        else if (nuocNgoai == null) {
                             result = app.clone(result, { nuocNgoai: null });
                         } else {
                             result = app.clone(result, { nuocNgoai });
@@ -957,35 +1183,47 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtKhenThuong.getAll({ shcc: canBo.shcc }, (error, khenThuong) => {
-                        if (error || khenThuong == null) {
-                            result = app.clone(result, { khenThuong: null });
+                    app.model.qtKhenThuongAll.getByShcc(canBo.shcc, (error, khenThuong) => {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin quá trình khen thưởng !' });
+                        }
+                        else if (khenThuong == null) {
+                            result = app.clone(result, { khenThuong: [] });
                         } else {
-                            result = app.clone(result, { khenThuong });
+                            result = app.clone(result, { khenThuong: khenThuong.rows });
                         }
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtKyLuat.getAll({ shcc: canBo.shcc }, (error, kyLuat) => {
-                        if (error || kyLuat == null) {
-                            result = app.clone(result, { kyLuat: null });
+                    app.model.qtKyLuat.getByShcc(canBo.shcc, (error, kyLuat) => {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin quá trình kỷ luật !' });
+                        }
+                        else if (kyLuat == null) {
+                            result = app.clone(result, { kyLuat: [] });
                         } else {
-                            result = app.clone(result, { kyLuat });
+                            result = app.clone(result, { kyLuat: kyLuat.rows });
                         }
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
                     app.model.qtNghienCuuKhoaHoc.getAll({ shcc: canBo.shcc }, (error, nghienCuuKhoaHoc) => {
-                        if (error || nghienCuuKhoaHoc == null) {
-                            result = app.clone(result, { nghienCuuKhoaHoc: null });
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin quá trình nghiên cứu khoa học !' });
+                        }
+                        else if (nghienCuuKhoaHoc == null) {
+                            result = app.clone(result, { nghienCuuKhoaHoc: [] });
                         } else {
                             result = app.clone(result, { nghienCuuKhoaHoc });
                         }
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtHuongDanLuanVan.getAll({ shcc: canBo.shcc }, (error, huongDanLuanVan) => {
-                        if (error || huongDanLuanVan == null) {
+                    app.model.qtHuongDanLuanVan.getAll({ shcc: canBo.shcc }, '*', 'namTotNghiep DESC', (error, huongDanLuanVan) => {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin quá trình HDLV !' });
+                        }
+                        else if (huongDanLuanVan == null) {
                             result = app.clone(result, { huongDanLuanVan: null });
                         } else {
                             result = app.clone(result, { huongDanLuanVan });
@@ -994,7 +1232,10 @@ module.exports = app => {
                     });
                 })).then(() => new Promise(resolve => {
                     app.model.sachGiaoTrinh.getAll({ shcc: canBo.shcc }, (error, sachGiaoTrinh) => {
-                        if (error || sachGiaoTrinh == null) {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin về sách giáo trình !' });
+                        }
+                        else if (sachGiaoTrinh == null) {
                             result = app.clone(result, { sachGiaoTrinh: null });
                         } else {
                             result = app.clone(result, { sachGiaoTrinh });
@@ -1002,8 +1243,11 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtBaiVietKhoaHoc.getAll({ shcc: canBo.shcc }, (error, baiVietKhoaHoc) => {
-                        if (error || baiVietKhoaHoc == null) {
+                    app.model.qtBaiVietKhoaHoc.getAll({ shcc: canBo.shcc }, '*', 'namXuatBan ASC', (error, baiVietKhoaHoc) => {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin bài viết khoa học !' });
+                        }
+                        else if (baiVietKhoaHoc == null) {
                             result = app.clone(result, { baiVietKhoaHoc: null });
                         } else {
                             result = app.clone(result, { baiVietKhoaHoc });
@@ -1012,7 +1256,10 @@ module.exports = app => {
                     });
                 })).then(() => new Promise(resolve => {
                     app.model.qtKyYeu.getAll({ shcc: canBo.shcc }, (error, kyYeu) => {
-                        if (error || kyYeu == null) {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin kỷ yếu !' });
+                        }
+                        else if (kyYeu == null) {
                             result = app.clone(result, { kyYeu: null });
                         } else {
                             result = app.clone(result, { kyYeu });
@@ -1021,7 +1268,10 @@ module.exports = app => {
                     });
                 })).then(() => new Promise(resolve => {
                     app.model.qtGiaiThuong.getAll({ shcc: canBo.shcc }, (error, giaiThuong) => {
-                        if (error || giaiThuong == null) {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin giải thưởng !' });
+                        }
+                        else if (giaiThuong == null) {
                             result = app.clone(result, { giaiThuong: null });
                         } else {
                             result = app.clone(result, { giaiThuong });
@@ -1030,7 +1280,10 @@ module.exports = app => {
                     });
                 })).then(() => new Promise(resolve => {
                     app.model.qtBangPhatMinh.getAll({ shcc: canBo.shcc }, (error, bangPhatMinh) => {
-                        if (error || bangPhatMinh == null) {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin bằng phát minh !' });
+                        }
+                        else if (bangPhatMinh == null) {
                             result = app.clone(result, { bangPhatMinh: null });
                         } else {
                             result = app.clone(result, { bangPhatMinh });
@@ -1039,7 +1292,10 @@ module.exports = app => {
                     });
                 })).then(() => new Promise(resolve => {
                     app.model.qtUngDungThuongMai.getAll({ shcc: canBo.shcc }, (error, ungDungThuongMai) => {
-                        if (error || ungDungThuongMai == null) {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin ứng dụng thương mại !' });
+                        }
+                        else if (ungDungThuongMai == null) {
                             result = app.clone(result, { ungDungThuongMai: null });
                         } else {
                             result = app.clone(result, { ungDungThuongMai });
@@ -1048,10 +1304,29 @@ module.exports = app => {
                     });
                 })).then(() => new Promise(resolve => {
                     app.model.qtLamViecNgoai.getAll({ shcc: canBo.shcc }, (error, lamViecNgoai) => {
-                        if (error || lamViecNgoai == null) {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin quá trình làm việc ngoài trường !' });
+                        }
+                        else if (lamViecNgoai == null) {
                             result = app.clone(result, { lamViecNgoai: null });
                         } else {
                             result = app.clone(result, { lamViecNgoai });
+                        }
+                        resolve();
+                    });
+                })).then(() => new Promise(resolve => {
+                    let dataCV = [];
+                    app.model.qtChucVu.getByShcc(canBo.shcc, (error, chucVu) => {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin quá trình chức vụ !' });
+                        }
+                        else if (chucVu == null) {
+                            result = app.clone(result, { chucVu: [] });
+                        } else {
+                            chucVu.rows.forEach(i => {
+                                dataCV.push(Object.assign(i, { lcv: i.loaiChucVu == 1 }));
+                            });
+                            result = app.clone(result, { chucVu: dataCV });
                         }
                         resolve();
                     });
@@ -1082,16 +1357,16 @@ module.exports = app => {
             });
 
         } else {
-            res.status(400).send({ error: 'Invalid parameter!' });
+            res.send({ error: 'Invalid parameter!' });
         }
     });
 
     app.post('/api/user/staff/quan-he', app.permission.check('staff:login'), (req, res) => {
         if (req.body.data && req.session.user) {
-            const data = app.clone(req.body.data, { shcc: req.session.user.shcc });
+            const data = req.body.data;
             app.model.quanHeCanBo.create(data, (error, item) => res.send({ error, item }));
         } else {
-            res.status(400).send({ error: 'Invalid parameter!' });
+            res.send({ error: 'Invalid parameter!' });
         }
     });
 
@@ -1099,18 +1374,18 @@ module.exports = app => {
         if (req.body.changes && req.session.user) {
             app.model.quanHeCanBo.get({ id: req.body.id }, (error, item) => {
                 if (error || item == null) {
-                    res.status(400).send({ error: 'Not found!' });
+                    res.send({ error: 'Not found!' });
                 } else {
-                    if (item.shcc === req.session.user.shcc) {
-                        const changes = app.clone(req.body.changes, { shcc: req.session.user.shcc });
+                    if (item.email === req.session.user.email) {
+                        const changes = req.body.changes;
                         app.model.quanHeCanBo.update({ id: req.body.id }, changes, (error, item) => res.send({ error, item }));
                     } else {
-                        res.status(400).send({ error: 'Not found!' });
+                        res.send({ error: 'Not found!' });
                     }
                 }
             });
         } else {
-            res.status(400).send({ error: 'Invalid parameter!' });
+            res.send({ error: 'Invalid parameter!' });
         }
     });
 
@@ -1118,17 +1393,17 @@ module.exports = app => {
         if (req.session.user) {
             app.model.quanHeCanBo.get({ id: req.body.id }, (error, item) => {
                 if (error || item == null) {
-                    res.status(400).send({ error: 'Not found!' });
+                    res.send({ error: 'Not found!' });
                 } else {
-                    if (item.shcc === req.session.user.shcc) {
+                    if (item.email === req.session.user.email) {
                         app.model.quanHeCanBo.delete({ id: req.body.id }, (error) => res.send(error));
                     } else {
-                        res.status(400).send({ error: 'Not found!' });
+                        res.send({ error: 'Not found!' });
                     }
                 }
             });
         } else {
-            res.status(400).send({ error: 'Invalid parameter!' });
+            res.send({ error: 'Invalid parameter!' });
         }
     });
 

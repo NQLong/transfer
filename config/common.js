@@ -69,11 +69,11 @@ module.exports = app => {
         },
         setting: {
             index: 2000, title: 'Cấu hình', link: '/user/settings', icon: 'fa-cog',
-            subMenusRender: false,
+            subMenusRender: false
         },
         tccb: {
             index: 3000, title: 'Tổ chức cán bộ', link: '/user/tccb', icon: 'fa-sort-alpha-asc',
-            subMenusRender: false, groups: ['Danh sách cán bộ', 'Quá trình hợp đồng', 'Quá trình nghỉ công tác', 'Các quá trình hành chính', 'Quá trình Khen thưởng - Kỷ luật']
+            subMenusRender: false, groups: ['Cán bộ', 'Công tác', 'Khen thưởng - Kỷ luật', 'Nghỉ', 'Chuyên môn']
         },
         category: {
             index: 4000, title: 'Danh mục', link: '/user/category', icon: 'fa-list-alt',

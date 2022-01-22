@@ -12,31 +12,21 @@ module.exports = app => {
     );
     app.get('/user/tccb/qua-trinh/giai-thuong/:id', app.permission.check('qtGiaiThuong:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/giai-thuong', app.permission.check('qtGiaiThuong:read'), app.templates.admin);
-    app.get('/user/tccb/qua-trinh/giai-thuong/group_gt/:loaiDoiTuong/:ma', app.permission.check('qtGiaiThuong:read'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/giai-thuong/group/:shcc', app.permission.check('qtGiaiThuong:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/tccb/qua-trinh/giai-thuong/page/:pageNumber/:pageSize', app.permission.check('qtGiaiThuong:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        let arr = req.query.parameter;
-        if (!Array.isArray(arr)) arr = [];
-        let loaiDoiTuong = '-1';
-        if (arr.length > 0) {
-            loaiDoiTuong = '(';
-            for (let idx = 0; idx < arr.length; idx++) {
-                if (typeof arr[idx] == 'string') loaiDoiTuong += '\'' + arr[idx] + '\'';
-                else loaiDoiTuong += '\'' + arr[idx].toString() + '\'';
-                if (idx != arr.length - 1) loaiDoiTuong += ',';
-            }
-            loaiDoiTuong += ')';
-        }
-        app.model.qtGiaiThuong.searchPage(pageNumber, pageSize, loaiDoiTuong, searchTerm, (error, page) => {
+        const { fromYear, toYear, list_shcc, list_dv } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null };
+        app.model.qtGiaiThuong.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
                 const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
-                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, list } });
+                const pageCondition = searchTerm;
+                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
             }
         });
     });
@@ -45,38 +35,14 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        let arr = req.query.parameter;
-        if (!Array.isArray(arr)) arr = [];
-        let loaiDoiTuong = '-1';
-        if (arr.length > 0) {
-            loaiDoiTuong = '(';
-            for (let idx = 0; idx < arr.length; idx++) {
-                if (typeof arr[idx] == 'string') loaiDoiTuong += '\'' + arr[idx] + '\'';
-                else loaiDoiTuong += '\'' + arr[idx].toString() + '\'';
-                if (idx != arr.length - 1) loaiDoiTuong += ',';
-            }
-            loaiDoiTuong += ')';
-        }
-        app.model.qtGiaiThuong.groupPage(pageNumber, pageSize, loaiDoiTuong, searchTerm, (error, page) => {
+        const { fromYear, toYear, list_shcc, list_dv } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null };
+        app.model.qtGiaiThuong.groupPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
                 const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
-                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, list } });
-            }
-        });
-    });
-    app.get('/api/tccb/qua-trinh/giai-thuong/group_gt/page/:loaiDoiTuong/:pageNumber/:pageSize', app.permission.check('qtGiaiThuong:read'), (req, res) => {
-        const pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize),
-            loaiDoiTuong = req.params.loaiDoiTuong,
-            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        app.model.qtGiaiThuong.groupPageMa(pageNumber, pageSize, loaiDoiTuong, searchTerm, (error, page) => {
-            if (error || page == null) {
-                res.send({ error });
-            } else {
-                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
-                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, list } });
+                const pageCondition = searchTerm;
+                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
             }
         });
     });

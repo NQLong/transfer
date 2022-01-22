@@ -327,7 +327,6 @@ export function updateStaffUser(email, changes, done) {
 //#region quanHeStaff User
 export function createQuanHeStaffUser(data, done) {
     return dispatch => {
-        console.log(data);
         const url = '/api/user/staff/quan-he';
         T.post(url, { data }, res => {
             if (res.error) {
@@ -350,7 +349,6 @@ export function updateQuanHeStaffUser(id, changes, done) {
                 T.notify('Cập nhật thông tin người thân bị lỗi', 'danger');
                 console.error('PUT: ' + url + '. ' + data.error);
             } else if (data.item) {
-                console.log(changes);
                 T.notify('Cập nhật thông tin người thân thành công!', 'info');
                 dispatch(userGetStaff(changes.email));
                 if (done) done();

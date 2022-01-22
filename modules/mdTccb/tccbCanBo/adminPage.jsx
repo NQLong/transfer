@@ -4,12 +4,15 @@ import { PageName, getStaffPage, deleteStaff } from './redux';
 import Pagination, { OverlayLoading } from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, FormSelect, } from 'view/component/AdminPage';
-import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
+import { getDmDonViAll, SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 
 class StaffPage extends AdminPage {
     state = { searching: false, filter: {} };
-
+    dvMapper = {};
     componentDidMount() {
+        this.props.getDmDonViAll(items => {
+            items.forEach(i => this.dvMapper[i.ma] = i.ten);
+        });
         T.ready('/user/tccb', () => {
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             // T.showSearchBox();
@@ -58,7 +61,7 @@ class StaffPage extends AdminPage {
 
     create = (e) => {
         e.preventDefault();
-        this.props.history.push('/user/staff/new');
+        this.props.history.push('/user/tccb/staff/new');
     };
 
     render() {
@@ -73,17 +76,23 @@ class StaffPage extends AdminPage {
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Mã số thẻ</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Họ & Tên</th>
-                    <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Email</th>
+                    <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Họ & Tên</th>
+                    <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Đơn vị</th>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                 </tr>),
             renderRow: (item, index) => (
                 <tr key={index}>
                     <TableCell type='number' content={(pageNumber - 1) * pageSize + index + 1} />
-                    <TableCell type='link' content={item.shcc} url={`/user/staff/${item.shcc}`} style={{ textAlign: 'center' }} />
-                    <TableCell type='text' content={`${item.ho} ${item.ten}`} style={{ whiteSpace: 'nowrap' }} />
-                    <TableCell type='text' content={item.email} />
-                    <TableCell type='buttons' content={item} permission={permission} onEdit={`/user/staff/${item.shcc}`} onDelete={this.delete}></TableCell>
+                    <TableCell type='link' content={item.shcc} url={`/user/tccb/staff/${item.shcc}`} style={{ textAlign: 'center' }} />
+                    <TableCell type='text' content={<>
+                        <span>{`${item.ho} ${item.ten}`}</span><br />
+                        <i>{item.email}</i>
+                        </>} style={{ whiteSpace: 'nowrap' }} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap'}} content={
+                        <>
+                            <span>{item.maDonVi ? this.dvMapper[item.maDonVi] : null}</span>
+                        </>} />
+                    <TableCell type='buttons' content={item} permission={permission} onEdit={`/user/tccb/staff/${item.shcc}`} onDelete={this.delete}></TableCell>
                 </tr>)
         });
 
@@ -109,7 +118,7 @@ class StaffPage extends AdminPage {
                     <Pagination style={{ marginLeft: '70px' }} name={PageName} pageNumber={pageNumber} pageSize={pageSize} pageTotal={pageTotal} totalItem={totalItem} pageCondition={pageCondition}
                         getPage={this.getPage} />
                     {permissionWrite && (
-                        <Link to='/user/staff/item/upload' className='btn btn-success btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px' }} >
+                        <Link to='/user/tccb/staff/item/upload' className='btn btn-success btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px' }} >
                             <i className='fa fa-lg fa-cloud-upload' />
                         </Link>)}
                 </div>
@@ -121,5 +130,5 @@ class StaffPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, staff: state.staff });
-const mapActionsToProps = { getStaffPage, deleteStaff };
+const mapActionsToProps = { getStaffPage, deleteStaff, getDmDonViAll };
 export default connect(mapStateToProps, mapActionsToProps)(StaffPage);

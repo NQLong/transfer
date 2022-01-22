@@ -2,17 +2,17 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3010: { title: 'Hợp Đồng Lao Động', link: '/user/tccb/qua-trinh/hop-dong-lao-dong', icon: 'fa-file-text-o', backgroundColor: '#524e4e', groupIndex: 1 },
+            3002: { title: 'Hợp đồng lao động', link: '/user/tccb/qua-trinh/hop-dong-lao-dong', icon: 'fa-briefcase', backgroundColor: '#1a76b8', groupIndex: 0 },
         },
     };
     app.permission.add(
-        { name: 'staff:login', menu: { parentMenu: { index: 1000, title: 'Thông tin cá nhân', icon: 'fa-user', link: '/user' } }, },
         { name: 'qtHopDongLaoDong:read', menu },
         { name: 'qtHopDongLaoDong:write' },
         { name: 'qtHopDongLaoDong:delete' },
     );
     app.get('/user/tccb/qua-trinh/hop-dong-lao-dong/:ma', app.permission.check('qtHopDongLaoDong:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/hop-dong-lao-dong', app.permission.check('qtHopDongLaoDong:read'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/hop-dong-lao-dong/group/:shcc', app.permission.check('qtHopDongLaoDong:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
@@ -21,7 +21,19 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        app.model.qtHopDongLaoDong.searchPage(pageNumber, pageSize, searchTerm, (error, page) => {
+        let arr = req.query.parameter;
+        if (!Array.isArray(arr)) arr = [];
+        let maDonVi = '-1';
+        if (arr.length > 0) {
+            maDonVi = '(';
+            for (let idx = 0; idx < arr.length; idx++) {
+                if (typeof arr[idx] == 'string') maDonVi += '\'' + arr[idx] + '\'';
+                else maDonVi += '\'' + arr[idx].toString() + '\'';
+                if (idx != arr.length - 1) maDonVi += ',';
+            }
+            maDonVi += ')';
+        }
+        app.model.qtHopDongLaoDong.searchPage(pageNumber, pageSize, maDonVi, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -35,7 +47,19 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        app.model.qtHopDongLaoDong.groupPage(pageNumber, pageSize, searchTerm, (error, page) => {
+        let arr = req.query.parameter;
+        if (!Array.isArray(arr)) arr = [];
+        let maDonVi = '-1';
+        if (arr.length > 0) {
+            maDonVi = '(';
+            for (let idx = 0; idx < arr.length; idx++) {
+                if (typeof arr[idx] == 'string') maDonVi += '\'' + arr[idx] + '\'';
+                else maDonVi += '\'' + arr[idx].toString() + '\'';
+                if (idx != arr.length - 1) maDonVi += ',';
+            }
+            maDonVi += ')';
+        }
+        app.model.qtHopDongLaoDong.groupPage(pageNumber, pageSize, maDonVi , searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {

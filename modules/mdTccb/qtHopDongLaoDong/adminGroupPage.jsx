@@ -16,7 +16,7 @@ class QtHopDongLaoDongGroupPage extends AdminPage {
                 shcc = route.parse(window.location.pathname);
             T.onSearch = (searchText) => this.props.getQtHopDongLaoDongPage(undefined, undefined, searchText || '');
             T.showSearchBox();
-            this.props.getQtHopDongLaoDongPage(undefined, undefined, shcc.shcc);
+            this.props.getQtHopDongLaoDongShccPage(undefined, undefined, shcc.shcc);
         });
     }
 
@@ -88,7 +88,7 @@ class QtHopDongLaoDongGroupPage extends AdminPage {
                     <TableCell style={{ whiteSpace: 'nowrap' }} type='text' content={(
                         <>
                             <span>{item.hoNguoiKy + ' ' + item.tenNguoiKy}<br /></span>
-                            <Link to={'/user/staff/' + item.shccNguoiKy}>{item.shccNguoiKy}</Link>
+                            <Link to={'/user/tccb/staff/' + item.shccNguoiKy}>{item.shccNguoiKy}</Link>
                         </>
                     )} />
                     <TableCell type='buttons' content={item} onEdit={`/user/tccb/qua-trinh/hop-dong-lao-dong/${item.ma}`} onDelete={this.delete} permission={permission} >
@@ -102,7 +102,7 @@ class QtHopDongLaoDongGroupPage extends AdminPage {
 
 
         return this.renderPage({
-            icon: 'fa fa-file-text-o',
+            icon: 'fa fa-briefcase',
             title: 'Hợp đồng Lao động cán bộ',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,

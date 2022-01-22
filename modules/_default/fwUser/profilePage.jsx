@@ -9,12 +9,20 @@ import ComponentTrinhDo from 'modules/mdTccb/tccbCanBo/componentTrinhDo';
 import ComponentTTCongTac from 'modules/mdTccb/tccbCanBo/componentTTCongTac';
 import ProfileCommon from './componentNotStaff';
 import Loading from 'view/component/Loading';
+import ComponentKhenThuong from 'modules/mdTccb/qtKhenThuongAll/componentKhenThuong';
+import ComponentNCKH from 'modules/mdTccb/qtNghienCuuKhoaHoc/componentNCKH';
+import ComponentKyLuat from 'modules/mdTccb/qtKyLuat/componentKyLuat';
+import ComponentNuocNgoai from 'modules/mdTccb/qtNuocNgoai/componentNuocNgoai';
+import ComponentHDLV from 'modules/mdTccb/qtHuongDanLuanVan/componentHDLV';
+import ComponentSGT from 'modules/mdTccb/sachGiaoTrinh/componentSGT';
+import ComponentDaoTao from 'modules/mdTccb/qtDaoTao/componentDaoTao';
+import ComponentLuong from 'modules/mdTccb/qtLuong/componentLuong';
+import ComponentCongTac from 'modules/mdTccb/qtHocTapCongTac/componentCongTac';
+import ComponentBaoHiemXaHoi from 'modules/mdTccb/qtBaoHiemXaHoi/componentBaoHiemXaHoi';
+import ComponentKeoDaiCongTac from 'modules/mdTccb/qtKeoDaiCongTac/componentKeoDaiCongTac';
 
 class ProfileCanBo extends AdminPage {
     state = { canBo: false, isLoad: true };
-    // shouldComponentUpdate(nextProps, nextState) {
-    //     return this.state.canBo != nextState.canBo;
-    // }
     componentDidMount() {
         T.ready(() => {
             if (this.props.system && this.props.system.user) {
@@ -40,9 +48,20 @@ class ProfileCanBo extends AdminPage {
             this.componentCaNhan.value(item);
             this.componentQuanHe.value(item.email, item.phai, item.shcc);
             this.componentTrinhDo.value(item);
+            this.componentCongTac.value(item.shcc, item.email);
             this.componentTTCongTac.value(item);
+            this.componentDaoTao.value(item.shcc, item.email);
+            this.componentKhenThuong.value(item.shcc);
+            this.componentNCKH.value(item.shcc, item.email);
+            this.componentKyLuat.value(item.shcc, item.email);
+            this.componentNuocNgoai.value(item.shcc, item.email);
+            this.componentHDLV.value(item.shcc, item.email);
+            this.componentSGT.value(item.shcc, item.email);
+            this.componentLuong.value(item.shcc, item.email);
+            this.componentBaoHiemXaHoi.value(item.shcc, item.email);
+            this.componentKeoDaiCongTac.value(item.shcc, item.email);
         });
-       
+
     }
 
     save = () => {
@@ -54,16 +73,28 @@ class ProfileCanBo extends AdminPage {
     render = () => {
         const item = this.props.staff?.userItem;
         return this.renderPage({
+            icon: 'fa fa-address-card-o',
             title: `Thông tin cá nhân${item?.shcc ? `: ${item?.ho} ${item?.ten}` : ''}`,
             content:
                 <>
                     {this.state.isLoad && <Loading />}
                     {!this.state.canBo ? <ProfileCommon ref={e => this.profileCommon = e} /> :
                         <>
-                            <ComponentCaNhan ref={e => this.componentCaNhan = e} userEdit={false} />
+                            <ComponentCaNhan ref={e => this.componentCaNhan = e} userEdit={false} isStaff={true}/>
                             <ComponentQuanHe ref={e => this.componentQuanHe = e} userEdit={true} />
                             <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={true} />
-                            <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={true} />
+                            <ComponentCongTac ref={e => this.componentCongTac = e} userEdit={true} />
+                            <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={true} tccb={false}/>
+                            <ComponentDaoTao ref={e => this.componentDaoTao = e} userEdit={true} />
+                            <ComponentLuong ref={e => this.componentLuong = e} userEdit={true} />
+                            <ComponentBaoHiemXaHoi ref={e => this.componentBaoHiemXaHoi = e} userEdit={true} />
+                            <ComponentKeoDaiCongTac ref={e => this.componentKeoDaiCongTac = e} userEdit={true} />
+                            <ComponentNuocNgoai ref={e => this.componentNuocNgoai = e} userEdit={true} />
+                            <ComponentKhenThuong ref={e => this.componentKhenThuong = e} userEdit={true} />
+                            <ComponentKyLuat ref={e => this.componentKyLuat = e} userEdit={true} />
+                            <ComponentNCKH ref={e => this.componentNCKH = e} userEdit={true} />
+                            <ComponentHDLV ref={e => this.componentHDLV = e} userEdit={true} />
+                            <ComponentSGT ref={e => this.componentSGT = e} userEdit={true} />
                         </>}
                 </>,
             onSave: this.state.canBo && this.save,

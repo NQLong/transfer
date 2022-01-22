@@ -22,7 +22,7 @@ module.exports = app => {
             workbook.xlsx.write(respone);
         },
 
-        write: (worksheet, items) => {
+        write: (worksheet, items, done) => {
             if (items.constructor !== Array) items = [items];
             for (let i = 0; i < items.length; i++) {
                 let item = items[i],
@@ -41,7 +41,13 @@ module.exports = app => {
                 } else if (item.value) {
                     cell.value = item.value;
                 }
-
+                if (item.dateFormat) {
+                    cell.dataValidation = {
+                        type: 'list',
+                        allowBlank: false,
+                        formulae: ['"yyyy,mm/yyyy,dd/mm/yyyy"']
+                      };
+                }
                 if (item.border) {
                     let border = {}, strBorder = item.border.toString();
                     if (strBorder.indexOf('1') >= 0) border.top = { style: 'thin' };
@@ -59,6 +65,7 @@ module.exports = app => {
                 };
                 if (item.bold != null && item.bold !== undefined) cell.font.bold = item.bold;
             }
+            if (done) done();
             return worksheet.getCell(items[0].cell);
         },
 

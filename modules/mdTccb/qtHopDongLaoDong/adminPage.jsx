@@ -1,30 +1,61 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, FormCheckbox } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, FormCheckbox, FormSelect } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
     getQtHopDongLaoDongPage, getQtHopDongLaoDongAll, updateQtHopDongLaoDong,
     deleteQtHopDongLaoDong, createQtHopDongLaoDong, getQtHopDongLaoDongGroupPage, downloadWord
 } from './redux';
+import { getDmDonViAll } from 'modules/mdDanhMuc/dmDonVi/redux';
 
 class QtHopDongLaoDongPage extends AdminPage {
     checked = false;
+    curState = [];
+    stateTable = [];
+    searchText = '';
 
     componentDidMount() {
         T.ready('/user/tccb', () => {
+            this.props.getDmDonViAll(items => {
+                if (items) {
+                    this.stateTable = [];
+                    items.forEach(item => this.stateTable.push({
+                        'id': item.ma,
+                        'text': item.ten
+                    }));
+                }
+            });
             T.onSearch = (searchText) => {
-                if (this.checked) this.props.getQtHopDongLaoDongGroupPage(undefined, undefined, searchText || '');
-                else this.props.getQtHopDongLaoDongPage(undefined, undefined, searchText || '');
+            this.searchText = searchText;
+            if (this.checked) this.props.getQtHopDongLaoDongGroupPage(undefined, undefined, this.curState, this.searchText || '');
+                else this.props.getQtHopDongLaoDongPage(undefined, undefined, this.curState, this.searchText || '');
             };
-            T.showSearchBox();
-            this.props.getQtHopDongLaoDongPage(undefined, undefined, '');
+            // T.showSearchBox();
+            // this.props.getQtHopDongLaoDongPage(undefined, undefined, '');
+            T.showSearchBox(() => {
+                this.maDonVi?.value('');
+                setTimeout(() => this.changeAdvancedSearch(), 50);
+                setTimeout(() => this.showAdvanceSearch(), 1000);
+            });
+            this.changeAdvancedSearch();
         });
     }
 
+    changeAdvancedSearch = () => {
+        let { pageNumber, pageSize } = this.props && this.props.qtHopDongLaoDong && this.props.qtHopDongLaoDong.page ? this.props.qtHopDongLaoDong.page : { pageNumber: 1, pageSize: 50};
+
+        const maDonVi  = this.maDonVi?.value() || [];
+        this.curState = maDonVi;
+        if (this.checked) this.props.getQtHopDongLaoDongGroupPage(pageNumber, pageSize, this.curState, this.searchText || '');
+        else this.props.getQtHopDongLaoDongPage(pageNumber, pageSize, this.curState, this.searchText || '');
+    }
+
     groupPage = () => {
+        let { pageNumber, pageSize } = this.props && this.props.qtHopDongLaoDong && this.props.qtHopDongLaoDong.page ? this.props.qtHopDongLaoDong.page : { pageNumber: 1, pageSize: 50};
         this.checked = !this.checked;
-        this.props.getQtHopDongLaoDongGroupPage(undefined, undefined, '');
+        if (this.checked) this.props.getQtHopDongLaoDongGroupPage(pageNumber, pageSize, this.curState, this.searchText || '');
+        else this.props.getQtHopDongLaoDongPage(pageNumber, pageSize, this.curState, this.searchText || '');
     }
 
     downloadWord = (item) => {
@@ -54,7 +85,7 @@ class QtHopDongLaoDongPage extends AdminPage {
             (this.props.qtHopDongLaoDong && this.props.qtHopDongLaoDong.page_gr ?
                 this.props.qtHopDongLaoDong.page_gr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list })
             : (this.props.qtHopDongLaoDong && this.props.qtHopDongLaoDong.page ? this.props.qtHopDongLaoDong.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] });
-
+        // let maDonVi = this.curState;        
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -103,7 +134,7 @@ class QtHopDongLaoDongPage extends AdminPage {
                         <TableCell style={{ whiteSpace: 'nowrap' }} type='text' content={(
                             <>
                                 <span>{item.hoNguoiKy + ' ' + item.tenNguoiKy}<br /></span>
-                                <Link to={'/user/staff/' + item.shccNguoiKy}>{item.shccNguoiKy}</Link>
+                                <Link to={'/user/tccb/staff/' + item.shccNguoiKy}>{item.shccNguoiKy}</Link>
                             </>
                         )} />
                         {
@@ -136,12 +167,15 @@ class QtHopDongLaoDongPage extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-file-text-o',
+            icon: 'fa fa-briefcase',
             title: 'Hợp đồng Lao động',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
                 'Hợp đồng Lao động'
             ],
+            advanceSearch: <>
+                <FormSelect className='col-12 col-md-12' multiple = {true} ref={e => this.maDonVi = e} label='Chọn đơn vị (có thể chọn nhiều đơn vị)' data={this.stateTable} onChange={() => this.changeAdvancedSearch()} allowClear={true} />
+            </>,
             content: <>
                 <div className='tile'>
                     <FormCheckbox label='Hiển thị theo cán bộ' onChange={this.groupPage} />
@@ -165,6 +199,6 @@ class QtHopDongLaoDongPage extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtHopDongLaoDong: state.qtHopDongLaoDong });
 const mapActionsToProps = {
     getQtHopDongLaoDongAll, getQtHopDongLaoDongPage, deleteQtHopDongLaoDong, createQtHopDongLaoDong,
-    updateQtHopDongLaoDong, getQtHopDongLaoDongGroupPage
+    updateQtHopDongLaoDong, getQtHopDongLaoDongGroupPage, getDmDonViAll
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtHopDongLaoDongPage);

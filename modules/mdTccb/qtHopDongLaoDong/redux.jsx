@@ -49,11 +49,13 @@ export default function QtHopDongLaoDongReducer(state = null, data) {
 
 // Actions ------------------------------------------------------------------------------------------------------------
 T.initPage('pageQtHopDongLaoDong', true);
-export function getQtHopDongLaoDongPage(pageNumber, pageSize, pageCondition, done) {
+export function getQtHopDongLaoDongPage(pageNumber, pageSize, maDonVi, pageCondition, done) {
     const page = T.updatePage('pageQtHopDongLaoDong', pageNumber, pageSize, pageCondition);
+    if (!maDonVi) maDonVi = [];
+    if (!Array.isArray(maDonVi)) maDonVi = [maDonVi];
     return dispatch => {
         const url = `/api/tccb/qua-trinh/hop-dong-lao-dong/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition }, data => {
+        T.get(url, { condition: page.pageCondition, parameter: maDonVi }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách hợp đồng bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
@@ -67,11 +69,13 @@ export function getQtHopDongLaoDongPage(pageNumber, pageSize, pageCondition, don
 }
 
 T.initPage('groupPageQtHopDongLaoDong', true);
-export function getQtHopDongLaoDongGroupPage(pageNumber, pageSize, pageCondition, done) {
+export function getQtHopDongLaoDongGroupPage(pageNumber, pageSize, maDonVi, pageCondition, done) {
     const page = T.updatePage('groupPageQtHopDongLaoDong', pageNumber, pageSize, pageCondition);
+    if (!maDonVi) maDonVi = [];
+    if (!Array.isArray(maDonVi)) maDonVi = [maDonVi];
     return dispatch => {
         const url = `/api/tccb/qua-trinh/hop-dong-lao-dong/group/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition }, data => {
+        T.get(url, { condition: page.pageCondition, parameter: maDonVi }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách hợp đồng theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
@@ -179,6 +183,7 @@ export function deleteQtHopDongLaoDong(ma, done) {
 }
 
 export function updateQtHopDongLaoDong(ma, changes, done) {
+    console.log(changes);
     return dispatch => {
         const url = '/api/tccb/qua-trinh/hop-dong-lao-dong';
         T.put(url, { ma, changes }, data => {

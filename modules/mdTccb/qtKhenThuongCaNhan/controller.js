@@ -1,18 +1,18 @@
 module.exports = app => {
-    const menu = {
-        parentMenu: app.parentMenu.tccb,
-        menus: {
-            // 3011: { title: 'Quá trình khen thưởng cá nhân', link: '/user/tccb/qua-trinh/khen-thuong-ca-nhan', icon: 'fa-pencil', backgroundColor: '#e07b91', groupIndex: 3 },
-        },
-    };
-    app.permission.add(
-        { name: 'staff:login', menu: { parentMenu: { index: 1000, title: 'Thông tin cá nhân', icon: 'fa-user', link: '/user' } }, },
-        { name: 'qtKhenThuongCaNhan:read', menu },
-        { name: 'qtKhenThuongCaNhan:write' },
-        { name: 'qtKhenThuongCaNhan:delete' },
-    );
-    app.get('/user/tccb/qua-trinh/khen-thuong-ca-nhan/:id', app.permission.check('qtKhenThuongCaNhan:read'), app.templates.admin);
-    app.get('/user/tccb/qua-trinh/khen-thuong-ca-nhan', app.permission.check('qtKhenThuongCaNhan:read'), app.templates.admin);
+    // const menu = {
+    //     parentMenu: app.parentMenu.tccb,
+    //     menus: {
+    //         // 3011: { title: 'Quá trình khen thưởng cá nhân', link: '/user/tccb/qua-trinh/khen-thuong-ca-nhan', icon: 'fa-pencil', backgroundColor: '#e07b91', groupIndex: 3 },
+    //     },
+    // };
+    // app.permission.add(
+    //     { name: 'staff:login', menu: { parentMenu: { index: 1000, title: 'Thông tin cá nhân', icon: 'fa-user', link: '/user' } }, },
+    //     { name: 'qtKhenThuongCaNhan:read', menu },
+    //     { name: 'qtKhenThuongCaNhan:write' },
+    //     { name: 'qtKhenThuongCaNhan:delete' },
+    // );
+    // app.get('/user/tccb/qua-trinh/khen-thuong-ca-nhan/:id', app.permission.check('qtKhenThuongCaNhan:read'), app.templates.admin);
+    // app.get('/user/tccb/qua-trinh/khen-thuong-ca-nhan', app.permission.check('qtKhenThuongCaNhan:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/tccb/qua-trinh/khen-thuong-ca-nhan/page/:pageNumber/:pageSize', app.permission.check('qtKhenThuongCaNhan:read'), (req, res) => {
@@ -56,10 +56,10 @@ module.exports = app => {
 
     app.post('/api/user/qua-trinh/khen-thuong-ca-nhan', app.permission.check('staff:login'), (req, res) => {
         if (req.body.data && req.session.user) {
-            const data = app.clone(req.body.data, { shcc: req.session.user.shcc });
+            const data = req.body.data;
             app.model.qtKhenThuongCaNhan.create(data, (error, item) => res.send({ error, item }));
         } else {
-            res.status(400).send({ error: 'Invalid parameter!' });
+            res.send({ error: 'Invalid parameter!' });
         }
     });
 
@@ -67,18 +67,18 @@ module.exports = app => {
         if (req.body.changes && req.session.user) {
             app.model.qtKhenThuongCaNhan.get({ id: req.body.id }, (error, item) => {
                 if (error || item == null) {
-                    res.status(400).send({ error: 'Not found!' });
+                    res.send({ error: 'Not found!' });
                 } else {
-                    if (item.shcc === req.session.user.shcc) {
-                        const changes = app.clone(req.body.changes, { shcc: req.session.user.shcc });
+                    if (item.email === req.session.user.email) {
+                        const changes = req.body.changes;
                         app.model.qtKhenThuongCaNhan.update({ id: req.body.id }, changes, (error, item) => res.send({ error, item }));
                     } else {
-                        res.status(400).send({ error: 'Not found!' });
+                        res.send({ error: 'Not found!' });
                     }
                 }
             });
         } else {
-            res.status(400).send({ error: 'Invalid parameter!' });
+            res.send({ error: 'Invalid parameter!' });
         }
     });
 
@@ -86,17 +86,17 @@ module.exports = app => {
         if (req.session.user) {
             app.model.qtKhenThuongCaNhan.get({ id: req.body.id }, (error, item) => {
                 if (error || item == null) {
-                    res.status(400).send({ error: 'Not found!' });
+                    res.send({ error: 'Not found!' });
                 } else {
-                    if (item.shcc === req.session.user.shcc) {
+                    if (item.email === req.session.user.email) {
                         app.model.qtKhenThuongCaNhan.delete({ id: req.body.id }, (error) => res.send(error));
                     } else {
-                        res.status(400).send({ error: 'Not found!' });
+                        res.send({ error: 'Not found!' });
                     }
                 }
             });
         } else {
-            res.status(400).send({ error: 'Invalid parameter!' });
+            res.send({ error: 'Invalid parameter!' });
         }
     });
 
