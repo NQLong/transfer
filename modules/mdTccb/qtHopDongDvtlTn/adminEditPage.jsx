@@ -412,8 +412,8 @@ class QtHopDongDvtlTnEditPage extends QTForm {
                         <h1><i className='fa fa-pencil' />Hợp đồng cán bộ {`: ${this.state.item.canBoDuocThue.ho}  ${this.state.item.canBoDuocThue.ten}`}</h1>
                         <p>Số hợp đồng: {this.state.item.qtHopDongDvtlTn.soHopDong}</p>
                     </>) : <>
-                        <h1><i className='fa fa-pencil' />Tạo mới hợp đồng</h1>
-                    </>}
+                            <h1><i className='fa fa-pencil' />Tạo mới hợp đồng</h1>
+                        </>}
                 </div>
                 <div className='tile'>
                     <h3 className='tile-title'>Thông tin hợp đồng phía trường</h3>
