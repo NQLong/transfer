@@ -193,7 +193,7 @@ export function deleteQtKeoDaiCongTacStaff(id, isEdit, shcc = null) {
                 T.notify('Xóa thông tin kéo dài công tác bị lỗi', 'danger');
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
-                T.alert('Thông tin kéo dài công tác được xóa thành công!', 'info', false, 800);
+                T.alert('Thông tin kéo dài công tác được xóa thành công!', 'info');
                 isEdit ? dispatch(getStaffEdit(shcc)) : dispatch(getQtKeoDaiCongTacPage());
             }
         }, () => T.notify('Xóa thông tin kéo dài công tác bị lỗi', 'danger'));

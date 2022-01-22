@@ -52,6 +52,7 @@ class EditModal extends AdminModal {
 
     onSubmit = (e) => {
         e.preventDefault();
+        console.log('submit');
         const changes = {
             shcc: this.shcc.value(),
             batDauType: this.state.batDauType,
@@ -164,7 +165,6 @@ class QtKeoDaiCongTacGroupPage extends AdminPage {
             permission = this.getUserPermission('qtKeoDaiCongTac', ['read', 'write', 'delete']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtKeoDaiCongTac && this.props.qtKeoDaiCongTac.page ? this.props.qtKeoDaiCongTac.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách!';
-        console.log(list);
         if (list && list.length > 0) {
             table = renderTable({
                 getDataSource: () => list, stickyHead: false,

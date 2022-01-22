@@ -6,8 +6,8 @@ import Pagination from 'view/component/Pagination';
 import Dropdown from 'view/component/Dropdown';
 import { DateInput } from 'view/component/Input';
 import {
-    getQtKeoDaiCongTacPage, getQtKeoDaiCongTacGroupPage, updateQtKeoDaiCongTacGroupPageMa,
-    createQtKeoDaiCongTacGroupPageMa, deleteQtKeoDaiCongTacGroupPageMa
+    getQtKeoDaiCongTacPage, getQtKeoDaiCongTacGroupPage, updateQtKeoDaiCongTacStaff,
+    createQtKeoDaiCongTacStaff, deleteQtKeoDaiCongTacStaff
 } from './redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import { SelectAdapter_DmDonVi} from 'modules/mdDanhMuc/dmDonVi/redux';
@@ -26,7 +26,6 @@ const EnumDateType = Object.freeze({
 class EditModal extends AdminModal {
     state = {
         id: null,
-        shcc: null,
         batDau: '',
         ketThuc: '',
         batDauType: 'dd/mm/yyyy',
@@ -38,7 +37,6 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        console.log(item);
         let { id, shcc, batDau, batDauType, ketThuc, ketThucType, soHieuVanBan, } = item ? item : {
                 id: '', shcc: '', batDau: '', batDauType: '', ketThuc: '', ketThucType: '', soHieuVanBan : ''
         };
@@ -49,7 +47,7 @@ class EditModal extends AdminModal {
         });
 
         setTimeout(() => {
-            this.shcc.value(shcc ? shcc : this.props.shcc);
+            this.shcc.value(shcc ? shcc : this.props.shcc); 
             this.batDau.setVal(batDau);
             this.ketThuc.setVal(ketThuc);
             this.batDauType.setText({ text: batDauType ? batDauType : 'dd/mm/yyyy' });
@@ -58,26 +56,24 @@ class EditModal extends AdminModal {
         }, 500);
     }
 
-    onSubmit = () => {
+    onSubmit = (e) => {
+        e.preventDefault();
         const changes = {
-            shcc: this.shcc.getVal(),
-            batDauType: this.batDauType.getVal(),
+            shcc: this.shcc.value(),
+            batDauType: this.state.batDauType,
             batDau: this.batDau.getVal(),
-            ketThucType: this.ketThucType.getVal(),
+            ketThucType: this.state.ketThucType,
             ketThuc: this.ketThuc.getVal(),
-            soHieuVanBan: this.soHieuVanBan.value(),
+            soHieuVanBan: this.soHieuVanBan.value()
         };
         if (!changes.shcc) {
             T.notify('Chưa chọn cán bộ', 'danger');
             this.shcc.focus();
-        } else if (!changes.soHieuVanBan) {
-            T.notify('Số hiệu văn bản trống', 'danger');
-            this.soHieuVanBan.focus();
         } else if (!changes.batDau) {
             T.notify('Ngày bắt đầu trống', 'danger');
             this.batDau.focus();
         } else {
-            this.state.id ? this.props.update(this.state.id, changes, null, false) : this.props.create(changes, null, false);
+            this.state.id ? this.props.update(this.state.id, changes, this.hide, false) : this.props.create(changes, this.hide, false);
         }
     }
 
@@ -186,7 +182,7 @@ class QtKeoDaiCongTac extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa quá trình kéo dài công tác', 'Bạn có chắc bạn muốn xóa quá trình kéo dài công tác này', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtKeoDaiCongTacGroupPageMa(item.id, error => {
+            isConfirm && this.props.deleteQtKeoDaiCongTacStaff(item.id, false, null, error => {
                 if (error) T.notify(error.message ? error.message : `Xoá quá trình kéo dài công tác ${item.ten} bị lỗi!`, 'danger');
                 else T.alert(`Xoá quá trình kéo dài công tác ${item.ten} thành công!`, 'success', false, 800);
             });
@@ -277,7 +273,7 @@ class QtKeoDaiCongTac extends AdminPage {
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition, loaiDoiTuong }}
                     getPage={this.checked ? this.props.getQtKeoDaiCongTacGroupPage : this.props.getQtKeoDaiCongTacPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
-                    create={this.props.createQtKeoDaiCongTacGroupPageMa} update={this.props.updateQtKeoDaiCongTacGroupPageMa}
+                    create={this.props.createQtKeoDaiCongTacStaff} update={this.props.updateQtKeoDaiCongTacStaff}
                      permissions={currentPermissions}
                     />
             </>,
@@ -289,7 +285,7 @@ class QtKeoDaiCongTac extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, qtKeoDaiCongTac: state.qtKeoDaiCongTac });
 const mapActionsToProps = {
-    getQtKeoDaiCongTacPage, getQtKeoDaiCongTacGroupPage, updateQtKeoDaiCongTacGroupPageMa,
-    createQtKeoDaiCongTacGroupPageMa, deleteQtKeoDaiCongTacGroupPageMa,
+    getQtKeoDaiCongTacPage, getQtKeoDaiCongTacGroupPage, updateQtKeoDaiCongTacStaff,
+    createQtKeoDaiCongTacStaff, deleteQtKeoDaiCongTacStaff,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtKeoDaiCongTac);
