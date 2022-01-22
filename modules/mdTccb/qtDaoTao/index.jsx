@@ -5,7 +5,8 @@ import qtDaoTao from './redux';
 
 export default {
     redux: {
-        qtDaoTao,
+        parents: 'tccb',
+        reducers: { qtDaoTao }
     },
     routes: [
         {

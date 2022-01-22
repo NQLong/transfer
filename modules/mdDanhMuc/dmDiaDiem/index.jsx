@@ -1,3 +1,4 @@
+
 //TEMPLATES: admin
 import Loadable from 'react-loadable';
 import Loading from 'view/component/Loading';
@@ -7,7 +8,8 @@ import dmPhuongXa from './reduxPhuongXa';
 
 export default {
     redux: {
-        dmTinhThanhPho, dmQuanHuyen, dmPhuongXa,
+        parent: 'danhMuc',
+        reducers: { dmTinhThanhPho, dmQuanHuyen, dmPhuongXa }
     },
     routes: [
         {

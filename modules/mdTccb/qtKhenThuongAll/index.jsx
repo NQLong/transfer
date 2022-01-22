@@ -5,7 +5,8 @@ import qtKhenThuongAll from './redux';
 
 export default {
     redux: {
-        qtKhenThuongAll,
+        parent: 'tccb',
+        reducer: { qtKhenThuongAll }
     },
     routes: [
         {

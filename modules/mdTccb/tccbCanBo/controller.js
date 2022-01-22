@@ -6,11 +6,21 @@ module.exports = app => {
         },
     };
 
+    const menuStaff = {
+        parentMenu: app.parentMenu.user,
+        menus: {
+            1001: { title: 'Hồ sơ cán bộ', link: '/user/info', icon: 'fa-address-card-o', backgroundColor: '#8bc34a', groupIndex: 0},
+        },
+    };
+
     app.permission.add(
+        { name: 'staff:login', menu: menuStaff },
         { name: 'staff:read', menu },
         { name: 'staff:write' },
         { name: 'staff:delete' },
     );
+
+    app.get('/user/info', app.permission.check('staff:login'), app.templates.admin);
 
     app.get('/user/tccb/staff/:shcc', app.permission.check('staff:read'), app.templates.admin);
     app.get('/user/tccb/staff', app.permission.check('staff:read'), app.templates.admin);

@@ -8,6 +8,7 @@ const QtNghienCuuKhoaHocGetPage = 'QtNghienCuuKhoaHoc:GetPage';
 const QtNghienCuuKhoaHocGetGroupPage = 'QtNghienCuuKhoaHoc:GetGroupPage';
 const QtNghienCuuKhoaHocUpdate = 'QtNghienCuuKhoaHoc:Update';
 const QtNghienCuuKhoaHocGet = 'QtNghienCuuKhoaHoc:Get';
+const QtNghienCuuKhoaHocUserGetAll = 'QtNghienCuuKhoaHoc:UserGetAll';
 
 export default function QtNghienCuuKhoaHocReducer(state = null, data) {
     switch (data.type) {
@@ -44,6 +45,8 @@ export default function QtNghienCuuKhoaHocReducer(state = null, data) {
             } else {
                 return null;
             }
+        case QtNghienCuuKhoaHocUserGetAll:
+            return Object.assign({}, state, { items: data.items });
         default:
             return state;
     }
@@ -116,6 +119,20 @@ export function getQtNghienCuuKhoaHocGroupPageMa(pageNumber, pageSize, loaiDoiTu
     };
 }
 
+export function getQtNghienCuuKhoaHocAll(done) {
+    return dispatch => {
+        const url = '/api/tccb/qua-trinh/nghien-cuu-khoa-hoc/all';
+        T.get(url, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách nghiên cứu khoa học bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                done && done(data.items);
+                dispatch({ type: QtNghienCuuKhoaHocGetAll, items: data.items ? data.items : [] });
+            }
+        }, error => T.notify('Lấy danh sách nghiên cứu khoa học bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+    };
+}
 
 export function createQtNckhStaffGroup(data, done, isEdit = null) {
     return dispatch => {
@@ -227,6 +244,24 @@ export function deleteQtNckhStaff(id, shcc, isEdit = null) {
         }, () => T.notify('Xóa thông tin nghiên cứu khoa học bị lỗi', 'danger'));
     };
 }
+
+
+// User Action ----------------------------------------------------------
+export function getQtNckhUserAll(done) {
+    return dispatch => {
+        const url = '/api/user/qua-trinh/nckh';
+        T.get(url, data => {
+            if (data.error) {
+                T.notify('Lấy thông tin nghiên cứu khoa học bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                done && done(data.items);
+                dispatch({ type: QtNghienCuuKhoaHocUserGetAll, items: data.items });
+            }
+        }, error => T.notify('Lấy thông tin nghiên cứu khoa học bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+    };
+}
+
 
 export function createQtNckhStaffUser(data, done) {
     return dispatch => {

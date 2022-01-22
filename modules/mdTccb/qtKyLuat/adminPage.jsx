@@ -278,7 +278,7 @@ class QtKyLuat extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtKyLuat: state.qtKyLuat });
+const mapStateToProps = state => ({ system: state.system, qtKyLuat: state.tccb.qtKyLuat });
 const mapActionsToProps = {
     getQtKyLuatAll, getQtKyLuatPage, deleteQtKyLuat, createQtKyLuat,
     updateQtKyLuat, getQtKyLuatGroupPage,

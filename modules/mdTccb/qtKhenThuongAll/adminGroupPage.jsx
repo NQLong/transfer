@@ -311,7 +311,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtKhenThuongAll: state.qtKhenThuongAll });
+const mapStateToProps = state => ({ system: state.system, qtKhenThuongAll: state.tccb.qtKhenThuongAll });
 const mapActionsToProps = {
     getQtKhenThuongAllPage, deleteQtKhenThuongAllGroupPageMa, createQtKhenThuongAllGroupPageMa,
     updateQtKhenThuongAllGroupPageMa, getDmKhenThuongLoaiDoiTuongAll,

@@ -5,7 +5,8 @@ import qtHocTapCongTac from './redux';
 
 export default {
     redux: {
-        qtHocTapCongTac,
+        parent: 'tccb',
+        reducers: { qtHocTapCongTac }
     },
     routes: [
         {

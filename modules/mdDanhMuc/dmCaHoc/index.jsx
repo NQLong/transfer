@@ -5,7 +5,8 @@ import dmCaHoc from './redux';
 
 export default {
     redux: {
-        dmCaHoc,
+        parent: 'danhMuc',
+        reducers: { dmCaHoc, }
     },
     routes: [
         {

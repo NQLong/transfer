@@ -211,7 +211,7 @@ class QtBaiVietKhoaHocGroupPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtBaiVietKhoaHoc: state.qtBaiVietKhoaHoc });
+const mapStateToProps = state => ({ system: state.system, qtBaiVietKhoaHoc: state.tccb.qtBaiVietKhoaHoc });
 const mapActionsToProps = {
     getQtBaiVietKhoaHocPage, deleteQtBaiVietKhoaHocGroupPageMa,
     updateQtBaiVietKhoaHocGroupPageMa, getQtBaiVietKhoaHocGroupPageMa,

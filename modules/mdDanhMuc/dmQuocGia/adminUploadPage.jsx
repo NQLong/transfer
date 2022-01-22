@@ -224,6 +224,6 @@ class adminUploadPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, categoryRoom: state.categoryRoom, categoryBuilding: state.categoryBuilding });
+const mapStateToProps = state => ({ system: state.system });
 const mapActionsToProps = { getDmQuocGiaPage, deleteDmQuocGia, createDmQuocGia, updateDmQuocGia, createDmQuocGiaByUpload };
 export default connect(mapStateToProps, mapActionsToProps)(adminUploadPage);

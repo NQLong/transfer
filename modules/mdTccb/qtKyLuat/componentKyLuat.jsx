@@ -218,7 +218,7 @@ class ComponentKyLuat extends AdminPage {
         );
     }
 }
-const mapStateToProps = state => ({ system: state.system, staff: state.staff });
+const mapStateToProps = state => ({ system: state.system, staff: state.tccb.staff });
 const mapActionsToProps = {
     updateQtKyLuat, deleteQtKyLuat, createQtKyLuat
 };

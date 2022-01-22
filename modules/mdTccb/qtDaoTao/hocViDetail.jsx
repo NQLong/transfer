@@ -215,7 +215,7 @@ class HocViDetail extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ staff: state.staff, system: state.system });
+const mapStateToProps = state => ({ staff: state.tccb.staff, system: state.system });
 const mapActionsToProps = {
     getStaffEdit, userGetStaff, createQtDaoTao, createQtDaoTaoStaffUser
 };

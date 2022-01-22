@@ -270,7 +270,7 @@ class ComponentSGT extends AdminPage {
 
     }
 }
-const mapStateToProps = state => ({ system: state.system, staff: state.staff });
+const mapStateToProps = state => ({ system: state.system, staff: state.tccb.staff });
 const mapActionsToProps = {
     createSachGTStaff, createSachGTStaffUser, updateSachGTStaff, updateSachGTStaffUser, deleteSachGTStaff, deleteSachGTStaffUser
 };

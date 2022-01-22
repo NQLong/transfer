@@ -523,7 +523,7 @@ class QtHopDongLaoDongEditPage extends QTForm {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtHopDongLaoDong: state.qtHopDongLaoDong });
+const mapStateToProps = state => ({ system: state.system, qtHopDongLaoDong: state.tccb.qtHopDongLaoDong });
 const mapActionsToProps = {
     createStaff, deleteStaff, updateStaff, getStaffAll, getDmLoaiHopDong,
     getQtHopDongLaoDongPage, getQtHopDongLaoDongAll, updateQtHopDongLaoDong, getdmLoaiHopDongAll,

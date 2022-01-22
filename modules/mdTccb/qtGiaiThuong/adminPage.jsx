@@ -227,7 +227,7 @@ class QtGiaiThuong extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtGiaiThuong: state.qtGiaiThuong });
+const mapStateToProps = state => ({ system: state.system, qtGiaiThuong: state.tccb.qtGiaiThuong });
 const mapActionsToProps = {
     getQtGiaiThuongPage, deleteQtGiaiThuongStaff, createQtGiaiThuongStaff,
     updateQtGiaiThuongStaff, getQtGiaiThuongGroupPage,

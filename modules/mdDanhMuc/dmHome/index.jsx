@@ -6,6 +6,10 @@ export default {
     redux: {},
     routes: [
         {
+            path: '/user',
+            component: () => <SubMenusPage menuLink='/user' menuKey={1000} headerIcon='fa-user' />
+        },
+        {
             path: '/user/tccb',
             component: () => <SubMenusPage menuLink='/user/tccb' menuKey={3000} headerIcon='fa-list-alt' />
         },
@@ -23,7 +27,7 @@ export default {
         },
         {
             path: '/user/websites',
-            component: () => <SubMenusPage menuLink='/user/websites' menuKey={1006} headerIcon='fa-list-alt' />
+            component: () => <SubMenusPage menuLink='/user/websites' menuKey={1900} headerIcon='fa-list-alt' />
         },
     ]
 };

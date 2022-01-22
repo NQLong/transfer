@@ -4,7 +4,8 @@ import dmHoatDongKhcn from './redux';
 
 export default {
     redux: {
-        dmHoatDongKhcn
+        parent: 'danhMuc',
+        reducers: { dmHoatDongKhcn, }
     },
     routes: [
         {

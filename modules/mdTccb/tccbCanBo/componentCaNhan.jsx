@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { updateSystemState } from 'modules/_default/_init/reduxSystem';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
-import { FormImageBox, FormTextBox, FormSelect, FormDatePicker, FormRichTextBox, FormCheckbox} from 'view/component/AdminPage';
+import { FormImageBox, FormTextBox, FormSelect, FormDatePicker, FormRichTextBox, FormCheckbox } from 'view/component/AdminPage';
 import { SelectAdapter_DmGioiTinhV2 } from 'modules/mdDanhMuc/dmGioiTinh/redux';
 import { ComponentDiaDiem } from 'modules/mdDanhMuc/dmDiaDiem/componentDiaDiem';
 import { SelectAdapter_DmQuocGia } from 'modules/mdDanhMuc/dmQuocGia/redux';
@@ -48,34 +48,34 @@ class ComponentCaNhan extends React.Component {
             this.chieuCao.value(item.chieuCao ? item.chieuCao : '');
             this.canNang.value(item.canNang ? item.canNang : '');
             this.nhomMau.value(item.nhomMau ? item.nhomMau : '');
-    
+
             this.soTruong.value(item.soTruong ? item.soTruong : '');
             this.tuNhanXet.value(item.tuNhanXet ? item.tuNhanXet : '');
-    
+
             this.doanVien.value(item.doanVien);
             this.state.doanVien && this.ngayVaoDoan.value(item.ngayVaoDoan ? item.ngayVaoDoan : '');
             this.state.doanVien && this.noiVaoDoan.value(item.noiVaoDoan ? item.noiVaoDoan : '');
-    
+
             this.dangVien.value(item.dangVien);
             this.state.dangVien && this.ngayVaoDang.value(item.ngayVaoDang ? item.ngayVaoDang : '');
             this.state.dangVien && this.ngayVaoDangCT.value(item.ngayVaoDangChinhThuc ? item.ngayVaoDangChinhThuc : '');
             this.state.dangVien && this.noiVaoDang.value(item.noiDangDb ? item.noiDangDb : '');
             this.state.dangVien && this.noiVaoDangCT.value(item.noiDangCt ? item.noiDangCt : '');
-    
+
             this.congDoan.value(item.congDoan);
             this.state.congDoan && this.ngayVaoCongDoan.value(item.ngayVaoCongDoan ? item.ngayVaoCongDoan : '');
             this.state.congDoan && this.noiVaoCongDoan.value(item.noiVaoCongDoan ? item.noiVaoCongDoan : '');
-    
+
             this.namNhapNgu.value(item.ngayNhapNgu ? item.ngayNhapNgu : '');
             this.namXuatNgu.value(item.namXuatNgu ? item.namXuatNgu : '');
             this.capBacCaoNhat.value(item.quanHamCaoNhat ? item.quanHamCaoNhat : '');
             this.hangThuongBinh.value(item.hangThuongBinh ? item.hangThuongBinh : '');
             this.giaDinhChinhSach.value(item.giaDinhChinhSach ? item.giaDinhChinhSach : '');
             this.danhHieuPhongTangCaoNhat.value(item.danhHieu ? item.danhHieu : '');
-            
+
             this.componentToChucKhac.value(item.shcc, item.email);
         });
-       
+
     }
 
     imageChanged = (data) => {
@@ -179,88 +179,85 @@ class ComponentCaNhan extends React.Component {
             <div className='tile'>
                 <h3 className='tile-title'>Thông tin cá nhân</h3>
                 <div className='tile-body row'>
-                    <div className='form-group col-md-3'>
-                        <FormImageBox ref={e => this.imageBox = e} style={{ display: 'block' }} label='Hình đại diện'
-                            postUrl='/user/upload' uploadType='CanBoImage' success={this.imageChanged} />
-                    </div>
+                    <FormImageBox ref={e => this.imageBox = e} style={{ display: 'block' }} label='Hình đại diện'
+                        postUrl='/user/upload' uploadType='CanBoImage' success={this.imageChanged} className='form-group col-md-3' />
 
-
-                    <div className='col-md-9'>
+                    <div className='form-group col-md-9'>
                         <div className='row'>
-                            <FormTextBox ref={e => this.maTheCanBo = e} label='Mã số cán bộ' className='col-md-4' readOnly={this.props.userEdit} required maxLength={10} />
-                            <FormSelect ref={e => this.donVi = e} label='Đơn vị công tác' className='col-md-8' readOnly={this.props.userEdit} required data={SelectAdapter_DmDonVi} />
-
+                            <FormTextBox ref={e => this.maTheCanBo = e} label='Mã số cán bộ' className='form-group col-md-4' readOnly={this.props.userEdit} required maxLength={10} />
+                            <FormSelect ref={e => this.donVi = e} label='Đơn vị công tác' className='form-group col-md-8' readOnly={this.props.userEdit} required data={SelectAdapter_DmDonVi} />
+                            <FormTextBox ref={e => this.ho = e} label='Họ và tên lót' className='form-group col-md-4' readOnly={this.props.userEdit} required maxLength={100} />
+                            <FormTextBox ref={e => this.ten = e} label='Tên' className='form-group col-md-4' readOnly={this.props.userEdit} required maxLength={30} />
+                            <FormSelect ref={e => this.phai = e} label='Giới tính' className='form-group col-md-4' readOnly={this.props.userEdit} required data={SelectAdapter_DmGioiTinhV2} />
+                            <FormTextBox ref={e => this.biDanh = e} label='Bí danh' className='form-group col-md-4' maxLength={30} />
+                            <FormDatePicker ref={e => this.ngaySinh = e} type='date-mask' className='form-group col-md-4' label='Ngày sinh' required />
+                            <FormSelect ref={e => this.quocTich = e} label='Quốc tịch' className='form-group col-md-4' data={SelectAdapter_DmQuocGia} />
                         </div>
                     </div>
-                    <FormTextBox ref={e => this.ho = e} label='Họ và tên lót' className='col-md-4' readOnly={this.props.userEdit} required maxLength={100} />
-                    <FormTextBox ref={e => this.ten = e} label='Tên' className='col-md-4' readOnly={this.props.userEdit} required maxLength={30} />
-                    <FormTextBox ref={e => this.biDanh = e} label='Tên khác (Bí danh)' className='col-md-4' maxLength={30} />
-                    <FormSelect ref={e => this.phai = e} label='Giới tính' className='col-md-4' readOnly={this.props.userEdit} required data={SelectAdapter_DmGioiTinhV2} />
-                    <FormDatePicker ref={e => this.ngaySinh = e} type='date-mask' className='col-md-4' label='Ngày sinh' required readOnly={this.props.userEdit} />
+
+
                     <div className='form-group col-md-12'></div>
-                    <ComponentDiaDiem ref={e => this.noiSinh = e} label='Nơi sinh' className='col-md-12' />
-                    <ComponentDiaDiem ref={e => this.nguyenQuan = e} label='Nguyên quán' className='col-md-12' />
-                    <ComponentDiaDiem ref={e => this.thuongTru = e} label='Thường trú' className='col-md-12' requiredSoNhaDuong={true} />
-                    <p className='col-md-12'>
+                    <ComponentDiaDiem ref={e => this.noiSinh = e} label='Nơi sinh' className='form-group col-md-12' />
+                    <ComponentDiaDiem ref={e => this.nguyenQuan = e} label='Nguyên quán' className='form-group col-md-12' />
+                    <ComponentDiaDiem ref={e => this.thuongTru = e} label='Thường trú' className='form-group col-md-12' requiredSoNhaDuong={true} />
+                    <p className='form-group col-md-12'>
                         Nếu <b>Địa chỉ thường trú</b> là <b>Địa chỉ hiện tại</b> thì&nbsp;<a href='#' onClick={this.copyAddress}>nhấp vào đây</a>.
                     </p>
-                    <ComponentDiaDiem ref={e => this.hienTai = e} label='Nơi ở hiện tại' className='col-md-12' requiredSoNhaDuong={true} />
+                    <ComponentDiaDiem ref={e => this.hienTai = e} label='Nơi ở hiện tại' className='form-group col-md-12' requiredSoNhaDuong={true} />
 
                     <div className='form-group col-md-12'></div>
 
-                    <FormTextBox ref={e => this.cmnd = e} label='CMND/CCCD' className='col-md-4' readOnly={this.props.userEdit} />
-                    <FormDatePicker ref={e => this.cmndNgayCap = e} type='date-mask' label='Ngày cấp CMND/CCCD' className='col-md-4' readOnly={this.props.userEdit} />
-                    <FormTextBox ref={e => this.cmndNoiCap = e} label='Nơi cấp CMND/CCCD' className='col-md-4' readOnly={this.props.userEdit} />
+                    <FormTextBox ref={e => this.cmnd = e} label='CMND/CCCD' className='form-group col-md-4' />
+                    <FormDatePicker ref={e => this.cmndNgayCap = e} type='date-mask' label='Ngày cấp CMND/CCCD' className='form-group col-md-4' />
+                    <FormTextBox ref={e => this.cmndNoiCap = e} label='Nơi cấp CMND/CCCD' className='form-group col-md-4' />
 
-                    <FormTextBox ref={e => this.soDienThoaiCaNhan = e} label='Số điện thoại cá nhân' className='col-md-6' maxLength={10} />
-                    <FormTextBox ref={e => this.soDienThoaiBaoTin = e} label='Số điện thoại báo tin' className='col-md-6' maxLength={10} />
+                    <FormTextBox ref={e => this.soDienThoaiCaNhan = e} label='Số điện thoại cá nhân' className='form-group col-md-6' maxLength={10} />
+                    <FormTextBox ref={e => this.soDienThoaiBaoTin = e} label='Số điện thoại báo tin' className='form-group col-md-6' maxLength={10} />
 
-                    <FormTextBox ref={e => this.emailCaNhan = e} label='Email cá nhân' className='col-md-6' readOnly={this.props.userEdit} />
-                    <FormTextBox ref={e => this.emailTruong = e} label='Email trường' className='col-md-6' readOnly={this.props.userEdit}/>
-
-                    <div className='form-group col-md-12'></div>
-
-                    <FormSelect ref={e => this.quocTich = e} label='Quốc tịch' className='col-md-4' data={SelectAdapter_DmQuocGia} readOnly={this.props.userEdit} />
-                    <FormSelect ref={e => this.danToc = e} label='Dân tộc' className='col-md-4' data={SelectAdapter_DmDanTocV2} readOnly={this.props.userEdit} />
-                    <FormSelect ref={e => this.tonGiao = e} label='Tôn giáo' className='col-md-4' data={SelectAdapter_DmTonGiaoV2} readOnly={this.props.userEdit} />
-
-                    <FormTextBox ref={e => this.tinhTrangSucKhoe = e} label='Tình trạng sức khỏe' className='col-md-3' readOnly={this.props.userEdit} />
-                    <FormTextBox type='number' step={1} ref={e => this.chieuCao = e} label='Chiều cao (cm)' className='col-md-3' readOnly={this.props.userEdit} />
-                    <FormTextBox type='number' step={0.1} ref={e => this.canNang = e} label='Cân nặng (kg)' className='col-md-3' readOnly={this.props.userEdit} />
-                    <FormSelect ref={e => this.nhomMau = e} label='Nhóm máu' className='col-md-3' data={SelectAdapter_DmNhomMauV2} readOnly={this.props.userEdit} />
-
-                    <FormRichTextBox ref={e => this.soTruong = e} label='Sở trường/Năng khiếu/Ưu điểm' className='col-md-6' />
-                    <FormRichTextBox ref={e => this.tuNhanXet = e} label='Tự nhận xét' className='col-md-6' />
+                    <FormTextBox ref={e => this.emailCaNhan = e} label='Email cá nhân' className='form-group col-md-6' />
+                    <FormTextBox ref={e => this.emailTruong = e} label='Email trường' className='form-group col-md-6' />
 
                     <div className='form-group col-md-12'></div>
 
-                    <FormCheckbox ref={e => this.doanVien = e} label='Đoàn viên' onChange={value => this.setState({ doanVien: value })} className='col-md-12' />
-                    {this.state.doanVien ? <FormDatePicker ref={e => this.ngayVaoDoan = e} type='date-mask' label='Ngày vào Đoàn' className='col-md-3' readOnly={this.props.userEdit} /> : null}
-                    {this.state.doanVien ? <FormTextBox ref={e => this.noiVaoDoan = e} label='Nơi vào Đoàn' className='col-md-3' readOnly={this.props.userEdit} /> : null}
+                    <FormSelect ref={e => this.danToc = e} label='Dân tộc' className='form-group col-md-2' data={SelectAdapter_DmDanTocV2} />
+                    <FormSelect ref={e => this.tonGiao = e} label='Tôn giáo' className='form-group col-md-4' data={SelectAdapter_DmTonGiaoV2} />
+                    <FormTextBox type='number' step={1} ref={e => this.chieuCao = e} label='Chiều cao (cm)' className='form-group col-md-2' />
+                    <FormTextBox type='number' step={0.1} ref={e => this.canNang = e} label='Cân nặng (kg)' className='form-group col-md-2' />
+                    <FormSelect ref={e => this.nhomMau = e} label='Nhóm máu' className='form-group col-md-2' data={SelectAdapter_DmNhomMauV2} />
 
-                    <FormCheckbox ref={e => this.dangVien = e} label='Đảng viên' onChange={value => this.setState({ dangVien: value })} className='col-md-12' />
-                    {this.state.dangVien ? <FormDatePicker ref={e => this.ngayVaoDang = e} type='date-mask' label='Ngày vào Đảng (dự bị)' className='col-md-3' readOnly={this.props.userEdit} /> : null}
-                    {this.state.dangVien ? <FormTextBox ref={e => this.noiVaoDang = e} label='Nơi vào Đảng (dự bị)' className='col-md-3' readOnly={this.props.userEdit} /> : null}
-                    {this.state.dangVien ? <FormDatePicker ref={e => this.ngayVaoDangCT = e} type='date-mask' label='Ngày vào Đảng (chính thức)' className='col-md-3' readOnly={this.props.userEdit} /> : null}
-                    {this.state.dangVien ? <FormTextBox ref={e => this.noiVaoDangCT = e} label='Nơi vào Đảng (chính thức)' className='col-md-3' readOnly={this.props.userEdit} /> : null}
+                    <FormRichTextBox ref={e => this.tinhTrangSucKhoe = e} label='Tình trạng sức khỏe' className='form-group col-md-4' />
+                    <FormRichTextBox ref={e => this.soTruong = e} label='Sở trường' className='form-group col-md-4' />
+                    <FormRichTextBox ref={e => this.tuNhanXet = e} label='Tự nhận xét' className='form-group col-md-4' />
 
-                    <FormCheckbox ref={e => this.congDoan = e} label='Công đoàn viên' onChange={value => this.setState({ congDoan: value })} className='col-md-12' />
-                    {this.state.congDoan ? <FormDatePicker ref={e => this.ngayVaoCongDoan = e} type='date-mask' label='Ngày vào Công đoàn' className='col-md-3' readOnly={this.props.userEdit} /> : null}
-                    {this.state.congDoan ? <FormTextBox ref={e => this.noiVaoCongDoan = e} label='Nơi vào Công đoàn' className='col-md-3' readOnly={this.props.userEdit} /> : null}
+                    <div className='form-group col-md-12'></div>
+
+                    <FormCheckbox ref={e => this.doanVien = e} label='Đoàn viên' onChange={value => this.setState({ doanVien: value })} className='form-group col-md-12' />
+                    {this.state.doanVien ? <FormDatePicker ref={e => this.ngayVaoDoan = e} type='date-mask' label='Ngày vào Đoàn' className='form-group col-md-3' readOnly={this.props.userEdit} /> : null}
+                    {this.state.doanVien ? <FormTextBox ref={e => this.noiVaoDoan = e} label='Nơi vào Đoàn' className='form-group col-md-3' readOnly={this.props.userEdit} /> : null}
+
+                    <FormCheckbox ref={e => this.dangVien = e} label='Đảng viên' onChange={value => this.setState({ dangVien: value })} className='form-group col-md-12' />
+                    {this.state.dangVien ? <FormDatePicker ref={e => this.ngayVaoDang = e} type='date-mask' label='Ngày vào Đảng (dự bị)' className='form-group col-md-3' readOnly={this.props.userEdit} /> : null}
+                    {this.state.dangVien ? <FormTextBox ref={e => this.noiVaoDang = e} label='Nơi vào Đảng (dự bị)' className='form-group col-md-3' readOnly={this.props.userEdit} /> : null}
+                    {this.state.dangVien ? <FormDatePicker ref={e => this.ngayVaoDangCT = e} type='date-mask' label='Ngày vào Đảng (chính thức)' className='form-group col-md-3' readOnly={this.props.userEdit} /> : null}
+                    {this.state.dangVien ? <FormTextBox ref={e => this.noiVaoDangCT = e} label='Nơi vào Đảng (chính thức)' className='form-group col-md-3' readOnly={this.props.userEdit} /> : null}
+
+                    <FormCheckbox ref={e => this.congDoan = e} label='Công đoàn viên' onChange={value => this.setState({ congDoan: value })} className='form-group col-md-12' />
+                    {this.state.congDoan ? <FormDatePicker ref={e => this.ngayVaoCongDoan = e} type='date-mask' label='Ngày vào Công đoàn' className='form-group col-md-3' readOnly={this.props.userEdit} /> : null}
+                    {this.state.congDoan ? <FormTextBox ref={e => this.noiVaoCongDoan = e} label='Nơi vào Công đoàn' className='form-group col-md-3' readOnly={this.props.userEdit} /> : null}
 
                     <div className='form-group col-md-12'>
-                        <ComponentToChucKhac ref={e => this.componentToChucKhac = e} label='Tổ chức chính trị - xã hội, nghề nghiệp khác' userEdit={this.props.isStaff}/>
+                        <ComponentToChucKhac ref={e => this.componentToChucKhac = e} label='Tổ chức chính trị - xã hội, nghề nghiệp khác' userEdit={this.props.isStaff} />
                     </div>
 
                     <div className='form-group col-md-12' />
 
-                    <FormDatePicker className='col-md-3' type='date-mask' ref={e => this.namNhapNgu = e} label='Năm nhập ngũ' />
-                    <FormDatePicker className='col-md-3' type='date-mask' ref={e => this.namXuatNgu = e} label='Năm xuất ngũ' />
-                    <FormTextBox className='col-md-3' ref={e => this.capBacCaoNhat = e} label='Quân hàm/Cấp bậc cao nhất' />
-                    <FormTextBox className='col-md-3' ref={e => this.hangThuongBinh = e} label='Hạng thương binh' />
+                    <FormDatePicker className='form-group col-md-3' type='date-mask' ref={e => this.namNhapNgu = e} label='Năm nhập ngũ' />
+                    <FormDatePicker className='form-group col-md-3' type='date-mask' ref={e => this.namXuatNgu = e} label='Năm xuất ngũ' />
+                    <FormTextBox className='form-group col-md-3' ref={e => this.capBacCaoNhat = e} label='Quân hàm/Cấp bậc cao nhất' />
+                    <FormTextBox className='form-group col-md-3' ref={e => this.hangThuongBinh = e} label='Hạng thương binh' />
 
-                    <FormTextBox className='col-md-6' ref={e => this.giaDinhChinhSach = e} label='Gia đình chính sách' />
-                    <FormTextBox className='col-md-6' ref={e => this.danhHieuPhongTangCaoNhat = e} label='Danh hiệu được phong tặng cao nhất' />
+                    <FormTextBox className='form-group col-md-6' ref={e => this.giaDinhChinhSach = e} label='Gia đình chính sách' />
+                    <FormTextBox className='form-group col-md-6' ref={e => this.danhHieuPhongTangCaoNhat = e} label='Danh hiệu được phong tặng cao nhất' />
 
 
 
@@ -270,6 +267,6 @@ class ComponentCaNhan extends React.Component {
     }
 }
 
-const mapStateToProps = state => ({ staff: state.staff, system: state.system });
+const mapStateToProps = state => ({ staff: state.tccb.staff, system: state.system });
 const mapActionsToProps = { updateSystemState };
 export default connect(mapStateToProps, mapActionsToProps, null, { forwardRef: true })(ComponentCaNhan);

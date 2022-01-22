@@ -200,7 +200,7 @@ class QtHuongDanLuanVan extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtHuongDanLuanVan: state.qtHuongDanLuanVan });
+const mapStateToProps = state => ({ system: state.system, qtHuongDanLuanVan: state.tccb.qtHuongDanLuanVan });
 const mapActionsToProps = {
     getQtHuongDanLuanVanAll, getQtHuongDanLuanVanPage, deleteQtHuongDanLuanVan, createQtHuongDanLuanVan,
     updateQtHuongDanLuanVan, getQtHuongDanLuanVanGroupPage

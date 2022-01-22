@@ -534,7 +534,7 @@ class QtHopDongVienChucEditPage extends QTForm {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtHopDongVienChuc: state.qtHopDongVienChuc });
+const mapStateToProps = state => ({ system: state.system, qtHopDongVienChuc: state.tccb.qtHopDongVienChuc });
 const mapActionsToProps = {
     createStaff, deleteStaff, updateStaff, getStaffAll, getDmLoaiHopDong,
     getQtHopDongVienChucPage, getQtHopDongVienChucAll, updateQtHopDongVienChuc, getdmLoaiHopDongAll,

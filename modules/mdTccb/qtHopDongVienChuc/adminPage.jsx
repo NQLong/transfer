@@ -187,7 +187,7 @@ class QtHopDongVienChucPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtHopDongVienChuc: state.qtHopDongVienChuc });
+const mapStateToProps = state => ({ system: state.system, qtHopDongVienChuc: state.tccb.qtHopDongVienChuc });
 const mapActionsToProps = {
     getQtHopDongVienChucAll, getQtHopDongVienChucPage, deleteQtHopDongVienChuc, createQtHopDongVienChuc,
     updateQtHopDongVienChuc, getQtHopDongVienChucGroupPage, getDmDonViAll

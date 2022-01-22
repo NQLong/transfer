@@ -5,7 +5,8 @@ import sachGiaoTrinh from './redux';
 
 export default {
     redux: {
-        sachGiaoTrinh,
+        parent: 'tccb',
+        reducers: { sachGiaoTrinh }
     },
     routes: [
         {

@@ -4,7 +4,8 @@ import dmDoiTuongMghp from './redux';
 
 export default {
     redux: {
-        dmDoiTuongMghp,
+        parent: 'danhMuc',
+        reducers: { dmDoiTuongMghp, }
     },
     routes: [
         {

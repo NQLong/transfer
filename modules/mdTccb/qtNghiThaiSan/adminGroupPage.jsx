@@ -210,7 +210,7 @@ class QtNghiThaiSanGroupPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtNghiThaiSan: state.qtNghiThaiSan });
+const mapStateToProps = state => ({ system: state.system, qtNghiThaiSan: state.tccb.qtNghiThaiSan });
 const mapActionsToProps = {
     getQtNghiThaiSanAll, getQtNghiThaiSanPage, deleteQtNghiThaiSan, getDmDonViAll, createQtNghiThaiSan,
     updateQtNghiThaiSan, getDmChucVuAll, getStaffAll, getQtNghiThaiSanGroupPage

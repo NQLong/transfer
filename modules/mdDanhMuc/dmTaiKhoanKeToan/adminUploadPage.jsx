@@ -203,6 +203,6 @@ class adminUploadPage extends React.Component {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, categoryRoom: state.categoryRoom, categoryBuilding: state.categoryBuilding });
+const mapStateToProps = state => ({ system: state.system });
 const mapActionsToProps = { getDmTaiKhoanKeToanPage, deleteDmTaiKhoanKeToan, createDmTaiKhoanKeToan, updateDmTaiKhoanKeToan, createDmTaiKhoanKeToanByUpload };
 export default connect(mapStateToProps, mapActionsToProps)(adminUploadPage);

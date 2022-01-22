@@ -5,15 +5,25 @@ module.exports = app => {
             3021: { title: 'Quá trình nghiên cứu khoa học', link: '/user/tccb/qua-trinh/nghien-cuu-khoa-hoc', icon: 'fa-wpexplorer', backgroundColor: '#f03a88', groupIndex: 4 },
         },
     };
+
+    const menuStaff = {
+        parentMenu: app.parentMenu.user,
+        menus: {
+            1002: { title: 'Nghiên cứu khoa học', link: '/user/nghien-cuu-khoa-hoc', icon: 'fa-wpexplorer', backgroundColor: '#f03a88', groupIndex: 4 },
+        },
+    };
+
     app.permission.add(
+        { name: 'staff:login', menu: menuStaff },
         { name: 'qtNghienCuuKhoaHoc:read', menu },
         { name: 'qtNghienCuuKhoaHoc:write' },
         { name: 'qtNghienCuuKhoaHoc:delete' },
     );
+
     app.get('/user/tccb/qua-trinh/nghien-cuu-khoa-hoc/:id', app.permission.check('qtNghienCuuKhoaHoc:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/nghien-cuu-khoa-hoc', app.permission.check('qtNghienCuuKhoaHoc:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/nghien-cuu-khoa-hoc/group_nckh/:loaiDoiTuong/:ma', app.permission.check('qtNghienCuuKhoaHoc:read'), app.templates.admin);
-
+    app.get('/user/nghien-cuu-khoa-hoc', app.permission.check('staff:login'), app.templates.admin);
     // Hook ready -----------------------------------------------------------------------------------------------------------------------------------
     app.readyHooks.add('readyQtNghienCuuKhoaHoc', {
         ready: () => app.dbConnection && app.model && app.model.qtNghienCuuKhoaHoc,
@@ -76,6 +86,18 @@ module.exports = app => {
             }
         });
     });
+
+    app.get('/api/tccb/qua-trinh/nghien-cuu-khoa-hoc/all', app.permission.check('staff:login'), (req, res) => {
+        let condition = { statement: null };
+        if (req.query.shcc) {
+            condition = {
+                statement: 'shcc = :searchText',
+                parameter: { searchText: req.query.shcc },
+            };
+        }
+        app.model.qtNghienCuuKhoaHoc.getAll(condition, (error, items) => res.send({ error, items }));
+    });
+
     app.post('/api/qua-trinh/nckh', app.permission.check('staff:write'), (req, res) =>
         app.model.qtNghienCuuKhoaHoc.create(req.body.data, (error, item) => res.send({ error, item })));
 
@@ -85,8 +107,19 @@ module.exports = app => {
     app.delete('/api/qua-trinh/nckh', app.permission.check('staff:write'), (req, res) =>
         app.model.qtNghienCuuKhoaHoc.delete({ id: req.body.id }, (error) => res.send(error)));
 
+
+    // User API  -----------------------------------------------------------------------------------------------
+    app.get('/api/user/qua-trinh/nckh', app.permission.check('staff:login'), (req, res) => {
+        app.model.qtNghienCuuKhoaHoc.userPage(req.session.user.email.trim(), (error, items) => {
+            if (error || items == null) {
+                res.send({ error });
+            } else {
+                res.send({ items: items.rows });
+            }
+        });
+    });
+
     app.post('/api/user/qua-trinh/nckh', app.permission.check('staff:login'), (req, res) => {
-        console.log(req);
         if (req.body.data && req.session.user) {
             const data = req.body.data;
             app.model.qtNghienCuuKhoaHoc.create(data, (error, item) => res.send({ error, item }));
@@ -165,13 +198,13 @@ module.exports = app => {
                         ketQua = worksheet.getCell('H' + index).value ? worksheet.getCell('H' + index).value.toString().trim() : '';
                     if (isNaN(Date.parse(batDau))) {
                         done({ error: 'Sai định dạng cột bắt đầu' });
-                    } 
+                    }
                     else if (isNaN(Date.parse(ketThuc))) {
                         done({ error: 'Sai định dạng cột kết thúc' });
-                    } 
+                    }
                     else if (isNaN(Date.parse(ngayNghiemThu))) {
                         done({ error: 'Sai định dạng cột nghiệm thu' });
-                    } 
+                    }
                     else items.push({ tenDeTai, maSoCapQuanLy, vaiTro, batDau, batDauType, ketThuc, ketThucType, ngayNghiemThu, ngayNghiemThuType, kinhPhi, ketQua });
                 } else {
                     done({ items });

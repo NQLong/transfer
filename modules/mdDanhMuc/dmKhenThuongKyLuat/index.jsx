@@ -7,7 +7,8 @@ import dmKyLuat from './reduxKyLuat';
 
 export default {
     redux: {
-        dmHinhThucKyLuat, dmKhenThuong, dmKyLuat,
+        parent: 'danhMuc',
+        reducers: {  dmHinhThucKyLuat, dmKhenThuong, dmKyLuat, } 
     },
     routes: [
         {

@@ -240,7 +240,7 @@ class ComponentDaoTao extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, staff: state.staff });
+const mapStateToProps = state => ({ system: state.system, staff: state.tccb.staff });
 const mapActionsToProps = {
     createQtDaoTao, updateQtDaoTao, deleteQtDaoTao, createQtDaoTaoStaffUser, updateQtDaoTaoStaffUser, deleteQtDaoTaoStaffUser
 };

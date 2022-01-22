@@ -212,7 +212,7 @@ class QtDaoTaoGroupPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtDaoTao: state.qtDaoTao });
+const mapStateToProps = state => ({ system: state.system, qtDaoTao: state.tccb.qtDaoTao });
 const mapActionsToProps = {
     updateQtDaoTaoGroupPageMa, deleteQtDaoTaoGroupPageMa,
     getQtDaoTaoPage

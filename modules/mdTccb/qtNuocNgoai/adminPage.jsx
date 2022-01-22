@@ -288,7 +288,7 @@ class QtNuocNgoai extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtNuocNgoai: state.qtNuocNgoai });
+const mapStateToProps = state => ({ system: state.system, qtNuocNgoai: state.tccb.qtNuocNgoai });
 const mapActionsToProps = {
     getQtNuocNgoaiPage, deleteQtNuocNgoaiStaff, createQtNuocNgoaiStaff,
     updateQtNuocNgoaiStaff, getQtNuocNgoaiGroupPage,

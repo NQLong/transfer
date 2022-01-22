@@ -122,7 +122,7 @@ class DmChucDanhChuyenMon extends AdminPage {
 
 }
 
-const mapStateToProps = state => ({ system: state.system, dmChucDanhChuyenMon: state.dmChucDanhChuyenMon });
+const mapStateToProps = state => ({ system: state.system, dmChucDanhChuyenMon: state.danhMuc.dmChucDanhChuyenMon });
 const mapActionsToProps = { 
     getDmChucDanhChuyenMonAll, createDmChucDanhChuyenMon, updateDmChucDanhChuyenMon, deleteDmChucDanhChuyenMon
 };

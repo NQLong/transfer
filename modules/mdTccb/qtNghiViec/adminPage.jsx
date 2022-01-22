@@ -222,7 +222,7 @@ class QtNghiViec extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtNghiViec: state.qtNghiViec });
+const mapStateToProps = state => ({ system: state.system, qtNghiViec: state.tccb.qtNghiViec });
 const mapActionsToProps = {
     createQtNghiViecStaff, updateQtNghiViecStaff, deleteQtNghiViecStaff,
     getQtNghiViecGroupPage, getQtNghiViecPage,

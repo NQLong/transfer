@@ -5,7 +5,8 @@ import dmTapChi from './redux';
 
 export default {
     redux: {
-        dmTapChi,
+        parent: 'danhMuc',
+        reducers: { dmTapChi }
     },
     routes: [
         {

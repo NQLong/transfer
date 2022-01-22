@@ -5,7 +5,8 @@ import dmTrinhDoLyLuanChinhTri from './redux';
 
 export default {
     redux: {
-        dmTrinhDoLyLuanChinhTri,
+        parent: 'danhMuc',
+        reducers: { dmTrinhDoLyLuanChinhTri }
     },
     routes: [
         {

@@ -2,7 +2,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getDmNhomMauAll, createDmNhomMau, updateDmNhomMau, deleteDmNhomMau } from './reduxNhomMau';
 import { Link } from 'react-router-dom';
-import Pagination from 'view/component/Pagination';
 import { AdminPage, AdminModal, renderTable, TableCell, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
 
 class EditModal extends AdminModal {
@@ -85,10 +84,7 @@ class dmNhomMauPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmNhomMau:write'),
-            permissionDelete = currentPermissions.includes('dmNhomMau:delete'),
-            permission = this.getUserPermission('dmBenhVien', ['read', 'write', 'delete']);
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition } = this.props.dmBenhVien && this.props.dmBenhVien.page ?
-            this.props.dmBenhVien.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {} };
+            permission = this.getUserPermission('dmNhomMau', ['read', 'write', 'delete']);
         let table = 'Không có dữ liệu!',
             items = this.props.dmNhomMau && this.props.dmNhomMau.items;
         if (items && items.length > 0) {
@@ -106,7 +102,7 @@ class dmNhomMauPage extends AdminPage {
                         <TableCell type='text' content={item.ma}/>
                         <TableCell type='link' content={T.language.parse(item.ten, true).vi} onClick={() => this.modal.show(item)} />
                         <TableCell type='checkbox' content={item.kichHoat} permission={permissionWrite} onChanged={() => permissionWrite && this.changeActive(item)} />
-                        <TableCell type='buttons' content={item} permission={permissionDelete} onEdit={this.edit} onDelete={this.delete}></TableCell>
+                        <TableCell type='buttons' content={item} permission={permission} onEdit={() => this.modal.show(item)} onDelete={this.delete}></TableCell>
                     </tr>
                 )
             });
@@ -121,7 +117,6 @@ class dmNhomMauPage extends AdminPage {
             ],
             content: <>
                 <div className='tile'>{table}</div>
-                <Pagination style={{ marginLeft: '65px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.props.getDmNhomMauAll} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createDmBenhVien} update={this.props.updateDmNhomMau} permissions={currentPermissions} />
             </>,
@@ -132,6 +127,6 @@ class dmNhomMauPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, dmNhomMau: state.dmNhomMau });
+const mapStateToProps = state => ({ system: state.system, dmNhomMau: state.danhMuc.dmNhomMau });
 const mapActionsToProps = { getDmNhomMauAll, createDmNhomMau, updateDmNhomMau, deleteDmNhomMau };
 export default connect(mapStateToProps, mapActionsToProps)(dmNhomMauPage);

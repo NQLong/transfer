@@ -5,7 +5,8 @@ import qtKyLuat from './redux';
 
 export default {
     redux: {
-        qtKyLuat,
+        parent: 'tccb',
+        reducers: { qtKyLuat }
     },
     routes: [
         {

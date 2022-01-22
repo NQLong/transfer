@@ -5,7 +5,8 @@ import qtNuocNgoai from './redux';
 
 export default {
     redux: {
-        qtNuocNgoai,
+        parent: 'tccb',
+        reducers: { qtNuocNgoai }
     },
     routes: [
         {

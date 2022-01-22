@@ -232,7 +232,7 @@ class QtLuongGroupPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtLuong: state.qtLuong });
+const mapStateToProps = state => ({ system: state.system, qtLuong: state.tccb.qtLuong });
 const mapActionsToProps = {
     updateQtLuongGroupPageMa, deleteQtLuongGroupPageMa,
     getQtLuongGroupPageMa, getQtLuongPage,

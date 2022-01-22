@@ -264,7 +264,7 @@ class QtChucVu extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtChucVu: state.qtChucVu });
+const mapStateToProps = state => ({ system: state.system, qtChucVu: state.tccb.qtChucVu });
 const mapActionsToProps = {
     getQtChucVuAll, getQtChucVuPage, deleteQtChucVu, createQtChucVu,
     updateQtChucVu, getChucVuByShcc, getQtChucVuGroupPage, getDmChucVuAll,

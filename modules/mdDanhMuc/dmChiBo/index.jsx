@@ -5,7 +5,8 @@ import dmChiBo from './redux';
 
 export default {
     redux: {
-        dmChiBo,
+        parent: 'danhMuc',
+        reducers: { dmChiBo }
     },
     routes: [
         {

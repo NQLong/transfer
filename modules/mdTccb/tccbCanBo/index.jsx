@@ -5,9 +5,14 @@ import staff from './redux';
 
 export default {
     redux: {
-        staff,
+        parent: 'tccb',
+        reducers: { staff }
     },
     routes: [
+        {
+            path: '/user/info',
+            component: Loadable({ loading: Loading, loader: () => import('./staffPage') })
+        },
         {
             path: '/user/tccb/staff/item/upload',
             component: Loadable({ loading: Loading, loader: () => import('./staffImportPage') })

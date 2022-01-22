@@ -6,7 +6,6 @@ module.exports = app => {
         },
     };
     app.permission.add(
-        { name: 'staff:login', menu: { parentMenu: { index: 1000, title: 'Thông tin cá nhân', icon: 'fa-user', link: '/user' } }, },
         { name: 'qtHocTapCongTac:read', menu },
         { name: 'qtHocTapCongTac:write' },
         { name: 'qtHocTapCongTac:delete' },

@@ -5,7 +5,8 @@ import dmBoMon from './redux';
 
 export default {
     redux: {
-        dmBoMon,
+        parent: 'danhMuc',
+        reducers: { dmBoMon },
     },
     routes: [
         {

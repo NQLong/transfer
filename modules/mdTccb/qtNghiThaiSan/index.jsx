@@ -5,7 +5,8 @@ import qtNghiThaiSan from './redux';
 
 export default {
     redux: {
-        qtNghiThaiSan,
+        parent: 'tccb',
+        reducers: { qtNghiThaiSan }
     },
     routes: [
         {

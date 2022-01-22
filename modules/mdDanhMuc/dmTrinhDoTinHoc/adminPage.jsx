@@ -121,6 +121,6 @@ class DmTrinhDoTinHocPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, dmTrinhDoTinHoc: state.dmTrinhDoTinHoc });
+const mapStateToProps = state => ({ system: state.system, dmTrinhDoTinHoc: state.danhMuc.dmTrinhDoTinHoc });
 const mapActionsToProps = { getDmTrinhDoTinHocAll, deleteDmTrinhDoTinHoc, createDmTrinhDoTinHoc, updateDmTrinhDoTinHoc };
 export default connect(mapStateToProps, mapActionsToProps)(DmTrinhDoTinHocPage);

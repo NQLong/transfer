@@ -1,3 +1,4 @@
+
 //TEMPLATES: admin
 import Loadable from 'react-loadable';
 import Loading from 'view/component/Loading';
@@ -5,7 +6,8 @@ import dmLuongCoSo from './redux';
 
 export default {
     redux: {
-        dmLuongCoSo
+        parent: 'danhMuc',
+        reducers: {  dmLuongCoSo }
     },
     routes: [
         {

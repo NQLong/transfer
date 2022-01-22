@@ -5,7 +5,8 @@ import qtHuongDanLuanVan from './redux';
 
 export default {
     redux: {
-        qtHuongDanLuanVan,
+        parent: 'tccb',
+        reducers: { qtHuongDanLuanVan }
     },
     routes: [
         {

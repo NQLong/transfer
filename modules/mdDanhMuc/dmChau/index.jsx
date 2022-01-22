@@ -5,7 +5,8 @@ import dmChau from './redux';
 
 export default {
     redux: {
-        dmChau,
+        parent: 'danhMuc',
+        reducers: { dmChau }
     },
     routes: [
         {

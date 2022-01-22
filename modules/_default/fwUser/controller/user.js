@@ -6,7 +6,7 @@ module.exports = app => {
         },
     };
     app.permission.add(
-        { name: 'user:login', menu: { parentMenu: { index: 1000, title: 'Thông tin cá nhân', icon: 'fa-user', link: '/user' } }, },
+        // { name: 'user:login', menu },
         { name: 'user:read', menu },
         { name: 'user:write', menu },
         { name: 'user:delete', menu },

@@ -124,7 +124,7 @@ class QtHopDongLaoDongGroupPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtHopDongLaoDong: state.qtHopDongLaoDong });
+const mapStateToProps = state => ({ system: state.system, qtHopDongLaoDong: state.tccb.qtHopDongLaoDong });
 const mapActionsToProps = {
     getQtHopDongLaoDongAll, getQtHopDongLaoDongPage, deleteQtHopDongLaoDong, createQtHopDongLaoDong,
     updateQtHopDongLaoDong, getQtHopDongLaoDongShccPage, downloadWord

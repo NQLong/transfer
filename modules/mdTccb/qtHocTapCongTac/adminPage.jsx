@@ -292,7 +292,7 @@ class QtHocTapCongTac extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtHocTapCongTac: state.qtHocTapCongTac });
+const mapStateToProps = state => ({ system: state.system, qtHocTapCongTac: state.tccb.qtHocTapCongTac });
 const mapActionsToProps = {
     getQtHocTapCongTacPage, deleteQtHocTapCongTacStaff, createQtHocTapCongTacStaff,
     updateQtHocTapCongTacStaff, getQtHocTapCongTacGroupPage,

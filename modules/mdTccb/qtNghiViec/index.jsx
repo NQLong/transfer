@@ -5,7 +5,8 @@ import qtNghiViec from './redux';
 
 export default {
     redux: {
-        qtNghiViec,
+        parent: 'tccb',
+        reducers: { qtNghiViec }
     },
     routes: [
         {

@@ -5,7 +5,8 @@ import qtBaiVietKhoaHoc from './redux';
 
 export default {
     redux: {
-        qtBaiVietKhoaHoc,
+        parent: 'tccb',
+        reducers: { qtBaiVietKhoaHoc }
     },
     routes: [
         {

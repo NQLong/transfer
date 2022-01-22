@@ -6,7 +6,8 @@ import dmToaNha from './redux';
 
 export default {
     redux: {
-        dmToaNha,
+        parent: 'danhMuc',
+        reducers: { dmToaNha }
     },
     routes: [
         {

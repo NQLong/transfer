@@ -202,7 +202,7 @@ class SachGiaoTrinhGroupPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, sachGiaoTrinh: state.sachGiaoTrinh });
+const mapStateToProps = state => ({ system: state.system, sachGiaoTrinh: state.tccb.sachGiaoTrinh });
 const mapActionsToProps = {
     updateSachGiaoTrinhGroupPageMa, deleteSachGiaoTrinhGroupPageMa, 
     getSachGiaoTrinhGroupPageMa, getSachGiaoTrinhPage,

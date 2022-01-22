@@ -65,6 +65,6 @@ class DmPhuongXaUpLoadPage extends React.Component {
 	}
 }
 
-const mapStateToProps = state => ({ system: state.system, dmPhuongXa: state.dmPhuongXa, dmQuanHuyen: state.dmQuanHuyen, dmTinhThanhPho: state.dmTinhThanhPho });
+const mapStateToProps = state => ({ system: state.system, dmPhuongXa: state.danhMuc.dmPhuongXa, dmQuanHuyen: state.danhMuc.dmQuanHuyen, dmTinhThanhPho: state.danhMuc.dmTinhThanhPho });
 const mapActionsToProps = { getDmPhuongXaPage, deleteDmPhuongXa, createDmPhuongXa, updateDmPhuongXa, createDmPhuongXaByUpload };
 export default connect(mapStateToProps, mapActionsToProps)(DmPhuongXaUpLoadPage);

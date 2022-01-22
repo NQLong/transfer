@@ -118,6 +118,6 @@ class DmNguonVonPage extends AdminPage {
   }
 }
 
-const mapStateToProps = (state) => ({ system: state.system, dmNguonVon: state.dmNguonVon });
+const mapStateToProps = (state) => ({ system: state.system, dmNguonVon: state.danhMuc.dmNguonVon });
 const mapActionsToProps = { getDmNguonVonPage, createDmNguonVon, updateDmNguonVon, deleteDmNguonVon };
 export default connect(mapStateToProps, mapActionsToProps)(DmNguonVonPage);

@@ -11,16 +11,6 @@ import { AdminPage } from 'view/component/AdminPage';
 import ComponentQuanHe from './componentQuanHe';
 import ComponentTTCongTac from './componentTTCongTac';
 import ComponentTrinhDo from './componentTrinhDo';
-import ComponentKhenThuong from '../qtKhenThuongAll/componentKhenThuong';
-import ComponentNCKH from '../qtNghienCuuKhoaHoc/componentNCKH';
-import ComponentKyLuat from '../qtKyLuat/componentKyLuat';
-import ComponentNuocNgoai from '../qtNuocNgoai/componentNuocNgoai';
-import ComponentHDLV from '../qtHuongDanLuanVan/componentHDLV';
-import ComponentSGT from '../sachGiaoTrinh/componentSGT';
-import ComponentDaoTao from '../qtDaoTao/componentDaoTao';
-import ComponentLuong from '../qtLuong/componentLuong';
-import ComponentCongTac from '../qtHocTapCongTac/componentCongTac';
-import ComponentBaoHiemXaHoi from '../qtBaoHiemXaHoi/componentBaoHiemXaHoi';
 
 class CanBoPage extends AdminPage {
     state = { item: null }
@@ -49,18 +39,9 @@ class CanBoPage extends AdminPage {
     setUp = (item) => {
         this.componentCaNhan.value(item);
         this.componentTTCongTac.value(item);
-        this.componentCongTac.value(item.shcc, item.email);
         this.componentQuanHe.value(item.email, item.phai, item.shcc);
         this.componentTrinhDo.value(item);
-        this.componentDaoTao.value(item.shcc, item.email);
-        this.componentKhenThuong.value(item.shcc);
-        this.componentNCKH.value(item.shcc, item.email);
-        this.componentKyLuat.value(item.shcc);
-        this.componentNuocNgoai.value(item.shcc, item.email);
-        this.componentHDLV.value(item.shcc, item.email);
-        this.componentSGT.value(item.shcc, item.email);
-        this.componentLuong.value(item.shcc, item.email);
-        this.componentBaoHiemXaHoi.value(item.shcc, item.email);
+      
     }
 
     save = () => {
@@ -86,17 +67,7 @@ class CanBoPage extends AdminPage {
                 <ComponentCaNhan ref={e => this.componentCaNhan = e} userEdit={false} isStaff={false}/>
                 <ComponentQuanHe ref={e => this.componentQuanHe = e} userEdit={false} />
                 <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={false} />
-                <ComponentCongTac ref={e => this.componentCongTac = e}  userEdit= {false} />
                 <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={false} tccb={true}/>
-                <ComponentDaoTao ref={e => this.componentDaoTao = e} userEdit={false} tccb={true}/>
-                <ComponentLuong ref={e => this.componentLuong = e} userEdit={false} />
-                <ComponentBaoHiemXaHoi ref={e => this.componentBaoHiemXaHoi = e} userEdit={false} />
-                <ComponentNuocNgoai ref={e => this.componentNuocNgoai = e} userEdit={false} />
-                <ComponentKhenThuong ref={e => this.componentKhenThuong = e} userEdit={false} />
-                <ComponentKyLuat ref={e => this.componentKyLuat = e} userEdit={false} />
-                <ComponentNCKH ref={e => this.componentNCKH = e} userEdit={false} />
-                <ComponentHDLV ref={e => this.componentHDLV = e} userEdit={false} />
-                <ComponentSGT ref={e => this.componentSGT = e} userEdit={false} />
             </>,
             backRoute: '/user/tccb/staff',
             onSave: this.save,
@@ -105,7 +76,7 @@ class CanBoPage extends AdminPage {
 
 }
 
-const mapStateToProps = state => ({ staff: state.staff });
+const mapStateToProps = state => ({ staff: state.tccb.staff });
 const mapActionsToProps = {
     getStaffEdit, updateStaff, createStaff, getDmQuanHeGiaDinhAll,
     createQuanHeCanBo, updateQuanHeCanBo, deleteQuanHeCanBo

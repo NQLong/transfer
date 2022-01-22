@@ -5,7 +5,8 @@ import dmNghiCongTac from './redux';
 
 export default {
     redux: {
-        dmNghiCongTac,
+        parent: 'danhMuc',
+        reducers: {  dmNghiCongTac }
     },
     routes: [
         {

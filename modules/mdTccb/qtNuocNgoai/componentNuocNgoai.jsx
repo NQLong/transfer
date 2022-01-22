@@ -204,7 +204,7 @@ class ComponentNuocNgoai extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, staff: state.staff });
+const mapStateToProps = state => ({ system: state.system, staff: state.tccb.staff });
 const mapActionsToProps = {
     createQtNuocNgoaiStaff, createQtNuocNgoaiStaffUser, updateQtNuocNgoaiStaff, updateQtNuocNgoaiStaffUser, deleteQtNuocNgoaiStaff, deleteQtNuocNgoaiStaffUser
 };

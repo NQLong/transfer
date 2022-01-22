@@ -133,6 +133,6 @@ class dmKyLuatPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, dmKyLuat: state.dmKyLuat });
+const mapStateToProps = state => ({ system: state.system, dmKyLuat: state.danhMuc.dmKyLuat });
 const mapActionsToProps = { getDmKyLuatPage, getDmKyLuatAll, createDmKyLuat, updateDmKyLuat, deleteDmKyLuat };
 export default connect(mapStateToProps, mapActionsToProps)(dmKyLuatPage);

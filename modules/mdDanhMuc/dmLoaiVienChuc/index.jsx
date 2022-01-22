@@ -5,7 +5,8 @@ import dmLoaiVienChuc from './redux';
 
 export default {
     redux: {
-        dmLoaiVienChuc,
+        parent: 'danhMuc',
+        reducers: {  dmLoaiVienChuc }
     },
     routes: [
         {

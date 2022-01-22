@@ -5,7 +5,8 @@ import qtChucVu from './redux';
 
 export default {
     redux: {
-        qtChucVu,
+        parent: 'tccb',
+        reducers: { qtChucVu }
     },
     routes: [
         {

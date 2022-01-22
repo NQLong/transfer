@@ -6,7 +6,8 @@ import dmTangBhxh from './reduxTangBhxh';
 
 export default {
     redux: {
-        dmGiamBhxh, dmTangBhxh,
+        parent: 'danhMuc',
+        reducers: { dmGiamBhxh, dmTangBhxh },
     },
     routes: [
         {

@@ -133,6 +133,6 @@ class DmLoaiBangCapPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, dmLoaiBangCap: state.dmLoaiBangCap });
+const mapStateToProps = state => ({ system: state.system, dmLoaiBangCap: state.danhMuc.dmLoaiBangCap });
 const mapActionsToProps = { getDmLoaiBangCapAll, createDmLoaiBangCap, updateDmLoaiBangCap, deleteDmLoaiBangCap, getDmLoaiBangCapPage};
 export default connect(mapStateToProps, mapActionsToProps)(DmLoaiBangCapPage);

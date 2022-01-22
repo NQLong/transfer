@@ -5,7 +5,8 @@ import qtLuong from './redux';
 
 export default {
     redux: {
-        qtLuong,
+        parent: 'tccb',
+        reducers: { qtLuong }
     },
     routes: [
         {
