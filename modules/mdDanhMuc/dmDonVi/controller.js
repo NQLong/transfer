@@ -142,8 +142,8 @@ module.exports = app => {
         app.permission.has(req, () => uploadDmDonViImageDisplayTA(req, fields, files, params, done), done, 'dmDonVi:write'));
 
     // Hook ready -----------------------------------------------------------------------------------------------------------------------------------
-    app.readyHooks.add('readyDmDonVi', {
-        ready: () => app.dbConnection != null && app.model != null && app.model.dmDonVi != null,
-        run: () => app.model.dmDonVi.count((error, numberOfDonVi) => app.data.numberOfDonVi = error ? 0 : numberOfDonVi),
-    });
+    // app.readyHooks.add('readyDmDonVi', {
+    //     ready: () => app.dbConnection != null && app.model != null && app.model.dmDonVi != null,
+    //     run: () => app.model.dmDonVi.count((error, numberOfDonVi) => app.data.numberOfDonVi = error ? 0 : numberOfDonVi),
+    // });
 };

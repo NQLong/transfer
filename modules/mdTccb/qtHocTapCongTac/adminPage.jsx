@@ -23,7 +23,13 @@ const EnumDateType = Object.freeze({
     'dd/mm/yyyy': 'date'
 };
 class EditModal extends AdminModal {
-    state = { id: ''};
+    state = {
+        id: '',
+        batDau: '',
+        ketThuc: '',
+        batDauType: 'dd/mm/yyyy',
+        ketThucType: 'dd/mm/yyyy',
+    };    
     multiple = false;
     componentDidMount() {
     }
@@ -203,7 +209,6 @@ class QtHocTapCongTac extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('qtHocTapCongTac', ['read', 'write', 'delete']);
-        let loaiDoiTuong = this.curState;
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ? (
             this.props.qtHocTapCongTac && this.props.qtHocTapCongTac.page_gr ?
                 this.props.qtHocTapCongTac.page_gr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
@@ -249,7 +254,7 @@ class QtHocTapCongTac extends AdminPage {
                         }
                         {
                             this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}>
-                                <Link className='btn btn-success' to={`/user/tccb/qua-trinh/hoc-tap-cong-tac/${item.shcc}`} >
+                                <Link className='btn btn-success' to={`/user/tccb/qua-trinh/hoc-tap-cong-tac/group/${item.shcc}`} >
                                     <i className='fa fa-lg fa-compress' />
                                 </Link>
                             </TableCell>
@@ -279,8 +284,8 @@ class QtHocTapCongTac extends AdminPage {
                     <FormCheckbox label='Hiển thị theo cán bộ' ref={e => this.hienThiTheoCanBo = e} onChange={this.groupPage} />
                     {table}
                 </div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition, loaiDoiTuong }}
-                    getPage={this.checked ? this.props.getQtHocTapCongTacGroupPage : this.props.getQtHocTapCongTacPage} />
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
+                    getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} permission={permission} 
                     create={this.props.createQtHocTapCongTacStaff} update={this.props.updateQtHocTapCongTacStaff}
                     permissions={currentPermissions}

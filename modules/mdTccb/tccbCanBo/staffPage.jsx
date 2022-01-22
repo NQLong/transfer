@@ -72,10 +72,13 @@ class StaffUserPage extends AdminPage {
 
 
     render() {
-        const item = this.props.staff?.userItem;
+        const { isStaff, shcc } = this.props.system && this.props.system.user ? this.props.system.user : { isStaff: false, shcc: '' };
+        const { firstName, lastName } = isStaff && this.props.system.user || { firstName: '', lastName: '' };
+        const name = isStaff ? `${lastName} ${firstName} (${shcc})` : '';
         return this.renderPage({
             icon: 'fa fa-address-card-o',
-            title: `Thông tin cán bộ${item?.shcc ? `: ${item?.ho} ${item?.ten}` : ''}`,
+            title: 'Hồ sơ cá nhân',
+            subTitle: <span style={{ color: 'blue'}}>Cán bộ: {name}</span>,
             breadcrumb: [
                 <Link key={0} to='/user'>Trang cá nhân</Link>,
                 'Hồ sơ cán bộ',
@@ -84,17 +87,7 @@ class StaffUserPage extends AdminPage {
                 <ComponentCaNhan ref={e => this.componentCaNhan = e} userEdit={true} isStaff={true}/>
                 <ComponentQuanHe ref={e => this.componentQuanHe = e} userEdit={true} />
                 <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={true} />
-                {/* <ComponentCongTac ref={e => this.componentCongTac = e}  userEdit= {false} /> */}
                 <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={true} tccb={false}/>
-                {/* <ComponentDaoTao ref={e => this.componentDaoTao = e} userEdit={false} tccb={true}/>
-                <ComponentLuong ref={e => this.componentLuong = e} userEdit={false} />
-                <ComponentBaoHiemXaHoi ref={e => this.componentBaoHiemXaHoi = e} userEdit={false} />
-                <ComponentNuocNgoai ref={e => this.componentNuocNgoai = e} userEdit={false} />
-                <ComponentKhenThuong ref={e => this.componentKhenThuong = e} userEdit={false} />
-                <ComponentKyLuat ref={e => this.componentKyLuat = e} userEdit={false} />
-                <ComponentNCKH ref={e => this.componentNCKH = e} userEdit={false} />
-                <ComponentHDLV ref={e => this.componentHDLV = e} userEdit={false} />
-                <ComponentSGT ref={e => this.componentSGT = e} userEdit={false} /> */}
             </>,
             backRoute: '/user',
             onSave: this.save,

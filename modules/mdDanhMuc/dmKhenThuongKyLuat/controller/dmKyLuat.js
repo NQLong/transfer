@@ -31,7 +31,7 @@ module.exports = app => {
     });
 
     app.get('/api/dm-ky-luat/item/:_id', app.permission.check('user:login'), (req, res) => {
-        app.model.dmKyLuat.get(req.params._id, (error, item) => res.send({ error, item }));
+        app.model.dmKyLuat.get({ma: req.params._id}, (error, item) => res.send({ error, item }));
     });
 
     app.post('/api/dm-ky-luat', app.permission.check('dmKyLuat:write'), (req, res) => {

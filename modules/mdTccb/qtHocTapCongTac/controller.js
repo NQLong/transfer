@@ -12,7 +12,7 @@ module.exports = app => {
     );
     app.get('/user/tccb/qua-trinh/hoc-tap-cong-tac/:id', app.permission.check('qtHocTapCongTac:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/hoc-tap-cong-tac', app.permission.check('qtHocTapCongTac:read'), app.templates.admin);
-    app.get('/user/tccb/qua-trinh/hoc-tap-cong-tac/:shcc', app.permission.check('qtHocTapCongTac:read'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/hoc-tap-cong-tac/group/:shcc', app.permission.check('qtHocTapCongTac:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/tccb/qua-trinh/hoc-tap-cong-tac/page/:pageNumber/:pageSize', app.permission.check('qtHocTapCongTac:read'), (req, res) => {

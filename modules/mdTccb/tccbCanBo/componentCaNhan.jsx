@@ -79,6 +79,7 @@ class ComponentCaNhan extends React.Component {
     }
 
     imageChanged = (data) => {
+        console.log(data);
         if (data && data.image) {
             const user = Object.assign({}, this.props.system.user, { image: data.image });
             this.props.updateSystemState({ user });
@@ -180,7 +181,7 @@ class ComponentCaNhan extends React.Component {
                 <h3 className='tile-title'>Thông tin cá nhân</h3>
                 <div className='tile-body row'>
                     <FormImageBox ref={e => this.imageBox = e} style={{ display: 'block' }} label='Hình đại diện'
-                        postUrl='/user/upload' uploadType='CanBoImage' success={this.imageChanged} className='form-group col-md-3' />
+                        postUrl='/user/upload' uploadType='CanBoImage' onSuccess={this.imageChanged} className='form-group col-md-3' />
 
                     <div className='form-group col-md-9'>
                         <div className='row'>

@@ -11,34 +11,23 @@ module.exports = app => {
         { name: 'qtHuongDanLuanVan:write' },
         { name: 'qtHuongDanLuanVan:delete' },
     );
-    app.get('/user/tccb/qua-trinh/hdlv/:stt', app.permission.check('qtHuongDanLuanVan:read'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/hdlv/:id', app.permission.check('qtHuongDanLuanVan:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/hdlv', app.permission.check('qtHuongDanLuanVan:read'), app.templates.admin);
-    app.get('/user/tccb/qua-trinh/hdlv/group/:loaiDoiTuong/:ma', app.permission.check('qtHuongDanLuanVan:read'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/hdlv/group/:shcc', app.permission.check('qtHuongDanLuanVan:read'), app.templates.admin);
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
-
-    app.get('/api/qua-trinh/hdlv/page/:pageNumber/:pageSize', checkGetStaffPermission, (req, res) => {
+    app.get('/api/qua-trinh/hdlv/page/:pageNumber/:pageSize', app.permission.check('qtHuongDanLuanVan:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        let arr = req.query.parameter;
-        if (!Array.isArray(arr)) arr = [];
-        let loaiDoiTuong = '-1';
-        if (arr.length > 0) {
-            loaiDoiTuong = '(';
-            for (let idx = 0; idx < arr.length; idx++) {
-                if (typeof arr[idx] == 'string') loaiDoiTuong += '\'' + arr[idx] + '\'';
-                else loaiDoiTuong += '\'' + arr[idx].toString() + '\'';
-                if (idx != arr.length - 1) loaiDoiTuong += ',';
-            }
-            loaiDoiTuong += ')';
-        }
-        app.model.qtHuongDanLuanVan.searchPage(pageNumber, pageSize, loaiDoiTuong, searchTerm, (error, page) => {
+        const { fromYear, toYear, list_shcc, list_dv} = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null };
+        app.model.qtHuongDanLuanVan.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
                 const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
-                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, list } });
+                const pageCondition = searchTerm;
+                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
             }
         });
     });
@@ -47,42 +36,18 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        let arr = req.query.parameter;
-        if (!Array.isArray(arr)) arr = [];
-        let loaiDoiTuong = '-1';
-        if (arr.length > 0) {
-            loaiDoiTuong = '(';
-            for (let idx = 0; idx < arr.length; idx++) {
-                if (typeof arr[idx] == 'string') loaiDoiTuong += '\'' + arr[idx] + '\'';
-                else loaiDoiTuong += '\'' + arr[idx].toString() + '\'';
-                if (idx != arr.length - 1) loaiDoiTuong += ',';
-            }
-            loaiDoiTuong += ')';
-        }
-        app.model.qtHuongDanLuanVan.groupPage(pageNumber, pageSize, loaiDoiTuong, searchTerm, (error, page) => {
+        const { fromYear, toYear, list_shcc, list_dv} = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null };
+        app.model.qtHuongDanLuanVan.groupPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
                 const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
-                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, list } });
+                const pageCondition = searchTerm;
+                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
             }
         });
     });
 
-    app.get('/api/qua-trinh/hdlv/group/page/:loaiDoiTuong/:pageNumber/:pageSize', app.permission.check('qtHuongDanLuanVan:read'), (req, res) => {
-        const pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize),
-            loaiDoiTuong = req.params.loaiDoiTuong,
-            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        app.model.qtHuongDanLuanVan.groupPageMa(pageNumber, pageSize, loaiDoiTuong, searchTerm, (error, page) => {
-            if (error || page == null) {
-                res.send({ error });
-            } else {
-                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
-                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, list } });
-            }
-        });
-    });
 
     app.get('/api/qua-trinh/hdlv/all', checkGetStaffPermission, (req, res) => {
         app.model.qtHuongDanLuanVan.getAll((error, items) => res.send({ error, items }));

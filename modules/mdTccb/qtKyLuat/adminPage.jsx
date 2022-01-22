@@ -1,11 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormCheckbox, FormDatePicker, FormRichTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
-    getQtKyLuatPage, getQtKyLuatAll, updateQtKyLuat,
-    deleteQtKyLuat, createQtKyLuat, getQtKyLuatGroupPage,
+    getQtKyLuatPage, updateQtKyLuatStaff,
+    deleteQtKyLuatStaff, createQtKyLuatStaff, getQtKyLuatGroupPage,
 } from './redux';
 import { DateInput } from 'view/component/Input';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
@@ -36,15 +36,17 @@ class EditModal extends AdminModal {
     
     onShow = (item, multiple = true) => {
         this.multiple = multiple;
-        this.batDau.clear();
-        this.ketThuc.clear();
 
-        let { id, maCanBo, lyDoHinhThuc, capQuyetDinh, batDau, batDauType, ketThuc, ketThucType, diemThiDua } = item ? item : {
-            id: '', maCanBo: '', lyDoHinhThuc: '', capQuyetDinh: '', batDau: '', batDauType: '', ketThuc: '', ketThucType: '', diemThiDua: ''
+        let { id, maCanBo, lyDoHinhThuc, capQuyetDinh, batDau, batDauType, ketThuc, ketThucType, diemThiDua, noiDung } = item ? item : {
+            id: '', maCanBo: '', lyDoHinhThuc: '', capQuyetDinh: '', batDau: '', batDauType: '', ketThuc: '', ketThucType: '', diemThiDua: '', noiDung: ''
         };
+        
+        this.setState({
+            id, batDauType: batDauType ? batDauType : 'dd/mm/yyyy',
+            ketThucType: ketThucType ? ketThucType : 'dd/mm/yyyy',
+            batDau, ketThuc
+        });
 
-        this.setState({ id: id });
-        this.setState({ batDauType: batDauType ? batDauType : 'dd/mm/yyyy', ketThucType: ketThucType ? ketThucType : 'dd/mm/yyyy' });
 
         setTimeout(() => {
             this.maCanBo.value(maCanBo);
@@ -55,6 +57,7 @@ class EditModal extends AdminModal {
             this.batDau.setVal(batDau);
             this.ketThuc.setVal(ketThuc);
             this.diemThiDua.value(diemThiDua);
+            this.noiDung.value(noiDung ? noiDung : '');
         }, 500);
     };
 
@@ -69,6 +72,12 @@ class EditModal extends AdminModal {
         if (list_ma.length == 0) {
             T.notify('Cán bộ bị trống', 'danger');
             this.maCanBo.focus();
+        } else if (!this.noiDung.value()) {
+            T.notify('Nội dung kỷ luật trống', 'danger');
+            this.noiDung.focus();
+        } else if (this.noiDung.value().length > 100) {
+            T.notify('Nội dung kỷ luật dài quá 100 ký tự', 'danger');
+            this.noiDung.focus();
         } else if (!this.hinhThucKyLuat.value()) {
             T.notify('Hình thức kỷ luật trống', 'danger');
             this.hinhThucKyLuat.focus();
@@ -89,32 +98,35 @@ class EditModal extends AdminModal {
                     ketThucType: this.state.ketThucType,
                     ketThuc: this.ketThuc.getVal(),
                     diemThiDua: this.diemThiDua.value(),
+                    noiDung: this.noiDung.value()
                 };
                 if (index == list_ma.length - 1) {
-                    this.state.id ? this.props.update(false, this.state.id, changes, this.hide) : this.props.create(false, changes, this.hide);
+                    this.state.id ? this.props.update(this.state.id, changes, this.hide, false) : this.props.create(changes, this.hide, false);
                     this.setState({
                         id: ''
                     });
                     this.maCanBo.reset();
                 }
                 else {
-                    this.state.id ? this.props.update(false, this.state.id, changes) : this.props.create(false, changes);
+                    this.state.id ? this.props.update(this.state.id, changes, null, false) : this.props.create(changes, null, false);
                 }
             });
         }
     }
 
     render = () => {
-        const readOnly = this.state.id ? true : this.props.readOnly;
+        const readOnly = this.props.readOnly;
         return this.renderModal({
             title: this.state.id ? 'Cập nhật quá trình kỷ luật' : 'Tạo mới quá trình kỷ luật',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={readOnly} required />
+                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={this.state.id ? true : false} required />
 
-                <FormSelect className='col-md-12' ref={e => this.hinhThucKyLuat = e} label='Hình thức kỷ luật' data={SelectAdapter_DmKyLuatV2} readOnly={false} required />
+                <FormRichTextBox className='col-md-12' ref={e => this.noiDung = e} rows={2} readOnly={readOnly} label='Nội dung kỷ luật' placeholder='Nhập nội dung kỷ luật (tối đa 100 ký tự)' required maxLength={100} />
 
-                <FormTextBox className='col-md-12' ref={e => this.capQuyetDinh = e} type='text' label='Cấp quyết định' readOnly={false} required />
+                <FormSelect className='col-md-12' ref={e => this.hinhThucKyLuat = e} label='Hình thức kỷ luật' data={SelectAdapter_DmKyLuatV2} readOnly={readOnly} required />
+
+                <FormTextBox className='col-md-12' ref={e => this.capQuyetDinh = e} type='text' label='Cấp quyết định' readOnly={readOnly} required />
 
                 <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
                     label={
@@ -130,7 +142,7 @@ class EditModal extends AdminModal {
                             onSelected={item => this.setState({ ketThucType: item })} readOnly={readOnly} />)</div>
                     }
                     type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} readOnly={readOnly} /></div>
-                <FormTextBox className='col-md-4' ref={e => this.diemThiDua = e} type='number' label='Điểm thi đua' readOnly={false} />
+                <FormTextBox className='col-md-4' ref={e => this.diemThiDua = e} type='number' label='Điểm thi đua' readOnly={readOnly} />
 
             </div>
         });
@@ -138,22 +150,25 @@ class EditModal extends AdminModal {
 }
 
 class QtKyLuat extends AdminPage {
-    checked = false;
-    curState = [];
-    searchText = '';
+    checked = parseInt(T.cookie('hienThiTheoCanBo')) == 1 ? true : false;
+    state = { filter: {} };
     componentDidMount() {
         T.ready('/user/tccb', () => {
-            T.onSearch = (searchText) => {
-                this.searchText = searchText;
-                if (this.checked) this.props.getQtKyLuatGroupPage(undefined, undefined, this.curState, this.searchText || '');
-                else this.props.getQtKyLuatPage(undefined, undefined, this.curState, this.searchText || '');
-            };
+            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
-                this.loaiDoiTuong?.value('');
+                this.fromYear?.value('');
+                this.toYear?.value('');
+                this.maDonVi?.value('');
+                this.mulCanBo?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
-                setTimeout(() => this.showAdvanceSearch(), 1000);
             });
-            this.changeAdvancedSearch();
+            if (this.checked) {
+                this.hienThiTheoCanBo.value(true);
+                this.props.getQtKyLuatGroupPage();
+            } else {
+                this.props.getQtKyLuatPage();
+            }
+            this.changeAdvancedSearch(true);
         });
     }
 
@@ -162,24 +177,42 @@ class QtKyLuat extends AdminPage {
         this.modal.show();
     }
 
-    changeAdvancedSearch = () => {
+
+    changeAdvancedSearch = (isInitial = false) => {
         let { pageNumber, pageSize } = this.props && this.props.qtKyLuat && this.props.qtKyLuat.page ? this.props.qtKyLuat.page : { pageNumber: 1, pageSize: 50 };
-        const loaiDoiTuong = this.loaiDoiTuong?.value() || [];
-        this.curState = loaiDoiTuong;
-        if (this.checked) this.props.getQtKyLuatGroupPage(pageNumber, pageSize, this.curState, this.searchText || '');
-        else this.props.getQtKyLuatPage(pageNumber, pageSize, this.curState, this.searchText || '');
+        const fromYear = this.fromYear?.value() == '' ? null : this.fromYear?.value().getTime();
+        const toYear = this.toYear?.value() == '' ? null : this.toYear?.value().getTime();
+        const list_dv = this.maDonVi?.value().toString() || '';
+        const list_shcc = this.mulCanBo?.value().toString() || '';
+        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc };
+        this.setState({ filter: pageFilter }, () => {
+            this.getPage(pageNumber, pageSize, '', (page) => {
+                if (isInitial) {
+                    const filter = page.filter || {};
+                    this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
+                    this.fromYear?.value(filter.fromYear || '');
+                    this.toYear?.value(filter.toYear || '');
+                    this.maDonVi?.value(filter.list_dv);
+                    this.mulCanBo?.value(filter.list_shcc);
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.list_shcc || filter.list_dv)) this.showAdvanceSearch();
+                }
+            });
+        });
+    }
+
+    getPage = (pageN, pageS, pageC, done) => {
+        if (this.checked) this.props.getQtKyLuatGroupPage(pageN, pageS, pageC, this.state.filter, done);
+        else this.props.getQtKyLuatPage(pageN, pageS, pageC, this.state.filter, done);
     }
 
     groupPage = () => {
-        let { pageNumber, pageSize } = this.props && this.props.qtKyLuat && this.props.qtKyLuat.page ? this.props.qtKyLuat.page : { pageNumber: 1, pageSize: 50 };
         this.checked = !this.checked;
-        if (this.checked) this.props.getQtKyLuatGroupPage(pageNumber, pageSize, this.curState, this.searchText || '');
-        else this.props.getQtKyLuatPage(pageNumber, pageSize, this.curState, this.searchText || '');
+        T.cookie('hienThiTheoCanBo', this.checked ? 1 : 0);
+        this.getPage();
     }
-
     delete = (e, item) => {
         T.confirm('Xóa kỷ luật', 'Bạn có chắc bạn muốn xóa kỷ luật này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtKyLuat(false, item.id, null, error => {
+            isConfirm && this.props.deleteQtKyLuatStaff(item.id, false, null, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá kỷ luật bị lỗi!', 'danger');
                 else T.alert('Xoá kỷ luật thành công!', 'success', false, 800);
             });
@@ -201,10 +234,12 @@ class QtKyLuat extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Hình thức kỷ luật</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cấp quyết định</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Điểm thi đua</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
+                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nội dung kỷ luật</th> }
+                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Hình thức kỷ luật</th> }
+                        {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Số lần bị kỷ luật</th> }
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cấp quyết định</th> }
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Điểm thi đua</th> }
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
@@ -218,21 +253,28 @@ class QtKyLuat extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' content={(
+                        {!this.checked && <TableCell type='text' content={(
+                            <>
+                                {item.noiDung ? item.noiDung : ''}
+                            </>
+                        )}
+                        />}
+                        {!this.checked && <TableCell type='text' content={(
                             <>
                                 <span style={{ whiteSpace: 'nowrap' }}>{item.tenKyLuat}</span><br /> <br/>
                                 <span style={{ whiteSpace: 'nowrap' }}>Thời gian bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType) : ''}</span></span><br />
                                 <span style={{ whiteSpace: 'nowrap' }}>Thời gian kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType) : ''}</span></span>
                             </>
                         )}
-                        />
-                        <TableCell type='text' content={(
+                        />}
+                        {this.checked && <TableCell type='text' style={{ textAlign: 'left' }} content={item.soKyLuat} />}
+                        {!this.checked && <TableCell type='text' content={(
                             <>
                                 {item.capQuyetDinh ? item.capQuyetDinh : ''}
                             </>
                         )}
-                        />
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemThiDua} />
+                        />}
+                        {!this.checked && <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemThiDua} />}
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                                 onEdit={() => this.modal.show(item, false)} onDelete={this.delete} >
@@ -240,7 +282,7 @@ class QtKyLuat extends AdminPage {
                         }
                         {
                             this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}>
-                                <Link className='btn btn-success' to={`/user/tccb/qua-trinh/ky-luat/group_kl/-1/${item.maCanBo}`} >
+                                <Link className='btn btn-success' to={`/user/tccb/qua-trinh/ky-luat/group/${item.maCanBo}`} >
                                     <i className='fa fa-lg fa-compress' />
                                 </Link>
                             </TableCell>
@@ -258,18 +300,23 @@ class QtKyLuat extends AdminPage {
                 'Quá trình kỷ luật'
             ],
             advanceSearch: <>
-                <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.loaiDoiTuong = e} label='Chọn loại đơn vị (có thể chọn nhiều loại)' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} />
+                <div className='row'>
+                    <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-3' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />
+                    <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-3' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1}/>
+                    <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1}/>
+                </div>
             </>,
             content: <>
                 <div className='tile'>
-                    <FormCheckbox label='Hiển thị theo cán bộ' onChange={this.groupPage} />
+                    <FormCheckbox label='Hiển thị theo cán bộ' ref={e => this.hienThiTheoCanBo = e} onChange={this.groupPage} />
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                    getPage={this.checked ? this.props.getQtKyLuatGroupPage : this.props.getQtKyLuatPage} />
+                    getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     permissions={currentPermissions}
-                    create={this.props.createQtKyLuat} update={this.props.updateQtKyLuat}
+                    create={this.props.createQtKyLuatStaff} update={this.props.updateQtKyLuatStaff}
                 />
             </>,
             backRoute: '/user/tccb',
@@ -280,7 +327,7 @@ class QtKyLuat extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, qtKyLuat: state.tccb.qtKyLuat });
 const mapActionsToProps = {
-    getQtKyLuatAll, getQtKyLuatPage, deleteQtKyLuat, createQtKyLuat,
-    updateQtKyLuat, getQtKyLuatGroupPage,
+    getQtKyLuatPage, updateQtKyLuatStaff,
+    deleteQtKyLuatStaff, createQtKyLuatStaff, getQtKyLuatGroupPage,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtKyLuat);

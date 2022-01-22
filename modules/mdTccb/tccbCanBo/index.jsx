@@ -10,7 +10,7 @@ export default {
     },
     routes: [
         {
-            path: '/user/info',
+            path: '/user/profile',
             component: Loadable({ loading: Loading, loader: () => import('./staffPage') })
         },
         {

@@ -4,11 +4,10 @@ import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox 
 import Dropdown from 'view/component/Dropdown';
 import { DateInput } from 'view/component/Input';
 import {
-    createQtBaoHiemXaHoiStaff, createQtBaoHiemXaHoiStaffUser, updateQtBaoHiemXaHoiStaff, 
-    updateQtBaoHiemXaHoiStaffUser, deleteQtBaoHiemXaHoiStaff, deleteQtBaoHiemXaHoiStaffUser
+    createQtKeoDaiCongTacStaff, createQtKeoDaiCongTacStaffUser, updateQtKeoDaiCongTacStaff, 
+    updateQtKeoDaiCongTacStaffUser, deleteQtKeoDaiCongTacStaff, deleteQtKeoDaiCongTacStaffUser
 } from './redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
-import { SelectAdapter_DmChucVuV1 } from 'modules/mdDanhMuc/dmChucVu/redux';
 
 const EnumDateType = Object.freeze({
     0: { text: '' },
@@ -29,11 +28,9 @@ class EditModal extends AdminModal {
         ketThucType: 'dd/mm/yyyy',
     };
 
-
     onShow = (item) => {
-        let { id, batDau, batDauType, ketThuc, ketThucType, chucVu, mucDong, phuCapChucVu, phuCapThamNienVuotKhung, phuCapThamNienNghe, tyLeDong } = item && item.item ? item.item : {
-                id: '', batDau: '', batDauType: '', ketThuc: '', ketThucType: '', chucVu: '', mucDong: '', phuCapChucVu: '', 
-                phuCapThamNienVuotKhung: '', phuCapThamNienNghe: '', tyLeDong: ''
+        let { id, batDau, batDauType, ketThuc, ketThucType, soHieuVanBan } = item && item.item ? item.item : {
+                id: '', batDau: '', batDauType: '', ketThuc: '', ketThucType: '', soHieuVanBan : ''
         };
         this.setState({
             id, batDauType: batDauType ? batDauType : 'dd/mm/yyyy',
@@ -47,12 +44,7 @@ class EditModal extends AdminModal {
             this.ketThuc.setVal(ketThuc);
             this.batDauType.setText({ text: batDauType ? batDauType : 'dd/mm/yyyy' });
             this.ketThucType.setText({ text: ketThucType ? ketThucType : 'dd/mm/yyyy' });
-            this.chucVu.value(chucVu ? chucVu : '');
-            this.mucDong.value(mucDong ? mucDong : '');
-            this.phuCapChucVu.value(phuCapChucVu ? phuCapChucVu : '');
-            this.phuCapThamNienVuotKhung.value(phuCapThamNienVuotKhung ? phuCapThamNienVuotKhung : '');
-            this.phuCapThamNienNghe.value(phuCapThamNienNghe ? phuCapThamNienNghe : '');
-            this.tyLeDong.value(tyLeDong ? tyLeDong : '');
+            this.soHieuVanBan.value(soHieuVanBan ? soHieuVanBan : '');
         }, 500);
     }
 
@@ -64,16 +56,14 @@ class EditModal extends AdminModal {
             batDau: this.batDau.getVal(),
             ketThucType: this.state.ketThucType,
             ketThuc: this.ketThuc.getVal(),
-            chucVu: this.chucVu.value(),
-            mucDong: this.mucDong.value(),
-            phuCapChucVu: this.phuCapChucVu.value(),
-            phuCapThamNienVuotKhung: this.phuCapThamNienVuotKhung.value(),
-            phuCapThamNienNghe: this.phuCapThamNienNghe.value(),
-            tyLeDong: this.tyLeDong.value(),
+            soHieuVanBan: this.soHieuVanBan.value(),
         };
         if (!changes.shcc) {
             T.notify('Chưa chọn cán bộ', 'danger');
             this.shcc.focus();
+        } else if (!changes.soHieuVanBan) {
+            T.notify('Số hiệu văn bản trống', 'danger');
+            this.soHieuVanBan.focus();
         } else if (!changes.batDau) {
             T.notify('Ngày bắt đầu trống', 'danger');
             this.batDau.focus();
@@ -85,16 +75,11 @@ class EditModal extends AdminModal {
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
-            title: this.state.id ? 'Cập nhật thông tin bảo hiểm xã hội' : 'Tạo mới thông tin bảo hiểm xã hội',
+            title: this.state.id ? 'Cập nhật thông tin kéo dài công tác' : 'Tạo mới thông tin kéo dài công tác',
             size: 'large',
             body: <div className='row'>
                 <FormSelect className='col-md-12' ref={e => this.shcc = e} data={SelectAdapter_FwCanBo} label='Cán bộ' readOnly />
-                <FormSelect className='col-md-6' ref={e => this.chucVu = e} label='Chức vụ' data={SelectAdapter_DmChucVuV1} readOnly={readOnly} />
-                <FormTextBox className='col-md-3' type='number' ref={e => this.mucDong = e} label='Mức đóng' readOnly={readOnly} />
-                <FormTextBox className='col-md-3' type='number' ref={e => this.tyLeDong = e} label='Tỷ lệ đóng' readOnly={readOnly} />
-                <FormTextBox className='col-md-4' type='number' ref={e => this.phuCapChucVu = e} label='Phụ cấp chức vụ' readOnly={readOnly} />
-                <FormTextBox className='col-md-4' type='number' ref={e => this.phuCapThamNienVuotKhung = e} label='Phụ cấp thâm niên vượt khung' readOnly={readOnly} />
-                <FormTextBox className='col-md-4' type='number' ref={e => this.phuCapThamNienNghe = e} label='Phụ cấp thâm niên nghề' readOnly={readOnly} />
+                <FormTextBox className='col-md-12' ref={e => this.soHieuVanBan = e} label='Số hiệu văn bản' readOnly={readOnly} required />
                 <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
                     label={
                         <div style={{ display: 'flex' }}>Thời gian bắt đầu (định dạng:&nbsp; <Dropdown ref={e => this.batDauType = e}
@@ -114,7 +99,7 @@ class EditModal extends AdminModal {
     }
 }
 
-class ComponentBaoHiemXaHoi extends AdminPage {
+class ComponentKeoDaiCongTac extends AdminPage {
     state = { shcc: '', email: '' };
     value = (shcc, email) => {
         this.setState({ shcc, email });
@@ -125,30 +110,28 @@ class ComponentBaoHiemXaHoi extends AdminPage {
         this.modal.show({ item: item, shcc: shcc, email: email });
     }
 
-    deleteBaoHiemXaHoi = (e, item) => {
-        T.confirm('Xóa thông tin quá trình bảo hiểm xã hội', 'Bạn có chắc bạn muốn xóa quá trình này?', true, isConfirm =>
-            isConfirm && (this.props.userEdit ? this.props.deleteQtBaoHiemXaHoiStaffUser(item.id, this.state.email): this.props.deleteQtBaoHiemXaHoiStaff(item.id, true, this.state.shcc)));
+    deleteKeoDaiCongTac = (e, item) => {
+        T.confirm('Xóa thông tin quá trình kéo dài công tác', 'Bạn có chắc bạn muốn xóa quá trình này?', true, isConfirm =>
+            isConfirm && (this.props.userEdit ? this.props.deleteQtKeoDaiCongTacStaffUser(item.id, this.state.email): this.props.deleteQtKeoDaiCongTacStaff(item.id, true, this.state.shcc)));
         e.preventDefault();
     }
 
     render() {
-        let dataBaoHiemXaHoi = !this.props.userEdit ? this.props.staff?.selectedItem?.baoHiemXaHoi : this.props.staff?.userItem?.baoHiemXaHoi;
+        let dataKeoDaiCongTac = !this.props.userEdit ? this.props.staff?.selectedItem?.keoDaiCongTac : this.props.staff?.userItem?.keoDaiCongTac;
         const permission = {
             write: true,
             read: true,
             delete: !this.props.userEdit
         };
 
-        const renderBaoHiemXaHoiTable = (items) => {
+        const renderKeoDaiCongTacTable = (items) => {
             return renderTable({
                 getDataSource: () => items, stickyHead: false,
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thời gian</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Chức vụ</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap', textAlign: 'center' }}>Thông tin tham gia</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap', textAlign: 'center' }}>Thông tin phụ cấp</th>
+                        <th style={{ width: '100%', whiteSpace: 'nowrap', textAlign: 'center' }}>Số hiệu văn bản</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
@@ -162,24 +145,9 @@ class ComponentBaoHiemXaHoi extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' style={{  whiteSpace: 'nowrap' }} content={item.tenChucVu}/>
-                        <TableCell type='text' style={{  whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <span><i>Mức đóng: </i></span> <span>{item.mucDong}</span> <br/>
-                                <span><i>Tỷ lệ đóng: </i></span><span>{item.tyLeDong}</span> <br/>
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' style={{  whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <span><i>Phụ cấp chức vụ: </i></span> <span>{item.phuCapChucVu}</span> <br/>
-                                <span><i>Phụ cấp thâm niên vượt khung: </i></span> <span>{item.phuCapThamNienVuotKhung}</span> <br/>
-                                <span><i>Phụ cấp thâm niên nghề: </i></span> <span>{item.phuCapThamNienNghe}</span> <br/>
-                            </>
-                        )}
-                        />                   
-                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                            onEdit={() => this.modal.show({ item: item, shcc: this.state.shcc, email: this.state.email })} onDelete={this.deleteBaoHiemXaHoi} >
+                        <TableCell type='text' style={{  whiteSpace: 'nowrap' }} content={item.soHieuVanBan}/>                
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
+                            onEdit={() => this.modal.show({ item: item, shcc: this.state.shcc, email: this.state.email })} onDelete={this.deleteKeoDaiCongTac} >
                         </TableCell>
                     </tr>
                 )
@@ -187,21 +155,21 @@ class ComponentBaoHiemXaHoi extends AdminPage {
         };
         return (
             <div className='tile'>
-                <h3 className='tile-title'>Quá trình bảo hiểm xã hội</h3>
+                <h3 className='tile-title'>Quá trình kéo dài công tác</h3>
                 <div className='tile-body'>
                     {
-                        dataBaoHiemXaHoi && renderBaoHiemXaHoiTable(dataBaoHiemXaHoi)
+                        dataKeoDaiCongTac && renderKeoDaiCongTacTable(dataKeoDaiCongTac)
                     }
                     {
                        !this.props.userEdit ? <div className='tile-footer' style={{ textAlign: 'right' }}>
                             <button className='btn btn-info' type='button' onClick={e => this.showModal(e, null, this.state.shcc, this.state.email)}>
-                                <i className='fa fa-fw fa-lg fa-plus' />Thêm quá trình bảo hiểm xã hội
+                                <i className='fa fa-fw fa-lg fa-plus' />Thêm quá trình kéo dài công tác
                             </button>
                         </div> : null
                     }
                     <EditModal ref={e => this.modal = e} permission={permission} readOnly={false}
-                        create={this.props.userEdit ? this.props.createQtBaoHiemXaHoiStaffUser : this.props.createQtBaoHiemXaHoiStaff} 
-                        update={this.props.userEdit ? this.props.updateQtBaoHiemXaHoiStaffUser : this.props.updateQtBaoHiemXaHoiStaff}
+                        create={this.props.userEdit ? this.props.createQtKeoDaiCongTacStaffUser : this.props.createQtKeoDaiCongTacStaff} 
+                        update={this.props.userEdit ? this.props.updateQtKeoDaiCongTacStaffUser : this.props.updateQtKeoDaiCongTacStaff}
                     />
                 </div>
             </div>
@@ -209,9 +177,9 @@ class ComponentBaoHiemXaHoi extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, staff: state.tccb.staff });
+const mapStateToProps = state => ({ system: state.system, staff: state.staff });
 const mapActionsToProps = {
-    createQtBaoHiemXaHoiStaff, createQtBaoHiemXaHoiStaffUser, updateQtBaoHiemXaHoiStaff, 
-    updateQtBaoHiemXaHoiStaffUser, deleteQtBaoHiemXaHoiStaff, deleteQtBaoHiemXaHoiStaffUser
+    createQtKeoDaiCongTacStaff, createQtKeoDaiCongTacStaffUser, updateQtKeoDaiCongTacStaff, 
+    updateQtKeoDaiCongTacStaffUser, deleteQtKeoDaiCongTacStaff, deleteQtKeoDaiCongTacStaffUser
 };
-export default connect(mapStateToProps, mapActionsToProps, null, { forwardRef: true })(ComponentBaoHiemXaHoi);
+export default connect(mapStateToProps, mapActionsToProps, null, { forwardRef: true })(ComponentKeoDaiCongTac);

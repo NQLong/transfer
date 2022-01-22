@@ -167,17 +167,11 @@ class QtNghienCuuKhoaHocStaffUserPage extends AdminPage {
         const name = isStaff ? `${lastName} ${firstName} (${shcc})` : '';
         let list = this.props.qtNghienCuuKhoaHoc && this.props.qtNghienCuuKhoaHoc.items ? this.props.qtNghienCuuKhoaHoc.items : [];
 
-        // const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-        //     permission = this.getUserPermission('qtNghienCuuKhoaHoc', ['read', 'write', 'delete']);
-        // let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtNghienCuuKhoaHoc && this.props.qtNghienCuuKhoaHoc.page ? this.props.qtNghienCuuKhoaHoc.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
-        // let table = 'Không có danh sách!';
-
         let table = renderTable({
             getDataSource: () => list, stickyHead: false,
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                    {/* <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th> */}
                     <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Tên đề tài, dự án</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Mã số và cấp quản lý</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian thực hiện</th>
@@ -189,17 +183,9 @@ class QtNghienCuuKhoaHocStaffUserPage extends AdminPage {
             renderRow: (item, index) => (
                 <tr key={index}>
                     <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
-                    {/* <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                        <>
-                            <a href='#' onClick={e => { e.preventDefault(); this.modal.show(item, false); }}>
-                                <span>{(item.hoCanBo ? item.hoCanBo : '') + ' ' + (item.tenCanBo ? item.tenCanBo : '')}</span><br />
-                                {item.shcc}</a>
-                        </>
-                    )}
-                    /> */}
                     <TableCell type='text' content={
                         <>
-                            <span><i style={{ textAlign: 'justify', textTransform: 'uppercase' }}>{item.tenDeTai}</i></span><br /><br />
+                            <span><i style={{ textAlign: 'justify', textTransform: 'uppercase' }}>{item.tenDeTai}</i></span><br />
                             {item.vaiTro ? <span style={{ whiteSpace: 'nowrap' }}>Vai trò: <span style={{ color: 'blue' }}>{item.vaiTro}</span></span> : null}
                         </>
                     } />
@@ -212,15 +198,14 @@ class QtNghienCuuKhoaHocStaffUserPage extends AdminPage {
                         </>
                     )}
                     />
-                    <TableCell type='text' content={item.kinhPhi} />
-                    <TableCell type='text' content={item.ketQua} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.kinhPhi} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.ketQua} />
                     <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                         onEdit={() => this.modal.show({item, shcc})} onDelete={this.delete} >
                     </TableCell>
                 </tr>
             )
         });
-
 
         return this.renderPage({
             icon: 'fa fa-wpexplorer',
@@ -234,21 +219,19 @@ class QtNghienCuuKhoaHocStaffUserPage extends AdminPage {
                 <div className='tile'>
                     {table}
                 </div>
-                {/* <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                    getPage={this.props.getQtNghienCuuKhoaHocPage} /> */}
                 <NckhModal ref={e => this.modal = e} permission={permission}
                     shcc={shcc} readOnly={!permission.write}
                     create={this.props.createQtNckhStaffGroup}
                     update={this.props.updateQtNckhStaffGroup}
                 />
             </>,
-            backRoute: '/user/tccb/qua-trinh/nghien-cuu-khoa-hoc',
+            backRoute: '/user',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
         });
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtNghienCuuKhoaHoc: state.tccb.qtNghienCuuKhoaHoc, staff: state.tccb.staff });
+const mapStateToProps = state => ({ system: state.system, qtNghienCuuKhoaHoc: state.tccb.qtNghienCuuKhoaHoc });
 const mapActionsToProps = {
     getQtNghienCuuKhoaHocPage, createQtNckhStaffGroup, updateQtNckhStaffGroup, deleteQtNckhStaffGroup, getQtNckhUserAll
 };

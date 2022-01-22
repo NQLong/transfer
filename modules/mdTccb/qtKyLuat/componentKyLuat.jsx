@@ -6,7 +6,8 @@ import Dropdown from 'view/component/Dropdown';
 import { DateInput } from 'view/component/Input';
 import { SelectAdapter_FwCanBo } from '../tccbCanBo/redux';
 import {
-    updateQtKyLuat, deleteQtKyLuat, createQtKyLuat
+    createQtKyLuatStaff, createQtKyLuatStaffUser, updateQtKyLuatStaff, 
+    updateQtKyLuatStaffUser, deleteQtKyLuatStaff, deleteQtKyLuatStaffUser
 } from './redux';
 const EnumDateType = Object.freeze({
     0: { text: '' },
@@ -26,7 +27,6 @@ class EditModal extends AdminModal {
         ketThuc: '',
         batDauType: 'dd/mm/yyyy',
         ketThucType: 'dd/mm/yyyy',
-        doiTuong: ''
     };
     componentDidMount() {
     }
@@ -39,7 +39,7 @@ class EditModal extends AdminModal {
         this.setState({
             id, batDauType: batDauType ? batDauType : 'dd/mm/yyyy',
             ketThucType: ketThucType ? ketThucType : 'dd/mm/yyyy',
-            shcc: item.shcc, item, batDau, ketThuc
+            shcc: item.shcc, item, batDau, ketThuc, email: item.email
         });
 
         setTimeout(() => {
@@ -51,7 +51,7 @@ class EditModal extends AdminModal {
             this.batDau.setVal(batDau);
             this.ketThuc.setVal(ketThuc);
             this.diemThiDua.value(diemThiDua);
-            this.noiDung.value(noiDung);
+            this.noiDung.value(noiDung ? noiDung : '');
         }, 500);
     };
 
@@ -59,6 +59,7 @@ class EditModal extends AdminModal {
         e.preventDefault();
         const changes = {
             shcc: this.state.shcc,
+            email: this.state.email,
             lyDoHinhThuc: this.hinhThucKyLuat.value(),
             capQuyetDinh: this.capQuyetDinh.value(),
             batDauType: this.state.batDauType,
@@ -85,7 +86,7 @@ class EditModal extends AdminModal {
             this.capQuyetDinh.focus();
         }
         else {
-            this.state.id ? this.props.update(true, this.state.id, changes, this.hide) : this.props.create(true, changes, this.hide);
+            this.state.id ? this.props.update(this.state.id, changes, this.hide, true) : this.props.create(changes, this.hide, true);
         }
     }
     render = () => {
@@ -115,38 +116,38 @@ class EditModal extends AdminModal {
                     }
                     type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} readOnly={readOnly} /></div>
 
-                <FormTextBox className='col-md-4' ref={e => this.diemThiDua = e} type='number' label='Điểm kỷ luật' readOnly={readOnly} />
+                <FormTextBox className='col-md-4' ref={e => this.diemThiDua = e} type='number' label='Điểm thi đua' readOnly={readOnly} />
 
             </div>
         });
     }
 }
 class ComponentKyLuat extends AdminPage {
-    state = { shcc: ''};
-    value = (shcc) => {
-        this.setState({ shcc });
+    state = { shcc: '', email: '' };
+    value = (shcc, email) => {
+        this.setState({ shcc, email });
     }
 
-    showModal = (e, item, shcc) => {
+    showModal = (e, item, shcc, email) => {
         e.preventDefault();
-        this.modal.show({ item: item, shcc: shcc });
+        this.modal.show({ item: item, shcc: shcc, email: email });
     }
 
-    delete = (e, item) => {
-        T.confirm('Xóa kỷ luật', 'Bạn có chắc bạn muốn xóa kỷ luật này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtKyLuat(true, item.id, this.state.shcc, error => {
-                if (error) T.notify(error.message ? error.message : 'Xoá kỷ luật bị lỗi!', 'danger');
-                else T.alert('Xoá kỷ luật thành công!', 'success', false, 800);
-            });
-        });
+    deleteKyLuat = (e, item) => {
+        T.confirm('Xóa thông tin quá trình quá trình kỷ luật', 'Bạn có chắc bạn muốn xóa quá trình này?', true, isConfirm =>
+            isConfirm && (this.props.userEdit ? this.props.deleteQtKyLuatStaffUser(item.id, this.state.email): this.props.deleteQtKyLuatStaff(item.id, true, this.state.shcc)));
         e.preventDefault();
     }
 
     render = () => {
         let dataKyLuat = !this.props.userEdit ? this.props.staff?.selectedItem?.kyLuat : this.props.staff?.userItem?.kyLuat;
-        const permission = this.getUserPermission('staff', ['read', 'write', 'delete']);
-        const renderKyLuat = (items) => (
-            renderTable({
+        const permission = {
+            write: true,
+            read: true,
+            delete: !this.props.userEdit
+        };
+        const renderKyLuat = (items) => {
+            return renderTable({
                 getDataSource: () => items, stickyHead: false,
                 renderHead: () => (
                     <tr>
@@ -161,7 +162,7 @@ class ComponentKyLuat extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
-                        <TableCell type='link' onClick={() => this.modal.show({ item: item, shcc: this.state.shcc })} style={{ whiteSpace: 'nowrap' }} content={(
+                        <TableCell type='link' onClick={() => this.modal.show({ item: item, shcc: this.state.shcc, email: this.state.email })} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{item.hoCanBo + ' ' + item.tenCanBo}</span><br />
                                 {item.maCanBo}
@@ -189,12 +190,12 @@ class ComponentKyLuat extends AdminPage {
                         )}
                         />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                            onEdit={() => this.modal.show({ item: item, shcc: this.state.shcc })} onDelete={this.delete} >
+                            onEdit={() => this.modal.show({ item: item, shcc: this.state.shcc, email: this.state.email })} onDelete={this.delete} >
                         </TableCell>
                     </tr>
                 )
-            })
-        );
+            });
+        };
 
         return (
             <div className='tile'>
@@ -204,14 +205,15 @@ class ComponentKyLuat extends AdminPage {
                         dataKyLuat && renderKyLuat(dataKyLuat)
                     }
                     {
-                        !this.props.userEdit ? <div className='tile-footer' style={{ textAlign: 'right' }}>
-                            <button className='btn btn-info' type='button' onClick={e => this.showModal(e, null, this.state.shcc)}>
+                       !this.props.userEdit ? <div className='tile-footer' style={{ textAlign: 'right' }}>
+                            <button className='btn btn-info' type='button' onClick={e => this.showModal(e, null, this.state.shcc, this.state.email)}>
                                 <i className='fa fa-fw fa-lg fa-plus' />Thêm thông tin kỷ luật
                             </button>
                         </div> : null
                     }
-                    <EditModal ref={e => this.modal = e} permission={permission} readOnly={this.props.userEdit}
-                        create={this.props.createQtKyLuat} update={this.props.updateQtKyLuat}
+                    <EditModal ref={e => this.modal = e} permission={permission} readOnly={false}
+                        create={this.props.userEdit ? this.props.createQtKyLuatStaffUser : this.props.createQtKyLuatStaff} 
+                        update={this.props.userEdit ? this.props.updateQtKyLuatStaffUser : this.props.updateQtKyLuatStaff}
                     />
                 </div>
             </div>
@@ -220,6 +222,7 @@ class ComponentKyLuat extends AdminPage {
 }
 const mapStateToProps = state => ({ system: state.system, staff: state.tccb.staff });
 const mapActionsToProps = {
-    updateQtKyLuat, deleteQtKyLuat, createQtKyLuat
+    createQtKyLuatStaff, createQtKyLuatStaffUser, updateQtKyLuatStaff, 
+    updateQtKyLuatStaffUser, deleteQtKyLuatStaff, deleteQtKyLuatStaffUser
 };
 export default connect(mapStateToProps, mapActionsToProps, null, { forwardRef: true })(ComponentKyLuat);

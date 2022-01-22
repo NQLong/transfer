@@ -10,7 +10,7 @@ export default {
     },
     routes: [
         {
-            path: '/user/tccb/qua-trinh/hdlv/group/:loaiDoiTuong/:ma',
+            path: '/user/tccb/qua-trinh/hdlv/:shcc',
             component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
         },
         {

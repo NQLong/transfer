@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormSelect, FormDatePicker, FormCheckbox } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormSelect, FormDatePicker, FormCheckbox, FormRichTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import Dropdown from 'view/component/Dropdown';
 import { DateInput } from 'view/component/Input';
@@ -13,6 +13,14 @@ import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import { SelectApdater_DmBangDaoTao } from 'modules/mdDanhMuc/dmBangDaoTao/redux';
 import { SelectAdapter_DmHinhThucDaoTaoV2 } from 'modules/mdDanhMuc/dmHinhThucDaoTao/redux';
 import { SelectAdapter_DmDonVi} from 'modules/mdDanhMuc/dmDonVi/redux';
+import { SelectApdaterDmTrinhDoDaoTaoFilter } from 'modules/mdDanhMuc/dmTrinhDoDaoTao/redux';
+
+const chuyenNganhSupportText = {
+    5: 'Ngoại ngữ',
+    6: 'Tin học',
+    7: 'Lý luận chính trị',
+    8: 'Quản lý nhà nước'
+};
 
 const EnumDateType = Object.freeze({
     0: { text: '' },
@@ -26,7 +34,18 @@ const EnumDateType = Object.freeze({
 };
 
 class EditModal extends AdminModal {
-    state = { id: null };
+    state = {
+        id: null,
+        item: null,
+        shcc: '',
+        email: '',
+        batDau: '',
+        ketThuc: '',
+        loaiBangCap: '',
+        batDauType: 'dd/mm/yyyy',
+        ketThucType: 'dd/mm/yyyy',
+    }
+
     multiple = false;
     componentDidMount() {
     }
@@ -36,7 +55,7 @@ class EditModal extends AdminModal {
         let { shcc, tenTruong, chuyenNganh, batDau, ketThuc, hinhThuc, loaiBangCap, id,
         batDauType, ketThucType, thoiGian, trinhDo, kinhPhi } = item ? item : {
             shcc: '', tenTruong: '', chuyenNganh: '', batDau: '', ketThuc: '', hinhThuc: '', loaiBangCap: '', id: '',
-            batDauType: '', ketThucType: '', thoiGian: '', trinhDo: '', kinhPhi: ''
+            batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', thoiGian: '', trinhDo: '', kinhPhi: ''
             };
 
         this.setState({ id, 
@@ -72,6 +91,9 @@ class EditModal extends AdminModal {
         } else if (!this.batDau.getVal()) {
             T.notify('Ngày bắt đầu quá trình đào tạo trống', 'danger');
             this.batDau.focus();
+        } else if (!this.chuyenNganh.getVal()) {
+            T.notify('Nội dung đào tạo không được trống', 'danger');
+            this.chuyenNganh.focus();
         } else {
             list_ma.forEach((ma, index) => {
                 const changes = {
@@ -100,35 +122,53 @@ class EditModal extends AdminModal {
         }
     }
 
+    handleBang = (value) => {
+        this.setState({ loaiBangCap: value.id }, () => {
+            this.trinhDo?.value(this.state.item?.trinhDo ? this.state.item?.trinhDo : '');
+            this.chuyenNganh?.value(this.state.item?.chuyenNganh ? this.state.item?.chuyenNganh : chuyenNganhSupportText[value.id]);
+        });
+
+    }
+
+    checkBang = (loaiBangCap) => {
+        return (loaiBangCap != '' && loaiBangCap != '1' && loaiBangCap != '2' && loaiBangCap != '9');
+    };
+
     render = () => {
-        const readOnly = this.props.readOnly;
+        const displayElement = this.state.loaiBangCap == '' ? 'none' : 'block';
+        // const readOnly = this.props.readOnly;
         const canEdit = this.state.id ? false : true;
         return this.renderModal({
             title: this.state.id ? 'Cập nhật quá trình đào tạo' : 'Tạo mới quá trình đào tạo',
             size: 'large',
             body: <div className='row'>
                 <FormSelect className='col-md-12'  multiple={this.multiple} ref={e => this.maCanBo = e} data={SelectAdapter_FwCanBo} label='Mã thẻ cán bộ' readOnly={!canEdit} required/>
-                <FormTextBox type='text' className='col-md-6' ref={e => this.tenTruong = e} label='Tên trường' readOnly={readOnly} />
-                <FormTextBox type='text' className='col-md-6' ref={e => this.chuyenNganh = e} label='Chuyên ngành' readOnly={readOnly} />
-                <FormSelect className='col-md-6' ref={e => this.hinhThuc = e} data={SelectAdapter_DmHinhThucDaoTaoV2} label='Hình thức' readOnly={readOnly} />
-                <FormSelect className='col-md-6' ref={e => this.loaiBangCap = e} data={SelectApdater_DmBangDaoTao} label='Loại bằng cấp' readOnly={readOnly} />
-                <FormTextBox type='text' className='col-md-6' ref={e => this.trinhDo = e} label="Trình độ" readOnly={readOnly} />
-                <FormTextBox type='text' className='col-md-6' ref={e => this.kinhPhi = e} label="Kinh phí" readOnly={readOnly} />
-                <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
+                <FormSelect className='form-group col-md-6' ref={e => this.loaiBangCap = e} label='Loại bằng cấp' data={SelectApdater_DmBangDaoTao} onChange={this.handleBang} required />
+                {
+                    (this.state.loaiBangCap != '5' && this.state.loaiBangCap != '9') ?
+                        <FormSelect ref={e => this.trinhDo = e} data={SelectApdaterDmTrinhDoDaoTaoFilter(this.state.loaiBangCap)}
+                            className='col-md-6' style={{ display: this.checkBang(this.state.loaiBangCap) ? 'block' : 'none' }} label='Trình độ/Kết quả'/>
+                        : 
+                        <FormTextBox ref={e => this.trinhDo = e} className='form-group col-md-6' label='Trình độ/Kết quả' required/>
+                }
+                <FormRichTextBox ref={e => this.chuyenNganh = e} className='form-group col-md-12' label='Nội dung bồi dưỡng, đào tạo' style={{ display: displayElement }} required/>
+                <FormTextBox ref={e => this.tenCoSoDaoTao = e} className='form-group col-md-12' label='Tên cơ sở bồi dưỡng, đào tạo' style={{ display: displayElement }}/>
+                <FormSelect ref={e => this.hinhThuc = e} className='form-group col-md-6' label='Hình thức' data={SelectAdapter_DmHinhThucDaoTaoV2} style={{ display: displayElement }}/>
+                <FormTextBox ref={e => this.kinhPhi = e} className='form-group col-md-6' label='Kinh phí' style={{ display: displayElement }}/>
+                <div className='form-group col-md-6' style={{ display: displayElement }}><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
                     label={
                         <div style={{ display: 'flex' }}>Thời gian bắt đầu (định dạng:&nbsp; <Dropdown ref={e => this.batDauType = e}
                             items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
-                            onSelected={item => this.setState({ batDauType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
+                            onSelected={item => this.setState({ batDauType: item })} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
                     }
-                    type={this.state.batDauType ? typeMapper[this.state.batDauType] : null} readOnly={readOnly} /></div>
-                <div className='form-group col-md-6'><DateInput ref={e => this.ketThuc = e} placeholder='Thời gian kết thúc'
+                    type={this.state.batDauType ? typeMapper[this.state.batDauType] : null} /></div>
+                <div className='form-group col-md-6' style={{ display: displayElement }}><DateInput ref={e => this.ketThuc = e} placeholder='Thời gian kết thúc'
                     label={
                         <div style={{ display: 'flex' }}>Thời gian kết thúc (định dạng:&nbsp; <Dropdown ref={e => this.ketThucType = e}
                             items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
-                            onSelected={item => this.setState({ ketThucType: item })} readOnly={readOnly} />)</div>
+                            onSelected={item => this.setState({ ketThucType: item })} />)</div>
                     }
-                    type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} readOnly={readOnly} /></div>
-                <FormTextBox type='text' className='col-md-4' ref={e => this.thoiGian = e} label='Thời gian' readOnly={readOnly} />
+                    type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} /></div>
             </div>
         });
     }
@@ -226,12 +266,13 @@ class QtDaoTao extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: '30%', textAlign: 'center' }}>Cán bộ</th>
-                        {!this.checked && <th style={{ width: '15%', textAlign: 'center' }}>Tên trường</th>}
-                        {!this.checked && <th style={{ width: '15%', textAlign: 'center' }}>Chuyên ngành</th>}
-                        {!this.checked && <th style={{ width: '20%', textAlign: 'center' }}>Thời gian đào tạo</th>}
-                        {!this.checked && <th style={{ width: '20%', textAlign: 'center' }}>Hình thức</th>}
-                        {!this.checked && <th style={{ width: '20%', textAlign: 'center', whiteSpace: 'nowrap' }}>Loại bằng cấp</th>}
+                        <th style={{ width: '25%', textAlign: 'center' }}>Cán bộ</th>
+                        {!this.checked && <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Nội dung bồi dưỡng</th>}
+                        {!this.checked && <th style={{ width: '25%', whiteSpace: 'nowrap' }}>Tên cơ sở</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Hình thức</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kinh phí</th>}
+                        {!this.checked && <th style={{ width: '10%', whiteSpace: 'nowrap' }}>Kết quả</th>}
                         {this.checked && <th style={{width: 'auto', textAlign: 'center', whiteSpace: 'nowrap'}}>Số quá trình đào tạo</th>}
                         {this.checked && <th style={{width: '100%', textAlign: 'center'}}>Danh sách chuyên nghành đào tạo</th>}
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
@@ -247,17 +288,18 @@ class QtDaoTao extends AdminPage {
                             </>
                         )}
                         />
-                        {!this.checked && <TableCell type='text' style={{}} content={item.tenTruong} />}
                         {!this.checked && <TableCell type='text' style={{}} content={item.chuyenNganh} />}
-                        {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <span style={{ whiteSpace: 'nowrap' }}>Từ: <span style={{ color: 'blue' }}>{item.batDau ? new Date(item.batDau).ddmmyyyy() : ''}</span></span><br />
-                                <span style={{ whiteSpace: 'nowrap' }}>Đến: <span style={{ color: 'blue' }}>{item.ketThuc ? new Date(item.ketThuc).ddmmyyyy() : ''}</span></span><br />
-                            </>
-                        )}
-                        />}
-                        {!this.checked && <TableCell type='text' content={item.tenHTDT} />}
-                        {!this.checked && <TableCell type='text' content={item.tenBDT} />}
+                        {!this.checked && <TableCell type='text' style={{}} content={item.tenCoSoDaoTao} />}
+                        {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.hinhThuc ? item.tenHinhThuc : ''} />}
+                        {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={<>
+                            {item.batDau && <span>Từ: <span style={{ color: 'blue' }}>{T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy')}</span><br /></span>}
+                            {item.ketThuc && <span>Đến: <span style={{ color: 'blue' }}>{T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy')}</span></span>}
+                        </>} />}
+                        {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.kinhPhi ? item.kinhPhi : ''} />}
+                        {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={<>
+                            {item.loaiBangCap && <span style={{ color: 'blue' }}>{item.tenLoaiBangCap}<br /></span>}
+                            {item.trinhDo && <span>Kết quả: <span style={{ color: 'blue' }}>{item.tenTrinhDo ? item.tenTrinhDo : item.trinhDo}<br /></span></span>}
+                        </>} />}
                         {this.checked && <TableCell type='text' content={item.soQuaTrinh} />}
                         {this.checked && <TableCell type='text' content={this.list(item.danhSachChuyenNganh, item.soQuaTrinh, item.soQuaTrinh)} />}
                         {
