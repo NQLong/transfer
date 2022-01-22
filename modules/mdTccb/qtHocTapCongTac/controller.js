@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3033: { title: 'Quá trình học tập, công tác', link: '/user/tccb/qua-trinh/hoc-tap-cong-tac', icon: 'fa-gift', backgroundColor: '#2559ba', groupIndex: 1},
+            3033: { title: 'Quá trình học tập, công tác', link: '/user/tccb/qua-trinh/hoc-tap-cong-tac', icon: 'fa-calendar', backgroundColor: '#30a17f', groupIndex: 1 },
         },
     };
     app.permission.add(
@@ -13,7 +13,7 @@ module.exports = app => {
     );
     app.get('/user/tccb/qua-trinh/hoc-tap-cong-tac/:id', app.permission.check('qtHocTapCongTac:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/hoc-tap-cong-tac', app.permission.check('qtHocTapCongTac:read'), app.templates.admin);
-    app.get('/user/tccb/qua-trinh/hoc-tap-cong-tac/:shcc', app.permission.check('qtHocTapCongTac:read'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/hoc-tap-cong-tac/group/:shcc', app.permission.check('qtHocTapCongTac:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/tccb/qua-trinh/hoc-tap-cong-tac/page/:pageNumber/:pageSize', app.permission.check('qtHocTapCongTac:read'), (req, res) => {
@@ -101,4 +101,67 @@ module.exports = app => {
             res.send({ error: 'Invalid parameter!' });
         }
     });
+
+    const qtHTCTImportData = (fields, files, done) => {
+        let worksheet = null;
+        new Promise((resolve, reject) => {
+            if (fields.userData && fields.userData[0] && fields.userData[0] == 'HTCTDataFile' && files.HTCTDataFile && files.HTCTDataFile.length) {
+                const srcPath = files.HTCTDataFile[0].path;
+                const workbook = app.excel.create();
+                workbook.xlsx.readFile(srcPath).then(() => {
+                    app.deleteFile(srcPath);
+                    worksheet = workbook.getWorksheet(1);
+                    worksheet ? resolve() : reject('File dữ liệu không hợp lệ!');
+                });
+            }
+        }).then(() => {
+            let index = 1,
+                items = [];
+            while (true) {
+                index++;
+                let flag = worksheet.getCell('A' + index).value;
+                if (flag) {
+                    let noiDung = worksheet.getCell('A' + index).value ? worksheet.getCell('A' + index).value.toString().trim() : '',
+                        batDau = worksheet.getCell('B' + index).value ? worksheet.getCell('B' + index).value.toString().trim() : '',
+                        ketThuc = worksheet.getCell('C' + index).value ? worksheet.getCell('C' + index).value.toString().trim() : '';
+                    if (ketThuc == '') {
+                        ketThuc = -1;
+                    }
+                    if (batDau.length != 4) {
+                        done({ error: 'Sai định dạng cột bắt đầu' });
+                    }
+                    else if (ketThuc.length != 4 && ketThuc != -1) {
+                        done({ error: 'Sai định dạng cột kết thúc' });
+                    }
+                    else items.push({ noiDung, batDau, ketThuc, batDauType: 'yyyy', ketThucType: 'yyyy' });
+
+
+                } else {
+                    done({ items });
+                    break;
+                }
+            }
+
+        }).catch(error => done({ error }));
+    };
+
+    app.get('/api/qua-trinh/hoc-tap-cong-tac/download-template', app.permission.check('staff:login'), (req, res) => {
+        const workBook = app.excel.create();
+        const ws = workBook.addWorksheet('Qua_trinh_HTCT_Template');
+        const defaultColumns = [
+            { header: 'NỘI DUNG', key: 'noiDung', width: 50 },
+            { header: 'BẮT ĐẦU (yyyy)', key: 'batDau', width: 20 },
+            { header: 'KẾT THÚC (yyyy)', key: 'ketThuc', width: 20 },
+            { header: 'Ghi chú', key: 'ghiChu', width: 20 },
+        ];
+        ws.columns = defaultColumns;
+        ws.getRow(1).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', horizontal: 'center' };
+        ws.getCell('D2').value = 'NỘI DUNG bao gồm nơi học tập, công tác; tên đơn vị; chức vụ (nếu có); chức danh nghề nghiệp (nếu có)';
+        ws.getCell('D3').value = 'Nếu đang công tác tại đơn vị, để trống ô KẾT THÚC';
+        app.excel.attachment(workBook, res, 'Qua_trinh_HTCT_Template.xlsx');
+    });
+
+    app.uploadHooks.add('HTCTDataFile', (req, fields, files, params, done) =>
+        app.permission.has(req, () => qtHTCTImportData(fields, files, done), done, 'staff:login'));
+
 };

@@ -12,7 +12,7 @@ module.exports = app => {
     );
     app.get('/user/tccb/qua-trinh/nghien-cuu-khoa-hoc/:id', app.permission.check('qtNghienCuuKhoaHoc:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/nghien-cuu-khoa-hoc', app.permission.check('qtNghienCuuKhoaHoc:read'), app.templates.admin);
-    app.get('/user/tccb/qua-trinh/nghien-cuu-khoa-hoc/group_nckh/:loaiDoiTuong/:ma', app.permission.check('qtNghienCuuKhoaHoc:read'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/nghien-cuu-khoa-hoc/group/:shcc', app.permission.check('qtNghienCuuKhoaHoc:read'), app.templates.admin);
 
     // Hook ready -----------------------------------------------------------------------------------------------------------------------------------
     app.readyHooks.add('readyQtNghienCuuKhoaHoc', {

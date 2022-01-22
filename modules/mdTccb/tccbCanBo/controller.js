@@ -129,6 +129,42 @@ module.exports = app => {
                                 resolve();
                             });
                         })).then(() => new Promise(resolve => {
+                            app.model.qtDaoTao.getTDCT(canBo.shcc , (error, llct) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin trình độ lí luận chính trị cán bộ !' });
+                                }
+                                else if (llct == null || llct.rows.length == 0) {
+                                    result = app.clone(result, { llct: null });
+                                } else {
+                                    result = app.clone(result, { llct: llct.rows[0] });
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
+                            app.model.qtDaoTao.getQLNN(canBo.shcc , (error, qlnn) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin trình độ quản lý nhà nước cán bộ !' });
+                                }
+                                else if (qlnn == null || qlnn.length == 0) {
+                                    result = app.clone(result, { qlnn: null });
+                                } else {
+                                    result = app.clone(result, { qlnn: qlnn.rows[0] });
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
+                            app.model.qtDaoTao.getTH(canBo.shcc , (error, tinHoc) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin trình độ tin học cán bộ !' });
+                                }
+                                else if (tinHoc == null || tinHoc.length == 0) {
+                                    result = app.clone(result, { tinHoc: null });
+                                } else {
+                                    result = app.clone(result, { tinHoc: tinHoc.rows[0] });
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
                             app.model.qtLuong.getAll({shcc: canBo.shcc}, '*', 'ngayHuong ASC', (error, luong) => {
                                 if (error) {
                                     res.send({ error: 'Lỗi khi lấy thông tin lương cán bộ !' });
@@ -1046,6 +1082,18 @@ module.exports = app => {
                             result = app.clone(result, { qlnn: null });
                         } else {
                             result = app.clone(result, { qlnn: qlnn.rows[0] });
+                        }
+                        resolve();
+                    });
+                })).then(() => new Promise(resolve => {
+                    app.model.qtDaoTao.getTH(canBo.shcc , (error, tinHoc) => {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin trình độ tin học cán bộ !' });
+                        }
+                        else if (tinHoc == null || tinHoc.length == 0) {
+                            result = app.clone(result, { tinHoc: null });
+                        } else {
+                            result = app.clone(result, { tinHoc: tinHoc.rows[0] });
                         }
                         resolve();
                     });

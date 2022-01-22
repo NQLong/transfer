@@ -17,6 +17,7 @@ import ComponentHDLV from 'modules/mdTccb/qtHuongDanLuanVan/componentHDLV';
 import ComponentSGT from 'modules/mdTccb/sachGiaoTrinh/componentSGT';
 import ComponentDaoTao from 'modules/mdTccb/qtDaoTao/componentDaoTao';
 import ComponentLuong from 'modules/mdTccb/qtLuong/componentLuong';
+import ComponentCongTac from 'modules/mdTccb/qtHocTapCongTac/componentCongTac';
 import ComponentBaoHiemXaHoi from 'modules/mdTccb/qtBaoHiemXaHoi/componentBaoHiemXaHoi';
 import ComponentKeoDaiCongTac from 'modules/mdTccb/qtKeoDaiCongTac/componentKeoDaiCongTac';
 
@@ -47,6 +48,7 @@ class ProfileCanBo extends AdminPage {
             this.componentCaNhan.value(item);
             this.componentQuanHe.value(item.email, item.phai, item.shcc);
             this.componentTrinhDo.value(item);
+            this.componentCongTac.value(item.shcc, item.email);
             this.componentTTCongTac.value(item);
             this.componentDaoTao.value(item.shcc, item.email);
             this.componentKhenThuong.value(item.shcc);
@@ -81,6 +83,7 @@ class ProfileCanBo extends AdminPage {
                             <ComponentCaNhan ref={e => this.componentCaNhan = e} userEdit={false} isStaff={true}/>
                             <ComponentQuanHe ref={e => this.componentQuanHe = e} userEdit={true} />
                             <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={true} />
+                            <ComponentCongTac ref={e => this.componentCongTac = e} userEdit={true} />
                             <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={true} tccb={false}/>
                             <ComponentDaoTao ref={e => this.componentDaoTao = e} userEdit={true} />
                             <ComponentLuong ref={e => this.componentLuong = e} userEdit={true} />

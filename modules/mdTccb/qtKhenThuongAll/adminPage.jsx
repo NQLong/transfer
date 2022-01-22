@@ -347,8 +347,8 @@ class QtKhenThuongAll extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    <FormTextBox className='col-md-4' ref={e => this.fromYear = e} label='Năm đạt được (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
-                    <FormTextBox className='col-md-4' ref={e => this.toYear = e} label='Năm đạt được (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />  
+                    <FormTextBox className='col-md-4' ref={e => this.fromYear = e} label='Từ năm đạt được (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
+                    <FormTextBox className='col-md-4' ref={e => this.toYear = e} label='Đến năm đạt được (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />  
                 </div>
             </>,
             content: <>

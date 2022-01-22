@@ -219,7 +219,7 @@ class QtHuongDanLuanVan extends AdminPage {
                         }
                         {
                             this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}>
-                                <Link className='btn btn-success' to={`/user/tccb/qua-trinh/hdlv/${item.shcc}`} >
+                                <Link className='btn btn-success' to={`/user/tccb/qua-trinh/hdlv/group/${item.shcc}`} >
                                     <i className='fa fa-lg fa-compress' />
                                 </Link>
                             </TableCell>

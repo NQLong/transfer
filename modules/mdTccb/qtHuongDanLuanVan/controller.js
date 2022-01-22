@@ -11,8 +11,9 @@ module.exports = app => {
         { name: 'qtHuongDanLuanVan:write' },
         { name: 'qtHuongDanLuanVan:delete' },
     );
-    app.get('/user/tccb/qua-trinh/hdlv/:shcc', app.permission.check('qtHuongDanLuanVan:read'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/hdlv/:id', app.permission.check('qtHuongDanLuanVan:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/hdlv', app.permission.check('qtHuongDanLuanVan:read'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/hdlv/group/:shcc', app.permission.check('qtHuongDanLuanVan:read'), app.templates.admin);
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
     app.get('/api/qua-trinh/hdlv/page/:pageNumber/:pageSize', app.permission.check('qtHuongDanLuanVan:read'), (req, res) => {
