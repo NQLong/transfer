@@ -113,6 +113,7 @@ export function updateQtKeoDaiCongTacGroupPageMa(id, changes, done) {
 }
 
 export function createQtKeoDaiCongTacGroupPageMa(data, done) {
+    console.log(data);
     return dispatch => {
         const url = '/api/tccb/qua-trinh/keo-dai-cong-tac';
         T.post(url, { data }, res => {
