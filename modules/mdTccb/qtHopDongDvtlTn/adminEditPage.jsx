@@ -412,14 +412,14 @@ class QtHopDongDvtlTnEditPage extends QTForm {
                         <h1><i className='fa fa-pencil' />Hợp đồng cán bộ {`: ${this.state.item.canBoDuocThue.ho}  ${this.state.item.canBoDuocThue.ten}`}</h1>
                         <p>Số hợp đồng: {this.state.item.qtHopDongDvtlTn.soHopDong}</p>
                     </>) : <>
-                            <h1><i className='fa fa-pencil' />Tạo mới hợp đồng</h1>
-                        </>}
+                        <h1><i className='fa fa-pencil' />Tạo mới hợp đồng</h1>
+                    </>}
                 </div>
                 <div className='tile'>
                     <h3 className='tile-title'>Thông tin hợp đồng phía trường</h3>
                     <div className='tile-body row'>
                         <div className='form-group col-xl-6 col-md-6'><TextInput ref={this.soHopDong} label='Số hợp đồng' readOnly={readOnly} required /> </div>
-                        <FormSelect className='form-group col-xl-6 col-md-6' data={[{ id: 'DVTL', text: 'Đơn vị trả lương' }, { id: 'TN', text: 'Trách nhiệm' }]} required label='Diện hợp đồng' ref={this.kieuHopDong} onChange={this.handleChangeDienHopDong} />
+                        <FormSelect className='form-group col-xl-6 col-md-6' data={[{ id: 'DVTL', text: 'Đơn vị trả lương' }, { id: 'TN', text: 'Trách nhiệm' }]} required label='Diện hợp đồng' ref={this.kieuHopDong} onChange={this.handleChangeDienHopDong}/>
                         <div className='form-group col-xl-6 col-md-6'><Select adapter={SelectAdapter_FwCanBo} ref={this.nguoiKy} onChange={this.autoChucVu} label='Người đại diện ký' readOnly={readOnly} required /></div>
                         <div className='form-group col-md-6'>Chức vụ: <><br /><b>{this.state.chucVuNguoiKy}</b></></div>
                     </div>

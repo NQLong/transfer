@@ -96,7 +96,6 @@ export function getQtHopDongDvtlTnEdit(ma, done) {
     return dispatch => {
         const url = `/api/tccb/qua-trinh/hop-dong-dvtl-tn/edit/item/${ma}`;
         T.get(url, data => {
-            console.log(data);
             if (data.error) {
                 T.notify('Lấy thông tin hợp đồng bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
