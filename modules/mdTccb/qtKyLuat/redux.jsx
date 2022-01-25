@@ -50,6 +50,79 @@ export default function QtKyLuatReducer(state = null, data) {
 
 // Actions ------------------------------------------------------------------------------------------------------------
 T.initPage('pageQtKyLuat');
+export function getQtKyLuatUserPage(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('pageQtKyLuat', pageNumber, pageSize, pageCondition, filter);
+    return dispatch => {
+        const url = `/api/user/qua-trinh/ky-luat/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách kỷ luật bị lỗi!', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (page.filter) data.page.filter = page.filter;
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                if (done) done(data.page);
+                dispatch({ type: QtKyLuatGetPage, page: data.page });
+            }
+        }, () => T.notify('Lấy danh sách kỷ luật bị lỗi!', 'danger'));
+    };
+}
+
+export function updateQtKyLuatUserPage(id, changes, done) {
+    return dispatch => {
+        const url = '/api/user/qua-trinh/ky-luat';
+        T.put(url, { id, changes }, data => {
+            if (data.error || changes == null) {
+                T.notify('Cập nhật kỷ luật bị lỗi!', 'danger');
+                console.error(`PUT: ${url}.`, data.error);
+                done && done(data.error);
+            } else {
+                T.notify('Cập nhật kỷ luật thành công!', 'success');
+                done && done(data.item);
+                dispatch(getQtKyLuatUserPage());
+            }
+        }, () => T.notify('Cập nhật kỷ luật bị lỗi!', 'danger'));
+    };
+}
+
+export function createQtKyLuatUserPage(data, done) {
+    return dispatch => {
+        const url = '/api/user/qua-trinh/ky-luat';
+        T.post(url, { data }, res => {
+            if (res.error) {
+                T.notify('Tạo kỷ luật bị lỗi!', 'danger');
+                console.error(`POST: ${url}.`, res.error);
+            } else {
+                if (done) {
+                    T.notify('Tạo kỷ luật thành công!', 'success');
+                    dispatch(getQtKyLuatUserPage());
+                    done && done(data);
+                }
+            }
+        }, () => T.notify('Tạo kỷ luật bị lỗi!', 'danger'));
+    };
+}
+export function deleteQtKyLuatUserPage(id, done) {
+    return dispatch => {
+        const url = '/api/user/qua-trinh/ky-luat';
+        T.delete(url, { id }, data => {
+            if (data.error) {
+                T.notify('Xóa kỷ luật bị lỗi!', 'danger');
+                console.error(`DELETE: ${url}.`, data.error);
+            } else {
+                T.alert('kỷ luật đã xóa thành công!', 'success', false, 800);
+                done && done(data.item);
+                dispatch(getQtKyLuatUserPage());
+            }
+        }, () => T.notify('Xóa kỷ luật bị lỗi!', 'danger'));
+    };
+}
+
+T.initPage('pageQtKyLuat');
 export function getQtKyLuatPage(pageNumber, pageSize, pageCondition, filter, done) {
     if (typeof filter === 'function') {
         done = filter;

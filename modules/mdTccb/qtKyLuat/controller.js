@@ -5,7 +5,16 @@ module.exports = app => {
             3006: { title: 'Quá trình kỷ luật', link: '/user/tccb/qua-trinh/ky-luat', icon: 'fa-ban', backgroundColor: '#f03a3a', groupIndex: 2 },
         },
     };
+
+    const menuStaff = {
+        parentMenu: app.parentMenu.user,
+        menus: {
+            1004: { title: 'Kỷ luật', link: '/user/ky-luat', icon: 'fa-ban', backgroundColor: '#f03a3a', groupIndex: 2 },
+        },
+    };
+
     app.permission.add(
+        { name: 'staff:login', menu: menuStaff },
         { name: 'qtKyLuat:read', menu },
         { name: 'qtKyLuat:write' },
         { name: 'qtKyLuat:delete' },
@@ -13,8 +22,24 @@ module.exports = app => {
     app.get('/user/tccb/qua-trinh/ky-luat/:id', app.permission.check('qtKyLuat:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/ky-luat', app.permission.check('qtKyLuat:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/ky-luat/group/:shcc', app.permission.check('qtKyLuat:read'), app.templates.admin);
-
+    app.get('/user/ky-luat', app.permission.check('staff:login'), app.templates.admin);
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
+    app.get('/api/user/qua-trinh/ky-luat/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+        const pageNumber = parseInt(req.params.pageNumber),
+            pageSize = parseInt(req.params.pageSize),
+            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+        const { fromYear, toYear, list_shcc, list_dv} = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null };
+        app.model.qtKyLuat.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, searchTerm, (error, page) => {
+            if (error || page == null) {
+                res.send({ error });
+            } else {
+                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
+                const pageCondition = searchTerm;
+                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
+            }
+        });
+    });
+
     app.get('/api/tccb/qua-trinh/ky-luat/page/:pageNumber/:pageSize', app.permission.check('qtKyLuat:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),

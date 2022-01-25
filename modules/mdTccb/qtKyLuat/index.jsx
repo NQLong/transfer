@@ -17,5 +17,9 @@ export default {
             path: '/user/tccb/qua-trinh/ky-luat',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
+        {
+            path: '/user/ky-luat',
+            component: Loadable({ loading: Loading, loader: () => import('./staffPage') })
+        },
     ],
 };
