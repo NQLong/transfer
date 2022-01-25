@@ -190,6 +190,79 @@ export function getQtHuongDanLuanVanGroupPage(pageNumber, pageSize, pageConditio
     };
 }
 
+T.initPage('pageQtHuongDanLuanVan');
+export function getQtHuongDanLuanVanUserPage(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('pageQtHuongDanLuanVan', pageNumber, pageSize, pageCondition, filter);
+    return dispatch => {
+        const url = `/api/user/qua-trinh/hdlv/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách hướng dẫn luận văn bị lỗi!', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (page.filter) data.page.filter = page.filter;
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                if (done) done(data.page);
+                dispatch({ type: QtHuongDanLuanVanGetPage, page: data.page });
+            }
+        }, () => T.notify('Lấy danh sách hướng dẫn luận văn bị lỗi!', 'danger'));
+    };
+}
+
+export function updateQtHuongDanLuanVanUserPage(id, changes, done) {
+    return dispatch => {
+        const url = '/api/qua-trinh/hdlv';
+        T.put(url, { id, changes }, data => {
+            if (data.error || changes == null) {
+                T.notify('Cập nhật hướng dẫn luận văn bị lỗi!', 'danger');
+                console.error(`PUT: ${url}.`, data.error);
+                done && done(data.error);
+            } else {
+                T.notify('Cập nhật hướng dẫn luận văn thành công!', 'success');
+                done && done(data.item);
+                dispatch(getQtHuongDanLuanVanUserPage());
+            }
+        }, () => T.notify('Cập nhật hướng dẫn luận văn bị lỗi!', 'danger'));
+    };
+}
+
+export function createQtHuongDanLuanVanUserPage(data, done) {
+    return dispatch => {
+        const url = '/api/qua-trinh/hdlv';
+        T.post(url, { data }, res => {
+            if (res.error) {
+                T.notify('Tạo hướng dẫn luận văn bị lỗi!', 'danger');
+                console.error(`POST: ${url}.`, res.error);
+            } else {
+                if (done) {
+                    T.notify('Tạo hướng dẫn luận văn thành công!', 'success');
+                    dispatch(getQtHuongDanLuanVanUserPage());
+                    done && done(data);
+                }
+            }
+        }, () => T.notify('Tạo hướng dẫn luận văn bị lỗi!', 'danger'));
+    };
+}
+export function deleteQtHuongDanLuanVanUserPage(id, done) {
+    return dispatch => {
+        const url = '/api/qua-trinh/hdlv';
+        T.delete(url, { id }, data => {
+            if (data.error) {
+                T.notify('Xóa hướng dẫn luận văn bị lỗi!', 'danger');
+                console.error(`DELETE: ${url}.`, data.error);
+            } else {
+                T.alert('hướng dẫn luận văn đã xóa thành công!', 'success', false, 800);
+                done && done(data.item);
+                dispatch(getQtHuongDanLuanVanUserPage());
+            }
+        }, () => T.notify('Xóa hướng dẫn luận văn bị lỗi!', 'danger'));
+    };
+}
+
 export function createQtHuongDanLuanVanStaff(data, done, isEdit = null) {
     return dispatch => {
         const url = '/api/qua-trinh/hdlv';

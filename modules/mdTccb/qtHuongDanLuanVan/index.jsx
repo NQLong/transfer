@@ -17,5 +17,9 @@ export default {
             path: '/user/tccb/qua-trinh/hdlv',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
+        {
+            path: '/user/huong-dan-luan-van',
+            component: Loadable({ loading: Loading, loader: () => import('./staffPage') })
+        },
     ],
 };
