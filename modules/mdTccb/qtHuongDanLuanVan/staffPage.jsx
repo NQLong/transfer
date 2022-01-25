@@ -12,15 +12,16 @@ class EditModal extends AdminModal {
     state = {
         id: null,
         shcc: '',
-        email: '',
     }
 
     onShow = (item) => {
+        console.log(item);
         let { hoTen, tenLuanVan, namTotNghiep, sanPham, bacDaoTao, id } = item && item.item ? item.item : {
             hoTen: '', tenLuanVan: '', namTotNghiep: null, sanPham: '', bacDaoTao: '', id: ''
         };
-        this.setState({ id, item,
-            shcc: item.shcc, email: item.email,    
+        this.setState({
+            id, item,
+            shcc: item.shcc
         });
         setTimeout(() => {
             this.hoTen.value(hoTen ? hoTen : '');
@@ -35,17 +36,14 @@ class EditModal extends AdminModal {
         e.preventDefault();
         const changes = {
             shcc: this.state.shcc,
-            email: this.state.email,
             hoTen: this.hoTen.value(),
             tenLuanVan: this.tenLuanVan.value(),
             namTotNghiep: this.namTotNghiep.value(),
             sanPham: this.sanPham.value(),
             bacDaoTao: this.bacDaoTao.value(),
         };
-        if (!changes.shcc) {
-            T.notify('Cán bộ trống', 'danger');
-            this.maCanBo.focus();
-        } else if (!this.tenLuanVan.value()) {
+        
+        if (!this.tenLuanVan.value()) {
             T.notify('Tên luận văn trống', 'danger');
             this.tenLuanVan.focus();
         } else if (!this.namTotNghiep.value()) {
@@ -77,7 +75,7 @@ class QtHuongDanLuanVanStaffUserPage extends AdminPage {
     componentDidMount() {
         T.ready(() => {
             const { shcc } = this.props.system && this.props.system.user ? this.props.system.user : { shcc: '' };
-            this.setState({filter: {list_shcc: shcc, list_dv: '', fromYear: null, toYear: null}});
+            this.setState({ filter: { list_shcc: shcc, list_dv: '', fromYear: null, toYear: null } });
             this.getPage();
         });
     }
@@ -88,7 +86,7 @@ class QtHuongDanLuanVanStaffUserPage extends AdminPage {
 
     showModal = (e) => {
         e.preventDefault();
-        this.modal.show();
+        this.modal.show({item: null, shcc: this.state.filter.list_shcc});
     }
 
     delete = (e, item) => {
@@ -102,11 +100,16 @@ class QtHuongDanLuanVanStaffUserPage extends AdminPage {
     }
 
     render() {
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permission = this.getUserPermission('qtHuongDanLuanVan', ['read', 'write', 'delete']);
-            const { isStaff, shcc } = this.props.system && this.props.system.user ? this.props.system.user : { isStaff: false, shcc: '' };
-            const { firstName, lastName } = isStaff && this.props.system.user || { firstName: '', lastName: '' };
-            const name = isStaff ? `${lastName} ${firstName} (${shcc})` : '';
+        let permission = this.getUserPermission('staff', ['login']);
+        if (permission.login == true) {
+            permission = {
+                write: true,
+                delete: true
+            };
+        }
+        const { isStaff, shcc } = this.props.system && this.props.system.user ? this.props.system.user : { isStaff: false, shcc: '' };
+        const { firstName, lastName } = isStaff && this.props.system.user || { firstName: '', lastName: '' };
+        const name = isStaff ? `${lastName} ${firstName} (${shcc})` : '';
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtHuongDanLuanVan && this.props.qtHuongDanLuanVan.page ? this.props.qtHuongDanLuanVan.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
@@ -117,9 +120,9 @@ class QtHuongDanLuanVanStaffUserPage extends AdminPage {
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         {/* <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th> */}
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Họ tên sinh viên</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tên luận văn</th> 
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tên luận văn</th>
                         <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Năm tốt nghiệp</th>
-                        <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Bậc đào tạo</th> 
+                        <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Bậc đào tạo</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
@@ -133,15 +136,15 @@ class QtHuongDanLuanVanStaffUserPage extends AdminPage {
                             </>
                         )}
                         /> */}
-                        <TableCell type='text' content={item.hoTen} /> 
+                        <TableCell type='text' content={item.hoTen} />
                         <TableCell type='text' style={{}} content={<>
                             <span><i>{item.tenLuanVan}</i></span><br />
                             {item.sanPham ? <span>Sản phẩm: {item.sanPham ? item.sanPham : ''}</span> : null}
-                        </>} /> 
+                        </>} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.namTotNghiep} />
                         <TableCell type='text' content={item.bacDaoTao} style={{ whiteSpace: 'nowrap' }} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                            onEdit={() => this.modal.show({item, shcc})} onDelete={this.delete} >
+                            onEdit={() => this.modal.show({ item, shcc })} onDelete={this.delete} >
                         </TableCell>
 
                     </tr>
@@ -152,7 +155,7 @@ class QtHuongDanLuanVanStaffUserPage extends AdminPage {
         return this.renderPage({
             icon: 'fa fa-university',
             title: 'Quá trình hướng dẫn luận văn',
-            subTitle: <span style={{ color: 'blue'}}>Cán bộ: {name}</span>,
+            subTitle: <span style={{ color: 'blue' }}>Cán bộ: {name}</span>,
             breadcrumb: [
                 <Link key={0} to='/user/'>Trang cá nhân</Link>,
                 'Hướng dẫn luận văn'
@@ -163,8 +166,7 @@ class QtHuongDanLuanVanStaffUserPage extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
-                <EditModal ref={e => this.modal = e} permission={permission}
-                    permissions={currentPermissions} shcc={shcc} readOnly={!permission.write}
+                <EditModal ref={e => this.modal = e} shcc={shcc} readOnly={!permission.write}
                     create={this.props.createQtHuongDanLuanVanUserPage} update={this.props.updateQtHuongDanLuanVanUserPage}
                 />
             </>,

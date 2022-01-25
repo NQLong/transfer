@@ -215,7 +215,7 @@ export function getQtHuongDanLuanVanUserPage(pageNumber, pageSize, pageCondition
 
 export function updateQtHuongDanLuanVanUserPage(id, changes, done) {
     return dispatch => {
-        const url = '/api/qua-trinh/hdlv';
+        const url = '/api/user/qua-trinh/hdlv';
         T.put(url, { id, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật hướng dẫn luận văn bị lỗi!', 'danger');
@@ -232,7 +232,7 @@ export function updateQtHuongDanLuanVanUserPage(id, changes, done) {
 
 export function createQtHuongDanLuanVanUserPage(data, done) {
     return dispatch => {
-        const url = '/api/qua-trinh/hdlv';
+        const url = '/api/user/qua-trinh/hdlv';
         T.post(url, { data }, res => {
             if (res.error) {
                 T.notify('Tạo hướng dẫn luận văn bị lỗi!', 'danger');
@@ -249,7 +249,7 @@ export function createQtHuongDanLuanVanUserPage(data, done) {
 }
 export function deleteQtHuongDanLuanVanUserPage(id, done) {
     return dispatch => {
-        const url = '/api/qua-trinh/hdlv';
+        const url = '/api/user/qua-trinh/hdlv';
         T.delete(url, { id }, data => {
             if (data.error) {
                 T.notify('Xóa hướng dẫn luận văn bị lỗi!', 'danger');
