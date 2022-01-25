@@ -74,16 +74,9 @@ class EditModal extends AdminModal {
 
 class QtHuongDanLuanVanStaffUserPage extends AdminPage {
     state = { filter: {} };
-    isStaff = false;
-    firstName = '';
-    lastName = '';
     componentDidMount() {
         T.ready(() => {
-            const { isStaff, shcc } = this.props.system && this.props.system.user ? this.props.system.user : { isStaff: false, shcc: '' };
-            const { firstName, lastName } = isStaff && this.props.system.user || { firstName: '', lastName: '' };
-            this.isStaff = isStaff;
-            this.firstName = firstName;
-            this.lastName = lastName;
+            const { shcc } = this.props.system && this.props.system.user ? this.props.system.user : { shcc: '' };
             this.setState({filter: {list_shcc: shcc, list_dv: '', fromYear: null, toYear: null}});
             this.getPage();
         });
@@ -111,8 +104,9 @@ class QtHuongDanLuanVanStaffUserPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('qtHuongDanLuanVan', ['read', 'write', 'delete']);
-        const shcc = this.state.filter.list_shcc;
-        const name = this.isStaff ? `${this.lastName} ${this.firstName} (${shcc})` : '';
+            const { isStaff, shcc } = this.props.system && this.props.system.user ? this.props.system.user : { isStaff: false, shcc: '' };
+            const { firstName, lastName } = isStaff && this.props.system.user || { firstName: '', lastName: '' };
+            const name = isStaff ? `${lastName} ${firstName} (${shcc})` : '';
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtHuongDanLuanVan && this.props.qtHuongDanLuanVan.page ? this.props.qtHuongDanLuanVan.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {

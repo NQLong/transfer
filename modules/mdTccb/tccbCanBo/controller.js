@@ -1105,6 +1105,30 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
+                    app.model.qtDaoTao.getHV(canBo.shcc, (error, hocViCB) => {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin trình độ học vấn, đào tạo !' });
+                        }
+                        else if (hocViCB == null || hocViCB.length == 0) {
+                            result = app.clone(result, { hocViCB: null });
+                        } else {
+                            result = app.clone(result, { hocViCB: hocViCB.rows });
+                        }
+                        resolve();
+                    });
+                })).then(() => new Promise(resolve => {
+                    app.model.qtDaoTao.getCC(canBo.shcc, (error, chungChi) => {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin trình độ cử nhân !' });
+                        }
+                        else if (chungChi == null || chungChi.length == 0) {
+                            result = app.clone(result, { chungChi: null });
+                        } else {
+                            result = app.clone(result, { chungChi: chungChi.rows });
+                        }
+                        resolve();
+                    });
+                })).then(() => new Promise(resolve => {
                     app.model.qtDaoTao.getTH(canBo.shcc, (error, tinHoc) => {
                         if (error) {
                             res.send({ error: 'Lỗi khi lấy thông tin trình độ tin học cán bộ !' });

@@ -15,7 +15,6 @@ class ComponentTTCongTac extends AdminPage {
     state = { doiTuongBoiDuong: false, tinhTrangBoiDuong: false, dangONuocNgoai: false, dangNghiTheoCheDo: false, daNghi: false };
 
     value = (item) => {
-        console.log(item);
         this.setState({
             doiTuongBoiDuong: item.doiTuongBoiDuongKienThucQpan, tinhTrangBoiDuong: item.tinhTrangBoiDuong,
             dangONuocNgoai: item.dangONuocNgoai, dangNghiTheoCheDo: item.dangNghiTheoCheDo, daNghi: item.daNghi

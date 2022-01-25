@@ -65,8 +65,12 @@ class StaffUserPage extends AdminPage {
         const caNhanData = this.componentCaNhan.getAndValidate();
         const congTacData = this.componentTTCongTac.getAndValidate();
         const trinhDoData = this.componentTrinhDo.getAndValidate();
-        if (this.urlSHCC) {
-            caNhanData && congTacData && trinhDoData && this.props.updateStaffUser(this.urlSHCC, { ...caNhanData, ...congTacData, ...trinhDoData });
+        if (this.emailCanBo) {
+            console.log(caNhanData);
+            console.log(congTacData);
+            console.log(trinhDoData);
+
+            caNhanData && congTacData && trinhDoData && this.props.updateStaffUser(this.emailCanBo, { ...caNhanData, ...congTacData, ...trinhDoData });
         }
     }
 
@@ -77,11 +81,11 @@ class StaffUserPage extends AdminPage {
         const name = isStaff ? `${lastName} ${firstName} (${shcc})` : '';
         return this.renderPage({
             icon: 'fa fa-address-card-o',
-            title: 'Hồ sơ cá nhân',
+            title: 'HỒ SƠ CÁ NHÂN',
             subTitle: <span style={{ color: 'blue'}}>Cán bộ: {name}</span>,
             breadcrumb: [
                 <Link key={0} to='/user'>Trang cá nhân</Link>,
-                'Hồ sơ cán bộ',
+                'Hồ sơ',
             ],
             content: <>
                 <ComponentCaNhan ref={e => this.componentCaNhan = e} userEdit={true} isStaff={true}/>
