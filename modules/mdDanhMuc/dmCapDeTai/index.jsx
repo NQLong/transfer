@@ -6,7 +6,7 @@ import dmCapDeTai from './redux';
 export default {
     redux: {
         parent: 'danhMuc',
-        reducer: dmCapDeTai
+        reducers: dmCapDeTai
     },
     routes: [
         {

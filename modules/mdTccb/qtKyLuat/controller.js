@@ -9,7 +9,7 @@ module.exports = app => {
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1004: { title: 'Kỷ luật', link: '/user/ky-luat', icon: 'fa-ban', backgroundColor: '#f03a3a', groupIndex: 2 },
+            1005: { title: 'Kỷ luật', link: '/user/ky-luat', icon: 'fa-ban', backgroundColor: '#f03a3a', groupIndex: 2 },
         },
     };
 
@@ -24,6 +24,53 @@ module.exports = app => {
     app.get('/user/tccb/qua-trinh/ky-luat/group/:shcc', app.permission.check('qtKyLuat:read'), app.templates.admin);
     app.get('/user/ky-luat', app.permission.check('staff:login'), app.templates.admin);
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
+    // //User Actions:
+    app.post('/api/user/qua-trinh/ky-luat', app.permission.check('staff:login'), (req, res) => {
+        if (req.body.data && req.session.user) {
+            const data = req.body.data;
+            app.model.qtKyLuat.create(data, (error, item) => res.send({ error, item }));
+        } else {
+            res.send({ error: 'Invalid parameter!' });
+        }
+    });
+
+    app.put('/api/user/qua-trinh/ky-luat', app.permission.check('staff:login'), (req, res) => {
+        if (req.body.changes && req.session.user) {
+            app.model.qtKyLuat.get({ id: req.body.id }, (error, item) => {
+                if (error || item == null) {
+                    res.send({ error: 'Not found!' });
+                } else {
+                    app.model.canBo.get({ shcc: item.shcc }, (e, r) => {
+                        if (e || r == null) res.send({ error: 'Staff not found!' }); else {
+                            const changes = req.body.changes;
+                            app.model.qtKyLuat.update({ id: req.body.id }, changes, (error, item) => res.send({ error, item }));
+                        }
+                    });
+                }
+            });
+        } else {
+            res.send({ error: 'Invalid parameter!' });
+        }
+    });
+
+    app.delete('/api/user/qua-trinh/ky-luat', app.permission.check('staff:login'), (req, res) => {
+        if (req.session.user) {
+            app.model.qtKyLuat.get({ id: req.body.id }, (error, item) => {
+                if (error || item == null) {
+                    res.send({ error: 'Not found!' });
+                } else {
+                    app.model.canBo.get({ shcc: item.shcc }, (e, r) => {
+                        if (e || r == null) res.send({ error: 'Staff not found!' }); else {
+                            app.model.qtKyLuat.delete({ id: req.body.id }, (error, item) => res.send({ error, item }));
+                        }
+                    });
+                }
+            });
+        } else {
+            res.send({ error: 'Invalid parameter!' });
+        }
+    });
+
     app.get('/api/user/qua-trinh/ky-luat/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
@@ -39,6 +86,7 @@ module.exports = app => {
             }
         });
     });
+    ///END USER ACTIONS
 
     app.get('/api/tccb/qua-trinh/ky-luat/page/:pageNumber/:pageSize', app.permission.check('qtKyLuat:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
@@ -96,51 +144,4 @@ module.exports = app => {
     app.delete('/api/tccb/qua-trinh/ky-luat', app.permission.check('staff:write'), (req, res) =>
         app.model.qtKyLuat.delete({ id: req.body.id }, (error) => res.send(error)));
 
-
-    // //User Actions:
-    app.post('/api/user/qua-trinh/ky-luat', app.permission.check('staff:login'), (req, res) => {
-        if (req.body.data && req.session.user) {
-            const data = req.body.data;
-            app.model.qtKyLuat.create(data, (error, item) => res.send({ error, item }));
-        } else {
-            res.send({ error: 'Invalid parameter!' });
-        }
-    });
-
-    app.put('/api/user/qua-trinh/ky-luat', app.permission.check('staff:login'), (req, res) => {
-        if (req.body.changes && req.session.user) {
-            app.model.qtKyLuat.get({ id: req.body.id }, (error, item) => {
-                if (error || item == null) {
-                    res.send({ error: 'Not found!' });
-                } else {
-                    app.model.canBo.get({ shcc: item.shcc }, (e, r) => {
-                        if (e || r == null) res.send({ error: 'Not found!' }); else {
-                            const changes = req.body.changes;
-                            app.model.qtKyLuat.update({ id: req.body.id }, changes, (error, item) => res.send({ error, item }));
-                        }
-                    });
-                }
-            });
-        } else {
-            res.send({ error: 'Invalid parameter!' });
-        }
-    });
-
-    app.delete('/api/user/qua-trinh/ky-luat', app.permission.check('staff:login'), (req, res) => {
-        if (req.session.user) {
-            app.model.qtKyLuat.get({ id: req.body.id }, (error, item) => {
-                if (error || item == null) {
-                    res.send({ error: 'Not found!' });
-                } else {
-                    app.model.canBo.get({ shcc: item.shcc }, (e, r) => {
-                        if (e || r == null) res.send({ error: 'Not found!' }); else {
-                            app.model.qtKyLuat.delete({ id: req.body.id }, (error, item) => res.send({ error, item }));
-                        }
-                    });
-                }
-            });
-        } else {
-            res.send({ error: 'Invalid parameter!' });
-        }
-    });
 };

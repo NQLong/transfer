@@ -142,7 +142,7 @@ class QtKyLuatGroupPage extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa kỷ luật', 'Bạn có chắc bạn muốn xóa kỷ luật này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtKyLuatUserPage(item.id, item.shcc, error => {
+            isConfirm && this.props.deleteQtKyLuatUserPage(item.id, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá kỷ luật bị lỗi!', 'danger');
                 else T.alert('Xoá kỷ luật thành công!', 'success', false, 800);
             });
@@ -169,7 +169,6 @@ class QtKyLuatGroupPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        {/* <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th> */}
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nội dung kỷ luật</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Hình thức kỷ luật</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap'}}>Cấp quyết định</th>
@@ -180,13 +179,6 @@ class QtKyLuatGroupPage extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{textAlign:'right'}} content={index + 1} />
-                        {/* <TableCell type='link' onClick = {() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <span>{(item.hoCanBo ? item.hoCanBo : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo : ' ')}</span><br />
-                                    {item.maCanBo }
-                            </>
-                        )}
-                        /> */}
                         <TableCell type='text' content={(
                             <>
                                 {item.noiDung ? item.noiDung : ''}
