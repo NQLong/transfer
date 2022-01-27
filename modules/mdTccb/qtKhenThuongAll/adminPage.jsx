@@ -180,7 +180,8 @@ class QtKhenThuongAll extends AdminPage {
         const fromYear = this.fromYear?.value() == '' ? null : Number(this.fromYear?.value());
         const toYear = this.toYear?.value() == '' ? null : Number(this.toYear?.value());
         const loaiDoiTuong = this.loaiDoiTuong?.value() || '-1';
-        const pageFilter = isInitial ? null : { fromYear, toYear, loaiDoiTuong };
+        const ma = null;
+        const pageFilter = isInitial ? null : { fromYear, toYear, loaiDoiTuong, ma };
         this.curState = loaiDoiTuong;
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
@@ -198,7 +199,7 @@ class QtKhenThuongAll extends AdminPage {
 
     getPage = (pageN, pageS, pageC, done) => {
         if (this.checked) this.props.getQtKhenThuongAllGroupPage(pageN, pageS, pageC, this.state.filter, done);
-        else this.props.getQtKhenThuongAllPage(pageN, pageS, pageC, '', this.state.filter, done);
+        else this.props.getQtKhenThuongAllPage(pageN, pageS, pageC, this.state.filter, done);
 
     }
 
