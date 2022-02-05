@@ -50,6 +50,79 @@ export default function QtKeoDaiCongTacReducer(state = null, data) {
 
 // Actions ------------------------------------------------------------------------------------------------------------
 T.initPage('pageQtKeoDaiCongTac');
+export function getQtKeoDaiCongTacUserPage(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('pageQtKeoDaiCongTac', pageNumber, pageSize, pageCondition, filter);
+    return dispatch => {
+        const url = `/api/user/qua-trinh/keo-dai-cong-tac/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách kéo dài công tác bị lỗi!', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (page.filter) data.page.filter = page.filter;
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                if (done) done(data.page);
+                dispatch({ type: QtKeoDaiCongTacGetPage, page: data.page });
+            }
+        }, () => T.notify('Lấy danh sách kéo dài công tác bị lỗi!', 'danger'));
+    };
+}
+
+export function updateQtKeoDaiCongTacUserPage(id, changes, done) {
+    return dispatch => {
+        const url = '/api/user/qua-trinh/keo-dai-cong-tac';
+        T.put(url, { id, changes }, data => {
+            if (data.error || changes == null) {
+                T.notify('Cập nhật kéo dài công tác bị lỗi!', 'danger');
+                console.error(`PUT: ${url}.`, data.error);
+                done && done(data.error);
+            } else {
+                T.notify('Cập nhật kéo dài công tác thành công!', 'success');
+                done && done(data.item);
+                dispatch(getQtKeoDaiCongTacUserPage());
+            }
+        }, () => T.notify('Cập nhật kéo dài công tác bị lỗi!', 'danger'));
+    };
+}
+
+export function createQtKeoDaiCongTacUserPage(data, done) {
+    return dispatch => {
+        const url = '/api/user/qua-trinh/keo-dai-cong-tac';
+        T.post(url, { data }, res => {
+            if (res.error) {
+                T.notify('Tạo kéo dài công tác bị lỗi!', 'danger');
+                console.error(`POST: ${url}.`, res.error);
+            } else {
+                if (done) {
+                    T.notify('Tạo kéo dài công tác thành công!', 'success');
+                    dispatch(getQtKeoDaiCongTacUserPage());
+                    done && done(data);
+                }
+            }
+        }, () => T.notify('Tạo kéo dài công tác bị lỗi!', 'danger'));
+    };
+}
+export function deleteQtKeoDaiCongTacUserPage(id, done) {
+    return dispatch => {
+        const url = '/api/user/qua-trinh/keo-dai-cong-tac';
+        T.delete(url, { id }, data => {
+            if (data.error) {
+                T.notify('Xóa kéo dài công tác bị lỗi!', 'danger');
+                console.error(`DELETE: ${url}.`, data.error);
+            } else {
+                T.alert('kéo dài công tác đã xóa thành công!', 'success', false, 800);
+                done && done(data.item);
+                dispatch(getQtKeoDaiCongTacUserPage());
+            }
+        }, () => T.notify('Xóa kéo dài công tác bị lỗi!', 'danger'));
+    };
+}
+
+T.initPage('pageQtKeoDaiCongTac');
 export function getQtKeoDaiCongTacPage(pageNumber, pageSize, pageCondition, filter, done) {
     if (typeof filter === 'function') {
         done = filter;
@@ -113,7 +186,6 @@ export function updateQtKeoDaiCongTacGroupPageMa(id, changes, done) {
 }
 
 export function createQtKeoDaiCongTacGroupPageMa(data, done) {
-    console.log(data);
     return dispatch => {
         const url = '/api/tccb/qua-trinh/keo-dai-cong-tac';
         T.post(url, { data }, res => {

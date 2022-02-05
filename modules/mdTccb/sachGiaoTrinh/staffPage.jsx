@@ -199,7 +199,7 @@ class SachGiaoTrinhGroupPage extends AdminPage {
                     update={this.props.updateSachGiaoTrinhUserPage} create={this.props.createSachGiaoTrinhUserPage}
                 />
             </>,
-            backRoute: '/user/tccb/sach-giao-trinh',
+            backRoute: '/user',
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
         });
     }

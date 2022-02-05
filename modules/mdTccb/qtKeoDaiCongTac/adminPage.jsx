@@ -36,7 +36,8 @@ class EditModal extends AdminModal {
     componentDidMount() {
     }
 
-    onShow = (item) => {
+    onShow = (item, multiple = true) => {
+        this.multiple = multiple;
         let { id, shcc, batDau, batDauType, ketThuc, ketThucType, soHieuVanBan, } = item ? item : {
                 id: '', shcc: '', batDau: '', batDauType: '', ketThuc: '', ketThucType: '', soHieuVanBan : ''
         };
@@ -58,22 +59,37 @@ class EditModal extends AdminModal {
 
     onSubmit = (e) => {
         e.preventDefault();
-        const changes = {
-            shcc: this.shcc.value(),
-            batDauType: this.state.batDauType,
-            batDau: this.batDau.getVal(),
-            ketThucType: this.state.ketThucType,
-            ketThuc: this.ketThuc.getVal(),
-            soHieuVanBan: this.soHieuVanBan.value()
-        };
-        if (!changes.shcc) {
-            T.notify('Chưa chọn cán bộ', 'danger');
+        let list_ma = this.shcc.value();
+        if (!Array.isArray(list_ma)) {
+            list_ma = [list_ma];
+        }
+        if (list_ma.length == 0) {
+            T.notify('Cán bộ bị trống', 'danger');
             this.shcc.focus();
-        } else if (!changes.batDau) {
+        } else if (!this.batDau.getVal()) {
             T.notify('Ngày bắt đầu trống', 'danger');
             this.batDau.focus();
         } else {
-            this.state.id ? this.props.update(this.state.id, changes, this.hide, false) : this.props.create(changes, this.hide, false);
+            list_ma.forEach((ma, index) => {
+                const changes = {
+                    shcc: ma,
+                    batDauType: this.state.batDauType,
+                    batDau: this.batDau.getVal(),
+                    ketThucType: this.state.ketThucType,
+                    ketThuc: this.ketThuc.getVal(),
+                    soHieuVanBan: this.soHieuVanBan.value()
+                };
+                if (index == list_ma.length - 1) {
+                    this.state.id ? this.props.update(this.state.id, changes, this.hide, false) : this.props.create(changes, this.hide, false);
+                    this.setState({
+                        id: ''
+                    });
+                    this.shcc.reset();
+                }
+                else {
+                    this.state.id ? this.props.update(this.state.id, changes, null, false) : this.props.create(changes, null, false);
+                }
+            });
         }
     }
 
@@ -84,8 +100,8 @@ class EditModal extends AdminModal {
             title: this.state.id ? 'Cập nhật thông tin kéo dài công tác' : 'Tạo mới thông tin kéo dài công tác',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12' ref={e => this.shcc = e} data={SelectAdapter_FwCanBo} label='Cán bộ' readOnly={!canEdit} required/>
-                <FormTextBox className='col-md-12' ref={e => this.soHieuVanBan = e} label='Số hiệu văn bản' readOnly={readOnly} required />
+                <FormSelect className='col-md-12' ref={e => this.shcc = e} multiple={this.multiple} data={SelectAdapter_FwCanBo} label='Cán bộ' readOnly={!canEdit} required/>
+                <FormTextBox className='col-md-12' ref={e => this.soHieuVanBan = e} label='Số hiệu văn bản' readOnly={readOnly} />
                 <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
                     label={
                         <div style={{ display: 'flex' }}>Thời gian bắt đầu (định dạng:&nbsp; <Dropdown ref={e => this.batDauType = e}
@@ -235,7 +251,7 @@ class QtKeoDaiCongTac extends AdminPage {
                         {this.checked && <TableCell type='text' content={this.list(item.danhSachBatDau, item.danhSachKetThuc, item.danhSachBatDauType, item.danhSachKetThucType, item.soQuaTrinh)} />}
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                                onEdit={() => this.modal.show(item)} onDelete={e => this.delete(e, item)} > </TableCell>
+                                onEdit={() => this.modal.show(item, false)} onDelete={e => this.delete(e, item)} > </TableCell>
                         }
                         {
                             this.checked &&
