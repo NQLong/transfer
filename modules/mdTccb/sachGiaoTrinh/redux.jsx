@@ -51,17 +51,20 @@ export default function SachGiaoTrinhReducer(state = null, data) {
 
 // Actions ------------------------------------------------------------------------------------------------------------
 T.initPage('pageSachGiaoTrinh');
-export function getSachGiaoTrinhPage(pageNumber, pageSize, loaiDoiTuong, pageCondition, done) {
-    const page = T.updatePage('pageSachGiaoTrinh', pageNumber, pageSize, pageCondition);
-    if (!loaiDoiTuong) loaiDoiTuong = [];
-    if (!Array.isArray(loaiDoiTuong)) loaiDoiTuong = [loaiDoiTuong];
+export function getSachGiaoTrinhUserPage(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('pageSachGiaoTrinh', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
-        const url = `/api/tccb/sach-giao-trinh/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition, parameter: loaiDoiTuong}, data => {
+        const url = `/api/user/qua-trinh/sach-giao-trinh/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách sách giáo trình bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
+                if (page.filter) data.page.filter = page.filter;
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 if (done) done(data.page);
                 dispatch({ type: SachGiaoTrinhGetPage, page: data.page });
@@ -70,18 +73,94 @@ export function getSachGiaoTrinhPage(pageNumber, pageSize, loaiDoiTuong, pageCon
     };
 }
 
-T.initPage('groupPageSachGiaoTrinh', true);
-export function getSachGiaoTrinhGroupPage(pageNumber, pageSize, loaiDoiTuong, pageCondition, done) {
-    const page = T.updatePage('groupPageSachGiaoTrinh', pageNumber, pageSize, pageCondition);
-    if (!loaiDoiTuong) loaiDoiTuong = [];
-    if (!Array.isArray(loaiDoiTuong)) loaiDoiTuong = [loaiDoiTuong];
+export function updateSachGiaoTrinhUserPage(id, changes, done) {
     return dispatch => {
-        const url = `/api/tccb/sach-giao-trinh/group/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition, parameter: loaiDoiTuong}, data => {
+        const url = '/api/user/qua-trinh/sach-giao-trinh';
+        T.put(url, { id, changes }, data => {
+            if (data.error || changes == null) {
+                T.notify('Cập nhật sách giáo trình bị lỗi!', 'danger');
+                console.error(`PUT: ${url}.`, data.error);
+                done && done(data.error);
+            } else {
+                T.notify('Cập nhật sách giáo trình thành công!', 'success');
+                done && done(data.item);
+                dispatch(getSachGiaoTrinhUserPage());
+            }
+        }, () => T.notify('Cập nhật sách giáo trình bị lỗi!', 'danger'));
+    };
+}
+
+export function createSachGiaoTrinhUserPage(data, done) {
+    return dispatch => {
+        const url = '/api/user/qua-trinh/sach-giao-trinh';
+        T.post(url, { data }, res => {
+            if (res.error) {
+                T.notify('Tạo sách giáo trình bị lỗi!', 'danger');
+                console.error(`POST: ${url}.`, res.error);
+            } else {
+                if (done) {
+                    T.notify('Tạo sách giáo trình thành công!', 'success');
+                    dispatch(getSachGiaoTrinhUserPage());
+                    done && done(data);
+                }
+            }
+        }, () => T.notify('Tạo sách giáo trình bị lỗi!', 'danger'));
+    };
+}
+export function deleteSachGiaoTrinhUserPage(id, done) {
+    return dispatch => {
+        const url = '/api/user/qua-trinh/sach-giao-trinh';
+        T.delete(url, { id }, data => {
             if (data.error) {
-                T.notify('Lấy danh sách sách giáo trình theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                T.notify('Xóa sách giáo trình bị lỗi!', 'danger');
+                console.error(`DELETE: ${url}.`, data.error);
+            } else {
+                T.alert('sách giáo trình đã xóa thành công!', 'success', false, 800);
+                done && done(data.item);
+                dispatch(getSachGiaoTrinhUserPage());
+            }
+        }, () => T.notify('Xóa sách giáo trình bị lỗi!', 'danger'));
+    };
+}
+
+T.initPage('pageSachGiaoTrinh');
+export function getSachGiaoTrinhPage(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('pageSachGiaoTrinh', pageNumber, pageSize, pageCondition, filter);
+    return dispatch => {
+        const url = `/api/tccb/qua-trinh/sach-giao-trinh/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách quá trình sách giáo trình bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
+                if (page.filter) data.page.filter = page.filter;
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                if (done) done(data.page);
+                dispatch({ type: SachGiaoTrinhGetPage, page: data.page });
+            }
+        }, () => T.notify('Lấy danh sách quá trình sách giáo trình bị lỗi!', 'danger'));
+    };
+}
+
+T.initPage('groupPageSachGiaoTrinh', true);
+export function getSachGiaoTrinhGroupPage(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('groupPageSachGiaoTrinh', pageNumber, pageSize, pageCondition, filter);
+    return dispatch => {
+        const url = `/api/tccb/qua-trinh/sach-giao-trinh/group/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition, filter: page.filter}, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách quá trình sách giáo trình bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (page.filter) data.page.filter = page.filter;
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 done && done(data.page);
                 dispatch({ type: SachGiaoTrinhGetGroupPage, page: data.page });
@@ -89,26 +168,6 @@ export function getSachGiaoTrinhGroupPage(pageNumber, pageSize, loaiDoiTuong, pa
         }, error => console.error(`GET: ${url}.`, error));
     };
 }
-
-T.initPage('groupPageMaSachGiaoTrinh', true);
-export function getSachGiaoTrinhGroupPageMa(pageNumber, pageSize, loaiDoiTuong, pageCondition, done) {
-    const page = T.updatePage('groupPageMaSachGiaoTrinh', pageNumber, pageSize, pageCondition);
-    if (!loaiDoiTuong) loaiDoiTuong = '-1';
-    return dispatch => {
-        const url = `/api/tccb/sach-giao-trinh/group_sgt/page/${loaiDoiTuong}/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition }, data => {
-            if (data.error) {
-                T.notify('Lấy danh sách sách giáo trình theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
-                console.error(`GET: ${url}.`, data.error);
-            } else {
-                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
-                done && done(data.page);
-                dispatch({ type: SachGiaoTrinhGetPage, page: data.page });
-            }
-        }, error => console.error(`GET: ${url}.`, error));
-    };
-}
-
 
 export function updateSachGiaoTrinhGroupPageMa(id, changes, done) {
     return dispatch => {
@@ -121,14 +180,14 @@ export function updateSachGiaoTrinhGroupPageMa(id, changes, done) {
             } else {
                 T.notify('Cập nhật sách giáo trình thành công!', 'success');
                 done && done(data.item);
-                dispatch(getSachGiaoTrinhGroupPageMa(undefined, undefined, '-1', data.shcc));
+                dispatch(getSachGiaoTrinhPage());
             }
         }, () => T.notify('Cập nhật sách giáo trình bị lỗi!', 'danger'));
     };
 }
 
 
-export function deleteSachGiaoTrinhGroupPageMa(id, shcc, done) {
+export function deleteSachGiaoTrinhGroupPageMa(id, done) {
     return dispatch => {
         const url = '/api/staff/sach-giao-trinh';
         T.delete(url, { id }, data => {
@@ -138,9 +197,27 @@ export function deleteSachGiaoTrinhGroupPageMa(id, shcc, done) {
             } else {
                 T.alert('Thông tin sách, giáo trình được xóa thành công!', 'info', false, 800);
                 done && done(data.item);
-                dispatch(getSachGiaoTrinhGroupPageMa(undefined, undefined, '-1', shcc));
+                dispatch(getSachGiaoTrinhPage());
             }
         }, () => T.notify('Xóa thông tin sách, giáo trình bị lỗi', 'danger'));
+    };
+}
+
+export function createSachGiaoTrinhGroupPageMa(data, done) {
+    return dispatch => {
+        const url = '/api/staff/sach-giao-trinh';
+        T.post(url, { data }, res => {
+            if (res.error) {
+                T.notify('Tạo quá trình sách giáo trình bị lỗi!', 'danger');
+                console.error(`POST: ${url}.`, res.error);
+            } else {
+                if (done) {
+                    T.notify('Tạo quá trình sách giáo trình thành công!', 'success');
+                    dispatch(getSachGiaoTrinhPage());
+                    done && done(data);
+                }
+            }
+        }, () => T.notify('Tạo quá trình sách giáo trình bị lỗi!', 'danger'));
     };
 }
 

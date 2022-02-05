@@ -10,12 +10,16 @@ export default {
     },
     routes: [
         {
-            path: '/user/tccb/sach-giao-trinh/group_sgt/:loaiDoiTuong/:ma',
+            path: '/user/tccb/sach-giao-trinh/group/:shcc',
             component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
         },
         {
             path: '/user/tccb/sach-giao-trinh',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
+        },
+        {
+            path: '/user/sach-giao-trinh',
+            component: Loadable({ loading: Loading, loader: () => import('./staffPage') })
         },
     ],
 };
