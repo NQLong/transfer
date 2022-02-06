@@ -184,11 +184,16 @@ class QtKeoDaiCongTac extends AdminPage {
     }
 
     list = (batDauList, ketThucList, batDauTypeList, ketThucTypeList, soQt) => {
+        if (soQt == 0) return [];
         let batDaus = batDauList.split('??');
         let ketThucs = ketThucList.split('??');
         let batDauTypes = batDauTypeList.split('??');
         let ketThucTypes = ketThucTypeList.split('??');
         let results = [];
+        for (let i = 0; i < soQt; i++) {
+            batDaus[i] = batDaus[i].trim();
+            ketThucs[i] = ketThucs[i].trim();
+        }
         for (let i = 0; i < soQt; i++) {
             results.push(<p style={{ textTransform: 'uppercase' }}>{i+1}. Bắt đầu: <span style={{ color: 'blue' }}>{batDaus[i] ? T.dateToText(Number(batDaus[i]), batDauTypes[i] ? batDauTypes[i] : 'dd/mm/yyyy') : ''}</span> -
                                                                         Kết thúc: <span style={{ color: 'blue' }}>{ketThucs[i] ? T.dateToText(Number(ketThucs[i]), ketThucTypes[i] ? ketThucTypes[i] : 'dd/mm/yyyy') : ''}</span></p>);

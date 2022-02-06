@@ -209,8 +209,8 @@ class QtKeoDaiCongTacGroupPage extends AdminPage {
             title: 'Quá trình kéo dài công tác - Cán bộ',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
-                <Link key={0} to='/user/tccb/qua-trinh/keo-dai-cong-tac'>Quá trình kéo dài, công tác</Link>,
-                'Quá trình kéo dài, công tác - Cán bộ'
+                <Link key={0} to='/user/tccb/qua-trinh/keo-dai-cong-tac'>Quá trình kéo dài công tác</Link>,
+                'Quá trình kéo dài công tác - Cán bộ'
             ],
             advanceSearch: <>
                 <div className='row'>

@@ -6,10 +6,9 @@ import Pagination from 'view/component/Pagination';
 import Dropdown from 'view/component/Dropdown';
 import { DateInput } from 'view/component/Input';
 import { SelectAdapter_FwCanBo } from '../tccbCanBo/redux';
-import { getQtNuocNgoaiPage, deleteQtNuocNgoaiGroupPageMa, getQtNuocNgoaiGroupPageMa,
+import { getQtNuocNgoaiPage, deleteQtNuocNgoaiGroupPageMa, createQtNuocNgoaiGroupPageMa,
     updateQtNuocNgoaiGroupPageMa }
 from './redux';
-import Loading from 'view/component/Loading';
 
 const EnumDateType = Object.freeze({
     0: { text: '' },
@@ -21,6 +20,11 @@ const EnumDateType = Object.freeze({
     'mm/yyyy': 'month',
     'dd/mm/yyyy': 'date'
 };
+const timeList = [
+    { id: 0, text: 'Không' },
+    { id: 1, text: 'Theo ngày bắt đầu - ngày kết thúc' },
+    { id: 2, text: 'Theo ngày trở lại công tác' }
+];
 class EditModal extends AdminModal {
     state = {
         id: null,
@@ -42,7 +46,7 @@ class EditModal extends AdminModal {
         });
 
         setTimeout(() => {
-            this.maCanBo.value(shcc);
+            this.maCanBo.value(shcc ? shcc : this.props.shcc);
             this.kinhPhi.value(kinhPhi);
             this.tenCoSo.value(tenCoSo ? tenCoSo : '');
             this.troLaiCongTac.value(troLaiCongTac);
@@ -57,35 +61,29 @@ class EditModal extends AdminModal {
 
     onSubmit = (e) => {
         e.preventDefault();
-        let list_ma = this.maCanBo.value();
-        if (!Array.isArray(list_ma)) {
-            list_ma = [list_ma];
-        }
-        if (list_ma.length == 0) {
-            T.notify('Cán bộ đi nước ngoài trống', 'danger');
+        const changes = {
+            shcc: this.maCanBo.value(),
+            tenCoSo: this.tenCoSo.value(),
+            kinhPhi: this.kinhPhi.value(),
+            troLaiCongTac: Number(this.troLaiCongTac.value()),
+            batDauType: this.state.batDauType,
+            batDau: this.batDau.getVal(),
+            ketThucType: this.state.ketThucType,
+            ketThuc: this.ketThuc.getVal(),
+            quocGia: this.quocGia.value(),
+            noiDung: this.noiDung.value()
+        };
+        if (!changes.shcc) {
+            T.notify('Chưa chọn cán bộ', 'danger');
             this.maCanBo.focus();
-        } else if (!this.noiDung.value()) {
+        } else if (!changes.noiDung) {
             T.notify('Nội dung đi nước ngoài trống', 'danger');
             this.noiDung.focus();
-        } else if (!this.batDau.getVal()) {
+        } else if (!changes.batDau) {
             T.notify('Ngày bắt đầu đi nước ngoài trống', 'danger');
             this.batDau.focus();
         } else {
-            list_ma.forEach((ma) => {
-                const changes = {
-                    shcc: ma,
-                    tenCoSo: this.tenCoSo.value(),
-                    kinhPhi: this.kinhPhi.value(),
-                    troLaiCongTac: Number(this.troLaiCongTac.value()),
-                    batDauType: this.state.batDauType,
-                    batDau: this.batDau.getVal(),
-                    ketThucType: this.state.ketThucType,
-                    ketThuc: this.ketThuc.getVal(),
-                    quocGia: this.quocGia.value(),
-                    noiDung: this.noiDung.value()
-                };
-                this.props.update(this.state.id, changes, this.hide);
-            });
+            this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
         }
     }
 
@@ -123,17 +121,51 @@ class EditModal extends AdminModal {
 }
 
 class QtNuocNgoaiGroupPage extends AdminPage {
-    ma = ''; loaiDoiTuong = '-1';
+    state = { filter: {} };
+
     componentDidMount() {
         T.ready('/user/tccb', () => {
-            const route = T.routeMatcher('/user/tccb/qua-trinh/nuoc-ngoai/group_nn/:loaiDoiTuong/:ma'),
+            const route = T.routeMatcher('/user/tccb/qua-trinh/nuoc-ngoai/group/:shcc'),
                 params = route.parse(window.location.pathname);
-            this.loaiDoiTuong = params.loaiDoiTuong;
-            this.ma = params.ma;
-            T.onSearch = (searchText) => this.props.getQtNuocNgoaiPage(undefined, undefined, this.loaiDoiTuong, searchText || '');
-            T.showSearchBox();
-            this.props.getQtNuocNgoaiGroupPageMa(undefined, undefined, this.loaiDoiTuong, this.ma);
+            this.shcc = params.shcc;
+            this.setState({ filter: { timeType: 0, list_shcc: params.shcc, list_dv: '' } });
+            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
+
+            T.showSearchBox(() => {
+                this.timeType?.value(0);
+                this.fromYear?.value('');
+                this.toYear?.value('');
+                setTimeout(() => this.changeAdvancedSearch(), 50);
+            });
+            this.props.getQtNuocNgoaiPage(undefined, undefined, undefined, this.state.filter, () => {
+                T.updatePage('pageQtNuocNgoai', undefined, undefined, undefined, this.state.filter);
+            });
         });
+    }
+
+    changeAdvancedSearch = (isInitial = false) => {
+        let { pageNumber, pageSize } = this.props && this.props.qtNuocNgoai && this.props.qtNuocNgoai.page ? this.props.qtNuocNgoai.page : { pageNumber: 1, pageSize: 50 };
+        const timeType = this.timeType?.value() || 0;
+        const fromYear = this.fromYear?.value() == '' ? null : this.fromYear?.value().getTime();
+        const toYear = this.toYear?.value() == '' ? null : this.toYear?.value().getTime();
+        const list_dv = this.state.filter.list_dv;
+        const list_shcc = this.state.filter.list_shcc;
+        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc, timeType };
+        this.setState({ filter: pageFilter }, () => {
+            this.getPage(pageNumber, pageSize, '', (page) => {
+                if (isInitial) {
+                    const filter = page.filter || {};
+                    this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
+                    this.fromYear?.value(filter.fromYear || '');
+                    this.toYear?.value(filter.toYear || '');
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.timeType )) this.showAdvanceSearch();
+                }
+            });
+        });
+    }
+
+    getPage = (pageN, pageS, pageC, done) => {
+        this.props.getQtNuocNgoaiPage(pageN, pageS, pageC, this.state.filter, done);
     }
 
     showModal = (e) => {
@@ -142,21 +174,21 @@ class QtNuocNgoaiGroupPage extends AdminPage {
     }
 
     delete = (e, item) => {
-        T.confirm('Xóa quá trình đi nước ngoài', 'Bạn có chắc bạn muốn xóa quá trình đi nước ngoài này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtNuocNgoaiGroupPageMa(item.id, item.shcc, error => {
-                if (error) T.notify(error.message ? error.message : 'Xoá quá trình đi nước ngoài bị lỗi!', 'danger');
-                else T.alert('Xoá quá trình đi nước ngoài thành công!', 'success', false, 800);
+        T.confirm('Xóa thông tin đi nước ngoài', 'Bạn có chắc bạn muốn xóa thông tin đi nước ngoài này?', 'warning', true, isConfirm => {
+            isConfirm && this.props.deleteQtNuocNgoaiGroupPageMa(item.id, error => {
+                if (error) T.notify(error.message ? error.message : 'Xoá thông tin đi nước ngoài bị lỗi!', 'danger');
+                else T.alert('Xoá thông tin đi nước ngoài thành công!', 'success', false, 800);
             });
         });
         e.preventDefault();
     }
 
+
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('qtNuocNgoai', ['read', 'write', 'delete']);
-        let loaiDoiTuong = this.curState;
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtNuocNgoai && this.props.qtNuocNgoai.page ? this.props.qtNuocNgoai.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
-        let table = <Loading />;
+        let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
                 getDataSource: () => list, stickyHead: false,
@@ -218,23 +250,32 @@ class QtNuocNgoaiGroupPage extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-fighter-jet',
-            title: ' Quá trình đi nước ngoài',
+            title: 'Quá trình đi nước ngoài - Cán bộ',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
-                'Quá trình nước ngoài'
+                <Link key={0} to='/user/tccb/qua-trinh/nuoc-ngoai'>Quá trình đi nước ngoài</Link>,
+                'Quá trình đi nước ngoài - Cán bộ'
             ],
+            advanceSearch: <>
+                <div className='row'>
+                    <FormSelect className='col-12 col-md-4' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
+                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} /> }
+                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} /> }
+                </div>
+            </>,
             content: <>
                 <div className='tile'>
                     {table}
                 </div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition, loaiDoiTuong }}
-                    getPage={this.props.getQtNuocNgoaiPage} />
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
+                    getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
-                    update={this.props.updateQtNuocNgoaiGroupPageMa}
-                    permissions={currentPermissions}
+                    permissions={currentPermissions} shcc={this.shcc}
+                    create={this.props.createQtNuocNgoaiGroupPageMa} update={this.props.updateQtNuocNgoaiGroupPageMa}
                 />
             </>,
             backRoute: '/user/tccb/qua-trinh/nuoc-ngoai',
+            onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
         });
     }
 }
@@ -242,6 +283,6 @@ class QtNuocNgoaiGroupPage extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtNuocNgoai: state.tccb.qtNuocNgoai });
 const mapActionsToProps = {
     getQtNuocNgoaiPage, deleteQtNuocNgoaiGroupPageMa,
-    updateQtNuocNgoaiGroupPageMa, getQtNuocNgoaiGroupPageMa,
+    updateQtNuocNgoaiGroupPageMa, createQtNuocNgoaiGroupPageMa,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtNuocNgoaiGroupPage);
