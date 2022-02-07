@@ -7,7 +7,7 @@ import { DateInput } from 'view/component/Input';
 import Dropdown from 'view/component/Dropdown';
 import {
     updateQtLuongGroupPageMa, deleteQtLuongGroupPageMa,
-    getQtLuongGroupPageMa, getQtLuongPage,
+    createQtLuongGroupPageMa, getQtLuongPage,
 } from './redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 
@@ -58,7 +58,8 @@ class EditModal extends AdminModal {
         }, 500);
     }
 
-    onSubmit = () => {
+    onSubmit = (e) => {
+        e.preventDefault();
         const changes = {
             shcc: this.shcc.value(),
             batDauType: this.state.batDauType,
@@ -116,19 +117,50 @@ class EditModal extends AdminModal {
 
 
 class QtLuongGroupPage extends AdminPage {
-    ma = ''; loaiDoiTuong = '-1';
+    state = { filter: {} };
+
     componentDidMount() {
         T.ready('/user/tccb', () => {
-            const route = T.routeMatcher('/user/tccb/qua-trinh/luong/group/:loaiDoiTuong/:ma'),
+            const route = T.routeMatcher('/user/tccb/qua-trinh/luong/group/:ma'),
                 params = route.parse(window.location.pathname);
-            this.loaiDoiTuong = params.loaiDoiTuong;
             this.ma = params.ma;
-            T.onSearch = (searchText) => this.props.getQtLuongPage(undefined, undefined, this.loaiDoiTuong, searchText || '');
-            T.showSearchBox();
-            this.props.getQtLuongGroupPageMa(undefined, undefined, this.loaiDoiTuong, this.ma);
+            this.setState({filter: {list_shcc: params.ma, list_dv: ''}});
+            T.onSearch = (searchText) => this.props.getPage(undefined, undefined, searchText || '');
+            T.showSearchBox(() => {
+                this.fromYear?.value('');
+                this.toYear?.value('');
+                setTimeout(() => this.changeAdvancedSearch(), 50);
+            });
+            this.props.getQtLuongPage(undefined, undefined, undefined, this.state.filter, () => {
+                T.updatePage('pageQtLuong', undefined, undefined, undefined, this.state.filter);
+            });
         });
     }
 
+    changeAdvancedSearch = (isInitial = false) => {
+        let { pageNumber, pageSize } = this.props && this.props.qtLuong && this.props.qtLuong.page ? this.props.qtLuong.page : { pageNumber: 1, pageSize: 50 };
+        const fromYear = this.fromYear?.value() == '' ? null : Number(this.fromYear?.value());
+        const toYear = this.toYear?.value() == '' ? null : Number(this.toYear?.value());
+        const list_dv = this.state.filter.list_dv;
+        const list_shcc = this.state.filter.list_shcc;
+        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc };
+        this.setState({ filter: pageFilter }, () => {
+            this.getPage(pageNumber, pageSize, '', (page) => {
+                if (isInitial) {
+                    const filter = page.filter || {};
+                    this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
+                    this.fromYear?.value(filter.fromYear || '');
+                    this.toYear?.value(filter.toYear || '');
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear)) this.showAdvanceSearch();
+                }
+            });
+        });
+    }
+    
+    getPage = (pageN, pageS, pageC, done) => {
+        this.props.getQtLuongPage(pageN, pageS, pageC, this.state.filter, done);
+    }
+    
     showModal = (e) => {
         e.preventDefault();
         this.modal.show();
@@ -136,7 +168,7 @@ class QtLuongGroupPage extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa thông tin lương', 'Bạn có chắc bạn muốn xóa thông tin lương này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtLuongGroupPageMa(item.ma, item.shcc, error => {
+            isConfirm && this.props.deleteQtLuongGroupPageMa(item.id, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá thông tin lương bị lỗi!', 'danger');
                 else T.alert('Xoá thông tin lương thành công!', 'success', false, 800);
             });
@@ -183,25 +215,18 @@ class QtLuongGroupPage extends AdminPage {
                             </>
                         )}
                         />
-                        {!this.checked && <TableCell type='text' content={(
+                        <TableCell type='text' content={(
                             <>
                                 {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br/></span> : null}
                                 {item.ketThuc ? <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span><br/></span> : null}
                                 {item.ngayHuong ? <span style={{ whiteSpace: 'nowrap' }}>Ngày hưởng: <span style={{ color: 'blue' }}>{item.ngayHuong ? T.dateToText(item.ngayHuong, 'dd/mm/yyyy') : ''}</span></span> : null}
                             </>
                         )}
-                        />}
+                        />
                         <TableCell type='text' content={item.soHieuVanBan}/>
                         {
-                            !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
+                            <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                                 onEdit={() => this.modal.show(item)} onDelete={this.delete} >
-                            </TableCell>
-                        }
-                        {
-                            this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}>
-                                <Link className='btn btn-success' to={`/user/tccb/qua-trinh/luong/group/-1/${item.shcc}`} >
-                                    <i className='fa fa-lg fa-compress' />
-                                </Link>
                             </TableCell>
                         }
                     </tr>
@@ -210,24 +235,32 @@ class QtLuongGroupPage extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-sign-out',
-            title: 'Quá trình lương',
+            icon: 'fa fa-money',
+            title: 'Quá trình lương - Cán bộ',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
-                'Quá trình lương'
+                <Link key={0} to='/user/tccb/qua-trinh/hdlv'>Quá trình lương</Link>,
+                'Quá trình lương - Cán bộ'
             ],
+            advanceSearch: <>
+                <div className='row'>
+                    <FormTextBox className='col-md-3' ref={e => this.fromYear = e} label='Từ năm (ngày hưởng)' type='year' onChange={() => this.changeAdvancedSearch()} />
+                    <FormTextBox className='col-md-3' ref={e => this.toYear = e} label='Đến năm (ngày hưởng))' type='year' onChange={() => this.changeAdvancedSearch()} /> 
+                </div>
+            </>,
             content: <>
                 <div className='tile'>
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                    getPage={this.props.getQtLuongPage} />
+                    getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
-                    permissions={currentPermissions}
-                    update={this.props.updateQtLuongGroupPageMa}
+                    permissions={currentPermissions} shcc={this.shcc}
+                    update={this.props.updateQtLuongGroupPageMa} create={this.props.createQtLuongGroupPgaeMa}
                 />
             </>,
             backRoute: '/user/tccb/qua-trinh/luong',
+            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
         });
     }
 }
@@ -235,6 +268,6 @@ class QtLuongGroupPage extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtLuong: state.tccb.qtLuong });
 const mapActionsToProps = {
     updateQtLuongGroupPageMa, deleteQtLuongGroupPageMa,
-    getQtLuongGroupPageMa, getQtLuongPage,
+    createQtLuongGroupPageMa, getQtLuongPage,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtLuongGroupPage);
