@@ -51,17 +51,20 @@ export default function QtLuongReducer(state = null, data) {
 
 // Actions ------------------------------------------------------------------------------------------------------------
 T.initPage('pageQtLuong');
-export function getQtLuongPage(pageNumber, pageSize, loaiDoiTuong, pageCondition, done) {
-    const page = T.updatePage('pageQtLuong', pageNumber, pageSize, pageCondition);
-    if (!loaiDoiTuong) loaiDoiTuong = [];
-    if (!Array.isArray(loaiDoiTuong)) loaiDoiTuong = [loaiDoiTuong];
+export function getQtLuongPage(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('pageQtLuong', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/tccb/qua-trinh/luong/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition, parameter: loaiDoiTuong}, data => {
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách lương bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
+                if (page.filter) data.page.filter = page.filter;
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 if (done) done(data.page);
                 dispatch({ type: QtLuongGetPage, page: data.page });
@@ -71,17 +74,20 @@ export function getQtLuongPage(pageNumber, pageSize, loaiDoiTuong, pageCondition
 }
 
 T.initPage('groupPageQtLuong', true);
-export function getQtLuongGroupPage(pageNumber, pageSize, loaiDoiTuong, pageCondition, done) {
-    const page = T.updatePage('groupPageQtLuong', pageNumber, pageSize, pageCondition);
-    if (!loaiDoiTuong) loaiDoiTuong = [];
-    if (!Array.isArray(loaiDoiTuong)) loaiDoiTuong = [loaiDoiTuong];
+export function getQtLuongGroupPage(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('groupPageQtLuong', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/tccb/qua-trinh/luong/group/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition, parameter: loaiDoiTuong}, data => {
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách lương theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
+                if (page.filter) data.page.filter = page.filter;
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 done && done(data.page);
                 dispatch({ type: QtLuongGetGroupPage, page: data.page });
@@ -90,30 +96,10 @@ export function getQtLuongGroupPage(pageNumber, pageSize, loaiDoiTuong, pageCond
     };
 }
 
-T.initPage('groupPageMaQtLuong', true);
-export function getQtLuongGroupPageMa(pageNumber, pageSize, loaiDoiTuong, pageCondition, done) {
-    const page = T.updatePage('groupPageMaQtLuong', pageNumber, pageSize, pageCondition);
-    if (!loaiDoiTuong) loaiDoiTuong = '-1';
+export function updateQtLuongGroupPageMa(id, changes, done) {
     return dispatch => {
-        const url = `/api/tccb/qua-trinh/luong/group/page/${loaiDoiTuong}/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition }, data => {
-            if (data.error) {
-                T.notify('Lấy danh sách lương theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
-                console.error(`GET: ${url}.`, data.error);
-            } else {
-                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
-                done && done(data.page);
-                dispatch({ type: QtLuongGetPage, page: data.page });
-            }
-        }, error => console.error(`GET: ${url}.`, error));
-    };
-}
-
-
-export function updateQtLuongGroupPageMa(ma, changes, done) {
-    return dispatch => {
-        const url = '/api/staff/qua-trinh/luong';
-        T.put(url, { ma, changes }, data => {
+        const url = '/api/qua-trinh/luong';
+        T.put(url, { id, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật lương bị lỗi!', 'danger');
                 console.error(`PUT: ${url}.`, data.error);
@@ -121,16 +107,16 @@ export function updateQtLuongGroupPageMa(ma, changes, done) {
             } else {
                 T.notify('Cập nhật lương thành công!', 'success');
                 done && done(data.item);
-                dispatch(getQtLuongGroupPageMa(undefined, undefined, '-1', data.shcc));
+                dispatch(getQtLuongPage());
             }
         }, () => T.notify('Cập nhật lương bị lỗi!', 'danger'));
     };
 }
 
 
-export function deleteQtLuongGroupPageMa(id, shcc, done) {
+export function deleteQtLuongGroupPageMa(id, done) {
     return dispatch => {
-        const url = '/api/staff/qua-trinh/luong';
+        const url = '/api/qua-trinh/luong';
         T.delete(url, { id }, data => {
             if (data.error) {
                 T.notify('Xóa thông tin lương bị lỗi', 'danger');
@@ -138,15 +124,33 @@ export function deleteQtLuongGroupPageMa(id, shcc, done) {
             } else {
                 T.alert('Thông tin lương được xóa thành công!', 'info', false, 800);
                 done && done(data.item);
-                dispatch(getQtLuongGroupPageMa(undefined, undefined, '-1', shcc));
+                dispatch(getQtLuongPage());
             }
         }, () => T.notify('Xóa thông tin lương bị lỗi', 'danger'));
     };
 }
 
+export function createQtLuongGroupPageMa(data, done) {
+    return dispatch => {
+        const url = '/api/qua-trinh/luong';
+        T.post(url, { data }, res => {
+            if (res.error) {
+                T.notify('Tạo lương bị lỗi!', 'danger');
+                console.error(`POST: ${url}.`, res.error);
+            } else {
+                if (done) {
+                    T.notify('Tạo lương thành công!', 'success');
+                    dispatch(getQtLuongPage());
+                    done && done(data);
+                }
+            }
+        }, () => T.notify('Tạo lương bị lỗi!', 'danger'));
+    };
+}
+
 export function createQtLuongStaff(data, done, isEdit = null) {
     return dispatch => {
-        const url = '/api/staff/qua-trinh/luong';
+        const url = '/api/qua-trinh/luong';
         T.post(url, { data }, res => {
             if (res.error) {
                 T.notify('Thêm thông tin lương bị lỗi', 'danger');
@@ -170,7 +174,7 @@ export function createQtLuongStaff(data, done, isEdit = null) {
 
 export function updateQtLuongStaff(id, changes, done, isEdit = null) {
     return dispatch => {
-        const url = '/api/staff/qua-trinh/luong';
+        const url = '/api/qua-trinh/luong';
         T.put(url, { id, changes }, data => {
             if (data.error) {
                 T.notify('Cập nhật thông tin lương bị lỗi', 'danger');
@@ -186,7 +190,7 @@ export function updateQtLuongStaff(id, changes, done, isEdit = null) {
 
 export function deleteQtLuongStaff(id, isEdit, shcc = null) {
     return dispatch => {
-        const url = '/api/staff/qua-trinh/luong';
+        const url = '/api/qua-trinh/luong';
         T.delete(url, { id }, data => {
             if (data.error) {
                 T.notify('Xóa thông tin lương bị lỗi', 'danger');
