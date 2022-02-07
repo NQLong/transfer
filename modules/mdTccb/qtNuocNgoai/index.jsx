@@ -17,5 +17,9 @@ export default {
             path: '/user/tccb/qua-trinh/nuoc-ngoai',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
+        {
+            path: '/user/nuoc-ngoai',
+            component: Loadable({ loading: Loading, loader: () => import('./staffPage') })
+        },
     ],
 };
