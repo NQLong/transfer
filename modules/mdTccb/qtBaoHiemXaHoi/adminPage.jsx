@@ -324,7 +324,7 @@ class QtBaoHiemXaHoi extends AdminPage {
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                    getPage={this.checked ? this.props.getQtBaoHiemXaHoiGroupPage : this.props.getQtBaoHiemXaHoiPage} />
+                    getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createQtBaoHiemXaHoiStaff} update={this.props.updateQtBaoHiemXaHoiStaff}
                      permissions={currentPermissions}

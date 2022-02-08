@@ -17,9 +17,9 @@ export default {
             path: '/user/tccb/qua-trinh/bao-hiem-xa-hoi',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
-        // {
-        //     path: '/user/bao-hiem-xa-hoi',
-        //     component: Loadable({ loading: Loading, loader: () => import('./staffPage.jsx') })
-        // },
+        {
+            path: '/user/bao-hiem-xa-hoi',
+            component: Loadable({ loading: Loading, loader: () => import('./staffPage') })
+        },
     ],
 };
