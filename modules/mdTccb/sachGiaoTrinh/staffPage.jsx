@@ -85,7 +85,7 @@ class EditModal extends AdminModal {
     }
 }
 
-class SachGiaoTrinhGroupPage extends AdminPage {
+class SachGiaoTrinhUserPage extends AdminPage {
     state = { filter: {} };
     componentDidMount() {
         T.ready(() => {
@@ -125,7 +125,7 @@ class SachGiaoTrinhGroupPage extends AdminPage {
         const { isStaff, shcc } = this.props.system && this.props.system.user ? this.props.system.user : { isStaff: false, shcc: '' };
         const { firstName, lastName } = isStaff && this.props.system.user || { firstName: '', lastName: '' };
         const name = isStaff ? `${lastName} ${firstName} (${shcc})` : '';
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.sachGiaoTrinh && this.props.sachGiaoTrinh.page ? this.props.sachGiaoTrinh.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.sachGiaoTrinh && this.props.sachGiaoTrinh.user_page ? this.props.sachGiaoTrinh.user_page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -200,7 +200,7 @@ class SachGiaoTrinhGroupPage extends AdminPage {
                 />
             </>,
             backRoute: '/user',
-            onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
+            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
         });
     }
 }
@@ -210,4 +210,4 @@ const mapActionsToProps = {
     updateSachGiaoTrinhUserPage, deleteSachGiaoTrinhUserPage, 
     getSachGiaoTrinhUserPage, createSachGiaoTrinhUserPage,
 };
-export default connect(mapStateToProps, mapActionsToProps)(SachGiaoTrinhGroupPage);
+export default connect(mapStateToProps, mapActionsToProps)(SachGiaoTrinhUserPage);

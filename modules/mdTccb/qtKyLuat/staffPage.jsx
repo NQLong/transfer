@@ -120,7 +120,7 @@ class EditModal extends AdminModal {
         });
     }
 }
-class QtKyLuatGroupPage extends AdminPage {
+class QtKyLuatUserPage extends AdminPage {
     state = { filter: {} };
     componentDidMount() {
         T.ready(() => {
@@ -161,7 +161,7 @@ class QtKyLuatGroupPage extends AdminPage {
         const { isStaff, shcc } = this.props.system && this.props.system.user ? this.props.system.user : { isStaff: false, shcc: '' };
         const { firstName, lastName } = isStaff && this.props.system.user || { firstName: '', lastName: '' };
         const name = isStaff ? `${lastName} ${firstName} (${shcc})` : '';
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtKyLuat && this.props.qtKyLuat.page ? this.props.qtKyLuat.page : {pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: []};
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtKyLuat && this.props.qtKyLuat.user_page ? this.props.qtKyLuat.user_page : {pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: []};
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -236,4 +236,4 @@ const mapActionsToProps = {
     createQtKyLuatUserPage, getQtKyLuatUserPage, deleteQtKyLuatUserPage,
     updateQtKyLuatUserPage,
 };
-export default connect(mapStateToProps, mapActionsToProps)(QtKyLuatGroupPage);
+export default connect(mapStateToProps, mapActionsToProps)(QtKyLuatUserPage);

@@ -93,7 +93,7 @@ class EditModal extends AdminModal {
     }
 }
 
-class QtKeoDaiCongTacGroupPage extends AdminPage {
+class QtKeoDaiCongTacUserPage extends AdminPage {
     state = { filter: {} };
     componentDidMount() {
         T.ready(() => {
@@ -133,7 +133,7 @@ class QtKeoDaiCongTacGroupPage extends AdminPage {
         const { isStaff, shcc } = this.props.system && this.props.system.user ? this.props.system.user : { isStaff: false, shcc: '' };
         const { firstName, lastName } = isStaff && this.props.system.user || { firstName: '', lastName: '' };
         const name = isStaff ? `${lastName} ${firstName} (${shcc})` : '';
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtKeoDaiCongTac && this.props.qtKeoDaiCongTac.page ? this.props.qtKeoDaiCongTac.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtKeoDaiCongTac && this.props.qtKeoDaiCongTac.user_page ? this.props.qtKeoDaiCongTac.user_page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -191,9 +191,9 @@ class QtKeoDaiCongTacGroupPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtKeoDaiCongTac: state.qtKeoDaiCongTac });
+const mapStateToProps = state => ({ system: state.system, qtKeoDaiCongTac: state.tccb.qtKeoDaiCongTac });
 const mapActionsToProps = {
     updateQtKeoDaiCongTacUserPage, deleteQtKeoDaiCongTacUserPage,
     createQtKeoDaiCongTacUserPage, getQtKeoDaiCongTacUserPage,
 };
-export default connect(mapStateToProps, mapActionsToProps)(QtKeoDaiCongTacGroupPage);
+export default connect(mapStateToProps, mapActionsToProps)(QtKeoDaiCongTacUserPage);

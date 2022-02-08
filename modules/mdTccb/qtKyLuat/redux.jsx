@@ -4,6 +4,7 @@ import { getStaffEdit, userGetStaff } from '../tccbCanBo/redux';
 // Reducer ------------------------------------------------------------------------------------------------------------
 const QtKyLuatGetAll = 'QtKyLuat:GetAll';
 const QtKyLuatGetPage = 'QtKyLuat:GetPage';
+const QtKyLuatGetUserPage = 'QtKyLuat:GetUserPage';
 const QtKyLuatGetGroupPage = 'QtKyLuat:GetGroupPage';
 const QtKyLuatUpdate = 'QtKyLuat:Update';
 const QtKyLuatGet = 'QtKyLuat:Get';
@@ -16,6 +17,8 @@ export default function QtKyLuatReducer(state = null, data) {
             return Object.assign({}, state, { page_gr: data.page });
         case QtKyLuatGetPage:
             return Object.assign({}, state, { page: data.page });
+        case QtKyLuatGetUserPage:
+            return Object.assign({}, state, { user_page: data.page });
         case QtKyLuatGet:
             return Object.assign({}, state, { selectedItem: data.item });
         case QtKyLuatUpdate:
@@ -49,13 +52,13 @@ export default function QtKyLuatReducer(state = null, data) {
 }
 
 // Actions ------------------------------------------------------------------------------------------------------------
-T.initPage('pageQtKyLuat');
+T.initPage('userPageQtKyLuat');
 export function getQtKyLuatUserPage(pageNumber, pageSize, pageCondition, filter, done) {
     if (typeof filter === 'function') {
         done = filter;
         filter = {};
     }
-    const page = T.updatePage('pageQtKyLuat', pageNumber, pageSize, pageCondition, filter);
+    const page = T.updatePage('userPageQtKyLuat', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/user/qua-trinh/ky-luat/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
@@ -66,7 +69,7 @@ export function getQtKyLuatUserPage(pageNumber, pageSize, pageCondition, filter,
                 if (page.filter) data.page.filter = page.filter;
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 if (done) done(data.page);
-                dispatch({ type: QtKyLuatGetPage, page: data.page });
+                dispatch({ type: QtKyLuatGetUserPage, page: data.page });
             }
         }, () => T.notify('Lấy danh sách kỷ luật bị lỗi!', 'danger'));
     };

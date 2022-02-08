@@ -19,7 +19,7 @@ export default {
         },
         {
             path: '/user/keo-dai-cong-tac',
-            component: Loadable({ loading: Loading, loader: () => import('./staffPage.jsx') })
+            component: Loadable({ loading: Loading, loader: () => import('./staffPage') })
         },
     ],
 };

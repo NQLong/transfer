@@ -77,7 +77,7 @@ class EditModal extends AdminModal {
         });
     }
 }
-class QtKhenThuongAllGroupPage extends AdminPage {
+class QtKhenThuongAllUserPage extends AdminPage {
     state = { filter: {} };
     componentDidMount() {
         T.ready(() => {
@@ -118,7 +118,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
         const { isStaff, shcc } = this.props.system && this.props.system.user ? this.props.system.user : { isStaff: false, shcc: '' };
         const { firstName, lastName } = isStaff && this.props.system.user || { firstName: '', lastName: '' };
         const name = isStaff ? `${lastName} ${firstName} (${shcc})` : '';
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.page ? this.props.qtKhenThuongAll.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list };
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.user_page ? this.props.qtKhenThuongAll.user_page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -183,4 +183,4 @@ const mapActionsToProps = {
     getQtKhenThuongAllUserPage, deleteQtKhenThuongAllUserPage, createQtKhenThuongAllUserPage,
     updateQtKhenThuongAllUserPage, getDmKhenThuongLoaiDoiTuongAll,
 };
-export default connect(mapStateToProps, mapActionsToProps)(QtKhenThuongAllGroupPage);
+export default connect(mapStateToProps, mapActionsToProps)(QtKhenThuongAllUserPage);

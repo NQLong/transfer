@@ -99,6 +99,7 @@ export function deleteQtHuongDanLVStaffUser(id, email, done) {
 // Reducer ------------------------------------------------------------------------------------------------------------
 const QtHuongDanLuanVanGetAll = 'QtHuongDanLuanVan:GetAll';
 const QtHuongDanLuanVanGetPage = 'QtHuongDanLuanVan:GetPage';
+const QtHuongDanLuanVanGetUserPage = 'QtHuongDanLuanVan:GetUserPage';
 const QtHuongDanLuanVanGetGroupPage = 'QtHuongDanLuanVan:GetGroupPage';
 const QtHuongDanLuanVanUpdate = 'QtHuongDanLuanVan:Update';
 const QtHuongDanLuanVanGet = 'QtHuongDanLuanVan:Get';
@@ -111,6 +112,8 @@ export default function QtHuongDanLuanVanReducer(state = null, data) {
             return Object.assign({}, state, { page_gr: data.page });
         case QtHuongDanLuanVanGetPage:
             return Object.assign({}, state, { page: data.page });
+        case QtHuongDanLuanVanGetUserPage:
+            return Object.assign({}, state, { user_page: data.page });
         case QtHuongDanLuanVanGet:
             return Object.assign({}, state, { selectedItem: data.item });
         case QtHuongDanLuanVanUpdate:
@@ -190,13 +193,13 @@ export function getQtHuongDanLuanVanGroupPage(pageNumber, pageSize, pageConditio
     };
 }
 
-T.initPage('pageQtHuongDanLuanVan');
+T.initPage('userPageQtHuongDanLuanVan');
 export function getQtHuongDanLuanVanUserPage(pageNumber, pageSize, pageCondition, filter, done) {
     if (typeof filter === 'function') {
         done = filter;
         filter = {};
     }
-    const page = T.updatePage('pageQtHuongDanLuanVan', pageNumber, pageSize, pageCondition, filter);
+    const page = T.updatePage('userPageQtHuongDanLuanVan', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/user/qua-trinh/hdlv/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
@@ -207,7 +210,7 @@ export function getQtHuongDanLuanVanUserPage(pageNumber, pageSize, pageCondition
                 if (page.filter) data.page.filter = page.filter;
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 if (done) done(data.page);
-                dispatch({ type: QtHuongDanLuanVanGetPage, page: data.page });
+                dispatch({ type: QtHuongDanLuanVanGetUserPage, page: data.page });
             }
         }, () => T.notify('Lấy danh sách hướng dẫn luận văn bị lỗi!', 'danger'));
     };

@@ -5,6 +5,7 @@ import T from 'view/js/common';
 // Reducer ------------------------------------------------------------------------------------------------------------
 const SachGiaoTrinhGetAll = 'SachGiaoTrinh:GetAll';
 const SachGiaoTrinhGetPage = 'SachGiaoTrinh:GetPage';
+const SachGiaoTrinhGetUserPage = 'SachGiaoTrinh:GetUserPage';
 const SachGiaoTrinhGetGroupPage = 'SachGiaoTrinh:GetGroupPage';
 const SachGiaoTrinhUpdate = 'SachGiaoTrinh:Update';
 const SachGiaoTrinhGet = 'SachGiaoTrinh:Get';
@@ -17,6 +18,8 @@ export default function SachGiaoTrinhReducer(state = null, data) {
             return Object.assign({}, state, { page_gr: data.page });
         case SachGiaoTrinhGetPage:
             return Object.assign({}, state, { page: data.page });
+        case SachGiaoTrinhGetUserPage:
+            return Object.assign({}, state, { user_page: data.page });
         case SachGiaoTrinhGet:
             return Object.assign({}, state, { selectedItem: data.item });
         case SachGiaoTrinhUpdate:
@@ -50,13 +53,13 @@ export default function SachGiaoTrinhReducer(state = null, data) {
 }
 
 // Actions ------------------------------------------------------------------------------------------------------------
-T.initPage('pageSachGiaoTrinh');
+T.initPage('userPageSachGiaoTrinh');
 export function getSachGiaoTrinhUserPage(pageNumber, pageSize, pageCondition, filter, done) {
     if (typeof filter === 'function') {
         done = filter;
         filter = {};
     }
-    const page = T.updatePage('pageSachGiaoTrinh', pageNumber, pageSize, pageCondition, filter);
+    const page = T.updatePage('userPageSachGiaoTrinh', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/user/qua-trinh/sach-giao-trinh/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
@@ -67,7 +70,7 @@ export function getSachGiaoTrinhUserPage(pageNumber, pageSize, pageCondition, fi
                 if (page.filter) data.page.filter = page.filter;
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 if (done) done(data.page);
-                dispatch({ type: SachGiaoTrinhGetPage, page: data.page });
+                dispatch({ type: SachGiaoTrinhGetUserPage, page: data.page });
             }
         }, () => T.notify('Lấy danh sách sách giáo trình bị lỗi!', 'danger'));
     };

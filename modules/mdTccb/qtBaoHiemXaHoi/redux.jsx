@@ -69,7 +69,7 @@ export function getQtBaoHiemXaHoiUserPage(pageNumber, pageSize, pageCondition, f
                 if (page.filter) data.page.filter = page.filter;
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 if (done) done(data.page);
-                dispatch({ type: QtBaoHiemXaHoiGetUserPage, user_page: data.page });
+                dispatch({ type: QtBaoHiemXaHoiGetUserPage, page: data.page });
             }
         }, () => T.notify('Lấy danh sách bảo hiểm xã hội bị lỗi!', 'danger'));
     };

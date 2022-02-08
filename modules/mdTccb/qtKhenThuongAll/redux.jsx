@@ -4,6 +4,7 @@ import { getStaffEdit } from '../tccbCanBo/redux';
 // Reducer ------------------------------------------------------------------------------------------------------------
 const QtKhenThuongAllGetAll = 'QtKhenThuongAll:GetAll';
 const QtKhenThuongAllGetPage = 'QtKhenThuongAll:GetPage';
+const QtKhenThuongAllGetUserPage = 'QtKhenThuongAll:GetUserPage';
 const QtKhenThuongAllGetGroupPage = 'QtKhenThuongAll:GetGroupPage';
 const QtKhenThuongAllUpdate = 'QtKhenThuongAll:Update';
 const QtKhenThuongAllGet = 'QtKhenThuongAll:Get';
@@ -16,6 +17,8 @@ export default function QtKhenThuongAllReducer(state = null, data) {
             return Object.assign({}, state, { page_gr: data.page });
         case QtKhenThuongAllGetPage:
             return Object.assign({}, state, { page: data.page });
+        case QtKhenThuongAllGetUserPage:
+            return Object.assign({}, state, { user_page: data.page });
         case QtKhenThuongAllGet:
             return Object.assign({}, state, { selectedItem: data.item });
         case QtKhenThuongAllUpdate:
@@ -49,13 +52,13 @@ export default function QtKhenThuongAllReducer(state = null, data) {
 }
 
 // Actions ------------------------------------------------------------------------------------------------------------
-T.initPage('pageQtKhenThuongAll');
+T.initPage('userPageQtKhenThuongAll');
 export function getQtKhenThuongAllUserPage(pageNumber, pageSize, pageCondition, filter, done) {
     if (typeof filter === 'function') {
         done = filter;
         filter = {};
     }
-    const page = T.updatePage('pageQtKhenThuongAll', pageNumber, pageSize, pageCondition, filter);
+    const page = T.updatePage('userPageQtKhenThuongAll', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/user/qua-trinh/khen-thuong-all/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
@@ -66,7 +69,7 @@ export function getQtKhenThuongAllUserPage(pageNumber, pageSize, pageCondition, 
                 if (page.filter) data.page.filter = page.filter;
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 if (done) done(data.page);
-                dispatch({ type: QtKhenThuongAllGetPage, page: data.page });
+                dispatch({ type: QtKhenThuongAllGetUserPage, page: data.page });
             }
         }, () => T.notify('Lấy danh sách khen thưởng bị lỗi!', 'danger'));
     };

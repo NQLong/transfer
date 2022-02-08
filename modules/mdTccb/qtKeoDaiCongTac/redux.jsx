@@ -4,6 +4,7 @@ import { getStaffEdit, userGetStaff } from '../tccbCanBo/redux';
 // Reducer ------------------------------------------------------------------------------------------------------------
 const QtKeoDaiCongTacGetAll = 'QtKeoDaiCongTac:GetAll';
 const QtKeoDaiCongTacGetPage = 'QtKeoDaiCongTac:GetPage';
+const QtKeoDaiCongTacGetUserPage = 'QtKeoDaiCongTac:GetUserPage';
 const QtKeoDaiCongTacGetGroupPage = 'QtKeoDaiCongTac:GetGroupPage';
 const QtKeoDaiCongTacUpdate = 'QtKeoDaiCongTac:Update';
 const QtKeoDaiCongTacGet = 'QtKeoDaiCongTac:Get';
@@ -16,6 +17,8 @@ export default function QtKeoDaiCongTacReducer(state = null, data) {
             return Object.assign({}, state, { page_gr: data.page });
         case QtKeoDaiCongTacGetPage:
             return Object.assign({}, state, { page: data.page });
+        case QtKeoDaiCongTacGetUserPage:
+            return Object.assign({}, state, { user_page: data.page });            
         case QtKeoDaiCongTacGet:
             return Object.assign({}, state, { selectedItem: data.item });
         case QtKeoDaiCongTacUpdate:
@@ -49,13 +52,13 @@ export default function QtKeoDaiCongTacReducer(state = null, data) {
 }
 
 // Actions ------------------------------------------------------------------------------------------------------------
-T.initPage('pageQtKeoDaiCongTac');
+T.initPage('userPageQtKeoDaiCongTac');
 export function getQtKeoDaiCongTacUserPage(pageNumber, pageSize, pageCondition, filter, done) {
     if (typeof filter === 'function') {
         done = filter;
         filter = {};
     }
-    const page = T.updatePage('pageQtKeoDaiCongTac', pageNumber, pageSize, pageCondition, filter);
+    const page = T.updatePage('userPageQtKeoDaiCongTac', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/user/qua-trinh/keo-dai-cong-tac/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
@@ -66,7 +69,7 @@ export function getQtKeoDaiCongTacUserPage(pageNumber, pageSize, pageCondition, 
                 if (page.filter) data.page.filter = page.filter;
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 if (done) done(data.page);
-                dispatch({ type: QtKeoDaiCongTacGetPage, page: data.page });
+                dispatch({ type: QtKeoDaiCongTacGetUserPage, page: data.page });
             }
         }, () => T.notify('Lấy danh sách kéo dài công tác bị lỗi!', 'danger'));
     };

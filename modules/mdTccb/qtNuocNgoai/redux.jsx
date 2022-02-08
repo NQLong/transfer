@@ -5,6 +5,7 @@ import { getStaffEdit, userGetStaff } from '../tccbCanBo/redux';
 // Reducer ------------------------------------------------------------------------------------------------------------
 const QtNuocNgoaiGetAll = 'QtNuocNgoai:GetAll';
 const QtNuocNgoaiGetPage = 'QtNuocNgoai:GetPage';
+const QtNuocNgoaiGetUserPage = 'QtNuocNgoai:GetUserPage';
 const QtNuocNgoaiGetGroupPage = 'QtNuocNgoai:GetGroupPage';
 const QtNuocNgoaiUpdate = 'QtNuocNgoai:Update';
 const QtNuocNgoaiGet = 'QtNuocNgoai:Get';
@@ -17,6 +18,8 @@ export default function QtNuocNgoaiReducer(state = null, data) {
             return Object.assign({}, state, { page_gr: data.page });
         case QtNuocNgoaiGetPage:
             return Object.assign({}, state, { page: data.page });
+        case QtNuocNgoaiGetUserPage:
+            return Object.assign({}, state, { user_page: data.page });
         case QtNuocNgoaiGet:
             return Object.assign({}, state, { selectedItem: data.item });
         case QtNuocNgoaiUpdate:
@@ -50,13 +53,13 @@ export default function QtNuocNgoaiReducer(state = null, data) {
 }
 
 // Actions ------------------------------------------------------------------------------------------------------------
-T.initPage('pageQtNuocNgoai');
+T.initPage('userPageQtNuocNgoai');
 export function getQtNuocNgoaiUserPage(pageNumber, pageSize, pageCondition, filter, done) {
     if (typeof filter === 'function') {
         done = filter;
         filter = {};
     }
-    const page = T.updatePage('pageQtNuocNgoai', pageNumber, pageSize, pageCondition, filter);
+    const page = T.updatePage('userPageQtNuocNgoai', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/user/qua-trinh/nuoc-ngoai/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
@@ -67,7 +70,7 @@ export function getQtNuocNgoaiUserPage(pageNumber, pageSize, pageCondition, filt
                 if (page.filter) data.page.filter = page.filter;
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 if (done) done(data.page);
-                dispatch({ type: QtNuocNgoaiGetPage, page: data.page });
+                dispatch({ type: QtNuocNgoaiGetUserPage, page: data.page });
             }
         }, () => T.notify('Lấy danh sách đi nước ngoài bị lỗi!', 'danger'));
     };

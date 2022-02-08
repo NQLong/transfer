@@ -110,7 +110,7 @@ class EditModal extends AdminModal {
     }
 }
 
-class QtNuocNgoaiGroupPage extends AdminPage {
+class QtNuocNgoaiUserPage extends AdminPage {
     state = { filter: {} };
     componentDidMount() {
         T.ready(() => {
@@ -150,7 +150,7 @@ class QtNuocNgoaiGroupPage extends AdminPage {
         const { isStaff, shcc } = this.props.system && this.props.system.user ? this.props.system.user : { isStaff: false, shcc: '' };
         const { firstName, lastName } = isStaff && this.props.system.user || { firstName: '', lastName: '' };
         const name = isStaff ? `${lastName} ${firstName} (${shcc})` : '';
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtNuocNgoai && this.props.qtNuocNgoai.page ? this.props.qtNuocNgoai.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtNuocNgoai && this.props.qtNuocNgoai.user_page ? this.props.qtNuocNgoai.user_page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -222,7 +222,7 @@ class QtNuocNgoaiGroupPage extends AdminPage {
                 />
             </>,
             backRoute: '/user',
-            onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
+            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
         });
     }
 }
@@ -232,4 +232,4 @@ const mapActionsToProps = {
     getQtNuocNgoaiUserPage, deleteQtNuocNgoaiUserPage,
     updateQtNuocNgoaiUserPage, createQtNuocNgoaiUserPage,
 };
-export default connect(mapStateToProps, mapActionsToProps)(QtNuocNgoaiGroupPage);
+export default connect(mapStateToProps, mapActionsToProps)(QtNuocNgoaiUserPage);
