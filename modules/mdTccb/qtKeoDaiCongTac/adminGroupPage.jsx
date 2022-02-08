@@ -205,7 +205,7 @@ class QtKeoDaiCongTacGroupPage extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-calendar',
+            icon: 'fa fa-gift',
             title: 'Quá trình kéo dài công tác - Cán bộ',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
@@ -235,7 +235,7 @@ class QtKeoDaiCongTacGroupPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtKeoDaiCongTac: state.qtKeoDaiCongTac });
+const mapStateToProps = state => ({ system: state.system, qtKeoDaiCongTac: state.tccb.qtKeoDaiCongTac });
 const mapActionsToProps = {
     updateQtKeoDaiCongTacGroupPageMa, deleteQtKeoDaiCongTacGroupPageMa,
     createQtKeoDaiCongTacGroupPageMa, getQtKeoDaiCongTacPage,
