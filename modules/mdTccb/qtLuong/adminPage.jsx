@@ -23,6 +23,11 @@ const EnumDateType = Object.freeze({
     'mm/yyyy': 'month',
     'dd/mm/yyyy': 'date'
 };
+const timeList = [
+    { id: 0, text: 'Không' },
+    { id: 1, text: 'Theo ngày bắt đầu - ngày kết thúc' },
+    { id: 2, text: 'Theo ngày hưởng' }
+];
 class EditModal extends AdminModal {
     state = {
         id: null,
@@ -143,6 +148,7 @@ class QtLuong extends AdminPage {
         T.ready('/user/tccb', () => {
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
+                this.timeType?.value(0);
                 this.fromYear?.value('');
                 this.toYear?.value('');
                 this.maDonVi?.value('');
@@ -166,11 +172,12 @@ class QtLuong extends AdminPage {
 
     changeAdvancedSearch = (isInitial = false) => {
         let { pageNumber, pageSize } = this.props && this.props.qtLuong && this.props.qtLuong.page ? this.props.qtLuong.page : { pageNumber: 1, pageSize: 50 };
-        const fromYear = this.fromYear?.value() == '' ? null : Number(this.fromYear?.value());
-        const toYear = this.toYear?.value() == '' ? null : Number(this.toYear?.value());
+        const timeType = this.timeType?.value() || 0;
+        const fromYear = this.fromYear?.value() == '' ? null : this.fromYear?.value().getTime();
+        const toYear = this.toYear?.value() == '' ? null : this.toYear?.value().getTime();
         const list_dv = this.maDonVi?.value().toString() || '';
         const list_shcc = this.mulCanBo?.value().toString() || '';
-        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc };
+        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc, timeType };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
@@ -180,7 +187,8 @@ class QtLuong extends AdminPage {
                     this.toYear?.value(filter.toYear || '');
                     this.maDonVi?.value(filter.list_dv);
                     this.mulCanBo?.value(filter.list_shcc);
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.list_shcc || filter.list_dv)) this.showAdvanceSearch();
+                    this.timeType?.value(filter.timeType);
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.list_shcc || filter.list_dv || filter.timeType)) this.showAdvanceSearch();
                 }
             });
         });
@@ -294,8 +302,9 @@ class QtLuong extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    <FormTextBox className='col-md-3' ref={e => this.fromYear = e} label='Từ năm (ngày hưởng)' type='year' onChange={() => this.changeAdvancedSearch()} />
-                    <FormTextBox className='col-md-3' ref={e => this.toYear = e} label='Đến năm (ngày hưởng))' type='year' onChange={() => this.changeAdvancedSearch()} /> 
+                    <FormSelect className='col-12 col-md-4' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
+                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} /> }
+                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} /> }
                     <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1}/>
                     <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1}/>
                 </div>
