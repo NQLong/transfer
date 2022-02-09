@@ -59,13 +59,13 @@ class EditModal extends AdminModal {
             this.ketThuc.setVal(ketThuc);
             this.batDauType.setText({ text: batDauType ? batDauType : 'dd/mm/yyyy' });
             this.ketThucType.setText({ text: ketThucType ? ketThucType : 'dd/mm/yyyy' });
-            this.chucDanhNgheNghiep.value(chucDanhNgheNghiep);
-            this.bac.value(bac);
-            this.heSoLuong.value(heSoLuong);
-            this.phuCapThamNienVuotKhung.value(phuCapThamNienVuotKhung);
-            this.ngayHuong.value(ngayHuong);
-            this.mocNangBacLuong.value(mocNangBacLuong);
-            this.soHieuVanBan.value(soHieuVanBan);
+            this.chucDanhNgheNghiep.value(chucDanhNgheNghiep ? chucDanhNgheNghiep : '');
+            this.bac.value(bac ? bac : '');
+            this.heSoLuong.value(heSoLuong ? heSoLuong : '');
+            this.phuCapThamNienVuotKhung.value(phuCapThamNienVuotKhung ? phuCapThamNienVuotKhung : '');
+            this.ngayHuong.value(ngayHuong ? ngayHuong : '');
+            this.mocNangBacLuong.value(mocNangBacLuong ? mocNangBacLuong : '');
+            this.soHieuVanBan.value(soHieuVanBan ? soHieuVanBan : '');
         }, 500);
     }
 

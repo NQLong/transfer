@@ -17,5 +17,9 @@ export default {
             path: '/user/tccb/qua-trinh/luong',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
+        {
+            path: '/user/luong',
+            component: Loadable({ loading: Loading, loader: () => import('./staffPage') })
+        },
     ],
 };

@@ -1,15 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormDatePicker } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormDatePicker } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import { DateInput } from 'view/component/Input';
 import Dropdown from 'view/component/Dropdown';
 import {
-    updateQtLuongGroupPageMa, deleteQtLuongGroupPageMa,
-    createQtLuongGroupPageMa, getQtLuongPage,
+    updateQtLuongUserPage, deleteQtLuongUserPage,
+    createQtLuongUserPage, getQtLuongUserPage,
 } from './redux';
-import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 
 const EnumDateType = Object.freeze({
     0: { text: '' },
@@ -21,11 +20,6 @@ const EnumDateType = Object.freeze({
     'mm/yyyy': 'month',
     'dd/mm/yyyy': 'date'
 };
-const timeList = [
-    { id: 0, text: 'Không' },
-    { id: 1, text: 'Theo ngày bắt đầu - ngày kết thúc' },
-    { id: 2, text: 'Theo ngày hưởng' }
-];
 class EditModal extends AdminModal {
     state = {
         id: null,
@@ -37,18 +31,18 @@ class EditModal extends AdminModal {
 
     onShow = (item) => {
         let { id, batDau, batDauType, ketThuc, ketThucType, chucDanhNgheNghiep, bac, heSoLuong, 
-            phuCapThamNienVuotKhung, ngayHuong, mocNangBacLuong, soHieuVanBan, shcc } = item ? item : {
+            phuCapThamNienVuotKhung, ngayHuong, mocNangBacLuong, soHieuVanBan } = item && item.item ? item.item : {
                 id: '', batDau: '', batDauType: '', ketThuc: '', ketThucType: '', chucDanhNgheNghiep: '', bac: '', heSoLuong: '', 
-                phuCapThamNienVuotKhung: '', ngayHuong: '', mocNangBacLuong: '', soHieuVanBan: '', shcc: ''
+                phuCapThamNienVuotKhung: '', ngayHuong: '', mocNangBacLuong: '', soHieuVanBan: ''
         };
         this.setState({
             id, batDauType: batDauType ? batDauType : 'dd/mm/yyyy',
             ketThucType: ketThucType ? ketThucType : 'dd/mm/yyyy',
-            item, batDau, ketThuc
+            item, batDau, ketThuc,
+            shcc: item.shcc
         });
 
         setTimeout(() => {
-            this.shcc.value(shcc ? shcc : this.props.shcc);
             this.batDau.setVal(batDau);
             this.ketThuc.setVal(ketThuc);
             this.batDauType.setText({ text: batDauType ? batDauType : 'dd/mm/yyyy' });
@@ -66,7 +60,7 @@ class EditModal extends AdminModal {
     onSubmit = (e) => {
         e.preventDefault();
         const changes = {
-            shcc: this.shcc.value(),
+            shcc: this.state.shcc,
             batDauType: this.state.batDauType,
             batDau: this.batDau.getVal(),
             ketThucType: this.state.ketThucType,
@@ -79,12 +73,7 @@ class EditModal extends AdminModal {
             mocNangBacLuong: this.mocNangBacLuong.value(),
             soHieuVanBan: this.soHieuVanBan.value(),
         };
-        if (!changes.shcc) {
-            T.notify('Chưa chọn cán bộ', 'danger');
-            this.shcc.focus();
-        } else {
-            this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
-        }
+        this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
     }
 
     render = () => {
@@ -93,7 +82,6 @@ class EditModal extends AdminModal {
             title: this.state.id ? 'Cập nhật thông tin lương' : 'Tạo mới thông tin lương',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12' ref={e => this.shcc = e} data={SelectAdapter_FwCanBo} label='Cán bộ' readOnly={true} />
                 <FormTextBox type='text' className='col-md-4' ref={e => this.chucDanhNgheNghiep = e} label='Chức danh nghề nghiệp' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-4' ref={e => this.bac = e} label='Bậc' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-4' ref={e => this.heSoLuong = e} label='Hệ số lương' readOnly={readOnly} />
@@ -121,61 +109,28 @@ class EditModal extends AdminModal {
 }
 
 
-class QtLuongGroupPage extends AdminPage {
+class QtLuongUserPage extends AdminPage {
     state = { filter: {} };
-
     componentDidMount() {
-        T.ready('/user/tccb', () => {
-            const route = T.routeMatcher('/user/tccb/qua-trinh/luong/group/:ma'),
-                params = route.parse(window.location.pathname);
-            this.ma = params.ma;
-            this.setState({filter: {list_shcc: params.ma, list_dv: '', timeType: 0}});
-            T.onSearch = (searchText) => this.props.getPage(undefined, undefined, searchText || '');
-            T.showSearchBox(() => {
-                this.timeType?.value(0);
-                this.fromYear?.value('');
-                this.toYear?.value('');
-                setTimeout(() => this.changeAdvancedSearch(), 50);
-            });
-            this.props.getQtLuongPage(undefined, undefined, undefined, this.state.filter, () => {
-                T.updatePage('pageQtLuong', undefined, undefined, undefined, this.state.filter);
-            });
+        T.ready(() => {
+            const { shcc } = this.props.system && this.props.system.user ? this.props.system.user : { shcc: '' };
+            this.setState({ filter: { list_shcc: shcc, list_dv: '', fromYear: null, toYear: null, timeType: 0 } });
+            this.getPage();
         });
     }
 
-    changeAdvancedSearch = (isInitial = false) => {
-        let { pageNumber, pageSize } = this.props && this.props.qtLuong && this.props.qtLuong.page ? this.props.qtLuong.page : { pageNumber: 1, pageSize: 50 };
-        const timeType = this.timeType?.value() || 0;
-        const fromYear = this.fromYear?.value() == '' ? null : this.fromYear?.value().getTime();
-        const toYear = this.toYear?.value() == '' ? null : this.toYear?.value().getTime();
-        const list_dv = this.state.filter.list_dv;
-        const list_shcc = this.state.filter.list_shcc;
-        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc, timeType };
-        this.setState({ filter: pageFilter }, () => {
-            this.getPage(pageNumber, pageSize, '', (page) => {
-                if (isInitial) {
-                    const filter = page.filter || {};
-                    this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
-                    this.fromYear?.value(filter.fromYear || '');
-                    this.toYear?.value(filter.toYear || '');
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.timeType )) this.showAdvanceSearch();
-                }
-            });
-        });
-    }
-    
     getPage = (pageN, pageS, pageC, done) => {
-        this.props.getQtLuongPage(pageN, pageS, pageC, this.state.filter, done);
+        this.props.getQtLuongUserPage(pageN, pageS, pageC, this.state.filter, done);
     }
-    
+
     showModal = (e) => {
         e.preventDefault();
-        this.modal.show();
+        this.modal.show({item: null, shcc: this.state.filter.list_shcc});
     }
 
     delete = (e, item) => {
         T.confirm('Xóa thông tin lương', 'Bạn có chắc bạn muốn xóa thông tin lương này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtLuongGroupPageMa(item.id, error => {
+            isConfirm && this.props.deleteQtLuongUserPage(item.id, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá thông tin lương bị lỗi!', 'danger');
                 else T.alert('Xoá thông tin lương thành công!', 'success', false, 800);
             });
@@ -184,9 +139,17 @@ class QtLuongGroupPage extends AdminPage {
     }
 
     render() {
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permission = this.getUserPermission('qtLuong', ['read', 'write', 'delete']);
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtLuong && this.props.qtLuong.page ? this.props.qtLuong.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
+        let permission = this.getUserPermission('staff', ['login']);
+        if (permission.login == true) {
+            permission = {
+                write: true,
+                delete: true
+            };
+        }
+        const { isStaff, shcc } = this.props.system && this.props.system.user ? this.props.system.user : { isStaff: false, shcc: '' };
+        const { firstName, lastName } = isStaff && this.props.system.user || { firstName: '', lastName: '' };
+        const name = isStaff ? `${lastName} ${firstName} (${shcc})` : '';
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtLuong && this.props.qtLuong.user_page ? this.props.qtLuong.user_page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -194,9 +157,8 @@ class QtLuongGroupPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Cán bộ</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Chức danh nghề nghiệp</th>
-                        <th style={{ width: '70%', whiteSpace: 'nowrap', textAlign: 'center' }}>Thông tin</th>
+                        <th style={{ width: '100%', whiteSpace: 'nowrap', textAlign: 'center' }}>Thông tin</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thời gian</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Số hiệu văn bản</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
@@ -205,13 +167,6 @@ class QtLuongGroupPage extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
-                        <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <span>{(item.ho ? item.ho : ' ') + ' ' + (item.ten ? item.ten : ' ')}</span><br />
-                                {item.shcc}
-                            </> 
-                        )}
-                        />
                         <TableCell type='text' style={{  whiteSpace: 'nowrap' }} content={item.chucDanhNgheNghiep}/>
                         <TableCell type='text' style={{  whiteSpace: 'nowrap' }} content={(
                             <>
@@ -233,7 +188,7 @@ class QtLuongGroupPage extends AdminPage {
                         <TableCell type='text' content={item.soHieuVanBan}/>
                         {
                             <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                                onEdit={() => this.modal.show(item)} onDelete={this.delete} >
+                                onEdit={() => this.modal.show({ item, shcc })} onDelete={this.delete} >
                             </TableCell>
                         }
                     </tr>
@@ -243,31 +198,23 @@ class QtLuongGroupPage extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-money',
-            title: 'Quá trình lương - Cán bộ',
+            title: 'Quá trình lương',
+            subTitle: <span style={{ color: 'blue' }}>Cán bộ: {name}</span>,
             breadcrumb: [
-                <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
-                <Link key={0} to='/user/tccb/qua-trinh/hdlv'>Quá trình lương</Link>,
-                'Quá trình lương - Cán bộ'
+                <Link key={0} to='/user/'>Trang cá nhân</Link>,
+                'Lương'
             ],
-            advanceSearch: <>
-                <div className='row'>
-                <FormSelect className='col-12 col-md-4' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
-                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} /> }
-                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} /> }
-                </div>
-            </>,
             content: <>
                 <div className='tile'>
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
-                <EditModal ref={e => this.modal = e} permission={permission}
-                    permissions={currentPermissions} shcc={this.ma}
-                    update={this.props.updateQtLuongGroupPageMa} create={this.props.createQtLuongGroupPageMa}
+                <EditModal ref={e => this.modal = e} shcc={this.shcc} readOnly={!permission.write}
+                    create={this.props.createQtLuongUserPage} update={this.props.updateQtLuongUserPage}
                 />
             </>,
-            backRoute: '/user/tccb/qua-trinh/luong',
+            backRoute: '/user',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
         });
     }
@@ -275,7 +222,7 @@ class QtLuongGroupPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, qtLuong: state.tccb.qtLuong });
 const mapActionsToProps = {
-    updateQtLuongGroupPageMa, deleteQtLuongGroupPageMa,
-    createQtLuongGroupPageMa, getQtLuongPage,
+    updateQtLuongUserPage, deleteQtLuongUserPage,
+    createQtLuongUserPage, getQtLuongUserPage,
 };
-export default connect(mapStateToProps, mapActionsToProps)(QtLuongGroupPage);
+export default connect(mapStateToProps, mapActionsToProps)(QtLuongUserPage);

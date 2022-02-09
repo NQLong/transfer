@@ -5,6 +5,7 @@ import T from 'view/js/common';
 // Reducer ------------------------------------------------------------------------------------------------------------
 const QtLuongGetAll = 'QtLuong:GetAll';
 const QtLuongGetPage = 'QtLuong:GetPage';
+const QtLuongGetUserPage = 'QtLuong:GetUserPage';
 const QtLuongGetGroupPage = 'QtLuong:GetGroupPage';
 const QtLuongUpdate = 'QtLuong:Update';
 const QtLuongGet = 'QtLuong:Get';
@@ -17,6 +18,8 @@ export default function QtLuongReducer(state = null, data) {
             return Object.assign({}, state, { page_gr: data.page });
         case QtLuongGetPage:
             return Object.assign({}, state, { page: data.page });
+        case QtLuongGetUserPage:
+            return Object.assign({}, state, { user_page: data.page });
         case QtLuongGet:
             return Object.assign({}, state, { selectedItem: data.item });
         case QtLuongUpdate:
@@ -50,6 +53,79 @@ export default function QtLuongReducer(state = null, data) {
 }
 
 // Actions ------------------------------------------------------------------------------------------------------------
+T.initPage('userPageQtLuong');
+export function getQtLuongUserPage(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('userPageQtLuong', pageNumber, pageSize, pageCondition, filter);
+    return dispatch => {
+        const url = `/api/user/qua-trinh/luong/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách lương bị lỗi!', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (page.filter) data.page.filter = page.filter;
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                if (done) done(data.page);
+                dispatch({ type: QtLuongGetUserPage, page: data.page });
+            }
+        }, () => T.notify('Lấy danh sách lương bị lỗi!', 'danger'));
+    };
+}
+
+export function updateQtLuongUserPage(id, changes, done) {
+    return dispatch => {
+        const url = '/api/user/qua-trinh/luong';
+        T.put(url, { id, changes }, data => {
+            if (data.error || changes == null) {
+                T.notify('Cập nhật lương bị lỗi!', 'danger');
+                console.error(`PUT: ${url}.`, data.error);
+                done && done(data.error);
+            } else {
+                T.notify('Cập nhật lương thành công!', 'success');
+                done && done(data.item);
+                dispatch(getQtLuongUserPage());
+            }
+        }, () => T.notify('Cập nhật lương bị lỗi!', 'danger'));
+    };
+}
+
+export function createQtLuongUserPage(data, done) {
+    return dispatch => {
+        const url = '/api/user/qua-trinh/luong';
+        T.post(url, { data }, res => {
+            if (res.error) {
+                T.notify('Tạo lương bị lỗi!', 'danger');
+                console.error(`POST: ${url}.`, res.error);
+            } else {
+                if (done) {
+                    T.notify('Tạo lương thành công!', 'success');
+                    dispatch(getQtLuongUserPage());
+                    done && done(data);
+                }
+            }
+        }, () => T.notify('Tạo lương bị lỗi!', 'danger'));
+    };
+}
+export function deleteQtLuongUserPage(id, done) {
+    return dispatch => {
+        const url = '/api/user/qua-trinh/luong';
+        T.delete(url, { id }, data => {
+            if (data.error) {
+                T.notify('Xóa lương bị lỗi!', 'danger');
+                console.error(`DELETE: ${url}.`, data.error);
+            } else {
+                T.alert('lương đã xóa thành công!', 'success', false, 800);
+                done && done(data.item);
+                dispatch(getQtLuongUserPage());
+            }
+        }, () => T.notify('Xóa lương bị lỗi!', 'danger'));
+    };
+}
+
 T.initPage('pageQtLuong');
 export function getQtLuongPage(pageNumber, pageSize, pageCondition, filter, done) {
     if (typeof filter === 'function') {
