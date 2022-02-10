@@ -20,19 +20,14 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        // if (req.query.condition) {
-        //     condition = {
-        //         statement: 'lower(stt) LIKE :searchText OR lower(ten) LIKE :searchText',
-        //         parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
-        //     };
-        // }
-        // app.model.qtNghiThaiSan.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
-        app.model.qtNghiThaiSan.searchPage(pageNumber, pageSize, searchTerm, (error, page) => {
+            const { fromYear, toYear, list_shcc, list_dv, timeType } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0 };
+        app.model.qtNghiThaiSan.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, timeType, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
                 const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
-                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, list } });
+                const pageCondition = searchTerm;
+                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
             }
         });
     });
@@ -41,12 +36,14 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        app.model.qtNghiThaiSan.groupPage(pageNumber, pageSize, searchTerm, (error, page) => {
+            const { fromYear, toYear, list_shcc, list_dv, timeType } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0 };
+            app.model.qtNghiThaiSan.groupPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, timeType, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
                 const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
-                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, list } });
+                const pageCondition = searchTerm;
+                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
             }
         });
     });
@@ -55,20 +52,12 @@ module.exports = app => {
         app.model.qtNghiThaiSan.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/qua-trinh/nghi-thai-san/item/:stt', checkGetStaffPermission, (req, res) => {
-        app.model.qtNghiThaiSan.get({ stt: req.params.stt }, (error, item) => res.send({ error, item }));
-    });
-
-    app.get('/api/qua-trinh/nghi-thai-san/edit/item/:stt', checkGetStaffPermission, (req, res) => {
-        app.model.qtNghiThaiSan.get({ stt: req.params.stt }, (error, item) => res.send({ error, item }));
-    });
-
     app.post('/api/qua-trinh/nghi-thai-san', app.permission.check('qtNghiThaiSan:write'), (req, res) => {
-        app.model.qtNghiThaiSan.create(req.body.item, (error, item) => res.send({ error, item }));
+        app.model.qtNghiThaiSan.create(req.body.data, (error, item) => res.send({ error, item }));
     });
 
     app.put('/api/qua-trinh/nghi-thai-san', app.permission.check('qtNghiThaiSan:write'), (req, res) => {
-        app.model.qtNghiThaiSan.update({ stt: req.body.stt }, req.body.changes, (error, items) => res.send({ error, items }));
+        app.model.qtNghiThaiSan.update({ stt: req.body.stt }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
     app.delete('/api/qua-trinh/nghi-thai-san', app.permission.check('qtNghiThaiSan:delete'), (req, res) => {
