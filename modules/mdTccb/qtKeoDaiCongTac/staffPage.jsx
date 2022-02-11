@@ -96,7 +96,7 @@ class EditModal extends AdminModal {
 class QtKeoDaiCongTacUserPage extends AdminPage {
     state = { filter: {} };
     componentDidMount() {
-        T.ready(() => {
+        T.ready('user', () => {
             const { shcc } = this.props.system && this.props.system.user ? this.props.system.user : { shcc: '' };
             this.setState({ filter: { list_shcc: shcc, list_dv: '', fromYear: null, toYear: null } });
             this.getPage();

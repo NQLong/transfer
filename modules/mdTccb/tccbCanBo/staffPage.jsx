@@ -25,7 +25,7 @@ class StaffUserPage extends AdminPage {
     state = { item: null }
 
     componentDidMount() {
-        T.ready(() => {
+        T.ready('user', () => {
             if (this.props.system && this.props.system.user) {
                 const user = this.props.system.user;
                 this.emailCanBo = user.email ? user.email : null;
