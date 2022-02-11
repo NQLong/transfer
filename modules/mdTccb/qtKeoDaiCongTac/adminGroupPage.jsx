@@ -29,7 +29,7 @@ class EditModal extends AdminModal {
         ketThuc: '',
         batDauType: 'dd/mm/yyyy',
         ketThucType: 'dd/mm/yyyy',
-    };    
+    };
 
     onShow = (item) => {
         let { id, shcc, soHieuVanBan, batDau, batDauType, ketThuc, ketThucType } = item ? item : {
@@ -188,12 +188,12 @@ class QtKeoDaiCongTacGroupPage extends AdminPage {
                         />
                         <TableCell type='text' content={(
                             <>
-                                {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br/></span> : null}
-                                {item.ketThuc ? <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span><br/></span> : null}
+                                {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
+                                {item.ketThuc ? <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
                             </>
                         )}
                         />
-                        <TableCell type='text' style={{  whiteSpace: 'nowrap' }} content={item.soHieuVanBan}/>            
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.soHieuVanBan} />
                         {
                             <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                                 onEdit={() => this.modal.show(item)} onDelete={this.delete} >
@@ -205,7 +205,7 @@ class QtKeoDaiCongTacGroupPage extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-gift',
+            icon: 'fa fa-hourglass-start',
             title: 'Quá trình kéo dài công tác - Cán bộ',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,

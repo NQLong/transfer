@@ -434,7 +434,7 @@ export class FormSelect extends React.Component {
         $(this.input).off('select2:open');
     }
 
-    focus = () => $(this.input).select2('open');
+    focus = () => !this.props.readOnly && $(this.input).select2('open');
 
     clear = () => $(this.input).val('').trigger('change') && $(this.input).html('');
 
@@ -766,7 +766,7 @@ export class AdminModal extends React.Component {
         }
     }
 
-    renderModal = ({ title, body, size, buttons, isLoading = false, submitText = 'Lưu', isShowSubmit = true, style={} }) => {
+    renderModal = ({ title, body, size, buttons, isLoading = false, submitText = 'Lưu', isShowSubmit = true, style = {} }) => {
         const { readOnly = false } = this.props;
         return (
             <div className='modal fade' role='dialog' ref={e => this.modal = e} style={style}>

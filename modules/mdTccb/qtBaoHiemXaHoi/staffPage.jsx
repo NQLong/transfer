@@ -9,7 +9,7 @@ import {
     updateQtBaoHiemXaHoiUserPage, deleteQtBaoHiemXaHoiUserPage,
     createQtBaoHiemXaHoiUserPage, getQtBaoHiemXaHoiUserPage,
 } from './redux';
-import { SelectAdapter_DmChucVuV1} from 'modules/mdDanhMuc/dmChucVu/redux';
+import { SelectAdapter_DmChucVuV1 } from 'modules/mdDanhMuc/dmChucVu/redux';
 
 const EnumDateType = Object.freeze({
     0: { text: '' },
@@ -33,7 +33,7 @@ class EditModal extends AdminModal {
 
     onShow = (item) => {
         let { id, batDau, batDauType, ketThuc, ketThucType, chucVu, mucDong, phuCapChucVu, phuCapThamNienVuotKhung, phuCapThamNienNghe, tyLeDong } = item && item.item ? item.item : {
-            id: '', batDau: '', batDauType: '', ketThuc: '', ketThucType: '', chucVu: '', mucDong: '', phuCapChucVu: '',  phuCapThamNienVuotKhung: '', phuCapThamNienNghe: '', tyLeDong: ''
+            id: '', batDau: '', batDauType: '', ketThuc: '', ketThucType: '', chucVu: '', mucDong: '', phuCapChucVu: '', phuCapThamNienVuotKhung: '', phuCapThamNienNghe: '', tyLeDong: ''
         };
         this.setState({
             id, batDauType: batDauType ? batDauType : 'dd/mm/yyyy',
@@ -126,7 +126,7 @@ class QtBaoHiemXaHoiUserPage extends AdminPage {
 
     showModal = (e) => {
         e.preventDefault();
-        this.modal.show({item: null, shcc: this.state.filter.list_shcc});
+        this.modal.show({ item: null, shcc: this.state.filter.list_shcc });
     }
 
     delete = (e, item) => {
@@ -168,31 +168,31 @@ class QtBaoHiemXaHoiUserPage extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
-                        <TableCell type='text' style={{  whiteSpace: 'nowrap' }} content={item.tenChucVu}/>
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucVu} />
                         <TableCell type='text' content={(
                             <>
-                                {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br/></span> : null}
-                                {item.ketThuc ? <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span><br/></span> : null}
+                                {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
+                                {item.ketThuc ? <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
                             </>
                         )}
                         />
-                        <TableCell type='text' style={{  whiteSpace: 'nowrap' }} content={(
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span><i>Mức đóng: </i></span> <span>{item.mucDong}</span> <br/>
-                                <span><i>Tỷ lệ đóng: </i></span><span>{item.tyLeDong}</span> <br/>
+                                <span><i>Mức đóng: </i></span> <span>{item.mucDong}</span> <br />
+                                <span><i>Tỷ lệ đóng: </i></span><span>{item.tyLeDong}</span> <br />
                             </>
                         )}
                         />
-                        <TableCell type='text' style={{  whiteSpace: 'nowrap' }} content={(
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span><i>Phụ cấp chức vụ: </i></span> <span>{item.phuCapChucVu}</span> <br/>
-                                <span><i>Phụ cấp thâm niên vượt khung: </i></span> <span>{item.phuCapThamNienVuotKhung}</span> <br/>
-                                <span><i>Phụ cấp thâm niên nghề: </i></span> <span>{item.phuCapThamNienNghe}</span> <br/>
+                                <span><i>Phụ cấp chức vụ: </i></span> <span>{item.phuCapChucVu}</span> <br />
+                                <span><i>Phụ cấp thâm niên vượt khung: </i></span> <span>{item.phuCapThamNienVuotKhung}</span> <br />
+                                <span><i>Phụ cấp thâm niên nghề: </i></span> <span>{item.phuCapThamNienNghe}</span> <br />
                             </>
                         )}
                         />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                            onEdit={() => this.modal.show({ item, shcc })} onDelete={e => this.delete(e, item)} > 
+                            onEdit={() => this.modal.show({ item, shcc })} onDelete={e => this.delete(e, item)} >
                         </TableCell>
                     </tr>
                 )
@@ -200,7 +200,7 @@ class QtBaoHiemXaHoiUserPage extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-gift',
+            icon: 'fa fa-life-ring',
             title: 'Quá trình bảo hiểm xã hội',
             subTitle: <span style={{ color: 'blue' }}>Cán bộ: {name}</span>,
             breadcrumb: [

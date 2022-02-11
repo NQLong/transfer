@@ -10,8 +10,8 @@ import {
     createQtBaoHiemXaHoiStaff, deleteQtBaoHiemXaHoiStaff
 } from './redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
-import { SelectAdapter_DmDonVi} from 'modules/mdDanhMuc/dmDonVi/redux';
-import { SelectAdapter_DmChucVuV1} from 'modules/mdDanhMuc/dmChucVu/redux';
+import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
+import { SelectAdapter_DmChucVuV1 } from 'modules/mdDanhMuc/dmChucVu/redux';
 
 const EnumDateType = Object.freeze({
     0: { text: '' },
@@ -40,7 +40,7 @@ class EditModal extends AdminModal {
     onShow = (item, multiple = true) => {
         this.multiple = multiple;
         let { id, shcc, batDau, batDauType, ketThuc, ketThucType, chucVu, mucDong, phuCapChucVu, phuCapThamNienVuotKhung, phuCapThamNienNghe, tyLeDong } = item ? item : {
-            id: '', shcc: '', batDau: '', batDauType: '', ketThuc: '', ketThucType: '', chucVu: '', mucDong: '', phuCapChucVu: '',  phuCapThamNienVuotKhung: '', phuCapThamNienNghe: '', tyLeDong: ''
+            id: '', shcc: '', batDau: '', batDauType: '', ketThuc: '', ketThucType: '', chucVu: '', mucDong: '', phuCapChucVu: '', phuCapThamNienVuotKhung: '', phuCapThamNienNghe: '', tyLeDong: ''
         };
         this.setState({
             id, batDauType: batDauType ? batDauType : 'dd/mm/yyyy',
@@ -192,7 +192,7 @@ class QtBaoHiemXaHoi extends AdminPage {
         if (this.checked) this.props.getQtBaoHiemXaHoiGroupPage(pageN, pageS, pageC, this.state.filter, done);
         else this.props.getQtBaoHiemXaHoiPage(pageN, pageS, pageC, this.state.filter, done);
     }
-    
+
     groupPage = () => {
         this.checked = !this.checked;
         T.cookie('hienThiTheoCanBo', this.checked ? 1 : 0);
@@ -211,8 +211,8 @@ class QtBaoHiemXaHoi extends AdminPage {
             ketThucs[i] = ketThucs[i].trim();
         }
         for (let i = 0; i < soQt; i++) {
-            results.push(<p style={{ textTransform: 'uppercase' }}>{i+1}. Bắt đầu: <span style={{ color: 'blue' }}>{batDaus[i] ? T.dateToText(Number(batDaus[i]), batDauTypes[i] ? batDauTypes[i] : 'dd/mm/yyyy') : ''}</span> -
-                                                                        Kết thúc: <span style={{ color: 'blue' }}>{ketThucs[i] ? T.dateToText(Number(ketThucs[i]), ketThucTypes[i] ? ketThucTypes[i] : 'dd/mm/yyyy') : ''}</span></p>);
+            results.push(<p style={{ textTransform: 'uppercase' }}>{i + 1}. Bắt đầu: <span style={{ color: 'blue' }}>{batDaus[i] ? T.dateToText(Number(batDaus[i]), batDauTypes[i] ? batDauTypes[i] : 'dd/mm/yyyy') : ''}</span> -
+                Kết thúc: <span style={{ color: 'blue' }}>{ketThucs[i] ? T.dateToText(Number(ketThucs[i]), ketThucTypes[i] ? ketThucTypes[i] : 'dd/mm/yyyy') : ''}</span></p>);
         }
         return results;
     }
@@ -243,11 +243,11 @@ class QtBaoHiemXaHoi extends AdminPage {
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Cán bộ</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Chức vụ</th>
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thời gian</th> }
-                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap', textAlign: 'center' }}>Thông tin tham gia</th> }
-                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap', textAlign: 'center' }}>Thông tin phụ cấp</th> }
-                        {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quá trình</th> }
-                        {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách thời gian</th> }
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thời gian</th>}
+                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap', textAlign: 'center' }}>Thông tin tham gia</th>}
+                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap', textAlign: 'center' }}>Thông tin phụ cấp</th>}
+                        {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quá trình</th>}
+                        {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách thời gian</th>}
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
@@ -261,26 +261,26 @@ class QtBaoHiemXaHoi extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' style={{  whiteSpace: 'nowrap' }} content={item.tenChucVu}/>
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucVu} />
                         {!this.checked && <TableCell type='text' content={(
                             <>
-                                {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br/></span> : null}
-                                {item.ketThuc ? <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span><br/></span> : null}
+                                {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
+                                {item.ketThuc ? <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
                             </>
                         )}
                         />}
-                        {!this.checked && <TableCell type='text' style={{  whiteSpace: 'nowrap' }} content={(
+                        {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span><i>Mức đóng: </i></span> <span>{item.mucDong}</span> <br/>
-                                <span><i>Tỷ lệ đóng: </i></span><span>{item.tyLeDong}</span> <br/>
+                                <span><i>Mức đóng: </i></span> <span>{item.mucDong}</span> <br />
+                                <span><i>Tỷ lệ đóng: </i></span><span>{item.tyLeDong}</span> <br />
                             </>
                         )}
                         />}
-                        {!this.checked && <TableCell type='text' style={{  whiteSpace: 'nowrap' }} content={(
+                        {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span><i>Phụ cấp chức vụ: </i></span> <span>{item.phuCapChucVu}</span> <br/>
-                                <span><i>Phụ cấp thâm niên vượt khung: </i></span> <span>{item.phuCapThamNienVuotKhung}</span> <br/>
-                                <span><i>Phụ cấp thâm niên nghề: </i></span> <span>{item.phuCapThamNienNghe}</span> <br/>
+                                <span><i>Phụ cấp chức vụ: </i></span> <span>{item.phuCapChucVu}</span> <br />
+                                <span><i>Phụ cấp thâm niên vượt khung: </i></span> <span>{item.phuCapThamNienVuotKhung}</span> <br />
+                                <span><i>Phụ cấp thâm niên nghề: </i></span> <span>{item.phuCapThamNienNghe}</span> <br />
                             </>
                         )}
                         />}
@@ -304,7 +304,7 @@ class QtBaoHiemXaHoi extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-gift',
+            icon: 'fa fa-life-ring',
             title: 'Quá trình bảo hiểm xã hội',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
@@ -314,21 +314,21 @@ class QtBaoHiemXaHoi extends AdminPage {
                 <div className='row'>
                     <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-3' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />
                     <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-3' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />
-                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1}/>
-                    <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1}/>
+                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
                 </div>
             </>,
             content: <>
                 <div className='tile'>
-                <FormCheckbox label='Hiển thị theo cán bộ' ref={e => this.hienThiTheoCanBo = e} onChange={this.groupPage} />
+                    <FormCheckbox label='Hiển thị theo cán bộ' ref={e => this.hienThiTheoCanBo = e} onChange={this.groupPage} />
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createQtBaoHiemXaHoiStaff} update={this.props.updateQtBaoHiemXaHoiStaff}
-                     permissions={currentPermissions}
-                    />
+                    permissions={currentPermissions}
+                />
             </>,
             backRoute: '/user/tccb',
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
