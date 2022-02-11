@@ -4,6 +4,7 @@ import { getStaffEdit, userGetStaff } from '../tccbCanBo/redux';
 // Reducer ------------------------------------------------------------------------------------------------------------
 const QtHocTapCongTacGetAll = 'QtHocTapCongTac:GetAll';
 const QtHocTapCongTacGetPage = 'QtHocTapCongTac:GetPage';
+const QtHocTapCongTacGetUserPage = 'QtHocTapCongTac:GetUserPage';
 const QtHocTapCongTacGetGroupPage = 'QtHocTapCongTac:GetGroupPage';
 const QtHocTapCongTacUpdate = 'QtHocTapCongTac:Update';
 const QtHocTapCongTacGet = 'QtHocTapCongTac:Get';
@@ -16,6 +17,8 @@ export default function QtHocTapCongTacReducer(state = null, data) {
             return Object.assign({}, state, { page_gr: data.page });
         case QtHocTapCongTacGetPage:
             return Object.assign({}, state, { page: data.page });
+        case QtHocTapCongTacGetUserPage:
+            return Object.assign({}, state, { user_page: data.page });
         case QtHocTapCongTacGet:
             return Object.assign({}, state, { selectedItem: data.item });
         case QtHocTapCongTacUpdate:
@@ -49,6 +52,79 @@ export default function QtHocTapCongTacReducer(state = null, data) {
 }
 
 // Actions ------------------------------------------------------------------------------------------------------------
+T.initPage('userPageQtHocTapCongTac');
+export function getQtHocTapCongTacUserPage(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('userPageQtHocTapCongTac', pageNumber, pageSize, pageCondition, filter);
+    return dispatch => {
+        const url = `/api/user/qua-trinh/hoc-tap-cong-tac/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách học tập, công tác bị lỗi!', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (page.filter) data.page.filter = page.filter;
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                if (done) done(data.page);
+                dispatch({ type: QtHocTapCongTacGetUserPage, page: data.page });
+            }
+        }, () => T.notify('Lấy danh sách học tập, công tác bị lỗi!', 'danger'));
+    };
+}
+
+export function updateQtHocTapCongTacUserPage(id, changes, done) {
+    return dispatch => {
+        const url = '/api/user/qua-trinh/hoc-tap-cong-tac';
+        T.put(url, { id, changes }, data => {
+            if (data.error || changes == null) {
+                T.notify('Cập nhật học tập, công tác bị lỗi!', 'danger');
+                console.error(`PUT: ${url}.`, data.error);
+                done && done(data.error);
+            } else {
+                T.notify('Cập nhật học tập, công tác thành công!', 'success');
+                done && done(data.item);
+                dispatch(getQtHocTapCongTacUserPage());
+            }
+        }, () => T.notify('Cập nhật học tập, công tác bị lỗi!', 'danger'));
+    };
+}
+
+export function createQtHocTapCongTacUserPage(data, done) {
+    return dispatch => {
+        const url = '/api/user/qua-trinh/hoc-tap-cong-tac';
+        T.post(url, { data }, res => {
+            if (res.error) {
+                T.notify('Tạo học tập, công tác bị lỗi!', 'danger');
+                console.error(`POST: ${url}.`, res.error);
+            } else {
+                if (done) {
+                    T.notify('Tạo học tập, công tác thành công!', 'success');
+                    dispatch(getQtHocTapCongTacUserPage());
+                    done && done(data);
+                }
+            }
+        }, () => T.notify('Tạo học tập, công tác bị lỗi!', 'danger'));
+    };
+}
+export function deleteQtHocTapCongTacUserPage(id, done) {
+    return dispatch => {
+        const url = '/api/user/qua-trinh/hoc-tap-cong-tac';
+        T.delete(url, { id }, data => {
+            if (data.error) {
+                T.notify('Xóa học tập, công tác bị lỗi!', 'danger');
+                console.error(`DELETE: ${url}.`, data.error);
+            } else {
+                T.alert('học tập, công tác đã xóa thành công!', 'success', false, 800);
+                done && done(data.item);
+                dispatch(getQtHocTapCongTacUserPage());
+            }
+        }, () => T.notify('Xóa học tập, công tác bị lỗi!', 'danger'));
+    };
+}
+
 T.initPage('pageQtHocTapCongTac');
 export function getQtHocTapCongTacPage(pageNumber, pageSize, pageCondition, filter, done) {
     if (typeof filter === 'function') {

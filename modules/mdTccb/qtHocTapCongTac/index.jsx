@@ -17,5 +17,9 @@ export default {
             path: '/user/tccb/qua-trinh/hoc-tap-cong-tac',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
+        {
+            path: '/user/hoc-tap-cong-tac',
+            component: Loadable({ loading: Loading, loader: () => import('./staffPage') })
+        },
     ],
 };
