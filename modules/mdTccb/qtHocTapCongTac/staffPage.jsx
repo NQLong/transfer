@@ -1,11 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, AdminModal, FormRichTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
-    updateQtKeoDaiCongTacUserPage, deleteQtKeoDaiCongTacUserPage,
-    createQtKeoDaiCongTacUserPage, getQtKeoDaiCongTacUserPage,
+    updateQtHocTapCongTacUserPage, deleteQtHocTapCongTacUserPage,
+    createQtHocTapCongTacUserPage, getQtHocTapCongTacUserPage,
 } from './redux';
 import { DateInput } from 'view/component/Input';
 import Dropdown from 'view/component/Dropdown';
@@ -31,8 +31,8 @@ class EditModal extends AdminModal {
     };    
 
     onShow = (item) => {
-        let { id, soHieuVanBan, batDau, batDauType, ketThuc, ketThucType } = item && item.item ? item.item : {
-            id: '', ho: '', ten: '', soHieuVanBan: '', batDau: '', batDauType: '', ketThuc: '', ketThucType: ''
+        let { id, noiDung, batDau, batDauType, ketThuc, ketThucType } = item && item.item ? item.item : {
+            id: '', ho: '', ten: '', noiDung: '', batDau: '', batDauType: '', ketThuc: '', ketThucType: ''
         };
         this.setState({
             id, batDauType: batDauType ? batDauType : 'dd/mm/yyyy',
@@ -45,7 +45,7 @@ class EditModal extends AdminModal {
             this.ketThucType.setText({ text: ketThucType ? ketThucType : 'dd/mm/yyyy' });
             this.batDau.setVal(batDau ? batDau : '');
             this.ketThuc.setVal(ketThuc);
-            this.soHieuVanBan.value(soHieuVanBan ? soHieuVanBan : '');
+            this.noiDung.value(noiDung ? noiDung : '');
         }, 500);
     }
 
@@ -57,10 +57,13 @@ class EditModal extends AdminModal {
             batDau: this.batDau.getVal(),
             ketThucType: this.state.ketThucType,
             ketThuc: this.ketThuc.getVal(),
-            soHieuVanBan: this.soHieuVanBan.value()
+            noiDung: this.noiDung.value()
         };
-        if (!this.batDau.getVal()) {
-            T.notify('Ngày bắt đầu kéo dài công tác trống', 'danger');
+        if (!this.noiDung.value()) {
+            T.notify('Nội dung học tập, công tác trống', 'danger');
+            this.noiDung.focus();
+        } else if (!this.batDau.getVal()) {
+            T.notify('Ngày bắt đầu học tập, công tác trống', 'danger');
             this.batDau.focus();
         } else {
             this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
@@ -70,10 +73,11 @@ class EditModal extends AdminModal {
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
-            title: this.state.id ? 'Cập nhật thông tin kéo dài công tác' : 'Tạo mới thông tin kéo dài công tác',
+            title: this.state.id ? 'Cập nhật thông tin học tập công tác' : 'Tạo mới thông tin học tập công tác',
             size: 'large',
             body: <div className='row'>
-                <FormTextBox className='col-md-12' ref={e => this.soHieuVanBan = e} label='Số hiệu văn bản' readOnly={readOnly} />
+                <FormRichTextBox className='col-md-12' ref={e => this.noiDung = e} rows={2} label='Nội dung' placeholder='Nhập nội dung (tối đa 200 ký tự)' required maxLength={200} />
+
                 <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
                     label={
                         <div style={{ display: 'flex' }}>Thời gian bắt đầu (định dạng:&nbsp; <Dropdown ref={e => this.batDauType = e}
@@ -93,7 +97,7 @@ class EditModal extends AdminModal {
     }
 }
 
-class QtKeoDaiCongTacUserPage extends AdminPage {
+class QtHocTapCongTacUserPage extends AdminPage {
     state = { filter: {} };
     componentDidMount() {
         T.ready('/user', () => {
@@ -104,7 +108,7 @@ class QtKeoDaiCongTacUserPage extends AdminPage {
     }
 
     getPage = (pageN, pageS, pageC, done) => {
-        this.props.getQtKeoDaiCongTacUserPage(pageN, pageS, pageC, this.state.filter, done);
+        this.props.getQtHocTapCongTacUserPage(pageN, pageS, pageC, this.state.filter, done);
     }
 
     showModal = (e) => {
@@ -113,10 +117,10 @@ class QtKeoDaiCongTacUserPage extends AdminPage {
     }
 
     delete = (e, item) => {
-        T.confirm('Xóa thông tin kéo dài công tác', 'Bạn có chắc bạn muốn xóa thông tin kéo dài công tác này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtKeoDaiCongTacUserPage(item.id, error => {
-                if (error) T.notify(error.message ? error.message : 'Xoá thông tin kéo dài công tác bị lỗi!', 'danger');
-                else T.alert('Xoá thông tin kéo dài công tác thành công!', 'success', false, 800);
+        T.confirm('Xóa thông tin học tập công tác', 'Bạn có chắc bạn muốn xóa thông tin học tập công tác này?', 'warning', true, isConfirm => {
+            isConfirm && this.props.deleteQtHocTapCongTacUserPage(item.id, error => {
+                if (error) T.notify(error.message ? error.message : 'Xoá thông tin học tập công tác bị lỗi!', 'danger');
+                else T.alert('Xoá thông tin học tập công tác thành công!', 'success', false, 800);
             });
         });
         e.preventDefault();
@@ -133,7 +137,7 @@ class QtKeoDaiCongTacUserPage extends AdminPage {
         const { isStaff, shcc } = this.props.system && this.props.system.user ? this.props.system.user : { isStaff: false, shcc: '' };
         const { firstName, lastName } = isStaff && this.props.system.user || { firstName: '', lastName: '' };
         const name = isStaff ? `${lastName} ${firstName} (${shcc})` : '';
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtKeoDaiCongTac && this.props.qtKeoDaiCongTac.user_page ? this.props.qtKeoDaiCongTac.user_page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtHocTapCongTac && this.props.qtHocTapCongTac.user_page ? this.props.qtHocTapCongTac.user_page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -141,8 +145,7 @@ class QtKeoDaiCongTacUserPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thời gian</th>
-                        <th style={{ width: '100%', whiteSpace: 'nowrap', textAlign: 'center' }}>Số hiệu văn bản</th>
+                        <th style={{ width: '100%', whiteSpace: 'nowrap', textAlign: 'center' }}>Nội dung</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
@@ -151,12 +154,12 @@ class QtKeoDaiCongTacUserPage extends AdminPage {
                         <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
                         <TableCell type='text' content={(
                             <>
-                                {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br/></span> : null}
-                                {item.ketThuc ? <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span><br/></span> : null}
+                                <span><i>{item.noiDung ? item.noiDung : ''}</i></span> <br /> <br />
+                                {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
+                                {item.ketThuc ? <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
                             </>
                         )}
                         />
-                        <TableCell type='text' style={{  whiteSpace: 'nowrap' }} content={item.soHieuVanBan}/>            
                         {
                             <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                                 onEdit={() => this.modal.show({ item, shcc })} onDelete={this.delete} >
@@ -169,11 +172,11 @@ class QtKeoDaiCongTacUserPage extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-calendar',
-            title: 'Quá trình kéo dài công tác',
+            title: 'Quá trình học tập, công tác',
             subTitle: <span style={{ color: 'blue' }}>Cán bộ: {name}</span>,
             breadcrumb: [
                 <Link key={0} to='/user/'>Trang cá nhân</Link>,
-                'Kéo dài công tác'
+                'Học tập, công tác'
             ],
             content: <>
                 <div className='tile'>
@@ -182,7 +185,7 @@ class QtKeoDaiCongTacUserPage extends AdminPage {
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} shcc={this.shcc} readOnly={!permission.write}
-                    create={this.props.createQtKeoDaiCongTacUserPage} update={this.props.updateQtKeoDaiCongTacUserPage}
+                    create={this.props.createQtHocTapCongTacUserPage} update={this.props.updateQtHocTapCongTacUserPage}
                 />
             </>,
             backRoute: '/user',
@@ -191,9 +194,9 @@ class QtKeoDaiCongTacUserPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtKeoDaiCongTac: state.tccb.qtKeoDaiCongTac });
+const mapStateToProps = state => ({ system: state.system, qtHocTapCongTac: state.tccb.qtHocTapCongTac });
 const mapActionsToProps = {
-    updateQtKeoDaiCongTacUserPage, deleteQtKeoDaiCongTacUserPage,
-    createQtKeoDaiCongTacUserPage, getQtKeoDaiCongTacUserPage,
+    updateQtHocTapCongTacUserPage, deleteQtHocTapCongTacUserPage,
+    createQtHocTapCongTacUserPage, getQtHocTapCongTacUserPage,
 };
-export default connect(mapStateToProps, mapActionsToProps)(QtKeoDaiCongTacUserPage);
+export default connect(mapStateToProps, mapActionsToProps)(QtHocTapCongTacUserPage);
