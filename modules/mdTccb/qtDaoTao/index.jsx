@@ -10,6 +10,10 @@ export default {
     },
     routes: [
         {
+            path: '/user/dao-tao',
+            component: Loadable({ loading: Loading, loader: () => import('./staffPage') })
+        },
+        {
             path: '/user/tccb/qua-trinh/dao-tao',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
