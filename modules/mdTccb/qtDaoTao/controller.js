@@ -2,11 +2,19 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3016: { title: 'Quá trình đào tạo', link: '/user/tccb/qua-trinh/dao-tao', icon: 'fa-podcast', backgroundColor: '#635118', groupIndex: 4},
+            3016: { title: 'Quá trình đào tạo', link: '/user/tccb/qua-trinh/dao-tao', icon: 'fa-podcast', backgroundColor: '#635118', groupIndex: 4 },
+        },
+    };
+
+    const menuStaff = {
+        parentMenu: app.parentMenu.user,
+        menus: {
+            1011: { title: 'Đào tạo', link: '/user/dao-tao', icon: 'fa-podcast', backgroundColor: '#635118', groupIndex: 4 },
         },
     };
 
     app.permission.add(
+        { name: 'staff:login', menu: menuStaff },
         { name: 'qtDaoTao:read', menu },
         { name: 'qtDaoTao:write' },
         { name: 'qtDaoTao:delete' },
@@ -14,6 +22,7 @@ module.exports = app => {
     app.get('/user/tccb/qua-trinh/dao-tao/:stt', app.permission.check('qtDaoTao:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/dao-tao', app.permission.check('qtDaoTao:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/dao-tao/:ma', app.permission.check('qtHocTapCongTac:read'), app.templates.admin);
+    app.get('/user/dao-tao', app.permission.check('staff:login'), app.templates.admin);
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
 
@@ -32,7 +41,7 @@ module.exports = app => {
             }
         });
     });
-    
+
     app.get('/api/tccb/qua-trinh/dao-tao/group/page/:pageNumber/:pageSize', app.permission.check('qtDaoTao:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),

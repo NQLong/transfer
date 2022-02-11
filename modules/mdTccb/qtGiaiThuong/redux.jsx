@@ -81,7 +81,7 @@ export function getQtGiaiThuongGroupPage(pageNumber, pageSize, pageCondition, fi
     const page = T.updatePage('groupPageQtGiaiThuong', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/tccb/qua-trinh/giai-thuong/group/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition, filter: page.filter}, data => {
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách giải thưởng bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);

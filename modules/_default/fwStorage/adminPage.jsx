@@ -74,7 +74,7 @@ class FileModal extends React.Component {
                                 <textarea name='message' id='note' className='form-control' style={{ fontSize: '17px' }} ref={this.message} cols='30' rows='5' placeholder={'Ghi chú'} />
                             </div>
                             <div className='form-group' style={{ display: this.state.id ? 'none' : 'block' }}>
-                                <label>Hình đại diện</label>
+                                <label>Tệp tin tải lên</label>
                                 <FileBox ref={this.fileBox} postUrl='/user/upload-file' ajax={false} uploadType='assets' success={this.props.onSuccess} />
                             </div>
                         </div>

@@ -62,7 +62,7 @@ class EditModal extends AdminModal {
             size: 'large',
             body: <div className='row'>
                 <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={true} required />
-                <FormRichTextBox className='col-12' ref={e => this.tenGiaiThuong = e} label={'Giải thưởng'} type='text' required readOnly={readOnly}/>
+                <FormRichTextBox className='col-12' ref={e => this.tenGiaiThuong = e} label={'Giải thưởng'} type='text' required readOnly={readOnly} />
                 <FormRichTextBox className='col-12' ref={e => this.noiDung = e} label={'Nội dung giải thưởng'} type='text' readOnly={readOnly} />
                 <FormTextBox className='col-9' ref={e => this.noiCap = e} label={'Nơi cấp giải thưởng'} type='text' readOnly={readOnly} />
                 <FormTextBox className='col-md-3' ref={e => this.namCap = e} label='Năm đạt giải (yyyy)' type='year' required readOnly={readOnly} />
@@ -153,25 +153,25 @@ class QtGiaiThuongGroupPage extends AdminPage {
                         <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
                         <TableCell type='text' content={(
                             <>
-                                <span><b>{item.tenGiaiThuong}</b></span> <br/>
-                                <span><i>{item.noiDung}</i></span> <br/> <br/>
+                                <span><b>{item.tenGiaiThuong}</b></span> <br />
+                                <span><i>{item.noiDung}</i></span> <br /> <br />
                                 <span>Cán bộ đạt giải:
                                     <a href='#' onClick={() => this.modal.show(item)}>
-                                        <span style={{color: 'blue'}}>{' ' + (item.hoCanBo ? item.hoCanBo : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo : ' ') + ' - ' + item.shcc} </span>
+                                        <span style={{ color: 'blue' }}>{' ' + (item.hoCanBo ? item.hoCanBo : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo : ' ') + ' - ' + item.shcc} </span>
                                     </a>
                                 </span>
 
                             </>
-                            
+
                         )} />
                         <TableCell type='text' content={(
                             <>
-                                <span>Nơi cấp giải thưởng: <span><i>{item.noiCap}</i></span></span> <br/> <br/>
-                                <span>Năm cấp giải thưởng: <span style={{color: 'blue'}}>{item.namCap}</span></span> 
+                                <span>Nơi cấp giải thưởng: <span><i>{item.noiCap}</i></span></span> <br /> <br />
+                                <span>Năm cấp giải thưởng: <span style={{ color: 'blue' }}>{item.namCap}</span></span>
 
                             </>
-                            
-                        )} 
+
+                        )}
                         />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={this.delete} >
@@ -191,7 +191,7 @@ class QtGiaiThuongGroupPage extends AdminPage {
             advanceSearch: <>
                 <div className='row'>
                     <FormTextBox className='col-md-3' ref={e => this.fromYear = e} label='Từ năm đạt giải(yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
-                    <FormTextBox className='col-md-3' ref={e => this.toYear = e} label='Đến năm đạt giải (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />  
+                    <FormTextBox className='col-md-3' ref={e => this.toYear = e} label='Đến năm đạt giải (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
                 </div>
             </>,
             content: <>

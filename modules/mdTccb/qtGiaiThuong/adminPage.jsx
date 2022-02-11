@@ -79,7 +79,7 @@ class EditModal extends AdminModal {
             size: 'large',
             body: <div className='row'>
                 <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={this.state.id ? true : false} required />
-                <FormRichTextBox className='col-12' ref={e => this.tenGiaiThuong = e} label={'Giải thưởng'} type='text' required readOnly={readOnly}/>
+                <FormRichTextBox className='col-12' ref={e => this.tenGiaiThuong = e} label={'Giải thưởng'} type='text' required readOnly={readOnly} />
                 <FormRichTextBox className='col-12' ref={e => this.noiDung = e} label={'Nội dung giải thưởng'} type='text' readOnly={readOnly} />
                 <FormTextBox className='col-9' ref={e => this.noiCap = e} label={'Nơi cấp giải thưởng'} type='text' readOnly={readOnly} />
                 <FormTextBox className='col-md-3' ref={e => this.namCap = e} label='Năm đạt giải (yyyy)' type='year' required readOnly={readOnly} />
@@ -189,7 +189,7 @@ class QtGiaiThuong extends AdminPage {
                         {this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Số giải thưởng</th>}
                         {this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Danh sách giải thưởng</th>}
                         {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Giải thưởng</th>}
-                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nơi cấp, năm đạt giải</th> }
+                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nơi cấp, năm đạt giải</th>}
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
@@ -207,24 +207,24 @@ class QtGiaiThuong extends AdminPage {
                         {this.checked && <TableCell type='text' content={this.list(item.danhSachGiaiThuong, item.soGiaiThuong, item.soGiaiThuong)} />}
                         {!this.checked && <TableCell type='text' content={(
                             <>
-                                <span><b>{item.tenGiaiThuong}</b></span> <br/>
-                                <span><i>{item.noiDung}</i></span> <br/> <br/>
+                                <span><b>{item.tenGiaiThuong}</b></span> <br />
+                                <span><i>{item.noiDung}</i></span> <br /> <br />
                                 <span>Cán bộ đạt giải:
                                     <a href='#' onClick={() => this.modal.show(item, false)}>
-                                        <span style={{color: 'blue'}}>{' ' + (item.hoCanBo ? item.hoCanBo : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo : ' ') + ' - ' + item.shcc} </span>
+                                        <span style={{ color: 'blue' }}>{' ' + (item.hoCanBo ? item.hoCanBo : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo : ' ') + ' - ' + item.shcc} </span>
                                     </a>
                                 </span>
 
                             </>
-                            
+
                         )} />}
                         {!this.checked && <TableCell type='text' content={(
                             <>
-                                <span>Nơi cấp giải thưởng: <span><i>{item.noiCap}</i></span></span> <br/> <br/>
-                                <span>Năm đạt giải: <span style={{color: 'blue'}}>{item.namCap}</span></span> 
+                                <span>Nơi cấp giải thưởng: <span><i>{item.noiCap}</i></span></span> <br /> <br />
+                                <span>Năm đạt giải: <span style={{ color: 'blue' }}>{item.namCap}</span></span>
 
-                            </>         
-                        )} 
+                            </>
+                        )}
                         />}
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
@@ -253,9 +253,9 @@ class QtGiaiThuong extends AdminPage {
             advanceSearch: <>
                 <div className='row'>
                     <FormTextBox className='col-md-3' ref={e => this.fromYear = e} label='Từ năm đạt giải(yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
-                    <FormTextBox className='col-md-3' ref={e => this.toYear = e} label='Đến năm đạt giải (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />  
-                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1}/>
-                    <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1}/>
+                    <FormTextBox className='col-md-3' ref={e => this.toYear = e} label='Đến năm đạt giải (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
                 </div>
             </>,
             content: <>

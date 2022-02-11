@@ -122,27 +122,27 @@ const T = {
     },
 
     getCookiePageCondition: cookieName => {
-        const pageData = T.cookie(cookieName);
+        const pageData = T.storage(cookieName);
         return pageData && pageData[T.pageKeyName.pageCondition] ? pageData[T.pageKeyName.pageCondition] : '';
     },
     initPage: (cookieName) => {
-        let initData = T.cookie(cookieName);
+        let initData = T.storage(cookieName);
         if (initData[T.pageKeyName.pageNumber] == null) initData[T.pageKeyName.pageNumber] = 1;
         if (initData[T.pageKeyName.pageSize] == null) initData[T.pageKeyName.pageSize] = 50;
         if (initData[T.pageKeyName.pageCondition] == null) initData[T.pageKeyName.pageCondition] = '';
         if (initData[T.pageKeyName.filter] == null) initData[T.pageKeyName.filter] = '%%%%%%%%';
         if (initData[T.pageKeyName.advancedSearch] == null) initData[T.pageKeyName.advancedSearch] = false;
-        T.cookie(cookieName, initData);
+        T.storage(cookieName, initData);
     },
 
     updatePage: (cookieName, pageNumber, pageSize, pageCondition, filter, advancedSearch) => {
-        const updateStatus = {}, oldStatus = T.cookie(cookieName);
+        const updateStatus = {}, oldStatus = T.storage(cookieName);
         updateStatus[T.pageKeyName.pageNumber] = pageNumber ? pageNumber : oldStatus[T.pageKeyName.pageNumber];
         updateStatus[T.pageKeyName.pageSize] = pageSize ? pageSize : oldStatus[T.pageKeyName.pageSize];
         updateStatus[T.pageKeyName.pageCondition] = pageCondition != null || pageCondition == '' ? pageCondition : oldStatus[T.pageKeyName.pageCondition];
         updateStatus[T.pageKeyName.filter] = filter ? filter : oldStatus[T.pageKeyName.filter];
         updateStatus[T.pageKeyName.advancedSearch] = advancedSearch != null ? advancedSearch : oldStatus[T.pageKeyName.advancedSearch];
-        T.cookie(cookieName, updateStatus);
+        T.storage(cookieName, updateStatus);
         return {
             pageNumber: updateStatus[T.pageKeyName.pageNumber],
             pageSize: updateStatus[T.pageKeyName.pageSize],
