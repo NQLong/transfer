@@ -18,7 +18,7 @@ class EditModal extends AdminModal {
     onShow = (item) => {
         let { daNopHoSoThaiSan, ghiChu, hoSoThaiSanDuocDuyet, soBhxh,
             soThangDuocNghi, stt, thoiGianBaoTangBenBhxh, thoiGianBatDauNghi, thoiGianDiLamLai,
-            thoiGianKetThucNghi } = item ? item : {
+            thoiGianKetThucNghi } = item && item.item ? item.item : {
                 chucVu: '', daNopHoSoThaiSan: '', donVi: '', ghiChu: '', ho: '', hoSoThaiDuocDuyet: '', shcc: '', soBhxh: '',
                 soThangDuocNghi: '', stt: '', ten: '', thoiGianBaoTangBenBhxh: '', thoiGianBatDauNghi: '', thoiGianDiLamLai: '',
                 thoiGianKetThucNghi: ''
@@ -151,7 +151,7 @@ class QtNghiThaiSanUserPage extends AdminPage {
                         <TableCell type='text' content={item.thoiGianBaoTangBenBhxh} />
                         <TableCell type='text' content={item.ghiChu} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                            onEdit={() => this.modal.show(item)} onDelete={e => this.delete(e, item)} />
+                            onEdit={() => this.modal.show({ item, shcc })} onDelete={e => this.delete(e, item)} />
                     </tr>
                 )
             });

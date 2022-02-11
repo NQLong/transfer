@@ -77,10 +77,10 @@ export function getQtNghiThaiSanUserPage(pageNumber, pageSize, pageCondition, fi
     };
 }
 
-export function updateQtNghiThaiSanUserPage(id, changes, done) {
+export function updateQtNghiThaiSanUserPage(stt, changes, done) {
     return dispatch => {
         const url = '/api/user/qua-trinh/nghi-thai-san';
-        T.put(url, { id, changes }, data => {
+        T.put(url, { stt, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật nghỉ thai sản bị lỗi!', 'danger');
                 console.error(`PUT: ${url}.`, data.error);

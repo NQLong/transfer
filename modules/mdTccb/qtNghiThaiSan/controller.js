@@ -85,14 +85,14 @@ module.exports = app => {
 
     app.put('/api/user/qua-trinh/nghi-thai-san', app.permission.check('staff:login'), (req, res) => {
         if (req.body.changes && req.session.user) {
-            app.model.qtNghiThaiSan.get({ id: req.body.id }, (error, item) => {
+            app.model.qtNghiThaiSan.get({ stt: req.body.stt }, (error, item) => {
                 if (error || item == null) {
                     res.send({ error: 'Not found!' });
                 } else {
                     app.model.canBo.get({ shcc: item.shcc }, (e, r) => {
                         if (e || r == null) res.send({ error: 'Staff not found!' }); else {
                             const changes = req.body.changes;
-                            app.model.qtNghiThaiSan.update({ id: req.body.id }, changes, (error, item) => res.send({ error, item }));
+                            app.model.qtNghiThaiSan.update({ stt: req.body.stt }, changes, (error, item) => res.send({ error, item }));
                         }
                     });
                 }
@@ -124,7 +124,6 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        console.log(req.query.filter);
         const { fromYear, toYear, list_shcc, list_dv} = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null };
         app.model.qtNghiThaiSan.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, 0, searchTerm, (error, page) => {
             if (error || page == null) {
