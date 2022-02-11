@@ -17,5 +17,10 @@ export default {
             path: '/user/tccb/qua-trinh/nghi-thai-san/group/:shcc',
             component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
         },
+        {
+            path: '/user/nghi-thai-san',
+            component: Loadable({ loading: Loading, loader: () => import('./staffPage') })
+        },
+
     ],
 };

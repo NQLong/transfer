@@ -5,14 +5,23 @@ module.exports = app => {
             3015: { title: 'Quá trình nghỉ thai sản', link: '/user/tccb/qua-trinh/nghi-thai-san', icon: 'fa-bed', backgroundColor: '#515659', groupIndex: 1},
         },
     };
+    const menuStaff = {
+        parentMenu: app.parentMenu.user,
+        menus: {
+            1013: { title: 'Nghỉ thai sản', link: '/user/nghi-thai-san', icon: 'fa-bed', backgroundColor: '#515659', groupIndex: 1 },
+        },
+    };
+
     app.permission.add(
+        { name: 'staff:login', menu: menuStaff },
         { name: 'qtNghiThaiSan:read', menu },
         { name: 'qtNghiThaiSan:write' },
         { name: 'qtNghiThaiSan:delete' },
     );
     app.get('/user/tccb/qua-trinh/nghi-thai-san/:stt', app.permission.check('qtNghiThaiSan:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/nghi-thai-san', app.permission.check('qtNghiThaiSan:read'), app.templates.admin);
-
+    app.get('/user/nghi-thai-san', app.permission.check('staff:login'), app.templates.admin);
+    
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
 
@@ -63,4 +72,69 @@ module.exports = app => {
     app.delete('/api/qua-trinh/nghi-thai-san', app.permission.check('qtNghiThaiSan:delete'), (req, res) => {
         app.model.qtNghiThaiSan.delete({ stt: req.body.stt }, errors => res.send({ errors }));
     });
+
+    // //User Actions:
+    app.post('/api/user/qua-trinh/nghi-thai-san', app.permission.check('staff:login'), (req, res) => {
+        if (req.body.data && req.session.user) {
+            const data = req.body.data;
+            app.model.qtNghiThaiSan.create(data, (error, item) => res.send({ error, item }));
+        } else {
+            res.send({ error: 'Invalid parameter!' });
+        }
+    });
+
+    app.put('/api/user/qua-trinh/nghi-thai-san', app.permission.check('staff:login'), (req, res) => {
+        if (req.body.changes && req.session.user) {
+            app.model.qtNghiThaiSan.get({ id: req.body.id }, (error, item) => {
+                if (error || item == null) {
+                    res.send({ error: 'Not found!' });
+                } else {
+                    app.model.canBo.get({ shcc: item.shcc }, (e, r) => {
+                        if (e || r == null) res.send({ error: 'Staff not found!' }); else {
+                            const changes = req.body.changes;
+                            app.model.qtNghiThaiSan.update({ id: req.body.id }, changes, (error, item) => res.send({ error, item }));
+                        }
+                    });
+                }
+            });
+        } else {
+            res.send({ error: 'Invalid parameter!' });
+        }
+    });
+
+    app.delete('/api/user/qua-trinh/nghi-thai-san', app.permission.check('staff:login'), (req, res) => {
+        if (req.session.user) {
+            app.model.qtNghiThaiSan.get({ stt: req.body.stt }, (error, item) => {
+                if (error || item == null) {
+                    res.send({ error: 'Not found!' });
+                } else {
+                    app.model.canBo.get({ shcc: item.shcc }, (e, r) => {
+                        if (e || r == null) res.send({ error: 'Staff not found!' }); else {
+                            app.model.qtNghiThaiSan.delete({ stt: req.body.stt }, (error, item) => res.send({ error, item }));
+                        }
+                    });
+                }
+            });
+        } else {
+            res.send({ error: 'Invalid parameter!' });
+        }
+    });
+
+    app.get('/api/user/qua-trinh/nghi-thai-san/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+        const pageNumber = parseInt(req.params.pageNumber),
+            pageSize = parseInt(req.params.pageSize),
+            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+        console.log(req.query.filter);
+        const { fromYear, toYear, list_shcc, list_dv} = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null };
+        app.model.qtNghiThaiSan.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, 0, searchTerm, (error, page) => {
+            if (error || page == null) {
+                res.send({ error });
+            } else {
+                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
+                const pageCondition = searchTerm;
+                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
+            }
+        });
+    });
+    ///END USER ACTIONS
 };

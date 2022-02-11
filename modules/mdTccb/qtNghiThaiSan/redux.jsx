@@ -5,6 +5,7 @@ import T from 'view/js/common';
 // Reducer ------------------------------------------------------------------------------------------------------------
 const QtNghiThaiSanGetAll = 'QtNghiThaiSan:GetAll';
 const QtNghiThaiSanGetPage = 'QtNghiThaiSan:GetPage';
+const QtNghiThaiSanGetUserPage = 'QtNghiThaiSan:GetUserPage';
 const QtNghiThaiSanUpdate = 'QtNghiThaiSan:Update';
 const QtNghiThaiSanGet = 'QtNghiThaiSan:Get';
 const QtNghiThaiSanGetGroupPage = 'QtNghiThaiSan:GetGroupPage';
@@ -15,6 +16,8 @@ export default function QtNghiThaiSanReducer(state = null, data) {
             return Object.assign({}, state, { items: data.items });
         case QtNghiThaiSanGetPage:
             return Object.assign({}, state, { page: data.page });
+        case QtNghiThaiSanGetUserPage:
+            return Object.assign({}, state, { user_page: data.page });
         case QtNghiThaiSanGetGroupPage:
             return Object.assign({}, state, { page_gr: data.page });
         case QtNghiThaiSanGet:
@@ -50,6 +53,80 @@ export default function QtNghiThaiSanReducer(state = null, data) {
 }
 
 // Actions ------------------------------------------------------------------------------------------------------------
+
+T.initPage('userPageQtNghiThaiSan');
+export function getQtNghiThaiSanUserPage(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('userPageQtNghiThaiSan', pageNumber, pageSize, pageCondition, filter);
+    return dispatch => {
+        const url = `/api/user/qua-trinh/nghi-thai-san/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách nghỉ thai sản bị lỗi!', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (page.filter) data.page.filter = page.filter;
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                if (done) done(data.page);
+                dispatch({ type: QtNghiThaiSanGetUserPage, page: data.page });
+            }
+        }, () => T.notify('Lấy danh sách nghỉ thai sản bị lỗi!', 'danger'));
+    };
+}
+
+export function updateQtNghiThaiSanUserPage(id, changes, done) {
+    return dispatch => {
+        const url = '/api/user/qua-trinh/nghi-thai-san';
+        T.put(url, { id, changes }, data => {
+            if (data.error || changes == null) {
+                T.notify('Cập nhật nghỉ thai sản bị lỗi!', 'danger');
+                console.error(`PUT: ${url}.`, data.error);
+                done && done(data.error);
+            } else {
+                T.notify('Cập nhật nghỉ thai sản thành công!', 'success');
+                done && done(data.item);
+                dispatch(getQtNghiThaiSanUserPage());
+            }
+        }, () => T.notify('Cập nhật nghỉ thai sản bị lỗi!', 'danger'));
+    };
+}
+
+export function createQtNghiThaiSanUserPage(data, done) {
+    return dispatch => {
+        const url = '/api/user/qua-trinh/nghi-thai-san';
+        T.post(url, { data }, res => {
+            if (res.error) {
+                T.notify('Tạo nghỉ thai sản bị lỗi!', 'danger');
+                console.error(`POST: ${url}.`, res.error);
+            } else {
+                if (done) {
+                    T.notify('Tạo nghỉ thai sản thành công!', 'success');
+                    dispatch(getQtNghiThaiSanUserPage());
+                    done && done(data);
+                }
+            }
+        }, () => T.notify('Tạo nghỉ thai sản bị lỗi!', 'danger'));
+    };
+}
+export function deleteQtNghiThaiSanUserPage(stt, done) {
+    return dispatch => {
+        const url = '/api/user/qua-trinh/nghi-thai-san';
+        T.delete(url, { stt }, data => {
+            if (data.error) {
+                T.notify('Xóa nghỉ thai sản bị lỗi!', 'danger');
+                console.error(`DELETE: ${url}.`, data.error);
+            } else {
+                T.alert('nghỉ thai sản đã xóa thành công!', 'success', false, 800);
+                done && done(data.item);
+                dispatch(getQtNghiThaiSanUserPage());
+            }
+        }, () => T.notify('Xóa nghỉ thai sản bị lỗi!', 'danger'));
+    };
+}
+
 T.initPage('pageQtNghiThaiSan');
 export function getQtNghiThaiSanPage(pageNumber, pageSize, pageCondition, filter, done) {
     if (typeof filter === 'function') {
@@ -179,7 +256,6 @@ export function updateQtNghiThaiSanStaff(stt, changes, done, isEdit = null) {
                 T.notify('Cập nhật thông tin nghỉ thai sản bị lỗi', 'danger');
                 console.error('PUT: ' + url + '. ' + data.error);
             } else if (data.item) {
-                console.log('success');
                 T.notify('Cập nhật thông tin nghỉ thai sản thành công!', 'info');
                 isEdit ? (done && done()) : (done && done(data.item));
                 isEdit ? dispatch(getStaffEdit(changes.shcc)) : dispatch(getQtNghiThaiSanPage());
