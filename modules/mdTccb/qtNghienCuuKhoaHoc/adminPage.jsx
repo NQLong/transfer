@@ -351,8 +351,9 @@ class QtNghienCuuKhoaHoc extends AdminPage {
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
             onExport: (e) => {
                 e.preventDefault();
-                const { maDonVi, fromYear, toYear, loaiHocVi, maSoCanBo } = this.state.filter;
-
+                const { maDonVi, fromYear, toYear, loaiHocVi, maSoCanBo } = this.state.filter != '%%%%%%%%' ? this.state.filter : {
+                    maDonVi: '', fromYear: null, toYear: null, loaiHocVi: '', maSoCanBo: '',
+                };
                 T.download(T.url(`/api/qua-trinh/nckh/download-excel/${maDonVi !== '' ? maDonVi : null}/${fromYear != null ? fromYear : null}/${toYear != null ? toYear : null}/${loaiHocVi != '' ? loaiHocVi : null}/${maSoCanBo != '' ? maSoCanBo : null}`), 'NCKH.xlsx');
             }
         });
