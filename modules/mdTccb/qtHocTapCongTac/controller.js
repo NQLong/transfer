@@ -8,7 +8,7 @@ module.exports = app => {
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1011: { title: 'Học tập, công tác', link: '/user/hoc-tap-cong-tac', icon: 'fa-calendar', backgroundColor: '#30a17f', groupIndex: 1 },
+            1012: { title: 'Học tập, công tác', link: '/user/hoc-tap-cong-tac', icon: 'fa-calendar', backgroundColor: '#30a17f', groupIndex: 1 },
         },
     };
 
