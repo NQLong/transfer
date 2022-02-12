@@ -95,7 +95,7 @@ class EditModal extends AdminModal {
             title: this.state.stt ? 'Cập nhật nghỉ thai sản' : 'Tạo mới nghỉ thai sản',
             size: 'large',
             body: <div className='row'>
-                <FormSelect type='text' className='col-md-6' multiple={this.multiple} ref={e => this.shcc = e} data={SelectAdapter_FwCanBo} label='Mã thẻ cán bộ' readOnly={readOnly} />
+                <FormSelect type='text' className='col-md-12' multiple={this.multiple} ref={e => this.shcc = e} data={SelectAdapter_FwCanBo} label='Cán bộ' readOnly={this.state.stt ? true : false} />
                 <FormCheckbox className='col-md-12' ref={e => this.daNopHoSoThaiSan = e} label='Đã nộp hồ sơ' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
                     onChange={value => this.changeKichHoat(value ? 1 : 0, this.daNopHoSoThaiSan)} />
                 <FormTextBox className='col-md-6' ref={e => this.hoSoThaiSanDuocDuyet = e} label='Đã duyệt hồ sơ' readOnly={readOnly} />
@@ -233,7 +233,7 @@ class QtNghiThaiSan extends AdminPage {
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{item.ho + ' ' + item.ten}</span><br />
-                                <a href='#' onClick={() => this.modal.show(item)}>{item.shcc}</a>
+                                <a href='#' onClick={() => this.modal.show(item, false)}>{item.shcc}</a>
                             </>
                         )}
                         />
@@ -251,7 +251,7 @@ class QtNghiThaiSan extends AdminPage {
                         {this.checked && <TableCell type='text' content={this.list(item.danhSachBatDauNghi, item.danhSachKetThucNghi, item.soLanNghi)} /> }
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                                onEdit={() => this.modal.show(item)} onDelete={e => this.delete(e, item)} > </TableCell>
+                                onEdit={() => this.modal.show(item, false)} onDelete={e => this.delete(e, item)} > </TableCell>
                         }
                         {
                             this.checked &&
