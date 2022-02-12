@@ -1,7 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import xlsx from 'xlsx';
 import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormCheckbox, FormRichTextBox, FormDatePicker } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
@@ -147,7 +146,7 @@ class EditModal extends AdminModal {
                     }
                     type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} /></div>
                 <FormTextBox className='col-md-6' ref={e => this.vaiTro = e} label={'Vai trò'} type='text' required />
-                <div className='form-group col-md-6'><DateInput ref={e => this.ngayNghiemThu = e} placeholder='Thời gian kết thúc'
+                <div className='form-group col-md-6'><DateInput ref={e => this.ngayNghiemThu = e} placeholder='Thời gian nghiệm thu'
                     label={
                         <div style={{ display: 'flex' }}>Thời gian nghiệm thu (định dạng:&nbsp; <Dropdown ref={e => this.ngayNghiemThuType = e}
                             items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
@@ -271,8 +270,8 @@ class QtNghienCuuKhoaHoc extends AdminPage {
 
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                {!this.checked ? <span><a href='#' onClick={(e) => {e.preventDefault(); this.modal.show(item, false);}}>{(item.hoCanBo ? item.hoCanBo : '' )+ ' ' + (item.tenCanBo ? item.tenCanBo : '')}</a><br /></span> :
-                                <span style={{ color: 'blue' }}>{(item.hoCanBo ? item.hoCanBo : '' )+ ' ' + (item.tenCanBo ? item.tenCanBo : '')}<br/></span>}
+                                {!this.checked ? <span><a href='#' onClick={(e) => { e.preventDefault(); this.modal.show(item, false); }}>{(item.hoCanBo ? item.hoCanBo : '') + ' ' + (item.tenCanBo ? item.tenCanBo : '')}</a><br /></span> :
+                                    <span style={{ color: 'blue' }}>{(item.hoCanBo ? item.hoCanBo : '') + ' ' + (item.tenCanBo ? item.tenCanBo : '')}<br /></span>}
                                 {item.shcc + (item.hocViCanBo ? ' - ' + item.hocViCanBo : '')}<br />
 
                             </>
@@ -331,9 +330,9 @@ class QtNghienCuuKhoaHoc extends AdminPage {
                         { id: '04', text: 'Cử nhân' },
                         { id: '03', text: 'Thạc sĩ' },
                         { id: '02', text: 'Tiến sĩ' },
-                    ]} onChange={() => this.changeAdvancedSearch()} multiple={true} allowClear={true} minimumResultsForSearch={-1}/>
-                    <FormSelect className='col-12 col-md-3' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1}/>
-                    <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1}/>
+                    ]} onChange={() => this.changeAdvancedSearch()} multiple={true} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-12 col-md-3' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
                 </div>
             </>,
             content: <>
@@ -350,7 +349,12 @@ class QtNghienCuuKhoaHoc extends AdminPage {
             </>,
             backRoute: '/user/tccb',
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
-            onExport: () => xlsx.writeFile(xlsx.utils.table_to_book(document.querySelector('.table')), this.constructor.name + '.xlsx')
+            onExport: (e) => {
+                e.preventDefault();
+                const { maDonVi, fromYear, toYear, loaiHocVi, maSoCanBo } = this.state.filter;
+
+                T.download(T.url(`/api/qua-trinh/nckh/download-excel/${maDonVi !== '' ? maDonVi : null}/${fromYear != null ? fromYear : null}/${toYear != null ? toYear : null}/${loaiHocVi != '' ? loaiHocVi : null}/${maSoCanBo != '' ? maSoCanBo : null}`), 'NCKH.xlsx');
+            }
         });
     }
 }
