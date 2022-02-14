@@ -699,9 +699,9 @@ export class CirclePageButton extends React.Component {
         } else if (type == 'search') {
             result = <button {...properties} className='btn btn-primary btn-circle'><i className='fa fa-lg fa-search' /></button>;
         } else if (type == 'create') {
-            result = <button {...properties} className='btn btn-success btn-circle'><i className='fa fa-lg fa-plus' /></button>;
+            result = <button {...properties} className='btn btn-warning btn-circle'><i className='fa fa-lg fa-plus' /></button>;
         } else if (type == 'export') {
-            result = <button {...properties} className='btn btn-success btn-circle'><i className='fa fa-lg fa-cloud-download' /></button>;
+            result = <button {...properties} className='btn btn-success btn-circle'><i className='fa fa-lg fa-file-excel-o' /></button>;
         } else if (type == 'import') {
             result = <button {...properties} className='btn btn-success btn-circle'><i className='fa fa-lg fa-cloud-upload' /></button>;
         } else if (type == 'delete') {

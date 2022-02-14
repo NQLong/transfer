@@ -138,9 +138,9 @@ module.exports = app => {
                         cells.push({ cell: 'C' + (index + 2), border: '1234', value: hoTen });
                         cells.push({ cell: 'D' + (index + 2), border: '1234', value: item.tenDeTai });
                         cells.push({ cell: 'E' + (index + 2), border: '1234', value: item.maSoCapQuanLy });
-                        cells.push({ cell: 'F' + (index + 2), border: '1234', value: item.batDau ? app.date.dateTimeFormat(new Date(item.batDau), item.batDauType ? item.batDauType : 'dd/mm/yyyy') : '' });
-                        cells.push({ cell: 'G' + (index + 2), border: '1234', value: item.ketThuc != null ? app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : '' });
-                        cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.ngayNghiemThu ? app.date.dateTimeFormat(new Date(item.ngayNghiemThu), item.ngayNghiemThuType ? item.ngayNghiemThuType : 'dd/mm/yyyy') : '' });
+                        cells.push({ cell: 'F' + (index + 2), alignment: 'center', border: '1234', value: item.batDau ? app.date.dateTimeFormat(new Date(item.batDau), item.batDauType ? item.batDauType : 'dd/mm/yyyy') : '' });
+                        cells.push({ cell: 'G' + (index + 2), alignment: 'center', border: '1234', value: item.ketThuc != null ? app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : '' });
+                        cells.push({ cell: 'H' + (index + 2), alignment: 'center', border: '1234', value: item.ngayNghiemThu ? app.date.dateTimeFormat(new Date(item.ngayNghiemThu), item.ngayNghiemThuType ? item.ngayNghiemThuType : 'dd/mm/yyyy') : '' });
                         cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.vaiTro ? item.vaiTro : '' });
                         cells.push({ cell: 'J' + (index + 2), border: '1234', value: item.ketQua ? item.ketQua : '' });
                     });
