@@ -82,14 +82,14 @@ class EditModal extends AdminModal {
                     noiDung: this.noiDung.value()
                 };
                 if (index == list_ma.length - 1) {
-                    this.state.id ? this.props.update(this.state.id, changes, this.hide, false) : this.props.create(changes, this.hide, false);
+                    this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
                     this.setState({
                         id: ''
                     });
                     this.maCanBo.reset();
                 }
                 else {
-                    this.state.id ? this.props.update(this.state.id, changes, null, false) : this.props.create(changes, null, false);
+                    this.state.id ? this.props.update(this.state.id, changes, null) : this.props.create(changes, null);
                 }
             });
         }
@@ -198,7 +198,7 @@ class QtHocTapCongTac extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa quá trình học tập, công tác', 'Bạn có chắc bạn muốn xóa quá trình học tập, công tác này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtHocTapCongTacStaff(item.id, false, null, error => {
+            isConfirm && this.props.deleteQtHocTapCongTacStaff(item.id, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá quá trình học tập, công tác bị lỗi!', 'danger');
                 else T.alert('Xoá quá trình học tập, công tác thành công!', 'success', false, 800);
             });

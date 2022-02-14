@@ -80,14 +80,14 @@ class EditModal extends AdminModal {
                     soHieuVanBan: this.soHieuVanBan.value()
                 };
                 if (index == list_ma.length - 1) {
-                    this.state.id ? this.props.update(this.state.id, changes, this.hide, false) : this.props.create(changes, this.hide, false);
+                    this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
                     this.setState({
                         id: ''
                     });
                     this.shcc.reset();
                 }
                 else {
-                    this.state.id ? this.props.update(this.state.id, changes, null, false) : this.props.create(changes, null, false);
+                    this.state.id ? this.props.update(this.state.id, changes, null) : this.props.create(changes, null);
                 }
             });
         }
@@ -203,7 +203,7 @@ class QtKeoDaiCongTac extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa quá trình kéo dài công tác', 'Bạn có chắc bạn muốn xóa quá trình kéo dài công tác này', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtKeoDaiCongTacStaff(item.id, false, null, error => {
+            isConfirm && this.props.deleteQtKeoDaiCongTacStaff(item.id, error => {
                 if (error) T.notify(error.message ? error.message : `Xoá quá trình kéo dài công tác ${item.ten} bị lỗi!`, 'danger');
                 else T.alert(`Xoá quá trình kéo dài công tác ${item.ten} thành công!`, 'success', false, 800);
             });

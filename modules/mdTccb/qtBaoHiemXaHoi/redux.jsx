@@ -1,5 +1,5 @@
 import T from 'view/js/common';
-import { getStaffEdit, userGetStaff } from '../tccbCanBo/redux';
+import { userGetStaff } from '../tccbCanBo/redux';
 
 // Reducer ------------------------------------------------------------------------------------------------------------
 const QtBaoHiemXaHoiGetAll = 'QtBaoHiemXaHoi:GetAll';
@@ -220,7 +220,7 @@ export function deleteQtBaoHiemXaHoiGroupPageMa(id, done) {
         }, () => T.notify('Xóa bảo hiểm xã hội bị lỗi!', 'danger'));
     };
 }
-export function createQtBaoHiemXaHoiStaff(data, done, isEdit = null) {
+export function createQtBaoHiemXaHoiStaff(data, done) {
     return dispatch => {
         const url = '/api/tccb/qua-trinh/bao-hiem-xa-hoi';
         T.post(url, { data }, res => {
@@ -228,23 +228,17 @@ export function createQtBaoHiemXaHoiStaff(data, done, isEdit = null) {
                 T.notify('Thêm thông tin bảo hiểm xã hội bị lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
-                T.notify('Thêm thông tin bảo hiểm xã hội thành công!', 'info');
                 if (done) {
-                    if (isEdit) {
-                        done();
-                        dispatch(getStaffEdit(data.shcc));
-                    }
-                    else {
-                        done(data);
-                        dispatch(getQtBaoHiemXaHoiPage());
-                    }
+                    T.notify('Thêm thông tin bảo hiểm xã hội thành công!', 'info');
+                    done(data);
+                    dispatch(getQtBaoHiemXaHoiPage());
                 }
             }
         }, () => T.notify('Thêm thông tin bảo hiểm xã hội bị lỗi', 'danger'));
     };
 }
 
-export function updateQtBaoHiemXaHoiStaff(id, changes, done, isEdit = null) {
+export function updateQtBaoHiemXaHoiStaff(id, changes, done) {
     return dispatch => {
         const url = '/api/tccb/qua-trinh/bao-hiem-xa-hoi';
         T.put(url, { id, changes }, data => {
@@ -253,14 +247,14 @@ export function updateQtBaoHiemXaHoiStaff(id, changes, done, isEdit = null) {
                 console.error('PUT: ' + url + '. ' + data.error);
             } else if (data.item) {
                 T.notify('Cập nhật thông tin bảo hiểm xã hội thành công!', 'info');
-                isEdit ? (done && done()) : (done && done(data.item));
-                isEdit ? dispatch(getStaffEdit(changes.shcc)) : dispatch(getQtBaoHiemXaHoiPage());
+                done && done(data.item);
+                dispatch(getQtBaoHiemXaHoiPage());
             }
         }, () => T.notify('Cập nhật thông tin bảo hiểm xã hội bị lỗi', 'danger'));
     };
 }
 
-export function deleteQtBaoHiemXaHoiStaff(id, isEdit, shcc = null) {
+export function deleteQtBaoHiemXaHoiStaff(id, done) {
     return dispatch => {
         const url = '/api/tccb/qua-trinh/bao-hiem-xa-hoi';
         T.delete(url, { id }, data => {
@@ -269,7 +263,8 @@ export function deleteQtBaoHiemXaHoiStaff(id, isEdit, shcc = null) {
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
                 T.alert('Thông tin bảo hiểm xã hội được xóa thành công!', 'info', false, 800);
-                isEdit ? dispatch(getStaffEdit(shcc)) : dispatch(getQtBaoHiemXaHoiPage());
+                done && done(data.item);
+                dispatch(getQtBaoHiemXaHoiPage());
             }
         }, () => T.notify('Xóa thông tin bảo hiểm xã hội bị lỗi', 'danger'));
     };

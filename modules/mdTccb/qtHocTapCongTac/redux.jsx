@@ -1,5 +1,5 @@
 import T from 'view/js/common';
-import { getStaffEdit, userGetStaff } from '../tccbCanBo/redux';
+import { userGetStaff } from '../tccbCanBo/redux';
 
 // Reducer ------------------------------------------------------------------------------------------------------------
 const QtHocTapCongTacGetAll = 'QtHocTapCongTac:GetAll';
@@ -171,7 +171,7 @@ export function getQtHocTapCongTacGroupPage(pageNumber, pageSize, pageCondition,
     };
 }
 
-export function createQtHocTapCongTacStaff(data, done, isEdit = null) {
+export function createQtHocTapCongTacStaff(data, done) {
     return dispatch => {
         const url = '/api/qua-trinh/htct';
         T.post(url, { data }, res => {
@@ -181,21 +181,15 @@ export function createQtHocTapCongTacStaff(data, done, isEdit = null) {
             } else {
                 if (done) {
                     T.notify('Tạo học tập, công tác thành công!', 'success');
-                    if (isEdit) {
-                        done();
-                        dispatch(getStaffEdit(data.shcc));
-                    }
-                    else {
-                        done(data);
-                        dispatch(getQtHocTapCongTacPage());
-                    }
+                    done(data);
+                    dispatch(getQtHocTapCongTacPage());
                 }
             }
         }, () => T.notify('Tạo học tập, công tác bị lỗi!', 'danger'));
     };
 }
 
-export function deleteQtHocTapCongTacStaff(id, shcc, idEdit = null) {
+export function deleteQtHocTapCongTacStaff(id, done) {
     return dispatch => {
         const url = '/api/qua-trinh/htct';
         T.delete(url, { id }, data => {
@@ -204,13 +198,14 @@ export function deleteQtHocTapCongTacStaff(id, shcc, idEdit = null) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('học tập, công tác đã xóa thành công!', 'success', false, 800);
-                idEdit ? dispatch(getStaffEdit(shcc)) : dispatch(getQtHocTapCongTacPage());
+                done && done(data.item);
+                dispatch(getQtHocTapCongTacPage());
             }
         }, () => T.notify('Xóa học tập, công tác bị lỗi!', 'danger'));
     };
 }
 
-export function updateQtHocTapCongTacStaff(id, changes, done, isEdit = null) {
+export function updateQtHocTapCongTacStaff(id, changes, done) {
     return dispatch => {
         const url = '/api/qua-trinh/htct';
         T.put(url, { id, changes }, data => {
@@ -220,8 +215,8 @@ export function updateQtHocTapCongTacStaff(id, changes, done, isEdit = null) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật học tập, công tác thành công!', 'success');
-                isEdit ? (done && done()) : (done && done(data.item));
-                isEdit ? dispatch(getStaffEdit(changes.shcc)) : dispatch(getQtHocTapCongTacPage());
+                done && done(data.item);
+                dispatch(getQtHocTapCongTacPage());
             }
         }, () => T.notify('Cập nhật học tập, công tác bị lỗi!', 'danger'));
     };

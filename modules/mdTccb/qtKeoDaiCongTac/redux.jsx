@@ -1,5 +1,5 @@
 import T from 'view/js/common';
-import { getStaffEdit, userGetStaff } from '../tccbCanBo/redux';
+import { userGetStaff } from '../tccbCanBo/redux';
 
 // Reducer ------------------------------------------------------------------------------------------------------------
 const QtKeoDaiCongTacGetAll = 'QtKeoDaiCongTac:GetAll';
@@ -220,7 +220,7 @@ export function deleteQtKeoDaiCongTacGroupPageMa(id, done) {
         }, () => T.notify('Xóa kéo dài công tác bị lỗi!', 'danger'));
     };
 }
-export function createQtKeoDaiCongTacStaff(data, done, isEdit = null) {
+export function createQtKeoDaiCongTacStaff(data, done) {
     return dispatch => {
         const url = '/api/tccb/qua-trinh/keo-dai-cong-tac';
         T.post(url, { data }, res => {
@@ -228,23 +228,17 @@ export function createQtKeoDaiCongTacStaff(data, done, isEdit = null) {
                 T.notify('Thêm thông tin kéo dài công tác bị lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
-                T.notify('Thêm thông tin kéo dài công tác thành công!', 'info');
                 if (done) {
-                    if (isEdit) {
-                        done();
-                        dispatch(getStaffEdit(data.shcc));
-                    }
-                    else {
-                        done(data);
-                        dispatch(getQtKeoDaiCongTacPage());
-                    }
+                    T.notify('Thêm thông tin kéo dài công tác thành công!', 'info');
+                    done(data);
+                    dispatch(getQtKeoDaiCongTacPage());
                 }
             }
         }, () => T.notify('Thêm thông tin kéo dài công tác bị lỗi', 'danger'));
     };
 }
 
-export function updateQtKeoDaiCongTacStaff(id, changes, done, isEdit = null) {
+export function updateQtKeoDaiCongTacStaff(id, changes, done) {
     return dispatch => {
         const url = '/api/tccb/qua-trinh/keo-dai-cong-tac';
         T.put(url, { id, changes }, data => {
@@ -253,14 +247,14 @@ export function updateQtKeoDaiCongTacStaff(id, changes, done, isEdit = null) {
                 console.error('PUT: ' + url + '. ' + data.error);
             } else if (data.item) {
                 T.notify('Cập nhật thông tin kéo dài công tác thành công!', 'info');
-                isEdit ? (done && done()) : (done && done(data.item));
-                isEdit ? dispatch(getStaffEdit(changes.shcc)) : dispatch(getQtKeoDaiCongTacPage());
+                done && done(data.item);
+                dispatch(getQtKeoDaiCongTacPage());
             }
         }, () => T.notify('Cập nhật thông tin kéo dài công tác bị lỗi', 'danger'));
     };
 }
 
-export function deleteQtKeoDaiCongTacStaff(id, isEdit, shcc = null) {
+export function deleteQtKeoDaiCongTacStaff(id, done) {
     return dispatch => {
         const url = '/api/tccb/qua-trinh/keo-dai-cong-tac';
         T.delete(url, { id }, data => {
@@ -269,7 +263,8 @@ export function deleteQtKeoDaiCongTacStaff(id, isEdit, shcc = null) {
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
                 T.alert('Thông tin kéo dài công tác được xóa thành công!', 'info');
-                isEdit ? dispatch(getStaffEdit(shcc)) : dispatch(getQtKeoDaiCongTacPage());
+                done && done(data.item);
+                dispatch(getQtKeoDaiCongTacPage());
             }
         }, () => T.notify('Xóa thông tin kéo dài công tác bị lỗi', 'danger'));
     };

@@ -59,14 +59,14 @@ class EditModal extends AdminModal {
                     bacDaoTao: this.bacDaoTao.value(),
                 };
                 if (index == list_ma.length - 1) {
-                    this.state.id ? this.props.update(this.state.id, changes, this.hide, false) : this.props.create(changes, this.hide, false);
+                    this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
                     this.setState({
                         id: ''
                     });
                     this.shcc.reset();
                 }
                 else {
-                    this.state.id ? this.props.update(this.state.id, changes, null, false) : this.props.create(changes, null, false);
+                    this.state.id ? this.props.update(this.state.id, changes, null) : this.props.create(changes, null);
                 }
             });
         }
@@ -160,7 +160,7 @@ class QtHuongDanLuanVan extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa hướng dẫn luận văn', 'Bạn có chắc bạn muốn xóa hướng dẫn luận văn này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtHuongDanLuanVanStaff(item.id, false, null, error => {
+            isConfirm && this.props.deleteQtHuongDanLuanVanStaff(item.id, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá hướng dẫn luận văn bị lỗi!', 'danger');
                 else T.alert('Xoá hướng dẫn luận văn thành công!', 'success', false, 800);
             });

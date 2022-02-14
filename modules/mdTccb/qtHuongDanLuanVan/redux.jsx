@@ -266,7 +266,7 @@ export function deleteQtHuongDanLuanVanUserPage(id, done) {
     };
 }
 
-export function createQtHuongDanLuanVanStaff(data, done, isEdit = null) {
+export function createQtHuongDanLuanVanStaff(data, done) {
     return dispatch => {
         const url = '/api/qua-trinh/hdlv';
         T.post(url, { data }, res => {
@@ -276,21 +276,15 @@ export function createQtHuongDanLuanVanStaff(data, done, isEdit = null) {
             } else {
                 if (done) {
                     T.notify('Tạo hướng dẫn luận văn thành công!', 'success');
-                    if (isEdit) {
-                        done();
-                        dispatch(getStaffEdit(data.shcc));
-                    }
-                    else {
-                        done(data);
-                        dispatch(getQtHuongDanLuanVanPage());
-                    }
+                    done(data);
+                    dispatch(getQtHuongDanLuanVanPage());
                 }
             }
         }, () => T.notify('Tạo hướng dẫn luận văn bị lỗi!', 'danger'));
     };
 }
 
-export function deleteQtHuongDanLuanVanStaff(id, shcc, idEdit = null) {
+export function deleteQtHuongDanLuanVanStaff(id, done) {
     return dispatch => {
         const url = '/api/qua-trinh/hdlv';
         T.delete(url, { id }, data => {
@@ -299,13 +293,14 @@ export function deleteQtHuongDanLuanVanStaff(id, shcc, idEdit = null) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('hướng dẫn luận văn đã xóa thành công!', 'success', false, 800);
-                idEdit ? dispatch(getStaffEdit(shcc)) : dispatch(getQtHuongDanLuanVanPage());
+                done && done(data.item);
+                dispatch(getQtHuongDanLuanVanPage());
             }
         }, () => T.notify('Xóa hướng dẫn luận văn bị lỗi!', 'danger'));
     };
 }
 
-export function updateQtHuongDanLuanVanStaff(id, changes, done, isEdit = null) {
+export function updateQtHuongDanLuanVanStaff(id, changes, done) {
     return dispatch => {
         const url = '/api/qua-trinh/hdlv';
         T.put(url, { id, changes }, data => {
@@ -315,8 +310,8 @@ export function updateQtHuongDanLuanVanStaff(id, changes, done, isEdit = null) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật hướng dẫn luận văn thành công!', 'success');
-                isEdit ? (done && done()) : (done && done(data.item));
-                isEdit ? dispatch(getStaffEdit(changes.shcc)) : dispatch(getQtHuongDanLuanVanPage());
+                done && done(data.item);
+                dispatch(getQtHuongDanLuanVanPage());
             }
         }, () => T.notify('Cập nhật hướng dẫn luận văn bị lỗi!', 'danger'));
     };
