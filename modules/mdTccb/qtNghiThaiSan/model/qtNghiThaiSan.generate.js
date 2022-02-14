@@ -1,6 +1,6 @@
-// Table name: QT_NGHI_THAI_SAN { stt, chucVu, donVi, soBhxh, thoiGianBatDauNghi, thoiGianKetThucNghi, thoiGianDiLamLai, ghiChu, thoiGianBaoTangBenBhxh, soThangDuocNghi, daNopHoSoThaiSan, hoSoThaiDuocDuyet, shcc }
-const keys = ['SHCC', 'STT'];
-const obj2Db = { 'stt': 'STT', 'chucVu': 'CHUC_VU', 'donVi': 'DON_VI', 'soBhxh': 'SO_BHXH', 'thoiGianBatDauNghi': 'THOI_GIAN_BAT_DAU_NGHI', 'thoiGianKetThucNghi': 'THOI_GIAN_KET_THUC_NGHI', 'thoiGianDiLamLai': 'THOI_GIAN_DI_LAM_LAI', 'ghiChu': 'GHI_CHU', 'thoiGianBaoTangBenBhxh': 'THOI_GIAN_BAO_TANG_BEN_BHXH', 'soThangDuocNghi': 'SO_THANG_DUOC_NGHI', 'daNopHoSoThaiSan': 'DA_NOP_HO_SO_THAI_SAN', 'hoSoThaiDuocDuyet': 'HO_SO_THAI_DUOC_DUYET', 'shcc': 'SHCC' };
+// Table name: QT_NGHI_THAI_SAN { chucVu, donVi, soBhxh, thoiGianBatDauNghi, thoiGianKetThucNghi, thoiGianDiLamLai, ghiChu, thoiGianBaoTangBenBhxh, soThangDuocNghi, daNopHoSoThaiSan, hoSoThaiDuocDuyet, shcc, stt }
+const keys = ['STT'];
+const obj2Db = { 'chucVu': 'CHUC_VU', 'donVi': 'DON_VI', 'soBhxh': 'SO_BHXH', 'thoiGianBatDauNghi': 'THOI_GIAN_BAT_DAU_NGHI', 'thoiGianKetThucNghi': 'THOI_GIAN_KET_THUC_NGHI', 'thoiGianDiLamLai': 'THOI_GIAN_DI_LAM_LAI', 'ghiChu': 'GHI_CHU', 'thoiGianBaoTangBenBhxh': 'THOI_GIAN_BAO_TANG_BEN_BHXH', 'soThangDuocNghi': 'SO_THANG_DUOC_NGHI', 'daNopHoSoThaiSan': 'DA_NOP_HO_SO_THAI_SAN', 'hoSoThaiDuocDuyet': 'HO_SO_THAI_DUOC_DUYET', 'shcc': 'SHCC', 'stt': 'STT' };
 
 module.exports = app => {
     app.model.qtNghiThaiSan = {
@@ -131,14 +131,14 @@ module.exports = app => {
             app.dbConnection.execute(sql, parameter, (error, result) => done(error, result));
         },
 
-        searchPage: (pagenumber, pagesize, searchterm, done) => {
-            app.dbConnection.execute('BEGIN :ret:=qt_nghi_thai_san_search_page(:pagenumber, :pagesize, :searchterm, :totalitem, :pagetotal); END;',
-                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, pagenumber: { val: pagenumber, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, pagesize: { val: pagesize, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, searchterm, totalitem: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pagetotal: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
+        searchPage: (pagenumber, pagesize, listShcc, listDv, fromyear, toyear, timetype, searchterm, done) => {
+            app.dbConnection.execute('BEGIN :ret:=qt_nghi_thai_san_search_page(:pagenumber, :pagesize, :listShcc, :listDv, :fromyear, :toyear, :timetype, :searchterm, :totalitem, :pagetotal); END;',
+                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, pagenumber: { val: pagenumber, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, pagesize: { val: pagesize, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, listShcc, listDv, fromyear, toyear, timetype, searchterm, totalitem: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pagetotal: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
         },
 
-        groupPage: (pagenumber, pagesize, searchterm, done) => {
-            app.dbConnection.execute('BEGIN :ret:=qt_nghi_thai_san_group_page(:pagenumber, :pagesize, :searchterm, :totalitem, :pagetotal); END;',
-                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, pagenumber: { val: pagenumber, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, pagesize: { val: pagesize, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, searchterm, totalitem: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pagetotal: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
+        groupPage: (pagenumber, pagesize, listShcc, listDv, fromyear, toyear, timetype, searchterm, done) => {
+            app.dbConnection.execute('BEGIN :ret:=qt_nghi_thai_san_group_page(:pagenumber, :pagesize, :listShcc, :listDv, :fromyear, :toyear, :timetype, :searchterm, :totalitem, :pagetotal); END;',
+                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, pagenumber: { val: pagenumber, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, pagesize: { val: pagesize, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, listShcc, listDv, fromyear, toyear, timetype, searchterm, totalitem: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pagetotal: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
         },
     };
 };
