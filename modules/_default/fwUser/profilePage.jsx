@@ -1,25 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { AdminPage } from 'view/component/AdminPage';
-import ComponentCaNhan from 'modules/mdTccb/tccbCanBo/componentCaNhan';
 import { updateSystemState } from 'modules/_default/_init/reduxSystem';
 import { userGetStaff, updateStaffUser } from 'modules/mdTccb/tccbCanBo/redux';
-import ComponentQuanHe from 'modules/mdTccb/tccbCanBo/componentQuanHe';
-import ComponentTrinhDo from 'modules/mdTccb/tccbCanBo/componentTrinhDo';
-import ComponentTTCongTac from 'modules/mdTccb/tccbCanBo/componentTTCongTac';
 import ProfileCommon from './componentNotStaff';
 import Loading from 'view/component/Loading';
-import ComponentKhenThuong from 'modules/mdTccb/qtKhenThuongAll/componentKhenThuong';
-import ComponentNCKH from 'modules/mdTccb/qtNghienCuuKhoaHoc/componentNCKH';
-import ComponentKyLuat from 'modules/mdTccb/qtKyLuat/componentKyLuat';
-import ComponentNuocNgoai from 'modules/mdTccb/qtNuocNgoai/componentNuocNgoai';
-import ComponentHDLV from 'modules/mdTccb/qtHuongDanLuanVan/componentHDLV';
-import ComponentSGT from 'modules/mdTccb/sachGiaoTrinh/componentSGT';
-import ComponentDaoTao from 'modules/mdTccb/qtDaoTao/componentDaoTao';
-import ComponentLuong from 'modules/mdTccb/qtLuong/componentLuong';
-import ComponentCongTac from 'modules/mdTccb/qtHocTapCongTac/componentCongTac';
-import ComponentBaoHiemXaHoi from 'modules/mdTccb/qtBaoHiemXaHoi/componentBaoHiemXaHoi';
-import ComponentKeoDaiCongTac from 'modules/mdTccb/qtKeoDaiCongTac/componentKeoDaiCongTac';
+import SubMenusPage from 'view/component/SubMenusPage';
 
 class ProfileCanBo extends AdminPage {
     state = { canBo: false, isLoad: true };
@@ -27,82 +13,28 @@ class ProfileCanBo extends AdminPage {
         T.ready('/user', () => {
             if (this.props.system && this.props.system.user) {
                 const user = this.props.system.user;
-                this.emailCanBo = user.email ? user.email : null;
-                this.props.userGetStaff(user.email, data => {
-                    if (data.error) {
-                        T.notify('Lấy thông tin cán bộ bị lỗi!', 'danger');
-                    } else if (data.item) {
-                        this.setUp(data.item);
-                    }
-                    else {
-                        this.setState({ isLoad: false });
-                        this.profileCommon.value(user);
-                    }
-                });
+                if (user.isStaff != 1) {
+                    this.setState({ isLoad: false });
+                    this.profileCommon.value(user);
+                } else this.setState({ canBo: true });
             }
         });
     }
 
-    setUp = (item) => {
-        this.setState({ canBo: true, isLoad: false }, () => {
-            this.componentCaNhan.value(item);
-            this.componentQuanHe.value(item.email, item.phai, item.shcc);
-            this.componentTrinhDo.value(item);
-            this.componentCongTac.value(item.shcc, item.email);
-            this.componentTTCongTac.value(item);
-            this.componentDaoTao.value(item.shcc, item.email);
-            this.componentKhenThuong.value(item.shcc);
-            this.componentNCKH.value(item.shcc, item.email);
-            this.componentKyLuat.value(item.shcc, item.email);
-            this.componentNuocNgoai.value(item.shcc, item.email);
-            this.componentHDLV.value(item.shcc, item.email);
-            this.componentSGT.value(item.shcc, item.email);
-            this.componentLuong.value(item.shcc, item.email);
-            this.componentBaoHiemXaHoi.value(item.shcc, item.email);
-            this.componentKeoDaiCongTac.value(item.shcc, item.email);
-        });
-
-    }
-
-    save = () => {
-        const caNhanData = this.componentCaNhan.getAndValidate();
-        const congTacData = this.componentTTCongTac.getAndValidate();
-        const trinhDoData = this.componentTrinhDo.getAndValidate();
-        this.emailCanBo && this.props.updateStaffUser(this.emailCanBo, { ...caNhanData, ...trinhDoData, ...congTacData });
-    };
     render = () => {
-        const item = this.props.staff?.userItem;
-        return this.renderPage({
+        return this.state.canBo ? <SubMenusPage menuLink='/user' menuKey={1000} headerIcon='fa-user' /> : this.renderPage({
             icon: 'fa fa-address-card-o',
-            title: `Thông tin cá nhân${item?.shcc ? `: ${item?.ho} ${item?.ten}` : ''}`,
+            title: 'Thông tin cá nhân',
             content:
                 <>
                     {this.state.isLoad && <Loading />}
-                    {!this.state.canBo ? <ProfileCommon ref={e => this.profileCommon = e} /> :
-                        <>
-                            <ComponentCaNhan ref={e => this.componentCaNhan = e} userEdit={false} isStaff={true} />
-                            <ComponentQuanHe ref={e => this.componentQuanHe = e} userEdit={true} />
-                            <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={true} />
-                            <ComponentCongTac ref={e => this.componentCongTac = e} userEdit={true} />
-                            <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={true} tccb={false} />
-                            <ComponentDaoTao ref={e => this.componentDaoTao = e} userEdit={true} />
-                            <ComponentLuong ref={e => this.componentLuong = e} userEdit={true} />
-                            <ComponentBaoHiemXaHoi ref={e => this.componentBaoHiemXaHoi = e} userEdit={true} />
-                            <ComponentKeoDaiCongTac ref={e => this.componentKeoDaiCongTac = e} userEdit={true} />
-                            <ComponentNuocNgoai ref={e => this.componentNuocNgoai = e} userEdit={true} />
-                            <ComponentKhenThuong ref={e => this.componentKhenThuong = e} userEdit={true} />
-                            <ComponentKyLuat ref={e => this.componentKyLuat = e} userEdit={true} />
-                            <ComponentNCKH ref={e => this.componentNCKH = e} userEdit={true} />
-                            <ComponentHDLV ref={e => this.componentHDLV = e} userEdit={true} />
-                            <ComponentSGT ref={e => this.componentSGT = e} userEdit={true} />
-                        </>}
+                    <ProfileCommon ref={e => this.profileCommon = e} />
                 </>,
-            onSave: this.state.canBo && this.save,
         });
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, staff: state.staff });
+const mapStateToProps = state => ({ system: state.system });
 const mapActionsToProps = {
     userGetStaff, updateStaffUser, updateSystemState
 };
