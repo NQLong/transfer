@@ -110,7 +110,11 @@ class SachGiaoTrinh extends AdminPage {
     state = { filter: {} };
     componentDidMount() {
         T.ready('/user/tccb', () => {
-            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
+            T.clearSearchBox();
+            T.onSearch = (searchText) => {
+                this.searchText = searchText;
+                this.getPage();
+            };
             T.showSearchBox(() => {
                 this.fromYear?.value('');
                 this.toYear?.value('');
@@ -120,10 +124,8 @@ class SachGiaoTrinh extends AdminPage {
             });
             if (this.checked) {
                 this.hienThiTheoCanBo.value(true);
-                this.props.getSachGiaoTrinhGroupPage();
-            } else {
-                this.props.getSachGiaoTrinhPage();
             }
+            this.getPage();
             this.changeAdvancedSearch(true);
         });
     }
@@ -142,7 +144,7 @@ class SachGiaoTrinh extends AdminPage {
         const list_shcc = this.mulCanBo?.value().toString() || '';
         const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc };
         this.setState({ filter: pageFilter }, () => {
-            this.getPage(pageNumber, pageSize, '', (page) => {
+            this.getPage(pageNumber, pageSize, (page) => {
                 if (isInitial) {
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
@@ -156,9 +158,9 @@ class SachGiaoTrinh extends AdminPage {
         });
     }
 
-    getPage = (pageN, pageS, pageC, done) => {
-        if (this.checked) this.props.getSachGiaoTrinhGroupPage(pageN, pageS, pageC, this.state.filter, done);
-        else this.props.getSachGiaoTrinhPage(pageN, pageS, pageC, this.state.filter, done);
+    getPage = (pageN, pageS, done) => {
+        if (this.checked) this.props.getSachGiaoTrinhGroupPage(pageN, pageS, this.searchText, this.state.filter, done);
+        else this.props.getSachGiaoTrinhPage(pageN, pageS, this.searchText, this.state.filter, done);
     }
 
     groupPage = () => {
@@ -168,6 +170,7 @@ class SachGiaoTrinh extends AdminPage {
     }
 
     list = (text, i, j) => {
+        if (i == 0) return [];
         let deTais = text.split('??').map(str => <p key={i--} style={{ textTransform: 'uppercase' }}>{j - i}. {str}</p>);
         return deTais;
     }

@@ -116,6 +116,7 @@ class EditModal extends AdminModal {
 class QtKhenThuongAllGroupPage extends AdminPage {
     state = { filter: {} };
     ma = ''; loaiDoiTuong = '-1';
+    searchText = '';
     componentDidMount() {
         T.ready('/user/tccb', () => {
             const route = T.routeMatcher('/user/tccb/qua-trinh/khen-thuong-all/group_dt/:loaiDoiTuong/:ma'),
@@ -123,15 +124,16 @@ class QtKhenThuongAllGroupPage extends AdminPage {
             this.loaiDoiTuong = params.loaiDoiTuong;
             this.ma = params.ma;
             this.setState({filter: {loaiDoiTuong : this.loaiDoiTuong, ma: this.ma}});
-            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
+            T.onSearch = (searchText) => {
+                this.searchText = searchText;
+                this.getPage();
+            };
             T.showSearchBox(() => {
                 this.fromYear?.value('');
                 this.toYear?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
-            this.props.getQtKhenThuongAllPage(undefined, undefined, undefined, this.state.filter, () => {
-                T.updatePage('pageQtKhenThuongAll', undefined, undefined, undefined, this.state.filter);
-            });
+            this.getPage();
         });
     }
 
@@ -143,7 +145,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
         const ma = this.state.filter.ma;
         const pageFilter = isInitial ? null : { fromYear, toYear, loaiDoiTuong, ma};
         this.setState({ filter: pageFilter }, () => {
-            this.getPage(pageNumber, pageSize, '', (page) => {
+            this.getPage(pageNumber, pageSize, (page) => {
                 if (isInitial) {
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
@@ -155,8 +157,8 @@ class QtKhenThuongAllGroupPage extends AdminPage {
         });
     }
 
-    getPage = (pageN, pageS, pageC, done) => {
-        this.props.getQtKhenThuongAllPage(pageN, pageS, pageC, this.state.filter, done);
+    getPage = (pageN, pageS, done) => {
+        this.props.getQtKhenThuongAllPage(pageN, pageS, this.searchText, this.state.filter, done);
 
     }
     showModal = (e) => {

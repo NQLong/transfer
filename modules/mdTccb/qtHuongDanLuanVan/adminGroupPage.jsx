@@ -72,23 +72,24 @@ class EditModal extends AdminModal {
 
 class QtHuongDanLuanVanGroupPage extends AdminPage {
     state = { filter: {} };
-
+    searchText = '';
     componentDidMount() {
         T.ready('/user/tccb', () => {
+            T.clearSearchBox();
             const route = T.routeMatcher('/user/tccb/qua-trinh/hdlv/group/:shcc'),
                 params = route.parse(window.location.pathname);
             this.shcc = params.shcc;
             this.setState({filter: {list_shcc: params.shcc, list_dv: ''}});
-            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
-
+            T.onSearch = (searchText) => {
+                this.searchText = searchText;
+                this.getPage();
+            };
             T.showSearchBox(() => {
                 this.fromYear?.value('');
                 this.toYear?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
-            this.props.getQtHuongDanLuanVanPage(undefined, undefined, undefined, this.state.filter, () => {
-                T.updatePage('pageQtHuongDanLuanVan', undefined, undefined, undefined, this.state.filter);
-            });
+            this.getPage();
         });
     }
 
@@ -100,7 +101,7 @@ class QtHuongDanLuanVanGroupPage extends AdminPage {
         const list_shcc = this.state.filter.list_shcc;
         const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc };
         this.setState({ filter: pageFilter }, () => {
-            this.getPage(pageNumber, pageSize, '', (page) => {
+            this.getPage(pageNumber, pageSize, (page) => {
                 if (isInitial) {
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
@@ -112,8 +113,8 @@ class QtHuongDanLuanVanGroupPage extends AdminPage {
         });
     }
 
-    getPage = (pageN, pageS, pageC, done) => {
-        this.props.getQtHuongDanLuanVanPage(pageN, pageS, pageC, this.state.filter, done);
+    getPage = (pageN, pageS, done) => {
+        this.props.getQtHuongDanLuanVanPage(pageN, pageS, this.searchText, this.state.filter, done);
     }
 
     showModal = (e) => {

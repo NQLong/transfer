@@ -139,9 +139,11 @@ class QtKhenThuongAll extends AdminPage {
     stateTable = [
         { 'id': '-1', 'text': 'Tất cả' }
     ];
+    searchText = '';
     curState = '-1';
     componentDidMount() {
         T.ready('/user/tccb', () => {
+            T.clearSearchBox();
             this.props.getDmKhenThuongLoaiDoiTuongAll(items => {
                 if (items) {
                     this.stateTable = [
@@ -153,7 +155,10 @@ class QtKhenThuongAll extends AdminPage {
                     }));
                 }
             });
-            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
+            T.onSearch = (searchText) => {
+                this.searchText = searchText;
+                this.getPage();
+            };
             T.showSearchBox(() => {
                 this.fromYear?.value('');
                 this.toYear?.value('');
@@ -162,10 +167,8 @@ class QtKhenThuongAll extends AdminPage {
             });
             if (this.checked) {
                 this.hienThiTheoDoiTuong.value(true);
-                this.props.getQtKhenThuongAllGroupPage();
-            } else {
-                this.props.getQtKhenThuongAllPage();
             }
+            this.getPage();
             this.changeAdvancedSearch(true);
         });
     }
@@ -184,7 +187,7 @@ class QtKhenThuongAll extends AdminPage {
         const pageFilter = isInitial ? null : { fromYear, toYear, loaiDoiTuong, ma };
         this.curState = loaiDoiTuong;
         this.setState({ filter: pageFilter }, () => {
-            this.getPage(pageNumber, pageSize, '', (page) => {
+            this.getPage(pageNumber, pageSize, (page) => {
                 if (isInitial) {
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
@@ -197,9 +200,9 @@ class QtKhenThuongAll extends AdminPage {
         });
     }
 
-    getPage = (pageN, pageS, pageC, done) => {
-        if (this.checked) this.props.getQtKhenThuongAllGroupPage(pageN, pageS, pageC, this.state.filter, done);
-        else this.props.getQtKhenThuongAllPage(pageN, pageS, pageC, this.state.filter, done);
+    getPage = (pageN, pageS, done) => {
+        if (this.checked) this.props.getQtKhenThuongAllGroupPage(pageN, pageS, this.searchText, this.state.filter, done);
+        else this.props.getQtKhenThuongAllPage(pageN, pageS, this.searchText, this.state.filter, done);
 
     }
 

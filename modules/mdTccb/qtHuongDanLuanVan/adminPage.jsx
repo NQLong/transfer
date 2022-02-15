@@ -92,9 +92,14 @@ class EditModal extends AdminModal {
 class QtHuongDanLuanVan extends AdminPage {
     checked = parseInt(T.cookie('hienThiTheoCanBo')) == 1 ? true : false;
     state = { filter: {} };
+    searchText = '';
     componentDidMount() {
         T.ready('/user/tccb', () => {
-            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
+            T.clearSearchBox();
+            T.onSearch = (searchText) => {
+                this.searchText = searchText;
+                this.getPage();
+            };            
             T.showSearchBox(() => {
                 this.fromYear?.value('');
                 this.toYear?.value('');
@@ -104,10 +109,8 @@ class QtHuongDanLuanVan extends AdminPage {
             });
             if (this.checked) {
                 this.hienThiTheoCanBo.value(true);
-                this.props.getQtHuongDanLuanVanGroupPage();
-            } else {
-                this.props.getQtHuongDanLuanVanPage();
             }
+            this.getPage();
             this.changeAdvancedSearch(true);
         });
     }
@@ -126,7 +129,7 @@ class QtHuongDanLuanVan extends AdminPage {
         const list_shcc = this.mulCanBo?.value().toString() || '';
         const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc };
         this.setState({ filter: pageFilter }, () => {
-            this.getPage(pageNumber, pageSize, '', (page) => {
+            this.getPage(pageNumber, pageSize, (page) => {
                 if (isInitial) {
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
@@ -140,9 +143,9 @@ class QtHuongDanLuanVan extends AdminPage {
         });
     }
 
-    getPage = (pageN, pageS, pageC, done) => {
-        if (this.checked) this.props.getQtHuongDanLuanVanGroupPage(pageN, pageS, pageC, this.state.filter, done);
-        else this.props.getQtHuongDanLuanVanPage(pageN, pageS, pageC, this.state.filter, done);
+    getPage = (pageN, pageS, done) => {
+        if (this.checked) this.props.getQtHuongDanLuanVanGroupPage(pageN, pageS, this.searchText, this.state.filter, done);
+        else this.props.getQtHuongDanLuanVanPage(pageN, pageS, this.searchText, this.state.filter, done);
     }
 
     groupPage = () => {
