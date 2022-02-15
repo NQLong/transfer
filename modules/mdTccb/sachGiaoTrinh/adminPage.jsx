@@ -3,7 +3,8 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormCheckbox, FormRichTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
-import { createSachGTStaff, updateSachGTStaff, deleteSachGTStaff,
+import {
+    createSachGTStaff, updateSachGTStaff, deleteSachGTStaff,
     getSachGiaoTrinhGroupPage, getSachGiaoTrinhPage,
 } from './redux';
 
@@ -92,7 +93,7 @@ class EditModal extends AdminModal {
             size: 'large',
             body: <div className='row'>
                 <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={readOnly} required />
-                <FormRichTextBox className='col-12' ref={e => this.ten = e} label={'Tên sách, giáo trình'} type='text' required/>
+                <FormRichTextBox className='col-12' ref={e => this.ten = e} label={'Tên sách, giáo trình'} type='text' required />
                 <div className='form-group col-md-4'><DateInput ref={e => this.namSanXuat = e} label='Năm xuất bản' type='year' required /></div>
                 <FormTextBox className='col-8' ref={e => this.nhaSanXuat = e} label={'Nhà xuất bản, số hiệu ISBN'} type='text' required />
                 <FormTextBox className='col-4' ref={e => this.theLoai = e} label={'Thể loại'} type='text' />
@@ -200,13 +201,13 @@ class SachGiaoTrinh extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thông tin sách</th> }
-                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thông tin xuất bản</th> }
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thông tin sản phẩm</th> }
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Phạm vi xuất bản</th> }
+                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thông tin sách</th>}
+                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thông tin xuất bản</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thông tin sản phẩm</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Phạm vi xuất bản</th>}
 
-                        {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số lượng sách giáo trình</th> }
-                        {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách</th> }
+                        {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số lượng sách giáo trình</th>}
+                        {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách</th>}
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
@@ -225,32 +226,32 @@ class SachGiaoTrinh extends AdminPage {
                                 <span><i>{item.ten}</i></span><br />
                                 <span>Thể loại: <span style={{ color: 'blue' }}>{item.theLoai}</span></span>
                             </>
-                        )} 
+                        )}
                         />}
                         {!this.checked && <TableCell type='text' content={(
                             <>
                                 <span>Nhà xuất bản: <i>{item.nhaSanXuat}</i></span><br />
-                                <span>Năm xuất bản: <span style={{ color: 'blue' }}>{item.namSanXuat}</span></span> <br /> <br/>
+                                <span>Năm xuất bản: <span style={{ color: 'blue' }}>{item.namSanXuat}</span></span> <br /> <br />
                                 <span>Chủ biên: <span style={{ color: 'blue' }}>{item.chuBien}</span></span>
                             </>
-                        )} 
+                        )}
                         />}
                         {!this.checked && <TableCell type='text' content={(
                             <>
                                 <span>Sản phẩm: {item.sanPham}</span><br />
                                 <span>Bút danh: <span style={{ color: 'blue' }}>{item.butDanh}</span></span>
                             </>
-                        )} 
+                        )}
                         />}
                         {!this.checked && <TableCell type='text' content={(
                             item.quocTe == '0' ? <span>Trong nước</span>
-                            : item.quocTe == '1' ? <span>Quốc tế</span>
-                                : item.quocTe == '2' ? <span>Trong và ngoài nước </span>
-                                    : ''
+                                : item.quocTe == '1' ? <span>Quốc tế</span>
+                                    : item.quocTe == '2' ? <span>Trong và ngoài nước </span>
+                                        : ''
                         )}
                         />}
-                        {this.checked && <TableCell type='text' content={item.soLuong} /> }
-                        {this.checked && <TableCell type='text' content={this.list(item.danhSach, item.soLuong, item.soLuong)} /> }
+                        {this.checked && <TableCell type='text' content={item.soLuong} />}
+                        {this.checked && <TableCell type='text' content={this.list(item.danhSach, item.soLuong, item.soLuong)} />}
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                                 onEdit={() => this.modal.show(item, false)} onDelete={this.delete} >
@@ -267,7 +268,7 @@ class SachGiaoTrinh extends AdminPage {
                 )
             });
         }
-        
+
         return this.renderPage({
             icon: 'fa fa-book',
             title: 'Sách, giáo trình',
@@ -277,10 +278,10 @@ class SachGiaoTrinh extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    <FormTextBox className='col-md-3' ref={e => this.fromYear = e} label='Từ năm đạt được (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
-                    <FormTextBox className='col-md-3' ref={e => this.toYear = e} label='Đến năm đạt được (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />  
-                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1}/>
-                    <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1}/>
+                    <FormTextBox className='col-md-3' ref={e => this.fromYear = e} label='Từ năm xuất bản (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
+                    <FormTextBox className='col-md-3' ref={e => this.toYear = e} label='Đến năm xuất bản (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
                 </div>
             </>,
             content: <>
@@ -303,7 +304,7 @@ class SachGiaoTrinh extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, sachGiaoTrinh: state.tccb.sachGiaoTrinh });
 const mapActionsToProps = {
-    createSachGTStaff, updateSachGTStaff, deleteSachGTStaff, 
+    createSachGTStaff, updateSachGTStaff, deleteSachGTStaff,
     getSachGiaoTrinhGroupPage, getSachGiaoTrinhPage,
 };
 export default connect(mapStateToProps, mapActionsToProps)(SachGiaoTrinh);
