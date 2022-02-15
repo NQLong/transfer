@@ -17,7 +17,7 @@ export default {
             component: Loadable({ loading: Loading, loader: () => import('./adminProfilePage') })
         },
         // {
-        //     path: '/user',
+        //     path: '/user/profile',
         //     component: Loadable({ loading: Loading, loader: () => import('./profilePage') })
         // },
     ],

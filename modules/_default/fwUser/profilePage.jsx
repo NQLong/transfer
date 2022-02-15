@@ -24,7 +24,7 @@ import ComponentKeoDaiCongTac from 'modules/mdTccb/qtKeoDaiCongTac/componentKeoD
 class ProfileCanBo extends AdminPage {
     state = { canBo: false, isLoad: true };
     componentDidMount() {
-        T.ready(() => {
+        T.ready('/user', () => {
             if (this.props.system && this.props.system.user) {
                 const user = this.props.system.user;
                 this.emailCanBo = user.email ? user.email : null;
@@ -80,11 +80,11 @@ class ProfileCanBo extends AdminPage {
                     {this.state.isLoad && <Loading />}
                     {!this.state.canBo ? <ProfileCommon ref={e => this.profileCommon = e} /> :
                         <>
-                            <ComponentCaNhan ref={e => this.componentCaNhan = e} userEdit={false} isStaff={true}/>
+                            <ComponentCaNhan ref={e => this.componentCaNhan = e} userEdit={false} isStaff={true} />
                             <ComponentQuanHe ref={e => this.componentQuanHe = e} userEdit={true} />
                             <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={true} />
                             <ComponentCongTac ref={e => this.componentCongTac = e} userEdit={true} />
-                            <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={true} tccb={false}/>
+                            <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={true} tccb={false} />
                             <ComponentDaoTao ref={e => this.componentDaoTao = e} userEdit={true} />
                             <ComponentLuong ref={e => this.componentLuong = e} userEdit={true} />
                             <ComponentBaoHiemXaHoi ref={e => this.componentBaoHiemXaHoi = e} userEdit={true} />
