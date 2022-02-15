@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox} from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
-    getQtKhenThuongAllPage, updateQtKhenThuongAllGroupPageMa,
+    getQtKhenThuongAllGroupPageMa, updateQtKhenThuongAllGroupPageMa,
     deleteQtKhenThuongAllGroupPageMa, createQtKhenThuongAllGroupPageMa, 
 } from './redux';
 
@@ -116,7 +116,6 @@ class EditModal extends AdminModal {
 class QtKhenThuongAllGroupPage extends AdminPage {
     state = { filter: {} };
     ma = ''; loaiDoiTuong = '-1';
-    searchText = '';
     componentDidMount() {
         T.ready('/user/tccb', () => {
             const route = T.routeMatcher('/user/tccb/qua-trinh/khen-thuong-all/group_dt/:loaiDoiTuong/:ma'),
@@ -124,10 +123,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
             this.loaiDoiTuong = params.loaiDoiTuong;
             this.ma = params.ma;
             this.setState({filter: {loaiDoiTuong : this.loaiDoiTuong, ma: this.ma}});
-            T.onSearch = (searchText) => {
-                this.searchText = searchText;
-                this.getPage();
-            };
+            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
                 this.fromYear?.value('');
                 this.toYear?.value('');
@@ -138,14 +134,14 @@ class QtKhenThuongAllGroupPage extends AdminPage {
     }
 
     changeAdvancedSearch = (isInitial = false) => {
-        let { pageNumber, pageSize } = this.props && this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.page ? this.props.qtKhenThuongAll.page : { pageNumber: 1, pageSize: 50 };
+        let { pageNumber, pageSize } = this.props && this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.page_ma ? this.props.qtKhenThuongAll.page_ma : { pageNumber: 1, pageSize: 50 };
         const fromYear = this.fromYear?.value() == '' ? null : Number(this.fromYear?.value());
         const toYear = this.toYear?.value() == '' ? null : Number(this.toYear?.value());
         const loaiDoiTuong = this.state.filter.loaiDoiTuong;
         const ma = this.state.filter.ma;
         const pageFilter = isInitial ? null : { fromYear, toYear, loaiDoiTuong, ma};
         this.setState({ filter: pageFilter }, () => {
-            this.getPage(pageNumber, pageSize, (page) => {
+            this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
@@ -157,8 +153,8 @@ class QtKhenThuongAllGroupPage extends AdminPage {
         });
     }
 
-    getPage = (pageN, pageS, done) => {
-        this.props.getQtKhenThuongAllPage(pageN, pageS, this.searchText, this.state.filter, done);
+    getPage = (pageN, pageS, pageC, done) => {
+        this.props.getQtKhenThuongAllGroupPageMa(pageN, pageS, pageC, this.state.filter, done);
 
     }
     showModal = (e) => {
@@ -204,7 +200,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('qtKhenThuongAll', ['read', 'write', 'delete']);
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.page ? this.props.qtKhenThuongAll.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list };
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.page_ma ? this.props.qtKhenThuongAll.page_ma : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -314,7 +310,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, qtKhenThuongAll: state.tccb.qtKhenThuongAll });
 const mapActionsToProps = {
-    getQtKhenThuongAllPage, deleteQtKhenThuongAllGroupPageMa, createQtKhenThuongAllGroupPageMa,
+    getQtKhenThuongAllGroupPageMa, deleteQtKhenThuongAllGroupPageMa, createQtKhenThuongAllGroupPageMa,
     updateQtKhenThuongAllGroupPageMa, getDmKhenThuongLoaiDoiTuongAll,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtKhenThuongAllGroupPage);
