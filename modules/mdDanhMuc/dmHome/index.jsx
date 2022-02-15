@@ -5,10 +5,10 @@ import SubMenusPage from 'view/component/SubMenusPage';
 export default {
     redux: {},
     routes: [
-        {
-            path: '/user',
-            component: () => <SubMenusPage menuLink='/user' menuKey={1000} headerIcon='fa-user' />
-        },
+        // {
+        //     path: '/user',
+        //     component: () => <SubMenusPage menuLink='/user' menuKey={1000} headerIcon='fa-user' />
+        // },
         {
             path: '/user/tccb',
             component: () => <SubMenusPage menuLink='/user/tccb' menuKey={3000} headerIcon='fa-list-alt' />

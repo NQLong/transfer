@@ -3631,6 +3631,13 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": 500
+            },
+            "OTHER_WEB_ADDRESS": {
+                "value": "otherWebAddress",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 200
             }
         },
         "primaryKeys": [
@@ -8021,13 +8028,6 @@
             "qt_nghi_thai_san_group_page": "groupPage"
         },
         "columns": {
-            "STT": {
-                "value": "stt",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": false,
-                "size": "22,0"
-            },
             "CHUC_VU": {
                 "value": "chucVu",
                 "dataType": "VARCHAR2",
@@ -8109,12 +8109,18 @@
                 "value": "shcc",
                 "dataType": "VARCHAR2",
                 "dataDefault": "",
-                "nullable": false,
+                "nullable": true,
                 "size": 10
+            },
+            "STT": {
+                "value": "stt",
+                "dataType": "NUMBER",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_442480\".nextval",
+                "nullable": false,
+                "size": "22,0"
             }
         },
         "primaryKeys": [
-            "SHCC",
             "STT"
         ],
         "foreignKeys": [],

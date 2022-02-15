@@ -53,7 +53,7 @@ export default function QtNghienCuuKhoaHocReducer(state = null, data) {
 }
 
 // Actions ------------------------------------------------------------------------------------------------------------
-T.initPage('pageQtNghienCuuKhoaHoc', true);
+T.initPage('pageQtNghienCuuKhoaHoc');
 export function getQtNghienCuuKhoaHocPage(pageNumber, pageSize, pageCondition, mscb, filter, done) {
     if (typeof filter === 'function') {
         done = filter;

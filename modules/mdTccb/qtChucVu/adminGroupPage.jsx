@@ -5,40 +5,52 @@ import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormDatePic
 import Pagination from 'view/component/Pagination';
 import {
     getQtChucVuPage, getQtChucVuAll, updateQtChucVuGroupPageMa,
-    deleteQtChucVu, createQtChucVu, getChucVuByShcc, getQtChucVuGroupPageMa
+    deleteQtChucVuGroupPageMa, createQtChucVuGroupPageMa,
 } from './redux';
 import { SelectAdapter_DmChucVuV2 } from 'modules/mdDanhMuc/dmChucVu/redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_DmBoMon } from 'modules/mdDanhMuc/dmBoMon/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 
+const timeList = [
+    { id: 0, text: 'Không' },
+    { id: 1, text: 'Theo ngày ra quyết định' },
+    { id: 2, text: 'Theo ngày thôi chức vụ' },
+    { id: 3, text: 'Theo ngày ra quyết định thôi chức vụ' }
+];
+
 export class EditModal extends AdminModal {
-    state = { shcc: null, stt: '' };
+    state = { shcc: null, stt: '' , chucVuChinh: 0, thoiChucVu: 0 };
     componentDidMount() {
 
     }
 
     onShow = (item) => {
-        let { stt, shcc, maChucVu, maDonVi, soQuyetDinh, ngayRaQuyetDinh, ngayRaQd, soQd, chucVuChinh, maBoMon } = item ? item : {
+        let { stt, shcc, maChucVu, maDonVi, soQuyetDinh, ngayRaQuyetDinh, ngayRaQd, soQd, chucVuChinh, maBoMon, thoiChucVu, soQdThoiChucVu, ngayRaQdThoiChucVu, ngayThoiChucVu } = item ? item : {
             stt: '',
             shcc: '', maChucVu: '', maDonVi: '', soQuyetDinh: '', ngayRaQuyetDinh: '', chucVuChinh: '', maBoMon: '',
-            ngayRaQd: '', soQd: ''
+            ngayRaQd: '', soQd: '', thoiChucVu: '', ngayRaQdThoiChucVu: '', ngayThoiChucVu: '', soQdThoiChucVu: ''
         };
-        this.setState({ shcc, stt, item, chucVuChinh });
-        this.shcc.value(shcc ? shcc : '');
-        this.maChucVu.value(maChucVu ? maChucVu : '');
-        this.maDonVi.value(maDonVi ? maDonVi : '');
-        this.soQuyetDinh.value(soQd ? soQd : (soQuyetDinh ? soQuyetDinh : ''));
-        this.ngayRaQuyetDinh.value(ngayRaQd ? ngayRaQd : (ngayRaQuyetDinh ? ngayRaQuyetDinh : ''));
-        this.chucVuChinh.value(chucVuChinh ? 1 : 0);
-        this.maBoMon.value(maBoMon ? maBoMon : '');
+        this.setState({ shcc, stt, item, chucVuChinh, thoiChucVu: thoiChucVu ? 1 : 0}, () => {
+            this.shcc.value(shcc ? shcc : '');
+            this.maChucVu.value(maChucVu ? maChucVu : '');
+            this.maDonVi.value(maDonVi ? maDonVi : '');
+            this.soQuyetDinh.value(soQd ? soQd : (soQuyetDinh ? soQuyetDinh : ''));
+            this.ngayRaQuyetDinh.value(ngayRaQd ? ngayRaQd : (ngayRaQuyetDinh ? ngayRaQuyetDinh : ''));
+            this.chucVuChinh.value(chucVuChinh ? 1 : 0);
+            this.maBoMon.value(maBoMon ? maBoMon : '');
+            this.thoiChucVu.value(thoiChucVu ? 1 : 0);
+            this.state.thoiChucVu ? this.soQdThoiChucVu.value(soQdThoiChucVu ? soQdThoiChucVu : '') : $('#soQdThoiChucVu').hide();
+            this.state.thoiChucVu ? this.ngayRaQdThoiChucVu.value(ngayRaQdThoiChucVu ? ngayRaQdThoiChucVu : '') : $('#ngayRaQdThoiChucVu').hide();
+            this.state.thoiChucVu ? this.ngayThoiChucVu.value(ngayThoiChucVu ? ngayThoiChucVu : '') : $('#ngayThoiChucVu').hide();
+        });
     };
 
     changeKichHoat = (value, target) => target.value(value ? 1 : 0) || target.value(value);
 
     checkChucVu = (changes) => {
         if (changes.chucVuChinh == this.state.chucVuChinh) {
-            this.state.stt ? this.props.update(this.state.stt, changes, this.hide) : this.props.create(false, changes, this.hide);
+            this.state.stt ? this.props.update(this.state.stt, changes, this.hide, false) : this.props.create(false, changes, this.hide);
             return;
         }
         T.confirm('Thông tin chức vụ chính', 'Đây sẽ là chức vụ chính của cán bộ', 'warning', true, isConfirm => {
@@ -51,9 +63,9 @@ export class EditModal extends AdminModal {
                     });
                 }
                 if (this.state.stt) {
-                    this.props.update(this.state.stt, changes, this.hide);
+                    this.props.update(this.state.stt, changes, this.hide, false);
                 } else {
-                    this.props.create(false, changes, this.hide);
+                    this.props.create(changes, this.hide, false);
                 }
             });
         });
@@ -69,6 +81,10 @@ export class EditModal extends AdminModal {
             ngayRaQd: Number(this.ngayRaQuyetDinh.value()),
             chucVuChinh: this.chucVuChinh.value(),
             maBoMon: this.maBoMon.value(),
+            thoiChucVu: this.thoiChucVu.value(),
+            soQdThoiChucVu: this.soQdThoiChucVu.value(),
+            ngayRaQdThoiChucVu: Number(this.ngayRaQdThoiChucVu.value()),
+            ngayThoiChucVu: Number(this.ngayThoiChucVu.value()),
         };
         if (changes.shcc == '') {
             T.notify('Mã số cán bộ bị trống');
@@ -78,7 +94,7 @@ export class EditModal extends AdminModal {
                 if (this.state.stt) {
                     this.props.update(this.state.stt, changes, this.hide);
                 } else {
-                    this.props.create(false, changes, this.hide);
+                    this.props.create(changes, this.hide);
                 }
             } else
                 this.checkChucVu(changes);
@@ -92,13 +108,20 @@ export class EditModal extends AdminModal {
         return false;
     }
 
+    handleThoiChucVu = (value) => {
+        value ? $('#soQdThoiChucVu').show() : $('#soQdThoiChucVu').hide();
+        value ? $('#ngayRaQdThoiChucVu').show() : $('#ngayRaQdThoiChucVu').hide();
+        value ? $('#ngayThoiChucVu').show() : $('#ngayThoiChucVu').hide();
+        this.setState({thoiChucVu: value});
+    }
+
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
             title: this.state.shcc ? 'Cập nhật quá trình chức vụ' : 'Tạo mới quá trình chức vụ',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12' ref={e => this.shcc = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={readOnly} />
+                <FormSelect className='col-md-12' ref={e => this.shcc = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={true} />
                 <FormSelect className='col-md-4' ref={e => this.maChucVu = e} label='Chức vụ' data={SelectAdapter_DmChucVuV2} readOnly={readOnly} />
                 <FormSelect className='col-md-4' ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} readOnly={readOnly} />
                 <FormSelect className='col-md-4' ref={e => this.maBoMon = e} label='Bộ môn' data={SelectAdapter_DmBoMon} readOnly={readOnly} />
@@ -106,23 +129,66 @@ export class EditModal extends AdminModal {
                 <FormTextBox type='text' className='col-md-6' ref={e => this.soQuyetDinh = e} label='Số quyết định' readOnly={readOnly} />
                 <FormDatePicker className='col-md-6' ref={e => this.ngayRaQuyetDinh = e} label='Ngày ra quyết định' readOnly={readOnly} />
                 <FormCheckbox className='col-md-12' ref={e => this.thoiChucVu = e} label='Thôi giữ chức vụ' isSwitch={true} readOnly={readOnly} />
+                <div className='col-md-4' id='soQdThoiChucVu'><FormTextBox type='text' ref={e => this.soQdThoiChucVu = e} label='Số quyết định thôi chức vụ' readOnly={readOnly} /> </div>
+                <div className='col-md-4' id='ngayThoiChucVu'> <FormDatePicker type='date-mask' ref={e => this.ngayThoiChucVu = e} label='Ngày ra thôi chức vụ' readOnly={readOnly} /> </div>
+                <div className='col-md-4' id='ngayRaQdThoiChucVu'> <FormDatePicker type='date-mask' ref={e => this.ngayRaQdThoiChucVu = e} label='Ngày ra quyết định thôi chức vụ' readOnly={readOnly} /> </div>
             </div>
         });
     }
 }
 
 class QtChucVuGroup extends AdminPage {
-    shcc = ''; loaiDoiTuong = '-1';
+    state = { filter: {} };
+    searchText = '';
+
     componentDidMount() {
         T.ready('/user/tccb', () => {
-            const route = T.routeMatcher('/user/tccb/qua-trinh/chuc-vu/group_cv/:loaiDoiTuong/:shcc'),
+            const route = T.routeMatcher('/user/tccb/qua-trinh/chuc-vu/group/:ma'),
                 params = route.parse(window.location.pathname);
-            this.shcc = params.shcc;
-            this.loaiDoiTuong = params.loaiDoiTuong;
-            T.onSearch = (searchText) => this.props.getQtChucVuPage(undefined, undefined, this.loaiDoiTuong, searchText || '');
-            T.showSearchBox();
-            this.props.getQtChucVuGroupPageMa(undefined, undefined, this.loaiDoiTuong, this.shcc);
+            console.log(params);
+            this.ma = params.ma;
+            this.setState({filter: {list_shcc: params.ma, list_dv: '', timeType: 0}});
+            T.onSearch = (searchText) => {
+                this.searchText = searchText;
+                this.getPage();
+            };
+            T.showSearchBox(() => {
+                this.timeType?.value(0);
+                this.fromYear?.value('');
+                this.toYear?.value('');
+                setTimeout(() => this.changeAdvancedSearch(), 50);
+            });
+            this.getPage();
         });
+    }
+
+    changeAdvancedSearch = (isInitial = false) => {
+        let { pageNumber, pageSize } = this.props && this.props.qtChucVu && this.props.qtChucVu.page ? this.props.qtChucVu.page : { pageNumber: 1, pageSize: 50 };
+        const timeType = this.timeType?.value() || 0;
+        const fromYear = this.fromYear?.value() == '' ? null : this.fromYear?.value().getTime();
+        const toYear = this.toYear?.value() == '' ? null : this.toYear?.value().getTime();
+        const list_dv = this.maDonVi?.value().toString() || '';
+        const list_shcc = this.mulCanBo?.value().toString() || '';
+        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc, timeType };
+        this.setState({ filter: pageFilter }, () => {
+            this.getPage(pageNumber, pageSize, (page) => {
+                if (isInitial) {
+                    const filter = page.filter || {};
+                    this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
+                    this.fromYear?.value(filter.fromYear || '');
+                    this.toYear?.value(filter.toYear || '');
+                    this.maDonVi?.value(filter.list_dv);
+                    this.mulCanBo?.value(filter.list_shcc);
+                    this.timeType?.value(filter.timeType);
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.list_shcc || filter.list_dv || filter.timeType)) this.showAdvanceSearch();
+                }
+            });
+        });
+    }
+
+    getPage = (pageN, pageS, done) => {
+        if (this.checked) this.props.getQtChucVuGroupPage(pageN, pageS, this.searchText, this.state.filter, done);
+        else this.props.getQtChucVuPage(pageN, pageS, this.searchText, this.state.filter, done);
     }
 
     showModal = (e) => {
@@ -132,7 +198,7 @@ class QtChucVuGroup extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa chức vụ', 'Bạn có chắc bạn muốn xóa chức vụ này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtChucVu(false, item.stt, null, error => {
+            isConfirm && this.props.deleteQtChucVuGroupPageMa(item.stt, null, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá chức vụ bị lỗi!', 'danger');
                 else T.alert('Xoá chức vụ thành công!', 'success', false, 800);
             });
@@ -141,7 +207,8 @@ class QtChucVuGroup extends AdminPage {
     }
 
     render() {
-        const permission = this.getUserPermission('qtChucVu', ['read', 'write', 'delete']);
+        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
+            permission = this.getUserPermission('qtChucVu', ['read', 'write', 'delete']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtChucVu && this.props.qtChucVu.page ?
             this.props.qtChucVu.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list };
         let table = 'Không có danh sách!';
@@ -151,11 +218,13 @@ class QtChucVuGroup extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Chức vụ</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
+                        <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Chức vụ</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Quyết định</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Chức vụ chính</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thôi chức vụ</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Quyết định thôi chức vụ</th>
+                        <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
@@ -183,6 +252,14 @@ class QtChucVuGroup extends AdminPage {
                         )}
                         />
                         <TableCell type='checkbox' content={item.chucVuChinh} />
+                        <TableCell type='checkbox' content={item.thoiChucVu} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                            <>
+                                <span>Số: {item.soQdThoiChucVu}</span><br />
+                                <span>Ngày: <span style={{ color: 'blue' }}>{item.ngayRaQdThoiChucVu ? new Date(item.ngayRaQdThoiChucVu).ddmmyyyy() : ''}</span></span>
+                            </>
+                        )}
+                        />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={this.delete} >
                         </TableCell>
@@ -199,25 +276,32 @@ class QtChucVuGroup extends AdminPage {
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
                 'Quá trình chức vụ'
             ],
+            advanceSearch: <>
+                <div className='row'>
+                <FormSelect className='col-12 col-md-4' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
+                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} /> }
+                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} /> }
+                </div>
+            </>,
             content: <>
                 <div className='tile'>
                     {table}</div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                    getPage={this.props.getQtChucVuPage} />
-                <EditModal ref={e => this.modal = e}
+                    getPage={this.getPage} />
+                <EditModal ref={e => this.modal = e} permission={currentPermissions}
                     getQtChucVuAll={this.props.getQtChucVuAll}
-                    create={this.props.createQtChucVu} update={this.props.updateQtChucVuGroupPageMa}
+                    create={this.props.createQtChucVuGroupPageMa} update={this.props.updateQtChucVuGroupPageMa}
                 />
             </>,
             backRoute: '/user/tccb/qua-trinh/chuc-vu',
-            // onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
         });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, qtChucVu: state.tccb.qtChucVu });
 const mapActionsToProps = {
-    getQtChucVuAll, getQtChucVuPage, deleteQtChucVu, createQtChucVu,
-    updateQtChucVuGroupPageMa, getChucVuByShcc, getQtChucVuGroupPageMa
+    getQtChucVuAll, getQtChucVuPage, deleteQtChucVuGroupPageMa, createQtChucVuGroupPageMa,
+    updateQtChucVuGroupPageMa,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtChucVuGroup);

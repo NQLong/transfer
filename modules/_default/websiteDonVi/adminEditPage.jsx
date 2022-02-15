@@ -22,6 +22,7 @@ class AdminEditPage extends React.Component {
                         $('#email').val(data.email);
                         $('#address').val(data.address);
                         $('#phoneNumber').val(data.phoneNumber);
+                        $('#otherWebAddress').val(data.otherWebAddress);
 
                         this.props.getDmDonVi(data.maDonVi, donVi => {
                             this.setState({
@@ -49,6 +50,7 @@ class AdminEditPage extends React.Component {
             address: $('#address').val().trim(),
             email: $('#email').val().trim(),
             kichHoat: this.state.kichHoat,
+            otherWebAddress: $('#otherWebAddress').val().trim()
         };
         if (item.shortname == '') {
             T.notify('Tên viết tắt bị trống');
@@ -103,7 +105,6 @@ class AdminEditPage extends React.Component {
                     </div>
                     <ul className='app-breadcrumb breadcrumb'>
                         <Link to='/user'><i className='fa fa-home fa-lg' /></Link>&nbsp;/&nbsp;
-                        {/* <Link to='/user/settings'>Cấu hình</Link>&nbsp;/&nbsp; */}
                         <Link to='/user/website'>Website</Link>&nbsp;/&nbsp;
                         Chỉnh sửa
                     </ul>
@@ -134,6 +135,10 @@ class AdminEditPage extends React.Component {
                                 <div className='form-group col-md-4'>
                                     <label htmlFor='address'>Địa chỉ</label>
                                     <input type='text' className='form-control' id='address' placeholder='Địa chỉ' />
+                                </div>
+                                <div className='form-group col-md-4'>
+                                    <label htmlFor='address'>Địa chỉ trang web khác</label>
+                                    <input type='text' className='form-control' id='otherWebAddress' placeholder='Địa chỉ trang web' />
                                 </div>
                                 <div className='form-group col-12'>
                                     <div style={{ display: 'inline-flex', margin: 0, fontSize: '14px', fontWeight: 'normal' }}>

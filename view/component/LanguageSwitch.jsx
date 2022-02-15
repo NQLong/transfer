@@ -3,8 +3,10 @@ import { connect } from 'react-redux';
 import { updateSystemState } from 'modules/_default/_init/reduxSystem';
 
 class LanguageSwitch extends React.Component {
-    change() {
-        window.open(T.language() == 'vi' ? '/en' : '/', '_self');
+
+    change = () => {
+        let url = this.props.address ? this.props.address : T.language() == 'vi' ? '/en' : '/';
+        window.open(url, '_self');
     }
     render() {
         return <img src={`/img/flag/${T.language.next()}.png`} style={{ height: '1.4vw', cursor: 'pointer' }}
