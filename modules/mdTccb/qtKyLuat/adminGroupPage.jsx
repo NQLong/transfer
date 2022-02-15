@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormDatePicker, FormRichTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
-    createQtKyLuatGroupPageMa, getQtKyLuatPage, deleteQtKyLuatGroupPageMa,
+    createQtKyLuatGroupPageMa, getQtKyLuatGroupPageMa, deleteQtKyLuatGroupPageMa,
     updateQtKyLuatGroupPageMa,
 } from './redux';
 import { DateInput } from 'view/component/Input';
@@ -151,7 +151,7 @@ class QtKyLuatGroupPage extends AdminPage {
     }
 
     changeAdvancedSearch = (isInitial = false) => {
-        let { pageNumber, pageSize } = this.props && this.props.qtKyLuat && this.props.qtKyLuat.page ? this.props.qtKyLuat.page : { pageNumber: 1, pageSize: 50 };
+        let { pageNumber, pageSize } = this.props && this.props.qtKyLuat && this.props.qtKyLuat.page_ma ? this.props.qtKyLuat.page_ma : { pageNumber: 1, pageSize: 50 };
         const fromYear = this.fromYear?.value() == '' ? null : this.fromYear?.value().getTime();
         const toYear = this.toYear?.value() == '' ? null : this.toYear?.value().getTime();
         const list_dv = this.state.filter.list_dv;
@@ -171,7 +171,7 @@ class QtKyLuatGroupPage extends AdminPage {
     }
 
     getPage = (pageN, pageS, done) => {
-        this.props.getQtKyLuatPage(pageN, pageS, this.searchText, this.state.filter, done);
+        this.props.getQtKyLuatGroupPageMa(pageN, pageS, this.searchText, this.state.filter, done);
     }
 
     showModal = (e) => {
@@ -192,7 +192,7 @@ class QtKyLuatGroupPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('qtKyLuat', ['read', 'write', 'delete']);
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtKyLuat && this.props.qtKyLuat.page ? this.props.qtKyLuat.page : {pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: []};
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtKyLuat && this.props.qtKyLuat.page_ma ? this.props.qtKyLuat.page_ma : {pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: []};
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -279,7 +279,7 @@ class QtKyLuatGroupPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, qtKyLuat: state.tccb.qtKyLuat });
 const mapActionsToProps = {
-    createQtKyLuatGroupPageMa, getQtKyLuatPage, deleteQtKyLuatGroupPageMa,
+    createQtKyLuatGroupPageMa, getQtKyLuatGroupPageMa, deleteQtKyLuatGroupPageMa,
     updateQtKyLuatGroupPageMa,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtKyLuatGroupPage);
