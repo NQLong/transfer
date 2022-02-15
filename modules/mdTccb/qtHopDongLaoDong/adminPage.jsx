@@ -27,8 +27,8 @@ class QtHopDongLaoDongPage extends AdminPage {
                 }
             });
             T.onSearch = (searchText) => {
-            this.searchText = searchText;
-            if (this.checked) this.props.getQtHopDongLaoDongGroupPage(undefined, undefined, this.curState, this.searchText || '');
+                this.searchText = searchText;
+                if (this.checked) this.props.getQtHopDongLaoDongGroupPage(undefined, undefined, this.curState, this.searchText || '');
                 else this.props.getQtHopDongLaoDongPage(undefined, undefined, this.curState, this.searchText || '');
             };
             // T.showSearchBox();
@@ -43,16 +43,16 @@ class QtHopDongLaoDongPage extends AdminPage {
     }
 
     changeAdvancedSearch = () => {
-        let { pageNumber, pageSize } = this.props && this.props.qtHopDongLaoDong && this.props.qtHopDongLaoDong.page ? this.props.qtHopDongLaoDong.page : { pageNumber: 1, pageSize: 50};
+        let { pageNumber, pageSize } = this.props && this.props.qtHopDongLaoDong && this.props.qtHopDongLaoDong.page ? this.props.qtHopDongLaoDong.page : { pageNumber: 1, pageSize: 50 };
 
-        const maDonVi  = this.maDonVi?.value() || [];
+        const maDonVi = this.maDonVi?.value() || [];
         this.curState = maDonVi;
         if (this.checked) this.props.getQtHopDongLaoDongGroupPage(pageNumber, pageSize, this.curState, this.searchText || '');
         else this.props.getQtHopDongLaoDongPage(pageNumber, pageSize, this.curState, this.searchText || '');
     }
 
     groupPage = () => {
-        let { pageNumber, pageSize } = this.props && this.props.qtHopDongLaoDong && this.props.qtHopDongLaoDong.page ? this.props.qtHopDongLaoDong.page : { pageNumber: 1, pageSize: 50};
+        let { pageNumber, pageSize } = this.props && this.props.qtHopDongLaoDong && this.props.qtHopDongLaoDong.page ? this.props.qtHopDongLaoDong.page : { pageNumber: 1, pageSize: 50 };
         this.checked = !this.checked;
         if (this.checked) this.props.getQtHopDongLaoDongGroupPage(pageNumber, pageSize, this.curState, this.searchText || '');
         else this.props.getQtHopDongLaoDongPage(pageNumber, pageSize, this.curState, this.searchText || '');
@@ -96,8 +96,9 @@ class QtHopDongLaoDongPage extends AdminPage {
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Cán bộ</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Số hợp đồng</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ duyệt hồ sơ</th>
-                        <th style={{ width: 'auto', textAlign: 'center',  whiteSpace: 'nowrap' }}>Thao tác</th>
+                        <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Ngày tái ký HĐ</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ ký</th>
+                        <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
 
                     </tr>
                 ),
@@ -119,18 +120,23 @@ class QtHopDongLaoDongPage extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' content={(
+                        <TableCell type='text' style={{ textAlign: 'justify' }} content={(
                             item.loaiHopDong != '07' ?
-                                <>
-                                    <span style={{ whiteSpace: 'nowrap' }}>{item.tenLoaiHopDong.replace('Hợp đồng lao động', 'HĐLĐ')}</span><br />
+                                <p>
+                                    <b style={{ whiteSpace: 'nowrap' }}>{item.tenLoaiHopDong.replace('Hợp đồng lao động', 'HĐLĐ')}</b><br />
                                     <span style={{ whiteSpace: 'nowrap' }}>Từ ngày: <span style={{ color: 'blue' }}>{item.batDauLamViec ? new Date(item.batDauLamViec).ddmmyyyy() : ''}</span></span><br />
                                     <span style={{ whiteSpace: 'nowrap' }}>Đến ngày: <span style={{ color: 'blue' }}>{item.ketThucHopDong ? new Date(item.ketThucHopDong).ddmmyyyy() : ''}</span></span>
-                                </> :
-                                <>
+                                </p> :
+                                <p>
                                     <span>{item.tenLoaiHopDong.replace('Hợp đồng lao động', 'HĐLĐ')}</span><br />
-                                </>
+                                </p>
                         )}
                         />
+                        {item.loaiHopDong != '07' ? <TableCell type='text' style={{ textAlign: 'center' }} content={(
+                            <>
+                                <span style={{ whiteSpace: 'nowrap', color: 'red' }}>{item.ngayKyHopDongTiepTheo ? new Date(item.ngayKyHopDongTiepTheo).ddmmyyyy() : ''}</span>
+                            </>
+                        )} /> : <TableCell />}
                         <TableCell style={{ whiteSpace: 'nowrap' }} type='text' content={(
                             <>
                                 <span>{item.hoNguoiKy + ' ' + item.tenNguoiKy}<br /></span>
@@ -174,7 +180,7 @@ class QtHopDongLaoDongPage extends AdminPage {
                 'Hợp đồng Lao động'
             ],
             advanceSearch: <>
-                <FormSelect className='col-12 col-md-12' multiple = {true} ref={e => this.maDonVi = e} label='Chọn đơn vị (có thể chọn nhiều đơn vị)' data={this.stateTable} onChange={() => this.changeAdvancedSearch()} allowClear={true} />
+                <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.maDonVi = e} label='Chọn đơn vị (có thể chọn nhiều đơn vị)' data={this.stateTable} onChange={() => this.changeAdvancedSearch()} allowClear={true} />
             </>,
             content: <>
                 <div className='tile'>

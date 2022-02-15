@@ -12,8 +12,9 @@ import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 
 const quocTeList = [
-    { id: 0, text: 'Xuât bản trong nước' },
-    { id: 1, text: 'Xuất bản quốc tế' },
+    { id: 0, text: 'Trong nước' },
+    { id: 1, text: 'Quốc tế' },
+    { id: 2, text: 'Trong và ngoài nước' }
 ];
 
 class EditModal extends AdminModal {
@@ -101,13 +102,13 @@ class EditModal extends AdminModal {
             body: <div className='row'>
                 <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={readOnly} required />
                 <FormTextBox className='col-12' ref={e => this.tenTacGia = e} label={'Tác giả'} type='text' required />
-                <FormRichTextBox className='col-12' ref={e => this.tenBaiViet = e} label={'Tên bài viết'} type='text'/>
+                <FormRichTextBox className='col-12' ref={e => this.tenBaiViet = e} label={'Tên bài viết'} type='text' />
                 <FormTextBox className='col-9' ref={e => this.tenTapChi = e} label={'Tên tạp chí'} type='text' required />
                 <FormTextBox className='col-3' ref={e => this.soHieuIssn = e} label={'Số hiệu ISSN'} type='text' required />
-                <FormRichTextBox className='col-12' ref={e => this.sanPham = e} label={'Sản phẩm'} type='text'/>
+                <FormRichTextBox className='col-12' ref={e => this.sanPham = e} label={'Sản phẩm'} type='text' />
                 <div className='form-group col-md-4'><DateInput ref={e => this.namXuatBan = e} label='Năm xuất bản' type='year' required /></div>
                 <FormSelect className='col-md-4' ref={e => this.quocTe = e} label='Phạm vi xuất bản' data={quocTeList} />
-                <FormTextBox className='col-4' ref={e => this.diemIf = e} label={'Điểm If'} type='text'/>
+                <FormTextBox className='col-4' ref={e => this.diemIf = e} label={'Điểm If'} type='text' />
             </div>
         });
     }
@@ -178,9 +179,9 @@ class QtBaiVietKhoaHoc extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Bài viết</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tạp chí xuất bản</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Điểm If</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Phạm vi xuất bản</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tạp chí</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Điểm if</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Xuất bản</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
@@ -189,29 +190,34 @@ class QtBaiVietKhoaHoc extends AdminPage {
                         <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
                         <TableCell type='text' content={(
                             <>
-                                <span><i>{item.tenBaiViet}</i></span> <br/> <br/>
+                                <span><b>{item.tenBaiViet}</b></span> <br />
                                 <span>Tác giả:
                                     <a href='#' onClick={() => this.modal.show(item, false)}>
-                                        <span style={{color: 'blue'}}>{' ' + item.tenTacGia} </span>
+                                        <span style={{ color: 'blue' }}>{' ' + item.tenTacGia} </span>
                                     </a>
                                 </span>
 
                             </>
-                            
+
                         )} />
                         <TableCell type='text' content={(
                             <>
-                                <span>Tên: <span><i>{item.tenTapChi}</i></span> </span> <br/>
-                                <span style={{ whiteSpace: 'nowrap' }}>Số hiệu ISSN: <span style={{ color: 'blue' }}>{item.soHieuIssn}</span> </span> <br/> <br/>
-                                <span style={{ whiteSpace: 'nowrap' }}>Năm xuất bản: <span style={{ color: 'blue' }}>{item.namXuatBan}</span> </span>
+                                <span>Tên: <span><i>{item.tenTapChi}</i></span> </span> <br />
+                                <span style={{ whiteSpace: 'nowrap' }}>Số hiệu ISSN: <span style={{ color: 'blue' }}>{item.soHieuIssn}</span> </span> <br /> <br />
                             </>
                         )}
                         />
                         <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemIf} />
-                        <TableCell type='text' content={(
-                            item.quocTe == '0' ? <span> Xuất bản trong nước</span>
-                            : item.quocTe == '1' ? <span> Xuất bản quốc tế</span>
-                                : ''
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                            <>
+                                {item.quocTe != null && <span>{item.quocTe == '0' ? <span style={{ color: 'red' }}>Trong nước</span>
+                                    : item.quocTe == '1' ? <span style={{ color: 'orange' }}>Quốc tế</span>
+                                        : item.quocTe == '2' ? <span style={{ color: 'green' }}>Trong và ngoài nước</span> :
+                                            ''}<br /></span>}
+                                <span style={{ whiteSpace: 'nowrap' }}>Năm: <b>{item.namXuatBan}</b> </span>
+
+                            </>
+
                         )}
                         />
                         {

@@ -128,23 +128,25 @@ class EditModal extends AdminModal {
 }
 class QtKyLuatGroupPage extends AdminPage {
     state = { filter: {} };
-
+    searchText = '';
     componentDidMount() {
         T.ready('/user/tccb', () => {
+            T.clearSearchBox();
             const route = T.routeMatcher('/user/tccb/qua-trinh/ky-luat/group/:shcc'),
                 params = route.parse(window.location.pathname);
             this.shcc = params.shcc;
             this.setState({ filter: { list_shcc: params.shcc, list_dv: '' } });
-            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
+            T.onSearch = (searchText) => {
+                this.searchText = searchText;
+                this.getPage();
+            };
 
             T.showSearchBox(() => {
                 this.fromYear?.value('');
                 this.toYear?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
-            this.props.getQtKyLuatPage(undefined, undefined, undefined, this.state.filter, () => {
-                T.updatePage('pageQtKyLuat', undefined, undefined, undefined, this.state.filter);
-            });
+            this.getPage();
         });
     }
 
@@ -156,7 +158,7 @@ class QtKyLuatGroupPage extends AdminPage {
         const list_shcc = this.state.filter.list_shcc;
         const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc };
         this.setState({ filter: pageFilter }, () => {
-            this.getPage(pageNumber, pageSize, '', (page) => {
+            this.getPage(pageNumber, pageSize, (page) => {
                 if (isInitial) {
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
@@ -168,8 +170,8 @@ class QtKyLuatGroupPage extends AdminPage {
         });
     }
 
-    getPage = (pageN, pageS, pageC, done) => {
-        this.props.getQtKyLuatPage(pageN, pageS, pageC, this.state.filter, done);
+    getPage = (pageN, pageS, done) => {
+        this.props.getQtKyLuatPage(pageN, pageS, this.searchText, this.state.filter, done);
     }
 
     showModal = (e) => {
@@ -263,7 +265,7 @@ class QtKyLuatGroupPage extends AdminPage {
                 <div className='tile'>
                     {table}
                 </div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition}}
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     permissions={currentPermissions} maCanBo={this.shcc}

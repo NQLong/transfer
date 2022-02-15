@@ -24,7 +24,10 @@ const texts = {
 class HomeMenu extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { width: 0, divisionMenu: null, headerTitle: '', searchValue: '', headerMobile: '/img/logo-ussh.png?t=3' };
+        this.state = {
+            width: 0, divisionMenu: null, headerTitle: '', searchValue: '',
+            headerMobile: '/img/logo-ussh.png?t=3', otherWebAddress: ''
+        };
         this.nav = React.createRef();
     }
 
@@ -77,7 +80,8 @@ class HomeMenu extends React.Component {
                                 headerLink: websites[0].headerLink,
                                 headerTitle: websites[0].headerTitle,
                                 showHeaderTitle: websites[0].showHeaderTitle,
-                                headerMobile: websites[0].headerMobile ? websites[0].headerMobile : '/img/logo-ussh.png'
+                                headerMobile: websites[0].headerMobile ? websites[0].headerMobile : '/img/logo-ussh.png',
+                                otherWebAddress: websites[0].otherWebAddress,
                             });
                         }
                     }
@@ -112,8 +116,9 @@ class HomeMenu extends React.Component {
         let submenus = [], header = '', languageToggle = <div />;
         const { user } = this.props.system || {};
         // if (window.location.hostname == 'localhost')
-        languageToggle = <div className='ml-2'><LanguageSwitch /></div>;
+        languageToggle = <div className='ml-2'><LanguageSwitch address={this.state.otherWebAddress} /></div>;
         if (this.props.system && menus) {
+            console.log(this.state);
             submenus = menus.filter(item => item.parentId).forEach(element => {
                 menus.map(item => {
                     if (item.id === element.parentId) {
