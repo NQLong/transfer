@@ -10,7 +10,7 @@ export default {
     },
     routes: [
         {
-            path: '/user/tccb/qua-trinh/chuc-vu/group_cv/:loaiDoiTuong/:shcc',
+            path: '/user/tccb/qua-trinh/chuc-vu/group/:shcc',
             component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
         },
         {
