@@ -101,6 +101,7 @@ const QtHuongDanLuanVanGetAll = 'QtHuongDanLuanVan:GetAll';
 const QtHuongDanLuanVanGetPage = 'QtHuongDanLuanVan:GetPage';
 const QtHuongDanLuanVanGetUserPage = 'QtHuongDanLuanVan:GetUserPage';
 const QtHuongDanLuanVanGetGroupPage = 'QtHuongDanLuanVan:GetGroupPage';
+const QtHuongDanLuanVanGetGroupPageMa = 'QtHuongDanLuanVan:GetGroupPageMa';
 const QtHuongDanLuanVanUpdate = 'QtHuongDanLuanVan:Update';
 const QtHuongDanLuanVanGet = 'QtHuongDanLuanVan:Get';
 
@@ -110,6 +111,8 @@ export default function QtHuongDanLuanVanReducer(state = null, data) {
             return Object.assign({}, state, { items: data.items });
         case QtHuongDanLuanVanGetGroupPage:
             return Object.assign({}, state, { page_gr: data.page });
+        case QtHuongDanLuanVanGetGroupPageMa:
+            return Object.assign({}, state, { page_ma: data.page });
         case QtHuongDanLuanVanGetPage:
             return Object.assign({}, state, { page: data.page });
         case QtHuongDanLuanVanGetUserPage:
@@ -170,13 +173,12 @@ export function getQtHuongDanLuanVanPage(pageNumber, pageSize, pageCondition, fi
     };
 }
 
-T.initPage('groupPageQtHuongDanLuanVan', true);
 export function getQtHuongDanLuanVanGroupPage(pageNumber, pageSize, pageCondition, filter, done) {
     if (typeof filter === 'function') {
         done = filter;
         filter = {};
     }
-    const page = T.updatePage('groupPageQtHuongDanLuanVan', pageNumber, pageSize, pageCondition, filter);
+    const page = T.updatePage('pageQtHuongDanLuanVan', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/qua-trinh/hdlv/group/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter}, data => {
@@ -317,6 +319,30 @@ export function updateQtHuongDanLuanVanStaff(id, changes, done) {
     };
 }
 
+T.initPage('groupPageMaQtHuongDanLuanVan');
+export function getQtHuongDanLuanVanGroupPageMa(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('groupPageMaQtHuongDanLuanVan', pageNumber, pageSize, pageCondition, filter);
+    return dispatch => {
+        const url = `/api/qua-trinh/hdlv/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách hướng dẫn luận văn bị lỗi!', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (page.filter) data.page.filter = page.filter;
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                if (done) done(data.page);
+                dispatch({ type: QtHuongDanLuanVanGetGroupPageMa, page: data.page });
+            }
+        }, () => T.notify('Lấy danh sách hướng dẫn luận văn bị lỗi!', 'danger'));
+    };
+}
+
+
 export function updateQtHuongDanLuanVanGroupPageMa(id, changes, done) {
     return dispatch => {
         const url = '/api/qua-trinh/hdlv';
@@ -328,7 +354,7 @@ export function updateQtHuongDanLuanVanGroupPageMa(id, changes, done) {
             } else {
                 T.notify('Cập nhật hướng dẫn luận văn thành công!', 'success');
                 done && done(data.item);
-                dispatch(getQtHuongDanLuanVanPage());
+                dispatch(getQtHuongDanLuanVanGroupPageMa());
             }
         }, () => T.notify('Cập nhật hướng dẫn luận văn bị lỗi!', 'danger'));
     };
@@ -344,7 +370,7 @@ export function createQtHuongDanLuanVanGroupPageMa(data, done) {
             } else {
                 if (done) {
                     T.notify('Tạo hướng dẫn luận văn thành công!', 'success');
-                    dispatch(getQtHuongDanLuanVanPage());
+                    dispatch(getQtHuongDanLuanVanGroupPageMa());
                     done && done(data);
                 }
             }
@@ -361,7 +387,7 @@ export function deleteQtHuongDanLuanVanGroupPageMa(id, done) {
             } else {
                 T.alert('hướng dẫn luận văn đã xóa thành công!', 'success', false, 800);
                 done && done(data.item);
-                dispatch(getQtHuongDanLuanVanPage());
+                dispatch(getQtHuongDanLuanVanGroupPageMa());
             }
         }, () => T.notify('Xóa hướng dẫn luận văn bị lỗi!', 'danger'));
     };

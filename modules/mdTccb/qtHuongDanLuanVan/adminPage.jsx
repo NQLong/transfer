@@ -92,14 +92,10 @@ class EditModal extends AdminModal {
 class QtHuongDanLuanVan extends AdminPage {
     checked = parseInt(T.cookie('hienThiTheoCanBo')) == 1 ? true : false;
     state = { filter: {} };
-    searchText = '';
     componentDidMount() {
         T.ready('/user/tccb', () => {
             T.clearSearchBox();
-            T.onSearch = (searchText) => {
-                this.searchText = searchText;
-                this.getPage();
-            };            
+            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
                 this.fromYear?.value('');
                 this.toYear?.value('');
@@ -129,7 +125,7 @@ class QtHuongDanLuanVan extends AdminPage {
         const list_shcc = this.mulCanBo?.value().toString() || '';
         const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc };
         this.setState({ filter: pageFilter }, () => {
-            this.getPage(pageNumber, pageSize, (page) => {
+            this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
@@ -143,9 +139,9 @@ class QtHuongDanLuanVan extends AdminPage {
         });
     }
 
-    getPage = (pageN, pageS, done) => {
-        if (this.checked) this.props.getQtHuongDanLuanVanGroupPage(pageN, pageS, this.searchText, this.state.filter, done);
-        else this.props.getQtHuongDanLuanVanPage(pageN, pageS, this.searchText, this.state.filter, done);
+    getPage = (pageN, pageS, pageC, done) => {
+        if (this.checked) this.props.getQtHuongDanLuanVanGroupPage(pageN, pageS, pageC, this.state.filter, done);
+        else this.props.getQtHuongDanLuanVanPage(pageN, pageS, pageC, this.state.filter, done);
     }
 
     groupPage = () => {
@@ -155,7 +151,7 @@ class QtHuongDanLuanVan extends AdminPage {
     }
 
     list = (text, i, j) => {
-        if (!text) return '';
+        if (!text) return [];
         let deTais = text.split('??').map(str => <p key={i--} style={{ textTransform: 'uppercase' }}>{j - i}. {str}</p>);
         return deTais;
     }
@@ -177,6 +173,15 @@ class QtHuongDanLuanVan extends AdminPage {
             this.props.qtHuongDanLuanVan && this.props.qtHuongDanLuanVan.page_gr ?
                 this.props.qtHuongDanLuanVan.page_gr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
             : (this.props.qtHuongDanLuanVan && this.props.qtHuongDanLuanVan.page ? this.props.qtHuongDanLuanVan.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] });
+        if (this.checked && list && list.length > 0) {
+            let list_filter = [];
+            list.forEach(item => {
+                if (item.soDeTai > 0) {
+                    list_filter.push(item);
+                }
+            });
+            list = list_filter;
+        }
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({

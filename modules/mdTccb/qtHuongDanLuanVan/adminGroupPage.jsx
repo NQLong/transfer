@@ -4,8 +4,7 @@ import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
-    updateQtHuongDanLuanVanGroupPageMa, deleteQtHuongDanLuanVanGroupPageMa,
-    createQtHuongDanLuanVanGroupPageMa, getQtHuongDanLuanVanPage,
+    updateQtHuongDanLuanVanGroupPageMa, deleteQtHuongDanLuanVanGroupPageMa,createQtHuongDanLuanVanGroupPageMa, getQtHuongDanLuanVanGroupPageMa,
 } from './redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 
@@ -80,10 +79,8 @@ class QtHuongDanLuanVanGroupPage extends AdminPage {
                 params = route.parse(window.location.pathname);
             this.shcc = params.shcc;
             this.setState({filter: {list_shcc: params.shcc, list_dv: ''}});
-            T.onSearch = (searchText) => {
-                this.searchText = searchText;
-                this.getPage();
-            };
+            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
+            
             T.showSearchBox(() => {
                 this.fromYear?.value('');
                 this.toYear?.value('');
@@ -94,7 +91,7 @@ class QtHuongDanLuanVanGroupPage extends AdminPage {
     }
 
     changeAdvancedSearch = (isInitial = false) => {
-        let { pageNumber, pageSize } = this.props && this.props.qtHuongDanLuanVan && this.props.qtHuongDanLuanVan.page ? this.props.qtHuongDanLuanVan.page : { pageNumber: 1, pageSize: 50 };
+        let { pageNumber, pageSize } = this.props && this.props.qtHuongDanLuanVan && this.props.qtHuongDanLuanVan.page_ma ? this.props.qtHuongDanLuanVan.page_ma : { pageNumber: 1, pageSize: 50 };
         const fromYear = this.fromYear?.value() == '' ? null : Number(this.fromYear?.value());
         const toYear = this.toYear?.value() == '' ? null : Number(this.toYear?.value());
         const list_dv = this.state.filter.list_dv;
@@ -113,8 +110,8 @@ class QtHuongDanLuanVanGroupPage extends AdminPage {
         });
     }
 
-    getPage = (pageN, pageS, done) => {
-        this.props.getQtHuongDanLuanVanPage(pageN, pageS, this.searchText, this.state.filter, done);
+    getPage = (pageN, pageS, pageC, done) => {
+        this.props.getQtHuongDanLuanVanGroupPageMa(pageN, pageS, pageC, this.state.filter, done);
     }
 
     showModal = (e) => {
@@ -135,7 +132,7 @@ class QtHuongDanLuanVanGroupPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('qtHuongDanLuanVan', ['read', 'write', 'delete']);
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtHuongDanLuanVan && this.props.qtHuongDanLuanVan.page ? this.props.qtHuongDanLuanVan.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtHuongDanLuanVan && this.props.qtHuongDanLuanVan.page_ma ? this.props.qtHuongDanLuanVan.page_ma : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -188,7 +185,7 @@ class QtHuongDanLuanVanGroupPage extends AdminPage {
             advanceSearch: <>
                 <div className='row'>
                     <FormTextBox className='col-md-3' ref={e => this.fromYear = e} label='Từ năm (năm tốt nghiệp)' type='year' onChange={() => this.changeAdvancedSearch()} />
-                    <FormTextBox className='col-md-3' ref={e => this.toYear = e} label='Đến năm (năm tốt nghiệp))' type='year' onChange={() => this.changeAdvancedSearch()} /> 
+                    <FormTextBox className='col-md-3' ref={e => this.toYear = e} label='Đến năm (năm tốt nghiệp)' type='year' onChange={() => this.changeAdvancedSearch()} /> 
                 </div>
             </>,
             content: <>
@@ -211,6 +208,6 @@ class QtHuongDanLuanVanGroupPage extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtHuongDanLuanVan: state.tccb.qtHuongDanLuanVan });
 const mapActionsToProps = {
     updateQtHuongDanLuanVanGroupPageMa, deleteQtHuongDanLuanVanGroupPageMa,
-    createQtHuongDanLuanVanGroupPageMa, getQtHuongDanLuanVanPage,
+    createQtHuongDanLuanVanGroupPageMa, getQtHuongDanLuanVanGroupPageMa,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtHuongDanLuanVanGroupPage);
