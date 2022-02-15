@@ -1,9 +1,9 @@
-// Table name: DV_WEBSITE { id, shortname, kichHoat, website, maDonVi, image, header, headerLink, headerTitle, showHeaderTitle, phoneNumber, address, email, headerMobile, otherWebAddress }
+// Table name: QT_NGHI_PHEP { shcc, ho, ten, lyDoNghi, noiDen, batDau, batDauType, ketThuc, ketThucType, tongNgayDuocNghi, soNgayXinNghi, soNgayTinhPhep, thamNien, id, ghiChu }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'shortname': 'SHORTNAME', 'kichHoat': 'KICH_HOAT', 'website': 'WEBSITE', 'maDonVi': 'MA_DON_VI', 'image': 'IMAGE', 'header': 'HEADER', 'headerLink': 'HEADER_LINK', 'headerTitle': 'HEADER_TITLE', 'showHeaderTitle': 'SHOW_HEADER_TITLE', 'phoneNumber': 'PHONE_NUMBER', 'address': 'ADDRESS', 'email': 'EMAIL', 'headerMobile': 'HEADER_MOBILE', 'otherWebAddress': 'OTHER_WEB_ADDRESS' };
+const obj2Db = { 'shcc': 'SHCC', 'ho': 'HO', 'ten': 'TEN', 'lyDoNghi': 'LY_DO_NGHI', 'noiDen': 'NOI_DEN', 'batDau': 'BAT_DAU', 'batDauType': 'BAT_DAU_TYPE', 'ketThuc': 'KET_THUC', 'ketThucType': 'KET_THUC_TYPE', 'tongNgayDuocNghi': 'TONG_NGAY_DUOC_NGHI', 'soNgayXinNghi': 'SO_NGAY_XIN_NGHI', 'soNgayTinhPhep': 'SO_NGAY_TINH_PHEP', 'thamNien': 'THAM_NIEN', 'id': 'ID', 'ghiChu': 'GHI_CHU' };
 
 module.exports = app => {
-    app.model.dvWebsite = {
+    app.model.qtNghiPhep = {
         create: (data, done) => {
             let statement = '', values = '', parameter = {};
             Object.keys(data).forEach(column => {
@@ -17,10 +17,10 @@ module.exports = app => {
             if (statement.length == 0) {
                 done('Data is empty!');
             } else {
-                const sql = 'INSERT INTO DV_WEBSITE (' + statement.substring(2) + ') VALUES (' + values.substring(2) + ')';
+                const sql = 'INSERT INTO QT_NGHI_PHEP (' + statement.substring(2) + ') VALUES (' + values.substring(2) + ')';
                 app.dbConnection.execute(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
-                        app.model.dvWebsite.get({ rowId: resultSet.lastRowid }, done);
+                        app.model.qtNghiPhep.get({ rowId: resultSet.lastRowid }, done);
                     } else {
                         done(error ? error : 'Execute SQL command fail! Sql = ' + sql);
                     }
@@ -41,7 +41,7 @@ module.exports = app => {
             if (orderBy) Object.keys(obj2Db).sort((a, b) => b.length - a.length).forEach(key => orderBy = orderBy.replaceAll(key, obj2Db[key]));
             condition = app.dbConnection.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
-            const sql = 'SELECT ' + app.dbConnection.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT * FROM DV_WEBSITE' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '') + ') WHERE ROWNUM=1';
+            const sql = 'SELECT ' + app.dbConnection.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT * FROM QT_NGHI_PHEP' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '') + ') WHERE ROWNUM=1';
             app.dbConnection.execute(sql, parameter, (error, resultSet) => done(error, resultSet && resultSet.rows && resultSet.rows.length ? resultSet.rows[0] : null));
         },
 
@@ -58,7 +58,7 @@ module.exports = app => {
             if (orderBy) Object.keys(obj2Db).sort((a, b) => b.length - a.length).forEach(key => orderBy = orderBy.replaceAll(key, obj2Db[key]));
             condition = app.dbConnection.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
-            const sql = 'SELECT ' + app.dbConnection.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM DV_WEBSITE' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '');
+            const sql = 'SELECT ' + app.dbConnection.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM QT_NGHI_PHEP' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '');
             app.dbConnection.execute(sql, parameter, (error, resultSet) => done(error, resultSet && resultSet.rows ? resultSet.rows : []));
         },
 
@@ -76,14 +76,14 @@ module.exports = app => {
             condition = app.dbConnection.buildCondition(obj2Db, condition, ' AND ');
             let leftIndex = (pageNumber <= 1 ? 0 : pageNumber - 1) * pageSize,
                 parameter = condition.parameter ? condition.parameter : {};
-            const sql_count = 'SELECT COUNT(*) FROM DV_WEBSITE' + (condition.statement ? ' WHERE ' + condition.statement : '');
+            const sql_count = 'SELECT COUNT(*) FROM QT_NGHI_PHEP' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.dbConnection.execute(sql_count, parameter, (err, res) => {
                 let result = {};
                 let totalItem = res && res.rows && res.rows[0] ? res.rows[0]['COUNT(*)'] : 0;
                 result = { totalItem, pageSize, pageTotal: Math.ceil(totalItem / pageSize) };
                 result.pageNumber = Math.max(1, Math.min(pageNumber, result.pageTotal));
                 leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
-                const sql = 'SELECT ' + app.dbConnection.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT DV_WEBSITE.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM DV_WEBSITE' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
+                const sql = 'SELECT ' + app.dbConnection.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT QT_NGHI_PHEP.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM QT_NGHI_PHEP' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
                 app.dbConnection.execute(sql, parameter, (error, resultSet) => {
                     result.list = resultSet && resultSet.rows ? resultSet.rows : [];
                     done(error, result);
@@ -96,10 +96,10 @@ module.exports = app => {
             changes = app.dbConnection.buildCondition(obj2Db, changes, ', ', 'NEW_');
             if (changes.statement) {
                 const parameter = app.clone(condition.parameter ? condition.parameter : {}, changes.parameter ? changes.parameter : {});
-                const sql = 'UPDATE DV_WEBSITE SET ' + changes.statement + (condition.statement ? ' WHERE ' + condition.statement : '');
+                const sql = 'UPDATE QT_NGHI_PHEP SET ' + changes.statement + (condition.statement ? ' WHERE ' + condition.statement : '');
                 app.dbConnection.execute(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
-                        app.model.dvWebsite.get({ rowId: resultSet.lastRowid }, done);
+                        app.model.qtNghiPhep.get({ rowId: resultSet.lastRowid }, done);
                     } else {
                         done(error);
                     }
@@ -116,7 +116,7 @@ module.exports = app => {
             }
             condition = app.dbConnection.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
-            const sql = 'DELETE FROM DV_WEBSITE' + (condition.statement ? ' WHERE ' + condition.statement : '');
+            const sql = 'DELETE FROM QT_NGHI_PHEP' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.dbConnection.execute(sql, parameter, error => done(error));
         },
 
@@ -127,13 +127,8 @@ module.exports = app => {
             }
             condition = app.dbConnection.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
-            const sql = 'SELECT COUNT(*) FROM DV_WEBSITE' + (condition.statement ? ' WHERE ' + condition.statement : '');
+            const sql = 'SELECT COUNT(*) FROM QT_NGHI_PHEP' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.dbConnection.execute(sql, parameter, (error, result) => done(error, result));
-        },
-
-        searchPage: (pagenumber, pagesize, searchterm, done) => {
-            app.dbConnection.execute('BEGIN :ret:=dv_website_search_page(:pagenumber, :pagesize, :searchterm, :totalitem, :pagetotal); END;',
-                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, pagenumber: { val: pagenumber, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, pagesize: { val: pagesize, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, searchterm, totalitem: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pagetotal: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
         },
     };
 };
