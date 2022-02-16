@@ -51,7 +51,6 @@ export default function QtChucVuReducer(state = null, data) {
 // Actions ------------------------------------------------------------------------------------------------------------
 T.initPage('pageQtChucVu');
 export function getQtChucVuPage(pageNumber, pageSize, pageCondition, filter, done) {
-    console.log(done);
     if (typeof filter === 'function') {
         done = filter;
         filter = {};
@@ -79,7 +78,7 @@ export function getQtChucVuGroupPage(pageNumber, pageSize, pageCondition, filter
         done = filter;
         filter = {};
     }
-    const page = T.updatePage('groupPageQtChucVu', pageNumber, pageSize, pageCondition, filter);   
+    const page = T.updatePage('groupPageQtChucVu', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/tccb/qua-trinh/chuc-vu/group/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
