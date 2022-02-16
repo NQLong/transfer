@@ -34,7 +34,7 @@ export class EditModal extends AdminModal {
             shcc: '', maChucVu: '', maDonVi: '', soQuyetDinh: '', ngayRaQuyetDinh: '', chucVuChinh: 0, maBoMon: '',
             ngayRaQd: '', soQd: '', thoiChucVu: 0, ngayRaQdThoiChucVu: '', ngayThoiChucVu: '', soQdThoiChucVu: ''
         };
-        this.setState({ shcc, stt, item, chucVuChinh, thoiChucVu: thoiChucVu ? 1 : 0}, () => {
+        this.setState({ shcc, stt, item, chucVuChinh, thoiChucVu: thoiChucVu ? 1 : 0 }, () => {
             this.shcc.value(shcc ? shcc : '');
             this.maChucVu.value(maChucVu ? maChucVu : '');
             this.maDonVi.value(maDonVi ? maDonVi : '');
@@ -137,9 +137,9 @@ export class EditModal extends AdminModal {
         value ? $('#soQdThoiChucVu').show() : $('#soQdThoiChucVu').hide();
         value ? $('#ngayRaQdThoiChucVu').show() : $('#ngayRaQdThoiChucVu').hide();
         value ? $('#ngayThoiChucVu').show() : $('#ngayThoiChucVu').hide();
-        this.setState({thoiChucVu: value});
+        this.setState({ thoiChucVu: value });
     }
-    
+
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
@@ -165,15 +165,11 @@ export class EditModal extends AdminModal {
 class QtChucVu extends AdminPage {
     checked = parseInt(T.cookie('hienThiTheoCanBo')) == 1 ? true : false;
     state = { filter: {} };
-    searchText = '';
 
     componentDidMount() {
         T.ready('/user/tccb', () => {
             T.clearSearchBox();
-            T.onSearch = (searchText) => {
-                this.searchText = searchText;
-                this.getPage();
-            };
+            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
                 this.timeType?.value(0);
                 this.fromYear?.value('');
@@ -199,7 +195,7 @@ class QtChucVu extends AdminPage {
         const list_shcc = this.mulCanBo?.value().toString() || '';
         const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc, timeType };
         this.setState({ filter: pageFilter }, () => {
-            this.getPage(pageNumber, pageSize, (page) => {
+            this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
@@ -214,9 +210,9 @@ class QtChucVu extends AdminPage {
         });
     }
 
-    getPage = (pageN, pageS, done) => {
-        if (this.checked) this.props.getQtChucVuGroupPage(pageN, pageS, this.searchText, this.state.filter, done);
-        else this.props.getQtChucVuPage(pageN, pageS, this.searchText, this.state.filter, done);
+    getPage = (pageN, pageS, pageC, done) => {
+        if (this.checked) this.props.getQtChucVuGroupPage(pageN, pageS, pageC, this.state.filter, done);
+        else this.props.getQtChucVuPage(pageN, pageS, pageC, this.state.filter, done);
     }
 
     groupPage = () => {
@@ -261,7 +257,7 @@ class QtChucVu extends AdminPage {
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
                         <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Chức vụ</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Quyết định</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Quyết định bổ nhiệm</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Chức vụ chính</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thôi chức vụ</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Quyết định thôi chức vụ</th>
@@ -280,8 +276,8 @@ class QtChucVu extends AdminPage {
                         />
                         <TableCell type='text' content={(
                             <>
-                                <span>{item.tenChucVu}</span><br />
-                                <span>{!item.tenBoMon ? (item.tenDonVi ? 'Đơn vị: ' + item.tenDonVi.toUpperCase() : '') : (item.tenBoMon ? item.tenBoMon.toUpperCase() : '')}</span><br/>
+                                <b>{item.tenChucVu}</b><br />
+                                <span>{!item.tenBoMon ? (item.tenDonVi ? 'Đơn vị: ' + item.tenDonVi.toUpperCase() : '') : (item.tenBoMon ? item.tenBoMon.toUpperCase() : '')}</span><br />
                                 <span>Hệ số phụ cấp: {item.phuCap}</span>
                             </>
                         )}
@@ -329,10 +325,10 @@ class QtChucVu extends AdminPage {
             advanceSearch: <>
                 <div className='row'>
                     <FormSelect className='col-12 col-md-4' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
-                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} /> }
-                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} /> }
-                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1}/>
-                    <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1}/>
+                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />}
+                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />}
+                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
                 </div>
             </>,
             content: <>
