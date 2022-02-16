@@ -6,6 +6,7 @@ const QtKeoDaiCongTacGetAll = 'QtKeoDaiCongTac:GetAll';
 const QtKeoDaiCongTacGetPage = 'QtKeoDaiCongTac:GetPage';
 const QtKeoDaiCongTacGetUserPage = 'QtKeoDaiCongTac:GetUserPage';
 const QtKeoDaiCongTacGetGroupPage = 'QtKeoDaiCongTac:GetGroupPage';
+const QtKeoDaiCongTacGetGroupPageMa = 'QtKeoDaiCongTac:GetGroupPageMa';
 const QtKeoDaiCongTacUpdate = 'QtKeoDaiCongTac:Update';
 const QtKeoDaiCongTacGet = 'QtKeoDaiCongTac:Get';
 
@@ -15,6 +16,8 @@ export default function QtKeoDaiCongTacReducer(state = null, data) {
             return Object.assign({}, state, { items: data.items });
         case QtKeoDaiCongTacGetGroupPage:
             return Object.assign({}, state, { page_gr: data.page });
+        case QtKeoDaiCongTacGetGroupPageMa:
+            return Object.assign({}, state, { page_ma: data.page });
         case QtKeoDaiCongTacGetPage:
             return Object.assign({}, state, { page: data.page });
         case QtKeoDaiCongTacGetUserPage:
@@ -148,13 +151,12 @@ export function getQtKeoDaiCongTacPage(pageNumber, pageSize, pageCondition, filt
     };
 }
 
-T.initPage('groupPageQtKeoDaiCongTac', true);
 export function getQtKeoDaiCongTacGroupPage(pageNumber, pageSize, pageCondition, filter, done) {
     if (typeof filter === 'function') {
         done = filter;
         filter = {};
     }
-    const page = T.updatePage('groupPageQtKeoDaiCongTac', pageNumber, pageSize, pageCondition, filter);
+    const page = T.updatePage('pageQtKeoDaiCongTac', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/tccb/qua-trinh/keo-dai-cong-tac/group/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter}, data => {
@@ -171,6 +173,29 @@ export function getQtKeoDaiCongTacGroupPage(pageNumber, pageSize, pageCondition,
     };
 }
 
+T.initPage('groupPageMaQtKeoDaiCongTac');
+export function getQtKeoDaiCongTacGroupPageMa(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('groupPageMaQtKeoDaiCongTac', pageNumber, pageSize, pageCondition, filter);
+    return dispatch => {
+        const url = `/api/tccb/qua-trinh/keo-dai-cong-tac/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách kéo dài công tác bị lỗi!', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (page.filter) data.page.filter = page.filter;
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                if (done) done(data.page);
+                dispatch({ type: QtKeoDaiCongTacGetGroupPageMa, page: data.page });
+            }
+        }, () => T.notify('Lấy danh sách kéo dài công tác bị lỗi!', 'danger'));
+    };
+}
+
 export function updateQtKeoDaiCongTacGroupPageMa(id, changes, done) {
     return dispatch => {
         const url = '/api/tccb/qua-trinh/keo-dai-cong-tac';
@@ -182,7 +207,7 @@ export function updateQtKeoDaiCongTacGroupPageMa(id, changes, done) {
             } else {
                 T.notify('Cập nhật kéo dài công tác thành công!', 'success');
                 done && done(data.item);
-                dispatch(getQtKeoDaiCongTacPage());
+                dispatch(getQtKeoDaiCongTacGroupPageMa());
             }
         }, () => T.notify('Cập nhật kéo dài công tác bị lỗi!', 'danger'));
     };
@@ -198,7 +223,7 @@ export function createQtKeoDaiCongTacGroupPageMa(data, done) {
             } else {
                 if (done) {
                     T.notify('Tạo kéo dài công tác thành công!', 'success');
-                    dispatch(getQtKeoDaiCongTacPage());
+                    dispatch(getQtKeoDaiCongTacGroupPageMa());
                     done && done(data);
                 }
             }
@@ -215,7 +240,7 @@ export function deleteQtKeoDaiCongTacGroupPageMa(id, done) {
             } else {
                 T.alert('kéo dài công tác đã xóa thành công!', 'success', false, 800);
                 done && done(data.item);
-                dispatch(getQtKeoDaiCongTacPage());
+                dispatch(getQtKeoDaiCongTacGroupPageMa());
             }
         }, () => T.notify('Xóa kéo dài công tác bị lỗi!', 'danger'));
     };

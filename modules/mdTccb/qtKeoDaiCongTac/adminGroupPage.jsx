@@ -5,7 +5,7 @@ import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox,
 import Pagination from 'view/component/Pagination';
 import {
     updateQtKeoDaiCongTacGroupPageMa, deleteQtKeoDaiCongTacGroupPageMa,
-    createQtKeoDaiCongTacGroupPageMa, getQtKeoDaiCongTacPage,
+    createQtKeoDaiCongTacGroupPageMa, getQtKeoDaiCongTacGroupPageMa,
 } from './redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import { DateInput } from 'view/component/Input';
@@ -114,14 +114,12 @@ class QtKeoDaiCongTacGroupPage extends AdminPage {
                 this.toYear?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
-            this.props.getQtKeoDaiCongTacPage(undefined, undefined, undefined, this.state.filter, () => {
-                T.updatePage('pageQtKeoDaiCongTac', undefined, undefined, undefined, this.state.filter);
-            });
+            this.getPage();
         });
     }
 
     changeAdvancedSearch = (isInitial = false) => {
-        let { pageNumber, pageSize } = this.props && this.props.qtKeoDaiCongTac && this.props.qtKeoDaiCongTac.page ? this.props.qtKeoDaiCongTac.page : { pageNumber: 1, pageSize: 50 };
+        let { pageNumber, pageSize } = this.props && this.props.qtKeoDaiCongTac && this.props.qtKeoDaiCongTac.page_ma ? this.props.qtKeoDaiCongTac.page_ma : { pageNumber: 1, pageSize: 50 };
         const fromYear = this.fromYear?.value() == '' ? null : this.fromYear?.value().getTime();
         const toYear = this.toYear?.value() == '' ? null : this.toYear?.value().getTime();
         const list_dv = this.state.filter.list_dv;
@@ -141,7 +139,7 @@ class QtKeoDaiCongTacGroupPage extends AdminPage {
     }
 
     getPage = (pageN, pageS, pageC, done) => {
-        this.props.getQtKeoDaiCongTacPage(pageN, pageS, pageC, this.state.filter, done);
+        this.props.getQtKeoDaiCongTacGroupPageMa(pageN, pageS, pageC, this.state.filter, done);
     }
 
     showModal = (e) => {
@@ -162,7 +160,7 @@ class QtKeoDaiCongTacGroupPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('qtKeoDaiCongTac', ['read', 'write', 'delete']);
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtKeoDaiCongTac && this.props.qtKeoDaiCongTac.page ? this.props.qtKeoDaiCongTac.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtKeoDaiCongTac && this.props.qtKeoDaiCongTac.page_ma ? this.props.qtKeoDaiCongTac.page_ma : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -238,6 +236,6 @@ class QtKeoDaiCongTacGroupPage extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtKeoDaiCongTac: state.tccb.qtKeoDaiCongTac });
 const mapActionsToProps = {
     updateQtKeoDaiCongTacGroupPageMa, deleteQtKeoDaiCongTacGroupPageMa,
-    createQtKeoDaiCongTacGroupPageMa, getQtKeoDaiCongTacPage,
+    createQtKeoDaiCongTacGroupPageMa, getQtKeoDaiCongTacGroupPageMa,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtKeoDaiCongTacGroupPage);
