@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormRichTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import { updateSachGiaoTrinhGroupPageMa, deleteSachGiaoTrinhGroupPageMa,
-    getSachGiaoTrinhPage, createSachGiaoTrinhGroupPageMa,
+    getSachGiaoTrinhGroupPageMa, createSachGiaoTrinhGroupPageMa,
 } from './redux';
 
 import { DateInput } from 'view/component/Input';
@@ -96,10 +96,7 @@ class SachGiaoTrinhGroupPage extends AdminPage {
                 params = route.parse(window.location.pathname);
             this.shcc = params.shcc;
             this.setState({ filter: { list_shcc: params.shcc, list_dv: '' } });
-            T.onSearch = (searchText) => {
-                this.searchText = searchText;
-                this.getPage();
-            };
+            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
                 this.fromYear?.value('');
                 this.toYear?.value('');
@@ -110,14 +107,14 @@ class SachGiaoTrinhGroupPage extends AdminPage {
     }
 
     changeAdvancedSearch = (isInitial = false) => {
-        let { pageNumber, pageSize } = this.props && this.props.sachGiaoTrinh && this.props.sachGiaoTrinh.page ? this.props.sachGiaoTrinh.page : { pageNumber: 1, pageSize: 50 };
+        let { pageNumber, pageSize } = this.props && this.props.sachGiaoTrinh && this.props.sachGiaoTrinh.page_ma ? this.props.sachGiaoTrinh.page_ma : { pageNumber: 1, pageSize: 50 };
         const fromYear = this.fromYear?.value() == '' ? null : Number(this.fromYear?.value());
         const toYear = this.toYear?.value() == '' ? null : Number(this.toYear?.value());
         const list_dv = this.state.filter.list_dv;
         const list_shcc = this.state.filter.list_shcc;
         const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc };
         this.setState({ filter: pageFilter }, () => {
-            this.getPage(pageNumber, pageSize, (page) => {
+            this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
@@ -129,8 +126,8 @@ class SachGiaoTrinhGroupPage extends AdminPage {
         });
     }
 
-    getPage = (pageN, pageS, done) => {
-        this.props.getSachGiaoTrinhPage(pageN, pageS, this.searchText, this.state.filter, done);
+    getPage = (pageN, pageS, pageC, done) => {
+        this.props.getSachGiaoTrinhGroupPageMa(pageN, pageS, pageC, this.state.filter, done);
     }
 
     showModal = (e) => {
@@ -151,7 +148,7 @@ class SachGiaoTrinhGroupPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('sachGiaoTrinh', ['read', 'write', 'delete']);
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.sachGiaoTrinh && this.props.sachGiaoTrinh.page ? this.props.sachGiaoTrinh.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.sachGiaoTrinh && this.props.sachGiaoTrinh.page_ma ? this.props.sachGiaoTrinh.page_ma : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -249,6 +246,6 @@ class SachGiaoTrinhGroupPage extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, sachGiaoTrinh: state.tccb.sachGiaoTrinh });
 const mapActionsToProps = {
     updateSachGiaoTrinhGroupPageMa, deleteSachGiaoTrinhGroupPageMa, 
-    getSachGiaoTrinhPage, createSachGiaoTrinhGroupPageMa,
+    getSachGiaoTrinhGroupPageMa, createSachGiaoTrinhGroupPageMa,
 };
 export default connect(mapStateToProps, mapActionsToProps)(SachGiaoTrinhGroupPage);
