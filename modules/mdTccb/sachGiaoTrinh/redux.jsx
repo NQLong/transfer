@@ -1,4 +1,4 @@
-import { getStaffEdit, userGetStaff } from '../tccbCanBo/redux';
+import { userGetStaff } from '../tccbCanBo/redux';
 
 import T from 'view/js/common';
 
@@ -7,6 +7,7 @@ const SachGiaoTrinhGetAll = 'SachGiaoTrinh:GetAll';
 const SachGiaoTrinhGetPage = 'SachGiaoTrinh:GetPage';
 const SachGiaoTrinhGetUserPage = 'SachGiaoTrinh:GetUserPage';
 const SachGiaoTrinhGetGroupPage = 'SachGiaoTrinh:GetGroupPage';
+const SachGiaoTrinhGetGroupPageMa = 'SachGiaoTrinh:GetGroupPageMa';
 const SachGiaoTrinhUpdate = 'SachGiaoTrinh:Update';
 const SachGiaoTrinhGet = 'SachGiaoTrinh:Get';
 
@@ -16,6 +17,8 @@ export default function SachGiaoTrinhReducer(state = null, data) {
             return Object.assign({}, state, { items: data.items });
         case SachGiaoTrinhGetGroupPage:
             return Object.assign({}, state, { page_gr: data.page });
+        case SachGiaoTrinhGetGroupPageMa:
+            return Object.assign({}, state, { page_ma: data.page });
         case SachGiaoTrinhGetPage:
             return Object.assign({}, state, { page: data.page });
         case SachGiaoTrinhGetUserPage:
@@ -149,13 +152,12 @@ export function getSachGiaoTrinhPage(pageNumber, pageSize, pageCondition, filter
     };
 }
 
-T.initPage('groupPageSachGiaoTrinh', true);
 export function getSachGiaoTrinhGroupPage(pageNumber, pageSize, pageCondition, filter, done) {
     if (typeof filter === 'function') {
         done = filter;
         filter = {};
     }
-    const page = T.updatePage('groupPageSachGiaoTrinh', pageNumber, pageSize, pageCondition, filter);
+    const page = T.updatePage('pageSachGiaoTrinh', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/tccb/qua-trinh/sach-giao-trinh/group/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter}, data => {
@@ -172,6 +174,29 @@ export function getSachGiaoTrinhGroupPage(pageNumber, pageSize, pageCondition, f
     };
 }
 
+T.initPage('groupPageMaSachGiaoTrinh');
+export function getSachGiaoTrinhGroupPageMa(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('groupPageMaSachGiaoTrinh', pageNumber, pageSize, pageCondition, filter);
+    return dispatch => {
+        const url = `/api/tccb/qua-trinh/sach-giao-trinh/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách quá trình sách giáo trình bị lỗi!', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (page.filter) data.page.filter = page.filter;
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                if (done) done(data.page);
+                dispatch({ type: SachGiaoTrinhGetGroupPageMa, page: data.page });
+            }
+        }, () => T.notify('Lấy danh sách quá trình sách giáo trình bị lỗi!', 'danger'));
+    };
+}
+
 export function updateSachGiaoTrinhGroupPageMa(id, changes, done) {
     return dispatch => {
         const url = '/api/staff/sach-giao-trinh';
@@ -183,7 +208,7 @@ export function updateSachGiaoTrinhGroupPageMa(id, changes, done) {
             } else {
                 T.notify('Cập nhật sách giáo trình thành công!', 'success');
                 done && done(data.item);
-                dispatch(getSachGiaoTrinhPage());
+                dispatch(getSachGiaoTrinhGroupPageMa());
             }
         }, () => T.notify('Cập nhật sách giáo trình bị lỗi!', 'danger'));
     };
@@ -200,7 +225,7 @@ export function deleteSachGiaoTrinhGroupPageMa(id, done) {
             } else {
                 T.alert('Thông tin sách, giáo trình được xóa thành công!', 'info', false, 800);
                 done && done(data.item);
-                dispatch(getSachGiaoTrinhPage());
+                dispatch(getSachGiaoTrinhGroupPageMa());
             }
         }, () => T.notify('Xóa thông tin sách, giáo trình bị lỗi', 'danger'));
     };
@@ -216,7 +241,7 @@ export function createSachGiaoTrinhGroupPageMa(data, done) {
             } else {
                 if (done) {
                     T.notify('Tạo quá trình sách giáo trình thành công!', 'success');
-                    dispatch(getSachGiaoTrinhPage());
+                    dispatch(getSachGiaoTrinhGroupPageMa());
                     done && done(data);
                 }
             }
@@ -224,7 +249,7 @@ export function createSachGiaoTrinhGroupPageMa(data, done) {
     };
 }
 
-export function createSachGTStaff(data, done, isEdit = null) {
+export function createSachGTStaff(data, done) {
     return dispatch => {
         const url = '/api/staff/sach-giao-trinh';
         T.post(url, { data }, res => {
@@ -232,23 +257,17 @@ export function createSachGTStaff(data, done, isEdit = null) {
                 T.notify('Thêm thông tin sách, giáo trình bị lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
-                T.notify('Thêm thông tin sách, giáo trình thành công!', 'info');
                 if (done) {
-                    if (isEdit) {
-                        done();
-                        dispatch(getStaffEdit(data.shcc));
-                    }
-                    else {
-                        done(data);
-                        dispatch(getSachGiaoTrinhPage());
-                    }
+                    T.notify('Thêm thông tin sách, giáo trình thành công!', 'info');
+                    done(data);
+                    dispatch(getSachGiaoTrinhPage());
                 }
             }
         }, () => T.notify('Thêm thông tin sách, giáo trình bị lỗi', 'danger'));
     };
 }
 
-export function updateSachGTStaff(id, changes, done, isEdit = null) {
+export function updateSachGTStaff(id, changes, done) {
     return dispatch => {
         const url = '/api/staff/sach-giao-trinh';
         T.put(url, { id, changes }, data => {
@@ -257,14 +276,14 @@ export function updateSachGTStaff(id, changes, done, isEdit = null) {
                 console.error('PUT: ' + url + '. ' + data.error);
             } else if (data.item) {
                 T.notify('Cập nhật thông tin sách, giáo trình thành công!', 'info');
-                isEdit ? (done && done()) : (done && done(data.item));
-                isEdit ? dispatch(getStaffEdit(changes.shcc)) : dispatch(getSachGiaoTrinhPage());
+                done && done(data.item);
+                dispatch(getSachGiaoTrinhPage());
             }
         }, () => T.notify('Cập nhật thông tin sách, giáo trình bị lỗi', 'danger'));
     };
 }
 
-export function deleteSachGTStaff(id, isEdit, shcc = null) {
+export function deleteSachGTStaff(id, done) {
     return dispatch => {
         const url = '/api/staff/sach-giao-trinh';
         T.delete(url, { id }, data => {
@@ -273,7 +292,8 @@ export function deleteSachGTStaff(id, isEdit, shcc = null) {
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
                 T.alert('Thông tin sách, giáo trình được xóa thành công!', 'info', false, 800);
-                isEdit ? dispatch(getStaffEdit(shcc)) : dispatch(getSachGiaoTrinhPage());
+                done && done(data.item);
+                dispatch(getSachGiaoTrinhPage());
             }
         }, () => T.notify('Xóa thông tin sách, giáo trình bị lỗi', 'danger'));
     };

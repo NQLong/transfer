@@ -73,14 +73,14 @@ class EditModal extends AdminModal {
                     quocTe: this.quocTe.value()
                 };
                 if (index == list_ma.length - 1) {
-                    this.state.id ? this.props.update(this.state.id, changes, this.hide, false) : this.props.create(changes, this.hide, false);
+                    this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
                     this.setState({
                         id: ''
                     });
                     this.maCanBo.reset();
                 }
                 else {
-                    this.state.id ? this.props.update(this.state.id, changes, false) : this.props.create(changes, false);
+                    this.state.id ? this.props.update(this.state.id, changes, null) : this.props.create(changes, null);
                 }
             });
         }
@@ -112,10 +112,7 @@ class SachGiaoTrinh extends AdminPage {
     componentDidMount() {
         T.ready('/user/tccb', () => {
             T.clearSearchBox();
-            T.onSearch = (searchText) => {
-                this.searchText = searchText;
-                this.getPage();
-            };
+            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
                 this.fromYear?.value('');
                 this.toYear?.value('');
@@ -136,7 +133,6 @@ class SachGiaoTrinh extends AdminPage {
         this.modal.show();
     }
 
-
     changeAdvancedSearch = (isInitial = false) => {
         let { pageNumber, pageSize } = this.props && this.props.sachGiaoTrinh && this.props.sachGiaoTrinh.page ? this.props.sachGiaoTrinh.page : { pageNumber: 1, pageSize: 50 };
         const fromYear = this.fromYear?.value() == '' ? null : Number(this.fromYear?.value());
@@ -145,7 +141,7 @@ class SachGiaoTrinh extends AdminPage {
         const list_shcc = this.mulCanBo?.value().toString() || '';
         const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc };
         this.setState({ filter: pageFilter }, () => {
-            this.getPage(pageNumber, pageSize, (page) => {
+            this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
@@ -159,9 +155,9 @@ class SachGiaoTrinh extends AdminPage {
         });
     }
 
-    getPage = (pageN, pageS, done) => {
-        if (this.checked) this.props.getSachGiaoTrinhGroupPage(pageN, pageS, this.searchText, this.state.filter, done);
-        else this.props.getSachGiaoTrinhPage(pageN, pageS, this.searchText, this.state.filter, done);
+    getPage = (pageN, pageS, pageC, done) => {
+        if (this.checked) this.props.getSachGiaoTrinhGroupPage(pageN, pageS, pageC, this.state.filter, done);
+        else this.props.getSachGiaoTrinhPage(pageN, pageS, pageC, this.state.filter, done);
     }
 
     groupPage = () => {
@@ -178,7 +174,7 @@ class SachGiaoTrinh extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa sách giáo trình', 'Bạn có chắc bạn muốn xóa sách giáo trình này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteSachGTStaff(item.id, false, null, error => {
+            isConfirm && this.props.deleteSachGTStaff(item.id, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá sách giáo trình bị lỗi!', 'danger');
                 else T.alert('Xoá sách giáo trình thành công!', 'success', false, 800);
             });
@@ -193,6 +189,15 @@ class SachGiaoTrinh extends AdminPage {
             this.props.sachGiaoTrinh && this.props.sachGiaoTrinh.page_gr ?
                 this.props.sachGiaoTrinh.page_gr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
             : (this.props.sachGiaoTrinh && this.props.sachGiaoTrinh.page ? this.props.sachGiaoTrinh.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] });
+        if (this.checked && list && list.length > 0) {
+            let list_filter = [];
+            list.forEach(item => {
+                if (item.soLuong > 0) {
+                    list_filter.push(item);
+                }
+            });
+            list = list_filter;
+        }
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
