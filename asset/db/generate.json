@@ -5305,6 +5305,97 @@
         "foreignKeys": [],
         "type": "table"
     },
+    "FW_NOTIFICATION": {
+        "active": true,
+        "moduleName": "fwNotification",
+        "modelName": "fwNotification",
+        "columns": {
+            "ID": {
+                "value": "id",
+                "dataType": "NUMBER",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_521816\".nextval",
+                "nullable": false,
+                "size": "22,0"
+            },
+            "EMAIL": {
+                "value": "email",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 200
+            },
+            "TITLE": {
+                "value": "title",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 200
+            },
+            "SUB_TITLE": {
+                "value": "subTitle",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 500
+            },
+            "ICON": {
+                "value": "icon",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 30
+            },
+            "ICON_COLOR": {
+                "value": "iconColor",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 10
+            },
+            "TARGET_LINK": {
+                "value": "targetLink",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 200
+            },
+            "READ": {
+                "value": "read",
+                "dataType": "NUMBER",
+                "dataDefault": "0",
+                "nullable": true,
+                "size": "1,0"
+            },
+            "BUTTON_LINK": {
+                "value": "buttonLink",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 1000
+            },
+            "SEND_TIME": {
+                "value": "sendTime",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "22,0"
+            },
+            "ACTION": {
+                "value": "action",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 100
+            }
+        },
+        "primaryKeys": [
+            "ID"
+        ],
+        "foreignKeys": [
+            "EMAIL"
+        ],
+        "type": "table"
+    },
     "FW_QUESTION": {
         "active": true,
         "moduleName": "fwForm",

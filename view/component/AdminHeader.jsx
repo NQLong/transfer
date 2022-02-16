@@ -1,13 +1,17 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import { changeRole } from 'modules/_default/fwRole/redux';
+import { getUnreadContacts, getContact } from 'modules/_default/fwContact/redux';
+import { getUnreadNotification, addNotification, readNotification } from 'modules/_default/fwNotification/redux';
 import { updateSystemState, logout } from 'modules/_default/_init/reduxSystem';
 import { SelectAdapter_FwUser, switchUser } from 'modules/_default/fwUser/reduxUser';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import { AdminPage, } from 'view/component/AdminPage';
 
 import { Select } from './Input';
+import AdminContactModal from './AdminContactModal';
 
 class DebugModal extends React.Component {
     modal = React.createRef();
@@ -58,6 +62,170 @@ class DebugModal extends React.Component {
         );
     }
 }
+
+const UrlItem = (props) => {
+    const link = props.link || '#';
+    if (link == '#') {
+        return (
+            <a href='#' className='app-notification__item' onClick={e => e.preventDefault() || (props.onClick && props.onClick(e))}>
+                {props.children}
+            </a>
+        );
+    } else if (link.startsWith('http')) {
+        return (
+            <a href={link} className='app-notification__item' target='_blank' rel='noreferrer' onClick={(e) => props.onClick && props.onClick(e)}>
+                {props.children}
+            </a>
+        );
+    } else {
+        return (
+            <Link to={link} className='app-notification__item' onClick={(e) => props.onClick && props.onClick(e)}>
+                {props.children}
+            </Link>
+        );
+    }
+};
+class NotificationItem extends AdminPage {
+    componentDidMount() {
+        const handleGetNotification = () => {
+            if (this.props.system && this.props.system.user) {
+                const contactRead = this.getUserPermission('contact', ['read']).read;
+                if (contactRead) this.props.getUnreadContacts();
+                this.props.getUnreadNotification(1, 10);
+            } else setTimeout(handleGetNotification, 250);
+        };
+        handleGetNotification();
+    }
+
+    readNotify = (id, action) => {
+        this.props.readNotification(id, action, () => this.props.getUnreadNotification(1, 10));
+    }
+
+    handleClickButton = (e, button, notiId) => {
+        e.stopPropagation();
+        e.preventDefault();
+        let { method, url, body, text } = button;
+        if (url) {
+            if (!method) method = 'get';
+            method = method.toLowerCase();
+            // Redirect to another page
+            if (method == 'get' && !url.startsWith('/api')) {
+                // External link
+                if (url.startsWith('http')) {
+                    window.open(url, '_blank');
+                } else if (!url.startsWith('/user')) {
+                    // Homepage
+                    document.location.pathname = url;
+                } else {
+                    this.props.history.push(url);
+                }
+                this.readNotify(notiId);
+            } else {
+                // Handle request
+                T[method](url, body || {}, (data) => {
+                    if (data) {
+                        if (data.error) {
+                            T.notify(data.error.message || 'Thao tác bị lỗi!', 'danger');
+                        } else {
+                            T.notify(data.success && data.success.message ? data.success.message : 'Thao tác thành công!', 'success');
+                            this.readNotify(notiId, 'Đã ' + text.toLowerCase());
+                        }
+                    }
+                }, () => T.notify('Thao tác bị lỗi!', 'danger'));
+            }
+        }
+    }
+
+    render() {
+        const contactRead = this.getUserPermission('contact', ['read']).read;
+        const contacts = this.props.contact && this.props.contact.unreads ? this.props.contact.unreads : [];
+        const notifications = this.props.notification && this.props.notification.unread && this.props.notification.unread ? this.props.notification.unread : [];
+        const notificationLength = contacts.length + notifications.length;
+        const contactElements = contacts.map((item, index) => (
+            <li key={index}>
+                <a className='app-notification__item' href='#' onClick={e => this.props.showContact(e, item.id)}>
+                    <span className='app-notification__icon'>
+                        <span className='fa-stack fa-lg'>
+                            <i className='fa fa-circle fa-stack-2x text-primary' />
+                            <i className='fa fa-envelope fa-stack-1x fa-inverse' />
+                        </span>
+                    </span>
+                    <div>
+                        <p className='app-notification__message' style={{ fontWeight: 'bold' }}>{item.subject}</p>
+                        <p className='app-notification__meta'>{new Date(item.createdDate).getText()}</p>
+                    </div>
+                </a>
+            </li>));
+        const notificationElements = notifications.map((item, index) => {
+            let buttons;
+            try {
+                if (item.buttonLink) {
+                    buttons = JSON.parse(item.buttonLink);
+                } else {
+                    buttons = [];
+                }
+            } catch (e) {
+                console.error(e);
+                buttons = [];
+            }
+            if (buttons.length) item.targetLink = '#';
+            return (
+                <li key={index}>
+                    <UrlItem link={item.targetLink} onClick={e => buttons.length == 0 ? this.readNotify(item.id) : e.preventDefault()}>
+                        <span className='app-notification__icon'>
+                            <span className='fa-stack fa-lg'>
+                                <i className='fa fa-circle fa-stack-2x' style={{ color: item.iconColor }} />
+                                <i className={`fa ${item.icon} fa-stack-1x fa-inverse`} />
+                            </span>
+                        </span>
+                        <div>
+                            <p className='app-notification__message' style={{ fontWeight: 'bold' }}>{item.title}</p>
+                            <p className='app-notification__meta'>{new Date(item.sendTime).getText()}</p>
+                            <p className='app-notification__meta'>{item.subTitle}</p>
+                            {buttons.length ? (
+                                <div className='row'>
+                                    {buttons.map((button, index) => (
+                                        <div key={index} className='col-auto' style={{ padding: '0 5px' }}>
+                                            <button key={index} className={`btn btn-${button.type} btn-sm`} onClick={(e) => this.handleClickButton(e, button, item.id)}>{button.text}</button>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : ''}
+                        </div>
+                    </UrlItem>
+                </li>
+            );
+        });
+
+        return (
+            <li className='dropdown'>
+                <a className='app-nav__item' href='#' data-toggle='dropdown' aria-label='Show notifications'>
+                    <i className='fa fa-bell-o fa-lg' />
+                    {notificationLength ? <span className='badge badge-pill badge-danger' style={{ position: 'absolute', top: '6px', right: notificationLength >= 10 ? '-8px' : '-2px', fontSize: '87%' }}>{notificationLength}</span> : ''}
+                </a>
+                <ul className='app-notification dropdown-menu dropdown-menu-right'>
+                    <li className='app-notification__title'>{notificationLength ? `Bạn có ${notificationLength} thông báo mới` : 'Bạn không có thông báo mới nào'}</li>
+                    {contactRead && (<>
+                        <div className='app-notification__content'>
+                            {contactElements}
+                        </div>
+                        <li className='app-notification__footer'>
+                            <Link to='/user/contact'>Đến trang liên hệ</Link>
+                        </li>
+                    </>)}
+
+                    <div className='app-notification__content'>
+                        {notificationElements}
+                    </div>
+                    <li className='app-notification__footer'>
+                        <Link to='/user/notification'>Đến trang thông báo</Link>
+                    </li>
+                </ul>
+            </li>
+        );
+    }
+}
+const SectionNotification = withRouter(connect(state => ({ system: state.system, notification: state.notification, contact: state.contact }), { getUnreadNotification, readNotification, getUnreadContacts })(NotificationItem));
 
 class AdminHeader extends AdminPage {
     componentDidMount() {
@@ -142,7 +310,7 @@ class AdminHeader extends AdminPage {
                             <i className='fa fa-search-plus fa-lg' />
                         </a>
                     </li>
-                    {/* <SectionNotification showContact={this.showContact}/> */}
+                    <SectionNotification showContact={this.showContact} />
                     <li>
                         <Link className='app-nav__item' to='/user'>
                             <i className='fa fa-user fa-lg' />
@@ -155,12 +323,12 @@ class AdminHeader extends AdminPage {
                     </li>
                 </ul>
             </header>,
-            // <ContactModal key={1} ref={e => this.contactModal = e} />,
+            <AdminContactModal key={1} ref={e => this.contactModal = e} />,
             <DebugModal key={2} ref={e => this.debugModal = e} switchUser={this.props.switchUser} updateSystemState={this.props.updateSystemState} />
         ];
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, contact: state.contact, role: state.role });
-const mapActionsToProps = { changeRole, updateSystemState, switchUser, logout };
+const mapActionsToProps = { changeRole, updateSystemState, switchUser, logout, getContact, addNotification };
 export default connect(mapStateToProps, mapActionsToProps)(AdminHeader);
