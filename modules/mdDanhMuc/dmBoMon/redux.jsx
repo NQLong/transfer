@@ -164,7 +164,7 @@ export function changeDmBoMon(item) {
 export function createMultiDmBoMon(dmBoMon, isOverride, done) {
     return () => {
         const url = '/api/dm-bo-mon/multiple';
-        T.post(url, { dmBoMon, isOverride}, data => {
+        T.post(url, { dmBoMon, isOverride }, data => {
             if (data.error && data.error.length) {
                 T.notify('Cập nhật dữ liệu bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error('PUT: ' + url + '. ' + data.error.toString());
@@ -183,4 +183,14 @@ export const SelectAdapter_DmBoMon = {
     getOne: getDmBoMon,
     fetchOne: (ma, done) => (getDmBoMon(ma, item => done && done({ id: item.ma, text: item.ten })))(),
     processResultOne: response => response && ({ value: response.ma, text: response.ma + ': ' + response.ten }),
+};
+
+export const SelectAdapter_DmBoMonTheoDonVi = (maDonVi = 0) => {
+    return {
+        ajax: true,
+        url: `/api/dm-bo-mon/filter/${maDonVi}/1/20`,
+        data: params => ({ condition: params.term }),
+        processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.ten })) : [] }),
+        fetchOne: (ma, done) => (getDmBoMon(ma, item => done && done({ id: item.ma, text: item.ten })))()
+    };
 };

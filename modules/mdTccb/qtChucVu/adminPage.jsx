@@ -10,7 +10,7 @@ import {
 } from './redux';
 import { SelectAdapter_DmChucVuV2 } from 'modules/mdDanhMuc/dmChucVu/redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
-import { SelectAdapter_DmBoMon } from 'modules/mdDanhMuc/dmBoMon/redux';
+import { SelectAdapter_DmBoMonTheoDonVi } from 'modules/mdDanhMuc/dmBoMon/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 
 const timeList = [
@@ -87,7 +87,6 @@ export class EditModal extends AdminModal {
             ngayRaQdThoiChucVu: Number(this.ngayRaQdThoiChucVu.value()),
             ngayThoiChucVu: Number(this.ngayThoiChucVu.value()),
         };
-        console.log(changes);
         if (changes.shcc == '') {
             T.notify('Mã số cán bộ bị trống');
             this.shcc.focus();
@@ -101,6 +100,12 @@ export class EditModal extends AdminModal {
             } else
                 this.checkChucVu(changes);
         }
+    }
+
+    handleDonVi = (data) => {
+        this.setState({ donVi: data.id }, () => {
+            this.maBoMon.value('');
+        });
     }
 
     checkChucVuSwitch = () => {
@@ -125,8 +130,8 @@ export class EditModal extends AdminModal {
             body: <div className='row'>
                 <FormSelect className='col-md-12' ref={e => this.shcc = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={readOnly} />
                 <FormSelect className='col-md-4' ref={e => this.maChucVu = e} label='Chức vụ' data={SelectAdapter_DmChucVuV2} readOnly={readOnly} />
-                <FormSelect className='col-md-4' ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} readOnly={readOnly} />
-                <FormSelect className='col-md-4' ref={e => this.maBoMon = e} label='Bộ môn' data={SelectAdapter_DmBoMon} readOnly={readOnly} />
+                <FormSelect className='col-md-4' ref={e => this.maDonVi = e} label='Đơn vị của chức vụ' data={SelectAdapter_DmDonVi} onChange={this.handleDonVi} allowClear={true} readOnly={readOnly} />
+                <FormSelect className='col-md-4' ref={e => this.maBoMon = e} label='Bộ môn của chức vụ' data={SelectAdapter_DmBoMonTheoDonVi(this.state.donVi)} allowClear={true} eadOnly={readOnly} />
                 <FormCheckbox className='col-md-12' ref={e => this.chucVuChinh = e} label='Chức vụ chính' readOnly={this.checkChucVuSwitch()} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.soQuyetDinh = e} label='Số quyết định' readOnly={readOnly} />
                 <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayRaQuyetDinh = e} label='Ngày ra quyết định' readOnly={readOnly} />
@@ -233,13 +238,13 @@ class QtChucVu extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        {!this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Chức vụ</th> }
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Quyết định bổ nhiệm</th> }
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Chức vụ chính</th> }
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thôi chức vụ</th> }
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Quyết định thôi chức vụ</th> }
-                        {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số chức vụ</th> }
-                        {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách chức vụ</th> }
+                        {!this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Chức vụ</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Quyết định bổ nhiệm</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Chức vụ chính</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thôi chức vụ</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Quyết định thôi chức vụ</th>}
+                        {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số chức vụ</th>}
+                        {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách chức vụ</th>}
                         <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                     </tr>
                 ),
@@ -267,9 +272,9 @@ class QtChucVu extends AdminPage {
                                 <span>Ngày: <span style={{ color: 'blue' }}>{item.ngayRaQuyetDinh ? new Date(item.ngayRaQuyetDinh).ddmmyyyy() : ''}</span></span>
                             </>
                         )}
-                        /> }
+                        />}
                         {!this.checked && <TableCell type='checkbox' content={item.chucVuChinh} />}
-                        {!this.checked && <TableCell type='checkbox' content={item.thoiChucVu} /> }
+                        {!this.checked && <TableCell type='checkbox' content={item.thoiChucVu} />}
                         {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>Số: {item.soQdThoiChucVu}</span><br />
@@ -278,7 +283,7 @@ class QtChucVu extends AdminPage {
                         )}
                         />}
                         {this.checked && <TableCell type='text' content={item.soChucVu} />}
-                        {this.checked && <TableCell type='text' content={this.list(item.danhSachChucVu, item.soChucVu, item.soChucVu)} /> }
+                        {this.checked && <TableCell type='text' content={this.list(item.danhSachChucVu, item.soChucVu, item.soChucVu)} />}
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                                 onEdit={() => this.modal.show(item)} onDelete={this.delete} >
