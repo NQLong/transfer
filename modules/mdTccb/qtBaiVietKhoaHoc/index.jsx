@@ -10,7 +10,7 @@ export default {
     },
     routes: [
         {
-            path: '/user/tccb/qua-trinh/bai-viet-khoa-hoc/group_bvkh/:loaiDoiTuong/:ma',
+            path: '/user/tccb/qua-trinh/bai-viet-khoa-hoc/group/:shcc',
             component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
         },
         {
