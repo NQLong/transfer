@@ -26,9 +26,7 @@ export class EditModal extends AdminModal {
 
     }
 
-    multiple = false;
-    onShow = (item, multiple = true) => {
-        this.multiple = multiple;
+    onShow = (item) => {
         let { stt, shcc, maChucVu, maDonVi, soQuyetDinh, ngayRaQuyetDinh, ngayRaQd, soQd, chucVuChinh, maBoMon, thoiChucVu, soQdThoiChucVu, ngayRaQdThoiChucVu, ngayThoiChucVu } = item ? item : {
             stt: '',
             shcc: '', maChucVu: '', maDonVi: '', soQuyetDinh: '', ngayRaQuyetDinh: '', chucVuChinh: 0, maBoMon: '',
@@ -53,7 +51,7 @@ export class EditModal extends AdminModal {
 
     checkChucVu = (changes) => {
         if (changes.chucVuChinh == this.state.chucVuChinh) {
-            this.state.stt ? this.props.update(this.state.stt, changes, this.hide, false) : this.props.create(false, changes, this.hide);
+            this.state.stt ? this.props.update(this.state.stt, changes, this.hide, false) : this.props.create(changes, this.hide);
             return;
         }
         T.confirm('Thông tin chức vụ chính', 'Đây sẽ là chức vụ chính của cán bộ', 'warning', true, isConfirm => {
@@ -76,53 +74,32 @@ export class EditModal extends AdminModal {
 
     onSubmit = (e) => {
         e.preventDefault();
-        let list_ma = this.shcc.value();
-        if (!Array.isArray(list_ma)) {
-            list_ma = [list_ma];
-        }
-        if (list_ma.length == 0) {
-            T.notify('Danh sách cán bộ trống', 'danger');
+        const changes = {
+            shcc: this.state.maCanBo,
+            maChucVu: this.maChucVu.value(),
+            maDonVi: this.maDonVi.value(),
+            soQd: this.soQuyetDinh.value(),
+            ngayRaQd: Number(this.ngayRaQuyetDinh.value()),
+            chucVuChinh: this.chucVuChinh.value() ? 1 : 0,
+            maBoMon: this.maBoMon.value(),
+            thoiChucVu: this.thoiChucVu.value() ? 1 : 0,
+            soQdThoiChucVu: this.soQdThoiChucVu.value(),
+            ngayRaQdThoiChucVu: Number(this.ngayRaQdThoiChucVu.value()),
+            ngayThoiChucVu: Number(this.ngayThoiChucVu.value()),
+        };
+        console.log(changes);
+        if (changes.shcc == '') {
+            T.notify('Mã số cán bộ bị trống');
             this.shcc.focus();
         } else {
-            list_ma.forEach((ma, index) => {
-                const changes = {
-                    shcc: ma,
-                    maChucVu: this.maChucVu.value(),
-                    maDonVi: this.maDonVi.value(),
-                    soQd: this.soQuyetDinh.value(),
-                    ngayRaQd: Number(this.ngayRaQuyetDinh.value()),
-                    chucVuChinh: Number(this.chucVuChinh.value()),
-                    maBoMon: this.maBoMon.value(),
-                    thoiChucVu: Number(this.thoiChucVu.value()),
-                    soQdThoiChucVu: this.soQdThoiChucVu.value(),
-                    ngayRaQdThoiChucVu: Number(this.ngayRaQdThoiChucVu.value()),
-                    ngayThoiChucVu: Number(this.ngayThoiChucVu.value()),
-                };
-                if (index == list_ma.length - 1) {
-                    if (!changes.chucVuChinh) {
-                        if (this.state.stt) {
-                            this.props.update(this.state.stt, changes, this.hide, false);
-                        } else {
-                            this.props.create(changes, this.hide, false);
-                        }
-                    } else
-                        this.checkChucVu(changes);
-                    this.setState({
-                        stt: ''
-                    });
-                    this.shcc.reset();
+            if (!changes.chucVuChinh) {
+                if (this.state.stt) {
+                    this.props.update(this.state.stt, changes, this.hide);
+                } else {
+                    this.props.create(changes, this.hide);
                 }
-                else {
-                    if (!changes.chucVuChinh) {
-                        if (this.state.stt) {
-                            this.props.update(this.state.stt, changes, this.hide, false);
-                        } else {
-                            this.props.create(changes, this.hide);
-                        }
-                    } else
-                        this.checkChucVu(changes);
-                }
-            });
+            } else
+                this.checkChucVu(changes);
         }
     }
 
@@ -146,7 +123,7 @@ export class EditModal extends AdminModal {
             title: this.state.shcc ? 'Cập nhật quá trình chức vụ' : 'Tạo mới quá trình chức vụ',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.shcc = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={readOnly} />
+                <FormSelect className='col-md-12' ref={e => this.shcc = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={readOnly} />
                 <FormSelect className='col-md-4' ref={e => this.maChucVu = e} label='Chức vụ' data={SelectAdapter_DmChucVuV2} readOnly={readOnly} />
                 <FormSelect className='col-md-4' ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} readOnly={readOnly} />
                 <FormSelect className='col-md-4' ref={e => this.maBoMon = e} label='Bộ môn' data={SelectAdapter_DmBoMon} readOnly={readOnly} />
