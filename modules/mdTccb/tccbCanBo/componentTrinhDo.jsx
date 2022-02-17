@@ -62,7 +62,6 @@ class ComponentTrinhDo extends AdminPage {
     state = { thacSi: false, batDauThacSiType: 'mm/yyyy', ketThucThacSiType: 'mm/yyyy', shcc: '', email: '' };
 
     value = (item) => {
-        console.log(item);
         // this.shcc = item.shcc;
         // this.state.email = item.email;
         this.setState({ tienSi: item.tienSi, thacSi: item.thacSi, cuNhan: item.cuNhan, shcc: item.shcc, email: item.email }, () => {
