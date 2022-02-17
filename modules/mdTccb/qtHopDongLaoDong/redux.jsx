@@ -4,6 +4,7 @@ import T from 'view/js/common';
 const QtHopDongLaoDongGetAll = 'QtHopDongLaoDong:GetAll';
 const QtHopDongLaoDongGetPage = 'QtHopDongLaoDong:GetPage';
 const QtHopDongLaoDongGetGroupPage = 'QtHopDongLaoDong:GetGroupPage';
+const QtHopDongLaoDongGetGroupPageMa = 'QtHopDongLaoDong:GetGroupPageMa';
 const QtHopDongLaoDongUpdate = 'QtHopDongLaoDong:Update';
 const QtHopDongLaoDongGet = 'QtHopDongLaoDong:Get';
 
@@ -13,6 +14,8 @@ export default function QtHopDongLaoDongReducer(state = null, data) {
             return Object.assign({}, state, { items: data.items });
         case QtHopDongLaoDongGetGroupPage:
             return Object.assign({}, state, { page_gr: data.page });
+        case QtHopDongLaoDongGetGroupPageMa:
+            return Object.assign({}, state, { page_ma: data.page });
         case QtHopDongLaoDongGetPage:
             return Object.assign({}, state, { page: data.page });
         case QtHopDongLaoDongGet:
@@ -95,23 +98,30 @@ export function getQtHopDongLaoDongGroupPage(pageNumber, pageSize, pageCondition
     };
 }
 
-T.initPage('shccPageQtHopDongLaoDong', true);
-export function getQtHopDongLaoDongShccPage(pageNumber, pageSize, pageCondition, done) {
-    const page = T.updatePage('shccPageQtHopDongLaoDong', pageNumber, pageSize, pageCondition);
+T.initPage('groupPageMaQtHopDongLaoDong', true);
+export function getQtHopDongLaoDongGroupPageMa(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('groupPageMaQtHopDongLaoDong', pageNumber, pageSize, pageCondition, filter);
+
     return dispatch => {
-        const url = `/api/tccb/qua-trinh/hop-dong-lao-dong/groupShcc/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition }, data => {
+        const url = `/api/tccb/qua-trinh/hop-dong-lao-dong/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
-                T.notify('Lấy danh sách hợp đồng theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                T.notify('Lấy danh sách hợp đồng bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
+                if (page.filter) data.page.filter = page.filter;
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 done && done(data.page);
-                dispatch({ type: QtHopDongLaoDongGetPage, page: data.page });
+                dispatch({ type: QtHopDongLaoDongGetGroupPageMa, page: data.page });
             }
-        }, error => console.error(`GET: ${url}.`, error));
+        }, () => T.notify('Lấy danh sách hợp đồng bị lỗi!', 'danger'));
     };
 }
+
 
 export function getQtHopDongLaoDongAll(done) {
     return dispatch => {
