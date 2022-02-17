@@ -66,10 +66,6 @@ class StaffUserPage extends AdminPage {
         const congTacData = this.componentTTCongTac.getAndValidate();
         const trinhDoData = this.componentTrinhDo.getAndValidate();
         if (this.emailCanBo) {
-            console.log(caNhanData);
-            console.log(congTacData);
-            console.log(trinhDoData);
-
             caNhanData && congTacData && trinhDoData && this.props.updateStaffUser(this.emailCanBo, { ...caNhanData, ...congTacData, ...trinhDoData });
         }
     }
@@ -82,16 +78,16 @@ class StaffUserPage extends AdminPage {
         return this.renderPage({
             icon: 'fa fa-address-card-o',
             title: 'HỒ SƠ CÁ NHÂN',
-            subTitle: <span style={{ color: 'blue'}}>Cán bộ: {name}</span>,
+            subTitle: <span style={{ color: 'blue' }}>Cán bộ: {name}</span>,
             breadcrumb: [
                 <Link key={0} to='/user'>Trang cá nhân</Link>,
                 'Hồ sơ',
             ],
             content: <>
-                <ComponentCaNhan ref={e => this.componentCaNhan = e} userEdit={true} isStaff={true}/>
+                <ComponentCaNhan ref={e => this.componentCaNhan = e} userEdit={true} isStaff={true} />
                 <ComponentQuanHe ref={e => this.componentQuanHe = e} userEdit={true} />
                 <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={true} />
-                <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={true} tccb={false}/>
+                <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={true} tccb={false} />
             </>,
             backRoute: '/user',
             onSave: this.save,

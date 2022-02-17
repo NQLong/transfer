@@ -85,6 +85,7 @@ const UrlItem = (props) => {
         );
     }
 };
+
 class NotificationItem extends AdminPage {
     componentDidMount() {
         const handleGetNotification = () => {
@@ -225,6 +226,7 @@ class NotificationItem extends AdminPage {
         );
     }
 }
+
 const SectionNotification = withRouter(connect(state => ({ system: state.system, notification: state.notification, contact: state.contact }), { getUnreadNotification, readNotification, getUnreadContacts })(NotificationItem));
 
 class AdminHeader extends AdminPage {

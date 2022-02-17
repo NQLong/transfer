@@ -191,7 +191,7 @@ class ComponentCaNhan extends React.Component {
                             <FormSelect ref={e => this.phai = e} label='Giới tính' className='form-group col-md-4' readOnly={this.props.userEdit} required data={SelectAdapter_DmGioiTinhV2} />
                             <FormTextBox ref={e => this.biDanh = e} label='Bí danh' className='form-group col-md-4' maxLength={30} />
                             <FormDatePicker ref={e => this.ngaySinh = e} type='date-mask' className='form-group col-md-4' label='Ngày sinh' required />
-                            <FormSelect ref={e => this.quocTich = e} multiple={true} label='Quốc tịch' className='form-group col-md-4' data={SelectAdapter_DmQuocGia} />
+                            <FormSelect ref={e => this.quocTich = e} label='Quốc tịch' className='form-group col-md-4' data={SelectAdapter_DmQuocGia} />
                         </div>
                     </div>
 
