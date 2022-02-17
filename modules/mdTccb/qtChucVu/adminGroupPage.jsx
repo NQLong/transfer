@@ -25,14 +25,14 @@ export class EditModal extends AdminModal {
 
     }
 
-    onShow = (item) => {
+    onShow = (item, maCanBo) => {
         let { stt, shcc, maChucVu, maDonVi, soQuyetDinh, ngayRaQuyetDinh, ngayRaQd, soQd, chucVuChinh, maBoMon, thoiChucVu, soQdThoiChucVu, ngayRaQdThoiChucVu, ngayThoiChucVu } = item ? item : {
             stt: '',
             shcc: '', maChucVu: '', maDonVi: '', soQuyetDinh: '', ngayRaQuyetDinh: '', chucVuChinh: '', maBoMon: '',
             ngayRaQd: '', soQd: '', thoiChucVu: '', ngayRaQdThoiChucVu: '', ngayThoiChucVu: '', soQdThoiChucVu: ''
         };
-        this.setState({ shcc, stt, item, chucVuChinh, thoiChucVu: thoiChucVu ? 1 : 0}, () => {
-            this.shcc.value(shcc ? shcc : '');
+        this.setState({ shcc, stt, item, chucVuChinh, thoiChucVu: thoiChucVu ? 1 : 0, maCanBo}, () => {
+            this.shcc.value(shcc ? shcc : (maCanBo ? maCanBo : ''));
             this.maChucVu.value(maChucVu ? maChucVu : '');
             this.maDonVi.value(maDonVi ? maDonVi : '');
             this.soQuyetDinh.value(soQd ? soQd : (soQuyetDinh ? soQuyetDinh : ''));
@@ -56,7 +56,7 @@ export class EditModal extends AdminModal {
         T.confirm('Thông tin chức vụ chính', 'Đây sẽ là chức vụ chính của cán bộ', 'warning', true, isConfirm => {
             isConfirm && this.props.getQtChucVuAll(changes.shcc, data => {
                 if (data) {
-                    data.forEach(item => {
+                    data.rows.forEach(item => {
                         if (item.chucVuChinh && item.stt != this.state.stt) {
                             this.props.update(item.stt, { chucVuChinh: 0 });
                         }
@@ -73,19 +73,21 @@ export class EditModal extends AdminModal {
 
     onSubmit = (e) => {
         e.preventDefault();
+        console.log(this.state.maCanBo);
         const changes = {
-            shcc: this.shcc.value(),
+            shcc: this.state.maCanBo,
             maChucVu: this.maChucVu.value(),
             maDonVi: this.maDonVi.value(),
             soQd: this.soQuyetDinh.value(),
             ngayRaQd: Number(this.ngayRaQuyetDinh.value()),
-            chucVuChinh: this.chucVuChinh.value(),
+            chucVuChinh: this.chucVuChinh.value() ? 1 : 0,
             maBoMon: this.maBoMon.value(),
-            thoiChucVu: this.thoiChucVu.value(),
+            thoiChucVu: this.thoiChucVu.value() ? 1 : 0,
             soQdThoiChucVu: this.soQdThoiChucVu.value(),
             ngayRaQdThoiChucVu: Number(this.ngayRaQdThoiChucVu.value()),
             ngayThoiChucVu: Number(this.ngayThoiChucVu.value()),
         };
+        console.log(changes);
         if (changes.shcc == '') {
             T.notify('Mã số cán bộ bị trống');
             this.shcc.focus();
@@ -128,7 +130,7 @@ export class EditModal extends AdminModal {
                 <FormCheckbox className='col-md-12' ref={e => this.chucVuChinh = e} label='Chức vụ chính' isSwitch={true} readOnly={this.checkChucVuSwitch()} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.soQuyetDinh = e} label='Số quyết định' readOnly={readOnly} />
                 <FormDatePicker className='col-md-6' ref={e => this.ngayRaQuyetDinh = e} label='Ngày ra quyết định' readOnly={readOnly} />
-                <FormCheckbox className='col-md-12' ref={e => this.thoiChucVu = e} label='Thôi giữ chức vụ' isSwitch={true} readOnly={readOnly} />
+                <FormCheckbox className='col-md-12' ref={e => this.thoiChucVu = e} label='Thôi giữ chức vụ' onChange={this.handleThoiChucVu} isSwitch={true} readOnly={readOnly} />
                 <div className='col-md-4' id='soQdThoiChucVu'><FormTextBox type='text' ref={e => this.soQdThoiChucVu = e} label='Số quyết định thôi chức vụ' readOnly={readOnly} /> </div>
                 <div className='col-md-4' id='ngayThoiChucVu'> <FormDatePicker type='date-mask' ref={e => this.ngayThoiChucVu = e} label='Ngày ra thôi chức vụ' readOnly={readOnly} /> </div>
                 <div className='col-md-4' id='ngayRaQdThoiChucVu'> <FormDatePicker type='date-mask' ref={e => this.ngayRaQdThoiChucVu = e} label='Ngày ra quyết định thôi chức vụ' readOnly={readOnly} /> </div>
@@ -138,16 +140,13 @@ export class EditModal extends AdminModal {
 }
 
 class QtChucVuGroup extends AdminPage {
-    state = { filter: {} };
+    state = { filter: {}, ma: '' };
     searchText = '';
-
     componentDidMount() {
         T.ready('/user/tccb', () => {
             const route = T.routeMatcher('/user/tccb/qua-trinh/chuc-vu/group/:ma'),
                 params = route.parse(window.location.pathname);
-            console.log(params);
-            this.ma = params.ma;
-            this.setState({filter: {list_shcc: params.ma, list_dv: '', timeType: 0}});
+            this.setState({filter: {list_shcc: params.ma, list_dv: '', timeType: 0}, ma: params.ma});
             T.onSearch = (searchText) => {
                 this.searchText = searchText;
                 this.getPage();
@@ -193,7 +192,7 @@ class QtChucVuGroup extends AdminPage {
 
     showModal = (e) => {
         e.preventDefault();
-        this.modal.show();
+        this.modal.show(null, this.state.ma);
     }
 
     delete = (e, item) => {
@@ -240,7 +239,8 @@ class QtChucVuGroup extends AdminPage {
                         <TableCell type='text' content={(
                             <>
                                 <span>{item.tenChucVu}</span><br />
-                                {!item.tenBoMon ? (item.tenDonVi ? item.tenDonVi.toUpperCase() : '') : (item.tenBoMon ? item.tenBoMon.toUpperCase() : '')}
+                                {!item.tenDonVi ? (item.tenDonVi ? item.tenDonVi.toUpperCase() : '') : (item.tenDonVi ? item.tenDonVi.toUpperCase() : '')}<br/>
+                                {!item.tenBoMon ? (item.tenBoMon ? item.tenBoMon.toUpperCase() : '') : (item.tenBoMon ? item.tenBoMon.toUpperCase() : '')}
                             </>
                         )}
                         />
@@ -261,7 +261,7 @@ class QtChucVuGroup extends AdminPage {
                         )}
                         />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                            onEdit={() => this.modal.show(item)} onDelete={this.delete} >
+                            onEdit={() => this.modal.show(item, this.state.ma)} onDelete={this.delete} >
                         </TableCell>
 
                     </tr>

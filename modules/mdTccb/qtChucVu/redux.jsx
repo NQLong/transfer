@@ -94,10 +94,10 @@ export function getQtChucVuGroupPage(pageNumber, pageSize, pageCondition, filter
     };
 }
 
-export function updateQtChucVuGroupPageMa(id, changes, done) {
+export function updateQtChucVuGroupPageMa(stt, changes, done) {
     return dispatch => {
         const url = '/api/tccb/qua-trinh/chuc-vu';
-        T.put(url, { id, changes }, data => {
+        T.put(url, { stt, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật chức vụ bị lỗi!', 'danger');
                 console.error(`PUT: ${url}.`, data.error);
@@ -111,10 +111,10 @@ export function updateQtChucVuGroupPageMa(id, changes, done) {
     };
 }
 
-export function deleteQtChucVuGroupPageMa(id, done) {
+export function deleteQtChucVuGroupPageMa(stt, done) {
     return dispatch => {
         const url = '/api/tccb/qua-trinh/chuc-vu';
-        T.delete(url, { id }, data => {
+        T.delete(url, { stt }, data => {
             if (data.error) {
                 T.notify('Xóa thông tin chức vụ bị lỗi', 'danger');
                 console.error('DELETE: ' + url + '. ' + data.error);
@@ -169,10 +169,10 @@ export function createQtChucVuStaff(data, done, isEdit = null) {
     };
 }
 
-export function updateQtChucVuStaff(id, changes, done, isEdit = null) {
+export function updateQtChucVuStaff(stt, changes, done, isEdit = null) {
     return dispatch => {
         const url = '/api/tccb/qua-trinh/chuc-vu';
-        T.put(url, { id, changes }, data => {
+        T.put(url, { stt, changes }, data => {
             if (data.error) {
                 T.notify('Cập nhật thông tin chức vụ bị lỗi', 'danger');
                 console.error('PUT: ' + url + '. ' + data.error);
@@ -185,10 +185,10 @@ export function updateQtChucVuStaff(id, changes, done, isEdit = null) {
     };
 }
 
-export function deleteQtChucVuStaff(id, isEdit, shcc = null) {
+export function deleteQtChucVuStaff(stt, isEdit, shcc = null) {
     return dispatch => {
         const url = '/api/tccb/qua-trinh/chuc-vu';
-        T.delete(url, { id }, data => {
+        T.delete(url, { stt }, data => {
             if (data.error) {
                 T.notify('Xóa thông tin chức vụ bị lỗi', 'danger');
                 console.error('DELETE: ' + url + '. ' + data.error);
