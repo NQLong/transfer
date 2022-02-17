@@ -1,61 +1,69 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, FormCheckbox, FormSelect } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, FormCheckbox, FormSelect, FormDatePicker } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
     getQtHopDongLaoDongPage, getQtHopDongLaoDongAll, updateQtHopDongLaoDong,
     deleteQtHopDongLaoDong, createQtHopDongLaoDong, getQtHopDongLaoDongGroupPage, downloadWord
 } from './redux';
-import { getDmDonViAll } from 'modules/mdDanhMuc/dmDonVi/redux';
+import { getDmDonViAll, SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
+import { SelectAdapter_FwCanBo } from '../tccbCanBo/redux';
 
 class QtHopDongLaoDongPage extends AdminPage {
-    checked = false;
-    curState = [];
-    stateTable = [];
-    searchText = '';
-
+    checked = parseInt(T.cookie('hienThiTheoCanBo')) == 1 ? true : false;
+    state = { filter: {} };
     componentDidMount() {
         T.ready('/user/tccb', () => {
-            this.props.getDmDonViAll(items => {
-                if (items) {
-                    this.stateTable = [];
-                    items.forEach(item => this.stateTable.push({
-                        'id': item.ma,
-                        'text': item.ten
-                    }));
-                }
-            });
-            T.onSearch = (searchText) => {
-                this.searchText = searchText;
-                if (this.checked) this.props.getQtHopDongLaoDongGroupPage(undefined, undefined, this.curState, this.searchText || '');
-                else this.props.getQtHopDongLaoDongPage(undefined, undefined, this.curState, this.searchText || '');
-            };
-            // T.showSearchBox();
-            // this.props.getQtHopDongLaoDongPage(undefined, undefined, '');
+            T.clearSearchBox();
+            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
+                this.fromYear?.value('');
+                this.toYear?.value('');
                 this.maDonVi?.value('');
+                this.mulCanBo?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
-                setTimeout(() => this.showAdvanceSearch(), 1000);
             });
-            this.changeAdvancedSearch();
+            if (this.checked) {
+                this.hienThiTheoCanBo.value(true);
+            }
+            this.getPage();
+            this.changeAdvancedSearch(true);
         });
     }
 
-    changeAdvancedSearch = () => {
+    changeAdvancedSearch = (isInitial = false) => {
         let { pageNumber, pageSize } = this.props && this.props.qtHopDongLaoDong && this.props.qtHopDongLaoDong.page ? this.props.qtHopDongLaoDong.page : { pageNumber: 1, pageSize: 50 };
+        const fromYear = this.fromYear?.value() == '' ? null : this.fromYear?.value().getTime();
+        const toYear = this.toYear?.value() == '' ? null : this.toYear?.value().getTime();
+        const list_dv = this.maDonVi?.value().toString() || '';
+        const list_shcc = this.mulCanBo?.value().toString() || '';
+        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc };
+        console.log(toYear);
+        this.setState({ filter: pageFilter }, () => {
+            this.getPage(pageNumber, pageSize, '', (page) => {
+                if (isInitial) {
+                    const filter = page.filter || {};
+                    this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
+                    this.fromYear?.value(filter.fromYear || '');
+                    this.toYear?.value(filter.toYear || '');
+                    this.maDonVi?.value(filter.list_dv);
+                    this.mulCanBo?.value(filter.list_shcc);
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.list_shcc || filter.list_dv)) this.showAdvanceSearch();
+                }
+            });
+        });
+    }
 
-        const maDonVi = this.maDonVi?.value() || [];
-        this.curState = maDonVi;
-        if (this.checked) this.props.getQtHopDongLaoDongGroupPage(pageNumber, pageSize, this.curState, this.searchText || '');
-        else this.props.getQtHopDongLaoDongPage(pageNumber, pageSize, this.curState, this.searchText || '');
+    getPage = (pageN, pageS, pageC, done) => {
+        if (this.checked) this.props.getQtHopDongLaoDongGroupPage(pageN, pageS, pageC, this.state.filter, done);
+        else this.props.getQtHopDongLaoDongPage(pageN, pageS, pageC, this.state.filter, done);
     }
 
     groupPage = () => {
-        let { pageNumber, pageSize } = this.props && this.props.qtHopDongLaoDong && this.props.qtHopDongLaoDong.page ? this.props.qtHopDongLaoDong.page : { pageNumber: 1, pageSize: 50 };
         this.checked = !this.checked;
-        if (this.checked) this.props.getQtHopDongLaoDongGroupPage(pageNumber, pageSize, this.curState, this.searchText || '');
-        else this.props.getQtHopDongLaoDongPage(pageNumber, pageSize, this.curState, this.searchText || '');
+        T.cookie('hienThiTheoCanBo', this.checked ? 1 : 0);
+        this.getPage();
     }
 
     downloadWord = (item) => {
@@ -67,6 +75,11 @@ class QtHopDongLaoDongPage extends AdminPage {
     download = (e) => {
         e.preventDefault();
         T.download(T.url('/api/tccb/qua-trinh/hop-dong-lao-dong/download-excel'), 'HDLD.xlsx');
+    }
+    list = (text, i, j) => {
+        if (i == 0 || text == ' ') return [];
+        let deTais = text.split('??').map(str => <div key={i--}>Lần {j - i}: <b>{T.dateToText(Number(str.slice(0, -1)), 'dd/mm/yyyy')}</b><br /></div>);
+        return deTais;
     }
 
     delete = (e, item) => {
@@ -94,10 +107,12 @@ class QtHopDongLaoDongPage extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Số hợp đồng</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>
-                        <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Ngày tái ký HĐ</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ ký</th>
+                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Số hợp đồng</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>}
+                        {!this.checked && <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Ngày tái ký HĐ</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ ký</th>}
+                        {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số HĐ đã ký</th>}
+                        {this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Danh sách</th>}
                         <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
 
                     </tr>
@@ -113,36 +128,44 @@ class QtHopDongLaoDongPage extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' content={(
+                        {!this.checked && <TableCell type='text' content={(
                             <>
                                 <span style={{ whiteSpace: 'nowrap' }}>Số: {item.soHopDong}</span><br />
                                 <span>Ngày ký: <span style={{ color: 'blue' }}>{item.ngayKyHopDong ? new Date(item.ngayKyHopDong).ddmmyyyy() : ''}</span></span>
                             </>
                         )}
-                        />
-                        <TableCell type='text' style={{ textAlign: 'justify' }} content={(
+                        />}
+                        {!this.checked && <TableCell type='text' style={{ textAlign: 'justify' }} content={(
                             item.loaiHopDong != '07' ?
                                 <p>
-                                    <b style={{ whiteSpace: 'nowrap' }}>{item.tenLoaiHopDong.replace('Hợp đồng lao động', 'HĐLĐ')}</b><br />
+                                    <b style={{ whiteSpace: 'nowrap' }}>{item.tenLoaiHopDong.replace('Hợp đồng lao động', 'Hợp đồng')}</b><br />
                                     <span style={{ whiteSpace: 'nowrap' }}>Từ ngày: <span style={{ color: 'blue' }}>{item.batDauLamViec ? new Date(item.batDauLamViec).ddmmyyyy() : ''}</span></span><br />
                                     <span style={{ whiteSpace: 'nowrap' }}>Đến ngày: <span style={{ color: 'blue' }}>{item.ketThucHopDong ? new Date(item.ketThucHopDong).ddmmyyyy() : ''}</span></span>
                                 </p> :
                                 <p>
-                                    <span>{item.tenLoaiHopDong.replace('Hợp đồng lao động', 'HĐLĐ')}</span><br />
+                                    <span>{item.tenLoaiHopDong.replace('Hợp đồng lao động', 'Hợp đồng')}</span><br />
                                 </p>
                         )}
-                        />
-                        {item.loaiHopDong != '07' ? <TableCell type='text' style={{ textAlign: 'center' }} content={(
+                        />}
+                        {!this.checked ? (item.loaiHopDong != '07' ? <TableCell type='text' style={{ textAlign: 'center' }} content={(
                             <>
                                 <span style={{ whiteSpace: 'nowrap', color: 'red' }}>{item.ngayKyHopDongTiepTheo ? new Date(item.ngayKyHopDongTiepTheo).ddmmyyyy() : ''}</span>
                             </>
-                        )} /> : <TableCell />}
-                        <TableCell style={{ whiteSpace: 'nowrap' }} type='text' content={(
+                        )} /> : <TableCell />
+                        ) : null
+                        }
+                        {!this.checked && <TableCell style={{ whiteSpace: 'nowrap' }} type='text' content={(
                             <>
                                 <span>{item.hoNguoiKy + ' ' + item.tenNguoiKy}<br /></span>
                                 <Link to={'/user/tccb/staff/' + item.shccNguoiKy}>{item.shccNguoiKy}</Link>
                             </>
-                        )} />
+                        )} />}
+                        {
+                            this.checked && <TableCell style={{ textAlign: 'right' }} content={item.soHd} />
+                        }
+                        {
+                            this.checked && <TableCell style={{ whiteSpace: 'nowrap' }} content={this.list(item.danhSachHd, item.soHd, item.soHd)} />
+                        }
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                                 onEdit={`/user/tccb/qua-trinh/hop-dong-lao-dong/${item.ma}`} onDelete={this.delete} >
@@ -159,14 +182,6 @@ class QtHopDongLaoDongPage extends AdminPage {
                                 </Link>
                             </TableCell>
                         }
-                        {/* <TableCell type='buttons' content={item} onEdit={`/user/tccb/qua-trinh/hop-dong-lao-dong/${item.ma}`} onDelete={this.delete} permission={permission} >
-                            {!this.checked && <a href="#" className="btn btn-primary" style={{ width: '45px' }} onClick={e => e.preventDefault() || this.downloadWord(item)}>
-                                <i className='fa fa-lg fa-file-word-o' />
-                            </a>}
-                            {this.checked && <Link className='btn btn-success' to={`/user/tccb/qua-trinh/hop-dong-lao-dong/group/${item.shcc}`} style={{ width: '45px' }}>
-                                <i className='fa fa-lg fa-compress' />
-                            </Link>}
-                        </TableCell> */}
                     </tr>
                 )
             });
@@ -180,15 +195,20 @@ class QtHopDongLaoDongPage extends AdminPage {
                 'Hợp đồng Lao động'
             ],
             advanceSearch: <>
-                <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.maDonVi = e} label='Chọn đơn vị (có thể chọn nhiều đơn vị)' data={this.stateTable} onChange={() => this.changeAdvancedSearch()} allowClear={true} />
+                <div className='row'>
+                    <FormDatePicker type='date-mask' ref={e => this.fromYear = e} className='col-12 col-md-3' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />
+                    <FormDatePicker type='date-mask' ref={e => this.toYear = e} className='col-12 col-md-3' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                </div>
             </>,
             content: <>
                 <div className='tile'>
-                    <FormCheckbox label='Hiển thị theo cán bộ' onChange={this.groupPage} />
+                    <FormCheckbox label='Hiển thị theo cán bộ' ref={e => this.hienThiTheoCanBo = e} onChange={this.groupPage} />
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                    getPage={this.checked ? this.props.getQtHopDongLaoDongGroupPage : this.props.getQtHopDongLaoDongPage} />
+                    getPage={this.getPage} />
                 {permission.read &&
                     <button className='btn btn-success btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px' }} onClick={this.download} >
                         <i className='fa fa-lg fa-print' />
