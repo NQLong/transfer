@@ -21,7 +21,7 @@ const timeList = [
 ];
 
 export class EditModal extends AdminModal {
-    state = { shcc: null, stt: '', chucVuChinh: 0, thoiChucVu: 0 };
+    state = { shcc: null, stt: '', chucVuChinh: 0, thoiChucVu: 0, donVi: 0 };
     componentDidMount() {
 
     }
