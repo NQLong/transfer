@@ -87,8 +87,8 @@ class QtHopDongVienChucPage extends AdminPage {
     }
 
     list = (text, i, j) => {
-        if (i == 0) return [];
-        let deTais = text.split('??').map(str => <p key={i--}>{j - i}. {str}</p>);
+        if (i == 0 || text == ' ') return [];
+        let deTais = text.split('??').map(str => <div key={i--}>Lần {j - i}: <b>{T.dateToText(Number(str.slice(0, -1)), 'dd/mm/yyyy')}</b><br /></div>);
         return deTais;
     }
 
