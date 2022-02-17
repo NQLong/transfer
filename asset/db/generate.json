@@ -5322,7 +5322,7 @@
                 "dataType": "NVARCHAR2",
                 "dataDefault": "",
                 "nullable": true,
-                "size": 200
+                "size": 120
             },
             "TITLE": {
                 "value": "title",
@@ -5391,9 +5391,7 @@
         "primaryKeys": [
             "ID"
         ],
-        "foreignKeys": [
-            "EMAIL"
-        ],
+        "foreignKeys": [],
         "type": "table"
     },
     "FW_QUESTION": {
@@ -6250,7 +6248,7 @@
                 "dataType": "NVARCHAR2",
                 "dataDefault": "",
                 "nullable": true,
-                "size": 5
+                "size": 255
             },
             "NGAY_THOI_CHUC_VU": {
                 "value": "ngayThoiChucVu",

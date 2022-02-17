@@ -49,17 +49,21 @@ export default function QtHopDongLaoDongReducer(state = null, data) {
 
 // Actions ------------------------------------------------------------------------------------------------------------
 T.initPage('pageQtHopDongLaoDong', true);
-export function getQtHopDongLaoDongPage(pageNumber, pageSize, maDonVi, pageCondition, done) {
-    const page = T.updatePage('pageQtHopDongLaoDong', pageNumber, pageSize, pageCondition);
-    if (!maDonVi) maDonVi = [];
-    if (!Array.isArray(maDonVi)) maDonVi = [maDonVi];
+export function getQtHopDongLaoDongPage(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('pageQtHopDongLaoDong', pageNumber, pageSize, pageCondition, filter);
+
     return dispatch => {
         const url = `/api/tccb/qua-trinh/hop-dong-lao-dong/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition, parameter: maDonVi }, data => {
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách hợp đồng bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
+                if (page.filter) data.page.filter = page.filter;
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 done && done(data.page);
                 dispatch({ type: QtHopDongLaoDongGetPage, page: data.page });
@@ -68,18 +72,21 @@ export function getQtHopDongLaoDongPage(pageNumber, pageSize, maDonVi, pageCondi
     };
 }
 
-T.initPage('groupPageQtHopDongLaoDong', true);
-export function getQtHopDongLaoDongGroupPage(pageNumber, pageSize, maDonVi, pageCondition, done) {
-    const page = T.updatePage('groupPageQtHopDongLaoDong', pageNumber, pageSize, pageCondition);
-    if (!maDonVi) maDonVi = [];
-    if (!Array.isArray(maDonVi)) maDonVi = [maDonVi];
+export function getQtHopDongLaoDongGroupPage(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('pageQtHopDongLaoDong', pageNumber, pageSize, pageCondition, filter);
+
     return dispatch => {
         const url = `/api/tccb/qua-trinh/hop-dong-lao-dong/group/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition, parameter: maDonVi }, data => {
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách hợp đồng theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
+                if (page.filter) data.page.filter = page.filter;
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 done && done(data.page);
                 dispatch({ type: QtHopDongLaoDongGetGroupPage, page: data.page });
@@ -203,7 +210,7 @@ export function updateQtHopDongLaoDong(ma, changes, done) {
 export function downloadWord(ma, done) {
     const url = `/api/tccb/qua-trinh/hop-dong-lao-dong/download-word/${ma}`;
     T.get(url, data => {
-         if (data.error) {
+        if (data.error) {
             T.notify('Tải file world bị lỗi', 'danger');
             console.error(`GET: ${url}.`, data.error);
         } else if (done) {
