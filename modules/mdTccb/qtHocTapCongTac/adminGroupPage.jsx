@@ -136,7 +136,7 @@ class QtHocTapCongTacGroupPage extends AdminPage {
             const route = T.routeMatcher('/user/tccb/qua-trinh/hoc-tap-cong-tac/group/:shcc'),
                 params = route.parse(window.location.pathname);
             this.shcc = params.shcc;
-            this.setState({ filter: { list_shcc: params.shcc, list_dv: '' } });
+            this.setState({ filter: { list_shcc: params.shcc, list_dv: '', timeType: 0 } });
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
 
             T.showSearchBox(() => {
