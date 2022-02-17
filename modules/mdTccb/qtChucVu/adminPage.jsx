@@ -75,7 +75,7 @@ export class EditModal extends AdminModal {
     onSubmit = (e) => {
         e.preventDefault();
         const changes = {
-            shcc: this.state.maCanBo,
+            shcc: this.shcc.value(),
             maChucVu: this.maChucVu.value(),
             maDonVi: this.maDonVi.value(),
             soQd: this.soQuyetDinh.value(),
