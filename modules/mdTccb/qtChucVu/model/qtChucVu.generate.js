@@ -97,6 +97,8 @@ module.exports = app => {
             if (changes.statement) {
                 const parameter = app.clone(condition.parameter ? condition.parameter : {}, changes.parameter ? changes.parameter : {});
                 const sql = 'UPDATE QT_CHUC_VU SET ' + changes.statement + (condition.statement ? ' WHERE ' + condition.statement : '');
+                console.log(sql);
+                console.log(parameter);
                 app.dbConnection.execute(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
                         app.model.qtChucVu.get({ rowId: resultSet.lastRowid }, done);

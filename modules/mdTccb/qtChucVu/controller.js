@@ -12,7 +12,7 @@ module.exports = app => {
     );
     app.get('/user/tccb/qua-trinh/chuc-vu/:stt', app.permission.check('qtChucVu:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/chuc-vu', app.permission.check('qtChucVu:read'), app.templates.admin);
-
+    app.get('/user/tccb/qua-trinh/chuc-vu/group/:shcc', app.permission.check('qtChucVu:read'), app.templates.admin);
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
 
     app.get('/api/tccb/qua-trinh/chuc-vu/page/:pageNumber/:pageSize', app.permission.check('qtChucVu:read'), (req, res) => {
@@ -48,14 +48,7 @@ module.exports = app => {
     });
 
     app.get('/api/tccb/qua-trinh/chuc-vu/all', app.permission.check('qtChucVu:read'), (req, res) => {
-        let condition = { statement: null };
-        if (req.query.shcc) {
-            condition = {
-                statement: 'shcc = :searchText',
-                parameter: { searchText: req.query.shcc },
-            };
-        }
-        app.model.qtChucVu.getAll(condition, (error, items) => res.send({ error, items }));
+        app.model.qtChucVu.getByShcc(req.query.shcc, (error, items) => res.send({ error, items }));
     });
 
 

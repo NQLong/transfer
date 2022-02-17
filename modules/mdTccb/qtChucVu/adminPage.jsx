@@ -59,7 +59,7 @@ export class EditModal extends AdminModal {
         T.confirm('Thông tin chức vụ chính', 'Đây sẽ là chức vụ chính của cán bộ', 'warning', true, isConfirm => {
             isConfirm && this.props.getQtChucVuAll(changes.shcc, data => {
                 if (data) {
-                    data.forEach(item => {
+                    data.rows.forEach(item => {
                         if (item.chucVuChinh && item.stt != this.state.stt) {
                             this.props.update(item.stt, { chucVuChinh: 0 });
                         }
@@ -93,7 +93,7 @@ export class EditModal extends AdminModal {
                     ngayRaQd: Number(this.ngayRaQuyetDinh.value()),
                     chucVuChinh: Number(this.chucVuChinh.value()),
                     maBoMon: this.maBoMon.value(),
-                    thoiChucVu: this.thoiChucVu.value(),
+                    thoiChucVu: Number(this.thoiChucVu.value()),
                     soQdThoiChucVu: this.soQdThoiChucVu.value(),
                     ngayRaQdThoiChucVu: Number(this.ngayRaQdThoiChucVu.value()),
                     ngayThoiChucVu: Number(this.ngayThoiChucVu.value()),
@@ -256,11 +256,13 @@ class QtChucVu extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Chức vụ</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Quyết định bổ nhiệm</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Chức vụ chính</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thôi chức vụ</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Quyết định thôi chức vụ</th>
+                        {!this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Chức vụ</th> }
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Quyết định bổ nhiệm</th> }
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Chức vụ chính</th> }
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thôi chức vụ</th> }
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Quyết định thôi chức vụ</th> }
+                        {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số chức vụ</th> }
+                        {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách chức vụ</th> }
                         <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                     </tr>
                 ),
@@ -274,30 +276,32 @@ class QtChucVu extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' content={(
+                        {!this.checked && <TableCell type='text' content={(
                             <>
                                 <b>{item.tenChucVu}</b><br />
                                 <span>{!item.tenBoMon ? (item.tenDonVi ? 'Đơn vị: ' + item.tenDonVi.toUpperCase() : '') : (item.tenBoMon ? item.tenBoMon.toUpperCase() : '')}</span><br />
                                 <span>Hệ số phụ cấp: {item.phuCap}</span>
                             </>
                         )}
-                        />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                        />}
+                        {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>Số: {item.soQuyetDinh}</span><br />
                                 <span>Ngày: <span style={{ color: 'blue' }}>{item.ngayRaQuyetDinh ? new Date(item.ngayRaQuyetDinh).ddmmyyyy() : ''}</span></span>
                             </>
                         )}
-                        />
-                        <TableCell type='checkbox' content={item.chucVuChinh} />
-                        <TableCell type='checkbox' content={item.thoiChucVu} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                        /> }
+                        {!this.checked && <TableCell type='checkbox' content={item.chucVuChinh} />}
+                        {!this.checked && <TableCell type='checkbox' content={item.thoiChucVu} /> }
+                        {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>Số: {item.soQdThoiChucVu}</span><br />
                                 <span>Ngày: <span style={{ color: 'blue' }}>{item.ngayRaQdThoiChucVu ? new Date(item.ngayRaQdThoiChucVu).ddmmyyyy() : ''}</span></span>
                             </>
                         )}
-                        />
+                        />}
+                        {this.checked && <TableCell type='text' content={item.soChucVu} />}
+                        {this.checked && <TableCell type='text' content={this.list(item.danhSachChucVu, item.soChucVu, item.soChucVu)} /> }
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                                 onEdit={() => this.modal.show(item)} onDelete={this.delete} >
