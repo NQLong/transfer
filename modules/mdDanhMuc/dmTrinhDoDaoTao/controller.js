@@ -33,8 +33,13 @@ module.exports = app => {
         if (req.query.condition) {
             if (loai != '00') {
                 condition = {
-                    statement: '(lower(ma) LIKE :searchText OR lower(ten) LIKE :searchText AND loai =:loai',
+                    statement: 'lower(ma) LIKE :searchText OR lower(ten) LIKE :searchText AND loai =:loai',
                     parameter: { searchText: `%${req.query.condition.toLowerCase()}%`, loai },
+                };
+            } else {
+                condition = {
+                    statement: 'lower(ma) LIKE :searchText OR lower(ten) LIKE :searchText',
+                    parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
                 };
             }
         } else {
