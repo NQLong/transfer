@@ -126,8 +126,8 @@ class ComponentTrinhDo extends AdminPage {
         }
     }
     render() {
-        let dataDaoTao = this.props.tccb ? this.props.staff?.selectedItem?.chungChi :
-            this.props.staff?.userItem?.chungChi;
+        // let dataDaoTao = this.props.tccb ? this.props.staff?.selectedItem?.chungChi :
+        //     this.props.staff?.userItem?.chungChi;
         return (
             <div className='tile'>
                 <h3 className='tile-title'>Thông tin về trình độ</h3>
@@ -164,20 +164,20 @@ class ComponentTrinhDo extends AdminPage {
                     <FormSelect ref={e => this.trinhDoLLCT = e} label={'Trình độ LLCT'} data={SelectApdaterDmTrinhDoDaoTaoFilter('7')} className='form-group col-md-3' readOnly />
                     <FormTextBox ref={e => this.namCapCcLyLuan = e} label='Thời gian' className='form-group col-md-3' readOnly />
                     <FormTextBox ref={e => this.noiCapCcLyLuan = e} label='Nơi cấp' className='form-group col-md-4' readOnly />
-                    <div className='form-group col-md-2' style={{ textAlign: 'right' }}><a href='Chọn trình độ khác' onClick={e => {
+                    {/* <div className='form-group col-md-2' style={{ textAlign: 'right' }}><a href='Chọn trình độ khác' onClick={e => {
                         e.preventDefault();
                         this.modalChungChi.show(dataDaoTao.filter(i => i.loaiBangCap == '7'));
                     }}>Chọn trình độ khác</a></div>
-                    <div className='form-group col-md-12' />
+                    <div className='form-group col-md-12' /> */}
 
                     <FormSelect ref={e => this.quanLyNhaNuoc = e} label='Trình độ QLNN' data={SelectApdaterDmTrinhDoDaoTaoFilter('8')} className='form-group col-md-3' readOnly />
                     <FormTextBox ref={e => this.namCapQlnn = e} label='Thời gian' className='form-group col-md-3' readOnly />
                     <FormTextBox ref={e => this.noiCapQlnn = e} label='Nơi cấp  ' className='form-group col-md-4' readOnly />
-                    <div className='form-group col-md-2' style={{ textAlign: 'right' }}><a href='Chọn trình độ khác' onClick={e => {
+                    {/* <div className='form-group col-md-2' style={{ textAlign: 'right' }}><a href='Chọn trình độ khác' onClick={e => {
                         e.preventDefault();
                         this.modalChungChi.show(dataDaoTao.filter(i => i.loaiBangCap == '8'));
                     }}>Chọn trình độ khác</a></div>
-                    <div className='form-group col-md-12' />
+                    <div className='form-group col-md-12' /> */}
 
                     <FormTextBox ref={e => this.hocTapHienTai = e} label='Tình hình học tập, bồi dưỡng hiện tại' className='form-group col-md-4' />
                     <FormTextBox ref={e => this.coSoHocTapHienTai = e} label='Tên cơ sở đào tạo' className='form-group col-md-4' />
