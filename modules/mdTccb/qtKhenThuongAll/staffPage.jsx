@@ -173,7 +173,7 @@ class QtKhenThuongAllUserPage extends AdminPage {
                     getLoaiDoiTuong={this.props.getDmKhenThuongLoaiDoiTuongAll}
                 />
             </>,
-            backRoute: '/user/tccb/qua-trinh/khen-thuong-all',
+            backRoute: '/user',
         });
     }
 }

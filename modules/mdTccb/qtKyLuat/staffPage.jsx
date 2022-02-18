@@ -226,7 +226,7 @@ class QtKyLuatUserPage extends AdminPage {
                     create={this.props.createQtKyLuatUserPage} update={this.props.updateQtKyLuatUserPage}
                 />
             </>,
-            backRoute: '/user/tccb/qua-trinh/ky-luat/',
+            backRoute: '/user',
         });
     }
 }
