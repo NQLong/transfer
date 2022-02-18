@@ -45,28 +45,26 @@ class CanBoTheoDonVi extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Họ và tên</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Email</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Họ và tên</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Email</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số điện thoại</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số CMND/CCCD</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
-                        <TableCell type='text' style={{whiteSpace: 'nowrap' }} content={item.ho + ' ' + item.ten} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.email} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.dienThoaiCaNhan} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.cmnd} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap', fontWeight: 'bold' }} content={item.ho + ' ' + item.ten} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap', color: 'blue', fontStyle: 'italic' }} content={item.email} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign:'left' }} content={item.dienThoaiCaNhan} />
                     </tr>
                 )
             });
         }
 
         return this.renderPage({
-            icon: 'fa user-cirle-0',
+            icon: 'fa fa-user-circle-o',
             title: 'Cán bộ thuộc đơn vị',
-            subTitle: <span style={{ color: 'blue' }}>Cán bộ: {name}</span>,
+            subTitle: <span style={{ color: 'blue' }}>Đơn vị: {name}</span>,
             breadcrumb: [
                 <Link key={0} to='/user'>Trang cá nhân</Link>,
                 'Thông tin cán bộ thuộc đơn vị'
