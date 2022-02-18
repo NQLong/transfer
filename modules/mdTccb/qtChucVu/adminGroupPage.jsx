@@ -9,7 +9,7 @@ import {
 } from './redux';
 import { SelectAdapter_DmChucVuV2 } from 'modules/mdDanhMuc/dmChucVu/redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
-import { SelectAdapter_DmBoMon } from 'modules/mdDanhMuc/dmBoMon/redux';
+import { SelectAdapter_DmBoMonTheoDonVi } from 'modules/mdDanhMuc/dmBoMon/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 
 const timeList = [
@@ -20,7 +20,7 @@ const timeList = [
 ];
 
 export class EditModal extends AdminModal {
-    state = { shcc: null, stt: '' , chucVuChinh: 0, thoiChucVu: 0 };
+    state = { shcc: null, stt: '', chucVuChinh: 0, thoiChucVu: 0, donVi: 0 };
     componentDidMount() {
 
     }
@@ -31,7 +31,7 @@ export class EditModal extends AdminModal {
             shcc: '', maChucVu: '', maDonVi: '', soQuyetDinh: '', ngayRaQuyetDinh: '', chucVuChinh: '', maBoMon: '',
             ngayRaQd: '', soQd: '', thoiChucVu: '', ngayRaQdThoiChucVu: '', ngayThoiChucVu: '', soQdThoiChucVu: ''
         };
-        this.setState({ shcc, stt, item, chucVuChinh, thoiChucVu: thoiChucVu ? 1 : 0, maCanBo}, () => {
+        this.setState({ shcc, stt, item, chucVuChinh, thoiChucVu: thoiChucVu ? 1 : 0, maCanBo }, () => {
             this.shcc.value(shcc ? shcc : (maCanBo ? maCanBo : ''));
             this.maChucVu.value(maChucVu ? maChucVu : '');
             this.maDonVi.value(maDonVi ? maDonVi : '');
@@ -87,7 +87,6 @@ export class EditModal extends AdminModal {
             ngayRaQdThoiChucVu: Number(this.ngayRaQdThoiChucVu.value()),
             ngayThoiChucVu: Number(this.ngayThoiChucVu.value()),
         };
-        console.log(changes);
         if (changes.shcc == '') {
             T.notify('Mã số cán bộ bị trống');
             this.shcc.focus();
@@ -110,11 +109,17 @@ export class EditModal extends AdminModal {
         return false;
     }
 
+    handleDonVi = (data) => {
+        data && this.setState({ donVi: data.id }, () => {
+            this.maBoMon.value('');
+        });
+    }
+
     handleThoiChucVu = (value) => {
         value ? $('#soQdThoiChucVu').show() : $('#soQdThoiChucVu').hide();
         value ? $('#ngayRaQdThoiChucVu').show() : $('#ngayRaQdThoiChucVu').hide();
         value ? $('#ngayThoiChucVu').show() : $('#ngayThoiChucVu').hide();
-        this.setState({thoiChucVu: value});
+        this.setState({ thoiChucVu: value });
     }
 
     render = () => {
@@ -123,14 +128,14 @@ export class EditModal extends AdminModal {
             title: this.state.shcc ? 'Cập nhật quá trình chức vụ' : 'Tạo mới quá trình chức vụ',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12' ref={e => this.shcc = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={true} />
-                <FormSelect className='col-md-4' ref={e => this.maChucVu = e} label='Chức vụ' data={SelectAdapter_DmChucVuV2} readOnly={readOnly} />
-                <FormSelect className='col-md-4' ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} readOnly={readOnly} />
-                <FormSelect className='col-md-4' ref={e => this.maBoMon = e} label='Bộ môn' data={SelectAdapter_DmBoMon} readOnly={readOnly} />
-                <FormCheckbox className='col-md-12' ref={e => this.chucVuChinh = e} label='Chức vụ chính' isSwitch={true} readOnly={this.checkChucVuSwitch()} />
+                <FormSelect className='col-md-12' ref={e => this.shcc = e} label='Cán bộ' data={SelectAdapter_FwCanBo} allowClear={true} readOnly={readOnly} />
+                <FormSelect className='col-md-4' ref={e => this.maChucVu = e} label='Chức vụ' data={SelectAdapter_DmChucVuV2} allowClear={true} readOnly={readOnly} />
+                <FormSelect className='col-md-4' ref={e => this.maDonVi = e} label='Đơn vị của chức vụ' data={SelectAdapter_DmDonVi} onChange={this.handleDonVi} allowClear={true} readOnly={readOnly} />
+                <FormSelect className='col-md-4' ref={e => this.maBoMon = e} label='Bộ môn của chức vụ' data={SelectAdapter_DmBoMonTheoDonVi(this.state.donVi)} allowClear={true} readOnly={readOnly} />
+                <FormCheckbox className='col-md-12' ref={e => this.chucVuChinh = e} label='Chức vụ chính' readOnly={this.checkChucVuSwitch()} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.soQuyetDinh = e} label='Số quyết định' readOnly={readOnly} />
-                <FormDatePicker className='col-md-6' ref={e => this.ngayRaQuyetDinh = e} label='Ngày ra quyết định' readOnly={readOnly} />
-                <FormCheckbox className='col-md-12' ref={e => this.thoiChucVu = e} label='Thôi giữ chức vụ' onChange={this.handleThoiChucVu} isSwitch={true} readOnly={readOnly} />
+                <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayRaQuyetDinh = e} label='Ngày ra quyết định' readOnly={readOnly} />
+                <FormCheckbox className='col-md-12' ref={e => this.thoiChucVu = e} onChange={this.handleThoiChucVu} label='Thôi giữ chức vụ' readOnly={readOnly} />
                 <div className='col-md-4' id='soQdThoiChucVu'><FormTextBox type='text' ref={e => this.soQdThoiChucVu = e} label='Số quyết định thôi chức vụ' readOnly={readOnly} /> </div>
                 <div className='col-md-4' id='ngayThoiChucVu'> <FormDatePicker type='date-mask' ref={e => this.ngayThoiChucVu = e} label='Ngày ra thôi chức vụ' readOnly={readOnly} /> </div>
                 <div className='col-md-4' id='ngayRaQdThoiChucVu'> <FormDatePicker type='date-mask' ref={e => this.ngayRaQdThoiChucVu = e} label='Ngày ra quyết định thôi chức vụ' readOnly={readOnly} /> </div>
@@ -146,7 +151,7 @@ class QtChucVuGroup extends AdminPage {
         T.ready('/user/tccb', () => {
             const route = T.routeMatcher('/user/tccb/qua-trinh/chuc-vu/group/:ma'),
                 params = route.parse(window.location.pathname);
-            this.setState({filter: {list_shcc: params.ma, list_dv: '', timeType: 0}, ma: params.ma});
+            this.setState({ filter: { list_shcc: params.ma, list_dv: '', timeType: 0 }, ma: params.ma });
             T.onSearch = (searchText) => {
                 this.searchText = searchText;
                 this.getPage();
@@ -239,7 +244,7 @@ class QtChucVuGroup extends AdminPage {
                         <TableCell type='text' content={(
                             <>
                                 <span>{item.tenChucVu}</span><br />
-                                {!item.tenDonVi ? (item.tenDonVi ? item.tenDonVi.toUpperCase() : '') : (item.tenDonVi ? item.tenDonVi.toUpperCase() : '')}<br/>
+                                {!item.tenDonVi ? (item.tenDonVi ? item.tenDonVi.toUpperCase() : '') : (item.tenDonVi ? item.tenDonVi.toUpperCase() : '')}<br />
                                 {!item.tenBoMon ? (item.tenBoMon ? item.tenBoMon.toUpperCase() : '') : (item.tenBoMon ? item.tenBoMon.toUpperCase() : '')}
                             </>
                         )}
@@ -278,9 +283,9 @@ class QtChucVuGroup extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                <FormSelect className='col-12 col-md-4' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
-                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} /> }
-                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} /> }
+                    <FormSelect className='col-12 col-md-4' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
+                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />}
+                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />}
                 </div>
             </>,
             content: <>
