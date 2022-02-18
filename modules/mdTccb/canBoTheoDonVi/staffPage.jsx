@@ -16,7 +16,11 @@ class CanBoTheoDonVi extends AdminPage {
                 if (data.error) {
                     T.notify('Lấy thông tin cán bộ bị lỗi', 'warning');
                 } else {
-                    this.props.getCanBoTheoDonViAll(data.item.maDonVi);
+                    if (data.item == null || data.item.maDonVi == null) {
+                        T.notify('Bạn không thuộc đơn vị nào', 'warning');
+                    } else {
+                        this.props.getCanBoTheoDonViAll(data.item.maDonVi);
+                    }
                 }
             });
         });
@@ -60,7 +64,7 @@ class CanBoTheoDonVi extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-podcast',
+            icon: 'fa user-cirle-0',
             title: 'Cán bộ thuộc đơn vị',
             subTitle: <span style={{ color: 'blue' }}>Cán bộ: {name}</span>,
             breadcrumb: [
