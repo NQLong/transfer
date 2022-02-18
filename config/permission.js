@@ -229,6 +229,8 @@ module.exports = app => {
                                         app.permissionHooks.pushUserPermission(user, 'quanLy:login');
                                         resolve();
                                     });
+                                } else {
+                                    resolve();
                                 }
                             });
                         } else resolve();
