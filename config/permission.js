@@ -224,8 +224,11 @@ module.exports = app => {
                         else if (re && re.length > 0) {
                             re.forEach(item => {
                                 if (item.chucVuChinh == 1 && item.maChucVu != '002' && item.maChucVu != '001' && item.maChucVu != '013' && item.maChucVu != '014') {
-                                    app.permissionHooks.pushUserPermission(user, 'quanLy:login');
-                                    resolve();
+                                    app.model.dmDonVi.get({ ma: item.maDonVi }, (er, resu) => {
+                                        user.donVi = resu.ten;
+                                        app.permissionHooks.pushUserPermission(user, 'quanLy:login');
+                                        resolve();
+                                    });
                                 }
                             });
                         } else resolve();

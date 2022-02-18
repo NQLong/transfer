@@ -33,10 +33,8 @@ class CanBoTheoDonVi extends AdminPage {
                 read: true
             };
         }
-        const { isStaff, shcc } = this.props.system && this.props.system.user ? this.props.system.user : { isStaff: false, shcc: '' };
-        const { firstName, lastName } = isStaff && this.props.system.user || { firstName: '', lastName: '' };
-        const name = isStaff ? `${lastName} ${firstName} (${shcc})` : '';
-        let list  = this.props.canBoTheoDonVi ? this.props.canBoTheoDonVi.items : [];
+        const tenDv = this.props.system && this.props.system.user ? this.props.system.user.donVi : '';
+        let list = this.props.canBoTheoDonVi ? this.props.canBoTheoDonVi.items : [];
         console.log(list);
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
@@ -62,9 +60,9 @@ class CanBoTheoDonVi extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-user-circle-o',
-            title: 'Cán bộ thuộc đơn vị',
-            subTitle: <span style={{ color: 'blue' }}>Đơn vị: {name}</span>,
+            icon: 'fa fa-user-cirle-o',
+            title: 'Danh sách cán bộ thuộc đơn vị',
+            subTitle: <span style={{ color: 'blue' }}>Đơn vị: {tenDv}</span>,
             breadcrumb: [
                 <Link key={0} to='/user'>Trang cá nhân</Link>,
                 'Thông tin cán bộ thuộc đơn vị'
