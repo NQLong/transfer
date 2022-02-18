@@ -5,7 +5,8 @@ import dmLinhVucKinhDoanh from './redux';
 
 export default {
     redux: {
-        dmLinhVucKinhDoanh,
+        parent: 'danhMuc',
+        reducers: {  dmLinhVucKinhDoanh } 
     },
     routes: [
         {

@@ -5,7 +5,8 @@ import qtKhenThuongAll from './redux';
 
 export default {
     redux: {
-        qtKhenThuongAll,
+        parent: 'tccb',
+        reducers: { qtKhenThuongAll }
     },
     routes: [
         {
@@ -15,6 +16,10 @@ export default {
         {
             path: '/user/tccb/qua-trinh/khen-thuong-all',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
+        },
+        {
+            path: '/user/khen-thuong-all',
+            component: Loadable({ loading: Loading, loader: () => import('./staffPage') })
         },
     ],
 };

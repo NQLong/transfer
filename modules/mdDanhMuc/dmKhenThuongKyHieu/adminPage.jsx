@@ -125,7 +125,7 @@ class DmKhenThuongKyHieuPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, dmKhenThuongKyHieu: state.dmKhenThuongKyHieu });
+const mapStateToProps = state => ({ system: state.system, dmKhenThuongKyHieu: state.danhMuc.dmKhenThuongKyHieu });
 const mapActionsToProps = {getDmKhenThuongKyHieuPage, createDmKhenThuongKyHieu, 
     getDmKhenThuongKyHieu, updateDmKhenThuongKyHieu, 
     deleteDmKhenThuongKyHieu };

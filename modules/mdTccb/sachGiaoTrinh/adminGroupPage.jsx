@@ -1,10 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormRichTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import { updateSachGiaoTrinhGroupPageMa, deleteSachGiaoTrinhGroupPageMa,
-    getSachGiaoTrinhGroupPageMa, getSachGiaoTrinhPage,
+    getSachGiaoTrinhGroupPageMa, createSachGiaoTrinhGroupPageMa,
 } from './redux';
 
 import { DateInput } from 'view/component/Input';
@@ -19,16 +19,14 @@ class EditModal extends AdminModal {
     state = {
         id: null,
     }
-    multiple = false;
 
-    onShow = (item, multiple = true) => {
-        this.multiple = multiple;
+    onShow = (item) => {
         let { id, shcc, ten, theLoai, nhaSanXuat, namSanXuat, chuBien, sanPham, butDanh, quocTe } = item ? item : {
             id: null, shcc: '', ten: '', theLoai: '', nhaSanXuat: '', namSanXuat: null, chuBien: '', sanPham: '', butDanh: '', quocTe: 0
         };
         this.setState({ id });
         setTimeout(() => {
-            this.maCanBo.value(shcc);
+            this.maCanBo.value(shcc ? shcc : this.props.shcc);
             this.ten.value(ten);
             this.theLoai.value(theLoai ? theLoai : '');
             if (namSanXuat) this.namSanXuat.setVal(new Date(namSanXuat.toString()));
@@ -40,7 +38,8 @@ class EditModal extends AdminModal {
         }, 500);
     }
 
-    onSubmit = () => {
+    onSubmit = (e) => {
+        e.preventDefault();
         const changes = {
             shcc: this.maCanBo.value(),
             ten: this.ten.value(),
@@ -52,7 +51,10 @@ class EditModal extends AdminModal {
             butDanh: this.butDanh.value(),
             quocTe: this.quocTe.value()
         };
-        if (!this.ten.value()) {
+        if (!changes.shcc) {
+            T.notify('Chưa chọn cán bộ', 'danger');
+            this.maCanBo.focus();
+        } else if (!this.ten.value()) {
             T.notify('Tên sách, giáo trình trống', 'danger');
             this.ten.focus();
         } else if (!this.namSanXuat.getVal()) {
@@ -61,7 +63,9 @@ class EditModal extends AdminModal {
         } else if (!this.nhaSanXuat.value()) {
             T.notify('Nhà xuất bản trống', 'danger');
             this.nhaSanXuat.focus();
-        } else this.props.update(this.state.id, changes, this.hide, true);
+        } else {
+            this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
+        }
     }
 
     render = () => {
@@ -69,32 +73,61 @@ class EditModal extends AdminModal {
             title: this.state.id ? 'Cập nhật sách giáo trình' : 'Tạo mới sách giáo trình',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={true} />
-                <FormTextBox className='col-12' ref={e => this.ten = e} label={'Tên sách, giáo trình'} type='text' required/>
-                <FormTextBox className='col-6' ref={e => this.theLoai = e} label={'Thể loại'} type='text' required/>
-                <FormTextBox className='col-6' ref={e => this.nhaSanXuat = e} label={'Nhà sản xuất, số hiệu ISBN'} type='text' required/>
-                <div className='form-group col-md-6'><DateInput ref={e => this.namSanXuat = e} label='Năm xuất bản' type='year' required/></div>
-                <FormTextBox className='col-md-6' ref={e => this.chuBien = e} label={'Chủ biên, đồng chủ biên'} type='text' />
-                <FormTextBox className='col-md-6' ref={e => this.sanPham = e} label={'Sản phẩm'} type='text' />
+                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={true} required />
+                <FormRichTextBox className='col-12' ref={e => this.ten = e} label={'Tên sách, giáo trình'} type='text' required/>
+                <div className='form-group col-md-4'><DateInput ref={e => this.namSanXuat = e} label='Năm xuất bản' type='year' required /></div>
+                <FormTextBox className='col-8' ref={e => this.nhaSanXuat = e} label={'Nhà xuất bản, số hiệu ISBN'} type='text' required />
+                <FormTextBox className='col-4' ref={e => this.theLoai = e} label={'Thể loại'} type='text' />
+                <FormTextBox className='col-md-8' ref={e => this.chuBien = e} label={'Chủ biên, đồng chủ biên'} type='text' />
+                <FormRichTextBox className='col-md-12' ref={e => this.sanPham = e} label={'Sản phẩm'} type='text' />
                 <FormTextBox className='col-md-6' ref={e => this.butDanh = e} label={'Bút danh'} type='text' />
-                <FormSelect className='col-md-6' ref={e => this.quocTe = e} label='Phạm vi xuất bản' data={quocTeList} required/>
+                <FormSelect className='col-md-6' ref={e => this.quocTe = e} label='Phạm vi xuất bản' data={quocTeList} />
             </div>,
         });
     }
 }
 
 class SachGiaoTrinhGroupPage extends AdminPage {
-    ma = ''; loaiDoiTuong = '-1';
+    state = { filter: {} };
+
     componentDidMount() {
         T.ready('/user/tccb', () => {
-            const route = T.routeMatcher('/user/tccb/sach-giao-trinh/group_sgt/:loaiDoiTuong/:ma'),
+            const route = T.routeMatcher('/user/tccb/sach-giao-trinh/group/:shcc'),
                 params = route.parse(window.location.pathname);
-            this.loaiDoiTuong = params.loaiDoiTuong;
-            this.ma = params.ma;
-            T.onSearch = (searchText) => this.props.getSachGiaoTrinhPage(undefined, undefined, this.loaiDoiTuong, searchText || '');
-            T.showSearchBox();
-            this.props.getSachGiaoTrinhGroupPageMa(undefined, undefined, this.loaiDoiTuong, this.ma);
+            this.shcc = params.shcc;
+            this.setState({ filter: { list_shcc: params.shcc, list_dv: '' } });
+            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
+            T.showSearchBox(() => {
+                this.fromYear?.value('');
+                this.toYear?.value('');
+                setTimeout(() => this.changeAdvancedSearch(), 50);
+            });
+            this.getPage();
         });
+    }
+
+    changeAdvancedSearch = (isInitial = false) => {
+        let { pageNumber, pageSize } = this.props && this.props.sachGiaoTrinh && this.props.sachGiaoTrinh.page_ma ? this.props.sachGiaoTrinh.page_ma : { pageNumber: 1, pageSize: 50 };
+        const fromYear = this.fromYear?.value() == '' ? null : Number(this.fromYear?.value());
+        const toYear = this.toYear?.value() == '' ? null : Number(this.toYear?.value());
+        const list_dv = this.state.filter.list_dv;
+        const list_shcc = this.state.filter.list_shcc;
+        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc };
+        this.setState({ filter: pageFilter }, () => {
+            this.getPage(pageNumber, pageSize, '', (page) => {
+                if (isInitial) {
+                    const filter = page.filter || {};
+                    this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
+                    this.fromYear?.value(filter.fromYear || '');
+                    this.toYear?.value(filter.toYear || '');
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear)) this.showAdvanceSearch();
+                }
+            });
+        });
+    }
+
+    getPage = (pageN, pageS, pageC, done) => {
+        this.props.getSachGiaoTrinhGroupPageMa(pageN, pageS, pageC, this.state.filter, done);
     }
 
     showModal = (e) => {
@@ -104,7 +137,7 @@ class SachGiaoTrinhGroupPage extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa sách giáo trình', 'Bạn có chắc bạn muốn xóa sách giáo trình này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteSachGiaoTrinhGroupPageMa(item.id, item.shcc, error => {
+            isConfirm && this.props.deleteSachGiaoTrinhGroupPageMa(item.id, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá sách giáo trình bị lỗi!', 'danger');
                 else T.alert('Xoá sách giáo trình thành công!', 'success', false, 800);
             });
@@ -115,7 +148,7 @@ class SachGiaoTrinhGroupPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('sachGiaoTrinh', ['read', 'write', 'delete']);
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.sachGiaoTrinh && this.props.sachGiaoTrinh.page ? this.props.sachGiaoTrinh.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.sachGiaoTrinh && this.props.sachGiaoTrinh.page_ma ? this.props.sachGiaoTrinh.page_ma : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -123,9 +156,9 @@ class SachGiaoTrinhGroupPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Thông tin sách</th>
-                        <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Thông tin xuất bản</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thông tin sách</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thông tin xuất bản</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thông tin sản phẩm</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Nơi xuất bản</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
@@ -134,7 +167,7 @@ class SachGiaoTrinhGroupPage extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
-                        <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
+                        <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{(item.hoCanBo ? item.hoCanBo : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo : ' ')}</span><br />
                                 {item.shcc}
@@ -171,7 +204,7 @@ class SachGiaoTrinhGroupPage extends AdminPage {
                         )}                        
                         />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                            onEdit={() => this.modal.show(item, false)} onDelete={this.delete} >
+                            onEdit={() => this.modal.show(item)} onDelete={this.delete} >
                         </TableCell>
 
                     </tr>
@@ -181,30 +214,38 @@ class SachGiaoTrinhGroupPage extends AdminPage {
         
         return this.renderPage({
             icon: 'fa fa-book',
-            title: 'Sách, giáo trình',
+            title: 'Sách giáo trình - Cán bộ',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
-                'Sách giáo trình'
+                <Link key={0} to='/user/tccb/sach-giao-trinh'>Sách giáo trình</Link>,
+                'Sách giáo trình - Cán bộ',
             ],
+            advanceSearch: <>
+                <div className='row'>
+                    <FormTextBox className='col-md-3' ref={e => this.fromYear = e} label='Từ năm sản suất (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
+                    <FormTextBox className='col-md-3' ref={e => this.toYear = e} label='Đến năm sản xuất (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} /> 
+                </div>
+            </>,
             content: <>
                 <div className='tile'>
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                    getPage={this.props.getSachGiaoTrinhPage} />
+                    getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
-                    permissions={currentPermissions}
-                    update={this.props.updateSachGiaoTrinhGroupPageMa}
+                    permissions={currentPermissions} shcc={this.shcc}
+                    update={this.props.updateSachGiaoTrinhGroupPageMa} create={this.props.createSachGiaoTrinhGroupPageMa}
                 />
             </>,
             backRoute: '/user/tccb/sach-giao-trinh',
+            onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
         });
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, sachGiaoTrinh: state.sachGiaoTrinh });
+const mapStateToProps = state => ({ system: state.system, sachGiaoTrinh: state.tccb.sachGiaoTrinh });
 const mapActionsToProps = {
     updateSachGiaoTrinhGroupPageMa, deleteSachGiaoTrinhGroupPageMa, 
-    getSachGiaoTrinhGroupPageMa, getSachGiaoTrinhPage,
+    getSachGiaoTrinhGroupPageMa, createSachGiaoTrinhGroupPageMa,
 };
 export default connect(mapStateToProps, mapActionsToProps)(SachGiaoTrinhGroupPage);

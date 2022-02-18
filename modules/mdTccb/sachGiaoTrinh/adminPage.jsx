@@ -3,7 +3,8 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormCheckbox, FormRichTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
-import { createSachGTStaff, updateSachGTStaff, deleteSachGTStaff,
+import {
+    createSachGTStaff, updateSachGTStaff, deleteSachGTStaff,
     getSachGiaoTrinhGroupPage, getSachGiaoTrinhPage,
 } from './redux';
 
@@ -72,14 +73,14 @@ class EditModal extends AdminModal {
                     quocTe: this.quocTe.value()
                 };
                 if (index == list_ma.length - 1) {
-                    this.state.id ? this.props.update(this.state.id, changes, this.hide, false) : this.props.create(changes, this.hide, false);
+                    this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
                     this.setState({
                         id: ''
                     });
                     this.maCanBo.reset();
                 }
                 else {
-                    this.state.id ? this.props.update(this.state.id, changes, false) : this.props.create(changes, false);
+                    this.state.id ? this.props.update(this.state.id, changes, null) : this.props.create(changes, null);
                 }
             });
         }
@@ -92,7 +93,7 @@ class EditModal extends AdminModal {
             size: 'large',
             body: <div className='row'>
                 <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={readOnly} required />
-                <FormRichTextBox className='col-12' ref={e => this.ten = e} label={'Tên sách, giáo trình'} type='text' required/>
+                <FormRichTextBox className='col-12' ref={e => this.ten = e} label={'Tên sách, giáo trình'} type='text' required />
                 <div className='form-group col-md-4'><DateInput ref={e => this.namSanXuat = e} label='Năm xuất bản' type='year' required /></div>
                 <FormTextBox className='col-8' ref={e => this.nhaSanXuat = e} label={'Nhà xuất bản, số hiệu ISBN'} type='text' required />
                 <FormTextBox className='col-4' ref={e => this.theLoai = e} label={'Thể loại'} type='text' />
@@ -106,22 +107,24 @@ class EditModal extends AdminModal {
 }
 
 class SachGiaoTrinh extends AdminPage {
-    checked = false;
-    curState = [];
-    searchText = '';
+    checked = parseInt(T.cookie('hienThiTheoCanBo')) == 1 ? true : false;
+    state = { filter: {} };
     componentDidMount() {
         T.ready('/user/tccb', () => {
-            T.onSearch = (searchText) => {
-                this.searchText = searchText;
-                if (this.checked) this.props.getSachGiaoTrinhGroupPage(undefined, undefined, this.curState, this.searchText || '');
-                else this.props.getSachGiaoTrinhPage(undefined, undefined, this.curState, this.searchText || '');
-            };
+            T.clearSearchBox();
+            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
-                this.loaiDoiTuong?.value('');
+                this.fromYear?.value('');
+                this.toYear?.value('');
+                this.maDonVi?.value('');
+                this.mulCanBo?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
-                setTimeout(() => this.showAdvanceSearch(), 1000);
             });
-            this.changeAdvancedSearch();
+            if (this.checked) {
+                this.hienThiTheoCanBo.value(true);
+            }
+            this.getPage();
+            this.changeAdvancedSearch(true);
         });
     }
 
@@ -130,24 +133,48 @@ class SachGiaoTrinh extends AdminPage {
         this.modal.show();
     }
 
-    changeAdvancedSearch = () => {
+    changeAdvancedSearch = (isInitial = false) => {
         let { pageNumber, pageSize } = this.props && this.props.sachGiaoTrinh && this.props.sachGiaoTrinh.page ? this.props.sachGiaoTrinh.page : { pageNumber: 1, pageSize: 50 };
-        const loaiDoiTuong = this.loaiDoiTuong?.value() || [];
-        this.curState = loaiDoiTuong;
-        if (this.checked) this.props.getSachGiaoTrinhGroupPage(pageNumber, pageSize, this.curState, this.searchText || '');
-        else this.props.getSachGiaoTrinhPage(pageNumber, pageSize, this.curState, this.searchText || '');
+        const fromYear = this.fromYear?.value() == '' ? null : Number(this.fromYear?.value());
+        const toYear = this.toYear?.value() == '' ? null : Number(this.toYear?.value());
+        const list_dv = this.maDonVi?.value().toString() || '';
+        const list_shcc = this.mulCanBo?.value().toString() || '';
+        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc };
+        this.setState({ filter: pageFilter }, () => {
+            this.getPage(pageNumber, pageSize, '', (page) => {
+                if (isInitial) {
+                    const filter = page.filter || {};
+                    this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
+                    this.fromYear?.value(filter.fromYear || '');
+                    this.toYear?.value(filter.toYear || '');
+                    this.maDonVi?.value(filter.list_dv);
+                    this.mulCanBo?.value(filter.list_shcc);
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.list_shcc || filter.list_dv)) this.showAdvanceSearch();
+                }
+            });
+        });
+    }
+
+    getPage = (pageN, pageS, pageC, done) => {
+        if (this.checked) this.props.getSachGiaoTrinhGroupPage(pageN, pageS, pageC, this.state.filter, done);
+        else this.props.getSachGiaoTrinhPage(pageN, pageS, pageC, this.state.filter, done);
     }
 
     groupPage = () => {
-        let { pageNumber, pageSize } = this.props && this.props.sachGiaoTrinh && this.props.sachGiaoTrinh.page ? this.props.sachGiaoTrinh.page : { pageNumber: 1, pageSize: 50 };
         this.checked = !this.checked;
-        if (this.checked) this.props.getSachGiaoTrinhGroupPage(pageNumber, pageSize, this.curState, this.searchText || '');
-        else this.props.getSachGiaoTrinhPage(pageNumber, pageSize, this.curState, this.searchText || '');
+        T.cookie('hienThiTheoCanBo', this.checked ? 1 : 0);
+        this.getPage();
+    }
+
+    list = (text, i, j) => {
+        if (i == 0) return [];
+        let deTais = text.split('??').map(str => <p key={i--} style={{ textTransform: 'uppercase' }}>{j - i}. {str}</p>);
+        return deTais;
     }
 
     delete = (e, item) => {
         T.confirm('Xóa sách giáo trình', 'Bạn có chắc bạn muốn xóa sách giáo trình này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteSachGTStaff(item.id, false, null, error => {
+            isConfirm && this.props.deleteSachGTStaff(item.id, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá sách giáo trình bị lỗi!', 'danger');
                 else T.alert('Xoá sách giáo trình thành công!', 'success', false, 800);
             });
@@ -162,6 +189,15 @@ class SachGiaoTrinh extends AdminPage {
             this.props.sachGiaoTrinh && this.props.sachGiaoTrinh.page_gr ?
                 this.props.sachGiaoTrinh.page_gr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
             : (this.props.sachGiaoTrinh && this.props.sachGiaoTrinh.page ? this.props.sachGiaoTrinh.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] });
+        if (this.checked && list && list.length > 0) {
+            let list_filter = [];
+            list.forEach(item => {
+                if (item.soLuong > 0) {
+                    list_filter.push(item);
+                }
+            });
+            list = list_filter;
+        }
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -169,11 +205,14 @@ class SachGiaoTrinh extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Thông tin sách</th>
-                        <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Thông tin xuất bản</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thông tin sản phẩm</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Phạm vi xuất bản</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
+                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thông tin sách</th>}
+                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thông tin xuất bản</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thông tin sản phẩm</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Phạm vi xuất bản</th>}
+
+                        {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số lượng sách giáo trình</th>}
+                        {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách</th>}
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
@@ -187,35 +226,37 @@ class SachGiaoTrinh extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' content={(
+                        {!this.checked && <TableCell type='text' content={(
                             <>
                                 <span><i>{item.ten}</i></span><br />
                                 <span>Thể loại: <span style={{ color: 'blue' }}>{item.theLoai}</span></span>
                             </>
-                        )} 
-                        />
-                        <TableCell type='text' content={(
+                        )}
+                        />}
+                        {!this.checked && <TableCell type='text' content={(
                             <>
                                 <span>Nhà xuất bản: <i>{item.nhaSanXuat}</i></span><br />
-                                <span>Năm xuất bản: <span style={{ color: 'blue' }}>{item.namSanXuat}</span></span> <br /> <br/>
+                                <span>Năm xuất bản: <span style={{ color: 'blue' }}>{item.namSanXuat}</span></span> <br /> <br />
                                 <span>Chủ biên: <span style={{ color: 'blue' }}>{item.chuBien}</span></span>
                             </>
-                        )} 
-                        />
-                        <TableCell type='text' content={(
+                        )}
+                        />}
+                        {!this.checked && <TableCell type='text' content={(
                             <>
                                 <span>Sản phẩm: {item.sanPham}</span><br />
                                 <span>Bút danh: <span style={{ color: 'blue' }}>{item.butDanh}</span></span>
                             </>
-                        )} 
-                        />
-                        <TableCell type='text' content={(
-                            item.quocTe == '0' ? <span>Trong nước</span>
-                            : item.quocTe == '1' ? <span>Quốc tế</span>
-                                : item.quocTe == '2' ? <span>Trong và ngoài nước </span>
-                                    : ''
                         )}
-                        />
+                        />}
+                        {!this.checked && <TableCell type='text' content={(
+                            item.quocTe == '0' ? <span>Trong nước</span>
+                                : item.quocTe == '1' ? <span>Quốc tế</span>
+                                    : item.quocTe == '2' ? <span>Trong và ngoài nước </span>
+                                        : ''
+                        )}
+                        />}
+                        {this.checked && <TableCell type='text' content={item.soLuong} />}
+                        {this.checked && <TableCell type='text' content={this.list(item.danhSach, item.soLuong, item.soLuong)} />}
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                                 onEdit={() => this.modal.show(item, false)} onDelete={this.delete} >
@@ -223,7 +264,7 @@ class SachGiaoTrinh extends AdminPage {
                         }
                         {
                             this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}>
-                                <Link className='btn btn-success' to={`/user/tccb/sach-giao-trinh/group_sgt/-1/${item.shcc}`} >
+                                <Link className='btn btn-success' to={`/user/tccb/sach-giao-trinh/group/${item.shcc}`} >
                                     <i className='fa fa-lg fa-compress' />
                                 </Link>
                             </TableCell>
@@ -232,7 +273,7 @@ class SachGiaoTrinh extends AdminPage {
                 )
             });
         }
-        
+
         return this.renderPage({
             icon: 'fa fa-book',
             title: 'Sách, giáo trình',
@@ -241,15 +282,20 @@ class SachGiaoTrinh extends AdminPage {
                 'Sách giáo trình'
             ],
             advanceSearch: <>
-                <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.loaiDoiTuong = e} label='Chọn loại đơn vị (có thể chọn nhiều loại)' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} />
+                <div className='row'>
+                    <FormTextBox className='col-md-3' ref={e => this.fromYear = e} label='Từ năm xuất bản (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
+                    <FormTextBox className='col-md-3' ref={e => this.toYear = e} label='Đến năm xuất bản (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                </div>
             </>,
             content: <>
                 <div className='tile'>
-                    <FormCheckbox label='Hiển thị theo cán bộ' onChange={this.groupPage} />
+                    <FormCheckbox label='Hiển thị theo cán bộ' ref={e => this.hienThiTheoCanBo = e} onChange={this.groupPage} />
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                    getPage={this.checked ? this.props.getSachGiaoTrinhGroupPage : this.props.getSachGiaoTrinhPage} />
+                    getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     permissions={currentPermissions}
                     create={this.props.createSachGTStaff} update={this.props.updateSachGTStaff}
@@ -261,9 +307,9 @@ class SachGiaoTrinh extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, sachGiaoTrinh: state.sachGiaoTrinh });
+const mapStateToProps = state => ({ system: state.system, sachGiaoTrinh: state.tccb.sachGiaoTrinh });
 const mapActionsToProps = {
-    createSachGTStaff, updateSachGTStaff, deleteSachGTStaff, 
+    createSachGTStaff, updateSachGTStaff, deleteSachGTStaff,
     getSachGiaoTrinhGroupPage, getSachGiaoTrinhPage,
 };
 export default connect(mapStateToProps, mapActionsToProps)(SachGiaoTrinh);

@@ -5,6 +5,7 @@ import { getStaffEdit, userGetStaff } from '../tccbCanBo/redux';
 // Reducer ------------------------------------------------------------------------------------------------------------
 const QtNuocNgoaiGetAll = 'QtNuocNgoai:GetAll';
 const QtNuocNgoaiGetPage = 'QtNuocNgoai:GetPage';
+const QtNuocNgoaiGetUserPage = 'QtNuocNgoai:GetUserPage';
 const QtNuocNgoaiGetGroupPage = 'QtNuocNgoai:GetGroupPage';
 const QtNuocNgoaiUpdate = 'QtNuocNgoai:Update';
 const QtNuocNgoaiGet = 'QtNuocNgoai:Get';
@@ -17,6 +18,8 @@ export default function QtNuocNgoaiReducer(state = null, data) {
             return Object.assign({}, state, { page_gr: data.page });
         case QtNuocNgoaiGetPage:
             return Object.assign({}, state, { page: data.page });
+        case QtNuocNgoaiGetUserPage:
+            return Object.assign({}, state, { user_page: data.page });
         case QtNuocNgoaiGet:
             return Object.assign({}, state, { selectedItem: data.item });
         case QtNuocNgoaiUpdate:
@@ -50,18 +53,94 @@ export default function QtNuocNgoaiReducer(state = null, data) {
 }
 
 // Actions ------------------------------------------------------------------------------------------------------------
-T.initPage('pageQtNuocNgoai');
-export function getQtNuocNgoaiPage(pageNumber, pageSize, loaiDoiTuong, pageCondition, done) {
-    const page = T.updatePage('pageQtNuocNgoai', pageNumber, pageSize, pageCondition);
-    if (!loaiDoiTuong) loaiDoiTuong = [];
-    if (!Array.isArray(loaiDoiTuong)) loaiDoiTuong = [loaiDoiTuong];
+T.initPage('userPageQtNuocNgoai');
+export function getQtNuocNgoaiUserPage(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('userPageQtNuocNgoai', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
-        const url = `/api/tccb/qua-trinh/nuoc-ngoai/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition, parameter: loaiDoiTuong}, data => {
+        const url = `/api/user/qua-trinh/nuoc-ngoai/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách đi nước ngoài bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
+                if (page.filter) data.page.filter = page.filter;
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                if (done) done(data.page);
+                dispatch({ type: QtNuocNgoaiGetUserPage, page: data.page });
+            }
+        }, () => T.notify('Lấy danh sách đi nước ngoài bị lỗi!', 'danger'));
+    };
+}
+
+export function updateQtNuocNgoaiUserPage(id, changes, done) {
+    return dispatch => {
+        const url = '/api/user/qua-trinh/nuoc-ngoai';
+        T.put(url, { id, changes }, data => {
+            if (data.error || changes == null) {
+                T.notify('Cập nhật đi nước ngoài bị lỗi!', 'danger');
+                console.error(`PUT: ${url}.`, data.error);
+                done && done(data.error);
+            } else {
+                T.notify('Cập nhật đi nước ngoài thành công!', 'success');
+                done && done(data.item);
+                dispatch(getQtNuocNgoaiUserPage());
+            }
+        }, () => T.notify('Cập nhật đi nước ngoài bị lỗi!', 'danger'));
+    };
+}
+
+export function createQtNuocNgoaiUserPage(data, done) {
+    return dispatch => {
+        const url = '/api/user/qua-trinh/nuoc-ngoai';
+        T.post(url, { data }, res => {
+            if (res.error) {
+                T.notify('Tạo đi nước ngoài bị lỗi!', 'danger');
+                console.error(`POST: ${url}.`, res.error);
+            } else {
+                if (done) {
+                    T.notify('Tạo đi nước ngoài thành công!', 'success');
+                    dispatch(getQtNuocNgoaiUserPage());
+                    done && done(data);
+                }
+            }
+        }, () => T.notify('Tạo đi nước ngoài bị lỗi!', 'danger'));
+    };
+}
+export function deleteQtNuocNgoaiUserPage(id, done) {
+    return dispatch => {
+        const url = '/api/user/qua-trinh/nuoc-ngoai';
+        T.delete(url, { id }, data => {
+            if (data.error) {
+                T.notify('Xóa đi nước ngoài bị lỗi!', 'danger');
+                console.error(`DELETE: ${url}.`, data.error);
+            } else {
+                T.alert('đi nước ngoài đã xóa thành công!', 'success', false, 800);
+                done && done(data.item);
+                dispatch(getQtNuocNgoaiUserPage());
+            }
+        }, () => T.notify('Xóa đi nước ngoài bị lỗi!', 'danger'));
+    };
+}
+
+T.initPage('pageQtNuocNgoai');
+export function getQtNuocNgoaiPage(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('pageQtNuocNgoai', pageNumber, pageSize, pageCondition, filter);
+    return dispatch => {
+        const url = `/api/tccb/qua-trinh/nuoc-ngoai/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách đi nước ngoài bị lỗi!', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (page.filter) data.page.filter = page.filter;
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 if (done) done(data.page);
                 dispatch({ type: QtNuocNgoaiGetPage, page: data.page });
@@ -71,17 +150,20 @@ export function getQtNuocNgoaiPage(pageNumber, pageSize, loaiDoiTuong, pageCondi
 }
 
 T.initPage('groupPageQtNuocNgoai', true);
-export function getQtNuocNgoaiGroupPage(pageNumber, pageSize, loaiDoiTuong, pageCondition, done) {
-    const page = T.updatePage('groupPageQtNuocNgoai', pageNumber, pageSize, pageCondition);
-    if (!loaiDoiTuong) loaiDoiTuong = [];
-    if (!Array.isArray(loaiDoiTuong)) loaiDoiTuong = [loaiDoiTuong];
+export function getQtNuocNgoaiGroupPage(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('groupPageQtNuocNgoai', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/tccb/qua-trinh/nuoc-ngoai/group/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition, parameter: loaiDoiTuong}, data => {
+        T.get(url, { condition: page.pageCondition, filter: page.filter}, data => {
             if (data.error) {
-                T.notify('Lấy danh sách đi nước ngoài theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                T.notify('Lấy danh sách đi nước ngoài bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
+                if (page.filter) data.page.filter = page.filter;
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 done && done(data.page);
                 dispatch({ type: QtNuocNgoaiGetGroupPage, page: data.page });
@@ -90,22 +172,53 @@ export function getQtNuocNgoaiGroupPage(pageNumber, pageSize, loaiDoiTuong, page
     };
 }
 
-T.initPage('groupPageMaQtNuocNgoai', true);
-export function getQtNuocNgoaiGroupPageMa(pageNumber, pageSize, loaiDoiTuong, pageCondition, done) {
-    const page = T.updatePage('groupPageMaQtNuocNgoai', pageNumber, pageSize, pageCondition);
-    if (!loaiDoiTuong) loaiDoiTuong = [];
+export function updateQtNuocNgoaiGroupPageMa(id, changes, done) {
     return dispatch => {
-        const url = `/api/tccb/qua-trinh/nuoc-ngoai/group_nn/page/${loaiDoiTuong}/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition }, data => {
+        const url = '/api/qua-trinh/nuoc-ngoai';
+        T.put(url, { id, changes }, data => {
             if (data.error) {
-                T.notify('Lấy danh sách đi nước ngoài theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
-                console.error(`GET: ${url}.`, data.error);
-            } else {
-                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
-                done && done(data.page);
-                dispatch({ type: QtNuocNgoaiGetPage, page: data.page });
+                T.notify('Cập nhật thông tin quá trình đi nước ngoài bị lỗi', 'danger');
+                console.error('PUT: ' + url + '. ' + data.error);
+            } else if (data.item) {
+                T.notify('Cập nhật thông tin quá trình đi nước ngoài thành công!', 'info');
+                done && done(data.item);
+                dispatch(getQtNuocNgoaiPage());
             }
-        }, error => console.error(`GET: ${url}.`, error));
+        }, () => T.notify('Cập nhật thông tin quá trình đi nước ngoài bị lỗi', 'danger'));
+    };
+}
+
+export function deleteQtNuocNgoaiGroupPageMa(id, done) {
+    return dispatch => {
+        const url = '/api/qua-trinh/nuoc-ngoai';
+        T.delete(url, { id }, data => {
+            if (data.error) {
+                T.notify('Xóa thông tin quá trình đi nước ngoài bị lỗi', 'danger');
+                console.error('DELETE: ' + url + '. ' + data.error);
+            } else {
+                T.alert('Thông tin quá trình đi nước ngoài được xóa thành công!', 'info', false, 800);
+                done && done(data.item);
+                dispatch(getQtNuocNgoaiPage());
+            }
+        }, () => T.notify('Xóa thông tin quá trình đi nước ngoài bị lỗi', 'danger'));
+    };
+}
+
+export function createQtNuocNgoaiGroupPageMa(data, done) {
+    return dispatch => {
+        const url = '/api/qua-trinh/nuoc-ngoai';
+        T.post(url, { data }, res => {
+            if (res.error) {
+                T.notify('Tạo đi nước ngoài bị lỗi!', 'danger');
+                console.error(`POST: ${url}.`, res.error);
+            } else {
+                if (done) {
+                    T.notify('Tạo đi nước ngoài thành công!', 'success');
+                    dispatch(getQtNuocNgoaiPage());
+                    done && done(data);
+                }
+            }
+        }, () => T.notify('Tạo đi nước ngoài bị lỗi!', 'danger'));
     };
 }
 
@@ -167,38 +280,6 @@ export function updateQtNuocNgoaiStaff(id, changes, done, isStaffEdit = null) {
                 isStaffEdit ? dispatch(getStaffEdit(changes.shcc)) : dispatch(getQtNuocNgoaiPage());
             }
         }, () => T.notify('Cập nhật thông tin quá trình đi nước ngoài bị lỗi', 'danger'));
-    };
-}
-
-export function updateQtNuocNgoaiGroupPageMa(id, changes, done) {
-    return dispatch => {
-        const url = '/api/qua-trinh/nuoc-ngoai';
-        T.put(url, { id, changes }, data => {
-            if (data.error) {
-                T.notify('Cập nhật thông tin quá trình đi nước ngoài bị lỗi', 'danger');
-                console.error('PUT: ' + url + '. ' + data.error);
-            } else if (data.item) {
-                T.notify('Cập nhật thông tin quá trình đi nước ngoài thành công!', 'info');
-                done && done(data.item);
-                dispatch(getQtNuocNgoaiGroupPageMa(undefined, undefined, '-1', data.shcc));
-            }
-        }, () => T.notify('Cập nhật thông tin quá trình đi nước ngoài bị lỗi', 'danger'));
-    };
-}
-
-export function deleteQtNuocNgoaiGroupPageMa(id, shcc, done) {
-    return dispatch => {
-        const url = '/api/qua-trinh/nuoc-ngoai';
-        T.delete(url, { id }, data => {
-            if (data.error) {
-                T.notify('Xóa thông tin quá trình đi nước ngoài bị lỗi', 'danger');
-                console.error('DELETE: ' + url + '. ' + data.error);
-            } else {
-                T.alert('Thông tin quá trình đi nước ngoài được xóa thành công!', 'info', false, 800);
-                done && done(data.item);
-                dispatch(getQtNuocNgoaiGroupPageMa(undefined, undefined, '-1', shcc));
-            }
-        }, () => T.notify('Xóa thông tin quá trình đi nước ngoài bị lỗi', 'danger'));
     };
 }
 

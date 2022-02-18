@@ -5,16 +5,21 @@ import qtNuocNgoai from './redux';
 
 export default {
     redux: {
-        qtNuocNgoai,
+        parent: 'tccb',
+        reducers: { qtNuocNgoai }
     },
     routes: [
         {
-            path: '/user/tccb/qua-trinh/nuoc-ngoai/group_nn/:loaiDoiTuong/:ma',
+            path: '/user/tccb/qua-trinh/nuoc-ngoai/group/:shcc',
             component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
         },
         {
             path: '/user/tccb/qua-trinh/nuoc-ngoai',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
+        },
+        {
+            path: '/user/nuoc-ngoai',
+            component: Loadable({ loading: Loading, loader: () => import('./staffPage') })
         },
     ],
 };

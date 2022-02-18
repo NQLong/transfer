@@ -5,7 +5,8 @@ import dmChucVu from './redux';
 
 export default {
     redux: {
-        dmChucVu,
+        parent: 'danhMuc',
+        reducers: { dmChucVu, }
     },
     routes: [
         {

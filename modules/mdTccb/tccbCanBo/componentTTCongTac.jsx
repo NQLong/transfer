@@ -15,7 +15,6 @@ class ComponentTTCongTac extends AdminPage {
     state = { doiTuongBoiDuong: false, tinhTrangBoiDuong: false, dangONuocNgoai: false, dangNghiTheoCheDo: false, daNghi: false };
 
     value = (item) => {
-        console.log(item);
         this.setState({
             doiTuongBoiDuong: item.doiTuongBoiDuongKienThucQpan, tinhTrangBoiDuong: item.tinhTrangBoiDuong,
             dangONuocNgoai: item.dangONuocNgoai, dangNghiTheoCheDo: item.dangNghiTheoCheDo, daNghi: item.daNghi
@@ -189,7 +188,7 @@ class ComponentTTCongTac extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ staff: state.staff, system: state.system });
+const mapStateToProps = state => ({ staff: state.tccb.staff, system: state.system });
 const mapActionsToProps = {
     getStaffEdit
 };

@@ -5,7 +5,8 @@ import qtNghienCuuKhoaHoc from './redux';
 
 export default {
     redux: {
-        qtNghienCuuKhoaHoc,
+        parent: 'tccb',
+        reducers: { qtNghienCuuKhoaHoc }
     },
     routes: [
         {
@@ -15,6 +16,10 @@ export default {
         {
             path: '/user/tccb/qua-trinh/nghien-cuu-khoa-hoc',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
+        },
+        {
+            path: '/user/nghien-cuu-khoa-hoc',
+            component: Loadable({ loading: Loading, loader: () => import('./staffPage') })
         },
         
     ],

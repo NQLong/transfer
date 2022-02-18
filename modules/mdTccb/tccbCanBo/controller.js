@@ -6,11 +6,21 @@ module.exports = app => {
         },
     };
 
+    const menuStaff = {
+        parentMenu: app.parentMenu.user,
+        menus: {
+            1001: { title: 'Hồ sơ cán bộ', link: '/user/profile', icon: 'fa-address-card-o', backgroundColor: '#8bc34a', groupIndex: 0 },
+        },
+    };
+
     app.permission.add(
+        { name: 'staff:login', menu: menuStaff },
         { name: 'staff:read', menu },
         { name: 'staff:write' },
         { name: 'staff:delete' },
     );
+
+    app.get('/user/profile', app.permission.check('staff:login'), app.templates.admin);
 
     app.get('/user/tccb/staff/:shcc', app.permission.check('staff:read'), app.templates.admin);
     app.get('/user/tccb/staff', app.permission.check('staff:read'), app.templates.admin);
@@ -129,7 +139,7 @@ module.exports = app => {
                                 resolve();
                             });
                         })).then(() => new Promise(resolve => {
-                            app.model.qtDaoTao.getTDCT(canBo.shcc , (error, llct) => {
+                            app.model.qtDaoTao.getTDCT(canBo.shcc, (error, llct) => {
                                 if (error) {
                                     res.send({ error: 'Lỗi khi lấy thông tin trình độ lí luận chính trị cán bộ !' });
                                 }
@@ -141,7 +151,7 @@ module.exports = app => {
                                 resolve();
                             });
                         })).then(() => new Promise(resolve => {
-                            app.model.qtDaoTao.getQLNN(canBo.shcc , (error, qlnn) => {
+                            app.model.qtDaoTao.getQLNN(canBo.shcc, (error, qlnn) => {
                                 if (error) {
                                     res.send({ error: 'Lỗi khi lấy thông tin trình độ quản lý nhà nước cán bộ !' });
                                 }
@@ -153,7 +163,7 @@ module.exports = app => {
                                 resolve();
                             });
                         })).then(() => new Promise(resolve => {
-                            app.model.qtDaoTao.getTH(canBo.shcc , (error, tinHoc) => {
+                            app.model.qtDaoTao.getTH(canBo.shcc, (error, tinHoc) => {
                                 if (error) {
                                     res.send({ error: 'Lỗi khi lấy thông tin trình độ tin học cán bộ !' });
                                 }
@@ -165,14 +175,14 @@ module.exports = app => {
                                 resolve();
                             });
                         })).then(() => new Promise(resolve => {
-                            app.model.qtLuong.getAll({shcc: canBo.shcc}, '*', 'ngayHuong ASC', (error, luong) => {
+                            app.model.qtLuong.getAll({ shcc: canBo.shcc }, '*', 'ngayHuong ASC', (error, luong) => {
                                 if (error) {
                                     res.send({ error: 'Lỗi khi lấy thông tin lương cán bộ !' });
                                 }
                                 else if (luong == null) {
                                     result = app.clone(result, { luong: null });
                                 } else {
-                                    result = app.clone(result, { luong});
+                                    result = app.clone(result, { luong });
                                 }
                                 resolve();
                             });
@@ -184,7 +194,7 @@ module.exports = app => {
                                 else if (baoHiemXaHoi == null) {
                                     result = app.clone(result, { baoHiemXaHoi: null });
                                 } else {
-                                    result = app.clone(result, { baoHiemXaHoi: baoHiemXaHoi.rows});
+                                    result = app.clone(result, { baoHiemXaHoi: baoHiemXaHoi.rows });
                                 }
                                 resolve();
                             });
@@ -196,7 +206,7 @@ module.exports = app => {
                                 else if (keoDaiCongTac == null) {
                                     result = app.clone(result, { keoDaiCongTac: null });
                                 } else {
-                                    result = app.clone(result, { keoDaiCongTac: keoDaiCongTac.rows});
+                                    result = app.clone(result, { keoDaiCongTac: keoDaiCongTac.rows });
                                 }
                                 resolve();
                             });
@@ -1038,6 +1048,15 @@ module.exports = app => {
             } else {
                 let result = app.clone(canBo);
                 new Promise(resolve => {
+                    app.model.fwUser.get({ email: canBo.email }, (error, user) => {
+                        if (error || user == null) {
+                            res.send({ error: 'Lỗi khi lấy thông tin cán bộ !' });
+                        } else {
+                            result = app.clone(canBo, { image: user.image });
+                        }
+                        resolve();
+                    });
+                }).then(() => new Promise(resolve => {
                     app.model.quanHeCanBo.getQhByShcc(canBo.shcc, (error, items) => {
                         if (error) {
                             res.send({ error: 'Lỗi khi lấy thông tin quan hệ cán bộ !' });
@@ -1049,7 +1068,7 @@ module.exports = app => {
                         }
                         resolve();
                     });
-                }).then(() => new Promise(resolve => {
+                })).then(() => new Promise(resolve => {
                     app.model.tccbToChucKhac.getAll({ shcc: canBo.shcc }, (error, toChucKhac) => {
                         if (error) {
                             res.send({ error: 'Lỗi khi lấy thông tin tổ chức chính trị - xã hội, nghề nghiệp cán bộ !' });
@@ -1062,7 +1081,7 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtDaoTao.getTDCT(canBo.shcc , (error, llct) => {
+                    app.model.qtDaoTao.getTDCT(canBo.shcc, (error, llct) => {
                         if (error) {
                             res.send({ error: 'Lỗi khi lấy thông tin trình độ lí luận chính trị cán bộ !' });
                         }
@@ -1074,7 +1093,7 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtDaoTao.getQLNN(canBo.shcc , (error, qlnn) => {
+                    app.model.qtDaoTao.getQLNN(canBo.shcc, (error, qlnn) => {
                         if (error) {
                             res.send({ error: 'Lỗi khi lấy thông tin trình độ quản lý nhà nước cán bộ !' });
                         }
@@ -1086,7 +1105,31 @@ module.exports = app => {
                         resolve();
                     });
                 })).then(() => new Promise(resolve => {
-                    app.model.qtDaoTao.getTH(canBo.shcc , (error, tinHoc) => {
+                    app.model.qtDaoTao.getHV(canBo.shcc, (error, hocViCB) => {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin trình độ học vấn, đào tạo !' });
+                        }
+                        else if (hocViCB == null || hocViCB.length == 0) {
+                            result = app.clone(result, { hocViCB: null });
+                        } else {
+                            result = app.clone(result, { hocViCB: hocViCB.rows });
+                        }
+                        resolve();
+                    });
+                })).then(() => new Promise(resolve => {
+                    app.model.qtDaoTao.getCC(canBo.shcc, (error, chungChi) => {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin trình độ cử nhân !' });
+                        }
+                        else if (chungChi == null || chungChi.length == 0) {
+                            result = app.clone(result, { chungChi: null });
+                        } else {
+                            result = app.clone(result, { chungChi: chungChi.rows });
+                        }
+                        resolve();
+                    });
+                })).then(() => new Promise(resolve => {
+                    app.model.qtDaoTao.getTH(canBo.shcc, (error, tinHoc) => {
                         if (error) {
                             res.send({ error: 'Lỗi khi lấy thông tin trình độ tin học cán bộ !' });
                         }
@@ -1106,211 +1149,6 @@ module.exports = app => {
                             result = app.clone(result, { trinhDoNN: null });
                         } else {
                             result = app.clone(result, { trinhDoNN: trinhDoNN.rows[0] });
-                        }
-                        resolve();
-                    });
-                })).then(() => new Promise(resolve => {
-                    app.model.qtHocTapCongTac.getAll({ shcc: canBo.shcc }, '*', 'batDau ASC', (error, hocTapCongTac) => {
-                        if (error) {
-                            res.send({ error: 'Lỗi khi lấy thông tin học tập cán bộ !' });
-                        }
-                        else if (hocTapCongTac == null) {
-                            result = app.clone(result, { hocTapCongTac: null });
-                        } else {
-                            result = app.clone(result, { hocTapCongTac });
-                        }
-                        resolve();
-                    });
-                })).then(() => new Promise(resolve => {
-                    app.model.qtDaoTao.getByShcc(canBo.shcc, (error, daoTao) => {
-                        if (error) {
-                            res.send({ error: 'Lỗi khi lấy thông tin đào tạo cán bộ !' });
-                        }
-                        else if (daoTao == null) {
-                            result = app.clone(result, { daoTao: null });
-                        } else {
-                            result = app.clone(result, { daoTao: daoTao.rows });
-                        }
-                        resolve();
-                    });
-                })).then(() => new Promise(resolve => {
-                    app.model.qtLuong.getAll({shcc: canBo.shcc}, '*', 'ngayHuong ASC', (error, luong) => {
-                        if (error) {
-                            res.send({ error: 'Lỗi khi lấy thông tin đào tạo cán bộ !' });
-                        }
-                        else if (luong == null) {
-                            result = app.clone(result, { luong: null });
-                        } else {
-                            result = app.clone(result, { luong});
-                        }
-                        resolve();
-                    });
-                })).then(() => new Promise(resolve => {
-                    app.model.qtBaoHiemXaHoi.getByShcc(canBo.shcc, (error, baoHiemXaHoi) => {
-                        if (error) {
-                            res.send({ error: 'Lỗi khi lấy thông tin bảo hiểm xã hội cán bộ !' });
-                        }
-                        else if (baoHiemXaHoi == null) {
-                            result = app.clone(result, { baoHiemXaHoi: null });
-                        } else {
-                            result = app.clone(result, { baoHiemXaHoi: baoHiemXaHoi.rows});
-                        }
-                        resolve();
-                    });
-                })).then(() => new Promise(resolve => {
-                    app.model.qtKeoDaiCongTac.getByShcc(canBo.shcc, (error, keoDaiCongTac) => {
-                        if (error) {
-                            res.send({ error: 'Lỗi khi lấy thông tin kéo dài công tác cán bộ !' });
-                        }
-                        else if (keoDaiCongTac == null) {
-                            result = app.clone(result, { keoDaiCongTac: null });
-                        } else {
-                            result = app.clone(result, { keoDaiCongTac: keoDaiCongTac.rows});
-                        }
-                        resolve();
-                    });
-                })).then(() => new Promise(resolve => {
-
-                    app.model.qtNuocNgoai.getAll({ shcc: canBo.shcc }, '*', 'batDau ASC', (error, nuocNgoai) => {
-                        if (error) {
-                            res.send({ error: 'Lỗi khi lấy thông tin công tác nước ngoài cán bộ !' });
-                        }
-                        else if (nuocNgoai == null) {
-                            result = app.clone(result, { nuocNgoai: null });
-                        } else {
-                            result = app.clone(result, { nuocNgoai });
-                        }
-                        resolve();
-                    });
-                })).then(() => new Promise(resolve => {
-                    app.model.qtKhenThuongAll.getByShcc(canBo.shcc, (error, khenThuong) => {
-                        if (error) {
-                            res.send({ error: 'Lỗi khi lấy thông tin quá trình khen thưởng !' });
-                        }
-                        else if (khenThuong == null) {
-                            result = app.clone(result, { khenThuong: [] });
-                        } else {
-                            result = app.clone(result, { khenThuong: khenThuong.rows });
-                        }
-                        resolve();
-                    });
-                })).then(() => new Promise(resolve => {
-                    app.model.qtKyLuat.getByShcc(canBo.shcc, (error, kyLuat) => {
-                        if (error) {
-                            res.send({ error: 'Lỗi khi lấy thông tin quá trình kỷ luật !' });
-                        }
-                        else if (kyLuat == null) {
-                            result = app.clone(result, { kyLuat: [] });
-                        } else {
-                            result = app.clone(result, { kyLuat: kyLuat.rows });
-                        }
-                        resolve();
-                    });
-                })).then(() => new Promise(resolve => {
-                    app.model.qtNghienCuuKhoaHoc.getAll({ shcc: canBo.shcc }, (error, nghienCuuKhoaHoc) => {
-                        if (error) {
-                            res.send({ error: 'Lỗi khi lấy thông tin quá trình nghiên cứu khoa học !' });
-                        }
-                        else if (nghienCuuKhoaHoc == null) {
-                            result = app.clone(result, { nghienCuuKhoaHoc: [] });
-                        } else {
-                            result = app.clone(result, { nghienCuuKhoaHoc });
-                        }
-                        resolve();
-                    });
-                })).then(() => new Promise(resolve => {
-                    app.model.qtHuongDanLuanVan.getAll({ shcc: canBo.shcc }, '*', 'namTotNghiep DESC', (error, huongDanLuanVan) => {
-                        if (error) {
-                            res.send({ error: 'Lỗi khi lấy thông tin quá trình HDLV !' });
-                        }
-                        else if (huongDanLuanVan == null) {
-                            result = app.clone(result, { huongDanLuanVan: null });
-                        } else {
-                            result = app.clone(result, { huongDanLuanVan });
-                        }
-                        resolve();
-                    });
-                })).then(() => new Promise(resolve => {
-                    app.model.sachGiaoTrinh.getAll({ shcc: canBo.shcc }, (error, sachGiaoTrinh) => {
-                        if (error) {
-                            res.send({ error: 'Lỗi khi lấy thông tin về sách giáo trình !' });
-                        }
-                        else if (sachGiaoTrinh == null) {
-                            result = app.clone(result, { sachGiaoTrinh: null });
-                        } else {
-                            result = app.clone(result, { sachGiaoTrinh });
-                        }
-                        resolve();
-                    });
-                })).then(() => new Promise(resolve => {
-                    app.model.qtBaiVietKhoaHoc.getAll({ shcc: canBo.shcc }, '*', 'namXuatBan ASC', (error, baiVietKhoaHoc) => {
-                        if (error) {
-                            res.send({ error: 'Lỗi khi lấy thông tin bài viết khoa học !' });
-                        }
-                        else if (baiVietKhoaHoc == null) {
-                            result = app.clone(result, { baiVietKhoaHoc: null });
-                        } else {
-                            result = app.clone(result, { baiVietKhoaHoc });
-                        }
-                        resolve();
-                    });
-                })).then(() => new Promise(resolve => {
-                    app.model.qtKyYeu.getAll({ shcc: canBo.shcc }, (error, kyYeu) => {
-                        if (error) {
-                            res.send({ error: 'Lỗi khi lấy thông tin kỷ yếu !' });
-                        }
-                        else if (kyYeu == null) {
-                            result = app.clone(result, { kyYeu: null });
-                        } else {
-                            result = app.clone(result, { kyYeu });
-                        }
-                        resolve();
-                    });
-                })).then(() => new Promise(resolve => {
-                    app.model.qtGiaiThuong.getAll({ shcc: canBo.shcc }, (error, giaiThuong) => {
-                        if (error) {
-                            res.send({ error: 'Lỗi khi lấy thông tin giải thưởng !' });
-                        }
-                        else if (giaiThuong == null) {
-                            result = app.clone(result, { giaiThuong: null });
-                        } else {
-                            result = app.clone(result, { giaiThuong });
-                        }
-                        resolve();
-                    });
-                })).then(() => new Promise(resolve => {
-                    app.model.qtBangPhatMinh.getAll({ shcc: canBo.shcc }, (error, bangPhatMinh) => {
-                        if (error) {
-                            res.send({ error: 'Lỗi khi lấy thông tin bằng phát minh !' });
-                        }
-                        else if (bangPhatMinh == null) {
-                            result = app.clone(result, { bangPhatMinh: null });
-                        } else {
-                            result = app.clone(result, { bangPhatMinh });
-                        }
-                        resolve();
-                    });
-                })).then(() => new Promise(resolve => {
-                    app.model.qtUngDungThuongMai.getAll({ shcc: canBo.shcc }, (error, ungDungThuongMai) => {
-                        if (error) {
-                            res.send({ error: 'Lỗi khi lấy thông tin ứng dụng thương mại !' });
-                        }
-                        else if (ungDungThuongMai == null) {
-                            result = app.clone(result, { ungDungThuongMai: null });
-                        } else {
-                            result = app.clone(result, { ungDungThuongMai });
-                        }
-                        resolve();
-                    });
-                })).then(() => new Promise(resolve => {
-                    app.model.qtLamViecNgoai.getAll({ shcc: canBo.shcc }, (error, lamViecNgoai) => {
-                        if (error) {
-                            res.send({ error: 'Lỗi khi lấy thông tin quá trình làm việc ngoài trường !' });
-                        }
-                        else if (lamViecNgoai == null) {
-                            result = app.clone(result, { lamViecNgoai: null });
-                        } else {
-                            result = app.clone(result, { lamViecNgoai });
                         }
                         resolve();
                     });

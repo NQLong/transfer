@@ -5,7 +5,8 @@ import dmViTriTuyenDung from './redux';
 
 export default {
     redux: {
-        dmViTriTuyenDung,
+        parent: 'danhMuc',
+        reducers: { dmViTriTuyenDung }
     },
     routes: [
         {

@@ -1,10 +1,12 @@
+//TEMPLATES: admin
 import Loadable from 'react-loadable';
 import Loading from 'view/component/Loading';
 import dmHoatDongKhcn from './redux';
 
 export default {
     redux: {
-        dmHoatDongKhcn
+        parent: 'danhMuc',
+        reducers: { dmHoatDongKhcn, }
     },
     routes: [
         {

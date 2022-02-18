@@ -5,7 +5,8 @@ import qtGiaiThuong from './redux';
 
 export default {
     redux: {
-        qtGiaiThuong,
+        parent: 'tccb',
+        reducers: { qtGiaiThuong }
     },
     routes: [
         {

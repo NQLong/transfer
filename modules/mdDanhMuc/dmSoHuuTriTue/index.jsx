@@ -5,7 +5,8 @@ import dmSoHuuTriTue from './redux';
 
 export default {
     redux: {
-        dmSoHuuTriTue,
+        parent: 'danhMuc',
+        reducers: { dmSoHuuTriTue }
     },
     routes: [
         {

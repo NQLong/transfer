@@ -5,7 +5,8 @@ import dmHoiNghi from './redux';
 
 export default {
     redux: {
-        dmHoiNghi,
+        parent: 'danhMuc',
+        reducers: { dmHoiNghi, }
     },
     routes: [
         {

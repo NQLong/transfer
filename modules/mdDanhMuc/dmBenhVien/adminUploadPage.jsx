@@ -177,6 +177,6 @@ class UploadDmBenhVien extends React.Component {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, dmBenhVienMaTuyen: state.dmTuyenBenhVien });
+const mapStateToProps = state => ({ system: state.system, dmBenhVienMaTuyen: state.danhMuc.dmTuyenBenhVien });
 const mapActionsToProps = { createMultiDmBenhVien, getDmTuyenBenhVienAll };
 export default connect(mapStateToProps, mapActionsToProps)(UploadDmBenhVien);

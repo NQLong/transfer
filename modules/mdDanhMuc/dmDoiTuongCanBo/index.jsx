@@ -5,7 +5,8 @@ import dmDoiTuongCanBo from './redux';
 
 export default {
     redux: {
-        dmDoiTuongCanBo,
+        parent: 'danhMuc',
+        reducers: { dmDoiTuongCanBo, }
     },
     routes: [
         {

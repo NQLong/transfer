@@ -5,7 +5,8 @@ import qtHopDongLaoDong from './redux';
 
 export default {
     redux: {
-        qtHopDongLaoDong,
+        parent: 'tccb',
+        reducers: { qtHopDongLaoDong }
     },
     routes: [
         {

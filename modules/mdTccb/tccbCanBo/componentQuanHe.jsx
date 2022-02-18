@@ -196,7 +196,7 @@ class ComponentQuanHe extends AdminPage {
         );
     }
 }
-const mapStateToProps = state => ({ staff: state.staff, system: state.system });
+const mapStateToProps = state => ({ staff: state.tccb.staff, system: state.system });
 const mapActionsToProps = {
     getStaffEdit, updateStaff, createStaff, getDmQuanHeGiaDinhAll,
     createQuanHeCanBo, updateQuanHeCanBo, deleteQuanHeCanBo, createQuanHeStaffUser, updateQuanHeStaffUser, deleteQuanHeStaffUser

@@ -5,7 +5,8 @@ import dmTaiKhoanKeToan from './redux';
 
 export default {
     redux: {
-        dmTaiKhoanKeToan,
+        parent: 'danhMuc',
+        reducers: { dmTaiKhoanKeToan }
     },
     routes: [
         {

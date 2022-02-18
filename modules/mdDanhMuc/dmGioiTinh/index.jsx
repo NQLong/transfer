@@ -5,7 +5,8 @@ import dmGioiTinh from './redux';
 
 export default {
     redux: {
-        dmGioiTinh,
+        parent: 'danhMuc',
+        reducers: { dmGioiTinh, }
     },
     routes: [
         {

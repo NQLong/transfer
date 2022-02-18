@@ -5,23 +5,94 @@ module.exports = app => {
             3005: { title: 'Quá trình khen thưởng', link: '/user/tccb/qua-trinh/khen-thuong-all', icon: 'fa-gift', backgroundColor: '#2559ba', groupIndex: 2 },
         },
     };
+
+    const menuStaff = {
+        parentMenu: app.parentMenu.user,
+        menus: {
+            1004: { title: 'Khen thưởng', link: '/user/khen-thuong-all', icon: 'fa-gift', backgroundColor: '#2559ba', groupIndex: 2 },
+        },
+    };
+
     app.permission.add(
-        { name: 'staff:login', menu: { parentMenu: { index: 1000, title: 'Thông tin cá nhân', icon: 'fa-user', link: '/user' } }, },
+        { name: 'staff:login', menu: menuStaff },
         { name: 'qtKhenThuongAll:read', menu },
         { name: 'qtKhenThuongAll:write' },
         { name: 'qtKhenThuongAll:delete' },
     );
-    app.get('/user/tccb/qua-trinh/khen-thuong-all/:id', app.permission.check('qtKhenThuongAll:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/khen-thuong-all', app.permission.check('qtKhenThuongAll:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/khen-thuong-all/group_dt/:loaiDoiTuong/:ma', app.permission.check('qtKhenThuongAll:read'), app.templates.admin);
+    app.get('/user/khen-thuong-all', app.permission.check('staff:login'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
+    // //User Actions:
+    app.post('/api/user/qua-trinh/khen-thuong-all', app.permission.check('staff:login'), (req, res) => {
+        if (req.body.data && req.session.user) {
+            const data = req.body.data;
+            app.model.qtKhenThuongAll.create(data, (error, item) => res.send({ error, item }));
+        } else {
+            res.send({ error: 'Invalid parameter!' });
+        }
+    });
+
+    app.put('/api/user/qua-trinh/khen-thuong-all', app.permission.check('staff:login'), (req, res) => {
+        if (req.body.changes && req.session.user) {
+            app.model.qtKhenThuongAll.get({ id: req.body.id }, (error, item) => {
+                if (error || item == null) {
+                    res.send({ error: 'Not found!' });
+                } else {
+                    app.model.canBo.get({ shcc: item.ma }, (e, r) => {
+                        if (e || r == null) res.send({ error: 'Staff not found!' }); else {
+                            const changes = req.body.changes;
+                            app.model.qtKhenThuongAll.update({ id: req.body.id }, changes, (error, item) => res.send({ error, item }));
+                        }
+                    });
+                }
+            });
+        } else {
+            res.send({ error: 'Invalid parameter!' });
+        }
+    });
+
+    app.delete('/api/user/qua-trinh/khen-thuong-all', app.permission.check('staff:login'), (req, res) => {
+        if (req.session.user) {
+            app.model.qtKhenThuongAll.get({ id: req.body.id }, (error, item) => {
+                if (error || item == null) {
+                    res.send({ error: 'Not found!' });
+                } else {
+                    app.model.canBo.get({ shcc: item.ma }, (e, r) => {
+                        if (e || r == null) res.send({ error: 'Staff not found!' }); else {
+                            app.model.qtKhenThuongAll.delete({ id: req.body.id }, (error, item) => res.send({ error, item }));
+                        }
+                    });
+                }
+            });
+        } else {
+            res.send({ error: 'Invalid parameter!' });
+        }
+    });
+
+    app.get('/api/user/qua-trinh/khen-thuong-all/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+        const pageNumber = parseInt(req.params.pageNumber),
+            pageSize = parseInt(req.params.pageSize),
+            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+        const { fromYear, toYear, loaiDoiTuong, ma } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1', ma: null};
+        app.model.qtKhenThuongAll.searchPage(pageNumber, pageSize, loaiDoiTuong, ma, fromYear, toYear, searchTerm, (error, page) => {
+            if (error || page == null) {
+                res.send({ error });
+            } else {
+                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
+                const pageCondition = searchTerm;
+                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
+            }
+        });
+    });
+    ///END USER ACTIONS
+
     app.get('/api/tccb/qua-trinh/khen-thuong-all/page/:pageNumber/:pageSize', app.permission.check('qtKhenThuongAll:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
-            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '',
-            ma = req.query.ma ? req.query.ma : '';
-        const { fromYear, toYear, loaiDoiTuong } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1' };
+            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+        const { fromYear, toYear, loaiDoiTuong, ma } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1', ma: null};
         app.model.qtKhenThuongAll.searchPage(pageNumber, pageSize, loaiDoiTuong, ma, fromYear, toYear, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });

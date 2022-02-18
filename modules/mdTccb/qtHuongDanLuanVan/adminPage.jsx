@@ -59,14 +59,14 @@ class EditModal extends AdminModal {
                     bacDaoTao: this.bacDaoTao.value(),
                 };
                 if (index == list_ma.length - 1) {
-                    this.state.id ? this.props.update(this.state.id, changes, this.hide, false) : this.props.create(changes, this.hide, false);
+                    this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
                     this.setState({
                         id: ''
                     });
                     this.shcc.reset();
                 }
                 else {
-                    this.state.id ? this.props.update(this.state.id, changes, null, false) : this.props.create(changes, null, false);
+                    this.state.id ? this.props.update(this.state.id, changes, null) : this.props.create(changes, null);
                 }
             });
         }
@@ -81,7 +81,7 @@ class EditModal extends AdminModal {
                 <FormSelect type='text' className='col-md-12' multiple={this.multiple} ref={e => this.shcc = e} data={SelectAdapter_FwCanBo} label='Cán bộ' readOnly={this.state.id ? true : false} required/>
                 <FormTextBox type='text' className='col-md-12' ref={e => this.hoTen = e} label='Danh sách họ tên sinh viên, học viên' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-12' ref={e => this.tenLuanVan = e} label='Tên luận văn' readOnly={readOnly} required />
-                <FormTextBox className='col-md-4' ref={e => this.namTotNghiep = e} label='Năm tốt nghiệp (yyyy)' type='year' readOnly={false} required />
+                <FormTextBox className='col-md-4' ref={e => this.namTotNghiep = e} label='Năm tốt nghiệp (yyyy)' type='year' readOnly={readOnly} required />
                 <FormTextBox type='text' className='col-md-4' ref={e => this.sanPham = e} label='Sản phẩm' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-4' ref={e => this.bacDaoTao = e} label='Bậc hướng dẫn luận văn' readOnly={readOnly} />
             </div>
@@ -94,6 +94,7 @@ class QtHuongDanLuanVan extends AdminPage {
     state = { filter: {} };
     componentDidMount() {
         T.ready('/user/tccb', () => {
+            T.clearSearchBox();
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
                 this.fromYear?.value('');
@@ -104,10 +105,8 @@ class QtHuongDanLuanVan extends AdminPage {
             });
             if (this.checked) {
                 this.hienThiTheoCanBo.value(true);
-                this.props.getQtHuongDanLuanVanGroupPage();
-            } else {
-                this.props.getQtHuongDanLuanVanPage();
             }
+            this.getPage();
             this.changeAdvancedSearch(true);
         });
     }
@@ -152,7 +151,7 @@ class QtHuongDanLuanVan extends AdminPage {
     }
 
     list = (text, i, j) => {
-        if (!text) return '';
+        if (!text) return [];
         let deTais = text.split('??').map(str => <p key={i--} style={{ textTransform: 'uppercase' }}>{j - i}. {str}</p>);
         return deTais;
     }
@@ -160,7 +159,7 @@ class QtHuongDanLuanVan extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa hướng dẫn luận văn', 'Bạn có chắc bạn muốn xóa hướng dẫn luận văn này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtHuongDanLuanVanStaff(item.id, false, null, error => {
+            isConfirm && this.props.deleteQtHuongDanLuanVanStaff(item.id, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá hướng dẫn luận văn bị lỗi!', 'danger');
                 else T.alert('Xoá hướng dẫn luận văn thành công!', 'success', false, 800);
             });
@@ -174,6 +173,15 @@ class QtHuongDanLuanVan extends AdminPage {
             this.props.qtHuongDanLuanVan && this.props.qtHuongDanLuanVan.page_gr ?
                 this.props.qtHuongDanLuanVan.page_gr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
             : (this.props.qtHuongDanLuanVan && this.props.qtHuongDanLuanVan.page ? this.props.qtHuongDanLuanVan.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] });
+        if (this.checked && list && list.length > 0) {
+            let list_filter = [];
+            list.forEach(item => {
+                if (item.soDeTai > 0) {
+                    list_filter.push(item);
+                }
+            });
+            list = list_filter;
+        }
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -263,7 +271,7 @@ class QtHuongDanLuanVan extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtHuongDanLuanVan: state.qtHuongDanLuanVan });
+const mapStateToProps = state => ({ system: state.system, qtHuongDanLuanVan: state.tccb.qtHuongDanLuanVan });
 const mapActionsToProps = {
     getQtHuongDanLuanVanPage, deleteQtHuongDanLuanVanStaff, createQtHuongDanLuanVanStaff,
     updateQtHuongDanLuanVanStaff, getQtHuongDanLuanVanGroupPage,

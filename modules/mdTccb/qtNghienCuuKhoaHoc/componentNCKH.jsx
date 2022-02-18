@@ -325,7 +325,7 @@ class ComponentNCKH extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, staff: state.staff });
+const mapStateToProps = state => ({ system: state.system, staff: state.tccb.staff });
 const mapActionsToProps = {
     createQtNckhStaff, createQtNckhStaffUser, updateQtNckhStaff, updateQtNckhStaffUser, deleteQtNckhStaff, deleteQtNckhStaffUser,
 };

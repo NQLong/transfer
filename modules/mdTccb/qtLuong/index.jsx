@@ -5,16 +5,21 @@ import qtLuong from './redux';
 
 export default {
     redux: {
-        qtLuong,
+        parent: 'tccb',
+        reducers: { qtLuong }
     },
     routes: [
         {
-            path: '/user/tccb/qua-trinh/luong/group/:loaiDoiTuong/:ma',
+            path: '/user/tccb/qua-trinh/luong/group/:shcc',
             component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
         },
         {
             path: '/user/tccb/qua-trinh/luong',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
+        },
+        {
+            path: '/user/luong',
+            component: Loadable({ loading: Loading, loader: () => import('./staffPage') })
         },
     ],
 };

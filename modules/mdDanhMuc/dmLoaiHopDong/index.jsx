@@ -5,7 +5,8 @@ import dmLoaiHopDong from './redux';
 
 export default {
     redux: {
-        dmLoaiHopDong,
+        parent: 'danhMuc',
+        reducers: {  dmLoaiHopDong } 
     },
     routes: [
         {

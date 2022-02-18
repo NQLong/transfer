@@ -1,9 +1,10 @@
-    import T from 'view/js/common';
+import T from 'view/js/common';
 import { getStaffEdit, userGetStaff } from '../tccbCanBo/redux';
 
 // Reducer ------------------------------------------------------------------------------------------------------------
 const QtDaoTaoGetAll = 'QtDaoTao:GetAll';
 const QtDaoTaoGetPage = 'QtDaoTao:GetPage';
+const QtDaoTaoGetStaffPage = 'QtDaoTao:GetStaffPage';
 const QtDaoTaoUpdate = 'QtDaoTao:Update';
 const QtDaoTaoGet = 'QtDaoTao:Get';
 const QtDaoTaoGetGroupPage = 'QtDaoTao:GetGroupPage';
@@ -14,6 +15,8 @@ export default function QtDaoTaoReducer(state = null, data) {
             return Object.assign({}, state, { items: data.items });
         case QtDaoTaoGetPage:
             return Object.assign({}, state, { page: data.page });
+        case QtDaoTaoGetStaffPage:
+            return Object.assign({}, state, { staff_page: data.page });
         case QtDaoTaoGetGroupPage:
             return Object.assign({}, state, { page_gr: data.page });
         case QtDaoTaoGet:
@@ -51,8 +54,6 @@ export default function QtDaoTaoReducer(state = null, data) {
 // Actions ------------------------------------------------------------------------------------------------------------
 T.initPage('pageQtDaoTao');
 export function getQtDaoTaoPage(pageNumber, pageSize, pageCondition, ma, filter, done) {
-    console.log(ma);
-    console.log('Call get page function');
     if (typeof filter === 'function') {
         done = filter;
         filter = {};
@@ -224,5 +225,77 @@ export function deleteQtDaoTaoStaffUser(id, email, done) {
                 dispatch(userGetStaff(email));
             }
         }, () => T.notify('Xóa thông tin quá trình đào tạo bị lỗi', 'danger'));
+    };
+}
+
+//StaffPage----------------------
+T.initPage('staffPageQtDaoTao');
+export function getQtDaoTaoStaffPage(pageNumber, pageSize, pageCondition, ma, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('staffPageQtDaoTao', pageNumber, pageSize, pageCondition, filter);
+    return dispatch => {
+        const url = `/api/qua-trinh/dao-tao/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition, ma: ma, filter: page.filter }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách quá trình đào tạo bị lỗi!', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (page.filter) data.page.filter = page.filter;
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                if (done) done(data.page);
+                dispatch({ type: QtDaoTaoGetStaffPage, page: data.page });
+            }
+        }, () => T.notify('Lấy danh sách quá trình đào tạo bị lỗi!', 'danger'));
+    };
+}
+
+export function createQtDaoTaoStaffPage(changes, done) {
+    return dispatch => {
+        const url = '/api/user/qua-trinh/dao-tao';
+        T.post(url, { changes }, data => {
+            if (data.error) {
+                T.notify('Tạo thông tin đào tạo lỗi', 'danger');
+                console.error('POST: ' + url + '. ' + data.error);
+            } else {
+                T.notify('Thêm thông tin quá trình đào tạo thành công!', 'info');
+                if (done) done(data);
+                dispatch(getQtDaoTaoStaffPage());
+            }
+        }, () => T.notify('Thêm thông tin quá trình đào tạo bị lỗi', 'danger'));
+    };
+}
+
+export function updateQtDaoTaoStaffPage(id, changes, done) {
+    return dispatch => {
+        const url = '/api/user/qua-trinh/dao-tao';
+        T.put(url, { id, changes }, data => {
+            if (data.error) {
+                T.notify('Cập nhật thông tin đào tạo lỗi', 'danger');
+                console.error('POST: ' + url + '. ' + data.error);
+            } else {
+                T.notify('Cập nhật thông tin đào tạo thành công!', 'info');
+                if (done) done(data);
+                dispatch(getQtDaoTaoStaffPage());
+            }
+        }, () => T.notify('Cập nhật thông tin đào tạo bị lỗi', 'danger'));
+    };
+}
+
+export function deleteQtDaoTaoStaffPage(id, done) {
+    return dispatch => {
+        const url = '/api/user/qua-trinh/dao-tao';
+        T.delete(url, { id }, data => {
+            if (data.error) {
+                T.notify('Xoá thông tin đào tạo lỗi', 'danger');
+                console.error('POST: ' + url + '. ' + data.error);
+            } else {
+                T.notify('Xoá thông tin đào tạo thành công!', 'info');
+                if (done) done(data);
+                dispatch(getQtDaoTaoStaffPage());
+            }
+        }, () => T.notify('Xoá thông tin đào tạo bị lỗi', 'danger'));
     };
 }

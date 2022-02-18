@@ -5,7 +5,8 @@ import dmHoSoCcvcNld from './redux';
 
 export default {
     redux: {
-        dmHoSoCcvcNld,
+        parent: 'danhMuc',
+        reducers: { dmHoSoCcvcNld, }
     },
     routes: [
         {

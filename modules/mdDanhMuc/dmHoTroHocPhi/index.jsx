@@ -5,7 +5,8 @@ import dmHoTroHocPhi from './redux';
 
 export default {
     redux: {
-        dmHoTroHocPhi,
+        parent: 'danhMuc',
+        reducers: { dmHoTroHocPhi, }
     },
     routes: [
         {

@@ -5,7 +5,8 @@ import qtHocTapCongTac from './redux';
 
 export default {
     redux: {
-        qtHocTapCongTac,
+        parent: 'tccb',
+        reducers: { qtHocTapCongTac }
     },
     routes: [
         {
@@ -15,6 +16,10 @@ export default {
         {
             path: '/user/tccb/qua-trinh/hoc-tap-cong-tac',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
+        },
+        {
+            path: '/user/hoc-tap-cong-tac',
+            component: Loadable({ loading: Loading, loader: () => import('./staffPage') })
         },
     ],
 };

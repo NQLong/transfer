@@ -71,6 +71,10 @@ module.exports = app => {
             index: 2000, title: 'Cấu hình', link: '/user/settings', icon: 'fa-cog',
             subMenusRender: false
         },
+        user: {
+            index: 1000, title: 'Trang cá nhân', link: '/user', icon: 'fa-user',
+            subMenusRender: false, groups: ['Cán bộ', 'Công tác', 'Khen thưởng - kỷ luật', 'Nghỉ', 'Chuyên môn']
+        },
         tccb: {
             index: 3000, title: 'Tổ chức cán bộ', link: '/user/tccb', icon: 'fa-sort-alpha-asc',
             subMenusRender: false, groups: ['Cán bộ', 'Công tác', 'Khen thưởng - Kỷ luật', 'Nghỉ', 'Chuyên môn']
@@ -85,7 +89,7 @@ module.exports = app => {
             groups: ['Cấu hình', 'Bài viết', 'Sự kiện', 'Tuyển sinh']
         },
         websiteDv: {
-            index: 1006, title: 'Website đơn vị', link: '/user/website', icon: 'fa-database',
+            index: 1900, title: 'Website đơn vị', link: '/user/website', icon: 'fa-database',
             subMenusRender: false,
         },
     };

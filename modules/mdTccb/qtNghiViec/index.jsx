@@ -5,11 +5,12 @@ import qtNghiViec from './redux';
 
 export default {
     redux: {
-        qtNghiViec,
+        parent: 'tccb',
+        reducers: { qtNghiViec }
     },
     routes: [
         {
-            path: '/user/tccb/qua-trinh/nghi-viec/group/:loaiDoiTuong/:ma',
+            path: '/user/tccb/qua-trinh/nghi-viec/group/:shcc',
             component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
         },
         {

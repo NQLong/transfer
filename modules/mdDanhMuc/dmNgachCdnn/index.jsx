@@ -5,7 +5,8 @@ import dmNgachCdnn from './redux';
 
 export default {
     redux: {
-        dmNgachCdnn,
+        parent: 'danhMuc',
+        reducers: {  dmNgachCdnn }
     },
     routes: [
         {

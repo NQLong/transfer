@@ -126,6 +126,6 @@ class dmChiBoPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, dmChiBo: state.dmChiBo });
+const mapStateToProps = state => ({ system: state.system, dmChiBo: state.danhMuc.dmChiBo });
 const mapActionsToProps = { getDmChiBoPage, createDmChiBo, updateDmChiBo, deleteDmChiBo };
 export default connect(mapStateToProps, mapActionsToProps)(dmChiBoPage);

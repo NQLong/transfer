@@ -1,48 +1,90 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, FormDatePicker } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
-    getQtHopDongLaoDongPage, getQtHopDongLaoDongAll, updateQtHopDongLaoDong,
-    deleteQtHopDongLaoDong, createQtHopDongLaoDong, getQtHopDongLaoDongShccPage, downloadWord
+    updateQtHopDongLaoDong,
+    deleteQtHopDongLaoDong, createQtHopDongLaoDong, getQtHopDongLaoDongGroupPageMa, downloadWord
 } from './redux';
 
 class QtHopDongLaoDongGroupPage extends AdminPage {
+    state = { filter: {} };
 
     componentDidMount() {
         T.ready('/user/tccb', () => {
+            T.clearSearchBox();
             const route = T.routeMatcher('/user/tccb/qua-trinh/hop-dong-lao-dong/group/:shcc'),
-                shcc = route.parse(window.location.pathname);
-            T.onSearch = (searchText) => this.props.getQtHopDongLaoDongPage(undefined, undefined, searchText || '');
-            T.showSearchBox();
-            this.props.getQtHopDongLaoDongShccPage(undefined, undefined, shcc.shcc);
+                params = route.parse(window.location.pathname);
+            this.shcc = params.shcc;
+            this.setState({ filter: { list_shcc: params.shcc, list_dv: '' } });
+            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
+
+            T.showSearchBox(() => {
+                this.fromYear?.value('');
+                this.toYear?.value('');
+                this.xuatBanRange.value('');
+                setTimeout(() => this.changeAdvancedSearch(), 50);
+            });
+            this.getPage();
         });
     }
 
-    downloadWord = item => {
-        downloadWord(parseInt(item.ma), data => {
-            T.FileSaver(new Blob([new Uint8Array(data.data)]), item.shcc + '_hopdong.docx');
+    changeAdvancedSearch = (isInitial = false) => {
+        let { pageNumber, pageSize } = this.props && this.props.qtHopDongLaoDong && this.props.qtHopDongLaoDong.page_ma ? this.props.qtHopDongLaoDong.page_ma : { pageNumber: 1, pageSize: 50 };
+        const fromYear = this.fromYear?.value() == '' ? null : this.fromYear?.value().getTime();
+        const toYear = this.toYear?.value() == '' ? null : this.toYear?.value().getTime();
+        const list_dv = this.state.filter.list_dv;
+        const list_shcc = this.state.filter.list_shcc;
+        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc };
+        this.setState({ filter: pageFilter }, () => {
+            this.getPage(pageNumber, pageSize, '', (page) => {
+                if (isInitial) {
+                    const filter = page.filter || {};
+                    this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
+                    this.fromYear?.value(filter.fromYear || '');
+                    this.toYear?.value(filter.toYear || '');
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear)) this.showAdvanceSearch();
+                }
+            });
         });
+    }
+
+    getPage = (pageN, pageS, pageC, done) => {
+        this.props.getQtHopDongLaoDongGroupPageMa(pageN, pageS, pageC, this.state.filter, done);
+    }
+
+    showModal = (e) => {
+        e.preventDefault();
+        this.modal.show();
     }
 
     delete = (e, item) => {
-        T.confirm('Xóa hợp đồng', 'Bạn có chắc bạn muốn xóa hợp đồng này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtHopDongLaoDong(item.stt, error => {
-                if (error) T.notify(error.message ? error.message : 'Xoá hợp đồng bị lỗi!', 'danger');
-                else T.alert('Xoá hợp đồng thành công!', 'success', false, 800);
+        T.confirm('Xóa thông tin hợp đồng lao động này', 'Bạn có chắc bạn muốn xóa thông tin hợp đồng lao động này này?', 'warning', true, isConfirm => {
+            isConfirm && this.props.deleteQtBaiVietKhoaHocGroupPageMa(item.id, error => {
+                if (error) T.notify(error.message ? error.message : 'Xoá thông tin hợp đồng lao động này bị lỗi!', 'danger');
+                else T.alert('Xoá thông tin hợp đồng lao động này thành công!', 'success', false, 800);
             });
         });
         e.preventDefault();
     }
 
+    downloadWord = (item) => {
+        downloadWord(item.ma, data => {
+            T.FileSaver(new Blob([new Uint8Array(data.data)]), item.shcc + '_hopdong.docx');
+        });
+    }
+
+    download = (e) => {
+        e.preventDefault();
+        T.download(T.url('/api/tccb/qua-trinh/hop-dong-lao-dong/download-excel'), 'HDLD.xlsx');
+    }
     render() {
         const permission = this.getUserPermission('qtHopDongLaoDong', ['read', 'write', 'delete']);
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } =
-            this.props.qtHopDongLaoDong && this.props.qtHopDongLaoDong.page ?
-                this.props.qtHopDongLaoDong.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
-
-        let table = renderTable({
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtHopDongLaoDong && this.props.qtHopDongLaoDong.page_ma ? this.props.qtHopDongLaoDong.page_ma : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
+        let table = 'Không có danh sách!';
+        if (list && list.length > 0) {
+            table = renderTable({
             getDataSource: () => list, stickyHead: true,
             renderHead: () => (
                 <tr>
@@ -98,9 +140,8 @@ class QtHopDongLaoDongGroupPage extends AdminPage {
                     </TableCell>
                 </tr>
             )
-        });
-
-
+            });
+        }
         return this.renderPage({
             icon: 'fa fa-briefcase',
             title: 'Hợp đồng Lao động cán bộ',
@@ -109,13 +150,19 @@ class QtHopDongLaoDongGroupPage extends AdminPage {
                 <Link key={1} to='/user/tccb/qua-trinh/ky-hop-dong'>Hợp đồng Lao dộng</Link>,
                 'Hợp đồng Lao động cán bộ'
             ],
+            advanceSearch: <>
+            <div className='row'>
+                <FormDatePicker type='date-mask' ref={e => this.fromYear = e} className='col-12 col-md-3' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />
+                <FormDatePicker type='date-mask' ref={e => this.toYear = e} className='col-12 col-md-3' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />
+            </div>
+        </>,
             content: <>
                 <div className='tile'>
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }}
                     {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                    getPage={this.props.getQtHopDongLaoDongPage} />
+                    getPage={this.getPage} />
             </>,
             backRoute: '/user/tccb/qua-trinh/hop-dong-lao-dong',
             onCreate: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/tccb/qua-trinh/hop-dong-lao-dong/new') : null
@@ -124,9 +171,9 @@ class QtHopDongLaoDongGroupPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtHopDongLaoDong: state.qtHopDongLaoDong });
+const mapStateToProps = state => ({ system: state.system, qtHopDongLaoDong: state.tccb.qtHopDongLaoDong });
 const mapActionsToProps = {
-    getQtHopDongLaoDongAll, getQtHopDongLaoDongPage, deleteQtHopDongLaoDong, createQtHopDongLaoDong,
-    updateQtHopDongLaoDong, getQtHopDongLaoDongShccPage, downloadWord
+    deleteQtHopDongLaoDong, createQtHopDongLaoDong,
+    updateQtHopDongLaoDong, getQtHopDongLaoDongGroupPageMa, downloadWord
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtHopDongLaoDongGroupPage);

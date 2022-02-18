@@ -12,10 +12,10 @@ export default {
             path: '/user/member',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') }),
         },
-        {
-            path: '/user/index.html',
-            component: Loadable({ loading: Loading, loader: () => import('./adminProfilePage') })
-        },
+        // {
+        //     path: '/user/index.html',
+        //     component: Loadable({ loading: Loading, loader: () => import('./adminProfilePage') })
+        // },
         {
             path: '/user',
             component: Loadable({ loading: Loading, loader: () => import('./profilePage') })

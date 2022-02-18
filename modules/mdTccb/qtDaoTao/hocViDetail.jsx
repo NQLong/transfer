@@ -144,8 +144,8 @@ class HocViDetail extends AdminPage {
         this.setState({ shcc, email, loaiBangCap, trinhDo });
     }
     render = () => {
-        let dataDaoTao = this.props.tccb ? this.props.staff?.selectedItem?.daoTao?.filter(i => {i.tenTrinhDo === this.props.tenHocVi;}) :
-            this.props.staff?.userItem?.daoTao?.filter(i => {i.tenTrinhDo === this.props.tenHocVi;});
+        let dataDaoTao = this.props.tccb ? this.props.staff?.selectedItem?.hocViCB?.filter(i => i.tenTrinhDo === this.props.tenHocVi) :
+            this.props.staff?.userItem?.hocViCB?.filter(i => i.tenTrinhDo === this.props.tenHocVi);
         const permission = {
             write: true,
             read: true,
@@ -215,7 +215,7 @@ class HocViDetail extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ staff: state.staff, system: state.system });
+const mapStateToProps = state => ({ staff: state.tccb.staff, system: state.system });
 const mapActionsToProps = {
     getStaffEdit, userGetStaff, createQtDaoTao, createQtDaoTaoStaffUser
 };

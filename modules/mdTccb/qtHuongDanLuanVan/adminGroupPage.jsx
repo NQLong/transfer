@@ -4,8 +4,7 @@ import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
-    updateQtHuongDanLuanVanGroupPageMa, deleteQtHuongDanLuanVanGroupPageMa,
-    createQtHuongDanLuanVanGroupPageMa, getQtHuongDanLuanVanPage,
+    updateQtHuongDanLuanVanGroupPageMa, deleteQtHuongDanLuanVanGroupPageMa,createQtHuongDanLuanVanGroupPageMa, getQtHuongDanLuanVanGroupPageMa,
 } from './redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 
@@ -62,7 +61,7 @@ class EditModal extends AdminModal {
                 <FormSelect type='text' className='col-md-12' multiple={this.multiple} ref={e => this.shcc = e} data={SelectAdapter_FwCanBo} label='Cán bộ' readOnly={true} required/>
                 <FormTextBox type='text' className='col-md-12' ref={e => this.hoTen = e} label='Danh sách họ tên sinh viên, học viên' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-12' ref={e => this.tenLuanVan = e} label='Tên luận văn' readOnly={readOnly} required />
-                <FormTextBox className='col-md-4' ref={e => this.namTotNghiep = e} label='Năm tốt nghiệp (yyyy)' type='year' readOnly={false} required />
+                <FormTextBox className='col-md-4' ref={e => this.namTotNghiep = e} label='Năm tốt nghiệp (yyyy)' type='year' readOnly={readOnly} required />
                 <FormTextBox type='text' className='col-md-4' ref={e => this.sanPham = e} label='Sản phẩm' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-4' ref={e => this.bacDaoTao = e} label='Bậc hướng dẫn luận văn' readOnly={readOnly} />
             </div>
@@ -72,35 +71,34 @@ class EditModal extends AdminModal {
 
 class QtHuongDanLuanVanGroupPage extends AdminPage {
     state = { filter: {} };
-
+    searchText = '';
     componentDidMount() {
         T.ready('/user/tccb', () => {
+            T.clearSearchBox();
             const route = T.routeMatcher('/user/tccb/qua-trinh/hdlv/group/:shcc'),
                 params = route.parse(window.location.pathname);
             this.shcc = params.shcc;
             this.setState({filter: {list_shcc: params.shcc, list_dv: ''}});
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
-
+            
             T.showSearchBox(() => {
                 this.fromYear?.value('');
                 this.toYear?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
-            this.props.getQtHuongDanLuanVanPage(undefined, undefined, undefined, this.state.filter, () => {
-                T.updatePage('pageQtHuongDanLuanVan', undefined, undefined, undefined, this.state.filter);
-            });
+            this.getPage();
         });
     }
 
     changeAdvancedSearch = (isInitial = false) => {
-        let { pageNumber, pageSize } = this.props && this.props.qtHuongDanLuanVan && this.props.qtHuongDanLuanVan.page ? this.props.qtHuongDanLuanVan.page : { pageNumber: 1, pageSize: 50 };
+        let { pageNumber, pageSize } = this.props && this.props.qtHuongDanLuanVan && this.props.qtHuongDanLuanVan.page_ma ? this.props.qtHuongDanLuanVan.page_ma : { pageNumber: 1, pageSize: 50 };
         const fromYear = this.fromYear?.value() == '' ? null : Number(this.fromYear?.value());
         const toYear = this.toYear?.value() == '' ? null : Number(this.toYear?.value());
         const list_dv = this.state.filter.list_dv;
         const list_shcc = this.state.filter.list_shcc;
         const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc };
         this.setState({ filter: pageFilter }, () => {
-            this.getPage(pageNumber, pageSize, '', (page) => {
+            this.getPage(pageNumber, pageSize, (page) => {
                 if (isInitial) {
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
@@ -113,7 +111,7 @@ class QtHuongDanLuanVanGroupPage extends AdminPage {
     }
 
     getPage = (pageN, pageS, pageC, done) => {
-        this.props.getQtHuongDanLuanVanPage(pageN, pageS, pageC, this.state.filter, done);
+        this.props.getQtHuongDanLuanVanGroupPageMa(pageN, pageS, pageC, this.state.filter, done);
     }
 
     showModal = (e) => {
@@ -122,10 +120,10 @@ class QtHuongDanLuanVanGroupPage extends AdminPage {
     }
 
     delete = (e, item) => {
-        T.confirm('Xóa thông tin học tập công tác', 'Bạn có chắc bạn muốn xóa thông tin học tập công tác này?', 'warning', true, isConfirm => {
+        T.confirm('Xóa thông tin hướng dẫn luận văn', 'Bạn có chắc bạn muốn xóa thông tin hướng dẫn luận văn này?', 'warning', true, isConfirm => {
             isConfirm && this.props.deleteQtHuongDanLuanVanGroupPageMa(item.id, error => {
-                if (error) T.notify(error.message ? error.message : 'Xoá thông tin học tập công tác bị lỗi!', 'danger');
-                else T.alert('Xoá thông tin học tập công tác thành công!', 'success', false, 800);
+                if (error) T.notify(error.message ? error.message : 'Xoá thông tin hướng dẫn luận văn bị lỗi!', 'danger');
+                else T.alert('Xoá thông tin hướng dẫn luận văn thành công!', 'success', false, 800);
             });
         });
         e.preventDefault();
@@ -134,7 +132,7 @@ class QtHuongDanLuanVanGroupPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('qtHuongDanLuanVan', ['read', 'write', 'delete']);
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtHuongDanLuanVan && this.props.qtHuongDanLuanVan.page ? this.props.qtHuongDanLuanVan.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtHuongDanLuanVan && this.props.qtHuongDanLuanVan.page_ma ? this.props.qtHuongDanLuanVan.page_ma : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -177,7 +175,7 @@ class QtHuongDanLuanVanGroupPage extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-calendar',
+            icon: 'fa fa-university',
             title: 'Quá trình hướng dẫn luận văn - Cán bộ',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
@@ -187,7 +185,7 @@ class QtHuongDanLuanVanGroupPage extends AdminPage {
             advanceSearch: <>
                 <div className='row'>
                     <FormTextBox className='col-md-3' ref={e => this.fromYear = e} label='Từ năm (năm tốt nghiệp)' type='year' onChange={() => this.changeAdvancedSearch()} />
-                    <FormTextBox className='col-md-3' ref={e => this.toYear = e} label='Đến năm (năm tốt nghiệp))' type='year' onChange={() => this.changeAdvancedSearch()} /> 
+                    <FormTextBox className='col-md-3' ref={e => this.toYear = e} label='Đến năm (năm tốt nghiệp)' type='year' onChange={() => this.changeAdvancedSearch()} /> 
                 </div>
             </>,
             content: <>
@@ -207,9 +205,9 @@ class QtHuongDanLuanVanGroupPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtHuongDanLuanVan: state.qtHuongDanLuanVan });
+const mapStateToProps = state => ({ system: state.system, qtHuongDanLuanVan: state.tccb.qtHuongDanLuanVan });
 const mapActionsToProps = {
     updateQtHuongDanLuanVanGroupPageMa, deleteQtHuongDanLuanVanGroupPageMa,
-    createQtHuongDanLuanVanGroupPageMa, getQtHuongDanLuanVanPage,
+    createQtHuongDanLuanVanGroupPageMa, getQtHuongDanLuanVanGroupPageMa,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtHuongDanLuanVanGroupPage);

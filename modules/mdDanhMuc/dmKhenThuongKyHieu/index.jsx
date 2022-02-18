@@ -5,7 +5,8 @@ import dmKhenThuongKyHieu from './redux';
 
 export default {
     redux: {
-        dmKhenThuongKyHieu,
+        parent: 'danhMuc',
+        reducers: { dmKhenThuongKyHieu, }
     },
     routes: [
         {

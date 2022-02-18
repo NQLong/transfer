@@ -5,7 +5,8 @@ import dmTrinhDoTinHoc from './redux';
 
 export default {
     redux: {
-        dmTrinhDoTinHoc,
+        parent: 'danhMuc',
+        reducers: { dmTrinhDoTinHoc }
     },
     routes: [
         {

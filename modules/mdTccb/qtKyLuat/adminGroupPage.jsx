@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormDatePicker, FormRichTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
-    createQtKyLuatGroupPageMa, getQtKyLuatPage, deleteQtKyLuatGroupPageMa,
+    createQtKyLuatGroupPageMa, getQtKyLuatGroupPageMa, deleteQtKyLuatGroupPageMa,
     updateQtKyLuatGroupPageMa,
 } from './redux';
 import { DateInput } from 'view/component/Input';
@@ -58,8 +58,6 @@ class EditModal extends AdminModal {
         }, 500);
     };
 
-    changeKichHoat = (value, target) => target.value(value ? 1 : 0) || target.value(value);
-
     onSubmit = (e) => {
         e.preventDefault();
         const changes = {
@@ -83,10 +81,10 @@ class EditModal extends AdminModal {
             T.notify('Nội dung kỷ luật dài quá 100 ký tự', 'danger');
             this.noiDung.focus();
         } else if (!this.hinhThucKyLuat.value()) {
-            T.notify('Tên đề tài, dự án trống', 'danger');
+            T.notify('Hình thức kỷ luật trống', 'danger');
             this.hinhThucKyLuat.focus();
         } else if (!this.capQuyetDinh.value()) {
-            T.notify('Tên đề tài, dự án trống', 'danger');
+            T.notify('Cấp quyết định trống', 'danger');
             this.capQuyetDinh.focus();
         } else if (!this.batDau.getVal()) {
             T.notify('Ngày bắt đầu trống', 'danger');
@@ -100,7 +98,7 @@ class EditModal extends AdminModal {
             title: this.state.id ? 'Cập nhật quá trình kỷ luật' : 'Tạo mới quá trình kỷ luật',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={this.state.id ? true : false} required />
+                <FormSelect className='col-md-12' ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={this.state.id ? true : false} required />
 
                 <FormRichTextBox className='col-md-12' ref={e => this.noiDung = e} rows={2} readOnly={readOnly} label='Nội dung kỷ luật' placeholder='Nhập nội dung kỷ luật (tối đa 100 ký tự)' required maxLength={100} />
 
@@ -130,35 +128,37 @@ class EditModal extends AdminModal {
 }
 class QtKyLuatGroupPage extends AdminPage {
     state = { filter: {} };
-
+    searchText = '';
     componentDidMount() {
         T.ready('/user/tccb', () => {
+            T.clearSearchBox();
             const route = T.routeMatcher('/user/tccb/qua-trinh/ky-luat/group/:shcc'),
                 params = route.parse(window.location.pathname);
             this.shcc = params.shcc;
             this.setState({ filter: { list_shcc: params.shcc, list_dv: '' } });
-            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
+            T.onSearch = (searchText) => {
+                this.searchText = searchText;
+                this.getPage();
+            };
 
             T.showSearchBox(() => {
                 this.fromYear?.value('');
                 this.toYear?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
-            this.props.getQtKyLuatPage(undefined, undefined, undefined, this.state.filter, () => {
-                T.updatePage('pageQtKyLuat', undefined, undefined, undefined, this.state.filter);
-            });
+            this.getPage();
         });
     }
 
     changeAdvancedSearch = (isInitial = false) => {
-        let { pageNumber, pageSize } = this.props && this.props.qtKyLuat && this.props.qtKyLuat.page ? this.props.qtKyLuat.page : { pageNumber: 1, pageSize: 50 };
+        let { pageNumber, pageSize } = this.props && this.props.qtKyLuat && this.props.qtKyLuat.page_ma ? this.props.qtKyLuat.page_ma : { pageNumber: 1, pageSize: 50 };
         const fromYear = this.fromYear?.value() == '' ? null : this.fromYear?.value().getTime();
         const toYear = this.toYear?.value() == '' ? null : this.toYear?.value().getTime();
         const list_dv = this.state.filter.list_dv;
         const list_shcc = this.state.filter.list_shcc;
         const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc };
         this.setState({ filter: pageFilter }, () => {
-            this.getPage(pageNumber, pageSize, '', (page) => {
+            this.getPage(pageNumber, pageSize, (page) => {
                 if (isInitial) {
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
@@ -170,8 +170,8 @@ class QtKyLuatGroupPage extends AdminPage {
         });
     }
 
-    getPage = (pageN, pageS, pageC, done) => {
-        this.props.getQtKyLuatPage(pageN, pageS, pageC, this.state.filter, done);
+    getPage = (pageN, pageS, done) => {
+        this.props.getQtKyLuatGroupPageMa(pageN, pageS, this.searchText, this.state.filter, done);
     }
 
     showModal = (e) => {
@@ -181,7 +181,7 @@ class QtKyLuatGroupPage extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa kỷ luật', 'Bạn có chắc bạn muốn xóa kỷ luật này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtKyLuatGroupPageMa(item.id, item.shcc, error => {
+            isConfirm && this.props.deleteQtKyLuatGroupPageMa(item.id, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá kỷ luật bị lỗi!', 'danger');
                 else T.alert('Xoá kỷ luật thành công!', 'success', false, 800);
             });
@@ -192,7 +192,7 @@ class QtKyLuatGroupPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('qtKyLuat', ['read', 'write', 'delete']);
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtKyLuat && this.props.qtKyLuat.page ? this.props.qtKyLuat.page : {pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: []};
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtKyLuat && this.props.qtKyLuat.page_ma ? this.props.qtKyLuat.page_ma : {pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: []};
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -265,7 +265,7 @@ class QtKyLuatGroupPage extends AdminPage {
                 <div className='tile'>
                     {table}
                 </div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition}}
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     permissions={currentPermissions} maCanBo={this.shcc}
@@ -277,9 +277,9 @@ class QtKyLuatGroupPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtKyLuat: state.qtKyLuat });
+const mapStateToProps = state => ({ system: state.system, qtKyLuat: state.tccb.qtKyLuat });
 const mapActionsToProps = {
-    createQtKyLuatGroupPageMa, getQtKyLuatPage, deleteQtKyLuatGroupPageMa,
+    createQtKyLuatGroupPageMa, getQtKyLuatGroupPageMa, deleteQtKyLuatGroupPageMa,
     updateQtKyLuatGroupPageMa,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtKyLuatGroupPage);

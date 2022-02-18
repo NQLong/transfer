@@ -5,9 +5,14 @@ import qtDaoTao from './redux';
 
 export default {
     redux: {
-        qtDaoTao,
+        parent: 'tccb',
+        reducers: { qtDaoTao }
     },
     routes: [
+        {
+            path: '/user/dao-tao',
+            component: Loadable({ loading: Loading, loader: () => import('./staffPage') })
+        },
         {
             path: '/user/tccb/qua-trinh/dao-tao',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })

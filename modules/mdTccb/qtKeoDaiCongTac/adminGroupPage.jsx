@@ -5,7 +5,7 @@ import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox,
 import Pagination from 'view/component/Pagination';
 import {
     updateQtKeoDaiCongTacGroupPageMa, deleteQtKeoDaiCongTacGroupPageMa,
-    createQtKeoDaiCongTacGroupPageMa, getQtKeoDaiCongTacPage,
+    createQtKeoDaiCongTacGroupPageMa, getQtKeoDaiCongTacGroupPageMa,
 } from './redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import { DateInput } from 'view/component/Input';
@@ -29,7 +29,7 @@ class EditModal extends AdminModal {
         ketThuc: '',
         batDauType: 'dd/mm/yyyy',
         ketThucType: 'dd/mm/yyyy',
-    };    
+    };
 
     onShow = (item) => {
         let { id, shcc, soHieuVanBan, batDau, batDauType, ketThuc, ketThucType } = item ? item : {
@@ -52,7 +52,6 @@ class EditModal extends AdminModal {
 
     onSubmit = (e) => {
         e.preventDefault();
-        console.log('submit');
         const changes = {
             shcc: this.shcc.value(),
             batDauType: this.state.batDauType,
@@ -79,7 +78,7 @@ class EditModal extends AdminModal {
             size: 'large',
             body: <div className='row'>
                 <FormSelect className='col-md-12' ref={e => this.shcc = e} data={SelectAdapter_FwCanBo} label='Cán bộ' readOnly />
-                <FormTextBox className='col-md-12' ref={e => this.soHieuVanBan = e} label='Số hiệu văn bản' readOnly={readOnly} required />
+                <FormTextBox className='col-md-12' ref={e => this.soHieuVanBan = e} label='Số hiệu văn bản' readOnly={readOnly} />
                 <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
                     label={
                         <div style={{ display: 'flex' }}>Thời gian bắt đầu (định dạng:&nbsp; <Dropdown ref={e => this.batDauType = e}
@@ -115,14 +114,12 @@ class QtKeoDaiCongTacGroupPage extends AdminPage {
                 this.toYear?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
-            this.props.getQtKeoDaiCongTacPage(undefined, undefined, undefined, this.state.filter, () => {
-                T.updatePage('pageQtKeoDaiCongTac', undefined, undefined, undefined, this.state.filter);
-            });
+            this.getPage();
         });
     }
 
     changeAdvancedSearch = (isInitial = false) => {
-        let { pageNumber, pageSize } = this.props && this.props.qtKeoDaiCongTac && this.props.qtKeoDaiCongTac.page ? this.props.qtKeoDaiCongTac.page : { pageNumber: 1, pageSize: 50 };
+        let { pageNumber, pageSize } = this.props && this.props.qtKeoDaiCongTac && this.props.qtKeoDaiCongTac.page_ma ? this.props.qtKeoDaiCongTac.page_ma : { pageNumber: 1, pageSize: 50 };
         const fromYear = this.fromYear?.value() == '' ? null : this.fromYear?.value().getTime();
         const toYear = this.toYear?.value() == '' ? null : this.toYear?.value().getTime();
         const list_dv = this.state.filter.list_dv;
@@ -142,7 +139,7 @@ class QtKeoDaiCongTacGroupPage extends AdminPage {
     }
 
     getPage = (pageN, pageS, pageC, done) => {
-        this.props.getQtKeoDaiCongTacPage(pageN, pageS, pageC, this.state.filter, done);
+        this.props.getQtKeoDaiCongTacGroupPageMa(pageN, pageS, pageC, this.state.filter, done);
     }
 
     showModal = (e) => {
@@ -163,7 +160,7 @@ class QtKeoDaiCongTacGroupPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('qtKeoDaiCongTac', ['read', 'write', 'delete']);
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtKeoDaiCongTac && this.props.qtKeoDaiCongTac.page ? this.props.qtKeoDaiCongTac.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtKeoDaiCongTac && this.props.qtKeoDaiCongTac.page_ma ? this.props.qtKeoDaiCongTac.page_ma : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -189,12 +186,12 @@ class QtKeoDaiCongTacGroupPage extends AdminPage {
                         />
                         <TableCell type='text' content={(
                             <>
-                                {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br/></span> : null}
-                                {item.ketThuc ? <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span><br/></span> : null}
+                                {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
+                                {item.ketThuc ? <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
                             </>
                         )}
                         />
-                        <TableCell type='text' style={{  whiteSpace: 'nowrap' }} content={item.soHieuVanBan}/>            
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.soHieuVanBan} />
                         {
                             <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                                 onEdit={() => this.modal.show(item)} onDelete={this.delete} >
@@ -206,12 +203,12 @@ class QtKeoDaiCongTacGroupPage extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-calendar',
+            icon: 'fa fa-hourglass-start',
             title: 'Quá trình kéo dài công tác - Cán bộ',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
-                <Link key={0} to='/user/tccb/qua-trinh/keo-dai-cong-tac'>Quá trình kéo dài, công tác</Link>,
-                'Quá trình kéo dài, công tác - Cán bộ'
+                <Link key={0} to='/user/tccb/qua-trinh/keo-dai-cong-tac'>Quá trình kéo dài công tác</Link>,
+                'Quá trình kéo dài công tác - Cán bộ'
             ],
             advanceSearch: <>
                 <div className='row'>
@@ -236,9 +233,9 @@ class QtKeoDaiCongTacGroupPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtKeoDaiCongTac: state.qtKeoDaiCongTac });
+const mapStateToProps = state => ({ system: state.system, qtKeoDaiCongTac: state.tccb.qtKeoDaiCongTac });
 const mapActionsToProps = {
     updateQtKeoDaiCongTacGroupPageMa, deleteQtKeoDaiCongTacGroupPageMa,
-    createQtKeoDaiCongTacGroupPageMa, getQtKeoDaiCongTacPage,
+    createQtKeoDaiCongTacGroupPageMa, getQtKeoDaiCongTacGroupPageMa,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtKeoDaiCongTacGroupPage);

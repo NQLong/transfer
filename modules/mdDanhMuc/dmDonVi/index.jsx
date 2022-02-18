@@ -5,7 +5,8 @@ import dmDonVi from './redux';
 
 export default {
     redux: {
-        dmDonVi,
+        parent: 'danhMuc',
+        reducers: { dmDonVi, }
     },
     routes: [
         {

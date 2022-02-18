@@ -209,7 +209,7 @@ class ComponentBaoHiemXaHoi extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, staff: state.staff });
+const mapStateToProps = state => ({ system: state.system, staff: state.tccb.staff });
 const mapActionsToProps = {
     createQtBaoHiemXaHoiStaff, createQtBaoHiemXaHoiStaffUser, updateQtBaoHiemXaHoiStaff, 
     updateQtBaoHiemXaHoiStaffUser, deleteQtBaoHiemXaHoiStaff, deleteQtBaoHiemXaHoiStaffUser

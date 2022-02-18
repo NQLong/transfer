@@ -5,7 +5,8 @@ import dmLoaiBangCap from './redux';
 
 export default {
     redux: {
-        dmLoaiBangCap,
+        parent: 'danhMuc',
+        reducers: {  dmLoaiBangCap } 
     },
     routes: [
         {

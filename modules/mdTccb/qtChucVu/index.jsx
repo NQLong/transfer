@@ -5,11 +5,12 @@ import qtChucVu from './redux';
 
 export default {
     redux: {
-        qtChucVu,
+        parent: 'tccb',
+        reducers: { qtChucVu }
     },
     routes: [
         {
-            path: '/user/tccb/qua-trinh/chuc-vu/group_cv/:loaiDoiTuong/:shcc',
+            path: '/user/tccb/qua-trinh/chuc-vu/group/:shcc',
             component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
         },
         {

@@ -434,7 +434,7 @@ export class FormSelect extends React.Component {
         $(this.input).off('select2:open');
     }
 
-    focus = () => $(this.input).select2('open');
+    focus = () => !this.props.readOnly && $(this.input).select2('open');
 
     clear = () => $(this.input).val('').trigger('change') && $(this.input).html('');
 
@@ -699,9 +699,9 @@ export class CirclePageButton extends React.Component {
         } else if (type == 'search') {
             result = <button {...properties} className='btn btn-primary btn-circle'><i className='fa fa-lg fa-search' /></button>;
         } else if (type == 'create') {
-            result = <button {...properties} className='btn btn-success btn-circle'><i className='fa fa-lg fa-plus' /></button>;
+            result = <button {...properties} className='btn btn-warning btn-circle'><i className='fa fa-lg fa-plus' /></button>;
         } else if (type == 'export') {
-            result = <button {...properties} className='btn btn-success btn-circle'><i className='fa fa-lg fa-cloud-download' /></button>;
+            result = <button {...properties} className='btn btn-success btn-circle'><i className='fa fa-lg fa-file-excel-o' /></button>;
         } else if (type == 'import') {
             result = <button {...properties} className='btn btn-success btn-circle'><i className='fa fa-lg fa-cloud-upload' /></button>;
         } else if (type == 'delete') {
@@ -766,7 +766,7 @@ export class AdminModal extends React.Component {
         }
     }
 
-    renderModal = ({ title, body, size, buttons, isLoading = false, submitText = 'Lưu', isShowSubmit = true, style={} }) => {
+    renderModal = ({ title, body, size, buttons, isLoading = false, submitText = 'Lưu', isShowSubmit = true, style = {} }) => {
         const { readOnly = false } = this.props;
         return (
             <div className='modal fade' role='dialog' ref={e => this.modal = e} style={style}>

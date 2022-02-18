@@ -5,7 +5,8 @@ import dmQuocGia from './redux';
 
 export default {
     redux: {
-        dmQuocGia,
+        parent: 'danhMuc',
+        reducers: { dmQuocGia }
     },
     routes: [
         {

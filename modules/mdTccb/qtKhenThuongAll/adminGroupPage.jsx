@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox} from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
-    getQtKhenThuongAllPage, updateQtKhenThuongAllGroupPageMa,
+    getQtKhenThuongAllGroupPageMa, updateQtKhenThuongAllGroupPageMa,
     deleteQtKhenThuongAllGroupPageMa, createQtKhenThuongAllGroupPageMa, 
 } from './redux';
 
@@ -80,7 +80,7 @@ class EditModal extends AdminModal {
         } else if (!this.thanhTich.value()) {
             T.notify('Thành tích trống', 'danger');
             this.thanhTich.focus();
-        } else this.state.id ? this.props.update(this.state.id, ma, changes, this.hide) : this.props.create(changes, this.hide);
+        } else this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
     }
 
     onChangeDT = (value) => {
@@ -122,25 +122,24 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                 params = route.parse(window.location.pathname);
             this.loaiDoiTuong = params.loaiDoiTuong;
             this.ma = params.ma;
-            this.setState({filter: {loaiDoiTuong : this.loaiDoiTuong}});
+            this.setState({filter: {loaiDoiTuong : this.loaiDoiTuong, ma: this.ma}});
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
                 this.fromYear?.value('');
                 this.toYear?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
-            this.props.getQtKhenThuongAllPage(undefined, undefined, '', this.ma, this.state.filter, () => {
-                T.updatePage('pageQtKhenThuongAll', undefined, undefined, '', this.state.filter);
-            });
+            this.getPage();
         });
     }
 
     changeAdvancedSearch = (isInitial = false) => {
-        let { pageNumber, pageSize } = this.props && this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.page ? this.props.qtKhenThuongAll.page : { pageNumber: 1, pageSize: 50 };
+        let { pageNumber, pageSize } = this.props && this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.page_ma ? this.props.qtKhenThuongAll.page_ma : { pageNumber: 1, pageSize: 50 };
         const fromYear = this.fromYear?.value() == '' ? null : Number(this.fromYear?.value());
         const toYear = this.toYear?.value() == '' ? null : Number(this.toYear?.value());
         const loaiDoiTuong = this.state.filter.loaiDoiTuong;
-        const pageFilter = isInitial ? null : { fromYear, toYear, loaiDoiTuong};
+        const ma = this.state.filter.ma;
+        const pageFilter = isInitial ? null : { fromYear, toYear, loaiDoiTuong, ma};
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
@@ -155,7 +154,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
     }
 
     getPage = (pageN, pageS, pageC, done) => {
-        this.props.getQtKhenThuongAllPage(pageN, pageS, pageC, this.ma, this.state.filter, done);
+        this.props.getQtKhenThuongAllGroupPageMa(pageN, pageS, pageC, this.state.filter, done);
 
     }
     showModal = (e) => {
@@ -190,7 +189,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa khen thưởng', 'Bạn có chắc bạn muốn xóa khen thưởng này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtKhenThuongAllGroupPageMa(item.id, this.ma, null, error => {
+            isConfirm && this.props.deleteQtKhenThuongAllGroupPageMa(item.id, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá khen thưởng bị lỗi!', 'danger');
                 else T.alert('Xoá khen thưởng thành công!', 'success', false, 800);
             });
@@ -201,9 +200,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('qtKhenThuongAll', ['read', 'write', 'delete']);
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = 
-        this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.page ?
-            this.props.qtKhenThuongAll.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list };
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.page_ma ? this.props.qtKhenThuongAll.page_ma : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -213,7 +210,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Đối tượng</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm đạt được</th>
-                        <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Thành tích</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thành tích</th>
                         <th style={{ width: 'auto', textAlign: 'right', whiteSpace: 'nowrap' }}>Điểm thi đua</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Loại đối tượng</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
@@ -311,9 +308,9 @@ class QtKhenThuongAllGroupPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtKhenThuongAll: state.qtKhenThuongAll });
+const mapStateToProps = state => ({ system: state.system, qtKhenThuongAll: state.tccb.qtKhenThuongAll });
 const mapActionsToProps = {
-    getQtKhenThuongAllPage, deleteQtKhenThuongAllGroupPageMa, createQtKhenThuongAllGroupPageMa,
+    getQtKhenThuongAllGroupPageMa, deleteQtKhenThuongAllGroupPageMa, createQtKhenThuongAllGroupPageMa,
     updateQtKhenThuongAllGroupPageMa, getDmKhenThuongLoaiDoiTuongAll,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtKhenThuongAllGroupPage);
