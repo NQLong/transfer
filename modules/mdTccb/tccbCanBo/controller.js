@@ -76,6 +76,10 @@ module.exports = app => {
         app.model.canBo.get({ shcc: req.params.shcc }, (error, item) => res.send({ error, item }));
     });
 
+    app.get('/api/staff/:maDonVi', checkGetStaffPermission, (req, res) => {
+        app.model.canBo.getAll({ maDonVi: req.params.maDonVi }, (error, item) => res.send({ error, item }));
+    });
+
     app.get('/api/staff/all', checkGetStaffPermission, (req, res) => {
         app.model.canBo.getAll((error, items) => res.send({ error, items }));
     });
