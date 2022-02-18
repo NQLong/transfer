@@ -10,6 +10,7 @@ import { AdminPage } from 'view/component/AdminPage';
 import ComponentQuanHe from './componentQuanHe';
 import ComponentTTCongTac from './componentTTCongTac';
 import ComponentTrinhDo from './componentTrinhDo';
+import Loading from 'view/component/Loading';
 // import ComponentKhenThuong from '../qtKhenThuongAll/componentKhenThuong';
 // import ComponentNCKH from '../qtNghienCuuKhoaHoc/componentNCKH';
 // import ComponentKyLuat from '../qtKyLuat/componentKyLuat';
@@ -84,6 +85,7 @@ class StaffUserPage extends AdminPage {
                 'Hồ sơ',
             ],
             content: <>
+                {name == '' && <Loading />}
                 <ComponentCaNhan ref={e => this.componentCaNhan = e} userEdit={true} isStaff={true} />
                 <ComponentQuanHe ref={e => this.componentQuanHe = e} userEdit={true} />
                 <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={true} />
