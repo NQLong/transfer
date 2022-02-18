@@ -27,7 +27,7 @@ class CanBoTheoDonVi extends AdminPage {
     }
 
     render() {
-        let permission = this.getUserPermission('staff', ['login']);
+        let permission = this.getUserPermission('quanLy', ['login']);
         if (permission.login == true) {
             permission = {
                 read: true
@@ -53,14 +53,14 @@ class CanBoTheoDonVi extends AdminPage {
                         <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap', fontWeight: 'bold' }} content={item.ho + ' ' + item.ten} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap', color: 'blue', fontStyle: 'italic' }} content={item.email} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign:'left' }} content={item.dienThoaiCaNhan} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'left' }} content={item.dienThoaiCaNhan} />
                     </tr>
                 )
             });
         }
 
         return this.renderPage({
-            icon: 'fa fa-user-cirle-o',
+            icon: 'fa fa-user-circle-o',
             title: 'Danh sách cán bộ thuộc đơn vị',
             subTitle: <span style={{ color: 'blue' }}>Đơn vị: {tenDv}</span>,
             breadcrumb: [
