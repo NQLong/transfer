@@ -74,8 +74,13 @@ module.exports = app => {
         if (req.query.condition) {
             if (maDv != 0) {
                 condition = {
-                    statement: '(lower(ma) LIKE :searchText OR lower(ten) LIKE :searchText AND maDv =:maDv',
+                    statement: 'lower(ma) LIKE :searchText OR lower(ten) LIKE :searchText AND maDv =:maDv',
                     parameter: { searchText: `%${req.query.condition.toLowerCase()}%`, maDv },
+                };
+            } else {
+                condition = {
+                    statement: 'lower(ma) LIKE :searchText OR lower(ten) LIKE :searchText',
+                    parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
                 };
             }
         } else {

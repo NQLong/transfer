@@ -213,11 +213,27 @@ module.exports = app => {
                             resolve();
                         } else {
                             user.isStaff = 1;
+                            user.shcc = item.shcc;
                             app.permissionHooks.pushUserPermission(user, 'staff:login'); // Add staff permission: staff:login
                             resolve();
                         }
                     });
                 }).then(() => new Promise(resolve => {
+                    app.model.qtChucVu.getAll({ shcc: user.shcc }, (e, re) => {
+                        if (e || re == null) resolve();
+                        else if (re && re.length > 0) {
+                            re.forEach(item => {
+                                if (item.chucVuChinh == 1 && item.maChucVu != '002' && item.maChucVu != '001' && item.maChucVu != '013' && item.maChucVu != '014') {
+                                    app.model.dmDonVi.get({ ma: item.maDonVi }, (er, resu) => {
+                                        user.donVi = resu.ten;
+                                        app.permissionHooks.pushUserPermission(user, 'quanLy:login');
+                                        resolve();
+                                    });
+                                }
+                            });
+                        } else resolve();
+                    });
+                })).then(() => new Promise(resolve => {
                     user.menu = app.permission.tree();
                     Object.keys(user.menu).forEach(parentMenuIndex => {
                         let flag = true;

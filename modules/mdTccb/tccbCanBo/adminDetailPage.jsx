@@ -11,6 +11,7 @@ import { AdminPage } from 'view/component/AdminPage';
 import ComponentQuanHe from './componentQuanHe';
 import ComponentTTCongTac from './componentTTCongTac';
 import ComponentTrinhDo from './componentTrinhDo';
+import Loading from 'view/component/Loading';
 
 class CanBoPage extends AdminPage {
     state = { item: null }
@@ -59,17 +60,19 @@ class CanBoPage extends AdminPage {
         return this.renderPage({
             icon: 'fa fa-address-card-o',
             title: 'Hồ sơ cá nhân',
-            subTitle: <span style={{ color: 'blue' }}>Cán bộ: {`${item?.ho} ${item?.ten} (${item?.shcc} - ${item?.email})`}</span>,
+            subTitle: <span style={{ color: 'blue' }}>{item ? `Cán bộ: ${item?.ho} ${item?.ten} (${item?.shcc} - ${item?.email})` : ''}</span>,
             breadcrumb: [
                 <Link key={0} to='/user/staff'>Cán bộ</Link>,
                 'Lý lịch cán bộ',
             ],
-            content: <>
-                <ComponentCaNhan ref={e => this.componentCaNhan = e} userEdit={false} isStaff={false} />
-                <ComponentQuanHe ref={e => this.componentQuanHe = e} userEdit={false} />
-                <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={false} />
-                <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={false} tccb={true} />
-            </>,
+            content:
+                <>
+                    {!item && <Loading />}
+                    <ComponentCaNhan ref={e => this.componentCaNhan = e} userEdit={false} isStaff={false} />
+                    <ComponentQuanHe ref={e => this.componentQuanHe = e} userEdit={false} />
+                    <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={false} />
+                    <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={false} tccb={true} />
+                </>,
             backRoute: '/user/tccb/staff',
             onSave: this.save,
         });
