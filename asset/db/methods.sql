@@ -754,9 +754,10 @@ END;
 /
 --EndMethod--
 
-CREATE OR REPLACE FUNCTION QT_BAI_VIET_KHOA_HOC_GROUP_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER, loaiDoiTuong IN STRING,
-                                               searchTerm IN STRING,
-                                               totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
+CREATE OR REPLACE FUNCTION QT_BAI_VIET_KHOA_HOC_GROUP_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER,
+                                        list_shcc IN STRING, list_dv IN STRING,
+                                        fromYear IN NUMBER, toYear IN NUMBER, xuatBanRange IN NUMBER, searchTerm IN STRING,
+                                         totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
 AS
     my_cursor SYS_REFCURSOR;
     sT        STRING(500) := '%' || lower(searchTerm) || '%';
@@ -767,14 +768,7 @@ BEGIN
     FROM (SELECT *
           FROM QT_BAI_VIET_KHOA_HOC
           WHERE ID IN (SELECT MAX(ID) FROM (SELECT * FROM QT_BAI_VIET_KHOA_HOC ORDER BY SHCC DESC) GROUP BY SHCC)) qtbvkh
-             LEFT JOIN TCHC_CAN_BO cb on qtbvkh.SHCC = cb.SHCC
-             LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
-    WHERE (loaiDoiTuong = '-1' OR INSTR(loaiDoiTuong, dv.MA) != 0)
-        AND (searchTerm = ''
-       OR LOWER(cb.SHCC) LIKE sT
-       OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
-       OR LOWER(qtbvkh.TEN_TAC_GIA) LIKE sT
-       OR LOWER(qtbvkh.TEN_TAP_CHI) LIKE sT);
+             LEFT JOIN TCHC_CAN_BO cb on qtbvkh.SHCC = cb.SHCC;
 
     IF pageNumber < 1 THEN pageNumber := 1; END IF;
     IF pageSize < 1 THEN pageSize := 1; END IF;
@@ -785,35 +779,58 @@ BEGIN
         SELECT *
         FROM (
                  SELECT qtbvkh.ID           AS                "id",
-                        qtbvkh.TEN_TAC_GIA  AS "tenTacGia",
-                        qtbvkh.NAM_XUAT_BAN AS "namXuatBan",
-                        qtbvkh.TEN_BAI_VIET AS "tenBaiViet",
-                        qtbvkh.TEN_TAP_CHI  AS "tenTapChi",
-                        qtbvkh.SO_HIEU_ISSN AS "soHieuIssn",
-                        qtbvkh.SAN_PHAM AS "sanPham",
-                        qtbvkh.DIEM_IF  AS "diemIf",
-                        qtbvkh.QUOC_TE  AS "quocTe",
                         qtbvkh.SHCC AS "shcc",
+                        (SELECT COUNT(*)
+                        FROM QT_BAI_VIET_KHOA_HOC qtbvkh_temp
+                                 LEFT JOIN TCHC_CAN_BO cb on qtbvkh_temp.SHCC = cb.SHCC
+                                 LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
+                        WHERE (qtbvkh_temp.SHCC = qtbvkh.SHCC)
+                            AND (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
+                            OR (((list_shcc IS NOT NULL AND ((INSTR(list_shcc, ',') != 0 AND INSTR(list_shcc, qtbvkh_temp.SHCC) != 0) OR (list_shcc = qtbvkh_temp.SHCC)))
+                          OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
+                          OR (list_shcc IS NULL AND list_dv IS NULL))
+                          AND (qtbvkh_temp.NAM_XUAT_BAN IS NOT NULL AND (fromYear IS NULL OR qtbvkh_temp.NAM_XUAT_BAN >= fromYear))
+                          AND (qtbvkh_temp.NAM_XUAT_BAN IS NOT NULL AND (toYear IS NULL OR qtbvkh_temp.NAM_XUAT_BAN <= toYear))))
+                          AND (xuatBanRange IS NULL OR (qtbvkh_temp.QUOC_TE IS NOT NULL AND qtbvkh_temp.QUOC_TE = xuatBanRange))
+                          AND (searchTerm = ''
+                            OR LOWER(cb.SHCC) LIKE sT
+                            OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
+                            OR LOWER(qtbvkh_temp.TEN_TAC_GIA) LIKE sT
+                            OR LOWER(qtbvkh_temp.TEN_BAI_VIET) LIKE sT
+                            OR LOWER(qtbvkh_temp.SO_HIEU_ISSN) LIKE sT
+                            OR LOWER(qtbvkh_temp.TEN_TAP_CHI) LIKE sT)
+                        ) AS "soBaiViet",
+
+                        (select rtrim(xmlagg(xmlelement(e, qtbvkh_temp.TEN_BAI_VIET || ' ','??').extract('//text()') order by null).getclobval(),'??')
+                        FROM QT_BAI_VIET_KHOA_HOC qtbvkh_temp
+                                 LEFT JOIN TCHC_CAN_BO cb on qtbvkh_temp.SHCC = cb.SHCC
+                                 LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
+                        WHERE (qtbvkh_temp.SHCC = qtbvkh.SHCC)
+                            AND (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
+                            OR (((list_shcc IS NOT NULL AND ((INSTR(list_shcc, ',') != 0 AND INSTR(list_shcc, qtbvkh_temp.SHCC) != 0) OR (list_shcc = qtbvkh_temp.SHCC)))
+                          OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
+                          OR (list_shcc IS NULL AND list_dv IS NULL))
+                          AND (qtbvkh_temp.NAM_XUAT_BAN IS NOT NULL AND (fromYear IS NULL OR qtbvkh_temp.NAM_XUAT_BAN >= fromYear))
+                          AND (qtbvkh_temp.NAM_XUAT_BAN IS NOT NULL AND (toYear IS NULL OR qtbvkh_temp.NAM_XUAT_BAN <= toYear))))
+                          AND (xuatBanRange IS NULL OR (qtbvkh_temp.QUOC_TE IS NOT NULL AND qtbvkh_temp.QUOC_TE = xuatBanRange))
+                          AND (searchTerm = ''
+                            OR LOWER(cb.SHCC) LIKE sT
+                            OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
+                            OR LOWER(qtbvkh_temp.TEN_TAC_GIA) LIKE sT
+                            OR LOWER(qtbvkh_temp.TEN_BAI_VIET) LIKE sT
+                            OR LOWER(qtbvkh_temp.SO_HIEU_ISSN) LIKE sT
+                            OR LOWER(qtbvkh_temp.TEN_TAP_CHI) LIKE sT)
+                        ) AS "danhSachBaiViet",
 
                         cb.HO              AS                "hoCanBo",
                         cb.TEN             AS                "tenCanBo",
 
-                        dv.MA              AS                "maDonVi",
-                        dv.TEN             AS                "tenDonVi",
-
-                        ROW_NUMBER() OVER (ORDER BY ID DESC) R
+                        ROW_NUMBER() OVER (ORDER BY NAM_XUAT_BAN DESC) R
                 FROM (SELECT *
                       FROM QT_BAI_VIET_KHOA_HOC
                       WHERE ID IN (SELECT MAX(ID) FROM (SELECT * FROM QT_BAI_VIET_KHOA_HOC ORDER BY SHCC DESC) GROUP BY SHCC)) qtbvkh
                          LEFT JOIN TCHC_CAN_BO cb on qtbvkh.SHCC = cb.SHCC
-                         LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
-                WHERE (loaiDoiTuong = '-1' OR INSTR(loaiDoiTuong, dv.MA) != 0)
-                    AND (searchTerm = ''
-                   OR LOWER(cb.SHCC) LIKE sT
-                   OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
-                   OR LOWER(qtbvkh.TEN_TAC_GIA) LIKE sT
-                   OR LOWER(qtbvkh.TEN_TAP_CHI) LIKE sT)
-                ORDER BY qtbvkh.ID DESC
+                ORDER BY qtbvkh.NAM_XUAT_BAN DESC
              )
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
     RETURN my_cursor;
@@ -822,63 +839,10 @@ END;
 /
 --EndMethod--
 
-CREATE OR REPLACE FUNCTION QT_BAI_VIET_KHOA_HOC_GROUP_PAGE_MA(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER, loaiDoiTuong IN STRING,
-                                               searchTerm IN STRING,
-                                               totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
-AS
-    my_cursor SYS_REFCURSOR;
-    sT        STRING(500) := '%' || lower(searchTerm) || '%';
-BEGIN
-    SELECT COUNT(*)
-    INTO totalItem
-
-    FROM QT_BAI_VIET_KHOA_HOC qtbvkh
-         LEFT JOIN TCHC_CAN_BO cb on qtbvkh.SHCC = cb.SHCC
-         LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
-    WHERE (loaiDoiTuong = '-1' OR loaiDoiTuong = dv.MA) AND (qtbvkh.SHCC = searchTerm);
-
-    IF pageNumber < 1 THEN pageNumber := 1; END IF;
-    IF pageSize < 1 THEN pageSize := 1; END IF;
-    pageTotal := CEIL(totalItem / pageSize);
-    pageNumber := LEAST(pageNumber, pageTotal);
-
-    OPEN my_cursor FOR
-        SELECT *
-        FROM (
-                 SELECT qtbvkh.ID           AS                "id",
-                        qtbvkh.TEN_TAC_GIA  AS "tenTacGia",
-                        qtbvkh.NAM_XUAT_BAN AS "namXuatBan",
-                        qtbvkh.TEN_BAI_VIET AS "tenBaiViet",
-                        qtbvkh.TEN_TAP_CHI  AS "tenTapChi",
-                        qtbvkh.SO_HIEU_ISSN AS "soHieuIssn",
-                        qtbvkh.SAN_PHAM AS "sanPham",
-                        qtbvkh.DIEM_IF  AS "diemIf",
-                        qtbvkh.QUOC_TE  AS "quocTe",
-                        qtbvkh.SHCC AS "shcc",
-
-                        cb.HO              AS                "hoCanBo",
-                        cb.TEN             AS                "tenCanBo",
-
-                        dv.MA              AS                "maDonVi",
-                        dv.TEN             AS                "tenDonVi",
-
-                        ROW_NUMBER() OVER (ORDER BY ID DESC) R
-                FROM QT_BAI_VIET_KHOA_HOC qtbvkh
-                     LEFT JOIN TCHC_CAN_BO cb on qtbvkh.SHCC = cb.SHCC
-                     LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
-                WHERE (loaiDoiTuong = '-1' OR loaiDoiTuong = dv.MA) AND (qtbvkh.SHCC = searchTerm)
-                ORDER BY qtbvkh.ID DESC
-             )
-        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
-    RETURN my_cursor;
-
-END;
-/
---EndMethod--
-
-CREATE OR REPLACE FUNCTION QT_BAI_VIET_KHOA_HOC_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER, loaiDoiTuong IN STRING,
-                                               searchTerm IN STRING,
-                                               totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
+CREATE OR REPLACE FUNCTION QT_BAI_VIET_KHOA_HOC_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER,
+                                        list_shcc IN STRING, list_dv IN STRING,
+                                        fromYear IN NUMBER, toYear IN NUMBER, xuatBanRange IN NUMBER, searchTerm IN STRING,
+                                         totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
 AS
     my_cursor SYS_REFCURSOR;
     sT        STRING(500) := '%' || lower(searchTerm) || '%';
@@ -889,12 +853,20 @@ BEGIN
     FROM QT_BAI_VIET_KHOA_HOC qtbvkh
              LEFT JOIN TCHC_CAN_BO cb on qtbvkh.SHCC = cb.SHCC
              LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
-    WHERE (loaiDoiTuong = '-1' OR INSTR(loaiDoiTuong, dv.MA) != 0)
-        AND (searchTerm = ''
-       OR LOWER(cb.SHCC) LIKE sT
-       OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
-       OR LOWER(qtbvkh.TEN_TAC_GIA) LIKE sT
-       OR LOWER(qtbvkh.TEN_TAP_CHI) LIKE sT);
+    WHERE (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
+        OR (((list_shcc IS NOT NULL AND ((INSTR(list_shcc, ',') != 0 AND INSTR(list_shcc, qtbvkh.SHCC) != 0) OR (list_shcc = qtbvkh.SHCC)))
+      OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
+      OR (list_shcc IS NULL AND list_dv IS NULL))
+      AND (qtbvkh.NAM_XUAT_BAN IS NOT NULL AND (fromYear IS NULL OR qtbvkh.NAM_XUAT_BAN >= fromYear))
+      AND (qtbvkh.NAM_XUAT_BAN IS NOT NULL AND (toYear IS NULL OR qtbvkh.NAM_XUAT_BAN <= toYear))))
+      AND (xuatBanRange IS NULL OR (qtbvkh.QUOC_TE IS NOT NULL AND qtbvkh.QUOC_TE = xuatBanRange))
+      AND (searchTerm = ''
+        OR LOWER(cb.SHCC) LIKE sT
+        OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
+        OR LOWER(qtbvkh.TEN_TAC_GIA) LIKE sT
+        OR LOWER(qtbvkh.TEN_BAI_VIET) LIKE sT
+        OR LOWER(qtbvkh.SO_HIEU_ISSN) LIKE sT
+        OR LOWER(qtbvkh.TEN_TAP_CHI) LIKE sT);
 
     IF pageNumber < 1 THEN pageNumber := 1; END IF;
     IF pageSize < 1 THEN pageSize := 1; END IF;
@@ -921,17 +893,25 @@ BEGIN
                         dv.MA              AS                "maDonVi",
                         dv.TEN             AS                "tenDonVi",
 
-                        ROW_NUMBER() OVER (ORDER BY ID DESC) R
+                        ROW_NUMBER() OVER (ORDER BY NAM_XUAT_BAN DESC) R
                 FROM QT_BAI_VIET_KHOA_HOC qtbvkh
                          LEFT JOIN TCHC_CAN_BO cb on qtbvkh.SHCC = cb.SHCC
                          LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
-                WHERE (loaiDoiTuong = '-1' OR INSTR(loaiDoiTuong, dv.MA) != 0)
-                    AND (searchTerm = ''
-                   OR LOWER(cb.SHCC) LIKE sT
-                   OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
-                   OR LOWER(qtbvkh.TEN_TAC_GIA) LIKE sT
-                   OR LOWER(qtbvkh.TEN_TAP_CHI) LIKE sT)
-                ORDER BY qtbvkh.ID DESC
+                WHERE (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
+                    OR (((list_shcc IS NOT NULL AND ((INSTR(list_shcc, ',') != 0 AND INSTR(list_shcc, qtbvkh.SHCC) != 0) OR (list_shcc = qtbvkh.SHCC)))
+                  OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
+                  OR (list_shcc IS NULL AND list_dv IS NULL))
+                  AND (qtbvkh.NAM_XUAT_BAN IS NOT NULL AND (fromYear IS NULL OR qtbvkh.NAM_XUAT_BAN >= fromYear))
+                  AND (qtbvkh.NAM_XUAT_BAN IS NOT NULL AND (toYear IS NULL OR qtbvkh.NAM_XUAT_BAN <= toYear))))
+                  AND (xuatBanRange IS NULL OR (qtbvkh.QUOC_TE IS NOT NULL AND qtbvkh.QUOC_TE = xuatBanRange))
+                  AND (searchTerm = ''
+                    OR LOWER(cb.SHCC) LIKE sT
+                    OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
+                    OR LOWER(qtbvkh.TEN_TAC_GIA) LIKE sT
+                    OR LOWER(qtbvkh.TEN_BAI_VIET) LIKE sT
+                    OR LOWER(qtbvkh.SO_HIEU_ISSN) LIKE sT
+                    OR LOWER(qtbvkh.TEN_TAP_CHI) LIKE sT)
+                ORDER BY qtbvkh.NAM_XUAT_BAN DESC
              )
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
     RETURN my_cursor;
@@ -1267,19 +1247,7 @@ BEGIN
     FROM (SELECT *
           FROM QT_CHUC_VU
           WHERE STT IN (SELECT MAX(STT) FROM (SELECT * FROM QT_CHUC_VU ORDER BY MA_CHUC_VU DESC) GROUP BY SHCC)) qtcv
-             LEFT JOIN TCHC_CAN_BO cb on qtcv.SHCC = cb.SHCC
-             LEFT JOIN DM_CHUC_VU cv ON qtcv.MA_CHUC_VU = cv.MA
-             LEFT JOIN DM_DON_VI dv ON qtcv.MA_DON_VI = dv.MA
-             LEFT JOIN DM_BO_MON bm ON qtcv.MA_BO_MON = bm.MA
-    WHERE ((list_shcc IS NOT NULL AND INSTR(list_shcc, qtcv.SHCC) != 0)
-      OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
-      OR (list_shcc IS NULL AND list_dv IS NULL))
-       AND (searchTerm = ''
-       OR LOWER(qtcv.SHCC) LIKE sT
-       OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
-       OR LOWER(qtcv.SO_QD) LIKE sT
-       OR LOWER(qtcv.SO_QD_THOI_CHUC_VU) LIKE sT);
-
+             LEFT JOIN TCHC_CAN_BO cb on qtcv.SHCC = cb.SHCC;
 
     pageTotal := CEIL(totalItem / pageSize);
     pageNumber := LEAST(pageNumber, pageTotal);
@@ -1293,44 +1261,57 @@ BEGIN
                         qtcv.STT                     AS       "stt",
                         cb.HO                        AS       "ho",
                         cb.TEN                       AS       "ten",
-                        cv.PHU_CAP                   AS       "phuCap",
-                        qtcv.MA_DON_VI               AS       "maDonVi",
-                        dv.TEN                       AS       "tenDonVi",
-                        qtcv.MA_BO_MON               AS       "maBoMon",
-                        bm.TEN                       AS       "tenBoMon",
-                        qtcv.MA_CHUC_VU              AS       "maChucVu",
-                        cv.TEN                       AS       "tenChucVu",
-                        qtcv.SO_QD                   AS       "soQuyetDinh",
-                        qtcv.NGAY_RA_QD              AS       "ngayRaQuyetDinh",
-                        qtcv.CHUC_VU_CHINH           AS       "chucVuChinh",
-                        qtcv.THOI_CHUC_VU            AS       "thoiChucVu",
-                        qtcv.SO_QD_THOI_CHUC_VU      AS       "soQdThoiChucVu",
-                        qtcv.NGAY_THOI_CHUC_VU       AS       "ngayThoiChucVu",
-                        qtcv.NGAY_RA_QD_THOI_CHUC_VU AS       "ngayRaQdThoiChucVu",
 
                         (SELECT COUNT(*)
-                         FROM QT_CHUC_VU qtcv_temp
-                         WHERE qtcv_temp.SHCC = qtcv.SHCC
-                            AND (timeType = 0 OR (timeType = 1
-                            AND (fromYear IS NULL OR qtcv_temp.NGAY_RA_QD IS NULL OR qtcv_temp.NGAY_RA_QD >= fromYear)
-                            AND (toYear IS NULL OR qtcv_temp.NGAY_RA_QD IS NULL OR qtcv_temp.NGAY_RA_QD <= toYear)) OR (timeType = 2
-                            AND (fromYear IS NULL OR qtcv_temp.NGAY_THOI_CHUC_VU IS NULL OR qtcv_temp.NGAY_THOI_CHUC_VU >= fromYear)
-                            AND (toYear IS NULL OR qtcv_temp.NGAY_THOI_CHUC_VU IS NULL OR qtcv_temp.NGAY_THOI_CHUC_VU <= toYear)) OR (timeType = 3
-                            AND (fromYear IS NULL OR qtcv_temp.NGAY_RA_QD_THOI_CHUC_VU IS NULL OR qtcv_temp.NGAY_RA_QD_THOI_CHUC_VU >= fromYear)
-                            AND (toYear IS NULL OR qtcv_temp.NGAY_RA_QD_THOI_CHUC_VU IS NULL OR qtcv_temp.NGAY_RA_QD_THOI_CHUC_VU <= toYear)))
+                        FROM QT_CHUC_VU qtcv_temp
+                                 LEFT JOIN TCHC_CAN_BO cb on qtcv_temp.SHCC = cb.SHCC
+                                 LEFT JOIN DM_CHUC_VU cv ON qtcv_temp.MA_CHUC_VU = cv.MA
+                                 LEFT JOIN DM_DON_VI dv ON qtcv_temp.MA_DON_VI = dv.MA
+                                 LEFT JOIN DM_BO_MON bm ON qtcv_temp.MA_BO_MON = bm.MA
+                        WHERE (qtcv_temp.SHCC = qtcv.SHCC)
+                            AND ((list_shcc IS NOT NULL AND INSTR(list_shcc, qtcv_temp.SHCC) != 0)
+                          OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
+                          OR (list_shcc IS NULL AND list_dv IS NULL))
+                          AND (timeType = 0 OR (timeType = 1 AND
+                                (fromYear IS NULL OR qtcv_temp.NGAY_RA_QD IS NULL OR qtcv_temp.NGAY_RA_QD >= fromYear) AND (toYear IS NULL OR qtcv_temp.NGAY_RA_QD IS NULL OR qtcv_temp.NGAY_RA_QD <= toYear))
+                              OR ((timeType = 2) AND
+                                  (fromYear IS NULL OR qtcv_temp.NGAY_THOI_CHUC_VU IS NULL OR qtcv_temp.NGAY_THOI_CHUC_VU >= fromYear) AND (toYear IS NULL OR qtcv_temp.NGAY_THOI_CHUC_VU IS NULL OR qtcv_temp.NGAY_THOI_CHUC_VU <= toYear))
+                              OR ((timeType = 3) AND
+                                  (fromYear IS NULL OR qtcv_temp.NGAY_RA_QD_THOI_CHUC_VU IS NULL OR qtcv_temp.NGAY_RA_QD_THOI_CHUC_VU >= fromYear) AND (toYear IS NULL OR qtcv_temp.NGAY_RA_QD_THOI_CHUC_VU IS NULL OR qtcv_temp.NGAY_RA_QD <= toYear))
+                              )
+                            AND (searchTerm = ''
+                            OR LOWER(cb.SHCC) LIKE sT
+                            OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
+                            OR LOWER(qtcv_temp.SO_QD) LIKE sT
+                            OR LOWER(qtcv_temp.SO_QD_THOI_CHUC_VU) LIKE sT
+                            OR LOWER(cv.TEN) LIKE sT
+                            OR LOWER(dv.TEN) LIKE sT)
                         ) AS "soChucVu",
 
-                        (Select listagg(cv.TEN || ' ', '??') within group ( order by null)
-                         FROM QT_CHUC_VU qtcv_temp1
-                            LEFT JOIN DM_CHUC_VU cv on qtcv_temp1.MA_CHUC_VU = cv.MA
-                         WHERE qtcv_temp1.SHCC = qtcv.SHCC
-                            AND (timeType = 0 OR (timeType = 1
-                            AND (fromYear IS NULL OR qtcv_temp1.NGAY_RA_QD IS NULL OR qtcv_temp1.NGAY_RA_QD >= fromYear)
-                            AND (toYear IS NULL OR qtcv_temp1.NGAY_RA_QD IS NULL OR qtcv_temp1.NGAY_RA_QD <= toYear)) OR (timeType = 2
-                            AND (fromYear IS NULL OR qtcv_temp1.NGAY_THOI_CHUC_VU IS NULL OR qtcv_temp1.NGAY_THOI_CHUC_VU >= fromYear)
-                            AND (toYear IS NULL OR qtcv_temp1.NGAY_THOI_CHUC_VU IS NULL OR qtcv_temp1.NGAY_THOI_CHUC_VU <= toYear)) OR (timeType = 3
-                            AND (fromYear IS NULL OR qtcv_temp1.NGAY_RA_QD_THOI_CHUC_VU IS NULL OR qtcv_temp1.NGAY_RA_QD_THOI_CHUC_VU >= fromYear)
-                            AND (toYear IS NULL OR qtcv_temp1.NGAY_RA_QD_THOI_CHUC_VU IS NULL OR qtcv_temp1.NGAY_RA_QD_THOI_CHUC_VU <= toYear)))
+                        (select rtrim(xmlagg(xmlelement(e, cv.TEN || ' ','??').extract('//text()') order by null).getclobval(),'??')
+                        FROM QT_CHUC_VU qtcv_temp
+                                 LEFT JOIN TCHC_CAN_BO cb on qtcv_temp.SHCC = cb.SHCC
+                                 LEFT JOIN DM_CHUC_VU cv ON qtcv_temp.MA_CHUC_VU = cv.MA
+                                 LEFT JOIN DM_DON_VI dv ON qtcv_temp.MA_DON_VI = dv.MA
+                                 LEFT JOIN DM_BO_MON bm ON qtcv_temp.MA_BO_MON = bm.MA
+                        WHERE (qtcv_temp.SHCC = qtcv.SHCC)
+                            AND ((list_shcc IS NOT NULL AND INSTR(list_shcc, qtcv_temp.SHCC) != 0)
+                          OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
+                          OR (list_shcc IS NULL AND list_dv IS NULL))
+                          AND (timeType = 0 OR (timeType = 1 AND
+                                (fromYear IS NULL OR qtcv_temp.NGAY_RA_QD IS NULL OR qtcv_temp.NGAY_RA_QD >= fromYear) AND (toYear IS NULL OR qtcv_temp.NGAY_RA_QD IS NULL OR qtcv_temp.NGAY_RA_QD <= toYear))
+                              OR ((timeType = 2) AND
+                                  (fromYear IS NULL OR qtcv_temp.NGAY_THOI_CHUC_VU IS NULL OR qtcv_temp.NGAY_THOI_CHUC_VU >= fromYear) AND (toYear IS NULL OR qtcv_temp.NGAY_THOI_CHUC_VU IS NULL OR qtcv_temp.NGAY_THOI_CHUC_VU <= toYear))
+                              OR ((timeType = 3) AND
+                                  (fromYear IS NULL OR qtcv_temp.NGAY_RA_QD_THOI_CHUC_VU IS NULL OR qtcv_temp.NGAY_RA_QD_THOI_CHUC_VU >= fromYear) AND (toYear IS NULL OR qtcv_temp.NGAY_RA_QD_THOI_CHUC_VU IS NULL OR qtcv_temp.NGAY_RA_QD <= toYear))
+                              )
+                            AND (searchTerm = ''
+                            OR LOWER(cb.SHCC) LIKE sT
+                            OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
+                            OR LOWER(qtcv_temp.SO_QD) LIKE sT
+                            OR LOWER(qtcv_temp.SO_QD_THOI_CHUC_VU) LIKE sT
+                            OR LOWER(cv.TEN) LIKE sT
+                            OR LOWER(dv.TEN) LIKE sT)
                         ) AS "danhSachChucVu",
 
                         ROW_NUMBER() OVER (ORDER BY qtcv.NGAY_RA_QD_THOI_CHUC_VU DESC ) R
@@ -1339,17 +1320,6 @@ BEGIN
                        WHERE STT IN
                              (SELECT MAX(STT) FROM (SELECT * FROM QT_CHUC_VU ORDER BY MA_CHUC_VU ASC) GROUP BY SHCC)) qtcv
                           LEFT JOIN TCHC_CAN_BO cb on qtcv.SHCC = cb.SHCC
-                          LEFT JOIN DM_CHUC_VU cv ON qtcv.MA_CHUC_VU = cv.MA
-                          LEFT JOIN DM_DON_VI dv ON qtcv.MA_DON_VI = dv.MA
-                          LEFT JOIN DM_BO_MON bm ON qtcv.MA_BO_MON = bm.MA
-                 WHERE ((list_shcc IS NOT NULL AND INSTR(list_shcc, qtcv.SHCC) != 0)
-                      OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
-                      OR (list_shcc IS NULL AND list_dv IS NULL))
-                       AND (searchTerm = ''
-                       OR LOWER(qtcv.SHCC) LIKE sT
-                       OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
-                       OR LOWER(qtcv.SO_QD) LIKE sT
-                       OR LOWER(qtcv.SO_QD_THOI_CHUC_VU) LIKE sT)
                  ORDER BY qtcv.STT DESC
              )
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
@@ -1436,18 +1406,20 @@ BEGIN
     WHERE ((list_shcc IS NOT NULL AND INSTR(list_shcc, qtcv.SHCC) != 0)
       OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
       OR (list_shcc IS NULL AND list_dv IS NULL))
-      AND ((timeType = 0 AND
+      AND (timeType = 0 OR (timeType = 1 AND
             (fromYear IS NULL OR qtcv.NGAY_RA_QD IS NULL OR qtcv.NGAY_RA_QD >= fromYear) AND (toYear IS NULL OR qtcv.NGAY_RA_QD IS NULL OR qtcv.NGAY_RA_QD <= toYear))
-          OR ((timeType = 1) AND
-              (fromYear IS NULL OR qtcv.NGAY_THOI_CHUC_VU IS NULL OR qtcv.NGAY_THOI_CHUC_VU >= fromYear) AND (toYear IS NULL OR qtcv.NGAY_THOI_CHUC_VU IS NULL OR qtcv.NGAY_THOI_CHUC_VU <= toYear))
           OR ((timeType = 2) AND
+              (fromYear IS NULL OR qtcv.NGAY_THOI_CHUC_VU IS NULL OR qtcv.NGAY_THOI_CHUC_VU >= fromYear) AND (toYear IS NULL OR qtcv.NGAY_THOI_CHUC_VU IS NULL OR qtcv.NGAY_THOI_CHUC_VU <= toYear))
+          OR ((timeType = 3) AND
               (fromYear IS NULL OR qtcv.NGAY_RA_QD_THOI_CHUC_VU IS NULL OR qtcv.NGAY_RA_QD_THOI_CHUC_VU >= fromYear) AND (toYear IS NULL OR qtcv.NGAY_RA_QD_THOI_CHUC_VU IS NULL OR qtcv.NGAY_RA_QD <= toYear))
           )
         AND (searchTerm = ''
         OR LOWER(cb.SHCC) LIKE sT
         OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
         OR LOWER(qtcv.SO_QD) LIKE sT
-        OR LOWER(qtcv.SO_QD_THOI_CHUC_VU) LIKE sT);
+        OR LOWER(qtcv.SO_QD_THOI_CHUC_VU) LIKE sT
+        OR LOWER(cv.TEN) LIKE sT
+        OR LOWER(dv.TEN) LIKE sT);
 
     IF pageNumber < 1 THEN pageNumber := 1; END IF;
     IF pageSize < 1 THEN pageSize := 1; END IF;
@@ -1484,11 +1456,11 @@ BEGIN
                  WHERE ((list_shcc IS NOT NULL AND INSTR(list_shcc, qtcv.SHCC) != 0)
                       OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
                       OR (list_shcc IS NULL AND list_dv IS NULL))
-                      AND ((timeType = 0 AND
+                      AND (timeType = 0 OR (timeType = 1 AND
                             (fromYear IS NULL OR qtcv.NGAY_RA_QD IS NULL OR qtcv.NGAY_RA_QD >= fromYear) AND (toYear IS NULL OR qtcv.NGAY_RA_QD IS NULL OR qtcv.NGAY_RA_QD <= toYear))
-                          OR ((timeType = 1) AND
-                              (fromYear IS NULL OR qtcv.NGAY_THOI_CHUC_VU IS NULL OR qtcv.NGAY_THOI_CHUC_VU >= fromYear) AND (toYear IS NULL OR qtcv.NGAY_THOI_CHUC_VU IS NULL OR qtcv.NGAY_THOI_CHUC_VU <= toYear))
                           OR ((timeType = 2) AND
+                              (fromYear IS NULL OR qtcv.NGAY_THOI_CHUC_VU IS NULL OR qtcv.NGAY_THOI_CHUC_VU >= fromYear) AND (toYear IS NULL OR qtcv.NGAY_THOI_CHUC_VU IS NULL OR qtcv.NGAY_THOI_CHUC_VU <= toYear))
+                          OR ((timeType = 3) AND
                               (fromYear IS NULL OR qtcv.NGAY_RA_QD_THOI_CHUC_VU IS NULL OR qtcv.NGAY_RA_QD_THOI_CHUC_VU >= fromYear) AND (toYear IS NULL OR qtcv.NGAY_RA_QD_THOI_CHUC_VU IS NULL OR qtcv.NGAY_RA_QD <= toYear))
                           )
                         AND (searchTerm = ''
@@ -2099,50 +2071,23 @@ END;
 /
 --EndMethod--
 
-CREATE OR REPLACE FUNCTION QT_HOC_TAP_CONG_TAC_GET_BY_SHCC(isSHCC in STRING) RETURN SYS_REFCURSOR
-AS
-    my_cursor SYS_REFCURSOR;
-BEGIN
-    OPEN my_cursor FOR
-        SELECT htct.ID            as "id",
-               htct.SHCC          as "shcc",
-               htct.BAT_DAU       as "batDau",
-               htct.KET_THUC      as "ketThuc",
-               htct.NOI_DUNG      as "noiDung",
-               htct.BAT_DAU_TYPE  as "batDauType",
-               htct.KET_THUC_TYPE as "ketThucType",
-               cb.TEN             as "tenCanBo",
-               cb.HO              as "hoCanBo"
-        FROM QT_HOC_TAP_CONG_TAC htct
-                 LEFT JOIN TCHC_CAN_BO CB ON htct.SHCC = CB.SHCC
-        WHERE htct.SHCC = isSHCC;
-    RETURN my_cursor;
-END;
-/
---EndMethod--
-
 CREATE OR REPLACE FUNCTION QT_HOC_TAP_CONG_TAC_GROUP_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER,
                                         list_shcc IN STRING, list_dv IN STRING,
-                                        fromYear IN NUMBER, toYear IN NUMBER, searchTerm IN STRING,
+                                        fromYear IN NUMBER, toYear IN NUMBER, timeType IN NUMBER, tinhTrang IN NUMBER, searchTerm IN STRING,
                                          totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
 AS
     my_cursor SYS_REFCURSOR;
     ST        STRING(500) := '%' || lower(searchTerm) || '%';
+    today   NUMBER;
 BEGIN
+    select (cast(sysdate as date) - cast(to_date('1970-01-01', 'YYYY-MM-DD') as date)) * 86400000 into today from dual;
     SELECT COUNT(*)
     INTO totalItem
     FROM (SELECT *
             FROM QT_HOC_TAP_CONG_TAC
             WHERE ID IN (
                 SELECT MAX(ID) FROM (SELECT * FROM QT_HOC_TAP_CONG_TAC ORDER BY SHCC DESC ) GROUP BY SHCC)) htct
-             LEFT JOIN TCHC_CAN_BO cb on htct.SHCC = cb.SHCC
-             LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
-     WHERE ((list_shcc IS NOT NULL AND INSTR(list_shcc, htct.SHCC) != 0)
-       OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI)  != 0)
-       OR (list_shcc IS NULL AND list_dv IS NULL))
-      AND (searchTerm = ''
-        OR LOWER(cb.SHCC) LIKE ST
-        OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE ST);
+             LEFT JOIN TCHC_CAN_BO cb on htct.SHCC = cb.SHCC;
 
     IF pageNumber < 1 THEN pageNumber := 1; END IF;
     IF pageSize < 1 THEN pageSize := 1; END IF;
@@ -2155,34 +2100,47 @@ BEGIN
                  SELECT
                         htct.ID            as   "id",
                         htct.SHCC          as   "shcc",
-                        htct.BAT_DAU       as   "batDau",
-                        htct.KET_THUC      as   "ketThuc",
-                        htct.NOI_DUNG      as   "noiDung",
-                        htct.BAT_DAU_TYPE  as   "batDauType",
-                        htct.KET_THUC_TYPE as   "ketThucType",
 
                         (SELECT COUNT(*)
-                         FROM QT_HOC_TAP_CONG_TAC htct_temp
-                         WHERE htct_temp.SHCC = htct.SHCC
-                           AND (htct_temp.BAT_DAU IS NULL OR fromYear IS NULL OR
-                                htct_temp.BAT_DAU >= fromYear)
-                           AND (htct_temp.KET_THUC IS NULL OR toYear IS NULL OR
-                                htct_temp.KET_THUC <= toYear)
+                        FROM QT_HOC_TAP_CONG_TAC htct_temp
+                                 LEFT JOIN TCHC_CAN_BO cb on htct_temp.SHCC = cb.SHCC
+                                 LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
+                        WHERE (htct_temp.SHCC = htct.SHCC)
+                            AND (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL) AND (tinhTrang IS NULL))
+                            OR (((list_shcc IS NOT NULL AND ((INSTR(list_shcc, ',') != 0 AND INSTR(list_shcc, htct_temp.SHCC) != 0) OR (list_shcc = htct_temp.SHCC)))
+                          OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
+                          OR (list_shcc IS NULL AND list_dv IS NULL))
+                          AND (timeType = 0 OR (
+                                timeType = 1 AND (htct_temp.BAT_DAU IS NOT NULL AND (fromYear IS NULL OR htct_temp.BAT_DAU >= fromYear)) AND (toYear IS NULL OR htct_temp.BAT_DAU <= toYear)
+                              ))
+                          AND (tinhTrang IS NULL OR ((htct_temp.KET_THUC = -1 OR htct.KET_THUC >= today) AND tinhTrang = 2) OR (htct_temp.KET_THUC IS NOT NULL AND htct_temp.KET_THUC != -1 AND tinhTrang = 1))))
+                          AND (searchTerm = ''
+                            OR LOWER(cb.SHCC) LIKE ST
+                            OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE ST
+                            OR LOWER(htct_temp.NOI_DUNG) LIKE ST)
                         ) AS "soNoiDung",
                         
-                        (Select listagg(htct_temp2.NOI_DUNG, '??') within group ( order by null)
-                         from QT_HOC_TAP_CONG_TAC htct_temp2
-                        WHERE htct_temp2.SHCC = htct.SHCC
-                           AND (htct_temp2.BAT_DAU IS NULL OR fromYear IS NULL OR
-                                htct_temp2.BAT_DAU >= fromYear)
-                           AND (htct_temp2.KET_THUC IS NULL OR toYear IS NULL OR
-                                htct_temp2.KET_THUC <= toYear)
+                        (select rtrim(xmlagg(xmlelement(e, htct_temp.NOI_DUNG || ' ','??').extract('//text()') order by null).getclobval(),'??')
+                        FROM QT_HOC_TAP_CONG_TAC htct_temp
+                                 LEFT JOIN TCHC_CAN_BO cb on htct_temp.SHCC = cb.SHCC
+                                 LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
+                        WHERE (htct_temp.SHCC = htct.SHCC)
+                            AND (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL) AND (tinhTrang IS NULL))
+                            OR (((list_shcc IS NOT NULL AND ((INSTR(list_shcc, ',') != 0 AND INSTR(list_shcc, htct_temp.SHCC) != 0) OR (list_shcc = htct_temp.SHCC)))
+                          OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
+                          OR (list_shcc IS NULL AND list_dv IS NULL))
+                          AND (timeType = 0 OR (
+                                timeType = 1 AND (htct_temp.BAT_DAU IS NOT NULL AND (fromYear IS NULL OR htct_temp.BAT_DAU >= fromYear)) AND (toYear IS NULL OR htct_temp.BAT_DAU <= toYear)
+                              ))
+                          AND (tinhTrang IS NULL OR ((htct_temp.KET_THUC = -1 OR htct.KET_THUC >= today) AND tinhTrang = 2) OR (htct_temp.KET_THUC IS NOT NULL AND htct_temp.KET_THUC != -1 AND tinhTrang = 1))))
+                          AND (searchTerm = ''
+                            OR LOWER(cb.SHCC) LIKE ST
+                            OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE ST
+                            OR LOWER(htct_temp.NOI_DUNG) LIKE ST)
                         ) AS "danhSachNoiDung",
                         
                         cb.TEN             as   "tenCanBo",
                         cb.HO              as   "hoCanBo",
-                        dv.MA              AS                       "maDonVi",
-                        dv.TEN             AS                       "tenDonVi",
 
                         ROW_NUMBER() OVER (ORDER BY htct.BAT_DAU ASC) R
                 FROM (SELECT *
@@ -2190,65 +2148,7 @@ BEGIN
                         WHERE ID IN (
                             SELECT MAX(ID) FROM (SELECT * FROM QT_HOC_TAP_CONG_TAC ORDER BY SHCC DESC ) GROUP BY SHCC)) htct
                          LEFT JOIN TCHC_CAN_BO cb on htct.SHCC = cb.SHCC
-                         LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
-                 WHERE ((list_shcc IS NOT NULL AND INSTR(list_shcc, htct.SHCC) != 0)
-                   OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI)  != 0)
-                   OR (list_shcc IS NULL AND list_dv IS NULL))
-                  AND (searchTerm = ''
-                    OR LOWER(cb.SHCC) LIKE ST
-                    OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE ST)
                 ORDER BY htct.BAT_DAU ASC
-             )
-        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
-    RETURN my_cursor;
-
-END;
-/
---EndMethod--
-
-CREATE OR REPLACE FUNCTION QT_HOC_TAP_CONG_TAC_GROUP_PAGE_MA(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER, loaiDoiTuong IN STRING,
-                                           searchTerm IN STRING,
-                                           totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
-AS
-    my_cursor SYS_REFCURSOR;
-BEGIN
-    SELECT COUNT(*)
-    INTO totalItem
-
-    FROM QT_HOC_TAP_CONG_TAC htct
-             LEFT JOIN TCHC_CAN_BO cb on htct.SHCC = cb.SHCC
-             LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
-    WHERE (loaiDoiTuong = '-1' OR INSTR(loaiDoiTuong, dv.MA) != 0)
-      AND (htct.SHCC = searchTerm);
-
-    IF pageNumber < 1 THEN pageNumber := 1; END IF;
-    IF pageSize < 1 THEN pageSize := 1; END IF;
-    pageTotal := CEIL(totalItem / pageSize);
-    pageNumber := LEAST(pageNumber, pageTotal);
-
-    OPEN my_cursor FOR
-        SELECT *
-        FROM (
-                 SELECT htct.ID            as   "id",
-                        cb.TEN             as   "ten",
-                        cb.HO              as   "ho",
-                        htct.SHCC          as   "shcc",
-                        htct.BAT_DAU       as   "batDau",
-                        htct.KET_THUC      as   "ketThuc",
-                        htct.NOI_DUNG      as   "noiDung",
-                        htct.BAT_DAU_TYPE  as   "batDauType",
-                        htct.KET_THUC_TYPE as   "ketThucType",
-
-                        dv.MA              AS                       "maDonVi",
-                        dv.TEN             AS                       "tenDonVi",
-
-                        ROW_NUMBER() OVER (ORDER BY htct.KET_THUC DESC ) R
-                 FROM QT_HOC_TAP_CONG_TAC htct
-                          LEFT JOIN TCHC_CAN_BO cb on htct.SHCC = cb.SHCC
-                          LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
-                 WHERE (loaiDoiTuong = '-1' OR INSTR(loaiDoiTuong, dv.MA) != 0)
-                   AND (htct.SHCC = searchTerm)
-                 ORDER BY htct.KET_THUC DESC
              )
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
     RETURN my_cursor;
@@ -2259,26 +2159,32 @@ END;
 
 CREATE OR REPLACE FUNCTION QT_HOC_TAP_CONG_TAC_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER,
                                         list_shcc IN STRING, list_dv IN STRING,
-                                        fromYear IN NUMBER, toYear IN NUMBER, searchTerm IN STRING,
+                                        fromYear IN NUMBER, toYear IN NUMBER, timeType IN NUMBER, tinhTrang IN NUMBER, searchTerm IN STRING,
                                          totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
 AS
     my_cursor SYS_REFCURSOR;
     ST        STRING(500) := '%' || lower(searchTerm) || '%';
+    today   NUMBER;
 BEGIN
+    select (cast(sysdate as date) - cast(to_date('1970-01-01', 'YYYY-MM-DD') as date)) * 86400000 into today from dual;
     SELECT COUNT(*)
     INTO totalItem
 
     FROM QT_HOC_TAP_CONG_TAC htct
              LEFT JOIN TCHC_CAN_BO cb on htct.SHCC = cb.SHCC
              LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
-    WHERE ((list_shcc IS NOT NULL AND INSTR(list_shcc, htct.SHCC) != 0)
+    WHERE (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL) AND (timeType = 0) AND (tinhTrang IS NULL))
+        OR (((list_shcc IS NOT NULL AND ((INSTR(list_shcc, ',') != 0 AND INSTR(list_shcc, htct.SHCC) != 0) OR (list_shcc = htct.SHCC)))
       OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
       OR (list_shcc IS NULL AND list_dv IS NULL))
-      AND (fromYear IS NULL OR htct.BAT_DAU IS NULL OR htct.BAT_DAU >= fromYear)
-      AND (toYear IS NULL OR htct.KET_THUC IS NULL OR htct.KET_THUC <= toYear)
+      AND (timeType = 0 OR (
+            timeType = 1 AND (htct.BAT_DAU IS NOT NULL AND (fromYear IS NULL OR htct.BAT_DAU >= fromYear)) AND (toYear IS NULL OR htct.BAT_DAU <= toYear)
+          ))
+      AND (tinhTrang IS NULL OR ((htct.KET_THUC = -1 OR htct.KET_THUC >= today) AND tinhTrang = 2) OR (htct.KET_THUC IS NOT NULL AND htct.KET_THUC != -1 AND tinhTrang = 1))))
       AND (searchTerm = ''
         OR LOWER(cb.SHCC) LIKE ST
-        OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE ST);
+        OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE ST
+        OR LOWER(htct.NOI_DUNG) LIKE ST);
 
     IF pageNumber < 1 THEN pageNumber := 1; END IF;
     IF pageSize < 1 THEN pageSize := 1; END IF;
@@ -2296,25 +2202,30 @@ BEGIN
                         htct.NOI_DUNG      as   "noiDung",
                         htct.BAT_DAU_TYPE  as   "batDauType",
                         htct.KET_THUC_TYPE as   "ketThucType",
-                        
+
+                        today   as "today",
                         cb.TEN             as   "tenCanBo",
                         cb.HO              as   "hoCanBo",
                         dv.MA              AS                       "maDonVi",
                         dv.TEN             AS                       "tenDonVi",
 
-                        ROW_NUMBER() OVER (ORDER BY htct.KET_THUC DESC) R
+                        ROW_NUMBER() OVER (ORDER BY htct.BAT_DAU DESC) R
                  FROM QT_HOC_TAP_CONG_TAC htct
                           LEFT JOIN TCHC_CAN_BO cb on htct.SHCC = cb.SHCC
                           LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
-                 WHERE ((list_shcc IS NOT NULL AND INSTR(list_shcc, htct.SHCC) != 0)
-                   OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI)  != 0)
-                   OR (list_shcc IS NULL AND list_dv IS NULL))
-                   AND (fromYear IS NULL OR htct.BAT_DAU IS NULL OR htct.BAT_DAU >= fromYear)
-                   AND (toYear IS NULL OR htct.KET_THUC IS NULL OR htct.KET_THUC <= toYear)
-                   AND (searchTerm = ''
-                     OR LOWER(cb.SHCC) LIKE ST
-                     OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE ST)
-                 ORDER BY htct.KET_THUC DESC
+                    WHERE (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL) AND (tinhTrang IS NULL))
+                        OR (((list_shcc IS NOT NULL AND ((INSTR(list_shcc, ',') != 0 AND INSTR(list_shcc, htct.SHCC) != 0) OR (list_shcc = htct.SHCC)))
+                      OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
+                      OR (list_shcc IS NULL AND list_dv IS NULL))
+                      AND (timeType = 0 OR (
+                            timeType = 1 AND (htct.BAT_DAU IS NOT NULL AND (fromYear IS NULL OR htct.BAT_DAU >= fromYear)) AND (toYear IS NULL OR htct.BAT_DAU <= toYear)
+                          ))
+                      AND (tinhTrang IS NULL OR ((htct.KET_THUC = -1 OR htct.KET_THUC >= today) AND tinhTrang = 2) OR (htct.KET_THUC IS NOT NULL AND htct.KET_THUC != -1 AND tinhTrang = 1))))
+                      AND (searchTerm = ''
+                        OR LOWER(cb.SHCC) LIKE ST
+                        OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE ST
+                        OR LOWER(htct.NOI_DUNG) LIKE ST)
+                 ORDER BY htct.BAT_DAU DESC
              )
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
     RETURN my_cursor;
@@ -2411,7 +2322,8 @@ END;
 --EndMethod--
 
 CREATE OR REPLACE FUNCTION QT_HOP_DONG_LAO_DONG_GROUP_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER,
-                                                maDonVi IN STRING, searchTerm IN STRING,
+                                                list_shcc IN STRING, list_dv IN STRING,
+                                                fromYear IN NUMBER, toYear IN NUMBER, searchTerm IN STRING,
                                                 totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
 AS
     my_cursor SYS_REFCURSOR;
@@ -2423,16 +2335,8 @@ BEGIN
           FROM QT_HOP_DONG_LAO_DONG
           WHERE MA IN
                 (SELECT MAX(MA) FROM (SELECT * FROM QT_HOP_DONG_LAO_DONG ORDER BY MA DESC) GROUP BY NGUOI_DUOC_THUE)) hd
-             LEFT JOIN TCHC_CAN_BO nguoiKy on hd.NGUOI_KY = nguoiKy.SHCC
-             LEFT JOIN TCHC_CAN_BO benA ON hd.NGUOI_DUOC_THUE = benA.SHCC
-             LEFT JOIN DM_LOAI_HOP_DONG dhd ON hd.LOAI_HOP_DONG = dhd.MA
-    WHERE (maDonVi = '-1' OR INSTR(maDonVi, benA.MA_DON_VI) != 0)
-      AND (searchTerm = ''
-        OR hd.NGUOI_DUOC_THUE = searchTerm
-        OR LOWER(hd.NGUOI_KY) LIKE sT
-        OR LOWER(TRIM(benA.HO || ' ' || benA.TEN)) LIKE sT
-        OR LOWER(hd.SO_HOP_DONG) LIKE sT);
-
+             LEFT JOIN TCHC_CAN_BO benA on hd.NGUOI_DUOC_THUE = benA.SHCC
+             LEFT JOIN TCHC_CAN_BO nguoiKy on hd.NGUOI_KY = nguoiKy.SHCC;
     pageTotal := CEIL(totalItem / pageSize);
     pageNumber := LEAST(pageNumber, pageTotal);
     IF pageNumber < 1 THEN pageNumber := 1; END IF;
@@ -2441,45 +2345,69 @@ BEGIN
     OPEN my_cursor FOR
         SELECT *
         FROM (
-                 SELECT hd.NGUOI_DUOC_THUE      AS              "shcc",
-                        hd.MA                   AS              "ma",
-                        benA.HO                 AS              "hoBenA",
-                        benA.TEN                AS              "tenBenA",
-                        nguoiKy.SHCC            as              "shccNguoiKy",
-                        nguoiKy.HO              as              "hoNguoiKy",
-                        nguoiKy.TEN             as              "tenNguoiKy",
-                        nguoiKy.MA_CHUC_VU      as              "chucVuNguoiKy",
-                        hd.SO_HOP_DONG          as              "soHopDong",
+                 SELECT hd.NGUOI_DUOC_THUE AS                   "shcc",
+                        hd.MA              AS                   "ma",
+                        benA.HO            AS                   "hoBenA",
+                        benA.TEN           AS                   "tenBenA",
+                        (SELECT COUNT(*)
+                        FROM QT_HOP_DONG_LAO_DONG hd_temp
+                                 LEFT JOIN TCHC_CAN_BO nguoiKy on hd_temp.NGUOI_KY = nguoiKy.SHCC
+                                 LEFT JOIN DM_LOAI_HOP_DONG dhd ON hd_temp.LOAI_HOP_DONG = dhd.MA
+                                 LEFT JOIN TCHC_CAN_BO benA ON hd_temp.NGUOI_DUOC_THUE = benA.SHCC
+                                 LEFT JOIN DM_DON_VI dv on hd_temp.DIA_DIEM_LAM_VIEC = dv.MA
+                                 LEFT JOIN DM_NGACH_CDNN ncdnn ON hd_temp.MA_NGACH = ncdnn.MA
+                                 LEFT JOIN DM_CHUC_DANH_CHUYEN_MON cdcm on hd_temp.CHUC_DANH_CHUYEN_MON = cdcm.MA
+                        WHERE (hd_temp.NGUOI_DUOC_THUE = hd.NGUOI_DUOC_THUE)
+                            AND (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
+                            OR (((list_shcc IS NOT NULL AND
+                                  ((INSTR(list_shcc, ',') != 0 AND INSTR(list_shcc, benA.SHCC) != 0) OR (list_shcc = benA.SHCC)))
+                                OR (list_dv IS NOT NULL AND INSTR(list_dv, benA.MA_DON_VI) != 0)
+                                OR (list_shcc IS NULL AND list_dv IS NULL))
+                                AND (hd_temp.NGAY_KY_HOP_DONG IS NOT NULL AND (fromYear IS NULL OR hd_temp.NGAY_KY_HOP_DONG >= fromYear))
+                                AND (hd_temp.NGAY_KY_HOP_DONG IS NOT NULL AND (toYear IS NULL OR hd_temp.NGAY_KY_HOP_DONG <= (toYear + 86399999)))))
+                          AND (searchTerm = ''
+                            OR LOWER(hd_temp.NGUOI_KY) LIKE sT
+                            OR LOWER(hd_temp.NGUOI_DUOC_THUE) LIKE sT
+                            OR LOWER(TRIM(benA.HO || ' ' || benA.TEN)) LIKE sT
+                            OR LOWER(TRIM(nguoiKy.HO || ' ' || nguoiKy.TEN)) LIKE sT
+                            OR LOWER(hd_temp.SO_HOP_DONG) LIKE sT)
+                        )                  AS                   "soHd",
 
-                        hd.LOAI_HOP_DONG        as              "loaiHopDong",
-                        lhd.TEN                 as              "tenLoaiHopDong",
-                        hd.BAT_DAU_LAM_VIEC     as              "batDauLamViec",
-                        hd.KET_THUC_HOP_DONG    as              "ketThucHopDong",
-                        hd.NGAY_KY_HD_TIEP_THEO as              "ngayKyHopDongTiepTheo",
-                        hd.DIA_DIEM_LAM_VIEC    as              "diaDiemLamViec",
-                        hd.CHUC_DANH_CHUYEN_MON as              "chucDanhChuyenMon",
-                        hd.CONG_VIEC_DUOC_GIAO  as              "congViecDuocGiao",
-                        hd.CHIU_SU_PHAN_CONG    as              "chiuSuPhanCong",
-                        hd.MA_NGACH             as              "maNgach",
-                        hd.BAC                  as              "bac",
-                        hd.HE_SO                as              "heSo",
-                        hd.NGAY_KY_HOP_DONG     as              "ngayKyHopDong",
-                        hd.PHAN_TRAM_HUONG      as              "phanTramHuong",
-                        ROW_NUMBER() OVER (ORDER BY hd.MA DESC) R
+                        (select rtrim(xmlagg(
+                                              xmlelement(e, hd_temp.NGAY_KY_HOP_DONG || ' ', '??').extract('//text()')
+                                              order by null).getclobval(), '??')
+                        FROM QT_HOP_DONG_LAO_DONG hd_temp
+                                 LEFT JOIN TCHC_CAN_BO nguoiKy on hd_temp.NGUOI_KY = nguoiKy.SHCC
+                                 LEFT JOIN DM_LOAI_HOP_DONG dhd ON hd_temp.LOAI_HOP_DONG = dhd.MA
+                                 LEFT JOIN TCHC_CAN_BO benA ON hd_temp.NGUOI_DUOC_THUE = benA.SHCC
+                                 LEFT JOIN DM_DON_VI dv on hd_temp.DIA_DIEM_LAM_VIEC = dv.MA
+                                 LEFT JOIN DM_NGACH_CDNN ncdnn ON hd_temp.MA_NGACH = ncdnn.MA
+                                 LEFT JOIN DM_CHUC_DANH_CHUYEN_MON cdcm on hd_temp.CHUC_DANH_CHUYEN_MON = cdcm.MA
+                        WHERE (hd_temp.NGUOI_DUOC_THUE = hd.NGUOI_DUOC_THUE)
+                            AND (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
+                            OR (((list_shcc IS NOT NULL AND
+                                  ((INSTR(list_shcc, ',') != 0 AND INSTR(list_shcc, benA.SHCC) != 0) OR (list_shcc = benA.SHCC)))
+                                OR (list_dv IS NOT NULL AND INSTR(list_dv, benA.MA_DON_VI) != 0)
+                                OR (list_shcc IS NULL AND list_dv IS NULL))
+                                AND (hd_temp.NGAY_KY_HOP_DONG IS NOT NULL AND (fromYear IS NULL OR hd_temp.NGAY_KY_HOP_DONG >= fromYear))
+                                AND (hd_temp.NGAY_KY_HOP_DONG IS NOT NULL AND (toYear IS NULL OR hd_temp.NGAY_KY_HOP_DONG <= (toYear + 86399999)))))
+                          AND (searchTerm = ''
+                            OR LOWER(hd_temp.NGUOI_KY) LIKE sT
+                            OR LOWER(hd_temp.NGUOI_DUOC_THUE) LIKE sT
+                            OR LOWER(TRIM(benA.HO || ' ' || benA.TEN)) LIKE sT
+                            OR LOWER(TRIM(nguoiKy.HO || ' ' || nguoiKy.TEN)) LIKE sT
+                            OR LOWER(hd_temp.SO_HOP_DONG) LIKE sT)
+                        )                  AS                   "danhSachHd",
+
+                        ROW_NUMBER() OVER (ORDER BY hd.NGAY_KY_HOP_DONG, benA.TEN DESC) R
                  FROM (SELECT *
                        FROM QT_HOP_DONG_LAO_DONG
-                       WHERE MA IN (SELECT MAX(MA)
-                                    FROM (SELECT * FROM QT_HOP_DONG_LAO_DONG ORDER BY MA DESC)
-                                    GROUP BY NGUOI_DUOC_THUE)) hd
+                       WHERE MA IN
+                             (SELECT MAX(MA)
+                              FROM (SELECT * FROM QT_HOP_DONG_LAO_DONG ORDER BY MA DESC)
+                              GROUP BY NGUOI_DUOC_THUE)) hd
+                          LEFT JOIN TCHC_CAN_BO benA on hd.NGUOI_DUOC_THUE = benA.SHCC
                           LEFT JOIN TCHC_CAN_BO nguoiKy on hd.NGUOI_KY = nguoiKy.SHCC
-                          LEFT JOIN TCHC_CAN_BO benA ON hd.NGUOI_DUOC_THUE = benA.SHCC
-                          LEFT JOIN DM_LOAI_HOP_DONG lhd ON hd.LOAI_HOP_DONG = lhd.MA
-                 WHERE (maDonVi = '-1' OR INSTR(maDonVi, benA.MA_DON_VI) != 0)
-                   AND (searchTerm = ''
-                     OR hd.NGUOI_DUOC_THUE = searchTerm
-                     OR LOWER(hd.NGUOI_KY) LIKE sT
-                     OR LOWER(TRIM(nguoiKy.HO || ' ' || nguoiKy.TEN)) LIKE sT
-                     OR LOWER(hd.SO_HOP_DONG) LIKE sT)
                  ORDER BY hd.NGAY_KY_HOP_DONG DESC, benA.TEN DESC
              )
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
@@ -2489,7 +2417,8 @@ END;
 --EndMethod--
 
 CREATE OR REPLACE FUNCTION QT_HOP_DONG_LAO_DONG_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER,
-                                                 maDonVi IN STRING, searchTerm IN STRING,
+                                                 list_shcc IN STRING, list_dv IN STRING,
+                                                 fromYear IN NUMBER, toYear IN NUMBER, searchTerm IN STRING,
                                                  totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
 AS
     my_cursor SYS_REFCURSOR;
@@ -2505,14 +2434,19 @@ BEGIN
              LEFT JOIN DM_DON_VI dv on hd.DIA_DIEM_LAM_VIEC = dv.MA
              LEFT JOIN DM_NGACH_CDNN ncdnn ON hd.MA_NGACH = ncdnn.MA
              LEFT JOIN DM_CHUC_DANH_CHUYEN_MON cdcm on hd.CHUC_DANH_CHUYEN_MON = cdcm.MA
-    WHERE (maDonVi = '-1' OR INSTR(maDonVi, benA.MA_DON_VI) != 0)
+    WHERE (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
+        OR (((list_shcc IS NOT NULL AND
+              ((INSTR(list_shcc, ',') != 0 AND INSTR(list_shcc, benA.SHCC) != 0) OR (list_shcc = benA.SHCC)))
+            OR (list_dv IS NOT NULL AND INSTR(list_dv, benA.MA_DON_VI) != 0)
+            OR (list_shcc IS NULL AND list_dv IS NULL))
+            AND (hd.NGAY_KY_HOP_DONG IS NOT NULL AND (fromYear IS NULL OR hd.NGAY_KY_HOP_DONG >= fromYear))
+            AND (hd.NGAY_KY_HOP_DONG IS NOT NULL AND (toYear IS NULL OR hd.NGAY_KY_HOP_DONG <= (toYear + 86399999)))))
       AND (searchTerm = ''
         OR LOWER(hd.NGUOI_KY) LIKE sT
         OR LOWER(hd.NGUOI_DUOC_THUE) LIKE sT
         OR LOWER(TRIM(benA.HO || ' ' || benA.TEN)) LIKE sT
         OR LOWER(TRIM(nguoiKy.HO || ' ' || nguoiKy.TEN)) LIKE sT
-        OR LOWER(hd.SO_HOP_DONG) LIKE sT
-        OR LOWER(ncdnn.TEN) LIKE sT);
+        OR LOWER(hd.SO_HOP_DONG) LIKE sT);
 
     IF pageNumber < 1 THEN pageNumber := 1; END IF;
     IF pageSize < 1 THEN pageSize := 1; END IF;
@@ -2532,9 +2466,8 @@ BEGIN
                         nguoiKy.MA_CHUC_VU      as              "chucVuNguoiKy",
                         nguoiKy.MA_DON_VI       as              "donviNguoiKy",
                         hd.SO_HOP_DONG          as              "soHopDong",
-
                         hd.LOAI_HOP_DONG        as              "loaiHopDong",
-                        lhd.TEN                 as              "tenLoaiHopDong",
+                        dhd.TEN                 as              "tenLoaiHopDong",
                         hd.BAT_DAU_LAM_VIEC     as              "batDauLamViec",
                         hd.KET_THUC_HOP_DONG    as              "ketThucHopDong",
                         hd.NGAY_KY_HD_TIEP_THEO as              "ngayKyHopDongTiepTheo",
@@ -2552,116 +2485,51 @@ BEGIN
                         ROW_NUMBER() OVER (ORDER BY hd.MA DESC) R
                  FROM QT_HOP_DONG_LAO_DONG hd
                           LEFT JOIN TCHC_CAN_BO nguoiKy on hd.NGUOI_KY = nguoiKy.SHCC
+                          LEFT JOIN DM_LOAI_HOP_DONG dhd ON hd.LOAI_HOP_DONG = dhd.MA
                           LEFT JOIN TCHC_CAN_BO benA ON hd.NGUOI_DUOC_THUE = benA.SHCC
-                          LEFT JOIN DM_LOAI_HOP_DONG lhd ON hd.LOAI_HOP_DONG = lhd.MA
                           LEFT JOIN DM_DON_VI dv on hd.DIA_DIEM_LAM_VIEC = dv.MA
                           LEFT JOIN DM_NGACH_CDNN ncdnn ON hd.MA_NGACH = ncdnn.MA
                           LEFT JOIN DM_CHUC_DANH_CHUYEN_MON cdcm on hd.CHUC_DANH_CHUYEN_MON = cdcm.MA
-                 WHERE (maDonVi = '-1' OR INSTR(maDonVi, benA.MA_DON_VI) != 0)
+                 WHERE (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
+                     OR (((list_shcc IS NOT NULL AND
+                           ((INSTR(list_shcc, ',') != 0 AND INSTR(list_shcc, benA.SHCC) != 0) OR
+                            (list_shcc = benA.SHCC)))
+                         OR (list_dv IS NOT NULL AND INSTR(list_dv, benA.MA_DON_VI) != 0)
+                         OR (list_shcc IS NULL AND list_dv IS NULL))
+                         AND (hd.NGAY_KY_HOP_DONG IS NOT NULL AND (fromYear IS NULL OR hd.NGAY_KY_HOP_DONG >= fromYear))
+                         AND (hd.NGAY_KY_HOP_DONG IS NOT NULL AND (toYear IS NULL OR hd.NGAY_KY_HOP_DONG <= (toYear + 86399999)))))
                    AND (searchTerm = ''
                      OR LOWER(hd.NGUOI_KY) LIKE sT
                      OR LOWER(hd.NGUOI_DUOC_THUE) LIKE sT
                      OR LOWER(TRIM(benA.HO || ' ' || benA.TEN)) LIKE sT
                      OR LOWER(TRIM(nguoiKy.HO || ' ' || nguoiKy.TEN)) LIKE sT
-                     OR LOWER(hd.SO_HOP_DONG) LIKE sT
-                     OR LOWER(ncdnn.TEN) LIKE sT)
+                     OR LOWER(hd.SO_HOP_DONG) LIKE sT)
                  ORDER BY hd.NGAY_KY_HOP_DONG DESC, benA.TEN DESC
              )
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
     RETURN my_cursor;
 
-END;
-/
---EndMethod--
-
-CREATE OR REPLACE FUNCTION QT_HOP_DONG_LAO_DONG_SHCC_GROUP_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER, searchTerm IN STRING,
-                                  totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
-AS
-    my_cursor SYS_REFCURSOR;
-BEGIN
-    SELECT COUNT(*)
-    INTO totalItem
-    FROM QT_HOP_DONG_LAO_DONG hd
-    WHERE
-       hd.NGUOI_DUOC_THUE = searchTerm;
-
-    pageTotal := CEIL(totalItem / pageSize);
-    pageNumber := LEAST(pageNumber, pageTotal);
-    IF pageNumber < 1 THEN pageNumber := 1; END IF;
-    IF pageSize < 1 THEN pageSize := 1; END IF;
-
-    OPEN my_cursor FOR
-        SELECT *
-        FROM (
-                  SELECT hd.NGUOI_DUOC_THUE      AS              "shcc",
-                        hd.MA                   AS              "ma",
-                        benA.HO                 AS              "hoBenA",
-                        benA.TEN                AS              "tenBenA",
-                        nguoiKy.SHCC            as              "shccNguoiKy",
-                        nguoiKy.HO              as              "hoNguoiKy",
-                        nguoiKy.TEN             as              "tenNguoiKy",
-                        nguoiKy.MA_CHUC_VU      as              "chucVuNguoiKy",
-                        hd.SO_HOP_DONG          as              "soHopDong",
-
-                        hd.LOAI_HOP_DONG        as              "loaiHopDong",
-                        lhd.TEN                 as              "tenLoaiHopDong",
-                        hd.BAT_DAU_LAM_VIEC     as              "batDauLamViec",
-                        hd.KET_THUC_HOP_DONG    as              "ketThucHopDong",
-                        hd.NGAY_KY_HD_TIEP_THEO as              "ngayKyHopDongTiepTheo",
-                        hd.DIA_DIEM_LAM_VIEC    as              "diaDiemLamViec",
-                        hd.CHUC_DANH_CHUYEN_MON as              "chucDanhChuyenMon",
-                        hd.CONG_VIEC_DUOC_GIAO  as              "congViecDuocGiao",
-                        hd.CHIU_SU_PHAN_CONG    as              "chiuSuPhanCong",
-                        hd.MA_NGACH             as              "maNgach",
-                        hd.BAC                  as              "bac",
-                        hd.HE_SO                as              "heSo",
-                        hd.NGAY_KY_HOP_DONG     as              "ngayKyHopDong",
-                        hd.PHAN_TRAM_HUONG      as              "phanTramHuong",
-                        ROW_NUMBER() OVER (ORDER BY hd.MA DESC) R
-                 FROM QT_HOP_DONG_LAO_DONG hd
-                          LEFT JOIN TCHC_CAN_BO nguoiKy on hd.NGUOI_KY = nguoiKy.SHCC
-                          LEFT JOIN TCHC_CAN_BO benA ON hd.NGUOI_DUOC_THUE = benA.SHCC
-                          LEFT JOIN DM_LOAI_HOP_DONG lhd ON hd.LOAI_HOP_DONG = lhd.MA
-                WHERE
-       hd.NGUOI_DUOC_THUE = searchTerm
-                 ORDER BY hd.NGAY_KY_HOP_DONG DESC, benA.TEN DESC
-             )
-        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
-    RETURN my_cursor;
 END;
 /
 --EndMethod--
 
 CREATE OR REPLACE FUNCTION QT_HOP_DONG_VIEN_CHUC_GROUP_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER,
-                                                 maDonVi IN STRING, searchTerm IN STRING,
+                                                 list_shcc IN STRING, list_dv IN STRING,
+                                                 fromYear IN NUMBER, toYear IN NUMBER, searchTerm IN STRING,
                                                  totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
 AS
     my_cursor SYS_REFCURSOR;
-    sT        STRING(500) := '%' || lower(searchTerm) || '%';
+    ST        STRING(500) := '%' || lower(searchTerm) || '%';
 BEGIN
     SELECT COUNT(*)
     INTO totalItem
-
     FROM (SELECT *
           FROM QT_HOP_DONG_VIEN_CHUC
-          WHERE MA IN
-                (SELECT MAX(MA)
-                 FROM (SELECT * FROM QT_HOP_DONG_VIEN_CHUC ORDER BY MA DESC)
-                 GROUP BY NGUOI_DUOC_THUE)) hd
-             LEFT JOIN TCHC_CAN_BO benA on hd.NGUOI_KY = benA.SHCC
-             LEFT JOIN DM_LOAI_HOP_DONG lhd ON hd.LOAI_HD = lhd.MA
-             LEFT JOIN TCHC_CAN_BO benB ON hd.NGUOI_DUOC_THUE = benB.SHCC
-             LEFT JOIN DM_DON_VI dv on hd.DIA_DIEM_LAM_VIEC = dv.MA
-             LEFT JOIN DM_NGACH_CDNN ncdnn ON hd.MA_NGACH = ncdnn.MA
-             LEFT JOIN DM_CHUC_DANH_CHUYEN_MON cdcm on hd.CHUC_DANH_CHUYEN_MON = cdcm.MA
-    WHERE (maDonVi = '-1' OR INSTR(maDonVi, benB.MA_DON_VI) != 0)
-      AND (searchTerm = ''
-        OR LOWER(hd.NGUOI_KY) LIKE sT
-        OR LOWER(hd.NGUOI_DUOC_THUE) LIKE sT
-        OR LOWER(TRIM(benA.HO || ' ' || benA.TEN)) LIKE sT
-        OR LOWER(TRIM(benB.HO || ' ' || benB.TEN)) LIKE sT
-        OR LOWER(hd.SO_QD) LIKE sT
-        OR LOWER(ncdnn.TEN) LIKE sT);
+          WHERE MA IN (
+              SELECT MAX(MA)
+              FROM (SELECT * FROM QT_HOP_DONG_VIEN_CHUC ORDER BY NGUOI_DUOC_THUE DESC)
+              GROUP BY NGUOI_DUOC_THUE)) hdvc
+             LEFT JOIN TCHC_CAN_BO cb on hdvc.NGUOI_DUOC_THUE = cb.SHCC;
 
     IF pageNumber < 1 THEN pageNumber := 1; END IF;
     IF pageSize < 1 THEN pageSize := 1; END IF;
@@ -2671,66 +2539,81 @@ BEGIN
     OPEN my_cursor FOR
         SELECT *
         FROM (
-                 SELECT hd.NGUOI_DUOC_THUE              AS                      "shcc",
-                        hd.MA                           AS                      "ma",
-                        benB.HO                         AS                      "hoBenB",
-                        benB.TEN                        AS                      "tenBenB",
-                        benA.SHCC                       as                      "shccNguoiKy",
-                        benA.HO                         as                      "hoNguoiKy",
-                        benA.TEN                        as                      "tenNguoiKy",
-                        benA.MA_CHUC_VU                 as                      "chucVuNguoiKy",
-                        benA.MA_DON_VI                  as                      "donviNguoiKy",
-                        hd.SO_QD                        as                      "soQuyetDinh",
-                        hd.NOI_DUNG                     as                      "noiDung",
-                        hd.LOAI_HD                      as                      "loaiHopDong",
-                        lhd.TEN                         as                      "tenLoaiHopDong",
-                        hd.NGAY_KY_HOP_DONG             as                      "ngayKyHopDong",
-                        hd.NGAY_KET_THUC_HOP_DONG       as                      "ketThucHopDong",
-                        hd.NGAY_KY_QUYET_DINH           as                      "ngayKyQuyetDinh",
-                        hd.NGAY_KY_HD_TIEP_THEO         as                      "ngayKyHopDongTiepTheo",
-                        hd.HIEU_LUC_HOP_DONG            as                      "hieuLucHopDong",
-                        hd.NGAY_BAT_DAU_LAM_VIEC        as                      "batDauLamViec",
-                        hd.DIA_DIEM_LAM_VIEC            as                      "diaDiemLamViec",
-                        dv.TEN                          as                      "tenDiaDiemLamViec",
-                        hd.CHUC_DANH_CHUYEN_MON         as                      "chucDanhChuyenMon",
-                        cdcm.TEN                        as                      "tenChucDanhChuyenMon",
-                        hd.NHIEM_VU                     as                      "congViecDuocGiao",
-                        hd.MA_NGACH                     as                      "maNgach",
-                        hd.BAC                          as                      "bac",
-                        hd.HE_SO                        as                      "heSo",
-                        hd.THOI_GIAN_XET_NANG_BAC_LUONG as                      "thoiGianXetNangBacLuong",
-                        ROW_NUMBER() OVER (ORDER BY hd.NGAY_KY_QUYET_DINH DESC) R
-                 FROM (SELECT *
-                       FROM QT_HOP_DONG_VIEN_CHUC
-                       WHERE MA IN
-                             (SELECT MAX(MA)
-                              FROM (SELECT * FROM QT_HOP_DONG_VIEN_CHUC ORDER BY MA DESC)
-                              GROUP BY NGUOI_DUOC_THUE)) hd
-                          LEFT JOIN TCHC_CAN_BO benA on hd.NGUOI_KY = benA.SHCC
-                          LEFT JOIN DM_LOAI_HOP_DONG lhd ON hd.LOAI_HD = lhd.MA
-                          LEFT JOIN TCHC_CAN_BO benB ON hd.NGUOI_DUOC_THUE = benB.SHCC
-                          LEFT JOIN DM_DON_VI dv on hd.DIA_DIEM_LAM_VIEC = dv.MA
-                          LEFT JOIN DM_NGACH_CDNN ncdnn ON hd.MA_NGACH = ncdnn.MA
-                          LEFT JOIN DM_CHUC_DANH_CHUYEN_MON cdcm on hd.CHUC_DANH_CHUYEN_MON = cdcm.MA
-                 WHERE (maDonVi = '-1' OR INSTR(maDonVi, benB.MA_DON_VI) != 0)
-                   AND (searchTerm = ''
-                     OR LOWER(hd.NGUOI_KY) LIKE sT
-                     OR LOWER(hd.NGUOI_DUOC_THUE) LIKE sT
-                     OR LOWER(TRIM(benA.HO || ' ' || benA.TEN)) LIKE sT
-                     OR LOWER(TRIM(benB.HO || ' ' || benB.TEN)) LIKE sT
-                     OR LOWER(hd.SO_QD) LIKE sT
-                     OR LOWER(ncdnn.TEN) LIKE sT)
-                 ORDER BY hd.NGAY_KY_QUYET_DINH DESC, benB.TEN DESC
+                 SELECT hdvc.MA           AS                "ma",
+                        hdvc.NGUOI_DUOC_THUE AS "shcc",
+                        (SELECT COUNT(*)
+                        FROM QT_HOP_DONG_VIEN_CHUC hdvc_temp
+                                 LEFT JOIN TCHC_CAN_BO benA on hdvc_temp.NGUOI_KY = benA.SHCC
+                                 LEFT JOIN DM_LOAI_HOP_DONG lhd ON hdvc_temp.LOAI_HD = lhd.MA
+                                 LEFT JOIN TCHC_CAN_BO benB ON hdvc_temp.NGUOI_DUOC_THUE = benB.SHCC
+                                 LEFT JOIN DM_DON_VI dv on hdvc_temp.DIA_DIEM_LAM_VIEC = dv.MA
+                                 LEFT JOIN DM_NGACH_CDNN ncdnn ON hdvc_temp.MA_NGACH = ncdnn.MA
+                                 LEFT JOIN DM_CHUC_DANH_CHUYEN_MON cdcm on hdvc_temp.CHUC_DANH_CHUYEN_MON = cdcm.MA
+                        WHERE (TO_CHAR(hdvc_temp.NGUOI_DUOC_THUE) = TO_CHAR(hdvc.NGUOI_DUOC_THUE))
+                            AND (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
+                            OR (((list_shcc IS NOT NULL AND
+                                  ((INSTR(list_shcc, ',') != 0 AND INSTR(list_shcc, benB.SHCC) != 0) OR (list_shcc = benB.SHCC)))
+                                OR (list_dv IS NOT NULL AND INSTR(list_dv, benB.MA_DON_VI) != 0)
+                                OR (list_shcc IS NULL AND list_dv IS NULL))
+                                AND (hdvc_temp.NGAY_KY_QUYET_DINH IS NOT NULL AND (fromYear IS NULL OR hdvc_temp.NGAY_KY_QUYET_DINH >= fromYear))
+                                AND (hdvc_temp.NGAY_KY_QUYET_DINH IS NOT NULL AND (toYear IS NULL OR hdvc_temp.NGAY_KY_QUYET_DINH <= (toYear + 86399999)))))
+                          AND (searchTerm = ''
+                            OR LOWER(hdvc_temp.NGUOI_KY) LIKE sT
+                            OR LOWER(hdvc_temp.NGUOI_DUOC_THUE) LIKE sT
+                            OR LOWER(TRIM(benA.HO || ' ' || benA.TEN)) LIKE sT
+                            OR LOWER(TRIM(benB.HO || ' ' || benB.TEN)) LIKE sT
+                            OR LOWER(hdvc_temp.SO_QD) LIKE sT
+                            OR LOWER(ncdnn.TEN) LIKE sT)
+                        ) AS "soHd",
+
+                        (select rtrim(xmlagg(xmlelement(e, hdvc_temp.NGAY_KY_QUYET_DINH || ' ','??').extract('//text()') order by null).getclobval(),'??')
+                        FROM QT_HOP_DONG_VIEN_CHUC hdvc_temp
+                                 LEFT JOIN TCHC_CAN_BO benA on hdvc_temp.NGUOI_KY = benA.SHCC
+                                 LEFT JOIN DM_LOAI_HOP_DONG lhd ON hdvc_temp.LOAI_HD = lhd.MA
+                                 LEFT JOIN TCHC_CAN_BO benB ON hdvc_temp.NGUOI_DUOC_THUE = benB.SHCC
+                                 LEFT JOIN DM_DON_VI dv on hdvc_temp.DIA_DIEM_LAM_VIEC = dv.MA
+                                 LEFT JOIN DM_NGACH_CDNN ncdnn ON hdvc_temp.MA_NGACH = ncdnn.MA
+                                 LEFT JOIN DM_CHUC_DANH_CHUYEN_MON cdcm on hdvc_temp.CHUC_DANH_CHUYEN_MON = cdcm.MA
+                        WHERE (TO_CHAR(hdvc_temp.NGUOI_DUOC_THUE) = TO_CHAR(hdvc.NGUOI_DUOC_THUE))
+                            AND (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
+                            OR (((list_shcc IS NOT NULL AND
+                                  ((INSTR(list_shcc, ',') != 0 AND INSTR(list_shcc, benB.SHCC) != 0) OR (list_shcc = benB.SHCC)))
+                                OR (list_dv IS NOT NULL AND INSTR(list_dv, benB.MA_DON_VI) != 0)
+                                OR (list_shcc IS NULL AND list_dv IS NULL))
+                                AND (hdvc_temp.NGAY_KY_QUYET_DINH IS NOT NULL AND (fromYear IS NULL OR hdvc_temp.NGAY_KY_QUYET_DINH >= fromYear))
+                                AND (hdvc_temp.NGAY_KY_QUYET_DINH IS NOT NULL AND (toYear IS NULL OR hdvc_temp.NGAY_KY_QUYET_DINH <= (toYear + 86399999)))))
+                          AND (searchTerm = ''
+                            OR LOWER(hdvc_temp.NGUOI_KY) LIKE sT
+                            OR LOWER(hdvc_temp.NGUOI_DUOC_THUE) LIKE sT
+                            OR LOWER(TRIM(benA.HO || ' ' || benA.TEN)) LIKE sT
+                            OR LOWER(TRIM(benB.HO || ' ' || benB.TEN)) LIKE sT
+                            OR LOWER(hdvc_temp.SO_QD) LIKE sT
+                            OR LOWER(ncdnn.TEN) LIKE sT)
+                        ) AS "danhSachHd",
+
+                        cb.TEN               as                                  "tenBenB",
+                        cb.HO                as                                  "hoBenB",
+
+                        ROW_NUMBER() OVER (ORDER BY NGAY_KY_QUYET_DINH DESC) R
+                FROM (SELECT *
+                      FROM QT_HOP_DONG_VIEN_CHUC
+                      WHERE MA IN (
+                          SELECT MAX(MA)
+                          FROM (SELECT * FROM QT_HOP_DONG_VIEN_CHUC ORDER BY NGUOI_DUOC_THUE DESC)
+                          GROUP BY NGUOI_DUOC_THUE)) hdvc
+                         LEFT JOIN TCHC_CAN_BO cb on hdvc.NGUOI_DUOC_THUE = cb.SHCC
+                ORDER BY hdvc.NGAY_KY_QUYET_DINH DESC
              )
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
     RETURN my_cursor;
-
+    
 END;
 /
 --EndMethod--
 
 CREATE OR REPLACE FUNCTION QT_HOP_DONG_VIEN_CHUC_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER,
-                                                  maDonVi IN STRING, searchTerm IN STRING,
+                                                  list_shcc IN STRING, list_dv IN STRING,
+                                                  fromYear IN NUMBER, toYear IN NUMBER, searchTerm IN STRING,
                                                   totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
 AS
     my_cursor SYS_REFCURSOR;
@@ -2746,7 +2629,13 @@ BEGIN
              LEFT JOIN DM_DON_VI dv on hd.DIA_DIEM_LAM_VIEC = dv.MA
              LEFT JOIN DM_NGACH_CDNN ncdnn ON hd.MA_NGACH = ncdnn.MA
              LEFT JOIN DM_CHUC_DANH_CHUYEN_MON cdcm on hd.CHUC_DANH_CHUYEN_MON = cdcm.MA
-    WHERE (maDonVi = '-1' OR INSTR(maDonVi, benB.MA_DON_VI) != 0)
+    WHERE (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
+        OR (((list_shcc IS NOT NULL AND
+              ((INSTR(list_shcc, ',') != 0 AND INSTR(list_shcc, benB.SHCC) != 0) OR (list_shcc = benB.SHCC)))
+            OR (list_dv IS NOT NULL AND INSTR(list_dv, benB.MA_DON_VI) != 0)
+            OR (list_shcc IS NULL AND list_dv IS NULL))
+            AND (hd.NGAY_KY_QUYET_DINH IS NOT NULL AND (fromYear IS NULL OR hd.NGAY_KY_QUYET_DINH >= fromYear))
+            AND (hd.NGAY_KY_QUYET_DINH IS NOT NULL AND (toYear IS NULL OR hd.NGAY_KY_QUYET_DINH <= (toYear + 86399999)))))
       AND (searchTerm = ''
         OR LOWER(hd.NGUOI_KY) LIKE sT
         OR LOWER(hd.NGUOI_DUOC_THUE) LIKE sT
@@ -2791,7 +2680,7 @@ BEGIN
                         hd.BAC                          as                      "bac",
                         hd.HE_SO                        as                      "heSo",
                         hd.THOI_GIAN_XET_NANG_BAC_LUONG as                      "thoiGianXetNangBacLuong",
-                        ROW_NUMBER() OVER (ORDER BY hd.NGAY_KY_QUYET_DINH DESC) R
+                        ROW_NUMBER() OVER (ORDER BY hd.NGAY_KY_HOP_DONG DESC) R
                  FROM QT_HOP_DONG_VIEN_CHUC hd
                           LEFT JOIN TCHC_CAN_BO benA on hd.NGUOI_KY = benA.SHCC
                           LEFT JOIN DM_LOAI_HOP_DONG lhd ON hd.LOAI_HD = lhd.MA
@@ -2799,7 +2688,14 @@ BEGIN
                           LEFT JOIN DM_DON_VI dv on hd.DIA_DIEM_LAM_VIEC = dv.MA
                           LEFT JOIN DM_NGACH_CDNN ncdnn ON hd.MA_NGACH = ncdnn.MA
                           LEFT JOIN DM_CHUC_DANH_CHUYEN_MON cdcm on hd.CHUC_DANH_CHUYEN_MON = cdcm.MA
-                 WHERE (maDonVi = '-1' OR INSTR(maDonVi, benB.MA_DON_VI) != 0)
+                 WHERE (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
+                     OR (((list_shcc IS NOT NULL AND
+                           ((INSTR(list_shcc, ',') != 0 AND INSTR(list_shcc, benB.SHCC) != 0) OR
+                            (list_shcc = benB.SHCC)))
+                         OR (list_dv IS NOT NULL AND INSTR(list_dv, benB.MA_DON_VI) != 0)
+                         OR (list_shcc IS NULL AND list_dv IS NULL))
+                         AND (hd.NGAY_KY_QUYET_DINH IS NOT NULL AND (fromYear IS NULL OR hd.NGAY_KY_QUYET_DINH >= fromYear))
+                         AND (hd.NGAY_KY_QUYET_DINH IS NOT NULL AND (toYear IS NULL OR hd.NGAY_KY_QUYET_DINH <= (toYear + 86399999)))))
                    AND (searchTerm = ''
                      OR LOWER(hd.NGUOI_KY) LIKE sT
                      OR LOWER(hd.NGUOI_DUOC_THUE) LIKE sT
@@ -2807,74 +2703,7 @@ BEGIN
                      OR LOWER(TRIM(benB.HO || ' ' || benB.TEN)) LIKE sT
                      OR LOWER(hd.SO_QD) LIKE sT
                      OR LOWER(ncdnn.TEN) LIKE sT)
-                 ORDER BY hd.NGAY_KY_QUYET_DINH DESC, benB.TEN DESC
-             )
-        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
-    RETURN my_cursor;
-
-END;
-/
---EndMethod--
-
-CREATE OR REPLACE FUNCTION QT_HOP_DONG_VIEN_CHUC_SHCC_GROUP_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER,
-                                                      searchTerm IN STRING,
-                                                      totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
-AS
-    my_cursor SYS_REFCURSOR;
-BEGIN
-    SELECT COUNT(*)
-    INTO totalItem
-
-    FROM QT_HOP_DONG_VIEN_CHUC hd
-    WHERE
-       hd.NGUOI_DUOC_THUE = searchTerm;
-
-    IF pageNumber < 1 THEN pageNumber := 1; END IF;
-    IF pageSize < 1 THEN pageSize := 1; END IF;
-    pageTotal := CEIL(totalItem / pageSize);
-    pageNumber := LEAST(pageNumber, pageTotal);
-
-    OPEN my_cursor FOR
-        SELECT *
-        FROM (
-                 SELECT hd.NGUOI_DUOC_THUE              AS                      "shcc",
-                        hd.MA                           AS                      "ma",
-                        benB.HO                         AS                      "hoBenB",
-                        benB.TEN                        AS                      "tenBenB",
-                        benA.SHCC                       as                      "shccNguoiKy",
-                        benA.HO                         as                      "hoNguoiKy",
-                        benA.TEN                        as                      "tenNguoiKy",
-                        benA.MA_CHUC_VU                 as                      "chucVuNguoiKy",
-                        benA.MA_DON_VI                  as                      "donviNguoiKy",
-                        hd.SO_QD                        as                      "soQuyetDinh",
-                        hd.NOI_DUNG                     as                      "noiDung",
-                        hd.LOAI_HD                      as                      "loaiHopDong",
-                        lhd.TEN                         as                      "tenLoaiHopDong",
-                        hd.NGAY_KY_HOP_DONG             as                      "ngayKyHopDong",
-                        hd.NGAY_KET_THUC_HOP_DONG       as                      "ketThucHopDong",
-                        hd.NGAY_KY_QUYET_DINH           as                      "ngayKyQuyetDinh",
-                        hd.NGAY_KY_HD_TIEP_THEO         as                      "ngayKyHopDongTiepTheo",
-                        hd.HIEU_LUC_HOP_DONG            as                      "hieuLucHopDong",
-                        hd.NGAY_BAT_DAU_LAM_VIEC        as                      "batDauLamViec",
-                        hd.DIA_DIEM_LAM_VIEC            as                      "diaDiemLamViec",
-                        dv.TEN                          as                      "tenDiaDiemLamViec",
-                        hd.CHUC_DANH_CHUYEN_MON         as                      "chucDanhChuyenMon",
-                        cdcm.TEN                        as                      "tenChucDanhChuyenMon",
-                        hd.NHIEM_VU                     as                      "congViecDuocGiao",
-                        hd.MA_NGACH                     as                      "maNgach",
-                        hd.BAC                          as                      "bac",
-                        hd.HE_SO                        as                      "heSo",
-                        hd.THOI_GIAN_XET_NANG_BAC_LUONG as                      "thoiGianXetNangBacLuong",
-                        ROW_NUMBER() OVER (ORDER BY hd.NGAY_KY_QUYET_DINH DESC) R
-                 FROM QT_HOP_DONG_VIEN_CHUC hd
-                          LEFT JOIN TCHC_CAN_BO benA on hd.NGUOI_KY = benA.SHCC
-                          LEFT JOIN DM_LOAI_HOP_DONG lhd ON hd.LOAI_HD = lhd.MA
-                          LEFT JOIN TCHC_CAN_BO benB ON hd.NGUOI_DUOC_THUE = benB.SHCC
-                          LEFT JOIN DM_DON_VI dv on hd.DIA_DIEM_LAM_VIEC = dv.MA
-                          LEFT JOIN DM_NGACH_CDNN ncdnn ON hd.MA_NGACH = ncdnn.MA
-                          LEFT JOIN DM_CHUC_DANH_CHUYEN_MON cdcm on hd.CHUC_DANH_CHUYEN_MON = cdcm.MA
-                 WHERE hd.NGUOI_DUOC_THUE = searchTerm
-                 ORDER BY hd.NGAY_KY_QUYET_DINH DESC, benA.TEN DESC
+                 ORDER BY hd.NGAY_KY_HOP_DONG DESC, benB.TEN DESC
              )
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
     RETURN my_cursor;
@@ -2899,15 +2728,7 @@ BEGIN
             WHERE ID IN (
                 SELECT MAX(ID) FROM (SELECT * FROM QT_HUONG_DAN_LUAN_VAN ORDER BY SHCC DESC ) GROUP BY SHCC)) hdlv
             LEFT JOIN TCHC_CAN_BO cb on hdlv.SHCC = cb.SHCC
-            LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
-    WHERE ((list_shcc IS NOT NULL AND INSTR(list_shcc, hdlv.SHCC) != 0)
-      OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
-      OR (list_shcc IS NULL AND list_dv IS NULL))
-      AND (searchTerm = ''
-        OR LOWER(cb.SHCC) LIKE sT
-        OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
-        OR LOWER(hdlv.TEN_LUAN_VAN) LIKE sT
-        OR LOWER(hdlv.SAN_PHAM) LIKE sT);
+            LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA);
 
     IF pageNumber < 1 THEN pageNumber := 1; END IF;
     IF pageSize < 1 THEN pageSize := 1; END IF;
@@ -2918,111 +2739,73 @@ BEGIN
         SELECT *
         FROM (
                  SELECT hdlv.ID             AS               "id",
-                        hdlv.TEN_LUAN_VAN   AS               "tenLuanVan",
-                        hdlv.HO_TEN         AS               "hoTen",
-                        hdlv.SHCC           as               "shcc",
-                        hdlv.NAM_TOT_NGHIEP AS               "namTotNghiep",
-                        hdlv.BAC_DAO_TAO    AS               "bacDaoTao",
-                        hdlv.SAN_PHAM       AS               "sanPham",
+                        hdlv.SHCC           AS  "shcc",
                         cb.HO               AS               "hoCanBo",
                         cb.TEN              AS               "tenCanBo",
                         (SELECT COUNT(*)
                          FROM QT_HUONG_DAN_LUAN_VAN hdlv_temp
+                            LEFT JOIN TCHC_CAN_BO cb on hdlv_temp.SHCC = cb.SHCC
+                            LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
                          WHERE hdlv_temp.SHCC = hdlv.SHCC
-                           AND (hdlv_temp.NAM_TOT_NGHIEP IS NULL OR fromYear IS NULL OR
-                                hdlv_temp.NAM_TOT_NGHIEP >= fromYear)
-                           AND (hdlv_temp.NAM_TOT_NGHIEP IS NULL OR toYear IS NULL OR
-                                hdlv_temp.NAM_TOT_NGHIEP <= toYear)
+                             AND (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
+                                    OR (((list_shcc IS NOT NULL AND INSTR(list_shcc, hdlv_temp.SHCC) != 0)
+                              OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
+                              OR (list_shcc IS NULL AND list_dv IS NULL))
+                              AND (hdlv_temp.NAM_TOT_NGHIEP IS NOT NULL AND (fromYear IS NULL OR hdlv_temp.NAM_TOT_NGHIEP >= fromYear))
+                              AND (hdlv_temp.NAM_TOT_NGHIEP IS NOT NULL AND (toYear IS NULL OR hdlv_temp.NAM_TOT_NGHIEP <= toYear))))
+                              AND (searchTerm = ''
+                                OR LOWER(cb.SHCC) LIKE sT
+                                OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
+                                OR LOWER(hdlv_temp.TEN_LUAN_VAN) LIKE sT
+                                OR LOWER(hdlv_temp.SAN_PHAM) LIKE sT)
                         ) AS "soDeTai",
 
-                        (Select listagg(hdlv_temp2.HO_TEN || ' ', '??') within group ( order by null)
+                        (select rtrim(xmlagg(xmlelement(e, hdlv_temp2.HO_TEN || ' ','??').extract('//text()') order by null).getclobval(),'??')
                          FROM QT_HUONG_DAN_LUAN_VAN hdlv_temp2
+                            LEFT JOIN TCHC_CAN_BO cb on hdlv_temp2.SHCC = cb.SHCC
+                            LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
                          WHERE hdlv_temp2.SHCC = hdlv.SHCC
-                           AND (hdlv_temp2.NAM_TOT_NGHIEP IS NULL OR fromYear IS NULL OR
-                                hdlv_temp2.NAM_TOT_NGHIEP >= fromYear)
-                           AND (hdlv_temp2.NAM_TOT_NGHIEP IS NULL OR toYear IS NULL OR
-                                hdlv_temp2.NAM_TOT_NGHIEP <= toYear)
+                             AND (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
+                                    OR (((list_shcc IS NOT NULL AND INSTR(list_shcc, hdlv_temp2.SHCC) != 0)
+                              OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
+                              OR (list_shcc IS NULL AND list_dv IS NULL))
+                              AND (hdlv_temp2.NAM_TOT_NGHIEP IS NOT NULL AND (fromYear IS NULL OR hdlv_temp2.NAM_TOT_NGHIEP >= fromYear))
+                              AND (hdlv_temp2.NAM_TOT_NGHIEP IS NOT NULL AND (toYear IS NULL OR hdlv_temp2.NAM_TOT_NGHIEP <= toYear))))
+                              AND (searchTerm = ''
+                                OR LOWER(cb.SHCC) LIKE sT
+                                OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
+                                OR LOWER(hdlv_temp2.TEN_LUAN_VAN) LIKE sT
+                                OR LOWER(hdlv_temp2.SAN_PHAM) LIKE sT)
                         ) AS "danhSachHoTen",
-
-                        (Select listagg(hdlv_temp3.TEN_LUAN_VAN || ' ', '??') within group ( order by null)
+                        (select rtrim(xmlagg(xmlelement(e, hdlv_temp3.TEN_LUAN_VAN || ' ','??').extract('//text()') order by null).getclobval(),'??')
                          FROM QT_HUONG_DAN_LUAN_VAN hdlv_temp3
+                            LEFT JOIN TCHC_CAN_BO cb on hdlv_temp3.SHCC = cb.SHCC
+                            LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
                          WHERE hdlv_temp3.SHCC = hdlv.SHCC
-                           AND (hdlv_temp3.NAM_TOT_NGHIEP IS NULL OR fromYear IS NULL OR
-                                hdlv_temp3.NAM_TOT_NGHIEP >= fromYear)
-                           AND (hdlv_temp3.NAM_TOT_NGHIEP IS NULL OR toYear IS NULL OR
-                                hdlv_temp3.NAM_TOT_NGHIEP <= toYear)
+                             AND (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
+                                    OR (((list_shcc IS NOT NULL AND INSTR(list_shcc, hdlv_temp3.SHCC) != 0)
+                              OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
+                              OR (list_shcc IS NULL AND list_dv IS NULL))
+                              AND (hdlv_temp3.NAM_TOT_NGHIEP IS NOT NULL AND (fromYear IS NULL OR hdlv_temp3.NAM_TOT_NGHIEP >= fromYear))
+                              AND (hdlv_temp3.NAM_TOT_NGHIEP IS NOT NULL AND (toYear IS NULL OR hdlv_temp3.NAM_TOT_NGHIEP <= toYear))))
+                              AND (searchTerm = ''
+                                OR LOWER(cb.SHCC) LIKE sT
+                                OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
+                                OR LOWER(hdlv_temp3.TEN_LUAN_VAN) LIKE sT
+                                OR LOWER(hdlv_temp3.SAN_PHAM) LIKE sT)
                         ) AS "danhSachDeTai",
 
                         dv.MA               AS               "maDonVi",
                         dv.TEN              AS               "tenDonVi",
 
-                        ROW_NUMBER() OVER (ORDER BY ID DESC) R
+                        ROW_NUMBER() OVER (ORDER BY hdlv.NAM_TOT_NGHIEP DESC, hdlv.SHCC DESC) R
                 FROM (SELECT *
                         FROM QT_HUONG_DAN_LUAN_VAN
                         WHERE ID IN (
                             SELECT MAX(ID) FROM (SELECT * FROM QT_HUONG_DAN_LUAN_VAN ORDER BY SHCC DESC ) GROUP BY SHCC)) hdlv
                         LEFT JOIN TCHC_CAN_BO cb on hdlv.SHCC = cb.SHCC
                         LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
-                WHERE ((list_shcc IS NOT NULL AND INSTR(list_shcc, hdlv.SHCC) != 0)
-                  OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
-                  OR (list_shcc IS NULL AND list_dv IS NULL))
-                  AND (fromYear IS NULL OR hdlv.NAM_TOT_NGHIEP IS NULL OR hdlv.NAM_TOT_NGHIEP >= fromYear)
-                  AND (toYear IS NULL OR hdlv.NAM_TOT_NGHIEP IS NULL OR hdlv.NAM_TOT_NGHIEP <= toYear)
-                  AND (searchTerm = ''
-                     OR LOWER(cb.SHCC) LIKE sT
-                     OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
-                     OR LOWER(hdlv.TEN_LUAN_VAN) LIKE sT
-                     OR LOWER(hdlv.SAN_PHAM) LIKE sT)
-                 ORDER BY hdlv.NAM_TOT_NGHIEP DESC
-             )
-        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
-    RETURN my_cursor;
-END;
-/
---EndMethod--
-
-CREATE OR REPLACE FUNCTION QT_HUONG_DAN_LUAN_VAN_GROUP_PAGE_SHCC(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER,
-                                                      loaiDoiTuong IN STRING,
-                                                      searchTerm IN STRING,
-                                                      totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
-AS
-    my_cursor SYS_REFCURSOR;
-    sT        STRING(500) := '%' || lower(searchTerm) || '%';
-BEGIN
-    SELECT COUNT(*)
-    INTO totalItem
-
-    FROM QT_HUONG_DAN_LUAN_VAN hdlv
-             LEFT JOIN TCHC_CAN_BO cb on hdlv.SHCC = cb.SHCC
-             LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
-    WHERE (loaiDoiTuong = '-1' OR loaiDoiTuong = dv.MA)
-      AND (hdlv.SHCC = searchTerm);
-
-    IF pageNumber < 1 THEN pageNumber := 1; END IF;
-    IF pageSize < 1 THEN pageSize := 1; END IF;
-    pageTotal := CEIL(totalItem / pageSize);
-    pageNumber := LEAST(pageNumber, pageTotal);
-
-    OPEN my_cursor FOR
-        SELECT *
-        FROM (
-                 SELECT hdlv.ID             AS               "id",
-                        hdlv.SHCC           AS               "shcc",
-                        hdlv.TEN_LUAN_VAN   AS               "tenLuanVan",
-                        hdlv.HO_TEN         AS               "hoTen",
-                        hdlv.NAM_TOT_NGHIEP AS               "namTotNghiep",
-                        hdlv.BAC_DAO_TAO    AS               "bacDaoTao",
-                        hdlv.SAN_PHAM       AS               "sanPham",
-                        cb.HO               AS               "hoCanBo",
-                        cb.TEN              AS               "tenCanBo",
-
-                        ROW_NUMBER() OVER (ORDER BY ID DESC) R
-                 FROM QT_HUONG_DAN_LUAN_VAN hdlv
-                          LEFT JOIN TCHC_CAN_BO cb on hdlv.SHCC = cb.SHCC
-                          LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
-                 WHERE (loaiDoiTuong = '-1' OR loaiDoiTuong = dv.MA)
-                   AND (hdlv.SHCC = searchTerm)
-                 ORDER BY hdlv.NAM_TOT_NGHIEP DESC
+                 ORDER BY hdlv.NAM_TOT_NGHIEP DESC, hdlv.SHCC DESC
              )
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
     RETURN my_cursor;
@@ -3044,11 +2827,12 @@ BEGIN
     FROM QT_HUONG_DAN_LUAN_VAN hdlv
              LEFT JOIN TCHC_CAN_BO cb on hdlv.SHCC = cb.SHCC
              LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
-    WHERE ((list_shcc IS NOT NULL AND INSTR(list_shcc, hdlv.SHCC) != 0)
+    WHERE (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
+        OR (((list_shcc IS NOT NULL AND ((INSTR(list_shcc, ',') != 0 AND INSTR(list_shcc, hdlv.SHCC) != 0) OR (list_shcc = hdlv.SHCC)))
       OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
       OR (list_shcc IS NULL AND list_dv IS NULL))
-      AND (fromYear IS NULL OR hdlv.NAM_TOT_NGHIEP IS NULL OR hdlv.NAM_TOT_NGHIEP >= fromYear)
-      AND (toYear IS NULL OR hdlv.NAM_TOT_NGHIEP IS NULL OR hdlv.NAM_TOT_NGHIEP <= toYear)
+      AND (hdlv.NAM_TOT_NGHIEP IS NOT NULL AND (fromYear IS NULL OR hdlv.NAM_TOT_NGHIEP >= fromYear))
+      AND (hdlv.NAM_TOT_NGHIEP IS NOT NULL AND (toYear IS NULL OR hdlv.NAM_TOT_NGHIEP <= toYear))))
       AND (searchTerm = ''
         OR LOWER(cb.SHCC) LIKE sT
         OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
@@ -3076,15 +2860,16 @@ BEGIN
                         dv.MA               AS               "maDonVi",
                         dv.TEN              AS               "tenDonVi",
 
-                        ROW_NUMBER() OVER (ORDER BY ID DESC) R
+                        ROW_NUMBER() OVER (ORDER BY hdlv.NAM_TOT_NGHIEP DESC) R
                  FROM QT_HUONG_DAN_LUAN_VAN hdlv
                           LEFT JOIN TCHC_CAN_BO cb on hdlv.SHCC = cb.SHCC
                           LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
-                WHERE ((list_shcc IS NOT NULL AND INSTR(list_shcc, hdlv.SHCC) != 0)
+                WHERE (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
+                    OR (((list_shcc IS NOT NULL AND ((INSTR(list_shcc, ',') != 0 AND INSTR(list_shcc, hdlv.SHCC) != 0) OR (list_shcc = hdlv.SHCC)))
                   OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
                   OR (list_shcc IS NULL AND list_dv IS NULL))
-                  AND (fromYear IS NULL OR hdlv.NAM_TOT_NGHIEP IS NULL OR hdlv.NAM_TOT_NGHIEP >= fromYear)
-                  AND (toYear IS NULL OR hdlv.NAM_TOT_NGHIEP IS NULL OR hdlv.NAM_TOT_NGHIEP <= toYear)
+                  AND (hdlv.NAM_TOT_NGHIEP IS NOT NULL AND (fromYear IS NULL OR hdlv.NAM_TOT_NGHIEP >= fromYear))
+                  AND (hdlv.NAM_TOT_NGHIEP IS NOT NULL AND (toYear IS NULL OR hdlv.NAM_TOT_NGHIEP <= toYear))))
                   AND (searchTerm = ''
                      OR LOWER(cb.SHCC) LIKE sT
                      OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
@@ -3137,13 +2922,7 @@ BEGIN
             FROM QT_KEO_DAI_CONG_TAC
             WHERE ID IN (
                 SELECT MAX(ID) FROM (SELECT * FROM QT_KEO_DAI_CONG_TAC ORDER BY SHCC DESC ) GROUP BY SHCC)) kdct
-             LEFT JOIN TCHC_CAN_BO cb on kdct.SHCC = cb.SHCC
-             LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
-    WHERE (list_shcc IS NULL OR INSTR(list_shcc, kdct.SHCC) != 0)
-      AND (list_dv IS NULL OR INSTR(list_dv, cb.MA_DON_VI) != 0)
-      AND (searchTerm = ''
-        OR LOWER(cb.SHCC) LIKE ST
-        OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE ST);
+             LEFT JOIN TCHC_CAN_BO cb on kdct.SHCC = cb.SHCC;
 
     IF pageNumber < 1 THEN pageNumber := 1; END IF;
     IF pageSize < 1 THEN pageSize := 1; END IF;
@@ -3156,58 +2935,94 @@ BEGIN
                  SELECT
                         kdct.ID             as  "id",
                         kdct.SHCC           as  "shcc",
-                        kdct.BAT_DAU        as  "batDau",
-                        kdct.BAT_DAU_TYPE   as  "batDauType",
-                        kdct.KET_THUC       as  "ketThuc",
-                        kdct.KET_THUC_TYPE  as  "ketThucType",
-                        kdct.SO_HIEU_VAN_BAN        as  "soHieuVanBan",
                         
                         (SELECT COUNT(*)
-                         FROM QT_KEO_DAI_CONG_TAC kdct_temp
-                         WHERE kdct_temp.SHCC = kdct.SHCC
-                           AND (kdct_temp.BAT_DAU IS NULL OR fromYear IS NULL OR
-                                kdct_temp.BAT_DAU >= fromYear)
-                           AND (kdct_temp.KET_THUC IS NULL OR toYear IS NULL OR
-                                kdct_temp.KET_THUC <= toYear)
+                        FROM QT_KEO_DAI_CONG_TAC kdct_temp
+                                 LEFT JOIN TCHC_CAN_BO cb on kdct_temp.SHCC = cb.SHCC
+                                 LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
+                        WHERE (kdct_temp.SHCC = kdct.SHCC)
+                              AND (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
+                                OR (((list_shcc IS NOT NULL AND INSTR(list_shcc, kdct_temp.SHCC) != 0)
+                          OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
+                          OR (list_shcc IS NULL AND list_dv IS NULL))
+                          AND (kdct_temp.BAT_DAU IS NOT NULL AND (fromYear IS NULL OR kdct_temp.BAT_DAU >= fromYear))
+                          AND (kdct_temp.KET_THUC IS NOT NULL AND (toYear IS NULL OR kdct_temp.KET_THUC <= toYear))))
+                          AND (searchTerm = ''
+                            OR LOWER(cb.SHCC) LIKE ST
+                            OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE ST
+                            OR LOWER(kdct_temp.SO_HIEU_VAN_BAN) LIKE ST)
                         ) AS "soQuaTrinh",
 
-                        (Select listagg(kdct_temp2.BAT_DAU || ' ', '??') within group ( order by null)
-                         from QT_KEO_DAI_CONG_TAC kdct_temp2
-                         WHERE kdct_temp2.SHCC = kdct.SHCC
-                           AND (kdct_temp2.BAT_DAU IS NULL OR fromYear IS NULL OR
-                                kdct_temp2.BAT_DAU >= fromYear)
-                           AND (kdct_temp2.KET_THUC IS NULL OR toYear IS NULL OR
-                                kdct_temp2.KET_THUC <= toYear)) AS "danhSachBatDau",
+                        (select rtrim(xmlagg(xmlelement(e, kdct_temp.BAT_DAU || ' ','??').extract('//text()') order by null).getclobval(),'??')
+                        FROM QT_KEO_DAI_CONG_TAC kdct_temp
+                                 LEFT JOIN TCHC_CAN_BO cb on kdct_temp.SHCC = cb.SHCC
+                                 LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
+                        WHERE (kdct_temp.SHCC = kdct.SHCC)
+                              AND (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
+                                OR (((list_shcc IS NOT NULL AND INSTR(list_shcc, kdct_temp.SHCC) != 0)
+                          OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
+                          OR (list_shcc IS NULL AND list_dv IS NULL))
+                          AND (kdct_temp.BAT_DAU IS NOT NULL AND (fromYear IS NULL OR kdct_temp.BAT_DAU >= fromYear))
+                          AND (kdct_temp.KET_THUC IS NOT NULL AND (toYear IS NULL OR kdct_temp.KET_THUC <= toYear))))
+                          AND (searchTerm = ''
+                            OR LOWER(cb.SHCC) LIKE ST
+                            OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE ST
+                            OR LOWER(kdct_temp.SO_HIEU_VAN_BAN) LIKE ST)
+                        ) AS "danhSachBatDau",
 
-                        (Select listagg(kdct_temp3.KET_THUC || ' ', '??') within group ( order by null)
-                         from QT_KEO_DAI_CONG_TAC kdct_temp3
-                         WHERE kdct_temp3.SHCC = kdct.SHCC
-                           AND (kdct_temp3.BAT_DAU IS NULL OR fromYear IS NULL OR
-                                kdct_temp3.BAT_DAU >= fromYear)
-                           AND (kdct_temp3.KET_THUC IS NULL OR toYear IS NULL OR
-                                kdct_temp3.KET_THUC <= toYear)) AS "danhSachKetThuc",
+                        (select rtrim(xmlagg(xmlelement(e, kdct_temp.KET_THUC || ' ','??').extract('//text()') order by null).getclobval(),'??')
+                        FROM QT_KEO_DAI_CONG_TAC kdct_temp
+                                 LEFT JOIN TCHC_CAN_BO cb on kdct_temp.SHCC = cb.SHCC
+                                 LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
+                        WHERE (kdct_temp.SHCC = kdct.SHCC)
+                              AND (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
+                                OR (((list_shcc IS NOT NULL AND INSTR(list_shcc, kdct_temp.SHCC) != 0)
+                          OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
+                          OR (list_shcc IS NULL AND list_dv IS NULL))
+                          AND (kdct_temp.BAT_DAU IS NOT NULL AND (fromYear IS NULL OR kdct_temp.BAT_DAU >= fromYear))
+                          AND (kdct_temp.KET_THUC IS NOT NULL AND (toYear IS NULL OR kdct_temp.KET_THUC <= toYear))))
+                          AND (searchTerm = ''
+                            OR LOWER(cb.SHCC) LIKE ST
+                            OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE ST
+                            OR LOWER(kdct_temp.SO_HIEU_VAN_BAN) LIKE ST)
+                        ) AS "danhSachKetThuc",
 
-                        (Select listagg(kdct_temp4.KET_THUC_TYPE || ' ', '??') within group ( order by null)
-                         from QT_KEO_DAI_CONG_TAC kdct_temp4
-                         WHERE kdct_temp4.SHCC = kdct.SHCC
-                           AND (kdct_temp4.BAT_DAU IS NULL OR fromYear IS NULL OR
-                                kdct_temp4.BAT_DAU >= fromYear)
-                           AND (kdct_temp4.KET_THUC IS NULL OR toYear IS NULL OR
-                                kdct_temp4.KET_THUC <= toYear)) AS "danhSachKetThucType",
+                        (select rtrim(xmlagg(xmlelement(e, kdct_temp.KET_THUC_TYPE || ' ','??').extract('//text()') order by null).getclobval(),'??')
+                        FROM QT_KEO_DAI_CONG_TAC kdct_temp
+                                 LEFT JOIN TCHC_CAN_BO cb on kdct_temp.SHCC = cb.SHCC
+                                 LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
+                        WHERE (kdct_temp.SHCC = kdct.SHCC)
+                              AND (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
+                                OR (((list_shcc IS NOT NULL AND INSTR(list_shcc, kdct_temp.SHCC) != 0)
+                          OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
+                          OR (list_shcc IS NULL AND list_dv IS NULL))
+                          AND (kdct_temp.BAT_DAU IS NOT NULL AND (fromYear IS NULL OR kdct_temp.BAT_DAU >= fromYear))
+                          AND (kdct_temp.KET_THUC IS NOT NULL AND (toYear IS NULL OR kdct_temp.KET_THUC <= toYear))))
+                          AND (searchTerm = ''
+                            OR LOWER(cb.SHCC) LIKE ST
+                            OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE ST
+                            OR LOWER(kdct_temp.SO_HIEU_VAN_BAN) LIKE ST)
+                        ) AS "danhSachKetThucType",
 
-                        (Select listagg(kdct_temp5.BAT_DAU_TYPE || ' ', '??') within group ( order by null)
-                         from QT_KEO_DAI_CONG_TAC kdct_temp5
-                         WHERE kdct_temp5.SHCC = kdct.SHCC
-                           AND (kdct_temp5.BAT_DAU IS NULL OR fromYear IS NULL OR
-                                kdct_temp5.BAT_DAU >= fromYear)
-                           AND (kdct_temp5.KET_THUC IS NULL OR toYear IS NULL OR
-                                kdct_temp5.KET_THUC <= toYear) ) AS "danhSachBatDauType",
+                        (select rtrim(xmlagg(xmlelement(e, kdct_temp.BAT_DAU_TYPE || ' ','??').extract('//text()') order by null).getclobval(),'??')
+                        FROM QT_KEO_DAI_CONG_TAC kdct_temp
+                                 LEFT JOIN TCHC_CAN_BO cb on kdct_temp.SHCC = cb.SHCC
+                                 LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
+                        WHERE (kdct_temp.SHCC = kdct.SHCC)
+                              AND (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
+                                OR (((list_shcc IS NOT NULL AND INSTR(list_shcc, kdct_temp.SHCC) != 0)
+                          OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
+                          OR (list_shcc IS NULL AND list_dv IS NULL))
+                          AND (kdct_temp.BAT_DAU IS NOT NULL AND (fromYear IS NULL OR kdct_temp.BAT_DAU >= fromYear))
+                          AND (kdct_temp.KET_THUC IS NOT NULL AND (toYear IS NULL OR kdct_temp.KET_THUC <= toYear))))
+                          AND (searchTerm = ''
+                            OR LOWER(cb.SHCC) LIKE ST
+                            OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE ST
+                            OR LOWER(kdct_temp.SO_HIEU_VAN_BAN) LIKE ST)
+                        ) AS "danhSachBatDauType",
 
                         cb.TEN             as   "tenCanBo",
                         cb.HO              as   "hoCanBo",
-                        dv.MA              AS                       "maDonVi",
-                        dv.TEN             AS                       "tenDonVi",
-
 
                         ROW_NUMBER() OVER (ORDER BY kdct.BAT_DAU DESC ) R
                 FROM (SELECT *
@@ -3215,12 +3030,6 @@ BEGIN
                         WHERE ID IN (
                             SELECT MAX(ID) FROM (SELECT * FROM QT_KEO_DAI_CONG_TAC ORDER BY SHCC DESC ) GROUP BY SHCC)) kdct
                          LEFT JOIN TCHC_CAN_BO cb on kdct.SHCC = cb.SHCC
-                         LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
-                WHERE (list_shcc IS NULL OR INSTR(list_shcc, kdct.SHCC) != 0)
-                  AND (list_dv IS NULL OR INSTR(list_dv, cb.MA_DON_VI) != 0)
-                  AND (searchTerm = ''
-                    OR LOWER(cb.SHCC) LIKE ST
-                    OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE ST)
                 ORDER BY kdct.BAT_DAU DESC
              )
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
@@ -3244,13 +3053,16 @@ BEGIN
     FROM QT_KEO_DAI_CONG_TAC kdct
              LEFT JOIN TCHC_CAN_BO cb on kdct.SHCC = cb.SHCC
              LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
-    WHERE (list_shcc IS NULL OR INSTR(list_shcc, kdct.SHCC) != 0)
-      AND (list_dv IS NULL OR INSTR(list_dv, cb.MA_DON_VI) != 0)
-      AND (fromYear IS NULL OR kdct.BAT_DAU IS NULL OR kdct.BAT_DAU >= fromYear)
-      AND (toYear IS NULL OR kdct.KET_THUC IS NULL OR kdct.KET_THUC <= toYear)
+    WHERE (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
+            OR (((list_shcc IS NOT NULL AND ((INSTR(list_shcc, ',') != 0 AND INSTR(list_shcc, kdct.SHCC) != 0) OR (list_shcc = kdct.SHCC)))
+      OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
+      OR (list_shcc IS NULL AND list_dv IS NULL))
+      AND (kdct.BAT_DAU IS NOT NULL AND (fromYear IS NULL OR kdct.BAT_DAU >= fromYear))
+      AND (kdct.KET_THUC IS NOT NULL AND (toYear IS NULL OR kdct.KET_THUC <= toYear))))
       AND (searchTerm = ''
         OR LOWER(cb.SHCC) LIKE ST
-        OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE ST);
+        OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE ST
+        OR LOWER(kdct.SO_HIEU_VAN_BAN) LIKE ST);
 
     IF pageNumber < 1 THEN pageNumber := 1; END IF;
     IF pageSize < 1 THEN pageSize := 1; END IF;
@@ -3278,54 +3090,22 @@ BEGIN
                  FROM QT_KEO_DAI_CONG_TAC kdct
                           LEFT JOIN TCHC_CAN_BO cb on kdct.SHCC = cb.SHCC
                           LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
-                 WHERE (list_shcc IS NULL OR INSTR(list_shcc, kdct.SHCC) != 0)
-                   AND (list_dv IS NULL OR INSTR(list_dv, cb.MA_DON_VI) != 0)
-                   AND (fromYear IS NULL OR kdct.BAT_DAU IS NULL OR kdct.BAT_DAU >= fromYear)
-                   AND (toYear IS NULL OR kdct.KET_THUC IS NULL OR kdct.KET_THUC <= toYear)
-                   AND (searchTerm = ''
-                     OR LOWER(cb.SHCC) LIKE ST
-                     OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE ST)
+                WHERE (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
+                        OR (((list_shcc IS NOT NULL AND ((INSTR(list_shcc, ',') != 0 AND INSTR(list_shcc, kdct.SHCC) != 0) OR (list_shcc = kdct.SHCC)))
+                  OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
+                  OR (list_shcc IS NULL AND list_dv IS NULL))
+                  AND (kdct.BAT_DAU IS NOT NULL AND (fromYear IS NULL OR kdct.BAT_DAU >= fromYear))
+                  AND (kdct.KET_THUC IS NOT NULL AND (toYear IS NULL OR kdct.KET_THUC <= toYear))))
+                  AND (searchTerm = ''
+                    OR LOWER(cb.SHCC) LIKE ST
+                    OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE ST
+                    OR LOWER(kdct.SO_HIEU_VAN_BAN) LIKE ST)
                  ORDER BY kdct.KET_THUC DESC
              )
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
     RETURN my_cursor;
 
 END;
-/
---EndMethod--
-
-CREATE OR REPLACE FUNCTION QT_KHEN_THUONG_ALL_BY_SHCC(isSHCC IN STRING) RETURN SYS_REFCURSOR
-AS
-    my_cursor SYS_REFCURSOR;
-BEGIN
-    OPEN my_cursor FOR
-        SELECT qtkta.MA           AS                "ma",
-               qtkta.ID           AS                "id",
-               qtkta.nam_dat_duoc AS                "namDatDuoc",
-               qtkta.DIEM_THI_DUA AS                "diemThiDua",
-
-               ldt.MA             AS                "maLoaiDoiTuong",
-               ldt.TEN            AS                "tenLoaiDoiTuong",
-
-               cb.SHCC            AS                "maCanBo",
-               cb.HO              AS                "hoCanBo",
-               cb.TEN             AS                "tenCanBo",
-
-               ktkh.MA            AS                "maThanhTich",
-               ktkh.TEN           AS                "tenThanhTich",
-
-               ktct.MA            AS                "maChuThich",
-               ktct.TEN           AS                "tenChuThich",
-               ROW_NUMBER() OVER (ORDER BY NAM_DAT_DUOC DESC) R
-        FROM QT_KHEN_THUONG_ALL qtkta
-                 LEFT JOIN DM_KHEN_THUONG_LOAI_DOI_TUONG ldt on ldt.MA = qtkta.LOAI_DOI_TUONG
-                 LEFT JOIN TCHC_CAN_BO cb on (qtkta.LOAI_DOI_TUONG = '02' and qtkta.MA = cb.SHCC)
-                 LEFT JOIN DM_KHEN_THUONG_KY_HIEU ktkh ON qtkta.THANH_TICH = ktkh.MA
-                 LEFT JOIN DM_KHEN_THUONG_CHU_THICH ktct ON qtkta.CHU_THICH = ktct.MA
-        WHERE qtkta.MA = isSHCC
-          AND qtkta.LOAI_DOI_TUONG = '02';
-    RETURN my_cursor;
-end;
 /
 --EndMethod--
 
@@ -3347,19 +3127,7 @@ BEGIN
             LEFT JOIN DM_DON_VI dv on (qtkta.LOAI_DOI_TUONG = '03' and qtkta.MA = TO_CHAR(dv.MA))
             LEFT JOIN DM_BO_MON bm on (qtkta.LOAI_DOI_TUONG = '04' and qtkta.MA = TO_CHAR(bm.MA))
             LEFT JOIN DM_DON_VI dv2 on (bm.MA_DV = dv2.ma)
-            LEFT JOIN DM_KHEN_THUONG_KY_HIEU ktkh ON qtkta.THANH_TICH = ktkh.MA
-            LEFT JOIN DM_KHEN_THUONG_CHU_THICH ktct ON qtkta.CHU_THICH = ktct.MA
-    WHERE (loaiDoiTuong = '-1' OR (loaiDoiTuong = qtkta.LOAI_DOI_TUONG))
-        AND (searchTerm = ''
-       OR LOWER(cb.SHCC) LIKE sT
-       OR LOWER(ldt.TEN) like sT
-       OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
-       OR LOWER(TRIM(dv.TEN)) LIKE sT
-       OR LOWER(TRIM(bm.TEN)) LIKE sT
-       OR qtkta.NAM_DAT_DUOC LIKE sT
-       OR LOWER(TRIM(ktct.TEN)) LIKE sT
-       OR LOWER(TRIM(ktkh.ten)) LIKE sT);
-
+    WHERE (loaiDoiTuong = '-1' OR (loaiDoiTuong = qtkta.LOAI_DOI_TUONG));
     pageTotal := CEIL(totalItem / pageSize);
     pageNumber := LEAST(pageNumber, pageTotal);
     IF pageNumber < 1 THEN pageNumber := 1; END IF;
@@ -3370,18 +3138,62 @@ BEGIN
         FROM (
                  SELECT qtkta.MA    AS  "ma",
                         qtkta.ID    AS  "id",
-                        qtkta.nam_dat_duoc  AS "namDatDuoc",
-                        qtkta.DIEM_THI_DUA AS                "diemThiDua",
 
                         (SELECT COUNT(*)
-                         FROM QT_KHEN_THUONG_ALL qtkta_temp
-                         WHERE TO_CHAR(qtkta_temp.MA) = TO_CHAR(qtkta.MA)
-                           AND (qtkta_temp.LOAI_DOI_TUONG = qtkta.LOAI_DOI_TUONG)
-                           AND (qtkta_temp.NAM_DAT_DUOC IS NULL OR fromYear IS NULL OR
-                                (TO_NUMBER(qtkta_temp.NAM_DAT_DUOC) >= fromYear))
-                           AND (qtkta_temp.NAM_DAT_DUOC IS NULL OR toYear IS NULL OR
-                                (TO_NUMBER(qtkta_temp.NAM_DAT_DUOC) <= toYear))
+                        FROM QT_KHEN_THUONG_ALL qtkta_temp
+                                 LEFT JOIN DM_KHEN_THUONG_LOAI_DOI_TUONG ldt on ldt.MA = qtkta_temp.LOAI_DOI_TUONG
+                                 LEFT JOIN TCHC_CAN_BO cb on (qtkta_temp.LOAI_DOI_TUONG = '02' and qtkta_temp.MA = cb.SHCC)
+                                 LEFT JOIN DM_DON_VI dv on (qtkta_temp.LOAI_DOI_TUONG = '03' and qtkta_temp.MA = TO_CHAR(dv.MA))
+                                 LEFT JOIN DM_BO_MON bm on (qtkta_temp.LOAI_DOI_TUONG = '04' and qtkta_temp.MA = TO_CHAR(bm.MA))
+                                 LEFT JOIN DM_KHEN_THUONG_KY_HIEU ktkh ON qtkta_temp.THANH_TICH = ktkh.MA
+                                 LEFT JOIN DM_KHEN_THUONG_CHU_THICH ktct ON qtkta_temp.CHU_THICH = ktct.MA
+                        WHERE (qtkta_temp.LOAI_DOI_TUONG = qtkta.LOAI_DOI_TUONG AND qtkta_temp.MA = qtkta.MA)
+                            AND (loaiDoiTuong = '-1' OR (loaiDoiTuong = qtkta_temp.LOAI_DOI_TUONG))                 
+                            AND ((
+                                    (fromYear IS NULL) AND (toYear IS NULL)
+                                ) OR (
+                                      (qtkta_temp.NAM_DAT_DUOC IS NOT NULL AND (fromYear IS NULL OR
+                                       (TO_NUMBER(qtkta_temp.NAM_DAT_DUOC) >= fromYear)))
+                                      AND (qtkta_temp.NAM_DAT_DUOC IS NOT NULL AND (toYear IS NULL OR
+                                           (TO_NUMBER(qtkta_temp.NAM_DAT_DUOC) <= toYear)))
+                                ))
+                            AND (searchTerm = ''
+                           OR LOWER(cb.SHCC) LIKE sT
+                           OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
+                           OR LOWER(TRIM(dv.TEN)) LIKE sT
+                           OR LOWER(TRIM(bm.TEN)) LIKE sT
+                           OR LOWER(ldt.TEN) like sT
+                           OR LOWER(TRIM(ktct.TEN)) LIKE sT
+                           OR LOWER(TRIM(ktkh.ten)) LIKE sT)
                         ) AS "soKhenThuong",
+
+                        (select rtrim(xmlagg(xmlelement(e, ktkh.TEN || ' ','??').extract('//text()') order by null).getclobval(),'??')
+                        FROM QT_KHEN_THUONG_ALL qtkta_temp
+                                 LEFT JOIN DM_KHEN_THUONG_LOAI_DOI_TUONG ldt on ldt.MA = qtkta_temp.LOAI_DOI_TUONG
+                                 LEFT JOIN TCHC_CAN_BO cb on (qtkta_temp.LOAI_DOI_TUONG = '02' and qtkta_temp.MA = cb.SHCC)
+                                 LEFT JOIN DM_DON_VI dv on (qtkta_temp.LOAI_DOI_TUONG = '03' and qtkta_temp.MA = TO_CHAR(dv.MA))
+                                 LEFT JOIN DM_BO_MON bm on (qtkta_temp.LOAI_DOI_TUONG = '04' and qtkta_temp.MA = TO_CHAR(bm.MA))
+                                 LEFT JOIN DM_KHEN_THUONG_KY_HIEU ktkh ON qtkta_temp.THANH_TICH = ktkh.MA
+                                 LEFT JOIN DM_KHEN_THUONG_CHU_THICH ktct ON qtkta_temp.CHU_THICH = ktct.MA
+                        WHERE (qtkta_temp.LOAI_DOI_TUONG = qtkta.LOAI_DOI_TUONG AND qtkta_temp.MA = qtkta.MA)
+                            AND (loaiDoiTuong = '-1' OR (loaiDoiTuong = qtkta_temp.LOAI_DOI_TUONG))
+                            AND ((
+                                    (fromYear IS NULL) AND (toYear IS NULL)
+                                ) OR (
+                                      (qtkta_temp.NAM_DAT_DUOC IS NOT NULL AND (fromYear IS NULL OR
+                                       (TO_NUMBER(qtkta_temp.NAM_DAT_DUOC) >= fromYear)))
+                                      AND (qtkta_temp.NAM_DAT_DUOC IS NOT NULL AND (toYear IS NULL OR
+                                           (TO_NUMBER(qtkta_temp.NAM_DAT_DUOC) <= toYear)))
+                                ))
+                            AND (searchTerm = ''
+                           OR LOWER(cb.SHCC) LIKE sT
+                           OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
+                           OR LOWER(TRIM(dv.TEN)) LIKE sT
+                           OR LOWER(TRIM(bm.TEN)) LIKE sT
+                           OR LOWER(ldt.TEN) like sT
+                           OR LOWER(TRIM(ktct.TEN)) LIKE sT
+                           OR LOWER(TRIM(ktkh.ten)) LIKE sT)
+                        ) AS "danhSachKhenThuong",
 
                         ldt.MA  AS "maLoaiDoiTuong",
                         ldt.TEN AS "tenLoaiDoiTuong",
@@ -3389,42 +3201,25 @@ BEGIN
                         cb.SHCC AS "maCanBo",
                         cb.HO   AS  "hoCanBo",
                         cb.TEN  AS  "tenCanBo",
-
-                        dv.MA   AS "maDonVi",
-                        dv.TEN  AS "tenDonVi",
-
-                        bm.MA   AS "maBoMon",
-                        bm.TEN  AS "tenBoMon",
-                        bm.MA_DV AS "maDonViBoMon",
-                        dv2.TEN  AS "tenDonViBoMon",
                         
-                        ktkh.MA AS "maThanhTich",
-                        ktkh.TEN    AS  "tenThanhTich",
+                        dv.MA              AS                "maDonVi",
+                        dv.TEN             AS                "tenDonVi",
 
-                        ktct.MA AS  "maChuThich",
-                        ktct.TEN    AS  "tenChuThich",
+                        bm.MA              AS                "maBoMon",
+                        bm.TEN             AS                "tenBoMon",
+                        bm.MA_DV           AS                "maDonViBoMon",
+                        dv2.TEN            AS                "tenDonViBoMon",
                         ROW_NUMBER() OVER (ORDER BY qtkta.NAM_DAT_DUOC DESC, qtkta.ID DESC) R
                 FROM (SELECT * 
                         FROM QT_KHEN_THUONG_ALL 
                         WHERE ID IN (
-                            SELECT MAX(ID) FROM (SELECT * FROM QT_KHEN_THUONG_ALL ORDER BY MA DESC ) GROUP BY MA)) qtkta                   
+                            SELECT MAX(ID) FROM (SELECT * FROM QT_KHEN_THUONG_ALL ORDER BY MA DESC ) GROUP BY MA)) qtkta        
                         LEFT JOIN DM_KHEN_THUONG_LOAI_DOI_TUONG ldt on ldt.MA = qtkta.LOAI_DOI_TUONG
                         LEFT JOIN TCHC_CAN_BO cb on (qtkta.LOAI_DOI_TUONG = '02' and qtkta.MA = cb.SHCC)
                         LEFT JOIN DM_DON_VI dv on (qtkta.LOAI_DOI_TUONG = '03' and qtkta.MA = TO_CHAR(dv.MA))
                         LEFT JOIN DM_BO_MON bm on (qtkta.LOAI_DOI_TUONG = '04' and qtkta.MA = TO_CHAR(bm.MA))
                         LEFT JOIN DM_DON_VI dv2 on (bm.MA_DV = dv2.ma)
-                        LEFT JOIN DM_KHEN_THUONG_KY_HIEU ktkh ON qtkta.THANH_TICH = ktkh.MA
-                        LEFT JOIN DM_KHEN_THUONG_CHU_THICH ktct ON qtkta.CHU_THICH = ktct.MA
                 WHERE (loaiDoiTuong = '-1' OR (loaiDoiTuong = qtkta.LOAI_DOI_TUONG))
-                    AND (searchTerm = ''
-                   OR LOWER(cb.SHCC) LIKE sT
-                   OR LOWER(ldt.TEN) like sT
-                   OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
-                   OR LOWER(TRIM(dv.TEN)) LIKE sT
-                   OR LOWER(TRIM(bm.TEN)) LIKE sT
-                   OR qtkta.NAM_DAT_DUOC LIKE sT
-                   OR LOWER(TRIM(ktct.TEN)) LIKE sT
-                   OR LOWER(TRIM(ktkh.ten)) LIKE sT)
                 ORDER BY qtkta.NAM_DAT_DUOC DESC, qtkta.ID DESC
             )
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND  pageNumber * pageSize;
@@ -3453,15 +3248,20 @@ BEGIN
              LEFT JOIN DM_KHEN_THUONG_CHU_THICH ktct ON qtkta.CHU_THICH = ktct.MA
     WHERE (loaiDoiTuong = '-1' OR (loaiDoiTuong = qtkta.LOAI_DOI_TUONG))
         AND (maDT IS NULL OR (loaiDoiTuong = qtkta.LOAI_DOI_TUONG and qtkta.MA = TO_CHAR(maDT)))
-        AND (qtkta.NAM_DAT_DUOC IS NULL OR fromYear IS NULL OR (TO_NUMBER(qtkta.NAM_DAT_DUOC) >= fromYear))
-        AND (qtkta.NAM_DAT_DUOC IS NULL OR toYear IS NULL OR (TO_NUMBER(qtkta.NAM_DAT_DUOC) <= toYear))
+        AND ((
+                (fromYear IS NULL) AND (toYear IS NULL)
+            ) OR (
+                  (qtkta.NAM_DAT_DUOC IS NOT NULL AND (fromYear IS NULL OR
+                   (TO_NUMBER(qtkta.NAM_DAT_DUOC) >= fromYear)))
+                  AND (qtkta.NAM_DAT_DUOC IS NOT NULL AND (toYear IS NULL OR
+                       (TO_NUMBER(qtkta.NAM_DAT_DUOC) <= toYear)))
+            ))
         AND (searchTerm = ''
        OR LOWER(cb.SHCC) LIKE sT
        OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
        OR LOWER(TRIM(dv.TEN)) LIKE sT
        OR LOWER(TRIM(bm.TEN)) LIKE sT
        OR LOWER(ldt.TEN) like sT
-       OR qtkta.NAM_DAT_DUOC LIKE sT
        OR LOWER(TRIM(ktct.TEN)) LIKE sT
        OR LOWER(TRIM(ktkh.ten)) LIKE sT);
 
@@ -3509,15 +3309,20 @@ BEGIN
                           LEFT JOIN DM_KHEN_THUONG_CHU_THICH ktct ON qtkta.CHU_THICH = ktct.MA
                 WHERE (loaiDoiTuong = '-1' OR (loaiDoiTuong = qtkta.LOAI_DOI_TUONG))
                     AND (maDT IS NULL OR (loaiDoiTuong = qtkta.LOAI_DOI_TUONG and qtkta.MA = TO_CHAR(maDT)))
-                    AND (qtkta.NAM_DAT_DUOC IS NULL OR fromYear IS NULL OR (TO_NUMBER(qtkta.NAM_DAT_DUOC) >= fromYear))
-                    AND (qtkta.NAM_DAT_DUOC IS NULL OR toYear IS NULL OR (TO_NUMBER(qtkta.NAM_DAT_DUOC) <= toYear))
+                    AND ((
+                            (fromYear IS NULL) AND (toYear IS NULL)
+                        ) OR (
+                              (qtkta.NAM_DAT_DUOC IS NOT NULL AND (fromYear IS NULL OR
+                               (TO_NUMBER(qtkta.NAM_DAT_DUOC) >= fromYear)))
+                              AND (qtkta.NAM_DAT_DUOC IS NOT NULL AND (toYear IS NULL OR
+                                   (TO_NUMBER(qtkta.NAM_DAT_DUOC) <= toYear)))
+                        ))
                     AND (searchTerm = ''
                     OR LOWER(cb.SHCC) LIKE sT
                     OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
                     OR LOWER(TRIM(dv.TEN)) LIKE sT
                     OR LOWER(TRIM(bm.TEN)) LIKE sT
                     OR LOWER(ldt.TEN) like sT
-                    OR qtkta.NAM_DAT_DUOC LIKE sT
                     OR LOWER(TRIM(ktct.TEN)) LIKE sT
                     OR LOWER(TRIM(ktkh.ten)) LIKE sT)
                 ORDER BY qtkta.NAM_DAT_DUOC DESC, qtkta.ID DESC
@@ -3526,95 +3331,6 @@ BEGIN
     RETURN my_cursor;
 
 END;
-/
---EndMethod--
-
-CREATE OR REPLACE FUNCTION QT_KHEN_THUONG_CA_NHAN_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER, searchTerm IN STRING, totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
-AS
-    my_cursor SYS_REFCURSOR;
-    sT STRING(500) := '%' || lower(searchTerm) || '%';
-BEGIN
-    SELECT COUNT(*)
-    INTO totalItem
-
-    FROM QT_KHEN_THUONG_CA_NHAN qtktcn
-                LEFT JOIN TCHC_CAN_BO cb on qtktcn.SHCC = cb.SHCC
-                LEFT JOIN DM_KHEN_THUONG_KY_HIEU ktkh ON qtktcn.THANH_TICH = ktkh.MA
-                LEFT JOIN DM_KHEN_THUONG_CHU_THICH ktct ON qtktcn.CHU_THICH = ktct.MA
-    WHERE searchTerm = ''
-        OR LOWER(qtktcn.SHCC) LIKE sT
-        OR qtktcn.NAM_DAT_DUOC LIKE sT
-        OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
-        OR LOWER(ktct.TEN) LIKE sT
-        OR LOWER(ktkh.ten) LIKE sT;
-
-    IF pageNumber < 1 THEN pageNumber := 1; END IF;
-    IF pageSize < 1 THEN pageSize := 1; END IF;
-    pageTotal := CEIL(totalItem / pageSize);
-    pageNumber := LEAST(pageNumber, pageTotal);
-
-    OPEN my_cursor FOR
-        SELECT *
-        FROM (
-                 SELECT qtktcn.SHCC                           AS  "shcc",
-                        qtktcn.ID                           AS  "id",
-                        qtktcn.nam_dat_duoc                 AS "namDatDuoc",
-                        cb.HO                               AS  "ho",
-                        cb.TEN                              AS  "ten",
-                        ktkh.MA                             AS "maThanhTich",
-                        ktkh.TEN                              AS  "tenThanhTich",
-                        ktct.MA                              AS  "maChuThich",
-                        ktct.TEN                              AS  "tenChuThich",
-                        ROW_NUMBER() OVER (ORDER BY ID DESC) R
-                FROM QT_KHEN_THUONG_CA_NHAN qtktcn
-                    LEFT JOIN TCHC_CAN_BO cb on qtktcn.SHCC = cb.SHCC
-                    LEFT JOIN DM_KHEN_THUONG_KY_HIEU ktkh ON qtktcn.THANH_TICH = ktkh.MA
-                    LEFT JOIN DM_KHEN_THUONG_CHU_THICH ktct ON qtktcn.CHU_THICH = ktct.MA
-                WHERE searchTerm = ''
-                    OR LOWER(qtktcn.SHCC) LIKE sT
-                    OR qtktcn.NAM_DAT_DUOC LIKE sT
-                    OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
-                    OR LOWER(ktct.TEN) LIKE sT
-                    OR LOWER(ktkh.ten) LIKE sT
-                    ORDER BY qtktcn.ID DESC
-            )
-        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND  pageNumber * pageSize;
-    RETURN my_cursor;
-
-END;
-/
---EndMethod--
-
-CREATE OR REPLACE FUNCTION QT_KY_LUAT_BY_SHCC(isSHCC in STRING) RETURN SYS_REFCURSOR
-AS
-    my_cursor SYS_REFCURSOR;
-BEGIN
-    OPEN my_cursor FOR
-        SELECT qtkl.ID              AS              "id",
-               qtkl.LY_DO_HINH_THUC AS              "lyDoHinhThuc",
-               qtkl.BAT_DAU         AS              "batDau",
-               qtkl.BAT_DAU_TYPE    AS              "batDauType",
-               qtkl.KET_THUC        AS              "ketThuc",
-               qtkl.KET_THUC_TYPE   AS              "ketThucType",
-               qtkl.CAP_QUYET_DINH  AS              "capQuyetDinh",
-               qtkl.DIEM_THI_DUA    AS              "diemThiDua",
-
-               dmkl.TEN             AS              "tenKyLuat",
-               cb.SHCC              AS              "maCanBo",
-               cb.HO                AS              "hoCanBo",
-               cb.TEN               AS              "tenCanBo",
-
-               dv.MA                AS              "maDonVi",
-               dv.TEN               AS              "tenDonVi",
-               qtkl.NOI_DUNG        AS              "noiDung",
-               ROW_NUMBER() OVER (ORDER BY ID DESC) R
-        FROM QT_KY_LUAT qtkl
-                 LEFT JOIN TCHC_CAN_BO cb on qtkl.SHCC = cb.SHCC
-                 LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
-                 LEFT JOIN DM_KY_LUAT dmkl ON qtkl.LY_DO_HINH_THUC = dmkl.MA
-        WHERE INSTR(isSHCC, qtkl.SHCC) != 0;
-    return my_cursor;
-end;
 /
 --EndMethod--
 
@@ -3634,10 +3350,7 @@ BEGIN
             WHERE ID IN (
                 SELECT MAX(ID) FROM (SELECT * FROM QT_KY_LUAT ORDER BY SHCC DESC ) GROUP BY SHCC)) qtkl
              LEFT JOIN TCHC_CAN_BO cb on qtkl.SHCC = cb.SHCC
-             LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
-    WHERE ((list_shcc IS NOT NULL AND INSTR(list_shcc, qtkl.SHCC) != 0)
-      OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
-      OR (list_shcc IS NULL AND list_dv IS NULL));
+             LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = TO_CHAR(dv.MA));
 
     IF pageNumber < 1 THEN pageNumber := 1; END IF;
     IF pageSize < 1 THEN pageSize := 1; END IF;
@@ -3650,23 +3363,44 @@ BEGIN
                  SELECT qtkl.ID           AS                "id",
 
                         (SELECT COUNT(*)
-                         FROM QT_KY_LUAT qtkl_temp
-                            LEFT JOIN TCHC_CAN_BO cb_temp on qtkl_temp.SHCC = cb_temp.SHCC
-                            LEFT JOIN DM_DON_VI dv_temp on cb_temp.MA_DON_VI = TO_CHAR(dv_temp.MA)
-                            LEFT JOIN DM_KY_LUAT dmkl_temp ON qtkl_temp.LY_DO_HINH_THUC = dmkl_temp.MA
-                         WHERE qtkl_temp.SHCC = qtkl.SHCC
-                           AND (qtkl_temp.BAT_DAU IS NULL OR fromYear IS NULL OR
-                                qtkl_temp.BAT_DAU >= fromYear)
-                           AND (qtkl_temp.KET_THUC IS NULL OR toYear IS NULL OR
-                                qtkl_temp.KET_THUC <= toYear)
-                           AND (searchTerm = ''
-                            OR LOWER(cb_temp.SHCC) LIKE sT
-                            OR LOWER(qtkl_temp.NOI_DUNG) LIKE sT
-                            OR LOWER(dmkl_temp.TEN) LIKE sT
-                            OR LOWER(qtkl_temp.CAP_QUYET_DINH) LIKE sT
-                            OR LOWER(TRIM(cb_temp.HO || ' ' || cb_temp.TEN)) LIKE sT)
+                        FROM QT_KY_LUAT qtkl_temp
+                                 LEFT JOIN TCHC_CAN_BO cb on qtkl_temp.SHCC = cb.SHCC
+                                 LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
+                                 LEFT JOIN DM_KY_LUAT dmkl ON qtkl_temp.LY_DO_HINH_THUC = dmkl.MA
+                        WHERE (qtkl_temp.SHCC = qtkl.SHCC)
+                              AND (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
+                                OR (((list_shcc IS NOT NULL AND INSTR(list_shcc, qtkl_temp.SHCC) != 0)
+                          OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
+                          OR (list_shcc IS NULL AND list_dv IS NULL))
+                          AND (qtkl_temp.BAT_DAU IS NOT NULL AND (fromYear IS NULL OR qtkl_temp.BAT_DAU >= fromYear))
+                          AND (qtkl_temp.KET_THUC IS NOT NULL AND (toYear IS NULL OR qtkl_temp.KET_THUC <= toYear))))
+                            AND (searchTerm = ''
+                           OR LOWER(cb.SHCC) LIKE sT
+                           OR LOWER(qtkl_temp.NOI_DUNG) LIKE sT
+                           OR LOWER(dmkl.TEN) LIKE sT
+                           OR LOWER(qtkl_temp.CAP_QUYET_DINH) LIKE sT
+                           OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT)
                         ) AS "soKyLuat",
 
+                        (select rtrim(xmlagg(xmlelement(e, dmkl.TEN || ' ','??').extract('//text()') order by null).getclobval(),'??')
+                        FROM QT_KY_LUAT qtkl_temp
+                                 LEFT JOIN TCHC_CAN_BO cb on qtkl_temp.SHCC = cb.SHCC
+                                 LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
+                                 LEFT JOIN DM_KY_LUAT dmkl ON qtkl_temp.LY_DO_HINH_THUC = dmkl.MA
+                        WHERE (qtkl_temp.SHCC = qtkl.SHCC)
+                              AND (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
+                                OR (((list_shcc IS NOT NULL AND INSTR(list_shcc, qtkl_temp.SHCC) != 0)
+                          OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
+                          OR (list_shcc IS NULL AND list_dv IS NULL))
+                          AND (qtkl_temp.BAT_DAU IS NOT NULL AND (fromYear IS NULL OR qtkl_temp.BAT_DAU >= fromYear))
+                          AND (qtkl_temp.KET_THUC IS NOT NULL AND (toYear IS NULL OR qtkl_temp.KET_THUC <= toYear))))
+                            AND (searchTerm = ''
+                           OR LOWER(cb.SHCC) LIKE sT
+                           OR LOWER(qtkl_temp.NOI_DUNG) LIKE sT
+                           OR LOWER(dmkl.TEN) LIKE sT
+                           OR LOWER(qtkl_temp.CAP_QUYET_DINH) LIKE sT
+                           OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT)
+                        ) AS "danhSachKyLuat",
                         cb.SHCC            AS                "maCanBo",
                         cb.HO              AS                "hoCanBo",
                         cb.TEN             AS                "tenCanBo",
@@ -3678,66 +3412,7 @@ BEGIN
                             SELECT MAX(ID) FROM (SELECT * FROM QT_KY_LUAT ORDER BY SHCC DESC ) GROUP BY SHCC)) qtkl
                          LEFT JOIN TCHC_CAN_BO cb on qtkl.SHCC = cb.SHCC
                          LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = TO_CHAR(dv.MA))
-                WHERE ((list_shcc IS NOT NULL AND INSTR(list_shcc, qtkl.SHCC) != 0)
-                  OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
-                  OR (list_shcc IS NULL AND list_dv IS NULL))
                  ORDER BY qtkl.KET_THUC DESC
-             )
-        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
-    RETURN my_cursor;
-
-END;
-/
---EndMethod--
-
-CREATE OR REPLACE FUNCTION QT_KY_LUAT_GROUP_PAGE_MA(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER, loaiDoiTuong IN STRING,
-                                               searchTerm IN STRING,
-                                               totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
-AS
-    my_cursor SYS_REFCURSOR;
-    sT        STRING(500) := '%' || lower(searchTerm) || '%';
-BEGIN
-    SELECT COUNT(*)
-    INTO totalItem
-
-    FROM QT_KY_LUAT qtkl
-             LEFT JOIN TCHC_CAN_BO cb on qtkl.SHCC = cb.SHCC
-             LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
-             LEFT JOIN DM_KY_LUAT dmkl ON qtkl.LY_DO_HINH_THUC = dmkl.MA
-    WHERE (loaiDoiTuong = '-1' OR loaiDoiTuong = dv.MA) AND (qtkl.SHCC = searchTerm);
-
-    IF pageNumber < 1 THEN pageNumber := 1; END IF;
-    IF pageSize < 1 THEN pageSize := 1; END IF;
-    pageTotal := CEIL(totalItem / pageSize);
-    pageNumber := LEAST(pageNumber, pageTotal);
-
-    OPEN my_cursor FOR
-        SELECT *
-        FROM (
-                 SELECT qtkl.ID           AS                "id",
-                        qtkl.LY_DO_HINH_THUC    AS "lyDoHinhThuc",
-                        qtkl.BAT_DAU    AS "batDau",
-                        qtkl.BAT_DAU_TYPE AS "batDauType",
-                        qtkl.KET_THUC   AS "ketThuc",
-                        qtkl.KET_THUC_TYPE  AS "ketThucType",
-                        qtkl.CAP_QUYET_DINH AS "capQuyetDinh",
-                        qtkl.DIEM_THI_DUA   AS "diemThiDua",
-
-                        dmkl.TEN           AS   "tenKyLuat",
-                        cb.SHCC            AS                "maCanBo",
-                        cb.HO              AS                "hoCanBo",
-                        cb.TEN             AS                "tenCanBo",
-
-                        dv.MA              AS                "maDonVi",
-                        dv.TEN             AS                "tenDonVi",
-
-                        ROW_NUMBER() OVER (ORDER BY ID DESC) R
-                FROM QT_KY_LUAT qtkl
-                         LEFT JOIN TCHC_CAN_BO cb on qtkl.SHCC = cb.SHCC
-                         LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
-                         LEFT JOIN DM_KY_LUAT dmkl ON qtkl.LY_DO_HINH_THUC = dmkl.MA
-                WHERE (loaiDoiTuong = '-1' OR loaiDoiTuong = dv.MA) AND (qtkl.SHCC = searchTerm)
-                ORDER BY qtkl.ID DESC
              )
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
     RETURN my_cursor;
@@ -3761,11 +3436,12 @@ BEGIN
              LEFT JOIN TCHC_CAN_BO cb on qtkl.SHCC = cb.SHCC
              LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
              LEFT JOIN DM_KY_LUAT dmkl ON qtkl.LY_DO_HINH_THUC = dmkl.MA
-    WHERE ((list_shcc IS NOT NULL AND INSTR(list_shcc, qtkl.SHCC) != 0)
+    WHERE (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
+        OR (((list_shcc IS NOT NULL AND ((INSTR(list_shcc, ',') != 0 AND INSTR(list_shcc, qtkl.SHCC) != 0) OR (list_shcc = qtkl.SHCC)))
       OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
       OR (list_shcc IS NULL AND list_dv IS NULL))
-      AND (fromYear IS NULL OR qtkl.BAT_DAU IS NULL OR qtkl.BAT_DAU >= fromYear)
-      AND (toYear IS NULL OR qtkl.KET_THUC IS NULL OR qtkl.KET_THUC <= toYear)
+      AND (qtkl.BAT_DAU IS NOT NULL AND (fromYear IS NULL OR qtkl.BAT_DAU >= fromYear))
+      AND (qtkl.KET_THUC IS NOT NULL AND (toYear IS NULL OR qtkl.KET_THUC <= toYear))))
         AND (searchTerm = ''
        OR LOWER(cb.SHCC) LIKE sT
        OR LOWER(qtkl.NOI_DUNG) LIKE sT
@@ -3804,11 +3480,12 @@ BEGIN
                          LEFT JOIN TCHC_CAN_BO cb on qtkl.SHCC = cb.SHCC
                          LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
                          LEFT JOIN DM_KY_LUAT dmkl ON qtkl.LY_DO_HINH_THUC = dmkl.MA
-                WHERE ((list_shcc IS NOT NULL AND INSTR(list_shcc, qtkl.SHCC) != 0)
+                WHERE (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
+                    OR (((list_shcc IS NOT NULL AND ((INSTR(list_shcc, ',') != 0 AND INSTR(list_shcc, qtkl.SHCC) != 0) OR (list_shcc = qtkl.SHCC)))
                   OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
                   OR (list_shcc IS NULL AND list_dv IS NULL))
-                  AND (fromYear IS NULL OR qtkl.BAT_DAU IS NULL OR qtkl.BAT_DAU >= fromYear)
-                  AND (toYear IS NULL OR qtkl.KET_THUC IS NULL OR qtkl.KET_THUC <= toYear)
+                  AND (qtkl.BAT_DAU IS NOT NULL AND (fromYear IS NULL OR qtkl.BAT_DAU >= fromYear))
+                  AND (qtkl.KET_THUC IS NOT NULL AND (toYear IS NULL OR qtkl.KET_THUC <= toYear))))
                     AND (searchTerm = ''
                    OR LOWER(cb.SHCC) LIKE sT
                    OR LOWER(qtkl.NOI_DUNG) LIKE sT
@@ -4259,64 +3936,6 @@ BEGIN
                      OR LOWER(TRIM(qtnckh.VAI_TRO)) LIKE sT
                      OR LOWER(TRIM(qtnckh.MA_SO_CAP_QUAN_LY)) LIKE sT)
                  ORDER BY qtnckh.NGAY_NGHIEM_THU DESC
-             )
-        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
-    RETURN my_cursor;
-
-END;
-/
---EndMethod--
-
-CREATE OR REPLACE FUNCTION QT_NCKH_GROUP_PAGE_MA(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER, loaiDoiTuong IN STRING,
-                                               searchTerm IN STRING,
-                                               totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
-AS
-    my_cursor SYS_REFCURSOR;
-    sT        STRING(500) := '%' || lower(searchTerm) || '%';
-BEGIN
-    SELECT COUNT(*)
-    INTO totalItem
-
-    FROM QT_NGHIEN_CUU_KHOA_HOC qtnckh
-             LEFT JOIN TCHC_CAN_BO cb on qtnckh.SHCC = cb.SHCC
-             LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
-    WHERE (loaiDoiTuong = '-1' OR loaiDoiTuong = dv.MA) AND (qtnckh.SHCC = searchTerm);
-
-    IF pageNumber < 1 THEN pageNumber := 1; END IF;
-    IF pageSize < 1 THEN pageSize := 1; END IF;
-    pageTotal := CEIL(totalItem / pageSize);
-    pageNumber := LEAST(pageNumber, pageTotal);
-
-    OPEN my_cursor FOR
-        SELECT *
-        FROM (
-                 SELECT qtnckh.ID           AS                "id",
-                        qtnckh.TEN_DE_TAI   AS "tenDeTai",
-                        qtnckh.MA_SO_CAP_QUAN_LY    AS "maSoCapQuanLy",
-                        qtnckh.KINH_PHI   AS "kinhPhi",
-                        qtnckh.BAT_DAU    AS "batDau",
-                        qtnckh.BAT_DAU_TYPE AS "batDauType",
-                        qtnckh.KET_THUC   AS "ketThuc",
-                        qtnckh.KET_THUC_TYPE  AS "ketThucType",
-                        qtnckh.NGAY_NGHIEM_THU  AS "ngayNghiemThu",
-                        qtnckh.NGAY_NGHIEM_THU_TYPE AS "ngayNghiemThuType",
-                        qtnckh.VAI_TRO  AS "vaiTro",
-                        qtnckh.KET_QUA  AS "ketQua",
-                        qtnckh.THOI_GIAN    AS "thoiGian",
-                        qtnckh.SHCC            AS                "shcc",
-
-                        cb.HO              AS                "hoCanBo",
-                        cb.TEN             AS                "tenCanBo",
-
-                        dv.MA              AS                "maDonVi",
-                        dv.TEN             AS                "tenDonVi",
-
-                        ROW_NUMBER() OVER (ORDER BY ID DESC) R
-                FROM QT_NGHIEN_CUU_KHOA_HOC qtnckh
-                         LEFT JOIN TCHC_CAN_BO cb on qtnckh.SHCC = cb.SHCC
-                         LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
-                WHERE (loaiDoiTuong = '-1' OR loaiDoiTuong = dv.MA) AND (qtnckh.SHCC = searchTerm)
-                ORDER BY qtnckh.ID DESC
              )
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
     RETURN my_cursor;
@@ -5204,20 +4823,7 @@ BEGIN
     FROM (SELECT *
           FROM SACH_GIAO_TRINH
           WHERE ID IN (SELECT MAX(ID) FROM (SELECT * FROM SACH_GIAO_TRINH ORDER BY SHCC DESC) GROUP BY SHCC)) sgt
-             LEFT JOIN TCHC_CAN_BO cb on sgt.SHCC = cb.SHCC
-             LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
-    WHERE ((list_shcc IS NOT NULL AND INSTR(list_shcc, sgt.SHCC) != 0)
-      OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
-      OR (list_shcc IS NULL AND list_dv IS NULL))
-      AND (searchTerm = ''
-       OR LOWER(cb.SHCC) LIKE sT
-       OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
-       OR LOWER(sgt.TEN) LIKE sT
-       OR LOWER(sgt.SAN_PHAM) LIKE sT
-       OR LOWER(sgt.NHA_SAN_XUAT) LIKE sT
-       OR LOWER(TO_CHAR(sgt.NAM_SAN_XUAT)) LIKE sT
-       OR LOWER(sgt.BUT_DANH) LIKE sT);
-
+             LEFT JOIN TCHC_CAN_BO cb on sgt.SHCC = cb.SHCC;
     IF pageNumber < 1 THEN pageNumber := 1; END IF;
     IF pageSize < 1 THEN pageSize := 1; END IF;
     pageTotal := CEIL(totalItem / pageSize);
@@ -5227,111 +4833,56 @@ BEGIN
         SELECT *
         FROM (
                  SELECT sgt.ID           AS                "id",
-                        sgt.TEN AS "ten",
-                        sgt.THE_LOAI AS "theLoai",
-                        sgt.NHA_SAN_XUAT AS "nhaSanXuat",
-                        sgt.NAM_SAN_XUAT    AS "namSanXuat",
-                        sgt.SAN_PHAM    AS "sanPham",
-                        sgt.CHU_BIEN    AS "chuBien",
-                        sgt.BUT_DANH    AS "butDanh",
-                        sgt.QUOC_TE AS "quocTe",
                         sgt.SHCC            AS                "shcc",
                         (SELECT COUNT(*)
-                         FROM SACH_GIAO_TRINH sgt_temp
-                         WHERE sgt_temp.SHCC = sgt.SHCC
-                           AND (sgt_temp.NAM_SAN_XUAT IS NULL OR fromYear IS NULL OR
-                                sgt_temp.NAM_SAN_XUAT >= fromYear)
-                           AND (sgt_temp.NAM_SAN_XUAT IS NULL OR toYear IS NULL OR
-                                sgt_temp.NAM_SAN_XUAT <= toYear)
+                        FROM SACH_GIAO_TRINH sgt_temp
+                                 LEFT JOIN TCHC_CAN_BO cb on sgt_temp.SHCC = cb.SHCC
+                                 LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
+                        WHERE (sgt_temp.SHCC = sgt.SHCC)
+                            AND (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
+                                OR (((list_shcc IS NOT NULL AND INSTR(list_shcc, sgt_temp.SHCC) != 0)
+                          OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
+                          OR (list_shcc IS NULL AND list_dv IS NULL))
+                          AND (sgt_temp.NAM_SAN_XUAT IS NOT NULL AND (fromYear IS NULL OR sgt_temp.NAM_SAN_XUAT >= fromYear))
+                          AND (sgt_temp.NAM_SAN_XUAT IS NOT NULL AND (toYear IS NULL OR sgt_temp.NAM_SAN_XUAT <= toYear))))
+                            AND (searchTerm = ''
+                           OR LOWER(cb.SHCC) LIKE sT
+                           OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
+                           OR LOWER(sgt_temp.TEN) LIKE sT
+                           OR LOWER(sgt_temp.SAN_PHAM) LIKE sT
+                           OR LOWER(sgt_temp.NHA_SAN_XUAT) LIKE sT
+                           OR LOWER(sgt_temp.BUT_DANH) LIKE sT)
                         ) AS "soLuong",
 
-                        (Select listagg(sgt_temp2.TEN || ' ', '??') within group ( order by null)
-                         FROM SACH_GIAO_TRINH sgt_temp2
-                         WHERE sgt_temp2.SHCC = sgt.SHCC
-                           AND (sgt_temp2.NAM_SAN_XUAT IS NULL OR fromYear IS NULL OR
-                                sgt_temp2.NAM_SAN_XUAT >= fromYear)
-                           AND (sgt_temp2.NAM_SAN_XUAT IS NULL OR toYear IS NULL OR
-                                sgt_temp2.NAM_SAN_XUAT <= toYear)
+                        (select rtrim(xmlagg(xmlelement(e, sgt_temp.TEN || ' ','??').extract('//text()') order by null).getclobval(),'??')
+                        FROM SACH_GIAO_TRINH sgt_temp
+                                 LEFT JOIN TCHC_CAN_BO cb on sgt_temp.SHCC = cb.SHCC
+                                 LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
+                        WHERE (sgt_temp.SHCC = sgt.SHCC)
+                            AND (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
+                                OR (((list_shcc IS NOT NULL AND INSTR(list_shcc, sgt_temp.SHCC) != 0)
+                          OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
+                          OR (list_shcc IS NULL AND list_dv IS NULL))
+                          AND (sgt_temp.NAM_SAN_XUAT IS NOT NULL AND (fromYear IS NULL OR sgt_temp.NAM_SAN_XUAT >= fromYear))
+                          AND (sgt_temp.NAM_SAN_XUAT IS NOT NULL AND (toYear IS NULL OR sgt_temp.NAM_SAN_XUAT <= toYear))))
+                            AND (searchTerm = ''
+                           OR LOWER(cb.SHCC) LIKE sT
+                           OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
+                           OR LOWER(sgt_temp.TEN) LIKE sT
+                           OR LOWER(sgt_temp.SAN_PHAM) LIKE sT
+                           OR LOWER(sgt_temp.NHA_SAN_XUAT) LIKE sT
+                           OR LOWER(sgt_temp.BUT_DANH) LIKE sT)
                         ) AS "danhSach",
 
                         cb.HO              AS                "hoCanBo",
                         cb.TEN             AS                "tenCanBo",
-
-                        dv.MA              AS                "maDonVi",
-                        dv.TEN             AS                "tenDonVi",
 
                         ROW_NUMBER() OVER (ORDER BY NAM_SAN_XUAT DESC) R
                 FROM (SELECT *
                       FROM SACH_GIAO_TRINH
                       WHERE ID IN (SELECT MAX(ID) FROM (SELECT * FROM SACH_GIAO_TRINH ORDER BY SHCC DESC) GROUP BY SHCC)) sgt
                          LEFT JOIN TCHC_CAN_BO cb on sgt.SHCC = cb.SHCC
-                         LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
-                WHERE ((list_shcc IS NOT NULL AND INSTR(list_shcc, sgt.SHCC) != 0)
-                  OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
-                  OR (list_shcc IS NULL AND list_dv IS NULL))
-                  AND (searchTerm = ''
-                   OR LOWER(cb.SHCC) LIKE sT
-                   OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
-                   OR LOWER(sgt.TEN) LIKE sT
-                   OR LOWER(sgt.SAN_PHAM) LIKE sT
-                   OR LOWER(sgt.NHA_SAN_XUAT) LIKE sT
-                   OR LOWER(TO_CHAR(sgt.NAM_SAN_XUAT)) LIKE sT
-                   OR LOWER(sgt.BUT_DANH) LIKE sT)
                 ORDER BY sgt.NAM_SAN_XUAT DESC
-             )
-        WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
-    RETURN my_cursor;
-
-END;
-/
---EndMethod--
-
-CREATE OR REPLACE FUNCTION SACH_GIAO_TRINH_GROUP_PAGE_MA(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER, loaiDoiTuong IN STRING,
-                                               searchTerm IN STRING,
-                                               totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
-AS
-    my_cursor SYS_REFCURSOR;
-    sT        STRING(500) := '%' || lower(searchTerm) || '%';
-BEGIN
-    SELECT COUNT(*)
-    INTO totalItem
-
-    FROM SACH_GIAO_TRINH sgt
-             LEFT JOIN TCHC_CAN_BO cb on sgt.SHCC = cb.SHCC
-             LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
-    WHERE (loaiDoiTuong = '-1' OR INSTR(loaiDoiTuong, dv.MA) != 0) AND (sgt.SHCC = searchTerm);
-
-    IF pageNumber < 1 THEN pageNumber := 1; END IF;
-    IF pageSize < 1 THEN pageSize := 1; END IF;
-    pageTotal := CEIL(totalItem / pageSize);
-    pageNumber := LEAST(pageNumber, pageTotal);
-
-    OPEN my_cursor FOR
-        SELECT *
-        FROM (
-                 SELECT sgt.ID           AS                "id",
-                        sgt.TEN AS "ten",
-                        sgt.THE_LOAI AS "theLoai",
-                        sgt.NHA_SAN_XUAT AS "nhaSanXuat",
-                        sgt.NAM_SAN_XUAT    AS "namSanXuat",
-                        sgt.SAN_PHAM    AS "sanPham",
-                        sgt.CHU_BIEN    AS "chuBien",
-                        sgt.BUT_DANH    AS "butDanh",
-                        sgt.QUOC_TE AS "quocTe",
-                        sgt.SHCC            AS                "shcc",
-
-                        cb.HO              AS                "hoCanBo",
-                        cb.TEN             AS                "tenCanBo",
-
-                        dv.MA              AS                "maDonVi",
-                        dv.TEN             AS                "tenDonVi",
-
-                        ROW_NUMBER() OVER (ORDER BY ID DESC) R
-                FROM SACH_GIAO_TRINH sgt
-                         LEFT JOIN TCHC_CAN_BO cb on sgt.SHCC = cb.SHCC
-                         LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
-                WHERE (loaiDoiTuong = '-1' OR INSTR(loaiDoiTuong, dv.MA) != 0) AND (sgt.SHCC = searchTerm)
-                ORDER BY sgt.ID DESC
              )
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
     RETURN my_cursor;
@@ -5354,18 +4905,18 @@ BEGIN
     FROM SACH_GIAO_TRINH sgt
              LEFT JOIN TCHC_CAN_BO cb on sgt.SHCC = cb.SHCC
              LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
-    WHERE ((list_shcc IS NOT NULL AND INSTR(list_shcc, sgt.SHCC) != 0)
+    WHERE (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
+        OR (((list_shcc IS NOT NULL AND ((INSTR(list_shcc, ',') != 0 AND INSTR(list_shcc, sgt.SHCC) != 0) OR (list_shcc = sgt.SHCC)))
       OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
       OR (list_shcc IS NULL AND list_dv IS NULL))
-      AND (fromYear IS NULL OR sgt.NAM_SAN_XUAT IS NULL OR sgt.NAM_SAN_XUAT >= fromYear)
-      AND (toYear IS NULL OR sgt.NAM_SAN_XUAT IS NULL OR sgt.NAM_SAN_XUAT <= toYear)
+      AND (sgt.NAM_SAN_XUAT IS NOT NULL AND (fromYear IS NULL OR sgt.NAM_SAN_XUAT >= fromYear))
+      AND (sgt.NAM_SAN_XUAT IS NOT NULL AND (toYear IS NULL OR sgt.NAM_SAN_XUAT <= toYear))))
         AND (searchTerm = ''
        OR LOWER(cb.SHCC) LIKE sT
        OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
        OR LOWER(sgt.TEN) LIKE sT
        OR LOWER(sgt.SAN_PHAM) LIKE sT
        OR LOWER(sgt.NHA_SAN_XUAT) LIKE sT
-       OR LOWER(TO_CHAR(sgt.NAM_SAN_XUAT)) LIKE sT
        OR LOWER(sgt.BUT_DANH) LIKE sT);
 
     IF pageNumber < 1 THEN pageNumber := 1; END IF;
@@ -5397,18 +4948,18 @@ BEGIN
                 FROM SACH_GIAO_TRINH sgt
                          LEFT JOIN TCHC_CAN_BO cb on sgt.SHCC = cb.SHCC
                          LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
-                WHERE ((list_shcc IS NOT NULL AND INSTR(list_shcc, sgt.SHCC) != 0)
+                WHERE (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL))
+                    OR (((list_shcc IS NOT NULL AND ((INSTR(list_shcc, ',') != 0 AND INSTR(list_shcc, sgt.SHCC) != 0) OR (list_shcc = sgt.SHCC)))
                   OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
                   OR (list_shcc IS NULL AND list_dv IS NULL))
-                  AND (fromYear IS NULL OR sgt.NAM_SAN_XUAT IS NULL OR sgt.NAM_SAN_XUAT >= fromYear)
-                  AND (toYear IS NULL OR sgt.NAM_SAN_XUAT IS NULL OR sgt.NAM_SAN_XUAT <= toYear)
-                  AND (searchTerm = ''
+                  AND (sgt.NAM_SAN_XUAT IS NOT NULL AND (fromYear IS NULL OR sgt.NAM_SAN_XUAT >= fromYear))
+                  AND (sgt.NAM_SAN_XUAT IS NOT NULL AND (toYear IS NULL OR sgt.NAM_SAN_XUAT <= toYear))))
+                    AND (searchTerm = ''
                    OR LOWER(cb.SHCC) LIKE sT
                    OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
                    OR LOWER(sgt.TEN) LIKE sT
                    OR LOWER(sgt.SAN_PHAM) LIKE sT
                    OR LOWER(sgt.NHA_SAN_XUAT) LIKE sT
-                   OR LOWER(TO_CHAR(sgt.NAM_SAN_XUAT)) LIKE sT
                    OR LOWER(sgt.BUT_DANH) LIKE sT)
                 ORDER BY sgt.NAM_SAN_XUAT DESC
              )
