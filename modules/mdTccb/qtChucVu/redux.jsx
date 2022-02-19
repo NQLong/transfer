@@ -7,6 +7,7 @@ const QtChucVuGetPage = 'QtChucVu:GetPage';
 const QtChucVuUpdate = 'QtChucVu:Update';
 const QtChucVuGet = 'QtChucVu:Get';
 const QtChucVuGetGroupPage = 'QtChucVu:GetGroupPage';
+const QtChucVuGetGroupPageMa = 'QtChucVu:GetGroupPageMa';
 
 export default function QtChucVuReducer(state = null, data) {
     switch (data.type) {
@@ -16,6 +17,8 @@ export default function QtChucVuReducer(state = null, data) {
             return Object.assign({}, state, { page: data.page });
         case QtChucVuGetGroupPage:
             return Object.assign({}, state, { page_gr: data.page });
+        case QtChucVuGetGroupPageMa:
+            return Object.assign({}, state, { page_ma: data.page });
         case QtChucVuGet:
             return Object.assign({}, state, { selectedItem: data.item });
         case QtChucVuUpdate:
@@ -94,6 +97,28 @@ export function getQtChucVuGroupPage(pageNumber, pageSize, pageCondition, filter
     };
 }
 
+T.initPage('groupPageMaQtChucVu');
+export function getQtChucVuGroupPageMa(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('groupPageMaQtChucVu', pageNumber, pageSize, pageCondition, filter);
+    return dispatch => {
+        const url = `/api/tccb/qua-trinh/chuc-vu/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách chức vụ bị lỗi!', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (page.filter) data.page.filter = page.filter;
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                if (done) done(data.page);
+                dispatch({ type: QtChucVuGetGroupPageMa, page: data.page });
+            }
+        }, () => T.notify('Lấy danh sách chức vụ bị lỗi!', 'danger'));
+    };
+}
 export function updateQtChucVuGroupPageMa(stt, changes, done) {
     return dispatch => {
         const url = '/api/tccb/qua-trinh/chuc-vu';
@@ -105,7 +130,7 @@ export function updateQtChucVuGroupPageMa(stt, changes, done) {
             } else {
                 T.notify('Cập nhật chức vụ thành công!', 'success');
                 done && done(data.item);
-                dispatch(getQtChucVuPage());
+                dispatch(getQtChucVuGroupPageMa());
             }
         }, () => T.notify('Cập nhật chức vụ bị lỗi!', 'danger'));
     };
@@ -121,7 +146,7 @@ export function deleteQtChucVuGroupPageMa(stt, done) {
             } else {
                 T.alert('Thông tin chức vụ được xóa thành công!', 'info', false, 800);
                 done && done(data.item);
-                dispatch(getQtChucVuPage());
+                dispatch(getQtChucVuGroupPageMa());
             }
         }, () => T.notify('Xóa thông tin chức vụ bị lỗi', 'danger'));
     };
@@ -137,7 +162,7 @@ export function createQtChucVuGroupPageMa(data, done) {
             } else {
                 if (done) {
                     T.notify('Tạo chức vụ thành công!', 'success');
-                    dispatch(getQtChucVuPage());
+                    dispatch(getQtChucVuGroupPageMa());
                     done && done(data);
                 }
             }
