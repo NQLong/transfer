@@ -185,7 +185,7 @@ class QtHocTapCongTacUserPage extends AdminPage {
                         />
                         <TableCell type='text' content={(
                             <>
-                                <span>{item.ketThuc == -1 ? <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đang diễn ra</span> : <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đã kết thúc</span>}</span>
+                                <span>{(item.ketThuc == -1 || item.ketThuc >= item.today) ? <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đang diễn ra</span> : <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đã kết thúc</span>}</span>
                             </>
                         )}></TableCell>
                         {
