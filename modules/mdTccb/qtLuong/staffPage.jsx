@@ -30,11 +30,11 @@ class EditModal extends AdminModal {
     };
 
     onShow = (item) => {
-        let { id, batDau, batDauType, ketThuc, ketThucType, chucDanhNgheNghiep, bac, heSoLuong, 
+        let { id, batDau, batDauType, ketThuc, ketThucType, chucDanhNgheNghiep, bac, heSoLuong,
             phuCapThamNienVuotKhung, ngayHuong, mocNangBacLuong, soHieuVanBan } = item && item.item ? item.item : {
-                id: '', batDau: '', batDauType: '', ketThuc: '', ketThucType: '', chucDanhNgheNghiep: '', bac: '', heSoLuong: '', 
+                id: '', batDau: '', batDauType: '', ketThuc: '', ketThucType: '', chucDanhNgheNghiep: '', bac: '', heSoLuong: '',
                 phuCapThamNienVuotKhung: '', ngayHuong: '', mocNangBacLuong: '', soHieuVanBan: ''
-        };
+            };
         this.setState({
             id, batDauType: batDauType ? batDauType : 'dd/mm/yyyy',
             ketThucType: ketThucType ? ketThucType : 'dd/mm/yyyy',
@@ -125,7 +125,7 @@ class QtLuongUserPage extends AdminPage {
 
     showModal = (e) => {
         e.preventDefault();
-        this.modal.show({item: null, shcc: this.state.filter.list_shcc});
+        this.modal.show({ item: null, shcc: this.state.filter.list_shcc });
     }
 
     delete = (e, item) => {
@@ -140,12 +140,12 @@ class QtLuongUserPage extends AdminPage {
 
     render() {
         let permission = this.getUserPermission('staff', ['login']);
-        if (permission.login == true) {
-            permission = {
-                write: true,
-                delete: true
-            };
-        }
+        // if (permission.login == true) {
+        //     permission = {
+        //         write: true,
+        //         delete: true
+        //     };
+        // }
         const { isStaff, shcc } = this.props.system && this.props.system.user ? this.props.system.user : { isStaff: false, shcc: '' };
         const { firstName, lastName } = isStaff && this.props.system.user || { firstName: '', lastName: '' };
         const name = isStaff ? `${lastName} ${firstName} (${shcc})` : '';
@@ -167,25 +167,25 @@ class QtLuongUserPage extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
-                        <TableCell type='text' style={{  whiteSpace: 'nowrap' }} content={item.chucDanhNgheNghiep}/>
-                        <TableCell type='text' style={{  whiteSpace: 'nowrap' }} content={(
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.chucDanhNgheNghiep} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span><i>Bậc: </i></span> <span>{item.bac}</span> <br/>
-                                <span><i>Hệ số lương: </i></span><span>{item.heSoLuong}</span> <br/>
-                                <span><i>Phụ cấp thâm niên vượt khung: </i></span><span>{item.phuCapThamNienVuotKhung}</span> <br/>
+                                <span><i>Bậc: </i></span> <span>{item.bac}</span> <br />
+                                <span><i>Hệ số lương: </i></span><span>{item.heSoLuong}</span> <br />
+                                <span><i>Phụ cấp thâm niên vượt khung: </i></span><span>{item.phuCapThamNienVuotKhung}</span> <br />
                                 <span><i>Mốc nâng bậc lương: </i></span><span>{item.mocNangBacLuong}</span>
                             </>
                         )}
                         />
                         <TableCell type='text' content={(
                             <>
-                                {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br/></span> : null}
-                                {item.ketThuc ? <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span><br/></span> : null}
+                                {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
+                                {item.ketThuc ? <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
                                 {item.ngayHuong ? <span style={{ whiteSpace: 'nowrap' }}>Ngày hưởng: <span style={{ color: 'blue' }}>{item.ngayHuong ? T.dateToText(item.ngayHuong, 'dd/mm/yyyy') : ''}</span></span> : null}
                             </>
                         )}
                         />
-                        <TableCell type='text' content={item.soHieuVanBan}/>
+                        <TableCell type='text' content={item.soHieuVanBan} />
                         {
                             <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                                 onEdit={() => this.modal.show({ item, shcc })} onDelete={this.delete} >

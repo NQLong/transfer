@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3006: { title: 'Quá trình kỷ luật', link: '/user/tccb/qua-trinh/ky-luat', icon: 'fa-ban', backgroundColor: '#f03a3a', groupIndex: 2 },
+            3006: { title: 'Quá trình kỷ luật', link: '/user/tccb/qua-trinh/ky-luat', icon: 'fa-ban', backgroundColor: '#f03a3a', groupIndex: 3 },
         },
     };
 
@@ -75,7 +75,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, list_shcc, list_dv, timeType, tinhTrang} = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, tinhTrang: null };
+        const { fromYear, toYear, list_shcc, list_dv, timeType, tinhTrang } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, tinhTrang: null };
         app.model.qtKyLuat.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -92,7 +92,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, list_shcc, list_dv, timeType, tinhTrang} = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, tinhTrang: null };
+        const { fromYear, toYear, list_shcc, list_dv, timeType, tinhTrang } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, tinhTrang: null };
         app.model.qtKyLuat.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -124,7 +124,7 @@ module.exports = app => {
         if (req.query.ma) {
             condition = {
                 statement: 'ma = :searchText',
-                parameter: { searchText: req.query.ma},
+                parameter: { searchText: req.query.ma },
             };
         }
         app.model.qtKyLuat.getAll(condition, (error, items) => res.send({ error, items }));

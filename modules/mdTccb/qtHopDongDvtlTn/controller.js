@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3003: { title: 'Hợp đồng đơn vị trả lương & trách nhiệm', link: '/user/tccb/qua-trinh/hop-dong-dvtl-tn', icon: 'fa-pencil', backgroundColor: '#00897b', groupIndex: 0 },
+            3003: { title: 'Hợp đồng đơn vị trả lương & trách nhiệm', link: '/user/tccb/qua-trinh/hop-dong-dvtl-tn', icon: 'fa-pencil', backgroundColor: '#00897b', groupIndex: 2 },
         },
     };
     app.permission.add(

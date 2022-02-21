@@ -5,9 +5,11 @@ import { AdminModal, AdminPage, FormDatePicker, FormRichTextBox, FormTextBox, re
 import Pagination from 'view/component/Pagination';
 import Dropdown from 'view/component/Dropdown';
 import { DateInput } from 'view/component/Input';
-import { getQtNuocNgoaiUserPage, deleteQtNuocNgoaiUserPage, createQtNuocNgoaiUserPage,
-    updateQtNuocNgoaiUserPage }
-from './redux';
+import {
+    getQtNuocNgoaiUserPage, deleteQtNuocNgoaiUserPage, createQtNuocNgoaiUserPage,
+    updateQtNuocNgoaiUserPage
+}
+    from './redux';
 
 const EnumDateType = Object.freeze({
     0: { text: '' },
@@ -86,7 +88,7 @@ class EditModal extends AdminModal {
             body: <div className='row'>
                 <FormRichTextBox className='col-md-12' ref={e => this.noiDung = e} rows={2} readOnly={readOnly} label='Nội dung' placeholder='Nhập nội dung đi nước ngoài (tối đa 200 ký tự)' required maxLength={200} />
                 <FormTextBox className='col-md-12' ref={e => this.quocGia = e} label='Quốc gia' />
-                <FormTextBox className='col-md-12' ref={e => this.tenCoSo = e} label='Tên cơ sở đào tạo/làm việc'  />
+                <FormTextBox className='col-md-12' ref={e => this.tenCoSo = e} label='Tên cơ sở đào tạo/làm việc' />
 
                 <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
                     label={
@@ -126,7 +128,7 @@ class QtNuocNgoaiUserPage extends AdminPage {
 
     showModal = (e) => {
         e.preventDefault();
-        this.modal.show({item: null, shcc: this.state.filter.list_shcc});
+        this.modal.show({ item: null, shcc: this.state.filter.list_shcc });
     }
 
     delete = (e, item) => {
@@ -171,7 +173,7 @@ class QtNuocNgoaiUserPage extends AdminPage {
                         <TableCell type='text' content={(
                             <>
                                 <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span></span><br />
-                                <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span></span> <br/>
+                                <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span></span> <br />
                                 <span style={{ whiteSpace: 'nowrap' }}>Trở lại công tác: <span style={{ color: 'blue' }}>{item.troLaiCongTac ? T.dateToText(item.troLaiCongTac, 'dd/mm/yyyy') : ''}</span></span>
                             </>
                         )}
@@ -189,7 +191,7 @@ class QtNuocNgoaiUserPage extends AdminPage {
                             </>
                         )}
                         />
-                       <TableCell type='text' content={(
+                        <TableCell type='text' content={(
                             <>
                                 {item.kinhPhi ? item.kinhPhi : ''}
                             </>

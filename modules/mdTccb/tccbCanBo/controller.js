@@ -85,10 +85,12 @@ module.exports = app => {
     });
 
     app.get('/api/staff/edit/item/:shcc', app.permission.check('staff:read'), async (req, res) => {
+
         app.model.canBo.get({ shcc: req.params.shcc }, (error, canBo) => {
             if (error || canBo == null) {
                 res.send({ error: 'Lỗi khi lấy thông tin cán bộ !' });
             } else {
+                let curTime = new Date().getTime();
                 app.model.fwUser.get({ email: canBo.email }, (error, user) => {
                     if (error || user == null) {
                         res.send({ error: 'Lỗi khi lấy thông tin cán bộ !' });
@@ -107,38 +109,26 @@ module.exports = app => {
                                 resolve();
                             });
                         }).then(() => new Promise(resolve => {
-                            app.model.trinhDoNgoaiNgu.getTrinhDoNNByShcc(canBo.shcc, (error, trinhDoNN) => {
+                            app.model.tccbToChucKhac.getAll({ shcc: canBo.shcc }, (error, toChucKhac) => {
                                 if (error) {
-                                    res.send({ error: 'Lỗi khi lấy thông tin trình độ ngoại ngữ cán bộ !' });
+                                    res.send({ error: 'Lỗi khi lấy thông tin tổ chức chính trị - xã hội, nghề nghiệp cán bộ !' });
                                 }
-                                else if (trinhDoNN == null) {
-                                    result = app.clone(result, { trinhDoNN: null });
+                                else if (toChucKhac == null) {
+                                    result = app.clone(result, { toChucKhac: null });
                                 } else {
-                                    result = app.clone(result, { trinhDoNN: trinhDoNN.rows });
+                                    result = app.clone(result, { toChucKhac });
                                 }
                                 resolve();
                             });
                         })).then(() => new Promise(resolve => {
-                            app.model.qtHocTapCongTac.getAll({ shcc: canBo.shcc }, '*', 'batDau ASC', (error, hocTapCongTac) => {
+                            app.model.qtDaoTao.getCurrentOfStaff(canBo.shcc, curTime, (error, daoTaoCurrent) => {
                                 if (error) {
-                                    res.send({ error: 'Lỗi khi lấy thông tin học tập cán bộ !' });
+                                    res.send({ error: 'Lỗi khi lấy thông tin đào tạo hiện tại!' });
                                 }
-                                else if (hocTapCongTac == null) {
-                                    result = app.clone(result, { hocTapCongTac: null });
+                                else if (daoTaoCurrent == null || daoTaoCurrent.length == 0) {
+                                    result = app.clone(result, { daoTaoCurrent: [] });
                                 } else {
-                                    result = app.clone(result, { hocTapCongTac });
-                                }
-                                resolve();
-                            });
-                        })).then(() => new Promise(resolve => {
-                            app.model.qtDaoTao.getByShcc(canBo.shcc, (error, daoTao) => {
-                                if (error) {
-                                    res.send({ error: 'Lỗi khi lấy thông tin đào tạo cán bộ !' });
-                                }
-                                else if (daoTao == null) {
-                                    result = app.clone(result, { daoTao: null });
-                                } else {
-                                    result = app.clone(result, { daoTao: daoTao.rows });
+                                    result = app.clone(result, { daoTaoCurrent: daoTaoCurrent.rows });
                                 }
                                 resolve();
                             });
@@ -167,6 +157,30 @@ module.exports = app => {
                                 resolve();
                             });
                         })).then(() => new Promise(resolve => {
+                            app.model.qtDaoTao.getHV(canBo.shcc, (error, hocViCB) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin trình độ học vấn, đào tạo !' });
+                                }
+                                else if (hocViCB == null || hocViCB.length == 0) {
+                                    result = app.clone(result, { hocViCB: null });
+                                } else {
+                                    result = app.clone(result, { hocViCB: hocViCB.rows });
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
+                            app.model.qtDaoTao.getCC(canBo.shcc, (error, chungChi) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin trình độ cử nhân !' });
+                                }
+                                else if (chungChi == null || chungChi.length == 0) {
+                                    result = app.clone(result, { chungChi: null });
+                                } else {
+                                    result = app.clone(result, { chungChi: chungChi.rows });
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
                             app.model.qtDaoTao.getTH(canBo.shcc, (error, tinHoc) => {
                                 if (error) {
                                     res.send({ error: 'Lỗi khi lấy thông tin trình độ tin học cán bộ !' });
@@ -179,14 +193,14 @@ module.exports = app => {
                                 resolve();
                             });
                         })).then(() => new Promise(resolve => {
-                            app.model.tccbToChucKhac.getAll({ shcc: canBo.shcc }, (error, toChucKhac) => {
+                            app.model.trinhDoNgoaiNgu.getTrinhDoNNByShcc(canBo.shcc, (error, trinhDoNN) => {
                                 if (error) {
-                                    res.send({ error: 'Lỗi khi lấy thông tin tổ chức chính trị - xã hội, nghề nghiệp cán bộ !' });
+                                    res.send({ error: 'Lỗi khi lấy thông tin trình độ ngoại ngữ cán bộ !' });
                                 }
-                                else if (toChucKhac == null) {
-                                    result = app.clone(result, { toChucKhac: null });
+                                else if (trinhDoNN == null) {
+                                    result = app.clone(result, { trinhDoNN: null });
                                 } else {
-                                    result = app.clone(result, { toChucKhac });
+                                    result = app.clone(result, { trinhDoNN: trinhDoNN.rows[0] });
                                 }
                                 resolve();
                             });
@@ -869,7 +883,8 @@ module.exports = app => {
             if (error || canBo == null) {
                 res.send({ error });
             } else {
-                let result = app.clone(canBo);
+                let result = app.clone(canBo),
+                    curTime = new Date().getTime();
                 new Promise(resolve => {
                     app.model.fwUser.get({ email: canBo.email }, (error, user) => {
                         if (error || user == null) {
@@ -900,6 +915,18 @@ module.exports = app => {
                             result = app.clone(result, { toChucKhac: null });
                         } else {
                             result = app.clone(result, { toChucKhac });
+                        }
+                        resolve();
+                    });
+                })).then(() => new Promise(resolve => {
+                    app.model.qtDaoTao.getCurrentOfStaff(canBo.shcc, curTime, (error, daoTaoCurrent) => {
+                        if (error) {
+                            res.send({ error: 'Lỗi khi lấy thông tin đào tạo hiện tại!' });
+                        }
+                        else if (daoTaoCurrent == null || daoTaoCurrent.length == 0) {
+                            result = app.clone(result, { daoTaoCurrent: [] });
+                        } else {
+                            result = app.clone(result, { daoTaoCurrent: daoTaoCurrent.rows });
                         }
                         resolve();
                     });

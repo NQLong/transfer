@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3025: { title: 'Quá trình bài viết khoa học', link: '/user/tccb/qua-trinh/bai-viet-khoa-hoc', icon: 'fa-quote-right', backgroundColor: '#23a0b0', groupIndex: 4 },
+            3025: { title: 'Danh sách bài viết khoa học', link: '/user/tccb/qua-trinh/bai-viet-khoa-hoc', icon: 'fa-quote-right', backgroundColor: '#23a0b0', groupIndex: 5 },
         },
     };
     app.permission.add(
@@ -97,7 +97,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, list_shcc, list_dv, xuatBanRange } = (req.query.filter && req.query.filter != '%%%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, xuatBanRange: null};
+        const { fromYear, toYear, list_shcc, list_dv, xuatBanRange } = (req.query.filter && req.query.filter != '%%%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, xuatBanRange: null };
         app.model.qtBaiVietKhoaHoc.groupPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, xuatBanRange, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });

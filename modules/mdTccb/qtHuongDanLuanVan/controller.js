@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3018: { title: 'Quá trình hướng dẫn luận văn', link: '/user/tccb/qua-trinh/hdlv', icon: 'fa-university', backgroundColor: '#488a37', groupIndex: 4 },
+            3018: { title: 'Quá trình hướng dẫn luận văn', link: '/user/tccb/qua-trinh/hdlv', icon: 'fa-university', backgroundColor: '#488a37', groupIndex: 5 },
         },
     };
 
@@ -29,7 +29,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, list_shcc, list_dv} = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null };
+        const { fromYear, toYear, list_shcc, list_dv } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null };
         app.model.qtHuongDanLuanVan.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -45,7 +45,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, list_shcc, list_dv} = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null };
+        const { fromYear, toYear, list_shcc, list_dv } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null };
         app.model.qtHuongDanLuanVan.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -61,7 +61,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, list_shcc, list_dv} = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null };
+        const { fromYear, toYear, list_shcc, list_dv } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null };
         app.model.qtHuongDanLuanVan.groupPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -155,11 +155,11 @@ module.exports = app => {
                     let hoTen = worksheet.getCell('A' + index).value ? worksheet.getCell('A' + index).value.toString().trim() : '',
                         tenLuanVan = worksheet.getCell('B' + index).value ? worksheet.getCell('B' + index).value.toString().trim() : '',
                         bacDaoTao = worksheet.getCell('C' + index).value ? worksheet.getCell('C' + index).value.toString().trim() : '',
-                        namTotNghiep = worksheet.getCell('D' + index).value ? worksheet.getCell('D' + index).value.toString(): '',
+                        namTotNghiep = worksheet.getCell('D' + index).value ? worksheet.getCell('D' + index).value.toString() : '',
                         sanPham = worksheet.getCell('E' + index).value ? worksheet.getCell('E' + index).value.toString().trim() : '';
                     if (namTotNghiep.length != 4) {
                         done({ error: 'Sai định dạng cột năm tốt nghiệp' });
-                    } 
+                    }
                     else items.push({ hoTen, tenLuanVan, bacDaoTao, namTotNghiep, sanPham });
                 } else {
                     done({ items });

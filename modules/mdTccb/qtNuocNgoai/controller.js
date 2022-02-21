@@ -1,26 +1,26 @@
 module.exports = app => {
-    const menu = {
-        parentMenu: app.parentMenu.tccb,
-        menus: {
-            3019: { title: 'Quá trình đi nước ngoài', link: '/user/tccb/qua-trinh/nuoc-ngoai', icon: 'fa-fighter-jet', color: '#000000', backgroundColor: '#4297ff', groupIndex: 1 },
-        },
-    };
-    const menuStaff = {
-        parentMenu: app.parentMenu.user,
-        menus: {
-            1008: { title: 'Đi nước ngoài', link: '/user/nuoc-ngoai', icon: 'fa-fighter-jet', backgroundColor: '#4297ff', groupIndex: 1 },
-        },
-    };
+    // const menu = {
+    //     parentMenu: app.parentMenu.tccb,
+    //     menus: {
+    //         3019: { title: 'Quá trình đi nước ngoài', link: '/user/tccb/qua-trinh/nuoc-ngoai', icon: 'fa-fighter-jet', color: '#000000', backgroundColor: '#4297ff', groupIndex: 1 },
+    //     },
+    // };
+    // const menuStaff = {
+    //     parentMenu: app.parentMenu.user,
+    //     menus: {
+    //         1008: { title: 'Đi nước ngoài', link: '/user/nuoc-ngoai', icon: 'fa-fighter-jet', backgroundColor: '#4297ff', groupIndex: 1 },
+    //     },
+    // };
 
-    app.permission.add(
-        { name: 'staff:login', menu: menuStaff },
-        { name: 'qtNuocNgoai:read', menu },
-        { name: 'qtNuocNgoai:write' },
-        { name: 'qtNuocNgoai:delete' },
-    );
-    app.get('/user/tccb/qua-trinh/nuoc-ngoai', app.permission.check('qtNuocNgoai:read'), app.templates.admin);
-    app.get('/user/tccb/qua-trinh/nuoc-ngoai/group/:shcc', app.permission.check('qtNuocNgoai:read'), app.templates.admin);
-    app.get('/user/nuoc-ngoai', app.permission.check('staff:login'), app.templates.admin);
+    // app.permission.add(
+    //     { name: 'staff:login', menu: menuStaff },
+    //     { name: 'qtNuocNgoai:read', menu },
+    //     { name: 'qtNuocNgoai:write' },
+    //     { name: 'qtNuocNgoai:delete' },
+    // );
+    // app.get('/user/tccb/qua-trinh/nuoc-ngoai', app.permission.check('qtNuocNgoai:read'), app.templates.admin);
+    // app.get('/user/tccb/qua-trinh/nuoc-ngoai/group/:shcc', app.permission.check('qtNuocNgoai:read'), app.templates.admin);
+    // app.get('/user/nuoc-ngoai', app.permission.check('staff:login'), app.templates.admin);
 
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------

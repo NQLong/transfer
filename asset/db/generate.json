@@ -8835,6 +8835,13 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": 100
+            },
+            "NGHE_NGHIEP_CU": {
+                "value": "ngheNghiepCu",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 200
             }
         },
         "primaryKeys": [
@@ -9846,6 +9853,20 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": "1,0"
+            },
+            "CHUYEN_NGANH_CHUC_DANH": {
+                "value": "chuyenNganhChucDanh",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 100
+            },
+            "CO_SO_CHUC_DANH": {
+                "value": "coSoChucDanh",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 200
             }
         },
         "primaryKeys": [

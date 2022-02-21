@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3005: { title: 'Quá trình khen thưởng', link: '/user/tccb/qua-trinh/khen-thuong-all', icon: 'fa-gift', backgroundColor: '#2559ba', groupIndex: 2 },
+            3005: { title: 'Quá trình khen thưởng', link: '/user/tccb/qua-trinh/khen-thuong-all', icon: 'fa-gift', backgroundColor: '#2559ba', groupIndex: 3 },
         },
     };
 
@@ -75,7 +75,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, loaiDoiTuong, ma } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1', ma: null};
+        const { fromYear, toYear, loaiDoiTuong, ma } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1', ma: null };
         app.model.qtKhenThuongAll.searchPage(pageNumber, pageSize, loaiDoiTuong, ma, fromYear, toYear, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -92,7 +92,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, loaiDoiTuong, ma } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1', ma: null};
+        const { fromYear, toYear, loaiDoiTuong, ma } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1', ma: null };
         app.model.qtKhenThuongAll.searchPage(pageNumber, pageSize, loaiDoiTuong, ma, fromYear, toYear, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -174,7 +174,7 @@ module.exports = app => {
                     let cells = [];
                     for (let idx = 0; idx < cols.length; idx++) {
                         let chr = String.fromCharCode(65 + idx); // where n is 0, 1, 2 ...                            
-                        cells.push({cell: chr + '1', value: cols[idx], bold: true, border: '1234'});
+                        cells.push({ cell: chr + '1', value: cols[idx], bold: true, border: '1234' });
                     }
                     page.rows.forEach((item, index) => {
                         cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });

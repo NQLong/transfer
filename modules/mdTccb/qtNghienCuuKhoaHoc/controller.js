@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3021: { title: 'Quá trình nghiên cứu khoa học', link: '/user/tccb/qua-trinh/nghien-cuu-khoa-hoc', icon: 'fa-wpexplorer', backgroundColor: '#f03a88', groupIndex: 4 },
+            3021: { title: 'Quá trình nghiên cứu khoa học', link: '/user/tccb/qua-trinh/nghien-cuu-khoa-hoc', icon: 'fa-wpexplorer', backgroundColor: '#f03a88', groupIndex: 5 },
         },
     };
 
@@ -36,7 +36,7 @@ module.exports = app => {
     });
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/tccb/qua-trinh/nghien-cuu-khoa-hoc/page/:pageNumber/:pageSize', app.permission.check('qtNghienCuuKhoaHoc:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/nghien-cuu-khoa-hoc/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             mscb = req.query.mscb ? req.query.mscb : '',
@@ -54,7 +54,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/tccb/qua-trinh/nghien-cuu-khoa-hoc/group/page/:pageNumber/:pageSize', app.permission.check('qtNghienCuuKhoaHoc:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/nghien-cuu-khoa-hoc/group/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             mscb = req.query.mscb ? req.query.mscb : '',
@@ -72,7 +72,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/tccb/qua-trinh/nghien-cuu-khoa-hoc/group_nckh/page/:loaiDoiTuong/:pageNumber/:pageSize', app.permission.check('qtNghienCuuKhoaHoc:read'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/nghien-cuu-khoa-hoc/group_nckh/page/:loaiDoiTuong/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             loaiDoiTuong = req.params.loaiDoiTuong,
@@ -98,13 +98,13 @@ module.exports = app => {
         app.model.qtNghienCuuKhoaHoc.getAll(condition, (error, items) => res.send({ error, items }));
     });
 
-    app.post('/api/qua-trinh/nckh', app.permission.check('staff:write'), (req, res) =>
+    app.post('/api/qua-trinh/nckh', app.permission.check('staff:login'), (req, res) =>
         app.model.qtNghienCuuKhoaHoc.create(req.body.data, (error, item) => res.send({ error, item })));
 
-    app.put('/api/qua-trinh/nckh', app.permission.check('staff:write'), (req, res) =>
+    app.put('/api/qua-trinh/nckh', app.permission.check('staff:login'), (req, res) =>
         app.model.qtNghienCuuKhoaHoc.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })));
 
-    app.delete('/api/qua-trinh/nckh', app.permission.check('staff:write'), (req, res) =>
+    app.delete('/api/qua-trinh/nckh', app.permission.check('staff:login'), (req, res) =>
         app.model.qtNghienCuuKhoaHoc.delete({ id: req.body.id }, (error) => res.send(error)));
 
 

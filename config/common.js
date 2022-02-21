@@ -77,7 +77,7 @@ module.exports = app => {
         },
         tccb: {
             index: 3000, title: 'Tổ chức cán bộ', link: '/user/tccb', icon: 'fa-sort-alpha-asc',
-            subMenusRender: false, groups: ['Cán bộ', 'Công tác', 'Khen thưởng - Kỷ luật', 'Nghỉ', 'Chuyên môn']
+            subMenusRender: false, groups: ['Cán bộ', 'Công tác', 'Hợp đồng', 'Khen thưởng - Kỷ luật', 'Nghỉ', 'Chuyên môn']
         },
         category: {
             index: 4000, title: 'Danh mục', link: '/user/category', icon: 'fa-list-alt',
