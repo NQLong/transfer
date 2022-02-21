@@ -10,7 +10,6 @@ module.exports = app => {
         { name: 'qtGiaiThuong:write' },
         { name: 'qtGiaiThuong:delete' },
     );
-    app.get('/user/tccb/qua-trinh/giai-thuong/:id', app.permission.check('qtGiaiThuong:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/giai-thuong', app.permission.check('qtGiaiThuong:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/giai-thuong/group/:shcc', app.permission.check('qtGiaiThuong:read'), app.templates.admin);
 

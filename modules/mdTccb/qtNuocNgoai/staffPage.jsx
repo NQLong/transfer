@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminModal, AdminPage, FormDatePicker, FormRichTextBox, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
+import { AdminModal, AdminPage, FormDatePicker, FormRichTextBox, FormTextBox, renderTable, TableCell, FormCheckbox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import Dropdown from 'view/component/Dropdown';
 import { DateInput } from 'view/component/Input';
@@ -34,25 +34,32 @@ class EditModal extends AdminModal {
         let { id, quocGia, noiDung, batDau, batDauType, ketThuc, ketThucType, tenCoSo, kinhPhi, troLaiCongTac } = item && item.item ? item.item : {
             id: '', quocGia: '', noiDung: '', tenCoSo: '', batDau: null, batDauType: '', ketThuc: null, ketThucType: '', kinhPhi: null, troLaiCongTac: ''
         };
-
         this.setState({
             id, batDauType: batDauType ? batDauType : 'dd/mm/yyyy',
             ketThucType: ketThucType ? ketThucType : 'dd/mm/yyyy',
             batDau, ketThuc,
             shcc: item.shcc
-        });
-
-        setTimeout(() => {
+        }, () => {
             this.kinhPhi.value(kinhPhi);
             this.tenCoSo.value(tenCoSo ? tenCoSo : '');
             this.troLaiCongTac.value(troLaiCongTac);
-            this.batDauType.setText({ text: batDauType ? batDauType : 'dd/mm/yyyy' });
-            this.ketThucType.setText({ text: ketThucType ? ketThucType : 'dd/mm/yyyy' });
-            this.batDau.setVal(batDau);
-            this.ketThuc.setVal(ketThuc);
             this.quocGia.value(quocGia);
             this.noiDung.value(noiDung);
-        }, 500);
+
+            this.batDauType.setText({ text: batDauType ? batDauType : 'dd/mm/yyyy' });
+            this.state.ketThuc != -1 && this.ketThucType.setText({ text: ketThucType ? ketThucType : 'dd/mm/yyyy' });
+            if (this.state.ketThuc == -1) {
+                this.setState({ denNay: true });
+                this.denNayCheck.value(true);
+                $('#ketThucDate').hide();
+            } else {
+                this.setState({ denNay: false });
+                this.denNayCheck.value(false);
+                $('#ketThucDate').show();
+            }
+            this.batDau.setVal(batDau ? batDau : '');
+            this.state.ketThuc != -1 && this.ketThuc.setVal(ketThuc ? ketThuc : '');
+        });
     };
 
     onSubmit = (e) => {
@@ -64,8 +71,8 @@ class EditModal extends AdminModal {
             troLaiCongTac: Number(this.troLaiCongTac.value()),
             batDauType: this.state.batDauType,
             batDau: this.batDau.getVal(),
-            ketThucType: this.state.ketThucType,
-            ketThuc: this.ketThuc.getVal(),
+            ketThucType: !this.state.denNay ? this.state.ketThucType : '',
+            ketThuc: !this.state.denNay ? this.ketThuc.getVal() : -1,
             quocGia: this.quocGia.value(),
             noiDung: this.noiDung.value()
         };
@@ -74,6 +81,12 @@ class EditModal extends AdminModal {
             this.noiDung.focus();
         } else if (!changes.batDau) {
             T.notify('Ngày bắt đầu đi nước ngoài trống', 'danger');
+            this.batDau.focus();
+        } else if (!this.state.denNay && !this.ketThuc.getVal()) {
+            T.notify('Ngày kết thúc học tập, công tác trống', 'danger');
+            this.ketThuc.focus();
+        } else if (!this.state.denNay && this.batDau.getVal() > this.ketThuc.getVal()) {
+            T.notify('Ngày bắt đầu lớn hơn ngày kết thúc', 'danger');
             this.batDau.focus();
         } else {
             this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
@@ -97,13 +110,14 @@ class EditModal extends AdminModal {
                             onSelected={item => this.setState({ batDauType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
                     }
                     type={this.state.batDauType ? typeMapper[this.state.batDauType] : null} readOnly={readOnly} /></div>
-                <div className='form-group col-md-6'><DateInput ref={e => this.ketThuc = e} placeholder='Thời gian kết thúc'
+                <FormCheckbox ref={e => this.denNayCheck = e} label='Đến nay' onChange={this.handleKetThuc} className='form-group col-md-3' />
+                <div className='form-group col-md-6' id='ketThucDate'><DateInput ref={e => this.ketThuc = e} placeholder='Thời gian kết thúc'
                     label={
                         <div style={{ display: 'flex' }}>Thời gian kết thúc (định dạng:&nbsp; <Dropdown ref={e => this.ketThucType = e}
                             items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
-                            onSelected={item => this.setState({ ketThucType: item })} readOnly={readOnly} />)</div>
+                            onSelected={item => this.setState({ ketThucType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
                     }
-                    type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} readOnly={readOnly} /></div>
+                    type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} /></div>
 
                 <FormTextBox className='col-md-6' ref={e => this.kinhPhi = e} type='number' label='Kinh phí' readOnly={readOnly} />
                 <FormDatePicker className='col-md-6' ref={e => this.troLaiCongTac = e} type='date-mask' label='Ngày tiếp nhận trở lại công tác' readOnly={readOnly} />
@@ -117,7 +131,7 @@ class QtNuocNgoaiUserPage extends AdminPage {
     componentDidMount() {
         T.ready('/user', () => {
             const { shcc } = this.props.system && this.props.system.user ? this.props.system.user : { shcc: '' };
-            this.setState({ filter: { list_shcc: shcc, list_dv: '', fromYear: null, toYear: null, timeType: 0 } });
+            this.setState({ filter: { list_shcc: shcc, list_dv: '', fromYear: null, toYear: null, timeType: 0, tinhTrang: null } });
             this.getPage();
         });
     }
@@ -132,13 +146,23 @@ class QtNuocNgoaiUserPage extends AdminPage {
     }
 
     delete = (e, item) => {
-        T.confirm('Xóa thông tin kéo dài công tác', 'Bạn có chắc bạn muốn xóa thông tin kéo dài công tác này?', 'warning', true, isConfirm => {
+        T.confirm('Xóa thông tin đi nước ngoài', 'Bạn có chắc bạn muốn xóa thông tin đi nước ngoài này?', 'warning', true, isConfirm => {
             isConfirm && this.props.deleteQtNuocNgoaiUserPage(item.id, error => {
-                if (error) T.notify(error.message ? error.message : 'Xoá thông tin kéo dài công tác bị lỗi!', 'danger');
-                else T.alert('Xoá thông tin kéo dài công tác thành công!', 'success', false, 800);
+                if (error) T.notify(error.message ? error.message : 'Xoá thông tin đi nước ngoài bị lỗi!', 'danger');
+                else T.alert('Xoá thông tin đi nước ngoài thành công!', 'success', false, 800);
             });
         });
         e.preventDefault();
+    }
+
+    handleKetThuc = (value) => {
+        value ? $('#ketThucDate').hide() : $('#ketThucDate').show();
+        this.setState({ denNay: value });
+        if (!value) {
+            this.ketThucType?.setText({ text: this.state.ketThucType ? this.state.ketThucType : 'dd/mm/yyyy' });
+        } else {
+            this.ketThucType?.setText({ text: '' });
+        }
     }
 
     render() {
@@ -164,6 +188,7 @@ class QtNuocNgoaiUserPage extends AdminPage {
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nội dung</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nơi làm việc</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kinh phí</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tình trạng</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
@@ -197,6 +222,11 @@ class QtNuocNgoaiUserPage extends AdminPage {
                             </>
                         )}
                         />
+                        <TableCell type='text' content={(
+                            <>
+                                <span>{(item.ketThuc == -1 || item.ketThuc >= item.today) ? <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đang diễn ra</span> : <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đã kết thúc</span>}</span>
+                            </>
+                        )}></TableCell>
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show({ item, shcc })} onDelete={this.delete} >
                         </TableCell>
