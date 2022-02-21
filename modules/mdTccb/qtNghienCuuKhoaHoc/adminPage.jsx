@@ -277,8 +277,8 @@ class QtNghienCuuKhoaHoc extends AdminPage {
                         {this.checked && <TableCell type='text' style={{ textAlign: 'right' }} content={item.soDeTai} />}
                         <TableCell type='text' content={
                             !this.checked ? <>
-                                <p style={{ textAlign: 'justify', textTransform: 'uppercase' }}><i>{item.tenDeTai}</i></p>
-                                {item.vaiTro ? <span style={{ whiteSpace: 'nowrap' }}>Vai trò: <span style={{ color: 'blue' }}>{item.vaiTro}</span></span> : null}
+                                <span style={{ color: 'blue' }}><i>{item.tenDeTai}</i><br /></span>
+                                {item.vaiTro ? <span style={{ whiteSpace: 'nowrap' }}>Vai trò: <span style={{ color: 'red' }}>{item.vaiTro}</span></span> : null}
                             </> : <>
                                 {this.list(item.danhSachDeTai, item.soDeTai, item.soDeTai)}
                             </>

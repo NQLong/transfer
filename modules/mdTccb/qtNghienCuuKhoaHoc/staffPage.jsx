@@ -2,9 +2,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox } from 'view/component/AdminPage';
-// import Pagination from 'view/component/Pagination';
 import {
-    getQtNghienCuuKhoaHocPage, createQtNckhStaffGroup, updateQtNckhStaffGroup, deleteQtNckhStaffGroup, getQtNckhUserAll
+    getQtNghienCuuKhoaHocPage, createQtNckhStaffUser, updateQtNckhStaffUser, deleteQtNckhStaffUser, getQtNckhUserAll
 }
     from './redux';
 
@@ -152,7 +151,7 @@ class QtNghienCuuKhoaHocStaffUserPage extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa nghiên cứu khoa học', 'Bạn có chắc bạn muốn xóa nghiên cứu khoa học này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtNckhStaffGroup(item.id, item.shcc, error => {
+            isConfirm && this.props.deleteQtNckhStaffUser(item.id, item.shcc, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá nghiên cứu khoa học bị lỗi!', 'danger');
                 else T.alert('Xoá nghiên cứu khoa học thành công!', 'success', false, 800);
             });
@@ -224,8 +223,8 @@ class QtNghienCuuKhoaHocStaffUserPage extends AdminPage {
                 </div>
                 <NckhModal ref={e => this.modal = e} permission={permission}
                     shcc={shcc} readOnly={!permission.write}
-                    create={this.props.createQtNckhStaffGroup}
-                    update={this.props.updateQtNckhStaffGroup}
+                    create={this.props.createQtNckhStaffUser}
+                    update={this.props.updateQtNckhStaffUser}
                 />
             </>,
             backRoute: '/user',
@@ -236,6 +235,6 @@ class QtNghienCuuKhoaHocStaffUserPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, qtNghienCuuKhoaHoc: state.tccb.qtNghienCuuKhoaHoc });
 const mapActionsToProps = {
-    getQtNghienCuuKhoaHocPage, createQtNckhStaffGroup, updateQtNckhStaffGroup, deleteQtNckhStaffGroup, getQtNckhUserAll
+    getQtNghienCuuKhoaHocPage, createQtNckhStaffUser, updateQtNckhStaffUser, deleteQtNckhStaffUser, getQtNckhUserAll
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtNghienCuuKhoaHocStaffUserPage);
