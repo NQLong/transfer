@@ -6,6 +6,7 @@ const QtBaoHiemXaHoiGetAll = 'QtBaoHiemXaHoi:GetAll';
 const QtBaoHiemXaHoiGetPage = 'QtBaoHiemXaHoi:GetPage';
 const QtBaoHiemXaHoiGetUserPage = 'QtBaoHiemXaHoi:GetUserPage';
 const QtBaoHiemXaHoiGetGroupPage = 'QtBaoHiemXaHoi:GetGroupPage';
+const QtBaoHiemXaHoiGetGroupPageMa = 'QtBaoHiemXaHoi:GetGroupPageMa';
 const QtBaoHiemXaHoiUpdate = 'QtBaoHiemXaHoi:Update';
 const QtBaoHiemXaHoiGet = 'QtBaoHiemXaHoi:Get';
 
@@ -15,6 +16,8 @@ export default function QtBaoHiemXaHoiReducer(state = null, data) {
             return Object.assign({}, state, { items: data.items });
         case QtBaoHiemXaHoiGetGroupPage:
             return Object.assign({}, state, { page_gr: data.page });
+        case QtBaoHiemXaHoiGetGroupPageMa:
+            return Object.assign({}, state, { page_ma: data.page });
         case QtBaoHiemXaHoiGetPage:
             return Object.assign({}, state, { page: data.page });
         case QtBaoHiemXaHoiGetUserPage:
@@ -148,13 +151,12 @@ export function getQtBaoHiemXaHoiPage(pageNumber, pageSize, pageCondition, filte
     };
 }
 
-T.initPage('groupPageQtBaoHiemXaHoi', true);
 export function getQtBaoHiemXaHoiGroupPage(pageNumber, pageSize, pageCondition, filter, done) {
     if (typeof filter === 'function') {
         done = filter;
         filter = {};
     }
-    const page = T.updatePage('groupPageQtBaoHiemXaHoi', pageNumber, pageSize, pageCondition, filter);
+    const page = T.updatePage('pageQtBaoHiemXaHoi', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/tccb/qua-trinh/bao-hiem-xa-hoi/group/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter}, data => {
@@ -171,6 +173,29 @@ export function getQtBaoHiemXaHoiGroupPage(pageNumber, pageSize, pageCondition, 
     };
 }
 
+T.initPage('groupPageMaQtBaoHiemXaHoi');
+export function getQtBaoHiemXaHoiGroupPageMa(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('groupPageMaQtBaoHiemXaHoi', pageNumber, pageSize, pageCondition, filter);
+    return dispatch => {
+        const url = `/api/tccb/qua-trinh/bao-hiem-xa-hoi/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách bảo hiểm xã hội bị lỗi!', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (page.filter) data.page.filter = page.filter;
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                if (done) done(data.page);
+                dispatch({ type: QtBaoHiemXaHoiGetGroupPageMa, page: data.page });
+            }
+        }, () => T.notify('Lấy danh sách bảo hiểm xã hội bị lỗi!', 'danger'));
+    };
+}
+
 export function updateQtBaoHiemXaHoiGroupPageMa(id, changes, done) {
     return dispatch => {
         const url = '/api/tccb/qua-trinh/bao-hiem-xa-hoi';
@@ -182,7 +207,7 @@ export function updateQtBaoHiemXaHoiGroupPageMa(id, changes, done) {
             } else {
                 T.notify('Cập nhật bảo hiểm xã hội thành công!', 'success');
                 done && done(data.item);
-                dispatch(getQtBaoHiemXaHoiPage());
+                dispatch(getQtBaoHiemXaHoiGroupPageMa());
             }
         }, () => T.notify('Cập nhật bảo hiểm xã hội bị lỗi!', 'danger'));
     };
@@ -198,7 +223,7 @@ export function createQtBaoHiemXaHoiGroupPageMa(data, done) {
             } else {
                 if (done) {
                     T.notify('Tạo bảo hiểm xã hội thành công!', 'success');
-                    dispatch(getQtBaoHiemXaHoiPage());
+                    dispatch(getQtBaoHiemXaHoiGroupPageMa());
                     done && done(data);
                 }
             }
@@ -215,7 +240,7 @@ export function deleteQtBaoHiemXaHoiGroupPageMa(id, done) {
             } else {
                 T.alert('bảo hiểm xã hội đã xóa thành công!', 'success', false, 800);
                 done && done(data.item);
-                dispatch(getQtBaoHiemXaHoiPage());
+                dispatch(getQtBaoHiemXaHoiGroupPageMa());
             }
         }, () => T.notify('Xóa bảo hiểm xã hội bị lỗi!', 'danger'));
     };

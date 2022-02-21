@@ -232,10 +232,7 @@ class QtNghienCuuKhoaHoc extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa nghiên cứu khoa học', 'Bạn có chắc bạn muốn xóa nghiên cứu khoa học này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtNckhStaff(item.id, null, error => {
-                if (error) T.notify(error.message ? error.message : 'Xoá nghiên cứu khoa học bị lỗi!', 'danger');
-                else T.alert('Xoá nghiên cứu khoa học thành công!', 'success', false, 800);
-            });
+            isConfirm && this.props.deleteQtNckhStaff(item.id, null);
         });
         e.preventDefault();
     }
@@ -280,8 +277,8 @@ class QtNghienCuuKhoaHoc extends AdminPage {
                         {this.checked && <TableCell type='text' style={{ textAlign: 'right' }} content={item.soDeTai} />}
                         <TableCell type='text' content={
                             !this.checked ? <>
-                                <p style={{ textAlign: 'justify', textTransform: 'uppercase' }}><i>{item.tenDeTai}</i></p>
-                                {item.vaiTro ? <span style={{ whiteSpace: 'nowrap' }}>Vai trò: <span style={{ color: 'blue' }}>{item.vaiTro}</span></span> : null}
+                                <span style={{ color: 'blue' }}><i>{item.tenDeTai}</i><br /></span>
+                                {item.vaiTro ? <span style={{ whiteSpace: 'nowrap' }}>Vai trò: <span style={{ color: 'red' }}>{item.vaiTro}</span></span> : null}
                             </> : <>
                                 {this.list(item.danhSachDeTai, item.soDeTai, item.soDeTai)}
                             </>

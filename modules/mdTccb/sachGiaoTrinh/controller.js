@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3023: { title: 'Sách, giáo trình', link: '/user/tccb/sach-giao-trinh', icon: 'fa-book', backgroundColor: '#ccad2f', groupIndex: 4 },
+            3023: { title: 'Sách, giáo trình', link: '/user/tccb/sach-giao-trinh', icon: 'fa-book', backgroundColor: '#ccad2f', groupIndex: 5 },
         },
     };
 
@@ -75,7 +75,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, list_shcc, list_dv} = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null };
+        const { fromYear, toYear, list_shcc, list_dv } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null };
         app.model.sachGiaoTrinh.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -92,7 +92,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, list_shcc, list_dv} = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null };
+        const { fromYear, toYear, list_shcc, list_dv } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null };
         app.model.sachGiaoTrinh.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -108,7 +108,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, list_shcc, list_dv} = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null };
+        const { fromYear, toYear, list_shcc, list_dv } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null };
         app.model.sachGiaoTrinh.groupPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -185,7 +185,7 @@ module.exports = app => {
             { header: '(ĐỒNG) CHỦ BIÊN', key: 'chuBien', width: 20 },
             { header: 'SẢN PHẨM', key: 'sanPham', width: 15 },
             { header: 'BÚT DANH', key: 'butDanh', width: 15 },
-            { header: 'PHẠM VI XUẤT BẢN', key: 'quocTe', width: 20, style: {numFmt: '@'}},
+            { header: 'PHẠM VI XUẤT BẢN', key: 'quocTe', width: 20, style: { numFmt: '@' } },
             { header: 'Ghi chú', key: 'ghiChu', width: 50 },
 
         ];

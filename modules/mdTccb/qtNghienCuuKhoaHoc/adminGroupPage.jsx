@@ -196,15 +196,15 @@ class QtNghienCuuKhoaHocGroupPage extends AdminPage {
                         <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <a href='#' onClick={e => {e.preventDefault(); this.modal.show(item, false);}}>
-                                    <span>{(item.hoCanBo ? item.hoCanBo : '' )+ ' ' + (item.tenCanBo ? item.tenCanBo : '')}</span><br />
-                                {item.shcc}</a>
+                                <a href='#' onClick={e => { e.preventDefault(); this.modal.show(item, false); }}>
+                                    <span>{(item.hoCanBo ? item.hoCanBo : '') + ' ' + (item.tenCanBo ? item.tenCanBo : '')}</span><br />
+                                    {item.shcc}</a>
                             </>
                         )}
                         />
                         <TableCell type='text' content={
                             <>
-                                <span><i style={{ textAlign: 'justify', textTransform: 'uppercase' }}>{item.tenDeTai}</i></span><br /><br />
+                                <span><i style={{ textAlign: 'justify' }}>{item.tenDeTai}</i></span><br /><br />
                                 {item.vaiTro ? <span style={{ whiteSpace: 'nowrap' }}>Vai trò: <span style={{ color: 'blue' }}>{item.vaiTro}</span></span> : null}
                             </>
                         } />

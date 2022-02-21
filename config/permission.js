@@ -210,9 +210,11 @@ module.exports = app => {
                 new Promise(resolve => {
                     app.model.canBo.get({ email: user.email }, (e, item) => {
                         if (e || item == null) {
+                            user.isStaff = 0;
                             resolve();
                         } else {
                             user.isStaff = 1;
+                            item.phai == '02' && app.permissionHooks.pushUserPermission(user, 'staff:female');
                             user.shcc = item.shcc;
                             app.permissionHooks.pushUserPermission(user, 'staff:login'); // Add staff permission: staff:login
                             resolve();
@@ -229,6 +231,8 @@ module.exports = app => {
                                         app.permissionHooks.pushUserPermission(user, 'quanLy:login');
                                         resolve();
                                     });
+                                } else {
+                                    resolve();
                                 }
                             });
                         } else resolve();

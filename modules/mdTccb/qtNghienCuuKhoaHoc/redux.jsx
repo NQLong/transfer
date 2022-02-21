@@ -1,4 +1,4 @@
-import { getStaffEdit, userGetStaff } from '../tccbCanBo/redux';
+import { getStaffEdit } from '../tccbCanBo/redux';
 
 import T from 'view/js/common';
 
@@ -273,7 +273,7 @@ export function createQtNckhStaffUser(data, done) {
             } else {
                 T.notify('Thêm thông tin nghiên cứu khoa học thành công!', 'info');
                 if (done) done(res);
-                dispatch(userGetStaff(data.email));
+                dispatch(getQtNckhUserAll());
 
             }
         }, () => T.notify('Thêm thông tin nghiên cứu khoa học bị lỗi', 'danger'));
@@ -289,14 +289,14 @@ export function updateQtNckhStaffUser(id, changes, done) {
                 console.error('PUT: ' + url + '. ' + data.error);
             } else if (data.item) {
                 T.notify('Cập nhật thông tin nghiên cứu khoa học thành công!', 'info');
-                dispatch(userGetStaff(changes.email));
+                dispatch(getQtNckhUserAll());
                 if (done) done();
             }
         }, () => T.notify('Cập nhật thông tin nghiên cứu khoa học bị lỗi', 'danger'));
     };
 }
 
-export function deleteQtNckhStaffUser(id, email, done) {
+export function deleteQtNckhStaffUser(id, done) {
     return dispatch => {
         const url = '/api/user/qua-trinh/nckh';
         T.delete(url, { id }, data => {
@@ -306,7 +306,7 @@ export function deleteQtNckhStaffUser(id, email, done) {
             } else {
                 T.alert('Thông tin nghiên cứu khoa học được xóa thành công!', 'info', false, 800);
                 done && done();
-                dispatch(userGetStaff(email));
+                dispatch(getQtNckhUserAll());
             }
         }, () => T.notify('Xóa thông tin nghiên cứu khoa học bị lỗi', 'danger'));
     };

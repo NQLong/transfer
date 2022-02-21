@@ -174,6 +174,7 @@ class QtKhenThuongAllUserPage extends AdminPage {
                 />
             </>,
             backRoute: '/user',
+            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
         });
     }
 }

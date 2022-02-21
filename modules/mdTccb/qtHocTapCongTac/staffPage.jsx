@@ -76,6 +76,9 @@ class EditModal extends AdminModal {
         } else if (!this.state.denNay && !this.ketThuc.getVal()) {
             T.notify('Ngày kết thúc học tập, công tác trống', 'danger');
             this.ketThuc.focus();
+        } else if (!this.state.denNay && this.batDau.getVal() > this.ketThuc.getVal()) {
+            T.notify('Ngày bắt đầu lớn hơn ngày kết thúc', 'danger');
+            this.batDau.focus();
         } else {
             this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
         }
@@ -185,7 +188,7 @@ class QtHocTapCongTacUserPage extends AdminPage {
                         />
                         <TableCell type='text' content={(
                             <>
-                                <span>{item.ketThuc == -1 ? <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đang diễn ra</span> : <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đã kết thúc</span>}</span>
+                                <span>{(item.ketThuc == -1 || item.ketThuc >= item.today) ? <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đang diễn ra</span> : <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đã kết thúc</span>}</span>
                             </>
                         )}></TableCell>
                         {

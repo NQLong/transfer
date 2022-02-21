@@ -2,14 +2,14 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3016: { title: 'Quá trình đào tạo', link: '/user/tccb/qua-trinh/dao-tao', icon: 'fa-podcast', backgroundColor: '#635118', groupIndex: 4 },
+            3016: { title: 'Quá trình đào tạo', link: '/user/tccb/qua-trinh/dao-tao', icon: 'fa-podcast', backgroundColor: '#635118', groupIndex: 5 },
         },
     };
 
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1014: { title: 'Đào tạo', link: '/user/dao-tao', icon: 'fa-podcast', backgroundColor: '#635118', groupIndex: 4 },
+            1014: { title: 'Đào tạo, bồi dưỡng', link: '/user/dao-tao', icon: 'fa-podcast', backgroundColor: '#635118', groupIndex: 4 },
         },
     };
 
@@ -30,8 +30,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, list_shcc, list_dv } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1' };
-        app.model.qtDaoTao.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, searchTerm, (error, page) => {
+        const { fromYear, toYear, list_shcc, list_dv, list_loaiBang } = (req.query.filter && req.query.filter != '%%%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1' };
+        app.model.qtDaoTao.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, list_loaiBang, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {

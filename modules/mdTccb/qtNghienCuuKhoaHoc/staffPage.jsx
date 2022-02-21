@@ -2,9 +2,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox } from 'view/component/AdminPage';
-// import Pagination from 'view/component/Pagination';
 import {
-    getQtNghienCuuKhoaHocPage, createQtNckhStaffGroup, updateQtNckhStaffGroup, deleteQtNckhStaffGroup, getQtNckhUserAll
+    getQtNghienCuuKhoaHocPage, createQtNckhStaffUser, updateQtNckhStaffUser, deleteQtNckhStaffUser, getQtNckhUserAll
 }
     from './redux';
 
@@ -109,31 +108,31 @@ class NckhModal extends AdminModal {
             body: <div className='row'>
                 <FormTextBox className='col-12' ref={e => this.tenDeTai = e} label={'Tên đề tài'} type='text' readOnly={readOnly} required />
                 <FormTextBox className='col-md-4' ref={e => this.maSoCapQuanLy = e} label={'Mã số và cấp quản lý'} type='text' readOnly={readOnly} required />
-                <FormTextBox className='col-md-4' ref={e => this.thoiGian = e} label={'Thời gian thực hiện (tháng)'} type='number' readOnly={readOnly}/>
-                <FormTextBox className='col-md-4' ref={e => this.kinhPhi = e} label={'Kinh phí'} type='text' readOnly={readOnly}/>
+                <FormTextBox className='col-md-4' ref={e => this.thoiGian = e} label={'Thời gian thực hiện (tháng)'} type='number' readOnly={readOnly} />
+                <FormTextBox className='col-md-4' ref={e => this.kinhPhi = e} label={'Kinh phí'} type='text' readOnly={readOnly} />
                 <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
                     label={
                         <div style={{ display: 'flex' }}>Thời gian bắt đầu (định dạng:&nbsp; <Dropdown readOnly={readOnly} ref={e => this.batDauType = e}
                             items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
                             onSelected={item => this.setState({ batDauType: item })} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
                     }
-                    type={this.state.batDauType ? typeMapper[this.state.batDauType] : null} readOnly={readOnly}/></div>
+                    type={this.state.batDauType ? typeMapper[this.state.batDauType] : null} readOnly={readOnly} /></div>
                 <div className='form-group col-md-6'><DateInput ref={e => this.ketThuc = e} placeholder='Thời gian kết thúc'
                     label={
                         <div style={{ display: 'flex' }}>Thời gian kết thúc (định dạng:&nbsp; <Dropdown readOnly={readOnly} ref={e => this.ketThucType = e}
                             items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
                             onSelected={item => this.setState({ ketThucType: item })} />)</div>
                     }
-                    type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} readOnly={readOnly}/></div>
-                <FormTextBox className='col-md-6' ref={e => this.vaiTro = e} label={'Vai trò'} type='text' required readOnly={readOnly}/>
+                    type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} readOnly={readOnly} /></div>
+                <FormTextBox className='col-md-6' ref={e => this.vaiTro = e} label={'Vai trò'} type='text' required readOnly={readOnly} />
                 <div className='form-group col-md-6'><DateInput ref={e => this.ngayNghiemThu = e} placeholder='Thời gian kết thúc'
                     label={
                         <div style={{ display: 'flex' }}>Thời gian nghiệm thu (định dạng:&nbsp; <Dropdown readOnly={readOnly} ref={e => this.ngayNghiemThuType = e}
                             items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
                             onSelected={item => this.setState({ ngayNghiemThuType: item })} />)</div>
                     }
-                    type={this.state.ngayNghiemThuType ? typeMapper[this.state.ngayNghiemThuType] : null} readOnly={readOnly}/></div>
-                <FormTextBox className='col-md-12' ref={e => this.ketQua = e} label={'Kết quả'} type='text' readOnly={readOnly}/>
+                    type={this.state.ngayNghiemThuType ? typeMapper[this.state.ngayNghiemThuType] : null} readOnly={readOnly} /></div>
+                <FormTextBox className='col-md-12' ref={e => this.ketQua = e} label={'Kết quả'} type='text' readOnly={readOnly} />
 
             </div>,
         });
@@ -152,7 +151,7 @@ class QtNghienCuuKhoaHocStaffUserPage extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa nghiên cứu khoa học', 'Bạn có chắc bạn muốn xóa nghiên cứu khoa học này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtNckhStaffGroup(item.id, item.shcc, error => {
+            isConfirm && this.props.deleteQtNckhStaffUser(item.id, item.shcc, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá nghiên cứu khoa học bị lỗi!', 'danger');
                 else T.alert('Xoá nghiên cứu khoa học thành công!', 'success', false, 800);
             });
@@ -161,7 +160,10 @@ class QtNghienCuuKhoaHocStaffUserPage extends AdminPage {
     }
 
     render() {
-        const permission = this.getUserPermission('qtNghienCuuKhoaHoc', ['read', 'write', 'delete']);
+        const permission = {
+            write: true,
+            delete: true
+        };
         const { isStaff, shcc } = this.props.system && this.props.system.user ? this.props.system.user : { isStaff: false, shcc: '' };
         const { firstName, lastName } = isStaff && this.props.system.user || { firstName: '', lastName: '' };
         const name = isStaff ? `${lastName} ${firstName} (${shcc})` : '';
@@ -201,7 +203,7 @@ class QtNghienCuuKhoaHocStaffUserPage extends AdminPage {
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.kinhPhi} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.ketQua} />
                     <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                        onEdit={() => this.modal.show({item, shcc})} onDelete={this.delete} >
+                        onEdit={() => this.modal.show({ item, shcc })} onDelete={this.delete} >
                     </TableCell>
                 </tr>
             )
@@ -210,7 +212,7 @@ class QtNghienCuuKhoaHocStaffUserPage extends AdminPage {
         return this.renderPage({
             icon: 'fa fa-wpexplorer',
             title: 'Thông tin nghiên cứu khoa học',
-            subTitle: <span style={{ color: 'blue'}}>Cán bộ: {name}</span>,
+            subTitle: <span style={{ color: 'blue' }}>Cán bộ: {name}</span>,
             breadcrumb: [
                 <Link key={0} to='/user'>Trang cá nhân</Link>,
                 'Nghiên cứu khoa học'
@@ -221,8 +223,8 @@ class QtNghienCuuKhoaHocStaffUserPage extends AdminPage {
                 </div>
                 <NckhModal ref={e => this.modal = e} permission={permission}
                     shcc={shcc} readOnly={!permission.write}
-                    create={this.props.createQtNckhStaffGroup}
-                    update={this.props.updateQtNckhStaffGroup}
+                    create={this.props.createQtNckhStaffUser}
+                    update={this.props.updateQtNckhStaffUser}
                 />
             </>,
             backRoute: '/user',
@@ -233,6 +235,6 @@ class QtNghienCuuKhoaHocStaffUserPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, qtNghienCuuKhoaHoc: state.tccb.qtNghienCuuKhoaHoc });
 const mapActionsToProps = {
-    getQtNghienCuuKhoaHocPage, createQtNckhStaffGroup, updateQtNckhStaffGroup, deleteQtNckhStaffGroup, getQtNckhUserAll
+    getQtNghienCuuKhoaHocPage, createQtNckhStaffUser, updateQtNckhStaffUser, deleteQtNckhStaffUser, getQtNckhUserAll
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtNghienCuuKhoaHocStaffUserPage);
