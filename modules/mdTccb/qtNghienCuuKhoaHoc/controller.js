@@ -9,7 +9,7 @@ module.exports = app => {
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1002: { title: 'Nghiên cứu khoa học', link: '/user/nghien-cuu-khoa-hoc', icon: 'fa-wpexplorer', backgroundColor: '#f03a88', groupIndex: 4 },
+            1002: { title: 'Nghiên cứu khoa học', link: '/user/nghien-cuu-khoa-hoc', icon: 'fa-wpexplorer', backgroundColor: '#ed9d34', groupIndex: 4 },
         },
     };
 
