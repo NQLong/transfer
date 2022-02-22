@@ -100,8 +100,9 @@ class QtNghiViecGroupPage extends AdminPage {
         const fromYear = this.fromYear?.value() == '' ? null : this.fromYear?.value().getTime();
         const toYear = this.toYear?.value() == '' ? null : this.toYear?.value().getTime();
         const list_dv = this.maDonVi?.value().toString() || '';
-        const list_shcc = this.mulCanBo?.value().toString() || '';
-        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc };
+        const list_shcc = this.ma;
+        const dienNghi = this.dienNghi.value();
+        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc, dienNghi };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
@@ -111,7 +112,8 @@ class QtNghiViecGroupPage extends AdminPage {
                     this.toYear?.value(filter.toYear || '');
                     this.maDonVi?.value(filter.list_dv);
                     this.mulCanBo?.value(filter.list_shcc);
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.list_shcc || filter.list_dv )) this.showAdvanceSearch();
+                    this.dienNghi?.value(filter.dienNghi);
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.list_shcc || filter.list_dv || filter.dienNghi )) this.showAdvanceSearch();
                 }
             });
         });
@@ -207,6 +209,7 @@ class QtNghiViecGroupPage extends AdminPage {
                 <div className='row'>
                     <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} /> 
                     <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} /> 
+                    <FormSelect className='col-md-4' ref={e => this.dienNghi = e} label={'Diện nghỉ'} data={[{ id: 1, text: 'Biên chế' }, { id: 2, text: 'Hợp đồng' }]} onChange={() => this.changeAdvancedSearch()} />
                 </div>
             </>,
             content: <>
