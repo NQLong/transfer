@@ -83,7 +83,7 @@ class EditModal extends AdminModal {
             T.notify('Ngày bắt đầu đi nước ngoài trống', 'danger');
             this.batDau.focus();
         } else if (!this.state.denNay && !this.ketThuc.getVal()) {
-            T.notify('Ngày kết thúc học tập, công tác trống', 'danger');
+            T.notify('Ngày kết thúc đi nước ngoài trống', 'danger');
             this.ketThuc.focus();
         } else if (!this.state.denNay && this.batDau.getVal() > this.ketThuc.getVal()) {
             T.notify('Ngày bắt đầu lớn hơn ngày kết thúc', 'danger');

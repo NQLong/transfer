@@ -3,6 +3,8 @@ import T from 'view/js/common';
 // Reducer ------------------------------------------------------------------------------------------------------------
 const QtHopDongDvtlTnGetAll = 'QtHopDongDvtlTn:GetAll';
 const QtHopDongDvtlTnGetPage = 'QtHopDongDvtlTn:GetPage';
+const QtHopDongDvtlTnGetGroupPage = 'QtHopDongDvtlTn:GetGroupPage';
+const QtHopDongDvtlTnGetGroupPageMa = 'QtHopDongDvtlTn:GetGroupPageMa';
 const QtHopDongDvtlTnUpdate = 'QtHopDongDvtlTn:Update';
 const QtHopDongDvtlTnGet = 'QtHopDongDvtlTn:Get';
 
@@ -12,6 +14,10 @@ export default function QtHopDongDvtlTnReducer(state = null, data) {
             return Object.assign({}, state, { items: data.items });
         case QtHopDongDvtlTnGetPage:
             return Object.assign({}, state, { page: data.page });
+        case QtHopDongDvtlTnGetGroupPage:
+            return Object.assign({}, state, { page_gr: data.page });
+        case QtHopDongDvtlTnGetGroupPageMa:
+            return Object.assign({}, state, { page_ma: data.page });
         case QtHopDongDvtlTnGet:
             return Object.assign({}, state, { selectedItem: data.item });
         case QtHopDongDvtlTnUpdate:
@@ -46,20 +52,47 @@ export default function QtHopDongDvtlTnReducer(state = null, data) {
 
 // Actions ------------------------------------------------------------------------------------------------------------
 T.initPage('pageQtHopDongDvtlTn');
-export function getQtHopDongDvtlTnPage(pageNumber, pageSize, pageCondition, done) {
-    const page = T.updatePage('pageQtHopDongDvtlTn', pageNumber, pageSize, pageCondition);
+export function getQtHopDongDvtlTnPage(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('pageQtHopDongDvtlTn', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/tccb/qua-trinh/hop-dong-dvtl-tn/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition }, data => {
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách hợp đồng bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
-                if (done) done(data.page);
+                if (page.filter) data.page.filter = page.filter;
+                done && done(data.page);
                 dispatch({ type: QtHopDongDvtlTnGetPage, page: data.page });
             }
         }, () => T.notify('Lấy danh sách hợp đồng bị lỗi!', 'danger'));
+    };
+}
+
+export function getQtHopDongDvtlTnGroupPage(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('pageQtHopDongDvtlTn', pageNumber, pageSize, pageCondition, filter);
+    return dispatch => {
+        const url = `/api/tccb/qua-trinh/hop-dong-dvtl-tn/group/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách hợp đồng bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (page.filter) data.page.filter = page.filter;
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                done && done(data.page);
+                dispatch({ type: QtHopDongDvtlTnGetGroupPage, page: data.page });
+            }
+        }, error => console.error(`GET: ${url}.`, error));
     };
 }
 
