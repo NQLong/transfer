@@ -238,7 +238,7 @@ class SachGiaoTrinhGroupPage extends AdminPage {
                 />
             </>,
             backRoute: '/user/library/sach-giao-trinh',
-            onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
+            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
         });
     }
 }

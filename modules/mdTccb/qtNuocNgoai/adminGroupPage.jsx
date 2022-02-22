@@ -314,7 +314,7 @@ class QtNuocNgoaiGroupPage extends AdminPage {
                 />
             </>,
             backRoute: '/user/tccb/qua-trinh/nuoc-ngoai',
-            onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
+            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
         });
     }
 }

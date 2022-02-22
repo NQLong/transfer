@@ -144,4 +144,53 @@ module.exports = app => {
     app.delete('/api/tccb/qua-trinh/ky-luat', app.permission.check('staff:write'), (req, res) =>
         app.model.qtKyLuat.delete({ id: req.body.id }, (error) => res.send(error)));
 
+    app.get('/api/qua-trinh/ky-luat/download-excel/:list_shcc/:list_dv/:fromYear/:toYear/:timeType/:tinhTrang', app.permission.check('qtKyLuat:read'), (req, res) => {
+        const pageNumber = 0, pageSize = 1000000;
+        let { list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang } = req.params ? req.params : { list_shcc: null, list_dv: null, toYear: null, timeType: 0, tinhTrang: null};
+        if (list_shcc == 'null') list_shcc = null;
+        if (list_dv == 'null') list_dv = null;
+        if (fromYear == 'null') fromYear = null;
+        if (toYear == 'null') toYear = null;
+        if (tinhTrang == 'null') tinhTrang = null;
+        app.model.qtKyLuat.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang, '', (err, result) => {
+            if (err || !result) {
+                res.send({ err });
+            } else {
+                const workbook = app.excel.create(),
+                    worksheet = workbook.addWorksheet('kyluat');
+                new Promise(resolve => {
+                    let cells = [
+                        { cell: 'A1', value: '#', bold: true, border: '1234' },
+                        { cell: 'B1', value: 'Mã thẻ cán bộ', bold: true, border: '1234' },
+                        { cell: 'C1', value: 'Họ và tên cán bộ', bold: true, border: '1234' },
+                        { cell: 'D1', value: 'Hình thức kỷ luật', bold: true, border: '1234' },
+                        { cell: 'E1', value: 'Cấp quyết định', bold: true, border: '1234' },
+                        { cell: 'F1', value: 'Bắt đầu', bold: true, border: '1234' },
+                        { cell: 'G1', value: 'Kết thúc', bold: true, border: '1234' },
+                        { cell: 'H1', value: 'Nội dung', bold: true, border: '1234' },
+                        { cell: 'I1', value: 'Điểm thi đua', bold: true, border: '1234' },
+                    ];
+                    result.rows.forEach((item, index) => {
+                        let hoTen = item.hoCanBo + ' ' + item.tenCanBo;
+                        cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
+                        cells.push({ cell: 'B' + (index + 2), border: '1234', value: item.maCanBo });
+                        cells.push({ cell: 'C' + (index + 2), border: '1234', value: hoTen });
+                        cells.push({ cell: 'D' + (index + 2), border: '1234', value: item.tenKyLuat });
+                        cells.push({ cell: 'E' + (index + 2), border: '1234', value: item.capQuyetDinh });
+                        cells.push({ cell: 'F' + (index + 2), alignment: 'center', border: '1234', value: item.batDau ? app.date.dateTimeFormat(new Date(item.batDau), item.batDauType ? item.batDauType : 'dd/mm/yyyy') : '' });
+                        cells.push({ cell: 'G' + (index + 2), alignment: 'center', border: '1234', value: (item.ketThuc != null && item.ketThuc != -1) ? app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : '' });
+                        cells.push({ cell: 'H' + (index + 2), alignment: 'center', border: '1234', value: item.noiDung });
+                        cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.diemThiDua });
+                    });
+                    resolve(cells);
+                }).then((cells) => {
+                    app.excel.write(worksheet, cells);
+                    app.excel.attachment(workbook, res, 'kyluat.xlsx');
+                }).catch((error) => {
+                    res.send({ error });
+                });
+            }
+        });
+
+    });
 };
