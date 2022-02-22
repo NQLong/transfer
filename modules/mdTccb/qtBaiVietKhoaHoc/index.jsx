@@ -16,6 +16,10 @@ export default {
         {
             path: '/user/tccb/qua-trinh/bai-viet-khoa-hoc',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
+        },
+        {
+            path: '/user/bai-viet-khoa-hoc',
+            component: Loadable({ loading: Loading, loader: () => import('./staffPage') })
         }
     ],
 };
