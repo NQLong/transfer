@@ -140,12 +140,12 @@ class QtLuongUserPage extends AdminPage {
 
     render() {
         let permission = this.getUserPermission('staff', ['login']);
-        // if (permission.login == true) {
-        //     permission = {
-        //         write: true,
-        //         delete: true
-        //     };
-        // }
+        if (permission.login == true) {
+            permission = {
+                write: true,
+                delete: true
+            };
+        }
         const { isStaff, shcc } = this.props.system && this.props.system.user ? this.props.system.user : { isStaff: false, shcc: '' };
         const { firstName, lastName } = isStaff && this.props.system.user || { firstName: '', lastName: '' };
         const name = isStaff ? `${lastName} ${firstName} (${shcc})` : '';
