@@ -146,7 +146,6 @@ module.exports = app => {
                     });
                     resolve(cells);
                 }).then((cells) => {
-                    console.log(123);
                     app.excel.write(worksheet, cells);
                     app.excel.attachment(workbook, res, 'NCKH.xlsx');
                 }).catch((error) => {

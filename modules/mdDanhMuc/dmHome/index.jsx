@@ -29,5 +29,9 @@ export default {
             path: '/user/websites',
             component: () => <SubMenusPage menuLink='/user/websites' menuKey={1900} headerIcon='fa-list-alt' />
         },
+        {
+            path: '/user/library',
+            component: () => <SubMenusPage menuLink='/user/library' menuKey={8000} headerIcon='fa-th-large' />
+        }
     ]
 };
