@@ -117,7 +117,6 @@ class QtHuongDanLuanVanStaffUserPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        {/* <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th> */}
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Họ tên sinh viên</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tên luận văn</th>
                         <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Năm tốt nghiệp</th>
@@ -128,13 +127,6 @@ class QtHuongDanLuanVanStaffUserPage extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
-                        {/* <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <span>{(item.hoCanBo ? item.hoCanBo : '') + ' ' + (item.tenCanBo ? item.tenCanBo : '')}</span><br />
-                                {item.shcc}
-                            </>
-                        )}
-                        /> */}
                         <TableCell type='text' content={item.hoTen} />
                         <TableCell type='text' style={{}} content={<>
                             <span><i>{item.tenLuanVan}</i></span><br />

@@ -80,13 +80,13 @@ class EditModal extends AdminModal {
             T.notify('Danh sách cán bộ trống', 'danger');
             this.maCanBo.focus();
         } else if (!this.noiDung.value()) {
-            T.notify('Nội dung đi nước ngoài trống', 'danger');
+            T.notify('Nội dung công tác ngoài nước trống', 'danger');
             this.noiDung.focus();
         } else if (!this.batDau.getVal()) {
-            T.notify('Ngày bắt đầu đi nước ngoài trống', 'danger');
+            T.notify('Ngày bắt đầu công tác ngoài nước trống', 'danger');
             this.batDau.focus();
         } else if (!this.state.denNay && !this.ketThuc.getVal()) {
-            T.notify('Ngày kết thúc đi nước ngoài trống', 'danger');
+            T.notify('Ngày kết thúc công tác ngoài nước trống', 'danger');
             this.ketThuc.focus();
         } else if (!this.state.denNay && this.batDau.getVal() > this.ketThuc.getVal()) {
             T.notify('Ngày bắt đầu lớn hơn ngày kết thúc', 'danger');
@@ -132,11 +132,11 @@ class EditModal extends AdminModal {
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
-            title: this.state.id ? 'Cập nhật quá trình đi nước ngoài' : 'Tạo mới quá trình đi nước ngoài',
+            title: this.state.id ? 'Cập nhật quá trình công tác ngoài nước' : 'Tạo mới quá trình công tác ngoài nước',
             size: 'large',
             body: <div className='row'>
                 <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={this.state.id ? true : false} required />    
-                <FormRichTextBox className='col-md-12' ref={e => this.noiDung = e} rows={2} readOnly={readOnly} label='Nội dung' placeholder='Nhập nội dung đi nước ngoài (tối đa 200 ký tự)' required maxLength={200} />
+                <FormRichTextBox className='col-md-12' ref={e => this.noiDung = e} rows={2} readOnly={readOnly} label='Nội dung' placeholder='Nhập nội dung công tác ngoài nước (tối đa 200 ký tự)' required maxLength={200} />
                 <FormTextBox className='col-md-12' ref={e => this.quocGia = e} label='Quốc gia' />
                 <FormTextBox className='col-md-12' ref={e => this.tenCoSo = e} label='Tên cơ sở đào tạo/làm việc'  />
 
@@ -251,10 +251,10 @@ class QtNuocNgoai extends AdminPage {
     }
 
     delete = (e, item) => {
-        T.confirm('Xóa quá trình đi nước ngoài', 'Bạn có chắc bạn muốn xóa quá trình đi nước ngoài này?', 'warning', true, isConfirm => {
+        T.confirm('Xóa quá trình công tác ngoài nước', 'Bạn có chắc bạn muốn xóa quá trình công tác ngoài nước này?', 'warning', true, isConfirm => {
             isConfirm && this.props.deleteQtNuocNgoaiStaff(item.id, error => {
-                if (error) T.notify(error.message ? error.message : 'Xoá quá trình đi nước ngoài bị lỗi!', 'danger');
-                else T.alert('Xoá quá trình đi nước ngoài thành công!', 'success', false, 800);
+                if (error) T.notify(error.message ? error.message : 'Xoá quá trình công tác ngoài nước bị lỗi!', 'danger');
+                else T.alert('Xoá quá trình công tác ngoài nước thành công!', 'success', false, 800);
             });
         });
         e.preventDefault();
@@ -348,10 +348,10 @@ class QtNuocNgoai extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-fighter-jet',
-            title: ' Quá trình đi nước ngoài',
+            title: ' Quá trình công tác ngoài nước',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
-                'Quá trình đi nước ngoài'
+                'Quá trình công tác ngoài nước'
             ],
             advanceSearch: <>
                 <div className='row'>
