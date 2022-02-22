@@ -83,6 +83,9 @@ class EditModal extends AdminModal {
         } else if (!this.state.denNay && !this.ketThuc.getVal()) {
             T.notify('Ngày kết thúc học tập, công tác trống', 'danger');
             this.ketThuc.focus();
+        } else if (!this.state.denNay && this.batDau.getVal() > this.ketThuc.getVal()) {
+            T.notify('Ngày bắt đầu lớn hơn ngày kết thúc', 'danger');
+            this.batDau.focus();
         } else {
             this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
         }
