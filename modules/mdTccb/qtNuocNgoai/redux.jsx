@@ -67,7 +67,7 @@ export function getQtNuocNgoaiUserPage(pageNumber, pageSize, pageCondition, filt
         const url = `/api/user/qua-trinh/nuoc-ngoai/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
-                T.notify('Lấy danh sách đi nước ngoài bị lỗi!', 'danger');
+                T.notify('Lấy danh sách công tác ngoài nước bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (page.filter) data.page.filter = page.filter;
@@ -75,7 +75,7 @@ export function getQtNuocNgoaiUserPage(pageNumber, pageSize, pageCondition, filt
                 if (done) done(data.page);
                 dispatch({ type: QtNuocNgoaiGetUserPage, page: data.page });
             }
-        }, () => T.notify('Lấy danh sách đi nước ngoài bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách công tác ngoài nước bị lỗi!', 'danger'));
     };
 }
 
@@ -84,15 +84,15 @@ export function updateQtNuocNgoaiUserPage(id, changes, done) {
         const url = '/api/user/qua-trinh/nuoc-ngoai';
         T.put(url, { id, changes }, data => {
             if (data.error || changes == null) {
-                T.notify('Cập nhật đi nước ngoài bị lỗi!', 'danger');
+                T.notify('Cập nhật công tác ngoài nước bị lỗi!', 'danger');
                 console.error(`PUT: ${url}.`, data.error);
                 done && done(data.error);
             } else {
-                T.notify('Cập nhật đi nước ngoài thành công!', 'success');
+                T.notify('Cập nhật công tác ngoài nước thành công!', 'success');
                 done && done(data.item);
                 dispatch(getQtNuocNgoaiUserPage());
             }
-        }, () => T.notify('Cập nhật đi nước ngoài bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật công tác ngoài nước bị lỗi!', 'danger'));
     };
 }
 
@@ -101,16 +101,16 @@ export function createQtNuocNgoaiUserPage(data, done) {
         const url = '/api/user/qua-trinh/nuoc-ngoai';
         T.post(url, { data }, res => {
             if (res.error) {
-                T.notify('Tạo đi nước ngoài bị lỗi!', 'danger');
+                T.notify('Tạo công tác ngoài nước bị lỗi!', 'danger');
                 console.error(`POST: ${url}.`, res.error);
             } else {
                 if (done) {
-                    T.notify('Tạo đi nước ngoài thành công!', 'success');
+                    T.notify('Tạo công tác ngoài nước thành công!', 'success');
                     dispatch(getQtNuocNgoaiUserPage());
                     done && done(data);
                 }
             }
-        }, () => T.notify('Tạo đi nước ngoài bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo công tác ngoài nước bị lỗi!', 'danger'));
     };
 }
 export function deleteQtNuocNgoaiUserPage(id, done) {
@@ -118,14 +118,14 @@ export function deleteQtNuocNgoaiUserPage(id, done) {
         const url = '/api/user/qua-trinh/nuoc-ngoai';
         T.delete(url, { id }, data => {
             if (data.error) {
-                T.notify('Xóa đi nước ngoài bị lỗi!', 'danger');
+                T.notify('Xóa công tác ngoài nước bị lỗi!', 'danger');
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
-                T.alert('đi nước ngoài đã xóa thành công!', 'success', false, 800);
+                T.alert('Xóa thành công!', 'success', false, 800);
                 done && done(data.item);
                 dispatch(getQtNuocNgoaiUserPage());
             }
-        }, () => T.notify('Xóa đi nước ngoài bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa công tác ngoài nước bị lỗi!', 'danger'));
     };
 }
 
@@ -140,7 +140,7 @@ export function getQtNuocNgoaiPage(pageNumber, pageSize, pageCondition, filter, 
         const url = `/api/tccb/qua-trinh/nuoc-ngoai/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
-                T.notify('Lấy danh sách đi nước ngoài bị lỗi!', 'danger');
+                T.notify('Lấy danh sách công tác ngoài nước bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (page.filter) data.page.filter = page.filter;
@@ -148,7 +148,7 @@ export function getQtNuocNgoaiPage(pageNumber, pageSize, pageCondition, filter, 
                 if (done) done(data.page);
                 dispatch({ type: QtNuocNgoaiGetPage, page: data.page });
             }
-        }, () => T.notify('Lấy danh sách đi nước ngoài bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách công tác ngoài nước bị lỗi!', 'danger'));
     };
 }
 
@@ -160,9 +160,9 @@ export function getQtNuocNgoaiGroupPage(pageNumber, pageSize, pageCondition, fil
     const page = T.updatePage('pageQtNuocNgoai', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/tccb/qua-trinh/nuoc-ngoai/group/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition, filter: page.filter}, data => {
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
-                T.notify('Lấy danh sách đi nước ngoài bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                T.notify('Lấy danh sách công tác ngoài nước bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (page.filter) data.page.filter = page.filter;
@@ -185,7 +185,7 @@ export function getQtNuocNgoaiGroupPageMa(pageNumber, pageSize, pageCondition, f
         const url = `/api/tccb/qua-trinh/nuoc-ngoai/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
-                T.notify('Lấy danh sách đi nước ngoài bị lỗi!', 'danger');
+                T.notify('Lấy danh sách công tác ngoài nước bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (page.filter) data.page.filter = page.filter;
@@ -193,7 +193,7 @@ export function getQtNuocNgoaiGroupPageMa(pageNumber, pageSize, pageCondition, f
                 if (done) done(data.page);
                 dispatch({ type: QtNuocNgoaiGetGroupPageMa, page: data.page });
             }
-        }, () => T.notify('Lấy danh sách đi nước ngoài bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách công tác ngoài nước bị lỗi!', 'danger'));
     };
 }
 
@@ -202,14 +202,14 @@ export function updateQtNuocNgoaiGroupPageMa(id, changes, done) {
         const url = '/api/qua-trinh/nuoc-ngoai';
         T.put(url, { id, changes }, data => {
             if (data.error) {
-                T.notify('Cập nhật thông tin quá trình đi nước ngoài bị lỗi', 'danger');
+                T.notify('Cập nhật thông tin quá trình công tác ngoài nước bị lỗi', 'danger');
                 console.error('PUT: ' + url + '. ' + data.error);
             } else if (data.item) {
-                T.notify('Cập nhật thông tin quá trình đi nước ngoài thành công!', 'info');
+                T.notify('Cập nhật thông tin quá trình công tác ngoài nước thành công!', 'info');
                 done && done(data.item);
                 dispatch(getQtNuocNgoaiGroupPageMa());
             }
-        }, () => T.notify('Cập nhật thông tin quá trình đi nước ngoài bị lỗi', 'danger'));
+        }, () => T.notify('Cập nhật thông tin quá trình công tác ngoài nước bị lỗi', 'danger'));
     };
 }
 
@@ -218,14 +218,14 @@ export function deleteQtNuocNgoaiGroupPageMa(id, done) {
         const url = '/api/qua-trinh/nuoc-ngoai';
         T.delete(url, { id }, data => {
             if (data.error) {
-                T.notify('Xóa thông tin quá trình đi nước ngoài bị lỗi', 'danger');
+                T.notify('Xóa thông tin quá trình công tác ngoài nước bị lỗi', 'danger');
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
-                T.alert('Thông tin quá trình đi nước ngoài được xóa thành công!', 'info', false, 800);
+                T.alert('Thông tin quá trình công tác ngoài nước được xóa thành công!', 'info', false, 800);
                 done && done(data.item);
                 dispatch(getQtNuocNgoaiGroupPageMa());
             }
-        }, () => T.notify('Xóa thông tin quá trình đi nước ngoài bị lỗi', 'danger'));
+        }, () => T.notify('Xóa thông tin quá trình công tác ngoài nước bị lỗi', 'danger'));
     };
 }
 
@@ -234,16 +234,16 @@ export function createQtNuocNgoaiGroupPageMa(data, done) {
         const url = '/api/qua-trinh/nuoc-ngoai';
         T.post(url, { data }, res => {
             if (res.error) {
-                T.notify('Tạo đi nước ngoài bị lỗi!', 'danger');
+                T.notify('Tạo công tác ngoài nước bị lỗi!', 'danger');
                 console.error(`POST: ${url}.`, res.error);
             } else {
                 if (done) {
-                    T.notify('Tạo đi nước ngoài thành công!', 'success');
+                    T.notify('Tạo công tác ngoài nước thành công!', 'success');
                     dispatch(getQtNuocNgoaiGroupPageMa());
                     done && done(data);
                 }
             }
-        }, () => T.notify('Tạo đi nước ngoài bị lỗi!', 'danger'));
+        }, () => T.notify('Tạo công tác ngoài nước bị lỗi!', 'danger'));
     };
 }
 
@@ -252,13 +252,13 @@ export function getQtNuocNgoaiAll(done) {
         const url = '/api/tccb/qua-trinh/nuoc-ngoai/all';
         T.get(url, data => {
             if (data.error) {
-                T.notify('Lấy danh sách đi nước ngoài bị lỗi!', 'danger');
+                T.notify('Lấy danh sách công tác ngoài nước bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (done) done(data.items);
                 dispatch({ type: QtNuocNgoaiGetAll, items: data.items ? data.items : {} });
             }
-        }, () => T.notify('Lấy danh sách đi nước ngoài bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách công tác ngoài nước bị lỗi!', 'danger'));
     };
 }
 
@@ -267,7 +267,7 @@ export function getQtNuocNgoai(id, done) {
         const url = `/api/tccb/qua-trinh/nuoc-ngoai/item/${id}`;
         T.get(url, data => {
             if (data.error) {
-                T.notify('Lấy đi nước ngoài bị lỗi!', 'danger');
+                T.notify('Lấy công tác ngoài nước bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (done) done(data.item);
@@ -281,14 +281,14 @@ export function createQtNuocNgoaiStaff(data, done) {
         const url = '/api/qua-trinh/nuoc-ngoai';
         T.post(url, { data }, res => {
             if (res.error) {
-                T.notify('Thêm thông tin quá trình đi nước ngoài bị lỗi', 'danger');
+                T.notify('Thêm thông tin quá trình công tác ngoài nước bị lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
-                T.notify('Thêm thông tin quá trình đi nước ngoài thành công!', 'info');
+                T.notify('Thêm thông tin quá trình công tác ngoài nước thành công!', 'info');
                 dispatch(getQtNuocNgoaiPage());
                 done && done(data);
             }
-        }, () => T.notify('Thêm thông tin quá trình đi nước ngoài bị lỗi', 'danger'));
+        }, () => T.notify('Thêm thông tin quá trình công tác ngoài nước bị lỗi', 'danger'));
     };
 }
 
@@ -297,14 +297,14 @@ export function updateQtNuocNgoaiStaff(id, changes, done) {
         const url = '/api/qua-trinh/nuoc-ngoai';
         T.put(url, { id, changes }, data => {
             if (data.error) {
-                T.notify('Cập nhật thông tin quá trình đi nước ngoài bị lỗi', 'danger');
+                T.notify('Cập nhật thông tin quá trình công tác ngoài nước bị lỗi', 'danger');
                 console.error('PUT: ' + url + '. ' + data.error);
             } else if (data.item) {
-                T.notify('Cập nhật thông tin quá trình đi nước ngoài thành công!', 'info');
+                T.notify('Cập nhật thông tin quá trình công tác ngoài nước thành công!', 'info');
                 done && done(data.item);
                 dispatch(getQtNuocNgoaiPage());
             }
-        }, () => T.notify('Cập nhật thông tin quá trình đi nước ngoài bị lỗi', 'danger'));
+        }, () => T.notify('Cập nhật thông tin quá trình công tác ngoài nước bị lỗi', 'danger'));
     };
 }
 
@@ -313,14 +313,14 @@ export function deleteQtNuocNgoaiStaff(id, done) {
         const url = '/api/qua-trinh/nuoc-ngoai';
         T.delete(url, { id }, data => {
             if (data.error) {
-                T.notify('Xóa thông tin quá trình đi nước ngoài bị lỗi', 'danger');
+                T.notify('Xóa thông tin quá trình công tác ngoài nước bị lỗi', 'danger');
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
-                T.alert('Thông tin quá trình đi nước ngoài được xóa thành công!', 'info', false, 800);
+                T.alert('Thông tin quá trình công tác ngoài nước được xóa thành công!', 'info', false, 800);
                 dispatch(getQtNuocNgoaiPage());
                 done && done(data.item);
             }
-        }, () => T.notify('Xóa thông tin quá trình đi nước ngoài bị lỗi', 'danger'));
+        }, () => T.notify('Xóa thông tin quá trình công tác ngoài nước bị lỗi', 'danger'));
     };
 }
 
@@ -329,14 +329,14 @@ export function createQtNuocNgoaiStaffUser(data, done) {
         const url = '/api/user/qua-trinh/nuoc-ngoai';
         T.post(url, { data }, res => {
             if (res.error) {
-                T.notify('Thêm thông tin quá trình đi nước ngoài bị lỗi', 'danger');
+                T.notify('Thêm thông tin quá trình công tác ngoài nước bị lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
-                T.notify('Thêm thông tin quá trình đi nước ngoài thành công!', 'info');
+                T.notify('Thêm thông tin quá trình công tác ngoài nước thành công!', 'info');
                 if (done) done(data);
                 dispatch(userGetStaff(data.email));
             }
-        }, () => T.notify('Thêm thông tin quá trình đi nước ngoài bị lỗi', 'danger'));
+        }, () => T.notify('Thêm thông tin quá trình công tác ngoài nước bị lỗi', 'danger'));
     };
 }
 
@@ -345,14 +345,14 @@ export function updateQtNuocNgoaiStaffUser(id, changes, done) {
         const url = '/api/user/qua-trinh/nuoc-ngoai';
         T.put(url, { id, changes }, data => {
             if (data.error) {
-                T.notify('Cập nhật thông tin quá trình đi nước ngoài bị lỗi', 'danger');
+                T.notify('Cập nhật thông tin quá trình công tác ngoài nước bị lỗi', 'danger');
                 console.error('PUT: ' + url + '. ' + data.error);
             } else if (data.item) {
-                T.notify('Cập nhật thông tin quá trình đi nước ngoài thành công!', 'info');
+                T.notify('Cập nhật thông tin quá trình công tác ngoài nước thành công!', 'info');
                 if (done) done();
                 dispatch(userGetStaff(changes.email));
             }
-        }, () => T.notify('Cập nhật thông tin quá trình đi nước ngoài bị lỗi', 'danger'));
+        }, () => T.notify('Cập nhật thông tin quá trình công tác ngoài nước bị lỗi', 'danger'));
     };
 }
 
@@ -361,13 +361,13 @@ export function deleteQtNuocNgoaiStaffUser(id, email, done) {
         const url = '/api/user/qua-trinh/nuoc-ngoai';
         T.delete(url, { id }, data => {
             if (data.error) {
-                T.notify('Xóa thông tin quá trình đi nước ngoài bị lỗi', 'danger');
+                T.notify('Xóa thông tin quá trình công tác ngoài nước bị lỗi', 'danger');
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
-                T.alert('Thông tin quá trình đi nước ngoài được xóa thành công!', 'info', false, 800);
+                T.alert('Thông tin quá trình công tác ngoài nước được xóa thành công!', 'info', false, 800);
                 done && done();
                 dispatch(userGetStaff(email));
             }
-        }, () => T.notify('Xóa thông tin quá trình đi nước ngoài bị lỗi', 'danger'));
+        }, () => T.notify('Xóa thông tin quá trình công tác ngoài nước bị lỗi', 'danger'));
     };
 }

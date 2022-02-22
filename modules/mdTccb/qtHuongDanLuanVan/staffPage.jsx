@@ -41,7 +41,7 @@ class EditModal extends AdminModal {
             sanPham: this.sanPham.value(),
             bacDaoTao: this.bacDaoTao.value(),
         };
-        
+
         if (!this.tenLuanVan.value()) {
             T.notify('Tên luận văn trống', 'danger');
             this.tenLuanVan.focus();
@@ -85,7 +85,7 @@ class QtHuongDanLuanVanStaffUserPage extends AdminPage {
 
     showModal = (e) => {
         e.preventDefault();
-        this.modal.show({item: null, shcc: this.state.filter.list_shcc});
+        this.modal.show({ item: null, shcc: this.state.filter.list_shcc });
     }
 
     delete = (e, item) => {
@@ -171,6 +171,7 @@ class QtHuongDanLuanVanStaffUserPage extends AdminPage {
             </>,
             backRoute: '/user',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+            // onImport: permission && permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/huong-dan-luan-van/upload') : null
         });
     }
 }
