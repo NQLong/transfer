@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, FormDatePicker, FormCheckbox} from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, FormDatePicker, FormCheckbox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
     getQtHopDongDvtlTnPage, getQtHopDongDvtlTnAll, updateQtHopDongDvtlTn,
@@ -29,7 +29,7 @@ class QtHopDongDvtlTn extends AdminPage {
                 this.hienThiTheoCanBo.value(true);
             }
             this.getPage();
-            this.changeAdvancedSearch(true);            
+            this.changeAdvancedSearch(true);
         });
     }
 
@@ -114,7 +114,7 @@ class QtHopDongDvtlTn extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' content={index + 1} />
+                        <TableCell type='text' content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <a href={'/user/tccb/qua-trinh/hop-dong-dvtl-tn/' + item.ma} >

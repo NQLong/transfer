@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
-    updateQtHuongDanLuanVanGroupPageMa, deleteQtHuongDanLuanVanGroupPageMa,createQtHuongDanLuanVanGroupPageMa, getQtHuongDanLuanVanGroupPageMa,
+    updateQtHuongDanLuanVanGroupPageMa, deleteQtHuongDanLuanVanGroupPageMa, createQtHuongDanLuanVanGroupPageMa, getQtHuongDanLuanVanGroupPageMa,
 } from './redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 
@@ -58,7 +58,7 @@ class EditModal extends AdminModal {
             title: this.state.id ? 'Cập nhật quá trình hướng dẫn luận văn' : 'Tạo mới quá trình hướng dẫn luận văn',
             size: 'large',
             body: <div className='row'>
-                <FormSelect type='text' className='col-md-12' multiple={this.multiple} ref={e => this.shcc = e} data={SelectAdapter_FwCanBo} label='Cán bộ' readOnly={true} required/>
+                <FormSelect type='text' className='col-md-12' multiple={this.multiple} ref={e => this.shcc = e} data={SelectAdapter_FwCanBo} label='Cán bộ' readOnly={true} required />
                 <FormTextBox type='text' className='col-md-12' ref={e => this.hoTen = e} label='Danh sách họ tên sinh viên, học viên' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-12' ref={e => this.tenLuanVan = e} label='Tên luận văn' readOnly={readOnly} required />
                 <FormTextBox className='col-md-4' ref={e => this.namTotNghiep = e} label='Năm tốt nghiệp (yyyy)' type='year' readOnly={readOnly} required />
@@ -78,9 +78,9 @@ class QtHuongDanLuanVanGroupPage extends AdminPage {
             const route = T.routeMatcher('/user/tccb/qua-trinh/hdlv/group/:shcc'),
                 params = route.parse(window.location.pathname);
             this.shcc = params.shcc;
-            this.setState({filter: {list_shcc: params.shcc, list_dv: ''}});
+            this.setState({ filter: { list_shcc: params.shcc, list_dv: '' } });
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
-            
+
             T.showSearchBox(() => {
                 this.fromYear?.value('');
                 this.toYear?.value('');
@@ -142,15 +142,15 @@ class QtHuongDanLuanVanGroupPage extends AdminPage {
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Họ tên sinh viên</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tên luận văn</th> 
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tên luận văn</th>
                         <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Năm tốt nghiệp</th>
-                        <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Bậc đào tạo</th> 
+                        <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Bậc đào tạo</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{(item.hoCanBo ? item.hoCanBo : '') + ' ' + (item.tenCanBo ? item.tenCanBo : '')}</span><br />
@@ -158,11 +158,11 @@ class QtHuongDanLuanVanGroupPage extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' content={item.hoTen} /> 
+                        <TableCell type='text' content={item.hoTen} />
                         <TableCell type='text' style={{}} content={<>
                             <span><i>{item.tenLuanVan}</i></span><br />
                             {item.sanPham ? <span>Sản phẩm: {item.sanPham ? item.sanPham : ''}</span> : null}
-                        </>} /> 
+                        </>} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.namTotNghiep} />
                         <TableCell type='text' content={item.bacDaoTao} style={{ whiteSpace: 'nowrap' }} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
@@ -185,7 +185,7 @@ class QtHuongDanLuanVanGroupPage extends AdminPage {
             advanceSearch: <>
                 <div className='row'>
                     <FormTextBox className='col-md-3' ref={e => this.fromYear = e} label='Từ năm (năm tốt nghiệp)' type='year' onChange={() => this.changeAdvancedSearch()} />
-                    <FormTextBox className='col-md-3' ref={e => this.toYear = e} label='Đến năm (năm tốt nghiệp)' type='year' onChange={() => this.changeAdvancedSearch()} /> 
+                    <FormTextBox className='col-md-3' ref={e => this.toYear = e} label='Đến năm (năm tốt nghiệp)' type='year' onChange={() => this.changeAdvancedSearch()} />
                 </div>
             </>,
             content: <>

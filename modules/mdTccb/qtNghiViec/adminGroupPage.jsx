@@ -64,11 +64,11 @@ class EditModal extends AdminModal {
             size: 'large',
             body: <div className='row'>
                 <FormSelect className='col-md-12' ref={e => this.shcc = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={true} />
-                <FormTextBox className='col-md-12' ref={e => this.soQuyetDinh = e} label='Số quyết định' type='text' required readOnly={readOnly}/>
-                <FormDatePicker className='col-md-6' ref={e => this.ngayNghi = e} label='Ngày nghỉ' type='date-mask' required readOnly={readOnly}/>
-                <FormSelect className='col-md-6' ref={e => this.dienNghi = e} label={'Diện nghỉ'} data={[{ id: 1, text: 'Biên chế' }, { id: 2, text: 'Hợp đồng' }]} required readOnly={readOnly}/>
-                <FormRichTextBox className='col-md-12' ref={e => this.noiDung = e} label={'Nội dung'} readOnly={readOnly}/>
-                <FormRichTextBox className='col-md-12' ref={e => this.ghiChu = e} label={'Ghi chú'} readOnly={readOnly}/>
+                <FormTextBox className='col-md-12' ref={e => this.soQuyetDinh = e} label='Số quyết định' type='text' required readOnly={readOnly} />
+                <FormDatePicker className='col-md-6' ref={e => this.ngayNghi = e} label='Ngày nghỉ' type='date-mask' required readOnly={readOnly} />
+                <FormSelect className='col-md-6' ref={e => this.dienNghi = e} label={'Diện nghỉ'} data={[{ id: 1, text: 'Biên chế' }, { id: 2, text: 'Hợp đồng' }]} required readOnly={readOnly} />
+                <FormRichTextBox className='col-md-12' ref={e => this.noiDung = e} label={'Nội dung'} readOnly={readOnly} />
+                <FormRichTextBox className='col-md-12' ref={e => this.ghiChu = e} label={'Ghi chú'} readOnly={readOnly} />
             </div>,
         });
     }
@@ -82,7 +82,7 @@ class QtNghiViecGroupPage extends AdminPage {
             const route = T.routeMatcher('/user/tccb/qua-trinh/nghi-viec/group/:ma'),
                 params = route.parse(window.location.pathname);
             this.ma = params.ma;
-            this.setState({filter: {list_shcc: params.ma, list_dv: '' }});
+            this.setState({ filter: { list_shcc: params.ma, list_dv: '' } });
             T.onSearch = (searchText) => this.props.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
                 this.fromYear?.value('');
@@ -113,7 +113,7 @@ class QtNghiViecGroupPage extends AdminPage {
                     this.maDonVi?.value(filter.list_dv);
                     this.mulCanBo?.value(filter.list_shcc);
                     this.dienNghi?.value(filter.dienNghi);
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.list_shcc || filter.list_dv || filter.dienNghi )) this.showAdvanceSearch();
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.list_shcc || filter.list_dv || filter.dienNghi)) this.showAdvanceSearch();
                 }
             });
         });
@@ -158,7 +158,7 @@ class QtNghiViecGroupPage extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
                             item.shcc ?
                                 <>
@@ -168,7 +168,7 @@ class QtNghiViecGroupPage extends AdminPage {
                                 <span>{item.hoTen ? item.hoTen : ''}</span>
                         )}
                         />
-                        <TableCell type='text' style={{  whiteSpace: 'nowrap' }} content={(
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span><i>{item.soQuyetDinh}</i></span><br />
                                 <span>Diện nghỉ: <span style={{ color: 'blue' }}>{item.dienNghi == 1 ? 'Biên chế' : 'Hợp đồng'}</span></span>
@@ -183,7 +183,7 @@ class QtNghiViecGroupPage extends AdminPage {
                         />
                         <TableCell type='text' content={(
                             <>
-                                <span><i>{item.noiDung}</i></span><br/>
+                                <span><i>{item.noiDung}</i></span><br />
                                 {item.ghiChu ? '(' + item.ghiChu + ')' : null}
                             </>
                         )}
@@ -207,8 +207,8 @@ class QtNghiViecGroupPage extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} /> 
-                    <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} /> 
+                    <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />
+                    <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />
                     <FormSelect className='col-md-4' ref={e => this.dienNghi = e} label={'Diện nghỉ'} data={[{ id: 1, text: 'Biên chế' }, { id: 2, text: 'Hợp đồng' }]} onChange={() => this.changeAdvancedSearch()} />
                 </div>
             </>,

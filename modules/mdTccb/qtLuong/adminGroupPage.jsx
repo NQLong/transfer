@@ -36,11 +36,11 @@ class EditModal extends AdminModal {
     };
 
     onShow = (item) => {
-        let { id, batDau, batDauType, ketThuc, ketThucType, chucDanhNgheNghiep, bac, heSoLuong, 
+        let { id, batDau, batDauType, ketThuc, ketThucType, chucDanhNgheNghiep, bac, heSoLuong,
             phuCapThamNienVuotKhung, ngayHuong, mocNangBacLuong, soHieuVanBan, shcc } = item ? item : {
-                id: '', batDau: '', batDauType: '', ketThuc: '', ketThucType: '', chucDanhNgheNghiep: '', bac: '', heSoLuong: '', 
+                id: '', batDau: '', batDauType: '', ketThuc: '', ketThucType: '', chucDanhNgheNghiep: '', bac: '', heSoLuong: '',
                 phuCapThamNienVuotKhung: '', ngayHuong: '', mocNangBacLuong: '', soHieuVanBan: '', shcc: ''
-        };
+            };
         this.setState({
             id, batDauType: batDauType ? batDauType : 'dd/mm/yyyy',
             ketThucType: ketThucType ? ketThucType : 'dd/mm/yyyy',
@@ -108,7 +108,7 @@ class EditModal extends AdminModal {
 
     handleKetThuc = (value) => {
         value ? $('#ketThucDate').hide() : $('#ketThucDate').show();
-        this.setState({ denNay: value});
+        this.setState({ denNay: value });
         if (!value) {
             this.ketThucType?.setText({ text: this.state.ketThucType ? this.state.ketThucType : 'dd/mm/yyyy' });
         } else {
@@ -161,7 +161,7 @@ class QtLuongGroupPage extends AdminPage {
             const route = T.routeMatcher('/user/tccb/qua-trinh/luong/group/:ma'),
                 params = route.parse(window.location.pathname);
             this.ma = params.ma;
-            this.setState({filter: {list_shcc: params.ma, list_dv: '', timeType: 0}});
+            this.setState({ filter: { list_shcc: params.ma, list_dv: '', timeType: 0 } });
             T.onSearch = (searchText) => this.props.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
                 this.timeType?.value(0);
@@ -195,11 +195,11 @@ class QtLuongGroupPage extends AdminPage {
             });
         });
     }
-    
+
     getPage = (pageN, pageS, pageC, done) => {
         this.props.getQtLuongGroupPageMa(pageN, pageS, pageC, this.state.filter, done);
     }
-    
+
     showModal = (e) => {
         e.preventDefault();
         this.modal.show();
@@ -237,20 +237,20 @@ class QtLuongGroupPage extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{(item.ho ? item.ho : ' ') + ' ' + (item.ten ? item.ten : ' ')}</span><br />
                                 {item.shcc}
-                            </> 
+                            </>
                         )}
                         />
-                        <TableCell type='text' style={{  whiteSpace: 'nowrap' }} content={item.chucDanhNgheNghiep}/>
-                        <TableCell type='text' style={{  whiteSpace: 'nowrap' }} content={(
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.chucDanhNgheNghiep} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span><i>Bậc: </i></span> <span>{item.bac}</span> <br/>
-                                <span><i>Hệ số lương: </i></span><span>{item.heSoLuong}</span> <br/>
-                                <span><i>Phụ cấp thâm niên vượt khung: </i></span><span>{item.phuCapThamNienVuotKhung}</span> <br/>
+                                <span><i>Bậc: </i></span> <span>{item.bac}</span> <br />
+                                <span><i>Hệ số lương: </i></span><span>{item.heSoLuong}</span> <br />
+                                <span><i>Phụ cấp thâm niên vượt khung: </i></span><span>{item.phuCapThamNienVuotKhung}</span> <br />
                                 <span><i>Mốc nâng bậc lương: </i></span><span>{item.mocNangBacLuong}</span>
                             </>
                         )}
@@ -263,7 +263,7 @@ class QtLuongGroupPage extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' content={item.soHieuVanBan}/>
+                        <TableCell type='text' content={item.soHieuVanBan} />
                         <TableCell type='text' content={(
                             <>
                                 <span>{(item.ketThuc == -1 || item.ketThuc >= item.today) ? <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đang diễn ra</span> : <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đã kết thúc</span>}</span>
@@ -289,9 +289,9 @@ class QtLuongGroupPage extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                <FormSelect className='col-12 col-md-4' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
-                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} /> }
-                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} /> }
+                    <FormSelect className='col-12 col-md-4' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
+                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />}
+                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />}
                 </div>
             </>,
             content: <>

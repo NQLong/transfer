@@ -99,7 +99,7 @@ class EditModal extends AdminModal {
 
     handleKetThuc = (value) => {
         value ? $('#ketThucDate').hide() : $('#ketThucDate').show();
-        this.setState({ denNay: value});
+        this.setState({ denNay: value });
         if (!value) {
             this.ketThucType?.setText({ text: this.state.ketThucType ? this.state.ketThucType : 'dd/mm/yyyy' });
         } else {
@@ -200,7 +200,7 @@ class QtLuongUserPage extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.chucDanhNgheNghiep} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>

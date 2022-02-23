@@ -36,14 +36,14 @@ class EditModal extends AdminModal {
         ketThucType: 'dd/mm/yyyy',
     };
     multiple = false;
-    
+
     onShow = (item, multiple = true) => {
         this.multiple = multiple;
 
         let { id, maCanBo, lyDoHinhThuc, capQuyetDinh, batDau, batDauType, ketThuc, ketThucType, diemThiDua, noiDung } = item ? item : {
             id: '', maCanBo: '', lyDoHinhThuc: '', capQuyetDinh: '', batDau: '', batDauType: '', ketThuc: '', ketThucType: '', diemThiDua: '', noiDung: ''
         };
-        
+
         this.setState({
             id, batDauType: batDauType ? batDauType : 'dd/mm/yyyy',
             ketThucType: ketThucType ? ketThucType : 'dd/mm/yyyy',
@@ -120,7 +120,7 @@ class EditModal extends AdminModal {
 
     handleKetThuc = (value) => {
         value ? $('#ketThucDate').hide() : $('#ketThucDate').show();
-        this.setState({ denNay: value});
+        this.setState({ denNay: value });
         if (!value) {
             this.ketThucType?.setText({ text: this.state.ketThucType ? this.state.ketThucType : 'dd/mm/yyyy' });
         } else {
@@ -135,9 +135,9 @@ class EditModal extends AdminModal {
             size: 'large',
             body: <div className='row'>
                 <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={this.state.id ? true : false} required />
-                
+
                 <FormSelect className='col-md-12' ref={e => this.hinhThucKyLuat = e} label='Hình thức kỷ luật' data={SelectAdapter_DmKyLuatV2} readOnly={readOnly} required />
-                
+
                 <FormRichTextBox className='col-md-12' ref={e => this.noiDung = e} rows={2} readOnly={readOnly} label='Nội dung kỷ luật' placeholder='Nhập nội dung kỷ luật (tối đa 100 ký tự)' maxLength={100} />
 
                 <FormTextBox className='col-md-12' ref={e => this.capQuyetDinh = e} type='text' label='Cấp quyết định' readOnly={readOnly} />
@@ -262,19 +262,19 @@ class QtKyLuat extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nội dung kỷ luật</th> }
-                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Hình thức kỷ luật</th> }
-                        {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số lần bị kỷ luật</th> }
-                        {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách hình thức kỷ luật</th> }
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cấp quyết định</th> }
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Điểm thi đua</th> }
+                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nội dung kỷ luật</th>}
+                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Hình thức kỷ luật</th>}
+                        {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số lần bị kỷ luật</th>}
+                        {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách hình thức kỷ luật</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cấp quyết định</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Điểm thi đua</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tình trạng</th>}
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{(item.hoCanBo ? item.hoCanBo : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo : ' ')}</span><br />
@@ -297,7 +297,7 @@ class QtKyLuat extends AdminPage {
                         )}
                         />}
                         {this.checked && <TableCell type='text' style={{ textAlign: 'left' }} content={item.soKyLuat} />}
-                        {this.checked && <TableCell type='text' content={this.list(item.danhSachKyLuat, item.soKyLuat, item.soKyLuat)} /> }
+                        {this.checked && <TableCell type='text' content={this.list(item.danhSachKyLuat, item.soKyLuat, item.soKyLuat)} />}
                         {!this.checked && <TableCell type='text' content={(
                             <>
                                 {item.capQuyetDinh ? item.capQuyetDinh : ''}
@@ -337,11 +337,11 @@ class QtKyLuat extends AdminPage {
             advanceSearch: <>
                 <div className='row'>
                     <FormSelect className='col-12 col-md-4' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
-                    {(this.timeType && this.timeType.value() == 1) && 
-                    <>
-                        <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-2' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />
-                        <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-2' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />
-                    </>}
+                    {(this.timeType && this.timeType.value() == 1) &&
+                        <>
+                            <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-2' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />
+                            <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-2' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />
+                        </>}
                     <FormSelect className='col-12 col-md-4' ref={e => this.tinhTrang = e} label='Tình trạng'
                         data={[
                             { id: 1, text: 'Đã kết thúc' }, { id: 2, text: 'Đang diễn ra' }

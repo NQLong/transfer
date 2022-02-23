@@ -6,9 +6,11 @@ import Pagination from 'view/component/Pagination';
 import Dropdown from 'view/component/Dropdown';
 import { DateInput } from 'view/component/Input';
 import { SelectAdapter_FwCanBo } from '../tccbCanBo/redux';
-import { getQtNuocNgoaiGroupPageMa, deleteQtNuocNgoaiGroupPageMa, createQtNuocNgoaiGroupPageMa,
-    updateQtNuocNgoaiGroupPageMa }
-from './redux';
+import {
+    getQtNuocNgoaiGroupPageMa, deleteQtNuocNgoaiGroupPageMa, createQtNuocNgoaiGroupPageMa,
+    updateQtNuocNgoaiGroupPageMa
+}
+    from './redux';
 
 const EnumDateType = Object.freeze({
     0: { text: '' },
@@ -103,7 +105,7 @@ class EditModal extends AdminModal {
 
     handleKetThuc = (value) => {
         value ? $('#ketThucDate').hide() : $('#ketThucDate').show();
-        this.setState({ denNay: value});
+        this.setState({ denNay: value });
         if (!value) {
             this.ketThucType?.setText({ text: this.state.ketThucType ? this.state.ketThucType : 'dd/mm/yyyy' });
         } else {
@@ -120,7 +122,7 @@ class EditModal extends AdminModal {
                 <FormSelect className='col-md-12' ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={true} required />
                 <FormRichTextBox className='col-md-12' ref={e => this.noiDung = e} rows={2} readOnly={readOnly} label='Nội dung' placeholder='Nhập nội dung công tác ngoài nước (tối đa 200 ký tự)' required maxLength={200} />
                 <FormTextBox className='col-md-12' ref={e => this.quocGia = e} label='Quốc gia' />
-                <FormTextBox className='col-md-12' ref={e => this.tenCoSo = e} label='Tên cơ sở đào tạo/làm việc'  />
+                <FormTextBox className='col-md-12' ref={e => this.tenCoSo = e} label='Tên cơ sở đào tạo/làm việc' />
 
                 <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
                     label={
@@ -184,7 +186,7 @@ class QtNuocNgoaiGroupPage extends AdminPage {
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
                     this.fromYear?.value(filter.fromYear || '');
                     this.toYear?.value(filter.toYear || '');
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.timeType || filter.tinhTrang )) this.showAdvanceSearch();
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.timeType || filter.tinhTrang)) this.showAdvanceSearch();
                 }
             });
         });
@@ -232,7 +234,7 @@ class QtNuocNgoaiGroupPage extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{(item.hoCanBo ? item.hoCanBo : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo : ' ')}</span><br />
@@ -261,13 +263,13 @@ class QtNuocNgoaiGroupPage extends AdminPage {
                             </>
                         )}
                         />
-                       <TableCell type='text' content={(
+                        <TableCell type='text' content={(
                             <>
                                 {item.kinhPhi ? item.kinhPhi : ''}
                             </>
                         )}
                         />
-                       <TableCell type='text' content={(
+                        <TableCell type='text' content={(
                             <>
                                 <span>{(item.ketThuc == -1 || item.ketThuc >= item.today) ? <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đang diễn ra</span> : <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đã kết thúc</span>}</span>
                             </>
@@ -291,11 +293,11 @@ class QtNuocNgoaiGroupPage extends AdminPage {
             advanceSearch: <>
                 <div className='row'>
                     <FormSelect className='col-12 col-md-4' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
-                    {(this.timeType && this.timeType.value() == 1) && 
-                    <>
-                        <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />
-                        <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />
-                    </>}
+                    {(this.timeType && this.timeType.value() == 1) &&
+                        <>
+                            <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />
+                            <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />
+                        </>}
                     <FormSelect className='col-12 col-md-4' ref={e => this.tinhTrang = e} label='Tình trạng'
                         data={[
                             { id: 1, text: 'Đã kết thúc' }, { id: 2, text: 'Đang diễn ra' }

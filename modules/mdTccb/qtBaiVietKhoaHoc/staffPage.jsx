@@ -5,7 +5,7 @@ import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox,
 import Pagination from 'view/component/Pagination';
 import {
     updateQtBaiVietKhoaHocUserPage, createQtBaiVietKhoaHocUserPage,
-    deleteQtBaiVietKhoaHocUserPage, getQtBaiVietKhoaHocUserPage, 
+    deleteQtBaiVietKhoaHocUserPage, getQtBaiVietKhoaHocUserPage,
 } from './redux';
 import { DateInput } from 'view/component/Input';
 
@@ -28,7 +28,7 @@ class EditModal extends AdminModal {
             quocTe: 0
         };
 
-        this.setState({ id: id, shcc: item.shcc});
+        this.setState({ id: id, shcc: item.shcc });
 
         setTimeout(() => {
             this.tenTacGia.value(tenTacGia ? tenTacGia : '');
@@ -151,18 +151,18 @@ class QtBaiVietKhoaHocUserPage extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='text' content={(
                             <>
                                 <span><b>{item.tenBaiViet}</b></span> <br />
                                 <span>Tác giả:
-                                    <a href='#' onClick={() => this.modal.show({item, shcc})}>
-                                        <span style={{color: 'blue'}}>{' ' + item.tenTacGia} </span>
+                                    <a href='#' onClick={() => this.modal.show({ item, shcc })}>
+                                        <span style={{ color: 'blue' }}>{' ' + item.tenTacGia} </span>
                                     </a>
                                 </span>
 
                             </>
-                            
+
                         )} />
                         <TableCell type='text' content={(
                             <>
@@ -184,9 +184,9 @@ class QtBaiVietKhoaHocUserPage extends AdminPage {
                         )}
                         />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                            onEdit={() => this.modal.show({item, shcc})} onDelete={this.delete} >
+                            onEdit={() => this.modal.show({ item, shcc })} onDelete={this.delete} >
                         </TableCell>
-                        
+
                     </tr>
                 )
             });

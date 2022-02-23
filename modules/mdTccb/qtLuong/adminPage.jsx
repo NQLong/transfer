@@ -42,11 +42,11 @@ class EditModal extends AdminModal {
     multiple = false;
     onShow = (item, multiple = true) => {
         this.multiple = multiple;
-        let { id, batDau, batDauType, ketThuc, ketThucType, chucDanhNgheNghiep, bac, heSoLuong, 
+        let { id, batDau, batDauType, ketThuc, ketThucType, chucDanhNgheNghiep, bac, heSoLuong,
             phuCapThamNienVuotKhung, ngayHuong, mocNangBacLuong, soHieuVanBan, shcc } = item ? item : {
-                id: '', batDau: '', batDauType: '', ketThuc: '', ketThucType: '', chucDanhNgheNghiep: '', bac: '', heSoLuong: '', 
+                id: '', batDau: '', batDauType: '', ketThuc: '', ketThucType: '', chucDanhNgheNghiep: '', bac: '', heSoLuong: '',
                 phuCapThamNienVuotKhung: '', ngayHuong: '', mocNangBacLuong: '', soHieuVanBan: '', shcc: ''
-        };
+            };
         this.setState({
             id, batDauType: batDauType ? batDauType : 'dd/mm/yyyy',
             ketThucType: ketThucType ? ketThucType : 'dd/mm/yyyy',
@@ -129,7 +129,7 @@ class EditModal extends AdminModal {
 
     handleKetThuc = (value) => {
         value ? $('#ketThucDate').hide() : $('#ketThucDate').show();
-        this.setState({ denNay: value});
+        this.setState({ denNay: value });
         if (!value) {
             this.ketThucType?.setText({ text: this.state.ketThucType ? this.state.ketThucType : 'dd/mm/yyyy' });
         } else {
@@ -143,7 +143,7 @@ class EditModal extends AdminModal {
             title: this.state.id ? 'Cập nhật thông tin lương' : 'Tạo mới thông tin lương',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.shcc = e} data={SelectAdapter_FwCanBo} label='Cán bộ' readOnly={this.state.id ? true : false} required/>
+                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.shcc = e} data={SelectAdapter_FwCanBo} label='Cán bộ' readOnly={this.state.id ? true : false} required />
                 <FormTextBox type='text' className='col-md-4' ref={e => this.chucDanhNgheNghiep = e} label='Chức danh nghề nghiệp' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-4' ref={e => this.bac = e} label='Bậc' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-4' ref={e => this.heSoLuong = e} label='Hệ số lương' readOnly={readOnly} />
@@ -269,7 +269,7 @@ class QtLuong extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Chức danh nghề nghiệp</th>}
                         {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Số lần hưởng</th>}
-                        {this.checked && <th style={{width: '100%', whiteSpace: 'nowrap'}}>Danh sách ngày hưởng</th>}
+                        {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách ngày hưởng</th>}
                         {!this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap', textAlign: 'center' }}>Thông tin</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thời gian</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Số hiệu văn bản</th>}
@@ -279,20 +279,20 @@ class QtLuong extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{(item.ho ? item.ho : ' ') + ' ' + (item.ten ? item.ten : ' ')}</span><br />
                                 {item.shcc}
-                            </> 
+                            </>
                         )}
                         />
-                        {!this.checked && <TableCell type='text' style={{  whiteSpace: 'nowrap' }} content={item.chucDanhNgheNghiep}/>}
-                        {!this.checked && <TableCell type='text' style={{  whiteSpace: 'nowrap' }} content={(
+                        {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.chucDanhNgheNghiep} />}
+                        {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span><i>Bậc: </i></span> <span>{item.bac}</span> <br/>
-                                <span><i>Hệ số lương: </i></span><span>{item.heSoLuong}</span> <br/>
-                                <span><i>Phụ cấp thâm niên vượt khung: </i></span><span>{item.phuCapThamNienVuotKhung}</span> <br/>
+                                <span><i>Bậc: </i></span> <span>{item.bac}</span> <br />
+                                <span><i>Hệ số lương: </i></span><span>{item.heSoLuong}</span> <br />
+                                <span><i>Phụ cấp thâm niên vượt khung: </i></span><span>{item.phuCapThamNienVuotKhung}</span> <br />
                                 <span><i>Mốc nâng bậc lương: </i></span><span>{item.mocNangBacLuong}</span>
                             </>
                         )}
@@ -305,14 +305,14 @@ class QtLuong extends AdminPage {
                             </>
                         )}
                         />}
-                        {!this.checked && <TableCell type='text' content={item.soHieuVanBan}/>}
+                        {!this.checked && <TableCell type='text' content={item.soHieuVanBan} />}
                         {!this.checked && <TableCell type='text' content={(
                             <>
                                 <span>{(item.ketThuc == -1 || item.ketThuc >= item.today) ? <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đang diễn ra</span> : <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đã kết thúc</span>}</span>
                             </>
                         )}></TableCell>}
-                        {this.checked && <TableCell type='text' content={item.soNgayHuong}/>}
-                        {this.checked && <TableCell type='text' content={this.list(item.danhSachNgayHuong, item.soNgayHuong, item.soNgayHuong)} /> }
+                        {this.checked && <TableCell type='text' content={item.soNgayHuong} />}
+                        {this.checked && <TableCell type='text' content={this.list(item.danhSachNgayHuong, item.soNgayHuong, item.soNgayHuong)} />}
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                                 onEdit={() => this.modal.show(item, false)} onDelete={this.delete} >
@@ -340,11 +340,11 @@ class QtLuong extends AdminPage {
             advanceSearch: <>
                 <div className='row'>
                     <FormSelect className='col-12 col-md-4' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
-                    {(this.timeType && this.timeType.value() >= 1) && 
-                    <>
-                        <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-2' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />
-                        <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-2' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />
-                    </>}
+                    {(this.timeType && this.timeType.value() >= 1) &&
+                        <>
+                            <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-2' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />
+                            <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-2' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />
+                        </>}
                     <FormSelect className='col-12 col-md-4' ref={e => this.tinhTrang = e} label='Tình trạng'
                         data={[
                             { id: 1, text: 'Đã kết thúc' }, { id: 2, text: 'Đang diễn ra' }

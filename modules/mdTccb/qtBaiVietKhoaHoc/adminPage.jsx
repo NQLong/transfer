@@ -136,7 +136,7 @@ class QtBaiVietKhoaHoc extends AdminPage {
             this.changeAdvancedSearch(true);
         });
     }
-    
+
     showModal = (e) => {
         e.preventDefault();
         this.modal.show();
@@ -209,18 +209,18 @@ class QtBaiVietKhoaHoc extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Bài viết</th> }
-                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tạp chí</th> }
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Điểm IF</th> }
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Xuất bản</th> }
-                        {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số bài viết</th> }
-                        {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách bài viết</th> }
+                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Bài viết</th>}
+                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tạp chí</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Điểm IF</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Xuất bản</th>}
+                        {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số bài viết</th>}
+                        {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách bài viết</th>}
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={((pageNumber - 1) * pageSize + index + 1)} />
                         <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{(item.hoCanBo ? item.hoCanBo : '') + ' ' + (item.tenCanBo ? item.tenCanBo : '')}</span><br />
@@ -258,8 +258,8 @@ class QtBaiVietKhoaHoc extends AdminPage {
                             </>
                         )}
                         />}
-                        {this.checked && <TableCell type='text' content={item.soBaiViet} /> }
-                        {this.checked && <TableCell type='text' content={this.list(item.danhSachBaiViet, item.soBaiViet, item.soBaiViet)} /> }
+                        {this.checked && <TableCell type='text' content={item.soBaiViet} />}
+                        {this.checked && <TableCell type='text' content={this.list(item.danhSachBaiViet, item.soBaiViet, item.soBaiViet)} />}
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                                 onEdit={() => this.modal.show(item, false)} onDelete={this.delete} >
@@ -288,9 +288,9 @@ class QtBaiVietKhoaHoc extends AdminPage {
                 <div className='row'>
                     <FormTextBox className='col-md-4' ref={e => this.fromYear = e} label='Từ năm (năm xuất bản)' type='year' onChange={() => this.changeAdvancedSearch()} />
                     <FormTextBox className='col-md-4' ref={e => this.toYear = e} label='Đến năm (năm xuất bản)' type='year' onChange={() => this.changeAdvancedSearch()} />
-                    <FormSelect className='col-md-4' ref={e => this.xuatBanRange = e} label='Phạm vi xuất bản' data={quocTeList} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} /> 
-                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1}/>
-                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1}/>
+                    <FormSelect className='col-md-4' ref={e => this.xuatBanRange = e} label='Phạm vi xuất bản' data={quocTeList} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
                 </div>
             </>,
             content: <>

@@ -6,9 +6,11 @@ import Pagination from 'view/component/Pagination';
 import Dropdown from 'view/component/Dropdown';
 import { DateInput } from 'view/component/Input';
 import { SelectAdapter_FwCanBo } from '../tccbCanBo/redux';
-import { getQtNuocNgoaiPage, deleteQtNuocNgoaiStaff, createQtNuocNgoaiStaff,
-    updateQtNuocNgoaiStaff, getQtNuocNgoaiGroupPage }
-from './redux';
+import {
+    getQtNuocNgoaiPage, deleteQtNuocNgoaiStaff, createQtNuocNgoaiStaff,
+    updateQtNuocNgoaiStaff, getQtNuocNgoaiGroupPage
+}
+    from './redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 
 const EnumDateType = Object.freeze({
@@ -121,7 +123,7 @@ class EditModal extends AdminModal {
 
     handleKetThuc = (value) => {
         value ? $('#ketThucDate').hide() : $('#ketThucDate').show();
-        this.setState({ denNay: value});
+        this.setState({ denNay: value });
         if (!value) {
             this.ketThucType?.setText({ text: this.state.ketThucType ? this.state.ketThucType : 'dd/mm/yyyy' });
         } else {
@@ -135,10 +137,10 @@ class EditModal extends AdminModal {
             title: this.state.id ? 'Cập nhật quá trình công tác ngoài nước' : 'Tạo mới quá trình công tác ngoài nước',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={this.state.id ? true : false} required />    
+                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={this.state.id ? true : false} required />
                 <FormRichTextBox className='col-md-12' ref={e => this.noiDung = e} rows={2} readOnly={readOnly} label='Nội dung' placeholder='Nhập nội dung công tác ngoài nước (tối đa 200 ký tự)' required maxLength={200} />
                 <FormTextBox className='col-md-12' ref={e => this.quocGia = e} label='Quốc gia' />
-                <FormTextBox className='col-md-12' ref={e => this.tenCoSo = e} label='Tên cơ sở đào tạo/làm việc'  />
+                <FormTextBox className='col-md-12' ref={e => this.tenCoSo = e} label='Tên cơ sở đào tạo/làm việc' />
 
                 <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
                     label={
@@ -223,7 +225,7 @@ class QtNuocNgoai extends AdminPage {
         if (this.checked) this.props.getQtNuocNgoaiGroupPage(pageN, pageS, pageC, this.state.filter, done);
         else this.props.getQtNuocNgoaiPage(pageN, pageS, pageC, this.state.filter, done);
     }
-    
+
     groupPage = () => {
         this.checked = !this.checked;
         T.cookie('hienThiTheoCanBo', this.checked ? 1 : 0);
@@ -244,8 +246,8 @@ class QtNuocNgoai extends AdminPage {
             troLaiCongTacs[i] = troLaiCongTacs[i].trim();
         }
         for (let i = 0; i < soQt; i++) {
-            results.push(<p style={{ textTransform: 'uppercase' }}>{i+1}. Bắt đầu: <span style={{ color: 'blue' }}>{batDaus[i] ? T.dateToText(Number(batDaus[i]), batDauTypes[i] ? batDauTypes[i] : 'dd/mm/yyyy') : ''}</span> -
-                                                                        Kết thúc: <span style={{ color: 'blue' }}>{ketThucs[i] ? T.dateToText(Number(ketThucs[i]), ketThucTypes[i] ? ketThucTypes[i] : 'dd/mm/yyyy') : ''}</span> - Trở lại công tác: <span style={{ color: 'blue' }}>{troLaiCongTacs[i] ? T.dateToText(Number(troLaiCongTacs[i]), 'dd/mm/yyyy') : ''}</span></p>);
+            results.push(<p style={{ textTransform: 'uppercase' }}>{i + 1}. Bắt đầu: <span style={{ color: 'blue' }}>{batDaus[i] ? T.dateToText(Number(batDaus[i]), batDauTypes[i] ? batDauTypes[i] : 'dd/mm/yyyy') : ''}</span> -
+                Kết thúc: <span style={{ color: 'blue' }}>{ketThucs[i] ? T.dateToText(Number(ketThucs[i]), ketThucTypes[i] ? ketThucTypes[i] : 'dd/mm/yyyy') : ''}</span> - Trở lại công tác: <span style={{ color: 'blue' }}>{troLaiCongTacs[i] ? T.dateToText(Number(troLaiCongTacs[i]), 'dd/mm/yyyy') : ''}</span></p>);
         }
         return results;
     }
@@ -275,19 +277,19 @@ class QtNuocNgoai extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th> }
-                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nội dung</th> }
-                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nơi làm việc</th> }
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kinh phí</th> }
-                        {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quá trình</th> }
-                        {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách thời gian</th> }
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>}
+                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nội dung</th>}
+                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nơi làm việc</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kinh phí</th>}
+                        {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quá trình</th>}
+                        {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách thời gian</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tình trạng</th>}
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{(item.hoCanBo ? item.hoCanBo : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo : ' ')}</span><br />
@@ -316,7 +318,7 @@ class QtNuocNgoai extends AdminPage {
                             </>
                         )}
                         />}
-                       {!this.checked && <TableCell type='number' content={(
+                        {!this.checked && <TableCell type='number' content={(
                             <>
                                 {item.kinhPhi ? T.numberDisplay(item.kinhPhi) : ''}
                             </>
@@ -356,11 +358,11 @@ class QtNuocNgoai extends AdminPage {
             advanceSearch: <>
                 <div className='row'>
                     <FormSelect className='col-12 col-md-4' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
-                    {(this.timeType && this.timeType.value() == 1) && 
-                    <>
-                        <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-2' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />
-                        <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-2' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />
-                    </>}
+                    {(this.timeType && this.timeType.value() == 1) &&
+                        <>
+                            <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-2' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />
+                            <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-2' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />
+                        </>}
                     <FormSelect className='col-12 col-md-4' ref={e => this.tinhTrang = e} label='Tình trạng'
                         data={[
                             { id: 1, text: 'Đã kết thúc' }, { id: 2, text: 'Đang diễn ra' }
@@ -376,7 +378,7 @@ class QtNuocNgoai extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
-                <EditModal ref={e => this.modal = e} permission={permission} 
+                <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createQtNuocNgoaiStaff} update={this.props.updateQtNuocNgoaiStaff}
                     permissions={currentPermissions}
                 />

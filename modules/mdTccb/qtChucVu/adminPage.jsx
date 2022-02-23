@@ -188,7 +188,7 @@ class QtChucVu extends AdminPage {
                     this.mulCanBo?.value(filter.list_shcc);
                     this.timeType?.value(filter.timeType);
                     this.mulMaChucVu?.value(filter.list_cv);
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.list_shcc || filter.list_dv || filter.timeType || filter.list_cv )) this.showAdvanceSearch();
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.list_shcc || filter.list_dv || filter.timeType || filter.list_cv)) this.showAdvanceSearch();
                 }
             });
         });
@@ -252,7 +252,7 @@ class QtChucVu extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{item.ho + ' ' + item.ten}</span><br />

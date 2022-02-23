@@ -126,7 +126,7 @@ class QtHuongDanLuanVanStaffUserPage extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='text' content={item.hoTen} />
                         <TableCell type='text' style={{}} content={<>
                             <span><i>{item.tenLuanVan}</i></span><br />
