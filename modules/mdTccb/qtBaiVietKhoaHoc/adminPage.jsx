@@ -109,6 +109,7 @@ class EditModal extends AdminModal {
             let index = name.indexOf(':');
             name = name.substring(index + 2);
             name = name.trim();
+            name = name.normalizedName();
             if (i > 0) result += ', ';
             result += name;
         }
@@ -119,7 +120,6 @@ class EditModal extends AdminModal {
             if (item.selected) this.list_name.push(item.text);
             else this.removeName(this.list_name, item.text);
             this.tenTacGia.value(this.convertName(this.list_name));
-            // console.log("list_name = ", this.list_name);
         }
     }
 
