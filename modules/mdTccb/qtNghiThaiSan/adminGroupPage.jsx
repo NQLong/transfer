@@ -17,7 +17,7 @@ const timeList = [
 ];
 
 class EditModal extends AdminModal {
-    state = { 
+    state = {
         stt: null,
         batDau: '',
         ketThuc: '',
@@ -32,7 +32,7 @@ class EditModal extends AdminModal {
                 thoiGianKetThucNghi: ''
             };
         this.setState({ stt, item, thoiGianBatDauNghi, thoiGianKetThucNghi });
-        
+
         setTimeout(() => {
             this.daNopHoSoThaiSan.value(daNopHoSoThaiSan ? 1 : 0);
             this.ghiChu.value(ghiChu ? ghiChu : '');
@@ -58,7 +58,7 @@ class EditModal extends AdminModal {
             soBhxh: this.soBhxh.value(),
             soThangDuocNghi: Number(this.soThangDuocNghi.value()),
             thoiGianBaoTangBenBhxh: this.thoiGianBaoTangBenBhxh.value(),
-            thoiGianBatDauNghi: this.thoiGianBatDauNghi.value() ? Number(this.thoiGianBatDauNghi.value()): null,
+            thoiGianBatDauNghi: this.thoiGianBatDauNghi.value() ? Number(this.thoiGianBatDauNghi.value()) : null,
             thoiGianDiLamLai: this.thoiGianDiLamLai.value() ? Number(this.thoiGianDiLamLai.value()) : null,
             thoiGianKetThucNghi: this.thoiGianKetThucNghi.value() ? Number(this.thoiGianKetThucNghi.value()) : null,
         };
@@ -100,7 +100,7 @@ class QtNghiThaiSanGroupPage extends AdminPage {
             const route = T.routeMatcher('/user/tccb/qua-trinh/nghi-thai-san/group/:shcc'),
                 params = route.parse(window.location.pathname);
             this.shcc = params.shcc;
-            this.setState({filter: {list_shcc: params.shcc, list_dv: '', timeType: 0}});
+            this.setState({ filter: { list_shcc: params.shcc, list_dv: '', timeType: 0 } });
             T.onSearch = (searchText) => this.props.getQtNghiThaiSanPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
                 this.timeType?.value(0);
@@ -129,16 +129,16 @@ class QtNghiThaiSanGroupPage extends AdminPage {
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
                     this.fromYear?.value(filter.fromYear || '');
                     this.toYear?.value(filter.toYear || '');
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.timeType )) this.showAdvanceSearch();
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.timeType)) this.showAdvanceSearch();
                 }
             });
         });
     }
-    
+
     getPage = (pageN, pageS, pageC, done) => {
         this.props.getQtNghiThaiSanPage(pageN, pageS, pageC, this.state.filter, done);
     }
-    
+
     showModal = (e) => {
         e.preventDefault();
         this.modal.show();
@@ -176,7 +176,7 @@ class QtNghiThaiSanGroupPage extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{textAlign:'right'}} content={index + 1} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{item.ho + ' ' + item.ten}</span><br />
@@ -191,7 +191,7 @@ class QtNghiThaiSanGroupPage extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content= {<span style={{ color: 'blue'}}>{item.thoiGianDiLamLai ? new Date(item.thoiGianDiLamLai).ddmmyyyy() : ''}</span>}/>
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={<span style={{ color: 'blue' }}>{item.thoiGianDiLamLai ? new Date(item.thoiGianDiLamLai).ddmmyyyy() : ''}</span>} />
                         <TableCell type='text' content={item.thoiGianBaoTangBenBhxh} />
                         <TableCell type='text' content={item.ghiChu} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
@@ -211,9 +211,9 @@ class QtNghiThaiSanGroupPage extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                <FormSelect className='col-12 col-md-4' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
-                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} /> }
-                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} /> }
+                    <FormSelect className='col-12 col-md-4' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
+                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />}
+                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />}
                 </div>
             </>,
             content: <>
@@ -223,7 +223,7 @@ class QtNghiThaiSanGroupPage extends AdminPage {
                 <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createQtNghiThaiSanGroupPageMa} update={this.props.updateQtNghiThaiSanGroupPageMa}
                     permissions={currentPermissions} shcc={this.shcc}
-                /> 
+                />
             </>,
             backRoute: '/user/tccb/qua-trinh/nghi-thai-san',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,

@@ -1,4 +1,4 @@
-import { userGetStaff } from '../tccbCanBo/redux';
+import { userGetStaff } from '../../mdTccb/tccbCanBo/redux';
 
 import T from 'view/js/common';
 
@@ -113,6 +113,7 @@ export function createSachGiaoTrinhUserPage(data, done) {
         }, () => T.notify('Tạo sách giáo trình bị lỗi!', 'danger'));
     };
 }
+
 export function deleteSachGiaoTrinhUserPage(id, done) {
     return dispatch => {
         const url = '/api/user/qua-trinh/sach-giao-trinh';
@@ -137,7 +138,7 @@ export function getSachGiaoTrinhPage(pageNumber, pageSize, pageCondition, filter
     }
     const page = T.updatePage('pageSachGiaoTrinh', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
-        const url = `/api/tccb/qua-trinh/sach-giao-trinh/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/library/qua-trinh/sach-giao-trinh/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách quá trình sách giáo trình bị lỗi!', 'danger');
@@ -159,8 +160,8 @@ export function getSachGiaoTrinhGroupPage(pageNumber, pageSize, pageCondition, f
     }
     const page = T.updatePage('pageSachGiaoTrinh', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
-        const url = `/api/tccb/qua-trinh/sach-giao-trinh/group/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition, filter: page.filter}, data => {
+        const url = `/api/library/qua-trinh/sach-giao-trinh/group/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách quá trình sách giáo trình bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
@@ -182,7 +183,7 @@ export function getSachGiaoTrinhGroupPageMa(pageNumber, pageSize, pageCondition,
     }
     const page = T.updatePage('groupPageMaSachGiaoTrinh', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
-        const url = `/api/tccb/qua-trinh/sach-giao-trinh/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/library/qua-trinh/sach-giao-trinh/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách quá trình sách giáo trình bị lỗi!', 'danger');

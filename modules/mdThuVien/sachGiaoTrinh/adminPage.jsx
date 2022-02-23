@@ -110,7 +110,7 @@ class SachGiaoTrinh extends AdminPage {
     checked = parseInt(T.cookie('hienThiTheoCanBo')) == 1 ? true : false;
     state = { filter: {} };
     componentDidMount() {
-        T.ready('/user/tccb', () => {
+        T.ready('/user/library', () => {
             T.clearSearchBox();
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
@@ -168,7 +168,7 @@ class SachGiaoTrinh extends AdminPage {
 
     list = (text, i, j) => {
         if (i == 0) return [];
-        let deTais = text.split('??').map(str => <p key={i--} style={{ textTransform: 'uppercase' }}>{j - i}. {str}</p>);
+        let deTais = text.split('??').map(str => <div key={i--} style={{}}>{j - i}. {str}</div>);
         return deTais;
     }
 
@@ -209,16 +209,14 @@ class SachGiaoTrinh extends AdminPage {
                         {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thông tin sách</th>}
                         {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thông tin xuất bản</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thông tin sản phẩm</th>}
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Phạm vi xuất bản</th>}
-
-                        {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số lượng sách giáo trình</th>}
-                        {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách</th>}
+                        {/* {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số lượng sách giáo trình</th>} */}
+                        {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách sách, giáo trình của cán bộ</th>}
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{(item.hoCanBo ? item.hoCanBo : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo : ' ')}</span><br />
@@ -228,34 +226,34 @@ class SachGiaoTrinh extends AdminPage {
                         />
                         {!this.checked && <TableCell type='text' content={(
                             <>
-                                <span><i>{item.ten}</i></span><br />
-                                <span>Thể loại: <span style={{ color: 'blue' }}>{item.theLoai}</span></span>
+                                <span><i style={{ color: 'blue' }}>{item.ten}</i><br /><br /></span>
+                                {item.theLoai ? <span><b>Thể loại: </b><span style={{ whiteSpace: 'nowrap' }}>{item.theLoai}<br /></span></span> : null}
+                                {item.butDanh ? <span><b>Bút danh: </b><i>{item.butDanh}</i></span> : null}
                             </>
                         )}
                         />}
                         {!this.checked && <TableCell type='text' content={(
                             <>
-                                <span>Nhà xuất bản: <i>{item.nhaSanXuat}</i></span><br />
-                                <span>Năm xuất bản: <span style={{ color: 'blue' }}>{item.namSanXuat}</span></span> <br /> <br />
-                                <span>Chủ biên: <span style={{ color: 'blue' }}>{item.chuBien}</span></span>
+                                <span><b>Nhà XB: </b><span style={{ color: 'blue' }}>{item.nhaSanXuat}</span></span><br />
+                                <span><b>Năm XB:</b> <span >{item.namSanXuat}</span></span> <br />
+                                <span><b>Vai trò:</b> <span>{item.chuBien}<br /></span></span>
+                                {item.quocTe ?
+                                    <span><b>Phạm vi:</b> {item.quocTe == '0' ? <span>Trong nước</span>
+                                        : item.quocTe == '1' ? <span>Quốc tế</span>
+                                            : item.quocTe == '2' ? <span>Trong và ngoài nước </span>
+                                                : ''}
+                                    </span> : null}
+
                             </>
                         )}
                         />}
                         {!this.checked && <TableCell type='text' content={(
                             <>
-                                <span>Sản phẩm: {item.sanPham}</span><br />
-                                <span>Bút danh: <span style={{ color: 'blue' }}>{item.butDanh}</span></span>
+                                <span>{item.sanPham}</span>
                             </>
                         )}
                         />}
-                        {!this.checked && <TableCell type='text' content={(
-                            item.quocTe == '0' ? <span>Trong nước</span>
-                                : item.quocTe == '1' ? <span>Quốc tế</span>
-                                    : item.quocTe == '2' ? <span>Trong và ngoài nước </span>
-                                        : ''
-                        )}
-                        />}
-                        {this.checked && <TableCell type='text' content={item.soLuong} />}
+                        {/* {this.checked && <TableCell type='text' style={{ textAlign: 'center' }} content={item.soLuong} />} */}
                         {this.checked && <TableCell type='text' content={this.list(item.danhSach, item.soLuong, item.soLuong)} />}
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
@@ -264,7 +262,7 @@ class SachGiaoTrinh extends AdminPage {
                         }
                         {
                             this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}>
-                                <Link className='btn btn-success' to={`/user/tccb/sach-giao-trinh/group/${item.shcc}`} >
+                                <Link className='btn btn-success' to={`/user/library/sach-giao-trinh/group/${item.shcc}`} >
                                     <i className='fa fa-lg fa-compress' />
                                 </Link>
                             </TableCell>
@@ -276,10 +274,10 @@ class SachGiaoTrinh extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-book',
-            title: 'Sách, giáo trình',
+            title: 'Sách, giáo trình cán bộ',
             breadcrumb: [
-                <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
-                'Sách giáo trình'
+                <Link key={0} to='/user/library'>Thư viện</Link>,
+                'Sách, giáo trình cán bộ'
             ],
             advanceSearch: <>
                 <div className='row'>
@@ -301,13 +299,13 @@ class SachGiaoTrinh extends AdminPage {
                     create={this.props.createSachGTStaff} update={this.props.updateSachGTStaff}
                 />
             </>,
-            backRoute: '/user/tccb',
+            backRoute: '/user/library',
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
         });
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, sachGiaoTrinh: state.tccb.sachGiaoTrinh });
+const mapStateToProps = state => ({ system: state.system, sachGiaoTrinh: state.library.sachGiaoTrinh });
 const mapActionsToProps = {
     createSachGTStaff, updateSachGTStaff, deleteSachGTStaff,
     getSachGiaoTrinhGroupPage, getSachGiaoTrinhPage,

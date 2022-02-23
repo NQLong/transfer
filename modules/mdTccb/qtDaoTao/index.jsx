@@ -10,16 +10,16 @@ export default {
     },
     routes: [
         {
-            path: '/user/dao-tao',
-            component: Loadable({ loading: Loading, loader: () => import('./staffPage') })
+            path: '/user/tccb/qua-trinh/dao-tao/:shcc',
+            component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
         },
         {
             path: '/user/tccb/qua-trinh/dao-tao',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
         {
-            path: '/user/tccb/qua-trinh/dao-tao/:shcc',
-            component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
+            path: '/user/dao-tao',
+            component: Loadable({ loading: Loading, loader: () => import('./staffPage') })
         },
     ],
 };

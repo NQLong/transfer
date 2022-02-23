@@ -9,7 +9,7 @@ module.exports = app => {
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1014: { title: 'Đào tạo, bồi dưỡng', link: '/user/dao-tao', icon: 'fa-podcast', backgroundColor: '#635118', groupIndex: 4 },
+            1015: { title: 'Đào tạo, bồi dưỡng', link: '/user/dao-tao', icon: 'fa-podcast', backgroundColor: '#635118', groupIndex: 4 },
         },
     };
 

@@ -1,4 +1,4 @@
-import { getStaffEdit } from '../tccbCanBo/redux';
+import { getStaffEdit } from '../../mdTccb/tccbCanBo/redux';
 
 import T from 'view/js/common';
 
@@ -61,7 +61,7 @@ export function getQtNghienCuuKhoaHocPage(pageNumber, pageSize, pageCondition, m
     }
     const page = T.updatePage('pageQtNghienCuuKhoaHoc', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
-        const url = `/api/tccb/qua-trinh/nghien-cuu-khoa-hoc/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/khcn/qua-trinh/nghien-cuu-khoa-hoc/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter, mscb: mscb }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách nghiên cứu khoa học bị lỗi!', 'danger');
@@ -84,7 +84,7 @@ export function getQtNghienCuuKhoaHocGroupPage(pageNumber, pageSize, pageConditi
     const page = T.updatePage('pageQtNghienCuuKhoaHoc', pageNumber, pageSize, pageCondition, filter);
 
     return dispatch => {
-        const url = `/api/tccb/qua-trinh/nghien-cuu-khoa-hoc/group/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/khcn/qua-trinh/nghien-cuu-khoa-hoc/group/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách nghiên cứu khoa học bị lỗi!', 'danger');
@@ -105,7 +105,7 @@ export function getQtNghienCuuKhoaHocGroupPageMa(pageNumber, pageSize, loaiDoiTu
     const page = T.updatePage('groupPageMaQtNghienCuuKhoaHoc', pageNumber, pageSize, pageCondition);
     if (!loaiDoiTuong) loaiDoiTuong = '-1';
     return dispatch => {
-        const url = `/api/tccb/qua-trinh/nghien-cuu-khoa-hoc/group_nckh/page/${loaiDoiTuong}/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/khcn/qua-trinh/nghien-cuu-khoa-hoc/group_nckh/page/${loaiDoiTuong}/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách nghiên cứu khoa học theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -121,7 +121,7 @@ export function getQtNghienCuuKhoaHocGroupPageMa(pageNumber, pageSize, loaiDoiTu
 
 export function getQtNghienCuuKhoaHocAll(done) {
     return dispatch => {
-        const url = '/api/tccb/qua-trinh/nghien-cuu-khoa-hoc/all';
+        const url = '/api/khcn/qua-trinh/nghien-cuu-khoa-hoc/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách nghiên cứu khoa học bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');

@@ -11,11 +11,11 @@ import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import { SelectAdapter_DmKhenThuongKyHieuV2 } from 'modules/mdDanhMuc/dmKhenThuongKyHieu/redux';
 import { SelectAdapter_DmKhenThuongChuThichV2 } from 'modules/mdDanhMuc/dmKhenThuongChuThich/redux';
 import { getDmKhenThuongLoaiDoiTuongAll } from 'modules/mdDanhMuc/dmKhenThuongLoaiDoiTuong/redux';
-import { SelectAdapter_DmBoMon} from 'modules/mdDanhMuc/dmBoMon/redux';
-import { SelectAdapter_DmDonVi} from 'modules/mdDanhMuc/dmDonVi/redux';
+import { SelectAdapter_DmBoMon } from 'modules/mdDanhMuc/dmBoMon/redux';
+import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 
 class EditModal extends AdminModal {
-    state = { id: '', doiTuong: ''};
+    state = { id: '', doiTuong: '' };
     multiple = false;
     componentDidMount() {
         this.props.getLoaiDoiTuong(items => {
@@ -79,7 +79,7 @@ class EditModal extends AdminModal {
                     ma: ma,
                     namDatDuoc: this.namDatDuoc.value(),
                     thanhTich: this.thanhTich.value(),
-                    chuThich: this.chuThich.value(),  
+                    chuThich: this.chuThich.value(),
                     diemThiDua: this.diemThiDua.value(),
                 };
                 if (index == list_ma.length - 1) {
@@ -119,8 +119,8 @@ class EditModal extends AdminModal {
                     style={doiTuong == '03' ? {} : { display: 'none' }}
                     readOnly={readOnly} required />
 
-                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maBoMon = e} label='Bộ môn' data={SelectAdapter_DmBoMon} 
-                    style={doiTuong == '04' ? {} : { display: 'none' }} 
+                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maBoMon = e} label='Bộ môn' data={SelectAdapter_DmBoMon}
+                    style={doiTuong == '04' ? {} : { display: 'none' }}
                     readOnly={readOnly} required />
 
                 <FormSelect className='col-md-12' ref={e => this.thanhTich = e} label='Thành tích' data={SelectAdapter_DmKhenThuongKyHieuV2} readOnly={false} required />
@@ -278,19 +278,19 @@ class QtKhenThuongAll extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Đối tượng</th>
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm đạt được</th> }
-                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thành tích</th> }
-                        {!this.checked &&  <th style={{ width: 'auto', textAlign: 'right', whiteSpace: 'nowrap' }}>Điểm thi đua</th> }
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm đạt được</th>}
+                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thành tích</th>}
+                        {!this.checked && <th style={{ width: 'auto', textAlign: 'right', whiteSpace: 'nowrap' }}>Điểm thi đua</th>}
 
-                        {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số thành tích đạt được</th> }
-                        {this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Danh sách thành tích</th> }
+                        {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số thành tích đạt được</th>}
+                        {this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Danh sách thành tích</th>}
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Loại đối tượng</th>
                         <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
                             item.maLoaiDoiTuong == '01' ?
                                 <>
@@ -317,21 +317,21 @@ class QtKhenThuongAll extends AdminPage {
 
                         )}
                         />
-                        {!this.checked && <TableCell type='text' style={{textAlign: 'center' }} content={(
+                        {!this.checked && <TableCell type='text' style={{ textAlign: 'center' }} content={(
                             <>
                                 {item.namDatDuoc}
                             </>
                         )}
-                        /> }
+                        />}
                         {!this.checked && <TableCell type='text' content={(
                             <>
                                 {item.tenThanhTich}
                             </>
                         )}
-                        /> }
-                        {!this.checked && <TableCell type='text' style={{textAlign:'right'}} content={item.diemThiDua} /> }
-                        {this.checked && <TableCell type='text' style={{textAlign:'left'}} content={item.soKhenThuong} /> }
-                        {this.checked && <TableCell type='text' content={this.list(item.danhSachKhenThuong, item.soKhenThuong, item.soKhenThuong)} /> }
+                        />}
+                        {!this.checked && <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemThiDua} />}
+                        {this.checked && <TableCell type='text' style={{ textAlign: 'left' }} content={item.soKhenThuong} />}
+                        {this.checked && <TableCell type='text' content={this.list(item.danhSachKhenThuong, item.soKhenThuong, item.soKhenThuong)} />}
                         <TableCell type='text' content={item.tenLoaiDoiTuong} />
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
@@ -360,7 +360,7 @@ class QtKhenThuongAll extends AdminPage {
             advanceSearch: <>
                 <div className='row'>
                     <FormTextBox className='col-md-4' ref={e => this.fromYear = e} label='Từ năm đạt được (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
-                    <FormTextBox className='col-md-4' ref={e => this.toYear = e} label='Đến năm đạt được (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />  
+                    <FormTextBox className='col-md-4' ref={e => this.toYear = e} label='Đến năm đạt được (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
                 </div>
             </>,
             content: <>
@@ -375,9 +375,9 @@ class QtKhenThuongAll extends AdminPage {
                     create={this.props.createQtKhenThuongAll} update={this.props.updateQtKhenThuongAll}
                     permissions={currentPermissions}
                     getLoaiDoiTuong={this.props.getDmKhenThuongLoaiDoiTuongAll}
-                    />
+                />
                 {
-                    permission.read && !this.checked && 
+                    permission.read && !this.checked &&
                     <button className='btn btn-success btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px' }} onClick={this.downloadExcel} >
                         <i className='fa fa-lg fa-print' />
                     </button>

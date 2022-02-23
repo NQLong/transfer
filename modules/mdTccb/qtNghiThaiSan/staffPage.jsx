@@ -9,11 +9,11 @@ import {
 } from './redux';
 
 class EditModal extends AdminModal {
-    state = { 
+    state = {
         stt: null,
         batDau: '',
         ketThuc: '',
-    }; 
+    };
 
     onShow = (item) => {
         let { daNopHoSoThaiSan, ghiChu, hoSoThaiSanDuocDuyet, soBhxh,
@@ -24,7 +24,7 @@ class EditModal extends AdminModal {
                 thoiGianKetThucNghi: ''
             };
         this.setState({ stt, item, thoiGianBatDauNghi, thoiGianKetThucNghi, shcc: item.shcc });
-        
+
         setTimeout(() => {
             this.daNopHoSoThaiSan.value(daNopHoSoThaiSan ? 1 : 0);
             this.ghiChu.value(ghiChu ? ghiChu : '');
@@ -49,7 +49,7 @@ class EditModal extends AdminModal {
             soBhxh: this.soBhxh.value(),
             soThangDuocNghi: Number(this.soThangDuocNghi.value()),
             thoiGianBaoTangBenBhxh: this.thoiGianBaoTangBenBhxh.value(),
-            thoiGianBatDauNghi: this.thoiGianBatDauNghi.value() ? Number(this.thoiGianBatDauNghi.value()): null,
+            thoiGianBatDauNghi: this.thoiGianBatDauNghi.value() ? Number(this.thoiGianBatDauNghi.value()) : null,
             thoiGianDiLamLai: this.thoiGianDiLamLai.value() ? Number(this.thoiGianDiLamLai.value()) : null,
             thoiGianKetThucNghi: this.thoiGianKetThucNghi.value() ? Number(this.thoiGianKetThucNghi.value()) : null,
         };
@@ -98,7 +98,7 @@ class QtNghiThaiSanUserPage extends AdminPage {
 
     showModal = (e) => {
         e.preventDefault();
-        this.modal.show({item: null, shcc: this.state.filter.list_shcc});
+        this.modal.show({ item: null, shcc: this.state.filter.list_shcc });
     }
 
     delete = (e, item) => {
@@ -139,7 +139,7 @@ class QtNghiThaiSanUserPage extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{textAlign:'right'}} content={index + 1} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span style={{ whiteSpace: 'nowrap' }}>Từ: <span style={{ color: 'blue' }}>{item.thoiGianBatDauNghi ? new Date(item.thoiGianBatDauNghi).ddmmyyyy() : ''}</span></span><br />
@@ -147,7 +147,7 @@ class QtNghiThaiSanUserPage extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content= {<span style={{ color: 'blue'}}>{item.thoiGianDiLamLai ? new Date(item.thoiGianDiLamLai).ddmmyyyy() : ''}</span>}/>
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={<span style={{ color: 'blue' }}>{item.thoiGianDiLamLai ? new Date(item.thoiGianDiLamLai).ddmmyyyy() : ''}</span>} />
                         <TableCell type='text' content={item.thoiGianBaoTangBenBhxh} />
                         <TableCell type='text' content={item.ghiChu} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}

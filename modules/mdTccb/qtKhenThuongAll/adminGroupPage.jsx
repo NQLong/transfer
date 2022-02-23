@@ -1,19 +1,19 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox} from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
     getQtKhenThuongAllGroupPageMa, updateQtKhenThuongAllGroupPageMa,
-    deleteQtKhenThuongAllGroupPageMa, createQtKhenThuongAllGroupPageMa, 
+    deleteQtKhenThuongAllGroupPageMa, createQtKhenThuongAllGroupPageMa,
 } from './redux';
 
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import { SelectAdapter_DmKhenThuongKyHieuV2 } from 'modules/mdDanhMuc/dmKhenThuongKyHieu/redux';
 import { SelectAdapter_DmKhenThuongChuThichV2 } from 'modules/mdDanhMuc/dmKhenThuongChuThich/redux';
 import { getDmKhenThuongLoaiDoiTuongAll } from 'modules/mdDanhMuc/dmKhenThuongLoaiDoiTuong/redux';
-import { SelectAdapter_DmBoMon} from 'modules/mdDanhMuc/dmBoMon/redux';
-import { SelectAdapter_DmDonVi} from 'modules/mdDanhMuc/dmDonVi/redux';
+import { SelectAdapter_DmBoMon } from 'modules/mdDanhMuc/dmBoMon/redux';
+import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 
 class EditModal extends AdminModal {
     state = { id: '', doiTuong: '' };
@@ -44,7 +44,7 @@ class EditModal extends AdminModal {
             if (maLoaiDoiTuong == '02') this.maCanBo.value(ma ? ma : this.props.ma);
             else if (maLoaiDoiTuong == '03') this.maDonVi.value(ma ? ma : this.props.ma);
             else if (maLoaiDoiTuong == '04') this.maBoMon.value(ma ? ma : this.props.ma);
-    
+
             this.namDatDuoc.value(namDatDuoc ? namDatDuoc : '');
             this.thanhTich.value(maThanhTich ? maThanhTich : '');
             this.chuThich.value(maChuThich ? maChuThich : '');
@@ -92,7 +92,7 @@ class EditModal extends AdminModal {
             title: this.state.id ? 'Cập nhật quá trình khen thưởng' : 'Tạo mới quá trình khen thưởng',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-4' ref={e => this.loaiDoiTuong = e} label='Loại đối tượng' data={this.loaiDoiTuongTable} readOnly={true}/>
+                <FormSelect className='col-md-4' ref={e => this.loaiDoiTuong = e} label='Loại đối tượng' data={this.loaiDoiTuongTable} readOnly={true} />
 
                 <FormSelect className='col-md-12' ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo}
                     style={doiTuong == '02' ? {} : { display: 'none' }}
@@ -122,7 +122,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                 params = route.parse(window.location.pathname);
             this.loaiDoiTuong = params.loaiDoiTuong;
             this.ma = params.ma;
-            this.setState({filter: {loaiDoiTuong : this.loaiDoiTuong, ma: this.ma}});
+            this.setState({ filter: { loaiDoiTuong: this.loaiDoiTuong, ma: this.ma } });
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
                 this.fromYear?.value('');
@@ -139,7 +139,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
         const toYear = this.toYear?.value() == '' ? null : Number(this.toYear?.value());
         const loaiDoiTuong = this.state.filter.loaiDoiTuong;
         const ma = this.state.filter.ma;
-        const pageFilter = isInitial ? null : { fromYear, toYear, loaiDoiTuong, ma};
+        const pageFilter = isInitial ? null : { fromYear, toYear, loaiDoiTuong, ma };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
@@ -218,30 +218,30 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{textAlign:'right'}} content={index + 1} />
-                        <TableCell type='link' onClick = {() => this.modal.show(item)} content={(
-                            item.maLoaiDoiTuong == '01' ? 
-                            <>
-                                <span>
-                                     {'Trường Đại học Khoa học Xã hội và Nhân Văn, TP. HCM'}
-                                </span>
-                            </>
-                            :
-                            item.maLoaiDoiTuong == '02' ? 
-                                <>
-                                    <span>{item.hoCanBo + ' ' + item.tenCanBo}</span><br />
-                                    {item.ma}
-                                </>
-                            : item.maLoaiDoiTuong == '03' ? 
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
+                        <TableCell type='link' onClick={() => this.modal.show(item)} content={(
+                            item.maLoaiDoiTuong == '01' ?
                                 <>
                                     <span>
-                                        {item.tenDonVi}
+                                        {'Trường Đại học Khoa học Xã hội và Nhân Văn, TP. HCM'}
                                     </span>
                                 </>
-                            : <>
-                                    <span>{item.tenBoMon}</span> <br/>
-                                    {'KHOA ' + item.tenDonViBoMon }
-                                </>
+                                :
+                                item.maLoaiDoiTuong == '02' ?
+                                    <>
+                                        <span>{item.hoCanBo + ' ' + item.tenCanBo}</span><br />
+                                        {item.ma}
+                                    </>
+                                    : item.maLoaiDoiTuong == '03' ?
+                                        <>
+                                            <span>
+                                                {item.tenDonVi}
+                                            </span>
+                                        </>
+                                        : <>
+                                            <span>{item.tenBoMon}</span> <br />
+                                            {'KHOA ' + item.tenDonViBoMon}
+                                        </>
 
                         )}
                         />
@@ -257,7 +257,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' style={{textAlign:'right'}} content={item.diemThiDua} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemThiDua} />
                         <TableCell type='text' content={item.tenLoaiDoiTuong} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={this.delete} />
@@ -268,31 +268,31 @@ class QtKhenThuongAllGroupPage extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-gift',
-            title: 'Quá trình khen thưởng - ' + (this.loaiDoiTuong == '01' ? 'Trường' : 
-                this.loaiDoiTuong == '02' ? 'Cán bộ' : 
-                this.loaiDoiTuong == '03' ? 'Đơn vị' :
-                'Bộ môn'),
+            title: 'Quá trình khen thưởng - ' + (this.loaiDoiTuong == '01' ? 'Trường' :
+                this.loaiDoiTuong == '02' ? 'Cán bộ' :
+                    this.loaiDoiTuong == '03' ? 'Đơn vị' :
+                        'Bộ môn'),
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
                 <Link key={0} to='/user/tccb/qua-trinh/khen-thuong/all'>Quá trình khen thưởng</Link>,
-                'Quá trình khen thưởng - ' + (this.loaiDoiTuong == '01' ? 'Trường' : 
-                this.loaiDoiTuong == '02' ? 'Cán bộ' : 
-                this.loaiDoiTuong == '03' ? 'Đơn vị' :
-                'Bộ môn')
+                'Quá trình khen thưởng - ' + (this.loaiDoiTuong == '01' ? 'Trường' :
+                    this.loaiDoiTuong == '02' ? 'Cán bộ' :
+                        this.loaiDoiTuong == '03' ? 'Đơn vị' :
+                            'Bộ môn')
             ],
             advanceSearch: <>
                 <div className='row'>
                     <FormTextBox className='col-md-4' ref={e => this.fromYear = e} label='Năm đạt được (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
-                    <FormTextBox className='col-md-4' ref={e => this.toYear = e} label='Năm đạt được (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />  
+                    <FormTextBox className='col-md-4' ref={e => this.toYear = e} label='Năm đạt được (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
                 </div>
             </>,
             content: <>
                 <div className='tile'>{table}</div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition}}
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createQtKhenThuongAllGroupPageMa} update={this.props.updateQtKhenThuongAllGroupPageMa}
-                    permissions={currentPermissions} ma = {this.ma} loaiDoiTuong = {this.loaiDoiTuong}
+                    permissions={currentPermissions} ma={this.ma} loaiDoiTuong={this.loaiDoiTuong}
                     getLoaiDoiTuong={this.props.getDmKhenThuongLoaiDoiTuongAll}
                 />
                 {

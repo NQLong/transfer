@@ -38,7 +38,6 @@ class StaffUserPage extends AdminPage {
                     }
                     else {
                         this.setState({ isLoad: false });
-                        // this.profileCommon.value(user);
                     }
                 });
             }
@@ -48,18 +47,8 @@ class StaffUserPage extends AdminPage {
     setUp = (item) => {
         this.componentCaNhan.value(item);
         this.componentTTCongTac.value(item);
-        // this.componentCongTac.value(item.shcc, item.email);
         this.componentQuanHe.value(item.email, item.phai, item.shcc);
         this.componentTrinhDo.value(item);
-        // this.componentDaoTao.value(item.shcc, item.email);
-        // this.componentKhenThuong.value(item.shcc);
-        // this.componentNCKH.value(item.shcc, item.email);
-        // this.componentKyLuat.value(item.shcc);
-        // this.componentNuocNgoai.value(item.shcc, item.email);
-        // this.componentHDLV.value(item.shcc, item.email);
-        // this.componentSGT.value(item.shcc, item.email);
-        // this.componentLuong.value(item.shcc, item.email);
-        // this.componentBaoHiemXaHoi.value(item.shcc, item.email);
     }
 
     save = () => {
@@ -67,7 +56,7 @@ class StaffUserPage extends AdminPage {
         const congTacData = this.componentTTCongTac.getAndValidate();
         const trinhDoData = this.componentTrinhDo.getAndValidate();
         if (this.emailCanBo) {
-            caNhanData && congTacData && trinhDoData && this.props.updateStaffUser(this.emailCanBo, { ...caNhanData, ...congTacData, ...trinhDoData });
+            caNhanData && congTacData && trinhDoData && this.props.updateStaffUser(this.emailCanBo, { ...caNhanData, ...congTacData, ...trinhDoData, userModified: this.emailCanBo, lastModified: new Date().getTime() });
         }
     }
 

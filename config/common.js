@@ -79,6 +79,14 @@ module.exports = app => {
             index: 3000, title: 'Tổ chức cán bộ', link: '/user/tccb', icon: 'fa-sort-alpha-asc',
             subMenusRender: false, groups: ['Cán bộ', 'Công tác', 'Hợp đồng', 'Khen thưởng - Kỷ luật', 'Nghỉ', 'Chuyên môn']
         },
+        khcn: {
+            index: 9500, title: 'Khoa học công nghệ', link: '/user/khcn', icon: 'fa-rocket ',
+            subMenusRender: false
+        },
+        library: {
+            index: 8000, title: 'Thư viện', link: '/user/library', icon: 'fa-th-large',
+            subMenusRender: false
+        },
         category: {
             index: 4000, title: 'Danh mục', link: '/user/category', icon: 'fa-list-alt',
             subMenusRender: false,

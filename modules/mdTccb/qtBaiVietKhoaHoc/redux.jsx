@@ -3,6 +3,7 @@ import T from 'view/js/common';
 // Reducer ------------------------------------------------------------------------------------------------------------
 const QtBaiVietKhoaHocGetAll = 'QtBaiVietKhoaHoc:GetAll';
 const QtBaiVietKhoaHocGetPage = 'QtBaiVietKhoaHoc:GetPage';
+const QtBaiVietKhoaHocGetUserPage = 'QtBaiVietKhoaHoc:GetUserPage';
 const QtBaiVietKhoaHocGetGroupPage = 'QtBaiVietKhoaHoc:GetGroupPage';
 const QtBaiVietKhoaHocGetGroupPageMa = 'QtBaiVietKhoaHoc:GetGroupPageMa';
 const QtBaiVietKhoaHocUpdate = 'QtBaiVietKhoaHoc:Update';
@@ -18,6 +19,8 @@ export default function QtBaiVietKhoaHocReducer(state = null, data) {
             return Object.assign({}, state, { page_ma: data.page });
         case QtBaiVietKhoaHocGetPage:
             return Object.assign({}, state, { page: data.page });
+        case QtBaiVietKhoaHocGetUserPage:
+            return Object.assign({}, state, { user_page: data.page });
         case QtBaiVietKhoaHocGet:
             return Object.assign({}, state, { selectedItem: data.item });
         case QtBaiVietKhoaHocUpdate:
@@ -51,6 +54,79 @@ export default function QtBaiVietKhoaHocReducer(state = null, data) {
 }
 
 // Actions ------------------------------------------------------------------------------------------------------------
+T.initPage('userPageQtBaiVietKhoaHoc');
+export function getQtBaiVietKhoaHocUserPage(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('userPageQtBaiVietKhoaHoc', pageNumber, pageSize, pageCondition, filter);
+    return dispatch => {
+        const url = `/api/user/qua-trinh/bai-viet-khoa-hoc/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách bài viết khoa học bị lỗi!', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (page.filter) data.page.filter = page.filter;
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                if (done) done(data.page);
+                dispatch({ type: QtBaiVietKhoaHocGetUserPage, page: data.page });
+            }
+        }, () => T.notify('Lấy danh sách bài viết khoa học bị lỗi!', 'danger'));
+    };
+}
+
+export function updateQtBaiVietKhoaHocUserPage(id, changes, done) {
+    return dispatch => {
+        const url = '/api/user/qua-trinh/bai-viet-khoa-hoc';
+        T.put(url, { id, changes }, data => {
+            if (data.error || changes == null) {
+                T.notify('Cập nhật bài viết khoa học bị lỗi!', 'danger');
+                console.error(`PUT: ${url}.`, data.error);
+                done && done(data.error);
+            } else {
+                T.notify('Cập nhật bài viết khoa học thành công!', 'success');
+                done && done(data.item);
+                dispatch(getQtBaiVietKhoaHocUserPage());
+            }
+        }, () => T.notify('Cập nhật bài viết khoa học bị lỗi!', 'danger'));
+    };
+}
+
+export function createQtBaiVietKhoaHocUserPage(data, done) {
+    return dispatch => {
+        const url = '/api/user/qua-trinh/bai-viet-khoa-hoc';
+        T.post(url, { data }, res => {
+            if (res.error) {
+                T.notify('Tạo bài viết khoa học bị lỗi!', 'danger');
+                console.error(`POST: ${url}.`, res.error);
+            } else {
+                if (done) {
+                    T.notify('Tạo bài viết khoa học thành công!', 'success');
+                    dispatch(getQtBaiVietKhoaHocUserPage());
+                    done && done(data);
+                }
+            }
+        }, () => T.notify('Tạo bài viết khoa học bị lỗi!', 'danger'));
+    };
+}
+export function deleteQtBaiVietKhoaHocUserPage(id, done) {
+    return dispatch => {
+        const url = '/api/user/qua-trinh/bai-viet-khoa-hoc';
+        T.delete(url, { id }, data => {
+            if (data.error) {
+                T.notify('Xóa bài viết khoa học bị lỗi!', 'danger');
+                console.error(`DELETE: ${url}.`, data.error);
+            } else {
+                T.alert('bài viết khoa học đã xóa thành công!', 'success', false, 800);
+                done && done(data.item);
+                dispatch(getQtBaiVietKhoaHocUserPage());
+            }
+        }, () => T.notify('Xóa bài viết khoa học bị lỗi!', 'danger'));
+    };
+}
+
 T.initPage('pageQtBaiVietKhoaHoc');
 export function getQtBaiVietKhoaHocPage(pageNumber, pageSize, pageCondition, filter, done) {
     if (typeof filter === 'function') {
@@ -62,7 +138,7 @@ export function getQtBaiVietKhoaHocPage(pageNumber, pageSize, pageCondition, fil
         const url = `/api/tccb/qua-trinh/bai-viet-khoa-hoc/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
-                T.notify('Lấy danh sách học tập, công tác bị lỗi!', 'danger');
+                T.notify('Lấy danh sách bài viết khoa học bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (page.filter) data.page.filter = page.filter;
@@ -70,7 +146,7 @@ export function getQtBaiVietKhoaHocPage(pageNumber, pageSize, pageCondition, fil
                 if (done) done(data.page);
                 dispatch({ type: QtBaiVietKhoaHocGetPage, page: data.page });
             }
-        }, () => T.notify('Lấy danh sách học tập, công tác bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách bài viết khoa học bị lỗi!', 'danger'));
     };
 }
 
@@ -84,7 +160,7 @@ export function getQtBaiVietKhoaHocGroupPage(pageNumber, pageSize, pageCondition
         const url = `/api/tccb/qua-trinh/bai-viet-khoa-hoc/group/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter}, data => {
             if (data.error) {
-                T.notify('Lấy danh sách học tập, công tác bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                T.notify('Lấy danh sách bài viết khoa học bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (page.filter) data.page.filter = page.filter;
@@ -107,7 +183,7 @@ export function getQtBaiVietKhoaHocGroupPageMa(pageNumber, pageSize, pageConditi
         const url = `/api/tccb/qua-trinh/bai-viet-khoa-hoc/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
-                T.notify('Lấy danh sách học tập, công tác bị lỗi!', 'danger');
+                T.notify('Lấy danh sách bài viết khoa học bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (page.filter) data.page.filter = page.filter;
@@ -115,7 +191,7 @@ export function getQtBaiVietKhoaHocGroupPageMa(pageNumber, pageSize, pageConditi
                 if (done) done(data.page);
                 dispatch({ type: QtBaiVietKhoaHocGetGroupPageMa, page: data.page });
             }
-        }, () => T.notify('Lấy danh sách học tập, công tác bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách bài viết khoa học bị lỗi!', 'danger'));
     };
 }
 

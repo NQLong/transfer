@@ -20,6 +20,6 @@ export default {
         {
             path: '/user/huong-dan-luan-van',
             component: Loadable({ loading: Loading, loader: () => import('./staffPage') })
-        },
+        }
     ],
 };

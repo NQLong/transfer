@@ -1,4 +1,4 @@
-import { getStaffEdit, userGetStaff } from '../tccbCanBo/redux';
+import { userGetStaff } from '../tccbCanBo/redux';
 
 import T from 'view/js/common';
 
@@ -7,6 +7,7 @@ const QtLuongGetAll = 'QtLuong:GetAll';
 const QtLuongGetPage = 'QtLuong:GetPage';
 const QtLuongGetUserPage = 'QtLuong:GetUserPage';
 const QtLuongGetGroupPage = 'QtLuong:GetGroupPage';
+const QtLuongGetGroupPageMa = 'QtLuong:GetGroupPageMa';
 const QtLuongUpdate = 'QtLuong:Update';
 const QtLuongGet = 'QtLuong:Get';
 
@@ -16,6 +17,8 @@ export default function QtLuongReducer(state = null, data) {
             return Object.assign({}, state, { items: data.items });
         case QtLuongGetGroupPage:
             return Object.assign({}, state, { page_gr: data.page });
+        case QtLuongGetGroupPageMa:
+            return Object.assign({}, state, { page_ma: data.page });
         case QtLuongGetPage:
             return Object.assign({}, state, { page: data.page });
         case QtLuongGetUserPage:
@@ -149,13 +152,12 @@ export function getQtLuongPage(pageNumber, pageSize, pageCondition, filter, done
     };
 }
 
-T.initPage('groupPageQtLuong', true);
 export function getQtLuongGroupPage(pageNumber, pageSize, pageCondition, filter, done) {
     if (typeof filter === 'function') {
         done = filter;
         filter = {};
     }
-    const page = T.updatePage('groupPageQtLuong', pageNumber, pageSize, pageCondition, filter);
+    const page = T.updatePage('pageQtLuong', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/tccb/qua-trinh/luong/group/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
@@ -172,6 +174,29 @@ export function getQtLuongGroupPage(pageNumber, pageSize, pageCondition, filter,
     };
 }
 
+T.initPage('groupPageMaQtLuong');
+export function getQtLuongGroupPageMa(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('groupPageMaQtLuong', pageNumber, pageSize, pageCondition, filter);
+    return dispatch => {
+        const url = `/api/tccb/qua-trinh/luong/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách lương bị lỗi!', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (page.filter) data.page.filter = page.filter;
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                if (done) done(data.page);
+                dispatch({ type: QtLuongGetGroupPageMa, page: data.page });
+            }
+        }, () => T.notify('Lấy danh sách lương bị lỗi!', 'danger'));
+    };
+}
+
 export function updateQtLuongGroupPageMa(id, changes, done) {
     return dispatch => {
         const url = '/api/qua-trinh/luong';
@@ -183,7 +208,7 @@ export function updateQtLuongGroupPageMa(id, changes, done) {
             } else {
                 T.notify('Cập nhật lương thành công!', 'success');
                 done && done(data.item);
-                dispatch(getQtLuongPage());
+                dispatch(getQtLuongGroupPageMa());
             }
         }, () => T.notify('Cập nhật lương bị lỗi!', 'danger'));
     };
@@ -200,7 +225,7 @@ export function deleteQtLuongGroupPageMa(id, done) {
             } else {
                 T.alert('Thông tin lương được xóa thành công!', 'info', false, 800);
                 done && done(data.item);
-                dispatch(getQtLuongPage());
+                dispatch(getQtLuongGroupPageMa());
             }
         }, () => T.notify('Xóa thông tin lương bị lỗi', 'danger'));
     };
@@ -216,7 +241,7 @@ export function createQtLuongGroupPageMa(data, done) {
             } else {
                 if (done) {
                     T.notify('Tạo lương thành công!', 'success');
-                    dispatch(getQtLuongPage());
+                    dispatch(getQtLuongGroupPageMa());
                     done && done(data);
                 }
             }
@@ -224,7 +249,7 @@ export function createQtLuongGroupPageMa(data, done) {
     };
 }
 
-export function createQtLuongStaff(data, done, isEdit = null) {
+export function createQtLuongStaff(data, done) {
     return dispatch => {
         const url = '/api/qua-trinh/luong';
         T.post(url, { data }, res => {
@@ -234,21 +259,15 @@ export function createQtLuongStaff(data, done, isEdit = null) {
             } else {
                 T.notify('Thêm thông tin lương thành công!', 'info');
                 if (done) {
-                    if (isEdit) {
-                        done();
-                        dispatch(getStaffEdit(data.shcc));
-                    }
-                    else {
-                        done(data);
-                        dispatch(getQtLuongPage());
-                    }
+                    done(data);
+                    dispatch(getQtLuongPage());
                 }
             }
         }, () => T.notify('Thêm thông tin lương bị lỗi', 'danger'));
     };
 }
 
-export function updateQtLuongStaff(id, changes, done, isEdit = null) {
+export function updateQtLuongStaff(id, changes, done) {
     return dispatch => {
         const url = '/api/qua-trinh/luong';
         T.put(url, { id, changes }, data => {
@@ -257,14 +276,14 @@ export function updateQtLuongStaff(id, changes, done, isEdit = null) {
                 console.error('PUT: ' + url + '. ' + data.error);
             } else if (data.item) {
                 T.notify('Cập nhật thông tin lương thành công!', 'info');
-                isEdit ? (done && done()) : (done && done(data.item));
-                isEdit ? dispatch(getStaffEdit(changes.shcc)) : dispatch(getQtLuongPage());
+                done && done(data.item);
+                dispatch(getQtLuongPage());
             }
         }, () => T.notify('Cập nhật thông tin lương bị lỗi', 'danger'));
     };
 }
 
-export function deleteQtLuongStaff(id, isEdit, shcc = null) {
+export function deleteQtLuongStaff(id, done) {
     return dispatch => {
         const url = '/api/qua-trinh/luong';
         T.delete(url, { id }, data => {
@@ -273,7 +292,8 @@ export function deleteQtLuongStaff(id, isEdit, shcc = null) {
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
                 T.alert('Thông tin lương được xóa thành công!', 'info', false, 800);
-                isEdit ? dispatch(getStaffEdit(shcc)) : dispatch(getQtLuongPage());
+                dispatch(getQtLuongPage());
+                done && done(data.item);
             }
         }, () => T.notify('Xóa thông tin lương bị lỗi', 'danger'));
     };

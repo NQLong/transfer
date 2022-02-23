@@ -3,7 +3,8 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormRichTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
-import { updateSachGiaoTrinhUserPage, deleteSachGiaoTrinhUserPage,
+import {
+    updateSachGiaoTrinhUserPage, deleteSachGiaoTrinhUserPage,
     getSachGiaoTrinhUserPage, createSachGiaoTrinhUserPage,
 } from './redux';
 
@@ -72,7 +73,7 @@ class EditModal extends AdminModal {
             title: this.state.id ? 'Cập nhật sách giáo trình' : 'Tạo mới sách giáo trình',
             size: 'large',
             body: <div className='row'>
-                <FormRichTextBox className='col-12' ref={e => this.ten = e} label={'Tên sách, giáo trình'} type='text' readOnly={readOnly} required/>
+                <FormRichTextBox className='col-12' ref={e => this.ten = e} label={'Tên sách, giáo trình'} type='text' readOnly={readOnly} required />
                 <div className='form-group col-md-4'><DateInput ref={e => this.namSanXuat = e} label='Năm xuất bản' type='year' readOnly={readOnly} required /></div>
                 <FormTextBox className='col-8' ref={e => this.nhaSanXuat = e} label={'Nhà xuất bản, số hiệu ISBN'} type='text' readOnly={readOnly} required />
                 <FormTextBox className='col-4' ref={e => this.theLoai = e} label={'Thể loại'} type='text' readOnly={readOnly} />
@@ -101,7 +102,7 @@ class SachGiaoTrinhUserPage extends AdminPage {
 
     showModal = (e) => {
         e.preventDefault();
-        this.modal.show({item: null, shcc: this.state.filter.list_shcc});
+        this.modal.show({ item: null, shcc: this.state.filter.list_shcc });
     }
 
     delete = (e, item) => {
@@ -145,32 +146,32 @@ class SachGiaoTrinhUserPage extends AdminPage {
                         <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
                         <TableCell type='text' content={(
                             <>
-                                <span>Tên: <i>{item.ten}</i></span><br /> <br/>
+                                <span>Tên: <i>{item.ten}</i></span><br /> <br />
                                 <span>Thể loại: <span style={{ color: 'blue' }}>{item.theLoai}</span></span>
                             </>
-                        )} 
+                        )}
                         />
                         <TableCell type='text' content={(
                             <>
                                 <span>Nhà xuất bản: <i>{item.nhaSanXuat}</i></span><br />
-                                <span>Năm xuất bản: <span style={{ color: 'blue' }}>{item.namSanXuat}</span></span> <br /> <br/>
+                                <span>Năm xuất bản: <span style={{ color: 'blue' }}>{item.namSanXuat}</span></span> <br /> <br />
                                 <span>Chủ biên: <span style={{ color: 'blue' }}>{item.chuBien}</span></span>
                             </>
-                        )} 
+                        )}
                         />
                         <TableCell type='text' content={(
                             <>
                                 <span>Tên: {item.sanPham}</span><br />
                                 <span>Bút danh: <span style={{ color: 'blue' }}>{item.butDanh}</span></span>
                             </>
-                        )} 
+                        )}
                         />
                         <TableCell type='text' content={(
                             item.quocTe == '0' ? <span> Xuất bản trong nước</span>
-                            : item.quocTe == '1' ? <span> Xuất bản quốc tế</span>
-                                : item.quocTe == '2' ? <span> Xuất bản trong và ngoài nước </span>
-                                    : ''
-                        )}                        
+                                : item.quocTe == '1' ? <span> Xuất bản quốc tế</span>
+                                    : item.quocTe == '2' ? <span> Xuất bản trong và ngoài nước </span>
+                                        : ''
+                        )}
                         />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show({ item, shcc })} onDelete={this.delete} >
@@ -180,7 +181,7 @@ class SachGiaoTrinhUserPage extends AdminPage {
                 )
             });
         }
-        
+
         return this.renderPage({
             icon: 'fa fa-book',
             title: 'Sách giáo trình',
@@ -205,9 +206,9 @@ class SachGiaoTrinhUserPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, sachGiaoTrinh: state.tccb.sachGiaoTrinh });
+const mapStateToProps = state => ({ system: state.system, sachGiaoTrinh: state.library.sachGiaoTrinh });
 const mapActionsToProps = {
-    updateSachGiaoTrinhUserPage, deleteSachGiaoTrinhUserPage, 
+    updateSachGiaoTrinhUserPage, deleteSachGiaoTrinhUserPage,
     getSachGiaoTrinhUserPage, createSachGiaoTrinhUserPage,
 };
 export default connect(mapStateToProps, mapActionsToProps)(SachGiaoTrinhUserPage);
