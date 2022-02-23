@@ -85,61 +85,61 @@ class QtHopDongLaoDongGroupPage extends AdminPage {
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
-            getDataSource: () => list, stickyHead: true,
-            renderHead: () => (
-                <tr>
-                    <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                    <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                    <th style={{ width: '70%', whiteSpace: 'nowrap' }}>Số hợp đồng</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ duyệt hồ sơ</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
+                getDataSource: () => list, stickyHead: true,
+                renderHead: () => (
+                    <tr>
+                        <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
+                        <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Cán bộ</th>
+                        <th style={{ width: '70%', whiteSpace: 'nowrap' }}>Số hợp đồng</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ duyệt hồ sơ</th>
+                        <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
 
-                </tr>
-            ),
-            renderRow: (item, index) => (
-                <tr key={index}>
-                    <TableCell type='text' content={index + 1} />
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                        <>
-                            <a href={'/user/tccb/qua-trinh/hop-dong-lao-dong/' + item.ma}>
-                                <span>{item.hoBenA + ' ' + item.tenBenA}</span><br />
-                                <span>Mã thẻ cán bộ: {item.shcc}</span></a>
-                        </>
-                    )}
-                    />
-                    <TableCell type='text' content={(
-                        <>
-                            <span>Số: {item.soHopDong}</span><br />
-                            <span>Ngày ký: <span style={{ color: 'blue' }}>{item.ngayKyHopDong ? new Date(item.ngayKyHopDong).ddmmyyyy() : ''}</span></span>
-                        </>
-                    )}
-                    />
-                    <TableCell type='text' content={(
-                        item.loaiHopDong != '07' ?
+                    </tr>
+                ),
+                renderRow: (item, index) => (
+                    <tr key={index}>
+                        <TableCell type='text' content={(pageNumber - 1) * pageSize + index + 1} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span style={{ whiteSpace: 'nowrap' }}>{item.tenLoaiHopDong.replace('Hợp đồng lao động', 'HĐLĐ')}</span><br />
-                                <span style={{ whiteSpace: 'nowrap' }}>Từ ngày: <span style={{ color: 'blue' }}>{item.batDauLamViec ? new Date(item.batDauLamViec).ddmmyyyy() : ''}</span></span><br />
-                                <span style={{ whiteSpace: 'nowrap' }}>Đến ngày: <span style={{ color: 'blue' }}>{item.ketThucHopDong ? new Date(item.ketThucHopDong).ddmmyyyy() : ''}</span></span>
-                            </> :
-                            <>
-                                <span>{item.tenLoaiHopDong.replace('Hợp đồng lao động', 'HĐLĐ')}</span><br />
+                                <a href={'/user/tccb/qua-trinh/hop-dong-lao-dong/' + item.ma}>
+                                    <span>{item.hoBenA + ' ' + item.tenBenA}</span><br />
+                                    <span>Mã thẻ cán bộ: {item.shcc}</span></a>
                             </>
-                    )}
-                    />
-                    <TableCell style={{ whiteSpace: 'nowrap' }} type='text' content={(
-                        <>
-                            <span>{item.hoNguoiKy + ' ' + item.tenNguoiKy}<br /></span>
-                            <Link to={'/user/tccb/staff/' + item.shccNguoiKy}>{item.shccNguoiKy}</Link>
-                        </>
-                    )} />
-                    <TableCell type='buttons' content={item} onEdit={`/user/tccb/qua-trinh/hop-dong-lao-dong/${item.ma}`} onDelete={this.delete} permission={permission} >
-                        <a href="#" className="btn btn-primary" style={{ width: '45px' }} onClick={e => e.preventDefault() || this.downloadWord(item)}>
-                            <i className='fa fa-lg fa-file-word-o' />
-                        </a>
-                    </TableCell>
-                </tr>
-            )
+                        )}
+                        />
+                        <TableCell type='text' content={(
+                            <>
+                                <span>Số: {item.soHopDong}</span><br />
+                                <span>Ngày ký: <span style={{ color: 'blue' }}>{item.ngayKyHopDong ? new Date(item.ngayKyHopDong).ddmmyyyy() : ''}</span></span>
+                            </>
+                        )}
+                        />
+                        <TableCell type='text' content={(
+                            item.loaiHopDong != '07' ?
+                                <>
+                                    <span style={{ whiteSpace: 'nowrap' }}>{item.tenLoaiHopDong.replace('Hợp đồng lao động', 'HĐLĐ')}</span><br />
+                                    <span style={{ whiteSpace: 'nowrap' }}>Từ ngày: <span style={{ color: 'blue' }}>{item.batDauLamViec ? new Date(item.batDauLamViec).ddmmyyyy() : ''}</span></span><br />
+                                    <span style={{ whiteSpace: 'nowrap' }}>Đến ngày: <span style={{ color: 'blue' }}>{item.ketThucHopDong ? new Date(item.ketThucHopDong).ddmmyyyy() : ''}</span></span>
+                                </> :
+                                <>
+                                    <span>{item.tenLoaiHopDong.replace('Hợp đồng lao động', 'HĐLĐ')}</span><br />
+                                </>
+                        )}
+                        />
+                        <TableCell style={{ whiteSpace: 'nowrap' }} type='text' content={(
+                            <>
+                                <span>{item.hoNguoiKy + ' ' + item.tenNguoiKy}<br /></span>
+                                <Link to={'/user/tccb/staff/' + item.shccNguoiKy}>{item.shccNguoiKy}</Link>
+                            </>
+                        )} />
+                        <TableCell type='buttons' content={item} onEdit={`/user/tccb/qua-trinh/hop-dong-lao-dong/${item.ma}`} onDelete={this.delete} permission={permission} >
+                            <a href="#" className="btn btn-primary" style={{ width: '45px' }} onClick={e => e.preventDefault() || this.downloadWord(item)}>
+                                <i className='fa fa-lg fa-file-word-o' />
+                            </a>
+                        </TableCell>
+                    </tr>
+                )
             });
         }
         return this.renderPage({
@@ -151,11 +151,11 @@ class QtHopDongLaoDongGroupPage extends AdminPage {
                 'Hợp đồng Lao động cán bộ'
             ],
             advanceSearch: <>
-            <div className='row'>
-                <FormDatePicker type='date-mask' ref={e => this.fromYear = e} className='col-12 col-md-3' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />
-                <FormDatePicker type='date-mask' ref={e => this.toYear = e} className='col-12 col-md-3' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />
-            </div>
-        </>,
+                <div className='row'>
+                    <FormDatePicker type='date-mask' ref={e => this.fromYear = e} className='col-12 col-md-3' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />
+                    <FormDatePicker type='date-mask' ref={e => this.toYear = e} className='col-12 col-md-3' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />
+                </div>
+            </>,
             content: <>
                 <div className='tile'>
                     {table}

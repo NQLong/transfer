@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3003: { title: 'Hợp đồng đơn vị trả lương & trách nhiệm', link: '/user/tccb/qua-trinh/hop-dong-dvtl-tn', icon: 'fa-pencil', backgroundColor: '#00897b', groupIndex: 0 },
+            3003: { title: 'Hợp đồng Đơn vị Trả lương & Trách nhiệm', link: '/user/tccb/qua-trinh/hop-dong-dvtl-tn', icon: 'fa-pencil', backgroundColor: '#00897b', groupIndex: 2 },
         },
     };
     app.permission.add(
@@ -18,12 +18,14 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        app.model.qtHopDongDvtlTn.searchPage(pageNumber, pageSize, searchTerm, (error, page) => {
+        const { fromYear, toYear } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null };
+        app.model.qtHopDongDvtlTn.searchPage(pageNumber, pageSize, fromYear, toYear, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
                 const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
-                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, list } });
+                const pageCondition = searchTerm;
+                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
             }
         });
     });
@@ -32,12 +34,14 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        app.model.qtHopDongDvtlTn.searchPageGroup(pageNumber, pageSize, searchTerm, (error, page) => {
+        const { fromYear, toYear } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null };
+        app.model.qtHopDongDvtlTn.groupPage(pageNumber, pageSize, fromYear, toYear, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
                 const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
-                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, list } });
+                const pageCondition = searchTerm;
+                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
             }
         });
     });

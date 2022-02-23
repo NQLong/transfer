@@ -1,11 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox} from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
     getQtKhenThuongAllUserPage, updateQtKhenThuongAllUserPage,
-    deleteQtKhenThuongAllUserPage, createQtKhenThuongAllUserPage, 
+    deleteQtKhenThuongAllUserPage, createQtKhenThuongAllUserPage,
 } from './redux';
 
 import { SelectAdapter_DmKhenThuongKyHieuV2 } from 'modules/mdDanhMuc/dmKhenThuongKyHieu/redux';
@@ -67,7 +67,7 @@ class EditModal extends AdminModal {
         return this.renderModal({
             title: this.state.id ? 'Cập nhật quá trình khen thưởng' : 'Tạo mới quá trình khen thưởng',
             size: 'large',
-            body: <div className='row'> 
+            body: <div className='row'>
                 <FormSelect className='col-md-12' ref={e => this.thanhTich = e} label='Thành tích' data={SelectAdapter_DmKhenThuongKyHieuV2} readOnly={readOnly} required />
                 <FormTextBox className='col-md-4' ref={e => this.namDatDuoc = e} label='Năm đạt được (yyyy)' type='year' readOnly={readOnly} />
                 <FormSelect className='col-md-8' ref={e => this.chuThich = e} label='Chú thích' data={SelectAdapter_DmKhenThuongChuThichV2} readOnly={readOnly} />
@@ -94,7 +94,7 @@ class QtKhenThuongAllUserPage extends AdminPage {
 
     showModal = (e) => {
         e.preventDefault();
-        this.modal.show({item: null, ma: this.state.filter.ma});
+        this.modal.show({ item: null, ma: this.state.filter.ma });
     }
 
     delete = (e, item) => {
@@ -134,7 +134,7 @@ class QtKhenThuongAllUserPage extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{textAlign:'right'}} content={index + 1} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='text' content={(
                             <>
                                 {item.tenThanhTich}
@@ -147,7 +147,7 @@ class QtKhenThuongAllUserPage extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' style={{textAlign:'right'}} content={item.diemThiDua} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemThiDua} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show({ item, ma: shcc })} onDelete={this.delete} />
                     </tr>
@@ -165,15 +165,16 @@ class QtKhenThuongAllUserPage extends AdminPage {
             ],
             content: <>
                 <div className='tile'>{table}</div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition}}
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
-                <EditModal ref={e => this.modal = e} 
+                <EditModal ref={e => this.modal = e}
                     create={this.props.createQtKhenThuongAllUserPage} update={this.props.updateQtKhenThuongAllUserPage}
-                    loaiDoiTuong = {this.state.filter.loaiDoiTuong} readOnly={!permission.write}
+                    loaiDoiTuong={this.state.filter.loaiDoiTuong} readOnly={!permission.write}
                     getLoaiDoiTuong={this.props.getDmKhenThuongLoaiDoiTuongAll}
                 />
             </>,
             backRoute: '/user',
+            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
         });
     }
 }

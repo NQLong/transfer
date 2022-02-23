@@ -5,8 +5,9 @@ import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox,
 import Pagination from 'view/component/Pagination';
 import {
     updateQtBaiVietKhoaHocGroupPageMa, createQtBaiVietKhoaHocGroupPageMa,
-    deleteQtBaiVietKhoaHocGroupPageMa, getQtBaiVietKhoaHocGroupPageMa, 
+    deleteQtBaiVietKhoaHocGroupPageMa, getQtBaiVietKhoaHocGroupPageMa,
 } from './redux';
+import { getStaffEdit } from 'modules/mdTccb/tccbCanBo/redux';
 import { DateInput } from 'view/component/Input';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 
@@ -91,14 +92,14 @@ class EditModal extends AdminModal {
                 <FormRichTextBox className='col-12' ref={e => this.sanPham = e} label={'Sản phẩm'} type='text' readOnly={readOnly} />
                 <div className='form-group col-md-4'><DateInput ref={e => this.namXuatBan = e} label='Năm xuất bản' type='year' required readOnly={readOnly} /></div>
                 <FormSelect className='col-md-4' ref={e => this.quocTe = e} label='Phạm vi xuất bản' data={quocTeList} readOnly={readOnly} />
-                <FormTextBox className='col-4' ref={e => this.diemIf = e} label={'Điểm If'} type='text' readOnly={readOnly} />
+                <FormTextBox className='col-4' ref={e => this.diemIf = e} label={'Điểm IF'} type='text' readOnly={readOnly} />
             </div>
         });
     }
 }
 
 class QtBaiVietKhoaHocGroupPage extends AdminPage {
-    state = { filter: {} };
+    state = { filter: {}, name: '' };
 
     componentDidMount() {
         T.ready('/user/tccb', () => {
@@ -107,6 +108,12 @@ class QtBaiVietKhoaHocGroupPage extends AdminPage {
                 params = route.parse(window.location.pathname);
             this.shcc = params.shcc;
             this.setState({ filter: { list_shcc: params.shcc, list_dv: '' } });
+            this.props.getStaffEdit(this.shcc, (data) => {
+                if (data.error) T.alert('Cán bộ không tồn tại!');
+                else {
+                    this.setState({ name: 'Cán bộ ' + data.item.ho + ' ' + data.item.ten + ' (' + this.shcc + ')' });
+                }
+            });
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
 
             T.showSearchBox(() => {
@@ -171,40 +178,38 @@ class QtBaiVietKhoaHocGroupPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Cán bộ</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Bài viết</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tạp chí xuất bản</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Điểm If</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Phạm vi xuất bản</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Điểm IF</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thông tin xuất bản</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
-                        <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
+                        {/* <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{(item.hoCanBo ? item.hoCanBo : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo : ' ')}</span><br />
                                 {item.shcc}
                             </>
                         )}
-                        />
+                        /> */}
                         <TableCell type='text' content={(
                             <>
-                                <span><b>{item.tenBaiViet}</b></span> <br />
+                                <a href='#' onClick={() => this.modal.show(item, false)}>
+                                    <span style={{ color: 'blue' }}>{item.tenBaiViet ? item.tenBaiViet : ''}</span> <br />
+                                </a>
                                 <span>Tác giả:
-                                    <a href='#' onClick={() => this.modal.show(item, false)}>
-                                        <span style={{color: 'blue'}}>{' ' + item.tenTacGia} </span>
-                                    </a>
+                                    <span style={{ color: 'black' }}>{' ' + item.tenTacGia} </span>
                                 </span>
-
                             </>
-                            
+
                         )} />
                         <TableCell type='text' content={(
                             <>
-                                <span>Tên: <span><i>{item.tenTapChi}</i></span> </span> <br />
-                                <span style={{ whiteSpace: 'nowrap' }}>Số hiệu ISSN: <span style={{ color: 'blue' }}>{item.soHieuIssn}</span> </span> <br /> <br />
+                                <span><span><i>{item.tenTapChi ? item.tenTapChi : ''}</i></span> </span> <br />
+                                {item.soHieuIssn ? <span style={{ whiteSpace: 'nowrap' }}>ISSN: <span style={{ color: 'blue' }}>{item.soHieuIssn}</span> </span> : null}
                             </>
                         )}
                         />
@@ -223,7 +228,7 @@ class QtBaiVietKhoaHocGroupPage extends AdminPage {
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={this.delete} >
                         </TableCell>
-                        
+
                     </tr>
                 )
             });
@@ -231,7 +236,8 @@ class QtBaiVietKhoaHocGroupPage extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-quote-right',
-            title: 'Bài viết khoa học',
+            title: 'Bài viết Khoa học - Cán bộ',
+            subTitle: <div style={{ color: 'blue' }} >{this.state.name}</div>,
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
                 <Link key={0} to='/user/tccb/qua-trinh/bai-viet-khoa-hoc'>Quá trình bài viết khoa học</Link>,
@@ -241,7 +247,7 @@ class QtBaiVietKhoaHocGroupPage extends AdminPage {
                 <div className='row'>
                     <FormTextBox className='col-md-4' ref={e => this.fromYear = e} label='Từ năm (năm xuất bản)' type='year' onChange={() => this.changeAdvancedSearch()} />
                     <FormTextBox className='col-md-4' ref={e => this.toYear = e} label='Đến năm (năm xuất bản)' type='year' onChange={() => this.changeAdvancedSearch()} />
-                    <FormSelect className='col-md-4' ref={e => this.xuatBanRange = e} label='Phạm vi xuất bản' data={quocTeList} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} /> 
+                    <FormSelect className='col-md-4' ref={e => this.xuatBanRange = e} label='Phạm vi xuất bản' data={quocTeList} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
                 </div>
             </>,
             content: <>
@@ -264,6 +270,6 @@ class QtBaiVietKhoaHocGroupPage extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtBaiVietKhoaHoc: state.tccb.qtBaiVietKhoaHoc });
 const mapActionsToProps = {
     deleteQtBaiVietKhoaHocGroupPageMa, createQtBaiVietKhoaHocGroupPageMa,
-    updateQtBaiVietKhoaHocGroupPageMa, getQtBaiVietKhoaHocGroupPageMa,
+    updateQtBaiVietKhoaHocGroupPageMa, getQtBaiVietKhoaHocGroupPageMa, getStaffEdit
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtBaiVietKhoaHocGroupPage);

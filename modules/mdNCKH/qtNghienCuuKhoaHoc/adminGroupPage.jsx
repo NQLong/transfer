@@ -142,8 +142,8 @@ class EditModal extends AdminModal {
 class QtNghienCuuKhoaHocGroupPage extends AdminPage {
     state = { shcc: '' };
     componentDidMount() {
-        T.ready('/user/tccb', () => {
-            const route = T.routeMatcher('/user/tccb/qua-trinh/nghien-cuu-khoa-hoc/group/:shcc'),
+        T.ready('/user/khcn', () => {
+            const route = T.routeMatcher('/user/khcn/qua-trinh/nghien-cuu-khoa-hoc/group/:shcc'),
                 shcc = route.parse(window.location.pathname);
             T.onSearch = (searchText) => {
                 this.props.getQtNghienCuuKhoaHocPage(undefined, undefined, searchText || '', shcc.shcc);
@@ -196,15 +196,15 @@ class QtNghienCuuKhoaHocGroupPage extends AdminPage {
                         <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <a href='#' onClick={e => {e.preventDefault(); this.modal.show(item, false);}}>
-                                    <span>{(item.hoCanBo ? item.hoCanBo : '' )+ ' ' + (item.tenCanBo ? item.tenCanBo : '')}</span><br />
-                                {item.shcc}</a>
+                                <a href='#' onClick={e => { e.preventDefault(); this.modal.show(item, false); }}>
+                                    <span>{(item.hoCanBo ? item.hoCanBo : '') + ' ' + (item.tenCanBo ? item.tenCanBo : '')}</span><br />
+                                    {item.shcc}</a>
                             </>
                         )}
                         />
                         <TableCell type='text' content={
                             <>
-                                <span><i style={{ textAlign: 'justify', textTransform: 'uppercase' }}>{item.tenDeTai}</i></span><br /><br />
+                                <span><i style={{ textAlign: 'justify' }}>{item.tenDeTai}</i></span><br /><br />
                                 {item.vaiTro ? <span style={{ whiteSpace: 'nowrap' }}>Vai trò: <span style={{ color: 'blue' }}>{item.vaiTro}</span></span> : null}
                             </>
                         } />
@@ -231,8 +231,8 @@ class QtNghienCuuKhoaHocGroupPage extends AdminPage {
             icon: 'fa fa-wpexplorer',
             title: 'Quá trình nghiên cứu khoa học - Cán bộ',
             breadcrumb: [
-                <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
-                <Link key={1} to='/user/tccb/qua-trinh/nghien-cuu-khoa-hoc'>Quá trình nghiên cứu khoa học</Link>,
+                <Link key={0} to='/user/khcn'>Khoa học công nghệ</Link>,
+                <Link key={1} to='/user/khcn/qua-trinh/nghien-cuu-khoa-hoc'>Quá trình nghiên cứu khoa học</Link>,
                 'Quá trình nghiên cứu khoa học - Cán bộ'
             ],
             content: <>
@@ -247,13 +247,13 @@ class QtNghienCuuKhoaHocGroupPage extends AdminPage {
                     update={this.props.updateQtNckhStaffGroup}
                 />
             </>,
-            backRoute: '/user/tccb/qua-trinh/nghien-cuu-khoa-hoc',
+            backRoute: '/user/khcn/qua-trinh/nghien-cuu-khoa-hoc',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
         });
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtNghienCuuKhoaHoc: state.tccb.qtNghienCuuKhoaHoc });
+const mapStateToProps = state => ({ system: state.system, qtNghienCuuKhoaHoc: state.khcn.qtNghienCuuKhoaHoc });
 const mapActionsToProps = {
     getQtNghienCuuKhoaHocPage, createQtNckhStaffGroup, updateQtNckhStaffGroup, deleteQtNckhStaffGroup
 };

@@ -61,7 +61,7 @@ class QtHopDongVienChucGroupPage extends AdminPage {
             ),
             renderRow: (item, index) => (
                 <tr key={index}>
-                    <TableCell type='text' content={index + 1} />
+                    <TableCell type='text' content={(pageNumber - 1) * pageSize + index + 1} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                         <>
                             <a href={'/user/tccb/qua-trinh/hop-dong-vien-chuc/' + item.ma}>

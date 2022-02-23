@@ -1,9 +1,9 @@
-// Table name: FW_STUDENT { mssv, ten, ho, phai, dienThoai, email, ngaySinh }
+// Table name: FW_STUDENT { mssv, ho, ten, ngaySinh }
 const keys = ['MSSV'];
-const obj2Db = { 'mssv': 'MSSV', 'ten': 'TEN', 'ho': 'HO', 'phai': 'PHAI', 'dienThoai': 'DIEN_THOAI', 'email': 'EMAIL', 'ngaySinh': 'NGAY_SINH' };
+const obj2Db = { 'mssv': 'MSSV', 'ho': 'HO', 'ten': 'TEN', 'ngaySinh': 'NGAY_SINH' };
 
 module.exports = app => {
-    app.model.fwStudent = {
+    app.model.fwStudents = {
         create: (data, done) => {
             let statement = '', values = '', parameter = {};
             Object.keys(data).forEach(column => {
@@ -20,7 +20,7 @@ module.exports = app => {
                 const sql = 'INSERT INTO FW_STUDENT (' + statement.substring(2) + ') VALUES (' + values.substring(2) + ')';
                 app.dbConnection.execute(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
-                        app.model.fwStudent.get({ rowId: resultSet.lastRowid }, done);
+                        app.model.fwStudents.get({ rowId: resultSet.lastRowid }, done);
                     } else {
                         done(error ? error : 'Execute SQL command fail! Sql = ' + sql);
                     }
@@ -99,7 +99,7 @@ module.exports = app => {
                 const sql = 'UPDATE FW_STUDENT SET ' + changes.statement + (condition.statement ? ' WHERE ' + condition.statement : '');
                 app.dbConnection.execute(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
-                        app.model.fwStudent.get({ rowId: resultSet.lastRowid }, done);
+                        app.model.fwStudents.get({ rowId: resultSet.lastRowid }, done);
                     } else {
                         done(error);
                     }

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormCheckbox, FormSelect, FormRichTextBox, FormDatePicker } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
-    updateQtNghiThaiSanStaff, deleteQtNghiThaiSanStaff, createQtNghiThaiSanStaff, 
+    updateQtNghiThaiSanStaff, deleteQtNghiThaiSanStaff, createQtNghiThaiSanStaff,
     getQtNghiThaiSanGroupPage, getQtNghiThaiSanPage
 } from './redux';
 
@@ -18,10 +18,10 @@ const timeList = [
 ];
 
 class EditModal extends AdminModal {
-    state = { 
+    state = {
         stt: null,
         thoiGianBatDauNghi: '',
-        thoiGianKetThucNghi: '', 
+        thoiGianKetThucNghi: '',
     };
     componentDidMount() {
     }
@@ -71,7 +71,7 @@ class EditModal extends AdminModal {
                     soBhxh: this.soBhxh.value(),
                     soThangDuocNghi: this.soThangDuocNghi.value(),
                     thoiGianBaoTangBenBhxh: this.thoiGianBaoTangBenBhxh.value(),
-                    thoiGianBatDauNghi: this.thoiGianBatDauNghi.value() ? Number(this.thoiGianBatDauNghi.value()): null,
+                    thoiGianBatDauNghi: this.thoiGianBatDauNghi.value() ? Number(this.thoiGianBatDauNghi.value()) : null,
                     thoiGianDiLamLai: this.thoiGianDiLamLai.value() ? Number(this.thoiGianDiLamLai.value()) : null,
                     thoiGianKetThucNghi: this.thoiGianKetThucNghi.value() ? Number(this.thoiGianKetThucNghi.value()) : null,
                 };
@@ -186,8 +186,8 @@ class QtNghiThaiSan extends AdminPage {
             ketThucs[i] = ketThucs[i].trim();
         }
         for (let i = 0; i < soQt; i++) {
-            results.push(<p style={{ textTransform: 'uppercase' }}>{i+1}. Bắt đầu: <span style={{ color: 'blue' }}>{batDaus[i] ? T.dateToText(Number(batDaus[i]), 'dd/mm/yyyy') : ''}</span> -
-                                                                        Kết thúc: <span style={{ color: 'blue' }}>{ketThucs[i] ? T.dateToText(Number(ketThucs[i]), 'dd/mm/yyyy') : ''}</span></p>);
+            results.push(<p style={{ textTransform: 'uppercase' }}>{i + 1}. Bắt đầu: <span style={{ color: 'blue' }}>{batDaus[i] ? T.dateToText(Number(batDaus[i]), 'dd/mm/yyyy') : ''}</span> -
+                Kết thúc: <span style={{ color: 'blue' }}>{ketThucs[i] ? T.dateToText(Number(ketThucs[i]), 'dd/mm/yyyy') : ''}</span></p>);
         }
         return results;
     }
@@ -206,9 +206,9 @@ class QtNghiThaiSan extends AdminPage {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('qtNghiThaiSan', ['read', 'write', 'delete']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ?
-        (this.props.qtNghiThaiSan && this.props.qtNghiThaiSan.page_gr ?
-            this.props.qtNghiThaiSan.page_gr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
-        : (this.props.qtNghiThaiSan && this.props.qtNghiThaiSan.page ? this.props.qtNghiThaiSan.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] });
+            (this.props.qtNghiThaiSan && this.props.qtNghiThaiSan.page_gr ?
+                this.props.qtNghiThaiSan.page_gr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
+            : (this.props.qtNghiThaiSan && this.props.qtNghiThaiSan.page ? this.props.qtNghiThaiSan.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] });
 
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
@@ -223,13 +223,13 @@ class QtNghiThaiSan extends AdminPage {
                         {!this.checked && <th style={{ width: '20%', textAlign: 'center' }}>Thời gian báo tăng bên Bhxh</th>}
                         {!this.checked && <th style={{ width: '20%', textAlign: 'center' }}>Ghi chú</th>}
                         {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Số lần nghỉ</th>}
-                        {this.checked && <th style={{width: '70%', whiteSpace: 'nowrap',  textAlign: 'center'}}>Danh sách thời gian nghỉ</th>}
+                        {this.checked && <th style={{ width: '70%', whiteSpace: 'nowrap', textAlign: 'center' }}>Danh sách thời gian nghỉ</th>}
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{item.ho + ' ' + item.ten}</span><br />
@@ -237,7 +237,7 @@ class QtNghiThaiSan extends AdminPage {
                             </>
                         )}
                         />
-                        {!this.checked &&  <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                        {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span style={{ whiteSpace: 'nowrap' }}>Từ: <span style={{ color: 'blue' }}>{item.thoiGianBatDauNghi ? new Date(item.thoiGianBatDauNghi).ddmmyyyy() : ''}</span></span><br />
                                 <span style={{ whiteSpace: 'nowrap' }}>Đến: <span style={{ color: 'blue' }}>{item.thoiGianKetThucNghi ? new Date(item.thoiGianKetThucNghi).ddmmyyyy() : ''}</span></span><br />
@@ -247,8 +247,8 @@ class QtNghiThaiSan extends AdminPage {
                         {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={<span style={{ color: 'blue' }}>{item.thoiGianDiLamLai ? new Date(item.thoiGianDiLamLai).ddmmyyyy() : ''}</span>} />}
                         {!this.checked && <TableCell type='text' content={item.thoiGianBaoTangBenBhxh} />}
                         {!this.checked && <TableCell type='text' content={item.ghiChu} />}
-                        {this.checked && <TableCell type='text' content={item.soLanNghi}/>}
-                        {this.checked && <TableCell type='text' content={this.list(item.danhSachBatDauNghi, item.danhSachKetThucNghi, item.soLanNghi)} /> }
+                        {this.checked && <TableCell type='text' content={item.soLanNghi} />}
+                        {this.checked && <TableCell type='text' content={this.list(item.danhSachBatDauNghi, item.danhSachKetThucNghi, item.soLanNghi)} />}
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                                 onEdit={() => this.modal.show(item, false)} onDelete={e => this.delete(e, item)} > </TableCell>
@@ -276,10 +276,10 @@ class QtNghiThaiSan extends AdminPage {
             advanceSearch: <>
                 <div className='row'>
                     <FormSelect className='col-12 col-md-4' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
-                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} /> }
-                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} /> }
-                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1}/>
-                    <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1}/>
+                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />}
+                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />}
+                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
                 </div>
             </>,
             content: <>

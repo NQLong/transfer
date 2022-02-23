@@ -105,36 +105,37 @@ class EditModal extends AdminModal {
     render = () => {
         const displayElement = this.state.loaiBangCap == '' ? 'none' : 'block';
         return this.renderModal({
-        title: 'Thông tin quá trình đào tạo',
-        size: 'large',
-        body: <div className='row'>
-            <FormSelect className='form-group col-md-4' ref={e => this.loaiBangCap = e} label='Loại bằng cấp' data={SelectApdater_DmBangDaoTao} onChange={this.handleBang} required readOnly/>
-            {
-                (this.state.loaiBangCap != '5' && this.state.loaiBangCap != '9') ?
-                    <FormSelect ref={e => this.trinhDo = e} data={SelectApdaterDmTrinhDoDaoTaoFilter(this.state.loaiBangCap)}
-                        className='col-md-4' style={{ display: this.checkBang(this.state.loaiBangCap) ? 'block' : 'none' }} label='Trình độ' readOnly/>
-                    : 
-                    <FormTextBox ref={e => this.trinhDo = e} className='form-group col-md-4' label='Trình độ/Kết quả' required/>
-            }
-            <FormSelect ref={e => this.hinhThuc = e} className='form-group col-md-4' label='Hình thức' data={SelectAdapter_DmHinhThucDaoTaoV2} style={{ display: displayElement }}/>
-            <FormRichTextBox ref={e => this.chuyenNganh = e} className='form-group col-md-12' label='Chuyên ngành đào tạo' style={{ display: displayElement }} required/>
-            <FormRichTextBox ref={e => this.tenCoSoDaoTao = e} className='form-group col-md-12' label='Tên cơ sở bồi dưỡng, đào tạo' style={{ display: displayElement }}/>
-            <div className='form-group col-md-6' style={{ display: displayElement }}><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
-                label={
-                    <div style={{ display: 'flex' }}>Thời gian bắt đầu (định dạng:&nbsp; <Dropdown ref={e => this.batDauType = e}
-                        items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
-                        onSelected={item => this.setState({ batDauType: item })} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
+            title: 'Thông tin quá trình đào tạo',
+            size: 'large',
+            body: <div className='row'>
+                <FormSelect className='form-group col-md-4' ref={e => this.loaiBangCap = e} label='Loại bằng cấp' data={SelectApdater_DmBangDaoTao} onChange={this.handleBang} required />
+                {
+                    (this.state.loaiBangCap != '5' && this.state.loaiBangCap != '9') ?
+                        <FormSelect ref={e => this.trinhDo = e} data={SelectApdaterDmTrinhDoDaoTaoFilter(this.state.loaiBangCap)}
+                            className='col-md-4' style={{ display: this.checkBang(this.state.loaiBangCap) ? 'block' : 'none' }} label='Trình độ' />
+                        :
+                        <FormTextBox ref={e => this.trinhDo = e} className='form-group col-md-4' label='Trình độ/Kết quả' required />
                 }
-                type={this.state.batDauType ? typeMapper[this.state.batDauType] : null} /></div>
-            <div className='form-group col-md-6' style={{ display: displayElement }}><DateInput ref={e => this.ketThuc = e} placeholder='Thời gian kết thúc'
-                label={
-                    <div style={{ display: 'flex' }}>Thời gian kết thúc (định dạng:&nbsp; <Dropdown ref={e => this.ketThucType = e}
-                        items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
-                        onSelected={item => this.setState({ ketThucType: item })} />)</div>
-                }
-                type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} /></div>
-        </div>
-    });}
+                <FormSelect ref={e => this.hinhThuc = e} className='form-group col-md-4' label='Hình thức' data={SelectAdapter_DmHinhThucDaoTaoV2} style={{ display: displayElement }} />
+                <FormRichTextBox ref={e => this.chuyenNganh = e} className='form-group col-md-12' label='Chuyên ngành đào tạo' style={{ display: displayElement }} required />
+                <FormRichTextBox ref={e => this.tenCoSoDaoTao = e} className='form-group col-md-12' label='Tên cơ sở bồi dưỡng, đào tạo' style={{ display: displayElement }} />
+                <div className='form-group col-md-6' style={{ display: displayElement }}><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
+                    label={
+                        <div style={{ display: 'flex' }}>Thời gian bắt đầu (định dạng:&nbsp; <Dropdown ref={e => this.batDauType = e}
+                            items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
+                            onSelected={item => this.setState({ batDauType: item })} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
+                    }
+                    type={this.state.batDauType ? typeMapper[this.state.batDauType] : null} /></div>
+                <div className='form-group col-md-6' style={{ display: displayElement }}><DateInput ref={e => this.ketThuc = e} placeholder='Thời gian kết thúc'
+                    label={
+                        <div style={{ display: 'flex' }}>Thời gian kết thúc (định dạng:&nbsp; <Dropdown ref={e => this.ketThucType = e}
+                            items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
+                            onSelected={item => this.setState({ ketThucType: item })} />)</div>
+                    }
+                    type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} /></div>
+            </div>
+        });
+    }
 }
 
 class HocViDetail extends AdminPage {
@@ -193,13 +194,13 @@ class HocViDetail extends AdminPage {
         return (
             <div className='col-md-12 form-group' style={this.props.style}>
                 <div className='tile-body'>{dataDaoTao && renderHocVi(dataDaoTao)}</div>
-                    <div className='tile-footer' style={{ textAlign: 'right' }}>
-                        <button className='btn btn-info' type='button' onClick={e => {e.preventDefault(); this.modal.show({ email: this.state.email, item: null, shcc: this.state.shcc, loaiBangCap: this.state.loaiBangCap, trinhDo: this.state.trinhDo });}}>
-                            <i className='fa fa-fw fa-lg fa-plus' />Thêm quá trình đào tạo {this.props.tenHocVi}
-                        </button>
-                    </div>
-                    <EditModal ref={e => this.modal = e} hocVi={this.props.tenHocVi} value={this.value}
-                        create={this.props.tccb ? this.props.createQtDaoTao : this.props.createQtDaoTaoStaffUser} />
+                <div className='tile-footer' style={{ textAlign: 'right' }}>
+                    <button className='btn btn-info' type='button' onClick={e => { e.preventDefault(); this.modal.show({ email: this.state.email, item: null, shcc: this.state.shcc, loaiBangCap: this.state.loaiBangCap, trinhDo: this.state.trinhDo }); }}>
+                        <i className='fa fa-fw fa-lg fa-plus' />Thêm quá trình đào tạo {this.props.tenHocVi}
+                    </button>
+                </div>
+                <EditModal ref={e => this.modal = e} hocVi={this.props.tenHocVi} value={this.value}
+                    create={this.props.tccb ? this.props.createQtDaoTao : this.props.createQtDaoTaoStaffUser} />
             </div>
             // (dataDaoTao && dataDaoTao.length > 0) ? renderHocVi(dataDaoTao) : (
             //     <div className='form-group col-md-10'>

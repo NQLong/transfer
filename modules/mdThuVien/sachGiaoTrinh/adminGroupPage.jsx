@@ -3,12 +3,14 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormRichTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
-import { updateSachGiaoTrinhGroupPageMa, deleteSachGiaoTrinhGroupPageMa,
+import {
+    updateSachGiaoTrinhGroupPageMa, deleteSachGiaoTrinhGroupPageMa,
     getSachGiaoTrinhGroupPageMa, createSachGiaoTrinhGroupPageMa,
 } from './redux';
 
 import { DateInput } from 'view/component/Input';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
+import { getStaffEdit } from 'modules/mdTccb/tccbCanBo/redux';
 
 const quocTeList = [
     { id: 0, text: 'Xuât bản trong nước' },
@@ -74,7 +76,7 @@ class EditModal extends AdminModal {
             size: 'large',
             body: <div className='row'>
                 <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={true} required />
-                <FormRichTextBox className='col-12' ref={e => this.ten = e} label={'Tên sách, giáo trình'} type='text' required/>
+                <FormRichTextBox className='col-12' ref={e => this.ten = e} label={'Tên sách, giáo trình'} type='text' required />
                 <div className='form-group col-md-4'><DateInput ref={e => this.namSanXuat = e} label='Năm xuất bản' type='year' required /></div>
                 <FormTextBox className='col-8' ref={e => this.nhaSanXuat = e} label={'Nhà xuất bản, số hiệu ISBN'} type='text' required />
                 <FormTextBox className='col-4' ref={e => this.theLoai = e} label={'Thể loại'} type='text' />
@@ -88,14 +90,20 @@ class EditModal extends AdminModal {
 }
 
 class SachGiaoTrinhGroupPage extends AdminPage {
-    state = { filter: {} };
+    state = { filter: {}, name: '' };
 
     componentDidMount() {
-        T.ready('/user/tccb', () => {
-            const route = T.routeMatcher('/user/tccb/sach-giao-trinh/group/:shcc'),
+        T.ready('/user/library', () => {
+            const route = T.routeMatcher('/user/library/sach-giao-trinh/group/:shcc'),
                 params = route.parse(window.location.pathname);
             this.shcc = params.shcc;
             this.setState({ filter: { list_shcc: params.shcc, list_dv: '' } });
+            this.props.getStaffEdit(this.shcc, (data) => {
+                if (data.error) T.alert('Cán bộ không tồn tại!');
+                else {
+                    this.setState({ name: 'Cán bộ ' + data.item.ho + ' ' + data.item.ten + ' (' + this.shcc + ')' });
+                }
+            });
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
                 this.fromYear?.value('');
@@ -156,52 +164,43 @@ class SachGiaoTrinhGroupPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thông tin sách</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thông tin xuất bản</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thông tin sản phẩm</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Nơi xuất bản</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
-                        <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
+                        <TableCell type='text' content={(
                             <>
-                                <span>{(item.hoCanBo ? item.hoCanBo : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo : ' ')}</span><br />
-                                {item.shcc}
+                                <span><a style={{ color: 'blue' }} href='#' onClick={e => { e.preventDefault(); this.modal.show(item); }}>{item.ten}</a><br /><br /></span>
+                                {item.theLoai ? <span><b>Thể loại: </b><span style={{ whiteSpace: 'nowrap' }}>{item.theLoai}<br /></span></span> : null}
+                                {item.butDanh ? <span><b>Bút danh: </b><i>{item.butDanh}</i></span> : null}
                             </>
                         )}
                         />
                         <TableCell type='text' content={(
                             <>
-                                <span>Tên: <i>{item.ten}</i></span><br /> <br/>
-                                <span>Thể loại: <span style={{ color: 'blue' }}>{item.theLoai}</span></span>
+                                <span><b>Nhà XB: </b><span style={{ color: 'blue' }}>{item.nhaSanXuat}</span></span><br />
+                                <span><b>Năm XB:</b> <span >{item.namSanXuat}</span></span> <br />
+                                <span><b>Vai trò:</b> <span>{item.chuBien}<br /></span></span>
+                                {item.quocTe ?
+                                    <span><b>Phạm vi:</b> {item.quocTe == '0' ? <span>Trong nước</span>
+                                        : item.quocTe == '1' ? <span>Quốc tế</span>
+                                            : item.quocTe == '2' ? <span>Trong và ngoài nước </span>
+                                                : ''}
+                                    </span> : null}
+
                             </>
-                        )} 
+                        )}
                         />
                         <TableCell type='text' content={(
                             <>
-                                <span>Nhà xuất bản: <i>{item.nhaSanXuat}</i></span><br />
-                                <span>Năm xuất bản: <span style={{ color: 'blue' }}>{item.namSanXuat}</span></span> <br /> <br/>
-                                <span>Chủ biên: <span style={{ color: 'blue' }}>{item.chuBien}</span></span>
+                                <span>{item.sanPham ? item.sanPham : ''}</span>
                             </>
-                        )} 
-                        />
-                        <TableCell type='text' content={(
-                            <>
-                                <span>Tên: {item.sanPham}</span><br />
-                                <span>Bút danh: <span style={{ color: 'blue' }}>{item.butDanh}</span></span>
-                            </>
-                        )} 
-                        />
-                        <TableCell type='text' content={(
-                            item.quocTe == '0' ? <span> Xuất bản trong nước</span>
-                            : item.quocTe == '1' ? <span> Xuất bản quốc tế</span>
-                                : item.quocTe == '2' ? <span> Xuất bản trong và ngoài nước </span>
-                                    : ''
-                        )}                        
+                        )}
                         />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={this.delete} >
@@ -211,19 +210,20 @@ class SachGiaoTrinhGroupPage extends AdminPage {
                 )
             });
         }
-        
+
         return this.renderPage({
             icon: 'fa fa-book',
-            title: 'Sách giáo trình - Cán bộ',
+            title: 'Sách, Giáo trình theo cán bộ',
+            subTitle: <div style={{ color: 'blue' }} >{this.state.name}</div>,
             breadcrumb: [
-                <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
-                <Link key={0} to='/user/tccb/sach-giao-trinh'>Sách giáo trình</Link>,
-                'Sách giáo trình - Cán bộ',
+                <Link key={0} to='/user/library'>Thư viện</Link>,
+                <Link key={0} to='/user/library/sach-giao-trinh'>Sách, giáo trình cán bộ</Link>,
+                'Sách, Giáo trình theo cán bộ',
             ],
             advanceSearch: <>
                 <div className='row'>
-                    <FormTextBox className='col-md-3' ref={e => this.fromYear = e} label='Từ năm sản suất (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
-                    <FormTextBox className='col-md-3' ref={e => this.toYear = e} label='Đến năm sản xuất (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} /> 
+                    <FormTextBox className='col-md-3' ref={e => this.fromYear = e} label='Từ năm xuất bản (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
+                    <FormTextBox className='col-md-3' ref={e => this.toYear = e} label='Đến năm xuất bản (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
                 </div>
             </>,
             content: <>
@@ -237,15 +237,15 @@ class SachGiaoTrinhGroupPage extends AdminPage {
                     update={this.props.updateSachGiaoTrinhGroupPageMa} create={this.props.createSachGiaoTrinhGroupPageMa}
                 />
             </>,
-            backRoute: '/user/tccb/sach-giao-trinh',
-            onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
+            backRoute: '/user/library/sach-giao-trinh',
+            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
         });
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, sachGiaoTrinh: state.tccb.sachGiaoTrinh });
+const mapStateToProps = state => ({ system: state.system, sachGiaoTrinh: state.library.sachGiaoTrinh });
 const mapActionsToProps = {
-    updateSachGiaoTrinhGroupPageMa, deleteSachGiaoTrinhGroupPageMa, 
-    getSachGiaoTrinhGroupPageMa, createSachGiaoTrinhGroupPageMa,
+    updateSachGiaoTrinhGroupPageMa, deleteSachGiaoTrinhGroupPageMa,
+    getSachGiaoTrinhGroupPageMa, createSachGiaoTrinhGroupPageMa, getStaffEdit
 };
 export default connect(mapStateToProps, mapActionsToProps)(SachGiaoTrinhGroupPage);

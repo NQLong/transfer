@@ -2,16 +2,25 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3025: { title: 'Quá trình bài viết khoa học', link: '/user/tccb/qua-trinh/bai-viet-khoa-hoc', icon: 'fa-quote-right', backgroundColor: '#23a0b0', groupIndex: 4 },
+            3025: { title: 'Danh sách bài viết khoa học', link: '/user/tccb/qua-trinh/bai-viet-khoa-hoc', icon: 'fa-quote-right', backgroundColor: '#23a0b0', groupIndex: 5 },
         },
     };
+    const menuStaff = {
+        parentMenu: app.parentMenu.user,
+        menus: {
+            1014: { title: 'Bài viết khoa học', link: '/user/bai-viet-khoa-hoc', icon: 'fa-quote-right', backgroundColor: '#23a0b0', groupIndex: 4 },
+        },
+    };
+
     app.permission.add(
+        { name: 'staff:login', menu: menuStaff },
         { name: 'qtBaiVietKhoaHoc:read', menu },
         { name: 'qtBaiVietKhoaHoc:write' },
         { name: 'qtBaiVietKhoaHoc:delete' },
     );
     app.get('/user/tccb/qua-trinh/bai-viet-khoa-hoc', app.permission.check('qtBaiVietKhoaHoc:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/bai-viet-khoa-hoc/group/:shcc', app.permission.check('qtBaiVietKhoaHoc:read'), app.templates.admin);
+    app.get('/user/bai-viet-khoa-hoc', app.permission.check('staff:login'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     // //User Actions:
@@ -97,7 +106,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, list_shcc, list_dv, xuatBanRange } = (req.query.filter && req.query.filter != '%%%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, xuatBanRange: null};
+        const { fromYear, toYear, list_shcc, list_dv, xuatBanRange } = (req.query.filter && req.query.filter != '%%%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, xuatBanRange: null };
         app.model.qtBaiVietKhoaHoc.groupPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, xuatBanRange, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });

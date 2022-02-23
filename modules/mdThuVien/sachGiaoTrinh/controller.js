@@ -1,15 +1,15 @@
 module.exports = app => {
     const menu = {
-        parentMenu: app.parentMenu.tccb,
+        parentMenu: app.parentMenu.library,
         menus: {
-            3023: { title: 'Sách, giáo trình', link: '/user/tccb/sach-giao-trinh', icon: 'fa-book', backgroundColor: '#ccad2f', groupIndex: 4 },
+            9001: { title: 'Sách, giáo trình', subTitle: 'Của cán bộ', link: '/user/library/sach-giao-trinh', icon: 'fa-book', backgroundColor: '#ccad2f' },
         },
     };
 
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1006: { title: 'Sách giáo trình', link: '/user/sach-giao-trinh', icon: 'fa-book', backgroundColor: '#ccad2f', groupIndex: 4 },
+            1006: { title: 'Sách, giáo trình', link: '/user/sach-giao-trinh', icon: 'fa-book', backgroundColor: '#ccad2f', groupIndex: 4 },
         },
     };
 
@@ -19,8 +19,8 @@ module.exports = app => {
         { name: 'sachGiaoTrinh:write' },
         { name: 'sachGiaoTrinh:delete' },
     );
-    app.get('/user/tccb/sach-giao-trinh', app.permission.check('sachGiaoTrinh:read'), app.templates.admin);
-    app.get('/user/tccb/sach-giao-trinh/group/:shcc', app.permission.check('sachGiaoTrinh:read'), app.templates.admin);
+    app.get('/user/library/sach-giao-trinh', app.permission.check('sachGiaoTrinh:read'), app.templates.admin);
+    app.get('/user/library/sach-giao-trinh/group/:shcc', app.permission.check('sachGiaoTrinh:read'), app.templates.admin);
     app.get('/user/sach-giao-trinh', app.permission.check('staff:login'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
@@ -75,7 +75,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, list_shcc, list_dv} = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null };
+        const { fromYear, toYear, list_shcc, list_dv } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null };
         app.model.sachGiaoTrinh.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -88,11 +88,11 @@ module.exports = app => {
     });
     ///END USER ACTIONS
 
-    app.get('/api/tccb/qua-trinh/sach-giao-trinh/page/:pageNumber/:pageSize', app.permission.check('sachGiaoTrinh:read'), (req, res) => {
+    app.get('/api/library/qua-trinh/sach-giao-trinh/page/:pageNumber/:pageSize', app.permission.check('sachGiaoTrinh:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, list_shcc, list_dv} = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null };
+        const { fromYear, toYear, list_shcc, list_dv } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null };
         app.model.sachGiaoTrinh.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -104,11 +104,11 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/tccb/qua-trinh/sach-giao-trinh/group/page/:pageNumber/:pageSize', app.permission.check('sachGiaoTrinh:read'), (req, res) => {
+    app.get('/api/library/qua-trinh/sach-giao-trinh/group/page/:pageNumber/:pageSize', app.permission.check('sachGiaoTrinh:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, list_shcc, list_dv} = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null };
+        const { fromYear, toYear, list_shcc, list_dv } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null };
         app.model.sachGiaoTrinh.groupPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -185,7 +185,7 @@ module.exports = app => {
             { header: '(ĐỒNG) CHỦ BIÊN', key: 'chuBien', width: 20 },
             { header: 'SẢN PHẨM', key: 'sanPham', width: 15 },
             { header: 'BÚT DANH', key: 'butDanh', width: 15 },
-            { header: 'PHẠM VI XUẤT BẢN', key: 'quocTe', width: 20, style: {numFmt: '@'}},
+            { header: 'PHẠM VI XUẤT BẢN', key: 'quocTe', width: 20, style: { numFmt: '@' } },
             { header: 'Ghi chú', key: 'ghiChu', width: 50 },
 
         ];

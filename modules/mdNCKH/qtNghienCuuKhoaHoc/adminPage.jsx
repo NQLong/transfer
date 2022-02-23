@@ -164,7 +164,7 @@ class QtNghienCuuKhoaHoc extends AdminPage {
     checked = parseInt(T.cookie('hienThiTheoCanBo')) == 1 ? true : false;
     state = { filter: {} };
     componentDidMount() {
-        T.ready('/user/tccb', () => {
+        T.ready('/user/khcn', () => {
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
                 this.fromYear?.value('');
@@ -232,10 +232,7 @@ class QtNghienCuuKhoaHoc extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa nghiên cứu khoa học', 'Bạn có chắc bạn muốn xóa nghiên cứu khoa học này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtNckhStaff(item.id, null, error => {
-                if (error) T.notify(error.message ? error.message : 'Xoá nghiên cứu khoa học bị lỗi!', 'danger');
-                else T.alert('Xoá nghiên cứu khoa học thành công!', 'success', false, 800);
-            });
+            isConfirm && this.props.deleteQtNckhStaff(item.id, null);
         });
         e.preventDefault();
     }
@@ -266,7 +263,7 @@ class QtNghienCuuKhoaHoc extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
 
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
@@ -280,8 +277,8 @@ class QtNghienCuuKhoaHoc extends AdminPage {
                         {this.checked && <TableCell type='text' style={{ textAlign: 'right' }} content={item.soDeTai} />}
                         <TableCell type='text' content={
                             !this.checked ? <>
-                                <p style={{ textAlign: 'justify', textTransform: 'uppercase' }}><i>{item.tenDeTai}</i></p>
-                                {item.vaiTro ? <span style={{ whiteSpace: 'nowrap' }}>Vai trò: <span style={{ color: 'blue' }}>{item.vaiTro}</span></span> : null}
+                                <span style={{ color: 'blue' }}><i>{item.tenDeTai}</i><br /></span>
+                                {item.vaiTro ? <span style={{ whiteSpace: 'nowrap' }}>Vai trò: <span style={{ color: 'red' }}>{item.vaiTro}</span></span> : null}
                             </> : <>
                                 {this.list(item.danhSachDeTai, item.soDeTai, item.soDeTai)}
                             </>
@@ -305,7 +302,7 @@ class QtNghienCuuKhoaHoc extends AdminPage {
                         }
                         {
                             this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}>
-                                <Link className='btn btn-success' to={`/user/tccb/qua-trinh/nghien-cuu-khoa-hoc/group/${item.shcc}`} >
+                                <Link className='btn btn-success' to={`/user/khcn/qua-trinh/nghien-cuu-khoa-hoc/group/${item.shcc}`} >
                                     <i className='fa fa-lg fa-compress' />
                                 </Link>
                             </TableCell>
@@ -319,7 +316,7 @@ class QtNghienCuuKhoaHoc extends AdminPage {
             icon: 'fa fa-wpexplorer',
             title: 'Quá trình nghiên cứu khoa học',
             breadcrumb: [
-                <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
+                <Link key={0} to='/user/khcn'>Khoa học công nghệ</Link>,
                 'Quá trình nghiên cứu khoa học'
             ],
             advanceSearch: <>
@@ -347,7 +344,7 @@ class QtNghienCuuKhoaHoc extends AdminPage {
                     create={this.props.createQtNckhStaff} update={this.props.updateQtNckhStaff}
                 />
             </>,
-            backRoute: '/user/tccb',
+            backRoute: '/user/khcn',
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
             onExport: (e) => {
                 e.preventDefault();
@@ -360,7 +357,7 @@ class QtNghienCuuKhoaHoc extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtNghienCuuKhoaHoc: state.tccb.qtNghienCuuKhoaHoc });
+const mapStateToProps = state => ({ system: state.system, qtNghienCuuKhoaHoc: state.khcn.qtNghienCuuKhoaHoc });
 const mapActionsToProps = {
     createQtNckhStaff, updateQtNckhStaff, deleteQtNckhStaff,
     getQtNghienCuuKhoaHocGroupPage, getQtNghienCuuKhoaHocPage,

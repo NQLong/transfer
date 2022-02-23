@@ -210,9 +210,11 @@ module.exports = app => {
                 new Promise(resolve => {
                     app.model.canBo.get({ email: user.email }, (e, item) => {
                         if (e || item == null) {
+                            user.isStaff = 0;
                             resolve();
                         } else {
                             user.isStaff = 1;
+                            item.phai == '02' && app.permissionHooks.pushUserPermission(user, 'staff:female');
                             user.shcc = item.shcc;
                             app.permissionHooks.pushUserPermission(user, 'staff:login'); // Add staff permission: staff:login
                             resolve();
@@ -223,13 +225,14 @@ module.exports = app => {
                         if (e || re == null) resolve();
                         else if (re && re.length > 0) {
                             re.forEach(item => {
-                                if (item.chucVuChinh == 1 && item.maChucVu != '002' && item.maChucVu != '001' && item.maChucVu != '013' && item.maChucVu != '014') {
-                                    app.model.dmDonVi.get({ ma: item.maDonVi }, (er, resu) => {
+                                if (item.maChucVu != '002' && item.maChucVu != '001' && item.maChucVu != '013' && item.maChucVu != '014') {
+                                    item.maDonVi && app.model.dmDonVi.get({ ma: item.maDonVi }, (er, resu) => {
                                         user.donVi = resu.ten;
                                         app.permissionHooks.pushUserPermission(user, 'quanLy:login');
                                         resolve();
                                     });
                                 }
+
                             });
                         } else resolve();
                     });

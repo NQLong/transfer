@@ -1,4 +1,4 @@
-import { getStaffEdit, userGetStaff } from '../tccbCanBo/redux';
+import { getStaffEdit } from '../../mdTccb/tccbCanBo/redux';
 
 import T from 'view/js/common';
 
@@ -61,7 +61,7 @@ export function getQtNghienCuuKhoaHocPage(pageNumber, pageSize, pageCondition, m
     }
     const page = T.updatePage('pageQtNghienCuuKhoaHoc', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
-        const url = `/api/tccb/qua-trinh/nghien-cuu-khoa-hoc/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/khcn/qua-trinh/nghien-cuu-khoa-hoc/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter, mscb: mscb }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách nghiên cứu khoa học bị lỗi!', 'danger');
@@ -84,7 +84,7 @@ export function getQtNghienCuuKhoaHocGroupPage(pageNumber, pageSize, pageConditi
     const page = T.updatePage('pageQtNghienCuuKhoaHoc', pageNumber, pageSize, pageCondition, filter);
 
     return dispatch => {
-        const url = `/api/tccb/qua-trinh/nghien-cuu-khoa-hoc/group/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/khcn/qua-trinh/nghien-cuu-khoa-hoc/group/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách nghiên cứu khoa học bị lỗi!', 'danger');
@@ -105,7 +105,7 @@ export function getQtNghienCuuKhoaHocGroupPageMa(pageNumber, pageSize, loaiDoiTu
     const page = T.updatePage('groupPageMaQtNghienCuuKhoaHoc', pageNumber, pageSize, pageCondition);
     if (!loaiDoiTuong) loaiDoiTuong = '-1';
     return dispatch => {
-        const url = `/api/tccb/qua-trinh/nghien-cuu-khoa-hoc/group_nckh/page/${loaiDoiTuong}/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/khcn/qua-trinh/nghien-cuu-khoa-hoc/group_nckh/page/${loaiDoiTuong}/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách nghiên cứu khoa học theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -121,7 +121,7 @@ export function getQtNghienCuuKhoaHocGroupPageMa(pageNumber, pageSize, loaiDoiTu
 
 export function getQtNghienCuuKhoaHocAll(done) {
     return dispatch => {
-        const url = '/api/tccb/qua-trinh/nghien-cuu-khoa-hoc/all';
+        const url = '/api/khcn/qua-trinh/nghien-cuu-khoa-hoc/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách nghiên cứu khoa học bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -273,7 +273,7 @@ export function createQtNckhStaffUser(data, done) {
             } else {
                 T.notify('Thêm thông tin nghiên cứu khoa học thành công!', 'info');
                 if (done) done(res);
-                dispatch(userGetStaff(data.email));
+                dispatch(getQtNckhUserAll());
 
             }
         }, () => T.notify('Thêm thông tin nghiên cứu khoa học bị lỗi', 'danger'));
@@ -289,14 +289,14 @@ export function updateQtNckhStaffUser(id, changes, done) {
                 console.error('PUT: ' + url + '. ' + data.error);
             } else if (data.item) {
                 T.notify('Cập nhật thông tin nghiên cứu khoa học thành công!', 'info');
-                dispatch(userGetStaff(changes.email));
+                dispatch(getQtNckhUserAll());
                 if (done) done();
             }
         }, () => T.notify('Cập nhật thông tin nghiên cứu khoa học bị lỗi', 'danger'));
     };
 }
 
-export function deleteQtNckhStaffUser(id, email, done) {
+export function deleteQtNckhStaffUser(id, done) {
     return dispatch => {
         const url = '/api/user/qua-trinh/nckh';
         T.delete(url, { id }, data => {
@@ -306,7 +306,7 @@ export function deleteQtNckhStaffUser(id, email, done) {
             } else {
                 T.alert('Thông tin nghiên cứu khoa học được xóa thành công!', 'info', false, 800);
                 done && done();
-                dispatch(userGetStaff(email));
+                dispatch(getQtNckhUserAll());
             }
         }, () => T.notify('Xóa thông tin nghiên cứu khoa học bị lỗi', 'danger'));
     };

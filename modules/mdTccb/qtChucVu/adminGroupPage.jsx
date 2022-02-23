@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormDatePicker, FormCheckbox, FormSelect } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
-    getQtChucVuPage, getQtChucVuAll, updateQtChucVuGroupPageMa,
+    getQtChucVuGroupPageMa, getQtChucVuAll, updateQtChucVuGroupPageMa,
     deleteQtChucVuGroupPageMa, createQtChucVuGroupPageMa,
 } from './redux';
 import { SelectAdapter_DmChucVuV2 } from 'modules/mdDanhMuc/dmChucVu/redux';
@@ -128,7 +128,7 @@ export class EditModal extends AdminModal {
             title: this.state.shcc ? 'Cập nhật quá trình chức vụ' : 'Tạo mới quá trình chức vụ',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12' ref={e => this.shcc = e} label='Cán bộ' data={SelectAdapter_FwCanBo} allowClear={true} readOnly={readOnly} />
+                <FormSelect className='col-md-12' ref={e => this.shcc = e} label='Cán bộ' data={SelectAdapter_FwCanBo} allowClear={true} readOnly={true} />
                 <FormSelect className='col-md-4' ref={e => this.maChucVu = e} label='Chức vụ' data={SelectAdapter_DmChucVuV2} allowClear={true} readOnly={readOnly} />
                 <FormSelect className='col-md-4' ref={e => this.maDonVi = e} label='Đơn vị của chức vụ' data={SelectAdapter_DmDonVi} onChange={this.handleDonVi} allowClear={true} readOnly={readOnly} />
                 <FormSelect className='col-md-4' ref={e => this.maBoMon = e} label='Bộ môn của chức vụ' data={SelectAdapter_DmBoMonTheoDonVi(this.state.donVi)} allowClear={true} readOnly={readOnly} />
@@ -152,10 +152,8 @@ class QtChucVuGroup extends AdminPage {
             const route = T.routeMatcher('/user/tccb/qua-trinh/chuc-vu/group/:ma'),
                 params = route.parse(window.location.pathname);
             this.setState({ filter: { list_shcc: params.ma, list_dv: '', timeType: 0 }, ma: params.ma });
-            T.onSearch = (searchText) => {
-                this.searchText = searchText;
-                this.getPage();
-            };
+            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
+
             T.showSearchBox(() => {
                 this.timeType?.value(0);
                 this.fromYear?.value('');
@@ -167,32 +165,31 @@ class QtChucVuGroup extends AdminPage {
     }
 
     changeAdvancedSearch = (isInitial = false) => {
-        let { pageNumber, pageSize } = this.props && this.props.qtChucVu && this.props.qtChucVu.page ? this.props.qtChucVu.page : { pageNumber: 1, pageSize: 50 };
+        let { pageNumber, pageSize } = this.props && this.props.qtChucVu && this.props.qtChucVu.page_ma ? this.props.qtChucVu.page_ma : { pageNumber: 1, pageSize: 50 };
         const timeType = this.timeType?.value() || 0;
         const fromYear = this.fromYear?.value() == '' ? null : this.fromYear?.value().getTime();
         const toYear = this.toYear?.value() == '' ? null : this.toYear?.value().getTime();
-        const list_dv = this.maDonVi?.value().toString() || '';
-        const list_shcc = this.mulCanBo?.value().toString() || '';
-        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc, timeType };
+        const list_dv = this.state.filter.list_dv;
+        const list_shcc = this.state.filter.list_shcc;
+        const list_cv = this.mulMaChucVu?.value().toString() || '';
+        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc, timeType, list_cv };
         this.setState({ filter: pageFilter }, () => {
-            this.getPage(pageNumber, pageSize, (page) => {
+            this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
                     this.fromYear?.value(filter.fromYear || '');
                     this.toYear?.value(filter.toYear || '');
-                    this.maDonVi?.value(filter.list_dv);
-                    this.mulCanBo?.value(filter.list_shcc);
                     this.timeType?.value(filter.timeType);
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.list_shcc || filter.list_dv || filter.timeType)) this.showAdvanceSearch();
+                    this.mulMaChucVu?.value(filter.list_cv);
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.timeType || filter.list_cv)) this.showAdvanceSearch();
                 }
             });
         });
     }
 
-    getPage = (pageN, pageS, done) => {
-        if (this.checked) this.props.getQtChucVuGroupPage(pageN, pageS, this.searchText, this.state.filter, done);
-        else this.props.getQtChucVuPage(pageN, pageS, this.searchText, this.state.filter, done);
+    getPage = (pageN, pageS, pageC, done) => {
+        this.props.getQtChucVuGroupPageMa(pageN, pageS, pageC, this.state.filter, done);
     }
 
     showModal = (e) => {
@@ -213,8 +210,8 @@ class QtChucVuGroup extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('qtChucVu', ['read', 'write', 'delete']);
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtChucVu && this.props.qtChucVu.page ?
-            this.props.qtChucVu.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list };
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtChucVu && this.props.qtChucVu.page_ma ?
+            this.props.qtChucVu.page_ma : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -233,7 +230,7 @@ class QtChucVuGroup extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{item.ho + ' ' + item.ten}</span><br />
@@ -283,9 +280,10 @@ class QtChucVuGroup extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    <FormSelect className='col-12 col-md-4' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect className='col-12 col-md-6' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
                     {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />}
                     {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />}
+                    <FormSelect className='col-md-6' multiple={true} ref={e => this.mulMaChucVu = e} label='Chức vụ' data={SelectAdapter_DmChucVuV2} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
                 </div>
             </>,
             content: <>
@@ -306,7 +304,7 @@ class QtChucVuGroup extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, qtChucVu: state.tccb.qtChucVu });
 const mapActionsToProps = {
-    getQtChucVuAll, getQtChucVuPage, deleteQtChucVuGroupPageMa, createQtChucVuGroupPageMa,
+    getQtChucVuAll, getQtChucVuGroupPageMa, deleteQtChucVuGroupPageMa, createQtChucVuGroupPageMa,
     updateQtChucVuGroupPageMa,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtChucVuGroup);
