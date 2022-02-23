@@ -1,8 +1,8 @@
 module.exports = app => {
     const menu = {
-        parentMenu: app.parentMenu.tccb,
+        parentMenu: app.parentMenu.khcn,
         menus: {
-            3025: { title: 'Danh sách bài viết khoa học', link: '/user/tccb/qua-trinh/bai-viet-khoa-hoc', icon: 'fa-quote-right', backgroundColor: '#23a0b0', groupIndex: 5 },
+            9501: { title: 'Danh sách bài viết khoa học', link: '/user/khcn/qua-trinh/bai-viet-khoa-hoc', icon: 'fa-quote-right', backgroundColor: '#23a0b0' },
         },
     };
     const menuStaff = {
@@ -18,8 +18,8 @@ module.exports = app => {
         { name: 'qtBaiVietKhoaHoc:write' },
         { name: 'qtBaiVietKhoaHoc:delete' },
     );
-    app.get('/user/tccb/qua-trinh/bai-viet-khoa-hoc', app.permission.check('qtBaiVietKhoaHoc:read'), app.templates.admin);
-    app.get('/user/tccb/qua-trinh/bai-viet-khoa-hoc/group/:shcc', app.permission.check('qtBaiVietKhoaHoc:read'), app.templates.admin);
+    app.get('/user/khcn/qua-trinh/bai-viet-khoa-hoc', app.permission.check('qtBaiVietKhoaHoc:read'), app.templates.admin);
+    app.get('/user/khcn/qua-trinh/bai-viet-khoa-hoc/group/:shcc', app.permission.check('qtBaiVietKhoaHoc:read'), app.templates.admin);
     app.get('/user/bai-viet-khoa-hoc', app.permission.check('staff:login'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
@@ -86,7 +86,7 @@ module.exports = app => {
     });
     ///END USER ACTIONS
 
-    app.get('/api/tccb/qua-trinh/bai-viet-khoa-hoc/page/:pageNumber/:pageSize', app.permission.check('qtBaiVietKhoaHoc:read'), (req, res) => {
+    app.get('/api/khcn/qua-trinh/bai-viet-khoa-hoc/page/:pageNumber/:pageSize', app.permission.check('qtBaiVietKhoaHoc:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -102,7 +102,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/tccb/qua-trinh/bai-viet-khoa-hoc/group/page/:pageNumber/:pageSize', app.permission.check('qtBaiVietKhoaHoc:read'), (req, res) => {
+    app.get('/api/khcn/qua-trinh/bai-viet-khoa-hoc/group/page/:pageNumber/:pageSize', app.permission.check('qtBaiVietKhoaHoc:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -128,7 +128,7 @@ module.exports = app => {
         app.model.qtBaiVietKhoaHoc.delete({ id: req.body.id }, (error) => res.send(error)));
 
     app.get('/api/qua-trinh/bai-viet-khoa-hoc/download-excel/:list_shcc/:list_dv/:fromYear/:toYear/:xuatBanRange', app.permission.check('qtBaiVietKhoaHoc:read'), (req, res) => {
-        let { list_shcc, list_dv, fromYear, toYear, xuatBanRange } = req.params ? req.params : { list_shcc: null, list_dv: null, toYear: null, xuatBanRange: null};
+        let { list_shcc, list_dv, fromYear, toYear, xuatBanRange } = req.params ? req.params : { list_shcc: null, list_dv: null, toYear: null, xuatBanRange: null };
         if (list_shcc == 'null') list_shcc = null;
         if (list_dv == 'null') list_dv = null;
         if (fromYear == 'null') fromYear = null;
