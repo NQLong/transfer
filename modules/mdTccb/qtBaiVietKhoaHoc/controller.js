@@ -1,8 +1,8 @@
 module.exports = app => {
     const menu = {
-        parentMenu: app.parentMenu.tccb,
+        parentMenu: app.parentMenu.khcn,
         menus: {
-            3025: { title: 'Danh sách bài viết khoa học', link: '/user/tccb/qua-trinh/bai-viet-khoa-hoc', icon: 'fa-quote-right', backgroundColor: '#23a0b0', groupIndex: 5 },
+            9501: { title: 'Danh sách bài viết khoa học', link: '/user/khcn/qua-trinh/bai-viet-khoa-hoc', icon: 'fa-quote-right', backgroundColor: '#23a0b0' },
         },
     };
     const menuStaff = {
@@ -18,8 +18,8 @@ module.exports = app => {
         { name: 'qtBaiVietKhoaHoc:write' },
         { name: 'qtBaiVietKhoaHoc:delete' },
     );
-    app.get('/user/tccb/qua-trinh/bai-viet-khoa-hoc', app.permission.check('qtBaiVietKhoaHoc:read'), app.templates.admin);
-    app.get('/user/tccb/qua-trinh/bai-viet-khoa-hoc/group/:shcc', app.permission.check('qtBaiVietKhoaHoc:read'), app.templates.admin);
+    app.get('/user/khcn/qua-trinh/bai-viet-khoa-hoc', app.permission.check('qtBaiVietKhoaHoc:read'), app.templates.admin);
+    app.get('/user/khcn/qua-trinh/bai-viet-khoa-hoc/group/:shcc', app.permission.check('qtBaiVietKhoaHoc:read'), app.templates.admin);
     app.get('/user/bai-viet-khoa-hoc', app.permission.check('staff:login'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
@@ -86,7 +86,7 @@ module.exports = app => {
     });
     ///END USER ACTIONS
 
-    app.get('/api/tccb/qua-trinh/bai-viet-khoa-hoc/page/:pageNumber/:pageSize', app.permission.check('qtBaiVietKhoaHoc:read'), (req, res) => {
+    app.get('/api/khcn/qua-trinh/bai-viet-khoa-hoc/page/:pageNumber/:pageSize', app.permission.check('qtBaiVietKhoaHoc:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -102,7 +102,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/tccb/qua-trinh/bai-viet-khoa-hoc/group/page/:pageNumber/:pageSize', app.permission.check('qtBaiVietKhoaHoc:read'), (req, res) => {
+    app.get('/api/khcn/qua-trinh/bai-viet-khoa-hoc/group/page/:pageNumber/:pageSize', app.permission.check('qtBaiVietKhoaHoc:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -126,4 +126,57 @@ module.exports = app => {
 
     app.delete('/api/qua-trinh/bai-viet-khoa-hoc', app.permission.check('staff:write'), (req, res) =>
         app.model.qtBaiVietKhoaHoc.delete({ id: req.body.id }, (error) => res.send(error)));
+
+    app.get('/api/qua-trinh/bai-viet-khoa-hoc/download-excel/:list_shcc/:list_dv/:fromYear/:toYear/:xuatBanRange', app.permission.check('qtBaiVietKhoaHoc:read'), (req, res) => {
+        let { list_shcc, list_dv, fromYear, toYear, xuatBanRange } = req.params ? req.params : { list_shcc: null, list_dv: null, toYear: null, xuatBanRange: null };
+        if (list_shcc == 'null') list_shcc = null;
+        if (list_dv == 'null') list_dv = null;
+        if (fromYear == 'null') fromYear = null;
+        if (toYear == 'null') toYear = null;
+        if (xuatBanRange == 'null') xuatBanRange = null;
+        app.model.qtBaiVietKhoaHoc.download(list_shcc, list_dv, fromYear, toYear, xuatBanRange, (err, result) => {
+            if (err || !result) {
+                res.send({ err });
+            } else {
+                const workbook = app.excel.create(),
+                    worksheet = workbook.addWorksheet('baivietkhoahoc');
+                new Promise(resolve => {
+                    let cells = [
+                        { cell: 'A1', value: '#', bold: true, border: '1234' },
+                        { cell: 'B1', value: 'Mã thẻ cán bộ', bold: true, border: '1234' },
+                        { cell: 'C1', value: 'Họ và tên cán bộ', bold: true, border: '1234' },
+                        { cell: 'D1', value: 'Tên tác giả', bold: true, border: '1234' },
+                        { cell: 'E1', value: 'Năm xuất bản', bold: true, border: '1234' },
+                        { cell: 'F1', value: 'Tên bài viết', bold: true, border: '1234' },
+                        { cell: 'G1', value: 'Tên tạp chí', bold: true, border: '1234' },
+                        { cell: 'H1', value: 'Số hiệu ISSN', bold: true, border: '1234' },
+                        { cell: 'I1', value: 'Sản phẩm', bold: true, border: '1234' },
+                        { cell: 'J1', value: 'Điểm IF', bold: true, border: '1234' },
+                        { cell: 'K1', value: 'Phạm vi xuất bản', bold: true, border: '1234' },
+                    ];
+                    result.rows.forEach((item, index) => {
+                        let hoTen = item.hoCanBo + ' ' + item.tenCanBo;
+                        cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
+                        cells.push({ cell: 'B' + (index + 2), border: '1234', value: item.shcc });
+                        cells.push({ cell: 'C' + (index + 2), border: '1234', value: hoTen });
+                        cells.push({ cell: 'D' + (index + 2), border: '1234', value: item.tenTacGia });
+                        cells.push({ cell: 'E' + (index + 2), border: '1234', value: item.namXuatBan });
+                        cells.push({ cell: 'F' + (index + 2), border: '1234', value: item.tenBaiViet });
+                        cells.push({ cell: 'G' + (index + 2), border: '1234', value: item.tenTapChi });
+                        cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.soHieuIssn });
+                        cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.sanPham });
+                        cells.push({ cell: 'J' + (index + 2), border: '1234', value: item.diemIf });
+                        cells.push({ cell: 'K' + (index + 2), border: '1234', value: item.quocTe ? (item.quocTe == 0 ? 'Trong nước' : item.quocTe == 1 ? 'Quốc tế' : 'Trong và ngoài nước') : '' });
+                    });
+                    resolve(cells);
+                }).then((cells) => {
+                    app.excel.write(worksheet, cells);
+                    app.excel.attachment(workbook, res, 'baivietkhoahoc.xlsx');
+                }).catch((error) => {
+                    res.send({ error });
+                });
+            }
+        });
+
+    });
 };

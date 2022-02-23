@@ -145,14 +145,13 @@ module.exports = app => {
         app.model.qtKyLuat.delete({ id: req.body.id }, (error) => res.send(error)));
 
     app.get('/api/qua-trinh/ky-luat/download-excel/:list_shcc/:list_dv/:fromYear/:toYear/:timeType/:tinhTrang', app.permission.check('qtKyLuat:read'), (req, res) => {
-        const pageNumber = 0, pageSize = 1000000;
         let { list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang } = req.params ? req.params : { list_shcc: null, list_dv: null, toYear: null, timeType: 0, tinhTrang: null};
         if (list_shcc == 'null') list_shcc = null;
         if (list_dv == 'null') list_dv = null;
         if (fromYear == 'null') fromYear = null;
         if (toYear == 'null') toYear = null;
         if (tinhTrang == 'null') tinhTrang = null;
-        app.model.qtKyLuat.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang, '', (err, result) => {
+        app.model.qtKyLuat.download(list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang, (err, result) => {
             if (err || !result) {
                 res.send({ err });
             } else {

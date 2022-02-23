@@ -5,16 +5,16 @@ import qtBaiVietKhoaHoc from './redux';
 
 export default {
     redux: {
-        parent: 'tccb',
+        parent: 'khcn',
         reducers: { qtBaiVietKhoaHoc }
     },
     routes: [
         {
-            path: '/user/tccb/qua-trinh/bai-viet-khoa-hoc/group/:shcc',
+            path: '/user/khcn/qua-trinh/bai-viet-khoa-hoc/group/:shcc',
             component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
         },
         {
-            path: '/user/tccb/qua-trinh/bai-viet-khoa-hoc',
+            path: '/user/khcn/qua-trinh/bai-viet-khoa-hoc',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
         {

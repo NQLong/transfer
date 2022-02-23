@@ -102,9 +102,9 @@ class QtBaiVietKhoaHocGroupPage extends AdminPage {
     state = { filter: {}, name: '' };
 
     componentDidMount() {
-        T.ready('/user/tccb', () => {
+        T.ready('/user/khcn', () => {
             T.clearSearchBox();
-            const route = T.routeMatcher('/user/tccb/qua-trinh/bai-viet-khoa-hoc/group/:shcc'),
+            const route = T.routeMatcher('/user/khcn/qua-trinh/bai-viet-khoa-hoc/group/:shcc'),
                 params = route.parse(window.location.pathname);
             this.shcc = params.shcc;
             this.setState({ filter: { list_shcc: params.shcc, list_dv: '' } });
@@ -239,8 +239,8 @@ class QtBaiVietKhoaHocGroupPage extends AdminPage {
             title: 'Bài viết Khoa học - Cán bộ',
             subTitle: <div style={{ color: 'blue' }} >{this.state.name}</div>,
             breadcrumb: [
-                <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
-                <Link key={0} to='/user/tccb/qua-trinh/bai-viet-khoa-hoc'>Quá trình bài viết khoa học</Link>,
+                <Link key={0} to='/user/khcn'>Tổ chức cán bộ</Link>,
+                <Link key={0} to='/user/khcn/qua-trinh/bai-viet-khoa-hoc'>Quá trình bài viết khoa học</Link>,
                 'Quá trình bài viết khoa học - Cán bộ',
             ],
             advanceSearch: <>
@@ -261,13 +261,18 @@ class QtBaiVietKhoaHocGroupPage extends AdminPage {
                     update={this.props.updateQtBaiVietKhoaHocGroupPageMa} create={this.props.createQtBaiVietKhoaHocGroupPageMa}
                 />
             </>,
-            backRoute: '/user/tccb/qua-trinh/bai-viet-khoa-hoc',
+            backRoute: '/user/khcn/qua-trinh/bai-viet-khoa-hoc',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+            onExport: (e) => {
+                e.preventDefault();
+                const { fromYear, toYear, list_shcc, list_dv, xuatBanRange } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, xuatBanRange: null };
+                T.download(T.url(`/api/qua-trinh/bai-viet-khoa-hoc/download-excel/${list_shcc ? list_shcc : null}/${list_dv ? list_dv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${xuatBanRange ? xuatBanRange : null}`), 'baivietkhoahoc.xlsx');
+            }
         });
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtBaiVietKhoaHoc: state.tccb.qtBaiVietKhoaHoc });
+const mapStateToProps = state => ({ system: state.system, qtBaiVietKhoaHoc: state.khcn.qtBaiVietKhoaHoc });
 const mapActionsToProps = {
     deleteQtBaiVietKhoaHocGroupPageMa, createQtBaiVietKhoaHocGroupPageMa,
     updateQtBaiVietKhoaHocGroupPageMa, getQtBaiVietKhoaHocGroupPageMa, getStaffEdit
