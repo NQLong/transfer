@@ -32,6 +32,10 @@ export default {
         {
             path: '/user/library',
             component: () => <SubMenusPage menuLink='/user/library' menuKey={8000} headerIcon='fa-th-large' />
+        },
+        {
+            path: '/user/khcn',
+            component: () => <SubMenusPage menuLink='/user/khcn' menuKey={9500} headerIcon='fa-rocket' />
         }
     ]
 };

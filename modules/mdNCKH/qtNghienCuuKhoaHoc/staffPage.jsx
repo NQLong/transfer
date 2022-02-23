@@ -230,7 +230,7 @@ class QtNghienCuuKhoaHocStaffUserPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtNghienCuuKhoaHoc: state.tccb.qtNghienCuuKhoaHoc });
+const mapStateToProps = state => ({ system: state.system, qtNghienCuuKhoaHoc: state.khcn.qtNghienCuuKhoaHoc });
 const mapActionsToProps = {
     getQtNghienCuuKhoaHocPage, createQtNckhStaffUser, updateQtNckhStaffUser, deleteQtNckhStaffUser, getQtNckhUserAll
 };

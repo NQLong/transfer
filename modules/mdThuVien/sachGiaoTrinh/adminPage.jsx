@@ -274,10 +274,10 @@ class SachGiaoTrinh extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-book',
-            title: 'Sách, giáo trình',
+            title: 'Sách, giáo trình cán bộ',
             breadcrumb: [
-                <Link key={0} to='/user/library'>Tổ chức cán bộ</Link>,
-                'Sách giáo trình'
+                <Link key={0} to='/user/library'>Thư viện</Link>,
+                'Sách, giáo trình cán bộ'
             ],
             advanceSearch: <>
                 <div className='row'>

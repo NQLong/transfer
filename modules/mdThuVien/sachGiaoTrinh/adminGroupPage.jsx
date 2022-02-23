@@ -216,8 +216,8 @@ class SachGiaoTrinhGroupPage extends AdminPage {
             title: 'Sách, Giáo trình theo cán bộ',
             subTitle: <div style={{ color: 'blue' }} >{this.state.name}</div>,
             breadcrumb: [
-                <Link key={0} to='/user/library'>Tổ chức cán bộ</Link>,
-                <Link key={0} to='/user/library/sach-giao-trinh'>Sách giáo trình</Link>,
+                <Link key={0} to='/user/library'>Thư viện</Link>,
+                <Link key={0} to='/user/library/sach-giao-trinh'>Sách, giáo trình cán bộ</Link>,
                 'Sách, Giáo trình theo cán bộ',
             ],
             advanceSearch: <>

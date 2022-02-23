@@ -164,7 +164,7 @@ class QtNghienCuuKhoaHoc extends AdminPage {
     checked = parseInt(T.cookie('hienThiTheoCanBo')) == 1 ? true : false;
     state = { filter: {} };
     componentDidMount() {
-        T.ready('/user/tccb', () => {
+        T.ready('/user/khcn', () => {
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
                 this.fromYear?.value('');
@@ -302,7 +302,7 @@ class QtNghienCuuKhoaHoc extends AdminPage {
                         }
                         {
                             this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}>
-                                <Link className='btn btn-success' to={`/user/tccb/qua-trinh/nghien-cuu-khoa-hoc/group/${item.shcc}`} >
+                                <Link className='btn btn-success' to={`/user/khcn/qua-trinh/nghien-cuu-khoa-hoc/group/${item.shcc}`} >
                                     <i className='fa fa-lg fa-compress' />
                                 </Link>
                             </TableCell>
@@ -316,7 +316,7 @@ class QtNghienCuuKhoaHoc extends AdminPage {
             icon: 'fa fa-wpexplorer',
             title: 'Quá trình nghiên cứu khoa học',
             breadcrumb: [
-                <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
+                <Link key={0} to='/user/khcn'>Khoa học công nghệ</Link>,
                 'Quá trình nghiên cứu khoa học'
             ],
             advanceSearch: <>
@@ -344,7 +344,7 @@ class QtNghienCuuKhoaHoc extends AdminPage {
                     create={this.props.createQtNckhStaff} update={this.props.updateQtNckhStaff}
                 />
             </>,
-            backRoute: '/user/tccb',
+            backRoute: '/user/khcn',
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
             onExport: (e) => {
                 e.preventDefault();
@@ -357,7 +357,7 @@ class QtNghienCuuKhoaHoc extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtNghienCuuKhoaHoc: state.tccb.qtNghienCuuKhoaHoc });
+const mapStateToProps = state => ({ system: state.system, qtNghienCuuKhoaHoc: state.khcn.qtNghienCuuKhoaHoc });
 const mapActionsToProps = {
     createQtNckhStaff, updateQtNckhStaff, deleteQtNckhStaff,
     getQtNghienCuuKhoaHocGroupPage, getQtNghienCuuKhoaHocPage,
