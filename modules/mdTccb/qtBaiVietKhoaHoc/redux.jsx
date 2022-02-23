@@ -135,7 +135,7 @@ export function getQtBaiVietKhoaHocPage(pageNumber, pageSize, pageCondition, fil
     }
     const page = T.updatePage('pageQtBaiVietKhoaHoc', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
-        const url = `/api/tccb/qua-trinh/bai-viet-khoa-hoc/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/khcn/qua-trinh/bai-viet-khoa-hoc/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách bài viết khoa học bị lỗi!', 'danger');
@@ -157,8 +157,8 @@ export function getQtBaiVietKhoaHocGroupPage(pageNumber, pageSize, pageCondition
     }
     const page = T.updatePage('pageQtBaiVietKhoaHoc', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
-        const url = `/api/tccb/qua-trinh/bai-viet-khoa-hoc/group/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition, filter: page.filter}, data => {
+        const url = `/api/khcn/qua-trinh/bai-viet-khoa-hoc/group/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách bài viết khoa học bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
@@ -180,7 +180,7 @@ export function getQtBaiVietKhoaHocGroupPageMa(pageNumber, pageSize, pageConditi
     }
     const page = T.updatePage('groupPageMaQtBaiVietKhoaHoc', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
-        const url = `/api/tccb/qua-trinh/bai-viet-khoa-hoc/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/khcn/qua-trinh/bai-viet-khoa-hoc/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách bài viết khoa học bị lỗi!', 'danger');
@@ -207,7 +207,7 @@ export function createQtBaiVietKhoaHocGroupPageMa(data, done) {
                     T.notify('Thêm thông tin quá trình bài viết khoa học thành công!', 'info');
                     done(data);
                     dispatch(getQtBaiVietKhoaHocGroupPageMa());
-                }            
+                }
             }
         }, () => T.notify('Thêm thông tin quá trình bài viết khoa học bị lỗi', 'danger'));
     };
@@ -258,7 +258,7 @@ export function createQtBaiVietKhoaHocStaff(data, done) {
                     T.notify('Thêm thông tin quá trình bài viết khoa học thành công!', 'info');
                     done(data);
                     dispatch(getQtBaiVietKhoaHocPage());
-                }            
+                }
             }
         }, () => T.notify('Thêm thông tin quá trình bài viết khoa học bị lỗi', 'danger'));
     };
@@ -274,7 +274,7 @@ export function updateQtBaiVietKhoaHocStaff(id, changes, done) {
             } else if (data.item) {
                 T.notify('Cập nhật thông tin quá trình bài viết khoa học thành công!', 'info');
                 done && done(data.item);
-                dispatch(getQtBaiVietKhoaHocPage());           
+                dispatch(getQtBaiVietKhoaHocPage());
             }
         }, () => T.notify('Cập nhật thông tin quá trình bài viết khoa học bị lỗi', 'danger'));
     };
@@ -290,7 +290,7 @@ export function deleteQtBaiVietKhoaHocStaff(id, done) {
             } else {
                 T.alert('Thông tin quá trình bài viết khoa học được xóa thành công!', 'info', false, 800);
                 done && done(data.item);
-                dispatch(getQtBaiVietKhoaHocPage());     
+                dispatch(getQtBaiVietKhoaHocPage());
             }
         }, () => T.notify('Xóa thông tin quá trình bài viết khoa học bị lỗi', 'danger'));
     };
