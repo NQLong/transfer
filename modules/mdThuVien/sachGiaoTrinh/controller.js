@@ -2,14 +2,14 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.library,
         menus: {
-            9001: { title: 'Sách, giáo trình cán bộ', link: '/user/library/sach-giao-trinh', icon: 'fa-book', backgroundColor: '#ccad2f' },
+            9001: { title: 'Sách, giáo trình', subTitle: 'Của cán bộ', link: '/user/library/sach-giao-trinh', icon: 'fa-book', backgroundColor: '#ccad2f' },
         },
     };
 
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1006: { title: 'Sách giáo trình', link: '/user/sach-giao-trinh', icon: 'fa-book', backgroundColor: '#ccad2f', groupIndex: 4 },
+            1006: { title: 'Sách, giáo trình', link: '/user/sach-giao-trinh', icon: 'fa-book', backgroundColor: '#ccad2f', groupIndex: 4 },
         },
     };
 
