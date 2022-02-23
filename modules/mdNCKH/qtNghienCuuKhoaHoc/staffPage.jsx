@@ -24,7 +24,6 @@ class NckhModal extends AdminModal {
     state = {
         id: null,
         shcc: '',
-        email: '',
         batDau: '',
         ketThuc: '',
         batDauType: 'dd/mm/yyyy',
@@ -39,7 +38,6 @@ class NckhModal extends AdminModal {
                     maSoCapQuanLy: '', kinhPhi: '', vaiTro: '', ngayNghiemThu: null, ketQua: '', ngayNghiemThuType: 'dd/mm/yyyy', thoiGian: null
                 };
         this.setState({
-            email: item.email,
             batDauType: batDauType ? batDauType : 'dd/mm/yyyy',
             ketThucType: ketThuc ? ketThucType : 'dd/mm/yyyy',
             ngayNghiemThuType: ngayNghiemThuType ? ngayNghiemThuType : 'dd/mm/yyyy',
@@ -63,7 +61,6 @@ class NckhModal extends AdminModal {
 
     onSubmit = () => {
         const changes = {
-            email: this.state.email,
             shcc: this.state.shcc,
             batDau: this.batDau.getVal(),
             ketThuc: this.ketThuc.getVal(),
@@ -144,9 +141,9 @@ class QtNghienCuuKhoaHocStaffUserPage extends AdminPage {
         T.ready();
     }
 
-    showModal = (e) => {
+    showModal = (e, shcc) => {
         e.preventDefault();
-        this.modal.show();
+        this.modal.show({ item: null, shcc });
     }
 
     delete = (e, item) => {
@@ -228,12 +225,12 @@ class QtNghienCuuKhoaHocStaffUserPage extends AdminPage {
                 />
             </>,
             backRoute: '/user',
-            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+            onCreate: permission && permission.write ? (e) => this.showModal(e, shcc) : null,
         });
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtNghienCuuKhoaHoc: state.tccb.qtNghienCuuKhoaHoc });
+const mapStateToProps = state => ({ system: state.system, qtNghienCuuKhoaHoc: state.khcn.qtNghienCuuKhoaHoc });
 const mapActionsToProps = {
     getQtNghienCuuKhoaHocPage, createQtNckhStaffUser, updateQtNckhStaffUser, deleteQtNckhStaffUser, getQtNckhUserAll
 };

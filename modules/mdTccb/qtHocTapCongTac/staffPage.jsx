@@ -28,7 +28,7 @@ class EditModal extends AdminModal {
         ketThuc: '',
         batDauType: 'dd/mm/yyyy',
         ketThucType: 'dd/mm/yyyy',
-    };    
+    };
 
     onShow = (item) => {
         let { id, noiDung, batDau, batDauType, ketThuc, ketThucType } = item && item.item ? item.item : {
@@ -86,7 +86,7 @@ class EditModal extends AdminModal {
 
     handleKetThuc = (value) => {
         value ? $('#ketThucDate').hide() : $('#ketThucDate').show();
-        this.setState({ denNay: value});
+        this.setState({ denNay: value });
         if (!value) {
             this.ketThucType?.setText({ text: this.state.ketThucType ? this.state.ketThucType : 'dd/mm/yyyy' });
         } else {
@@ -138,7 +138,7 @@ class QtHocTapCongTacUserPage extends AdminPage {
 
     showModal = (e) => {
         e.preventDefault();
-        this.modal.show({item: null, shcc: this.state.filter.list_shcc});
+        this.modal.show({ item: null, shcc: this.state.filter.list_shcc });
     }
 
     delete = (e, item) => {
@@ -177,7 +177,7 @@ class QtHocTapCongTacUserPage extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='text' content={(
                             <>
                                 <span><i>{item.noiDung ? item.noiDung : ''}</i></span> <br /> <br />

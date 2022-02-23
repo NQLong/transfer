@@ -41,7 +41,7 @@ class EditModal extends AdminModal {
             sanPham: this.sanPham.value(),
             bacDaoTao: this.bacDaoTao.value(),
         };
-        
+
         if (!this.tenLuanVan.value()) {
             T.notify('Tên luận văn trống', 'danger');
             this.tenLuanVan.focus();
@@ -85,7 +85,7 @@ class QtHuongDanLuanVanStaffUserPage extends AdminPage {
 
     showModal = (e) => {
         e.preventDefault();
-        this.modal.show({item: null, shcc: this.state.filter.list_shcc});
+        this.modal.show({ item: null, shcc: this.state.filter.list_shcc });
     }
 
     delete = (e, item) => {
@@ -117,7 +117,6 @@ class QtHuongDanLuanVanStaffUserPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        {/* <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th> */}
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Họ tên sinh viên</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tên luận văn</th>
                         <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Năm tốt nghiệp</th>
@@ -127,14 +126,7 @@ class QtHuongDanLuanVanStaffUserPage extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
-                        {/* <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <span>{(item.hoCanBo ? item.hoCanBo : '') + ' ' + (item.tenCanBo ? item.tenCanBo : '')}</span><br />
-                                {item.shcc}
-                            </>
-                        )}
-                        /> */}
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='text' content={item.hoTen} />
                         <TableCell type='text' style={{}} content={<>
                             <span><i>{item.tenLuanVan}</i></span><br />
@@ -171,6 +163,7 @@ class QtHuongDanLuanVanStaffUserPage extends AdminPage {
             </>,
             backRoute: '/user',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+            // onImport: permission && permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/huong-dan-luan-van/upload') : null
         });
     }
 }

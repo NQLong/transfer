@@ -94,14 +94,14 @@ class EditModal extends AdminModal {
 
     handleKetThuc = (value) => {
         value ? $('#ketThucDate').hide() : $('#ketThucDate').show();
-        this.setState({ denNay: value});
+        this.setState({ denNay: value });
         if (!value) {
             this.ketThucType?.setText({ text: this.state.ketThucType ? this.state.ketThucType : 'dd/mm/yyyy' });
         } else {
             this.ketThucType?.setText({ text: '' });
         }
     }
-    
+
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
@@ -192,11 +192,11 @@ class QtBaoHiemXaHoiUserPage extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucVu} />
                         <TableCell type='text' content={(
                             <>
-                                {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null} 
+                                {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
                                 {item.ketThuc && item.ketThuc != -1 ? <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc && item.ketThuc != -1 ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
                             </>
                         )}

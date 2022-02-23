@@ -175,7 +175,8 @@ class QtChucVu extends AdminPage {
         const toYear = this.toYear?.value() == '' ? null : this.toYear?.value().getTime();
         const list_dv = this.maDonVi?.value().toString() || '';
         const list_shcc = this.mulCanBo?.value().toString() || '';
-        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc, timeType };
+        const list_cv = this.mulMaChucVu?.value().toString() || '';
+        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc, timeType, list_cv };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
@@ -186,7 +187,8 @@ class QtChucVu extends AdminPage {
                     this.maDonVi?.value(filter.list_dv);
                     this.mulCanBo?.value(filter.list_shcc);
                     this.timeType?.value(filter.timeType);
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.list_shcc || filter.list_dv || filter.timeType)) this.showAdvanceSearch();
+                    this.mulMaChucVu?.value(filter.list_cv);
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.list_shcc || filter.list_dv || filter.timeType || filter.list_cv)) this.showAdvanceSearch();
                 }
             });
         });
@@ -250,7 +252,7 @@ class QtChucVu extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{item.ho + ' ' + item.ten}</span><br />
@@ -315,6 +317,7 @@ class QtChucVu extends AdminPage {
                     {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />}
                     <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
                     <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-md-6' multiple={true} ref={e => this.mulMaChucVu = e} label='Chức vụ' data={SelectAdapter_DmChucVuV2} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
                 </div>
             </>,
             content: <>

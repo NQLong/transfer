@@ -310,13 +310,13 @@ export function createQtChucVuUser(data, done) {
         const url = '/api/user/qua-trinh/chuc-vu';
         T.post(url, { data }, res => {
             if (res.error) {
-                T.notify('Thêm thông tin quá trình khen thưởng bị lỗi', 'danger');
+                T.notify('Thêm thông tin quá trình chức vụ bị lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
-                T.notify('Thêm thông tin quá trình khen thưởng thành công!', 'info');
+                T.notify('Thêm thông tin quá trình chức vụ thành công!', 'info');
                 if (done) done(res);
             }
-        }, () => T.notify('Thêm thông tin quá trình khen thưởng bị lỗi', 'danger'));
+        }, () => T.notify('Thêm thông tin quá trình chức vụ bị lỗi', 'danger'));
     };
 }
 
@@ -325,13 +325,13 @@ export function updateQtChucVuUser(stt, changes, done) {
         const url = '/api/user/qua-trinh/chuc-vu';
         T.put(url, { stt, changes }, data => {
             if (data.error) {
-                T.notify('Cập nhật thông tin quá trình khen thưởng bị lỗi', 'danger');
+                T.notify('Cập nhật thông tin quá trình chức vụ bị lỗi', 'danger');
                 console.error('PUT: ' + url + '. ' + data.error);
             } else if (data.item) {
-                T.notify('Cập nhật thông tin quá trình khen thưởng thành công!', 'info');
+                T.notify('Cập nhật thông tin quá trình chức vụ thành công!', 'info');
                 if (done) done();
             }
-        }, () => T.notify('Cập nhật thông tin quá trình khen thưởng bị lỗi', 'danger'));
+        }, () => T.notify('Cập nhật thông tin quá trình chức vụ bị lỗi', 'danger'));
     };
 }
 
@@ -340,13 +340,13 @@ export function deleteQtChucVuUser(stt, done) {
         const url = '/api/user/qua-trinh/chuc-vu';
         T.delete(url, { stt }, data => {
             if (data.error) {
-                T.notify('Xóa thông tin quá trình khen thưởng bị lỗi', 'danger');
+                T.notify('Xóa thông tin quá trình chức vụ bị lỗi', 'danger');
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
-                T.alert('Thông tin quá trình khen thưởng được xóa thành công!', 'info', false, 800);
+                T.alert('Thông tin quá trình chức vụ được xóa thành công!', 'info', false, 800);
                 done && done();
             }
-        }, () => T.notify('Xóa thông tin quá trình khen thưởng bị lỗi', 'danger'));
+        }, () => T.notify('Xóa thông tin quá trình chức vụ bị lỗi', 'danger'));
     };
 }
 

@@ -470,6 +470,14 @@ String.prototype.lowFirstChar = function () {
     return this[0].toLowerCase() + this.slice(1);
 }
 
+String.prototype.normalizedName = function () {
+    let convertToArray = this.toLowerCase().split(' ');
+    let result = convertToArray.map(function (val) {
+        return val.replace(val.charAt(0), val.charAt(0).toUpperCase());
+    });
+    return result.join(' ');
+}
+
 //Array prototype -----------------------------------------------------------------------------------------------------
 Array.prototype.contains = function (...pattern) {
     return pattern.reduce((result, item) => result && this.includes(item), true);

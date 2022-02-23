@@ -50,7 +50,7 @@ class CanBoPage extends AdminPage {
         const congTacData = this.componentTTCongTac.getAndValidate();
         const trinhDoData = this.componentTrinhDo.getAndValidate();
         if (this.urlSHCC) {
-            caNhanData && congTacData && trinhDoData && this.props.updateStaff(this.urlSHCC, { ...caNhanData, ...congTacData, ...trinhDoData });
+            caNhanData && congTacData && trinhDoData && this.props.updateStaff(this.urlSHCC, { ...caNhanData, ...congTacData, ...trinhDoData, userModified: this.emailCanBo, lastModified: new Date().getTime() });
         }
     }
 

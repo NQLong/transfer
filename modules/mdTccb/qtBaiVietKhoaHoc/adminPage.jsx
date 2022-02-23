@@ -8,7 +8,7 @@ import {
     deleteQtBaiVietKhoaHocStaff, createQtBaiVietKhoaHocStaff, getQtBaiVietKhoaHocGroupPage,
 } from './redux';
 import { DateInput } from 'view/component/Input';
-import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
+import { SelectAdapter_FwCanBo, getStaffAll } from 'modules/mdTccb/tccbCanBo/redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 
 const quocTeList = [
@@ -94,13 +94,20 @@ class EditModal extends AdminModal {
         }
     }
 
+    handleTacGia = () => {
+        // if (!this.state.id) {
+        //     if (this.tenTacGia.value() == '') this.tenTacGia.value(this.staffMapper[data.id]);
+        //     else this.tenTacGia.value(', ' + this.staffMapper[data.id]);
+        // }
+    }
+
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
             title: this.state.id ? 'Cập nhật bài viết khoa học' : 'Tạo mới bài viết khoa học',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={this.state.id ? true : false} required />
+                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={this.handleTacGia} readOnly={this.state.id ? true : false} required />
                 <FormTextBox className='col-12' ref={e => this.tenTacGia = e} label={'Tác giả'} type='text' required readOnly={readOnly} />
                 <FormRichTextBox className='col-12' ref={e => this.tenBaiViet = e} label={'Tên bài viết'} type='text' readOnly={readOnly} />
                 <FormTextBox className='col-9' ref={e => this.tenTapChi = e} label={'Tên tạp chí'} type='text' required readOnly={readOnly} />
@@ -117,8 +124,15 @@ class EditModal extends AdminModal {
 class QtBaiVietKhoaHoc extends AdminPage {
     checked = parseInt(T.cookie('hienThiTheoCanBo')) == 1 ? true : false;
     state = { filter: {} };
+    staffMapper = {};
+
     componentDidMount() {
         T.ready('/user/tccb', () => {
+            this.props.getStaffAll(items => {
+                items && items.forEach(canBo => {
+                    this.staffMapper[canBo.shcc] = (canBo.ho + ' ' + canBo.ten).normalizedName();
+                });
+            });
             T.clearSearchBox();
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
@@ -136,7 +150,7 @@ class QtBaiVietKhoaHoc extends AdminPage {
             this.changeAdvancedSearch(true);
         });
     }
-    
+
     showModal = (e) => {
         e.preventDefault();
         this.modal.show();
@@ -209,18 +223,18 @@ class QtBaiVietKhoaHoc extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Bài viết</th> }
-                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tạp chí</th> }
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Điểm IF</th> }
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Xuất bản</th> }
-                        {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số bài viết</th> }
-                        {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách bài viết</th> }
+                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Bài viết</th>}
+                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tạp chí</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Điểm IF</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Xuất bản</th>}
+                        {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số bài viết</th>}
+                        {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách bài viết</th>}
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={((pageNumber - 1) * pageSize + index + 1)} />
                         <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{(item.hoCanBo ? item.hoCanBo : '') + ' ' + (item.tenCanBo ? item.tenCanBo : '')}</span><br />
@@ -258,8 +272,8 @@ class QtBaiVietKhoaHoc extends AdminPage {
                             </>
                         )}
                         />}
-                        {this.checked && <TableCell type='text' content={item.soBaiViet} /> }
-                        {this.checked && <TableCell type='text' content={this.list(item.danhSachBaiViet, item.soBaiViet, item.soBaiViet)} /> }
+                        {this.checked && <TableCell type='text' content={item.soBaiViet} />}
+                        {this.checked && <TableCell type='text' content={this.list(item.danhSachBaiViet, item.soBaiViet, item.soBaiViet)} />}
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                                 onEdit={() => this.modal.show(item, false)} onDelete={this.delete} >
@@ -288,9 +302,9 @@ class QtBaiVietKhoaHoc extends AdminPage {
                 <div className='row'>
                     <FormTextBox className='col-md-4' ref={e => this.fromYear = e} label='Từ năm (năm xuất bản)' type='year' onChange={() => this.changeAdvancedSearch()} />
                     <FormTextBox className='col-md-4' ref={e => this.toYear = e} label='Đến năm (năm xuất bản)' type='year' onChange={() => this.changeAdvancedSearch()} />
-                    <FormSelect className='col-md-4' ref={e => this.xuatBanRange = e} label='Phạm vi xuất bản' data={quocTeList} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} /> 
-                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1}/>
-                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1}/>
+                    <FormSelect className='col-md-4' ref={e => this.xuatBanRange = e} label='Phạm vi xuất bản' data={quocTeList} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
                 </div>
             </>,
             content: <>
@@ -301,7 +315,7 @@ class QtBaiVietKhoaHoc extends AdminPage {
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
-                    permissions={currentPermissions}
+                    permissions={currentPermissions} getStaffAll={this.props.getStaffAll}
                     create={this.props.createQtBaiVietKhoaHocStaff} update={this.props.updateQtBaiVietKhoaHocStaff}
                 />
             </>,
@@ -314,6 +328,6 @@ class QtBaiVietKhoaHoc extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtBaiVietKhoaHoc: state.tccb.qtBaiVietKhoaHoc });
 const mapActionsToProps = {
     getQtBaiVietKhoaHocPage, deleteQtBaiVietKhoaHocStaff, createQtBaiVietKhoaHocStaff,
-    updateQtBaiVietKhoaHocStaff, getQtBaiVietKhoaHocGroupPage,
+    updateQtBaiVietKhoaHocStaff, getQtBaiVietKhoaHocGroupPage, getStaffAll
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtBaiVietKhoaHoc);

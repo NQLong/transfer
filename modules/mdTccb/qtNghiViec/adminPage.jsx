@@ -43,15 +43,15 @@ class EditModal extends AdminModal {
         if (list_ma.length == 0) {
             T.notify('Danh sách cán bộ trống', 'danger');
             this.shcc.focus();
-        } else if (!this.dienNghi.value()) {
-            T.notify('Chưa chọn diện nghỉ', 'danger');
-            this.dienNghi.focus();
         } else if (!this.soQuyetDinh.value()) {
             T.notify('Số quyết định bị trống', 'danger');
             this.soQuyetDinh.focus();
         } else if (!this.ngayNghi.value()) {
             T.notify('Ngày nghỉ bị trống', 'danger');
             this.ngayNghi.focus();
+        } else if (!this.dienNghi.value()) {
+            T.notify('Chưa chọn diện nghỉ', 'danger');
+            this.dienNghi.focus();
         } else {
             list_ma.forEach((ma, index) => {
                 const changes = {
@@ -127,7 +127,8 @@ class QtNghiViec extends AdminPage {
         const toYear = this.toYear?.value() == '' ? null : this.toYear?.value().getTime();
         const list_dv = this.maDonVi?.value().toString() || '';
         const list_shcc = this.mulCanBo?.value().toString() || '';
-        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc };
+        const dienNghi = this.dienNghi.value();
+        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc, dienNghi };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
@@ -137,7 +138,8 @@ class QtNghiViec extends AdminPage {
                     this.toYear?.value(filter.toYear || '');
                     this.maDonVi?.value(filter.list_dv);
                     this.mulCanBo?.value(filter.list_shcc);
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.list_shcc || filter.list_dv )) this.showAdvanceSearch();
+                    this.dienNghi?.value(filter.dienNghi);
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.list_shcc || filter.list_dv || filter.dienNghi)) this.showAdvanceSearch();
                 }
             });
         });
@@ -147,7 +149,7 @@ class QtNghiViec extends AdminPage {
         if (this.checked) this.props.getQtNghiViecGroupPage(pageN, pageS, pageC, this.state.filter, done);
         else this.props.getQtNghiViecPage(pageN, pageS, pageC, this.state.filter, done);
     }
-    
+
     groupPage = () => {
         this.checked = !this.checked;
         T.cookie('hienThiTheoCanBo', this.checked ? 1 : 0);
@@ -189,13 +191,13 @@ class QtNghiViec extends AdminPage {
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày nghỉ</th>}
                         {!this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Nội dung</th>}
                         {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Số chức lần nghỉ</th>}
-                        {this.checked && <th style={{width: '100%', whiteSpace: 'nowrap'}}>Danh sách nội dung nghỉ</th>}
+                        {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách nội dung nghỉ</th>}
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
                             item.shcc ?
                                 <>
@@ -205,7 +207,7 @@ class QtNghiViec extends AdminPage {
                                 <span>{item.hoTen ? item.hoTen : ''}</span>
                         )}
                         />
-                        {!this.checked && <TableCell type='text' style={{  whiteSpace: 'nowrap' }} content={(
+                        {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span><i>{item.soQuyetDinh}</i></span><br />
                                 <span>Diện nghỉ: <span style={{ color: 'blue' }}>{item.dienNghi == 1 ? 'Biên chế' : 'Hợp đồng'}</span></span>
@@ -218,15 +220,15 @@ class QtNghiViec extends AdminPage {
                             </>
                         )}
                         />}
-                        {!this.checked &&<TableCell type='text' content={(
+                        {!this.checked && <TableCell type='text' content={(
                             <>
-                                <span><i>{item.noiDung}</i></span><br/>
+                                <span><i>{item.noiDung}</i></span><br />
                                 {item.ghiChu ? '(' + item.ghiChu + ')' : null}
                             </>
                         )}
                         />}
-                        {this.checked && <TableCell type='text' content={item.soLanNghi}/>}
-                        {this.checked && <TableCell type='text' content={this.list(item.danhSachNghiViec, item.soLanNghi, item.soLanNghi)} /> }
+                        {this.checked && <TableCell type='text' content={item.soLanNghi} />}
+                        {this.checked && <TableCell type='text' content={this.list(item.danhSachNghiViec, item.soLanNghi, item.soLanNghi)} />}
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                                 onEdit={() => this.modal.show(item)} onDelete={this.delete} >
@@ -253,10 +255,11 @@ class QtNghiViec extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-6' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} /> 
-                    <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-6' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} /> 
-                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1}/>
-                    <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1}/>
+                    <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-6' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />
+                    <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-6' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-md-6' ref={e => this.dienNghi = e} label={'Diện nghỉ'} data={[{ id: 1, text: 'Biên chế' }, { id: 2, text: 'Hợp đồng' }]} onChange={() => this.changeAdvancedSearch()} allowClear={true} />
+                    <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
                 </div>
             </>,
             content: <>

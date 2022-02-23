@@ -5,16 +5,16 @@ import sachGiaoTrinh from './redux';
 
 export default {
     redux: {
-        parent: 'tccb',
+        parent: 'library',
         reducers: { sachGiaoTrinh }
     },
     routes: [
         {
-            path: '/user/tccb/sach-giao-trinh/group/:shcc',
+            path: '/user/library/sach-giao-trinh/group/:shcc',
             component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
         },
         {
-            path: '/user/tccb/sach-giao-trinh',
+            path: '/user/library/sach-giao-trinh',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
         {

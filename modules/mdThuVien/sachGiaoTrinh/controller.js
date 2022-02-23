@@ -1,15 +1,15 @@
 module.exports = app => {
     const menu = {
-        parentMenu: app.parentMenu.tccb,
+        parentMenu: app.parentMenu.library,
         menus: {
-            3023: { title: 'Sách, giáo trình', link: '/user/tccb/sach-giao-trinh', icon: 'fa-book', backgroundColor: '#ccad2f', groupIndex: 5 },
+            9001: { title: 'Sách, giáo trình', subTitle: 'Của cán bộ', link: '/user/library/sach-giao-trinh', icon: 'fa-book', backgroundColor: '#ccad2f' },
         },
     };
 
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1006: { title: 'Sách giáo trình', link: '/user/sach-giao-trinh', icon: 'fa-book', backgroundColor: '#ccad2f', groupIndex: 4 },
+            1006: { title: 'Sách, giáo trình', link: '/user/sach-giao-trinh', icon: 'fa-book', backgroundColor: '#ccad2f', groupIndex: 4 },
         },
     };
 
@@ -19,8 +19,8 @@ module.exports = app => {
         { name: 'sachGiaoTrinh:write' },
         { name: 'sachGiaoTrinh:delete' },
     );
-    app.get('/user/tccb/sach-giao-trinh', app.permission.check('sachGiaoTrinh:read'), app.templates.admin);
-    app.get('/user/tccb/sach-giao-trinh/group/:shcc', app.permission.check('sachGiaoTrinh:read'), app.templates.admin);
+    app.get('/user/library/sach-giao-trinh', app.permission.check('sachGiaoTrinh:read'), app.templates.admin);
+    app.get('/user/library/sach-giao-trinh/group/:shcc', app.permission.check('sachGiaoTrinh:read'), app.templates.admin);
     app.get('/user/sach-giao-trinh', app.permission.check('staff:login'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
@@ -88,7 +88,7 @@ module.exports = app => {
     });
     ///END USER ACTIONS
 
-    app.get('/api/tccb/qua-trinh/sach-giao-trinh/page/:pageNumber/:pageSize', app.permission.check('sachGiaoTrinh:read'), (req, res) => {
+    app.get('/api/library/qua-trinh/sach-giao-trinh/page/:pageNumber/:pageSize', app.permission.check('sachGiaoTrinh:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -104,7 +104,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/tccb/qua-trinh/sach-giao-trinh/group/page/:pageNumber/:pageSize', app.permission.check('sachGiaoTrinh:read'), (req, res) => {
+    app.get('/api/library/qua-trinh/sach-giao-trinh/group/page/:pageNumber/:pageSize', app.permission.check('sachGiaoTrinh:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
