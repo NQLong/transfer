@@ -8,7 +8,7 @@ import {
     deleteQtBaiVietKhoaHocStaff, createQtBaiVietKhoaHocStaff, getQtBaiVietKhoaHocGroupPage,
 } from './redux';
 import { DateInput } from 'view/component/Input';
-import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
+import { SelectAdapter_FwCanBo, getStaffAll } from 'modules/mdTccb/tccbCanBo/redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 
 const quocTeList = [
@@ -94,13 +94,20 @@ class EditModal extends AdminModal {
         }
     }
 
+    handleTacGia = () => {
+        // if (!this.state.id) {
+        //     if (this.tenTacGia.value() == '') this.tenTacGia.value(this.staffMapper[data.id]);
+        //     else this.tenTacGia.value(', ' + this.staffMapper[data.id]);
+        // }
+    }
+
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
             title: this.state.id ? 'Cập nhật bài viết khoa học' : 'Tạo mới bài viết khoa học',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={this.state.id ? true : false} required />
+                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={this.handleTacGia} readOnly={this.state.id ? true : false} required />
                 <FormTextBox className='col-12' ref={e => this.tenTacGia = e} label={'Tác giả'} type='text' required readOnly={readOnly} />
                 <FormRichTextBox className='col-12' ref={e => this.tenBaiViet = e} label={'Tên bài viết'} type='text' readOnly={readOnly} />
                 <FormTextBox className='col-9' ref={e => this.tenTapChi = e} label={'Tên tạp chí'} type='text' required readOnly={readOnly} />
@@ -117,8 +124,15 @@ class EditModal extends AdminModal {
 class QtBaiVietKhoaHoc extends AdminPage {
     checked = parseInt(T.cookie('hienThiTheoCanBo')) == 1 ? true : false;
     state = { filter: {} };
+    staffMapper = {};
+
     componentDidMount() {
         T.ready('/user/tccb', () => {
+            this.props.getStaffAll(items => {
+                items && items.forEach(canBo => {
+                    this.staffMapper[canBo.shcc] = (canBo.ho + ' ' + canBo.ten).normalizedName();
+                });
+            });
             T.clearSearchBox();
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
@@ -301,7 +315,7 @@ class QtBaiVietKhoaHoc extends AdminPage {
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
-                    permissions={currentPermissions}
+                    permissions={currentPermissions} getStaffAll={this.props.getStaffAll}
                     create={this.props.createQtBaiVietKhoaHocStaff} update={this.props.updateQtBaiVietKhoaHocStaff}
                 />
             </>,
@@ -314,6 +328,6 @@ class QtBaiVietKhoaHoc extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtBaiVietKhoaHoc: state.tccb.qtBaiVietKhoaHoc });
 const mapActionsToProps = {
     getQtBaiVietKhoaHocPage, deleteQtBaiVietKhoaHocStaff, createQtBaiVietKhoaHocStaff,
-    updateQtBaiVietKhoaHocStaff, getQtBaiVietKhoaHocGroupPage,
+    updateQtBaiVietKhoaHocStaff, getQtBaiVietKhoaHocGroupPage, getStaffAll
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtBaiVietKhoaHoc);
