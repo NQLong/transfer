@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.khcn,
         menus: {
-            3021: { title: 'Quá trình nghiên cứu khoa học', link: '/user/khcn/qua-trinh/nghien-cuu-khoa-hoc', icon: 'fa-wpexplorer', backgroundColor: '#f03a88', groupIndex: 5 },
+            9501: { title: 'Quá trình nghiên cứu khoa học', link: '/user/khcn/qua-trinh/nghien-cuu-khoa-hoc', icon: 'fa-wpexplorer', backgroundColor: '#f03a88', groupIndex: 5 },
         },
     };
 
