@@ -306,7 +306,7 @@ class QtBaoHiemXaHoiGroupPage extends AdminPage {
                 />
             </>,
             backRoute: '/user/tccb/qua-trinh/bao-hiem-xa-hoi',
-            onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
+            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
         });
     }
 }
