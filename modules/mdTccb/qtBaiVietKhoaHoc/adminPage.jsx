@@ -22,8 +22,9 @@ class EditModal extends AdminModal {
         id: '',
     };
     multiple = false;
-
+    list_name = [];
     onShow = (item, multiple = true) => {
+        this.list_name = [];
         this.multiple = multiple;
 
         let { id, shcc, tenTacGia, namXuatBan, tenBaiViet, tenTapChi, soHieuIssn, sanPham, diemIf, quocTe } = item ? item : {
@@ -94,11 +95,32 @@ class EditModal extends AdminModal {
         }
     }
 
-    handleTacGia = () => {
-        // if (!this.state.id) {
-        //     if (this.tenTacGia.value() == '') this.tenTacGia.value(this.staffMapper[data.id]);
-        //     else this.tenTacGia.value(', ' + this.staffMapper[data.id]);
-        // }
+    removeName = (list_name, name) => {
+        const index = list_name.indexOf(name);
+        if (index > -1) {
+            list_name.splice(index, 1); // 2nd parameter means remove one item only
+        }
+    }
+    convertName = (list_name) => {
+        if (list_name.length == 0) return '';
+        let result = '';
+        for (let i = 0; i < list_name.length; i++) {
+            let name = list_name[i];
+            let index = name.indexOf(':');
+            name = name.substring(index + 2);
+            name = name.trim();
+            if (i > 0) result += ', ';
+            result += name;
+        }
+        return result;
+    }
+    handleTacGia = (item) => {
+        if (!this.state.id) {
+            if (item.selected) this.list_name.push(item.text);
+            else this.removeName(this.list_name, item.text);
+            this.tenTacGia.value(this.convertName(this.list_name));
+            // console.log("list_name = ", this.list_name);
+        }
     }
 
     render = () => {
@@ -107,7 +129,7 @@ class EditModal extends AdminModal {
             title: this.state.id ? 'Cập nhật bài viết khoa học' : 'Tạo mới bài viết khoa học',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={this.handleTacGia} readOnly={this.state.id ? true : false} required />
+                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={(item) => this.handleTacGia(item)} readOnly={this.state.id ? true : false} required />
                 <FormTextBox className='col-12' ref={e => this.tenTacGia = e} label={'Tác giả'} type='text' required readOnly={readOnly} />
                 <FormRichTextBox className='col-12' ref={e => this.tenBaiViet = e} label={'Tên bài viết'} type='text' readOnly={readOnly} />
                 <FormTextBox className='col-9' ref={e => this.tenTapChi = e} label={'Tên tạp chí'} type='text' required readOnly={readOnly} />

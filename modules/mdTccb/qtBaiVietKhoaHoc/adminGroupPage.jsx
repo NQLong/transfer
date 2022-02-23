@@ -24,7 +24,6 @@ class EditModal extends AdminModal {
     };
 
     onShow = (item) => {
-
         let { id, shcc, tenTacGia, namXuatBan, tenBaiViet, tenTapChi, soHieuIssn, sanPham, diemIf, quocTe } = item ? item : {
             id: null, shcc: '', tenTacGia: '', namXuatBan: null, tenBaiViet: '', tenTapChi: '', soHieuIssn: '', sanPham: '', diemIf: '',
             quocTe: 0
