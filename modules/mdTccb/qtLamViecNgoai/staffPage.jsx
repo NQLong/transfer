@@ -87,6 +87,16 @@ class EditModal extends AdminModal {
         }
     }
 
+    handleKetThuc = (value) => {
+        value ? $('#ketThucDate').hide() : $('#ketThucDate').show();
+        this.setState({ denNay: value });
+        if (!value) {
+            this.ketThucType?.setText({ text: this.state.ketThucType ? this.state.ketThucType : 'dd/mm/yyyy' });
+        } else {
+            this.ketThucType?.setText({ text: '' });
+        }
+    }
+    
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
