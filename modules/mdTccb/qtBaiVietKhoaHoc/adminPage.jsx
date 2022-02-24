@@ -295,7 +295,7 @@ class QtBaiVietKhoaHoc extends AdminPage {
             icon: 'fa fa-quote-right',
             title: 'Bài viết khoa học',
             breadcrumb: [
-                <Link key={0} to='/user/khcn'>Tổ chức cán bộ</Link>,
+                <Link key={0} to='/user/khcn'>Khoa học công nghệ</Link>,
                 'Bài viết khoa học'
             ],
             advanceSearch: <>
