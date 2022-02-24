@@ -94,6 +94,7 @@ class EditModal extends AdminModal {
                     ketThucType: !this.state.denNay ? this.state.ketThucType : '',
                     ketThuc: !this.state.denNay ? this.ketThuc.getVal() : -1,
                     noiLamViec: this.noiLamViec.value(),
+                    noiDung: this.noiDung.value(),
                 };
                 if (index == list_ma.length - 1) {
                     this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
