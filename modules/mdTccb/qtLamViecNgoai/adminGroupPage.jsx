@@ -77,13 +77,13 @@ class EditModal extends AdminModal {
             T.notify('Chưa chọn cán bộ', 'danger');
             this.maCanBo.focus();
         } else if (!changes.noiDung) {
-            T.notify('Nội dung công tác ngoài nước trống', 'danger');
+            T.notify('Nội dung làm việc ngoài trống', 'danger');
             this.noiDung.focus();
         } else if (!changes.batDau) {
-            T.notify('Ngày bắt đầu công tác ngoài nước trống', 'danger');
+            T.notify('Ngày bắt đầu làm việc ngoài trống', 'danger');
             this.batDau.focus();
         } else if (!this.state.denNay && !this.ketThuc.getVal()) {
-            T.notify('Ngày kết thúc công tác ngoài nước trống', 'danger');
+            T.notify('Ngày kết thúc làm việc ngoài trống', 'danger');
             this.ketThuc.focus();
         } else if (!this.state.denNay && this.batDau.getVal() > this.ketThuc.getVal()) {
             T.notify('Ngày bắt đầu lớn hơn ngày kết thúc', 'danger');
@@ -106,11 +106,11 @@ class EditModal extends AdminModal {
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
-            title: this.state.id ? 'Cập nhật quá trình công tác ngoài nước' : 'Tạo mới quá trình công tác ngoài nước',
+            title: this.state.id ? 'Cập nhật quá trình làm việc ngoài' : 'Tạo mới quá trình làm việc ngoài',
             size: 'large',
             body: <div className='row'>
                 <FormSelect className='col-md-12' ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={true} required />
-                <FormRichTextBox className='col-md-12' ref={e => this.noiDung = e} rows={2} readOnly={readOnly} label='Nội dung' placeholder='Nhập nội dung công tác ngoài nước (tối đa 200 ký tự)' required maxLength={200} />
+                <FormRichTextBox className='col-md-12' ref={e => this.noiDung = e} rows={2} readOnly={readOnly} label='Nội dung' placeholder='Nhập nội dung làm việc ngoài (tối đa 200 ký tự)' required maxLength={200} />
                 <FormTextBox className='col-md-12' ref={e => this.noiLamViec = e} label='Nơi làm việc' />
 
                 <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
@@ -188,10 +188,10 @@ class QtLamViecNgoaiGroupPage extends AdminPage {
     }
 
     delete = (e, item) => {
-        T.confirm('Xóa thông tin công tác ngoài nước', 'Bạn có chắc bạn muốn xóa thông tin công tác ngoài nước này?', 'warning', true, isConfirm => {
+        T.confirm('Xóa thông tin làm việc ngoài', 'Bạn có chắc bạn muốn xóa thông tin làm việc ngoài này?', 'warning', true, isConfirm => {
             isConfirm && this.props.deleteQtLamViecNgoaiGroupPageMa(item.id, error => {
-                if (error) T.notify(error.message ? error.message : 'Xoá thông tin công tác ngoài nước bị lỗi!', 'danger');
-                else T.alert('Xoá thông tin công tác ngoài nước thành công!', 'success', false, 800);
+                if (error) T.notify(error.message ? error.message : 'Xoá thông tin làm việc ngoài bị lỗi!', 'danger');
+                else T.alert('Xoá thông tin làm việc ngoài thành công!', 'success', false, 800);
             });
         });
         e.preventDefault();
@@ -265,7 +265,7 @@ class QtLamViecNgoaiGroupPage extends AdminPage {
             title: 'Quá trình làm việc ngoài - Cán bộ',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
-                <Link key={0} to='/user/tccb/qua-trinh/lam-viec-ngoai'>Quá trình công tác ngoài nước</Link>,
+                <Link key={0} to='/user/tccb/qua-trinh/lam-viec-ngoai'>Quá trình làm việc ngoài</Link>,
                 'Quá trình làm việc ngoài - Cán bộ'
             ],
             advanceSearch: <>
