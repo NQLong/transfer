@@ -14,6 +14,7 @@ asset/upload/*
 asset/download/*
 asset/menu.txt
 asset/ho_so_ccvc_nld
+asset/db/tables
 
 public/img/*
 !public/img/*.*
