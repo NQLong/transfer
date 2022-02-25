@@ -241,7 +241,7 @@ class QtBaiVietKhoaHocGroupPage extends AdminPage {
             title: 'Bài viết Khoa học - Cán bộ',
             subTitle: <div style={{ color: 'blue' }} >{this.state.name}</div>,
             breadcrumb: [
-                <Link key={0} to='/user/khcn'>Tổ chức cán bộ</Link>,
+                <Link key={0} to='/user/khcn'>Khoa học công nghệ</Link>,
                 <Link key={0} to='/user/khcn/qua-trinh/bai-viet-khoa-hoc'>Quá trình bài viết khoa học</Link>,
                 'Quá trình bài viết khoa học - Cán bộ',
             ],
