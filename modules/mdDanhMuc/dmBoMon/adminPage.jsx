@@ -65,6 +65,7 @@ class EditModal extends AdminModal {
         const readOnly = this.props.readOnly;
         return this.renderModal({
             title: this.state.ma ? 'Cập nhật bộ môn' : 'Tạo mới bộ môn',
+            size: 'large',
             body: <div className='row'>
                 <FormTextBox type='text' className='col-md-6' ref={e => this.ma = e} label='Mã bộ môn' 
                     readOnly={this.state.ma ? true : readOnly} required />
@@ -166,6 +167,6 @@ class DmBoMonPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, dmBoMon: state.dmBoMon, dmDonVi: state.dmDonVi });
+const mapStateToProps = state => ({ system: state.system, dmBoMon: state.danhMuc.dmBoMon, dmDonVi: state.danhMuc.dmDonVi });
 const mapActionsToProps = { getDmDonViAll, createDmBoMon, getDmBoMonPage, updateDmBoMon, deleteDmBoMon };
 export default connect(mapStateToProps, mapActionsToProps)(DmBoMonPage);

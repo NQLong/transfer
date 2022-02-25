@@ -5,16 +5,21 @@ import qtDaoTao from './redux';
 
 export default {
     redux: {
-        qtDaoTao,
+        parent: 'tccb',
+        reducers: { qtDaoTao }
     },
     routes: [
+        {
+            path: '/user/tccb/qua-trinh/dao-tao/:shcc',
+            component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
+        },
         {
             path: '/user/tccb/qua-trinh/dao-tao',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
         {
-            path: '/user/tccb/qua-trinh/dao-tao/:shcc',
-            component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
+            path: '/user/dao-tao',
+            component: Loadable({ loading: Loading, loader: () => import('./staffPage') })
         },
     ],
 };

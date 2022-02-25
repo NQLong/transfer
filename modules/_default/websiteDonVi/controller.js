@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.websiteDv,
         menus: {
-            1007: { title: 'Danh sách', link: '/user/website', icon: 'fa-chrome', backgroundColor: '#00aa00' },
+            1901: { title: 'Danh sách', link: '/user/website', icon: 'fa-chrome', backgroundColor: '#00aa00' },
         },
     };
     app.permission.add(

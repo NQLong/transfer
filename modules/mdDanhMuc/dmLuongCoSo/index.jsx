@@ -5,7 +5,8 @@ import dmLuongCoSo from './redux';
 
 export default {
     redux: {
-        dmLuongCoSo
+        parent: 'danhMuc',
+        reducers: {  dmLuongCoSo }
     },
     routes: [
         {

@@ -98,7 +98,6 @@ class dmBenhVienPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permissionWrite = currentPermissions.includes('dmBenhVien:write'),
-            permissionDelete = currentPermissions.includes('dmBenhVien:delete'),
             permission = this.getUserPermission('dmBenhVien', ['read', 'write', 'delete']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmBenhVien && this.props.dmBenhVien.page ?
             this.props.dmBenhVien.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
@@ -124,7 +123,7 @@ class dmBenhVienPage extends AdminPage {
                         <TableCell type='text' content={T.language.parse(item.diaChi, true).vi} style={{ whiteSpace: 'nowrap' }}/>
                         <TableCell type='text' content={T.language.parse(this.tuyenMapper[item.maTuyen] ? this.tuyenMapper[item.maTuyen] : '', true).vi} style={{ whiteSpace: 'nowrap' }}/>
                         <TableCell type='checkbox' content={item.kichHoat} permissions={permissionWrite} onChanged={() => permissionWrite && this.changeActive(item)} />
-                        <TableCell type='buttons' content={item} permission={permissionDelete} onEdit={this.edit} onDelete={this.delete}></TableCell>
+                        <TableCell type='buttons' content={item} permission={permission} onEdit={() => this.modal.show(item)} onDelete={this.delete}></TableCell>
                     </tr>)
             });
         }
@@ -148,6 +147,6 @@ class dmBenhVienPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, dmBenhVien: state.dmBenhVien, dmBenhVienMaTuyen: state.dmTuyenBenhVien });
+const mapStateToProps = state => ({ system: state.system, dmBenhVien: state.danhMuc.dmBenhVien, dmBenhVienMaTuyen: state.danhMuc.dmTuyenBenhVien });
 const mapActionsToProps = { getDmBenhVienPage, createDmBenhVien, updateDmBenhVien, deleteDmBenhVien, getDmTuyenBenhVienAll };
 export default connect(mapStateToProps, mapActionsToProps)(dmBenhVienPage);

@@ -6,7 +6,8 @@ import SectionAllDivision from '../dmLoaiDonVi/sectionAllDivisions';
 
 export default {
     redux: {
-        dmLoaiDonVi,
+        parent: 'danhMuc',
+        reducers: {  dmLoaiDonVi } 
     },
     routes: [
         {

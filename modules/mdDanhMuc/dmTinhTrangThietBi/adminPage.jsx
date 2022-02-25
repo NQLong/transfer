@@ -124,6 +124,6 @@ class DanhMucTinhTrangThietBi extends AdminPage {
 }
 
 
-const mapStateToProps = (state) => ({ system: state.system, dmTinhTrangThietBi: state.dmTinhTrangThietBi });
+const mapStateToProps = (state) => ({ system: state.system, dmTinhTrangThietBi: state.danhMuc.dmTinhTrangThietBi });
 const mapActionsToProps = { getDanhSachTinhTrangThietBi, createTinhTrangThietBi, deleteTinhTrangThietBi, updateTinhTrangThietBi };
 export default connect(mapStateToProps, mapActionsToProps)(DanhMucTinhTrangThietBi);

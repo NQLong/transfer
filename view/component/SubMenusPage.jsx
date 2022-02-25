@@ -170,6 +170,7 @@ class SubMenusPage extends React.Component {
                                         <i style={{ backgroundColor: menuState[item.key] ? item.backgroundColor || '#00b0ff' : '#aaa' }} className={'icon fa fa-3x ' + (item.icon || 'fa-tasks')} />
                                         <div className='info'>
                                             <p>{item.title}</p>
+                                            {item.subTitle ? <small style={{ color: 'grey' }}><i>{item.subTitle}</i></small> : null}
                                             {isEditMode ? <i className={'fa fa-lg ' + (menuState[item.key] ? 'fa-check text-success' : 'fa-times text-danger')} style={{ position: 'absolute', right: 24, top: 12 }} /> : null}
                                         </div>
                                     </div>

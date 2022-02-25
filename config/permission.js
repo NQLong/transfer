@@ -207,35 +207,65 @@ module.exports = app => {
                 // Add login permission => user.active == 1 => user:login
                 if (user.active == 1) app.permissionHooks.pushUserPermission(user, 'user:login');
                 if (user.isStudent) app.permissionHooks.pushUserPermission(user, 'student:login'); // Add student permission: student:login
-                if (user.isStaff) app.permissionHooks.pushUserPermission(user, 'staff:login'); // Add staff permission: staff:login 
-
-                user.menu = app.permission.tree();
-                Object.keys(user.menu).forEach(parentMenuIndex => {
-                    let flag = true;
-                    const menuItem = user.menu[parentMenuIndex];
-                    if (menuItem.parentMenu && menuItem.parentMenu.permissions) {
-                        if (hasPermission(user.permissions, menuItem.parentMenu.permissions)) {
-                            delete menuItem.parentMenu.permissions;
+                new Promise(resolve => {
+                    app.model.canBo.get({ email: user.email }, (e, item) => {
+                        if (e || item == null) {
+                            user.isStaff = 0;
+                            resolve();
                         } else {
-                            delete user.menu[parentMenuIndex];
-                            flag = false;
-                        }
-                    }
-
-                    flag && Object.keys(menuItem.menus).forEach(menuIndex => {
-                        const menu = menuItem.menus[menuIndex];
-                        if (hasPermission(user.permissions, menu.permissions)) {
-                            delete menu.permissions;
-                        } else {
-                            delete menuItem.menus[menuIndex];
-                            if (Object.keys(menuItem.menus).length == 0) delete user.menu[parentMenuIndex];
+                            user.isStaff = 1;
+                            item.phai == '02' && app.permissionHooks.pushUserPermission(user, 'staff:female');
+                            user.shcc = item.shcc;
+                            app.permissionHooks.pushUserPermission(user, 'staff:login'); // Add staff permission: staff:login
+                            resolve();
                         }
                     });
-                });
+                }).then(() => new Promise(resolve => {
+                    app.model.qtChucVu.getAll({ shcc: user.shcc }, (e, re) => {
+                        if (e || re == null) resolve();
+                        else if (re && re.length > 0) {
+                            re.forEach(item => {
+                                if (item.maChucVu != '002' && item.maChucVu != '001' && item.maChucVu != '013' && item.maChucVu != '014') {
+                                    item.maDonVi && app.model.dmDonVi.get({ ma: item.maDonVi }, (er, resu) => {
+                                        user.donVi = resu.ten;
+                                        app.permissionHooks.pushUserPermission(user, 'quanLy:login');
+                                        resolve();
+                                    });
+                                }
 
-                req.session.user = user;
-                req.session.save();
-                done && done(user);
+                            });
+                        } else resolve();
+                    });
+                })).then(() => new Promise(resolve => {
+                    user.menu = app.permission.tree();
+                    Object.keys(user.menu).forEach(parentMenuIndex => {
+                        let flag = true;
+                        const menuItem = user.menu[parentMenuIndex];
+                        if (menuItem.parentMenu && menuItem.parentMenu.permissions) {
+                            if (hasPermission(user.permissions, menuItem.parentMenu.permissions)) {
+                                delete menuItem.parentMenu.permissions;
+                            } else {
+                                delete user.menu[parentMenuIndex];
+                                flag = false;
+                            }
+                        }
+
+                        flag && Object.keys(menuItem.menus).forEach(menuIndex => {
+                            const menu = menuItem.menus[menuIndex];
+                            if (hasPermission(user.permissions, menu.permissions)) {
+                                delete menu.permissions;
+                            } else {
+                                delete menuItem.menus[menuIndex];
+                                if (Object.keys(menuItem.menus).length == 0) delete user.menu[parentMenuIndex];
+                            }
+                        });
+                    });
+
+                    req.session.user = user;
+                    req.session.save();
+                    done && done(user);
+                    resolve();
+                }));
             }
         });
     };

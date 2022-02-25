@@ -5,7 +5,8 @@ import dmChuongTrinhDaoTao from './redux';
 
 export default {
     redux: {
-        dmChuongTrinhDaoTao,
+        parent: 'danhMuc',
+        reducers: { dmChuongTrinhDaoTao, }
     },
     routes: [
         {

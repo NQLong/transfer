@@ -66,6 +66,34 @@ module.exports = app => {
         }
     });
 
+    app.get('/api/dm-bo-mon/filter/:maDonVi/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
+        let pageNumber = parseInt(req.params.pageNumber),
+            pageSize = parseInt(req.params.pageSize),
+            maDv = Number(req.params.maDonVi),
+            condition = {};
+        if (req.query.condition) {
+            if (maDv != 0) {
+                condition = {
+                    statement: 'lower(ma) LIKE :searchText OR lower(ten) LIKE :searchText AND maDv =:maDv',
+                    parameter: { searchText: `%${req.query.condition.toLowerCase()}%`, maDv },
+                };
+            } else {
+                condition = {
+                    statement: 'lower(ma) LIKE :searchText OR lower(ten) LIKE :searchText',
+                    parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
+                };
+            }
+        } else {
+            if (maDv != 0) {
+                condition = {
+                    statement: 'maDv =:maDv',
+                    parameter: { maDv },
+                };
+            }
+        }
+        app.model.dmBoMon.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
+    });
+
     // Hook--------------------------------------------------------------------------------------------------------------------------------------------------------
 
     const dmBoMonImportData = (fields, files, done) => {

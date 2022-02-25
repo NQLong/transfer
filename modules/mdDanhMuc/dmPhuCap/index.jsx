@@ -6,7 +6,9 @@ import dmHuongPhuCap from './reduxHuongPhuCap';
 
 export default {
     redux: {
-        dmHuongPhuCap, dmPhuCap,
+        parent: 'danhMuc',
+        reducers: { dmHuongPhuCap, dmPhuCap, }
+       
     },
     routes: [
         {

@@ -4,7 +4,8 @@ import Loading from 'view/component/Loading';
 import dmTinhTrangThietBi from './redux';
 export default {
     redux: {
-        dmTinhTrangThietBi,
+        parent: 'danhMuc',
+        reducers: { dmTinhTrangThietBi }
     },
     routes: [
         {

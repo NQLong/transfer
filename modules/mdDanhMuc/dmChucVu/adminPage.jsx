@@ -161,6 +161,6 @@ class DmChucVuPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, dmChucVu: state.dmChucVu });
+const mapStateToProps = state => ({ system: state.system, dmChucVu: state.danhMuc.dmChucVu });
 const mapActionsToProps = { getDmChucVuPage, createDmChucVu, deleteDmChucVu, updateDmChucVu };
 export default connect(mapStateToProps, mapActionsToProps)(DmChucVuPage);

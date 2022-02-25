@@ -5,7 +5,8 @@ import dmChungChiTiengAnh from './redux';
 
 export default {
     redux: {
-        dmChungChiTiengAnh,
+        parent: 'danhMuc',
+        reducers: { dmChungChiTiengAnh, }
     },
     routes: [
         {

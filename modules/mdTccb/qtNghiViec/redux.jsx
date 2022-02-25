@@ -51,35 +51,40 @@ export default function QtNghiViecReducer(state = null, data) {
 
 // Actions ------------------------------------------------------------------------------------------------------------
 T.initPage('pageQtNghiViec');
-export function getQtNghiViecPage(pageNumber, pageSize, loaiDoiTuong, pageCondition, done) {
-    const page = T.updatePage('pageQtNghiViec', pageNumber, pageSize, pageCondition);
-    if (!loaiDoiTuong) loaiDoiTuong = [];
-    if (!Array.isArray(loaiDoiTuong)) loaiDoiTuong = [loaiDoiTuong];
+export function getQtNghiViecPage(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('pageQtNghiViec', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/tccb/qua-trinh/nghi-viec/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition, parameter: loaiDoiTuong}, data => {
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
-                T.notify('Lấy danh sách sách giáo trình bị lỗi!', 'danger');
+                T.notify('Lấy danh sách sách nghỉ việc bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
+                if (page.filter) data.page.filter = page.filter;
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 if (done) done(data.page);
                 dispatch({ type: QtNghiViecGetPage, page: data.page });
             }
-        }, () => T.notify('Lấy danh sách sách giáo trình bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách sách nghỉ việc bị lỗi!', 'danger'));
     };
 }
 
 T.initPage('groupPageQtNghiViec', true);
-export function getQtNghiViecGroupPage(pageNumber, pageSize, loaiDoiTuong, pageCondition, done) {
-    const page = T.updatePage('groupPageQtNghiViec', pageNumber, pageSize, pageCondition);
-    if (!loaiDoiTuong) loaiDoiTuong = [];
-    if (!Array.isArray(loaiDoiTuong)) loaiDoiTuong = [loaiDoiTuong];
+export function getQtNghiViecGroupPage(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('groupPageQtNghiViec', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/tccb/qua-trinh/nghi-viec/group/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition, parameter: loaiDoiTuong}, data => {
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
-                T.notify('Lấy danh sách sách giáo trình theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                T.notify('Lấy danh sách nghỉ việc theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
@@ -90,47 +95,44 @@ export function getQtNghiViecGroupPage(pageNumber, pageSize, loaiDoiTuong, pageC
     };
 }
 
-T.initPage('groupPageMaQtNghiViec', true);
-export function getQtNghiViecGroupPageMa(pageNumber, pageSize, loaiDoiTuong, pageCondition, done) {
-    const page = T.updatePage('groupPageMaQtNghiViec', pageNumber, pageSize, pageCondition);
-    if (!loaiDoiTuong) loaiDoiTuong = '-1';
-    return dispatch => {
-        const url = `/api/tccb/qua-trinh/nghi-viec/group_sgt/page/${loaiDoiTuong}/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition }, data => {
-            if (data.error) {
-                T.notify('Lấy danh sách sách giáo trình theo cán bộ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
-                console.error(`GET: ${url}.`, data.error);
-            } else {
-                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
-                done && done(data.page);
-                dispatch({ type: QtNghiViecGetPage, page: data.page });
-            }
-        }, error => console.error(`GET: ${url}.`, error));
-    };
-}
-
-
 export function updateQtNghiViecGroupPageMa(ma, changes, done) {
     return dispatch => {
-        const url = '/api/staff/qua-trinh/nghi-viec';
+        const url = '/api/qua-trinh/nghi-viec';
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
-                T.notify('Cập nhật sách giáo trình bị lỗi!', 'danger');
+                T.notify('Cập nhật nghỉ việc bị lỗi!', 'danger');
                 console.error(`PUT: ${url}.`, data.error);
                 done && done(data.error);
             } else {
-                T.notify('Cập nhật sách giáo trình thành công!', 'success');
+                T.notify('Cập nhật nghỉ việc thành công!', 'success');
                 done && done(data.item);
-                dispatch(getQtNghiViecGroupPageMa(undefined, undefined, '-1', data.shcc));
+                dispatch(getQtNghiViecPage());
             }
-        }, () => T.notify('Cập nhật sách giáo trình bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật nghỉ việc bị lỗi!', 'danger'));
     };
 }
 
-
-export function deleteQtNghiViecGroupPageMa(ma, shcc, done) {
+export function createQtNghiViecGroupPageMa(data, done) {
     return dispatch => {
-        const url = '/api/staff/qua-trinh/nghi-viec';
+        const url = '/api/qua-trinh/nghi-viec';
+        T.post(url, { data }, res => {
+            if (res.error) {
+                T.notify('Tạo nghỉ việc bị lỗi!', 'danger');
+                console.error(`POST: ${url}.`, res.error);
+            } else {
+                if (done) {
+                    T.notify('Tạo nghỉ việc thành công!', 'success');
+                    dispatch(getQtNghiViecPage());
+                    done && done(data);
+                }
+            }
+        }, () => T.notify('Tạo nghỉ việc bị lỗi!', 'danger'));
+    };
+}
+
+export function deleteQtNghiViecGroupPageMa(ma, done) {
+    return dispatch => {
+        const url = '/api/qua-trinh/nghi-viec';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa thông tin nghỉ việc bị lỗi', 'danger');
@@ -138,7 +140,7 @@ export function deleteQtNghiViecGroupPageMa(ma, shcc, done) {
             } else {
                 T.alert('Thông tin nghỉ việc được xóa thành công!', 'info', false, 800);
                 done && done(data.item);
-                dispatch(getQtNghiViecGroupPageMa(undefined, undefined, '-1', shcc));
+                dispatch(getQtNghiViecPage());
             }
         }, () => T.notify('Xóa thông tin nghỉ việc bị lỗi', 'danger'));
     };
@@ -146,7 +148,7 @@ export function deleteQtNghiViecGroupPageMa(ma, shcc, done) {
 
 export function createQtNghiViecStaff(data, done, isEdit = null) {
     return dispatch => {
-        const url = '/api/staff/qua-trinh/nghi-viec';
+        const url = '/api/qua-trinh/nghi-viec';
         T.post(url, { data }, res => {
             if (res.error) {
                 T.notify('Thêm thông tin nghỉ việc bị lỗi', 'danger');
@@ -170,7 +172,7 @@ export function createQtNghiViecStaff(data, done, isEdit = null) {
 
 export function updateQtNghiViecStaff(ma, changes, done, isEdit = null) {
     return dispatch => {
-        const url = '/api/staff/qua-trinh/nghi-viec';
+        const url = '/api/qua-trinh/nghi-viec';
         T.put(url, { ma, changes }, data => {
             if (data.error) {
                 T.notify('Cập nhật thông tin nghỉ việc bị lỗi', 'danger');
@@ -186,7 +188,7 @@ export function updateQtNghiViecStaff(ma, changes, done, isEdit = null) {
 
 export function deleteQtNghiViecStaff(ma, isEdit, shcc = null) {
     return dispatch => {
-        const url = '/api/staff/qua-trinh/nghi-viec';
+        const url = '/api/qua-trinh/nghi-viec';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa thông tin nghỉ việc bị lỗi', 'danger');

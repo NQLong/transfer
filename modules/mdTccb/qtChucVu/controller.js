@@ -12,31 +12,21 @@ module.exports = app => {
     );
     app.get('/user/tccb/qua-trinh/chuc-vu/:stt', app.permission.check('qtChucVu:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/chuc-vu', app.permission.check('qtChucVu:read'), app.templates.admin);
-
+    app.get('/user/tccb/qua-trinh/chuc-vu/group/:shcc', app.permission.check('qtChucVu:read'), app.templates.admin);
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
 
     app.get('/api/tccb/qua-trinh/chuc-vu/page/:pageNumber/:pageSize', app.permission.check('qtChucVu:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        let arr = req.query.parameter;
-        if (!Array.isArray(arr)) arr = [];
-        let loaiDoiTuong = '-1';
-        if (arr.length > 0) {
-            loaiDoiTuong = '(';
-            for (let idx = 0; idx < arr.length; idx++) {
-                if (typeof arr[idx] == 'string') loaiDoiTuong += '\'' + arr[idx] + '\'';
-                else loaiDoiTuong += '\'' + arr[idx].toString() + '\'';
-                if (idx != arr.length - 1) loaiDoiTuong += ',';
-            }
-            loaiDoiTuong += ')';
-        }
-        app.model.qtChucVu.searchPage(pageNumber, pageSize, loaiDoiTuong, searchTerm, (error, page) => {
+        const { fromYear, toYear, list_shcc, list_dv, timeType, list_cv } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, list_cv: null };
+        app.model.qtChucVu.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, timeType, list_cv, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
                 const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
-                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, list } });
+                const pageCondition = searchTerm;
+                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
             }
         });
     });
@@ -45,59 +35,31 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        let arr = req.query.parameter;
-        if (!Array.isArray(arr)) arr = [];
-        let loaiDoiTuong = '-1';
-        if (arr.length > 0) {
-            loaiDoiTuong = '(';
-            for (let idx = 0; idx < arr.length; idx++) {
-                if (typeof arr[idx] == 'string') loaiDoiTuong += '\'' + arr[idx] + '\'';
-                else loaiDoiTuong += '\'' + arr[idx].toString() + '\'';
-                if (idx != arr.length - 1) loaiDoiTuong += ',';
-            }
-            loaiDoiTuong += ')';
-        }
-        app.model.qtChucVu.groupPage(pageNumber, pageSize, loaiDoiTuong, searchTerm, (error, page) => {
+        const { fromYear, toYear, list_shcc, list_dv, timeType, list_cv } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, list_cv: null };
+        app.model.qtChucVu.groupPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, timeType, list_cv, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
                 const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
-                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, list } });
+                const pageCondition = searchTerm;
+                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
             }
         });
     });
 
-    app.get('/api/tccb/qua-trinh/chuc-vu/group_cv/page/:loaiDoiTuong/:pageNumber/:pageSize', app.permission.check('qtChucVu:read'), (req, res) => {
-        const pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize),
-            loaiDoiTuong = req.params.loaiDoiTuong,
-            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        app.model.qtChucVu.groupPageMa(pageNumber, pageSize, loaiDoiTuong, searchTerm, (error, page) => {
-            if (error || page == null) {
-                res.send({ error });
-            } else {
-                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
-                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, list } });
-            }
-        });
-    });
     app.get('/api/tccb/qua-trinh/chuc-vu/all', app.permission.check('qtChucVu:read'), (req, res) => {
-        let condition = { statement: null };
-        if (req.query.shcc) {
-            condition = {
-                statement: 'shcc = :searchText',
-                parameter: { searchText: req.query.shcc },
-            };
-        }
-        app.model.qtChucVu.getAll(condition, (error, items) => res.send({ error, items }));
+        app.model.qtChucVu.getByShcc(req.query.shcc, (error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/tccb/qua-trinh/chuc-vu/item/:stt', app.permission.check('qtChucVu:read'), (req, res) => {
-        app.model.qtChucVu.get({ stt: req.params.stt }, (error, item) => res.send({ error, item }));
-    });
 
-    app.post('/api/tccb/qua-trinh/chuc-vu', app.permission.check('qtChucVu:write'), (req, res) =>
-        app.model.qtChucVu.create(req.body.items, (error, item) => res.send({ error, item })));
+    // app.get('/api/tccb/qua-trinh/chuc-vu/all', app.permission.check('qtChucVu:read'), (req, res) => {
+    //     app.model.qtChucVu.getAll((error, items) => res.send({ error, items }));
+    // });
+
+    app.post('/api/tccb/qua-trinh/chuc-vu', app.permission.check('qtChucVu:write'), (req, res) => {
+        app.model.qtChucVu.create(req.body.data, (error, item) => res.send({ error, item }));
+    });
+    
 
     app.put('/api/tccb/qua-trinh/chuc-vu', app.permission.check('qtChucVu:write'), (req, res) =>
         app.model.qtChucVu.update({ stt: req.body.stt }, req.body.changes, (error, item) => res.send({ error, item })));

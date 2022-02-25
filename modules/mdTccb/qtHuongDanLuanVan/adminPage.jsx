@@ -59,14 +59,14 @@ class EditModal extends AdminModal {
                     bacDaoTao: this.bacDaoTao.value(),
                 };
                 if (index == list_ma.length - 1) {
-                    this.state.id ? this.props.update(this.state.id, changes, this.hide, false) : this.props.create(changes, this.hide, false);
+                    this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
                     this.setState({
                         id: ''
                     });
                     this.shcc.reset();
                 }
                 else {
-                    this.state.id ? this.props.update(this.state.id, changes, null, false) : this.props.create(changes, null, false);
+                    this.state.id ? this.props.update(this.state.id, changes, null) : this.props.create(changes, null);
                 }
             });
         }
@@ -78,10 +78,10 @@ class EditModal extends AdminModal {
             title: this.state.id ? 'Cập nhật quá trình hướng dẫn luận văn' : 'Tạo mới quá trình hướng dẫn luận văn',
             size: 'large',
             body: <div className='row'>
-                <FormSelect type='text' className='col-md-12' multiple={this.multiple} ref={e => this.shcc = e} data={SelectAdapter_FwCanBo} label='Cán bộ' readOnly={this.state.id ? true : false} required/>
+                <FormSelect type='text' className='col-md-12' multiple={this.multiple} ref={e => this.shcc = e} data={SelectAdapter_FwCanBo} label='Cán bộ' readOnly={this.state.id ? true : false} required />
                 <FormTextBox type='text' className='col-md-12' ref={e => this.hoTen = e} label='Danh sách họ tên sinh viên, học viên' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-12' ref={e => this.tenLuanVan = e} label='Tên luận văn' readOnly={readOnly} required />
-                <FormTextBox className='col-md-4' ref={e => this.namTotNghiep = e} label='Năm tốt nghiệp (yyyy)' type='year' readOnly={false} required />
+                <FormTextBox className='col-md-4' ref={e => this.namTotNghiep = e} label='Năm tốt nghiệp (yyyy)' type='year' readOnly={readOnly} required />
                 <FormTextBox type='text' className='col-md-4' ref={e => this.sanPham = e} label='Sản phẩm' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-4' ref={e => this.bacDaoTao = e} label='Bậc hướng dẫn luận văn' readOnly={readOnly} />
             </div>
@@ -94,6 +94,7 @@ class QtHuongDanLuanVan extends AdminPage {
     state = { filter: {} };
     componentDidMount() {
         T.ready('/user/tccb', () => {
+            T.clearSearchBox();
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
                 this.fromYear?.value('');
@@ -104,10 +105,8 @@ class QtHuongDanLuanVan extends AdminPage {
             });
             if (this.checked) {
                 this.hienThiTheoCanBo.value(true);
-                this.props.getQtHuongDanLuanVanGroupPage();
-            } else {
-                this.props.getQtHuongDanLuanVanPage();
             }
+            this.getPage();
             this.changeAdvancedSearch(true);
         });
     }
@@ -152,7 +151,7 @@ class QtHuongDanLuanVan extends AdminPage {
     }
 
     list = (text, i, j) => {
-        if (!text) return '';
+        if (!text) return [];
         let deTais = text.split('??').map(str => <p key={i--} style={{ textTransform: 'uppercase' }}>{j - i}. {str}</p>);
         return deTais;
     }
@@ -160,7 +159,7 @@ class QtHuongDanLuanVan extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa hướng dẫn luận văn', 'Bạn có chắc bạn muốn xóa hướng dẫn luận văn này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtHuongDanLuanVanStaff(item.id, false, null, error => {
+            isConfirm && this.props.deleteQtHuongDanLuanVanStaff(item.id, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá hướng dẫn luận văn bị lỗi!', 'danger');
                 else T.alert('Xoá hướng dẫn luận văn thành công!', 'success', false, 800);
             });
@@ -174,6 +173,15 @@ class QtHuongDanLuanVan extends AdminPage {
             this.props.qtHuongDanLuanVan && this.props.qtHuongDanLuanVan.page_gr ?
                 this.props.qtHuongDanLuanVan.page_gr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
             : (this.props.qtHuongDanLuanVan && this.props.qtHuongDanLuanVan.page ? this.props.qtHuongDanLuanVan.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] });
+        if (this.checked && list && list.length > 0) {
+            let list_filter = [];
+            list.forEach(item => {
+                if (item.soDeTai > 0) {
+                    list_filter.push(item);
+                }
+            });
+            list = list_filter;
+        }
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -182,19 +190,19 @@ class QtHuongDanLuanVan extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số đề tài hướng dẫn</th> }
-                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Họ tên sinh viên</th> }
-                        {this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Danh sách sinh viên</th> }
-                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tên luận văn</th> }
-                        {this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Danh sách luận văn</th> }
-                        {!this.checked && <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Năm tốt nghiệp</th> }
-                        {!this.checked &&  <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Bậc đào tạo</th> } 
+                        {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số đề tài hướng dẫn</th>}
+                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Họ tên sinh viên</th>}
+                        {this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Danh sách sinh viên</th>}
+                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tên luận văn</th>}
+                        {this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Danh sách luận văn</th>}
+                        {!this.checked && <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Năm tốt nghiệp</th>}
+                        {!this.checked && <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Bậc đào tạo</th>}
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{(item.hoCanBo ? item.hoCanBo : '') + ' ' + (item.tenCanBo ? item.tenCanBo : '')}</span><br />
@@ -202,16 +210,16 @@ class QtHuongDanLuanVan extends AdminPage {
                             </>
                         )}
                         />
-                        {this.checked && <TableCell type='text' content={item.soDeTai} /> }
-                        {!this.checked && <TableCell type='text' content={item.hoTen} /> }
-                        {this.checked && <TableCell type='text' content={this.list(item.danhSachHoTen, item.soDeTai, item.soDeTai)} /> }
+                        {this.checked && <TableCell type='text' content={item.soDeTai} />}
+                        {!this.checked && <TableCell type='text' content={item.hoTen} />}
+                        {this.checked && <TableCell type='text' content={this.list(item.danhSachHoTen, item.soDeTai, item.soDeTai)} />}
                         {!this.checked && <TableCell type='text' style={{}} content={<>
                             <span><i>{item.tenLuanVan}</i></span><br />
                             {item.sanPham ? <span>Sản phẩm: {item.sanPham ? item.sanPham : ''}</span> : null}
-                        </>} /> }
-                        {this.checked && <TableCell type='text' content={this.list(item.danhSachDeTai, item.soDeTai, item.soDeTai)} /> }
-                        {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.namTotNghiep} /> }
-                        {!this.checked && <TableCell type='text' content={item.bacDaoTao} style={{ whiteSpace: 'nowrap' }} /> }
+                        </>} />}
+                        {this.checked && <TableCell type='text' content={this.list(item.danhSachDeTai, item.soDeTai, item.soDeTai)} />}
+                        {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.namTotNghiep} />}
+                        {!this.checked && <TableCell type='text' content={item.bacDaoTao} style={{ whiteSpace: 'nowrap' }} />}
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                                 onEdit={() => this.modal.show(item, false)} onDelete={this.delete} >
@@ -239,9 +247,9 @@ class QtHuongDanLuanVan extends AdminPage {
             advanceSearch: <>
                 <div className='row'>
                     <FormTextBox className='col-md-3' ref={e => this.fromYear = e} label='Từ năm (năm tốt nghiệp)' type='year' onChange={() => this.changeAdvancedSearch()} />
-                    <FormTextBox className='col-md-3' ref={e => this.toYear = e} label='Đến năm (năm tốt nghiệp))' type='year' onChange={() => this.changeAdvancedSearch()} /> 
-                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1}/>
-                    <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1}/>
+                    <FormTextBox className='col-md-3' ref={e => this.toYear = e} label='Đến năm (năm tốt nghiệp))' type='year' onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
                 </div>
             </>,
             content: <>
@@ -263,7 +271,7 @@ class QtHuongDanLuanVan extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtHuongDanLuanVan: state.qtHuongDanLuanVan });
+const mapStateToProps = state => ({ system: state.system, qtHuongDanLuanVan: state.tccb.qtHuongDanLuanVan });
 const mapActionsToProps = {
     getQtHuongDanLuanVanPage, deleteQtHuongDanLuanVanStaff, createQtHuongDanLuanVanStaff,
     updateQtHuongDanLuanVanStaff, getQtHuongDanLuanVanGroupPage,

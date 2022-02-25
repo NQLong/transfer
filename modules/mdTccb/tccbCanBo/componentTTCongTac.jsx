@@ -15,7 +15,6 @@ class ComponentTTCongTac extends AdminPage {
     state = { doiTuongBoiDuong: false, tinhTrangBoiDuong: false, dangONuocNgoai: false, dangNghiTheoCheDo: false, daNghi: false };
 
     value = (item) => {
-        console.log(item);
         this.setState({
             doiTuongBoiDuong: item.doiTuongBoiDuongKienThucQpan, tinhTrangBoiDuong: item.tinhTrangBoiDuong,
             dangONuocNgoai: item.dangONuocNgoai, dangNghiTheoCheDo: item.dangNghiTheoCheDo, daNghi: item.daNghi
@@ -131,10 +130,10 @@ class ComponentTTCongTac extends AdminPage {
             <div className='tile'>
                 <h3 className='tile-title'>Thông tin công tác</h3>
                 <div className='tile-body row'>
-                    <FormTextBox className='col-md-6' ref={e => this.ngheNghiepCu = e} label='Nghề nghiệp trước khi tuyển dụng' readOnly={this.props.userEdit} />
-                    <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayBatDauCongTac = e} label='Ngày bắt đầu công tác tại trường' readOnly={this.props.userEdit} />
-                    <FormDatePicker type='date-mask' className='col-md-4' ref={e => this.ngayBienChe = e} label='Ngày vào biên chế' readOnly={this.props.userEdit} />
-                    <FormSelect data={SelectAdapter_DmDonVi} className='col-md-8' ref={e => this.donViTuyenDung = e} label='Đơn vị ban hành Quyết định tuyển dụng' readOnly={this.props.userEdit} />
+                    <FormTextBox className='col-md-6' ref={e => this.ngheNghiepCu = e} label='Nghề nghiệp trước khi tuyển dụng' />
+                    <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayBatDauCongTac = e} label='Ngày bắt đầu công tác tại trường' />
+                    <FormDatePicker type='date-mask' className='col-md-4' ref={e => this.ngayBienChe = e} label='Ngày vào biên chế' />
+                    <FormSelect data={SelectAdapter_DmDonVi} className='col-md-8' ref={e => this.donViTuyenDung = e} label='Đơn vị ban hành Quyết định tuyển dụng' />
                     <FormSelect data={SelectAdapter_DmNgachCdnnV2} className='col-md-4' ref={e => this.ngach = e} label='Chức danh nghề nghiệp' readOnly={this.props.userEdit} />
                     <FormSelect data={SelectAdapter_DmDienHopDongV2} className='col-md-4' ref={e => this.dienHopDong = e} label='Diện hợp đồng' readOnly={this.props.userEdit} />
                     <FormSelect data={SelectAdapter_DmLoaiHopDongV2} className='col-md-4' ref={e => this.loaiHopDong = e} label='Loại hợp đồng' readOnly={this.props.userEdit} />
@@ -189,7 +188,7 @@ class ComponentTTCongTac extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ staff: state.staff, system: state.system });
+const mapStateToProps = state => ({ staff: state.tccb.staff, system: state.system });
 const mapActionsToProps = {
     getStaffEdit
 };

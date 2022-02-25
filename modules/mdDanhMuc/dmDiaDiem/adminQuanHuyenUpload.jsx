@@ -288,6 +288,6 @@ class DmQuanHuyenUploadPage extends React.Component {
 	}
 }
 
-const mapStateToProps = state => ({ system: state.system, dmQuanHuyen: state.dmQuanHuyen, dmTinhThanhPho: state.dmTinhThanhPho });
+const mapStateToProps = state => ({ system: state.system, dmQuanHuyen: state.danhMuc.dmQuanHuyen, dmTinhThanhPho: state.danhMuc.dmTinhThanhPho });
 const mapActionsToProps = { getDmQuanHuyenAll, getDmQuanHuyenPage, getDMTinhThanhPhoAll, deleteDmQuanHuyen, createDmQuanHuyen, updateDmQuanHuyen, createDmQuanHuyenByUpload };
 export default connect(mapStateToProps, mapActionsToProps)(DmQuanHuyenUploadPage);

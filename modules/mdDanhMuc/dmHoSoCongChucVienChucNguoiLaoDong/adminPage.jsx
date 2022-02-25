@@ -240,6 +240,6 @@ class DmHoSoCcvcNldPage extends React.Component {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, dmHoSoCcvcNld: state.dmHoSoCcvcNld });
+const mapStateToProps = state => ({ system: state.system, dmHoSoCcvcNld: state.danhMuc.dmHoSoCcvcNld });
 const mapActionsToProps = { getDmHoSoCcvcNldAll, deleteDmHoSoCcvcNld, createDmHoSoCcvcNld, updateDmHoSoCcvcNld };
 export default connect(mapStateToProps, mapActionsToProps)(DmHoSoCcvcNldPage);

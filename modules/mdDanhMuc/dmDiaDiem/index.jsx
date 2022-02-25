@@ -7,7 +7,8 @@ import dmPhuongXa from './reduxPhuongXa';
 
 export default {
     redux: {
-        dmTinhThanhPho, dmQuanHuyen, dmPhuongXa,
+        parent: 'danhMuc',
+        reducers: { dmTinhThanhPho, dmQuanHuyen, dmPhuongXa }
     },
     routes: [
         {

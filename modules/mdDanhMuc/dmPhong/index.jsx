@@ -5,7 +5,8 @@ import dmPhong from './redux';
 
 export default {
     redux: {
-        dmPhong,
+        parent: 'danhMuc',
+        reducers: {  dmPhong }
     },
     routes: [
         {

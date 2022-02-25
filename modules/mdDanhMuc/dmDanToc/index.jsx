@@ -5,7 +5,8 @@ import dmDanToc from './redux';
 
 export default {
     redux: {
-        dmDanToc,
+        parent: 'danhMuc',
+        reducers: { dmDanToc, }
     },
     routes: [
         {

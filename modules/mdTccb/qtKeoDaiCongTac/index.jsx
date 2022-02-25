@@ -5,16 +5,21 @@ import qtKeoDaiCongTac from './redux';
 
 export default {
     redux: {
-        qtKeoDaiCongTac,
+        parent: 'tccb',
+        reducers: { qtKeoDaiCongTac }
     },
     routes: [
+        {
+            path: '/user/tccb/qua-trinh/keo-dai-cong-tac/:shcc',
+            component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
+        },
         {
             path: '/user/tccb/qua-trinh/keo-dai-cong-tac',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
         {
-            path: '/user/tccb/qua-trinh/keo-dai-cong-tac/:shcc',
-            component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
+            path: '/user/keo-dai-cong-tac',
+            component: Loadable({ loading: Loading, loader: () => import('./staffPage') })
         },
     ],
 };

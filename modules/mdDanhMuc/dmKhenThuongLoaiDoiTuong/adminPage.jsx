@@ -125,7 +125,7 @@ class DmKhenThuongLoaiDoiTuongPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, dmKhenThuongLoaiDoiTuong: state.dmKhenThuongLoaiDoiTuong });
+const mapStateToProps = state => ({ system: state.system, dmKhenThuongLoaiDoiTuong: state.danhMuc.dmKhenThuongLoaiDoiTuong });
 const mapActionsToProps = {getDmKhenThuongLoaiDoiTuongPage, createDmKhenThuongLoaiDoiTuong, 
      updateDmKhenThuongLoaiDoiTuong, 
     deleteDmKhenThuongLoaiDoiTuong };

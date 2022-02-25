@@ -122,6 +122,6 @@ class DmMucDichNuocNgoaiPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, dmMucDichNuocNgoai: state.dmMucDichNuocNgoai });
+const mapStateToProps = state => ({ system: state.system, dmMucDichNuocNgoai: state.danhMuc.dmMucDichNuocNgoai });
 const mapActionsToProps = { getDmMucDichNuocNgoaiAll, deleteDmMucDichNuocNgoai, createDmMucDichNuocNgoai, updateDmMucDichNuocNgoai };
 export default connect(mapStateToProps, mapActionsToProps)(DmMucDichNuocNgoaiPage);

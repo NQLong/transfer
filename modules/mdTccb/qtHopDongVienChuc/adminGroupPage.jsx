@@ -5,7 +5,7 @@ import { AdminPage, TableCell, renderTable } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
     getQtHopDongVienChucPage, getQtHopDongVienChucAll, updateQtHopDongVienChuc,
-    deleteQtHopDongVienChuc, createQtHopDongVienChuc, getQtHopDongVienChucShccPage, downloadWord
+    deleteQtHopDongVienChuc, createQtHopDongVienChuc, downloadWord
 } from './redux';
 
 class QtHopDongVienChucGroupPage extends AdminPage {
@@ -14,9 +14,14 @@ class QtHopDongVienChucGroupPage extends AdminPage {
         T.ready('/user/tccb', () => {
             const route = T.routeMatcher('/user/tccb/qua-trinh/hop-dong-vien-chuc/group/:shcc'),
                 shcc = route.parse(window.location.pathname);
-            T.onSearch = (searchText) => this.props.getQtHopDongVienChucPage(undefined, undefined, searchText || '');
+            T.onSearch = (searchText) => {
+                this.props.getQtHopDongVienChucPage(undefined, undefined, searchText || '', shcc.shcc);
+            };
             T.showSearchBox();
-            this.props.getQtHopDongVienChucShccPage(undefined, undefined, shcc.shcc);
+            this.setState({ shcc: shcc.shcc });
+            this.props.getQtHopDongVienChucPage(undefined, undefined, shcc.shcc, () => {
+                T.updatePage('pageQtHopDongVienChuc', undefined, undefined, '');
+            });
         });
     }
 
@@ -56,7 +61,7 @@ class QtHopDongVienChucGroupPage extends AdminPage {
             ),
             renderRow: (item, index) => (
                 <tr key={index}>
-                    <TableCell type='text' content={index + 1} />
+                    <TableCell type='text' content={(pageNumber - 1) * pageSize + index + 1} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                         <>
                             <a href={'/user/tccb/qua-trinh/hop-dong-vien-chuc/' + item.ma}>
@@ -123,9 +128,9 @@ class QtHopDongVienChucGroupPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtHopDongVienChuc: state.qtHopDongVienChuc });
+const mapStateToProps = state => ({ system: state.system, qtHopDongVienChuc: state.tccb.qtHopDongVienChuc });
 const mapActionsToProps = {
     getQtHopDongVienChucAll, getQtHopDongVienChucPage, deleteQtHopDongVienChuc, createQtHopDongVienChuc,
-    updateQtHopDongVienChuc, getQtHopDongVienChucShccPage, downloadWord
+    updateQtHopDongVienChuc, downloadWord
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtHopDongVienChucGroupPage);

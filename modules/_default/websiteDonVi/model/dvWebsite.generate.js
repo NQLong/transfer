@@ -1,6 +1,6 @@
-// Table name: DV_WEBSITE { id, shortname, kichHoat, website, maDonVi, image, header, headerLink, headerTitle, showHeaderTitle, phoneNumber, address, email, headerMobile }
+// Table name: DV_WEBSITE { id, shortname, kichHoat, website, maDonVi, image, header, headerLink, headerTitle, showHeaderTitle, phoneNumber, address, email, headerMobile, otherWebAddress }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'shortname': 'SHORTNAME', 'kichHoat': 'KICH_HOAT', 'website': 'WEBSITE', 'maDonVi': 'MA_DON_VI', 'image': 'IMAGE', 'header': 'HEADER', 'headerLink': 'HEADER_LINK', 'headerTitle': 'HEADER_TITLE', 'showHeaderTitle': 'SHOW_HEADER_TITLE', 'phoneNumber': 'PHONE_NUMBER', 'address': 'ADDRESS', 'email': 'EMAIL', 'headerMobile': 'HEADER_MOBILE' };
+const obj2Db = { 'id': 'ID', 'shortname': 'SHORTNAME', 'kichHoat': 'KICH_HOAT', 'website': 'WEBSITE', 'maDonVi': 'MA_DON_VI', 'image': 'IMAGE', 'header': 'HEADER', 'headerLink': 'HEADER_LINK', 'headerTitle': 'HEADER_TITLE', 'showHeaderTitle': 'SHOW_HEADER_TITLE', 'phoneNumber': 'PHONE_NUMBER', 'address': 'ADDRESS', 'email': 'EMAIL', 'headerMobile': 'HEADER_MOBILE', 'otherWebAddress': 'OTHER_WEB_ADDRESS' };
 
 module.exports = app => {
     app.model.dvWebsite = {

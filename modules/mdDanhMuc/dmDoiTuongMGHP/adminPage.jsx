@@ -208,6 +208,6 @@ class AdminPage extends React.Component {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, dmDoiTuongMghp: state.dmDoiTuongMghp });
+const mapStateToProps = state => ({ system: state.system, dmDoiTuongMghp: state.danhMuc.dmDoiTuongMghp });
 const mapActionsToProps = { getDmDoiTuongMghpAll, createDmDoiTuongMghp, updateDmDoiTuongMghp, deleteDmDoiTuongMghp };
 export default connect(mapStateToProps, mapActionsToProps)(AdminPage);

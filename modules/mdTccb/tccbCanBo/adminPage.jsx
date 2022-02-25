@@ -65,8 +65,6 @@ class StaffPage extends AdminPage {
     };
 
     render() {
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permissionWrite = currentPermissions.includes('staff:write');
         const permission = this.getUserPermission('staff');
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.staff && this.props.staff.page ?
             this.props.staff.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
@@ -87,8 +85,8 @@ class StaffPage extends AdminPage {
                     <TableCell type='text' content={<>
                         <span>{`${item.ho} ${item.ten}`}</span><br />
                         <i>{item.email}</i>
-                        </>} style={{ whiteSpace: 'nowrap' }} />
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap'}} content={
+                    </>} style={{ whiteSpace: 'nowrap' }} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
                         <>
                             <span>{item.maDonVi ? this.dvMapper[item.maDonVi] : null}</span>
                         </>} />
@@ -110,17 +108,9 @@ class StaffPage extends AdminPage {
             </>,
             content: <>
                 <div className='tile'>
-                    {/* <div>
-                        <FormCheckbox style={{ display: 'inline-flex', width: '100%', margin: 0 }} ref={e => this.kichHoat = e} label='Cán bộ thiếu email' isSwitch={true} readOnly={false}
-                            onChange={value => this.changeKichHoat(value ? 1 : 0)} />
-                    </div> */}
                     {!this.state.searching ? table : <OverlayLoading text='Đang tải..' />}
                     <Pagination style={{ marginLeft: '70px' }} name={PageName} pageNumber={pageNumber} pageSize={pageSize} pageTotal={pageTotal} totalItem={totalItem} pageCondition={pageCondition}
                         getPage={this.getPage} />
-                    {permissionWrite && (
-                        <Link to='/user/tccb/staff/item/upload' className='btn btn-success btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px' }} >
-                            <i className='fa fa-lg fa-cloud-upload' />
-                        </Link>)}
                 </div>
             </>,
             backRoute: '/user/tccb',
@@ -129,6 +119,6 @@ class StaffPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, staff: state.staff });
+const mapStateToProps = state => ({ system: state.system, staff: state.tccb.staff });
 const mapActionsToProps = { getStaffPage, deleteStaff, getDmDonViAll };
 export default connect(mapStateToProps, mapActionsToProps)(StaffPage);

@@ -5,7 +5,7 @@ import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox,
 import Pagination from 'view/component/Pagination';
 import {
     updateQtGiaiThuongGroupPageMa, deleteQtGiaiThuongGroupPageMa,
-    createQtGiaiThuongGroupPageMa, getQtGiaiThuongPage,
+    createQtGiaiThuongGroupPageMa, getQtGiaiThuongGroupPageMa,
 } from './redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 
@@ -76,6 +76,7 @@ class QtGiaiThuongGroupPage extends AdminPage {
 
     componentDidMount() {
         T.ready('/user/tccb', () => {
+            T.clearSearchBox();
             const route = T.routeMatcher('/user/tccb/qua-trinh/giai-thuong/group/:shcc'),
                 params = route.parse(window.location.pathname);
             this.shcc = params.shcc;
@@ -87,14 +88,12 @@ class QtGiaiThuongGroupPage extends AdminPage {
                 this.toYear?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
-            this.props.getQtGiaiThuongPage(undefined, undefined, undefined, this.state.filter, () => {
-                T.updatePage('pageQtGiaiThuong', undefined, undefined, undefined, this.state.filter);
-            });
+            this.getPage();
         });
     }
 
     changeAdvancedSearch = (isInitial = false) => {
-        let { pageNumber, pageSize } = this.props && this.props.qtGiaiThuong && this.props.qtGiaiThuong.page ? this.props.qtGiaiThuong.page : { pageNumber: 1, pageSize: 50 };
+        let { pageNumber, pageSize } = this.props && this.props.qtGiaiThuong && this.props.qtGiaiThuong.page_ma ? this.props.qtGiaiThuong.page_ma : { pageNumber: 1, pageSize: 50 };
         const fromYear = this.fromYear?.value() == '' ? null : Number(this.fromYear?.value());
         const toYear = this.toYear?.value() == '' ? null : Number(this.toYear?.value());
         const list_dv = this.state.filter.list_dv;
@@ -114,7 +113,7 @@ class QtGiaiThuongGroupPage extends AdminPage {
     }
 
     getPage = (pageN, pageS, pageC, done) => {
-        this.props.getQtGiaiThuongPage(pageN, pageS, pageC, this.state.filter, done);
+        this.props.getQtGiaiThuongGroupPageMa(pageN, pageS, pageC, this.state.filter, done);
     }
 
     showModal = (e) => {
@@ -135,7 +134,7 @@ class QtGiaiThuongGroupPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('qtGiaiThuong', ['read', 'write', 'delete']);
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtGiaiThuong && this.props.qtGiaiThuong.page ? this.props.qtGiaiThuong.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtGiaiThuong && this.props.qtGiaiThuong.page_ma ? this.props.qtGiaiThuong.page_ma : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -150,7 +149,7 @@ class QtGiaiThuongGroupPage extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='text' content={(
                             <>
                                 <span><b>{item.tenGiaiThuong}</b></span> <br />
@@ -190,7 +189,7 @@ class QtGiaiThuongGroupPage extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    <FormTextBox className='col-md-3' ref={e => this.fromYear = e} label='Từ năm đạt giải(yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
+                    <FormTextBox className='col-md-3' ref={e => this.fromYear = e} label='Từ năm đạt giải (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
                     <FormTextBox className='col-md-3' ref={e => this.toYear = e} label='Đến năm đạt giải (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
                 </div>
             </>,
@@ -211,9 +210,9 @@ class QtGiaiThuongGroupPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtGiaiThuong: state.qtGiaiThuong });
+const mapStateToProps = state => ({ system: state.system, qtGiaiThuong: state.tccb.qtGiaiThuong });
 const mapActionsToProps = {
     updateQtGiaiThuongGroupPageMa, deleteQtGiaiThuongGroupPageMa,
-    createQtGiaiThuongGroupPageMa, getQtGiaiThuongPage,
+    createQtGiaiThuongGroupPageMa, getQtGiaiThuongGroupPageMa,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtGiaiThuongGroupPage);

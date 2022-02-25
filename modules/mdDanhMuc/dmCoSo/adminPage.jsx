@@ -162,6 +162,6 @@ class DmCoSoPage extends AdminPage {
 
 }
 
-const mapStateToProps = state => ({ system: state.system, dmCoSo: state.dmCoSo });
+const mapStateToProps = state => ({ system: state.system, dmCoSo: state.danhMuc.dmCoSo });
 const mapActionsToProps = { getDmCoSoAll, createDmCoSo, updateDmCoSo, deleteDmCoSo };
 export default connect(mapStateToProps, mapActionsToProps)(DmCoSoPage);

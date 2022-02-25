@@ -133,6 +133,6 @@ class DmTapChiPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, dmTapChi: state.dmTapChi });
+const mapStateToProps = state => ({ system: state.system, dmTapChi: state.danhMuc.dmTapChi });
 const mapActionsToProps = { getDmTapChiPage, getDmTapChiAll, deleteDmTapChi, createDmTapChi, updateDmTapChi };
 export default connect(mapStateToProps, mapActionsToProps)(DmTapChiPage);

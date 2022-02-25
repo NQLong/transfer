@@ -227,6 +227,6 @@ class DmChuongTrinhDaoTaoPage extends React.Component {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, dmChuongTrinhDaoTao: state.dmChuongTrinhDaoTao });
+const mapStateToProps = state => ({ system: state.system, dmChuongTrinhDaoTao: state.danhMuc.dmChuongTrinhDaoTao });
 const mapActionsToProps = { getDmChuongTrinhDaoTaoPage, createDmChuongTrinhDaoTao, updateDmChuongTrinhDaoTao, deleteDmChuongTrinhDaoTao };
 export default connect(mapStateToProps, mapActionsToProps)(DmChuongTrinhDaoTaoPage);

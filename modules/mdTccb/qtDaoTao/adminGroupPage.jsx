@@ -198,7 +198,7 @@ class QtDaoTaoGroupPage extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{(item.hoCanBo ? item.hoCanBo : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo : ' ')}</span><br />
@@ -251,7 +251,7 @@ class QtDaoTaoGroupPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtDaoTao: state.qtDaoTao });
+const mapStateToProps = state => ({ system: state.system, qtDaoTao: state.tccb.qtDaoTao });
 const mapActionsToProps = {
     deleteQtDaoTao, updateQtDaoTao,
     getQtDaoTaoPage

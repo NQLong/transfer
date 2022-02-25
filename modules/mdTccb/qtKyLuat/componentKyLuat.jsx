@@ -79,10 +79,10 @@ class EditModal extends AdminModal {
             T.notify('Hình thức kỷ luật trống', 'danger');
             this.lyDoHinhThuc.focus();
         } else if (!changes.batDau) {
-            T.notify('Thời gian bắt đầu bị trống!', 'danger');
+            T.notify('Thời gian bắt đầu trống!', 'danger');
             this.batDau.focus();
         } else if (!changes.capQuyetDinh) {
-            T.notify('Cấp quyết định bị trống!', 'danger');
+            T.notify('Cấp quyết định trống!', 'danger');
             this.capQuyetDinh.focus();
         }
         else {
@@ -220,7 +220,7 @@ class ComponentKyLuat extends AdminPage {
         );
     }
 }
-const mapStateToProps = state => ({ system: state.system, staff: state.staff });
+const mapStateToProps = state => ({ system: state.system, staff: state.tccb.staff });
 const mapActionsToProps = {
     createQtKyLuatStaff, createQtKyLuatStaffUser, updateQtKyLuatStaff, 
     updateQtKyLuatStaffUser, deleteQtKyLuatStaff, deleteQtKyLuatStaffUser

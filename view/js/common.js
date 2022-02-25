@@ -297,7 +297,9 @@ T.socket = T.debug ? io() : io.connect(T.rootUrl, { secure: true });
 T.language = texts => {
     let lg = window.location.pathname.includes('/en')
         || window.location.pathname.includes('/news-en')
+        || window.location.pathname.includes('/nvduc/de')
         || window.location.pathname.includes('/article') ? 'en' : 'vi';
+
     if (lg == null || (lg != 'vi' && lg != 'en')) lg = 'vi';
     return texts ? (texts[lg] ? texts[lg] : '') : lg;
 };
@@ -331,6 +333,7 @@ T.language.getMonth = () => ({
 
 
 T.get2 = x => ('0' + x).slice(-2);
+
 T.socket.on('connect', () => {
     if (T.connected === 0) {
         T.connected = true;
@@ -345,6 +348,33 @@ if (T.debug) {
     T.socket.on('debug', type => (type === 'reload') && location.reload());
 }
 
+const getOracleErrorMessage = errorNum => {
+    if (Number.isInteger(errorNum)) {
+        switch (errorNum) {
+            case 1:
+                return 'ORA-00001: Unique constraint violated.';
+            case 904:
+                return 'ORA-00904: Invalid identifier.';
+            case 942:
+                return 'ORA-00942: Table or view does not exist.';
+            case 1438:
+                return 'ORA-01438: Value larger than specified precision allows for this column.';
+            case 1722:
+                return 'ORA-01722: Invalid number.';
+            case 3113:
+                return 'ORA-03113: End-of-file on communication channel';
+            case 3114:
+                return 'ORA-03114: Not Connected to Oracle';
+            case 6550:
+                return 'ORA-06550: Invalid block of PL/SQL code';
+            case 12899:
+                return 'ORA-12899: Value too large';
+            default:
+                return 'ORA-' + errorNum;
+        }
+    } else return null;
+};
+
 ['get', 'post', 'put', 'delete'].forEach(method => T[method] = (url, data, success, error) => {
     if (typeof data === 'function') {
         error = success;
@@ -354,10 +384,35 @@ if (T.debug) {
         url: T.url(url),
         data,
         type: method.toUpperCase(),
-        success: data => success && success(data),
-        error: data => {
-            console.error('Ajax (' + method + ' => ' + url + ') has error. Error:', data);
-            error && error(data)
+        success: response => {
+            if (response.error) {
+                if (typeof response.error === 'string') response.error = {
+                    message: response.error
+                };
+                else if (response.error.constructor === ({}).constructor) {
+                    if (response.error.errorNum) response.error.message = getOracleErrorMessage(response.error.errorNum);
+                }
+            }
+            success && success(response);
+        },
+        error: (jqXHR, textStatus, errorThrown) => {
+            const data = {
+                error: {}
+            };
+            if (jqXHR.responseJSON && jqXHR.responseJSON.error) {
+                if (typeof jqXHR.responseJSON.error === 'string') data.error.message = jqXHR.responseJSON.error;
+                else if (jqXHR.responseJSON.error.errorNum) data.error.message = getOracleErrorMessage(jqXHR.responseJSON.error.errorNum);
+            } else if (jqXHR.responseText) data.error.message = jqXHR.responseText;
+            else if (jqXHR.readyState == 4) {
+                if (jqXHR.status === 401) data.error.message = 'Không thể truy cập tài nguyên, vui lòng đăng nhập lại.';
+                if (jqXHR.status === 403) data.error.message = 'Không thể truy cập tài nguyên.';
+                if (jqXHR.status === 404) data.error.message = 'Không tìm thấy tài nguyên.';
+                if (jqXHR.status < 500) data.error.message = 'Yêu cầu bị lỗi!';
+                data.error.message = 'Server gặp lỗi. Hãy liên hệ logngười quản trị trang web.';
+            } else if (jqXHR.readyState == 0) data.error.message = 'Mạng có vấn đề, xin hãy kiểm tra lại đường truyền.';
+            else data.error.message = errorThrown;
+            console.error('Ajax (' + method + ' => ' + url + ') has error. Error:', data.error.message || jqXHR);
+            error && error(data);
         }
     })
 });
@@ -415,6 +470,14 @@ String.prototype.upFirstChar = function () {
 
 String.prototype.lowFirstChar = function () {
     return this[0].toLowerCase() + this.slice(1);
+}
+
+String.prototype.normalizedName = function () {
+    let convertToArray = this.toLowerCase().split(' ');
+    let result = convertToArray.map(function (val) {
+        return val.replace(val.charAt(0), val.charAt(0).toUpperCase());
+    });
+    return result.join(' ');
 }
 
 //Array prototype -----------------------------------------------------------------------------------------------------

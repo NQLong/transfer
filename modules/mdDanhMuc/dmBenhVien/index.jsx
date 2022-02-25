@@ -7,9 +7,12 @@ import dmNhomMau from './reduxNhomMau';
 
 export default {
     redux: {
-        dmBenhVien,
-        dmTuyenBenhVien,
-        dmNhomMau,
+        parent: 'danhMuc',
+        reducers: {
+            dmBenhVien,
+            dmTuyenBenhVien,
+            dmNhomMau,
+        },
     },
     routes: [
         {

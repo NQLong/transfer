@@ -1,8 +1,8 @@
 module.exports = app => {
-    const menu = { parentMenu: { index: 6000, title: 'Liên hệ', icon: 'fa-dashboard', link: '/user/contact' } };
+    // const menu = { parentMenu: { index: 6000, title: 'Liên hệ', icon: 'fa-dashboard', link: '/user/contact' } };
     app.permission.add(
         // { name: 'contact:read' },
-        { name: 'contact:read', menu },
+        { name: 'contact:read', },
         { name: 'contact:delete' }
     );
     app.get('/user/contact', app.permission.check('contact:read'), app.templates.admin);

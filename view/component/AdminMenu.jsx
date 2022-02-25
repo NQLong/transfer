@@ -73,6 +73,9 @@ class AdminMenu extends React.Component {
             });
         }
 
+        let firstname = '', lastname = '';
+        firstname = user?.firstName;
+        lastname = user?.lastName;
 
         return [
             <div key={1} className='app-sidebar__overlay' data-toggle='sidebar' />,
@@ -80,7 +83,7 @@ class AdminMenu extends React.Component {
                 <Link to='/user' style={{ textDecoration: 'none' }}>
                     <div className='app-sidebar__user'>
                         <img className='app-sidebar__user-avatar' src={user.image} alt='Avatar' style={{ width: '48px', height: 'auto' }} />
-                        <p className='app-sidebar__user-name' style={{ marginBottom: 0 }}>{user ? user.lastName + ' ' + user.firstName : ''}</p>
+                        <p className='app-sidebar__user-name' style={{ marginBottom: 0 }}>{lastname + ' ' + firstname}</p>
                     </div>
                     <p className='app-sidebar__user-designation'>{user.email}</p>
                 </Link>

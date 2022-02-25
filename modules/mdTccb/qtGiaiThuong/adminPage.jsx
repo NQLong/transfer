@@ -59,14 +59,14 @@ class EditModal extends AdminModal {
                     namCap: this.namCap.value(),
                 };
                 if (index == list_ma.length - 1) {
-                    this.state.id ? this.props.update(this.state.id, changes, this.hide, false) : this.props.create(changes, this.hide, false);
+                    this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
                     this.setState({
                         id: ''
                     });
                     this.maCanBo.reset();
                 }
                 else {
-                    this.state.id ? this.props.update(this.state.id, changes, null, false) : this.props.create(changes, null, false);
+                    this.state.id ? this.props.update(this.state.id, changes, null) : this.props.create(changes, null);
                 }
             });
         }
@@ -93,6 +93,7 @@ class QtGiaiThuong extends AdminPage {
     state = { filter: {} };
     componentDidMount() {
         T.ready('/user/tccb', () => {
+            T.clearSearchBox();
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
                 this.fromYear?.value('');
@@ -103,10 +104,8 @@ class QtGiaiThuong extends AdminPage {
             });
             if (this.checked) {
                 this.hienThiTheoCanBo.value(true);
-                this.props.getQtGiaiThuongGroupPage();
-            } else {
-                this.props.getQtGiaiThuongPage();
             }
+            this.getPage();
             this.changeAdvancedSearch(true);
         });
     }
@@ -163,7 +162,7 @@ class QtGiaiThuong extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa giải thưởng', 'Bạn có chắc bạn muốn xóa giải thưởng này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtGiaiThuongStaff(item.id, false, null, error => {
+            isConfirm && this.props.deleteQtGiaiThuongStaff(item.id, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá giải thưởng bị lỗi!', 'danger');
                 else T.alert('Xoá giải thưởng thành công!', 'success', false, 800);
             });
@@ -195,7 +194,7 @@ class QtGiaiThuong extends AdminPage {
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         {this.checked && <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{(item.hoCanBo ? item.hoCanBo : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo : ' ')}</span><br />
@@ -252,10 +251,10 @@ class QtGiaiThuong extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    <FormTextBox className='col-md-3' ref={e => this.fromYear = e} label='Từ năm đạt giải(yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
-                    <FormTextBox className='col-md-3' ref={e => this.toYear = e} label='Đến năm đạt giải (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
+                    <FormTextBox className='col-md-4' ref={e => this.fromYear = e} label='Từ năm đạt giải (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
+                    <FormTextBox className='col-md-4' ref={e => this.toYear = e} label='Đến năm đạt giải (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
                     <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
-                    <FormSelect className='col-12 col-md-12' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
                 </div>
             </>,
             content: <>
@@ -276,7 +275,7 @@ class QtGiaiThuong extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtGiaiThuong: state.qtGiaiThuong });
+const mapStateToProps = state => ({ system: state.system, qtGiaiThuong: state.tccb.qtGiaiThuong });
 const mapActionsToProps = {
     getQtGiaiThuongPage, deleteQtGiaiThuongStaff, createQtGiaiThuongStaff,
     updateQtGiaiThuongStaff, getQtGiaiThuongGroupPage,
