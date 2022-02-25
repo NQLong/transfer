@@ -232,7 +232,7 @@ class QtLamViecNgoaiUserPage extends AdminPage {
             subTitle: <span style={{ color: 'blue' }}>Cán bộ: {name}</span>,
             breadcrumb: [
                 <Link key={0} to='/user/'>Trang cá nhân</Link>,
-                'Công tác ngoài nước'
+                'Làm việc ngoài'
             ],
             content: <>
                 <div className='tile'>
