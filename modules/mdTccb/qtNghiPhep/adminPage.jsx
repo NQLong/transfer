@@ -232,7 +232,7 @@ class QtNghiPhep extends AdminPage {
 
     list = (text, i, j) => {
         if (!text) return [];
-        let items = text.split('??').map(str => <p key={i--} style={{ textTransform: 'uppercase' }}>{j - i}. {str}</p>);
+        let items = text.split('??').map(str => <p key={i--} >{j - i}. {str}</p>);
         return items;
     }
 
@@ -266,6 +266,7 @@ class QtNghiPhep extends AdminPage {
                         {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nơi đến khi nghỉ</th>}
                         {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số lần nghỉ</th>}
                         {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách lý do nghỉ</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thâm niên</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tình trạng</th>}
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
@@ -296,6 +297,12 @@ class QtNghiPhep extends AdminPage {
                         {!this.checked && <TableCell type='text' content={(
                             <>
                                 <span>{item.noiDen}</span>
+                            </>
+                        )}
+                        />}
+                        {!this.checked && <TableCell type='text' content={(
+                            <>
+                                <span>{item.thamNien}</span>
                             </>
                         )}
                         />}

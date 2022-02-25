@@ -229,6 +229,7 @@ class QtNghiPhepGroupPage extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Lý do nghỉ</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nơi đến khi nghỉ</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thâm niên</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tình trạng</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
@@ -264,6 +265,12 @@ class QtNghiPhepGroupPage extends AdminPage {
                         />
                         <TableCell type='text' content={(
                             <>
+                                <span>{item.thamNien}</span>
+                            </>
+                        )}
+                        />
+                        <TableCell type='text' content={(
+                            <>
                                 <span>{(item.ketThuc == -1 || item.ketThuc >= item.today) ? <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đang nghỉ</span> : <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đã kết thúc nghỉ</span>}</span>
                             </>
                         )}></TableCell>
@@ -277,11 +284,11 @@ class QtNghiPhepGroupPage extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa fa-fax',
-            title: 'Quá trình làm việc ngoài - Cán bộ',
+            title: 'Quá trình nghỉ phép - Cán bộ',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
                 <Link key={0} to='/user/tccb/qua-trinh/nghi-phep'>Quá trình nghỉ phép</Link>,
-                'Quá trình làm việc ngoài - Cán bộ'
+                'Quá trình nghỉ phép - Cán bộ'
             ],
             advanceSearch: <>
                 <div className='row'>

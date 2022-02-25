@@ -208,6 +208,7 @@ class QtNghiPhepUserPage extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tổng số ngày được nghỉ</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Số ngày xin nghỉ</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Số ngày tính phép</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thâm niên</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tình trạng</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
@@ -249,6 +250,12 @@ class QtNghiPhepUserPage extends AdminPage {
                         <TableCell type='text' content={(
                             <>
                                 <span>{item.soNgayTinhPhep}</span>
+                            </>
+                        )}
+                        />
+                        <TableCell type='text' content={(
+                            <>
+                                <span>{item.thamNien}</span>
                             </>
                         )}
                         />
