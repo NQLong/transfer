@@ -7,6 +7,7 @@ yarn.lock
 
 asset/host.json
 asset/config.json
+asset/migration.json
 asset/menu.txt
 asset/bundle
 asset/upload/

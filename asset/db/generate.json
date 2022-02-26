@@ -8272,7 +8272,7 @@
                 "dataType": "NVARCHAR2",
                 "dataDefault": "",
                 "nullable": true,
-                "size": 100
+                "size": 1000
             },
             "IN_LLKH": {
                 "value": "inLlkh",
