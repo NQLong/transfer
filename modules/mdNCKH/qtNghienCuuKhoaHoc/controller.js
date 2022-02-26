@@ -98,16 +98,14 @@ module.exports = app => {
         app.model.qtNghienCuuKhoaHoc.getAll(condition, (error, items) => res.send({ error, items }));
     });
 
-    app.post('/api/qua-trinh/nckh', app.permission.check('staff:login'), (req, res) =>
+    app.post('/api/qua-trinh/nckh', app.permission.check('qtNghienCuuKhoaHoc:write'), (req, res) =>
         app.model.qtNghienCuuKhoaHoc.create(req.body.data, (error, item) => res.send({ error, item })));
 
-    app.put('/api/qua-trinh/nckh', app.permission.check('staff:login'), (req, res) =>
+    app.put('/api/qua-trinh/nckh', app.permission.check('qtNghienCuuKhoaHoc:write'), (req, res) =>
         app.model.qtNghienCuuKhoaHoc.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })));
 
-    app.delete('/api/qua-trinh/nckh', app.permission.check('staff:login'), (req, res) =>
+    app.delete('/api/qua-trinh/nckh', app.permission.check('qtNghienCuuKhoaHoc:write'), (req, res) =>
         app.model.qtNghienCuuKhoaHoc.delete({ id: req.body.id }, (error) => res.send(error)));
-
-
 
     app.get('/api/qua-trinh/nckh/download-excel/:maDonVi/:fromYear/:toYear/:loaiHocVi/:maSoCanBo', app.permission.check('qtNghienCuuKhoaHoc:read'), (req, res) => {
         const { maDonVi, fromYear, toYear, loaiHocVi, maSoCanBo } = req.params ? req.params : { maDonVi: '', fromYear: null, toYear: null, loaiHocVi: '', maSoCanBo: '' };
