@@ -9,7 +9,7 @@ class LanguageSwitch extends React.Component {
         window.open(url, '_self');
     }
     render() {
-        return <img src={`/img/flag/${T.language.next()}.png`} style={{ height: '1.4vw', cursor: 'pointer' }}
+        return <img src={this.props.address == 'https://hcmussh.edu.vn/nvduc/de' ? '/img/flag/germany.png' : `/img/flag/${T.language.next()}.png`} style={{ height: '1.4vw', cursor: 'pointer' }}
             onClick={this.change} />;
     }
 }
