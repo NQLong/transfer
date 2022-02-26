@@ -55,7 +55,7 @@ class EditModal extends AdminModal {
             if (quocGia) {
                 quocGia = quocGia.split(',');
                 this.quocGia.value(quocGia);
-            }
+            } else this.quocGia.value('');
             this.mucDich.value(mucDich);
             this.noiDung.value(noiDung ? noiDung : '');
             this.chiPhi.value(chiPhi ? chiPhi : '');
@@ -91,7 +91,7 @@ class EditModal extends AdminModal {
         } else if (!this.noiDung.value()) {
             T.notify('Nội dung đi nước ngoài trống', 'danger');
             this.noiDung.focus();
-        } else if (!this.quocGia.value()) {
+        } else if (!this.quocGia.value().length) {
             T.notify('Danh sách quốc gia trống', 'danger');
             this.quocGia.focus();
         } else if (!this.ngayDi.getVal()) {
