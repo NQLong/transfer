@@ -1,0 +1,16 @@
+{
+    "dbFrom": {
+        "owner": "DEV_HCMUSSH",
+        "host": "203.205.32.235",
+        "sid": "ptchc",
+        "username": "dev_hcmussh",
+        "password": "2x$@!zXBm<Z{5%."
+    },
+    "dbTo": {
+        "owner": "DEV_HCMUSSH",
+        "host": "116.109.45.163",
+        "sid": "orcl",
+        "username": "dev_hcmussh",
+        "password": "2x$@!zXBm<Z{5%."
+    }
+}
