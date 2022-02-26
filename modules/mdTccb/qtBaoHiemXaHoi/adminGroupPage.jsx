@@ -307,12 +307,12 @@ class QtBaoHiemXaHoiGroupPage extends AdminPage {
             </>,
             backRoute: '/user/tccb/qua-trinh/bao-hiem-xa-hoi',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
-            onExport: (e) => {
-                e.preventDefault();
-                const { fromYear, toYear, list_shcc, list_dv, timeType, tinhTrang } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, tinhTrang: null };
+            // onExport: (e) => {
+            //     e.preventDefault();
+            //     const { fromYear, toYear, list_shcc, list_dv, timeType, tinhTrang } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, tinhTrang: null };
 
-                T.download(T.url(`/api/qua-trinh/bao-hiem-xa-hoi/download-excel/${list_shcc ? list_shcc : null}/${list_dv ? list_dv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${timeType}/${tinhTrang ? tinhTrang : null}`), 'baohiemxahoi.xlsx');
-            }
+            //     T.download(T.url(`/api/qua-trinh/bao-hiem-xa-hoi/download-excel/${list_shcc ? list_shcc : null}/${list_dv ? list_dv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${timeType}/${tinhTrang ? tinhTrang : null}`), 'baohiemxahoi.xlsx');
+            // }
         });
     }
 }
