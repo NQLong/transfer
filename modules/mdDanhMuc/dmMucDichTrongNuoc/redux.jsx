@@ -140,3 +140,13 @@ export function updateDmMucDichTrongNuoc(ma, changes, done) {
 export function changeDmMucDichTrongNuoc(item) {
     return { type: DmMucDichTrongNuocUpdate, item };
 }
+
+export const SelectAdapter_DmMucDichTrongNuoc = {
+    ajax: true,
+    url: '/api/danh-muc/muc-dich-trong-nuoc/page/1/20',
+    data: params => ({ condition: params.term, kichHoat: 1 }),
+    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.moTa })) : [] }),
+    fetchOne: (ma, done) => (getDmMucDichTrongNuoc(ma, item => item && done && done({ id: item.ma, text: item.moTa })))(),
+    getOne: getDmMucDichTrongNuoc,
+    processResultOne: response => response && ({ value: response.ma, text: `${response.ma}: ${response.moTa}` }),
+};
