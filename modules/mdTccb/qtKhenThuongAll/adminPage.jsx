@@ -208,10 +208,26 @@ class QtKhenThuongAll extends AdminPage {
         this.getPage();
     }
 
-    list = (text, i, j) => {
+    list = (text, i) => {
         if (!text) return [];
-        let deTais = text.split('??').map(str => <p key={i--} style={{ textTransform: 'uppercase' }}>{j - i}. {str}</p>);
-        return deTais;
+        let deTais = text.split('??');
+        let results = [];
+        let choose = i > 15 ? 15 : i;
+        for (let k = 0; k < choose; k++) {
+            results.push(<p style={{ textTransform: 'uppercase' }}> <span>
+                Lần {k+1}. {deTais[k]}
+            </span></p>);
+        }
+        if (i > 15) {
+            results.push(<p style={{ textTransform: 'uppercase' }}> <span>
+                .........................................
+            </span></p>);
+            let k = i - 1;
+            results.push(<p style={{ textTransform: 'uppercase' }}> <span>
+                Lần {k+1}. {deTais[k]}
+            </span></p>);
+        }
+        return results;
     }
 
     showModal = (e) => {
@@ -261,15 +277,6 @@ class QtKhenThuongAll extends AdminPage {
             this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.page_gr ?
                 this.props.qtKhenThuongAll.page_gr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
             : (this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.page ? this.props.qtKhenThuongAll.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] });
-        if (this.checked && list && list.length > 0) {
-            let list_filter = [];
-            list.forEach(item => {
-                if (item.soKhenThuong > 0) {
-                    list_filter.push(item);
-                }
-            });
-            list = list_filter;
-        }
         let table = 'Không có danh sách';
         if (list && list.length > 0) {
             table = renderTable({
@@ -331,7 +338,7 @@ class QtKhenThuongAll extends AdminPage {
                         />}
                         {!this.checked && <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemThiDua} />}
                         {this.checked && <TableCell type='text' style={{ textAlign: 'left' }} content={item.soKhenThuong} />}
-                        {this.checked && <TableCell type='text' content={this.list(item.danhSachKhenThuong, item.soKhenThuong, item.soKhenThuong)} />}
+                        {this.checked && <TableCell type='text' content={this.list(item.danhSachKhenThuong, item.soKhenThuong)} />}
                         <TableCell type='text' content={item.tenLoaiDoiTuong} />
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}

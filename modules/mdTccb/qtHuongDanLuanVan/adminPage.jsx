@@ -173,15 +173,6 @@ class QtHuongDanLuanVan extends AdminPage {
             this.props.qtHuongDanLuanVan && this.props.qtHuongDanLuanVan.page_gr ?
                 this.props.qtHuongDanLuanVan.page_gr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
             : (this.props.qtHuongDanLuanVan && this.props.qtHuongDanLuanVan.page ? this.props.qtHuongDanLuanVan.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] });
-        if (this.checked && list && list.length > 0) {
-            let list_filter = [];
-            list.forEach(item => {
-                if (item.soDeTai > 0) {
-                    list_filter.push(item);
-                }
-            });
-            list = list_filter;
-        }
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
