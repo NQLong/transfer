@@ -8646,8 +8646,8 @@
                 "value": "shcc",
                 "dataType": "NVARCHAR2",
                 "dataDefault": "",
-                "nullable": true,
-                "size": 15
+                "nullable": false,
+                "size": 20
             },
             "STT": {
                 "value": "stt",
