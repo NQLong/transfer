@@ -188,7 +188,7 @@ class QtBangPhatMinhUserPage extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa fa-fax',
+            icon: 'fa fa-cogs',
             title: 'Quá trình bằng phát minh',
             subTitle: <span style={{ color: 'blue' }}>Cán bộ: {name}</span>,
             breadcrumb: [

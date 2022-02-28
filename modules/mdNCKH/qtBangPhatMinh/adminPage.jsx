@@ -263,7 +263,7 @@ class QtBangPhatMinh extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa fa-fax',
+            icon: 'fa fa-cogs',
             title: ' Quá trình bằng phát minh',
             breadcrumb: [
                 <Link key={0} to='/user/khcn'>Tổ chức cán bộ</Link>,
