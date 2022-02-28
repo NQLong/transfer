@@ -452,13 +452,13 @@ class QtNghienCuuKhoaHoc extends AdminPage {
             </>,
             backRoute: '/user/khcn',
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
-            onExport: (e) => {
+            onExport: !this.checked ? (e) => {
                 e.preventDefault();
-                const { maDonVi, fromYear, toYear, loaiHocVi, maSoCanBo } = this.state.filter != '%%%%%%%%' ? this.state.filter : {
-                    maDonVi: '', fromYear: null, toYear: null, loaiHocVi: '', maSoCanBo: '',
+                const { maDonVi, fromYear, toYear, loaiHocVi, maSoCanBo, timeType } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : {
+                    maDonVi: '', fromYear: null, toYear: null, loaiHocVi: '', maSoCanBo: '', timeType: 0,
                 };
-                T.download(T.url(`/api/qua-trinh/nckh/download-excel/${maDonVi !== '' ? maDonVi : null}/${fromYear != null ? fromYear : null}/${toYear != null ? toYear : null}/${loaiHocVi != '' ? loaiHocVi : null}/${maSoCanBo != '' ? maSoCanBo : null}`), 'NCKH.xlsx');
-            }
+                T.download(T.url(`/api/qua-trinh/nckh/download-excel/${maDonVi !== '' ? maDonVi : null}/${fromYear != null ? fromYear : null}/${toYear != null ? toYear : null}/${loaiHocVi != '' ? loaiHocVi : null}/${maSoCanBo != '' ? maSoCanBo : null}/${timeType}`), 'NCKH.xlsx');
+            } : null
         });
     }
 }
