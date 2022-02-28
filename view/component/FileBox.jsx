@@ -16,7 +16,7 @@ const UploadBoxStyle = {
 };
 
 export default class FileBox extends React.Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.state = { isUploading: false, userData: null };
 
@@ -35,6 +35,7 @@ export default class FileBox extends React.Component {
         event.preventDefault();
         $(this.box.current).css('background-color', '#FFF');
 
+        console.log(event);
         if (event.dataTransfer.items) {
             if (event.dataTransfer.items.length > 0) {
                 const item = event.dataTransfer.items[0];
@@ -119,7 +120,7 @@ export default class FileBox extends React.Component {
             xhr: () => {
                 const xhr = new window.XMLHttpRequest();
 
-                xhr.upload.addEventListener('progress', evt => {
+                xhr.upload.addEvenxtListener('progress', evt => {
                     if (evt.lengthComputable) {
                         updateUploadPercent((100 * evt.loaded / evt.total).toFixed(2));
                     }

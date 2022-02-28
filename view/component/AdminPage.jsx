@@ -7,6 +7,7 @@ import Datetime from 'react-datetime';
 import InputMask from 'react-input-mask';
 import NumberFormat from 'react-number-format';
 import 'react-datetime/css/react-datetime.css';
+import FileBox2 from './FileBox2';
 
 // Table components ---------------------------------------------------------------------------------------------------
 export class TableCell extends React.Component { // type = number | date | link | image | checkbox | buttons | text (default)
@@ -650,6 +651,20 @@ export class FormFileBox extends React.Component {
                 {label && <label>{label}&nbsp;</label>}
                 {!readOnly && onDelete ? <a href='#' className='text-danger' onClick={onDelete}><i className='fa fa-fw fa-lg fa-trash' /></a> : null}
                 <FileBox ref={e => this.fileBox = e} postUrl={postUrl} uploadType={uploadType} readOnly={readOnly} success={data => onSuccess && onSuccess(data)} />
+            </div>);
+    }
+}
+
+export class FormFileUpload extends React.Component {
+    setData = data => this.fileBox.setData(data);
+
+    render() {
+        let { label = '', className = '', style = {}, readOnly = false, postUrl = '/user/upload', uploadType = '', onDelete = null, onSuccess = null } = this.props;
+        return (
+            <div className={'form-group ' + className} style={style}>
+                {label && <label>{label}&nbsp;</label>}
+                {!readOnly && onDelete ? <a href='#' className='text-danger' onClick={onDelete}><i className='fa fa-fw fa-lg fa-trash' /></a> : null}
+                <FileBox2 ref={e => this.fileBox = e} postUrl={postUrl} uploadType={uploadType} readOnly={readOnly} success={data => onSuccess && onSuccess(data)} />
             </div>);
     }
 }

@@ -14,7 +14,7 @@ import ComponentTrinhDo from './componentTrinhDo';
 import Loading from 'view/component/Loading';
 
 class CanBoPage extends AdminPage {
-    state = { item: null }
+    state = { item: null, create: false, load: true }
 
     componentDidMount() {
         T.ready('/user/tccb', () => {
@@ -34,6 +34,7 @@ class CanBoPage extends AdminPage {
             } else {
                 this.setState({ create: true });
             }
+            this.setState({ load: false });
         });
     }
 
@@ -51,6 +52,9 @@ class CanBoPage extends AdminPage {
         const trinhDoData = this.componentTrinhDo.getAndValidate();
         if (this.urlSHCC) {
             caNhanData && congTacData && trinhDoData && this.props.updateStaff(this.urlSHCC, { ...caNhanData, ...congTacData, ...trinhDoData, userModified: this.emailCanBo, lastModified: new Date().getTime() });
+        } else {
+            caNhanData && congTacData && trinhDoData && this.props.createStaff({ ...caNhanData, ...congTacData, ...trinhDoData, userModified: this.emailCanBo, lastModified: new Date().getTime() }, () => this.props.history.push('/user/tccb/staff'));
+
         }
     }
 
@@ -67,7 +71,7 @@ class CanBoPage extends AdminPage {
             ],
             content:
                 <>
-                    {!item && <Loading />}
+                    {this.state.load && <Loading />}
                     <ComponentCaNhan ref={e => this.componentCaNhan = e} userEdit={false} isStaff={false} />
                     <ComponentQuanHe ref={e => this.componentQuanHe = e} userEdit={false} />
                     <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={false} />

@@ -8,21 +8,21 @@ import Loading from 'view/component/Loading';
 import SubMenusPage from 'view/component/SubMenusPage';
 
 class ProfileCanBo extends AdminPage {
-    state = { canBo: false, isLoad: true };
+    state = { isHCMUSSH: false, isLoad: true };
     componentDidMount() {
         T.ready('/user', () => {
             if (this.props.system && this.props.system.user) {
                 const user = this.props.system.user;
-                if (user.isStaff != 1) {
+                if (user.isStaff != 1 && user.isStudent != 1) {
                     this.setState({ isLoad: false });
                     this.profileCommon.value(user);
-                } else this.setState({ canBo: true });
+                } else this.setState({ isHCMUSSH: true });
             }
         });
     }
 
     render = () => {
-        return this.state.canBo ? <SubMenusPage menuLink='/user' menuKey={1000} headerIcon='fa-user' /> : this.renderPage({
+        return this.state.isHCMUSSH ? <SubMenusPage menuLink='/user' menuKey={1000} headerIcon='fa-user' /> : this.renderPage({
             icon: 'fa fa-address-card-o',
             title: 'Thông tin cá nhân',
             content:

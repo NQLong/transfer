@@ -128,7 +128,15 @@ export const SelectAdapter_DmTinhThanhPho = {
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
     condition: { kichHoat: 1 },
 };
-
+export const SelectAdapter_DmTinhThanhPhoV2 = {
+    ajax: true,
+    url: '/api/danh-muc/tinh-thanh-pho/page/1/20',
+    data: params => ({ condition: params.term, kichHoat: 1 }),
+    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.ten })) : [] }),
+    fetchOne: (ma, done) => (getDmTinhThanhPho(ma, item => item && done && done({ id: item.ma, text: item.ten })))(),
+    getOne: getDmTinhThanhPho,
+    processResultOne: response => response && ({ value: response.ma, text: `${response.ma}: ${response.ten}` }),
+};
 export const ajaxSelectTinhThanhPho = {
     ajax: false,
     url: '/api/danh-muc/tinh-thanh-pho/all',

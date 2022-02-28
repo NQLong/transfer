@@ -31,7 +31,7 @@ class EditModal extends AdminModal {
         this.setState({ id: id, shcc: item.shcc });
 
         setTimeout(() => {
-            this.tenTacGia.value(tenTacGia ? tenTacGia : '');
+            this.tenTacGia.value(tenTacGia ? tenTacGia : this.props.hoten.trim().normalizedName());
             if (namXuatBan) this.namXuatBan.setVal(new Date(namXuatBan.toString()));
             this.tenBaiViet.value(tenBaiViet ? tenBaiViet : '');
             this.tenTapChi.value(tenTapChi ? tenTapChi : '');
@@ -134,6 +134,7 @@ class QtBaiVietKhoaHocUserPage extends AdminPage {
         const { isStaff, shcc } = this.props.system && this.props.system.user ? this.props.system.user : { isStaff: false, shcc: '' };
         const { firstName, lastName } = isStaff && this.props.system.user || { firstName: '', lastName: '' };
         const name = isStaff ? `${lastName} ${firstName} (${shcc})` : '';
+        const hoten = isStaff ? `${lastName} ${firstName}` : '';
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtBaiVietKhoaHoc && this.props.qtBaiVietKhoaHoc.user_page ? this.props.qtBaiVietKhoaHoc.user_page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
@@ -206,7 +207,7 @@ class QtBaiVietKhoaHocUserPage extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
-                <EditModal ref={e => this.modal = e} shcc={this.shcc} readOnly={!permission.write}
+                <EditModal ref={e => this.modal = e} shcc={this.shcc} readOnly={!permission.write} hoten={hoten}
                     update={this.props.updateQtBaiVietKhoaHocUserPage} create={this.props.createQtBaiVietKhoaHocUserPage}
                 />
             </>,

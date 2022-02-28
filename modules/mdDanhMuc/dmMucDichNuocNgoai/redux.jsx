@@ -144,3 +144,13 @@ export const SelectAdapter_DmMucDichNuocNgoai = {
     processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.moTa })) : [] }),
     condition: { kichHoat: 1 },
 };
+
+export const SelectAdapter_DmMucDichNuocNgoaiV2 = {
+    ajax: true,
+    url: '/api/danh-muc/muc-dich-nuoc-ngoai/page/1/20',
+    data: params => ({ condition: params.term, kichHoat: 1 }),
+    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.moTa })) : [] }),
+    fetchOne: (ma, done) => (getDmMucDichNuocNgoai(ma, item => item && done && done({ id: item.ma, text: item.moTa })))(),
+    getOne: getDmMucDichNuocNgoai,
+    processResultOne: response => response && ({ value: response.ma, text: `${response.ma}: ${response.moTa}` }),
+};
