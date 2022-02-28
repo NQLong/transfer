@@ -58,14 +58,14 @@ class Dashboard extends AdminPage {
     }
 
     render() {
-        let { totalMale, totalFemale, totalStaff, totalFaculty,
-            totalMalePhD, totalFemalePhD,
+        let { totalMale, totalFemale, totalStaff, totalFaculty, totalPB,
+            totalMalePhD, totalFemalePhD, totalKhoa,
             totalMaleMaster, totalFemaleMaster,
             totalMaleBachelor, totalFemaleBachelor
         } = this.props.dashboardTccb && this.props.dashboardTccb.page ? this.props.dashboardTccb.page :
                 {
-                    totalMale: 0, totalFemale: 0, totalStaff: 0, totalFaculty: 0,
-                    totalMalePhD: 0, totalFemalePhD: 0,
+                    totalMale: 0, totalFemale: 0, totalStaff: 0, totalFaculty: 0, totalPB: 0,
+                    totalMalePhD: 0, totalFemalePhD: 0, totalKhoa: 0,
                     totalMaleMaster: 0, totalFemaleMaster: 0,
                     totalMaleBachelor: 0, totalFemaleBachelor: 0
                 };
@@ -101,10 +101,10 @@ class Dashboard extends AdminPage {
                     <DashboardIcon type='warning' icon='fa-modx' title='Đơn vị' value={totalFaculty} link='/user/danh-muc/don-vi' />
                 </div>
                 <div className='col-md-6 col-lg-3'>
-                    <DashboardIcon type='info' icon='fa-modx' title='Đơn vị' value={totalFaculty} link='/user/danh-muc/don-vi' />
+                    <DashboardIcon type='info' icon='fa-tags' title='Khoa - Bộ môn' value={totalKhoa} link='/user/danh-muc/don-vi' />
                 </div>
                 <div className='col-md-6 col-lg-3'>
-                    <DashboardIcon type='danger' icon='fa-modx' title='Đơn vị' value={totalFaculty} link='/user/danh-muc/don-vi' />
+                    <DashboardIcon type='danger' icon='fa-sticky-note' title='Phòng ban' value={totalPB} link='/user/danh-muc/don-vi' />
                 </div>
                 <div className='col-lg-6'>
                     <div className='tile'>
