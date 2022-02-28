@@ -73,7 +73,7 @@ module.exports = app => {
         },
         user: {
             index: 1000, title: 'Trang cá nhân', link: '/user', icon: 'fa-user',
-            subMenusRender: false, groups: ['Cán bộ', 'Công tác', 'Khen thưởng - kỷ luật', 'Nghỉ', 'Chuyên môn']
+            subMenusRender: false, groups: ['Thông tin cá nhân', 'Công tác', 'Khen thưởng - kỷ luật', 'Nghỉ', 'Chuyên môn']
         },
         tccb: {
             index: 3000, title: 'Tổ chức cán bộ', link: '/user/tccb', icon: 'fa-sort-alpha-asc',
