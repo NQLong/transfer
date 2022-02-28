@@ -163,6 +163,7 @@ export const SelectAdapter_DmQuocGia = {
     url: '/api/danh-muc/quoc-gia/page/1/20',
     data: params => ({ condition: params.term }),
     processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.maCode, text: `${item.maCode}: ${item.tenQuocGia}` })) : [] }),
+    fetchOne: (maCode, done) => (getDmQuocGia(maCode, item => item && done && done({ id: item.maCode, text: `${item.maCode}: ${item.tenQuocGia}` })))(),
     getOne: getDmQuocGia,
     processResultOne: response => response && ({ value: response.maCode, text: response.maCode + ': ' + response.tenQuocGia }),
 };

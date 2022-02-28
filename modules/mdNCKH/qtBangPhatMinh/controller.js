@@ -119,13 +119,13 @@ module.exports = app => {
         });
     });
     
-    app.post('/api/qua-trinh/bang-phat-minh', app.permission.check('staff:write'), (req, res) => 
+    app.post('/api/qua-trinh/bang-phat-minh', app.permission.check('qtBangPhatMinh:write'), (req, res) => 
         app.model.qtBangPhatMinh.create(req.body.data, (error, item) => res.send({ error, item })));
 
-    app.put('/api/qua-trinh/bang-phat-minh', app.permission.check('staff:write'), (req, res) =>
+    app.put('/api/qua-trinh/bang-phat-minh', app.permission.check('qtBangPhatMinh:write'), (req, res) =>
         app.model.qtBangPhatMinh.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })));
 
-    app.delete('/api/qua-trinh/bang-phat-minh', app.permission.check('staff:write'), (req, res) =>
+    app.delete('/api/qua-trinh/bang-phat-minh', app.permission.check('qtBangPhatMinh:write'), (req, res) =>
         app.model.qtBangPhatMinh.delete({ id: req.body.id }, (error) => res.send(error)));
 
 };
