@@ -85,73 +85,78 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/state', (req, res) => {
-        const data = app.clone(app.data);
-        delete data.emailPassword;
-
-        if (app.isDebug) data.isDebug = true;
-        if (req.session.user) data.user = req.session.user;
-        
-        app.buildAppMenus();
-
-        const ready = () => {
-            if (app.dbConnection && app.model && app.model.fwMenu && app.model.fwSubmenu) {
-                app.model.fwMenu.getAll({}, '*', 'priority', (error, menus) => {
-                    if (menus) {
-                        data.menus = [], data.divisionMenus = [];
-                        menus.forEach(menu => {
-                            menu.content = '';
-                            if (menu.submenus) {
-                                menu.submenus.forEach(submenu => submenu.content = '');
-                            }
-                            if (menu.maDonVi == '00') data.menus.push(menu); else data.divisionMenus.push(menu);
-                        });
-                    }
-                    app.model.fwSubmenu.getAll({ active: 1 }, '*', 'priority ASC', (error, submenus) => {
-                        if (submenus) {
-                            data.submenus = submenus.slice();
-                        }
-                        app.model.setting.getValue(['headerTitle', 'headerLink', 'isShowHeaderTitle', 'address2', 'mapLink'], result => {
-                            data.headerTitle = result.headerTitle;
-                            data.headerLink = result.headerLink;
-                            data.address2 = result.address2;
-                            data.isShowHeaderTitle = result.isShowHeaderTitle;
-                            data.mapLink = result.mapLink;
-                            if (data.user && data.user.permissions && data.user.permissions.includes('website:write') &&
-                                !data.user.permissions.includes('menu:write')
-                            ) {
-                                delete data.user.menu['2000'];
-                                delete data.user.menu['5100'];
-                            }
-                            if (data.user && data.user.permissions && data.user.permissions.includes('news:write')) {
-                                delete data.user.menu['5000'].menus['5004'];
-                                delete data.user.menu['5000'].menus['5005'];
-                                delete data.user.menu['5000'].menus['5006'];
-                                delete data.user.menu['5000'].menus['5008'];
-
-                            }
-                            // else if (data.user && data.user.permissions
-                            //     && data.user.permissions.includes('unit:write')
-                            //     && !data.user.permissions.includes('news:write') && data.user.menu['5000']) {
-                            //     delete data.user.menu['5000'].menus['5001'];
-                            //     delete data.user.menu['5000'].menus['5002'];
-                            //     delete data.user.menu['5000'].menus['5003'];
-                            // }
-                            if (data.user && data.user.permissions
-                                && data.user.permissions.includes('website:write')
-                                && !data.user.permissions.includes('news:write')) {
-                                if (data.user.menu['2000']) delete data.user.menu['2000'].menus['2090'];
-                            }
-                            res.send(data);
-                        });
-                    });
-                });
+    app.get('/api/state', app.isDebug ? app.permission.check() : (req, res, next) => { next(); }, (req, res) => {
+        app.state.get((error, data) => {
+            if (error || data == null) {
+                res.send({ error: error || 'System has error!' });
             } else {
-                setTimeout(ready, 500);
+                Object.keys(data).forEach(key => {
+                    if (key.toLowerCase().indexOf('password') != -1) delete data[key]; // delete data.emailPassword, data.tchcEmailPassword
+                });
+
+                if (app.isDebug) data.isDebug = true;
+                if (req.session.user) data.user = req.session.user;
+                const ready = () => {
+                    if (app.dbConnection && app.model && app.model.fwMenu && app.model.fwSubmenu) {
+                        app.model.fwMenu.getAll({}, '*', 'priority', (error, menus) => {
+                            if (menus) {
+                                data.menus = [], data.divisionMenus = [];
+                                menus.forEach(menu => {
+                                    menu.content = '';
+                                    if (menu.submenus) {
+                                        menu.submenus.forEach(submenu => submenu.content = '');
+                                    }
+                                    if (menu.maDonVi == '00') data.menus.push(menu); else data.divisionMenus.push(menu);
+                                });
+                            }
+                            app.model.fwSubmenu.getAll({ active: 1 }, '*', 'priority ASC', (error, submenus) => {
+                                if (submenus) {
+                                    data.submenus = submenus.slice();
+                                }
+                                app.model.setting.getValue(['headerTitle', 'headerLink', 'isShowHeaderTitle', 'address2', 'mapLink'], result => {
+                                    data.headerTitle = result.headerTitle;
+                                    data.headerLink = result.headerLink;
+                                    data.address2 = result.address2;
+                                    data.isShowHeaderTitle = result.isShowHeaderTitle;
+                                    data.mapLink = result.mapLink;
+                                    if (data.user && data.user.permissions && data.user.permissions.includes('website:write') &&
+                                        !data.user.permissions.includes('menu:write')
+                                    ) {
+                                        delete data.user.menu['2000'];
+                                        delete data.user.menu['5100'];
+                                    }
+                                    if (data.user && data.user.permissions && data.user.permissions.includes('news:write')) {
+                                        delete data.user.menu['5000'].menus['5004'];
+                                        delete data.user.menu['5000'].menus['5005'];
+                                        delete data.user.menu['5000'].menus['5006'];
+                                        delete data.user.menu['5000'].menus['5008'];
+
+                                    }
+                                    // else if (data.user && data.user.permissions
+                                    //     && data.user.permissions.includes('unit:write')
+                                    //     && !data.user.permissions.includes('news:write') && data.user.menu['5000']) {
+                                    //     delete data.user.menu['5000'].menus['5001'];
+                                    //     delete data.user.menu['5000'].menus['5002'];
+                                    //     delete data.user.menu['5000'].menus['5003'];
+                                    // }
+                                    if (data.user && data.user.permissions
+                                        && data.user.permissions.includes('website:write')
+                                        && !data.user.permissions.includes('news:write')) {
+                                        if (data.user.menu['2000']) delete data.user.menu['2000'].menus['2090'];
+                                    }
+                                    res.send(data);
+                                });
+                            });
+                        });
+                    } else {
+                        setTimeout(ready, 500);
+                    }
+                };
+                ready();
             }
-        };
-        ready();
+        });
     });
+
     const getComponent = (index, componentIds, components, done) => {
         if (index < componentIds.length) {
             app.model.fwComponent.get({ id: componentIds[index] }, (error, component) => {
