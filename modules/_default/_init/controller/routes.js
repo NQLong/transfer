@@ -100,7 +100,8 @@ module.exports = app => {
                     if (app.dbConnection && app.model && app.model.fwMenu && app.model.fwSubmenu) {
                         app.model.fwMenu.getAll({}, '*', 'priority', (error, menus) => {
                             if (menus) {
-                                data.menus = [], data.divisionMenus = [];
+                                data.menus = [];
+                                data.divisionMenus = [];
                                 menus.forEach(menu => {
                                     menu.content = '';
                                     if (menu.submenus) {
