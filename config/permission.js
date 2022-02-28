@@ -249,7 +249,7 @@ module.exports = app => {
                             });
                         } else resolve();
                     });
-                })).then(() => new Promise(resolve => {
+                })).then(() => {
                     user.menu = app.permission.tree();
                     Object.keys(user.menu).forEach(parentMenuIndex => {
                         let flag = true;
@@ -274,11 +274,12 @@ module.exports = app => {
                         });
                     });
 
-                    req.session.user = user;
-                    req.session.save();
+                    if (req) {
+                        req.session.user = user;
+                        req.session.save();
+                    }
                     done && done(user);
-                    resolve();
-                }));
+                });
             }
         });
     };
