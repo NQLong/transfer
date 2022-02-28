@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, AdminModal, FormSelect, FormTextBox, FormCheckbox, FormRichTextBox, FormDatePicker, FormFileBox, renderTable } from 'view/component/AdminPage';
+import { AdminPage, TableCell, AdminModal, FormSelect, FormTextBox, FormCheckbox, FormRichTextBox, FormDatePicker, renderTable } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
     createQtNckhStaff,

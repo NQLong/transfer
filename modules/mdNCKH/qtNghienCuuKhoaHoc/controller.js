@@ -225,7 +225,7 @@ module.exports = app => {
                     res.send({ error: e });
                 });
             }
-        })
+        });
     });
 
     app.get('/api/user/qua-trinh/nckh/item/:id/:shcc', app.permission.check('staff:login'), (req, res) => {
