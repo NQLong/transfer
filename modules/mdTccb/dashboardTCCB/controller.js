@@ -15,6 +15,19 @@ module.exports = app => {
     app.get('/user/tccb/dashboard', app.permission.check('staff:read'), app.templates.admin);
 
     app.get('/api/tccb/dashboard/total-gender', app.permission.check('staff:read'), (req, res) => {
-        app.model.canBo.tccbDasboardTotalGender((error, data) => res.send({ error, data: data.rows[0] }));
+        app.model.canBo.tccbDasboardTotalGender((error, data) => {
+            if (error || !data) res.send({ error });
+            else {
+                let result = app.clone(data.rows[0]);
+                new Promise(resolve => app.model.dmDonVi.count((e, re) => {
+                    if (e || !re) {
+                        result = app.clone(result, { totalFaculty: 0 });
+                    }
+                    else result = app.clone(result, { totalFaculty: re.rows[0]['COUNT(*)'] });
+                    resolve();
+                })).then(() => res.send({ error, data: result })
+                ).catch((reason) => res.send({ error: reason }));
+            }
+        });
     });
 };

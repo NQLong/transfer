@@ -95,10 +95,16 @@ class Dashboard extends AdminPage {
             title: 'Dashboard Phòng Tổ chức cán bộ',
             content: <div className='row'>
                 <div className='col-md-6 col-lg-3'>
-                    <DashboardIcon type='primary' icon='fa-users' title='CÁN BỘ' value={totalStaff} link='/user/tccb/staff' />
+                    <DashboardIcon type='primary' icon='fa-users' title='Cán bộ' value={totalStaff} link='/user/tccb/staff' />
                 </div>
                 <div className='col-md-6 col-lg-3'>
-                    <DashboardIcon type='warning' icon='fa-users' title='Đơn vị' value={totalFaculty} link='/user/danh-muc/don-vi' />
+                    <DashboardIcon type='warning' icon='fa-modx' title='Đơn vị' value={totalFaculty} link='/user/danh-muc/don-vi' />
+                </div>
+                <div className='col-md-6 col-lg-3'>
+                    <DashboardIcon type='info' icon='fa-modx' title='Đơn vị' value={totalFaculty} link='/user/danh-muc/don-vi' />
+                </div>
+                <div className='col-md-6 col-lg-3'>
+                    <DashboardIcon type='danger' icon='fa-modx' title='Đơn vị' value={totalFaculty} link='/user/danh-muc/don-vi' />
                 </div>
                 <div className='col-lg-6'>
                     <div className='tile'>
