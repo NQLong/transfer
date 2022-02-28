@@ -24,7 +24,6 @@ class EditModal extends AdminModal {
     };
 
     onShow = (item) => {
-
         let { id, shcc, tenTacGia, namXuatBan, tenBaiViet, tenTapChi, soHieuIssn, sanPham, diemIf, quocTe } = item ? item : {
             id: null, shcc: '', tenTacGia: '', namXuatBan: null, tenBaiViet: '', tenTapChi: '', soHieuIssn: '', sanPham: '', diemIf: '',
             quocTe: 0
@@ -34,7 +33,7 @@ class EditModal extends AdminModal {
 
         setTimeout(() => {
             this.maCanBo.value(shcc ? shcc : this.props.shcc);
-            this.tenTacGia.value(tenTacGia ? tenTacGia : '');
+            this.tenTacGia.value(tenTacGia ? tenTacGia : this.props.hoten);
             if (namXuatBan) this.namXuatBan.setVal(new Date(namXuatBan.toString()));
             this.tenBaiViet.value(tenBaiViet ? tenBaiViet : '');
             this.tenTapChi.value(tenTapChi ? tenTapChi : '');
@@ -111,6 +110,9 @@ class QtBaiVietKhoaHocGroupPage extends AdminPage {
             this.props.getStaffEdit(this.shcc, (data) => {
                 if (data.error) T.alert('Cán bộ không tồn tại!');
                 else {
+                    this.hoten = data.item.ho + ' ' + data.item.ten;
+                    this.hoten = this.hoten.trim();
+                    this.hoten = this.hoten.normalizedName();
                     this.setState({ name: 'Cán bộ ' + data.item.ho + ' ' + data.item.ten + ' (' + this.shcc + ')' });
                 }
             });
@@ -239,7 +241,7 @@ class QtBaiVietKhoaHocGroupPage extends AdminPage {
             title: 'Bài viết Khoa học - Cán bộ',
             subTitle: <div style={{ color: 'blue' }} >{this.state.name}</div>,
             breadcrumb: [
-                <Link key={0} to='/user/khcn'>Tổ chức cán bộ</Link>,
+                <Link key={0} to='/user/khcn'>Khoa học công nghệ</Link>,
                 <Link key={0} to='/user/khcn/qua-trinh/bai-viet-khoa-hoc'>Quá trình bài viết khoa học</Link>,
                 'Quá trình bài viết khoa học - Cán bộ',
             ],
@@ -257,7 +259,7 @@ class QtBaiVietKhoaHocGroupPage extends AdminPage {
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
-                    permissions={currentPermissions} shcc={this.shcc}
+                    permissions={currentPermissions} shcc={this.shcc} hoten={this.hoten}
                     update={this.props.updateQtBaiVietKhoaHocGroupPageMa} create={this.props.createQtBaiVietKhoaHocGroupPageMa}
                 />
             </>,

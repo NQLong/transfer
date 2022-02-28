@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.khcn,
         menus: {
-            9501: { title: 'Danh sách bài viết khoa học', link: '/user/khcn/qua-trinh/bai-viet-khoa-hoc', icon: 'fa-quote-right', backgroundColor: '#23a0b0' },
+            9502: { title: 'Danh sách bài viết khoa học', link: '/user/khcn/qua-trinh/bai-viet-khoa-hoc', icon: 'fa-quote-right', backgroundColor: '#23a0b0' },
         },
     };
     const menuStaff = {
