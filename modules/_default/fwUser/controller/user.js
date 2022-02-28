@@ -20,28 +20,32 @@ module.exports = app => {
             app.model.fwUser.count({}, (error, numberOfUser) => app.data.numberOfUser = error ? 0 : numberOfUser.rows[0]['COUNT(*)']);
 
             // Tạo Admin user
-            new Promise(resolve => {
+            new Promise((resolve, reject) => {
                 app.model.fwRole.get({ name: 'admin' }, (error, role) => {
                     if (error) {
                         console.log('Error once get Admin role.');
                     } else if (role == null) {
                         app.model.fwRole.create({ name: 'admin', active: 1, isDefault: 0 }, (error, adminRole) => {
                             if (error || adminRole == null) {
-                                console.log(' - Error: Cannot create admin role!', error);
+                                console.log(` - #${process.pid}: Cannot create admin role!`, error.message);
+                                reject();
                             } else {
-                                console.log(' - Create admin role successfully!');
+                                console.log(` - #${process.pid}: Create admin role successfully!`);
                                 resolve(adminRole);
                             }
                         });
                     } else if (!app.isDebug) {
                         app.model.fwRole.update({ id: role.id }, { permission: app.permission.all().toString() }, (error, role) => {
                             if (error) {
-                                console.log(' - Error: Cannot create admin role!', error);
+                                console.log(` - #${process.pid}: Cannot create admin role!`, error.message);
+                                reject();
                             } else {
-                                console.log(' - Update admin role successfully!');
+                                console.log(` - #${process.pid}: Update admin role successfully!`);
                                 resolve(role);
                             }
                         });
+                    } else {
+                        app.model.fwRole.update({ id: role.id }, { permission: app.permission.all().toString() }, () => false);
                     }
                 });
             }).then(adminRole => {

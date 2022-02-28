@@ -136,7 +136,7 @@ module.exports = app => {
 
             if (ready) {
                 hookKeys.forEach(hookKey => readyHookContainer[hookKey].run());
-                console.log(` - #${process.pid}: The system is ready!`);
+                console.log(` - #${process.pid}${app.primaryWorker ? ' (primary)' : ''}: The system is ready!`);
             } else {
                 app.readyHooks.waiting();
             }

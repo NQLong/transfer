@@ -24,7 +24,7 @@ module.exports = async (app, db) => {
         password: db.password,
     }), timeoutPromise()]).then(connection => {
         if (connection) {
-            console.log(' - The Oracle connection succeeded.');
+            console.log(` - #${process.pid}: The Oracle connection succeeded.`);
             app.dbConnection = connection;
             app.dbConnection.buildCondition = (mapper, condition, seperation, preParam = '') => {
                 if (condition.statement && condition.parameter) {
@@ -125,7 +125,7 @@ module.exports = async (app, db) => {
             }, 1000);
         }
     }).catch(error => {
-        console.error(' - Could not connect to Oracle!');
+        console.log(` - #${process.pid}: Could not connect to Oracle!`, error);
         console.error(error);
         process.exit(1);
     });

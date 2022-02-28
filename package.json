@@ -49,6 +49,7 @@
     "path": {
         "view": "view",
         "modules": "modules",
+        "asset": "asset",
         "temp": "asset/temp",
         "upload": "asset/upload",
         "document": "asset/upload/document",
@@ -100,6 +101,7 @@
         "copy-to-clipboard": "^3.3.1",
         "cors": "^2.8.5",
         "docxtemplater": "^3.19.7",
+        "decompress-zip": "^0.3.3",
         "docxtemplater-image-module-free": "^1.1.1",
         "eslint": "^7.24.0",
         "eslint-plugin-react": "^7.23.2",
