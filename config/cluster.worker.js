@@ -39,7 +39,7 @@ module.exports = (cluster, isDebug) => {
     require('./common')(app, appConfig.name);
     require('./view')(app, express);
     require('./packages')(app, server, appConfig);
-    require('./database')(app, appConfig.db);
+    require('./database')(app, appConfig);
     require('./authentication')(app);
     require('./permission')(app);
     require('./authentication.google')(app, appConfig);

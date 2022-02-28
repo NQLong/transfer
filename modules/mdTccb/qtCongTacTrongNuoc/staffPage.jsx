@@ -249,7 +249,7 @@ class QtCongTacTrongNuocUserPage extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-fighter-jet',
+            icon: 'fa fa-pencil-square-o',
             title: 'Quá trình công tác trong nước',
             subTitle: <span style={{ color: 'blue' }}>Cán bộ: {name}</span>,
             breadcrumb: [

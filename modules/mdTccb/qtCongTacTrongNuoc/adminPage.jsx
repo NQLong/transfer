@@ -378,7 +378,7 @@ class QtCongTacTrongNuoc extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-fighter-jet',
+            icon: 'fa fa-pencil-square-o',
             title: ' Quá trình công tác trong nước',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,

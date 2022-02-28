@@ -2,13 +2,13 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.khcn,
         menus: {
-            9503: { title: 'Quá trình bằng phát minh', link: '/user/khcn/qua-trinh/bang-phat-minh', icon: 'fa fa-fax', color: '#000000', backgroundColor: '#f4fc03', groupIndex: 5 },
+            9503: { title: 'Quá trình bằng phát minh', link: '/user/khcn/qua-trinh/bang-phat-minh', icon: 'fa fa-cogs', color: '#000000', backgroundColor: '#00e34c', groupIndex: 5 },
         },
     };
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1030: { title: 'Bằng phát minh', link: '/user/bang-phat-minh', icon: 'fa fa-fax', backgroundColor: '#f4fc03', groupIndex: 4 },
+            1030: { title: 'Bằng phát minh', link: '/user/bang-phat-minh', icon: 'fa fa-cogs', backgroundColor: '#00e34c', groupIndex: 4 },
         },
     };
 
