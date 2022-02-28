@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3001: { title: 'Danh sách cán bộ', link: '/user/tccb/staff', icon: 'fa-users', backgroundColor: '#8bc34a', groupIndex: 0 },
+            3007: { title: 'Danh sách cán bộ', link: '/user/tccb/staff', icon: 'fa-users', backgroundColor: '#8bc34a', groupIndex: 0 },
         },
     };
 
@@ -67,7 +67,7 @@ module.exports = app => {
                 };
             }
         }
-        app.model.canBo.getPage(pageNumber, pageSize, condition, (error, page) => {
+        app.model.canBo.getPage(pageNumber, pageSize, condition, '*', 'SHCC DESC, TEN ASC', (error, page) => {
             res.send({ error, page });
         });
     });

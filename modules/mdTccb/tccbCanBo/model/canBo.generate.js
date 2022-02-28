@@ -130,5 +130,10 @@ module.exports = app => {
             const sql = 'SELECT COUNT(*) FROM TCHC_CAN_BO' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.dbConnection.execute(sql, parameter, (error, result) => done(error, result));
         },
+
+        tccbDasboardTotalGender: (done) => {
+            app.dbConnection.execute('BEGIN :ret:=tccb_dashboard_total_gender(); END;',
+                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
+        },
     };
 };

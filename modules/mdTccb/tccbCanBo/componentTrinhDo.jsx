@@ -302,12 +302,14 @@ class ComponentTrinhDo extends AdminPage {
 
     getAndValidate = () => {
         try {
+            let hocViCB = this.state.tienSi ? '02' : (this.state.thacSi ? '03' : (this.state.cuNhan ? '04' : ''));
             const data = {
                 trinhDoPhoThong: this.getValue(this.trinhDoPhoThong),
                 cuNhan: this.getValue(this.cuNhan) ? 1 : 0,
                 tienSi: this.getValue(this.tienSi) ? 1 : 0,
                 thacSi: this.getValue(this.thacSi) ? 1 : 0,
                 chucDanh: this.getValue(this.chucDanh),
+                hocVi: hocViCB,
                 namChucDanh: this.getValue(this.namChucDanh),
                 coSoChucDanh: this.getValue(this.coSoChucDanh),
                 chuyenNganhChucDanh: this.getValue(this.chuyenNganh),

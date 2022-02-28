@@ -6,6 +6,13 @@ module.exports = app => {
         },
     };
 
+    // const menuTCCB = {
+    //     parentMenu: app.parentMenu.tccb,
+    //     menus: {
+    //         3013: { title: 'Quá trình nghiên cứu khoa học', link: '/user/tccb/qua-trinh/nghien-cuu-khoa-hoc', icon: 'fa-wpexplorer', backgroundColor: '#f03a88', groupIndex: 5 },
+    //     },
+    // };
+
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
@@ -14,6 +21,7 @@ module.exports = app => {
     };
 
     app.permission.add(
+        // { name: 'qtNghienCuuKhoaHoc:onlyRead', menu: menuTCCB },
         { name: 'staff:login', menu: menuStaff },
         { name: 'qtNghienCuuKhoaHoc:read', menu },
         { name: 'qtNghienCuuKhoaHoc:write' },
@@ -22,8 +30,14 @@ module.exports = app => {
 
     app.get('/user/khcn/qua-trinh/nghien-cuu-khoa-hoc/:id', app.permission.check('qtNghienCuuKhoaHoc:read'), app.templates.admin);
     app.get('/user/khcn/qua-trinh/nghien-cuu-khoa-hoc', app.permission.check('qtNghienCuuKhoaHoc:read'), app.templates.admin);
-    app.get('/user/khcn/qua-trinh/nghien-cuu-khoa-hoc/group_nckh/:loaiDoiTuong/:ma', app.permission.check('qtNghienCuuKhoaHoc:read'), app.templates.admin);
+    app.get('/user/khcn/qua-trinh/nghien-cuu-khoa-hoc/group/:shcc', app.permission.check('qtNghienCuuKhoaHoc:read'), app.templates.admin);
+
+    // app.get('/user/tccb/qua-trinh/nghien-cuu-khoa-hoc/:id', app.permission.check('qtNghienCuuKhoaHoc:onlyRead'), app.templates.admin);
+    // app.get('/user/tccb/qua-trinh/nghien-cuu-khoa-hoc', app.permission.check('qtNghienCuuKhoaHoc:onlyRead'), app.templates.admin);
+    // app.get('/user/tccb/qua-trinh/nghien-cuu-khoa-hoc/group/:shcc', app.permission.check('qtNghienCuuKhoaHoc:onlyRead'), app.templates.admin);
+
     app.get('/user/nghien-cuu-khoa-hoc', app.permission.check('staff:login'), app.templates.admin);
+    app.get('/user/nghien-cuu-khoa-hoc/:id/:ownerShcc', app.permission.check('staff:login'), app.templates.admin);
     // Hook ready -----------------------------------------------------------------------------------------------------------------------------------
     app.readyHooks.add('readyQtNghienCuuKhoaHoc', {
         ready: () => app.dbConnection && app.model && app.model.qtNghienCuuKhoaHoc,
@@ -34,16 +48,15 @@ module.exports = app => {
             }
         }),
     });
+    // const checkReadPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/khcn/qua-trinh/nghien-cuu-khoa-hoc/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
-            mscb = req.query.mscb ? req.query.mscb : '',
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { maDonVi, fromYear, toYear, loaiHocVi, maSoCanBo } = req.query.filter ? req.query.filter : { maDonVi: '', fromYear: null, toYear: null, loaiHocVi: '', maSoCanBo: '' };
-        const filter = `%${fromYear ? fromYear : ''}%${toYear ? toYear : ''}%${loaiHocVi ? loaiHocVi : ''}%${maDonVi ? maDonVi : ''}%${maSoCanBo ? maSoCanBo : ''}%%`;
-        app.model.qtNghienCuuKhoaHoc.searchPage(pageNumber, pageSize, searchTerm, mscb, filter, (error, page) => {
+        const { fromYear, toYear, loaiHocVi, maSoCanBo, timeType, maDonVi } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, maSoCanBo: null, loaiHocVi: null, timeType: 0, maDonVi: null };
+        app.model.qtNghienCuuKhoaHoc.searchPage(pageNumber, pageSize, searchTerm, maSoCanBo, loaiHocVi, fromYear, toYear, timeType, maDonVi, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -57,32 +70,15 @@ module.exports = app => {
     app.get('/api/khcn/qua-trinh/nghien-cuu-khoa-hoc/group/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
-            mscb = req.query.mscb ? req.query.mscb : '',
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { maDonVi, fromYear, toYear, loaiHocVi, maSoCanBo } = req.query.filter ? req.query.filter : { maDonVi: '', fromYear: null, toYear: null, loaiHocVi: '', maSoCanBo: '' };
-        const filter = `%${fromYear ? fromYear : ''}%${toYear ? toYear : ''}%${loaiHocVi ? loaiHocVi : ''}%${maDonVi ? maDonVi : ''}%${maSoCanBo ? maSoCanBo : ''}%%`;
-        app.model.qtNghienCuuKhoaHoc.groupPage(pageNumber, pageSize, searchTerm, mscb, filter, (error, page) => {
+        const { fromYear, toYear, loaiHocVi, maSoCanBo, timeType, maDonVi } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, maSoCanBo: null, loaiHocVi: null, timeType: 0, maDonVi: null };
+        app.model.qtNghienCuuKhoaHoc.groupPage(pageNumber, pageSize, searchTerm, maSoCanBo, loaiHocVi, fromYear, toYear, timeType, maDonVi, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
                 const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
                 const pageCondition = searchTerm;
                 res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
-            }
-        });
-    });
-
-    app.get('/api/khcn/qua-trinh/nghien-cuu-khoa-hoc/group_nckh/page/:loaiDoiTuong/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
-        const pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize),
-            loaiDoiTuong = req.params.loaiDoiTuong,
-            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        app.model.qtNghienCuuKhoaHoc.groupPageMa(pageNumber, pageSize, loaiDoiTuong, searchTerm, (error, page) => {
-            if (error || page == null) {
-                res.send({ error });
-            } else {
-                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
-                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, list } });
             }
         });
     });
@@ -170,7 +166,29 @@ module.exports = app => {
     app.post('/api/user/qua-trinh/nckh', app.permission.check('staff:login'), (req, res) => {
         if (req.body.data && req.session.user) {
             const data = req.body.data;
-            app.model.qtNghienCuuKhoaHoc.create(data, (error, item) => res.send({ error, item }));
+            app.model.qtNghienCuuKhoaHoc.create(data, async (error, item) => {
+                //TO_DO: Delete /new Insert /ID
+
+                // if (!error && item) {
+                //     if (item.fileMinhChung && JSON.parse(item.fileMinhChung).length > 0) {
+                //         new Promise(resolve => {
+                //             JSON.parse(item.fileMinhChung).map(file => {
+                //                 app.fs.rename(app.assetPath + '/deTaiNCKH/new/' + file, app.assetPath + '/deTaiNCKH/' + item.id + '/' + file, (err) => {
+                //                     if (err) {
+                //                         res.send({ errorFile: err });
+                //                     }
+                //                 });
+                //             });
+                //             resolve();
+                //         }).then(() => {
+                //             JSON.parse(item.fileMinhChung).map(file => app.deleteFile(app.assetPath + '/deTaiNCKH/new' + file));
+                //             const folderPath = app.assetPath + '/deTaiNCKH/new';
+                //             if (app.fs.existsSync(folderPath) && app.fs.readdirSync(folderPath).length == 0) app.fs.rmdirSync(folderPath);
+                //         });
+                //     }
+                // }
+                res.send({ error, item });
+            });
         } else {
             res.send({ error: 'Invalid parameter!' });
         }
@@ -178,7 +196,6 @@ module.exports = app => {
 
     app.put('/api/user/qua-trinh/nckh', app.permission.check('staff:login'), (req, res) => {
         if (req.body.changes && req.session.user) {
-            console.log(req.session);
             app.model.qtNghienCuuKhoaHoc.get({ id: req.body.id }, (error, item) => {
                 if (error || item == null) {
                     res.send({ error: 'Not found!' });
@@ -197,90 +214,171 @@ module.exports = app => {
     });
 
     app.delete('/api/user/qua-trinh/nckh', app.permission.check('staff:login'), (req, res) => {
-        if (req.session.user) {
-            app.model.qtNghienCuuKhoaHoc.get({ id: req.body.id }, (error, item) => {
-                if (error || item == null) {
-                    res.send({ error: 'Not found!' });
-                } else {
-                    app.model.canBo.get({ shcc: item.shcc }, (e, r) => {
-                        if (e || r == null) res.send({ error: 'Not found!' }); else {
-                            app.model.qtNghienCuuKhoaHoc.delete({ id: req.body.id }, (error, item) => res.send({ error, item }));
-                        }
-                    });
+        app.model.qtNghienCuuKhoaHoc.get({ shcc: req.body.shcc, id: req.body.id }, (error, item) => {
+            if (!error && item) {
+                if (item.fileMinhChung && JSON.parse(item.fileMinhChung).length > 0) {
+                    JSON.parse(item.fileMinhChung).map(file => app.deleteFile(app.assetPath + '/deTaiNCKH' + file));
+                    const folderPath = app.assetPath + '/deTaiNCKH/' + item.id;
+                    if (app.fs.existsSync(folderPath) && app.fs.readdirSync(folderPath).length == 0) app.fs.rmdirSync(folderPath);
                 }
-            });
-        } else {
-            res.send({ error: 'Invalid parameter!' });
-        }
-    });
-
-    const qtNCKHImportData = (fields, files, done) => {
-        let worksheet = null;
-        new Promise((resolve, reject) => {
-            if (fields.userData && fields.userData[0] && fields.userData[0] == 'NCKHDataFile' && files.NCKHDataFile && files.NCKHDataFile.length) {
-                const srcPath = files.NCKHDataFile[0].path;
-                const workbook = app.excel.create();
-                workbook.xlsx.readFile(srcPath).then(() => {
-                    app.deleteFile(srcPath);
-                    worksheet = workbook.getWorksheet(1);
-                    worksheet ? resolve() : reject('File dữ liệu không hợp lệ!');
+                app.model.qtNghienCuuKhoaHoc.delete({ shcc: req.body.shcc, id: req.body.id }, e => {
+                    res.send({ error: e });
                 });
             }
-        }).then(() => {
-            let index = 1,
-                items = [];
-            while (true) {
-                index++;
-                let flag = worksheet.getCell('A' + index).value;
-                if (flag) {
-                    let tenDeTai = worksheet.getCell('A' + index).value ? worksheet.getCell('A' + index).value.toString().trim() : '',
-                        maSoCapQuanLy = worksheet.getCell('B' + index).value ? worksheet.getCell('B' + index).value.toString().trim() : '',
-                        vaiTro = worksheet.getCell('C' + index).value ? worksheet.getCell('C' + index).value.toString().trim() : '',
-                        batDau = worksheet.getCell('D' + index).value ? worksheet.getCell('D' + index).value : '',
-                        batDauType = worksheet.getCell('D' + index).value ? 'mm/yyyy' : '',
-                        ketThuc = worksheet.getCell('E' + index).value ? worksheet.getCell('E' + index).value : '',
-                        ketThucType = worksheet.getCell('E' + index).value ? 'mm/yyyy' : '',
-                        ngayNghiemThu = worksheet.getCell('F' + index).value ? worksheet.getCell('F' + index).value : '',
-                        ngayNghiemThuType = worksheet.getCell('F' + index).value ? 'mm/yyyy' : '',
-                        kinhPhi = worksheet.getCell('G' + index).value ? worksheet.getCell('G' + index).value.toString().trim() : '',
-                        ketQua = worksheet.getCell('H' + index).value ? worksheet.getCell('H' + index).value.toString().trim() : '';
-                    if (isNaN(Date.parse(batDau))) {
-                        done({ error: 'Sai định dạng cột bắt đầu' });
-                    }
-                    else if (isNaN(Date.parse(ketThuc))) {
-                        done({ error: 'Sai định dạng cột kết thúc' });
-                    }
-                    else if (isNaN(Date.parse(ngayNghiemThu))) {
-                        done({ error: 'Sai định dạng cột nghiệm thu' });
-                    }
-                    else items.push({ tenDeTai, maSoCapQuanLy, vaiTro, batDau, batDauType, ketThuc, ketThucType, ngayNghiemThu, ngayNghiemThuType, kinhPhi, ketQua });
-                } else {
-                    done({ items });
-                    break;
+        })
+    });
+
+    app.get('/api/user/qua-trinh/nckh/item/:id/:shcc', app.permission.check('staff:login'), (req, res) => {
+        app.model.qtNghienCuuKhoaHoc.get({ id: req.params.id, shcc: req.params.shcc }, (error, item) => res.send({ error, item }));
+    });
+
+    // const qtNCKHImportData = (fields, files, done) => {
+    //     let worksheet = null;
+    //     new Promise((resolve, reject) => {
+    //         if (fields.userData && fields.userData[0] && fields.userData[0] == 'NCKHDataFile' && files.NCKHDataFile && files.NCKHDataFile.length) {
+    //             const srcPath = files.NCKHDataFile[0].path;
+    //             const workbook = app.excel.create();
+    //             workbook.xlsx.readFile(srcPath).then(() => {
+    //                 app.deleteFile(srcPath);
+    //                 worksheet = workbook.getWorksheet(1);
+    //                 worksheet ? resolve() : reject('File dữ liệu không hợp lệ!');
+    //             });
+    //         }
+    //     }).then(() => {
+    //         let index = 1,
+    //             items = [];
+    //         while (true) {
+    //             index++;
+    //             let flag = worksheet.getCell('A' + index).value;
+    //             if (flag) {
+    //                 let tenDeTai = worksheet.getCell('A' + index).value ? worksheet.getCell('A' + index).value.toString().trim() : '',
+    //                     maSoCapQuanLy = worksheet.getCell('B' + index).value ? worksheet.getCell('B' + index).value.toString().trim() : '',
+    //                     vaiTro = worksheet.getCell('C' + index).value ? worksheet.getCell('C' + index).value.toString().trim() : '',
+    //                     batDau = worksheet.getCell('D' + index).value ? worksheet.getCell('D' + index).value : '',
+    //                     batDauType = worksheet.getCell('D' + index).value ? 'mm/yyyy' : '',
+    //                     ketThuc = worksheet.getCell('E' + index).value ? worksheet.getCell('E' + index).value : '',
+    //                     ketThucType = worksheet.getCell('E' + index).value ? 'mm/yyyy' : '',
+    //                     ngayNghiemThu = worksheet.getCell('F' + index).value ? worksheet.getCell('F' + index).value : '',
+    //                     ngayNghiemThuType = worksheet.getCell('F' + index).value ? 'mm/yyyy' : '',
+    //                     kinhPhi = worksheet.getCell('G' + index).value ? worksheet.getCell('G' + index).value.toString().trim() : '',
+    //                     ketQua = worksheet.getCell('H' + index).value ? worksheet.getCell('H' + index).value.toString().trim() : '';
+    //                 if (isNaN(Date.parse(batDau))) {
+    //                     done({ error: 'Sai định dạng cột bắt đầu' });
+    //                 }
+    //                 else if (isNaN(Date.parse(ketThuc))) {
+    //                     done({ error: 'Sai định dạng cột kết thúc' });
+    //                 }
+    //                 else if (isNaN(Date.parse(ngayNghiemThu))) {
+    //                     done({ error: 'Sai định dạng cột nghiệm thu' });
+    //                 }
+    //                 else items.push({ tenDeTai, maSoCapQuanLy, vaiTro, batDau, batDauType, ketThuc, ketThucType, ngayNghiemThu, ngayNghiemThuType, kinhPhi, ketQua });
+    //             } else {
+    //                 done({ items });
+    //                 break;
+    //             }
+    //         }
+
+    //     }).catch(error => done({ error }));
+    // };
+
+    // app.uploadHooks.add('NCKHDataFile', (req, fields, files, params, done) =>
+    //     app.permission.has(req, () => qtNCKHImportData(fields, files, done), done, 'staff:login'));
+
+    // app.get('/api/qua-trinh/nghien-cuu-khoa-hoc/download-template', app.permission.check('staff:login'), (req, res) => {
+    //     const workBook = app.excel.create();
+    //     const ws = workBook.addWorksheet('Qua_trinh_NCKH_Template');
+    //     const defaultColumns = [
+    //         { header: 'TÊN ĐỀ TÀI', key: 'tenDeTai', width: 40 },
+    //         { header: 'MÃ SỐ VÀ CẤP QUẢN LÝ', key: 'maSoCapQuanLy', width: 30 },
+    //         { header: 'VAI TRÒ', key: 'vaiTro', width: 15 },
+    //         { header: 'BẮT ĐẦU (mm/yyyy)', key: 'batDau', width: 20, style: { numFmt: 'mm/yyyy' } },
+    //         { header: 'KẾT THÚC (mm/yyyy)', key: 'ketThuc', width: 20, style: { numFmt: 'mm/yyyy' } },
+    //         { header: 'NGHIỆM THU (mm/yyyy)', key: 'ngayNghiemThu', width: 20, style: { numFmt: 'mm/yyyy' } },
+    //         { header: 'KINH PHÍ', key: 'kinhPhi', width: 15 },
+    //         { header: 'KẾT QUẢ', key: 'ketQua', width: 15 },
+    //     ];
+    //     ws.columns = defaultColumns;
+    //     ws.getRow(1).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', horizontal: 'center' };
+    //     app.excel.attachment(workBook, res, 'Qua_trinh_NCKH_Template.xlsx');
+    // });
+
+    //Upload File
+    // app.createFolder(app.path.join(app.assetPath, '/khcnDetaiNckh'));
+
+    app.createFolder(app.path.join(app.assetPath, '/deTaiNCKH'));
+
+
+    app.get('/api/khcn/download/:id/:fileName', app.permission.check('staff:login'), (req, res) => {
+        const { id, fileName } = req.params;
+        const dir = app.path.join(app.assetPath, `/deTaiNCKH/${id}`);
+
+        if (app.fs.existsSync(dir)) {
+            const serverFileNames = app.fs.readdirSync(dir).filter(v => app.fs.lstatSync(app.path.join(dir, v)).isFile());
+            for (const serverFileName of serverFileNames) {
+                const clientFileIndex = serverFileName.indexOf(fileName);
+                if (clientFileIndex !== -1 && serverFileName.slice(clientFileIndex) === fileName) {
+                    return res.sendFile(app.path.join(dir, serverFileName));
                 }
             }
+        }
 
-        }).catch(error => done({ error }));
+        res.status(400).send('Không tìm thấy tập tin');
+    });
+
+    app.uploadHooks.add('deTaiNCKHStaffFile', (req, fields, files, params, done) =>
+        app.permission.has(req, () => deTaiNCKHStaffFile(req, fields, files, params, done), done, 'staff:login'));
+
+    const deTaiNCKHStaffFile = (req, fields, files, params, done) => {
+        if (fields.userData && fields.userData[0] && fields.userData[0].startsWith('DeTaiNCKHStaffFile') && files.deTaiNCKHStaffFile && files.deTaiNCKHStaffFile.length > 0) {
+            const user = req.session.user,
+                srcPath = files.deTaiNCKHStaffFile[0].path,
+                filePath = (fields.userData[0].substring(19) != 'new' ? '/' + fields.userData[0].substring(19) : '/new') + '/' + user.shcc + '_' + (new Date().getTime()).toString() + '_' + files.deTaiNCKHStaffFile[0].originalFilename,
+                destPath = app.assetPath + '/deTaiNCKH' + filePath,
+                validUploadFileType = ['.xls', '.xlsx', '.doc', '.docx', '.pdf', '.png', '.jpg'],
+                baseNamePath = app.path.extname(srcPath);
+            if (!validUploadFileType.includes(baseNamePath.toLowerCase())) {
+                done({ error: 'Định dạng tập tin không hợp lệ!' });
+                app.deleteFile(srcPath);
+            } else {
+                app.createFolder(
+                    app.path.join(app.assetPath, '/deTaiNCKH/' + (fields.userData[0].substring(19) != 'new' ? '/' + fields.userData[0].substring(19) : '/new'))
+                );
+                app.fs.rename(srcPath, destPath, error => {
+                    if (error) {
+                        done({ error });
+                    } else {
+                        done({ data: filePath });
+                    }
+                });
+            }
+        }
     };
 
-    app.uploadHooks.add('NCKHDataFile', (req, fields, files, params, done) =>
-        app.permission.has(req, () => qtNCKHImportData(fields, files, done), done, 'staff:login'));
-
-    app.get('/api/qua-trinh/nghien-cuu-khoa-hoc/download-template', app.permission.check('staff:login'), (req, res) => {
-        const workBook = app.excel.create();
-        const ws = workBook.addWorksheet('Qua_trinh_NCKH_Template');
-        const defaultColumns = [
-            { header: 'TÊN ĐỀ TÀI', key: 'tenDeTai', width: 40 },
-            { header: 'MÃ SỐ VÀ CẤP QUẢN LÝ', key: 'maSoCapQuanLy', width: 30 },
-            { header: 'VAI TRÒ', key: 'vaiTro', width: 15 },
-            { header: 'BẮT ĐẦU (mm/yyyy)', key: 'batDau', width: 20, style: { numFmt: 'mm/yyyy' } },
-            { header: 'KẾT THÚC (mm/yyyy)', key: 'ketThuc', width: 20, style: { numFmt: 'mm/yyyy' } },
-            { header: 'NGHIỆM THU (mm/yyyy)', key: 'ngayNghiemThu', width: 20, style: { numFmt: 'mm/yyyy' } },
-            { header: 'KINH PHÍ', key: 'kinhPhi', width: 15 },
-            { header: 'KẾT QUẢ', key: 'ketQua', width: 15 },
-        ];
-        ws.columns = defaultColumns;
-        ws.getRow(1).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', horizontal: 'center' };
-        app.excel.attachment(workBook, res, 'Qua_trinh_NCKH_Template.xlsx');
+    //Delete file
+    app.put('/api/khcn/de-tai-nckh/delete-file', app.permission.check('staff:login'), (req, res) => {
+        const id = req.body.id,
+            shcc = req.body.shcc,
+            index = req.body.index,
+            file = req.body.file;
+        app.model.qtNghienCuuKhoaHoc.get({ id: id, shcc: shcc }, (error, item) => {
+            if (error) {
+                res.send({ error });
+            } else if (item && item.fileMinhChung) {
+                let newList = JSON.parse(item.fileMinhChung);
+                app.deleteFile(app.assetPath + '/deTaiNCKH' + newList[index]);
+                newList.splice(index, 1);
+                app.model.qtNghienCuuKhoaHoc.update(id, { fileMinhChung: JSON.stringify(newList) }, (error, qtNghienCuuKhoaHoc) => {
+                    res.send({ error, qtNghienCuuKhoaHoc });
+                });
+            } else {
+                const filePath = app.path.join(app.assetPath, '/deTaiNCKH', file);
+                if (app.fs.existsSync(filePath)) {
+                    app.deleteFile(filePath);
+                    res.send({ error: null });
+                } else {
+                    res.send({ error: 'Không tìm thấy đề tài' });
+                }
+            }
+        });
     });
 };

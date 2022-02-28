@@ -1,6 +1,6 @@
-// Table name: QT_NGHIEN_CUU_KHOA_HOC { id, tenDeTai, maSoCapQuanLy, kinhPhi, vaiTro, ngayNghiemThu, ketQua, shcc, batDau, ketThuc, batDauType, ketThucType, ngayNghiemThuType, thoiGian }
+// Table name: QT_NGHIEN_CUU_KHOA_HOC { id, tenDeTai, maSoCapQuanLy, kinhPhi, vaiTro, ngayNghiemThu, ketQua, shcc, batDau, ketThuc, batDauType, ketThucType, ngayNghiemThuType, thoiGian, fileMinhChung, inLlkh }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'tenDeTai': 'TEN_DE_TAI', 'maSoCapQuanLy': 'MA_SO_CAP_QUAN_LY', 'kinhPhi': 'KINH_PHI', 'vaiTro': 'VAI_TRO', 'ngayNghiemThu': 'NGAY_NGHIEM_THU', 'ketQua': 'KET_QUA', 'shcc': 'SHCC', 'batDau': 'BAT_DAU', 'ketThuc': 'KET_THUC', 'batDauType': 'BAT_DAU_TYPE', 'ketThucType': 'KET_THUC_TYPE', 'ngayNghiemThuType': 'NGAY_NGHIEM_THU_TYPE', 'thoiGian': 'THOI_GIAN' };
+const obj2Db = { 'id': 'ID', 'tenDeTai': 'TEN_DE_TAI', 'maSoCapQuanLy': 'MA_SO_CAP_QUAN_LY', 'kinhPhi': 'KINH_PHI', 'vaiTro': 'VAI_TRO', 'ngayNghiemThu': 'NGAY_NGHIEM_THU', 'ketQua': 'KET_QUA', 'shcc': 'SHCC', 'batDau': 'BAT_DAU', 'ketThuc': 'KET_THUC', 'batDauType': 'BAT_DAU_TYPE', 'ketThucType': 'KET_THUC_TYPE', 'ngayNghiemThuType': 'NGAY_NGHIEM_THU_TYPE', 'thoiGian': 'THOI_GIAN', 'fileMinhChung': 'FILE_MINH_CHUNG', 'inLlkh': 'IN_LLKH' };
 
 module.exports = app => {
     app.model.qtNghienCuuKhoaHoc = {
@@ -129,6 +129,26 @@ module.exports = app => {
             const parameter = condition.parameter ? condition.parameter : {};
             const sql = 'SELECT COUNT(*) FROM QT_NGHIEN_CUU_KHOA_HOC' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.dbConnection.execute(sql, parameter, (error, result) => done(error, result));
+        },
+
+        searchPage: (pagenumber, pagesize, searchterm, masocanbo, loaihocvi, fromyear, toyear, timetype, madonvi, done) => {
+            app.dbConnection.execute('BEGIN :ret:=qt_nghien_cuu_khoa_hoc_search_page(:pagenumber, :pagesize, :searchterm, :masocanbo, :loaihocvi, :fromyear, :toyear, :timetype, :madonvi, :totalitem, :pagetotal); END;',
+                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, pagenumber: { val: pagenumber, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, pagesize: { val: pagesize, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, searchterm, masocanbo, loaihocvi, fromyear, toyear, timetype, madonvi, totalitem: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pagetotal: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
+        },
+
+        groupPage: (pagenumber, pagesize, searchterm, masocanbo, loaihocvi, fromyear, toyear, timetype, madonvi, done) => {
+            app.dbConnection.execute('BEGIN :ret:=qt_nghien_cuu_khoa_hoc_group_page(:pagenumber, :pagesize, :searchterm, :masocanbo, :loaihocvi, :fromyear, :toyear, :timetype, :madonvi, :totalitem, :pagetotal); END;',
+                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, pagenumber: { val: pagenumber, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, pagesize: { val: pagesize, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, searchterm, masocanbo, loaihocvi, fromyear, toyear, timetype, madonvi, totalitem: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pagetotal: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
+        },
+
+        downloadExcel: (filter, done) => {
+            app.dbConnection.execute('BEGIN :ret:=qt_nghien_cuu_khoa_hoc_download_excel(:filter); END;',
+                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, filter }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
+        },
+
+        userPage: (staffemail, done) => {
+            app.dbConnection.execute('BEGIN :ret:=qt_nghien_cuu_khoa_hoc_user_page(:staffemail); END;',
+                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, staffemail }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
         },
     };
 };

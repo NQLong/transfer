@@ -136,7 +136,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_414121\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88712\".nextval",
                 "nullable": false,
                 "size": "22,0"
             }
@@ -155,7 +155,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_414123\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88715\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -249,7 +249,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316116\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88720\".nextval",
                 "nullable": false,
                 "size": "20,0"
             },
@@ -475,7 +475,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_420069\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88733\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -536,7 +536,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_414126\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88736\".nextval",
                 "nullable": false,
                 "size": "1,0"
             }
@@ -590,7 +590,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316120\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88739\".nextval",
                 "nullable": false,
                 "size": "22,0"
             }
@@ -1063,7 +1063,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316130\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88764\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -1169,7 +1169,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316134\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88771\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -1544,7 +1544,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_492998\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88796\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -1704,7 +1704,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316146\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88805\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -1897,7 +1897,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_526667\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88816\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -2045,7 +2045,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316151\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88823\".nextval",
                 "nullable": false,
                 "size": "10,0"
             }
@@ -2184,7 +2184,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316156\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88832\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -2244,7 +2244,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316159\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88837\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -2536,7 +2536,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316168\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88854\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -3016,7 +3016,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316181\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88879\".nextval",
                 "nullable": false,
                 "size": "22,0"
             }
@@ -3115,7 +3115,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316185\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88886\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -3148,7 +3148,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316187\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88889\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -3515,7 +3515,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316195\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88908\".nextval",
                 "nullable": false,
                 "size": "22,0"
             }
@@ -3570,7 +3570,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_452404\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88913\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -3691,7 +3691,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_259355\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88916\".nextval",
                 "nullable": false,
                 "size": "20,0"
             },
@@ -3777,7 +3777,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_259764\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88921\".nextval",
                 "nullable": false,
                 "size": "20,0"
             },
@@ -3814,7 +3814,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_259360\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88924\".nextval",
                 "nullable": false,
                 "size": "20,0"
             },
@@ -3896,7 +3896,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236031\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88927\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -3943,7 +3943,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236033\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88930\".nextval",
                 "nullable": false,
                 "size": "22,0"
             }
@@ -3962,7 +3962,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236114\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88933\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -4026,7 +4026,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236116\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88936\".nextval",
                 "nullable": false,
                 "size": "20,0"
             },
@@ -4223,7 +4223,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236039\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88940\".nextval",
                 "nullable": false,
                 "size": "22,0"
             }
@@ -4424,7 +4424,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236042\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88945\".nextval",
                 "nullable": false,
                 "size": "22,0"
             }
@@ -4540,7 +4540,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236118\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88952\".nextval",
                 "nullable": false,
                 "size": "22,0"
             }
@@ -4587,7 +4587,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236123\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88955\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -4720,7 +4720,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236125\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88960\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -4774,7 +4774,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236053\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88963\".nextval",
                 "nullable": false,
                 "size": "22,0"
             }
@@ -4807,7 +4807,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236127\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88968\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -4847,7 +4847,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236129\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88971\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -4915,7 +4915,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236131\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88974\".nextval",
                 "nullable": false,
                 "size": "3,0"
             },
@@ -4986,14 +4986,14 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236133\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88977\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
             "MA_DON_VI": {
                 "value": "maDonVi",
                 "dataType": "NVARCHAR2",
-                "dataDefault": "-1",
+                "dataDefault": "'-1'",
                 "nullable": true,
                 "size": 5
             },
@@ -5047,7 +5047,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236135\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88980\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -5080,7 +5080,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236137\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88983\".nextval",
                 "nullable": false,
                 "size": "22,0"
             }
@@ -5148,7 +5148,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236139\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88986\".nextval",
                 "nullable": false,
                 "size": "22,0"
             }
@@ -5293,7 +5293,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236070\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88989\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -5346,7 +5346,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_521816\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88996\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -5477,7 +5477,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236141\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88999\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -5545,7 +5545,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236143\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89002\".nextval",
                 "nullable": false,
                 "size": "22,0"
             }
@@ -5590,7 +5590,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_248674\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89009\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -5908,7 +5908,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_238083\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89014\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -5965,7 +5965,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_236149\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89017\".nextval",
                 "nullable": false,
                 "size": "10,0"
             },
@@ -6102,7 +6102,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_325235\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89022\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -6184,7 +6184,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_325244\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89025\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -6259,7 +6259,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_498897\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89028\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -6369,7 +6369,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316662\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89031\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -6405,7 +6405,7 @@
             "STT": {
                 "value": "stt",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_466482\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89034\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -6501,7 +6501,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_526710\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89037\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -6653,7 +6653,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316666\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89040\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -6721,7 +6721,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_526686\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89043\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -6824,7 +6824,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_325241\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89046\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -6906,7 +6906,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316664\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89049\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -7090,7 +7090,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_447122\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89052\".nextval",
                 "nullable": false,
                 "size": "22,0"
             }
@@ -7400,7 +7400,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_457015\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89057\".nextval",
                 "nullable": false,
                 "size": "22,0"
             }
@@ -7419,7 +7419,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_324764\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89060\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -7480,7 +7480,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_498894\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89063\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -7555,7 +7555,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316679\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89066\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -7663,7 +7663,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_476591\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89069\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -7689,7 +7689,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_465773\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89072\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -7736,7 +7736,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_467235\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89075\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -7790,7 +7790,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316685\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89078\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -7872,7 +7872,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_325238\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89081\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -7954,7 +7954,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_325250\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89084\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -8050,7 +8050,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316660\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89087\".nextval",
                 "nullable": false,
                 "size": "22,0"
             }
@@ -8153,7 +8153,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_498900\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89090\".nextval",
                 "nullable": false,
                 "size": "22,0"
             }
@@ -8178,7 +8178,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316682\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89093\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -8208,7 +8208,7 @@
                 "dataType": "NVARCHAR2",
                 "dataDefault": "",
                 "nullable": true,
-                "size": 100
+                "size": 2
             },
             "NGAY_NGHIEM_THU": {
                 "value": "ngayNghiemThu",
@@ -8278,7 +8278,7 @@
                 "dataType": "NVARCHAR2",
                 "dataDefault": "",
                 "nullable": true,
-                "size": 100
+                "size": 1000
             },
             "IN_LLKH": {
                 "value": "inLlkh",
@@ -8302,7 +8302,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_498903\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89096\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -8545,7 +8545,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_501798\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89099\".nextval",
                 "nullable": false,
                 "size": "22,0"
             }
@@ -8646,13 +8646,13 @@
                 "value": "shcc",
                 "dataType": "NVARCHAR2",
                 "dataDefault": "",
-                "nullable": false,
-                "size": 20
+                "nullable": true,
+                "size": 15
             },
             "STT": {
                 "value": "stt",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_442480\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89102\".nextval",
                 "nullable": false,
                 "size": "22,0"
             }
@@ -8720,7 +8720,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_497802\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89105\".nextval",
                 "nullable": false,
                 "size": "22,0"
             }
@@ -8788,7 +8788,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316670\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89108\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -8828,7 +8828,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_325247\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89111\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -8885,7 +8885,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_316200\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89114\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -8967,7 +8967,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_324767\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89117\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -9049,7 +9049,7 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_490598\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89120\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },
@@ -9091,6 +9091,9 @@
     "TCHC_CAN_BO": {
         "active": true,
         "moduleName": "tccbCanBo",
+        "methods": {
+            "tccb_dashboard_total_gender": "tccbDasboardTotalGender"
+        },
         "modelName": "canBo",
         "columns": {
             "TEN": {
@@ -10289,7 +10292,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_317634\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89127\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },

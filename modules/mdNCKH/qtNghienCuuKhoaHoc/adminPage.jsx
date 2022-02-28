@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormCheckbox, FormRichTextBox, FormDatePicker } from 'view/component/AdminPage';
+import { AdminPage, TableCell, AdminModal, FormSelect, FormTextBox, FormCheckbox, FormRichTextBox, FormDatePicker, FormFileBox, renderTable } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
     createQtNckhStaff,
@@ -14,6 +14,7 @@ import { DateInput } from 'view/component/Input';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import Dropdown from 'view/component/Dropdown';
+
 
 const EnumDateType = Object.freeze({
     0: { text: '' },
@@ -37,36 +38,59 @@ class EditModal extends AdminModal {
 
     multiple = false;
 
-    onShow = (item, multiple = true) => {
+    onShow = (data, multiple = false) => {
         this.multiple = multiple;
-        let { id, shcc, batDauType, ketThucType, batDau, ketThuc, tenDeTai, maSoCapQuanLy, kinhPhi, vaiTro, ngayNghiemThu, ketQua, ngayNghiemThuType, thoiGian }
-            = item ? item :
+        let { id, shcc, batDauType, ketThucType, batDau, ketThuc,
+            tenDeTai, maSoCapQuanLy, kinhPhi, vaiTro, ngayNghiemThu, ketQua, ngayNghiemThuType }
+            = data ? data :
                 {
-                    id: null, shcc: '', batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', batDau: null, ketThuc: null, tenDeTai: '',
-                    maSoCapQuanLy: '', kinhPhi: '', vaiTro: '', ngayNghiemThu: null, ketQua: '', ngayNghiemThuType: 'dd/mm/yyyy', thoiGian: null
+                    id: null, shcc: shcc ? shcc : data.shcc, batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', batDau: null, ketThuc: null, tenDeTai: '',
+                    maSoCapQuanLy: '', kinhPhi: '', vaiTro: '', ngayNghiemThu: null, ketQua: '', ngayNghiemThuType: 'dd/mm/yyyy', fileMinhChung: '[]'
                 };
         this.setState({
+            shcc: shcc,
             batDauType: batDauType ? batDauType : 'dd/mm/yyyy',
-            ketThucType: ketThuc ? ketThucType : 'dd/mm/yyyy',
+            ketThucType: ketThucType ? ketThucType : 'dd/mm/yyyy',
             ngayNghiemThuType: ngayNghiemThuType ? ngayNghiemThuType : 'dd/mm/yyyy',
-            id, batDau, ketThuc, ngayNghiemThu
-        });
-        setTimeout(() => {
-            this.maCanBo.value(shcc);
-            this.batDauType.setText({ text: batDauType ? batDauType : 'dd/mm/yyyy' });
-            this.ketThucType.setText({ text: ketThucType ? ketThucType : 'dd/mm/yyyy' });
-            this.ngayNghiemThuType.setText({ text: ngayNghiemThuType ? ngayNghiemThuType : 'dd/mm/yyyy' });
-            this.batDau.setVal(batDau ? batDau : '');
-            this.ketThuc.setVal(ketThuc ? ketThuc : '');
+            id, batDau, ketThuc, ngayNghiemThu,
+            denNay: ketThuc == -1 ? 1 : 0,
+            nghiemThu: (ngayNghiemThu == -1 || ketThuc == -1) ? 1 : 0,
+        }, () => {
+            this.maCanBo.value(shcc ? shcc : '');
             this.tenDeTai.value(tenDeTai);
-            this.maSoCapQuanLy.value(maSoCapQuanLy ? maSoCapQuanLy : '');
+            this.maSo.value(maSoCapQuanLy);
+            this.batDauType.setText({ text: batDauType ? batDauType : 'dd/mm/yyyy' });
+            if (ngayNghiemThu != -1) {
+                this.nghiemThuCheck.value(0);
+                $('#done').show();
+                this.ngayNghiemThu?.setVal(ngayNghiemThu ? ngayNghiemThu : '');
+                this.ngayNghiemThuType?.setText({ text: ngayNghiemThuType ? ngayNghiemThuType : 'dd/mm/yyyy' });
+            } else {
+                this.nghiemThuCheck.value(1);
+                $('#done').hide();
+
+            }
+            if (ketThuc != -1) {
+                this.denNayCheck.value(0);
+
+                $('#end').show();
+
+                this.ketThucType?.setText({ text: ketThucType ? ketThucType : 'dd/mm/yyyy' });
+                this.ketThuc?.setVal(ketThuc ? ketThuc : '');
+            } else {
+                this.denNayCheck.value(1);
+                $('#end').hide();
+                this.nghiemThuCheck.value(1);
+                $('#done').hide();
+            }
+            this.batDau.setVal(batDau ? batDau : '');
             this.kinhPhi.value(kinhPhi ? kinhPhi : '');
-            this.thoiGian.value(thoiGian);
             this.vaiTro.value(vaiTro ? vaiTro : '');
-            this.ngayNghiemThu.setVal(ngayNghiemThu ? ngayNghiemThu : '');
-            this.ketQua.value(ketQua ? ketQua : '');
-        }, 500);
+            !this.state.nghiemThu && this.ketQua.value(ketQua ? ketQua : '');
+            this.tenDeTai.focus();
+        });
     }
+
 
     onSubmit = (e) => {
         e.preventDefault();
@@ -89,35 +113,81 @@ class EditModal extends AdminModal {
         } else if (!this.vaiTro.value()) {
             T.notify('Vai trò bị trống!', 'danger');
             this.vaiTro.focus();
+        } else if (!this.state.denNay && !this.ketThuc.getVal()) {
+            T.notify('Ngày kết thúc trống', 'danger');
+            this.ketThuc.focus();
+        } else if (!this.state.denNay && !this.ngayNghiemThu.getVal()) {
+            T.notify('Ngày nghiệm thu trống', 'danger');
+            this.ngayNghiemThu.focus();
+        } else if (!this.state.denNay && (this.batDau.getVal() && this.ketThuc.getVal()) && this.batDau.getVal() >= this.ketThuc.getVal()) {
+            T.notify('Ngày bắt đầu phải nhỏ hơn kết thúc', 'danger');
+            this.batDau.focus();
+        } else if (!this.state.denNay && (this.batDau.getVal() && this.ngayNghiemThu.getVal()) && this.batDau.getVal() >= this.ngayNghiemThu.getVal()) {
+            T.notify('Ngày bắt đầu phải nhỏ hơn nghiệm thu', 'danger');
+            this.batDau.focus();
+        } else if (!this.state.denNay && (this.ketThuc.getVal() && this.ngayNghiemThu.getVal()) && this.ketThuc.getVal() > this.ngayNghiemThu.getVal()) {
+            T.notify('Ngày kết thúc lớn hơn ngày nghiệm thu', 'danger');
+            this.ketThuc.focus();
         } else {
             list_ma.forEach((ma, index) => {
                 const changes = {
                     shcc: ma,
                     batDau: this.batDau.getVal(),
-                    ketThuc: this.ketThuc.getVal(),
+                    ketThuc: !this.state.denNay ? this.ketThuc.getVal() : -1,
                     batDauType: this.state.batDauType,
-                    ketThucType: this.state.ketThucType,
+                    ketThucType: !this.state.denNay ? this.state.ketThucType : '',
                     tenDeTai: this.tenDeTai.value(),
                     maSoCapQuanLy: this.maSoCapQuanLy.value(),
                     kinhPhi: this.kinhPhi.value(),
-                    thoiGian: this.thoiGian.value(),
                     vaiTro: this.vaiTro.value(),
                     ketQua: this.ketQua.value(),
-                    ngayNghiemThu: this.ngayNghiemThu.getVal(),
-                    ngayNghiemThuType: this.state.ngayNghiemThuType,
+                    ngayNghiemThu: !this.state.denNay ? this.ngayNghiemThu.getVal() : null,
+                    ngayNghiemThuType: !this.state.denNay ? this.state.ngayNghiemThuType : '',
                 };
                 if (index == list_ma.length - 1) {
-                    this.state.id ? this.props.update(this.state.id, changes, this.hide, false) : this.props.create(changes, this.hide, false);
+                    if (this.state.id) {
+                        this.props.update(this.state.id, changes, this.hide);
+                    } else {
+                        this.props.create(changes, this.hide);
+                    }
                     this.setState({
                         id: ''
                     });
                     this.maCanBo.reset();
                 }
                 else {
-                    this.state.id ? this.props.update(this.state.id, changes, null, false) : this.props.create(changes, null, false);
+                    this.state.id ? this.props.update(this.state.id, changes) : this.props.create(changes);
                 }
             });
         }
+    }
+
+    handleKetThuc = (value) => {
+        if (value) {
+            $('#end').hide();
+            this.handleNghiemThu(1);
+            this.ketThucType?.setText({ text: '' });
+        }
+        else {
+            $('#end').show();
+            this.ketThucType?.setText({ text: this.state.ketThucType ? this.state.ketThucType : 'dd/mm/yyyy' });
+            this.ketThuc.setVal(null);
+        }
+        this.setState({ denNay: value });
+    }
+
+    handleNghiemThu = (value) => {
+        if (value) {
+            this.ngayNghiemThuType?.setText({ text: '' });
+            $('#done').hide();
+            this.nghiemThuCheck.value(1);
+        }
+        else {
+            $('#done').show();
+            this.ngayNghiemThuType?.setText({ text: this.state.ngayNghiemThuType ? this.state.ngayNghiemThuType : 'dd/mm/yyyy' });
+            this.ngayNghiemThu.setVal(null);
+        }
+        this.setState({ nghiemThu: value });
     }
 
     render = () => {
@@ -127,38 +197,52 @@ class EditModal extends AdminModal {
             size: 'large',
             body: <div className='row'>
                 <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={readOnly} required />
-                <FormRichTextBox className='col-12' ref={e => this.tenDeTai = e} label={'Tên đề tài'} type='text' required />
-                <FormRichTextBox className='col-md-12' ref={e => this.maSoCapQuanLy = e} label={'Mã số và cấp quản lý'} type='text' required />
-                <FormTextBox className='col-md-6' ref={e => this.thoiGian = e} label={'Thời gian thực hiện (tháng)'} type='number' />
-                <FormTextBox className='col-md-6' ref={e => this.kinhPhi = e} label={'Kinh phí'} type='text' />
-                <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
+                <FormRichTextBox className='col-12' ref={e => this.tenDeTai = e} label='Tên đề tài' readOnly={readOnly} required />
+                <FormTextBox className='col-md-6' ref={e => this.maSo = e} label='Mã số và cấp quản lý' readOnly={readOnly} required />
+                <FormTextBox className='col-md-6' ref={e => this.kinhPhi = e} label={'Kinh phí'} type='text' placeholder='Nhập kinh phí (triệu đồng' />
+
+                <div className='form-group col-md-4'>Các mốc thời gian: </div>
+                <FormCheckbox ref={e => this.denNayCheck = e} label='Chưa kết thúc' onChange={this.handleKetThuc} className='form-group col-md-4' />
+                <FormCheckbox ref={e => this.nghiemThuCheck = e} label='Chưa nghiệm thu' onChange={this.handleNghiemThu} className='form-group col-md-4' />
+                <div className='form-group col-md-4'><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
                     label={
-                        <div style={{ display: 'flex' }}>Thời gian bắt đầu (định dạng:&nbsp; <Dropdown ref={e => this.batDauType = e}
+                        <div style={{ display: 'flex' }}>Thời gian bắt đầu &nbsp; <Dropdown ref={e => this.batDauType = e}
                             items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
-                            onSelected={item => this.setState({ batDauType: item })} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
+                            onSelected={item => { this.setState({ batDauType: item }); this.batDau.clear(); this.batDau.focus(); }} />&nbsp;<span style={{ color: 'red' }}> *</span></div>
                     }
                     type={this.state.batDauType ? typeMapper[this.state.batDauType] : null} /></div>
-                <div className='form-group col-md-6'><DateInput ref={e => this.ketThuc = e} placeholder='Thời gian kết thúc'
+                <div className='form-group col-md-4' id='end'><DateInput ref={e => this.ketThuc = e} placeholder='Thời gian kết thúc'
                     label={
-                        <div style={{ display: 'flex' }}>Thời gian kết thúc (định dạng:&nbsp; <Dropdown ref={e => this.ketThucType = e}
+                        <div style={{ display: 'flex' }}>Thời gian kết thúc &nbsp; <Dropdown ref={e => this.ketThucType = e}
                             items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
-                            onSelected={item => this.setState({ ketThucType: item })} />)</div>
+                            onSelected={item => { this.setState({ ketThucType: item }); this.ketThuc.clear(); this.ketThuc.focus(); }} />&nbsp;<span style={{ color: 'red' }}> *</span></div>
                     }
                     type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} /></div>
-                <FormTextBox className='col-md-6' ref={e => this.vaiTro = e} label={'Vai trò'} type='text' required />
-                <div className='form-group col-md-6'><DateInput ref={e => this.ngayNghiemThu = e} placeholder='Thời gian nghiệm thu'
+                <div className='form-group col-md-4' style={{ display: this.state.denNay ? 'block' : 'none' }} />
+                <div className='form-group col-md-4' id='done'><DateInput ref={e => this.ngayNghiemThu = e} placeholder='Thời gian nghiệm thu'
                     label={
-                        <div style={{ display: 'flex' }}>Thời gian nghiệm thu (định dạng:&nbsp; <Dropdown ref={e => this.ngayNghiemThuType = e}
+                        <div style={{ display: 'flex' }}>Thời gian nghiệm thu &nbsp; <Dropdown ref={e => this.ngayNghiemThuType = e}
                             items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
-                            onSelected={item => this.setState({ ngayNghiemThuType: item })} />)</div>
+                            onSelected={item => { this.setState({ ngayNghiemThuType: item }); this.ngayNghiemThu.clear(); this.ngayNghiemThu.focus(); }} />&nbsp;<span style={{ color: 'red' }}> *</span></div>
                     }
                     type={this.state.ngayNghiemThuType ? typeMapper[this.state.ngayNghiemThuType] : null} /></div>
-                <FormTextBox className='col-md-12' ref={e => this.ketQua = e} label={'Kết quả'} type='text' />
+                <div className='form-group col-md-4' style={{ display: this.state.nghiemThu ? 'block' : 'none' }} />
 
+                <FormSelect className='col-md-4' ref={e => this.vaiTro = e} label={'Vai trò'} data={[
+                    { id: 'CN', text: 'Chủ nhiệm' }, { id: 'TG', text: 'Tham gia' }
+                ]} type='text' required />
+                {!this.state.nghiemThu && <FormTextBox className='col-md-4' ref={e => this.ketQua = e} label={'Kết quả'} type='text' />}
             </div>,
         });
     }
 }
+
+const timeList = [
+    { id: 0, text: 'Không' },
+    { id: 1, text: 'Theo thời gian bắt đầu' },
+    { id: 2, text: 'Theo thời gian kết thúc' },
+    { id: 3, text: 'Theo thời gian nghiệm thu' }
+];
 
 class QtNghienCuuKhoaHoc extends AdminPage {
     checked = parseInt(T.cookie('hienThiTheoCanBo')) == 1 ? true : false;
@@ -167,6 +251,7 @@ class QtNghienCuuKhoaHoc extends AdminPage {
         T.ready('/user/khcn', () => {
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
+                this.timeType?.value(0);
                 this.fromYear?.value('');
                 this.toYear?.value('');
                 this.loaiHocVi?.value('');
@@ -176,10 +261,8 @@ class QtNghienCuuKhoaHoc extends AdminPage {
             });
             if (this.checked) {
                 this.hienThiTheoCanBo.value(true);
-                this.props.getQtNghienCuuKhoaHocGroupPage();
-            } else {
-                this.props.getQtNghienCuuKhoaHocPage();
             }
+            this.getPage();
             this.changeAdvancedSearch(true);
         });
     }
@@ -191,31 +274,41 @@ class QtNghienCuuKhoaHoc extends AdminPage {
 
     changeAdvancedSearch = (isInitial = false) => {
         let { pageNumber, pageSize } = this.props && this.props.qtNghienCuuKhoaHoc && this.props.qtNghienCuuKhoaHoc.page ? this.props.qtNghienCuuKhoaHoc.page : { pageNumber: 1, pageSize: 50 };
+        const timeType = this.timeType?.value() || 0;
         const fromYear = this.fromYear?.value() == '' ? null : this.fromYear?.value().getTime();
         const toYear = this.toYear?.value() == '' ? null : this.toYear?.value().getTime();
         const loaiHocVi = this.loaiHocVi?.value() == '' ? '' : this.loaiHocVi?.value().toString();
         const maDonVi = this.maDonVi?.value().toString() || '';
         const maSoCanBo = this.mulCanBo?.value().toString() || '';
-        const pageFilter = isInitial ? null : { maDonVi, fromYear, toYear, loaiHocVi, maSoCanBo };
+        const pageFilter = isInitial ? null : { maDonVi, fromYear, toYear, loaiHocVi, maSoCanBo, timeType };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
+                    this.timeType?.value(filter.timeType);
                     this.fromYear?.value(filter.fromYear || '');
                     this.toYear?.value(filter.toYear || '');
                     this.loaiHocVi?.value(filter.loaiHocVi || '');
                     this.maDonVi?.value(filter.maDonVi);
                     this.mulCanBo?.value(filter.maSoCanBo);
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.loaiCt || filter.maDonVi)) this.showAdvanceSearch();
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.loaiHocVi || filter.maDonVi || filter.timeType || filter.maSoCanBo)) {
+                        this.showAdvanceSearch();
+                        window.scrollTo({
+                            top: 0,
+                            behavior: 'smooth'
+                        });
+                    }
                 }
             });
         });
     }
 
+
+
     getPage = (pageN, pageS, pageC, done) => {
         if (this.checked) this.props.getQtNghienCuuKhoaHocGroupPage(pageN, pageS, pageC, this.state.filter, done);
-        else this.props.getQtNghienCuuKhoaHocPage(pageN, pageS, pageC, '', this.state.filter, done);
+        else this.props.getQtNghienCuuKhoaHocPage(pageN, pageS, pageC, this.state.filter, done);
 
     }
 
@@ -226,7 +319,8 @@ class QtNghienCuuKhoaHoc extends AdminPage {
     }
 
     list = (text, i, j) => {
-        let deTais = text.split('??').map(str => <p key={i--} style={{ textTransform: 'uppercase' }}>{j - i}. {str}</p>);
+        if (i == 0) return [];
+        let deTais = text.split('??').map(str => <div key={i--} style={{}}>{j - i}. {str}</div>);
         return deTais;
     }
 
@@ -252,12 +346,15 @@ class QtNghienCuuKhoaHoc extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tổng đề tài, dự án</th>}
-                        <th style={{ width: '100%', whiteSpace: 'nowrap' }}>{!this.checked ? 'Tên đề tài, dự án' : 'Đề tài, dự án đã thực hiện'}</th>
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Mã số và cấp quản lý</th>}
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian thực hiện</th>}
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kinh phí</th>}
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kết quả</th>}
+                        {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tổng đề tài</th>}
+                        {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách</th>}
+                        {!this.checked && <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Đề tài nghiên cứu khoa học</th>}
+                        {!this.checked && <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Mã số và cấp quản lý</th>}
+                        {!this.checked && <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Thời gian thực hiện</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Kinh phí <br /><small>(triệu đồng)</small></th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Vai trò</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Nghiệm thu</th>}
+                        {!this.checked && <th style={{ width: '10%', whiteSpace: 'nowrap', textAlign: 'center' }}>Kết quả</th>}
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
@@ -274,27 +371,35 @@ class QtNghienCuuKhoaHoc extends AdminPage {
                             </>
                         )}
                         />
-                        {this.checked && <TableCell type='text' style={{ textAlign: 'right' }} content={item.soDeTai} />}
+                        {this.checked && <TableCell type='text' style={{ textAlign: 'center' }} content={item.soDeTai} />}
                         <TableCell type='text' content={
                             !this.checked ? <>
-                                <span style={{ color: 'blue' }}><i>{item.tenDeTai}</i><br /></span>
-                                {item.vaiTro ? <span style={{ whiteSpace: 'nowrap' }}>Vai trò: <span style={{ color: 'red' }}>{item.vaiTro}</span></span> : null}
+                                <div><br />{item.tenDeTai ? item.tenDeTai : ''}</div> <br />
                             </> : <>
                                 {this.list(item.danhSachDeTai, item.soDeTai, item.soDeTai)}
                             </>
                         }
                         />
-                        {!this.checked && <TableCell type='text' content={item.maSoCapQuanLy} />}
+                        {!this.checked && <TableCell type='text' content={item.maSoCapQuanLy ? item.maSoCapQuanLy : ''} />}
                         {!this.checked && <TableCell type='text' content={(
                             <>
                                 {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
-                                {item.ketThuc ? <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
-                                {item.ngayNghiemThu ? <span style={{ whiteSpace: 'nowrap' }}>Nghiệm thu: <span style={{ color: 'blue' }}>{item.ngayNghiemThu ? T.dateToText(item.ngayNghiemThu, item.ngayNghiemThuType ? item.ngayNghiemThuType : 'dd/mm/yyyy') : ''}</span></span> : null}
+                                {item.ketThuc && item.ketThuc != -1 ? <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
+                                {item.ketThuc && item.ketThuc == -1 ? <span style={{ whiteSpace: 'nowrap', color: 'red' }}>Đang diễn ra<br /></span> : null}
                             </>
                         )}
                         />}
-                        {!this.checked && <TableCell type='text' content={item.kinhPhi} />}
-                        {!this.checked && <TableCell type='text' content={item.ketQua} />}
+                        {!this.checked &&
+                            <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={(item.kinhPhi ? item.kinhPhi : '').numberWithCommas()} />
+                        }
+                        {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.vaiTro == 'CN' ? 'Chủ nhiệm' : 'Tham gia'} />}
+                        {!this.checked &&
+                            <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={
+                                item.ngayNghiemThu ?
+                                    <span style={{ color: 'red' }}>{item.ngayNghiemThu == -1 ? 'Chưa nghiệm thu' : T.dateToText(item.ngayNghiemThu, item.ngayNghiemThuType ? item.ngayNghiemThuType : 'dd/mm/yyyy')}</span>
+                                    : ''} />
+                        }
+                        {!this.checked && <TableCell type='text' content={item.ketQua ? item.ketQua : ''} />}
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                                 onEdit={() => this.modal.show(item, false)} onDelete={this.delete} >
@@ -321,8 +426,9 @@ class QtNghienCuuKhoaHoc extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    {!this.checked ? <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-3' label='Từ thời gian (nghiệm thu)' onChange={() => this.changeAdvancedSearch()} /> : null}
-                    {!this.checked ? <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-3' label='Đến thời gian (nghiệm thu)' onChange={() => this.changeAdvancedSearch()} /> : null}
+                    <FormSelect className='col-12 col-md-4' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
+                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />}
+                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />}
                     <FormSelect ref={e => this.loaiHocVi = e} label='Loại học vị' className='col-12 col-md-3' data={[
                         { id: '04', text: 'Cử nhân' },
                         { id: '03', text: 'Thạc sĩ' },
@@ -340,7 +446,7 @@ class QtNghienCuuKhoaHoc extends AdminPage {
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
-                    permissions={currentPermissions}
+                    permissions={currentPermissions} deleteFile={this.props.deleteFile}
                     create={this.props.createQtNckhStaff} update={this.props.updateQtNckhStaff}
                 />
             </>,
@@ -360,6 +466,6 @@ class QtNghienCuuKhoaHoc extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtNghienCuuKhoaHoc: state.khcn.qtNghienCuuKhoaHoc });
 const mapActionsToProps = {
     createQtNckhStaff, updateQtNckhStaff, deleteQtNckhStaff,
-    getQtNghienCuuKhoaHocGroupPage, getQtNghienCuuKhoaHocPage,
+    getQtNghienCuuKhoaHocGroupPage, getQtNghienCuuKhoaHocPage
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtNghienCuuKhoaHoc);
