@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, FormTextBox, FormSelect } from 'view/component/AdminPage';
+import { AdminPage, FormTextBox, FormSelect, FormImageBox } from 'view/component/AdminPage';
 import { getSinhVienEditUser } from './redux';
 import { SelectAdapter_DmQuocGia } from 'modules/mdDanhMuc/dmQuocGia/redux';
 import { SelectAdapter_DmDanTocV2 } from 'modules/mdDanhMuc/dmDanToc/redux';
@@ -22,6 +22,14 @@ class SinhVienPage extends AdminPage {
             });
         });
     }
+
+    imageChanged = (data) => {
+        console.log(data);
+        if (data && data.image) {
+            const user = Object.assign({}, this.props.system.user, { image: data.image });
+            this.props.updateSystemState({ user });
+        }
+    };
 
     setVal = (data = {}) => {
         this.mssv.value(data.mssv ? data.mssv : '');
@@ -53,6 +61,10 @@ class SinhVienPage extends AdminPage {
         this.quocTich.value(data.quocGia ? data.quocGia : '');
     }
 
+    save = () => {
+        
+    }
+
     render() {
         let item = this.props.system && this.props.system.user ? this.props.system.user.student : null;
         return this.renderPage({
@@ -68,18 +80,30 @@ class SinhVienPage extends AdminPage {
                     <h3 className='tile-title'>Thông tin cơ bản</h3>
                     <div className='tile-body'>
                         <div className='row'>
-                            <FormTextBox ref={e => this.mssv = e} label='Mã số sinh viên' className='form-group col-md-4' readOnly />
-                            <FormTextBox ref={e => this.ho = e} label='Họ và tên lót' className='form-group col-md-4' readOnly />
-                            <FormTextBox ref={e => this.ten = e} label='Tên' className='form-group col-md-4' readOnly />
-                            <FormTextBox ref={e => this.gioiTinh = e} label='Giới tính' className='form-group col-md-4' readOnly />
-                            <FormTextBox ref={e => this.khoa = e} label='Khoa' className='form-group col-md-4' readOnly />
-                            <FormTextBox ref={e => this.maKhoa= e} label='Mã khoa' className='form-group col-md-4' readOnly />
-                            <FormTextBox ref={e => this.maNganh = e} label='Mã ngành' className='form-group col-md-4' readOnly />
-                            <FormTextBox ref={e => this.lop = e} label='Lớp' className='form-group col-md-4' readOnly />
-                            <FormTextBox ref={e => this.loaiHinhDaoTao = e} label='Loại hình đào tạo' className='form-group col-md-4' readOnly />
-                            <FormTextBox ref={e => this.loaiSinhVien = e} label='Loại sinh viên' className='form-group col-md-4' readOnly />
-                            <FormTextBox ref={e => this.tinhTrang = e} label='Tình trạng' className='form-group col-md-4' readOnly />
-                            <div className="form-group col-md-4"></div>
+                            <FormImageBox //
+                                ref={e => this.imageBox = e} 
+                                style={{ display: 'block' }} 
+                                label='Hình đại diện'
+                                postUrl='/user/upload' 
+                                uploadType='CanBoImage' 
+                                onSuccess={this.imageChanged} 
+                                className='form-group col-md-3' 
+                            />
+                            <div className="form-group col-md-9">
+                                <div className="row">
+                                    <FormTextBox ref={e => this.mssv = e} label='Mã số sinh viên' className='form-group col-md-4' readOnly />
+                                    <FormTextBox ref={e => this.ho = e} label='Họ và tên lót' className='form-group col-md-4' readOnly />
+                                    <FormTextBox ref={e => this.ten = e} label='Tên' className='form-group col-md-4' readOnly />
+                                    <FormTextBox ref={e => this.gioiTinh = e} label='Giới tính' className='form-group col-md-4' readOnly />
+                                    <FormTextBox ref={e => this.khoa = e} label='Khoa' className='form-group col-md-4' readOnly />
+                                    <FormTextBox ref={e => this.maKhoa= e} label='Mã khoa' className='form-group col-md-4' readOnly />
+                                    <FormTextBox ref={e => this.maNganh = e} label='Mã ngành' className='form-group col-md-4' readOnly />
+                                    <FormTextBox ref={e => this.lop = e} label='Lớp' className='form-group col-md-4' readOnly />    
+                                    <FormTextBox ref={e => this.loaiHinhDaoTao = e} label='Loại hình đào tạo' className='form-group col-md-4' readOnly />
+                                    <FormTextBox ref={e => this.loaiSinhVien = e} label='Loại sinh viên' className='form-group col-md-4' readOnly />
+                                    <FormTextBox ref={e => this.tinhTrang = e} label='Tình trạng' className='form-group col-md-4' readOnly />
+                                </div>
+                            </div>
                             <FormTextBox ref={e => this.ngaySinh = e} label='Ngày sinh' className='form-group col-md-4' required />
                             <FormSelect ref={e => this.quocTich = e} label='Quốc tịch' className='form-group col-md-4' data={SelectAdapter_DmQuocGia} />
                             <FormSelect ref={e => this.danToc = e} label='Dân tộc' className='form-group col-md-4' data={SelectAdapter_DmDanTocV2} />
