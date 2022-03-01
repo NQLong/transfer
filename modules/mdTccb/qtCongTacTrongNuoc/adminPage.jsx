@@ -196,6 +196,7 @@ class QtCongTacTrongNuoc extends AdminPage {
                 this.maDonVi?.value('');
                 this.mulCanBo?.value('');
                 this.tinhTrang?.value('');
+                this.loaiHocVi?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
             if (this.checked) {
@@ -219,7 +220,8 @@ class QtCongTacTrongNuoc extends AdminPage {
         const list_dv = this.maDonVi?.value().toString() || '';
         const list_shcc = this.mulCanBo?.value().toString() || '';
         const tinhTrang = this.tinhTrang?.value() == '' ? null : this.tinhTrang?.value();
-        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc, tinhTrang, timeType };
+        const loaiHocVi = this.loaiHocVi?.value() == '' ? '' : this.loaiHocVi?.value().toString();
+        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc, tinhTrang, timeType, loaiHocVi };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
@@ -231,7 +233,8 @@ class QtCongTacTrongNuoc extends AdminPage {
                     this.mulCanBo?.value(filter.list_shcc);
                     this.timeType?.value(filter.timeType);
                     this.tinhTrang?.value(filter.tinhTrang);
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.list_shcc || filter.list_dv || filter.timeType || filter.tinhTrang)) this.showAdvanceSearch();
+                    this.loaiHocVi?.value(filter.loaiHocVi);
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.list_shcc || filter.list_dv || filter.timeType || filter.tinhTrang || filter.loaiHocVi )) this.showAdvanceSearch();
                 }
             });
         });
@@ -392,6 +395,11 @@ class QtCongTacTrongNuoc extends AdminPage {
                             <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-2' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />
                             <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-2' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />
                         </>}
+                    <FormSelect ref={e => this.loaiHocVi = e} label='Loại học vị' className='col-12 col-md-3' data={[
+                        { id: '04', text: 'Cử nhân' },
+                        { id: '03', text: 'Thạc sĩ' },
+                        { id: '02', text: 'Tiến sĩ' },
+                    ]} onChange={() => this.changeAdvancedSearch()} multiple={true} allowClear={true} minimumResultsForSearch={-1} />
                     <FormSelect className='col-12 col-md-4' ref={e => this.tinhTrang = e} label='Tình trạng'
                         data={[
                             { id: 1, text: 'Đã kết thúc' }, { id: 2, text: 'Đang diễn ra' }
@@ -416,9 +424,9 @@ class QtCongTacTrongNuoc extends AdminPage {
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
             onExport: !this.checked ? (e) => {
                 e.preventDefault();
-                const { fromYear, toYear, list_shcc, list_dv, timeType, tinhTrang } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, tinhTrang: null };
+                const { fromYear, toYear, list_shcc, list_dv, timeType, tinhTrang, loaiHocVi } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, tinhTrang: null, loaiHocVi: null };
 
-                T.download(T.url(`/api/qua-trinh/cong-tac-trong-nuoc/download-excel/${list_shcc ? list_shcc : null}/${list_dv ? list_dv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${timeType}/${tinhTrang ? tinhTrang : null}`), 'baohiemxahoi.xlsx');
+                T.download(T.url(`/api/qua-trinh/cong-tac-trong-nuoc/download-excel/${list_shcc ? list_shcc : null}/${list_dv ? list_dv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${timeType}/${tinhTrang ? tinhTrang : null}/${loaiHocVi ? loaiHocVi : null}`), 'congtactrongnuoc.xlsx');
             } : null
         });
     }
