@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3030: { title: 'Quá trình nghỉ việc', link: '/user/tccb/qua-trinh/nghi-viec', icon: 'fa-sign-out', backgroundColor: '#2a99b8', groupIndex: 4 },
+            3030: { title: 'Cán bộ Nghỉ việc', link: '/user/tccb/qua-trinh/nghi-viec', icon: 'fa-user-times', backgroundColor: '#2a99b8', groupIndex: 0 },
         },
     };
     app.permission.add(

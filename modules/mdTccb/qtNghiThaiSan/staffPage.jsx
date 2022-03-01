@@ -159,7 +159,7 @@ class QtNghiThaiSanUserPage extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-bed',
-            title: 'Quá trình nghỉ thai sản',
+            title: 'Nghỉ thai sản',
             subTitle: <span style={{ color: 'blue' }}>Cán bộ: {name}</span>,
             breadcrumb: [
                 <Link key={0} to='/user/'>Trang cá nhân</Link>,

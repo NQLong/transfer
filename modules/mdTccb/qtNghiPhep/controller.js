@@ -2,13 +2,13 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3041: { title: 'Quá trình nghỉ phép', link: '/user/tccb/qua-trinh/nghi-phep', icon: 'fa fa-calendar-o', color: '#000000', backgroundColor: '#850de0', groupIndex: 4 },
+            3041: { title: 'Danh sách Nghỉ phép', link: '/user/tccb/qua-trinh/nghi-phep', icon: 'fa fa-pause', color: '#000000', backgroundColor: '#e6e48a', groupIndex: 4 },
         },
     };
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1026: { title: 'Nghỉ phép', link: '/user/nghi-phep', icon: 'fa fa-calendar-o', backgroundColor: '#850de0', groupIndex: 1 },
+            1026: { title: 'Nghỉ phép', link: '/user/nghi-phep', icon: 'fa fa-pause', backgroundColor: '#e6e48a', groupIndex: 1 },
         },
     };
 
