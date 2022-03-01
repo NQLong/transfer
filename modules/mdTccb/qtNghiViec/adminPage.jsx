@@ -247,11 +247,11 @@ class QtNghiViec extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-sign-out',
-            title: 'Quá trình nghỉ việc',
+            icon: 'fa fa-user-times',
+            title: 'Cán bộ Nghỉ việc',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
-                'Quá trình nghỉ việc'
+                'Cán bộ Nghỉ việc'
             ],
             advanceSearch: <>
                 <div className='row'>

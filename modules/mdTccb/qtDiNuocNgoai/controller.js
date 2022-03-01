@@ -2,13 +2,13 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3042: { title: 'Quá trình đi nước ngoài', link: '/user/tccb/qua-trinh/di-nuoc-ngoai', icon: 'fa-fighter-jet', color: '#000000', backgroundColor: '#4297ff', groupIndex: 1 },
+            3042: { title: 'Quá trình Đi nước ngoài', link: '/user/tccb/qua-trinh/di-nuoc-ngoai', icon: 'fa-globe', backgroundColor: '#4297ff', groupIndex: 1 },
         },
     };
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1031: { title: 'Đi nước ngoài', link: '/user/di-nuoc-ngoai', icon: 'fa-fighter-jet', backgroundColor: '#4297ff', groupIndex: 1 },
+            1031: { title: 'Đi nước ngoài', link: '/user/di-nuoc-ngoai', icon: 'fa-globe', backgroundColor: '#4297ff', groupIndex: 1 },
         },
     };
 

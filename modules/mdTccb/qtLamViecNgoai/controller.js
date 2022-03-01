@@ -2,13 +2,13 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3040: { title: 'Quá trình làm việc ngoài', link: '/user/tccb/qua-trinh/lam-viec-ngoai', icon: 'fa fa-fax', color: '#000000', backgroundColor: '#f4fc03', groupIndex: 1 },
+            3040: { title: 'Quá trình Làm việc ngoài', link: '/user/tccb/qua-trinh/lam-viec-ngoai', icon: 'fa fa-external-link ', color: '#000000', backgroundColor: '#cc6c6c', groupIndex: 1 },
         },
     };
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1025: { title: 'Làm việc ngoài', link: '/user/lam-viec-ngoai', icon: 'fa fa-fax', backgroundColor: '#f4fc03', groupIndex: 1 },
+            1025: { title: 'Làm việc ngoài', link: '/user/lam-viec-ngoai', icon: 'fa fa-external-link ', backgroundColor: '#cc6c6c', groupIndex: 1 },
         },
     };
 
@@ -16,7 +16,7 @@ module.exports = app => {
         { name: 'staff:login', menu: menuStaff },
         { name: 'qtLamViecNgoai:read', menu },
         { name: 'qtLamViecNgoai:write' },
-        { name: 'qtLamViecNgoai:delete' },
+        { name: 'qtLamViecNgoai:delete' }
     );
     app.get('/user/tccb/qua-trinh/lam-viec-ngoai', app.permission.check('qtLamViecNgoai:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/lam-viec-ngoai/group/:shcc', app.permission.check('qtLamViecNgoai:read'), app.templates.admin);
