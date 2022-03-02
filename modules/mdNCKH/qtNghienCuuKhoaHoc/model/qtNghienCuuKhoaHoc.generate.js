@@ -140,6 +140,7 @@ module.exports = app => {
             app.dbConnection.execute('BEGIN :ret:=qt_nghien_cuu_khoa_hoc_group_page(:pagenumber, :pagesize, :searchterm, :masocanbo, :loaihocvi, :fromyear, :toyear, :timetype, :madonvi, :totalitem, :pagetotal); END;',
                 { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, pagenumber: { val: pagenumber, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, pagesize: { val: pagesize, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, searchterm, masocanbo, loaihocvi, fromyear, toyear, timetype, madonvi, totalitem: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pagetotal: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
         },
+
         downloadExcel: (masocanbo, loaihocvi, fromyear, toyear, timetype, madonvi, done) => {
             app.dbConnection.execute('BEGIN :ret:=qt_nghien_cuu_khoa_hoc_download_excel(:masocanbo, :loaihocvi, :fromyear, :toyear, :timetype, :madonvi); END;',
                 { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, masocanbo, loaihocvi, fromyear, toyear, timetype, madonvi }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));

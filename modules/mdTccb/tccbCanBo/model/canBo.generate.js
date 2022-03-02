@@ -135,5 +135,10 @@ module.exports = app => {
             app.dbConnection.execute('BEGIN :ret:=tccb_dashboard_total_gender(); END;',
                 { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
         },
+
+        tccbDashboardStaffByDV: (done) => {
+            app.dbConnection.execute('BEGIN :ret:=tccb_dashboard_get_number_staff_by_don_vi(); END;',
+                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
+        },
     };
 };

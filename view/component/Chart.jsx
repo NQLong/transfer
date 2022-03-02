@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 export const DefaultColors = {
@@ -7,16 +8,10 @@ export const DefaultColors = {
     green: '#28a745',
     yellow: '#ffc107',
     purple: 'rgb(153, 102, 255)',
-    grey: 'rgb(201, 203, 207)'
+    grey: 'rgb(201, 203, 207)',
+    info: '#11a2b8'
 };
 
-function deepEqual(x, y) {
-    return (x && y && typeof x === 'object' && typeof y === 'object') ?
-        (Object.keys(x).length === Object.keys(y).length) &&
-        Object.keys(x).reduce(function (isEqual, key) {
-            return isEqual && deepEqual(x[key], y[key]);
-        }, true) : (x === y);
-}
 export class ChartBase extends React.Component {
     canvas = React.createRef();
 
@@ -28,12 +23,14 @@ export class ChartBase extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        const prevConfig = this.constructor.dataToConfig(prevProps.data, prevProps.color);
-        const config = this.constructor.dataToConfig(this.props.data, this.props.color);
+        const prevConfig =  prevProps.data;
+        const config = this.props.data;
 
+        const prevDatasets = prevConfig.datasets ? prevConfig.datasets : [];
+        const thisDatasets = config.datasets ? config.datasets : [];
         // if (!_.isEqual(prevConfig, config)) {
-        if (!deepEqual(prevConfig, config)) {
-            this.chart.data = config.data;
+        if (prevDatasets.length || (thisDatasets.length && JSON.stringify(prevDatasets) !== JSON.stringify(thisDatasets))) {
+            this.chart.data = config;
             this.chart.update();
         }
     }
@@ -42,7 +39,7 @@ export class ChartBase extends React.Component {
 }
 
 export class DoughnutChart extends ChartBase {
-    static dataToConfig = (data, backgroundColor = Object.values(DefaultColors)) => {
+    static dataToConfig = (data) => {
         //#region explain
         // data = [{ value: 20, title: 'nam'}, {value: 12, title: 'nu'}];
         // =>
@@ -59,16 +56,13 @@ export class DoughnutChart extends ChartBase {
         //#endregion explain
 
         if (!data || !data.map) data = [];
-        const dataValue = data.map(item => item.value);
-        const dataLabels = data.map(item => item.title);
+        const datasets = data.data ? data.datasets : [];
+        const dataLabels = data.data ? data.labels : [];
         return {
             type: 'doughnut',
             data: {
-                datasets: [{
-                    data: dataValue,
-                    backgroundColor,
-                }],
-                labels: dataLabels
+                datasets: datasets,
+                labels: dataLabels,
             },
             options: {
                 responsive: true
@@ -202,15 +196,15 @@ export class BarChart extends ChartBase {
         // if (!data || !data.map) data = [];
         if (!data) data = {};
         // const dataValue = data.data.value.map(item => item);
-        const dataLabels = data.data.labels.map(item => item);
-
+        const dataLabels = data.data && data.data.labels.length > 0 ? data.labels.map(item => item) : [];
+        const datasets = data.data ? data.datasets : [];
         return {
             type: 'bar',
             data: {
                 ticks: {
                     align: 'bottom'
                 },
-                datasets: data.data.datasets,
+                datasets: datasets,
                 labels: dataLabels
             },
             options: {
