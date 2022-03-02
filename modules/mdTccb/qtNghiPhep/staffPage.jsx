@@ -273,7 +273,7 @@ class QtNghiPhepUserPage extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-calendar-o',
+            icon: 'fa fa-pause',
             title: 'Quá trình nghỉ phép',
             subTitle: <span style={{ color: 'blue' }}>Cán bộ: {name}</span>,
             breadcrumb: [
