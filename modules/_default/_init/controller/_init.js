@@ -23,7 +23,7 @@ module.exports = app => {
     };
 
     app.createFolder(
-        app.assetPath, app.uploadPath, app.publicPath,
+        app.assetPath, app.uploadPath, app.publicPath, app.documentPath,
         app.path.join(app.publicPath, '/img/staff'),
     );
 
