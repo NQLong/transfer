@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.library,
         menus: {
-            9001: { title: 'Sách, giáo trình', subTitle: 'Của cán bộ', link: '/user/library/sach-giao-trinh', icon: 'fa-book', backgroundColor: '#ccad2f' },
+            8001: { title: 'Sách, giáo trình', subTitle: 'Của cán bộ', link: '/user/library/sach-giao-trinh', icon: 'fa-book', backgroundColor: '#ccad2f', pin: true },
         },
     };
 

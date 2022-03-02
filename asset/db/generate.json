@@ -8731,95 +8731,6 @@
         "foreignKeys": [],
         "type": "table"
     },
-    "QT_NUOC_NGOAI": {
-        "active": true,
-        "moduleName": "qtNuocNgoai",
-        "modelName": "qtNuocNgoai",
-        "columns": {
-            "SHCC": {
-                "value": "shcc",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 10
-            },
-            "BAT_DAU": {
-                "value": "batDau",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "KET_THUC": {
-                "value": "ketThuc",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "NOI_DUNG": {
-                "value": "noiDung",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 200
-            },
-            "QUOC_GIA": {
-                "value": "quocGia",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 100
-            },
-            "BAT_DAU_TYPE": {
-                "value": "batDauType",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 20
-            },
-            "KET_THUC_TYPE": {
-                "value": "ketThucType",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 20
-            },
-            "ID": {
-                "value": "id",
-                "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89108\".nextval",
-                "nullable": false,
-                "size": "22,0"
-            },
-            "KINH_PHI": {
-                "value": "kinhPhi",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "10,0"
-            },
-            "TRO_LAI_CONG_TAC": {
-                "value": "troLaiCongTac",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "TEN_CO_SO": {
-                "value": "tenCoSo",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 50
-            }
-        },
-        "primaryKeys": [
-            "ID"
-        ],
-        "foreignKeys": [],
-        "type": "table"
-    },
     "QT_UNG_DUNG_THUONG_MAI": {
         "active": true,
         "moduleName": "qtUngDungThuongMai",
@@ -9092,7 +9003,8 @@
         "active": true,
         "moduleName": "tccbCanBo",
         "methods": {
-            "tccb_dashboard_total_gender": "tccbDasboardTotalGender"
+            "tccb_dashboard_total_gender": "tccbDasboardTotalGender",
+            "TCCB_DASHBOARD_GET_NUMBER_STAFF_BY_DON_VI": "tccbDashboardStaffByDV"
         },
         "modelName": "canBo",
         "columns": {

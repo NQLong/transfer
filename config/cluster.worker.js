@@ -32,7 +32,7 @@ module.exports = (cluster, isDebug) => {
     app.publicPath = app.path.join(__dirname, '..', appConfig.path.public);
     app.imagePath = app.path.join(appConfig.path.public, 'img');
     app.uploadPath = app.path.join(__dirname, '..', appConfig.path.upload);
-    app.documentPath = app.path.join(__dirname, appConfig.path.document);
+    app.documentPath = app.path.join(__dirname, '..', appConfig.path.document);
     app.faviconPath = app.path.join(__dirname, '..', appConfig.path.favicon);
 
     // Configure ------------------------------------------------------------------------------------------------------
