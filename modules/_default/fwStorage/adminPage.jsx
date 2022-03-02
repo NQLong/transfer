@@ -27,7 +27,7 @@ class FileModal extends React.Component {
         $('#nameDisplay').val(nameDisplay);
         $('#note').val(note);
         $(this.modal.current).modal('show');
-        this.fileBox.current.init();
+        this.fileBox.current.setData();
     }
 
     save = (e) => {
@@ -37,7 +37,7 @@ class FileModal extends React.Component {
             note: $('#note').val(),
             active: 1
         };
-        const value = this.fileBox.current.getFileState();
+        const value = this.fileBox.current.getFile();
         if (!body.nameDisplay) {
             T.alert('Vui lòng điền tên hiện thị', 'error', false, 2000);
         } else if (!value && !this.state.id) {
@@ -75,7 +75,7 @@ class FileModal extends React.Component {
                             </div>
                             <div className='form-group' style={{ display: this.state.id ? 'none' : 'block' }}>
                                 <label>Tệp tin tải lên</label>
-                                <FileBox ref={this.fileBox} postUrl='/user/upload-file' ajax={false} uploadType='assets' success={this.props.onSuccess} />
+                                <FileBox ref={this.fileBox} postUrl='/user/upload-file' pending uploadType='assets' success={this.props.onSuccess} />
                             </div>
                         </div>
                         <div className='modal-footer'>
