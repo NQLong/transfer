@@ -278,7 +278,7 @@ class QtNghiPhepUserPage extends AdminPage {
             subTitle: <span style={{ color: 'blue' }}>Cán bộ: {name}</span>,
             breadcrumb: [
                 <Link key={0} to='/user/'>Trang cá nhân</Link>,
-                'Công tác ngoài nước'
+                'Danh sách nghỉ phép'
             ],
             content: <>
                 <div className='tile'>
