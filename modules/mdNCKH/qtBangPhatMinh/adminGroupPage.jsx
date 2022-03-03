@@ -85,11 +85,12 @@ class EditModal extends AdminModal {
 
 class QtBangPhatMinhGroupPage extends AdminPage {
     state = { filter: {} };
-
+    menu = '';
     componentDidMount() {
-        T.ready('/user/khcn', () => {
+        this.menu = T.routeMatcher('/user/:tccb/qua-trinh/bang-phat-minh/group/:shcc').parse(window.location.pathname).tccb;
+        T.ready('/user/' + this.menu, () => {
             T.clearSearchBox();
-            const route = T.routeMatcher('/user/khcn/qua-trinh/bang-phat-minh/group/:shcc'),
+            const route = T.routeMatcher('/user/' + this.menu + '/qua-trinh/bang-phat-minh/group/:shcc'),
                 params = route.parse(window.location.pathname);
             this.shcc = params.shcc;
             this.setState({ filter: { list_shcc: params.shcc, list_dv: '', timeType: 0 } });
@@ -238,7 +239,7 @@ class QtBangPhatMinhGroupPage extends AdminPage {
                     create={this.props.createQtBangPhatMinhGroupPageMa} update={this.props.updateQtBangPhatMinhGroupPageMa}
                 />
             </>,
-            backRoute: '/user/khcn/qua-trinh/bang-phat-minh',
+            backRoute: '/user/' + this.menu + '/qua-trinh/bang-phat-minh',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
         });
     }

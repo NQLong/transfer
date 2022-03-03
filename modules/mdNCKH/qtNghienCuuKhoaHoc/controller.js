@@ -21,20 +21,16 @@ module.exports = app => {
     };
 
     app.permission.add(
-        { name: 'qtNghienCuuKhoaHoc:onlyRead', menu: menuTCCB },
         { name: 'staff:login', menu: menuStaff },
+        { name: 'qtNghienCuuKhoaHoc:read', menu: menuTCCB },
         { name: 'qtNghienCuuKhoaHoc:read', menu },
         { name: 'qtNghienCuuKhoaHoc:write' },
         { name: 'qtNghienCuuKhoaHoc:delete' },
     );
 
-    app.get('/user/khcn/qua-trinh/nghien-cuu-khoa-hoc/:id', app.permission.check('qtNghienCuuKhoaHoc:read'), app.templates.admin);
-    app.get('/user/khcn/qua-trinh/nghien-cuu-khoa-hoc', app.permission.check('qtNghienCuuKhoaHoc:read'), app.templates.admin);
-    app.get('/user/khcn/qua-trinh/nghien-cuu-khoa-hoc/group/:shcc', app.permission.check('qtNghienCuuKhoaHoc:read'), app.templates.admin);
-
-    app.get('/user/tccb/qua-trinh/nghien-cuu-khoa-hoc/:id', app.permission.check('qtNghienCuuKhoaHoc:onlyRead'), app.templates.admin);
-    app.get('/user/tccb/qua-trinh/nghien-cuu-khoa-hoc', app.permission.check('qtNghienCuuKhoaHoc:onlyRead'), app.templates.admin);
-    app.get('/user/tccb/qua-trinh/nghien-cuu-khoa-hoc/group/:shcc', app.permission.check('qtNghienCuuKhoaHoc:onlyRead'), app.templates.admin);
+    app.get('/user/:khcn/qua-trinh/nghien-cuu-khoa-hoc/:id', app.permission.check('qtNghienCuuKhoaHoc:read'), app.templates.admin);
+    app.get('/user/:khcn/qua-trinh/nghien-cuu-khoa-hoc', app.permission.check('qtNghienCuuKhoaHoc:read'), app.templates.admin);
+    app.get('/user/:khcn/qua-trinh/nghien-cuu-khoa-hoc/group/:shcc', app.permission.check('qtNghienCuuKhoaHoc:read'), app.templates.admin);
 
     app.get('/user/nghien-cuu-khoa-hoc', app.permission.check('staff:login'), app.templates.admin);
     app.get('/user/nghien-cuu-khoa-hoc/:id/:ownerShcc', app.permission.check('staff:login'), app.templates.admin);

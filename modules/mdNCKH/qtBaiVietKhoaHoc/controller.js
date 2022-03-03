@@ -5,22 +5,29 @@ module.exports = app => {
             9502: { title: 'Danh sách bài viết khoa học', link: '/user/khcn/qua-trinh/bai-viet-khoa-hoc', icon: 'fa-quote-right', backgroundColor: '#23a0b0' },
         },
     };
-    // const menuStaff = {
-    //     parentMenu: app.parentMenu.user,
-    //     menus: {
-    //         1014: { title: 'Bài viết khoa học', link: '/user/bai-viet-khoa-hoc', icon: 'fa-quote-right', backgroundColor: '#23a0b0', groupIndex: 4 },
-    //     },
-    // };
+    const menuStaff = {
+        parentMenu: app.parentMenu.user,
+        menus: {
+            1014: { title: 'Bài viết khoa học', link: '/user/bai-viet-khoa-hoc', icon: 'fa-quote-right', backgroundColor: '#23a0b0', groupIndex: 4 },
+        },
+    };
+    const menuTCCB = {
+        parentMenu: app.parentMenu.tccb,
+        menus: {
+            3021: { title: 'Danh sách bài viết khoa học', link: '/user/tccb/qua-trinh/bai-viet-khoa-hoc', icon: 'fa-quote-right', backgroundColor: '#23a0b0', groupIndex: 5 },
+        },
+    };
 
     app.permission.add(
-        // { name: 'staff:login', menu: menuStaff },
+        { name: 'staff:login', menu: menuStaff },
         { name: 'qtBaiVietKhoaHoc:read', menu },
+        { name: 'qtBaiVietKhoaHoc:read', menu: menuTCCB },
         { name: 'qtBaiVietKhoaHoc:write' },
         { name: 'qtBaiVietKhoaHoc:delete' },
     );
-    app.get('/user/khcn/qua-trinh/bai-viet-khoa-hoc', app.permission.check('qtBaiVietKhoaHoc:read'), app.templates.admin);
-    app.get('/user/khcn/qua-trinh/bai-viet-khoa-hoc/group/:shcc', app.permission.check('qtBaiVietKhoaHoc:read'), app.templates.admin);
-    // app.get('/user/bai-viet-khoa-hoc', app.permission.check('staff:login'), app.templates.admin);
+    app.get('/user/:khcn/qua-trinh/bai-viet-khoa-hoc', app.permission.check('qtBaiVietKhoaHoc:read'), app.templates.admin);
+    app.get('/user/:khcn/qua-trinh/bai-viet-khoa-hoc/group/:shcc', app.permission.check('qtBaiVietKhoaHoc:read'), app.templates.admin);
+    app.get('/user/bai-viet-khoa-hoc', app.permission.check('staff:login'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     // //User Actions:
