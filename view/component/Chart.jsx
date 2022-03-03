@@ -2,14 +2,14 @@
 import React from 'react';
 
 export const DefaultColors = {
-    blue: '#007bff',
     red: '#dc3545',
     orange: 'rgb(255, 159, 64)',
-    green: '#28a745',
     yellow: '#ffc107',
-    purple: 'rgb(153, 102, 255)',
+    green: '#28a745',
+    blue: '#007bff',
+    info: '#11a2b8',
     grey: 'rgb(201, 203, 207)',
-    info: '#11a2b8'
+    purple: 'rgb(153, 102, 255)',
 };
 
 export class ChartBase extends React.Component {
@@ -40,20 +40,6 @@ export class ChartBase extends React.Component {
 
 export class DoughnutChart extends ChartBase {
     static dataToConfig = (data) => {
-        //#region explain
-        // data = [{ value: 20, title: 'nam'}, {value: 12, title: 'nu'}];
-        // =>
-        // config = {
-        //     ...,
-        //     data: {
-        //         datasets: [{
-        //             data: [20, 12],
-        //             backgroundColor: [...]
-        //         }],
-        //         label: ['nam', 'nu']
-        //     }
-        // }
-        //#endregion explain
 
         if (!data || !data.map) data = [];
         const datasets = data.data ? data.datasets : [];
@@ -71,41 +57,41 @@ export class DoughnutChart extends ChartBase {
     }
 }
 
-// export class PieChart extends ChartBase {
-//     static dataToConfig = (data, backgroundColor = Object.values(DefaultColors)) => {
-//         //#region explain
-//         // data = [{ value: 20, title: 'nam'}, {value: 12, title: 'nu'}];
-//         // =>
-//         // config = {
-//         //     ...,
-//         //     data: {
-//         //         datasets: [{
-//         //             data: [20, 12],
-//         //             backgroundColor: [...]
-//         //         }],
-//         //         label: ['nam', 'nu']
-//         //     }
-//         // }
-//         //#endregion explain
+export class PieChart extends ChartBase {
+    static dataToConfig = (data) => {
+        //         //#region explain
+        //         // data = [{ value: 20, title: 'nam'}, {value: 12, title: 'nu'}];
+        //         // =>
+        //         // config = {
+        //         //     ...,
+        //         //     data: {
+        //         //         datasets: [{
+        //         //             data: [20, 12],
+        //         //             backgroundColor: [...]
+        //         //         }],
+        //         //         label: ['nam', 'nu']
+        //         //     }
+        //         // }
+        //         //#endregion explain
 
-//         if (!data || !data.map) data = [];
-//         const dataValue = data.map(item => item.value);
-//         const dataLabels = data.map(item => item.title);
-//         return {
-//             type: 'pie',
-//             data: {
-//                 datasets: [{
-//                     data: dataValue,
-//                     backgroundColor,
-//                 }],
-//                 labels: dataLabels
-//             },
-//             options: {
-//                 responsive: true
-//             }
-//         }
-//     }
-// }
+        //         if (!data || !data.map) data = [];
+        //         const dataValue = data.map(item => item.value);
+        //         const dataLabels = data.map(item => item.title);
+        if (!data || !data.map) data = [];
+        const datasets = data.data ? data.datasets : [];
+        const dataLabels = data.data ? data.labels : [];
+        return {
+            type: 'pie',
+            data: {
+                datasets: datasets,
+                labels: dataLabels,
+            },
+            options: {
+                responsive: true
+            }
+        };
+    }
+}
 
 export class LineChart extends ChartBase {
     // static dataToConfig = (data, backgroundColor = Object.values(DefaultColors)) => {
