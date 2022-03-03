@@ -409,6 +409,12 @@ class QtDiNuocNgoai extends AdminPage {
             </>,
             backRoute: '/user/tccb',
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
+            onExport: !this.checked ? (e) => {
+                e.preventDefault();
+                const { fromYear, toYear, list_shcc, list_dv, timeType, tinhTrang, loaiHocVi } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, tinhTrang: null, loaiHocVi: null };
+
+                T.download(T.url(`/api/qua-trinh/di-nuoc-ngoai/download-excel/${list_shcc ? list_shcc : null}/${list_dv ? list_dv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${timeType}/${tinhTrang ? tinhTrang : null}/${loaiHocVi ? loaiHocVi : null}`), 'dinuocngoai.xlsx');
+            } : null
         });
     }
 }

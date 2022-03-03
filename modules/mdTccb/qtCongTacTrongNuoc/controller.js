@@ -128,7 +128,7 @@ module.exports = app => {
     app.delete('/api/qua-trinh/cong-tac-trong-nuoc', app.permission.check('staff:write'), (req, res) =>
         app.model.qtCongTacTrongNuoc.delete({ id: req.body.id }, (error) => res.send(error)));
 
-    app.get('/api/qua-trinh/cong-tac-trong-nuoc/download-excel/:list_shcc/:list_dv/:fromYear/:toYear/:timeType/:tinhTrang/:loaiHocVi', app.permission.check('qtBaoHiemXaHoi:read'), (req, res) => {
+    app.get('/api/qua-trinh/cong-tac-trong-nuoc/download-excel/:list_shcc/:list_dv/:fromYear/:toYear/:timeType/:tinhTrang/:loaiHocVi', app.permission.check('qtCongTacTrongNuoc:read'), (req, res) => {
         let { list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang, loaiHocVi } = req.params ? req.params : { list_shcc: null, list_dv: null, toYear: null, timeType: 0, tinhTrang: null, loaiHocVi: null };
         if (list_shcc == 'null') list_shcc = null;
         if (list_dv == 'null') list_dv = null;
