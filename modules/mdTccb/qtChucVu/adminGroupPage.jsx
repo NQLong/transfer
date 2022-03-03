@@ -151,7 +151,7 @@ class QtChucVuGroup extends AdminPage {
         T.ready('/user/tccb', () => {
             const route = T.routeMatcher('/user/tccb/qua-trinh/chuc-vu/group/:ma'),
                 params = route.parse(window.location.pathname);
-            this.setState({ filter: { list_shcc: params.ma, list_dv: '', timeType: 0 }, ma: params.ma });
+            this.setState({ filter: { list_shcc: params.ma, list_dv: '', timeType: 0, gioiTinh: null }, ma: params.ma });
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
 
             T.showSearchBox(() => {
