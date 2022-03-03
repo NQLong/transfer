@@ -9,7 +9,7 @@ module.exports = app => {
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1001: { title: 'Hồ sơ cán bộ', link: '/user/profile', icon: 'fa-address-card-o', backgroundColor: '#8bc34a', groupIndex: 0 },
+            1001: { title: 'Hồ sơ cán bộ', link: '/user/profile', icon: 'fa-address-card-o', color: '#000000', backgroundColor: '#fbe904', groupIndex: 0 },
         },
     };
 
@@ -217,6 +217,30 @@ module.exports = app => {
                                         dataCV.push(Object.assign(i, { lcv: i.loaiChucVu == 1 }));
                                     });
                                     result = app.clone(result, { chucVu: dataCV });
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
+                            app.model.qtNghiViec.get({ shcc: canBo.shcc }, (error, dataNghiViec) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin nghỉ việc cán bộ!' });
+                                }
+                                else if (dataNghiViec == null) {
+                                    result = app.clone(result, { dataNghiViec: null });
+                                } else {
+                                    result = app.clone(result, { dataNghiViec });
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
+                            app.model.qtDiNuocNgoai.get({ shcc: canBo.shcc, ketThuc: -1 }, (error, dangONuocNgoai) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin đi nước ngoài của cán bộ!' });
+                                }
+                                else if (dangONuocNgoai == null) {
+                                    result = app.clone(result, { dangONuocNgoai: null });
+                                } else {
+                                    result = app.clone(result, { dangONuocNgoai });
                                 }
                                 resolve();
                             });

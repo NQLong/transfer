@@ -1,22 +1,16 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-
-import { AdminPage, FormCheckbox, FormTextBox, FormRichTextBox, FormFileUpload, renderTable, TableCell, FormSelect } from 'view/component/AdminPage';
-import {
-    getDeTaiNckh, createQtNckhStaffUser, updateQtNckhStaffUser, deleteQtNckhStaffUser, deleteFile
-}
-    from './redux';
+import { AdminPage, FormCheckbox, FormTextBox, FormRichTextBox, renderTable, TableCell, FormSelect, FormFileBox } from 'view/component/AdminPage';
+import { getDeTaiNckh, createQtNckhStaffUser, updateQtNckhStaffUser, deleteQtNckhStaffUser, deleteFile } from './redux';
 import { DateInput } from 'view/component/Input';
 import Dropdown from 'view/component/Dropdown';
-import T from 'view/js/common';
-// import FileBox from 'view/component/FileBox';
 
 const EnumDateType = Object.freeze({
     0: { text: '' },
     1: { text: 'dd/mm/yyyy' },
     2: { text: 'mm/yyyy' },
-    3: { text: 'yyyy' },
+    3: { text: 'yyyy' }
 }), typeMapper = {
     'yyyy': 'year',
     'mm/yyyy': 'month',
@@ -33,6 +27,7 @@ class StaffEditNCKH extends AdminPage {
         ngayNghiemThuType: 'dd/mm/yyyy',
         listFile: []
     }
+
     componentDidMount() {
         T.ready('/user', () => {
             this.getData();
@@ -56,13 +51,15 @@ class StaffEditNCKH extends AdminPage {
     }
 
     setData = (data) => {
-        let { id, shcc, batDauType, ketThucType, batDau, ketThuc, fileMinhChung, inLLKH,
-            tenDeTai, maSoCapQuanLy, kinhPhi, vaiTro, ngayNghiemThu, ketQua, ngayNghiemThuType }
+        let {
+            id, shcc, batDauType, ketThucType, batDau, ketThuc, fileMinhChung, inLLKH,
+            tenDeTai, maSoCapQuanLy, kinhPhi, vaiTro, ngayNghiemThu, ketQua, ngayNghiemThuType
+        }
             = data && data.item ? data.item :
-                {
-                    id: null, shcc: shcc ? shcc : data.shcc, batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', batDau: null, ketThuc: null, tenDeTai: '', inLLKH: 0,
-                    maSoCapQuanLy: '', kinhPhi: '', vaiTro: '', ngayNghiemThu: null, ketQua: '', ngayNghiemThuType: 'dd/mm/yyyy', fileMinhChung: '[]'
-                };
+            {
+                id: null, shcc: shcc ? shcc : data.shcc, batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', batDau: null, ketThuc: null, tenDeTai: '', inLLKH: 0,
+                maSoCapQuanLy: '', kinhPhi: '', vaiTro: '', ngayNghiemThu: null, ketQua: '', ngayNghiemThuType: 'dd/mm/yyyy', fileMinhChung: '[]'
+            };
         this.setState({
             ownerShcc: shcc,
             batDauType: batDauType ? batDauType : 'dd/mm/yyyy', listFile: fileMinhChung ? JSON.parse(fileMinhChung) : [],
@@ -70,7 +67,7 @@ class StaffEditNCKH extends AdminPage {
             ngayNghiemThuType: ngayNghiemThuType ? ngayNghiemThuType : 'dd/mm/yyyy',
             id, batDau, ketThuc, ngayNghiemThu,
             denNay: ketThuc == -1 ? 1 : 0,
-            nghiemThu: (ngayNghiemThu == -1 || ketThuc == -1) ? 1 : 0,
+            nghiemThu: (ngayNghiemThu == -1 || ketThuc == -1) ? 1 : 0
         }, () => {
             this.tenDeTai.value(tenDeTai);
             this.maSo.value(maSoCapQuanLy);
@@ -132,8 +129,7 @@ class StaffEditNCKH extends AdminPage {
             $('#end').hide();
             this.handleNghiemThu(1);
             this.ketThucType?.setText({ text: '' });
-        }
-        else {
+        } else {
             $('#end').show();
             this.ketThucType?.setText({ text: this.state.ketThucType ? this.state.ketThucType : 'dd/mm/yyyy' });
             this.ketThuc.setVal(null);
@@ -146,8 +142,7 @@ class StaffEditNCKH extends AdminPage {
             this.ngayNghiemThuType?.setText({ text: '' });
             $('#done').hide();
             this.nghiemThuCheck.value(1);
-        }
-        else {
+        } else {
             $('#done').show();
             this.ngayNghiemThuType?.setText({ text: this.state.ngayNghiemThuType ? this.state.ngayNghiemThuType : 'dd/mm/yyyy' });
             this.ngayNghiemThu.setVal(null);
@@ -175,8 +170,7 @@ class StaffEditNCKH extends AdminPage {
                 </>
                 } />
                 <TableCell style={{ textAlign: 'center' }} content={T.dateToText(parseInt(item.split('/')[2].substring(9, 22)), 'dd/mm/yyyy HH:MM')}></TableCell>
-                <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                    onDelete={e => this.deleteFile(e, index, item)} >
+                <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onDelete={e => this.deleteFile(e, index, item)}>
                     <a className='btn btn-info' href={`/api/khcn/download/${id}/${item}`} download>
                         <i className='fa fa-lg fa-download' />
                     </a>
@@ -211,7 +205,7 @@ class StaffEditNCKH extends AdminPage {
 
                 vaiTro: this.getVal(this.vaiTro),
                 ketQua: !this.state.nghiemThu ? this.getVal(this.ketQua) : '',
-                inLlkh: this.inLLKH.value() ? 1 : 0,
+                inLlkh: this.inLLKH.value() ? 1 : 0
             };
             return changes;
 
@@ -274,31 +268,31 @@ class StaffEditNCKH extends AdminPage {
                         <FormTextBox className='col-md-6' ref={e => this.maSo = e} label='Mã số và cấp quản lý' readOnly={readOnly} required />
                         <FormTextBox className='col-md-6' ref={e => this.kinhPhi = e} label={'Kinh phí'} type='text' placeholder='Nhập kinh phí (triệu đồng' />
 
-                        <div className='form-group col-md-4'>Các mốc thời gian: </div>
+                        <div className='form-group col-md-4'>Các mốc thời gian:</div>
                         <FormCheckbox ref={e => this.denNayCheck = e} label='Chưa kết thúc' onChange={this.handleKetThuc} className='form-group col-md-4' />
                         <FormCheckbox ref={e => this.nghiemThuCheck = e} label='Chưa nghiệm thu' onChange={this.handleNghiemThu} className='form-group col-md-4' />
-                        <div className='form-group col-md-4'><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
-                            label={
-                                <div style={{ display: 'flex' }}>Thời gian bắt đầu &nbsp; <Dropdown ref={e => this.batDauType = e}
-                                    items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
-                                    onSelected={item => { this.setState({ batDauType: item }); this.batDau.clear(); this.batDau.focus(); }} />&nbsp;<span style={{ color: 'red' }}> *</span></div>
-                            }
-                            type={this.state.batDauType ? typeMapper[this.state.batDauType] : null} /></div>
-                        <div className='form-group col-md-4' id='end'><DateInput ref={e => this.ketThuc = e} placeholder='Thời gian kết thúc'
-                            label={
-                                <div style={{ display: 'flex' }}>Thời gian kết thúc &nbsp; <Dropdown ref={e => this.ketThucType = e}
-                                    items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
-                                    onSelected={item => { this.setState({ ketThucType: item }); this.ketThuc.clear(); this.ketThuc.focus(); }} />&nbsp;<span style={{ color: 'red' }}> *</span></div>
-                            }
-                            type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} /></div>
+                        <div className='form-group col-md-4'><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu' label={
+                            <div style={{ display: 'flex' }}>Thời gian bắt đầu &nbsp; <Dropdown ref={e => this.batDauType = e} items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]} onSelected={item => {
+                                this.setState({ batDauType: item });
+                                this.batDau.clear();
+                                this.batDau.focus();
+                            }} />&nbsp;<span style={{ color: 'red' }}> *</span></div>
+                        } type={this.state.batDauType ? typeMapper[this.state.batDauType] : null} /></div>
+                        <div className='form-group col-md-4' id='end'><DateInput ref={e => this.ketThuc = e} placeholder='Thời gian kết thúc' label={
+                            <div style={{ display: 'flex' }}>Thời gian kết thúc &nbsp; <Dropdown ref={e => this.ketThucType = e} items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]} onSelected={item => {
+                                this.setState({ ketThucType: item });
+                                this.ketThuc.clear();
+                                this.ketThuc.focus();
+                            }} />&nbsp;<span style={{ color: 'red' }}> *</span></div>
+                        } type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} /></div>
                         <div className='form-group col-md-4' style={{ display: this.state.denNay ? 'block' : 'none' }} />
-                        <div className='form-group col-md-4' id='done'><DateInput ref={e => this.ngayNghiemThu = e} placeholder='Thời gian nghiệm thu'
-                            label={
-                                <div style={{ display: 'flex' }}>Thời gian nghiệm thu &nbsp; <Dropdown ref={e => this.ngayNghiemThuType = e}
-                                    items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
-                                    onSelected={item => { this.setState({ ngayNghiemThuType: item }); this.ngayNghiemThu.clear(); this.ngayNghiemThu.focus(); }} />&nbsp;<span style={{ color: 'red' }}> *</span></div>
-                            }
-                            type={this.state.ngayNghiemThuType ? typeMapper[this.state.ngayNghiemThuType] : null} /></div>
+                        <div className='form-group col-md-4' id='done'><DateInput ref={e => this.ngayNghiemThu = e} placeholder='Thời gian nghiệm thu' label={
+                            <div style={{ display: 'flex' }}>Thời gian nghiệm thu &nbsp; <Dropdown ref={e => this.ngayNghiemThuType = e} items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]} onSelected={item => {
+                                this.setState({ ngayNghiemThuType: item });
+                                this.ngayNghiemThu.clear();
+                                this.ngayNghiemThu.focus();
+                            }} />&nbsp;<span style={{ color: 'red' }}> *</span></div>
+                        } type={this.state.ngayNghiemThuType ? typeMapper[this.state.ngayNghiemThuType] : null} /></div>
                         <div className='form-group col-md-4' style={{ display: this.state.nghiemThu ? 'block' : 'none' }} />
 
                         <FormSelect className='col-md-4' ref={e => this.vaiTro = e} label={'Vai trò'} data={[
@@ -315,9 +309,7 @@ class StaffEditNCKH extends AdminPage {
                             <div className='form-group col-md-8'>
                                 {this.tableListFile(this.state.listFile, this.state.id, permission)}
                             </div>
-                            <FormFileUpload className='col-md-4' ref={e => this.fileBox = e} label='Tải lên tập tin minh chứng'
-                                postUrl='/user/upload' uploadType='deTaiNCKHStaffFile' userData='deTaiNCKHStaffFile'
-                                style={{ width: '100%', backgroundColor: '#fdfdfd' }} onSuccess={this.onSuccess} />
+                            <FormFileBox className='col-md-4' ref={e => this.fileBox = e} label='Tải lên tập tin minh chứng' postUrl='/user/upload' uploadType='deTaiNCKHStaffFile' userData='deTaiNCKHStaffFile' style={{ width: '100%', backgroundColor: '#fdfdfd' }} onSuccess={this.onSuccess} />
                         </div>
                     </div>
 
@@ -331,8 +323,5 @@ class StaffEditNCKH extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, qtNghienCuuKhoaHoc: state.khcn.qtNghienCuuKhoaHoc });
-const mapActionsToProps = {
-    getDeTaiNckh, createQtNckhStaffUser, updateQtNckhStaffUser, deleteQtNckhStaffUser, deleteFile
-
-};
+const mapActionsToProps = { getDeTaiNckh, createQtNckhStaffUser, updateQtNckhStaffUser, deleteQtNckhStaffUser, deleteFile };
 export default connect(mapStateToProps, mapActionsToProps)(StaffEditNCKH);

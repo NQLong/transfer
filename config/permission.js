@@ -211,7 +211,7 @@ module.exports = app => {
                         app.permissionHooks.pushUserPermission(user, 'student:login'); // Add student permission: student:login,
                         app.model.fwStudents.get({ mssv: user.studentId }, (error, student) => {
                             if (student) {
-                                user.student = student;
+                                user.data = student;
                                 app.permissionHooks.run('student', user, student).then(() => resolve());
                             } else {
                                 resolve();
@@ -229,6 +229,7 @@ module.exports = app => {
                             user.isStaff = 1;
                             item.phai == '02' && app.permissionHooks.pushUserPermission(user, 'staff:female');
                             user.shcc = item.shcc;
+                            user.data = item;
                             app.permissionHooks.pushUserPermission(user, 'staff:login'); // Add staff permission: staff:login
                             resolve();
                         }

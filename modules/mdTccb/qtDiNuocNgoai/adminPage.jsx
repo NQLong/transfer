@@ -34,22 +34,25 @@ class EditModal extends AdminModal {
     state = {
         id: null,
         ngayDi: '',
-        ngayVe: '',
+        ngayVe: null,
+        dangDienRa: true,
         ngayDiType: 'dd/mm/yyyy',
         ngayVeType: 'dd/mm/yyyy',
     };
     multiple = false;
 
     onShow = (item, multiple = true) => {
+        console.log(item);
         this.multiple = multiple;
-        let { id, shcc, quocGia, ngayDi, ngayDiType, ngayVe, ngayVeType, mucDich, noiDung, chiPhi, ghiChu, soQuyetDinh, ngayQuyetDinh } = item ? item : {
-            id: '', shcc: '', quocGia: '', ngayDi: null, ngayDiType: '', ngayVe: null, ngayVeType: '', mucDich: '', noiDung: '', chiPhi: null, ghiChu: '', soQuyetDinh: '', ngayQuyetDinh: null,
+        let { id, shcc, quocGia, ngayDi, ngayDiType, ngayVe, ngayVeType, mucDich, noiDung, chiPhi, ghiChu, soQuyetDinh, ngayQuyetDinh, today } = item ? item : {
+            id: '', shcc: '', quocGia: '', ngayDi: null, ngayDiType: '', ngayVe: null, ngayVeType: '', mucDich: '', noiDung: '', chiPhi: null, ghiChu: '', soQuyetDinh: '', ngayQuyetDinh: null, today: new Date().getTime()
         };
 
         this.setState({
             id, ngayDiType: ngayDiType ? ngayDiType : 'dd/mm/yyyy',
             ngayVeType: ngayVeType ? ngayVeType : 'dd/mm/yyyy',
-            ngayDi, ngayVe
+            ngayDi, ngayVe,
+            dangDienRa: ngayVe ? (ngayVe == -1 || ngayVe >= today) : true
         }, () => {
             this.shcc.value(shcc);
             if (quocGia) {
@@ -64,18 +67,22 @@ class EditModal extends AdminModal {
             this.ngayQuyetDinh.value(ngayQuyetDinh ? ngayQuyetDinh : '');
 
             this.ngayDiType.setText({ text: ngayDiType ? ngayDiType : 'dd/mm/yyyy' });
-            this.state.ngayVe != -1 && this.ngayVeType.setText({ text: ngayVeType ? ngayVeType : 'dd/mm/yyyy' });
-            if (this.state.ngayVe == -1) {
-                this.setState({ denNay: true });
-                this.denNayCheck.value(true);
-                $('#ketThucDate').hide();
-            } else {
-                this.setState({ denNay: false });
-                this.denNayCheck.value(false);
-                $('#ketThucDate').show();
-            }
             this.ngayDi.setVal(ngayDi ? ngayDi : '');
-            this.state.ngayVe != -1 && this.ngayVe.setVal(ngayVe ? ngayVe : '');
+            // this.state.ngayVe != -1 && this.ngayVeType.setText({ text: ngayVeType ? ngayVeType : 'dd/mm/yyyy' });
+            // if (this.state.ngayVe == -1) {
+            //     this.setState({ denNay: true });
+            //     this.denNayCheck.value(true);
+            //     $('#ketThucDate').hide();
+            // } else {
+            //     this.setState({ denNay: false });
+            //     this.denNayCheck.value(false);
+            //     $('#ketThucDate').show();
+            // }
+            this.denNayCheck.value(this.state.dangDienRa);
+            this.ngayVeType.setText({ text: ngayVeType ? ngayVeType : 'dd/mm/yyyy' });
+            if (this.state.ngayVe) {
+                this.state.ngayVe != -1 && this.ngayVe.setVal(ngayVe);
+            } else this.ngayVe.setVal(null);
         });
     };
 
@@ -97,10 +104,10 @@ class EditModal extends AdminModal {
         } else if (!this.ngayDi.getVal()) {
             T.notify('Ngày đi nước ngoài trống', 'danger');
             this.ngayDi.focus();
-        } else if (!this.state.denNay && !this.ngayVe.getVal()) {
+        } else if (!this.ngayVe.getVal()) {
             T.notify('Ngày về nước trống', 'danger');
             this.ngayVe.focus();
-        } else if (!this.state.denNay && this.ngayDi.getVal() > this.ngayVe.getVal()) {
+        } else if (this.ngayDi.getVal() > this.ngayVe.getVal()) {
             T.notify('Ngày đi lớn hơn ngày về', 'danger');
             this.ngayDi.focus();
         } else {
@@ -117,8 +124,8 @@ class EditModal extends AdminModal {
 
                     ngayDiType: this.state.ngayDiType,
                     ngayDi: this.ngayDi.getVal(),
-                    ngayVeType: !this.state.denNay ? this.state.ngayVeType : '',
-                    ngayVe: !this.state.denNay ? this.ngayVe.getVal() : -1
+                    ngayVeType: this.state.ngayVeType,
+                    ngayVe: this.ngayVe.getVal()
                 };
                 if (index == list_ma.length - 1) {
                     this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
@@ -136,13 +143,7 @@ class EditModal extends AdminModal {
     }
 
     handleNgayVe = (value) => {
-        value ? $('#ketThucDate').hide() : $('#ketThucDate').show();
-        this.setState({ denNay: value });
-        if (!value) {
-            this.ngayVeType?.setText({ text: this.state.ngayVeType ? this.state.ngayVeType : 'dd/mm/yyyy' });
-        } else {
-            this.ngayVeType?.setText({ text: '' });
-        }
+        this.setState({ dangDienRa: value });
     }
 
     render = () => {
@@ -161,15 +162,15 @@ class EditModal extends AdminModal {
 
                 <div className='form-group col-md-6'><DateInput ref={e => this.ngayDi = e} placeholder='Ngày đi'
                     label={
-                        <div style={{ display: 'flex' }}>Ngày đi (định dạng:&nbsp; <Dropdown ref={e => this.ngayDiType = e}
+                        <div style={{ display: 'flex' }}>Ngày đi (&nbsp; <Dropdown ref={e => this.ngayDiType = e}
                             items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
                             onSelected={item => this.setState({ ngayDiType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
                     }
                     type={this.state.ngayDiType ? typeMapper[this.state.ngayDiType] : null} readOnly={readOnly} /></div>
-                <FormCheckbox ref={e => this.denNayCheck = e} label='Đến nay' onChange={this.handleNgayVe} className='form-group col-md-3' />
+                <FormCheckbox ref={e => this.denNayCheck = e} label='Đang diễn ra' onChange={this.handleNgayVe} className='form-group col-md-3' />
                 <div className='form-group col-md-6' id='ketThucDate'><DateInput ref={e => this.ngayVe = e} placeholder='Ngày về'
                     label={
-                        <div style={{ display: 'flex' }}>Ngày về (định dạng:&nbsp; <Dropdown ref={e => this.ngayVeType = e}
+                        <div style={{ display: 'flex' }}>{this.state.dangDienRa ? 'Ngày về dự kiến' : 'Ngày về'} (&nbsp; <Dropdown ref={e => this.ngayVeType = e}
                             items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
                             onSelected={item => this.setState({ ngayVeType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
                     }

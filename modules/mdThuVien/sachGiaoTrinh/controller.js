@@ -2,26 +2,26 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.library,
         menus: {
-            9001: { title: 'Sách, giáo trình', subTitle: 'Của cán bộ', link: '/user/library/sach-giao-trinh', icon: 'fa-book', backgroundColor: '#ccad2f' },
+            8001: { title: 'Sách, giáo trình', subTitle: 'Của cán bộ', link: '/user/library/sach-giao-trinh', icon: 'fa-book', backgroundColor: '#ccad2f', pin: true },
         },
     };
 
-    const menuStaff = {
-        parentMenu: app.parentMenu.user,
-        menus: {
-            1006: { title: 'Sách, giáo trình', link: '/user/sach-giao-trinh', icon: 'fa-book', backgroundColor: '#ccad2f', groupIndex: 4 },
-        },
-    };
+    // const menuStaff = {
+    //     parentMenu: app.parentMenu.user,
+    //     menus: {
+    //         1006: { title: 'Sách, giáo trình', link: '/user/sach-giao-trinh', icon: 'fa-book', backgroundColor: '#ccad2f', groupIndex: 4 },
+    //     },
+    // };
 
     app.permission.add(
-        { name: 'staff:login', menu: menuStaff },
+        // { name: 'staff:login', menu: menuStaff },
         { name: 'sachGiaoTrinh:read', menu },
         { name: 'sachGiaoTrinh:write' },
         { name: 'sachGiaoTrinh:delete' },
     );
     app.get('/user/library/sach-giao-trinh', app.permission.check('sachGiaoTrinh:read'), app.templates.admin);
     app.get('/user/library/sach-giao-trinh/group/:shcc', app.permission.check('sachGiaoTrinh:read'), app.templates.admin);
-    app.get('/user/sach-giao-trinh', app.permission.check('staff:login'), app.templates.admin);
+    // app.get('/user/sach-giao-trinh', app.permission.check('staff:login'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     // //User Actions:

@@ -57,7 +57,7 @@
         "asset": "asset",
         "temp": "asset/temp",
         "upload": "asset/upload",
-        "document": "asset/upload/document",
+        "document": "asset/document",
         "public": "public",
         "favicon": "public/img/favicon.png"
     },

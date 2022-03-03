@@ -3,12 +3,24 @@ import { SelectAdapter_DmDienHopDongV2 } from 'modules/mdDanhMuc/dmDienHopDong/r
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_DmLoaiHopDongV2 } from 'modules/mdDanhMuc/dmLoaiHopDong/redux';
 import { SelectAdapter_DmNgachCdnnV2 } from 'modules/mdDanhMuc/dmNgachCdnn/redux';
-import { SelectAdapter_DmQuocGia } from 'modules/mdDanhMuc/dmQuocGia/redux';
+// import { SelectAdapter_DmQuocGia } from 'modules/mdDanhMuc/dmQuocGia/redux';
 import React from 'react';
 import { connect } from 'react-redux';
 import { AdminPage, FormCheckbox, FormDatePicker, FormRichTextBox, FormSelect, FormTextBox } from 'view/component/AdminPage';
+// import Dropdown from 'view/component/Dropdown';
+// import { DateInput } from 'view/component/Input';
 import ComponentChucVu from '../qtChucVu/componentChucVu';
 import { getStaffEdit } from './redux';
+// const EnumDateType = Object.freeze({
+//     0: { text: '' },
+//     1: { text: 'dd/mm/yyyy' },
+//     2: { text: 'mm/yyyy' },
+//     3: { text: 'yyyy' },
+// }), typeMapper = {
+//     'yyyy': 'year',
+//     'mm/yyyy': 'month-mask',
+//     'dd/mm/yyyy': 'date-mask'
+// };
 class ComponentTTCongTac extends AdminPage {
     state = {};
     shcc = '';
@@ -17,7 +29,7 @@ class ComponentTTCongTac extends AdminPage {
     value = (item) => {
         this.setState({
             doiTuongBoiDuong: item.doiTuongBoiDuongKienThucQpan, tinhTrangBoiDuong: item.tinhTrangBoiDuong,
-            dangONuocNgoai: item.dangONuocNgoai, dangNghiTheoCheDo: item.dangNghiTheoCheDo, daNghi: item.daNghi
+            dangONuocNgoai: item.dangONuocNgoai, dangNghiTheoCheDo: item.dangNghiTheoCheDo, daNghi: item.daNghi || item.dataNghiViec
         }, () => {
             this.shcc = item.shcc;
             this.ngheNghiepCu.value(item.ngheNghiepCu ? item.ngheNghiepCu : '');
@@ -51,17 +63,19 @@ class ComponentTTCongTac extends AdminPage {
             this.state.doiTuongBoiDuong ? this.tinhTrangBoiDuong.value(item.tinhTrangBoiDuong ? item.tinhTrangBoiDuong : 0) : null;
             this.state.doiTuongBoiDuong && this.state.tinhTrangBoiDuong ? this.namBoiDuong.value(item.namBoiDuong ? item.namBoiDuong : '') : null;
             this.state.doiTuongBoiDuong && this.state.tinhTrangBoiDuong ? this.khoaBoiDuong.value(item.khoaBoiDuong ? item.khoaBoiDuong : '') : null;
+            
+            // if (this.state.dangONuocNgoai) {
+            //     let { id, shcc, quocGia, ngayDi, ngayDiType, ngayVe, ngayVeType, mucDich, noiDung, chiPhi, ghiChu, soQuyetDinh, ngayQuyetDinh } = item.dangONuocNgoai;
+            //     this.quocGiaDangO.value
 
+            // }
 
-            this.dangONuocNgoai.value(item.dangONuocNgoai ? item.dangONuocNgoai : 0);
-            this.state.dangONuocNgoai && this.quocGiaDangO.value(item.quocGiaDangO ? item.quocGiaDangO : '');
-            this.state.dangONuocNgoai && this.ngayBatDauONuocNgoai.value(item.ngayBatDauONuocNgoai ? item.ngayBatDauONuocNgoai : '');
-            this.state.dangONuocNgoai && this.ngayKetThucONuocNgoai.value(item.ngayKetThucONuocNgoai ? item.ngayKetThucONuocNgoai : '');
-            this.state.dangONuocNgoai && this.lyDoONuocNgoai.value(item.lyDoONuocNgoai ? item.lyDoONuocNgoai : '');
-            this.daNghi.value(item.daNghi ? item.daNghi : 0);
-            this.state.daNghi && this.ngayDaNghi.value(item.ngayNghi ? item.ngayNghi : '');
-            this.state.daNghi && this.soHieuDaNghi.value(item.soHieuDaNghi ? item.soHieuDaNghi : '');
-            this.state.daNghi && this.noiDungDaNghi.value(item.noiDungDaNghi ? item.noiDungDaNghi : '');
+            if (this.state.daNghi) {
+                this.daNghi.value(item.daNghi ? item.daNghi : 0);
+                this.ngayDaNghi.value(item.dataNghiViec.ngayNghi);
+                this.soHieuDaNghi.value(item.dataNghiViec.soQuyetDinh);
+                this.noiDungDaNghi.value(item.dataNghiViec.noiDung);
+            }
         });
 
     }
@@ -167,10 +181,7 @@ class ComponentTTCongTac extends AdminPage {
                     <div className='form-group col-md-12'></div>
 
                     <FormCheckbox ref={e => this.dangONuocNgoai = e} label='Đang ở nước ngoài' onChange={value => this.setState({ dangONuocNgoai: value })} className='col-md-3' readOnly={this.props.userEdit} />
-                    {this.state.dangONuocNgoai ? <FormSelect ref={e => this.quocGiaDangO = e} label='Quốc gia' className='col-md-3' data={SelectAdapter_DmQuocGia} readOnly={this.props.userEdit} /> : null}
-                    {this.state.dangONuocNgoai ? <FormDatePicker type='date-mask' ref={e => this.ngayBatDauONuocNgoai = e} label='Từ ngày' className='col-md-3' readOnly={this.props.userEdit} /> : null}
-                    {this.state.dangONuocNgoai ? <FormDatePicker type='date-mask' ref={e => this.ngayKetThucONuocNgoai = e} label='Đến ngày' className='col-md-3' readOnly={this.props.userEdit} /> : null}
-                    {this.state.dangONuocNgoai ? <FormRichTextBox ref={e => this.lyDoONuocNgoai = e} label='Lý do/Nội dung' className='col-md-12' readOnly={this.props.userEdit} /> : <div className='col-md-9'></div>}
+                    <FormDatePicker type={this.state.ngayDiType} ref={e => this.ngayDi = e} />
 
                     <FormCheckbox ref={e => this.dangNghiTheoCheDo = e} label='Đang tạm nghỉ theo chế độ' onChange={value => this.setState({ dangNghiTheoCheDo: value })} className='col-md-3' readOnly={this.props.userEdit} />
                     {this.state.dangNghiTheoCheDo ? <FormTextBox ref={e => this.noiNghi = e} label='Nơi nghỉ' className='col-md-3' readOnly={this.props.userEdit} /> : null}
