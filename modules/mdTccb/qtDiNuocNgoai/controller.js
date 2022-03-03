@@ -75,8 +75,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, list_shcc, list_dv, timeType, tinhTrang, loaiHocVi } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, tinhTrang: null, loaiHocVi: null };
-        app.model.qtDiNuocNgoai.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang, loaiHocVi, searchTerm, (error, page) => {
+        const { fromYear, toYear, list_shcc, list_dv, timeType, tinhTrang, loaiHocVi, mucDich } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, tinhTrang: null, loaiHocVi: null, mucDich: null };
+        app.model.qtDiNuocNgoai.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang, loaiHocVi, mucDich, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -92,8 +92,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, list_shcc, list_dv, timeType, tinhTrang, loaiHocVi } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, tinhTrang: null, loaiHocVi: null };
-        app.model.qtDiNuocNgoai.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang, loaiHocVi, searchTerm, (error, page) => {
+        const { fromYear, toYear, list_shcc, list_dv, timeType, tinhTrang, loaiHocVi, mucDich } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, tinhTrang: null, loaiHocVi: null, mucDich: null };
+        app.model.qtDiNuocNgoai.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang, loaiHocVi, mucDich, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -108,8 +108,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, list_shcc, list_dv, timeType, tinhTrang, loaiHocVi } = (req.query.filter && req.query.filter != '%%%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, tinhTrang: null, loaiHocVi: null };
-        app.model.qtDiNuocNgoai.groupPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang, loaiHocVi, searchTerm, (error, page) => {
+        const { fromYear, toYear, list_shcc, list_dv, timeType, tinhTrang, loaiHocVi, mucDich } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, tinhTrang: null, loaiHocVi: null, mucDich: null };
+        app.model.qtDiNuocNgoai.groupPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang, loaiHocVi, mucDich, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -128,15 +128,16 @@ module.exports = app => {
     app.delete('/api/qua-trinh/di-nuoc-ngoai', app.permission.check('staff:write'), (req, res) =>
         app.model.qtDiNuocNgoai.delete({ id: req.body.id }, (error) => res.send(error)));
     
-    app.get('/api/qua-trinh/di-nuoc-ngoai/download-excel/:list_shcc/:list_dv/:fromYear/:toYear/:timeType/:tinhTrang/:loaiHocVi', app.permission.check('qtDiNuocNgoai:read'), (req, res) => {
-        let { list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang, loaiHocVi } = req.params ? req.params : { list_shcc: null, list_dv: null, toYear: null, timeType: 0, tinhTrang: null, loaiHocVi: null };
+    app.get('/api/qua-trinh/di-nuoc-ngoai/download-excel/:list_shcc/:list_dv/:fromYear/:toYear/:timeType/:tinhTrang/:loaiHocVi/:mucDich', app.permission.check('qtDiNuocNgoai:read'), (req, res) => {
+        let { list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang, loaiHocVi, mucDich } = req.params ? req.params : { list_shcc: null, list_dv: null, toYear: null, timeType: 0, tinhTrang: null, loaiHocVi: null, mucDich: null };
         if (list_shcc == 'null') list_shcc = null;
         if (list_dv == 'null') list_dv = null;
         if (fromYear == 'null') fromYear = null;
         if (toYear == 'null') toYear = null;
         if (tinhTrang == 'null') tinhTrang = null;
         if (loaiHocVi == 'null') loaiHocVi = null;
-        app.model.qtDiNuocNgoai.download(list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang, loaiHocVi, (err, result) => {
+        if (mucDich == 'null') mucDich = null;
+        app.model.qtDiNuocNgoai.download(list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang, loaiHocVi, mucDich, (err, result) => {
             if (err || !result) {
                 res.send({ err });
             } else {

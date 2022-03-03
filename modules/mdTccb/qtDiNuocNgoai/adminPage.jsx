@@ -42,7 +42,6 @@ class EditModal extends AdminModal {
     multiple = false;
 
     onShow = (item, multiple = true) => {
-        console.log(item);
         this.multiple = multiple;
         let { id, shcc, quocGia, ngayDi, ngayDiType, ngayVe, ngayVeType, mucDich, noiDung, chiPhi, ghiChu, soQuyetDinh, ngayQuyetDinh, today } = item ? item : {
             id: '', shcc: '', quocGia: '', ngayDi: null, ngayDiType: '', ngayVe: null, ngayVeType: '', mucDich: '', noiDung: '', chiPhi: null, ghiChu: '', soQuyetDinh: '', ngayQuyetDinh: null, today: new Date().getTime()
@@ -68,16 +67,6 @@ class EditModal extends AdminModal {
 
             this.ngayDiType.setText({ text: ngayDiType ? ngayDiType : 'dd/mm/yyyy' });
             this.ngayDi.setVal(ngayDi ? ngayDi : '');
-            // this.state.ngayVe != -1 && this.ngayVeType.setText({ text: ngayVeType ? ngayVeType : 'dd/mm/yyyy' });
-            // if (this.state.ngayVe == -1) {
-            //     this.setState({ denNay: true });
-            //     this.denNayCheck.value(true);
-            //     $('#ketThucDate').hide();
-            // } else {
-            //     this.setState({ denNay: false });
-            //     this.denNayCheck.value(false);
-            //     $('#ketThucDate').show();
-            // }
             this.denNayCheck.value(this.state.dangDienRa);
             this.ngayVeType.setText({ text: ngayVeType ? ngayVeType : 'dd/mm/yyyy' });
             if (this.state.ngayVe) {
@@ -198,6 +187,7 @@ class QtDiNuocNgoai extends AdminPage {
                 this.mulCanBo?.value('');
                 this.tinhTrang?.value('');
                 this.loaiHocVi?.value('');
+                this.mucDich?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
             if (this.checked) {
@@ -222,7 +212,8 @@ class QtDiNuocNgoai extends AdminPage {
         const list_shcc = this.mulCanBo?.value().toString() || '';
         const tinhTrang = this.tinhTrang?.value() == '' ? null : this.tinhTrang?.value();
         const loaiHocVi = this.loaiHocVi?.value() == '' ? '' : this.loaiHocVi?.value().toString();
-        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc, tinhTrang, timeType, loaiHocVi };
+        const mucDich = this.mucDich?.value() == '' ? '' : this.mucDich?.value().toString();
+        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc, tinhTrang, timeType, loaiHocVi, mucDich };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
@@ -235,7 +226,8 @@ class QtDiNuocNgoai extends AdminPage {
                     this.timeType?.value(filter.timeType);
                     this.tinhTrang?.value(filter.tinhTrang);
                     this.loaiHocVi?.value(filter.loaiHocVi);
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.list_shcc || filter.list_dv || filter.timeType || filter.tinhTrang || filter.loaiHocVi )) this.showAdvanceSearch();                
+                    this.mucDich?.value(filter.mucDich);
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.list_shcc || filter.list_dv || filter.timeType || filter.tinhTrang || filter.loaiHocVi || filter.mucDich )) this.showAdvanceSearch(); 
                 }
             });
         });
@@ -382,7 +374,7 @@ class QtDiNuocNgoai extends AdminPage {
                             <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-2' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />
                             <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-2' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />
                         </>}
-                    <FormSelect ref={e => this.loaiHocVi = e} label='Loại học vị' className='col-12 col-md-3' data={[
+                    <FormSelect ref={e => this.loaiHocVi = e} label='Loại học vị' className='col-12 col-md-4' data={[
                         { id: '04', text: 'Cử nhân' },
                         { id: '03', text: 'Thạc sĩ' },
                         { id: '02', text: 'Tiến sĩ' },
@@ -393,6 +385,7 @@ class QtDiNuocNgoai extends AdminPage {
                         ]} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
                     <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
                     <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.mucDich = e} label='Mục đích' data={SelectAdapter_DmMucDichNuocNgoaiV2} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
                 </div>
             </>,
             content: <>
@@ -411,9 +404,9 @@ class QtDiNuocNgoai extends AdminPage {
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
             onExport: !this.checked ? (e) => {
                 e.preventDefault();
-                const { fromYear, toYear, list_shcc, list_dv, timeType, tinhTrang, loaiHocVi } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, tinhTrang: null, loaiHocVi: null };
+                const { fromYear, toYear, list_shcc, list_dv, timeType, tinhTrang, loaiHocVi, mucDich } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, tinhTrang: null, loaiHocVi: null, mucDich: null };
 
-                T.download(T.url(`/api/qua-trinh/di-nuoc-ngoai/download-excel/${list_shcc ? list_shcc : null}/${list_dv ? list_dv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${timeType}/${tinhTrang ? tinhTrang : null}/${loaiHocVi ? loaiHocVi : null}`), 'dinuocngoai.xlsx');
+                T.download(T.url(`/api/qua-trinh/di-nuoc-ngoai/download-excel/${list_shcc ? list_shcc : null}/${list_dv ? list_dv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${timeType}/${tinhTrang ? tinhTrang : null}/${loaiHocVi ? loaiHocVi : null}/${mucDich ? mucDich : null}`), 'dinuocngoai.xlsx');
             } : null
         });
     }
