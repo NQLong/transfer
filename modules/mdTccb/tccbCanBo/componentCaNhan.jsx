@@ -258,9 +258,6 @@ class ComponentCaNhan extends React.Component {
 
                     <FormTextBox className='form-group col-md-6' ref={e => this.giaDinhChinhSach = e} label='Gia đình chính sách' />
                     <FormTextBox className='form-group col-md-6' ref={e => this.danhHieuPhongTangCaoNhat = e} label='Danh hiệu được phong tặng cao nhất' />
-
-
-
                 </div>
             </div>
         );

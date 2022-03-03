@@ -1,5 +1,5 @@
 import T from 'view/js/common';
-import { getStaffEdit, userGetStaff } from '../tccbCanBo/redux';
+import { getStaffEdit, userGetStaff } from '../../mdTccb/tccbCanBo/redux';
 
 export function createQtHuongDanLVStaff(data, done, isEdit = null) {
     return dispatch => {

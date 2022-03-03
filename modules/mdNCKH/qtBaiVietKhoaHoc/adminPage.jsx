@@ -146,15 +146,10 @@ class EditModal extends AdminModal {
 class QtBaiVietKhoaHoc extends AdminPage {
     checked = parseInt(T.cookie('hienThiTheoCanBo')) == 1 ? true : false;
     state = { filter: {} };
-    staffMapper = {};
-
+    menu = '';
     componentDidMount() {
-        T.ready('/user/khcn', () => {
-            this.props.getStaffAll(items => {
-                items && items.forEach(canBo => {
-                    this.staffMapper[canBo.shcc] = (canBo.ho + ' ' + canBo.ten).normalizedName();
-                });
-            });
+        this.menu = T.routeMatcher('/user/:khcn/qua-trinh/bai-viet-khoa-hoc').parse(window.location.pathname).khcn;
+        T.ready('/user/' + this.menu, () => {
             T.clearSearchBox();
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
@@ -251,7 +246,7 @@ class QtBaiVietKhoaHoc extends AdminPage {
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Xuất bản</th>}
                         {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số bài viết</th>}
                         {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách bài viết</th>}
-                        <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
+                        <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
@@ -303,7 +298,7 @@ class QtBaiVietKhoaHoc extends AdminPage {
                         }
                         {
                             this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}>
-                                <Link className='btn btn-success' to={`/user/khcn/qua-trinh/bai-viet-khoa-hoc/group/${item.shcc}`} >
+                                <Link className='btn btn-success' to={`/user/${this.menu}/qua-trinh/bai-viet-khoa-hoc/group/${item.shcc}`} >
                                     <i className='fa fa-lg fa-compress' />
                                 </Link>
                             </TableCell>
@@ -317,7 +312,7 @@ class QtBaiVietKhoaHoc extends AdminPage {
             icon: 'fa fa-quote-right',
             title: 'Bài viết khoa học',
             breadcrumb: [
-                <Link key={0} to='/user/khcn'>Khoa học công nghệ</Link>,
+                <Link key={0} to={'/user/' + this.menu}>{this.menu == 'tccb' ? 'Tổ chức cán bộ' : 'Khoa học công nghệ'}</Link>,
                 'Bài viết khoa học'
             ],
             advanceSearch: <>
@@ -341,7 +336,7 @@ class QtBaiVietKhoaHoc extends AdminPage {
                     create={this.props.createQtBaiVietKhoaHocStaff} update={this.props.updateQtBaiVietKhoaHocStaff}
                 />
             </>,
-            backRoute: '/user/khcn',
+            backRoute: '/user/' + this.menu,
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
             onExport: !this.checked ? (e) => {
                 e.preventDefault();

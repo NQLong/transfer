@@ -1,28 +1,35 @@
 module.exports = app => {
     const menu = {
+        parentMenu: app.parentMenu.khcn,
+        menus: {
+            9054: { title: 'Quá trình hướng dẫn luận văn', link: '/user/khcn/qua-trinh/hdlv', icon: 'fa-university', backgroundColor: '#488a37' },
+        },
+    };
+
+    const menuStaff = {
+        parentMenu: app.parentMenu.user,
+        menus: {
+            1003: { title: 'Hướng dẫn luận văn', link: '/user/huong-dan-luan-van', icon: 'fa-university', backgroundColor: '#decf45', groupIndex: 4 },
+        },
+    };
+
+    const menuTCCB = {
         parentMenu: app.parentMenu.tccb,
         menus: {
             3018: { title: 'Quá trình hướng dẫn luận văn', link: '/user/tccb/qua-trinh/hdlv', icon: 'fa-university', backgroundColor: '#488a37', groupIndex: 5 },
         },
     };
 
-    // const menuStaff = {
-    //     parentMenu: app.parentMenu.user,
-    //     menus: {
-    //         1003: { title: 'Hướng dẫn luận văn', link: '/user/huong-dan-luan-van', icon: 'fa-university', backgroundColor: '#decf45', groupIndex: 4 },
-    //     },
-    // };
-
     app.permission.add(
-        // { name: 'staff:login', menu: menuStaff },
+        { name: 'staff:login', menu: menuStaff },
         { name: 'qtHuongDanLuanVan:read', menu },
+        { name: 'qtHuongDanLuanVan:read', menu: menuTCCB },
         { name: 'qtHuongDanLuanVan:write' },
         { name: 'qtHuongDanLuanVan:delete' },
     );
-    app.get('/user/tccb/qua-trinh/hdlv/:id', app.permission.check('qtHuongDanLuanVan:read'), app.templates.admin);
-    app.get('/user/tccb/qua-trinh/hdlv', app.permission.check('qtHuongDanLuanVan:read'), app.templates.admin);
-    app.get('/user/tccb/qua-trinh/hdlv/group/:shcc', app.permission.check('qtHuongDanLuanVan:read'), app.templates.admin);
-    // app.get('/user/huong-dan-luan-van', app.permission.check('staff:login'), app.templates.admin);
+    app.get('/user/:khcn/qua-trinh/hdlv', app.permission.check('qtHuongDanLuanVan:read'), app.templates.admin);
+    app.get('/user/:khcn/qua-trinh/hdlv/group/:shcc', app.permission.check('qtHuongDanLuanVan:read'), app.templates.admin);
+    app.get('/user/huong-dan-luan-van', app.permission.check('staff:login'), app.templates.admin);
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
     app.get('/api/user/qua-trinh/hdlv/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {

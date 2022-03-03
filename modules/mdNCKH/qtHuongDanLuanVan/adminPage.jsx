@@ -92,8 +92,10 @@ class EditModal extends AdminModal {
 class QtHuongDanLuanVan extends AdminPage {
     checked = parseInt(T.cookie('hienThiTheoCanBo')) == 1 ? true : false;
     state = { filter: {} };
+    menu = '';
     componentDidMount() {
-        T.ready('/user/tccb', () => {
+        this.menu = T.routeMatcher('/user/:khcn/qua-trinh/hdlv').parse(window.location.pathname).khcn;
+        T.ready('/user/' + this.menu, () => {
             T.clearSearchBox();
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
@@ -152,7 +154,7 @@ class QtHuongDanLuanVan extends AdminPage {
 
     list = (text, i, j) => {
         if (!text) return [];
-        let deTais = text.split('??').map(str => <p key={i--} style={{ textTransform: 'uppercase' }}>{j - i}. {str}</p>);
+        let deTais = text.split('??').map(str => <div key={i--} style={{ }}>{j - i}. {str}</div>);
         return deTais;
     }
 
@@ -182,13 +184,12 @@ class QtHuongDanLuanVan extends AdminPage {
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
                         {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số đề tài hướng dẫn</th>}
+                        {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách luận văn</th>}
                         {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Họ tên sinh viên</th>}
-                        {this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Danh sách sinh viên</th>}
                         {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tên luận văn</th>}
-                        {this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Danh sách luận văn</th>}
                         {!this.checked && <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Năm tốt nghiệp</th>}
                         {!this.checked && <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Bậc đào tạo</th>}
-                        <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
+                        <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
@@ -201,9 +202,8 @@ class QtHuongDanLuanVan extends AdminPage {
                             </>
                         )}
                         />
-                        {this.checked && <TableCell type='text' content={item.soDeTai} />}
+                        {this.checked && <TableCell type='text' style={{ textAlign: 'center'}} content={item.soDeTai} />}
                         {!this.checked && <TableCell type='text' content={item.hoTen} />}
-                        {this.checked && <TableCell type='text' content={this.list(item.danhSachHoTen, item.soDeTai, item.soDeTai)} />}
                         {!this.checked && <TableCell type='text' style={{}} content={<>
                             <span><i>{item.tenLuanVan}</i></span><br />
                             {item.sanPham ? <span>Sản phẩm: {item.sanPham ? item.sanPham : ''}</span> : null}
@@ -218,7 +218,7 @@ class QtHuongDanLuanVan extends AdminPage {
                         }
                         {
                             this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}>
-                                <Link className='btn btn-success' to={`/user/tccb/qua-trinh/hdlv/group/${item.shcc}`} >
+                                <Link className='btn btn-success' to={`/user/${this.menu}/qua-trinh/hdlv/group/${item.shcc}`} >
                                     <i className='fa fa-lg fa-compress' />
                                 </Link>
                             </TableCell>
@@ -232,7 +232,7 @@ class QtHuongDanLuanVan extends AdminPage {
             icon: 'fa fa-university',
             title: 'Quá trình hướng dẫn luận văn',
             breadcrumb: [
-                <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
+                <Link key={0} to={`/user/${this.menu}`}>{this.menu == 'tccb' ? 'Tổ chức cán bộ' : 'Khoa học công nghệ'}</Link>,
                 'Quá trình hướng dẫn luận văn'
             ],
             advanceSearch: <>
@@ -256,13 +256,13 @@ class QtHuongDanLuanVan extends AdminPage {
 
                 />
             </>,
-            backRoute: '/user/tccb',
+            backRoute: '/user/' + this.menu,
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
         });
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtHuongDanLuanVan: state.tccb.qtHuongDanLuanVan });
+const mapStateToProps = state => ({ system: state.system, qtHuongDanLuanVan: state.khcn.qtHuongDanLuanVan });
 const mapActionsToProps = {
     getQtHuongDanLuanVanPage, deleteQtHuongDanLuanVanStaff, createQtHuongDanLuanVanStaff,
     updateQtHuongDanLuanVanStaff, getQtHuongDanLuanVanGroupPage,
