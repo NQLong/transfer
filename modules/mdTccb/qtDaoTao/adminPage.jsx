@@ -345,11 +345,16 @@ class QtDaoTao extends AdminPage {
                     getPage={this.checked ? this.props.getQtDaoTaoGroupPage : this.props.getQtDaoTaoPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createQtDaoTao} update={this.props.updateQtDaoTao}
-                    permissions={currentPermissions}
+                    permissions={currentPermissions}    
                 />
             </>,
             backRoute: '/user/tccb',
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
+            onExport: !this.checked ? (e) => {
+                e.preventDefault();
+                const { fromYear, toYear, list_shcc, list_dv, list_loaiBang } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, list_loaiBang: null };
+                T.download(T.url(`/api/qua-trinh/dao-tao/download-excel/${list_shcc ? list_shcc : null}/${list_dv ? list_dv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${list_loaiBang ? list_loaiBang : null}`), 'daotaoboiduong.xlsx');
+            } : null
         });
     }
 }

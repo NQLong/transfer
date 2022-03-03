@@ -45,4 +45,9 @@ module.exports = app => {
         app.dbConnection.execute('BEGIN :ret:=qt_dao_tao_get_current_of_staff(:iShcc, :iTime); END;',
             { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, iShcc, iTime }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
     };
+
+    app.model.qtDaoTao.download = (list_shcc, list_dv, fromYear, toYear, list_loaiBang, done) => {
+        app.dbConnection.execute('BEGIN :ret:=qt_dao_tao_download_excel(:list_shcc, :list_dv, :fromYear, :toYear, :list_loaiBang); END;',
+            { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, list_shcc, list_dv, fromYear, toYear, list_loaiBang }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
+    };
 };

@@ -112,4 +112,61 @@ module.exports = app => {
             res.send({ error: 'Invalid parameter!' });
         }
     });
+
+    app.get('/api/qua-trinh/dao-tao/download-excel/:list_shcc/:list_dv/:fromYear/:toYear/:list_loaiBang', app.permission.check('qtDaoTao:read'), (req, res) => {
+        let { list_shcc, list_dv, fromYear, toYear, list_loaiBang } = req.params ? req.params : { list_shcc: null, list_dv: null, fromYear: null, toYear: null, list_loaiBang: null };
+        if (list_shcc == 'null') list_shcc = null;
+        if (list_dv == 'null') list_dv = null;
+        if (fromYear == 'null') fromYear = null;
+        if (toYear == 'null') toYear = null;
+        if (list_loaiBang == 'null') list_loaiBang = null;
+        app.model.qtDaoTao.download(list_shcc, list_dv, fromYear, toYear, list_loaiBang, (err, result) => {
+            if (err || !result) {
+                res.send({ err });
+            } else {
+                const workbook = app.excel.create(),
+                    worksheet = workbook.addWorksheet('daotaoboiduong');
+                new Promise(resolve => {
+                    let cells = [
+                        { cell: 'A1', value: 'STT', bold: true, border: '1234' },
+                        { cell: 'B1', value: 'MÃ SỐ CÁN BỘ', bold: true, border: '1234' },
+                        { cell: 'C1', value: 'HỌ', bold: true, border: '1234' },
+                        { cell: 'D1', value: 'TÊN', bold: true, border: '1234' },
+                        { cell: 'E1', value: 'NỮ', bold: true, border: '1234' },
+                        { cell: 'F1', value: 'NGÀY THÁNG NĂM SINH', bold: true, border: '1234' },
+                        { cell: 'G1', value: 'LOẠI BẰNG', bold: true, border: '1234' },
+                        { cell: 'H1', value: 'TRÌNH ĐỘ/KẾT QUẢ', bold: true, border: '1234' },
+                        { cell: 'I1', value: 'CHUYÊN NGÀNH', bold: true, border: '1234' },
+                        { cell: 'J1', value: 'TÊN CƠ SỞ ĐÀO TẠO', bold: true, border: '1234' },
+                        { cell: 'K1', value: 'NGÀY BẮT ĐẦU', bold: true, border: '1234' },
+                        { cell: 'L1', value: 'NGÀY KẾT THÚC', bold: true, border: '1234' },
+                        { cell: 'M1', value: 'HÌNH THỨC', bold: true, border: '1234' },
+                        { cell: 'N1', value: 'KINH PHÍ', bold: true, border: '1234' },
+                    ];
+                    result.rows.forEach((item, index) => {
+                        cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
+                        cells.push({ cell: 'B' + (index + 2), alignment: 'center', border: '1234', value: item.shcc });
+                        cells.push({ cell: 'C' + (index + 2), border: '1234', value: item.hoCanBo });
+                        cells.push({ cell: 'D' + (index + 2), border: '1234', value: item.tenCanBo });
+                        cells.push({ cell: 'E' + (index + 2), border: '1234', value: item.gioiTinhCanBo == '02' ? 'x' : '' });
+                        cells.push({ cell: 'F' + (index + 2), alignment: 'left', border: '1234', value: item.ngaySinhCanBo ? app.date.dateTimeFormat(new Date(item.ngaySinhCanBo), 'dd/mm/yyyy') : ''});
+                        cells.push({ cell: 'G' + (index + 2), border: '1234', value: item.tenLoaiBangCap });
+                        cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.tenTrinhDo });
+                        cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.chuyenNganh });
+                        cells.push({ cell: 'J' + (index + 2), border: '1234', value: item.tenCoSoDaoTao });
+                        cells.push({ cell: 'K' + (index + 2), alignment: 'left', border: '1234', value: item.batDau ? app.date.dateTimeFormat(new Date(item.batDau), item.batDauType ? item.batDauType : 'dd/mm/yyyy') : '' });
+                        cells.push({ cell: 'L' + (index + 2), alignment: 'left', border: '1234', value: (item.ketThuc != null && item.ketThuc != 0) ? app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : '' });
+                        cells.push({ cell: 'M' + (index + 2), border: '1234', value: item.tenHinhThuc });
+                        cells.push({ cell: 'N' + (index + 2), border: '1234', value: item.kinhPhi });
+                    });
+                    resolve(cells);
+                }).then((cells) => {
+                    app.excel.write(worksheet, cells);
+                    app.excel.attachment(workbook, res, 'daotaoboiduong.xlsx');
+                }).catch((error) => {
+                    res.send({ error });
+                });
+            }
+        });
+    });
 };
