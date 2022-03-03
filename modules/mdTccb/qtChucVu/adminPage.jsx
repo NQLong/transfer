@@ -158,6 +158,7 @@ class QtChucVu extends AdminPage {
                 this.toYear?.value('');
                 this.maDonVi?.value('');
                 this.mulCanBo?.value('');
+                this.gioiTinh?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
             if (this.checked) {
@@ -176,7 +177,8 @@ class QtChucVu extends AdminPage {
         const list_dv = this.maDonVi?.value().toString() || '';
         const list_shcc = this.mulCanBo?.value().toString() || '';
         const list_cv = this.mulMaChucVu?.value().toString() || '';
-        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc, timeType, list_cv };
+        const gioiTinh = this.gioiTinh?.value() == '' ? null : this.gioiTinh?.value();
+        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc, timeType, list_cv, gioiTinh };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
@@ -188,7 +190,8 @@ class QtChucVu extends AdminPage {
                     this.mulCanBo?.value(filter.list_shcc);
                     this.timeType?.value(filter.timeType);
                     this.mulMaChucVu?.value(filter.list_cv);
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.list_shcc || filter.list_dv || filter.timeType || filter.list_cv)) this.showAdvanceSearch();
+                    this.gioiTinh?.value(filter.gioiTinh);
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.list_shcc || filter.list_dv || filter.timeType || filter.list_cv || filter.gioiTinh)) this.showAdvanceSearch();
                 }
             });
         });
@@ -316,7 +319,11 @@ class QtChucVu extends AdminPage {
                     {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />}
                     {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />}
                     <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
-                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-12 col-md-5' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect ref={e => this.gioiTinh = e} label='Giới tính' className='col-12 col-md-1' data={[
+                        { id: '01', text: 'Nam' },
+                        { id: '02', text: 'Nữ' },
+                    ]} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
                     <FormSelect className='col-md-6' multiple={true} ref={e => this.mulMaChucVu = e} label='Chức vụ' data={SelectAdapter_DmChucVuV2} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
                 </div>
             </>,
@@ -333,6 +340,12 @@ class QtChucVu extends AdminPage {
             </>,
             backRoute: '/user/tccb',
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
+            onExport: !this.checked ? (e) => {
+                e.preventDefault();
+                const { list_dv, fromYear, toYear, list_shcc, timeType, list_cv, gioiTinh } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, list_cv: null, gioiTinh: null };
+
+                T.download(T.url(`/api/qua-trinh/chuc-vu/download-excel/${list_shcc ? list_shcc : null}/${list_dv ? list_dv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${timeType}/${list_cv ? list_cv : null}/${gioiTinh ? gioiTinh : null}`), 'chucvu.xlsx');
+            } : null
         });
     }
 }

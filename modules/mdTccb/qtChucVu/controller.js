@@ -19,8 +19,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, list_shcc, list_dv, timeType, list_cv } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, list_cv: null };
-        app.model.qtChucVu.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, timeType, list_cv, searchTerm, (error, page) => {
+        const { fromYear, toYear, list_shcc, list_dv, timeType, list_cv, gioiTinh } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, list_cv: null, gioiTinh: null };
+        app.model.qtChucVu.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, timeType, list_cv, gioiTinh, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -35,8 +35,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, list_shcc, list_dv, timeType, list_cv } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, list_cv: null };
-        app.model.qtChucVu.groupPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, timeType, list_cv, searchTerm, (error, page) => {
+        const { fromYear, toYear, list_shcc, list_dv, timeType, list_cv, gioiTinh } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, list_cv: null, gioiTinh: null };
+        app.model.qtChucVu.groupPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, timeType, list_cv, gioiTinh, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -117,5 +117,69 @@ module.exports = app => {
         app.model.qtChucVu.getByShcc(req.params.shcc, (error, item) => {
             if (item && item.rows.length > 0) res.send({ error, item: item.rows });
         });
+    });
+
+    app.get('/api/qua-trinh/chuc-vu/download-excel/:list_shcc/:list_dv/:fromYear/:toYear/:timeType/:list_cv/:gioiTinh', app.permission.check('qtChucVu:read'), (req, res) => {
+        let { list_dv, fromYear, toYear, list_shcc, timeType, list_cv, gioiTinh } = req.params ? req.params : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, list_cv: null, gioiTinh: null };
+        if (list_shcc == 'null') list_shcc = null;
+        if (list_dv == 'null') list_dv = null;
+        if (fromYear == 'null') fromYear = null;
+        if (toYear == 'null') toYear = null;
+        if (list_cv == 'null') list_cv = null;
+        if (gioiTinh == 'null') gioiTinh = null;
+        app.model.qtChucVu.download(list_dv, fromYear, toYear, list_shcc, timeType, list_cv, gioiTinh, (err, result) => {
+            if (err || !result) {
+                res.send({ err });
+            } else {
+                const workbook = app.excel.create(),
+                    worksheet = workbook.addWorksheet('chucvu');
+                new Promise(resolve => {
+                    let cells = [
+                    // Table name: QT_CHUC_VU { stt, shcc, maChucVu, maDonVi, maBoMon, soQd, ngayRaQd, chucVuChinh, thoiChucVu, soQdThoiChucVu, ngayThoiChucVu, ngayRaQdThoiChucVu }
+                        { cell: 'A1', value: 'STT', bold: true, border: '1234' },
+                        { cell: 'B1', value: 'NGÀY QĐ', bold: true, border: '1234' },
+                        { cell: 'C1', value: 'SỐ CV', bold: true, border: '1234' },
+                        { cell: 'D1', value: 'HỌC VỊ', bold: true, border: '1234' },
+                        { cell: 'E1', value: 'MÃ THẺ CÁN BỘ', bold: true, border: '1234' },
+                        { cell: 'F1', value: 'HỌ', bold: true, border: '1234' },
+                        { cell: 'G1', value: 'TÊN', bold: true, border: '1234' },
+                        { cell: 'H1', value: 'CHỨC VỤ', bold: true, border: '1234' },
+                        { cell: 'I1', value: 'ĐƠN VỊ', bold: true, border: '1234' },
+                        { cell: 'J1', value: 'NƠI ĐẾN', bold: true, border: '1234' },
+                        { cell: 'K1', value: 'VIẾT TẮT', bold: true, border: '1234' },
+                        { cell: 'L1', value: 'LÝ DO ĐI', bold: true, border: '1234' },
+                        { cell: 'M1', value: 'NGÀY ĐI', bold: true, border: '1234' },
+                        { cell: 'N1', value: 'NGÀY VỀ', bold: true, border: '1234' },
+                        { cell: 'O1', value: 'KINH PHÍ', bold: true, border: '1234' },
+                        { cell: 'P1', value: 'GHI CHÚ', bold: true, border: '1234' },
+                    ];
+                    result.rows.forEach((item, index) => {
+                        cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
+                        cells.push({ cell: 'B' + (index + 2), alignment: 'center', border: '1234', value: item.ngayQuyetDinh ? app.date.dateTimeFormat(new Date(item.ngayQuyetDinh), 'dd/mm/yyyy') : '' });
+                        cells.push({ cell: 'C' + (index + 2), border: '1234', value: item.soCv });
+                        cells.push({ cell: 'D' + (index + 2), border: '1234', value: item.tenHocVi });
+                        cells.push({ cell: 'E' + (index + 2), border: '1234', value: item.shcc });
+                        cells.push({ cell: 'F' + (index + 2), border: '1234', value: item.hoCanBo });
+                        cells.push({ cell: 'G' + (index + 2), border: '1234', value: item.tenCanBo });
+                        cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.tenChucVu });
+                        cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.tenDonVi });
+                        cells.push({ cell: 'J' + (index + 2), border: '1234', value: item.danhSachTinh });
+                        cells.push({ cell: 'K' + (index + 2), border: '1234', value: item.tenMucDich });
+                        cells.push({ cell: 'L' + (index + 2), border: '1234', value: item.lyDo });
+                        cells.push({ cell: 'M' + (index + 2), alignment: 'center', border: '1234', value: item.batDau ? app.date.dateTimeFormat(new Date(item.batDau), item.batDauType ? item.batDauType : 'dd/mm/yyyy') : '' });
+                        cells.push({ cell: 'N' + (index + 2), alignment: 'center', border: '1234', value: (item.ketThuc != null && item.ketThuc != -1) ? app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : '' });
+                        cells.push({ cell: 'O' + (index + 2), border: '1234', value: item.kinhPhi });
+                        cells.push({ cell: 'P' + (index + 2), border: '1234', value: item.ghiChu });
+                    });
+                    resolve(cells);
+                }).then((cells) => {
+                    app.excel.write(worksheet, cells);
+                    app.excel.attachment(workbook, res, 'chucvu.xlsx');
+                }).catch((error) => {
+                    res.send({ error });
+                });
+            }
+        });
+
     });
 };
