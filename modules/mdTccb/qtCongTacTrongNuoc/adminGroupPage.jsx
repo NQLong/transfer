@@ -179,6 +179,7 @@ class QtCongTacTrongNuocGroupPage extends AdminPage {
                 this.fromYear?.value('');
                 this.toYear?.value('');
                 this.tinhTrang?.value('');
+                this.mucDich?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
             this.getPage();
@@ -194,7 +195,8 @@ class QtCongTacTrongNuocGroupPage extends AdminPage {
         const list_shcc = this.state.filter.list_shcc;
         const loaiHocVi = this.state.filter.loaiHocVi;
         const tinhTrang = this.tinhTrang?.value() == '' ? null : this.tinhTrang?.value();
-        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc, tinhTrang, timeType, loaiHocVi };
+        const mucDich = this.mucDich?.value() == '' ? '' : this.mucDich?.value().toString();
+        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc, tinhTrang, timeType, loaiHocVi, mucDich };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
@@ -202,7 +204,10 @@ class QtCongTacTrongNuocGroupPage extends AdminPage {
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
                     this.fromYear?.value(filter.fromYear || '');
                     this.toYear?.value(filter.toYear || '');
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.timeType || filter.tinhTrang)) this.showAdvanceSearch();
+                    this.timeType?.value(filter.timeType);
+                    this.tinhTrang?.value(filter.tinhTrang);
+                    this.mucDich?.value(filter.mucDich);
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.timeType || filter.tinhTrang || filter.mucDich )) this.showAdvanceSearch();
                 }
             });
         });
@@ -312,6 +317,7 @@ class QtCongTacTrongNuocGroupPage extends AdminPage {
                         data={[
                             { id: 1, text: 'Đã kết thúc' }, { id: 2, text: 'Đang diễn ra' }
                         ]} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.mucDich = e} label='Mục đích' data={SelectAdapter_DmMucDichTrongNuoc} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
                 </div>
             </>,
             content: <>
@@ -329,9 +335,9 @@ class QtCongTacTrongNuocGroupPage extends AdminPage {
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
             onExport: (e) => {
                 e.preventDefault();
-                const { fromYear, toYear, list_shcc, list_dv, timeType, tinhTrang, loaiHocVi } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, tinhTrang: null, loaiHocVi: null };
+                const { fromYear, toYear, list_shcc, list_dv, timeType, tinhTrang, loaiHocVi, mucDich } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, tinhTrang: null, loaiHocVi: null, mucDich: null };
 
-                T.download(T.url(`/api/qua-trinh/cong-tac-trong-nuoc/download-excel/${list_shcc ? list_shcc : null}/${list_dv ? list_dv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${timeType}/${tinhTrang ? tinhTrang : null}/${loaiHocVi ? loaiHocVi : null}`), 'congtactrongnuoc.xlsx');
+                T.download(T.url(`/api/qua-trinh/cong-tac-trong-nuoc/download-excel/${list_shcc ? list_shcc : null}/${list_dv ? list_dv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${timeType}/${tinhTrang ? tinhTrang : null}/${loaiHocVi ? loaiHocVi : null}/${mucDich ? mucDich : null}`), 'congtactrongnuoc.xlsx');
             }
         });
     }
