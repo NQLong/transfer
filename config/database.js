@@ -1,10 +1,14 @@
-module.exports = async (app, db) => {
+module.exports = (app, appConfig) => {
+    const db = appConfig.db, redisDB = appConfig.redisDB;
     // Connect RedisDB ------------------------------------------------------------------------------------------------------------------------------
     const redis = require('redis');
-    app.redis = redis.createClient();
+    app.redis = app.isDebug ? redis.createClient() : redis.createClient(redisDB.port, redisDB.host, { enable_offline_queue: false });
+    !app.isDebug && app.redis.auth(redisDB.auth);
+
     app.redis.on('connect', () => {
         console.log(` - #${process.pid}: The Redis connection succeeded.`);
     });
+
     app.redis.on('error', error => {
         console.log(` - #${process.pid}: The Redis connection failed!`, error.message);
         app.redis.end(true);
@@ -24,7 +28,7 @@ module.exports = async (app, db) => {
         password: db.password,
     }), timeoutPromise()]).then(connection => {
         if (connection) {
-            console.log(' - The Oracle connection succeeded.');
+            console.log(` - #${process.pid}: The Oracle connection succeeded.`);
             app.dbConnection = connection;
             app.dbConnection.buildCondition = (mapper, condition, seperation, preParam = '') => {
                 if (condition.statement && condition.parameter) {
@@ -125,7 +129,7 @@ module.exports = async (app, db) => {
             }, 1000);
         }
     }).catch(error => {
-        console.error(' - Could not connect to Oracle!');
+        console.log(` - #${process.pid}: Could not connect to Oracle!`, error);
         console.error(error);
         process.exit(1);
     });

@@ -198,8 +198,8 @@ class QtNghiViecGroupPage extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-sign-out',
-            title: 'Quá trình nghỉ việc - Cán bộ',
+            icon: 'fa fa-user-times',
+            title: 'Cán bộ Nghỉ việc - Cán bộ',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
                 <Link key={0} to='/user/tccb/qua-trinh/hdlv'>Quá trình lương</Link>,

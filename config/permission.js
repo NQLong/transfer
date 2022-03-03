@@ -206,8 +206,21 @@ module.exports = app => {
 
                 // Add login permission => user.active == 1 => user:login
                 if (user.active == 1) app.permissionHooks.pushUserPermission(user, 'user:login');
-                if (user.isStudent) app.permissionHooks.pushUserPermission(user, 'student:login'); // Add student permission: student:login
-                new Promise(resolve => {
+                new Promise(resolve => { // Check user is student
+                    if (user.isStudent) {
+                        app.permissionHooks.pushUserPermission(user, 'student:login'); // Add student permission: student:login,
+                        app.model.fwStudents.get({ mssv: user.studentId }, (error, student) => {
+                            if (student) {
+                                user.data = student;
+                                app.permissionHooks.run('student', user, student).then(() => resolve());
+                            } else {
+                                resolve();
+                            }
+                        });
+                    } else {
+                        resolve();
+                    }
+                }).then(() => new Promise(resolve => {
                     app.model.canBo.get({ email: user.email }, (e, item) => {
                         if (e || item == null) {
                             user.isStaff = 0;
@@ -216,11 +229,12 @@ module.exports = app => {
                             user.isStaff = 1;
                             item.phai == '02' && app.permissionHooks.pushUserPermission(user, 'staff:female');
                             user.shcc = item.shcc;
+                            user.data = item;
                             app.permissionHooks.pushUserPermission(user, 'staff:login'); // Add staff permission: staff:login
                             resolve();
                         }
                     });
-                }).then(() => new Promise(resolve => {
+                })).then(() => new Promise(resolve => {
                     app.model.qtChucVu.getAll({ shcc: user.shcc }, (e, re) => {
                         if (e || re == null) resolve();
                         else if (re && re.length > 0) {
@@ -236,7 +250,7 @@ module.exports = app => {
                             });
                         } else resolve();
                     });
-                })).then(() => new Promise(resolve => {
+                })).then(() => {
                     user.menu = app.permission.tree();
                     Object.keys(user.menu).forEach(parentMenuIndex => {
                         let flag = true;
@@ -261,11 +275,12 @@ module.exports = app => {
                         });
                     });
 
-                    req.session.user = user;
-                    req.session.save();
+                    if (req) {
+                        req.session.user = user;
+                        req.session.save();
+                    }
                     done && done(user);
-                    resolve();
-                }));
+                });
             }
         });
     };

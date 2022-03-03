@@ -9,7 +9,10 @@ module.exports = app => {
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1004: { title: 'Khen thưởng', link: '/user/khen-thuong-all', icon: 'fa-gift', backgroundColor: '#ff6b6b', groupIndex: 2 },
+            1004: {
+                title: 'Khen thưởng', link: '/user/khen-thuong-all', icon: 'fa-gift', color: '#000000',
+                backgroundColor: '#ec91ba', groupIndex: 2
+            },
         },
     };
 

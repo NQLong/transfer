@@ -73,7 +73,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1020: { title: 'Thông báo', link: '/user/notification', icon: 'fa-bell-o', backgroundColor: '#135942', groupIndex: 0 }
+            1020: { title: 'Thông báo', link: '/user/notification', icon: 'fa-bell-o', backgroundColor: '#13007c', pin: true }
         },
     };
     app.permission.add({ name: 'user:login', menu });

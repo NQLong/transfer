@@ -1,4 +1,5 @@
 import React from 'react';
+import T from 'view/js/common';
 
 const UploadBoxStyle = {
     backgroundImage: 'url(\'/img/upload.png\')',
@@ -16,97 +17,111 @@ const UploadBoxStyle = {
 };
 
 export default class FileBox extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = { isUploading: false, userData: null };
+    state = { isUploading: false, userData: null };
+    file = null;
 
-        this.box = React.createRef();
-        this.uploadInput = React.createRef();
-    }
+    getFile = () => this.file;
 
-    setData = (userData) => this.setState({ userData })
-
-    init = () => {
-        this.setState({ file: null });
-        $(this.box.current).css({ 'background-image': 'url(\'/img/upload.png\')' });
-    }
+    setData = (userData, reset = true) => this.setState({ userData }, () => {
+        if (reset) {
+            this.box.style.backgroundImage = 'url(/img/upload.png)';
+            this.file = null;
+        }
+    })
 
     onDrop = (event) => {
         event.preventDefault();
-        $(this.box.current).css('background-color', '#FFF');
+        const pending = !!this.props.pending;
+        this.box.style.backgroundColor = '#FFF';
 
         if (event.dataTransfer.items) {
             if (event.dataTransfer.items.length > 0) {
                 const item = event.dataTransfer.items[0];
                 if (item.kind == 'file') {
-                    this.onUploadFile(event.dataTransfer.items[0].getAsFile());
+                    if (pending) {
+                        this.file = event.dataTransfer.items[0].getAsFile();
+                        this.box.style.backgroundImage = 'url(/img/received.png)';
+                    } else {
+                        this.onUploadFile(event.dataTransfer.items[0].getAsFile());
+                    }
                 }
             }
             event.dataTransfer.items.clear();
         } else {
             if (event.dataTransfer.files.length > 0) {
-                this.onUploadFile(event.dataTransfer.files[0]);
+                if (pending) {
+                    this.file = event.dataTransfer.files[0];
+                    this.box.style.backgroundImage = 'url(/img/received.png)';
+                } else {
+                    this.onUploadFile(event.dataTransfer.files[0]);
+                }
             }
             event.dataTransfer.clearData();
         }
     }
 
-    onClick = (event) => {
-        event.preventDefault();
-        $(this.uploadInput.current).click();
-    }
-
     onDragOver = (event) => event.preventDefault();
+
     onDragEnter = (event) => {
-        $(this.box.current).css({ 'background-color': '#009688' });
+        this.box.style.backgroundColor = '#009688';
         event.preventDefault();
     }
 
     onDragLeave = (event) => {
-        $(this.box.current).css({ 'background-color': '#FFF' });
+        this.box.style.backgroundColor = '#FFF';
         event.preventDefault();
     }
-    getFileState = () => {
-        return this.state.file;
-    }
+
     onSelectFileChanged = (event) => {
+        const pending = !!this.props.pending;
         if (event.target.files.length > 0) {
-            if (this.props.ajax) {
-                this.onUploadFile2(event.target.files[0]);
+            if (!pending) {
+                this.onUploadFile(event.target.files[0]);
             } else {
-                const sizeFiles = event.target.files[0].size ? event.target.files[0].size / 1024 / 1024 : 0;
-                if (sizeFiles && sizeFiles > 15) {
-                    T.alert(`Tệp hình ảnh có kích thước ${Math.round(sizeFiles * 100) / 100} MB`, 'warning', false, 2000);
-                }
-                this.setState({ file: event.target.files[0] });
-                $(this.box.current).css({ 'background-image': 'url(\'/img/received.png\')' });
+                // const sizeFiles = event.target.files[0].size ? event.target.files[0].size / 1024 / 1024 : 0;
+                // if (sizeFiles && sizeFiles > 15) {
+                //     T.alert(`Tệp hình ảnh có kích thước ${Math.round(sizeFiles * 100) / 100} MB`, 'warning', false, 2000);
+                // }
+                this.file = event.target.files[0];
+                this.box.style.backgroundImage = 'url(/img/received.png)';
             }
             event.target.value = '';
         }
     };
 
-    onUploadFile = (body) => {
-        const { file } = this.state;
+    onUploadFile = (data) => {
+        const pending = !!this.props.pending;
+        let file, body;
+        if (pending) {
+            file = this.file;
+            body = data;
+        } else {
+            file = data;
+            body = null;
+        }
+
         if (!file) {
             T.alert('Bạn chưa đính kèm tệp tin', 'warning', false, 2000);
             return;
-        } else if (!body) {
+        } else if (!body && pending) {
             T.alert('Bạn chưa điền đủ dữ liệu', 'warning', false, 2000);
             return;
         }
         this.setState({ isUploading: true });
 
-        const box = $(this.box.current),
-            userData = this.state.userData ? this.state.userData : this.props.userData,
+        const userData = this.state.userData ? this.state.userData : this.props.userData,
             updateUploadPercent = percent => {
                 if (this.props.onPercent) this.props.onPercent(percent);
-                box.html(percent + '%');
+                this.box.innerHTML = percent + '%';
             };
 
         const formData = new FormData();
         formData.append(this.props.uploadType, file);
         if (userData) formData.append('userData', userData);
-        formData.append('data', JSON.stringify(body));
+        if (body) {
+            formData.append('data', JSON.stringify(body));
+        }
+
         $.ajax({
             method: 'POST',
             url: this.props.postUrl,
@@ -134,7 +149,8 @@ export default class FileBox extends React.Component {
                 return xhr;
             },
             complete: () => {
-                box.html('');
+                // box.html('');
+                this.box.innerHTML = '';
                 this.setState({ isUploading: false });
                 if (this.props.complete) this.props.complete();
             },
@@ -152,7 +168,7 @@ export default class FileBox extends React.Component {
     onUploadFile2 = (file) => {
         this.setState({ isUploading: true });
 
-        const box = $(this.box.current),
+        const box = $(this.box),
             userData = this.state.userData ? this.state.userData : this.props.userData,
             updateUploadPercent = percent => {
                 if (this.props.onPercent) this.props.onPercent(percent);
@@ -205,19 +221,18 @@ export default class FileBox extends React.Component {
     }
 
     render() {
-        // const accept = this.props.accept ? this.props.accept : '';
         const fileAttrs = { type: 'file' };
         if (this.props.accept) fileAttrs.accept = this.props.accept;
 
         return (
             <div style={this.props.style} className={this.props.className}>
-                <div ref={this.box} id={this.props.uploadType} style={UploadBoxStyle}
-                    onDrop={this.onDrop} onClick={this.onClick}
+                <div ref={e => this.box = e} id={this.props.uploadType} style={UploadBoxStyle}
+                    onDrop={this.onDrop} onClick={e => e.preventDefault() || this.uploadInput.click()}
                     onDragOver={this.onDragOver} onDragEnter={this.onDragEnter} onDragLeave={this.onDragLeave} />
                 <small className='form-text text-primary' style={{ textAlign: 'center' }}>
                     {this.props.description ? this.props.description : 'Nhấp hoặc kéo tập tin thả vào ô phía trên!'}
                 </small >
-                <input {...fileAttrs} name={this.props.uploadType} onChange={this.onSelectFileChanged} style={{ display: 'none' }} ref={this.uploadInput} />
+                <input {...fileAttrs} name={this.props.uploadType} onChange={this.onSelectFileChanged} style={{ display: 'none' }} ref={e => this.uploadInput = e} />
             </div>
         );
     }

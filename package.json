@@ -16,6 +16,11 @@
         "lint:fix": "npm run lint --  --fix",
         "lint": "eslint . --ext .jsx,.js --ignore-path .gitignore"
     },
+    "redisDB": {
+        "host": "10.22.1.49",
+        "port": 6379,
+        "auth": "6GmpjC44wnCwKR8BBhCbnw2NFJNG7NJm"
+    },
     "db": {
         "owner": "DEV_HCMUSSH",
         "host": "116.109.45.163",
@@ -49,9 +54,10 @@
     "path": {
         "view": "view",
         "modules": "modules",
+        "asset": "asset",
         "temp": "asset/temp",
         "upload": "asset/upload",
-        "document": "asset/upload/document",
+        "document": "asset/document",
         "public": "public",
         "favicon": "public/img/favicon.png"
     },
@@ -100,6 +106,7 @@
         "copy-to-clipboard": "^3.3.1",
         "cors": "^2.8.5",
         "docxtemplater": "^3.19.7",
+        "decompress-zip": "^0.3.3",
         "docxtemplater-image-module-free": "^1.1.1",
         "eslint": "^7.24.0",
         "eslint-plugin-react": "^7.23.2",
@@ -113,6 +120,7 @@
         "jquery": "^3.5.0",
         "json-beautify": "^1.1.1",
         "jsonwebtoken": "^8.5.1",
+        "lodash": "^4.17.21",
         "mongoose": "^5.9.10",
         "morgan": "^1.10.0",
         "multiparty": "^4.2.1",

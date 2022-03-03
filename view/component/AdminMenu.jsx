@@ -74,8 +74,8 @@ class AdminMenu extends React.Component {
         }
 
         let firstname = '', lastname = '';
-        firstname = user?.firstName;
-        lastname = user?.lastName;
+        firstname = user && user.data ? user.data.ten : (user.firstName ? user.firstName : '');
+        lastname = user && user.data ? user.data.ho : (user.lastName ? user.lastName : '' );
 
         return [
             <div key={1} className='app-sidebar__overlay' data-toggle='sidebar' />,
@@ -96,5 +96,5 @@ class AdminMenu extends React.Component {
 }
 
 const mapStateToProps = state => ({ system: state.system });
-const mapActionsToProps = {};
+const mapActionsToProps = { };
 export default connect(mapStateToProps, mapActionsToProps)(AdminMenu);

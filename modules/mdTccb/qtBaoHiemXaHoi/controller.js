@@ -2,13 +2,13 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3037: { title: 'Quá trình bảo hiểm xã hội', link: '/user/tccb/qua-trinh/bao-hiem-xa-hoi', icon: 'fa-life-ring', backgroundColor: '#02006e', groupIndex: 1 },
+            3037: { title: 'Quá trình Bảo hiểm xã hội', link: '/user/tccb/qua-trinh/bao-hiem-xa-hoi', icon: 'fa-life-ring', backgroundColor: '#02006e', groupIndex: 0 },
         },
     };
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1009: { title: 'Bảo hiểm xã hội', link: '/user/bao-hiem-xa-hoi', icon: 'fa-life-ring', backgroundColor: '#395ded', groupIndex: 1 },
+            1009: { title: 'Bảo hiểm xã hội', link: '/user/bao-hiem-xa-hoi', icon: 'fa-life-ring', color: '#ffffff', backgroundColor: '#4faa45', groupIndex: 0 },
         },
     };
 
@@ -126,5 +126,59 @@ module.exports = app => {
 
     app.delete('/api/tccb/qua-trinh/bao-hiem-xa-hoi', app.permission.check('staff:write'), (req, res) =>
         app.model.qtBaoHiemXaHoi.delete({ id: req.body.id }, (error) => res.send(error)));
+
+    app.get('/api/qua-trinh/bao-hiem-xa-hoi/download-excel/:list_shcc/:list_dv/:fromYear/:toYear/:timeType/:tinhTrang', app.permission.check('qtBaoHiemXaHoi:read'), (req, res) => {
+        let { list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang } = req.params ? req.params : { list_shcc: null, list_dv: null, toYear: null, timeType: 0, tinhTrang: null};
+        if (list_shcc == 'null') list_shcc = null;
+        if (list_dv == 'null') list_dv = null;
+        if (fromYear == 'null') fromYear = null;
+        if (toYear == 'null') toYear = null;
+        if (tinhTrang == 'null') tinhTrang = null;
+        app.model.qtBaoHiemXaHoi.download(list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang, (err, result) => {
+            if (err || !result) {
+                res.send({ err });
+            } else {
+                const workbook = app.excel.create(),
+                    worksheet = workbook.addWorksheet('baohiemxahoi');
+                new Promise(resolve => {
+                    let cells = [
+                        // Table name: QT_BAO_HIEM_XA_HOI { id, batDau, batDauType, ketThuc, ketThucType, chucVu, mucDong, phuCapChucVu, phuCapThamNienVuotKhung, phuCapThamNienNghe, tyLeDong, shcc }
+                        { cell: 'A1', value: '#', bold: true, border: '1234' },
+                        { cell: 'B1', value: 'Mã thẻ cán bộ', bold: true, border: '1234' },
+                        { cell: 'C1', value: 'Họ và tên cán bộ', bold: true, border: '1234' },
+                        { cell: 'D1', value: 'Chức vụ', bold: true, border: '1234' },
+                        { cell: 'E1', value: 'Mức đóng', bold: true, border: '1234' },
+                        { cell: 'F1', value: 'Phụ cấp chức vụ', bold: true, border: '1234' },
+                        { cell: 'G1', value: 'Phụ cấp thâm niên vượt khung', bold: true, border: '1234' },
+                        { cell: 'H1', value: 'Phụ cấp thâm niên nghề', bold: true, border: '1234' },
+                        { cell: 'I1', value: 'Tỷ lệ đóng', bold: true, border: '1234' },
+                        { cell: 'J1', value: 'Bắt đầu', bold: true, border: '1234' },
+                        { cell: 'K1', value: 'Kết thúc', bold: true, border: '1234' },
+                    ];
+                    result.rows.forEach((item, index) => {
+                        let hoTen = item.hoCanBo + ' ' + item.tenCanBo;
+                        cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
+                        cells.push({ cell: 'B' + (index + 2), border: '1234', value: item.shcc });
+                        cells.push({ cell: 'C' + (index + 2), border: '1234', value: hoTen });
+                        cells.push({ cell: 'D' + (index + 2), border: '1234', value: item.tenChucVu });
+                        cells.push({ cell: 'E' + (index + 2), border: '1234', number: item.mucDong });
+                        cells.push({ cell: 'F' + (index + 2), border: '1234', number: item.phuCapChucVu });
+                        cells.push({ cell: 'G' + (index + 2), border: '1234', number: item.phuCapThamNienVuotKhung });
+                        cells.push({ cell: 'H' + (index + 2), border: '1234', number: item.phuCapThamNienNghe });
+                        cells.push({ cell: 'I' + (index + 2), border: '1234', number: item.tyLeDong });
+                        cells.push({ cell: 'J' + (index + 2), alignment: 'center', border: '1234', value: item.batDau ? app.date.dateTimeFormat(new Date(item.batDau), item.batDauType ? item.batDauType : 'dd/mm/yyyy') : '' });
+                        cells.push({ cell: 'K' + (index + 2), alignment: 'center', border: '1234', value: (item.ketThuc != null && item.ketThuc != -1) ? app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : '' });
+                    });
+                    resolve(cells);
+                }).then((cells) => {
+                    app.excel.write(worksheet, cells);
+                    app.excel.attachment(workbook, res, 'baohiemxahoi.xlsx');
+                }).catch((error) => {
+                    res.send({ error });
+                });
+            }
+        });
+
+    });
 
 };
