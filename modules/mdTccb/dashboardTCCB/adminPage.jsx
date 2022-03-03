@@ -119,6 +119,7 @@ class Dashboard extends AdminPage {
         
         
         return this.renderPage({
+            icon: 'fa fa-bar-chart',
             title: 'Dashboard Phòng Tổ chức cán bộ',
             content: <div className='row'>
                 <div className='col-md-6 col-lg-3'>
@@ -154,7 +155,8 @@ class Dashboard extends AdminPage {
                         <BarChart data={this.state.listStaffFaculty} />
                     </div>
                 </div>
-            </div>
+            </div>,
+            backRoute: '/user/tccb',
         });
     }
 }

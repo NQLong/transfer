@@ -8,7 +8,7 @@ module.exports = app => {
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1025: { title: 'Làm việc ngoài', link: '/user/lam-viec-ngoai', icon: 'fa fa-external-link ', backgroundColor: '#cc6c6c', groupIndex: 1 },
+            1025: { title: 'Làm việc ngoài', subTitle: 'Được mời đi làm việc tại các nơi khác', link: '/user/lam-viec-ngoai', icon: 'fa fa-external-link ', color: '#000000', backgroundColor: '#9cff67', groupIndex: 0 },
         },
     };
 

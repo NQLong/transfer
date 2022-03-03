@@ -1,26 +1,26 @@
 module.exports = app => {
-    const menu = {
-        parentMenu: app.parentMenu.khcn,
-        menus: {
-            9503: { title: 'Quá trình bằng phát minh', link: '/user/khcn/qua-trinh/bang-phat-minh', icon: 'fa fa-cogs', color: '#000000', backgroundColor: '#00e34c', groupIndex: 5 },
-        },
-    };
-    const menuStaff = {
-        parentMenu: app.parentMenu.user,
-        menus: {
-            1030: { title: 'Bằng phát minh', link: '/user/bang-phat-minh', icon: 'fa fa-cogs', backgroundColor: '#00e34c', groupIndex: 4 },
-        },
-    };
+    // const menu = {
+    //     parentMenu: app.parentMenu.khcn,
+    //     menus: {
+    //         9503: { title: 'Quá trình bằng phát minh', link: '/user/khcn/qua-trinh/bang-phat-minh', icon: 'fa fa-cogs', color: '#000000', backgroundColor: '#00e34c', groupIndex: 5 },
+    //     },
+    // };
+    // const menuStaff = {
+    //     parentMenu: app.parentMenu.user,
+    //     menus: {
+    //         1030: { title: 'Bằng phát minh', link: '/user/bang-phat-minh', icon: 'fa fa-cogs', backgroundColor: '#00e34c', groupIndex: 4 },
+    //     },
+    // };
 
     app.permission.add(
-        { name: 'staff:login', menu: menuStaff },
-        { name: 'qtBangPhatMinh:read', menu },
+        // { name: 'staff:login', menu: menuStaff },
+        // { name: 'qtBangPhatMinh:read', menu },
         { name: 'qtBangPhatMinh:write' },
         { name: 'qtBangPhatMinh:delete' },
     );
-    app.get('/user/khcn/qua-trinh/bang-phat-minh', app.permission.check('qtBangPhatMinh:read'), app.templates.admin);
-    app.get('/user/khcn/qua-trinh/bang-phat-minh/group/:shcc', app.permission.check('qtBangPhatMinh:read'), app.templates.admin);
-    app.get('/user/bang-phat-minh', app.permission.check('staff:login'), app.templates.admin);
+    // app.get('/user/khcn/qua-trinh/bang-phat-minh', app.permission.check('qtBangPhatMinh:read'), app.templates.admin);
+    // app.get('/user/khcn/qua-trinh/bang-phat-minh/group/:shcc', app.permission.check('qtBangPhatMinh:read'), app.templates.admin);
+    // app.get('/user/bang-phat-minh', app.permission.check('staff:login'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     // //User Actions:
