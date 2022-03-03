@@ -298,6 +298,12 @@ class QtChucVuGroup extends AdminPage {
             </>,
             backRoute: '/user/tccb/qua-trinh/chuc-vu',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+            onExport: (e) => {
+                e.preventDefault();
+                const { list_dv, fromYear, toYear, list_shcc, timeType, list_cv, gioiTinh } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, list_cv: null, gioiTinh: null };
+
+                T.download(T.url(`/api/qua-trinh/chuc-vu/download-excel/${list_shcc ? list_shcc : null}/${list_dv ? list_dv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${timeType}/${list_cv ? list_cv : null}/${gioiTinh ? gioiTinh : null}`), 'chucvu.xlsx');
+            }
         });
     }
 }

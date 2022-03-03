@@ -127,49 +127,81 @@ module.exports = app => {
         if (toYear == 'null') toYear = null;
         if (list_cv == 'null') list_cv = null;
         if (gioiTinh == 'null') gioiTinh = null;
-        app.model.qtChucVu.download(list_dv, fromYear, toYear, list_shcc, timeType, list_cv, gioiTinh, (err, result) => {
+        app.model.qtChucVu.download(list_shcc, list_dv, fromYear, toYear, timeType, list_cv, gioiTinh, (err, result) => {
             if (err || !result) {
                 res.send({ err });
             } else {
+                let newRows = [];
+                for (let idx = 0; idx < result.rows.length; idx++) {
+                    if (result.rows[idx].soChucVuKiemNhiem == 0 && !result.rows[idx].itemChinh) continue;
+                    newRows.push(result.rows[idx]);
+                }
+                let maxSoLuongKiemNhiem = 0;
+                for (let idx = 0; idx < newRows.length; idx++) {
+                    let value = newRows[idx].soChucVuKiemNhiem;
+                    if (value > maxSoLuongKiemNhiem) {
+                        maxSoLuongKiemNhiem = value;
+                    }
+                }
                 const workbook = app.excel.create(),
                     worksheet = workbook.addWorksheet('chucvu');
                 new Promise(resolve => {
                     let cells = [
                     // Table name: QT_CHUC_VU { stt, shcc, maChucVu, maDonVi, maBoMon, soQd, ngayRaQd, chucVuChinh, thoiChucVu, soQdThoiChucVu, ngayThoiChucVu, ngayRaQdThoiChucVu }
                         { cell: 'A1', value: 'STT', bold: true, border: '1234' },
-                        { cell: 'B1', value: 'NGÀY QĐ', bold: true, border: '1234' },
-                        { cell: 'C1', value: 'SỐ CV', bold: true, border: '1234' },
-                        { cell: 'D1', value: 'HỌC VỊ', bold: true, border: '1234' },
-                        { cell: 'E1', value: 'MÃ THẺ CÁN BỘ', bold: true, border: '1234' },
-                        { cell: 'F1', value: 'HỌ', bold: true, border: '1234' },
-                        { cell: 'G1', value: 'TÊN', bold: true, border: '1234' },
-                        { cell: 'H1', value: 'CHỨC VỤ', bold: true, border: '1234' },
-                        { cell: 'I1', value: 'ĐƠN VỊ', bold: true, border: '1234' },
-                        { cell: 'J1', value: 'NƠI ĐẾN', bold: true, border: '1234' },
-                        { cell: 'K1', value: 'VIẾT TẮT', bold: true, border: '1234' },
-                        { cell: 'L1', value: 'LÝ DO ĐI', bold: true, border: '1234' },
-                        { cell: 'M1', value: 'NGÀY ĐI', bold: true, border: '1234' },
-                        { cell: 'N1', value: 'NGÀY VỀ', bold: true, border: '1234' },
-                        { cell: 'O1', value: 'KINH PHÍ', bold: true, border: '1234' },
-                        { cell: 'P1', value: 'GHI CHÚ', bold: true, border: '1234' },
+                        { cell: 'B1', value: 'MÃ THẺ CÁN BỘ', bold: true, border: '1234' },
+                        { cell: 'C1', value: 'HỌ VÀ TÊN', bold: true, border: '1234' },
+                        { cell: 'D1', value: 'NGÀY THÁNG NĂM SINH', bold: true, border: '1234' },
+                        { cell: 'E1', value: 'GIỚI TÍNH', bold: true, border: '1234' },
+                        { cell: 'F1', value: 'ĐƠN VỊ CÔNG TÁC', bold: true, border: '1234' },
+                        { cell: 'G1', value: 'CHỨC VỤ CHÍNH', bold: true, border: '1234' },
+                        { cell: 'H1', value: 'SỐ QĐ', bold: true, border: '1234' },
+                        { cell: 'I1', value: 'NGÀY RA QĐ', bold: true, border: '1234' },
                     ];
-                    result.rows.forEach((item, index) => {
+                    for (let idx = 0, col = 9; idx < maxSoLuongKiemNhiem; idx++) {
+                        cells.push({ cell: String.fromCharCode(65 + col) + '1', value: 'CHỨC VỤ KIÊM NHIỆM ' + (idx + 1).toString(), bold: true, border: '1234' });
+                        cells.push({ cell: String.fromCharCode(65 + col + 1) + '1', value: 'SỐ QĐ', bold: true, border: '1234' });
+                        cells.push({ cell: String.fromCharCode(65 + col + 2) + '1', value: 'NGÀY RA QĐ', bold: true, border: '1234' });
+                        col += 3;
+                    }
+                    newRows.forEach((item, index) => {
+                        let danhSachChinh = null, chucVuChinh = null, ngayRaQdChinh = null, soQdChinh = null;
+                        if (item.itemChinh) {
+                            danhSachChinh = item.itemChinh.split('??');
+                            chucVuChinh = danhSachChinh[0].trim();
+                            // donViChinh = danhSachChinh[1].trim();
+                            // boMonChinh = danhSachChinh[2].trim();
+                            ngayRaQdChinh = Number(danhSachChinh[3].trim());
+                            soQdChinh = danhSachChinh[4].trim();
+                        }
+                        let hoTen = item.ho + ' ' + item.ten;
                         cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
-                        cells.push({ cell: 'B' + (index + 2), alignment: 'center', border: '1234', value: item.ngayQuyetDinh ? app.date.dateTimeFormat(new Date(item.ngayQuyetDinh), 'dd/mm/yyyy') : '' });
-                        cells.push({ cell: 'C' + (index + 2), border: '1234', value: item.soCv });
-                        cells.push({ cell: 'D' + (index + 2), border: '1234', value: item.tenHocVi });
-                        cells.push({ cell: 'E' + (index + 2), border: '1234', value: item.shcc });
-                        cells.push({ cell: 'F' + (index + 2), border: '1234', value: item.hoCanBo });
-                        cells.push({ cell: 'G' + (index + 2), border: '1234', value: item.tenCanBo });
-                        cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.tenChucVu });
-                        cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.tenDonVi });
-                        cells.push({ cell: 'J' + (index + 2), border: '1234', value: item.danhSachTinh });
-                        cells.push({ cell: 'K' + (index + 2), border: '1234', value: item.tenMucDich });
-                        cells.push({ cell: 'L' + (index + 2), border: '1234', value: item.lyDo });
-                        cells.push({ cell: 'M' + (index + 2), alignment: 'center', border: '1234', value: item.batDau ? app.date.dateTimeFormat(new Date(item.batDau), item.batDauType ? item.batDauType : 'dd/mm/yyyy') : '' });
-                        cells.push({ cell: 'N' + (index + 2), alignment: 'center', border: '1234', value: (item.ketThuc != null && item.ketThuc != -1) ? app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : '' });
-                        cells.push({ cell: 'O' + (index + 2), border: '1234', value: item.kinhPhi });
-                        cells.push({ cell: 'P' + (index + 2), border: '1234', value: item.ghiChu });
+                        cells.push({ cell: 'B' + (index + 2), border: '1234', value: item.shcc });
+                        cells.push({ cell: 'C' + (index + 2), border: '1234', value: hoTen });
+                        cells.push({ cell: 'D' + (index + 2), alignment: 'center', border: '1234', value: item.ngaySinh ? app.date.dateTimeFormat(new Date(item.ngaySinh), 'dd/mm/yyyy') : '' });
+                        cells.push({ cell: 'E' + (index + 2), border: '1234', value: item.gioiTinh == '01' ? 'Nam' : 'Nữ' });
+                        cells.push({ cell: 'F' + (index + 2), border: '1234', value: item.tenDonVi });
+                        cells.push({ cell: 'G' + (index + 2), border: '1234', value: chucVuChinh });
+                        cells.push({ cell: 'H' + (index + 2), border: '1234', value: soQdChinh });
+                        cells.push({ cell: 'I' + (index + 2), border: '1234', value: ngayRaQdChinh ? app.date.dateTimeFormat(new Date(ngayRaQdChinh), 'dd/mm/yyyy') : '' });
+                        let idx = 0, col = 9;
+                        if (item.soChucVuKiemNhiem > 0) {
+                            let danhSachChucVuKiemNhiem = item.danhSachChucVuKiemNhiem.split('??');
+                            let danhSachSoQdKiemNhiem = item.danhSachSoQdKiemNhiem.split('??');
+                            let danhSachNgayQdKiemNhiem = item.danhSachNgayQdKiemNhiem.split('??');
+                            for (; idx < item.soChucVuKiemNhiem; idx++) {
+                                cells.push({ cell: String.fromCharCode(65 + col) + (index + 2), border: '1234', value: danhSachChucVuKiemNhiem[idx].trim()});
+                                cells.push({ cell: String.fromCharCode(65 + col + 1) + (index + 2), border: '1234', value: danhSachSoQdKiemNhiem[idx].trim()});
+                                cells.push({ cell: String.fromCharCode(65 + col + 2) + (index + 2), border: '1234', value: danhSachNgayQdKiemNhiem[idx].trim() ? app.date.dateTimeFormat(new Date(Number(danhSachNgayQdKiemNhiem[idx].trim())), 'dd/mm/yyyy') : ''});
+                                col += 3;
+                            }
+                        }
+                        for (; idx < maxSoLuongKiemNhiem; idx++) {
+                            cells.push({ cell: String.fromCharCode(65 + col) + (index + 2), border: '1234', value: '' });
+                            cells.push({ cell: String.fromCharCode(65 + col + 1) + (index + 2), border: '1234', value: '' });
+                            cells.push({ cell: String.fromCharCode(65 + col + 2) + (index + 2), border: '1234', value: '' });
+                            col += 3;
+                        }
                     });
                     resolve(cells);
                 }).then((cells) => {
