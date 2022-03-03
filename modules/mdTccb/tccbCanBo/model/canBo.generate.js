@@ -140,5 +140,15 @@ module.exports = app => {
             app.dbConnection.execute('BEGIN :ret:=tccb_dashboard_get_number_staff_by_don_vi(); END;',
                 { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
         },
+
+        tccbDashboardStaffCurrentlyForeign: (done) => {
+            app.dbConnection.execute('BEGIN :ret:=tccb_dashboard_get_staff_dang_nuoc_ngoai_by_muc_dich(); END;',
+                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
+        },
+
+        tccbDashboardStaffCurrentlyWorkOutside: (done) => {
+            app.dbConnection.execute('BEGIN :ret:=tccb_dashboard_get_staff_dang_trong_nuoc_by_muc_dich(); END;',
+                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
+        },
     };
 };

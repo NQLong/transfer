@@ -4,7 +4,7 @@ import CountUp from 'view/js/countUp';
 import { getTotalGender } from './redux';
 import { getStaffAll } from 'modules/mdTccb/tccbCanBo/redux';
 import { AdminPage } from 'view/component/AdminPage';
-import { BarChart, DefaultColors, DoughnutChart } from 'view/component/Chart';
+import { BarChart, DefaultColors, DoughnutChart, PieChart } from 'view/component/Chart';
 import { Link } from 'react-router-dom';
 
 class DashboardIcon extends React.Component {
@@ -52,24 +52,56 @@ class Dashboard extends AdminPage {
             yTitle: 'Số lượng cán bộ',
             xTitle: 'Khoa, bộ môn',
         },
+        listDiNuocNgoai: {
+            labels: null,
+            datasets: null,
+            yTitle: 'Số lượng cán bộ',
+            xTitle: 'Mục đích',
+        },
+        listCongTacTrongNuoc: {
+            labels: null,
+            datasets: null,
+            yTitle: 'Số lượng cán bộ',
+            xTitle: 'Mục đích',
+        },
     };
 
     componentDidMount() {
         T.ready('/user/tccb', () => {
             this.props.getTotalGender(data => {
-                let { listStaffFaculty } = data ? data : { listStaffFaculty };
+                let { listStaffFaculty, listDiNuocNgoai, listCongTacTrongNuoc } = data ? data : { listStaffFaculty, listDiNuocNgoai, listCongTacTrongNuoc };
                 let dataStaffFaculty = {
                         labels: [],
                         datasets: [
                             { data: [], label: 'Số lượng', backgroundColor: DefaultColors.info }
                         ]
                 };
-                this.setState({ listStaffFaculty }, () => {
+                let dataDiNuocNgoai = {
+                    labels: [],
+                    datasets: [
+                        { data: [], label: 'Số lượng', backgroundColor: Object.values(DefaultColors) }
+                    ]
+                };
+                let dataCongTacTrongNuoc = {
+                    labels: [],
+                    datasets: [
+                        { data: [], label: 'Số lượng', backgroundColor: Object.values(DefaultColors) }
+                    ]
+                };
+                this.setState({ listStaffFaculty, listDiNuocNgoai, listCongTacTrongNuoc }, () => {
                     listStaffFaculty.length && this.state.listStaffFaculty.forEach(faculty => {
                         dataStaffFaculty.labels.push(faculty.tenDonVi);
                         dataStaffFaculty.datasets[0].data.push(faculty.numOfStaff);
                     });
-                    this.setState({ listStaffFaculty: dataStaffFaculty });
+                    listDiNuocNgoai.length && this.state.listDiNuocNgoai.forEach((item) => {
+                        dataDiNuocNgoai.labels.push(item.tenMucDich);
+                        dataDiNuocNgoai.datasets[0].data.push(item.numOfStaff);
+                    });
+                    listCongTacTrongNuoc.length && this.state.listCongTacTrongNuoc.forEach((item) => {
+                        dataCongTacTrongNuoc.labels.push(item.tenMucDich);
+                        dataCongTacTrongNuoc.datasets[0].data.push(item.numOfStaff);
+                    });
+                    this.setState({ listStaffFaculty: dataStaffFaculty, listDiNuocNgoai: dataDiNuocNgoai, listCongTacTrongNuoc: dataCongTacTrongNuoc });
                 });
 
             });
@@ -153,6 +185,18 @@ class Dashboard extends AdminPage {
                     <div className='tile'>
                         <div className='tile-title'>Nhân sự các khoa, bộ môn</div>
                         <BarChart data={this.state.listStaffFaculty} />
+                    </div>
+                </div>
+                <div className='col-lg-6'>
+                    <div className='tile'>
+                        <div className='tile-title'>Cán bộ đang công tác trong nước</div>
+                        <PieChart data={this.state.listCongTacTrongNuoc} />
+                    </div>
+                </div>
+                <div className='col-lg-6'>
+                    <div className='tile'>
+                        <div className='tile-title'>Cán bộ đang ở nước ngoài</div>
+                        <PieChart data={this.state.listDiNuocNgoai} />
                     </div>
                 </div>
             </div>,

@@ -23,7 +23,7 @@ import Loading from 'view/component/Loading';
 // import ComponentBaoHiemXaHoi from '../qtBaoHiemXaHoi/componentBaoHiemXaHoi';
 
 class StaffUserPage extends AdminPage {
-    state = { item: null }
+    state = { item: null, lastModified: null }
 
     componentDidMount() {
         T.ready('/user', () => {
@@ -37,7 +37,7 @@ class StaffUserPage extends AdminPage {
                         this.setUp(data.item);
                     }
                     else {
-                        this.setState({ isLoad: false });
+                        T.notify('Bạn không tồn tại trong hệ thống cán bộ', 'danger');
                     }
                 });
             }
@@ -49,6 +49,7 @@ class StaffUserPage extends AdminPage {
         this.componentTTCongTac.value(item);
         this.componentQuanHe.value(item.email, item.phai, item.shcc);
         this.componentTrinhDo.value(item);
+        this.setState({ item });
     }
 
     save = () => {
@@ -56,25 +57,25 @@ class StaffUserPage extends AdminPage {
         const congTacData = this.componentTTCongTac.getAndValidate();
         const trinhDoData = this.componentTrinhDo.getAndValidate();
         if (this.emailCanBo) {
-            caNhanData && congTacData && trinhDoData && this.props.updateStaffUser(this.emailCanBo, { ...caNhanData, ...congTacData, ...trinhDoData, userModified: this.emailCanBo, lastModified: new Date().getTime() });
+            if (caNhanData && congTacData && trinhDoData) {
+                this.props.updateStaffUser(this.emailCanBo, { ...caNhanData, ...congTacData, ...trinhDoData, userModified: this.emailCanBo, lastModified: new Date().getTime() }, () => this.setState({ lastModified: new Date().getTime() }) );
+            }
         }
     }
 
 
     render() {
-        const { isStaff, shcc } = this.props.system && this.props.system.user ? this.props.system.user : { isStaff: false, shcc: '' };
-        const { firstName, lastName } = isStaff && this.props.system.user || { firstName: '', lastName: '' };
-        const name = isStaff ? `${lastName} ${firstName} (${shcc})` : '';
+        const { data } = this.props.system && this.props.system.user ? this.props.system.user : { data: null };
         return this.renderPage({
             icon: 'fa fa-address-card-o',
             title: 'HỒ SƠ CÁ NHÂN',
-            subTitle: <span style={{ color: 'blue' }}>Cán bộ: {name}</span>,
+            subTitle: data ? <small style={{ color: 'blue' }}>Chỉnh sửa lần cuối lúc {T.dateToText(this.state.lastModified ? this.state.lastModified : data.lastModified, 'hh:mm:ss dd/mm/yyyy')}</small> : '',
             breadcrumb: [
                 <Link key={0} to='/user'>Trang cá nhân</Link>,
                 'Hồ sơ',
             ],
             content: <>
-                {name == '' && <Loading />}
+                {!this.state.item && <Loading />}
                 <ComponentCaNhan ref={e => this.componentCaNhan = e} userEdit={true} isStaff={true} />
                 <ComponentQuanHe ref={e => this.componentQuanHe = e} userEdit={true} />
                 <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={true} />
