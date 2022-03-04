@@ -26,7 +26,7 @@ module.exports = app => {
                             if (error) {
                                 done(error);
                             } else {
-                                if (app.data && app.data.numberOfNews) app.data.numberOfNews++;
+                                // if (app.data && app.data.numberOfNews) app.data.numberOfNews++;
                                 const image = '/img/news/' + news.id + '.jpg';
                                 const srcPath = app.path.join(app.publicPath, '/img/avatar.png'),
                                     destPath = app.path.join(app.publicPath, image);
@@ -60,7 +60,7 @@ module.exports = app => {
                             if (error) {
                                 done(error);
                             } else {
-                                if (app.data && app.data.numberOfNews) app.data.numberOfNews--;
+                                // if (app.data && app.data.numberOfNews) app.data.numberOfNews--;
                                 app.deleteImage(news.image);
                                 app.model.fwNews.delete(condition, done);
                             }
@@ -74,7 +74,7 @@ module.exports = app => {
                                     if (error) {
                                         done(error);
                                     } else {
-                                        if (app.data && app.data.numberOfNews) app.data.numberOfNews--;
+                                        // if (app.data && app.data.numberOfNews) app.data.numberOfNews--;
                                         app.deleteImage(news.image);
                                         app.model.fwNews.delete(condition, done);
                                     }
