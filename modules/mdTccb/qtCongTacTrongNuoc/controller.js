@@ -145,7 +145,7 @@ module.exports = app => {
                     worksheet = workbook.addWorksheet('congtactrongnuoc');
                 new Promise(resolve => {
                     let cells = [
-                        // Table name: QT_CONG_TAC_TRONG_NUOC { id, ngayQuyetDinh, soCv, shcc, noiDen, vietTat, lyDo, batDau, batDauType, ketThuc, ketThucType, kinhPhi, ghiChu }
+                        // QT_CONG_TAC_TRONG_NUOC { id, ngayQuyetDinh, soCv, shcc, noiDen, vietTat, lyDo, batDau, batDauType, ketThuc, ketThucType, kinhPhi, ghiChu }
                         { cell: 'A1', value: 'STT', bold: true, border: '1234' },
                         { cell: 'B1', value: 'NGÀY QĐ', bold: true, border: '1234' },
                         { cell: 'C1', value: 'SỐ CV', bold: true, border: '1234' },
