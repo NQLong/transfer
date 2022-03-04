@@ -354,6 +354,9 @@ module.exports = app => {
     // Hook ready -----------------------------------------------------------------------------------------------------------------------------------
     app.readyHooks.add('readyEvent', {
         ready: () => app.dbConnection != null && app.model != null && app.model.fwEvent != null,
-        run: () => app.model.fwEvent.count((error, numberOfEvent) => app.data.numberOfEvent = error ? 0 : numberOfEvent.rows[0]['COUNT(*)']),
+        run: () => app.model.fwEvent.count((error, numberOfEvent) => {
+            numberOfEvent = Number(numberOfEvent);
+            app.model.setting.setValue({ numberOfEvent: isNaN(numberOfEvent) ? 0 : numberOfEvent });
+        }),
     });
 };

@@ -17,7 +17,12 @@ module.exports = app => {
     app.readyHooks.add('readyUser', {
         ready: () => app.dbConnection != null && app.model != null && app.model.fwRole != null && app.model.fwUser != null,
         run: () => {
-            app.model.fwUser.count({}, (error, numberOfUser) => app.data.numberOfUser = error ? 0 : numberOfUser.rows[0]['COUNT(*)']);
+            app.model.fwUser.count({}, (error, numberOfUser) => {
+                if (error == null) {
+                    numberOfUser = Number(numberOfUser);
+                    app.model.setting.setValue({ numberOfUser: isNaN(numberOfUser) ? 0 : Number(numberOfUser) });
+                }
+            });
 
             // Tạo Admin user
             new Promise((resolve, reject) => {
