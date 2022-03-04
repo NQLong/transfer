@@ -29,7 +29,6 @@ modules.forEach(module => {
     module.routes.forEach(addRoute);
 });
 const store = createStore(combineReducers(reducers), {}, composeWithDevTools(applyMiddleware(thunk)));
-store.dispatch(getSystemState());
 window.T = T;
 
 // Main DOM render ----------------------------------------------------------------------------------------------------------------------------------
