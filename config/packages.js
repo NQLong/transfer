@@ -38,6 +38,7 @@ module.exports = (app, http, config) => {
             maxAge: 3600000 * 24 * 7// one week
         }
     };
+
     if (config && app.redis) {
         // console.log(` - #${process.pid}: The system used Redis session!`);
         const redisStore = require('connect-redis')(session);

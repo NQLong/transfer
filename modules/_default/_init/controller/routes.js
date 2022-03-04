@@ -9,7 +9,7 @@ module.exports = app => {
         },
         { name: 'user:login', menu: { parentMenu: app.parentMenu.user } },
     );
-    
+
     app.get('/user', app.permission.check('user:login'), app.templates.admin);
     app.get('/user/dashboard', app.permission.check('dashboard:standard'), app.templates.admin);
     app.get('/user/truyen-thong/settings', app.permission.check('system:settings'), app.templates.admin);
@@ -77,7 +77,9 @@ module.exports = app => {
                                 if (submenus) {
                                     data.submenus = submenus.slice();
                                 }
-                                app.model.setting.getValue(['headerTitle', 'headerLink', 'isShowHeaderTitle', 'address2', 'mapLink'], result => {
+                                app.model.setting.getValue(['header', 'address', 'headerTitle', 'headerLink', 'isShowHeaderTitle', 'address2', 'mapLink'], result => {
+                                    data.header = result.header;
+                                    data.address = result.address;
                                     data.headerTitle = result.headerTitle;
                                     data.headerLink = result.headerLink;
                                     data.address2 = result.address2;

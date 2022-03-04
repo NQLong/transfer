@@ -38,13 +38,13 @@ module.exports = (cluster, isDebug) => {
     // Configure ------------------------------------------------------------------------------------------------------
     require('./common')(app, appConfig.name);
     require('./view')(app, express);
-    require('./packages')(app, server, appConfig);
+    require('./io')(app, server, appConfig);
     require('./database')(app, appConfig);
+    require('./packages')(app, server, appConfig);
     require('./authentication')(app);
     require('./permission')(app);
     require('./authentication.google')(app, appConfig);
     // require('./ldap')(app);
-    require('./io')(app, server, appConfig);
 
     // Init -----------------------------------------------------------------------------------------------------------
     app.createTemplate('home', 'admin', 'unit');
