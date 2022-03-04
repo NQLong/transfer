@@ -99,11 +99,13 @@ class EditModal extends AdminModal {
 
 class QtBaiVietKhoaHocGroupPage extends AdminPage {
     state = { filter: {}, name: '' };
+    menu = '';
 
     componentDidMount() {
-        T.ready('/user/khcn', () => {
+        this.menu = T.routeMatcher('/user/:khcn/qua-trinh/bai-viet-khoa-hoc/group/:shcc').parse(window.location.pathname).khcn;
+        T.ready('/user/' + this.menu, () => {
             T.clearSearchBox();
-            const route = T.routeMatcher('/user/khcn/qua-trinh/bai-viet-khoa-hoc/group/:shcc'),
+            const route = T.routeMatcher(`/user/${this.menu}/qua-trinh/bai-viet-khoa-hoc/group/:shcc`),
                 params = route.parse(window.location.pathname);
             this.shcc = params.shcc;
             this.setState({ filter: { list_shcc: params.shcc, list_dv: '' } });
@@ -241,8 +243,8 @@ class QtBaiVietKhoaHocGroupPage extends AdminPage {
             title: 'Bài viết Khoa học - Cán bộ',
             subTitle: <div style={{ color: 'blue' }} >{this.state.name}</div>,
             breadcrumb: [
-                <Link key={0} to='/user/khcn'>Khoa học công nghệ</Link>,
-                <Link key={0} to='/user/khcn/qua-trinh/bai-viet-khoa-hoc'>Quá trình bài viết khoa học</Link>,
+                <Link key={0} to={'/user/' + this.menu}>{this.menu == 'tccb' ? 'Tổ chức cán bộ' : 'Khoa học công nghệ'}</Link>,
+                <Link key={0} to={`/user/${this.menu}/qua-trinh/bai-viet-khoa-hoc`}>Quá trình bài viết khoa học</Link>,
                 'Quá trình bài viết khoa học - Cán bộ',
             ],
             advanceSearch: <>
@@ -263,7 +265,7 @@ class QtBaiVietKhoaHocGroupPage extends AdminPage {
                     update={this.props.updateQtBaiVietKhoaHocGroupPageMa} create={this.props.createQtBaiVietKhoaHocGroupPageMa}
                 />
             </>,
-            backRoute: '/user/khcn/qua-trinh/bai-viet-khoa-hoc',
+            backRoute: '/user/' + this.menu + '/qua-trinh/bai-viet-khoa-hoc',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
             onExport: (e) => {
                 e.preventDefault();

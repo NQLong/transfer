@@ -247,8 +247,10 @@ const timeList = [
 class QtNghienCuuKhoaHoc extends AdminPage {
     checked = parseInt(T.cookie('hienThiTheoCanBo')) == 1 ? true : false;
     state = { filter: {} };
+    menu = '';
     componentDidMount() {
-        T.ready('/user/khcn', () => {
+        this.menu = T.routeMatcher('/user/:tccb/qua-trinh/nghien-cuu-khoa-hoc').parse(window.location.pathname).tccb;
+        T.ready('/user/' + this.menu, () => {
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
                 this.timeType?.value(0);
@@ -407,7 +409,7 @@ class QtNghienCuuKhoaHoc extends AdminPage {
                         }
                         {
                             this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}>
-                                <Link className='btn btn-success' to={`/user/khcn/qua-trinh/nghien-cuu-khoa-hoc/group/${item.shcc}`} >
+                                <Link className='btn btn-success' to={`/user/${this.menu}/qua-trinh/nghien-cuu-khoa-hoc/group/${item.shcc}`} >
                                     <i className='fa fa-lg fa-compress' />
                                 </Link>
                             </TableCell>
@@ -450,15 +452,15 @@ class QtNghienCuuKhoaHoc extends AdminPage {
                     create={this.props.createQtNckhStaff} update={this.props.updateQtNckhStaff}
                 />
             </>,
-            backRoute: '/user/khcn',
+            backRoute: '/user/' + this.menu,
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
-            onExport: (e) => {
+            onExport: !this.checked ? (e) => {
                 e.preventDefault();
-                const { maDonVi, fromYear, toYear, loaiHocVi, maSoCanBo } = this.state.filter != '%%%%%%%%' ? this.state.filter : {
-                    maDonVi: '', fromYear: null, toYear: null, loaiHocVi: '', maSoCanBo: '',
+                const { maDonVi, fromYear, toYear, loaiHocVi, maSoCanBo, timeType } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : {
+                    maDonVi: '', fromYear: null, toYear: null, loaiHocVi: '', maSoCanBo: '', timeType: 0,
                 };
-                T.download(T.url(`/api/qua-trinh/nckh/download-excel/${maDonVi !== '' ? maDonVi : null}/${fromYear != null ? fromYear : null}/${toYear != null ? toYear : null}/${loaiHocVi != '' ? loaiHocVi : null}/${maSoCanBo != '' ? maSoCanBo : null}`), 'NCKH.xlsx');
-            }
+                T.download(T.url(`/api/qua-trinh/nckh/download-excel/${maDonVi !== '' ? maDonVi : null}/${fromYear != null ? fromYear : null}/${toYear != null ? toYear : null}/${loaiHocVi != '' ? loaiHocVi : null}/${maSoCanBo != '' ? maSoCanBo : null}/${timeType}`), 'NCKH.xlsx');
+            } : null
         });
     }
 }

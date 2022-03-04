@@ -283,7 +283,7 @@ class QtNghiPhepGroupPage extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa fa-fax',
+            icon: 'fa fa-pause',
             title: 'Quá trình nghỉ phép - Cán bộ',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,

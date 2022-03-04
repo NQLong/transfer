@@ -190,7 +190,7 @@ class QtNghiViec extends AdminPage {
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Quyết định nghỉ</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày nghỉ</th>}
                         {!this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Nội dung</th>}
-                        {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Số chức lần nghỉ</th>}
+                        {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Số lần nghỉ</th>}
                         {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách nội dung nghỉ</th>}
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
@@ -247,11 +247,11 @@ class QtNghiViec extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-sign-out',
-            title: 'Quá trình nghỉ việc',
+            icon: 'fa fa-user-times',
+            title: 'Cán bộ Nghỉ việc',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
-                'Quá trình nghỉ việc'
+                'Cán bộ Nghỉ việc'
             ],
             advanceSearch: <>
                 <div className='row'>

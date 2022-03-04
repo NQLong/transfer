@@ -72,10 +72,12 @@ class EditModal extends AdminModal {
 class QtHuongDanLuanVanGroupPage extends AdminPage {
     state = { filter: {} };
     searchText = '';
+    menu = '';
     componentDidMount() {
-        T.ready('/user/tccb', () => {
+        this.menu = T.routeMatcher('/user/:khcn/qua-trinh/hdlv/group/:shcc').parse(window.location.pathname).khcn;
+        T.ready('/user/' + this.menu, () => {
             T.clearSearchBox();
-            const route = T.routeMatcher('/user/tccb/qua-trinh/hdlv/group/:shcc'),
+            const route = T.routeMatcher(`/user/${this.menu}/qua-trinh/hdlv/group/:shcc`),
                 params = route.parse(window.location.pathname);
             this.shcc = params.shcc;
             this.setState({ filter: { list_shcc: params.shcc, list_dv: '' } });
@@ -178,8 +180,8 @@ class QtHuongDanLuanVanGroupPage extends AdminPage {
             icon: 'fa fa-university',
             title: 'Quá trình hướng dẫn luận văn - Cán bộ',
             breadcrumb: [
-                <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
-                <Link key={0} to='/user/tccb/qua-trinh/hdlv'>Quá trình hướng dẫn luận văn</Link>,
+                <Link key={0} to={'/user/' + this.menu}>{this.menu == 'tccb' ? 'Tổ chức cán bộ' : 'Khoa học công nghệ'}</Link>,
+                <Link key={0} to={`/user/${this.menu}/qua-trinh/hdlv`}>Quá trình hướng dẫn luận văn</Link>,
                 'Quá trình hướng dẫn luận văn - Cán bộ',
             ],
             advanceSearch: <>
@@ -199,13 +201,13 @@ class QtHuongDanLuanVanGroupPage extends AdminPage {
                     create={this.props.createQtHuongDanLuanVanGroupPageMa} update={this.props.updateQtHuongDanLuanVanGroupPageMa}
                 />
             </>,
-            backRoute: '/user/tccb/qua-trinh/hdlv',
+            backRoute: `/user/${this.menu}/qua-trinh/hdlv`,
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
         });
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtHuongDanLuanVan: state.tccb.qtHuongDanLuanVan });
+const mapStateToProps = state => ({ system: state.system, qtHuongDanLuanVan: state.khcn.qtHuongDanLuanVan });
 const mapActionsToProps = {
     updateQtHuongDanLuanVanGroupPageMa, deleteQtHuongDanLuanVanGroupPageMa,
     createQtHuongDanLuanVanGroupPageMa, getQtHuongDanLuanVanGroupPageMa,

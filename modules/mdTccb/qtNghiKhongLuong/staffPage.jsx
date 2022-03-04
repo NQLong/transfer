@@ -1,13 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminModal, AdminPage, FormDatePicker, FormRichTextBox, FormTextBox, renderTable, TableCell, FormCheckbox } from 'view/component/AdminPage';
+import { AdminModal, AdminPage, FormRichTextBox, FormTextBox, renderTable, TableCell, FormCheckbox, FormDatePicker } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import Dropdown from 'view/component/Dropdown';
 import { DateInput } from 'view/component/Input';
 import {
-    getQtNuocNgoaiUserPage, deleteQtNuocNgoaiUserPage, createQtNuocNgoaiUserPage,
-    updateQtNuocNgoaiUserPage
+    getQtNghiKhongLuongUserPage, deleteQtNghiKhongLuongUserPage, createQtNghiKhongLuongUserPage,
+    updateQtNghiKhongLuongUserPage
 }
     from './redux';
 
@@ -31,20 +31,32 @@ class EditModal extends AdminModal {
     };
 
     onShow = (item) => {
-        let { id, quocGia, noiDung, batDau, batDauType, ketThuc, ketThucType, tenCoSo, kinhPhi, troLaiCongTac } = item && item.item ? item.item : {
-            id: '', quocGia: '', noiDung: '', tenCoSo: '', batDau: null, batDauType: '', ketThuc: null, ketThucType: '', kinhPhi: null, troLaiCongTac: ''
+        let { id, soVanBan, batDau, batDauType, ketThuc, ketThucType, thoiGianDiLam, soThongBao, tongThoiGian, thoiGianTroLaiCongTac, ghiChu, thongBaoSo,
+            thamGiaBHXH, thoiGianBaoGiam, thoiGianBaoTang } = item.item ? item.item : {
+                id: '', soVanBan : '', batDau: '', batDauType: '', ketThuc: '', ketThucType: '', thoiGianDiLam: '', soThongBao: '', tongThoiGian: '', thoiGianTroLaiCongTac: '', ghiChu: '', thongBaoSo: '',
+                thamGiaBHXH: '', thoiGianBaoGiam: '', thoiGianBaoTang: ''
         };
+        console.log(item.item);
+        console.log(thoiGianDiLam);
+        console.log(batDau);
+        console.log(ketThuc);
+        console.log(thoiGianTroLaiCongTac);
         this.setState({
             id, batDauType: batDauType ? batDauType : 'dd/mm/yyyy',
             ketThucType: ketThucType ? ketThucType : 'dd/mm/yyyy',
             batDau, ketThuc,
             shcc: item.shcc
         }, () => {
-            this.kinhPhi.value(kinhPhi);
-            this.tenCoSo.value(tenCoSo ? tenCoSo : '');
-            this.troLaiCongTac.value(troLaiCongTac);
-            this.quocGia.value(quocGia);
-            this.noiDung.value(noiDung);
+            this.soVanBan.value(soVanBan ? soVanBan : '');
+            this.thoiGianDiLam.value(thoiGianDiLam ? thoiGianDiLam : '');
+            this.soThongBao.value(soThongBao ? soThongBao : '');
+            this.tongThoiGian.value(tongThoiGian ? tongThoiGian : '');
+            this.thoiGianTroLaiCongTac.value(thoiGianTroLaiCongTac ? thoiGianTroLaiCongTac : '');
+            this.ghiChu.value(ghiChu ? ghiChu : '');
+            this.thongBaoSo.value(thongBaoSo ? thongBaoSo : '');
+            this.thamGiaBHXH.value(thamGiaBHXH ? thamGiaBHXH : 0);
+            this.thoiGianBaoGiam.value(thoiGianBaoGiam ? thoiGianBaoGiam : '');
+            this.thoiGianBaoTang.value(thoiGianBaoTang ? thoiGianBaoTang : '');
 
             this.batDauType.setText({ text: batDauType ? batDauType : 'dd/mm/yyyy' });
             this.state.ketThuc != -1 && this.ketThucType.setText({ text: ketThucType ? ketThucType : 'dd/mm/yyyy' });
@@ -66,24 +78,26 @@ class EditModal extends AdminModal {
         e.preventDefault();
         const changes = {
             shcc: this.state.shcc,
-            tenCoSo: this.tenCoSo.value(),
-            kinhPhi: this.kinhPhi.value(),
-            troLaiCongTac: Number(this.troLaiCongTac.value()),
             batDauType: this.state.batDauType,
             batDau: this.batDau.getVal(),
             ketThucType: !this.state.denNay ? this.state.ketThucType : '',
             ketThuc: !this.state.denNay ? this.ketThuc.getVal() : -1,
-            quocGia: this.quocGia.value(),
-            noiDung: this.noiDung.value()
+            soVanBan: this.soVanBan.value(),
+            thoiGianDiLam: this.thoiGianDiLam.value() ? Number(this.thoiGianDiLam.value()) : null,
+            soThongBao: this.soThongBao.value(),
+            tongThoiGian: this.tongThoiGian.value(),
+            thoiGianTroLaiCongTac: this.thoiGianTroLaiCongTac.value() ? Number(this.thoiGianTroLaiCongTac.value()) : null,
+            thongBaoSo: this.thongBaoSo.value(),
+            thamGiaBHXH: this.thamGiaBHXH.value(),
+            thoiGianBaoGiam: this.thoiGianBaoGiam.value(),
+            thoiGianBaoTang: this.thoiGianBaoTang.value(),
+            ghiChu: this.ghiChu.value(),
         };
-        if (!changes.noiDung) {
-            T.notify('Nội dung công tác ngoài nước trống', 'danger');
-            this.noiDung.focus();
-        } else if (!changes.batDau) {
-            T.notify('Ngày bắt đầu công tác ngoài nước trống', 'danger');
+        if (!changes.batDau) {
+            T.notify('Ngày bắt đầu nghỉ không lương trống', 'danger');
             this.batDau.focus();
         } else if (!this.state.denNay && !this.ketThuc.getVal()) {
-            T.notify('Ngày kết thúc công tác ngoài nước trống', 'danger');
+            T.notify('Ngày kết thúc nghỉ không lương trống', 'danger');
             this.ketThuc.focus();
         } else if (!this.state.denNay && this.batDau.getVal() > this.ketThuc.getVal()) {
             T.notify('Ngày bắt đầu lớn hơn ngày kết thúc', 'danger');
@@ -93,16 +107,26 @@ class EditModal extends AdminModal {
         }
     }
 
+    handleKetThuc = (value) => {
+        value ? $('#ketThucDate').hide() : $('#ketThucDate').show();
+        this.setState({ denNay: value });
+        if (!value) {
+            this.ketThucType?.setText({ text: this.state.ketThucType ? this.state.ketThucType : 'dd/mm/yyyy' });
+        } else {
+            this.ketThucType?.setText({ text: '' });
+        }
+    }
+    
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
-            title: this.state.id ? 'Cập nhật quá trình công tác ngoài nước' : 'Tạo mới quá trình công tác ngoài nước',
+            title: this.state.shcc ? 'Cập nhật quá trình nghỉ không lương' : 'Tạo mới quá trình nghỉ không lương',
             size: 'large',
             body: <div className='row'>
-                <FormRichTextBox className='col-md-12' ref={e => this.noiDung = e} rows={2} readOnly={readOnly} label='Nội dung' placeholder='Nhập nội dung công tác ngoài nước (tối đa 200 ký tự)' required maxLength={200} />
-                <FormTextBox className='col-md-12' ref={e => this.quocGia = e} label='Quốc gia' />
-                <FormTextBox className='col-md-12' ref={e => this.tenCoSo = e} label='Tên cơ sở đào tạo/làm việc' />
-
+                <FormTextBox className='col-md-4' ref={e => this.soVanBan = e} readOnly={readOnly} label='Số văn bản' />
+                <FormTextBox className='col-md-4' ref={e => this.soThongBao = e} label='Số thông báo' />
+                <FormTextBox className='col-md-4' ref={e => this.thongBaoSo = e} label='Thông báo số' />
+                <FormCheckbox ref={e => this.thamGiaBHXH = e} label='Tham gia BHXH' className='col-md-12' />
                 <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
                     label={
                         <div style={{ display: 'flex' }}>Thời gian bắt đầu (định dạng:&nbsp; <Dropdown ref={e => this.batDauType = e}
@@ -118,26 +142,30 @@ class EditModal extends AdminModal {
                             onSelected={item => this.setState({ ketThucType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
                     }
                     type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} /></div>
-
-                <FormTextBox className='col-md-6' ref={e => this.kinhPhi = e} type='number' label='Kinh phí' readOnly={readOnly} />
-                <FormDatePicker className='col-md-6' ref={e => this.troLaiCongTac = e} type='date-mask' label='Ngày tiếp nhận trở lại công tác' readOnly={readOnly} />
+                <span className='col-md-12'></span>
+                <FormDatePicker className='col-md-4' ref={e => this.thoiGianDiLam = e} label='Thời gian đi làm' type='date-mask' readOnly={readOnly}/>
+                <FormDatePicker className='col-md-4' ref={e => this.thoiGianTroLaiCongTac = e} label='Thời gian trở lại công tác' type='date-mask' readOnly={readOnly}/>
+                <FormTextBox className='col-md-4' ref={e => this.tongThoiGian = e} label='Tổng thời gian' />
+                <FormTextBox className='col-md-6' ref={e => this.thoiGianBaoGiam = e} label='Thời gian báo giảm' />
+                <FormTextBox className='col-md-6' ref={e => this.thoiGianBaoTang = e} label='Thời gian báo tăng' />
+                <FormRichTextBox className='col-md-12' ref={e => this.ghiChu = e} rows={2} readOnly={readOnly} label='Ghi chú' placeholder='Ghi chú (tối đa 200 ký tự)' maxLength={200} />
             </div>
         });
     }
 }
 
-class QtNuocNgoaiUserPage extends AdminPage {
+class QtNghiKhongLuongUserPage extends AdminPage {
     state = { filter: {} };
     componentDidMount() {
         T.ready('/user', () => {
             const { shcc } = this.props.system && this.props.system.user ? this.props.system.user : { shcc: '' };
-            this.setState({ filter: { list_shcc: shcc, list_dv: '', fromYear: null, toYear: null, timeType: 0, tinhTrang: null } });
+            this.setState({ filter: { list_shcc: shcc, list_dv: '', fromYear: null, toYear: null, tinhTrang: null, timeType: 0 } });
             this.getPage();
         });
     }
 
     getPage = (pageN, pageS, pageC, done) => {
-        this.props.getQtNuocNgoaiUserPage(pageN, pageS, pageC, this.state.filter, done);
+        this.props.getQtNghiKhongLuongUserPage(pageN, pageS, pageC, this.state.filter, done);
     }
 
     showModal = (e) => {
@@ -146,10 +174,10 @@ class QtNuocNgoaiUserPage extends AdminPage {
     }
 
     delete = (e, item) => {
-        T.confirm('Xóa thông tin công tác ngoài nước', 'Bạn có chắc bạn muốn xóa thông tin công tác ngoài nước này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtNuocNgoaiUserPage(item.id, error => {
-                if (error) T.notify(error.message ? error.message : 'Xoá thông tin công tác ngoài nước bị lỗi!', 'danger');
-                else T.alert('Xoá thông tin công tác ngoài nước thành công!', 'success', false, 800);
+        T.confirm('Xóa thông tin nghỉ không lương', 'Bạn có chắc bạn muốn xóa thông tin nghỉ không lương này?', 'warning', true, isConfirm => {
+            isConfirm && this.props.deleteQtNghiKhongLuongUserPage(item.id, error => {
+                if (error) T.notify(error.message ? error.message : 'Xoá thông tin nghỉ không lương bị lỗi!', 'danger');
+                else T.alert('Xoá thông tin nghỉ không lương thành công!', 'success', false, 800);
             });
         });
         e.preventDefault();
@@ -176,7 +204,7 @@ class QtNuocNgoaiUserPage extends AdminPage {
         const { isStaff, shcc } = this.props.system && this.props.system.user ? this.props.system.user : { isStaff: false, shcc: '' };
         const { firstName, lastName } = isStaff && this.props.system.user || { firstName: '', lastName: '' };
         const name = isStaff ? `${lastName} ${firstName} (${shcc})` : '';
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtNuocNgoai && this.props.qtNuocNgoai.user_page ? this.props.qtNuocNgoai.user_page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtNghiKhongLuong && this.props.qtNghiKhongLuong.user_page ? this.props.qtNghiKhongLuong.user_page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -185,9 +213,12 @@ class QtNuocNgoaiUserPage extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nội dung</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nơi làm việc</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Kinh phí</th>
+                        <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Thông tin nghỉ</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian đi làm</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tổng thời gian</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tham gia BHXH</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thời gian báo giảm</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tham gia báo tăng</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tình trạng</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
@@ -199,32 +230,50 @@ class QtNuocNgoaiUserPage extends AdminPage {
                             <>
                                 <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span></span><br />
                                 <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span></span> <br />
-                                <span style={{ whiteSpace: 'nowrap' }}>Trở lại công tác: <span style={{ color: 'blue' }}>{item.troLaiCongTac ? T.dateToText(item.troLaiCongTac, 'dd/mm/yyyy') : ''}</span></span>
                             </>
                         )}
                         />
                         <TableCell type='text' content={(
                             <>
-                                {item.noiDung ? item.noiDung : ''}
+                                <span style={{ color: 'blue' }}>Số văn bản: </span>{item.soVanBan}<br/>
+                                <span style={{ color: 'blue' }}>Thông báo số: </span>{item.thongBaoSo}<br/>
+                                <span style={{ color: 'blue' }}>Số thông báo: </span>{item.soThongBao}
                             </>
                         )}
                         />
                         <TableCell type='text' content={(
                             <>
-                                <span style={{ whiteSpace: 'nowrap' }}>Tên cơ sở: <span>{item.tenCoSo ? item.tenCoSo : ''}</span></span><br />
-                                <span style={{ whiteSpace: 'nowrap' }}>Quốc gia: <span>{item.quocGia ? item.quocGia : ''}</span></span>
+                                <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, 'dd/mm/yyyy') : ''}</span>
                             </>
                         )}
                         />
                         <TableCell type='text' content={(
                             <>
-                                {item.kinhPhi ? item.kinhPhi : ''}
+                                <span>{item.tongThoiGian}</span>
+                            </>
+                        )}
+                        />
+                        <TableCell type='checkbox' content={(
+                            <>
+                                <span>{item.thamGiaBHXH}</span>
                             </>
                         )}
                         />
                         <TableCell type='text' content={(
                             <>
-                                <span>{(item.ketThuc == -1 || item.ketThuc >= item.today) ? <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đang diễn ra</span> : <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đã kết thúc</span>}</span>
+                                <span>{item.thoiGianBaoGiam}</span>
+                            </>
+                        )}
+                        />
+                        <TableCell type='text' content={(
+                            <>
+                                <span>{item.thoiGianBaoTang}</span>
+                            </>
+                        )}
+                        />
+                        <TableCell type='text' content={(
+                            <>
+                                <span>{(item.ketThuc == -1 || item.ketThuc >= item.today) ? <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đang nghỉ</span> : <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đã kết thúc nghỉ</span>}</span>
                             </>
                         )}></TableCell>
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
@@ -236,12 +285,12 @@ class QtNuocNgoaiUserPage extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-fighter-jet',
-            title: 'Quá trình công tác ngoài nước',
+            icon: 'fa fa-window-close',
+            title: 'Quá trình nghỉ không lương',
             subTitle: <span style={{ color: 'blue' }}>Cán bộ: {name}</span>,
             breadcrumb: [
                 <Link key={0} to='/user/'>Trang cá nhân</Link>,
-                'Công tác ngoài nước'
+                'Danh sách nghỉ không lương'
             ],
             content: <>
                 <div className='tile'>
@@ -250,7 +299,7 @@ class QtNuocNgoaiUserPage extends AdminPage {
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} shcc={this.shcc} readOnly={!permission.write}
-                    create={this.props.createQtNuocNgoaiUserPage} update={this.props.updateQtNuocNgoaiUserPage}
+                    create={this.props.createQtNghiKhongLuongUserPage} update={this.props.updateQtNghiKhongLuongUserPage}
                 />
             </>,
             backRoute: '/user',
@@ -259,9 +308,9 @@ class QtNuocNgoaiUserPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, qtNuocNgoai: state.tccb.qtNuocNgoai });
+const mapStateToProps = state => ({ system: state.system, qtNghiKhongLuong: state.tccb.qtNghiKhongLuong });
 const mapActionsToProps = {
-    getQtNuocNgoaiUserPage, deleteQtNuocNgoaiUserPage,
-    updateQtNuocNgoaiUserPage, createQtNuocNgoaiUserPage,
+    getQtNghiKhongLuongUserPage, deleteQtNghiKhongLuongUserPage,
+    updateQtNghiKhongLuongUserPage, createQtNghiKhongLuongUserPage,
 };
-export default connect(mapStateToProps, mapActionsToProps)(QtNuocNgoaiUserPage);
+export default connect(mapStateToProps, mapActionsToProps)(QtNghiKhongLuongUserPage);

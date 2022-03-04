@@ -159,7 +159,7 @@ class QtCongTacTrongNuocUserPage extends AdminPage {
     componentDidMount() {
         T.ready('/user', () => {
             const { shcc } = this.props.system && this.props.system.user ? this.props.system.user : { shcc: '' };
-            this.setState({ filter: { list_shcc: shcc, list_dv: '', fromYear: null, toYear: null, timeType: 0, tinhTrang: null } });
+            this.setState({ filter: { list_shcc: shcc, list_dv: '', fromYear: null, toYear: null, timeType: 0, tinhTrang: null, loaiHocVi: null, mucDich: null } });
             this.getPage();
         });
     }
@@ -249,7 +249,7 @@ class QtCongTacTrongNuocUserPage extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-fighter-jet',
+            icon: 'fa fa-pencil-square-o',
             title: 'Quá trình công tác trong nước',
             subTitle: <span style={{ color: 'blue' }}>Cán bộ: {name}</span>,
             breadcrumb: [

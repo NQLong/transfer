@@ -1,22 +1,17 @@
+
 import React from 'react';
 
 export const DefaultColors = {
-    blue: '#007bff',
     red: '#dc3545',
     orange: 'rgb(255, 159, 64)',
-    green: '#28a745',
     yellow: '#ffc107',
+    green: '#28a745',
+    blue: '#007bff',
+    info: '#11a2b8',
+    grey: 'rgb(201, 203, 207)',
     purple: 'rgb(153, 102, 255)',
-    grey: 'rgb(201, 203, 207)'
 };
 
-function deepEqual(x, y) {
-    return (x && y && typeof x === 'object' && typeof y === 'object') ?
-        (Object.keys(x).length === Object.keys(y).length) &&
-        Object.keys(x).reduce(function (isEqual, key) {
-            return isEqual && deepEqual(x[key], y[key]);
-        }, true) : (x === y);
-}
 export class ChartBase extends React.Component {
     canvas = React.createRef();
 
@@ -28,12 +23,14 @@ export class ChartBase extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        const prevConfig = this.constructor.dataToConfig(prevProps.data, prevProps.color);
-        const config = this.constructor.dataToConfig(this.props.data, this.props.color);
+        const prevConfig =  prevProps.data;
+        const config = this.props.data;
 
+        const prevDatasets = prevConfig.datasets ? prevConfig.datasets : [];
+        const thisDatasets = config.datasets ? config.datasets : [];
         // if (!_.isEqual(prevConfig, config)) {
-        if (!deepEqual(prevConfig, config)) {
-            this.chart.data = config.data;
+        if (prevDatasets.length || (thisDatasets.length && JSON.stringify(prevDatasets) !== JSON.stringify(thisDatasets))) {
+            this.chart.data = config;
             this.chart.update();
         }
     }
@@ -42,33 +39,16 @@ export class ChartBase extends React.Component {
 }
 
 export class DoughnutChart extends ChartBase {
-    static dataToConfig = (data, backgroundColor = Object.values(DefaultColors)) => {
-        //#region explain
-        // data = [{ value: 20, title: 'nam'}, {value: 12, title: 'nu'}];
-        // =>
-        // config = {
-        //     ...,
-        //     data: {
-        //         datasets: [{
-        //             data: [20, 12],
-        //             backgroundColor: [...]
-        //         }],
-        //         label: ['nam', 'nu']
-        //     }
-        // }
-        //#endregion explain
+    static dataToConfig = (data) => {
 
         if (!data || !data.map) data = [];
-        const dataValue = data.map(item => item.value);
-        const dataLabels = data.map(item => item.title);
+        const datasets = data.data ? data.datasets : [];
+        const dataLabels = data.data ? data.labels : [];
         return {
             type: 'doughnut',
             data: {
-                datasets: [{
-                    data: dataValue,
-                    backgroundColor,
-                }],
-                labels: dataLabels
+                datasets: datasets,
+                labels: dataLabels,
             },
             options: {
                 responsive: true
@@ -77,41 +57,41 @@ export class DoughnutChart extends ChartBase {
     }
 }
 
-// export class PieChart extends ChartBase {
-//     static dataToConfig = (data, backgroundColor = Object.values(DefaultColors)) => {
-//         //#region explain
-//         // data = [{ value: 20, title: 'nam'}, {value: 12, title: 'nu'}];
-//         // =>
-//         // config = {
-//         //     ...,
-//         //     data: {
-//         //         datasets: [{
-//         //             data: [20, 12],
-//         //             backgroundColor: [...]
-//         //         }],
-//         //         label: ['nam', 'nu']
-//         //     }
-//         // }
-//         //#endregion explain
+export class PieChart extends ChartBase {
+    static dataToConfig = (data) => {
+        //         //#region explain
+        //         // data = [{ value: 20, title: 'nam'}, {value: 12, title: 'nu'}];
+        //         // =>
+        //         // config = {
+        //         //     ...,
+        //         //     data: {
+        //         //         datasets: [{
+        //         //             data: [20, 12],
+        //         //             backgroundColor: [...]
+        //         //         }],
+        //         //         label: ['nam', 'nu']
+        //         //     }
+        //         // }
+        //         //#endregion explain
 
-//         if (!data || !data.map) data = [];
-//         const dataValue = data.map(item => item.value);
-//         const dataLabels = data.map(item => item.title);
-//         return {
-//             type: 'pie',
-//             data: {
-//                 datasets: [{
-//                     data: dataValue,
-//                     backgroundColor,
-//                 }],
-//                 labels: dataLabels
-//             },
-//             options: {
-//                 responsive: true
-//             }
-//         }
-//     }
-// }
+        //         if (!data || !data.map) data = [];
+        //         const dataValue = data.map(item => item.value);
+        //         const dataLabels = data.map(item => item.title);
+        if (!data || !data.map) data = [];
+        const datasets = data.data ? data.datasets : [];
+        const dataLabels = data.data ? data.labels : [];
+        return {
+            type: 'pie',
+            data: {
+                datasets: datasets,
+                labels: dataLabels,
+            },
+            options: {
+                responsive: true
+            }
+        };
+    }
+}
 
 export class LineChart extends ChartBase {
     // static dataToConfig = (data, backgroundColor = Object.values(DefaultColors)) => {
@@ -202,15 +182,15 @@ export class BarChart extends ChartBase {
         // if (!data || !data.map) data = [];
         if (!data) data = {};
         // const dataValue = data.data.value.map(item => item);
-        const dataLabels = data.data.labels.map(item => item);
-
+        const dataLabels = data.data && data.data.labels.length > 0 ? data.labels.map(item => item) : [];
+        const datasets = data.data ? data.datasets : [];
         return {
             type: 'bar',
             data: {
                 ticks: {
                     align: 'bottom'
                 },
-                datasets: data.data.datasets,
+                datasets: datasets,
                 labels: dataLabels
             },
             options: {

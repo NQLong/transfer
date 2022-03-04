@@ -1,25 +1,25 @@
 //TEMPLATES: admin
 import Loadable from 'react-loadable';
 import Loading from 'view/component/Loading';
-import qtHuongDanLuanVan from './redux';
+import qtNghiKhongLuong from './redux';
 
 export default {
     redux: {
         parent: 'tccb',
-        reducers: { qtHuongDanLuanVan }
+        reducers: { qtNghiKhongLuong }
     },
     routes: [
         {
-            path: '/user/tccb/qua-trinh/hdlv/group/:shcc',
-            component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
-        },
-        {
-            path: '/user/tccb/qua-trinh/hdlv',
+            path: '/user/tccb/qua-trinh/nghi-khong-luong',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
         {
-            path: '/user/huong-dan-luan-van',
+            path: '/user/nghi-khong-luong',
             component: Loadable({ loading: Loading, loader: () => import('./staffPage') })
-        }
+        },
+        // {
+        //     path: '/user/tccb/qua-trinh/nghi-khong-luong/group/:shcc',
+        //     component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
+        // },
     ],
 };
