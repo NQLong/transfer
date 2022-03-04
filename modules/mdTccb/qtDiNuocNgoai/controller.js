@@ -127,7 +127,7 @@ module.exports = app => {
 
     app.delete('/api/qua-trinh/di-nuoc-ngoai', app.permission.check('staff:write'), (req, res) =>
         app.model.qtDiNuocNgoai.delete({ id: req.body.id }, (error) => res.send(error)));
-    
+
     app.get('/api/qua-trinh/di-nuoc-ngoai/download-excel/:list_shcc/:list_dv/:fromYear/:toYear/:timeType/:tinhTrang/:loaiHocVi/:mucDich', app.permission.check('qtDiNuocNgoai:read'), (req, res) => {
         let { list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang, loaiHocVi, mucDich } = req.params ? req.params : { list_shcc: null, list_dv: null, toYear: null, timeType: 0, tinhTrang: null, loaiHocVi: null, mucDich: null };
         if (list_shcc == 'null') list_shcc = null;
@@ -145,7 +145,7 @@ module.exports = app => {
                     worksheet = workbook.addWorksheet('dinuocngoai');
                 new Promise(resolve => {
                     let cells = [
-                    // Table name: QT_DI_NUOC_NGOAI { id, shcc, quocGia, ngayDi, ngayDiType, ngayVe, ngayVeType, mucDich, noiDung, chiPhi, ghiChu, soQuyetDinh, ngayQuyetDinh }
+                        // QT_DI_NUOC_NGOAI { id, shcc, quocGia, ngayDi, ngayDiType, ngayVe, ngayVeType, mucDich, noiDung, chiPhi, ghiChu, soQuyetDinh, ngayQuyetDinh }
                         { cell: 'A1', value: 'STT', bold: true, border: '1234' },
                         { cell: 'B1', value: 'NGÀY QĐ', bold: true, border: '1234' },
                         { cell: 'C1', value: 'SỐ QĐ', bold: true, border: '1234' },
