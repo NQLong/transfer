@@ -19,9 +19,10 @@ import { getSystemState, register, login, forgotPassword, logout } from 'modules
 
 // Load modules -------------------------------------------------------------------------------------------------------------------------------------
 import { modules } from './modules';
+
 const reducers = {}, routeMapper = {},
     addRoute = route => {
-        if (!route.path.startsWith('/user')) routeMapper[route.path] = <Route key={route.path} {...route} />;
+        if (!route.path.startsWith('/user')) routeMapper[route.path] = <Route key={route.path} {...route} exact />;
     };
 modules.forEach(module => {
     Object.keys(module.redux).forEach(key => reducers[key] = module.redux[key]);
@@ -35,28 +36,40 @@ window.T = T;
 class App extends React.Component {
     loader = React.createRef();
     loginModal = React.createRef();
-    state = { routes: [] };
+    state = { routes: [], loading: true };
 
     componentDidMount() {
-        const done = () => {
-            if ($(this.loader.current).length > 0 && this.props.system && this.props.system.menus) { // Finished loading
-                this.loader.current.isShown() && this.loader.current.hide();
-                let menuList = [...this.props.system.menus];
-                menuList.map(item => {
-                    const link = item.link ? item.link.toLowerCase() : '/';
-                    if (item.submenus) {
-                        menuList.push(item.submenus);
+        $(document).ready(() => {
+            const handleHideLoader = () => {
+                if (this.loader) {
+                    this.loader.current.isShown() && this.loader.current.hide();
+                    this.setState({ loading: false });
+                }
+            };
+
+            this.props.getSystemState(data => {
+                // Handle setup routes
+                if (data && data.menus && data.menus.length) {
+                    let menuList = [data.menus];
+                    while (menuList.length) {
+                        const menus = menuList.pop();
+                        for (let i = 0; i < menus.length; i++) {
+                            const item = menus[i],
+                                link = item.link ? item.link.toLowerCase() : '/';
+                            if (item.submenus && item.submenus.length > 0) {
+                                menuList.push(item.submenus);
+                            }
+                            if (!link.startsWith('http://') && !link.startsWith('https://') && routeMapper[link] == undefined) {
+                                addRoute({ path: link, component: Loadable({ loading: Loading, loader: () => import('view/component/MenuPage') }) });
+                            }
+                        }
                     }
-                    if (!link.startsWith('http://') && !link.startsWith('https://') && routeMapper[link] == undefined) {
-                        addRoute({ path: link, component: Loadable({ loading: Loading, loader: () => import('view/component/MenuPage') }) });
-                    }
-                });
-                this.setState({ routes: Object.keys(routeMapper).sort().reverse().map(key => routeMapper[key]) });
-            } else {
-                setTimeout(done, 200);
-            }
-        };
-        $(document).ready(done);
+                    this.setState({ routes: Object.keys(routeMapper).sort().reverse().map(key => routeMapper[key]) }, handleHideLoader);
+                } else {
+                    this.setState({ routes: Object.keys(routeMapper).sort().reverse().map(key => routeMapper[key]) }, handleHideLoader);
+                }
+            });
+        });
     }
 
     showLoginModal = e => {
@@ -75,7 +88,9 @@ class App extends React.Component {
                     <HomeMenu showLoginModal={this.showLoginModal} />
                     <Switch>
                         {this.state.routes}
-                        <Route path='**' component={Loadable({ loading: Loading, loader: () => import('view/component/MessagePage') })} />
+                        {!this.state.loading && (
+                            <Route path='**' component={Loadable({ loading: Loading, loader: () => import('view/component/MessagePage') })} />
+                        )}
                     </Switch>
                     <HomeFooter />
                     <LoginModal ref={this.loginModal} register={this.props.register} login={this.props.login} forgotPassword={this.props.forgotPassword} pushHistory={url => this.props.history.push(url)} />
@@ -86,8 +101,5 @@ class App extends React.Component {
     }
 }
 
-const Main = connect(state => ({ system: state.system }), { register, login, forgotPassword, logout })(App);
-ReactDOM.render(<Provider store={store}
-><Main />
-</Provider>,
-    document.getElementById('app'));
+const Main = connect(state => ({ system: state.system }), { register, login, forgotPassword, logout, getSystemState })(App);
+ReactDOM.render(<Provider store={store}><Main /></Provider>, document.getElementById('app'));
