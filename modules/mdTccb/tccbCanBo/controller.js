@@ -2249,7 +2249,7 @@ module.exports = app => {
                 } else {
                     app.deleteImage(item.image);
                     let srcPath = files.CanBoImage[0].path,
-                        image = '/img/user/avatar/' + item.ma + app.path.extname(srcPath);
+                        image = '/img/user/avatar/' + item.email.trim() + app.path.extname(srcPath);
                     app.fs.rename(srcPath, app.path.join(app.publicPath, image), error => {
                         if (error) {
                             done({ error });
