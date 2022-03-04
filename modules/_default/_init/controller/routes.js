@@ -78,8 +78,8 @@ module.exports = app => {
                                     data.submenus = submenus.slice();
                                 }
                                 app.model.setting.getValue(['header', 'address', 'headerTitle', 'headerLink', 'isShowHeaderTitle', 'address2', 'mapLink'], result => {
-                                    data.header = result.header;
-                                    data.address = result.address;
+                                    // data.header = result.header;
+                                    // data.address = result.address;
                                     data.headerTitle = result.headerTitle;
                                     data.headerLink = result.headerLink;
                                     data.address2 = result.address2;
