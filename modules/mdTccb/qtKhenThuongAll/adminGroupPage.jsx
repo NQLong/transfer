@@ -30,8 +30,8 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        let { id, maLoaiDoiTuong, ma, namDatDuoc, maThanhTich, maChuThich, diemThiDua } = item ? item : {
-            id: '', maLoaiDoiTuong: '', ma: '', namDatDuoc: '', maThanhTich: '', maChuThich: '', diemThiDua: ''
+        let { id, maLoaiDoiTuong, ma, namDatDuoc, maThanhTich, maChuThich, diemThiDua, soQuyetDinh } = item ? item : {
+            id: '', maLoaiDoiTuong: '', ma: '', namDatDuoc: '', maThanhTich: '', maChuThich: '', diemThiDua: '', soQuyetDinh: ''
         };
 
         if (!maLoaiDoiTuong) maLoaiDoiTuong = this.props.loaiDoiTuong;
@@ -49,6 +49,7 @@ class EditModal extends AdminModal {
             this.thanhTich.value(maThanhTich ? maThanhTich : '');
             this.chuThich.value(maChuThich ? maChuThich : '');
             this.diemThiDua.value(diemThiDua);
+            this.soQuyetDinh.value(soQuyetDinh ? soQuyetDinh : '');
         }, 100);
     };
 
@@ -68,6 +69,7 @@ class EditModal extends AdminModal {
             thanhTich: this.thanhTich.value(),
             chuThich: this.chuThich.value(),
             diemThiDua: this.diemThiDua.value(),
+            soQuyetDinh: this.soQuyetDinh.value(),
         };
         if (!this.loaiDoiTuong.value()) {
             T.notify('Loại đối tượng trống', 'danger');
@@ -88,6 +90,7 @@ class EditModal extends AdminModal {
     }
     render = () => {
         const doiTuong = this.state.doiTuong;
+        const readOnly = this.props.readOnly;
         return this.renderModal({
             title: this.state.id ? 'Cập nhật quá trình khen thưởng' : 'Tạo mới quá trình khen thưởng',
             size: 'large',
@@ -104,10 +107,11 @@ class EditModal extends AdminModal {
 
                 <FormSelect className='col-md-12' ref={e => this.maBoMon = e} label='Bộ môn' data={SelectAdapter_DmBoMon} style={doiTuong == '04' ? {} : { display: 'none' }} readOnly={true} />
 
-                <FormSelect className='col-md-12' ref={e => this.thanhTich = e} label='Thành tích' data={SelectAdapter_DmKhenThuongKyHieuV2} readOnly={false} required />
-                <FormTextBox className='col-md-4' ref={e => this.namDatDuoc = e} label='Năm đạt được (yyyy)' type='year' readOnly={false} />
-                <FormSelect className='col-md-8' ref={e => this.chuThich = e} label='Chú thích' data={SelectAdapter_DmKhenThuongChuThichV2} readOnly={false} />
-                <FormTextBox className='col-md-4' ref={e => this.diemThiDua = e} type='number' label='Điểm thi đua' readOnly={false} />
+                <FormTextBox className='col-md-4' ref={e => this.soQuyetDinh = e} type='text' label='Số quyết định' readOnly={readOnly} />
+                <FormSelect className='col-md-8' ref={e => this.thanhTich = e} label='Thành tích' data={SelectAdapter_DmKhenThuongKyHieuV2} readOnly={readOnly} required />
+                <FormTextBox className='col-md-4' ref={e => this.namDatDuoc = e} label='Năm đạt được (yyyy)' type='year' readOnly={readOnly} />
+                <FormSelect className='col-md-8' ref={e => this.chuThich = e} label='Chú thích' data={SelectAdapter_DmKhenThuongChuThichV2} readOnly={readOnly} />
+                <FormTextBox className='col-md-4' ref={e => this.diemThiDua = e} type='number' label='Điểm thi đua' readOnly={readOnly} />
 
             </div>
         });
@@ -209,6 +213,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Đối tượng</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm đạt được</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thành tích</th>
                         <th style={{ width: 'auto', textAlign: 'right', whiteSpace: 'nowrap' }}>Điểm thi đua</th>
@@ -243,6 +248,12 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                                             {'KHOA ' + item.tenDonViBoMon}
                                         </>
 
+                        )}
+                        />
+                        <TableCell type='text' style={{ textAlign: 'center' }} content={(
+                            <>
+                                {item.soQuyetDinh ? item.soQuyetDinh : ''}
+                            </>
                         )}
                         />
                         <TableCell type='text' content={(

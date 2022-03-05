@@ -31,8 +31,8 @@ class EditModal extends AdminModal {
 
     onShow = (item, multiple = true) => {
         this.multiple = multiple;
-        let { id, maLoaiDoiTuong, ma, namDatDuoc, maThanhTich, maChuThich, diemThiDua } = item ? item : {
-            id: '', maLoaiDoiTuong: '', ma: '', namDatDuoc: '', maThanhTich: '', maChuThich: '', diemThiDua: ''
+        let { id, maLoaiDoiTuong, ma, namDatDuoc, maThanhTich, maChuThich, diemThiDua, soQuyetDinh } = item ? item : {
+            id: '', maLoaiDoiTuong: '', ma: '', namDatDuoc: '', maThanhTich: '', maChuThich: '', diemThiDua: '', soQuyetDinh: ''
         };
         this.setState({
             id: id, doiTuong: maLoaiDoiTuong
@@ -47,6 +47,7 @@ class EditModal extends AdminModal {
         this.thanhTich.value(maThanhTich ? maThanhTich : '');
         this.chuThich.value(maChuThich ? maChuThich : '');
         this.diemThiDua.value(diemThiDua);
+        this.soQuyetDinh.value(soQuyetDinh ? soQuyetDinh : '');
     };
 
     changeKichHoat = (value, target) => target.value(value ? 1 : 0) || target.value(value);
@@ -81,6 +82,7 @@ class EditModal extends AdminModal {
                     thanhTich: this.thanhTich.value(),
                     chuThich: this.chuThich.value(),
                     diemThiDua: this.diemThiDua.value(),
+                    soQuyetDinh: this.soQuyetDinh.value(),
                 };
                 if (index == list_ma.length - 1) {
                     this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
@@ -104,12 +106,12 @@ class EditModal extends AdminModal {
 
     render = () => {
         const doiTuong = this.state.doiTuong;
-        const readOnly = this.state.id ? true : this.props.readOnly;
+        const readOnly = this.props.readOnly;
         return this.renderModal({
             title: this.state.id ? 'Cập nhật quá trình khen thưởng' : 'Tạo mới quá trình khen thưởng',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-4' ref={e => this.loaiDoiTuong = e} label='Loại đối tượng' data={this.loaiDoiTuongTable} readOnly={readOnly} onChange={value => this.onChangeDT(value.id)} required />
+                <FormSelect className='col-md-4' ref={e => this.loaiDoiTuong = e} label='Loại đối tượng' data={this.loaiDoiTuongTable} readOnly={this.state.id ? true : false} onChange={value => this.onChangeDT(value.id)} required />
 
                 <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo}
                     style={doiTuong == '02' ? {} : { display: 'none' }}
@@ -123,10 +125,11 @@ class EditModal extends AdminModal {
                     style={doiTuong == '04' ? {} : { display: 'none' }}
                     readOnly={readOnly} required />
 
-                <FormSelect className='col-md-12' ref={e => this.thanhTich = e} label='Thành tích' data={SelectAdapter_DmKhenThuongKyHieuV2} readOnly={false} required />
-                <FormTextBox className='col-md-4' ref={e => this.namDatDuoc = e} label='Năm đạt được (yyyy)' type='year' readOnly={false} />
-                <FormSelect className='col-md-8' ref={e => this.chuThich = e} label='Chú thích' data={SelectAdapter_DmKhenThuongChuThichV2} readOnly={false} />
-                <FormTextBox className='col-md-4' ref={e => this.diemThiDua = e} type='number' label='Điểm thi đua' readOnly={false} />
+                <FormTextBox className='col-md-4' ref={e => this.soQuyetDinh = e} type='text' label='Số quyết định' readOnly={readOnly} />
+                <FormSelect className='col-md-8' ref={e => this.thanhTich = e} label='Thành tích' data={SelectAdapter_DmKhenThuongKyHieuV2} readOnly={readOnly} required />
+                <FormTextBox className='col-md-4' ref={e => this.namDatDuoc = e} label='Năm đạt được (yyyy)' type='year' readOnly={readOnly} />
+                <FormSelect className='col-md-8' ref={e => this.chuThich = e} label='Chú thích' data={SelectAdapter_DmKhenThuongChuThichV2} readOnly={readOnly} />
+                <FormTextBox className='col-md-4' ref={e => this.diemThiDua = e} type='number' label='Điểm thi đua' readOnly={readOnly} />
 
             </div>
         });
@@ -208,14 +211,15 @@ class QtKhenThuongAll extends AdminPage {
         this.getPage();
     }
 
-    list = (text, i) => {
+    list = (text, i, list_year) => {
         if (!text) return [];
         let deTais = text.split('??');
+        let years = list_year.split('??');
         let results = [];
         let choose = i > 15 ? 15 : i;
         for (let k = 0; k < choose; k++) {
             results.push(<p style={{ textTransform: 'uppercase' }}> <span>
-                Lần {k+1}. {deTais[k]}
+                Lần {k+1}. {deTais[k]} ({years[k].trim()})
             </span></p>);
         }
         if (i > 15) {
@@ -224,7 +228,7 @@ class QtKhenThuongAll extends AdminPage {
             </span></p>);
             let k = i - 1;
             results.push(<p style={{ textTransform: 'uppercase' }}> <span>
-                Lần {k+1}. {deTais[k]}
+                Lần {k+1}. {deTais[k]} ({years[k].trim()})
             </span></p>);
         }
         return results;
@@ -285,6 +289,7 @@ class QtKhenThuongAll extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Đối tượng</th>
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm đạt được</th>}
                         {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thành tích</th>}
                         {!this.checked && <th style={{ width: 'auto', textAlign: 'right', whiteSpace: 'nowrap' }}>Điểm thi đua</th>}
@@ -326,6 +331,12 @@ class QtKhenThuongAll extends AdminPage {
                         />
                         {!this.checked && <TableCell type='text' style={{ textAlign: 'center' }} content={(
                             <>
+                                {item.soQuyetDinh ? item.soQuyetDinh : ''}
+                            </>
+                        )}
+                        />}
+                        {!this.checked && <TableCell type='text' style={{ textAlign: 'center' }} content={(
+                            <>
                                 {item.namDatDuoc}
                             </>
                         )}
@@ -338,7 +349,7 @@ class QtKhenThuongAll extends AdminPage {
                         />}
                         {!this.checked && <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemThiDua} />}
                         {this.checked && <TableCell type='text' style={{ textAlign: 'left' }} content={item.soKhenThuong} />}
-                        {this.checked && <TableCell type='text' content={this.list(item.danhSachKhenThuong, item.soKhenThuong)} />}
+                        {this.checked && <TableCell type='text' content={this.list(item.danhSachKhenThuong, item.soKhenThuong, item.danhSachNamDatDuoc)} />}
                         <TableCell type='text' content={item.tenLoaiDoiTuong} />
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}

@@ -27,8 +27,8 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        let { id, namDatDuoc, maThanhTich, maChuThich, diemThiDua } = item && item.item ? item.item : {
-            id: '', namDatDuoc: '', maThanhTich: '', maChuThich: '', diemThiDua: ''
+        let { id, namDatDuoc, maThanhTich, maChuThich, diemThiDua, soQuyetDinh } = item && item.item ? item.item : {
+            id: '', namDatDuoc: '', maThanhTich: '', maChuThich: '', diemThiDua: '', soQuyetDinh: ''
         };
 
         this.setState({
@@ -41,6 +41,7 @@ class EditModal extends AdminModal {
             this.thanhTich.value(maThanhTich ? maThanhTich : '');
             this.chuThich.value(maChuThich ? maChuThich : '');
             this.diemThiDua.value(diemThiDua);
+            this.soQuyetDinh.value(soQuyetDinh ? soQuyetDinh : '');
         }, 100);
     };
 
@@ -55,6 +56,7 @@ class EditModal extends AdminModal {
             thanhTich: this.thanhTich.value(),
             chuThich: this.chuThich.value(),
             diemThiDua: this.diemThiDua.value(),
+            soQuyetDinh: this.soQuyetDinh.value(),
         };
         if (!this.thanhTich.value()) {
             T.notify('Thành tích trống', 'danger');
@@ -68,11 +70,11 @@ class EditModal extends AdminModal {
             title: this.state.id ? 'Cập nhật quá trình khen thưởng' : 'Tạo mới quá trình khen thưởng',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12' ref={e => this.thanhTich = e} label='Thành tích' data={SelectAdapter_DmKhenThuongKyHieuV2} readOnly={readOnly} required />
+                <FormTextBox className='col-md-4' ref={e => this.soQuyetDinh = e} type='text' label='Số quyết định' readOnly={readOnly} />
+                <FormSelect className='col-md-8' ref={e => this.thanhTich = e} label='Thành tích' data={SelectAdapter_DmKhenThuongKyHieuV2} readOnly={readOnly} required />
                 <FormTextBox className='col-md-4' ref={e => this.namDatDuoc = e} label='Năm đạt được (yyyy)' type='year' readOnly={readOnly} />
                 <FormSelect className='col-md-8' ref={e => this.chuThich = e} label='Chú thích' data={SelectAdapter_DmKhenThuongChuThichV2} readOnly={readOnly} />
                 <FormTextBox className='col-md-4' ref={e => this.diemThiDua = e} type='number' label='Điểm thi đua' readOnly={readOnly} />
-
             </div>
         });
     }
@@ -126,6 +128,7 @@ class QtKhenThuongAllUserPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>
                         <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Thành tích</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm đạt được</th>
                         <th style={{ width: 'auto', textAlign: 'right', whiteSpace: 'nowrap' }}>Điểm thi đua</th>
@@ -135,6 +138,12 @@ class QtKhenThuongAllUserPage extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
+                        <TableCell type='text' style={{ textAlign: 'center' }} content={(
+                            <>
+                                {item.soQuyetDinh ? item.soQuyetDinh : ''}
+                            </>
+                        )}
+                        />
                         <TableCell type='text' content={(
                             <>
                                 {item.tenThanhTich}

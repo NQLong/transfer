@@ -163,16 +163,16 @@ module.exports = app => {
                 new Promise(resolve => {
                     let cols = [];
                     if (loaiDoiTuong == '-1') {
-                        cols = ['STT', 'LOẠI ĐỐI TƯỢNG', 'ĐỐI TƯỢNG', 'NĂM ĐẠT ĐƯỢC', 'THÀNH TÍCH', 'CHÚ THÍCH', 'ĐIỂM THI ĐUA'];
+                        cols = ['STT', 'SỐ QUYẾT ĐỊNH', 'LOẠI ĐỐI TƯỢNG', 'ĐỐI TƯỢNG', 'NĂM ĐẠT ĐƯỢC', 'THÀNH TÍCH', 'CHÚ THÍCH', 'ĐIỂM THI ĐUA'];
                     }
                     if (loaiDoiTuong == '01') {
-                        cols = ['STT', 'NĂM ĐẠT ĐƯỢC', 'THÀNH TÍCH', 'CHÚ THÍCH', 'ĐIỂM THI ĐUA'];
+                        cols = ['STT', 'SỐ QUYẾT ĐỊNH', 'NĂM ĐẠT ĐƯỢC', 'THÀNH TÍCH', 'CHÚ THÍCH', 'ĐIỂM THI ĐUA'];
                     }
                     if (loaiDoiTuong == '02') {
-                        cols = ['STT', 'SHCC', 'HỌ', 'TÊN', 'NĂM ĐẠT ĐƯỢC', 'THÀNH TÍCH', 'CHÚ THÍCH', 'ĐIỂM THI ĐUA'];
+                        cols = ['STT', 'SỐ QUYẾT ĐỊNH', 'SHCC', 'HỌ', 'TÊN', 'NĂM ĐẠT ĐƯỢC', 'THÀNH TÍCH', 'CHÚ THÍCH', 'ĐIỂM THI ĐUA'];
                     }
                     if (loaiDoiTuong == '03' || loaiDoiTuong == '04') {
-                        cols = ['STT', 'ĐƠN VỊ', 'BỘ MÔN', 'NĂM ĐẠT ĐƯỢC', 'THÀNH TÍCH', 'CHÚ THÍCH', 'ĐIỂM THI ĐUA'];
+                        cols = ['STT', 'SỐ QUYẾT ĐỊNH', 'ĐƠN VỊ', 'BỘ MÔN', 'NĂM ĐẠT ĐƯỢC', 'THÀNH TÍCH', 'CHÚ THÍCH', 'ĐIỂM THI ĐUA'];
                     }
                     let cells = [];
                     for (let idx = 0; idx < cols.length; idx++) {
@@ -186,6 +186,7 @@ module.exports = app => {
                             let value = null;
                             let type = cols[idx];
                             if (type == 'LOẠI ĐỐI TƯỢNG') value = item.tenLoaiDoiTuong;
+                            if (type == 'SỐ QUYẾT ĐỊNH') value = item.soQuyetDinh;
                             if (type == 'ĐỐI TƯỢNG') {
                                 if (item.maLoaiDoiTuong == '01') {
                                     value = 'Trường Đai học Khoa học Xã Hội và Nhân Văn - Đại học Quốc Gia TP.HCM';
