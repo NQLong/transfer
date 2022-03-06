@@ -1769,6 +1769,39 @@
         "foreignKeys": [],
         "type": "table"
     },
+    "DM_LOAI_CHI_PHI": {
+        "active": true,
+        "moduleName": "dmLoaiChiPhi",
+        "modelName": "dmLoaiChiPhi",
+        "columns": {
+            "MA": {
+                "value": "ma",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": false,
+                "size": 2
+            },
+            "TEN": {
+                "value": "ten",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 50
+            },
+            "KICH_HOAT": {
+                "value": "kichHoat",
+                "dataType": "NUMBER",
+                "dataDefault": "1",
+                "nullable": true,
+                "size": "1,0"
+            }
+        },
+        "primaryKeys": [
+            "MA"
+        ],
+        "foreignKeys": [],
+        "type": "table"
+    },
     "DM_LOAI_DON_VI": {
         "active": true,
         "moduleName": "dmLoaiDonVi",
@@ -7673,6 +7706,13 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": "22,0"
+            },
+            "SO_QUYET_DINH": {
+                "value": "soQuyetDinh",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 30
             }
         },
         "primaryKeys": [
