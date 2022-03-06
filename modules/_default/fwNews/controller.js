@@ -745,6 +745,11 @@ module.exports = app => {
     // Hook ready -----------------------------------------------------------------------------------------------------------------------------------
     app.readyHooks.add('readyNews', {
         ready: () => app.dbConnection != null && app.model != null && app.model.fwNews != null,
-        run: () => app.model.fwNews.count((error, numberOfNews) => app.data.numberOfNews = error ? 0 : numberOfNews.rows[0]['COUNT(*)']),
+        run: () => app.model.fwNews.count((error, numberOfNews) => {
+            if (error == null) {
+                numberOfNews = Number(numberOfNews);
+                app.model.setting.setValue({ numberOfNews: isNaN(numberOfNews) ? 0 : numberOfNews });
+            }
+        }),
     });
 };

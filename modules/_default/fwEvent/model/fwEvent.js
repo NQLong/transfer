@@ -25,7 +25,7 @@ module.exports = app => {
                             if (error) {
                                 done(error);
                             } else {
-                                if (app.data && app.data.numberOfEvent) app.data.numberOfEvent++;
+                                // if (app.data && app.data.numberOfEvent) app.data.numberOfEvent++;
                                 const image = '/img/event/' + event.id + '.jpg';
                                 const srcPath = app.path.join(app.publicPath, '/img/avatar.png'),
                                     destPath = app.path.join(app.publicPath, image);
@@ -59,7 +59,7 @@ module.exports = app => {
                             if (error) {
                                 done(error);
                             } else {
-                                if (app.data && app.data.numberOfEvent) app.data.numberOfEvent--;
+                                // if (app.data && app.data.numberOfEvent) app.data.numberOfEvent--;
                                 app.deleteImage(event.image);
                                 app.model.fwEvent.delete(condition, done);
                             }
@@ -73,7 +73,7 @@ module.exports = app => {
                                     if (error) {
                                         done(error);
                                     } else {
-                                        if (app.data && app.data.numberOfEvent) app.data.numberOfEvent--;
+                                        // if (app.data && app.data.numberOfEvent) app.data.numberOfEvent--;
                                         app.deleteImage(event.image);
                                         app.model.fwEvent.delete(condition, done);
                                     }

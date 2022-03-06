@@ -1,4 +1,4 @@
-module.exports = app => {
+module.exports = (app) => {
     app.adminRole = {};
     app.clone = function () {
         const length = arguments.length;
@@ -27,15 +27,12 @@ module.exports = app => {
             app.templates[templateName] = (req, res) => {
                 const today = new Date().yyyymmdd();
                 if (req.session.today != today) {
-                    // app.redis.incr(`${appName}:todayViews`);
-                    // app.redis.incr(`${appName}:allViews`);
-                    app.data.todayViews += 1;
-                    app.data.allViews += 1;
+                    app.redis.incr(`${app.appName}_state:todayViews`);
+                    app.redis.incr(`${app.appName}_state:allViews`);
                     req.session.today = today;
                 }
 
                 if (app.isDebug) {
-
                     const http = require('http');
                     http.get(`http://localhost:${(app.port + 1) + path}`, response => {
                         let data = '';

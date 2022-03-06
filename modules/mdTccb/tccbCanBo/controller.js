@@ -26,14 +26,6 @@ module.exports = app => {
     app.get('/user/tccb/staff', app.permission.check('staff:read'), app.templates.admin);
     app.get('/user/tccb/staff/item/upload', app.permission.check('staff:write'), app.templates.admin);
 
-    app.readyHooks.add('readyUser', {
-        ready: () => app.dbConnection != null && app.model != null && app.model.canBo != null && app.model.canBo != null,
-
-        run: () => {
-            app.model.fwUser.count({}, (error, numberOfUser) => app.data.numberOfUser = error ? 0 : numberOfUser.rows[0]['COUNT(*)']);
-        }
-    });
-
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
 
@@ -2249,7 +2241,7 @@ module.exports = app => {
                 } else {
                     app.deleteImage(item.image);
                     let srcPath = files.CanBoImage[0].path,
-                        image = '/img/user/avatar/' + item.ma + app.path.extname(srcPath);
+                        image = '/img/user/avatar/' + item.email.trim() + app.path.extname(srcPath);
                     app.fs.rename(srcPath, app.path.join(app.publicPath, image), error => {
                         if (error) {
                             done({ error });
