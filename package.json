@@ -1,6 +1,6 @@
 {
     "name": "hcmussh",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "title": "TRƯỜNG ĐẠI HỌC KHOA HỌC XÃ HỘI VÀ NHÂN VĂN - ĐHQG TP.HCM",
     "description": "HCMUSSH website",
     "main": "hcmussh.web.js",
@@ -144,9 +144,9 @@
         "redis": "^3.0.2",
         "serve-favicon": "^2.5.0",
         "sftp-promises": "^1.7.1",
-        "socket.io": "^2.3.0",
-        "socket.io-client": "^4.1.3",
-        "socket.io-redis": "^5.4.0",
+        "socket.io": "^4.4.1",
+        "socket.io-client": "^4.4.1",
+        "socket.io-redis": "^6.1.1",
         "source-map-loader": "^1.1.1",
         "xlsx": "^0.15.6"
     },
