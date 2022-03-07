@@ -93,7 +93,7 @@ module.exports = (cluster, isDebug) => {
     // Listen from MASTER ---------------------------------------------------------------------------------------------
     process.on('message', message => {
         if (message.type == 'workersChanged') {
-            app.io.emit('workers-changed', message.workers);
+            app.io && app.io.emit('workers-changed', message.workers);
             app.worker.items = message.workers;
         } else if (message.type == 'resetWorker') {
             server.close();

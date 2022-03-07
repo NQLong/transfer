@@ -106,7 +106,7 @@ module.exports = app => {
             } else {
                 const views = ++items[0].views;
                 app.model.fwNews.update(condition, { views }, (error, item) => {
-                    app.io.emit('news:item-view-changed', item.id, item.views);
+                    app.io && app.io.emit('news:item-view-changed', item.id, item.views);
                     done(error, item);
                 });
             }
