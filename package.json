@@ -1,6 +1,6 @@
 {
     "name": "hcmussh",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "title": "TRƯỜNG ĐẠI HỌC KHOA HỌC XÃ HỘI VÀ NHÂN VĂN - ĐHQG TP.HCM",
     "description": "HCMUSSH website",
     "main": "hcmussh.web.js",
@@ -16,11 +16,6 @@
         "prepare": "husky install",
         "lint:fix": "npm run lint --  --fix",
         "lint": "eslint . --ext .jsx,.js --ignore-path .gitignore"
-    },
-    "redisDB": {
-        "host": "10.22.1.49",
-        "port": 6379,
-        "auth": "6GmpjC44wnCwKR8BBhCbnw2NFJNG7NJm"
     },
     "db": {
         "owner": "DEV_HCMUSSH",
