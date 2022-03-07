@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getEventInPage, getEventByCategoryAdmin, createEvent, updateEvent, swapEvent, deleteEvent } from 'modules/_default/fwEvent/redux';
+import { getEventInPage, getEventByCategoryAdmin, createEvent, updateEvent, swapEvent, deleteEvent } from 'modules/mdTruyenThong/fwEvent/redux';
 import { getTuyenSinh } from 'modules/_default/_init/reduxCategory';
 import { Link } from 'react-router-dom';
 import Pagination from 'view/component/Pagination';

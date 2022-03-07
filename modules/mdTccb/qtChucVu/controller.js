@@ -155,17 +155,20 @@ module.exports = app => {
                         { cell: 'E1', value: 'GIỚI TÍNH', bold: true, border: '1234' },
                         { cell: 'F1', value: 'ĐƠN VỊ CÔNG TÁC', bold: true, border: '1234' },
                         { cell: 'G1', value: 'CHỨC VỤ CHÍNH', bold: true, border: '1234' },
-                        { cell: 'H1', value: 'SỐ QĐ', bold: true, border: '1234' },
-                        { cell: 'I1', value: 'NGÀY RA QĐ', bold: true, border: '1234' },
+                        { cell: 'H1', value: 'HỆ SỐ PHỤ CẤP', bold: true, border: '1234' },
+                        { cell: 'I1', value: 'SỐ QĐ BỔ NHIỆM', bold: true, border: '1234' },
+                        { cell: 'J1', value: 'NGÀY RA QĐ', bold: true, border: '1234' },
                     ];
-                    for (let idx = 0, col = 9; idx < maxSoLuongKiemNhiem; idx++) {
+                    for (let idx = 0, col = 10; idx < maxSoLuongKiemNhiem; idx++) {
                         cells.push({ cell: String.fromCharCode(65 + col) + '1', value: 'CHỨC VỤ KIÊM NHIỆM ' + (idx + 1).toString(), bold: true, border: '1234' });
-                        cells.push({ cell: String.fromCharCode(65 + col + 1) + '1', value: 'SỐ QĐ', bold: true, border: '1234' });
-                        cells.push({ cell: String.fromCharCode(65 + col + 2) + '1', value: 'NGÀY RA QĐ', bold: true, border: '1234' });
-                        col += 3;
+                        cells.push({ cell: String.fromCharCode(65 + col + 1) + '1', value: 'ĐƠN VỊ CÔNG TÁC', bold: true, border: '1234' });
+                        cells.push({ cell: String.fromCharCode(65 + col + 2) + '1', value: 'HỆ SỐ PHỤ CẤP', bold: true, border: '1234' });
+                        cells.push({ cell: String.fromCharCode(65 + col + 3) + '1', value: 'SỐ QĐ BỔ NHIỆM', bold: true, border: '1234' });
+                        cells.push({ cell: String.fromCharCode(65 + col + 4) + '1', value: 'NGÀY RA QĐ', bold: true, border: '1234' });
+                        col += 5;
                     }
                     newRows.forEach((item, index) => {
-                        let danhSachChinh = null, chucVuChinh = null, ngayRaQdChinh = null, soQdChinh = null;
+                        let danhSachChinh = null, chucVuChinh = null, ngayRaQdChinh = null, soQdChinh = null, heSoPhuCap = null;
                         if (item.itemChinh) {
                             danhSachChinh = item.itemChinh.split('??');
                             chucVuChinh = danhSachChinh[0].trim();
@@ -173,6 +176,7 @@ module.exports = app => {
                             // boMonChinh = danhSachChinh[2].trim();
                             ngayRaQdChinh = Number(danhSachChinh[3].trim());
                             soQdChinh = danhSachChinh[4].trim();
+                            heSoPhuCap = parseFloat(danhSachChinh[5].trim());
                         }
                         let hoTen = item.ho + ' ' + item.ten;
                         cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
@@ -182,25 +186,32 @@ module.exports = app => {
                         cells.push({ cell: 'E' + (index + 2), border: '1234', value: item.gioiTinh == '01' ? 'Nam' : 'Nữ' });
                         cells.push({ cell: 'F' + (index + 2), border: '1234', value: item.tenDonVi });
                         cells.push({ cell: 'G' + (index + 2), border: '1234', value: chucVuChinh });
-                        cells.push({ cell: 'H' + (index + 2), border: '1234', value: soQdChinh });
-                        cells.push({ cell: 'I' + (index + 2), border: '1234', value: ngayRaQdChinh ? app.date.dateTimeFormat(new Date(ngayRaQdChinh), 'dd/mm/yyyy') : '' });
-                        let idx = 0, col = 9;
+                        cells.push({ cell: 'H' + (index + 2), border: '1234', value: heSoPhuCap });
+                        cells.push({ cell: 'I' + (index + 2), border: '1234', value: soQdChinh });
+                        cells.push({ cell: 'J' + (index + 2), border: '1234', value: ngayRaQdChinh ? app.date.dateTimeFormat(new Date(ngayRaQdChinh), 'dd/mm/yyyy') : '' });
+                        let idx = 0, col = 10;
                         if (item.soChucVuKiemNhiem > 0) {
                             let danhSachChucVuKiemNhiem = item.danhSachChucVuKiemNhiem.split('??');
                             let danhSachSoQdKiemNhiem = item.danhSachSoQdKiemNhiem.split('??');
                             let danhSachNgayQdKiemNhiem = item.danhSachNgayQdKiemNhiem.split('??');
+                            let danhSachHeSoPhuCapKiemNhiem = item.danhSachHeSoPhuCapKiemNhiem.split('??');
+                            let danhSachDonViKiemNhiem = item.danhSachDonViKiemNhiem.split('??');
                             for (; idx < item.soChucVuKiemNhiem; idx++) {
                                 cells.push({ cell: String.fromCharCode(65 + col) + (index + 2), border: '1234', value: danhSachChucVuKiemNhiem[idx].trim()});
-                                cells.push({ cell: String.fromCharCode(65 + col + 1) + (index + 2), border: '1234', value: danhSachSoQdKiemNhiem[idx].trim()});
-                                cells.push({ cell: String.fromCharCode(65 + col + 2) + (index + 2), border: '1234', value: danhSachNgayQdKiemNhiem[idx].trim() ? app.date.dateTimeFormat(new Date(Number(danhSachNgayQdKiemNhiem[idx].trim())), 'dd/mm/yyyy') : ''});
-                                col += 3;
+                                cells.push({ cell: String.fromCharCode(65 + col + 1) + (index + 2), border: '1234', value: danhSachDonViKiemNhiem[idx].trim()});
+                                cells.push({ cell: String.fromCharCode(65 + col + 2) + (index + 2), border: '1234', value: parseFloat(danhSachHeSoPhuCapKiemNhiem[idx].trim())});
+                                cells.push({ cell: String.fromCharCode(65 + col + 3) + (index + 2), border: '1234', value: danhSachSoQdKiemNhiem[idx].trim()});
+                                cells.push({ cell: String.fromCharCode(65 + col + 4) + (index + 2), border: '1234', value: danhSachNgayQdKiemNhiem[idx].trim() ? app.date.dateTimeFormat(new Date(Number(danhSachNgayQdKiemNhiem[idx].trim())), 'dd/mm/yyyy') : ''});
+                                col += 5;
                             }
                         }
                         for (; idx < maxSoLuongKiemNhiem; idx++) {
                             cells.push({ cell: String.fromCharCode(65 + col) + (index + 2), border: '1234', value: '' });
                             cells.push({ cell: String.fromCharCode(65 + col + 1) + (index + 2), border: '1234', value: '' });
                             cells.push({ cell: String.fromCharCode(65 + col + 2) + (index + 2), border: '1234', value: '' });
-                            col += 3;
+                            cells.push({ cell: String.fromCharCode(65 + col + 3) + (index + 2), border: '1234', value: '' });
+                            cells.push({ cell: String.fromCharCode(65 + col + 4) + (index + 2), border: '1234', value: '' });
+                            col += 5;
                         }
                     });
                     resolve(cells);

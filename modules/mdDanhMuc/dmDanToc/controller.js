@@ -24,7 +24,7 @@ module.exports = app => {
                 parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
             };
         }
-        app.model.dmDanToc.getPage(pageNumber, pageSize, condition, '*', 'ma', (error, page) => res.send({ error, page }));
+        app.model.dmDanToc.getPage(pageNumber, pageSize, condition, '*', 'ten', (error, page) => res.send({ error, page }));
     });
 
     app.get('/api/danh-muc/dan-toc/all', app.permission.check('user:login'), (req, res) => {
@@ -32,7 +32,7 @@ module.exports = app => {
     });
 
     app.get('/api/danh-muc/dan-toc/item/:ma', app.permission.check('user:login'), (req, res) => {
-        app.model.dmDanToc.get(req.params.ma, (error, item) => res.send({ error, item }));
+        app.model.dmDanToc.get({ma: req.params.ma}, (error, item) => res.send({ error, item }));
     });
 
     app.post('/api/danh-muc/dan-toc', app.permission.check('dmDanToc:write'), (req, res) => {
