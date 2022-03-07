@@ -112,7 +112,8 @@ class UserPage extends AdminPage {
                 <Pagination style={{ marginLeft: '65px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.props.getUserPage} />
                 <UserModal ref={e => this.userModal = e} permissionWrite={permission.write} allRoles={allRoles} updateUser={this.props.updateUser} createUser={this.props.createUser} changeUser={this.props.changeUser} />
             </>,
-            onCreate: permission && permission.write ? e => this.edit(e, null) : null
+            onCreate: permission && permission.write ? e => this.edit(e, null) : null,
+            backRoute: '/user/settings'
         });
     }
 }
