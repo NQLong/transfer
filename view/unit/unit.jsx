@@ -73,8 +73,10 @@ class App extends React.Component {
                                     component: Loadable({ loading: Loading, loader: () => import('view/component/MenuPage') })
                                 });
                             });
+                            this.setState({ routes: Object.keys(routeMapper).sort().reverse().map(key => routeMapper[key]) }, handleHideLoader);
+                        } else {
+                            this.setState({ routes: Object.keys(routeMapper).sort().reverse().map(key => routeMapper[key]) }, handleHideLoader);
                         }
-                        this.setState({ routes: Object.keys(routeMapper).sort().reverse().map(key => routeMapper[key]) }, handleHideLoader);
                     });
                 } else {
                     this.setState({ routes: Object.keys(routeMapper).sort().reverse().map(key => routeMapper[key]) }, handleHideLoader);
