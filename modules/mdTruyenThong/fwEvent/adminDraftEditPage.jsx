@@ -4,7 +4,7 @@ import { getDraftEvent, checkLink, createDraftEvent, updateDraftEvent } from './
 import { Link } from 'react-router-dom';
 import ImageBox from 'view/component/ImageBox';
 import Editor from 'view/component/CkEditor4';
-import SelectApplyForm from '../fwForm/sectionApplyForm';
+import SelectApplyForm from '../../_default/fwForm/sectionApplyForm';
 
 class DraftEventEditPage extends React.Component {
     constructor(props) {
