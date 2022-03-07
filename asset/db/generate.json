@@ -2739,6 +2739,13 @@
                 "dataDefault": "1",
                 "nullable": false,
                 "size": "1,0"
+            },
+            "LOAI": {
+                "value": "loai",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "1,0"
             }
         },
         "primaryKeys": [
@@ -8881,13 +8888,6 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": 10
-            },
-            "TYPE": {
-                "value": "type",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "1,0"
             },
             "DIA_CHI": {
                 "value": "diaChi",

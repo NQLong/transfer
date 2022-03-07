@@ -1,6 +1,6 @@
-// Table name: QUAN_HE_CAN_BO { id, hoTen, moiQuanHe, namSinh, ngheNghiep, noiCongTac, shcc, type, diaChi, queQuan }
+// Table name: QUAN_HE_CAN_BO { id, hoTen, moiQuanHe, namSinh, ngheNghiep, noiCongTac, shcc, diaChi, queQuan }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'hoTen': 'HO_TEN', 'moiQuanHe': 'MOI_QUAN_HE', 'namSinh': 'NAM_SINH', 'ngheNghiep': 'NGHE_NGHIEP', 'noiCongTac': 'NOI_CONG_TAC', 'shcc': 'SHCC', 'type': 'TYPE', 'diaChi': 'DIA_CHI', 'queQuan': 'QUE_QUAN' };
+const obj2Db = { 'id': 'ID', 'hoTen': 'HO_TEN', 'moiQuanHe': 'MOI_QUAN_HE', 'namSinh': 'NAM_SINH', 'ngheNghiep': 'NGHE_NGHIEP', 'noiCongTac': 'NOI_CONG_TAC', 'shcc': 'SHCC', 'diaChi': 'DIA_CHI', 'queQuan': 'QUE_QUAN' };
 
 module.exports = app => {
     app.model.quanHeCanBo = {

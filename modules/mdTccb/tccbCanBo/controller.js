@@ -1080,7 +1080,8 @@ module.exports = app => {
                 if (error || item == null) {
                     res.send({ error: 'Not found!' });
                 } else {
-                    if (item.email === req.session.user.email) {
+                    if (item.shcc === req.session.user.shcc) {
+                        console.log(req.body.id);
                         const changes = req.body.changes;
                         app.model.quanHeCanBo.update({ id: req.body.id }, changes, (error, item) => res.send({ error, item }));
                     } else {
@@ -1099,7 +1100,7 @@ module.exports = app => {
                 if (error || item == null) {
                     res.send({ error: 'Not found!' });
                 } else {
-                    if (item.email === req.session.user.email) {
+                    if (item.shcc === req.session.user.shcc) {
                         app.model.quanHeCanBo.delete({ id: req.body.id }, (error) => res.send(error));
                     } else {
                         res.send({ error: 'Not found!' });
