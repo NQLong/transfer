@@ -2230,7 +2230,7 @@ module.exports = app => {
         }
     };
     // Hook upload images ---------------------------------------------------------------------------------------------------------------------------
-    app.createFolder(app.path.join(app.publicPath, '/img/user/avatar'));
+    app.createFolder(app.path.join(app.publicPath, '/img/user'));
 
     const uploadCanBoImage = (req, fields, files, params, done) => {
         if (fields.userData && fields.userData.length && fields.userData[0].startsWith('CanBoImage:') && files.CanBoImage && files.CanBoImage.length) {
@@ -2241,14 +2241,14 @@ module.exports = app => {
                 } else {
                     app.deleteImage(item.image);
                     let srcPath = files.CanBoImage[0].path,
-                        image = '/img/user/avatar/' + item.email.trim() + app.path.extname(srcPath);
+                        image = '/img/user/' + app.path.basename(srcPath);
                     app.fs.rename(srcPath, app.path.join(app.publicPath, image), error => {
                         if (error) {
                             done({ error });
                         } else {
                             image += '?t=' + (new Date().getTime()).toString().slice(-8);
                             app.model.fwUser.update({ email: item.email }, { image }, (error, item) => {
-                                if (error == null) {
+                                if (error == null && req.session.user.email === item.email) {
                                     app.io.emit('avatar-changed', item);
                                     req.session.user.image = image;
                                 }

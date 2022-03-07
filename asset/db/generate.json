@@ -6621,6 +6621,13 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": 50
+            },
+            "LOAI_CHI_PHI": {
+                "value": "loaiChiPhi",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 2
             }
         },
         "primaryKeys": [
@@ -6841,6 +6848,13 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": "20,0"
+            },
+            "LOAI_CHI_PHI": {
+                "value": "loaiChiPhi",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 2
             }
         },
         "primaryKeys": [

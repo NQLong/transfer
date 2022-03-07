@@ -1,7 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { AdminPage } from 'view/component/AdminPage';
-import { updateSystemState } from 'modules/_default/_init/reduxSystem';
 import { userGetStaff, updateStaffUser } from 'modules/mdTccb/tccbCanBo/redux';
 import ProfileCommon from './componentNotStaff';
 import Loading from 'view/component/Loading';
@@ -36,6 +35,6 @@ class ProfileCanBo extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system });
 const mapActionsToProps = {
-    userGetStaff, updateStaffUser, updateSystemState
+    userGetStaff, updateStaffUser
 };
 export default connect(mapStateToProps, mapActionsToProps)(ProfileCanBo);
