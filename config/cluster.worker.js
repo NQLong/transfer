@@ -38,8 +38,8 @@ module.exports = (cluster, isDebug) => {
     // Configure ------------------------------------------------------------------------------------------------------
     require('./common')(app, appConfig.name);
     require('./view')(app, express);
-    require('./io')(app, server, appConfig);
     require('./database')(app, appConfig);
+    require('./io')(app, server, appConfig);
     require('./packages')(app, server, appConfig);
     require('./authentication')(app);
     require('./permission')(app);
