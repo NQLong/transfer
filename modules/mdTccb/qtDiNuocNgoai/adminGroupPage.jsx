@@ -33,18 +33,20 @@ class EditModal extends AdminModal {
         id: null,
         ngayDi: '',
         ngayVe: '',
+        dangDienRa: true,
         ngayDiType: 'dd/mm/yyyy',
         ngayVeType: 'dd/mm/yyyy',
     };
 
     onShow = (item) => {
-        let { id, shcc, quocGia, ngayDi, ngayDiType, ngayVe, ngayVeType, mucDich, noiDung, chiPhi, ghiChu, soQuyetDinh, ngayQuyetDinh } = item ? item : {
+        let { id, shcc, quocGia, ngayDi, ngayDiType, ngayVe, ngayVeType, mucDich, noiDung, chiPhi, ghiChu, soQuyetDinh, ngayQuyetDinh, today } = item ? item : {
             id: '', shcc: '', quocGia: '', ngayDi: null, ngayDiType: '', ngayVe: null, ngayVeType: '', mucDich: '', noiDung: '', chiPhi: null, ghiChu: '', soQuyetDinh: '', ngayQuyetDinh: null,
         };
         this.setState({
             id, ngayDiType: ngayDiType ? ngayDiType : 'dd/mm/yyyy',
             ngayVeType: ngayVeType ? ngayVeType : 'dd/mm/yyyy',
-            ngayDi, ngayVe
+            ngayDi, ngayVe,
+            dangDienRa: ngayVe ? (ngayVe == -1 || ngayVe >= today) : true
         }, () => {
             this.shcc.value(shcc ? shcc : this.props.shcc);
             if (quocGia) {
@@ -59,18 +61,12 @@ class EditModal extends AdminModal {
             this.ngayQuyetDinh.value(ngayQuyetDinh ? ngayQuyetDinh : '');
 
             this.ngayDiType.setText({ text: ngayDiType ? ngayDiType : 'dd/mm/yyyy' });
-            this.state.ngayVe != -1 && this.ngayVeType.setText({ text: ngayVeType ? ngayVeType : 'dd/mm/yyyy' });
-            if (this.state.ngayVe == -1) {
-                this.setState({ denNay: true });
-                this.denNayCheck.value(true);
-                $('#ketThucDate').hide();
-            } else {
-                this.setState({ denNay: false });
-                this.denNayCheck.value(false);
-                $('#ketThucDate').show();
-            }
             this.ngayDi.setVal(ngayDi ? ngayDi : '');
-            this.state.ngayVe != -1 && this.ngayVe.setVal(ngayVe ? ngayVe : '');
+            this.denNayCheck.value(this.state.dangDienRa);
+            this.ngayVeType.setText({ text: ngayVeType ? ngayVeType : 'dd/mm/yyyy' });
+            if (this.state.ngayVe) {
+                this.state.ngayVe != -1 && this.ngayVe.setVal(ngayVe);
+            } else this.ngayVe.setVal(null);
         });
     };
 
@@ -88,8 +84,8 @@ class EditModal extends AdminModal {
 
             ngayDiType: this.state.ngayDiType,
             ngayDi: this.ngayDi.getVal(),
-            ngayVeType: !this.state.denNay ? this.state.ngayVeType : '',
-            ngayVe: !this.state.denNay ? this.ngayVe.getVal() : -1
+            ngayVeType: this.state.ngayVeType,
+            ngayVe: this.ngayVe.getVal()
         };
         if (!changes.shcc) {
             T.notify('Chưa chọn cán bộ', 'danger');
@@ -103,10 +99,10 @@ class EditModal extends AdminModal {
         } else if (!this.ngayDi.getVal()) {
             T.notify('Ngày đi nước ngoài trống', 'danger');
             this.ngayDi.focus();
-        } else if (!this.state.denNay && !this.ngayVe.getVal()) {
+        } else if (!this.ngayVe.getVal()) {
             T.notify('Ngày về nước trống', 'danger');
             this.ngayVe.focus();
-        } else if (!this.state.denNay && this.ngayDi.getVal() > this.ngayVe.getVal()) {
+        } else if (this.ngayDi.getVal() > this.ngayVe.getVal()) {
             T.notify('Ngày đi lớn hơn ngày về', 'danger');
             this.ngayDi.focus();
         } else {
@@ -115,13 +111,7 @@ class EditModal extends AdminModal {
     }
 
     handleNgayVe = (value) => {
-        value ? $('#ketThucDate').hide() : $('#ketThucDate').show();
-        this.setState({ denNay: value });
-        if (!value) {
-            this.ngayVeType?.setText({ text: this.state.ngayVeType ? this.state.ngayVeType : 'dd/mm/yyyy' });
-        } else {
-            this.ngayVeType?.setText({ text: '' });
-        }
+        this.setState({ dangDienRa: value });
     }
 
     render = () => {
@@ -140,15 +130,15 @@ class EditModal extends AdminModal {
 
                 <div className='form-group col-md-6'><DateInput ref={e => this.ngayDi = e} placeholder='Ngày đi'
                     label={
-                        <div style={{ display: 'flex' }}>Ngày đi (định dạng:&nbsp; <Dropdown ref={e => this.ngayDiType = e}
+                        <div style={{ display: 'flex' }}>Ngày đi (&nbsp; <Dropdown ref={e => this.ngayDiType = e}
                             items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
                             onSelected={item => this.setState({ ngayDiType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
                     }
                     type={this.state.ngayDiType ? typeMapper[this.state.ngayDiType] : null} readOnly={readOnly} /></div>
-                <FormCheckbox ref={e => this.denNayCheck = e} label='Đến nay' onChange={this.handleNgayVe} className='form-group col-md-3' />
+                <FormCheckbox ref={e => this.denNayCheck = e} label='Đang diễn ra' onChange={this.handleNgayVe} className='form-group col-md-3' />
                 <div className='form-group col-md-6' id='ketThucDate'><DateInput ref={e => this.ngayVe = e} placeholder='Ngày về'
                     label={
-                        <div style={{ display: 'flex' }}>Ngày về (định dạng:&nbsp; <Dropdown ref={e => this.ngayVeType = e}
+                        <div style={{ display: 'flex' }}>{this.state.dangDienRa ? 'Ngày về dự kiến' : 'Ngày về'} (&nbsp; <Dropdown ref={e => this.ngayVeType = e}
                             items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
                             onSelected={item => this.setState({ ngayVeType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
                     }
@@ -169,7 +159,7 @@ class QtDiNuocNgoaiGroupPage extends AdminPage {
             const route = T.routeMatcher('/user/tccb/qua-trinh/di-nuoc-ngoai/group/:shcc'),
                 params = route.parse(window.location.pathname);
             this.shcc = params.shcc;
-            this.setState({ filter: { list_shcc: params.shcc, list_dv: '', timeType: 0 } });
+            this.setState({ filter: { list_shcc: params.shcc, list_dv: '', timeType: 0, loaiHocVi: null } });
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
 
             T.showSearchBox(() => {
@@ -177,6 +167,7 @@ class QtDiNuocNgoaiGroupPage extends AdminPage {
                 this.fromYear?.value('');
                 this.toYear?.value('');
                 this.tinhTrang?.value('');
+                this.mucDich?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
             this.getPage();
@@ -190,8 +181,10 @@ class QtDiNuocNgoaiGroupPage extends AdminPage {
         const toYear = this.toYear?.value() == '' ? null : this.toYear?.value().getTime();
         const list_dv = this.state.filter.list_dv;
         const list_shcc = this.state.filter.list_shcc;
+        const loaiHocVi = this.state.filter.loaiHocVi;
         const tinhTrang = this.tinhTrang?.value() == '' ? null : this.tinhTrang?.value();
-        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc, tinhTrang, timeType };
+        const mucDich = this.mucDich?.value() == '' ? '' : this.mucDich?.value().toString();
+        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc, tinhTrang, timeType, loaiHocVi, mucDich };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
@@ -199,7 +192,10 @@ class QtDiNuocNgoaiGroupPage extends AdminPage {
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
                     this.fromYear?.value(filter.fromYear || '');
                     this.toYear?.value(filter.toYear || '');
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.timeType || filter.tinhTrang)) this.showAdvanceSearch();
+                    this.timeType?.value(filter.timeType);
+                    this.tinhTrang?.value(filter.tinhTrang);
+                    this.mucDich?.value(filter.mucDich);
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.timeType || filter.tinhTrang || filter.mucDich )) this.showAdvanceSearch();
                 }
             });
         });
@@ -309,6 +305,7 @@ class QtDiNuocNgoaiGroupPage extends AdminPage {
                         data={[
                             { id: 1, text: 'Đã kết thúc' }, { id: 2, text: 'Đang diễn ra' }
                         ]} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.mucDich = e} label='Mục đích' data={SelectAdapter_DmMucDichNuocNgoaiV2} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
                 </div>
             </>,
             content: <>
@@ -324,6 +321,12 @@ class QtDiNuocNgoaiGroupPage extends AdminPage {
             </>,
             backRoute: '/user/tccb/qua-trinh/di-nuoc-ngoai',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+            onExport: (e) => {
+                e.preventDefault();
+                const { fromYear, toYear, list_shcc, list_dv, timeType, tinhTrang, loaiHocVi, mucDich } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, tinhTrang: null, loaiHocVi: null, mucDich: null };
+
+                T.download(T.url(`/api/qua-trinh/di-nuoc-ngoai/download-excel/${list_shcc ? list_shcc : null}/${list_dv ? list_dv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${timeType}/${tinhTrang ? tinhTrang : null}/${loaiHocVi ? loaiHocVi : null}/${mucDich ? mucDich : null}`), 'dinuocngoai.xlsx');
+            }
         });
     }
 }

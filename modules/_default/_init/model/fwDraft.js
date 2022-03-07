@@ -45,7 +45,7 @@ module.exports = app => {
             if (error || draft === null) {
                 done(error);
             } else {
-                if (app.data && app.data.numberOfNews) app.data.numberOfNews--;
+                // if (app.data && app.data.numberOfNews) app.data.numberOfNews--;
                 app.deleteImage(draft.image);
                 app.model.fwDraft.delete(condition, done);
             }

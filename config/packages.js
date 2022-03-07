@@ -28,7 +28,7 @@ module.exports = (app, http, config) => {
 
     // Configure session
     app.set('trust proxy', 1); // trust first proxy
-    const session = require('express-session');
+    const sessionIdPrefix = config.name + '_sess:', session = require('express-session');
     const sessionOptions = {
         secret: 'W6T55k2vLdgvNh8fkkVzF4WRpaASmW9vET87CDzRqdSTHU6yNDyN6AmHeWmMSqxjzAmuvpsd9ben9KBekdupQS6ptz97A6YaY4Q',
         key: 'dhkhxhnv-dhbk-dhqgtphcm',
@@ -38,10 +38,11 @@ module.exports = (app, http, config) => {
             maxAge: 3600000 * 24 * 7// one week
         }
     };
+
     if (config && app.redis) {
         // console.log(` - #${process.pid}: The system used Redis session!`);
         const redisStore = require('connect-redis')(session);
-        sessionOptions.store = new redisStore({ client: app.redis, prefix: config.name + '_sess:' });
+        sessionOptions.store = new redisStore({ client: app.redis, prefix: sessionIdPrefix });
     }
     app.use(session(sessionOptions));
 

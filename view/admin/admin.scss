@@ -215,3 +215,21 @@
         line-height: 34px;
     }
 }
+
+.tile-table-fix-head {
+    height: calc(100vh - 252px);
+    //overflow-y: scroll;
+
+    table {
+        overflow-y: auto;
+        height: 100%;
+
+        thead th {
+            color: #ffffff;
+            position: sticky;
+            top: 0;
+            z-index: 400;
+            border: 0;
+        }
+    }
+}

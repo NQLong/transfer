@@ -6,12 +6,12 @@ module.exports = app => {
         },
     };
 
-    // const menuTCCB = {
-    //     parentMenu: app.parentMenu.tccb,
-    //     menus: {
-    //         3013: { title: 'Quá trình nghiên cứu khoa học', link: '/user/tccb/qua-trinh/nghien-cuu-khoa-hoc', icon: 'fa-wpexplorer', backgroundColor: '#f03a88', groupIndex: 5 },
-    //     },
-    // };
+    const menuTCCB = {
+        parentMenu: app.parentMenu.tccb,
+        menus: {
+            3013: { title: 'Quá trình nghiên cứu khoa học', link: '/user/tccb/qua-trinh/nghien-cuu-khoa-hoc', icon: 'fa-wpexplorer', backgroundColor: '#f03a88', groupIndex: 5 },
+        },
+    };
 
     const menuStaff = {
         parentMenu: app.parentMenu.user,
@@ -21,20 +21,16 @@ module.exports = app => {
     };
 
     app.permission.add(
-        // { name: 'qtNghienCuuKhoaHoc:onlyRead', menu: menuTCCB },
         { name: 'staff:login', menu: menuStaff },
+        { name: 'qtNghienCuuKhoaHoc:read', menu: menuTCCB },
         { name: 'qtNghienCuuKhoaHoc:read', menu },
         { name: 'qtNghienCuuKhoaHoc:write' },
         { name: 'qtNghienCuuKhoaHoc:delete' },
     );
 
-    app.get('/user/khcn/qua-trinh/nghien-cuu-khoa-hoc/:id', app.permission.check('qtNghienCuuKhoaHoc:read'), app.templates.admin);
-    app.get('/user/khcn/qua-trinh/nghien-cuu-khoa-hoc', app.permission.check('qtNghienCuuKhoaHoc:read'), app.templates.admin);
-    app.get('/user/khcn/qua-trinh/nghien-cuu-khoa-hoc/group/:shcc', app.permission.check('qtNghienCuuKhoaHoc:read'), app.templates.admin);
-
-    // app.get('/user/tccb/qua-trinh/nghien-cuu-khoa-hoc/:id', app.permission.check('qtNghienCuuKhoaHoc:onlyRead'), app.templates.admin);
-    // app.get('/user/tccb/qua-trinh/nghien-cuu-khoa-hoc', app.permission.check('qtNghienCuuKhoaHoc:onlyRead'), app.templates.admin);
-    // app.get('/user/tccb/qua-trinh/nghien-cuu-khoa-hoc/group/:shcc', app.permission.check('qtNghienCuuKhoaHoc:onlyRead'), app.templates.admin);
+    app.get('/user/:khcn/qua-trinh/nghien-cuu-khoa-hoc/:id', app.permission.check('qtNghienCuuKhoaHoc:read'), app.templates.admin);
+    app.get('/user/:khcn/qua-trinh/nghien-cuu-khoa-hoc', app.permission.check('qtNghienCuuKhoaHoc:read'), app.templates.admin);
+    app.get('/user/:khcn/qua-trinh/nghien-cuu-khoa-hoc/group/:shcc', app.permission.check('qtNghienCuuKhoaHoc:read'), app.templates.admin);
 
     app.get('/user/nghien-cuu-khoa-hoc', app.permission.check('staff:login'), app.templates.admin);
     app.get('/user/nghien-cuu-khoa-hoc/:id/:ownerShcc', app.permission.check('staff:login'), app.templates.admin);
@@ -103,10 +99,14 @@ module.exports = app => {
     app.delete('/api/qua-trinh/nckh', app.permission.check('qtNghienCuuKhoaHoc:write'), (req, res) =>
         app.model.qtNghienCuuKhoaHoc.delete({ id: req.body.id }, (error) => res.send(error)));
 
-    app.get('/api/qua-trinh/nckh/download-excel/:maDonVi/:fromYear/:toYear/:loaiHocVi/:maSoCanBo', app.permission.check('qtNghienCuuKhoaHoc:read'), (req, res) => {
-        const { maDonVi, fromYear, toYear, loaiHocVi, maSoCanBo } = req.params ? req.params : { maDonVi: '', fromYear: null, toYear: null, loaiHocVi: '', maSoCanBo: '' };
-        const filter = `%${fromYear != 'null' ? fromYear : ''}%${toYear != 'null' ? toYear : ''}%${loaiHocVi != 'null' ? loaiHocVi : ''}%${maDonVi != 'null' ? maDonVi : ''}%${maSoCanBo != 'null' ? maSoCanBo : ''}%%`;
-        app.model.qtNghienCuuKhoaHoc.downloadExcel(filter, (err, result) => {
+    app.get('/api/qua-trinh/nckh/download-excel/:maDonVi/:fromYear/:toYear/:loaiHocVi/:maSoCanBo/:timeType', app.permission.check('qtNghienCuuKhoaHoc:read'), (req, res) => {
+        let { maDonVi, fromYear, toYear, loaiHocVi, maSoCanBo, timeType } = req.params ? req.params : { maDonVi: '', fromYear: null, toYear: null, loaiHocVi: '', maSoCanBo: '', timeType: 0};
+        if (maDonVi == 'null') maDonVi = null;
+        if (fromYear == 'null') fromYear = null;
+        if (toYear == 'null') toYear = null;
+        if (loaiHocVi == 'null') loaiHocVi = null;
+        if (maSoCanBo == 'null') maSoCanBo = null;
+        app.model.qtNghienCuuKhoaHoc.downloadExcel(maSoCanBo, loaiHocVi, fromYear, toYear, timeType, maDonVi, (err, result) => {
             if (err || !result) {
                 res.send({ err });
             } else {

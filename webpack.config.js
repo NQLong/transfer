@@ -1,19 +1,20 @@
 const appConfig = require('./package'),
     fs = require('fs'),
+    personnelConfig = fs.existsSync('./asset/config.json') ? require('./asset/config.json') : { ignoreModules: [] },
     path = require('path'),
     endOfLine = require('os').EOL;
 
-const cleanFilesluginOptions = [],
-    CleanFileslugin = function (options) {
+const cleanFilesPluginOptions = [],
+    CleanFilesPlugin = function (options) {
         options.forEach(option => {
             if (option.path) {
                 option = Object.assign({ fileExtension: '.js' }, option, { path: __dirname + option.path });
-                cleanFilesluginOptions.push(option);
+                cleanFilesPluginOptions.push(option);
                 console.log(`  - Clean files in folder ${option.path}!`);
             }
         });
     };
-CleanFileslugin.prototype.apply = compiler => {
+CleanFilesPlugin.prototype.apply = compiler => {
     const removeFiles = (option) => {
         fs.readdirSync(option.path).forEach(filePath => {
             filePath = option.path + '/' + filePath;
@@ -27,12 +28,15 @@ CleanFileslugin.prototype.apply = compiler => {
         });
     };
 
-    compiler.hooks.done.tap('CleanFiles', () => cleanFilesluginOptions.forEach(removeFiles));
+    compiler.hooks.done.tap('CleanFiles', () => cleanFilesPluginOptions.forEach(removeFiles));
 };
 
 const moduleContainer = { admin: {}, home: {}, unit: {} }, // Add template here
     templateNames = Object.keys(moduleContainer);
-const UpdateModulesPlugin = function () { };
+let isProduction = true;
+const UpdateModulesPlugin = function (_isProduction) {
+    isProduction = _isProduction;
+};
 UpdateModulesPlugin.prototype.apply = compiler => compiler.hooks.done.tap('UpdateModules', () => {
     templateNames.forEach(templateName => {
         moduleContainer[templateName].moduleNames = [];
@@ -40,12 +44,21 @@ UpdateModulesPlugin.prototype.apply = compiler => compiler.hooks.done.tap('Updat
     });
 
     const moduleData = [];
+    const ignoreModules = personnelConfig.ignoreModules || [];
     fs.readdirSync('./modules').forEach(mainModuleName => {
-        fs.statSync(`./modules/${mainModuleName}`).isDirectory() && fs.readdirSync(`./modules/${mainModuleName}`).forEach(moduleName => {
-            if (fs.statSync(`./modules/${mainModuleName}/${moduleName}`).isDirectory() && fs.existsSync(`./modules/${mainModuleName}/${moduleName}/index.jsx`)) {
-                moduleData.push(mainModuleName + '|' + moduleName);
-            }
-        });
+        if (isProduction) {
+            fs.statSync(`./modules/${mainModuleName}`).isDirectory() && fs.readdirSync(`./modules/${mainModuleName}`).forEach(moduleName => {
+                if (fs.statSync(`./modules/${mainModuleName}/${moduleName}`).isDirectory() && fs.existsSync(`./modules/${mainModuleName}/${moduleName}/index.jsx`)) {
+                    moduleData.push(mainModuleName + '|' + moduleName);
+                }
+            });
+        } else {
+            !ignoreModules.includes(mainModuleName) && fs.statSync(`./modules/${mainModuleName}`).isDirectory() && fs.readdirSync(`./modules/${mainModuleName}`).forEach(moduleName => {
+                if (fs.statSync(`./modules/${mainModuleName}/${moduleName}`).isDirectory() && fs.existsSync(`./modules/${mainModuleName}/${moduleName}/index.jsx`)) {
+                    moduleData.push(mainModuleName + '|' + moduleName);
+                }
+            });
+        }
     });
     moduleData.sort().forEach(item => {
         const [mainModuleName, moduleName] = item.split('|');
@@ -70,6 +83,8 @@ UpdateModulesPlugin.prototype.apply = compiler => compiler.hooks.done.tap('Updat
             fs.writeFileSync(`./view/${templateName}/modules.jsx`, `${templateModule.importText}\nexport const modules = [${templateModule.moduleNames.join(', ')}];`);
         }
     });
+
+    !isProduction && console.log('Ignored module(s): ', ignoreModules.toString());
 });
 
 const entry = {};
@@ -79,7 +94,7 @@ fs.readdirSync('./view').forEach(folder => {
     }
 });
 const genHtmlWebpackPlugins = (isProductionMode) => {
-    const HtmlWebpackPlugin = isProductionMode ? require(require.resolve('html-webpack-plugin', { paths: [require.main.path] })) : require('html-webpack-plugin'),
+    let HtmlWebpackPlugin = isProductionMode ? require(require.resolve('html-webpack-plugin', { paths: [require.main.path] })) : require('html-webpack-plugin'),
         plugins = [],
         htmlPluginOptions = {
             inject: false,
@@ -109,7 +124,7 @@ module.exports = (env, argv) => ({
     },
     plugins: [
         ...genHtmlWebpackPlugins(argv.mode === 'production'),
-        new CleanFileslugin(argv.mode === 'production' ?
+        new CleanFilesPlugin(argv.mode === 'production' ?
             [
                 { path: '/public/js', fileExtension: '.txt' },
             ] : [
@@ -117,7 +132,7 @@ module.exports = (env, argv) => ({
                 { path: '/public/js', fileExtension: '.js', excludeExtension: '.min.js' },
                 { path: '/public', fileExtension: '.template' },
             ]),
-        new UpdateModulesPlugin(),
+        new UpdateModulesPlugin(argv.mode === 'production'),
     ],
     module: {
         rules: [
@@ -127,24 +142,37 @@ module.exports = (env, argv) => ({
             {
                 test: /\.jsx?$/, exclude: /node_modules/,
                 use: {
+                    loader: 'babel-loader',
                     options: {
                         plugins: ['@babel/plugin-syntax-dynamic-import', '@babel/plugin-proposal-class-properties'],
                         presets: ['@babel/preset-env', '@babel/preset-react'],
                         cacheDirectory: true,
                         cacheCompression: false,
                     },
-                    loader: 'babel-loader',
                 }
+            },
+            {
+                test: /\.(eot|.svg|ttf|woff|woff2)(\?v=\d+\.\d+\.\d+)?$/,
+                use: {
+                    loader: 'url-loader',
+                    options: { limit: 10000 },
+                },
+            },
+            {
+                test: /\.svg$/,
+                use: {
+                    loader: 'svg-url-loader',
+                    options: { limit: 10000 },
+                },
             },
         ]
     },
     devServer: {
-        contentBase: path.join(__dirname, 'public'),
         port: appConfig.port + 1,
         compress: true,
         historyApiFallback: true,
-        disableHostCheck: true,
         open: true,
+        hot: true,
     },
     resolve: {
         alias: { exceljsFE: path.resolve(__dirname, 'node_modules/exceljs/dist/exceljs.min') },

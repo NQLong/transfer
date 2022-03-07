@@ -1,13 +1,14 @@
 import React from 'react';
-// import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { getUserPage, createUser, updateUser, deleteUser, changeUser, } from './reduxUser';
+import { getUserPage, createUser, updateUser, deleteUser, changeUser } from './reduxUser';
 import { getRoleAll } from '../fwRole/redux';
 import Pagination, { OverlayLoading } from 'view/component/Pagination';
+import { AdminPage, renderTable, TableCell } from 'view/component/AdminPage';
 import AdminSearchBox from 'view/component/AdminSearchBox';
 import ImageBox from 'view/component/ImageBox';
 import { SelectAdapter_DmDonVi } from '../../mdDanhMuc/dmDonVi/redux';
 import { Select } from 'view/component/Input';
+
 class RolesModal extends React.Component {
     state = {};
     modal = React.createRef();
@@ -108,7 +109,7 @@ class UserModal extends React.Component {
             studentId: this.state.isStudent ? ($('#userMssv').val() && $('#userMssv').val().trim()) : null,
             isStaff: this.state.isStaff ? 1 : 0,
             active: this.state.active ? 1 : 0,
-            roles: $('#userRoles').val(),
+            roles: $('#userRoles').val()
         };
         if (this.donVi.current) changes.maDonVi = this.donVi.current.val();
         if (!changes.email) {
@@ -166,12 +167,11 @@ class UserModal extends React.Component {
                             <div className='col-12 col-md-4'>
                                 <div className='form-group' style={{ display: this.state.email ? 'block' : 'none' }}>
                                     <label>Hình đại diện</label>
-                                    <ImageBox ref={this.imageBox} postUrl='/user/upload' uploadType='UserImage' userData='UserImage' image={this.state.image ? this.state.image : '/img/avatar.png'}
-                                        success={data => data.error == null && this.props.changeUser(Object.assign(this.state.user, { image: data.image }))} />
+                                    <ImageBox ref={this.imageBox} postUrl='/user/upload' uploadType='UserImage' userData='UserImage' image={this.state.image ? this.state.image : '/img/avatar.png'} success={data => data.error == null && this.props.changeUser(Object.assign(this.state.user, { image: data.image }))} />
                                 </div>
                                 <div className='form-group' style={{ display: 'inline-flex', width: '100%', margin: 0 }}>
                                     <label htmlFor='userActive'>Kích hoạt: </label>&nbsp;&nbsp;
-                                        <div className='toggle'>
+                                    <div className='toggle'>
                                         <label>
                                             <input type='checkbox' id='userActive' checked={this.state.active} onChange={() => permissionWrite && this.setState({ active: !this.state.active })} />
                                             <span className='button-indecator' />
@@ -182,7 +182,7 @@ class UserModal extends React.Component {
                             <div className='col-12 col-md-6'>
                                 <div className='form-group' style={{ display: 'inline-flex', width: '100%', margin: 0 }}>
                                     <label htmlFor='userIsStaff'>Người dùng là Cán bộ: </label>&nbsp;&nbsp;
-                                        <div className='toggle'>
+                                    <div className='toggle'>
                                         <label>
                                             <input type='checkbox' id='userIsStaff' checked={this.state.isStaff} onChange={() => permissionWrite && this.setState({ isStaff: !this.state.isStaff })} />
                                             <span className='button-indecator' />
@@ -196,7 +196,7 @@ class UserModal extends React.Component {
                             <div className='col-12 col-md-6'>
                                 <div className='form-group' style={{ display: 'inline-flex', width: '100%', margin: 0 }}>
                                     <label htmlFor='userIsStudent'>Người dùng là Sinh viên: </label>&nbsp;&nbsp;
-                                            <div className='toggle'>
+                                    <div className='toggle'>
                                         <label>
                                             <input type='checkbox' id='userIsStudent' checked={this.state.isStudent} onChange={() => permissionWrite && this.setState({ isStudent: !this.state.isStudent })} />
                                             <span className='button-indecator' />
@@ -230,7 +230,7 @@ class UserModal extends React.Component {
     }
 }
 
-class UserPage extends React.Component {
+class UserPage extends AdminPage {
     state = { personType: 'Tất cả', searchText: '', isSearching: false };
     searchBox = React.createRef();
     roleMapper = {};
@@ -239,7 +239,6 @@ class UserPage extends React.Component {
 
     componentDidMount() {
         this.props.getRoleAll(items => items && items.forEach(role => this.roleMapper[role.id] = role.name));
-        T.tooltip();
         T.ready('/user/settings', () => this.searchBox.current.getPage());
     }
 
@@ -257,6 +256,7 @@ class UserPage extends React.Component {
 
     delete = (e, item) => {
         e.preventDefault();
+        console.log(item);
         T.confirm('Người dùng: Xóa người dùng', 'Bạn có chắc bạn muốn xóa người dùng này?', true, isConfirm =>
             isConfirm && this.props.deleteUser(item.email));
     };
@@ -276,67 +276,42 @@ class UserPage extends React.Component {
     };
 
     render() {
-        const permissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permissionWrite = permissions.includes('user:write'),
-            permissionDelete = permissions.includes('user:delete');
+        const permission = this.getUserPermission('user');
         let { pageNumber, pageSize, pageTotal, pageCondition, totalItem, list } = this.props.user && this.props.user.page ?
             this.props.user.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, pageCondition: {}, totalItem: 0, list: null };
-        let table = 'Không có người dùng!';
-        if (list && list.length > 0) {
-            table = (
-                <table className='table table-hover table-bordered table-responsive'>
-                    <thead>
-                        <tr>
-                            <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                            <th style={{ width: '50%' }}>Email</th>
-                            <th style={{ width: '50%' }}>Họ tên</th>
-                            <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Hình ảnh</th>
-                            <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Vai trò</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                            <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {this.props.user.page.list.map((item, index) => (
-                            <tr key={index}>
-                                <td style={{ textAlign: 'right' }}>{(pageNumber - 1) * pageSize + index + 1}</td>
-                                <td>
-                                    <a href='#' onClick={e => this.edit(e, item)}>{item.email}</a>
-                                    {item.isStaff || item.isStudent ?
-                                        <><br />{item.isStaff ? <span> Cán bộ</span> : null}{item.isStudent ? <span> Sinh viên</span> : null}</> : null}
-                                </td>
-                                <td>{item.lastName} {item.firstName}</td>
-                                <td style={{ textAlign: 'center' }}>
-                                    <img src={item.image ? item.image : '/img/avatar.png'} alt='avatar' style={{ height: '32px' }} />
-                                </td>
-                                <td style={{ textAlign: 'left' }}>
-                                    {item.roles ?
-                                        item.roles.map(roleId => <label style={{ whiteSpace: 'nowrap' }} key={roleId}> {this.roleMapper && this.roleMapper[roleId] ? this.roleMapper[roleId] : ''}</label>) :
-                                        '<nothing>'}
-                                </td>
-                                <td className='toggle' style={{ textAlign: 'center' }}>
-                                    <label>
-                                        <input type='checkbox' checked={item.active} onChange={() => this.changeActive(item, index)} />
-                                        <span className='button-indecator' />
-                                    </label>
-                                </td>
-                                <td>
-                                    <div className={item.default ? '' : 'btn-group'}>
-                                        <a className='btn btn-primary' href='#' onClick={e => this.edit(e, item)}>
-                                            <i className='fa fa-lg fa-edit' />
-                                        </a>
-                                        {item.default == false && !item.email.endsWith('@hcmussh.edu.vn') ?
-                                            <a className='btn btn-info' href='#' onClick={e => this.changePassword(e, item)}><i className='fa fa-lg fa-key' /></a> : ''}
-                                        {item.default && permissionDelete ? null :
-                                            <a className='btn btn-danger' href='#' onClick={e => this.delete(e, item)}><i className='fa fa-lg fa-trash' /></a>}
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            );
-        }
+        const table = renderTable({
+            getDataSource: () => list, stickyHead: true,
+            emptyTable: 'Không có người dùng!',
+            renderHead: () => (
+                <tr>
+                    <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
+                    <th style={{ width: '50%' }}>Email</th>
+                    <th style={{ width: '50%' }}>Họ tên</th>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Hình ảnh</th>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Vai trò</th>
+                    <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
+                </tr>
+            ),
+            renderRow: (item, index) => (
+                <tr key={index}>
+                    <TableCell style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
+                    <TableCell type='link' onClick={e => this.edit(e, item)} content={<>
+                        {item.email}
+                        {item.isStaff || item.isStudent ? <><br />{item.isStaff ? <span> Cán bộ</span> : null}{item.isStudent ? <span> Sinh viên</span> : null}</> : null}
+                    </>} />
+                    <TableCell content={item.lastName + ' ' + item.firstName} />
+                    <TableCell type='image' content={item.image ? item.image : '/img/avatar.png'} />
+                    <TableCell content={item.roles ?
+                        item.roles.map(roleId => <label style={{ whiteSpace: 'nowrap' }} key={roleId}> {this.roleMapper && this.roleMapper[roleId] ? this.roleMapper[roleId] : ''}</label>) :
+                        '<nothing>'} />
+                    <TableCell type='checkbox' content={item.active} permission={permission} onChanged={() => this.changeActive(item, index)} />
+                    <TableCell type='buttons' permission={{ write: permission.write, delete: permission.delete && !item.default }} content={item} onEdit={e => this.edit(e, item)} onDelete={this.delete}>
+                        {!item.default && !item.email.endsWith('@hcmussh.edu.vn') ? <a className='btn btn-info' href='#' onClick={e => this.changePassword(e, item)}><i className='fa fa-lg fa-key' /></a> : ''}
+                    </TableCell>
+                </tr>
+            )
+        });
 
         return (
             <main className='app-content'>
@@ -349,24 +324,20 @@ class UserPage extends React.Component {
 
                 <div className='tile'>
                     {!this.state.searching ? table : <OverlayLoading text='Đang tải..' />}
-                    <Pagination name='adminUser' pageCondition={pageCondition} pageNumber={pageNumber} pageSize={pageSize} pageTotal={pageTotal} totalItem={totalItem}
-                        getPage={this.searchBox.current && this.searchBox.current.getPage} />
+                    <Pagination name='adminUser' pageCondition={pageCondition} pageNumber={pageNumber} pageSize={pageSize} pageTotal={pageTotal} totalItem={totalItem} getPage={this.searchBox.current && this.searchBox.current.getPage} />
 
                     <button type='button' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.edit}>
                         <i className='fa fa-lg fa-plus' />
                     </button>
 
-                    <UserModal ref={this.userModal} permissionWrite={permissionWrite}
-                        allRoles={this.props.system && this.props.system.roles ? this.props.system.roles : []}
-                        updateUser={this.props.updateUser} createUser={this.props.createUser} changeUser={this.props.changeUser} />
-                    <RolesModal ref={this.rolesModal} permissionWrite={permissionWrite}
-                        allRoles={this.props.system && this.props.system.roles ? this.props.system.roles : []}
-                        updateUser={this.props.updateUser} />
+                    <UserModal ref={this.userModal} permissionWrite={permission.write} allRoles={this.props.system && this.props.system.roles ? this.props.system.roles : []} updateUser={this.props.updateUser} createUser={this.props.createUser} changeUser={this.props.changeUser} />
+                    <RolesModal ref={this.rolesModal} permissionWrite={permission.write} allRoles={this.props.system && this.props.system.roles ? this.props.system.roles : []} updateUser={this.props.updateUser} />
                 </div>
             </main>
         );
     }
 }
+
 const mapStateToProps = state => ({ system: state.system, division: state.division, user: state.user, role: state.role });
 const mapActionsToProps = { getUserPage, createUser, updateUser, deleteUser, changeUser, getRoleAll };
 export default connect(mapStateToProps, mapActionsToProps)(UserPage);

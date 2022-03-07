@@ -273,12 +273,12 @@ class QtNghiPhepUserPage extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa fa-fax',
+            icon: 'fa fa-pause',
             title: 'Quá trình nghỉ phép',
             subTitle: <span style={{ color: 'blue' }}>Cán bộ: {name}</span>,
             breadcrumb: [
                 <Link key={0} to='/user/'>Trang cá nhân</Link>,
-                'Công tác ngoài nước'
+                'Danh sách nghỉ phép'
             ],
             content: <>
                 <div className='tile'>

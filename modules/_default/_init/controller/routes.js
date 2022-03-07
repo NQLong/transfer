@@ -9,7 +9,7 @@ module.exports = app => {
         },
         { name: 'user:login', menu: { parentMenu: app.parentMenu.user } },
     );
-    
+
     app.get('/user', app.permission.check('user:login'), app.templates.admin);
     app.get('/user/dashboard', app.permission.check('dashboard:standard'), app.templates.admin);
     app.get('/user/truyen-thong/settings', app.permission.check('system:settings'), app.templates.admin);
@@ -21,137 +21,108 @@ module.exports = app => {
 
     // API ------------------------------------------------------------------------------------------------------------------------------------------
     app.put('/api/system', app.permission.check('system:settings'), (req, res) => {
-        const changes = {};
+        const { password, address, address2, email, mobile, fax, facebook, youtube, twitter, instagram, linkMap } = req.body;
 
         if (req.body.password) {
-            changes.emailPassword = req.body.password;
-            app.model.setting.setValue(changes, error => {
-                if (error) {
-                    res.send({ error: 'Lỗi khi cập nhật mật khẩu email!' });
-                } else {
-                    app.data.emailPassword = req.body.emailPassword;
-                    res.send(app.data);
-                }
+            app.state.set('emailPassword', password, error => {
+                error && console.log('Error (/api/system):', error);
+                res.send(error ? { error: 'Lỗi khi cập nhật mật khẩu email!' } : app.state.data);
             });
         } else {
-            if (req.body.address != null || req.body.address == '') {
-                changes.address = req.body.address.trim();
-            }
-            if (req.body.address2 != null || req.body.address2 == '') {
-                changes.address2 = req.body.address2.trim();
-            }
-            if (req.body.email && req.body.email != '') {
-                changes.email = req.body.email.trim();
-            }
-            if (req.body.mobile != null || req.body.mobile == '') {
-                changes.mobile = req.body.mobile.trim();
-            }
-            if (req.body.fax != null || req.body.fax == '') {
-                changes.fax = req.body.fax.trim();
-            }
-            if (req.body.facebook != null || req.body.facebook == '') {
-                changes.facebook = req.body.facebook.trim();
-            }
-            if (req.body.youtube != null || req.body.youtube == '') {
-                changes.youtube = req.body.youtube.trim();
-            }
-            if (req.body.twitter != null || req.body.twitter == '') {
-                changes.twitter = req.body.twitter.trim();
-            }
-            if (req.body.instagram != null || req.body.instagram == '') {
-                changes.instagram = req.body.instagram.trim();
-            }
-            if (req.body.linkMap != null || req.body.linkMap == '') {
-                changes.linkMap = req.body.linkMap.trim();
-            }
-            // if (req.body.latitude != null || req.body.latitude == '') {
-            //     changes.latitude = req.body.latitude.trim();
-            // }
-            // if (req.body.longitude != null || req.body.longitude == '') {
-            //     changes.longitude = req.body.longitude.trim();
-            // }
+            const changes = [];
+            if (address || address == '') changes.push('address', address.trim());
+            if (address2 || address2 == '') changes.push('address2', address2.trim());
+            if (email) changes.push('email', email.trim());
+            if (mobile || mobile == '') changes.push('mobile', mobile.trim());
+            if (fax || fax == '') changes.push('fax', fax.trim());
+            if (facebook || facebook == '') changes.push('facebook', facebook.trim());
+            if (youtube || youtube == '') changes.push('youtube', youtube.trim());
+            if (twitter || twitter == '') changes.push('twitter', twitter.trim());
+            if (instagram || instagram == '') changes.push('instagram', instagram.trim());
+            if (linkMap || linkMap == '') changes.push('linkMap', linkMap.trim());
 
-            app.model.setting.setValue(changes, error => {
-                if (error) {
-                    res.send({ error: 'Lỗi khi cập nhật mật khẩu email!' });
-                } else {
-                    if (changes.email) {
-                        app.data.email = changes.email;
-                    }
-                    app.data = app.clone(app.data, changes);
-                    res.send(app.data);
-                }
+            app.state.set(...changes, error => {
+                error && console.log('Error (/api/system):', error);
+                app.state.get((error, data) => res.send(error ? { error } : data));
             });
         }
     });
 
-    app.get('/api/state', (req, res) => {
-        const data = app.clone(app.data);
-        delete data.emailPassword;
-
-        if (app.isDebug) data.isDebug = true;
-        if (req.session.user) data.user = req.session.user;
-        
-        app.buildAppMenus();
-
-        const ready = () => {
-            if (app.dbConnection && app.model && app.model.fwMenu && app.model.fwSubmenu) {
-                app.model.fwMenu.getAll({}, '*', 'priority', (error, menus) => {
-                    if (menus) {
-                        data.menus = [], data.divisionMenus = [];
-                        menus.forEach(menu => {
-                            menu.content = '';
-                            if (menu.submenus) {
-                                menu.submenus.forEach(submenu => submenu.content = '');
-                            }
-                            if (menu.maDonVi == '00') data.menus.push(menu); else data.divisionMenus.push(menu);
-                        });
-                    }
-                    app.model.fwSubmenu.getAll({ active: 1 }, '*', 'priority ASC', (error, submenus) => {
-                        if (submenus) {
-                            data.submenus = submenus.slice();
-                        }
-                        app.model.setting.getValue(['headerTitle', 'headerLink', 'isShowHeaderTitle', 'address2', 'mapLink'], result => {
-                            data.headerTitle = result.headerTitle;
-                            data.headerLink = result.headerLink;
-                            data.address2 = result.address2;
-                            data.isShowHeaderTitle = result.isShowHeaderTitle;
-                            data.mapLink = result.mapLink;
-                            if (data.user && data.user.permissions && data.user.permissions.includes('website:write') &&
-                                !data.user.permissions.includes('menu:write')
-                            ) {
-                                delete data.user.menu['2000'];
-                                delete data.user.menu['5100'];
-                            }
-                            if (data.user && data.user.permissions && data.user.permissions.includes('news:write')) {
-                                delete data.user.menu['5000'].menus['5004'];
-                                delete data.user.menu['5000'].menus['5005'];
-                                delete data.user.menu['5000'].menus['5006'];
-                                delete data.user.menu['5000'].menus['5008'];
-
-                            }
-                            // else if (data.user && data.user.permissions
-                            //     && data.user.permissions.includes('unit:write')
-                            //     && !data.user.permissions.includes('news:write') && data.user.menu['5000']) {
-                            //     delete data.user.menu['5000'].menus['5001'];
-                            //     delete data.user.menu['5000'].menus['5002'];
-                            //     delete data.user.menu['5000'].menus['5003'];
-                            // }
-                            if (data.user && data.user.permissions
-                                && data.user.permissions.includes('website:write')
-                                && !data.user.permissions.includes('news:write')) {
-                                if (data.user.menu['2000']) delete data.user.menu['2000'].menus['2090'];
-                            }
-                            res.send(data);
-                        });
-                    });
-                });
+    app.get('/api/state', app.isDebug ? app.permission.check() : (req, res, next) => { next(); }, (req, res) => {
+        app.state.get((error, data) => {
+            if (error || data == null) {
+                res.send({ error: error || 'System has error!' });
             } else {
-                setTimeout(ready, 500);
+                Object.keys(data).forEach(key => {
+                    if (key.toLowerCase().indexOf('password') != -1) delete data[key]; // delete data.emailPassword, data.tchcEmailPassword
+                });
+
+                if (app.isDebug) data.isDebug = true;
+                if (req.session.user) data.user = req.session.user;
+                const ready = () => {
+                    if (app.dbConnection && app.model && app.model.fwMenu && app.model.fwSubmenu) {
+                        app.model.fwMenu.getAll({}, '*', 'priority', (error, menus) => {
+                            if (menus) {
+                                data.menus = [];
+                                data.divisionMenus = [];
+                                menus.forEach(menu => {
+                                    menu.content = '';
+                                    if (menu.submenus) {
+                                        menu.submenus.forEach(submenu => submenu.content = '');
+                                    }
+                                    if (menu.maDonVi == '00') data.menus.push(menu); else data.divisionMenus.push(menu);
+                                });
+                            }
+                            app.model.fwSubmenu.getAll({ active: 1 }, '*', 'priority ASC', (error, submenus) => {
+                                if (submenus) {
+                                    data.submenus = submenus.slice();
+                                }
+                                app.model.setting.getValue(['header', 'address', 'headerTitle', 'headerLink', 'isShowHeaderTitle', 'address2', 'mapLink'], result => {
+                                    // data.header = result.header;
+                                    // data.address = result.address;
+                                    data.headerTitle = result.headerTitle;
+                                    data.headerLink = result.headerLink;
+                                    data.address2 = result.address2;
+                                    data.isShowHeaderTitle = result.isShowHeaderTitle;
+                                    data.mapLink = result.mapLink;
+                                    if (data.user && data.user.permissions && data.user.permissions.includes('website:write') &&
+                                        !data.user.permissions.includes('menu:write')
+                                    ) {
+                                        delete data.user.menu['2000'];
+                                        delete data.user.menu['5100'];
+                                    }
+                                    if (data.user && data.user.permissions && data.user.permissions.includes('news:write')) {
+                                        delete data.user.menu['5000'].menus['5004'];
+                                        delete data.user.menu['5000'].menus['5005'];
+                                        delete data.user.menu['5000'].menus['5006'];
+                                        delete data.user.menu['5000'].menus['5008'];
+
+                                    }
+                                    // else if (data.user && data.user.permissions
+                                    //     && data.user.permissions.includes('unit:write')
+                                    //     && !data.user.permissions.includes('news:write') && data.user.menu['5000']) {
+                                    //     delete data.user.menu['5000'].menus['5001'];
+                                    //     delete data.user.menu['5000'].menus['5002'];
+                                    //     delete data.user.menu['5000'].menus['5003'];
+                                    // }
+                                    if (data.user && data.user.permissions
+                                        && data.user.permissions.includes('website:write')
+                                        && !data.user.permissions.includes('news:write')) {
+                                        if (data.user.menu['2000']) delete data.user.menu['2000'].menus['2090'];
+                                    }
+                                    res.send(data);
+                                });
+                            });
+                        });
+                    } else {
+                        setTimeout(ready, 500);
+                    }
+                };
+                ready();
             }
-        };
-        ready();
+        });
     });
+
     const getComponent = (index, componentIds, components, done) => {
         if (index < componentIds.length) {
             app.model.fwComponent.get({ id: componentIds[index] }, (error, component) => {
@@ -271,68 +242,37 @@ module.exports = app => {
             const srcPath = files.SettingImage[0].path;
 
             if (fields.userData == 'logo') {
-                app.deleteImage(app.data.logo);
-                let destPath = '/img/favicon' + app.path.extname(srcPath);
-                app.fs.copyFile(srcPath, app.path.join(app.publicPath, destPath), error => {
-                    if (error == null) {
-                        app.deleteFile(srcPath);
-                        destPath += '?t=' + (new Date().getTime()).toString().slice(-8);
-                        app.model.setting.setValue({ logo: destPath }, error => {
-                            if (error == null) app.data.logo = destPath;
-                            done({ image: app.data.logo, error });
-                        });
-                    } else {
-                        done({ error });
-                    }
+                app.state.get(fields.userData, (_, oldImage) => {
+                    oldImage && app.deleteImage(oldImage);
+                    let destPath = `/img/favicon${app.path.extname(srcPath)}`;
+                    app.fs.rename(srcPath, app.path.join(app.publicPath, destPath), error => {
+                        if (error == null) {
+                            destPath += '?t=' + new Date().getTime().toString().slice(-8);
+                            app.state.set(fields.userData, destPath, (error) => done({ image: destPath, error }));
+                        } else {
+                            done({ error });
+                        }
+                    });
                 });
-            } else if (fields.userData == 'footer' && files.SettingImage && files.SettingImage.length > 0) {
-                app.deleteImage(app.data.footer);
-                let destPath = '/img/footer' + app.path.extname(srcPath);
-                app.fs.copyFile(srcPath, app.path.join(app.publicPath, destPath), error => {
-                    if (error == null) {
-                        app.deleteFile(srcPath);
-                        destPath += '?t=' + (new Date().getTime()).toString().slice(-8);
-                        app.model.setting.setValue({ footer: destPath }, error => {
-                            if (error == null) app.data.footer = destPath;
-                            done({ image: app.data.footer, error });
-                        });
-                    } else {
-                        done({ error });
-                    }
+            } else if (['footer', 'map', 'header'].includes(fields.userData.toString())) {
+                app.state.get(fields.userData, (_, oldImage) => {
+                    oldImage && app.deleteImage(oldImage);
+                    let destPath = `/img/${fields.userData}${app.path.extname(srcPath)}`;
+                    app.fs.rename(srcPath, app.path.join(app.publicPath, destPath), error => {
+                        if (error == null) {
+                            destPath += '?t=' + new Date().getTime().toString().slice(-8);
+                            app.state.set(fields.userData, destPath, (error) => done({ image: destPath, error }));
+                        } else {
+                            done({ error });
+                        }
+                    });
                 });
-            } else if (fields.userData == 'map' && files.SettingImage && files.SettingImage.length > 0) {
-                app.deleteImage(app.data.map);
-                let destPath = '/img/map' + app.path.extname(srcPath);
-                app.fs.copyFile(srcPath, app.path.join(app.publicPath, destPath), error => {
-                    if (error == null) {
-                        app.deleteFile(srcPath);
-                        destPath += '?t=' + (new Date().getTime()).toString().slice(-8);
-                        app.model.setting.setValue({ map: destPath }, error => {
-                            if (error == null) app.data.map = destPath;
-                            done({ image: app.data.map, error });
-                        });
-                    } else {
-                        done({ error });
-                    }
-                });
-            } else if (fields.userData == 'header' && files.SettingImage && files.SettingImage.length > 0) {
-                app.deleteImage(app.data.header);
-                let destPath = '/img/header' + app.path.extname(srcPath);
-                app.fs.copyFile(srcPath, app.path.join(app.publicPath, destPath), error => {
-                    if (error == null) {
-                        app.deleteFile(srcPath);
-                        destPath += '?t=' + (new Date().getTime()).toString().slice(-8);
-                        app.model.setting.setValue({ header: destPath }, error => {
-                            if (error == null) app.data.header = destPath;
-                            done({ image: app.data.header, error });
-                        });
-                    } else {
-                        done({ error });
-                    }
-                });
+            } else {
+                app.deleteImage(srcPath);
             }
         }
     };
+
     app.uploadHooks.add('uploadSettingImage', (req, fields, files, params, done) =>
         app.permission.has(req, () => uploadSettingImage(req, fields, files, params, done), done, 'system:settings'));
 };

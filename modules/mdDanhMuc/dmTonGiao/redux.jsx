@@ -152,5 +152,5 @@ export const SelectAdapter_DmTonGiaoV2 = {
     getOne: getDmTonGiao,
     processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.ten })) : [] }),
     fetchOne: (ma, done) => (getDmTonGiao(ma, item => done && done({ id: item.ma, text: item.ten })))(),
-    processResultOne: response => response && ({ value: response.ma, text: `${response.ma}: ${response.ten}` }),
+    processResultOne: response => response && ({ value: response.ma, text: response.ten }),
 };

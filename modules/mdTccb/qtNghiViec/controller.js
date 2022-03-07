@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3030: { title: 'Quá trình nghỉ việc', link: '/user/tccb/qua-trinh/nghi-viec', icon: 'fa-sign-out', backgroundColor: '#2a99b8', groupIndex: 4 },
+            3030: { title: 'Cán bộ Nghỉ việc', link: '/user/tccb/qua-trinh/nghi-viec', icon: 'fa-user-times', backgroundColor: '#2a99b8', groupIndex: 0 },
         },
     };
     app.permission.add(
@@ -48,7 +48,14 @@ module.exports = app => {
     });
 
     app.post('/api/qua-trinh/nghi-viec', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtNghiViec.create(req.body.data, (error, item) => res.send({ error, item })));
+        app.model.qtNghiViec.create(req.body.data, (error, item) => {
+            if (!error) {
+                app.model.canBo.update({ shcc: item.shcc }, { daNghi: 1 }, (e) => {
+                    if (e) res.send({ error: e });
+                } );
+            }
+            res.send({ error, item });
+        }));
 
     app.put('/api/qua-trinh/nghi-viec', app.permission.check('staff:write'), (req, res) =>
         app.model.qtNghiViec.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item })));

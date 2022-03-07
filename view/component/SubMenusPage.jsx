@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
+import { AdminPage } from 'view/component/AdminPage';
 
 const nonAccentVietnamese = str => str.toLowerCase()
     .replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, 'a')
@@ -70,14 +71,11 @@ const compareSearch = (item, searchValue) => {
     }
 };
 
-
-class SubMenusPage extends React.Component {
+class SubMenusPage extends AdminPage {
     state = { mode: 'normal' };
-    searchBox = React.createRef();
 
     componentDidMount() {
         T.ready(this.props.menuLink, () => {
-            this.searchBox.current.focus();
             if (this.props.ready) this.props.ready();
             const getMenu = () => {
                 const menu = this.props.system && this.props.system.user ? this.props.system.user.menu[this.props.menuKey] : null;
@@ -94,22 +92,17 @@ class SubMenusPage extends React.Component {
                 }
             };
             getMenu();
+
+            T.onSearch = (searchText) => this.search(searchText || '');
+            T.showSearchBox();
         });
     }
 
-    search = (e, searchValue) => {
-        e.preventDefault();
+    search = (searchValue) => {
         const menus = this.state.menus.slice();
         for (let i = 0; i < menus.length; i++)
             menus[i].show = compareSearch(menus[i].title, searchValue);
         this.setState({ menus });
-    }
-
-    clearSearch = e => {
-        if (this.searchBox.current.value) {
-            this.searchBox.current.value = '';
-            this.search(e, '');
-        }
     }
 
     menuClick = (e, item) => {
@@ -142,69 +135,70 @@ class SubMenusPage extends React.Component {
         const { mode, menuState, parentMenu, menus } = this.state;
         const isEditMode = mode == 'edit';
         const noGroup = parentMenu && (parentMenu.groups == null || parentMenu.groups.length == 0);
-        return (
-            <main className='app-content'>
-                <div className='app-title'>
-                    <h1><i className={'fa ' + this.props.headerIcon} /> {parentMenu ? parentMenu.title : ''}</h1>
-                    <ul className='app-breadcrumb breadcrumb'>
-                        <div style={{ position: 'relative', border: '1px solid #ddd', marginRight: 6 }} onClick={this.clearSearch}>
-                            <input ref={this.searchBox} className='app-search__input' style={{ width: '30vw', outline: 'none' }} type='search' placeholder='Tìm kiếm' onChange={e => this.search(e, e.target.value)} />
-                            <a href='#' style={{ position: 'absolute', top: 6, right: 9 }}>
-                                <i className='fa fa-search' />
-                            </a>
-                        </div>
-                    </ul>
-                </div>
-
-                {parentMenu && menus ? (parentMenu.groups || ['']).map((groupText, groupIndex) => {
-                    const groupMenus = [];
-                    menus.forEach((item, index) => {
-                        if ((item.show == null || item.show == true) && (noGroup ||
-                            (item.groupIndex == null || item.groupIndex == groupIndex)) && (isEditMode || menuState[item.key])) {
-                            groupMenus.push(
-                                <div key={index} href='#' className='col-md-6 col-lg-4' style={{
-                                    cursor: 'pointer'
-                                }}
-                                    onClick={e => isEditMode ? this.changeIconState(e, item) : this.menuClick(e, item)}>
-                                    <div className='widget-small coloured-icon'>
-                                        <i style={{ backgroundColor: menuState[item.key] ? item.backgroundColor || '#00b0ff' : '#aaa' }} className={'icon fa fa-3x ' + (item.icon || 'fa-tasks')} />
-                                        <div className='info'>
-                                            <p>{item.title}</p>
-                                            {item.subTitle ? <small style={{ color: 'grey' }}><i>{item.subTitle}</i></small> : null}
-                                            {isEditMode ? <i className={'fa fa-lg ' + (menuState[item.key] ? 'fa-check text-success' : 'fa-times text-danger')} style={{ position: 'absolute', right: 24, top: 12 }} /> : null}
-                                        </div>
-                                    </div>
+        const pinMenus = [];
+        const listGroupMenus = [];
+        parentMenu && menus && (parentMenu.groups || ['']).forEach((groupText, groupIndex) => {
+            const groupMenus = [];
+            menus.forEach((item, index) => {
+                if ((item.show == null || item.show == true) && (noGroup || (item.groupIndex == null && groupIndex == 0) || item.groupIndex == groupIndex) && (isEditMode || menuState[item.key])) {
+                    (!item.pin ? groupMenus : pinMenus).push(
+                        <div key={index} href='#' style={{
+                            cursor: 'pointer'
+                        }}
+                            className='col-md-6 col-lg-4' onClick={e => isEditMode ? this.changeIconState(e, item) : this.menuClick(e, item)}>
+                            <div className='widget-small coloured-icon'>
+                                <i style={{ color: item.color || 'white', backgroundColor: menuState[item.key] ? item.backgroundColor || '#00b0ff' : '#aaa' }} className={'icon fa fa-3x ' + (item.icon || 'fa-tasks')} />
+                                <div className='info'>
+                                    <p>{item.title}</p>
+                                    {item.subTitle ? <small style={{ color: 'grey' }}><i>{item.subTitle}</i></small> : null}
+                                    {isEditMode ? <i className={'fa fa-lg ' + (menuState[item.key] ? 'fa-check text-success' : 'fa-times text-danger')} style={{ position: 'absolute', right: 24, top: 12 }} /> : null}
                                 </div>
-                            );
-                        }
-                    });
-                    return groupMenus.length ? (
-                        <div key={groupIndex} className='row'>
-                            {groupText ? <h4 className='col-12'>{groupText}</h4> : null}
-                            {groupMenus}
+                            </div>
                         </div>
-                    ) : null;
-                }) : null}
+                    );
+                }
+            });
+            if (groupMenus.length) {
+                const groupItem = (
+                    <div key={groupIndex + 1} className='row'>
+                        {groupText ? <h4 className='col-12'>{groupText}</h4> : null}
+                        {groupMenus}
+                    </div>);
+                listGroupMenus.push(groupItem);
+            }
+        }
+        );
+    
+        // let edit = isEditMode ?
+        //     <React.Fragment>
+        //         <button type='button' className='btn btn-danger btn-circle' title='Ẩn tất cả' style={{ position: 'fixed', right: '200px', bottom: '10px' }} onClick={() => this.selectAllIcons(false)}>
+        //             <i className='fa fa-lg fa-times' />
+        //         </button>
+        //         <button type='button' className='btn btn-success btn-circle' title='Hiện tất cả' style={{ position: 'fixed', right: '140px', bottom: '10px' }} onClick={() => this.selectAllIcons(true)}>
+        //             <i className='fa fa-lg fa-check' />
+        //         </button>
+        //         <button type='button' className='btn btn-secondary btn-circle' title='Trở về' style={{ position: 'fixed', right: '70px', bottom: '10px' }} onClick={this.cancelUserPage}>
+        //             <i className='fa fa-lg fa-reply' />
+        //         </button>
+        //         <button type='button' className='btn btn-primary btn-circle' title='Lưu chỉnh sửa' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.saveUserPage}>
+        //             <i className='fa fa-lg fa-save' />
+        //         </button>
+        //     </React.Fragment> :
+        //     <button type='button' className='btn btn-primary btn-circle' title='Chỉnh sửa giao diện' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={() => this.setState({ mode: 'edit' })}>
+        //         <i className='fa fa-lg fa-edit' />
+        //     </button>;
 
-                {/* {isEditMode ?
-                    <React.Fragment>
-                        <button type='button' className='btn btn-danger btn-circle' title='Ẩn tất cả' style={{ position: 'fixed', right: '200px', bottom: '10px' }} onClick={() => this.selectAllIcons(false)}>
-                            <i className='fa fa-lg fa-times' />
-                        </button>
-                        <button type='button' className='btn btn-success btn-circle' title='Hiện tất cả' style={{ position: 'fixed', right: '140px', bottom: '10px' }} onClick={() => this.selectAllIcons(true)}>
-                            <i className='fa fa-lg fa-check' />
-                        </button>
-                        <button type='button' className='btn btn-secondary btn-circle' title='Trở về' style={{ position: 'fixed', right: '70px', bottom: '10px' }} onClick={this.cancelUserPage}>
-                            <i className='fa fa-lg fa-reply' />
-                        </button>
-                        <button type='button' className='btn btn-primary btn-circle' title='Lưu chỉnh sửa' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.saveUserPage}>
-                            <i className='fa fa-lg fa-save' />
-                        </button>
-                    </React.Fragment> :
-                    <button type='button' className='btn btn-primary btn-circle' title='Chỉnh sửa giao diện' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={() => this.setState({ mode: 'edit' })}>
-                        <i className='fa fa-lg fa-edit' />
-                    </button>} */}
-            </main>);
+        return this.renderPage({
+            icon: 'fa ' + this.props.headerIcon,
+            title: parentMenu ? parentMenu.title : '',
+            content: <>
+                <div key={0} className='row'>
+                    {pinMenus}
+                </div>
+                {listGroupMenus}
+                {/* {edit} */}
+            </>,
+        });
     }
 }
 

@@ -203,7 +203,7 @@ class QtNghiThaiSanGroupPage extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-bed',
-            title: 'Quá trình nghỉ thai sản - Cán bộ',
+            title: 'Nghỉ thai sản - Cán bộ',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
                 <Link key={1} to='/user/tccb/qua-trinh/nghi-thai-san'>Nghỉ thai sản</Link>,

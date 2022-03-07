@@ -150,9 +150,11 @@ const timeList = [
 
 class QtNghienCuuKhoaHocGroupPage extends AdminPage {
     state = { shcc: '', filter: '' };
+    menu = '';
     componentDidMount() {
-        T.ready('/user/khcn', () => {
-            const route = T.routeMatcher('/user/khcn/qua-trinh/nghien-cuu-khoa-hoc/group/:shcc'),
+        this.menu = T.routeMatcher('/user/:tccb/qua-trinh/nghien-cuu-khoa-hoc/group/:shcc').parse(window.location.pathname).tccb;
+        T.ready('/user/' + this.menu, () => {
+            const route = T.routeMatcher('/user/' + this.menu + '/qua-trinh/nghien-cuu-khoa-hoc/group/:shcc'),
                 shcc = route.parse(window.location.pathname);
             this.setState({ filter: { maSoCanBo: shcc.shcc, timeType: 0 }, shcc: shcc.shcc });
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
@@ -290,8 +292,15 @@ class QtNghienCuuKhoaHocGroupPage extends AdminPage {
                     update={this.props.updateQtNckhStaffGroup}
                 />
             </>,
-            backRoute: '/user/khcn/qua-trinh/nghien-cuu-khoa-hoc',
+            backRoute: '/user/' + this.menu + '/qua-trinh/nghien-cuu-khoa-hoc',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+            onExport: (e) => {
+                e.preventDefault();
+                const { maDonVi, fromYear, toYear, loaiHocVi, maSoCanBo, timeType } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : {
+                    maDonVi: '', fromYear: null, toYear: null, loaiHocVi: '', maSoCanBo: '', timeType: 0,
+                };
+                T.download(T.url(`/api/qua-trinh/nckh/download-excel/${maDonVi !== '' ? maDonVi : null}/${fromYear != null ? fromYear : null}/${toYear != null ? toYear : null}/${loaiHocVi != '' ? loaiHocVi : null}/${maSoCanBo != '' ? maSoCanBo : null}/${timeType}`), 'NCKH.xlsx');
+            }
         });
     }
 }
