@@ -1,10 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { getEventWithQuestionByUser, getEventByUser } from './redux';
-import { getQuestionInPageByUser } from '../fwForm/reduxQuestion';
+import { getQuestionInPageByUser } from '../../_default/fwForm/reduxQuestion';
 import { Link } from 'react-router-dom';
 // import HomeRegistrationForm from '../fwQuestionAndAnswer/homeRegistrationForm';
-import HomeRegistrationForm from '../fwForm/home/homeRegistrationForm';
+import HomeRegistrationForm from '../../_default/fwForm/home/homeRegistrationForm';
 
 const texts = {
     vi: {

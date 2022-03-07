@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { updateEvent, getEvent, getDraftEvent, checkLink, createDraftEvent, updateDraftEvent } from './redux';
-import { countAnswer } from '../fwForm/reduxAnswer';
+import { countAnswer } from '../../_default/fwForm/reduxAnswer';
 import { Link, withRouter } from 'react-router-dom';
 import ImageBox from 'view/component/ImageBox';
 import Editor from 'view/component/CkEditor4';

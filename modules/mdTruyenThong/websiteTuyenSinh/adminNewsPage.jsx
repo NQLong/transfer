@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { getNewsByCategoryAdmin, createNews, updateNews, swapNews, deleteNews } from 'modules/_default/fwNews/redux';
+import { getNewsByCategoryAdmin, createNews, updateNews, swapNews, deleteNews } from 'modules/mdTruyenThong/fwNews/redux';
 import { getTuyenSinh } from 'modules/_default/_init/reduxCategory';
 import Pagination from 'view/component/Pagination';
 import DropDown from 'view/component/Dropdown';

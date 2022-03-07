@@ -1,14 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { updateForm, getForm } from '../fwForm/redux';
-import { getQuestionsList } from '../fwForm/reduxQuestion';
-import { getAnswerInPage, getAnswer, updateAnswer, deleteAnswer } from '../fwForm/reduxAnswer';
+import { updateForm, getForm } from '../../_default/fwForm/redux';
+import { getQuestionsList } from '../../_default/fwForm/reduxQuestion';
+import { getAnswerInPage, getAnswer, updateAnswer, deleteAnswer } from '../../_default/fwForm/reduxAnswer';
 import Pagination from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
 import { getEvent } from './redux';
 
-import EditAnswerModal from '../fwForm/admin/modal/EditAnswerModal';
-import AddAnswerModal from '../fwForm/admin/modal/AddAnswerModal';
+import EditAnswerModal from '../../_default/fwForm/admin/modal/EditAnswerModal';
+import AddAnswerModal from '../../_default/fwForm/admin/modal/AddAnswerModal';
 // import ImportStudentModal from '../fwForm/admin/modal/ImportStudentModal';
 
 class adminRegistrationPage extends React.Component {
