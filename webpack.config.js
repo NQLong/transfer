@@ -1,6 +1,6 @@
 const appConfig = require('./package'),
-    personnelConfig = require('./asset/config.json') || { ignoreModules: [] },
     fs = require('fs'),
+    personnelConfig = fs.existsSync('./asset/config.json') ? require('./asset/config.json') : { ignoreModules: [] },
     path = require('path'),
     endOfLine = require('os').EOL;
 
