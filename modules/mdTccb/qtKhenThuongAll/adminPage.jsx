@@ -216,20 +216,20 @@ class QtKhenThuongAll extends AdminPage {
         let deTais = text.split('??');
         let years = list_year.split('??');
         let results = [];
-        let choose = i > 15 ? 15 : i;
+        let choose = i > 5 ? 5 : i;
         for (let k = 0; k < choose; k++) {
-            results.push(<p style={{ textTransform: 'uppercase' }}> <span>
+            results.push(<div> <span>
                 Lần {k+1}. {deTais[k]} ({years[k].trim()})
-            </span></p>);
+            </span></div>);
         }
         if (i > 15) {
-            results.push(<p style={{ textTransform: 'uppercase' }}> <span>
+            results.push(<div> <span>
                 .........................................
-            </span></p>);
+            </span></div>);
             let k = i - 1;
-            results.push(<p style={{ textTransform: 'uppercase' }}> <span>
+            results.push(<div> <span>
                 Lần {k+1}. {deTais[k]} ({years[k].trim()})
-            </span></p>);
+            </span></div>);
         }
         return results;
     }
@@ -284,18 +284,18 @@ class QtKhenThuongAll extends AdminPage {
         let table = 'Không có danh sách';
         if (list && list.length > 0) {
             table = renderTable({
-                getDataSource: () => list, stickyHead: false,
+                getDataSource: () => list, stickyHead: true,
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Đối tượng</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Đối tượng</th>
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm đạt được</th>}
-                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thành tích</th>}
+                        {!this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Thành tích</th>}
                         {!this.checked && <th style={{ width: 'auto', textAlign: 'right', whiteSpace: 'nowrap' }}>Điểm thi đua</th>}
 
                         {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số thành tích đạt được</th>}
-                        {this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Danh sách thành tích</th>}
+                        {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách thành tích</th>}
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Loại đối tượng</th>
                         <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                     </tr>
