@@ -1769,6 +1769,39 @@
         "foreignKeys": [],
         "type": "table"
     },
+    "DM_LOAI_CHI_PHI": {
+        "active": true,
+        "moduleName": "dmLoaiChiPhi",
+        "modelName": "dmLoaiChiPhi",
+        "columns": {
+            "MA": {
+                "value": "ma",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": false,
+                "size": 2
+            },
+            "TEN": {
+                "value": "ten",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 50
+            },
+            "KICH_HOAT": {
+                "value": "kichHoat",
+                "dataType": "NUMBER",
+                "dataDefault": "1",
+                "nullable": true,
+                "size": "1,0"
+            }
+        },
+        "primaryKeys": [
+            "MA"
+        ],
+        "foreignKeys": [],
+        "type": "table"
+    },
     "DM_LOAI_DON_VI": {
         "active": true,
         "moduleName": "dmLoaiDonVi",
@@ -6588,6 +6621,13 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": 50
+            },
+            "LOAI_CHI_PHI": {
+                "value": "loaiChiPhi",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 2
             }
         },
         "primaryKeys": [
@@ -6808,6 +6848,13 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": "20,0"
+            },
+            "LOAI_CHI_PHI": {
+                "value": "loaiChiPhi",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 2
             }
         },
         "primaryKeys": [
@@ -7673,6 +7720,13 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": "22,0"
+            },
+            "SO_QUYET_DINH": {
+                "value": "soQuyetDinh",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 30
             }
         },
         "primaryKeys": [
@@ -7794,20 +7848,6 @@
                 "nullable": false,
                 "size": "22,0"
             },
-            "BAT_DAU": {
-                "value": "batDau",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
-            "KET_THUC": {
-                "value": "ketThuc",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
-            },
             "LY_DO_HINH_THUC": {
                 "value": "lyDoHinhThuc",
                 "dataType": "NVARCHAR2",
@@ -7821,20 +7861,6 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": 50
-            },
-            "BAT_DAU_TYPE": {
-                "value": "batDauType",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 20
-            },
-            "KET_THUC_TYPE": {
-                "value": "ketThucType",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 20
             },
             "SHCC": {
                 "value": "shcc",
@@ -7856,6 +7882,20 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": 100
+            },
+            "SO_QUYET_DINH": {
+                "value": "soQuyetDinh",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 20
+            },
+            "NGAY_RA_QUYET_DINH": {
+                "value": "ngayRaQuyetDinh",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "20,0"
             }
         },
         "primaryKeys": [

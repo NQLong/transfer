@@ -17,11 +17,6 @@
         "lint:fix": "npm run lint --  --fix",
         "lint": "eslint . --ext .jsx,.js --ignore-path .gitignore"
     },
-    "redisDB": {
-        "host": "10.22.1.49",
-        "port": 6379,
-        "auth": "6GmpjC44wnCwKR8BBhCbnw2NFJNG7NJm"
-    },
     "db": {
         "owner": "DEV_HCMUSSH",
         "host": "116.109.45.163",
@@ -148,7 +143,8 @@
         "socket.io-client": "^4.4.1",
         "socket.io-redis": "^6.1.1",
         "source-map-loader": "^1.1.1",
-        "xlsx": "^0.15.6"
+        "xlsx": "^0.15.6",
+        "fs-extra": "^10.0.1"
     },
     "husky": {
         "hooks": {

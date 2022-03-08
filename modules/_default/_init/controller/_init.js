@@ -263,12 +263,9 @@ module.exports = app => {
         },
 
         init: () => app.redis.keys(`${app.appName}_state:*`, (_, keys) => {
-            app.model.setting.getValue(['todayViews', 'allViews', 'logo', 'footer', 'header', 'map', 'facebook', 'youtube', 'twitter', 'instagram', 'latitude', 'longitude', 'email', 'emailPassword', 'mobile', 'address', 'address2', 'schoolName', 'tchcEmail', 'linkMap'], result => {
-                keys && Object.keys(app.state.initState).forEach(key => {
-                    const redisKey = `${app.appName}_state:${key}`;
-                    if (!keys.includes(redisKey) && app.state.initState[key]) app.redis.set(redisKey, app.state.initState[key]);
-                    if (result[key]) app.redis.set(redisKey, result[key]);
-                });
+            keys && Object.keys(app.state.initState).forEach(key => {
+                const redisKey = `${app.appName}_state:${key}`;
+                if (!keys.includes(redisKey) && app.state.initState[key]) app.redis.set(redisKey, app.state.initState[key]);
             });
         }),
 
