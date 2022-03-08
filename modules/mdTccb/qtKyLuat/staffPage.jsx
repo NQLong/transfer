@@ -123,7 +123,7 @@ class QtKyLuatUserPage extends AdminPage {
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
-                getDataSource: () => list, stickyHead: false,
+                getDataSource: () => list, stickyHead: true,
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
@@ -140,7 +140,7 @@ class QtKyLuatUserPage extends AdminPage {
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='text' content={(
                             <>
-                                <b> {item.soQuyetDinh ? item.soQuyetDinh : ''} </b> <br/><br/>
+                                <b> {item.soQuyetDinh ? item.soQuyetDinh : ''} </b> <br/>
                                 {item.ngayRaQuyetDinh ? <span style={{ whiteSpace: 'nowrap' }}>Ngày ra quyết định: <span style={{ color: 'blue' }}>{item.ngayRaQuyetDinh ? T.dateToText(item.ngayRaQuyetDinh, 'dd/mm/yyyy') : ''}</span><br /></span> : null}
                             </>
                         )}
@@ -151,9 +151,9 @@ class QtKyLuatUserPage extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' content={(
+                        <TableCell type='text' style={{ color: 'red' }} content={(
                             <>
-                                <span><i>{item.tenKyLuat ? item.tenKyLuat : ''}</i></span> <br /> <br />
+                                <span><b>{item.tenKyLuat ? item.tenKyLuat : ''}</b></span>
                             </>
                         )}
                         />

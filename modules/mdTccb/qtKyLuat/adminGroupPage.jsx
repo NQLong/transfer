@@ -149,11 +149,14 @@ class QtKyLuatGroupPage extends AdminPage {
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
-                getDataSource: () => list, stickyHead: false,
+                getDataSource: () => list, stickyHead: true,
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Đơn vị công tác<br/>Chức vụ</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nội dung kỷ luật</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Hình thức kỷ luật</th>
@@ -169,15 +172,31 @@ class QtKyLuatGroupPage extends AdminPage {
                             <>
                                 <span>{(item.hoCanBo ? item.hoCanBo : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo : ' ')}</span><br />
                                 {item.maCanBo} <br/>
-                                {item.tenDonVi && <span>Đơn vị: {item.tenDonVi} </span>} <br/>
-                                {item.tenChucVu && <span>Chức vụ: {item.tenChucVu} </span>} <br/>
-                                {item.tenHocVi && <span>Học vị: {item.tenHocVi} </span>} <br/>
+                            </>
+                        )}
+                        />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                            <>
+                                {item.tenHocVi ? item.tenHocVi : ''}
+                            </>
+                        )}
+                        />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                            <>
+                                {item.tenChucDanhNgheNghiep ? item.tenChucDanhNgheNghiep : ''}
+                            </>
+                        )}
+                        />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                            <>
+                                <span> { item.tenDonVi ? item.tenDonVi : ''} <br/> </span>
+                                {item.tenChucVu ? item.tenChucVu : ''}
                             </>
                         )}
                         />
                         <TableCell type='text' content={(
                             <>
-                                <b> {item.soQuyetDinh ? item.soQuyetDinh : ''} </b> <br/><br/>
+                                <b> {item.soQuyetDinh ? item.soQuyetDinh : ''} </b> <br/>
                                 {item.ngayRaQuyetDinh ? <span style={{ whiteSpace: 'nowrap' }}>Ngày ra quyết định: <span style={{ color: 'blue' }}>{item.ngayRaQuyetDinh ? T.dateToText(item.ngayRaQuyetDinh, 'dd/mm/yyyy') : ''}</span><br /></span> : null}
                             </>
                         )}
@@ -188,9 +207,9 @@ class QtKyLuatGroupPage extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' content={(
+                        <TableCell type='text' style={{ color: 'red' }} content={(
                             <>
-                                <span><i>{item.tenKyLuat ? item.tenKyLuat : ''}</i></span> <br /> <br />
+                                <span><b>{item.tenKyLuat ? item.tenKyLuat : ''}</b></span>
                             </>
                         )}
                         />
