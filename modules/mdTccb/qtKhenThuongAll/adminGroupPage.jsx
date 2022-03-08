@@ -224,7 +224,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                        <TableCell type='link' onClick={() => this.modal.show(item)} content={(
+                        <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
                             item.maLoaiDoiTuong == '01' ?
                                 <>
                                     <span>
@@ -256,7 +256,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' content={(
+                        <TableCell type='text' style={{ textAlign: 'center' }} content={(
                             <>
                                 {item.namDatDuoc}
                             </>
