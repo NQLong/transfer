@@ -2739,6 +2739,13 @@
                 "dataDefault": "1",
                 "nullable": false,
                 "size": "1,0"
+            },
+            "LOAI": {
+                "value": "loai",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "1,0"
             }
         },
         "primaryKeys": [
@@ -5763,7 +5770,7 @@
                 "dataType": "NVARCHAR2",
                 "dataDefault": "",
                 "nullable": true,
-                "size": 3
+                "size": 10
             },
             "THUONG_TRU_SO_NHA": {
                 "value": "thuongTruSoNha",
@@ -5791,7 +5798,7 @@
                 "dataType": "NVARCHAR2",
                 "dataDefault": "",
                 "nullable": true,
-                "size": 3
+                "size": 10
             },
             "LIEN_LAC_SO_NHA": {
                 "value": "lienLacSoNha",
@@ -7288,16 +7295,9 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_89055\".nextval",
                 "nullable": false,
                 "size": "22,0"
-            },
-            "THUONG_TRU": {
-                "value": "thuongTru",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 1000
             }
         },
         "primaryKeys": [
@@ -7454,6 +7454,39 @@
         },
         "primaryKeys": [
             "MA"
+        ],
+        "foreignKeys": [],
+        "type": "table"
+    },
+    "QT_HO_TRO_HOC_PHI": {
+        "active": true,
+        "moduleName": "qtHoTroHocPhi",
+        "modelName": "qtHoTroHocPhi",
+        "columns": {
+            "ID": {
+                "value": "id",
+                "dataType": "NUMBER",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_94724\".nextval",
+                "nullable": false,
+                "size": "22,0"
+            },
+            "NGAY_LAM_DON": {
+                "value": "ngayLamDon",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "20,0"
+            },
+            "SHCC": {
+                "value": "shcc",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 10
+            }
+        },
+        "primaryKeys": [
+            "ID"
         ],
         "foreignKeys": [],
         "type": "table"
@@ -8882,13 +8915,6 @@
                 "nullable": true,
                 "size": 10
             },
-            "TYPE": {
-                "value": "type",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "1,0"
-            },
             "DIA_CHI": {
                 "value": "diaChi",
                 "dataType": "NVARCHAR2",
@@ -9125,7 +9151,7 @@
                 "dataType": "NVARCHAR2",
                 "dataDefault": "",
                 "nullable": true,
-                "size": 6
+                "size": 10
             },
             "HE_SO_LUONG": {
                 "value": "heSoLuong",
@@ -9189,34 +9215,6 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": 200
-            },
-            "MA_TRINH_DO_LLCT": {
-                "value": "maTrinhDoLlct",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 2
-            },
-            "MA_TRINH_DO_QLNN": {
-                "value": "maTrinhDoQlnn",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 2
-            },
-            "MA_TRINH_DO_NN": {
-                "value": "maTrinhDoNn",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 2
-            },
-            "MA_TRINH_DO_TIN_HOC": {
-                "value": "maTrinhDoTinHoc",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 2
             },
             "HO_KHAU": {
                 "value": "hoKhau",
@@ -9384,14 +9382,14 @@
                 "dataType": "NVARCHAR2",
                 "dataDefault": "",
                 "nullable": true,
-                "size": 200
+                "size": 100
             },
             "SUC_KHOE": {
                 "value": "sucKhoe",
                 "dataType": "NVARCHAR2",
                 "dataDefault": "",
                 "nullable": true,
-                "size": 200
+                "size": 50
             },
             "CAN_NANG": {
                 "value": "canNang",
@@ -9426,14 +9424,14 @@
                 "dataType": "NVARCHAR2",
                 "dataDefault": "",
                 "nullable": true,
-                "size": 100
+                "size": 20
             },
             "HANG_THUONG_BINH": {
                 "value": "hangThuongBinh",
                 "dataType": "NVARCHAR2",
                 "dataDefault": "",
                 "nullable": true,
-                "size": 100
+                "size": 20
             },
             "GIA_DINH_CHINH_SACH": {
                 "value": "giaDinhChinhSach",
