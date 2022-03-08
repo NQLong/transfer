@@ -94,7 +94,7 @@ class Footer extends React.Component {
                         <h3>{language.connect} <i className='fa fa-angle-down d-md-none'></i></h3>
                         <div className='list-unstyled' style={{ fontWeight: 'bold', fontSize: 16 }}>
                             <img src={'/img/logo-footer.png?t=4000'}
-                                onClick={() => window.open('http://hcmussh.edu.vn/', '_blank')}
+                                onClick={() => window.open('https://hcmussh.edu.vn/', '_blank')}
                                 style={{ width: '100%', maxWidth: 450, cursor: 'pointer' }} />
                             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', paddingTop: 10, maxWidth: 450 }}>
                                 {mobile &&
@@ -212,7 +212,7 @@ class Footer extends React.Component {
                             <li><i className='icon-facebook-square'></i><span className='ml-1' style={{ paddingLeft: '10px', }}>
                                 <a href='https://www.facebook.com/232430870759910' target='_blank' rel="noreferrer">
                                     www.facebook.com/232430870759910
-                                    </a>
+                                </a>
                             </span>
                             </li>
                         </div>
@@ -321,7 +321,7 @@ class Footer extends React.Component {
                         <h3>CONTACT DIRECTORY<i className='fa fa-angle-down d-md-none'></i></h3>
                         <div className='list-unstyled' style={{ fontWeight: 'bold', fontSize: 16 }}>
                             <img src={'/img/logo-footer.png?t=4000'}
-                                onClick={() => window.open('http://hcmussh.edu.vn/', '_blank')}
+                                onClick={() => window.open('https://hcmussh.edu.vn/', '_blank')}
                                 style={{ width: '100%', maxWidth: 450, cursor: 'pointer' }} />
                             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', paddingTop: 10, maxWidth: 450 }}>
                                 {mobile &&

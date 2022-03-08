@@ -127,6 +127,12 @@ class SinhVienPage extends AdminPage {
         }
     }
 
+    copyAddress = e => {
+        e.preventDefault();
+        const dataThuongTru = this.thuongTru.value();
+        this.lienLac.value(dataThuongTru.maTinhThanhPho, dataThuongTru.maQuanHuyen, dataThuongTru.maPhuongXa, dataThuongTru.soNhaDuong);
+    }
+
     getValue = (selector) => {
         const data = selector.value();
         const isRequired = selector.props.required;
@@ -187,6 +193,9 @@ class SinhVienPage extends AdminPage {
                             <FormSelect ref={e => this.danToc = e} label='Dân tộc' className='form-group col-md-4' data={SelectAdapter_DmDanTocV2} />
                             <FormSelect ref={e => this.tonGiao = e} label='Tôn giáo' className='form-group col-md-4' data={SelectAdapter_DmTonGiaoV2} />
                             <ComponentDiaDiem ref={e => this.thuongTru = e} label='Thường trú' className='form-group col-md-12' requiredSoNhaDuong={true} />
+                            <p className='form-group col-md-12'>
+                                Nếu <b>Địa chỉ thường trú</b> là <b>Địa chỉ hiện tại</b> thì&nbsp;<a href='#' onClick={this.copyAddress}>nhấp vào đây</a>.
+                            </p>
                             <ComponentDiaDiem ref={e => this.lienLac = e} label='Nơi ở hiện tại' className='form-group col-md-12' requiredSoNhaDuong={true} />
                             <FormTextBox ref={e => this.dienThoaiCaNhan = e} label='Điện thoại cá nhân' className='form-group col-md-4' maxLength={10} />
                             <FormTextBox ref={e => this.dienThoaiLienLac = e} label='Điện thoại liên lạc' className='form-group col-md-4' maxLength={10} />
