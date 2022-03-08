@@ -22,4 +22,24 @@ module.exports = app => {
             }
         });
     });
+
+    app.put('/api/user/student', app.permission.check('student:login'), (req, res) => {
+        if (req.body.changes && req.session.user) {
+            const changes = req.body.changes;
+            app.model.fwStudents.get({mssv: req.session.user.studentId}, (error, sinhVien) => {
+                if (!sinhVien) {
+                    changes.mssv = req.session.user.studentId;
+                    app.model.fwStudents.create(changes, (error, item) => {
+                        res.send({error, item});
+                    });
+                } else {    
+                    app.model.fwStudents.update({mssv: req.session.user.studentId}, changes, (error, item) => {
+                        res.send({error, item});
+                    });
+                }
+            });
+        } else {
+            res.send({ error: 'Invalid parameter!' });
+        }
+    });
 };

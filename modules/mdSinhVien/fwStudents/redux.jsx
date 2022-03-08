@@ -60,3 +60,18 @@ export function getSinhVienEditUser(done) {
     };
 }
 
+export function updateStudentUser(changes, done) {
+    return dispatch => {
+        const url = '/api/user/student';
+        T.put(url, { changes }, data => {
+            if (data.error) {
+                T.notify('Cập nhật dữ liệu sinh viên bị lỗi', 'danger');
+                console.error(`PUT: ${url}.`, data.error);
+            } else {
+                T.notify('Cập nhật thông tin sinh viên thành công!', 'success');
+                done && done(data.item);
+                dispatch({ type: sinhVienUserGet, item: data.item });
+            }
+        }, () => T.notify('Cập nhật dữ liệu sinh viên bị lỗi', 'danger'));
+    };
+}
