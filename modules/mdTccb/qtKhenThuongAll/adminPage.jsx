@@ -115,15 +115,15 @@ class EditModal extends AdminModal {
 
                 <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo}
                     style={doiTuong == '02' ? {} : { display: 'none' }}
-                    readOnly={readOnly} required />
+                    readOnly={this.state.id ? true : false} required />
 
                 <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi}
                     style={doiTuong == '03' ? {} : { display: 'none' }}
-                    readOnly={readOnly} required />
+                    readOnly={this.state.id ? true : false} required />
 
                 <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maBoMon = e} label='Bộ môn' data={SelectAdapter_DmBoMon}
                     style={doiTuong == '04' ? {} : { display: 'none' }}
-                    readOnly={readOnly} required />
+                    readOnly={this.state.id ? true : false} required />
 
                 <FormTextBox className='col-md-4' ref={e => this.soQuyetDinh = e} type='text' label='Số quyết định' readOnly={readOnly} />
                 <FormSelect className='col-md-8' ref={e => this.thanhTich = e} label='Thành tích' data={SelectAdapter_DmKhenThuongKyHieuV2} readOnly={readOnly} required />
