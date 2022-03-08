@@ -8,10 +8,11 @@ import { SelectAdapter_DmDanTocV2 } from 'modules/mdDanhMuc/dmDanToc/redux';
 import { ComponentDiaDiem } from 'modules/mdDanhMuc/dmDiaDiem/componentDiaDiem';
 import { SelectAdapter_DmTonGiaoV2 } from 'modules/mdDanhMuc/dmTonGiao/redux';
 import { SelectAdapter_DmGioiTinhV2 } from 'modules/mdDanhMuc/dmGioiTinh/redux';
+import { updateSystemState } from 'modules/_default/_init/reduxSystem';
 import T from 'view/js/common';
 
 class SinhVienPage extends AdminPage {
-    state = { item: null, lastModified: null }
+    state = { item: null, lastModified: null, image: '' }
 
     componentDidMount() {
         T.ready('/user', () => {
@@ -25,14 +26,6 @@ class SinhVienPage extends AdminPage {
             });
         });
     }
-
-    imageChanged = (data) => {
-        console.log(data);
-        if (data && data.image) {
-            const user = Object.assign({}, this.props.system.user, { image: data.image });
-            this.props.updateSystemState({ user });
-        }
-    };
 
     setVal = (data = {}) => {
         this.mssv.value(data.mssv ? data.mssv : '');
@@ -63,8 +56,8 @@ class SinhVienPage extends AdminPage {
         this.tonGiao.value(data.tonGiao ? data.tonGiao : '');
         this.lop.value(data.lop ? data.lop : '');
         this.quocTich.value(data.quocGia ? data.quocGia : '');
-        this.imageBox.setData('SinhVienImage:' + data.emailTruong, data.image ? data.image : '/img/avatar.png');
-    }
+        this.imageBox.setData('SinhVienImage:' + data.mssv, data.image ? data.image : '/img/avatar.png');
+    };
 
     getAndValidate = () => {
         try {
@@ -95,8 +88,7 @@ class SinhVienPage extends AdminPage {
                         dienThoaiCaNhan: this.getValue(this.dienThoaiCaNhan),
                         dienThoaiKhac: this.getValue(this.dienThoaiKhac),
                         dienThoaiLienLac: this.getValue(this.dienThoaiLienLac),
-                        emailCaNhan: this.getValue(this.emailCaNhan),
-                        emailTruong: this.getValue(this.emailTruong),
+                        emailCaNhan, emailTruong,
                         gioiTinh: this.getValue(this.gioiTinh),
                         khoa: this.getValue(this.khoa),
                         maKhoa: this.getValue(this.maKhoa),
@@ -114,24 +106,31 @@ class SinhVienPage extends AdminPage {
                         lop: this.getValue(this.lop),
                         quocGia: this.getValue(this.quocTich),
                         thuongTruMaHuyen, thuongTruMaTinh, thuongTruMaXa,  thuongTruSoNha,
-                        lienLacMaHuyen, lienLacMaTinh,  lienLacMaXa, lienLacSoNha
+                        lienLacMaHuyen, lienLacMaTinh,  lienLacMaXa, lienLacSoNha,
                     };
                     return data;
                 }
             }
-
+            
         catch (selector) {
             selector.focus();
             T.notify('<b>' + (selector.props.label || 'Dữ liệu') + '</b> bị trống!', 'danger');
             return false;
         }
-    }
+    };
 
     copyAddress = e => {
         e.preventDefault();
         const dataThuongTru = this.thuongTru.value();
         this.lienLac.value(dataThuongTru.maTinhThanhPho, dataThuongTru.maQuanHuyen, dataThuongTru.maPhuongXa, dataThuongTru.soNhaDuong);
-    }
+    };
+
+    imageChanged = (data) => {
+        if (data && data.image) {
+            const user = Object.assign({}, this.props.system.user, { image: data.image });
+            this.props.updateSystemState({ user });
+        }
+    };
 
     getValue = (selector) => {
         const data = selector.value();
@@ -147,7 +146,7 @@ class SinhVienPage extends AdminPage {
         if(studentData) {
            this.props.updateStudentUser(studentData, () => this.setState({ lastModified: new Date().getTime() }));
         }
-    }
+    };
 
     render() {
         let item = this.props.system && this.props.system.user ? this.props.system.user.student : null;
@@ -164,13 +163,13 @@ class SinhVienPage extends AdminPage {
                     <h3 className='tile-title'>Thông tin cơ bản</h3>
                     <div className='tile-body'>
                         <div className='row'>
-                            <FormImageBox
-                                ref={e => this.imageBox = e} 
-                                style={{ display: 'block' }} 
+                            <FormImageBox 
+                                ref={e => this.imageBox = e}
+                                style={{ display: 'block' }}
                                 label='Hình đại diện'
                                 postUrl='/user/upload' 
                                 uploadType='SinhVienImage' 
-                                onSuccess={this.imageChanged} 
+                                onSuccess={this.imageChanged}
                                 className='form-group col-md-3' 
                             />
                             <div className="form-group col-md-9">
@@ -188,10 +187,10 @@ class SinhVienPage extends AdminPage {
                                     <FormTextBox ref={e => this.tinhTrang = e} label='Tình trạng' className='form-group col-md-4' readOnly />
                                 </div>
                             </div>
-                            <FormDatePicker ref={e => this.ngaySinh = e} label='Ngày sinh' type='date-mask' className='form-group col-md-4' required />
-                            <FormSelect ref={e => this.quocTich = e} label='Quốc tịch' className='form-group col-md-4' data={SelectAdapter_DmQuocGia} />
-                            <FormSelect ref={e => this.danToc = e} label='Dân tộc' className='form-group col-md-4' data={SelectAdapter_DmDanTocV2} />
-                            <FormSelect ref={e => this.tonGiao = e} label='Tôn giáo' className='form-group col-md-4' data={SelectAdapter_DmTonGiaoV2} />
+                            <FormDatePicker ref={e => this.ngaySinh = e} label='Ngày sinh' type='date-mask' className='form-group col-md-3' required />
+                            <FormSelect ref={e => this.quocTich = e} label='Quốc tịch' className='form-group col-md-3' data={SelectAdapter_DmQuocGia} />
+                            <FormSelect ref={e => this.danToc = e} label='Dân tộc' className='form-group col-md-3' data={SelectAdapter_DmDanTocV2} />
+                            <FormSelect ref={e => this.tonGiao = e} label='Tôn giáo' className='form-group col-md-3' data={SelectAdapter_DmTonGiaoV2} />
                             <ComponentDiaDiem ref={e => this.thuongTru = e} label='Thường trú' className='form-group col-md-12' requiredSoNhaDuong={true} />
                             <p className='form-group col-md-12'>
                                 Nếu <b>Địa chỉ thường trú</b> là <b>Địa chỉ hiện tại</b> thì&nbsp;<a href='#' onClick={this.copyAddress}>nhấp vào đây</a>.
@@ -220,6 +219,6 @@ class SinhVienPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, sinhVien: state.sinhVien });
 const mapActionsToProps = {
-    getSinhVienEditUser, updateStudentUser
+    getSinhVienEditUser, updateStudentUser, updateSystemState,
 };
 export default connect(mapStateToProps, mapActionsToProps)(SinhVienPage);
