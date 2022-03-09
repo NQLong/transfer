@@ -1241,6 +1241,39 @@
         "foreignKeys": [],
         "type": "table"
     },
+    "DM_HO_TRO_HOC_PHI_CO_SO": {
+        "active": true,
+        "moduleName": "dmHoTroHocPhiCoSo",
+        "modelName": "dmHoTroHocPhiCoSo",
+        "columns": {
+            "MA": {
+                "value": "ma",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": false,
+                "size": 2
+            },
+            "TEN": {
+                "value": "ten",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 100
+            },
+            "KICH_HOAT": {
+                "value": "kichHoat",
+                "dataType": "NUMBER",
+                "dataDefault": "1",
+                "nullable": true,
+                "size": "1,0"
+            }
+        },
+        "primaryKeys": [
+            "MA"
+        ],
+        "foreignKeys": [],
+        "type": "table"
+    },
     "DM_HUONG_PHU_CAP": {
         "active": true,
         "moduleName": "dmPhuCap",
@@ -7483,6 +7516,76 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": 10
+            },
+            "NOI_DUNG": {
+                "value": "noiDung",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 100
+            },
+            "CO_SO_DAO_TAO": {
+                "value": "coSoDaoTao",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 100
+            },
+            "BAT_DAU": {
+                "value": "batDau",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "20,0"
+            },
+            "BAT_DAU_TYPE": {
+                "value": "batDauType",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 10
+            },
+            "KET_THUC": {
+                "value": "ketThuc",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "20,0"
+            },
+            "KET_THUC_TYPE": {
+                "value": "ketThucType",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 10
+            },
+            "HOC_KY_HO_TRO": {
+                "value": "hocKyHoTro",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 50
+            },
+            "SO_TIEN": {
+                "value": "soTien",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "10,0"
+            },
+            "HO_SO": {
+                "value": "hoSo",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 100
+            },
+            "GHI_CHU": {
+                "value": "ghiChu",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 100
             }
         },
         "primaryKeys": [
