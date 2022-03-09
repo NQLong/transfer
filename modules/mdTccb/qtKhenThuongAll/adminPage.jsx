@@ -163,6 +163,8 @@ class QtKhenThuongAll extends AdminPage {
                 this.fromYear?.value('');
                 this.toYear?.value('');
                 this.loaiDoiTuong?.value('');
+                this.maDonVi?.value('');
+                this.mulCanBo?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
             if (this.checked) {
@@ -183,8 +185,9 @@ class QtKhenThuongAll extends AdminPage {
         const fromYear = this.fromYear?.value() == '' ? null : Number(this.fromYear?.value());
         const toYear = this.toYear?.value() == '' ? null : Number(this.toYear?.value());
         const loaiDoiTuong = this.loaiDoiTuong?.value() || '-1';
-        const ma = null;
-        const pageFilter = isInitial ? null : { fromYear, toYear, loaiDoiTuong, ma };
+        const list_dv = loaiDoiTuong == '02' ? (this.maDonVi?.value().toString() || '') : '';
+        const list_shcc = loaiDoiTuong == '02' ? (this.mulCanBo?.value().toString() || '') : '';
+        const pageFilter = isInitial ? null : { fromYear, toYear, loaiDoiTuong, list_dv, list_shcc };
         this.curState = loaiDoiTuong;
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
@@ -194,7 +197,9 @@ class QtKhenThuongAll extends AdminPage {
                     this.fromYear?.value(filter.fromYear || '');
                     this.toYear?.value(filter.toYear || '');
                     this.loaiDoiTuong?.value(filter.loaiDoiTuong || '-1');
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.loaiDoiTuong)) this.showAdvanceSearch();
+                    this.list_dv?.value(filter.list_dv);
+                    this.list_shcc?.value(filter.list_shcc);
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.loaiDoiTuong || filter.list_dv || filter.list_shcc)) this.showAdvanceSearch();
                 }
             });
         });
@@ -222,7 +227,7 @@ class QtKhenThuongAll extends AdminPage {
                 Lần {k+1}. {deTais[k]} ({years[k].trim()})
             </span></div>);
         }
-        if (i > 15) {
+        if (i > 5) {
             results.push(<div> <span>
                 .........................................
             </span></div>);
@@ -237,31 +242,6 @@ class QtKhenThuongAll extends AdminPage {
     showModal = (e) => {
         e.preventDefault();
         this.modal.show();
-    }
-
-    downloadExcel = (e) => {
-        e.preventDefault();
-        let name = 'khen_thuong', loaiDoiTuong = this.curState, maDoiTuong = '-1';
-        const fromYear = this.fromYear?.value() == '' ? '$$$$' : this.fromYear?.value();
-        const toYear = this.toYear?.value() == '' ? '$$$$' : this.toYear?.value();
-        if (loaiDoiTuong == '-1') {
-            name += '_all';
-        }
-        else {
-            if (loaiDoiTuong == '01') {
-                name += '_truong';
-            }
-            else {
-                if (loaiDoiTuong == '02') name += '_canbo_';
-                if (loaiDoiTuong == '03') name += '_donvi_';
-                if (loaiDoiTuong == '04') name += '_bomon_';
-                if (maDoiTuong == '-1') name += 'all';
-                else name += maDoiTuong;
-            }
-        }
-        name += '_' + fromYear + '-' + toYear;
-        name += '.xlsx';
-        T.download(T.url(`/api/tccb/qua-trinh/khen-thuong-all/download-excel/${loaiDoiTuong}/${maDoiTuong}/${fromYear}/${toYear}`), name);
     }
 
     delete = (e, item) => {
@@ -379,6 +359,11 @@ class QtKhenThuongAll extends AdminPage {
                 <div className='row'>
                     <FormTextBox className='col-md-4' ref={e => this.fromYear = e} label='Từ năm đạt được (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
                     <FormTextBox className='col-md-4' ref={e => this.toYear = e} label='Đến năm đạt được (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
+                    {(this.loaiDoiTuong && this.loaiDoiTuong.value() == '02') &&
+                    <>
+                        <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                        <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} /> 
+                    </>}
                 </div>
             </>,
             content: <>
@@ -394,15 +379,15 @@ class QtKhenThuongAll extends AdminPage {
                     permissions={currentPermissions}
                     getLoaiDoiTuong={this.props.getDmKhenThuongLoaiDoiTuongAll}
                 />
-                {
-                    permission.read && !this.checked &&
-                    <button className='btn btn-success btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px' }} onClick={this.downloadExcel} >
-                        <i className='fa fa-lg fa-print' />
-                    </button>
-                }
             </>,
             backRoute: '/user/tccb',
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
+            onExport: !this.checked ? (e) => {
+                e.preventDefault();
+                const { fromYear, toYear, loaiDoiTuong, list_dv, list_shcc } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1', list_dv: null, list_shcc: null };
+
+                T.download(T.url(`/api/qua-trinh/khen-thuong-all/download-excel/${list_shcc ? list_shcc : null}/${list_dv ? list_dv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${loaiDoiTuong ? loaiDoiTuong : '-1'}`), 'khenthuong.xlsx');
+            } : null
         });
     }
 }

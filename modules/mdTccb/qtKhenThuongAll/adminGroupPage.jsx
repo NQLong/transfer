@@ -126,7 +126,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                 params = route.parse(window.location.pathname);
             this.loaiDoiTuong = params.loaiDoiTuong;
             this.ma = params.ma;
-            this.setState({ filter: { loaiDoiTuong: this.loaiDoiTuong, ma: this.ma } });
+            this.setState({ filter: { loaiDoiTuong: this.loaiDoiTuong, list_shcc: this.ma, list_dv: ''} });
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
                 this.fromYear?.value('');
@@ -142,8 +142,9 @@ class QtKhenThuongAllGroupPage extends AdminPage {
         const fromYear = this.fromYear?.value() == '' ? null : Number(this.fromYear?.value());
         const toYear = this.toYear?.value() == '' ? null : Number(this.toYear?.value());
         const loaiDoiTuong = this.state.filter.loaiDoiTuong;
-        const ma = this.state.filter.ma;
-        const pageFilter = isInitial ? null : { fromYear, toYear, loaiDoiTuong, ma };
+        const list_shcc = this.state.filter.list_shcc;
+        const list_dv = this.state.filter.list_dv;
+        const pageFilter = isInitial ? null : { fromYear, toYear, loaiDoiTuong, list_shcc, list_dv };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
@@ -164,31 +165,6 @@ class QtKhenThuongAllGroupPage extends AdminPage {
     showModal = (e) => {
         e.preventDefault();
         this.modal.show();
-    }
-
-    downloadExcel = (e) => {
-        e.preventDefault();
-        let name = 'khen_thuong', loaiDoiTuong = this.loaiDoiTuong, maDoiTuong = this.ma;
-        const fromYear = this.fromYear?.value() == '' ? '$$$$' : this.fromYear?.value();
-        const toYear = this.toYear?.value() == '' ? '$$$$' : this.toYear?.value();
-        if (loaiDoiTuong == '-1') {
-            name += '_all';
-        }
-        else {
-            if (loaiDoiTuong == '01') {
-                name += '_truong';
-            }
-            else {
-                if (loaiDoiTuong == '02') name += '_canbo_';
-                if (loaiDoiTuong == '03') name += '_donvi_';
-                if (loaiDoiTuong == '04') name += '_bomon_';
-                if (maDoiTuong == '-1') name += 'all';
-                else name += maDoiTuong;
-            }
-        }
-        name += '_' + fromYear + '-' + toYear;
-        name += '.xlsx';
-        T.download(T.url(`/api/tccb/qua-trinh/khen-thuong-all/download-excel/${loaiDoiTuong}/${maDoiTuong}/${fromYear}/${toYear}`), name);
     }
 
     delete = (e, item) => {
@@ -306,15 +282,15 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                     permissions={currentPermissions} ma={this.ma} loaiDoiTuong={this.loaiDoiTuong}
                     getLoaiDoiTuong={this.props.getDmKhenThuongLoaiDoiTuongAll}
                 />
-                {
-                    permission.read &&
-                    <button className='btn btn-success btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px' }} onClick={this.downloadExcel} >
-                        <i className='fa fa-lg fa-print' />
-                    </button>
-                }
             </>,
             backRoute: '/user/tccb/qua-trinh/khen-thuong-all',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+            onExport: (e) => {
+                e.preventDefault();
+                const { fromYear, toYear, loaiDoiTuong, list_dv, list_shcc } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1', list_dv: null, list_shcc: null };
+
+                T.download(T.url(`/api/qua-trinh/khen-thuong-all/download-excel/${list_shcc ? list_shcc : null}/${list_dv ? list_dv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${loaiDoiTuong ? loaiDoiTuong : '-1'}`), 'khenthuong.xlsx');
+            }
         });
     }
 }
