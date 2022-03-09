@@ -67,7 +67,7 @@ class dmLoaiSinhVienAdminPage extends AdminPage {
         T.ready('/user/category', () => {
             T.onSearch = (searchText) => this.props.getDmLoaiSinhVienPage(undefined, undefined, searchText || '');
             T.showSearchBox();
-            this.props.getDmLoaiSinhPage();
+            this.props.getDmLoaiSinhVienPage();
         });
     }
 
@@ -105,6 +105,7 @@ class dmLoaiSinhVienAdminPage extends AdminPage {
                     </tr>),
                 renderRow: (item, index) => (
                     <tr key={index}>
+                        {console.log(item)}
                         <TableCell type='link' content={item.ma ? item.ma : ''} onClick={() => this.modal.show(item)} style={{ textAlign: 'center' }} />
                         <TableCell type='text' content={item.ten ? item.ten : ''} />
                         <TableCell type='checkbox' content={item.kichHoat} permission={permission}
