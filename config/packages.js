@@ -39,12 +39,15 @@ module.exports = (app, http, config) => {
         }
     };
 
-    if (config && app.redis) {
-        // console.log(` - #${process.pid}: The system used Redis session!`);
-        const redisStore = require('connect-redis')(session);
-        sessionOptions.store = new redisStore({ client: app.redis, prefix: sessionIdPrefix });
-    }
-    app.use(session(sessionOptions));
+    app.readyHooks.add('redisStore', {
+        ready: () => config && app.redis,
+        run: () => {
+            // console.log(` - #${process.pid}: The system used Redis session!`);
+            const redisStore = require('connect-redis')(session);
+            sessionOptions.store = new redisStore({ client: app.redis, prefix: sessionIdPrefix });
+            app.use(session(sessionOptions));
+        }
+    });
 
     // Read cookies (needed for auth)
     const cookieParser = require('cookie-parser');
