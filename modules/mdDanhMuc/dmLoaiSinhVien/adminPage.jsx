@@ -38,23 +38,13 @@ class EditModal extends AdminModal {
     };
 
     changeKichHoat = value => this.kichHoat.value(value ? 1 : 0) || this.kichHoat.value(value);
-    
-    displayMa = () => {
-        if (this.state.ma)
-            return {
-                display: 'block'
-            };
-        return {
-            display: 'none'
-        };
-    }
 
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
             title: this.state.ma ? 'Cập nhật loại sinh viên' : 'Tạo mới loại sinh viên',
             body: <div className='row'>
-                <FormTextBox type='text' className='col-md-12' ref={e => this.ma = e} label='Mã loại sinh viên' readOnly style={this.displayMa()} />
+                <FormTextBox type='text' className='col-md-12' ref={e => this.ma = e} label='Mã loại sinh viên' readOnly style={{display: 'none'}} />
                 <FormTextBox 
                     type='text' 
                     className='col-md-12' 
@@ -110,14 +100,14 @@ class dmLoaiSinhVienAdminPage extends AdminPage {
                 getDataSource: () => list, stickyHead: false,
                 renderHead: () => (
                     <tr>
-                        <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
+                        <th style={{ width: 'auto' }} nowrap='true'>#</th>
                         <th style={{ width: '100%' }}>Tên</th>
                         <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
                         <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
                     </tr>),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='link' content={item.ma ? item.ma : ''} onClick={() => this.modal.show(item)} style={{ textAlign: 'center' }} />
+                        <TableCell type='link' content={index} onClick={() => this.modal.show(item)} style={{ textAlign: 'center' }} />
                         <TableCell type='text' content={item.ten ? item.ten : ''} />
                         <TableCell type='checkbox' content={item.kichHoat} permission={permission}
                             onChanged={value => this.props.updateDmLoaiSinhVien(item.ma, { kichHoat: value ? 1 : 0, })} />
