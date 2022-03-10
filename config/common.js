@@ -24,6 +24,8 @@ module.exports = (app) => {
     //     fse.removeSync(oldPath);
     // };
 
+    app.fs.renameSync = (oldPath, newPath) => app.fs.copyFileSync(oldPath, newPath) && app.fs.unlinkSync(oldPath);
+
     // Template html file ---------------------------------------------------------------------------------------------------------------------------
     app.templates = {};
     app.createTemplate = function () {
