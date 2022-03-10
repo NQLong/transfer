@@ -104,9 +104,10 @@ class EditModal extends AdminModal {
 class QtBangPhatMinh extends AdminPage {
     checked = parseInt(T.cookie('hienThiTheoCanBo')) == 1 ? true : false;
     state = { filter: {} };
-
+    menu = '';
     componentDidMount() {
-        T.ready('/user/khcn', () => {
+        this.menu = T.routeMatcher('/user/:tccb/qua-trinh/bang-phat-minh').parse(window.location.pathname).tccb;
+        T.ready('/user/' + this.menu, () => {
             T.clearSearchBox();
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
@@ -252,7 +253,7 @@ class QtBangPhatMinh extends AdminPage {
                         }
                         {
                             this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}>
-                                <Link className='btn btn-success' to={`/user/khcn/qua-trinh/bang-phat-minh/group/${item.shcc}`} >
+                                <Link className='btn btn-success' to={`/user/${this.menu}/qua-trinh/bang-phat-minh/group/${item.shcc}`} >
                                     <i className='fa fa-lg fa-compress' />
                                 </Link>
                             </TableCell>
@@ -289,7 +290,7 @@ class QtBangPhatMinh extends AdminPage {
                     permissions={currentPermissions}
                 />
             </>,
-            backRoute: '/user/khcn',
+            backRoute: '/user/' + this.menu,
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
         });
     }

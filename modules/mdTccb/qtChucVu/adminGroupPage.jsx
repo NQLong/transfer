@@ -14,7 +14,7 @@ import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 
 const timeList = [
     { id: 0, text: 'Không' },
-    { id: 1, text: 'Theo ngày ra quyết định' },
+    { id: 1, text: 'Theo ngày ra quyết định bổ nhiệm' },
     { id: 2, text: 'Theo ngày thôi chức vụ' },
     { id: 3, text: 'Theo ngày ra quyết định thôi chức vụ' }
 ];
@@ -133,11 +133,11 @@ export class EditModal extends AdminModal {
                 <FormSelect className='col-md-4' ref={e => this.maDonVi = e} label='Đơn vị của chức vụ' data={SelectAdapter_DmDonVi} onChange={this.handleDonVi} allowClear={true} readOnly={readOnly} />
                 <FormSelect className='col-md-4' ref={e => this.maBoMon = e} label='Bộ môn của chức vụ' data={SelectAdapter_DmBoMonTheoDonVi(this.state.donVi)} allowClear={true} readOnly={readOnly} />
                 <FormCheckbox className='col-md-12' ref={e => this.chucVuChinh = e} label='Chức vụ chính' readOnly={this.checkChucVuSwitch()} />
-                <FormTextBox type='text' className='col-md-6' ref={e => this.soQuyetDinh = e} label='Số quyết định' readOnly={readOnly} />
-                <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayRaQuyetDinh = e} label='Ngày ra quyết định' readOnly={readOnly} />
+                <FormTextBox type='text' className='col-md-6' ref={e => this.soQuyetDinh = e} label='Số quyết định bổ nhiệm' readOnly={readOnly} />
+                <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayRaQuyetDinh = e} label='Ngày ra quyết định bổ nhiệm' readOnly={readOnly} />
                 <FormCheckbox className='col-md-12' ref={e => this.thoiChucVu = e} onChange={this.handleThoiChucVu} label='Thôi giữ chức vụ' readOnly={readOnly} />
                 <div className='col-md-4' id='soQdThoiChucVu'><FormTextBox type='text' ref={e => this.soQdThoiChucVu = e} label='Số quyết định thôi chức vụ' readOnly={readOnly} /> </div>
-                <div className='col-md-4' id='ngayThoiChucVu'> <FormDatePicker type='date-mask' ref={e => this.ngayThoiChucVu = e} label='Ngày ra thôi chức vụ' readOnly={readOnly} /> </div>
+                <div className='col-md-4' id='ngayThoiChucVu'> <FormDatePicker type='date-mask' ref={e => this.ngayThoiChucVu = e} label='Ngày thôi chức vụ' readOnly={readOnly} /> </div>
                 <div className='col-md-4' id='ngayRaQdThoiChucVu'> <FormDatePicker type='date-mask' ref={e => this.ngayRaQdThoiChucVu = e} label='Ngày ra quyết định thôi chức vụ' readOnly={readOnly} /> </div>
             </div>
         });
@@ -151,7 +151,7 @@ class QtChucVuGroup extends AdminPage {
         T.ready('/user/tccb', () => {
             const route = T.routeMatcher('/user/tccb/qua-trinh/chuc-vu/group/:ma'),
                 params = route.parse(window.location.pathname);
-            this.setState({ filter: { list_shcc: params.ma, list_dv: '', timeType: 0 }, ma: params.ma });
+            this.setState({ filter: { list_shcc: params.ma, list_dv: '', timeType: 0, gioiTinh: null }, ma: params.ma });
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
 
             T.showSearchBox(() => {
@@ -221,7 +221,7 @@ class QtChucVuGroup extends AdminPage {
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
                         <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Chức vụ</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Quyết định</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Quyết định bổ nhiệm</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Chức vụ chính</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thôi chức vụ</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Quyết định thôi chức vụ</th>
@@ -298,6 +298,12 @@ class QtChucVuGroup extends AdminPage {
             </>,
             backRoute: '/user/tccb/qua-trinh/chuc-vu',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+            onExport: (e) => {
+                e.preventDefault();
+                const { list_dv, fromYear, toYear, list_shcc, timeType, list_cv, gioiTinh } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, list_cv: null, gioiTinh: null };
+
+                T.download(T.url(`/api/qua-trinh/chuc-vu/download-excel/${list_shcc ? list_shcc : null}/${list_dv ? list_dv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${timeType}/${list_cv ? list_cv : null}/${gioiTinh ? gioiTinh : null}`), 'chucvu.xlsx');
+            }
         });
     }
 }

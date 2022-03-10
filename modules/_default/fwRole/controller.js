@@ -12,7 +12,9 @@ module.exports = app => {
 
     const getActivedRoles = done => app.model.fwRole.getAll({ active: 1 }, (error, roles) => {
         if (error == null && roles) {
-            app.data.roles = roles;
+            if (app.isDebug) {
+                app.roles = roles;
+            }
             done && done();
         }
     });
@@ -54,7 +56,7 @@ module.exports = app => {
         delete role.id;
         if (role.permission && typeof role.permission == 'object') role.permission = role.permission.toString();
         app.model.fwRole.create(role, (error, item) => {
-            getActivedRoles(() => app.isDebug && app.io.emit('debug-role-changed', app.data.roles));
+            getActivedRoles(() => app.isDebug && app.io.emit('debug-role-changed', app.roles));
             res.send({ error, item });
         });
     });
@@ -95,7 +97,7 @@ module.exports = app => {
 
     app.delete('/api/role', app.permission.check('role:delete'), (req, res) => {
         app.model.fwRole.delete({ id: req.body.id }, error => {
-            getActivedRoles(() => app.isDebug && app.io.emit('debug-role-changed', app.data.roles));
+            getActivedRoles(() => app.isDebug && app.io.emit('debug-role-changed', app.roles));
             res.send({ error });
         });
     });

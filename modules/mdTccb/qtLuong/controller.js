@@ -2,13 +2,13 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3031: { title: 'Quá trình Lương', link: '/user/tccb/qua-trinh/luong', icon: 'fa-money', backgroundColor: '#21b849', groupIndex: 0 },
+            3031: { title: 'Diễn biến lương cán bộ', link: '/user/tccb/qua-trinh/luong', icon: 'fa-money', backgroundColor: '#21b849', groupIndex: 0 },
         },
     };
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1010: { title: 'Lương', link: '/user/luong', icon: 'fa-money', backgroundColor: '#1a5b87', groupIndex: 1 },
+            1010: { title: 'Diễn biến lương', link: '/user/luong', icon: 'fa-money', backgroundColor: '#1a5b87', groupIndex: 0 },
         },
     };
 

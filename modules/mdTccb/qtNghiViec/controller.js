@@ -48,7 +48,14 @@ module.exports = app => {
     });
 
     app.post('/api/qua-trinh/nghi-viec', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtNghiViec.create(req.body.data, (error, item) => res.send({ error, item })));
+        app.model.qtNghiViec.create(req.body.data, (error, item) => {
+            if (!error) {
+                app.model.canBo.update({ shcc: item.shcc }, { daNghi: 1 }, (e) => {
+                    if (e) res.send({ error: e });
+                } );
+            }
+            res.send({ error, item });
+        }));
 
     app.put('/api/qua-trinh/nghi-viec', app.permission.check('staff:write'), (req, res) =>
         app.model.qtNghiViec.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item })));

@@ -9,7 +9,7 @@ module.exports = app => {
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1001: { title: 'Hồ sơ cán bộ', link: '/user/profile', icon: 'fa-address-card-o', backgroundColor: '#8bc34a', groupIndex: 0 },
+            1001: { title: 'Hồ sơ cán bộ', link: '/user/profile', icon: 'fa-address-card-o', color: '#000000', backgroundColor: '#fbe904', groupIndex: 0 },
         },
     };
 
@@ -25,14 +25,6 @@ module.exports = app => {
     app.get('/user/tccb/staff/:shcc', app.permission.check('staff:read'), app.templates.admin);
     app.get('/user/tccb/staff', app.permission.check('staff:read'), app.templates.admin);
     app.get('/user/tccb/staff/item/upload', app.permission.check('staff:write'), app.templates.admin);
-
-    app.readyHooks.add('readyUser', {
-        ready: () => app.dbConnection != null && app.model != null && app.model.canBo != null && app.model.canBo != null,
-
-        run: () => {
-            app.model.fwUser.count({}, (error, numberOfUser) => app.data.numberOfUser = error ? 0 : numberOfUser.rows[0]['COUNT(*)']);
-        }
-    });
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
@@ -217,6 +209,30 @@ module.exports = app => {
                                         dataCV.push(Object.assign(i, { lcv: i.loaiChucVu == 1 }));
                                     });
                                     result = app.clone(result, { chucVu: dataCV });
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
+                            app.model.qtNghiViec.get({ shcc: canBo.shcc }, (error, dataNghiViec) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin nghỉ việc cán bộ!' });
+                                }
+                                else if (dataNghiViec == null) {
+                                    result = app.clone(result, { dataNghiViec: null });
+                                } else {
+                                    result = app.clone(result, { dataNghiViec });
+                                }
+                                resolve();
+                            });
+                        })).then(() => new Promise(resolve => {
+                            app.model.qtDiNuocNgoai.get({ shcc: canBo.shcc, ketThuc: -1 }, (error, dangONuocNgoai) => {
+                                if (error) {
+                                    res.send({ error: 'Lỗi khi lấy thông tin đi nước ngoài của cán bộ!' });
+                                }
+                                else if (dangONuocNgoai == null) {
+                                    result = app.clone(result, { dangONuocNgoai: null });
+                                } else {
+                                    result = app.clone(result, { dangONuocNgoai });
                                 }
                                 resolve();
                             });
@@ -2225,7 +2241,7 @@ module.exports = app => {
                 } else {
                     app.deleteImage(item.image);
                     let srcPath = files.CanBoImage[0].path,
-                        image = '/img/user/avatar/' + item.ma + app.path.extname(srcPath);
+                        image = '/img/user/avatar/' + item.email.trim() + app.path.extname(srcPath);
                     app.fs.rename(srcPath, app.path.join(app.publicPath, image), error => {
                         if (error) {
                             done({ error });

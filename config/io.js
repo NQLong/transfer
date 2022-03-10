@@ -1,20 +1,10 @@
 module.exports = (app, http) => {
-
-    const redis = require('socket.io-redis');
     app.io = require('socket.io')(http);
-    app.io.adapter(redis({ host: 'localhost', port: 6379 }));
-
-    // app.io = require('socket.io')({
-    //     // path: '/test',
-    //     serveClient: false
-    // });
-    // app.io.attach(http, {
-    //     pingInterval: 10000,
-    //     pingTimeout: 5000,
-    //     cookie: false
-    // });
-
-    app.io.on('connection', socket => app.onSocketConnect(socket));
+    app.onRedisConnect = () => {
+        const { createAdapter } = require('socket.io-redis');
+        app.io.adapter(createAdapter({ pubClient: app.redis, subClient: app.redis.duplicate() }));
+        // app.io.on('connection', socket => app.onSocketConnect(socket));
+    };
 
     if (app.isDebug) {
         app.fs.watch('public/js', () => {

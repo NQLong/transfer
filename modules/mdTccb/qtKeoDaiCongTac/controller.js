@@ -8,7 +8,7 @@ module.exports = app => {
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1007: { title: 'Kéo dài công tác', link: '/user/keo-dai-cong-tac', icon: 'fa-hourglass-start', backgroundColor: '#8fc9f2', groupIndex: 1 },
+            1007: { title: 'Kéo dài công tác', link: '/user/keo-dai-cong-tac', icon: 'fa-hourglass-start', color: '#000000', backgroundColor: '#eab676', groupIndex: 0 },
         },
     };
 

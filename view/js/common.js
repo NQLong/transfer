@@ -292,7 +292,7 @@ const T = {
     }
 };
 
-T.socket = T.debug ? io() : io.connect(T.rootUrl, { secure: true });
+T.socket = T.debug ? io('http://localhost:7012', { transports: ['websocket'] }) : io(T.rootUrl, { secure: true, transports: ['websocket'] });
 
 T.language = texts => {
     let lg = window.location.pathname.includes('/en')

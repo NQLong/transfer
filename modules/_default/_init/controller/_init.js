@@ -1,70 +1,20 @@
 module.exports = app => {
-    app.data = {
-        todayViews: 0,
-        allViews: 0,
-        logo: '/img/favicon.png',
-        logo2: '/img/logo-ussh.png',
-        footer: '/img/footer.jpg',
-        map: '/img/map.png',
-        facebook: 'https://www.facebook.com/ussh.vnuhcm',
-        youtube: '',
-        twitter: '',
-        instagram: '',
-        latitude: 10.7744962,
-        longitude: 106.6606518,
-        email: app.email.from,
-        emailPassword: app.email.password,
-        mobile: '(08) 2214 6555',
-        address: JSON.stringify({ vi: '', en: '' }),
-        schoolName: JSON.stringify({
-            vi: 'Trường Đại học Khoa học Xã hội và Nhân văn',
-            en: 'Ho Chi Minh City University of Social Science and Humane'
-        }),
-    };
-
     app.createFolder(
-        app.assetPath, app.uploadPath, app.publicPath,
+        app.assetPath, app.uploadPath, app.publicPath, app.documentPath,
         app.path.join(app.publicPath, '/img/staff'),
     );
 
-    app.readyHooks.add('readyInit', {
-        ready: () => app.dbConnection != null && app.model != null && app.model.setting != null,
-        run: () => app.model.setting.init(app.data, () => {
-            app.model.setting.getValue(['todayViews', 'allViews', 'logo', 'footer', 'header', 'map', 'facebook', 'youtube', 'twitter', 'instagram', 'latitude', 'longitude', 'email', 'emailPassword', 'mobile', 'address', 'schoolName', 'tchcEmail'], result => {
-                app.data.todayViews = parseInt(result.todayViews);
-                app.data.allViews = parseInt(result.allViews);
-                app.data.logo = result.logo;
-                app.data.header = result.header;
-                app.data.footer = result.footer;
-                app.data.map = result.map;
-                app.data.facebook = result.facebook;
-                app.data.youtube = result.youtube;
-                app.data.twitter = result.twitter;
-                app.data.instagram = result.instagram;
-                app.data.latitude = result.latitude;
-                app.data.longitude = result.longitude;
-                app.data.email = result.email;
-                app.data.emailPassword = result.emailPassword;
-                app.data.mobile = result.mobile;
-                app.data.address = result.address;
-                app.data.schoolName = result.schoolName;
-                app.data.tchcEmail = result.tchcEmail;
-            });
-        }),
-    });
-
     // Count views ----------------------------------------------------------------------------------------------------------------------------------
-    const fiveMinuteJob = () => {
-        const count = {
-            todayViews: app.data.todayViews,
-            allViews: app.data.allViews
-        };
-        app.io.emit('count', count);
-        app.model.setting.setValue(count);
-    };
-    app.schedule('*/5 * * * *', app.model.setting && app.model.setting.setValue && fiveMinuteJob);
-
-    app.schedule('0 0 * * *', () => app.data.todayViews = 0);
+    app.readyHooks.add('todaySchedule', {
+        ready: () => app.redis,
+        run: () => {
+            app.primaryWorker && app.schedule('0 0 * * *', () => {
+                // const today = new Date();
+                // Cập nhật biến đếm ngày hôm nay về 0
+                app.redis.set(`${app.appName}_state:todayViews`, 0);
+            });
+        },
+    });
 
     // Upload ---------------------------------------------------------------------------------------------------------------------------------------
     app.post('/user/upload', app.permission.check(), (req, res) => {
@@ -303,16 +253,22 @@ module.exports = app => {
             emailPassword: app.email.password,
             mobile: '(08) 2214 6555',
             address: JSON.stringify({ vi: '', en: '' }),
+            address2: JSON.stringify({ vi: '', en: '' }),
             schoolName: JSON.stringify({
                 vi: 'Trường Đại học Khoa học Xã hội và Nhân văn',
                 en: 'Ho Chi Minh City University of Social Science and Humane'
             }),
+            linkMap: '',
+            header: '/img/header.jpg'
         },
 
         init: () => app.redis.keys(`${app.appName}_state:*`, (_, keys) => {
-            keys && Object.keys(app.state.initState).forEach(key => {
-                const redisKey = `${app.appName}_state:${key}`;
-                if (!keys.includes(redisKey) && app.state.initState[key]) app.redis.set(redisKey, app.state.initState[key]);
+            app.model.setting.getValue(['todayViews', 'allViews', 'logo', 'footer', 'header', 'map', 'facebook', 'youtube', 'twitter', 'instagram', 'latitude', 'longitude', 'email', 'emailPassword', 'mobile', 'address', 'address2', 'schoolName', 'tchcEmail', 'linkMap'], result => {
+                keys && Object.keys(app.state.initState).forEach(key => {
+                    const redisKey = `${app.appName}_state:${key}`;
+                    if (!keys.includes(redisKey) && app.state.initState[key]) app.redis.set(redisKey, app.state.initState[key]);
+                    if (result[key]) app.redis.set(redisKey, result[key]);
+                });
             });
         }),
 

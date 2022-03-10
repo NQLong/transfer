@@ -1,8 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getEventFeed } from 'modules/_default/fwEvent/redux';
-import { getNewsFeed, getNewsFeedByCategory } from 'modules/_default/fwNews/redux';
-import { getNews } from 'modules/_default/fwNews/redux';
+import { getEventFeed } from 'modules/mdTruyenThong/fwEvent/redux';
+import { getNewsFeed, getNewsFeedByCategory } from 'modules/mdTruyenThong/fwNews/redux';
+import { getNews } from 'modules/mdTruyenThong/fwNews/redux';
 let texts = {
     vi: {
         homeTitle: 'Trang chủ',

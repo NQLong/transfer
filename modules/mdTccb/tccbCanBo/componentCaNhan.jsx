@@ -79,7 +79,6 @@ class ComponentCaNhan extends React.Component {
     }
 
     imageChanged = (data) => {
-        console.log(data);
         if (data && data.image) {
             const user = Object.assign({}, this.props.system.user, { image: data.image });
             this.props.updateSystemState({ user });
@@ -215,7 +214,7 @@ class ComponentCaNhan extends React.Component {
                     <FormTextBox ref={e => this.soDienThoaiBaoTin = e} label='Số điện thoại báo tin' className='form-group col-md-6' maxLength={10} />
 
                     <FormTextBox ref={e => this.emailCaNhan = e} label='Email cá nhân' className='form-group col-md-6' />
-                    <FormTextBox ref={e => this.emailTruong = e} label='Email trường' className='form-group col-md-6' />
+                    <FormTextBox ref={e => this.emailTruong = e} label='Email trường' className='form-group col-md-6' readOnly={this.props.userEdit}/>
 
                     <div className='form-group col-md-12'></div>
 
@@ -258,9 +257,6 @@ class ComponentCaNhan extends React.Component {
 
                     <FormTextBox className='form-group col-md-6' ref={e => this.giaDinhChinhSach = e} label='Gia đình chính sách' />
                     <FormTextBox className='form-group col-md-6' ref={e => this.danhHieuPhongTangCaoNhat = e} label='Danh hiệu được phong tặng cao nhất' />
-
-
-
                 </div>
             </div>
         );
