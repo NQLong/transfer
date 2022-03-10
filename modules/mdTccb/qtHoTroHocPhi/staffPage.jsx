@@ -242,7 +242,7 @@ class QtHoTroHocPhiUserPage extends AdminPage {
         }
 
         return this.renderPage({
-            icon: 'fa fa-pencil-square-o',
+            icon: 'fa fa-usd',
             title: 'Quá trình hỗ trợ học phí',
             subTitle: <span style={{ color: 'blue' }}>Cán bộ: {name}</span>,
             breadcrumb: [

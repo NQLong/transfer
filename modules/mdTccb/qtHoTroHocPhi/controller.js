@@ -2,13 +2,13 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3045: { title: 'Quá trình hỗ trợ học phí', link: '/user/tccb/qua-trinh/ho-tro-hoc-phi', icon: 'fa fa-building', backgroundColor: '#a69a03', groupIndex: 1 },
+            3045: { title: 'Quá trình hỗ trợ học phí', link: '/user/tccb/qua-trinh/ho-tro-hoc-phi', icon: 'fa fa-usd', backgroundColor: '#99ccff', groupIndex: 1 },
         },
     };
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1033: { title: 'Hỗ trợ học phí', link: '/user/ho-tro-hoc-phi', icon: 'fa fa-building', color: '#000000', backgroundColor: '#f7ff67', groupIndex: 0 },
+            1033: { title: 'Hỗ trợ học phí', link: '/user/ho-tro-hoc-phi', icon: 'fa fa-usd', color: '#000000', backgroundColor: '#6699ff', groupIndex: 0 },
         },
     };
 
@@ -128,63 +128,66 @@ module.exports = app => {
     app.delete('/api/qua-trinh/ho-tro-hoc-phi', app.permission.check('staff:write'), (req, res) =>
         app.model.qtHoTroHocPhi.delete({ id: req.body.id }, (error) => res.send(error)));
 
-    app.get('/api/qua-trinh/ho-tro-hoc-phi/download-excel/:list_shcc/:list_dv/:fromYear/:toYear/:timeType/:tinhTrang/:loaiHocVi/:mucDich', app.permission.check('qtHoTroHocPhi:read'), (req, res) => {
-        let { list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang, loaiHocVi, mucDich } = req.params ? req.params : { list_shcc: null, list_dv: null, toYear: null, timeType: 0, tinhTrang: null, loaiHocVi: null, mucDich: null };
+    app.get('/api/qua-trinh/ho-tro-hoc-phi/download-excel/:list_shcc/:list_dv/:fromYear/:toYear/:timeType/:tinhTrang/:loaiHocVi', app.permission.check('qtHoTroHocPhi:read'), (req, res) => {
+        let { list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang, loaiHocVi } = req.params ? req.params : { list_shcc: null, list_dv: null, toYear: null, timeType: 0, tinhTrang: null, loaiHocVi: null };
         if (list_shcc == 'null') list_shcc = null;
         if (list_dv == 'null') list_dv = null;
         if (fromYear == 'null') fromYear = null;
         if (toYear == 'null') toYear = null;
         if (tinhTrang == 'null') tinhTrang = null;
         if (loaiHocVi == 'null') loaiHocVi = null;
-        if (mucDich == 'null') mucDich = null;
-        app.model.qtHoTroHocPhi.download(list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang, loaiHocVi, mucDich, (err, result) => {
+        app.model.qtHoTroHocPhi.download(list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang, loaiHocVi, (err, result) => {
             if (err || !result) {
                 res.send({ err });
             } else {
                 const workbook = app.excel.create(),
-                    worksheet = workbook.addWorksheet('congtactrongnuoc');
+                    worksheet = workbook.addWorksheet('hotrohocphi');
                 new Promise(resolve => {
                     let cells = [
-                        // QT_CONG_TAC_TRONG_NUOC { id, ngayQuyetDinh, soCv, shcc, noiDen, vietTat, lyDo, batDau, batDauType, ketThuc, ketThucType, kinhPhi, ghiChu }
+                        // Table name: QT_HO_TRO_HOC_PHI { id, ngayLamDon, shcc, noiDung, coSoDaoTao, batDau, batDauType, ketThuc, ketThucType, hocKyHoTro, soTien, hoSo, ghiChu }
                         { cell: 'A1', value: 'STT', bold: true, border: '1234' },
                         { cell: 'B1', value: 'NGÀY QĐ', bold: true, border: '1234' },
-                        { cell: 'C1', value: 'SỐ CV', bold: true, border: '1234' },
-                        { cell: 'D1', value: 'HỌC VỊ', bold: true, border: '1234' },
-                        { cell: 'E1', value: 'MÃ THẺ CÁN BỘ', bold: true, border: '1234' },
-                        { cell: 'F1', value: 'HỌ', bold: true, border: '1234' },
-                        { cell: 'G1', value: 'TÊN', bold: true, border: '1234' },
-                        { cell: 'H1', value: 'CHỨC VỤ', bold: true, border: '1234' },
-                        { cell: 'I1', value: 'ĐƠN VỊ', bold: true, border: '1234' },
-                        { cell: 'J1', value: 'NƠI ĐẾN', bold: true, border: '1234' },
-                        { cell: 'K1', value: 'VIẾT TẮT', bold: true, border: '1234' },
-                        { cell: 'L1', value: 'LÝ DO ĐI', bold: true, border: '1234' },
-                        { cell: 'M1', value: 'NGÀY ĐI', bold: true, border: '1234' },
-                        { cell: 'N1', value: 'NGÀY VỀ', bold: true, border: '1234' },
-                        { cell: 'O1', value: 'KINH PHÍ', bold: true, border: '1234' },
-                        { cell: 'P1', value: 'GHI CHÚ', bold: true, border: '1234' },
+                        { cell: 'C1', value: 'HỌ VÀ TÊN', bold: true, border: '1234' },
+                        { cell: 'D1', value: 'ĐƠN VỊ', bold: true, border: '1234' },
+                        { cell: 'E1', value: 'CHỨC DANH NGHỀ NGHIỆP', bold: true, border: '1234' },
+                        { cell: 'F1', value: 'NỘI DUNG XIN HỖ TRỢ', bold: true, border: '1234' },
+                        { cell: 'G1', value: 'CHUYÊN NGÀNH HỌC', bold: true, border: '1234' },
+                        { cell: 'H1', value: 'CƠ SỞ ĐÀO TẠO', bold: true, border: '1234' },
+                        { cell: 'I1', value: 'THỜI GIAN HỌC', bold: true, border: '1234' },
+                        { cell: 'J1', value: 'HỌC KỲ HỖ TRỢ', bold: true, border: '1234' },
+                        { cell: 'K1', value: 'SỐ TIỀN HỖ TRỢ (ĐỒNG)', bold: true, border: '1234' },
+                        { cell: 'L1', value: 'HỒ SƠ ĐI KÈM', bold: true, border: '1234' },
+                        { cell: 'M1', value: 'GHI CHÚ', bold: true, border: '1234' },
                     ];
                     result.rows.forEach((item, index) => {
+                        let hoten = item.hoCanBo + ' ' + item.tenCanBo;
+                        // hoten = hoten.normalizedName(); //failed
+                        let timeRange = '';
+                        if (item.batDau) {
+                            timeRange += app.date.dateTimeFormat(new Date(item.batDau), item.batDauType ? item.batDauType : 'dd/mm/yyyy');
+                        }
+                        timeRange += ' - ';
+                        if (item.ketThuc != null && item.ketThuc != -1) {
+                            timeRange += app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType ? item.ketThucType : 'dd/mm/yyyy');
+                        }
                         cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
-                        cells.push({ cell: 'B' + (index + 2), alignment: 'center', border: '1234', value: item.ngayQuyetDinh ? app.date.dateTimeFormat(new Date(item.ngayQuyetDinh), 'dd/mm/yyyy') : '' });
-                        cells.push({ cell: 'C' + (index + 2), border: '1234', value: item.soCv });
-                        cells.push({ cell: 'D' + (index + 2), border: '1234', value: item.tenHocVi });
-                        cells.push({ cell: 'E' + (index + 2), border: '1234', value: item.shcc });
-                        cells.push({ cell: 'F' + (index + 2), border: '1234', value: item.hoCanBo });
-                        cells.push({ cell: 'G' + (index + 2), border: '1234', value: item.tenCanBo });
-                        cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.tenChucVu });
-                        cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.tenDonVi });
-                        cells.push({ cell: 'J' + (index + 2), border: '1234', value: item.danhSachTinh });
-                        cells.push({ cell: 'K' + (index + 2), border: '1234', value: item.tenMucDich });
-                        cells.push({ cell: 'L' + (index + 2), border: '1234', value: item.lyDo });
-                        cells.push({ cell: 'M' + (index + 2), alignment: 'center', border: '1234', value: item.batDau ? app.date.dateTimeFormat(new Date(item.batDau), item.batDauType ? item.batDauType : 'dd/mm/yyyy') : '' });
-                        cells.push({ cell: 'N' + (index + 2), alignment: 'center', border: '1234', value: (item.ketThuc != null && item.ketThuc != -1) ? app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : '' });
-                        cells.push({ cell: 'O' + (index + 2), border: '1234', value: item.kinhPhi });
-                        cells.push({ cell: 'P' + (index + 2), border: '1234', value: item.ghiChu });
+                        cells.push({ cell: 'B' + (index + 2), alignment: 'center', border: '1234', value: item.ngayLamDon ? app.date.dateTimeFormat(new Date(item.ngayLamDon), 'dd/mm/yyyy') : '' });
+                        cells.push({ cell: 'C' + (index + 2), border: '1234', value: hoten });
+                        cells.push({ cell: 'D' + (index + 2), border: '1234', value: item.tenDonVi });
+                        cells.push({ cell: 'E' + (index + 2), border: '1234', value: item.tenChucDanhNgheNghiep });
+                        cells.push({ cell: 'F' + (index + 2), border: '1234', value: item.noiDung });
+                        cells.push({ cell: 'G' + (index + 2), border: '1234', value: item.tenChuyenNganh });
+                        cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.tenCoSoDaoTao });
+                        cells.push({ cell: 'I' + (index + 2), border: '1234', value: timeRange });
+                        cells.push({ cell: 'J' + (index + 2), border: '1234', value: item.hocKyHoTro });
+                        cells.push({ cell: 'K' + (index + 2), border: '1234', value: item.soTien });
+                        cells.push({ cell: 'L' + (index + 2), border: '1234', value: item.hoSo });
+                        cells.push({ cell: 'M' + (index + 2), border: '1234', value: item.ghiChu });
                     });
                     resolve(cells);
                 }).then((cells) => {
                     app.excel.write(worksheet, cells);
-                    app.excel.attachment(workbook, res, 'congtactrongnuoc.xlsx');
+                    app.excel.attachment(workbook, res, 'hotrohocphi.xlsx');
                 }).catch((error) => {
                     res.send({ error });
                 });
