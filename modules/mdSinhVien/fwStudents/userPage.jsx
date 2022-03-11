@@ -9,6 +9,7 @@ import { ComponentDiaDiem } from 'modules/mdDanhMuc/dmDiaDiem/componentDiaDiem';
 import { SelectAdapter_DmTonGiaoV2 } from 'modules/mdDanhMuc/dmTonGiao/redux';
 import { SelectAdapter_DmGioiTinhV2 } from 'modules/mdDanhMuc/dmGioiTinh/redux';
 import { SelectAdapter_DmLoaiSinhVienV2 } from 'modules/mdDanhMuc/dmLoaiSinhVien/redux';
+import { SelectAdapter_DmTinhTrangSinhVienV2 } from 'modules/mdDanhMuc/dmTinhTrangSinhVien/redux';
 import { updateSystemState } from 'modules/_default/_init/reduxSystem';
 import T from 'view/js/common';
 
@@ -186,7 +187,7 @@ class SinhVienPage extends AdminPage {
                                     <FormTextBox ref={e => this.lop = e} label='Lớp' className='form-group col-md-4' readOnly />    
                                     <FormTextBox ref={e => this.loaiHinhDaoTao = e} label='Loại hình đào tạo' className='form-group col-md-4' readOnly />
                                     <FormSelect ref={e => this.loaiSinhVien = e} label='Loại sinh viên' className='form-group col-md-4' readOnly data={SelectAdapter_DmLoaiSinhVienV2} />
-                                    <FormTextBox ref={e => this.tinhTrang = e} label='Tình trạng' className='form-group col-md-4' readOnly />
+                                    <FormSelect ref={e => this.tinhTrang = e} label='Tình trạng' className='form-group col-md-4' readOnly data={SelectAdapter_DmTinhTrangSinhVienV2} />
                                 </div>
                             </div>
                             <FormDatePicker ref={e => this.ngaySinh = e} label='Ngày sinh' type='date-mask' className='form-group col-md-3' required />
