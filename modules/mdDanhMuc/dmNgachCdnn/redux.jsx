@@ -75,15 +75,15 @@ export function getDmNgachCdnnAll(done) {
     };
 }
 
-export function getDmNgachCdnn(id, done) {
+export function getDmNgachCdnn(ma, done) {
     return () => {
-        const url = `/api/danh-muc/ngach-cdnn/item/${id}`;
+        const url = `/api/danh-muc/ngach-cdnn/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
-                T.notify('Lấy thông tin cdnn bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                T.notify('Lấy thông tin Chức danh nghề nghiệp bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                if (done) done(data.item);
+                if (done) done(data.items);
             }
         }, error => console.error(`GET: ${url}.`, error));
     };

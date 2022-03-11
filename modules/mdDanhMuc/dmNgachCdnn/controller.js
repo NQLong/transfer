@@ -31,8 +31,8 @@ module.exports = app => {
         app.model.dmNgachCdnn.getAll(condition, '*', 'ma', (error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/danh-muc/ngach-cdnn/item/:id', app.permission.check('user:login'), (req, res) => {
-        app.model.dmNgachCdnn.get({ id: req.body.id }, (error, items) => res.send({ error, items }));
+    app.get('/api/danh-muc/ngach-cdnn/item/:ma', app.permission.check('user:login'), (req, res) => {
+        app.model.dmNgachCdnn.get({ ma: req.params.ma }, (error, items) => res.send({ error, items }));
     });
 
     app.post('/api/danh-muc/ngach-cdnn', app.permission.check('dmNgachCdnn:write'), (req, res) => {

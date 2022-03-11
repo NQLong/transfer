@@ -36,6 +36,12 @@ module.exports = app => {
         });
     });
 
+    app.get('/api/danh-muc/trinh-do/item/:ma', app.permission.check('staff:login'), (req, res) => {
+        app.model.dmTrinhDo.get({ ma: req.params.ma }, (error, item) => {
+            res.send({ error, item });
+        });
+    });
+    
     app.put('/api/danh-muc/trinh-do', app.permission.check('dmTrinhDo:write'), (req, res) => {
         app.model.dmTrinhDo.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }));
     });

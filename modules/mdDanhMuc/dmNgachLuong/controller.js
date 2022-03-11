@@ -2,14 +2,10 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.category,
         menus: {
-            4051: { title: 'Ngạch lương', link: '/user/danh-muc/ngach-luong' },
+            2042: { title: 'Ngạch lương', link: '/user/danh-muc/ngach-luong' },
         },
     };
-    app.permission.add(
-        { name: 'dmNgachLuong:read', menu },
-        { name: 'dmNgachLuong:write' },
-        { name: 'dmNgachLuong:delete' },
-    );
+    app.permission.add({ name: 'dmNgachLuong:read', menu }, { name: 'dmNgachLuong:write' }, { name: 'dmNgachLuong:delete' },);
     app.get('/user/danh-muc/ngach-luong', app.permission.check('dmNgachLuong:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
@@ -36,8 +32,30 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/danh-muc/ngach-luong/item/:id', app.permission.check('user:login'), (req, res) => {
-        app.model.dmNgachLuong.get({ id: req.body.id }, (error, items) => res.send({ error, items }));
+    app.get('/api/danh-muc/ngach-luong/item/:bac/:idNgach', app.permission.check('user:login'), (req, res) => {
+        app.model.dmNgachLuong.get({ bac: req.params.bac, idNgach: req.params.idNgach }, (error, items) => res.send({ error, items }));
+    });
+
+    app.get('/api/danh-muc/bac-luong/all', app.permission.check('user:login'), (req, res) => {
+        const condition = req.query.condition || {};
+        Object.keys(condition).forEach(key => condition[key] === '' ? (condition[key] = null) : '');
+        app.model.dmNgachLuong.getAll({}, '*', 'bac', (error, items) => res.send({ error, items }));
+    });
+    app.get('/api/danh-muc/max-bac-luong/:idNgach', app.permission.check('user:login'), (req, res) => {
+        const idNgach = req.params.idNgach;
+        console.log(idNgach);
+        app.model.dmNgachLuong.getAll({ idNgach: idNgach }, '*', 'bac', (error, items) => {
+            res.send({ error, item: items[items.length - 1] });
+        });
+    });
+
+    app.get('/api/danh-muc/filter-bac-luong/:idNgach', app.permission.check('user:login'), (req, res) => {
+        let idNgach = req.params.idNgach;
+        const condition = req.query.condition || {
+            statement: 'idNgach =:idNgach',
+            parameter: { idNgach }
+        };
+        app.model.dmNgachLuong.getAll(condition, '*', 'bac', (error, items) => res.send({ error, items }));
     });
 
     app.post('/api/danh-muc/ngach-luong', app.permission.check('dmNgachLuong:write'), (req, res) => {

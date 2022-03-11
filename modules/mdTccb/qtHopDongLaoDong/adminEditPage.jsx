@@ -375,10 +375,10 @@ class QtHopDongLaoDongEditPage extends QTForm {
             thuongTruSoNha: this.thuongTru.value().soNhaDuong
         };
         const dcCuTru = {
-            hienTaiMaTinh: this.cuTru.value().maTinhThanhPho,
-            hienTaiMaHuyen: this.cuTru.value().maQuanHuyen,
-            hienTaiMaXa: this.cuTru.value().maPhuongXa,
-            hienTaiSoNha: this.cuTru.value().soNhaDuong
+            thuongTruMaTinh: this.thuongTru.value().maTinhThanhPho,
+            thuongTruMaHuyen: this.thuongTru.value().maQuanHuyen,
+            thuongTruMaXa: this.thuongTru.value().maPhuongXa,
+            thuongTruSoNha: this.thuongTru.value().soNhaDuong
         };
         const dcNoiSinh = {
             maTinhNoiSinh: this.noiSinh.value().maTinhThanhPho
