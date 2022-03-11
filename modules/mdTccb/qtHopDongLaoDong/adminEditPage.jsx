@@ -312,7 +312,6 @@ class QtHopDongLaoDongEditPage extends QTForm {
     copyAddress = e => {
         e.preventDefault();
         const dataThuongTru = this.thuongTru.value();
-        console.log(dataThuongTru);
         this.cuTru.value(dataThuongTru.maTinhThanhPho, dataThuongTru.maQuanHuyen, dataThuongTru.maPhuongXa, dataThuongTru.soNhaDuong);
     }
     autoChucVu = (value) => {
@@ -390,7 +389,6 @@ class QtHopDongLaoDongEditPage extends QTForm {
         if (data.data) {
             if (this.urlMa) {
                 this.props.updateQtHopDongLaoDong(this.urlMa, Object.assign(data.data, dcThuongTru, dcCuTru, dcNguyenQuan, dcNoiSinh, { hopDongCanBo: 'LĐ' }), () => {
-                    console.log(data.data);
                     this.props.updateStaff(this.state.shcc, Object.assign(data.data, dcThuongTru, dcCuTru, dcNguyenQuan, dcNoiSinh, { hopDongCanBo: 'LĐ' }), () => {
                         this.main.current.classList.remove('validated');
                         this.props.history.push(`/user/tccb/qua-trinh/hop-dong-lao-dong/${this.urlMa}`);

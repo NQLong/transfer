@@ -4,7 +4,6 @@ export function createToChucKhacStaff(data, done) {
     return dispatch => {
         const url = '/api/staff/to-chuc-khac';
         T.post(url, { data }, res => {
-            console.log(res);
             if (res.error) {
                 T.notify('Thêm thông tin tổ chức bị lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);

@@ -61,7 +61,6 @@ export function getCanBoTheoDonViAll(maDonVi, done) {
                 T.notify('Lấy danh sách cán bộ bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                console.log('this is list: ', data);
                 if (page.maDonVi) data.page.maDonVi = page.maDonVi;
                 if (done) done(data.item);
                 dispatch({ type: canBoTheoDonViGetAll, items: data.item });

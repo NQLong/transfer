@@ -309,7 +309,6 @@ module.exports = app => {
                     app.deleteImage(user.image);
                     app.fs.copyFile(srcPath, userImagePath + '/' + filename, error => {
                         if (error) {
-                            console.log(error);
                             done({ error });
                         } else {
                             app.deleteFile(srcPath);

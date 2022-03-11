@@ -39,7 +39,6 @@ class QtHopDongLaoDongPage extends AdminPage {
         const list_dv = this.maDonVi?.value().toString() || '';
         const list_shcc = this.mulCanBo?.value().toString() || '';
         const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc };
-        console.log(toYear);
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {

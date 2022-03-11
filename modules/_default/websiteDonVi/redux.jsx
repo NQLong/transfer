@@ -69,7 +69,6 @@ export function getDvWebsiteAll(condition, done) {
         const url = '/api/website/all';
         T.get(url, { condition }, data => {
             if (data.error) {
-                console.log(data);
                 // T.notify('Lấy danh sách website đơn vị bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
@@ -77,7 +76,7 @@ export function getDvWebsiteAll(condition, done) {
                 dispatch({ type: DvWebsiteGetAll, items: data.items ? data.items : [] });
             }
         }, (error) => {
-            console.log(error);
+            console.error(error);
         });
     };
 }

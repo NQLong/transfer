@@ -188,7 +188,6 @@ export function deleteQtHopDongVienChuc(ma, done) {
 }
 
 export function updateQtHopDongVienChuc(ma, changes, done) {
-    console.log(changes);
     return dispatch => {
         const url = '/api/tccb/qua-trinh/hop-dong-vien-chuc';
         T.put(url, { ma, changes }, data => {

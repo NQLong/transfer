@@ -55,28 +55,17 @@ module.exports = app => {
                 <meta property='donVi' content=${news.maDonVi > 0 ? news.maDonVi : '00'} />`);
             res.send(data);
         };
-        new Promise(resolve => {
-            if (req.originalUrl.startsWith('/news/item/')) {
-                const idNews = req.originalUrl.substring('/news/item/'.length).split('?')[0];
-                app.model.fwNews.get({ id: idNews }, (error, item) => resolve(item));
+
+        let id = null, link = null;
+        if (req.originalUrl.startsWith('/news/item/')) id = req.originalUrl.substring('/news/item/'.length).split('?')[0];
+        if (req.originalUrl.startsWith('/tin-tuc/')) link = req.originalUrl.substring('/tin-tuc/'.length).split('?')[0];
+        app.model.fwNews.get(id ? { id } : { link }, (error, item) => {
+            if (error || !item) {
+                app.templates.home(req, res);
+            } else if (item.maDonVi == 0) {
+                app.templates.home(req, { send: (data) => changeMeta(item, data) });
             } else {
-                resolve(null);
-            }
-        }).then(news => new Promise(resolve => {
-            if (news) {
-                resolve(news);
-            } else if (req.originalUrl.startsWith('/tin-tuc/')) {
-                const idNews = req.originalUrl.substring('/tin-tuc/'.length).split('?')[0];
-                app.model.fwNews.getByLink(idNews, (error, item) => resolve(item));
-            } else {
-                resolve(null);
-            }
-        })).then(news => {
-            if (news && news.maDonVi == 0) app.templates.home(req, { send: (data) => changeMeta(news, data) });
-            else if (news) app.templates.unit(req, { send: (data) => changeMeta(news, data) });
-            else {
-                console.log(route, 'bugs');
-                // res.redirect('/404.html');
+                app.templates.unit(req, { send: (data) => changeMeta(item, data) });
             }
         });
     }));
@@ -104,29 +93,22 @@ module.exports = app => {
             <meta property='donVi' content=${news.maDonVi > 0 ? news.maDonVi : '67'} />`);
             res.send(data);
         };
-        new Promise(resolve => {
-            if (req.originalUrl.startsWith('/news-en/item/')) {
-                const idNews = req.originalUrl.substring('/news-en/item/'.length).split('?')[0];
-                app.model.fwNews.get({ id: idNews }, (error, item) => resolve(item));
+
+        let id = null, link = null;
+        if (req.originalUrl.startsWith('/news-en/item/')) id = req.originalUrl.substring('/news-en/item/'.length).split('?')[0];
+        if (req.originalUrl.startsWith('/article/')) link = req.originalUrl.substring('/article/'.length).split('?')[0];
+
+        app.model.fwNews.get(id ? { id } : { link }, (error, item) => {
+            if (error || !item) {
+                app.templates.home(req, res);
             } else {
-                resolve(null);
-            }
-        }).then(news => new Promise(resolve => {
-            if (news) {
-                resolve(news);
-            } else if (req.originalUrl.startsWith('/article/')) {
-                const idNews = req.originalUrl.substring('/article/'.length).split('?')[0];
-                app.model.fwNews.getByEnLink(idNews, (error, item) => resolve(item));
-            } else {
-                resolve(null);
-            }
-        })).then(news => {
-            if (news && news.language == 'vi' && news.isTranslate == 0) { res.redirect('/404.html'); }
-            // else if (news && news.maDonVi == 0) app.templates.home(req, { send: (data) => changeMeta(news, data) });
-            else if (news) app.templates.unit(req, { send: (data) => changeMeta(news, data) });
-            else {
-                console.log(route, 'bugs');
-                res.redirect('/404.html');
+                if (item && item.language == 'vi' && item.isTranslate == 0) {
+                    res.redirect('/404.html');
+                } else if (item.maDonVi == 0) {
+                    app.templates.home(req, { send: (data) => changeMeta(item, data) });
+                } else {
+                    app.templates.unit(req, { send: (data) => changeMeta(item, data) });
+                }
             }
         });
     }));

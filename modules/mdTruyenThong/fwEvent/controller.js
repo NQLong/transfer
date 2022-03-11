@@ -170,7 +170,7 @@ module.exports = app => {
                     res.send({ error, item });
                 });
         } else {
-            res.send({ eror: 'Bugs' });
+            res.send({ error: 'Bugs' });
         }
     });
 
@@ -273,7 +273,6 @@ module.exports = app => {
         app.model.fwEvent.getPage(pageNumber, pageSize, condition, '*', 'priority DESC', (error, page) => {
             const response = {};
             if (error || page == null) {
-                console.log(error);
                 response.error = 'Danh sách sự kiện không sẵn sàng!';
             } else {
                 let list = page.list.map(item => app.clone(item, { content: null }));

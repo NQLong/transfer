@@ -21,7 +21,6 @@ module.exports = app => {
         app.getUploadForm().parse(req, (error, fields, files) => {
             console.log('User Upload:', fields, files, req.query);
             if (error) {
-                console.log(error);
                 res.send({ error });
             } else {
                 let hasResponsed = false;

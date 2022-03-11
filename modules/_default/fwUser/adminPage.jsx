@@ -256,7 +256,6 @@ class UserPage extends AdminPage {
 
     delete = (e, item) => {
         e.preventDefault();
-        console.log(item);
         T.confirm('Người dùng: Xóa người dùng', 'Bạn có chắc bạn muốn xóa người dùng này?', true, isConfirm =>
             isConfirm && this.props.deleteUser(item.email));
     };

@@ -18,7 +18,6 @@ module.exports = app => {
     });
 
     app.put('/api/user/staff/trinh-do-nn', app.permission.check('staff:login'), (req, res) => {
-        console.log(req);
         if (req.body.changes && req.session.user) {
             app.model.trinhDoNgoaiNgu.get({ id: req.body.id }, (error, item) => {
                 if (error || item == null) {

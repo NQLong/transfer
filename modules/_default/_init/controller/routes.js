@@ -25,7 +25,6 @@ module.exports = app => {
 
         if (req.body.password) {
             app.state.set('emailPassword', password, error => {
-                error && console.log('Error (/api/system):', error);
                 res.send(error ? { error: 'Lỗi khi cập nhật mật khẩu email!' } : app.state.data);
             });
         } else {
@@ -180,53 +179,50 @@ module.exports = app => {
     app.get('/api/menu', (req, res) => {
         let pathname = app.url.parse(req.headers.referer).pathname;
         if (pathname.length > 1 && pathname.endsWith('/')) pathname = pathname.substring(0, pathname.length - 1);
-        const ready = () => {
-            if (app.menus && app.menus[pathname]) {
-                const menu = app.menus[pathname] || app.menus['/'];
-                if (menu) {
-                    const menuComponents = [];
-                    if (menu.component) {
-                        res.send(menu.component);
-                    } else if (menu.componentId) {
-                        //TODO
-                        getComponent(0, [menu.componentId], menuComponents, () => {
-                            const newComponents = menuComponents[0].components.sort((a, b) => a.priority - b.priority);
-                            menu.component = Object.assign(menuComponents[0], { components: newComponents });
-                            res.send(menu.component);
-                        });
-                    } else {
-                        res.send({ error: 'Menu không hợp lệ! 1' });
-                    }
-                } else {
-                    res.send({ error: 'Link không hợp lệ!' });
-                }
-            } else if (app.divisionMenus && app.divisionMenus[pathname]) {
-                const menu = app.divisionMenus[pathname];
-                if (menu) {
-                    const menuComponents = [];
-                    if (menu.component) {
-                        res.send(menu.component);
-                    } else if (menu.componentId) {
-                        //TODO
-                        getComponent(0, [menu.componentId], menuComponents, () => {
-                            const newComponents = menuComponents[0].components.sort((a, b) => a.priority - b.priority);
-                            menu.component = Object.assign(menuComponents[0], { components: newComponents });
-                            res.send(menu.component);
-                        });
-                    } else {
-                        console.log('Menu không hợp lệ! 2');
-                        res.send({ error: 'Menu không hợp lệ! 2' });
-                    }
-                } else {
-                    console.log('Menu không hợp lệ! ');
-                    res.send({ error: 'Link không hợp lệ!' });
-                }
-            } else {
-                console.log('Menu không hợp lệ! 3');
-                res.send({ error: 'Menu không hợp lệ! 3', pathname, divisionMenus: app.divisionMenus, menus: app.menus });
+
+        const promiseMenus = new Promise((resolve, reject) => app.redis.get(app.redis.menusKey, (error, menus) => {
+            error ? reject(error) : resolve(menus ? JSON.parse(menus) : {});
+        }));
+        const promiseDivisionMenus = new Promise((resolve, reject) => app.redis.get(app.redis.divisionMenusKey, (error, divisionMenus) => {
+            error ? reject(error) : resolve(divisionMenus ? JSON.parse(divisionMenus) : {});
+        }));
+
+        Promise.all([promiseMenus, promiseDivisionMenus]).then(([menus, divisionMenus]) => {
+            let menu = null, menuType = '';
+            if (menus && menus[pathname]) {
+                menu = menus[pathname];
+                menuType = 'common';
             }
-        };
-        ready();
+            if (!menu && divisionMenus && divisionMenus[pathname]) {
+                menu = divisionMenus[pathname];
+                menuType = 'division';
+            }
+
+            if (!menu) {
+                res.send({ error: 'Link không hợp lệ!' });
+            } else if (menu.component) {
+                res.send(menu.component);
+            } else if (menu.componentId) {
+                //TODO
+                const menuComponents = [];
+                getComponent(0, [menu.componentId], menuComponents, () => {
+                    const newComponents = menuComponents[0].components.sort((a, b) => a.priority - b.priority);
+                    menu.component = Object.assign(menuComponents[0], { components: newComponents });
+
+                    if (menuType == 'common') {
+                        menus[pathname] = menu;
+                        app.redis.set(app.redis.menusKey, JSON.stringify(menus));
+                    } else {
+                        divisionMenus[pathname] = menu;
+                        app.redis.set(app.redis.divisionMenusKey, JSON.stringify(divisionMenus));
+                    }
+
+                    res.send(menu.component);
+                });
+            } else {
+                res.send({ error: 'Menu không hợp lệ! 1' });
+            }
+        });
     });
 
     app.delete('/api/clear-session', app.permission.check(), (req, res) => {
