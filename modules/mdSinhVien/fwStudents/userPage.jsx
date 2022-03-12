@@ -61,6 +61,10 @@ class SinhVienPage extends AdminPage {
         this.lop.value(data.lop ? data.lop : '');
         this.quocTich.value(data.quocGia ? data.quocGia : '');
         this.imageBox.setData('SinhVienImage:' + data.mssv, data.image ? data.image : '/img/avatar.png');
+        this.sdtCha.value(data.sdtCha ? data.sdtCha : '');
+        this.sdtMe.value(data.sdtMe ? data.sdtMe : '');
+        this.hoTenNguoiLienLac.value(data.hoTenNguoiLienLac ? data.hoTenNguoiLienLac : '');
+        this.sdtNguoiLienLac.value(data.sdtNguoiLienLac ? data.sdtNguoiLienLac : '');
     };
 
     getAndValidate = () => {
@@ -111,6 +115,10 @@ class SinhVienPage extends AdminPage {
                         quocGia: this.getValue(this.quocTich),
                         thuongTruMaHuyen, thuongTruMaTinh, thuongTruMaXa,  thuongTruSoNha,
                         lienLacMaHuyen, lienLacMaTinh,  lienLacMaXa, lienLacSoNha,
+                        sdtCha: this.getValue(this.sdtCha),
+                        sdtMe: this.getValue(this.sdtMe),
+                        hoTenNguoiLienLac: this.getValue(this.hoTenNguoiLienLac),
+                        sdtNguoiLienLac: this.getValue(this.sdtNguoiLienLac),
                     };
                     return data;
                 }
@@ -200,17 +208,22 @@ class SinhVienPage extends AdminPage {
                                 Nếu <b>Địa chỉ thường trú</b> là <b>Địa chỉ hiện tại</b> thì&nbsp;<a href='#' onClick={this.copyAddress}>nhấp vào đây</a>.
                             </p>
                             <ComponentDiaDiem ref={e => this.lienLac = e} label='Nơi ở hiện tại' className='form-group col-md-12' requiredSoNhaDuong={true} />
-                            <FormTextBox ref={e => this.dienThoaiCaNhan = e} label='Điện thoại cá nhân' className='form-group col-md-4' maxLength={10} />
-                            <FormTextBox ref={e => this.dienThoaiLienLac = e} label='Điện thoại liên lạc' className='form-group col-md-4' maxLength={10} />
-                            <FormTextBox ref={e => this.dienThoaiKhac = e} label='Điện thoại khác' className='form-group col-md-4' maxLength={10} />
-                            <FormTextBox ref={e => this.emailCaNhan = e} label='Email cá nhân' className='form-group col-md-6' />
+                            <FormTextBox ref={e => this.dienThoaiCaNhan = e} label='Điện thoại cá nhân' className='form-group col-md-3' maxLength={10} />
+                            <FormTextBox ref={e => this.dienThoaiLienLac = e} label='Điện thoại liên lạc' className='form-group col-md-3' maxLength={10} />
+                            <FormTextBox ref={e => this.dienThoaiKhac = e} label='Điện thoại khác' className='form-group col-md-3' maxLength={10} />
+                            <FormTextBox ref={e => this.emailCaNhan = e} label='Email cá nhân' className='form-group col-md-3' />
                             <FormTextBox ref={e => this.emailTruong = e} label='Email trường' className='form-group col-md-6' />
-                            <FormTextBox ref={e => this.tenCha = e} label='Họ tên cha' className='form-group col-md-4' />
-                            <FormDatePicker ref={e => this.ngaySinhCha = e} label='Ngày sinh cha' type='date-mask' className='form-group col-md-4' />
-                            <FormTextBox ref={e => this.ngheNghiepCha = e} label='Nghề  nghiệp cha' className='form-group col-md-4' />
-                            <FormTextBox ref={e => this.tenMe = e} label='Họ tên mẹ' className='form-group col-md-4' />
-                            <FormDatePicker ref={e => this.ngaySinhMe = e} label='Ngày sinh mẹ' type='date-mask' className='form-group col-md-4' />
-                            <FormTextBox ref={e => this.ngheNghiepMe = e} label='Nghề  nghiệp mẹ' className='form-group col-md-4' />
+                            <div className='form-group col-md-6'></div>
+                            <FormTextBox ref={e => this.tenCha = e} label='Họ tên cha' className='form-group col-md-3' />
+                            <FormTextBox ref={e => this.sdtCha = e} label='Số  điện thoại cha' className='form-group col-md-3' />
+                            <FormDatePicker ref={e => this.ngaySinhCha = e} label='Ngày sinh cha' type='date-mask' className='form-group col-md-3' />
+                            <FormTextBox ref={e => this.ngheNghiepCha = e} label='Nghề  nghiệp cha' className='form-group col-md-3' />
+                            <FormTextBox ref={e => this.tenMe = e} label='Họ tên mẹ' className='form-group col-md-3' />
+                            <FormTextBox ref={e => this.sdtMe = e} label='Số điện thoại mẹ' className='form-group col-md-3' />
+                            <FormDatePicker ref={e => this.ngaySinhMe = e} label='Ngày sinh mẹ' type='date-mask' className='form-group col-md-3' />
+                            <FormTextBox ref={e => this.ngheNghiepMe = e} label='Nghề  nghiệp mẹ' className='form-group col-md-3' />
+                            <FormTextBox ref={e => this.hoTenNguoiLienLac = e} label='Họ tên người liên lạc' className='form-group col-md-4' />
+                            <FormTextBox ref={e => this.sdtNguoiLienLac = e} label='Số  điện thoại người liên lạc' className='form-group col-md-4' />
                         </div>
                     </div>
                 </div>
