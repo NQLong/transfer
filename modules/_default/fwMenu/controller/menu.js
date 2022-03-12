@@ -17,86 +17,55 @@ module.exports = app => {
     app.get('/user/menu/edit/:divisionId/:id', app.permission.check('menu:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.buildAppMenus = menuTree => {
-        const menus = {}, divisionMenus = {},
-            getMenu = (index, items, done) => {
-                if (index < items.length) {
-                    const item = items[index];
-                    if (item.maDonVi == '00') {
-                        menus[item.link] = item;
-                    } else {
-                        divisionMenus[item.link] = item;
+    app.buildAppMenus = () => { // Get đệ quy menu theo array của parentMenus, mỗi parentMenu có array của subMenus
+        app.model.fwMenu.getMenuTree((_, menuTree) => {
+            if (menuTree == null) menuTree = [];
+            const menus = {}, divisionMenus = {}; // 2 loại menu: Menu chung và menu cho đơn vị, menu đơn vị có maDonVi != '00'
+
+            // Mapper link của từng menu, kể cả subMenus vào trong 2 danh sách menu kể trên
+            while (menuTree.length) {
+                const item = menuTree.shift(); // Lấy phần tử menuTree[0] ra khỏi menuTree
+                if (item.maDonVi == '00') { // Nếu mã đơn vị == '00' nghĩa là không có đơn vị => Menu chung
+                    if (item.submenus && item.submenus.length) menuTree.push(...item.submenus);
+                    if (item.link != '#') {
+                        menus[item.link] = app.clone(item, { submenus: null });
                     }
-                    if (item.submenus && item.submenus.length > 0) {
-                        getMenu(0, item.submenus, () => {
-                            getMenu(index + 1, items, done);
-                        });
-                    } else {
-                        getMenu(index + 1, items, done);
+                } else { // Ngược lại, mã đơn vị != '00' => Menu của đơn vị
+                    if (item.submenus && item.submenus.length) menuTree.push(...item.submenus);
+                    if (item.link != '#') {
+                        divisionMenus[item.link] = app.clone(item, { submenus: null });
                     }
-                } else {
-                    done();
                 }
-            };
+            }
 
-        if (menuTree) {
-            getMenu(0, menuTree, () => {
-                app.menus = menus;
-                app.divisionMenus = divisionMenus;
-            });
-        } else {
-            app.model.fwMenu.getAll((error, menu) => {
-                const menus = {}, divisionMenus = {};
-                menu.forEach(item => {
-                    item.maDonVi == '00' ? menus[item.link] = item : divisionMenus[item.link] = item;
-                });
-                app.menus = menus;
-                app.divisionMenus = divisionMenus;
-            });
-            // app.model.fwMenu.getMenuTree((error, menuTree) => {
-            //     getMenu(0, menuTree, () => {
-            //         app.menus = menus;
-            //         app.divisionMenus = divisionMenus;
-            //     })
-            // });
-        }
+            // Lưu vào trong redis
+            app.redis.set(app.redis.menusKey, JSON.stringify(menus));
+            app.redis.set(app.redis.divisionMenusKey, JSON.stringify(divisionMenus));
+        });
     };
-
-    // const ready = () => {
-    //     if (app.dbConnection && app.dbConnection.buildCondition) {
-    //         app.model.fwMenu.get({ link: '/' }, (error, menu) => {
-    //             if (error) {
-    //                 console.error('Get menu by link has errors!');
-    //             } else if (menu == null) {
-    //                 app.model.fwMenu.createDefault(null, 'Home', '/', 1, (error) => {
-    //                 });
-    //             }
-    //         });
-
-    //         app.buildAppMenus();
-    //     } else {
-    //         setTimeout(ready, 1000);
-    //     }
-    // };
-    // ready();
 
     // Hook readyHooks ------------------------------------------------------------------------------------------------------------------------------
     app.readyHooks.add('readyMenu', {
-        ready: () => app.dbConnection && app.dbConnection.buildCondition,
-        run: () => app.model.fwMenu.get({ link: '/' }, (error, menu) => {
-            if (error) {
-                console.error('Get menu by link has errors!');
-            } else if (menu == null) {
-                app.model.fwMenu.createDefault(null, 'Home', '/', 1, '00', '', () => app.buildAppMenus());
-            } else {
-                app.buildAppMenus();
-            }
-        }),
+        ready: () => app.redis && app.dbConnection && app.dbConnection.buildCondition,
+        run: () => {
+            app.redis.menusKey = app.appName + '_menus';
+            app.redis.divisionMenusKey = app.appName + '_divisionMenus';
+
+            app.primaryWorker && app.model.fwMenu.get({ link: '/' }, (error, menu) => {
+                if (error) {
+                    console.error('Get menu by link has errors!');
+                } else if (menu == null) {
+                    app.model.fwMenu.createDefault(null, 'Home', '/', 1, '00', '', () => app.buildAppMenus());
+                } else {
+                    app.buildAppMenus();
+                }
+            });
+        }
     });
 
     app.readyHooks.add('readyDivisionMenu', {
-        ready: () => app.dbConnection && app.dbConnection.buildCondition,
-        run: () => app.model.dvWebsite.getAll((err, dvWebsites) => {
+        ready: () => app.redis && app.dbConnection && app.dbConnection.buildCondition,
+        run: () => app.primaryWorker && app.model.dvWebsite.getAll((err, dvWebsites) => {
             if (err) {
                 console.error('Get unit website has errors!');
             } else if (dvWebsites) {
@@ -108,14 +77,14 @@ module.exports = app => {
                                 console.error('Get menu by link has errors!');
                             } else if (menu == null) {
                                 app.model.fwMenu.createDefault(null, dvWebsite.shortname + ' home', '/' + dvWebsite.shortname, 1, dvWebsite.maDonVi, dvWebsite.shortname, () => {
-                                    app.buildAppMenus();
                                     handleCreateDefault(index + 1);
                                 });
                             } else {
-                                app.buildAppMenus();
                                 handleCreateDefault(index + 1);
                             }
                         });
+                    } else {
+                        app.buildAppMenus();
                     }
                 };
                 handleCreateDefault();
@@ -126,7 +95,6 @@ module.exports = app => {
 
     app.get('/api/menu/all', app.permission.check('menu:read'), (req, res) => {
         app.model.fwMenu.getDivisionMenuTree('00', '', (error, menuTree) => {
-            app.buildAppMenus(menuTree);
             res.send({ error, items: menuTree });
         });
     });
@@ -134,7 +102,6 @@ module.exports = app => {
     app.get('/api/menu/item/:id', app.permission.check('menu:read'), (req, res) => {
         app.model.fwMenu.get({ id: req.params.id }, (error, menu) => {
             if (error || menu == null) {
-                console.log(error);
                 res.send({ error: 'Lỗi khi lấy menu!' });
             } else {
                 const menuComponentIds = [],
@@ -237,7 +204,6 @@ module.exports = app => {
                     res.send({ error, item });
                 });
             } else {
-                console.log(error);
                 res.send({ error: 'Tạo menu bị lỗi!' });
             }
         });
@@ -265,6 +231,7 @@ module.exports = app => {
                         });
                     }
                 } else {
+                    app.buildAppMenus();
                     res.send({ error });
                 }
             };
@@ -274,11 +241,14 @@ module.exports = app => {
     app.delete('/api/menu', app.permission.check('menu:write'), (req, res) => {
         app.model.fwMenu.get({ id: req.body.id }, (error, item) => {
             if (error || item == null) {
-                console.log({ error: 'Id không hợp lệ!' });
+                res.send({ error: 'Id không hợp lệ!' });
             } else {
                 const componentId = Number(item.componentId);
                 if (!isNaN(componentId)) app.model.fwComponent.deleteComponent(componentId);
-                app.model.fwMenu.delete({ id: item.id }, error => res.send({ error }));
+                app.model.fwMenu.delete({ id: item.id }, error => {
+                    if (!error) app.buildAppMenus();
+                    res.send({ error });
+                });
             }
         });
     });

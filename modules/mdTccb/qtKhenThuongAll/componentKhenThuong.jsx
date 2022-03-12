@@ -10,7 +10,6 @@ class EditModal extends AdminModal {
     state = { id: '' };
 
     onShow = (item) => {
-        console.log(item);
         let { id, namDatDuoc, maThanhTich, maChuThich, diemThiDua } = item && item.item ? item.item : {
             id: '', ma: '', namDatDuoc: '', maThanhTich: '', maChuThich: '', diemThiDua: ''
         };

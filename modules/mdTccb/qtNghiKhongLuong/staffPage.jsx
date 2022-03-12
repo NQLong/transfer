@@ -36,11 +36,6 @@ class EditModal extends AdminModal {
                 id: '', soVanBan : '', batDau: '', batDauType: '', ketThuc: '', ketThucType: '', thoiGianDiLam: '', soThongBao: '', tongThoiGian: '', thoiGianTroLaiCongTac: '', ghiChu: '', thongBaoSo: '',
                 thamGiaBHXH: '', thoiGianBaoGiam: '', thoiGianBaoTang: ''
         };
-        console.log(item.item);
-        console.log(thoiGianDiLam);
-        console.log(batDau);
-        console.log(ketThuc);
-        console.log(thoiGianTroLaiCongTac);
         this.setState({
             id, batDauType: batDauType ? batDauType : 'dd/mm/yyyy',
             ketThucType: ketThucType ? ketThucType : 'dd/mm/yyyy',

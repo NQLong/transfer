@@ -29,7 +29,6 @@ class EditModal extends AdminModal {
             hieuLucDen: Number(this.hieuLucDen.value()),
             nghiDinhChinhPhu: this.nghiDinhChinhPhu.value(),
         };
-        console.log(changes);
         if (changes.mucLuong == '') {
             T.notify('Mức lương cơ sở bị trống!', 'danger');
             this.mucLuong.focus();

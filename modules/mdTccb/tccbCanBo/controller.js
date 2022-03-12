@@ -1498,7 +1498,6 @@ module.exports = app => {
                     })).then((data) => {
                         app.docx.generateFile(source, data, (error, data) => {
                             if (error) {
-                                console.log(error);
                                 res.send({ error });
                             }
                             else

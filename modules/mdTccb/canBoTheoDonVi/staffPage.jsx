@@ -12,7 +12,6 @@ class CanBoTheoDonVi extends AdminPage {
         T.ready('/user', () => {
             const { shcc } = this.props.system && this.props.system.user ? this.props.system.user : { shcc: '' };
             this.props.getStaff(shcc, (data) => {
-                console.log(data);
                 if (data.error) {
                     T.notify('Lấy thông tin cán bộ bị lỗi', 'warning');
                 } else {
@@ -35,7 +34,6 @@ class CanBoTheoDonVi extends AdminPage {
         }
         const tenDv = this.props.system && this.props.system.user ? this.props.system.user.donVi : '';
         let list = this.props.canBoTheoDonVi ? this.props.canBoTheoDonVi.items : [];
-        console.log(list);
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({

@@ -17,7 +17,6 @@ module.exports = app => {
         let pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             condition = { statement: null };
-        console.log(req.query.condition);
         if (req.query.condition) {
             condition = {
                 statement: 'lower(ten) LIKE :searchText OR lower(mo_ta) LIKE :searchText',
