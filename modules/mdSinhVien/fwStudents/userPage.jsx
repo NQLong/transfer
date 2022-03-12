@@ -10,6 +10,7 @@ import { SelectAdapter_DmTonGiaoV2 } from 'modules/mdDanhMuc/dmTonGiao/redux';
 import { SelectAdapter_DmGioiTinhV2 } from 'modules/mdDanhMuc/dmGioiTinh/redux';
 import { SelectAdapter_DmLoaiSinhVienV2 } from 'modules/mdDanhMuc/dmLoaiSinhVien/redux';
 import { SelectAdapter_DmTinhTrangSinhVienV2 } from 'modules/mdDanhMuc/dmTinhTrangSinhVien/redux';
+import { SelectAdapter_DmLoaiHinhDaoTaoV2 } from 'modules/mdDanhMuc/dmLoaiHinhDaoTao/redux';
 import { updateSystemState } from 'modules/_default/_init/reduxSystem';
 import T from 'view/js/common';
 
@@ -185,7 +186,7 @@ class SinhVienPage extends AdminPage {
                                     <FormTextBox ref={e => this.maKhoa= e} label='Mã khoa' className='form-group col-md-4' readOnly />
                                     <FormTextBox ref={e => this.maNganh = e} label='Mã ngành' className='form-group col-md-4' readOnly />
                                     <FormTextBox ref={e => this.lop = e} label='Lớp' className='form-group col-md-4' readOnly />    
-                                    <FormTextBox ref={e => this.loaiHinhDaoTao = e} label='Loại hình đào tạo' className='form-group col-md-4' readOnly />
+                                    <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Loại hình đào tạo' className='form-group col-md-4' readOnly data={SelectAdapter_DmLoaiHinhDaoTaoV2} />
                                     <FormSelect ref={e => this.loaiSinhVien = e} label='Loại sinh viên' className='form-group col-md-4' readOnly data={SelectAdapter_DmLoaiSinhVienV2} />
                                     <FormSelect ref={e => this.tinhTrang = e} label='Tình trạng' className='form-group col-md-4' readOnly data={SelectAdapter_DmTinhTrangSinhVienV2} />
                                 </div>
