@@ -82,11 +82,11 @@ module.exports = app => {
                     if (error || canBoDuocThue == null) {
                         res.send({ error });
                     } else {
-                        app.model.canBo.get({ shcc: qtHopDongLaoDong.nguoiKy }, (error, canBo) => {
-                            if (error || canBo == null) {
-                                res.send({ item: app.clone({ qtHopDongLaoDong: qtHopDongLaoDong }, { canBoDuocThue: canBoDuocThue }, { canBo: null }) });
+                        app.model.canBo.get({ shcc: qtHopDongLaoDong.nguoiKy }, (error, daiDien) => {
+                            if (error || daiDien == null) {
+                                res.send({ item: app.clone({ qtHopDongLaoDong }, { canBoDuocThue }, { canBo: null }) });
                             } else {
-                                res.send({ item: app.clone({ qtHopDongLaoDong: qtHopDongLaoDong }, { canBoDuocThue: canBoDuocThue }, { canBo: canBo }) });
+                                res.send({ item: app.clone({ qtHopDongLaoDong: qtHopDongLaoDong }, { canBoDuocThue }, { daiDien }) });
                             }
                         });
                     }
@@ -95,6 +95,22 @@ module.exports = app => {
         });
     });
 
+    app.get('/api/tccb/qua-trinh/hop-dong-lao-dong/get-dai-dien/:shcc', checkGetStaffPermission, (req, res) => {
+        app.model.canBo.get({ shcc: req.params.shcc }, (error, item) => {
+            if (error) res.send({ error });
+            else {
+                app.model.qtChucVu.get({ shcc: item.shcc, chucVuChinh: 1 }, (e, result) => {
+                    if (e) res.send({ error: e });
+                    else res.send({ item: app.clone(item, { chucVu: result.maChucVu }) });
+                });
+            }
+        });
+    });
+
+    app.get('/api/tccb/qua-trinh/hop-dong-lao-dong/newest/:shcc', app.permission.check('staff:login'), (req, res) => {
+        app.model.qtHopDongLaoDong.get({ nguoiDuocThue: req.params.shcc }, 'ngayKyHopDong', 'ngayKyHopDong DESC', (error, result) => res.send({ error, result }));
+    });
+    
     app.post('/api/tccb/qua-trinh/hop-dong-lao-dong', app.permission.check('qtHopDongLaoDong:write'), (req, res) => {
         app.model.qtHopDongLaoDong.create(req.body.item, (error, item) => res.send({ error, item }));
     });
@@ -279,9 +295,31 @@ module.exports = app => {
     });
 
     app.get('/api/tccb/qua-trinh/hop-dong-lao-dong/get-truong-phong-tccb', app.permission.check('qtHopDongLaoDong:read'), (req, res) => {
-        app.model.canBo.get({ maChucVu: '003', maDonVi: '30' }, 'shcc', 'shcc DESC', (error, truongPhongTccb) => {
-            res.send({ error, truongPhongTccb });
+        app.model.dmChucVu.get({ ten: 'Trưởng phòng' }, (error, result) => {
+            if (error) res.send({ error });
+            else {
+                app.model.qtChucVu.get({ maChucVu: result.ma, maDonVi: 30, chucVuChinh: 1 }, (er, truongPhongTCCB) => {
+                    if (er) res.send({ error: er });
+                    else {
+                        
+                        res.send({ truongPhongTCCB });
+                    }
+                });
+            }
+        });
+    });
 
+    app.get('/api/tccb/qua-trinh/hop-dong-lao-dong/suggested-shd', app.permission.check('qtHopDongLaoDong:write'), (req, res) => {
+        app.model.qtHopDongLaoDong.getAll({}, 'soHopDong', 'soHopDong DESC', (error, items) => {
+            let maxSoHD = 0, curYear = new Date().getFullYear();
+            items.forEach((item) => {
+                let soHopDong = Number(item.soHopDong.substring(0, item.soHopDong.indexOf('/'))),
+                    hopDongYear = Number(item.soHopDong.substring(item.soHopDong.indexOf('/') + 1, item.soHopDong.lastIndexOf('/')));
+                if (curYear == hopDongYear) {
+                    if (soHopDong > maxSoHD) maxSoHD = soHopDong;
+                }
+            });
+            res.send({ error, soHopDongSuggested: maxSoHD + 1 });
         });
     });
 };

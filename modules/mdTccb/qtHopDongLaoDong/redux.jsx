@@ -138,6 +138,21 @@ export function getQtHopDongLaoDongAll(done) {
     };
 }
 
+export function getHopDongMoiNhat(shcc, done) {
+    return () => {
+        const url = `/api/tccb/qua-trinh/hop-dong-lao-dong/newest/${shcc}`;
+        T.get(url, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách hợp đồng bị lỗi!', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                console.log(data.result);
+                if (done) done(data.result);
+            }
+        });
+    };
+}
+
 export function getQtHopDongLaoDong(ma, done) {
     return () => {
         const url = `/api/tccb/qua-trinh/hop-dong-lao-dong/item/${ma}`;
@@ -241,5 +256,32 @@ export function getTruongPhongTccb(done) {
                 done && done(data);
             }
         }, error => console.error(`GET: ${url}.`, error));
+    };
+}
+export function suggestSoHopDong(done) {
+    return () => {
+        const url = '/api/tccb/qua-trinh/hop-dong-lao-dong/suggested-shd';
+        T.get(url, {}, data => {
+            if (data.error) {
+                T.notify('Gợi ý số hợp đồng bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                done && done(data);
+            }
+        }, error => T.notify('Gợi ý số hợp đồng bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
+    };
+}
+
+export function getDaiDienKyHopDong(shcc, done) {
+    return () => {
+        const url = `/api/tccb/qua-trinh/hop-dong-lao-dong/get-dai-dien/${shcc}`;
+        T.get(url, data => {
+            if (data.error) {
+                T.notify('Lấy thông tin cán bộ bên A bị lỗi ' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else if (done) {
+                done(data);
+            }
+        });
     };
 }

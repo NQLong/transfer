@@ -1,6 +1,6 @@
-// Table name: QT_KHEN_THUONG_ALL { loaiDoiTuong, ma, namDatDuoc, thanhTich, chuThich, id, diemThiDua }
+// Table name: QT_KHEN_THUONG_ALL { loaiDoiTuong, ma, namDatDuoc, thanhTich, chuThich, id, diemThiDua, soQuyetDinh }
 const keys = ['ID'];
-const obj2Db = { 'loaiDoiTuong': 'LOAI_DOI_TUONG', 'ma': 'MA', 'namDatDuoc': 'NAM_DAT_DUOC', 'thanhTich': 'THANH_TICH', 'chuThich': 'CHU_THICH', 'id': 'ID', 'diemThiDua': 'DIEM_THI_DUA' };
+const obj2Db = { 'loaiDoiTuong': 'LOAI_DOI_TUONG', 'ma': 'MA', 'namDatDuoc': 'NAM_DAT_DUOC', 'thanhTich': 'THANH_TICH', 'chuThich': 'CHU_THICH', 'id': 'ID', 'diemThiDua': 'DIEM_THI_DUA', 'soQuyetDinh': 'SO_QUYET_DINH' };
 
 module.exports = app => {
     app.model.qtKhenThuongAll = {
@@ -131,14 +131,14 @@ module.exports = app => {
             app.dbConnection.execute(sql, parameter, (error, result) => done(error, result));
         },
 
-        searchPage: (pagenumber, pagesize, loaidoituong, madt, fromyear, toyear, searchterm, done) => {
-            app.dbConnection.execute('BEGIN :ret:=qt_khen_thuong_all_search_page(:pagenumber, :pagesize, :loaidoituong, :madt, :fromyear, :toyear, :searchterm, :totalitem, :pagetotal); END;',
-                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, pagenumber: { val: pagenumber, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, pagesize: { val: pagesize, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, loaidoituong, madt, fromyear, toyear, searchterm, totalitem: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pagetotal: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
+        searchPage: (pagenumber, pagesize, loaidoituong, fromyear, toyear, listDv, listShcc, searchterm, done) => {
+            app.dbConnection.execute('BEGIN :ret:=qt_khen_thuong_all_search_page(:pagenumber, :pagesize, :loaidoituong, :fromyear, :toyear, :listDv, :listShcc, :searchterm, :totalitem, :pagetotal); END;',
+                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, pagenumber: { val: pagenumber, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, pagesize: { val: pagesize, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, loaidoituong, fromyear, toyear, listDv, listShcc, searchterm, totalitem: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pagetotal: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
         },
 
-        groupPage: (pagenumber, pagesize, loaidoituong, fromyear, toyear, searchterm, done) => {
-            app.dbConnection.execute('BEGIN :ret:=qt_khen_thuong_all_group_page(:pagenumber, :pagesize, :loaidoituong, :fromyear, :toyear, :searchterm, :totalitem, :pagetotal); END;',
-                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, pagenumber: { val: pagenumber, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, pagesize: { val: pagesize, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, loaidoituong, fromyear, toyear, searchterm, totalitem: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pagetotal: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
+        groupPage: (pagenumber, pagesize, loaidoituong, fromyear, toyear, listDv, listShcc, searchterm, done) => {
+            app.dbConnection.execute('BEGIN :ret:=qt_khen_thuong_all_group_page(:pagenumber, :pagesize, :loaidoituong, :fromyear, :toyear, :listDv, :listShcc, :searchterm, :totalitem, :pagetotal); END;',
+                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, pagenumber: { val: pagenumber, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, pagesize: { val: pagesize, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, loaidoituong, fromyear, toyear, listDv, listShcc, searchterm, totalitem: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pagetotal: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
         },
     };
 };

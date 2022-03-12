@@ -1,6 +1,6 @@
-// Table name: QT_DI_NUOC_NGOAI { id, shcc, quocGia, ngayDi, ngayDiType, ngayVe, ngayVeType, mucDich, noiDung, chiPhi, ghiChu, soQuyetDinh, ngayQuyetDinh }
+// Table name: QT_DI_NUOC_NGOAI { id, shcc, quocGia, ngayDi, ngayDiType, ngayVe, ngayVeType, mucDich, noiDung, chiPhi, ghiChu, soQuyetDinh, ngayQuyetDinh, loaiChiPhi }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'shcc': 'SHCC', 'quocGia': 'QUOC_GIA', 'ngayDi': 'NGAY_DI', 'ngayDiType': 'NGAY_DI_TYPE', 'ngayVe': 'NGAY_VE', 'ngayVeType': 'NGAY_VE_TYPE', 'mucDich': 'MUC_DICH', 'noiDung': 'NOI_DUNG', 'chiPhi': 'CHI_PHI', 'ghiChu': 'GHI_CHU', 'soQuyetDinh': 'SO_QUYET_DINH', 'ngayQuyetDinh': 'NGAY_QUYET_DINH' };
+const obj2Db = { 'id': 'ID', 'shcc': 'SHCC', 'quocGia': 'QUOC_GIA', 'ngayDi': 'NGAY_DI', 'ngayDiType': 'NGAY_DI_TYPE', 'ngayVe': 'NGAY_VE', 'ngayVeType': 'NGAY_VE_TYPE', 'mucDich': 'MUC_DICH', 'noiDung': 'NOI_DUNG', 'chiPhi': 'CHI_PHI', 'ghiChu': 'GHI_CHU', 'soQuyetDinh': 'SO_QUYET_DINH', 'ngayQuyetDinh': 'NGAY_QUYET_DINH', 'loaiChiPhi': 'LOAI_CHI_PHI' };
 
 module.exports = app => {
     app.model.qtDiNuocNgoai = {

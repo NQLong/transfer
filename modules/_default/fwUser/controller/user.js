@@ -140,6 +140,7 @@ module.exports = app => {
         }
 
         app.model.fwUser.getPage(pageNumber, pageSize, condition, '*', 'email ASC', (error1, page) => {
+            console.log(page);
             if (page && page.list) {
                 let mapperUser = {},
                     emails = page.list.map(user => {
@@ -284,36 +285,36 @@ module.exports = app => {
     });
 
     // Hook upload images ---------------------------------------------------------------------------------------------------------------------------
-    const userImagePath = app.path.join(app.publicPath, '/img/user');
-    app.createFolder(userImagePath);
+    app.createFolder(app.path.join(app.publicPath, '/img/user'));
 
-    app.uploadHooks.add('uploadYourImage', (req, fields, files, params, done) => {
-        if (req.session.user && fields.userData && fields.userData[0] == 'profile' && files.ProfileImage && files.ProfileImage.length > 0) {
-            console.log('Hook: uploadYourImage => your image upload');
-            app.uploadComponentImage(req, 'user', app.model.fwUser,
-                req.session.user.email ? { email: req.session.user.email } : { shcc: 0 },
-                files.ProfileImage[0].path, done);
-        }
-    });
+
+    // app.uploadHooks.add('uploadYourImage', (req, fields, files, params, done) =>
+    //     app.permission.has(req, () => uploadUserImage(req, fields, files, params, done), done, 'user:login'));
 
     const uploadUserImage = (req, fields, files, params, done) => {
-        if (fields.userData && fields.userData[0].startsWith('user:') && files.UserImage && files.UserImage.length > 0) {
-            console.log('Hook: UserImage => user image upload');
-            let email = fields.userData[0].substring(5),
-                srcPath = files.UserImage[0].path,
-                filename = app.path.basename(srcPath);
-            app.model.fwUser.get({ email }, (error, user) => {
-                if (error || user == null) {
+        if (fields.userData && fields.userData.length && fields.userData[0].startsWith('UserImage:') && files.UserImage && files.UserImage.length) {
+            // let email = fields.userData[0].substring(5),
+            //     srcPath = files.UserImage[0].path,
+            //     filename = app.path.basename(srcPath);
+            app.model.fwUser.get({ email: fields.userData[0].substring('UserImage:'.length) }, (error, item) => {
+                if (error || item == null) {
                     done({ error: error ? error : 'Invalid email!' });
                 } else {
-                    app.deleteImage(user.image);
-                    app.fs.copyFile(srcPath, userImagePath + '/' + filename, error => {
+                    app.deleteImage(item.image);
+                    let srcPath = files.UserImage[0].path,
+                        image = '/img/user/' + app.path.basename(srcPath);
+                    app.fs.rename(srcPath, app.path.join(app.publicPath, image), error => {
                         if (error) {
                             done({ error });
                         } else {
-                            app.deleteFile(srcPath);
-                            filename = '/img/user/' + filename;
-                            app.model.fwUser.update({ email }, { image: filename }, error => done({ error, image: filename }));
+                            image += '?t=' + (new Date().getTime()).toString().slice(-8);
+                            app.model.fwUser.update({ email: item.email.trim() }, { image }, (error, item) => {
+                                if (error == null && req.session.user.email === item.email) {
+                                    app.io.emit('avatar-changed', item);
+                                    req.session.user.image = image;
+                                }
+                                done({ error, item, image });
+                            });
                         }
                     });
                 }
@@ -321,5 +322,5 @@ module.exports = app => {
         }
     };
     app.uploadHooks.add('UserImage', (req, fields, files, params, done) =>
-        app.permission.has(req, () => uploadUserImage(req, fields, files, params, done), done, 'user:write'));
+        app.permission.has(req, () => uploadUserImage(req, fields, files, params, done), done, 'user:login'));
 };

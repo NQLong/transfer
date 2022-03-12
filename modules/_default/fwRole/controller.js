@@ -25,7 +25,14 @@ module.exports = app => {
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/role/all', app.permission.check('role:read'), (req, res) => {
-        app.model.fwRole.getAll((error, items) => res.send({ error, items }));
+        let condition = { statement: null };
+        if (req.query.condition) {
+            condition = {
+                statement: 'lower(name) LIKE: searchText',
+                parameter: { searchText: `%${req.query.condition.toLowerCase()}%` }
+            };
+        }
+        app.model.fwRole.getAll(condition, (error, items) => res.send({ error, items }));
     });
 
     app.get('/api/role/page/:pageNumber/:pageSize', app.permission.check('role:read'), (req, res) => {
@@ -44,8 +51,8 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/role/item/:roleId', app.permission.check('role:read'), (req, res) => {
-        app.model.fwRole.get({ id: req.body.id }, (error, item) => {
+    app.get('/api/role/item/:id', app.permission.check('role:read'), (req, res) => {
+        app.model.fwRole.get({ id: req.params.id }, (error, item) => {
             if (item && item.permission) item.permission = item.permission.split(',');
             res.send({ error, item });
         });
