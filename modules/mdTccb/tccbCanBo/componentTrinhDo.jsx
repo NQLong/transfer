@@ -236,13 +236,13 @@ class ComponentTrinhDo extends AdminPage {
 
     value = (item) => {
         item && this.setState({
-            tienSi: item.tienSi ? 1 : 0, thacSi: item.thacSi ? 1 : 0, cuNhan: item.cuNhan ? 1 : 0,
+            tienSi: (item.tienSi || item.hocViCB.some(i => i['trinhDo'] === '4')) ? 1 : 0, thacSi: (item.thacSi || item.hocViCB.some(i => i['trinhDo'] === '3')) ? 1 : 0, cuNhan: (item.cuNhan || item.hocViCB.some(i => i['trinhDo'] === '1')) ? 1 : 0,
             shcc: item.shcc, email: item.email,
             tinHoc: item.tinHoc, llct: item.llct, qlnn: item.qlnn, dataDaoTaoCurrent: item.daoTaoCurrent ? item.daoTaoCurrent : []
         }, () => {
-            this.thacSi.value(item.thacSi ? item.thacSi : 0);
-            this.tienSi.value(item.tienSi ? item.tienSi : 0);
-            this.cuNhan.value(item.cuNhan ? item.cuNhan : 0);
+            this.thacSi.value(this.state.thacSi);
+            this.tienSi.value(this.state.tienSi);
+            this.cuNhan.value(this.state.cuNhan);
 
             this.state.tienSi && this.hocViTienSi.value(item.shcc, item.email, '4', '4');
             this.state.cuNhan && this.hocViCuNhan.value(item.shcc, item.email, '3', '1');
@@ -353,11 +353,11 @@ class ComponentTrinhDo extends AdminPage {
                     <FormTextBox ref={e => this.coSoChucDanh = e} label='Cơ sở giáo dục công nhận' className='form-group col-md-3' />
                     <div className='form-group col-md-12' />
 
-                    {this.state.tinHoc ? <FormSelect ref={e => this.trinhDoTinHoc = e} label='Trình độ tin học' data={SelectApdaterDmTrinhDoDaoTaoFilter('6')} className='form-group col-md-6' readOnly /> :
+                    {this.state.tinHoc ? <FormSelect ref={e => this.trinhDoTinHoc = e} label='Trình độ tin học' data={SelectApdaterDmTrinhDoDaoTaoFilter('6')} className='form-group col-md-9' readOnly /> :
                         <FormTextBox ref={e => this.trinhDoTinHoc = e} label='Trình độ tin học' className='form-group col-md-12' readOnly />}
                     {this.state.tinHoc ? <div className='form-group col-md-3' style={{ textAlign: 'right' }}>
                         <button className='btn btn-warning' type='button' onClick={e => { e.preventDefault(); this.modal.show({ email: this.state.email, shcc: this.state.shcc, item: this.state.tinHoc }); }}>
-                            <i className='fa fa-fw fa-lg fa-pencil' />Chỉnh sửa
+                            <i className='fa fa-fw fa-lg fa-pencil' />
                         </button>
                     </div> : null}
                     {this.state.llct ? <FormSelect ref={e => this.trinhDoLLCT = e} label={'Trình độ LLCT'} data={SelectApdaterDmTrinhDoDaoTaoFilter('7')} className='form-group col-md-3' readOnly /> :
@@ -366,7 +366,7 @@ class ComponentTrinhDo extends AdminPage {
                     {this.state.llct ? <FormTextBox ref={e => this.noiCapCcLyLuan = e} label='Nơi cấp' className='form-group col-md-3' readOnly /> : null}
                     {this.state.llct ? <div className='form-group col-md-3' style={{ textAlign: 'right' }}>
                         <button className='btn btn-warning' type='button' onClick={e => { e.preventDefault(); this.modal.show({ email: this.state.email, shcc: this.state.shcc, item: this.state.llct }); }}>
-                            <i className='fa fa-fw fa-lg fa-pencil' />Chỉnh sửa
+                            <i className='fa fa-fw fa-lg fa-pencil' />
                         </button>
                     </div> : null}
 
@@ -376,7 +376,7 @@ class ComponentTrinhDo extends AdminPage {
                     {this.state.qlnn ? <FormTextBox ref={e => this.noiCapQlnn = e} label='Nơi cấp' className='form-group col-md-4' readOnly /> : null}
                     {this.state.qlnn ? <div className='form-group col-md-2' style={{ textAlign: 'right' }}>
                         <button className='btn btn-warning' type='button' onClick={e => { e.preventDefault(); this.modal.show({ email: this.state.email, shcc: this.state.shcc, item: this.state.qlnn }); }}>
-                            <i className='fa fa-fw fa-lg fa-pencil' />Chỉnh sửa
+                            <i className='fa fa-fw fa-lg fa-pencil' />
                         </button>
                     </div> : null}
 
