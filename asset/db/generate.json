@@ -8945,6 +8945,46 @@
         "foreignKeys": [],
         "type": "table"
     },
+    "QT_SANG_KIEN": {
+        "active": true,
+        "moduleName": "qtSangKien",
+        "modelName": "qtSangKien",
+        "columns": {
+            "ID": {
+                "value": "id",
+                "dataType": "NUMBER",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_95448\".nextval",
+                "nullable": false,
+                "size": "22,0"
+            },
+            "SHCC": {
+                "value": "shcc",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 10
+            },
+            "MA_SO": {
+                "value": "maSo",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 50
+            },
+            "TEN_SANG_KIEN": {
+                "value": "tenSangKien",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 255
+            }
+        },
+        "primaryKeys": [
+            "ID"
+        ],
+        "foreignKeys": [],
+        "type": "table"
+    },
     "QT_UNG_DUNG_THUONG_MAI": {
         "active": true,
         "moduleName": "qtUngDungThuongMai",
@@ -10045,8 +10085,8 @@
     },
     "TCHC_CAN_BO_HOP_DONG_DVTL_TN": {
         "active": true,
-        "moduleName": "tchcCanBoHopDongDvtlTn",
-        "modelName": "tchcCanBoHopDongDvtlTn",
+        "moduleName": "tccbCanBoHopDongDvtlTn",
+        "modelName": "tccbCanBoHopDongDvtlTn",
         "columns": {
             "SHCC": {
                 "value": "shcc",
