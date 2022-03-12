@@ -28,7 +28,6 @@ class EditModal extends AdminModal {
             ten: this.ten.value(),
             kichHoat: this.kichHoat.value() ? 1 : 0,
         };
-        console.log(changes);
         if (changes.ma == '') {
             T.notify('Mã danh mục bị trống');
             this.ma.focus();

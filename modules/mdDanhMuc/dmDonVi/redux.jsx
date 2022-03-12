@@ -161,7 +161,7 @@ export function uploadDmDonVi(upload, history) {
 }
 export function getDmDonViFaculty(done) {
     return dispatch => {
-        const url = '/api/danh-muc/don-vi/all';
+        const url = '/api/danh-muc/don-vi/faculty';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách khoa bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -178,17 +178,27 @@ export const SelectAdapter_DmDonVi = {
     ajax: true,
     url: '/api/danh-muc/don-vi/page/1/50',
     data: params => ({ condition: params.term, kichHoat: 1 }),
-    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.ten })) : [] }),
-    fetchOne: (id, done) => (getDmDonVi(id, item => item && done && done({ id: item.ma, text: item.ten })))(),
+    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.ten.normalizedName() })) : [] }),
+    fetchOne: (id, done) => (getDmDonVi(id, item => item && done && done({ id: item.ma, text: item.ten.normalizedName() })))(),
     getOne: getDmDonVi,
-    processResultOne: response => response && ({ value: response.ma, text: `${response.ma}: ${response.ten}` }),
+    processResultOne: response => response && ({ value: response.ma, text: `${response.ten.normalizedName()}` }),
 };
 
 export const SelectAdapter_DmDonViFaculty = {
     ajax: false,
     getAll: getDmDonViFaculty,
-    processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ma + ': ' + item.ten })) : [] }),
+    processResults: response => ({ results: response ? response.items.map(item => ({ value: item.ma, text: item.ten })) : [] }),
     condition: { kichHoat: 1 },
+};
+
+export const SelectAdapter_DmDonViFaculty_V2 = {
+    ajax: true,
+    url: '/api/danh-muc/don-vi/faculty',
+    data: params => ({ condition: params.term, kichHoat: 1 }),
+    processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.ma, text: item.ten })) : [] }),
+    fetchOne: (id, done) => (getDmDonVi(id, item => item && done && done({ id: item.ma, text: item.ten })))(),
+    getOne: getDmDonVi,
+    processResultOne: response => response && ({ value: response.ma, text: `${response.ten}` }),
 };
 
 export const SelectAdapter_NoiKyHopDong = {

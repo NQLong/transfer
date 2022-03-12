@@ -17,7 +17,7 @@ import T from '../../view/js/common.js';
 
 
 export class InputBase extends React.Component {
-    constructor(props) {
+    constructor (props) {
         if (new.target === InputBase) throw new TypeError('Cannot construct InputBase instances directly');
         super(props);
         this.input = React.createRef();
@@ -327,7 +327,7 @@ export class DateInput2 extends InputBase {
     render = () => this.wrapLabel(
         <InputMask
             ref={this.input} className='form-control' formatChars={{ '2': '[12]', '0': '[09]', '1': '[01]', '3': '[0-3]', '9': '[0-9]', '5': '[0-5]', 'h': '[0-2]' }} value={this.state.value}
-            disabled={this.props.disabled} readOnly={this.props.readOnly} mask={DateInput2.#mask[this.props.type] || DateInput.#mask.date} placeholder={this.props.placeholder || 'Nhập ' + this.props.label.lowFirstChar()}
+            disabled={this.props.disabled} readOnly={this.props.readOnly} mask={DateInput2.#mask[this.props.type] || DateInput.mask.date} placeholder={this.props.placeholder || 'Nhập ' + this.props.label.lowFirstChar()}
             onChange={this.#handleOnChange} onKeyDown={this.keyPressed} onBlur={this.onBlur} />
     );
 }

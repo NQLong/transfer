@@ -123,7 +123,6 @@ export function deleteDmLinhVucKinhDoanh(ma) {
 export function updateDmLinhVucKinhDoanh(ma, changes, done) {
     return dispatch => {
         const url = '/api/danh-muc/linh-vuc-kinh-doanh';
-        console.log(changes);
         T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông tin lĩnh vực kinh doanh bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');

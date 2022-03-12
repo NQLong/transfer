@@ -47,8 +47,7 @@ class EditModal extends AdminModal {
         let {id, shcc, namDatDuoc, maThanhTich, maChuThich} = item ? item : {
             id : '', shcc: '', namDatDuoc: '', maThanhTich: '', maChuThich: '',
         };
-        console.log(item);
-        this.setState({id, shcc, item });
+        this.setState({ id, shcc, item });
         this.shcc.value(shcc ? shcc : '');
         this.namDatDuoc.value(namDatDuoc ? '20'+namDatDuoc : '');
         this.maThanhTich.value(maThanhTich ? maThanhTich : '');
@@ -69,8 +68,6 @@ class EditModal extends AdminModal {
             T.notify('Mã số cán bộ bị trống');
             this.shcc.focus();
         } else {
-            console.log(changes);
-            console.log(this.state);
             this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
         }
     }
@@ -105,7 +102,6 @@ class QtKhenThuongCaNhan extends AdminPage {
     }
 
     delete = (e, item) => {
-        console.log(item);
         T.confirm('Xóa chức vụ', 'Bạn có chắc bạn muốn xóa khen thưởng này?', 'warning', true, isConfirm => {
             isConfirm && this.props.deleteQtKhenThuongCaNhan(item.id, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá khen thưởng bị lỗi!', 'danger');

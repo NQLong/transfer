@@ -86,7 +86,7 @@ export function getNewsInPage(pageNumber, pageSize, pageCondition, done) {
                 if (done) done(data.page);
                 dispatch({ type: NewsGetNewsInPage, page: data.page, });
             }
-        }, (error) => console.log(error));
+        }, (error) => console.error(error));
     };
 }
 

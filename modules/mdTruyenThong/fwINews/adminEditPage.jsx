@@ -414,9 +414,7 @@ class adminINewsEdit extends React.Component {
 	}
 	copyClipboard = () => {
 		let { html, attachments } = this.renderINews();
-		console.log(attachments);
 		copy(html);
-
 	}
 
 	send = (mailTo) => {

@@ -33,7 +33,7 @@ module.exports = app => {
         app.model.homeFeatureItem.get({ id: req.params.featureItemId }, (error, item) => res.send({ error, item })));
 
     app.post('/api/featureItem', app.permission.check('website:write'), (req, res) => {
-        let body = req.body; console.log(body);
+        let body = req.body;
         app.model.homeFeatureItem.create(body, (error, item) => res.send({ error, item }));
     });
 

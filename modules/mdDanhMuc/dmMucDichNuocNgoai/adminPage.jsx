@@ -8,8 +8,8 @@ class EditModal extends AdminModal {
     state = { kichHoat: true };
 
     componentDidMount() {
-        $(document).ready(() => this.onShown(() => {
-            !this.ma.value() ? this.ma.focus() : this.ten.focus();
+        T.ready(() => this.onShown(() => {
+            !this.ma.value() ? this.ma.focus() : this.moTa.focus();
         }));
     }
 
@@ -17,17 +17,18 @@ class EditModal extends AdminModal {
         let { ma, moTa, kichHoat } = item ? item : { ma: '', moTa: '', kichHoat: true };
         this.ma.value(ma);
         this.moTa.value(moTa);
-        this.setState({ kichHoat });
+        this.kichHoat.value(kichHoat ? 1 : 0);
+        this.setState({ kichHoat: kichHoat ? 1 : 0, ma: ma ? ma : null });
     };
 
     changeKichHoat = value => this.kichHoat.value(value ? 1 : 0) || this.kichHoat.value(value);
 
     onSubmit = (e) => {
         e.preventDefault();
-        const 
+        const
             changes = {
-                ma: this.ma.value().trim(),
-                moTa: this.moTa.value().trim(),
+                ma: this.ma.value(),
+                moTa: this.moTa.value(),
                 kichHoat: Number(this.state.kichHoat),
             };
         if (changes.ma == '') {
@@ -94,7 +95,7 @@ class DmMucDichNuocNgoaiPage extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' content={item.ma ? item.ma : ''} />
-                        <TableCell type='link' content={item.moTa}  onClick={() => this.modal.show(item)} />
+                        <TableCell type='link' content={item.moTa} onClick={() => this.modal.show(item)} />
                         <TableCell type='checkbox' content={item.kichHoat} permission={permission}
                             onChanged={value => this.props.updateDmMucDichNuocNgoai(item.ma, { kichHoat: value ? 1 : 0, })} />
                         <TableCell type='buttons' content={item} permission={permission}

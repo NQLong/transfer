@@ -24,7 +24,6 @@ class SectionAllDivision extends React.Component {
 
         this.props.getDonViById(this.props.viewId, division => {
             const test = division.sort(sortComparer);
-            // console.log(test);
             this.setState({ division: test });
         });
     }

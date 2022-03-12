@@ -2,24 +2,21 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getDmNgachLuongAll, createDmNgachLuong, deleteDmNgachLuong, updateDmNgachLuong } from './redux';
 import { SelectAdapter_DmNgachCdnn } from 'modules/mdDanhMuc/dmNgachCdnn/redux';
+import { NumberInput, Select } from 'view/component/Input';
 import { Link } from 'react-router-dom';
-import { AdminPage, AdminModal, FormTextBox, FormCheckbox, FormSelect } from 'view/component/AdminPage';
+import { AdminPage, AdminModal, TableCell, FormCheckbox, renderTable } from 'view/component/AdminPage';
+// import { Tooltip } from '@material-ui/core';
 
 class EditModal extends AdminModal {
-    state = { vuotKhung: false }
-    maSoCdnn = '';
-    bac = '';
-    heSo = '';
-
+    state = { vuotKhung: false };
     componentDidMount() {
-        $(document).ready(() => this.onShown(() => {
-            !this.state.vuotKhung ? this.heSo.focus() : this.bac.focus();
-        }));
+        $(document).ready(() => this.onShown(() => this.heSo.focus()));
+        // this.vuotKhung.value() ? this.heSo.focus() : this.bac.focus()
     }
 
     onShow = (item) => {
         // const { idNgach, bac, heSo } = item ? item : { idNgach: '', bac: 1, heSo: 0 };
-        let idNgach = '', bac = '', heSo = '';
+        let idNgach = null, bac = null, heSo = null;
         if (item) {
             if (typeof item == 'object') {
                 idNgach = item.idNgach;
@@ -30,24 +27,32 @@ class EditModal extends AdminModal {
             }
         }
 
-        this.maSoCdnn.value(idNgach);
-        this.bac.value(bac);
-        this.heSo.value(heSo);
+        this.idNgach.val(idNgach ? idNgach : null);
+        if (idNgach == null) {
+            this.idNgach.clear();
+        }
+        if (bac && heSo) {
+            this.bac.setVal(bac);
+            this.heSo.setVal(heSo);
+        } else {
+            this.bac.clear();
+            this.heSo.clear();
+        }
+        this.setState({ item: item });
+        this.setState({ vuotKhung: bac === 0 });
+        this.vuotKhung.value(this.state.vuotKhung);
     }
 
-    onSubmit = (e) => {
-        e.preventDefault();
-        const
-            idNgach = this.idNgach,
-            bac = this.bac,
-            changes = {
-                idNgach: Number(this.maSoCdnn.getVal()),
-                bac: this.state.vuotKhung ? 0 : this.bac.getVal(),
-                heSo: this.heSo.getVal(),
-            };
+    onSubmit = () => {
+        const changes = {
+            idNgach: Number(this.idNgach.val()),
+            bac: this.state.vuotKhung ? 0 : this.bac.val(),
+            heSo: this.heSo.val(),
+        };
+
         if (changes.idNgach == '') {
             T.notify('Vui lòng chọn ngạch!', 'danger');
-            this.maSoCdnn.focus();
+            this.idNgach.focus();
         } else if (this.state.vuotKhung == false && changes.bac == '') {
             T.notify('Bậc lương bị trống!', 'danger');
             this.bac.focus();
@@ -55,37 +60,51 @@ class EditModal extends AdminModal {
             T.notify('Hệ số lương bị trống!', 'danger');
             this.heSo.focus();
         } else {
-            idNgach && bac ? this.props.update(idNgach, bac, changes, this.hide) : this.props.create(changes, this.hide);
+            if (this.state.item && this.state.item.idNgach && (changes.bac || this.state.vuotKhung)) {
+                this.props.updateDmNgachLuong(this.state.item.idNgach, changes.bac, changes);
+            } else {
+                this.props.createDmNgachLuong(changes, () => T.notify('Tạo ngạch lương thành công!', 'success'));
+            }
+            this.hide();
         }
     }
 
     render = () => {
         const readOnly = this.props.readOnly;
-        return (this.renderModal({
-            title: this.state.ma ? 'Cập nhật Ngạch lương' : 'Tạo mới Ngạch lương',
-            body: <div className='row'>
-                <FormSelect className='col-md-12' ref={this.maSoCdnn} required adapter={SelectAdapter_DmNgachCdnn} label='Chức danh nghề nghiệp' disabled={readOnly} />
-                <FormCheckbox className='col-md-6' ref={e => this.state.vuotKhung = e} label='Vượt khung' isSwitch={true} readOnly={readOnly} onChange={() => !readOnly && this.setState({ vuotKhung: !this.state.vuotKhung })} />
-                <FormTextBox type='number' className='col-md-12' ref={this.bac} label='Bậc lương' disabled={readOnly} min={0} max={1000} step={1} />
-                <FormTextBox type='number' className='col-md-12' ref={this.heSo} required label={this.state.vuotKhung ? 'Phần trăm vượt khung (%)' : 'Hệ số lương'} disabled={readOnly} min={0} max={1000} step='any' />
-            </div>
-        }));
+        return this.renderModal({
+            title: typeof this.state.item == 'object' ? 'Cập nhật Ngạch lương' : 'Tạo mới Ngạch lương',
+            size: 'medium',
+            body: (
+                <div className='form-group row'>
+                    <div className='form-group col-12 col-md-12'>
+                        <Select ref={e => this.idNgach = e} adapter={SelectAdapter_DmNgachCdnn} label='Chức danh nghề nghiệp' readOnly={readOnly} required />
+                    </div>
+
+                    <FormCheckbox ref={e => this.vuotKhung = e} className='col-12' label='Vượt khung' readOnly={readOnly} isSwitch={true} onChange={() => !readOnly && this.setState({ vuotKhung: !this.state.vuotKhung })} />
+
+                    <div className='form-group col-12 col-md-12' style={{ display: this.state.vuotKhung ? 'none' : 'block' }}>
+                        <NumberInput step={1} ref={e => this.bac = e} className='col-12 col-md-12' label='Bậc lương' readOnly={readOnly} required />
+                    </div>
+                    <div className='form-group col-12 col-md-12'>
+                        <NumberInput step={0.01} ref={e => this.heSo = e} className='col-12 col-md-12' label={this.state.vuotKhung ? 'Phần trăm vượt khung (%)' : 'Hệ số lương'} readOnly={readOnly} required min={1.00} max={8.00} />
+                    </div>
+                </div>
+            )
+        });
     }
 }
 
-class DmNgachLuongPage extends AdminPage {
+class DmNgachLuong extends AdminPage {
+    modal = React.createRef();
 
     componentDidMount() {
-        T.ready('/user/category', () => {
-            T.onSearch = (searchText) => this.props.getDmNgachLuongAll(undefined, undefined, searchText || '');
-            T.showSearchBox();
-            this.props.getDmNgachLuongAll();
-        });
+        this.props.getDmNgachLuongAll();
+        T.ready('/user/category');
     }
 
-    showModal = (e) => {
+    showModal = (e, item) => {
         e.preventDefault();
-        this.modal.show();
+        this.modal.show(item);
     }
 
     delete = (e, idNgach, bac) => {
@@ -94,16 +113,34 @@ class DmNgachLuongPage extends AdminPage {
             isConfirm && this.props.deleteDmNgachLuong(idNgach, bac));
     }
 
+    renderBac = (e, bac) => {
+        e.preventDefault();
+        return bac == 0 ? 'VK' : bac;
+    }
+    renderHeSo = (e, bac, heSo) => {
+        e.preventDefault();
+        return bac == 0 ? `VK ${heSo}%` : heSo.toFixed(2);
+    }
+
     render() {
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permissionWrite = currentPermissions.includes('dmNgachLuong:write'),
-            permissionDelete = currentPermissions.includes('dmNgachLuong:delete'),
-            permission = this.getUserPermission('dmNgachLuong', ['read', 'write', 'delete']);
-        let table = 'Không có danh sách ngạch lương!',
-            items = this.props.dmNgachLuong && this.props.dmNgachLuong.items ? this.props.dmNgachLuong.items : [];
-        if (items.length > 0) {
-            const rows = [];
-            items.forEach((item, index) => {
+        const permission = this.getUserPermission('dmNgachLuong', ['write', 'delete']);
+
+        let list = this.props.dmNgachLuong && this.props.dmNgachLuong.items ? this.props.dmNgachLuong.items : [];
+
+        const table = renderTable({
+            getDataSource: () => list, stickyHead: true,
+            renderHead: () => (
+                <tr>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Mã ngạch</th>
+                    <th style={{ width: '50%', textAlign: 'center' }}>Tên ngạch CDNN</th>
+                    <th style={{ width: '20%', textAlign: 'center' }}>Nhóm ngạch CDNN</th>
+                    <th style={{ width: '10%', textAlign: 'center' }}>Bậc lương</th>
+                    <th style={{ width: '20%', textAlign: 'center' }}>Hệ số lương</th>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
+                </tr>
+            ),
+            renderRow: (item) => {
+                const rows = [];
                 let luongs = item.luongs || [],
                     rowSpan = luongs.length;
                 if (rowSpan) {
@@ -114,114 +151,65 @@ class DmNgachLuongPage extends AdminPage {
                         if (i == 0) {
                             rows.push(
                                 <tr key={rows.length}>
-                                    <td style={{ textAlign: 'right' }} rowSpan={rowSpan}>{index + 1}</td>
-                                    <td style={{ textAlign: 'center' }} rowSpan={rowSpan}>{item.ma}</td>
-                                    <td rowSpan={rowSpan}>{item.maSoCdnn}</td>
-                                    <td rowSpan={rowSpan}>{item.ten}</td>
-                                    <td rowSpan={rowSpan}>{item.nhom}</td>
-                                    <td style={{ textAlign: 'center' }}>{bacLuong}</td>
-                                    <td style={{ textAlign: 'center' }}>{heSoLuong}</td>
-                                    <td style={{ textAlign: 'center' }}>
-                                        <div className='btn-group'>
-                                            {permissionWrite ?
-                                                <a className='btn btn-success' href='#' onClick={e => this.edit(e, item.id)}>
-                                                    <i className='fa fa-lg fa-plus' />
-                                                </a> : null}
-                                            <a className='btn btn-primary' href='#' onClick={e => this.edit(e, luong)}>
-                                                <i className='fa fa-lg fa-edit' />
+                                    <TableCell type='text' content={item.ma} style={{ textAlign: 'center' }} rowSpan={rowSpan} />
+                                    <TableCell type='text' content={item.ten} style={{ textAlign: 'center' }} rowSpan={rowSpan} />
+                                    <TableCell type='text' content={item.nhom} style={{ textAlign: 'center' }} rowSpan={rowSpan} />
+                                    <TableCell type='text' content={bacLuong} />
+                                    <TableCell type='text' content={heSoLuong} />
+                                    <TableCell type='buttons' style={{ textAlign: 'center' }}
+                                        onEdit={this.showModal} content={luong} permission={permission}
+                                        onDelete={e => this.delete(e, luong.idNgach, luong.bac)}>
+                                        {permission.write && (
+                                            // <Tooltip title='Tạo mới' arrow>
+                                            <a className='btn btn-success' href='#' onClick={e => this.showModal(e, item.id)}>
+                                                <i className='fa fa-lg fa-plus' />
                                             </a>
-                                            {permissionDelete ?
-                                                <a className='btn btn-danger' href='#' onClick={e => this.delete(e, luong.idNgach, luong.bac)}>
-                                                    <i className='fa fa-trash-o fa-lg' />
-                                                </a> : null}
-                                        </div>
-                                    </td>
+                                            // </Tooltip>
+                                        )}
+                                    </TableCell>
                                 </tr>
                             );
                         } else {
                             rows.push(
                                 <tr key={rows.length}>
-                                    <td style={{ textAlign: 'center' }}>{bacLuong}</td>
-                                    <td style={{ textAlign: 'center' }}>{heSoLuong}</td>
-                                    <td style={{ textAlign: 'center' }}>
-                                        <div className='btn-group'>
-                                            {permissionWrite ?
-                                                <a className='btn btn-success' href='#' onClick={e => this.edit(e, item.id)}>
-                                                    <i className='fa fa-lg fa-plus' />
-                                                </a> : null}
-                                            <a className='btn btn-primary' href='#' onClick={e => this.edit(e, luong)}>
-                                                <i className='fa fa-lg fa-edit' />
+                                    <TableCell type='text' content={bacLuong} />
+                                    <TableCell type='text' content={heSoLuong} />
+                                    <TableCell type='buttons' style={{ textAlign: 'center' }}
+                                        onEdit={this.showModal} content={luong} permission={permission}
+                                        onDelete={e => this.delete(e, luong.idNgach, luong.bac)}>
+                                        {permission.write && (
+                                            // <Tooltip title='Tạo mới' arrow>
+                                            <a className='btn btn-success' href='#' onClick={e => this.showModal(e, item.id)}>
+                                                <i className='fa fa-lg fa-plus' />
                                             </a>
-                                            {permissionDelete ?
-                                                <a className='btn btn-danger' href='#' onClick={e => this.delete(e, luong.idNgach, luong.bac)}>
-                                                    <i className='fa fa-trash-o fa-lg' />
-                                                </a> : null}
-                                        </div>
-                                    </td>
+                                            // </Tooltip>
+                                        )}
+                                    </TableCell>
                                 </tr>
                             );
                         }
                     }
-                } else {
-                    rows.push(
-                        <tr key={rows.length}>
-                            <td style={{ textAlign: 'right' }}>{index + 1}</td>
-                            <td style={{ textAlign: 'center' }}>{item.ma}</td>
-                            <td>{item.maSoCdnn}</td>
-                            <td>{item.ten}</td>
-                            <td>{item.nhom}</td>
-                            <td></td>
-                            <td></td>
-                            <td>
-                                <div className='btn-group'>
-                                    {permissionWrite ?
-                                        <a className='btn btn-success' href='#' onClick={e => this.edit(e, item.id)}>
-                                            <i className='fa fa-lg fa-plus' />
-                                        </a> : null}
-                                </div>
-                            </td>
-                        </tr>
-                    );
                 }
-            });
-
-            table = (
-                <table className='table table-hover table-bordered'>
-                    <thead>
-                        <tr>
-                            <th style={{ width: 'auto' }}>#</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Mã ngạch</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Mã số CDNN</th>
-                            <th style={{ width: '60%' }} nowrap='true'>Tên ngạch CDNN</th>
-                            <th style={{ width: '40%' }} nowrap='true'>Nhóm ngạch CDNN</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Bậc lương</th>
-                            <th style={{ width: 'auto' }} nowrap='true'>Hệ số lương</th>
-                            <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>{rows}</tbody>
-                </table>
-            );
-        }
-
+                return rows;
+            }
+        });
         return this.renderPage({
             icon: 'fa fa-list-alt',
-            title: 'Danh mục Ngạch Lương',
+            title: 'Danh mục Ngạch lương',
             breadcrumb: [
-                <Link key={0} to='/user/category'>Danh mục</Link>,
-                'Danh mục Ngạch Lương'
+                <Link key={0} to={'/user/category'}>Danh mục</Link>,
+                'Ngạch lương'
             ],
             content: <>
                 <div className='tile'>{table}</div>
-                <EditModal ref={e => this.modal = e} permission={permission}
-                    create={this.props.createDmNgachLuong} update={this.props.updateDmNgachLuong} permissions={currentPermissions} />
+                <EditModal ref={e => this.modal = e} readOnly={!permission.write} createDmNgachLuong={this.props.createDmNgachLuong} updateDmNgachLuong={this.props.updateDmNgachLuong} />
             </>,
             backRoute: '/user/category',
-            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+            onCreate: permission.write ? (e) => this.showModal(e, null) : null,
         });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, dmNgachLuong: state.danhMuc.dmNgachLuong });
 const mapActionsToProps = { getDmNgachLuongAll, createDmNgachLuong, deleteDmNgachLuong, updateDmNgachLuong };
-export default connect(mapStateToProps, mapActionsToProps)(DmNgachLuongPage);
+export default connect(mapStateToProps, mapActionsToProps)(DmNgachLuong);

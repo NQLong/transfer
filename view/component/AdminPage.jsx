@@ -307,6 +307,7 @@ export class FormTextBox extends React.Component {
     }
 
     focus = () => this.input.focus();
+    clear = () => this.input.clear();
 
     render() {
         let { type = 'text', smallText = '', label = '', placeholder = '', className = '', style = {}, readOnly = false, onChange = null, required = false } = this.props,

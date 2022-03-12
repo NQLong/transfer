@@ -222,7 +222,6 @@ module.exports = app => {
     app.get('/website/intro/all/:maDonVi', (req, res) => {
         app.model.dvWebsiteGioiThieu.getAll({ maDonVi: req.params.maDonVi, kichHoat: 1 }, '*', 'thuTu ASC', (error, items) => {
             if (error || items == null) {
-                console.log(error);
                 res.send({ error, items: null });
             } else {
                 const result = [];
