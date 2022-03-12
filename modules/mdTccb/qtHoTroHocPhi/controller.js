@@ -2,13 +2,13 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3045: { title: 'Quá trình hỗ trợ học phí', link: '/user/tccb/qua-trinh/ho-tro-hoc-phi', icon: 'fa fa-usd', backgroundColor: '#99ccff', groupIndex: 1 },
+            3045: { title: 'Quá trình hỗ trợ học phí', link: '/user/tccb/qua-trinh/ho-tro-hoc-phi', icon: 'fa fa-usd', backgroundColor: '#99ccff', groupIndex: 0 },
         },
     };
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1033: { title: 'Hỗ trợ học phí', link: '/user/ho-tro-hoc-phi', icon: 'fa fa-usd', color: '#000000', backgroundColor: '#6699ff', groupIndex: 0 },
+            1033: { title: 'Hỗ trợ học phí', link: '/user/ho-tro-hoc-phi', icon: 'fa fa-usd', color: '#000000', backgroundColor: '#6699ff', groupIndex: 4 },
         },
     };
 

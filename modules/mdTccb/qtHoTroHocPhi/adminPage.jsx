@@ -149,7 +149,7 @@ class EditModal extends AdminModal {
             body: <div className='row'>
                 <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.shcc = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={this.state.id ? true : false} required />
                 <FormDatePicker className='col-md-4' ref={e => this.ngayLamDon = e} type='date-mask' label='Ngày quyết định' readOnly={readOnly} required />
-                <FormSelect className='col-md-8' ref={e => this.coSoDaoTao = e} label='Cơ sở đào tạo' data={SelectAdapter_DmHoTroHocPhiCoSo} required />
+                <FormSelect className='col-md-8' ref={e => this.coSoDaoTao = e} label='Cơ sở đào tạo' data={SelectAdapter_DmHoTroHocPhiCoSo} required readOnly={readOnly} />
                 <FormRichTextBox className='col-md-12' ref={e => this.noiDung = e} rows={2} readOnly={readOnly} label='Nội dung xin hỗ trợ' placeholder='Nhập nội dung xin hỗ trợ học phí (tối đa 100 ký tự)' maxLength={100} />
                 <FormTextBox className='col-md-6' ref={e => this.hocKyHoTro = e} type='text' label='Học kỳ hỗ trợ' readOnly={readOnly} />
                 <FormTextBox className='col-md-6' ref={e => this.soTien = e} type='number' label='Số tiền' readOnly={readOnly} />
@@ -169,7 +169,7 @@ class EditModal extends AdminModal {
                             items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
                             onSelected={item => this.setState({ ketThucType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
                     }
-                    type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} /></div>
+                    type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} readOnly={readOnly} /></div>
 
                 <FormRichTextBox className='col-md-12' ref={e => this.ghiChu = e} rows={2} readOnly={readOnly} label='Ghi chú' placeholder='Nhập ghi chú (tối đa 100 ký tự)' maxLength={100} />
             </div>
