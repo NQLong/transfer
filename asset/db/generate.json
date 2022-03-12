@@ -10086,7 +10086,7 @@
     "TCHC_CAN_BO_HOP_DONG_DVTL_TN": {
         "active": true,
         "moduleName": "tccbCanBoHopDongDvtlTn",
-        "modelName": "tccbCanBoHopDongDvtlTn",
+        "modelName": "tchcCanBoHopDongDvtlTn",
         "columns": {
             "SHCC": {
                 "value": "shcc",
