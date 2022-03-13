@@ -1,19 +1,12 @@
 // eslint-disable-next-line no-unused-vars
-function max(a, b) {
-    if (a > b) return a;
-    return b;
-}
-function abs(a) {
-    if (a < 0) a = -a;
-    return a;
-}
+// source: https://en.wikipedia.org/wiki/Longest_common_subsequence_problem
 function lcs(a, b) {
     let m = a.length, n = b.length, C = [], i, j;
     for (i = 0; i <= m; i++) C.push([0]);
     for (j = 0; j < n; j++) C[0].push(0);
     for (i = 0; i < m; i++)
         for (j = 0; j < n; j++)
-            C[i+1][j+1] = a[i] === b[j] ? C[i][j]+1 : max(C[i+1][j], C[i][j+1]);
+            C[i+1][j+1] = a[i] === b[j] ? C[i][j]+1 : Math.max(C[i+1][j], C[i][j+1]);
     return C[m][n];
 }
 
@@ -27,15 +20,16 @@ function best_choice(s, t) {
         let i;
         for (i = 0; i < m - n + 1; i++) {
             let sub_t = t.substring(i, i + n);
-            cost = max(cost, lcs(s, sub_t));
+            cost = Math.max(cost, lcs(s, sub_t));
         }
     }
     return cost;
 }
 module.exports = app => {
     // app.model.canBo.foo = () => { };
-    app.model.canBo.getShccCanBo = (ho, ten, ngaySinh, donVi, done) => {
+    app.model.canBo.getShccCanBo = (data, done) => {
         const deltaTime = 86400 * 1000; ///1 day
+        let ho = data.ho, ten = data.ten, ngaySinh = data.ngaySinh, donVi = data.donVi;
         if (ho) {
             ho = ho.toString().trim();
             ho = ho.toUpperCase();
@@ -78,8 +72,8 @@ module.exports = app => {
                             score += 0.8;
                         }
                         if (items[idx].ngaySinh) {
-                            if (abs(items[idx].ngaySinh - ngaySinh) < deltaTime) {
-                                let percent = abs(items[idx].ngaySinh - ngaySinh) / deltaTime;
+                            if (Math.abs(items[idx].ngaySinh - ngaySinh) < deltaTime) {
+                                let percent = Math.abs(items[idx].ngaySinh - ngaySinh) / deltaTime;
                                 score += 0.2 - percent;
                             }
                         }

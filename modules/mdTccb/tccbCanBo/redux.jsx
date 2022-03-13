@@ -164,11 +164,11 @@ export function deleteStaff(shcc, done) {
     };
 }
 
-//ho, ten, ngaySinh, donVi: string
-export function getShccCanBo(ho, ten, ngaySinh, donVi, done) {
+//item = {ho, ten, ngaySinh, donVi: string}
+export function getShccCanBo(item, done) {
     return () => {
         const url = '/api/staff/calc-shcc';
-        T.get(url, {ho, ten, ngaySinh, donVi}, data => {
+        T.get(url, { item }, data => {
             if (data.error) {
                 T.notify('Không tìm được mã cán bộ' + (data.error.message && (':<br> Lý do: ' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);

@@ -69,11 +69,7 @@ module.exports = app => {
     });
 
     app.get('/api/staff/calc-shcc', checkGetStaffPermission, (req, res) => {
-        let ho = req.query.ho, 
-            ten = req.query.ten,
-            ngaySinh = req.query.ngaySinh,
-            donVi = req.query.donVi;
-        app.model.canBo.getShccCanBo(ho, ten, ngaySinh, donVi, (error, shcc) => {
+        app.model.canBo.getShccCanBo(req.query.item, (error, shcc) => {
             res.send({error, shcc});
         });
     });

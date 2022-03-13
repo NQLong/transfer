@@ -21,31 +21,31 @@ require('../../config/database')(app, package);
 // Init =======================================================================
 app.loadModules(false);
 const run = () => {
-    app.model.canBo.getShccCanBo('Nguyễn Thị Hoàng', 'Yến', '12/12/1964', 'Khoa Việt Nam học', (error, shcc) => {
+    app.model.canBo.getShccCanBo({ho: 'Nguyễn Thị Hoàng', ten: 'Yến', ngaySinh: '12/12/1964', donVi: 'Khoa Việt Nam học'}, (error, shcc) => {
         console.log("data1 = ", {error, shcc});
     });
-    app.model.canBo.getShccCanBo('Ngô Thị Phương', 'Lan', '12/11/1964', 'Ban giám hiệu', (error, shcc) => {
+    app.model.canBo.getShccCanBo({ho: 'Ngô Thị Phương', ten: 'Lan', ngaySinh: '12/11/1964', donVi: 'Ban giám hiệu'}, (error, shcc) => {
         console.log("data2 = ", {error, shcc});
     });
-    app.model.canBo.getShccCanBo('Ngô Thị Phương', 'Lan', null, 'Ban giám hiệu', (error, shcc) => {
+    app.model.canBo.getShccCanBo({ho: 'Ngô Thị Phương', ten: 'Lan', ngaySinh: null, donVi: 'Ban giám hiệu'}, (error, shcc) => {
         console.log("data3 = ", {error, shcc});
     });
-    app.model.canBo.getShccCanBo('Ngô Thị Phương', 'Lan', '12/11/1964', null, (error, shcc) => {
+    app.model.canBo.getShccCanBo({ho: 'Ngô Thị Phương', ten: 'Lan', ngaySinh: '12/11/1964', donVi: null}, (error, shcc) => {
         console.log("data4 = ", {error, shcc});
     });
-    app.model.canBo.getShccCanBo('Ngô Thị Phương', 'Lan', null, null, (error, shcc) => {
+    app.model.canBo.getShccCanBo({ho: 'Ngô Thị Phương', ten: 'Lan', ngaySinh: null, donVi: null}, (error, shcc) => {
         console.log("data5 = ", {error, shcc});
     });
-    app.model.canBo.getShccCanBo('Ngô Thị Phương', 'Lan', '22/11/1970', null, (error, shcc) => { //failed ngày sinh
+    app.model.canBo.getShccCanBo({ho: 'Ngô Thị Phương', ten: 'Lan', ngaySinh: '22/11/1970', donVi: null}, (error, shcc) => { //failed ngày sinh
         console.log("data6 = ", {error, shcc});
     });
-    app.model.canBo.getShccCanBo('NGUYỄN THỊ THU', 'HIỀN', null, 'Địa lý', (error, shcc) => {
+    app.model.canBo.getShccCanBo({ho: 'NGUYỄN THỊ THU', ten: 'HIỀN', ngaySinh: null, donVi: 'Địa lý'}, (error, shcc) => {
         console.log("data7 = ", {error, shcc});
     });
-    app.model.canBo.getShccCanBo('NGUYỄN THỊ THU', 'HIỀN', null, 'Công tác xã hội', (error, shcc) => {
+    app.model.canBo.getShccCanBo({ho: 'NGUYỄN THỊ THU', ten: 'HIỀN', ngaySinh: null, donVi: 'Công tác xã hội'}, (error, shcc) => {
         console.log("data8 = ", {error, shcc});
     });
-    app.model.canBo.getShccCanBo('NGUYỄN THỊ THU', 'HIỀN', null, 'Tổ chức cán bộ', (error, shcc) => {
+    app.model.canBo.getShccCanBo({ho: 'NGUYỄN THỊ THU', ten: 'HIỀN', ngaySinh: null, donVi: 'Tổ chức cán bộ'}, (error, shcc) => {
         console.log("data9 = ", {error, shcc});
     });
 };
