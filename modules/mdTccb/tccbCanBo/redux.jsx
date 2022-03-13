@@ -164,6 +164,20 @@ export function deleteStaff(shcc, done) {
     };
 }
 
+//ho, ten, ngaySinh, donVi: string
+export function getShccCanBo(ho, ten, ngaySinh, donVi, done) {
+    return () => {
+        const url = '/api/staff/calc-shcc';
+        T.get(url, {ho, ten, ngaySinh, donVi}, data => {
+            if (data.error) {
+                T.notify('Không tìm được mã cán bộ' + (data.error.message && (':<br> Lý do: ' + data.error.message)), 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else if (done) {
+                done(data);
+            }
+        }, error => console.error(`GET: ${url}.`, error));
+    };
+}
 export function getCanBoKy(shcc, done) {
     return () => {
         const url = `/api/can-bo-ky/${shcc}`;
