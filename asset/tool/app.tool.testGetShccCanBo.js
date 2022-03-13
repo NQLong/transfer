@@ -39,6 +39,15 @@ const run = () => {
     app.model.canBo.getShccCanBo('Ngô Thị Phương', 'Lan', '22/11/1970', null, (error, shcc) => { //failed ngày sinh
         console.log("data6 = ", {error, shcc});
     });
+    app.model.canBo.getShccCanBo('NGUYỄN THỊ THU', 'HIỀN', null, 'Địa lý', (error, shcc) => {
+        console.log("data7 = ", {error, shcc});
+    });
+    app.model.canBo.getShccCanBo('NGUYỄN THỊ THU', 'HIỀN', null, 'Công tác xã hội', (error, shcc) => {
+        console.log("data8 = ", {error, shcc});
+    });
+    app.model.canBo.getShccCanBo('NGUYỄN THỊ THU', 'HIỀN', null, 'Tổ chức cán bộ', (error, shcc) => {
+        console.log("data9 = ", {error, shcc});
+    });
 };
 
 app.readyHooks.add('Run tool.testGetShccCanBo.js', {

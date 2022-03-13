@@ -52,6 +52,11 @@ module.exports = app => {
                 return;
             }
         }
+
+        if (donVi) {
+            donVi = donVi.toString().trim();
+            donVi = donVi.toLowerCase();
+        }
         app.model.canBo.getAll({ho: ho, ten: ten}, (error, items) => {
             if (error || items.length == 0) {
                 done('Họ và tên cán bộ không tồn tại !', null);
@@ -59,7 +64,7 @@ module.exports = app => {
                 app.model.dmDonVi.getAll((error, items_dv) => {
                     let best_score = -1, ma_dv = null;
                     for (let idx = 0; idx < items_dv.length; idx++) {
-                        let score = best_choice(donVi, items_dv[idx].ten);
+                        let score = best_choice(donVi, items_dv[idx].ten.toLowerCase());
                         if (score > best_score) {
                             best_score = score;
                             ma_dv = items_dv[idx].ma;
