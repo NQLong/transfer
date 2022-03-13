@@ -18,7 +18,7 @@ module.exports = app => {
         { name: 'qtNghiThaiSan:write' },
         { name: 'qtNghiThaiSan:delete' },
     );
-    app.get('/user/tccb/qua-trinh/nghi-thai-san/:stt', app.permission.check('qtNghiThaiSan:read'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/nghi-thai-san/group/:shcc', app.permission.check('qtNghiThaiSan:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/nghi-thai-san', app.permission.check('qtNghiThaiSan:read'), app.templates.admin);
     app.get('/user/nghi-thai-san', app.permission.check('staff:female'), app.templates.admin);
 
@@ -29,8 +29,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, list_shcc, list_dv, timeType } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0 };
-        app.model.qtNghiThaiSan.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, timeType, searchTerm, (error, page) => {
+        const { fromYear, toYear, list_shcc, list_dv, timeType, tinhTrang } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, tinhTrang: null };
+        app.model.qtNghiThaiSan.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -45,8 +45,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, list_shcc, list_dv, timeType } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0 };
-        app.model.qtNghiThaiSan.groupPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, timeType, searchTerm, (error, page) => {
+        const { fromYear, toYear, list_shcc, list_dv, timeType, tinhTrang } = (req.query.filter && req.query.filter != '%%%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, tinhTrang: null };
+        app.model.qtNghiThaiSan.groupPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -66,11 +66,11 @@ module.exports = app => {
     });
 
     app.put('/api/qua-trinh/nghi-thai-san', app.permission.check('qtNghiThaiSan:write'), (req, res) => {
-        app.model.qtNghiThaiSan.update({ stt: req.body.stt }, req.body.changes, (error, item) => res.send({ error, item }));
+        app.model.qtNghiThaiSan.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
     app.delete('/api/qua-trinh/nghi-thai-san', app.permission.check('qtNghiThaiSan:delete'), (req, res) => {
-        app.model.qtNghiThaiSan.delete({ stt: req.body.stt }, errors => res.send({ errors }));
+        app.model.qtNghiThaiSan.delete({ id: req.body.id }, errors => res.send({ errors }));
     });
 
     // //User Actions:
@@ -85,14 +85,14 @@ module.exports = app => {
 
     app.put('/api/user/qua-trinh/nghi-thai-san', app.permission.check('staff:female'), (req, res) => {
         if (req.body.changes && req.session.user) {
-            app.model.qtNghiThaiSan.get({ stt: req.body.stt }, (error, item) => {
+            app.model.qtNghiThaiSan.get({ id: req.body.id }, (error, item) => {
                 if (error || item == null) {
                     res.send({ error: 'Not found!' });
                 } else {
                     app.model.canBo.get({ shcc: item.shcc }, (e, r) => {
                         if (e || r == null) res.send({ error: 'Staff not found!' }); else {
                             const changes = req.body.changes;
-                            app.model.qtNghiThaiSan.update({ stt: req.body.stt }, changes, (error, item) => res.send({ error, item }));
+                            app.model.qtNghiThaiSan.update({ id: req.body.id }, changes, (error, item) => res.send({ error, item }));
                         }
                     });
                 }
@@ -104,13 +104,13 @@ module.exports = app => {
 
     app.delete('/api/user/qua-trinh/nghi-thai-san', app.permission.check('staff:female'), (req, res) => {
         if (req.session.user) {
-            app.model.qtNghiThaiSan.get({ stt: req.body.stt }, (error, item) => {
+            app.model.qtNghiThaiSan.get({ id: req.body.id }, (error, item) => {
                 if (error || item == null) {
                     res.send({ error: 'Not found!' });
                 } else {
                     app.model.canBo.get({ shcc: item.shcc }, (e, r) => {
                         if (e || r == null) res.send({ error: 'Staff not found!' }); else {
-                            app.model.qtNghiThaiSan.delete({ stt: req.body.stt }, (error, item) => res.send({ error, item }));
+                            app.model.qtNghiThaiSan.delete({ id: req.body.id }, (error, item) => res.send({ error, item }));
                         }
                     });
                 }
@@ -124,8 +124,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, list_shcc, list_dv } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null };
-        app.model.qtNghiThaiSan.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, 0, searchTerm, (error, page) => {
+        const { fromYear, toYear, list_shcc, list_dv, timeType, tinhTrang } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, tinhTrang: null };
+        app.model.qtNghiThaiSan.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -136,4 +136,56 @@ module.exports = app => {
         });
     });
     ///END USER ACTIONS
+    app.get('/api/qua-trinh/nghi-thai-san/download-excel/:list_shcc/:list_dv/:fromYear/:toYear/:timeType/:tinhTrang', app.permission.check('qtNghiThaiSan:read'), (req, res) => {
+        let { list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang } = req.params ? req.params : { list_shcc: null, list_dv: null, toYear: null, timeType: 0, tinhTrang: null };
+        if (list_shcc == 'null') list_shcc = null;
+        if (list_dv == 'null') list_dv = null;
+        if (fromYear == 'null') fromYear = null;
+        if (toYear == 'null') toYear = null;
+        if (tinhTrang == 'null') tinhTrang = null;
+        app.model.qtNghiThaiSan.download(list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang, (err, result) => {
+            if (err || !result) {
+                res.send({ err });
+            } else {
+                const workbook = app.excel.create(),
+                    worksheet = workbook.addWorksheet('nghithaisan');
+                new Promise(resolve => {
+                    let cells = [
+                        // Table name: QT_NGHI_THAI_SAN { id, shcc, batDau, batDauType, ketThuc, ketThucType, noiDung, troLaiCongTac }
+                        { cell: 'A1', value: 'STT', bold: true, border: '1234' },
+                        { cell: 'B1', value: 'HỌC VỊ', bold: true, border: '1234' },
+                        { cell: 'C1', value: 'MÃ THẺ CÁN BỘ', bold: true, border: '1234' },
+                        { cell: 'D1', value: 'HỌ', bold: true, border: '1234' },
+                        { cell: 'E1', value: 'TÊN', bold: true, border: '1234' },
+                        { cell: 'F1', value: 'CHỨC VỤ', bold: true, border: '1234' },
+                        { cell: 'G1', value: 'ĐƠN VỊ', bold: true, border: '1234' },
+                        { cell: 'H1', value: 'TỪ NGÀY', bold: true, border: '1234' },
+                        { cell: 'I1', value: 'ĐẾN NGÀY', bold: true, border: '1234' },
+                        { cell: 'J1', value: 'NỘI DUNG', bold: true, border: '1234' },
+                        { cell: 'K1', value: 'NGÀY TRỞ LẠI CÔNG TÁC', bold: true, border: '1234' },
+                    ];
+                    result.rows.forEach((item, index) => {
+                        cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
+                        cells.push({ cell: 'B' + (index + 2), border: '1234', value: item.tenHocVi });
+                        cells.push({ cell: 'C' + (index + 2), border: '1234', value: item.shcc });
+                        cells.push({ cell: 'D' + (index + 2), border: '1234', value: item.hoCanBo });
+                        cells.push({ cell: 'E' + (index + 2), border: '1234', value: item.tenCanBo });
+                        cells.push({ cell: 'F' + (index + 2), border: '1234', value: item.tenChucVu });
+                        cells.push({ cell: 'G' + (index + 2), border: '1234', value: item.tenDonVi });
+                        cells.push({ cell: 'H' + (index + 2), alignment: 'center', border: '1234', value: item.batDau ? app.date.dateTimeFormat(new Date(item.batDau), item.batDauType ? item.batDauType : 'dd/mm/yyyy') : '' });
+                        cells.push({ cell: 'I' + (index + 2), alignment: 'center', border: '1234', value: (item.ketThuc != null && item.ketThuc != -1) ? app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : '' });
+                        cells.push({ cell: 'J' + (index + 2), border: '1234', value: item.noiDung });
+                        cells.push({ cell: 'K' + (index + 2), alignment: 'center', border: '1234', value: item.troLaiCongTac ? app.date.dateTimeFormat(new Date(item.troLaiCongTac), 'dd/mm/yyyy') : '' });
+                    });
+                    resolve(cells);
+                }).then((cells) => {
+                    app.excel.write(worksheet, cells);
+                    app.excel.attachment(workbook, res, 'nghithaisan.xlsx');
+                }).catch((error) => {
+                    res.send({ error });
+                });
+            }
+        });
+
+    });
 };

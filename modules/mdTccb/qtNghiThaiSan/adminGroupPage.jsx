@@ -1,92 +1,135 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormCheckbox, FormSelect, FormRichTextBox, FormDatePicker } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, AdminModal, FormCheckbox, FormSelect, FormRichTextBox, FormDatePicker } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
-    getQtNghiThaiSanPage, updateQtNghiThaiSanGroupPageMa,
+    getQtNghiThaiSanGroupPageMa, updateQtNghiThaiSanGroupPageMa,
     deleteQtNghiThaiSanGroupPageMa, createQtNghiThaiSanGroupPageMa
 } from './redux';
 
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
+import { DateInput } from 'view/component/Input';
+import Dropdown from 'view/component/Dropdown';
 
+const EnumDateType = Object.freeze({
+    0: { text: '' },
+    1: { text: 'dd/mm/yyyy' },
+    2: { text: 'mm/yyyy' },
+    3: { text: 'yyyy' },
+}), typeMapper = {
+    'yyyy': 'year',
+    'mm/yyyy': 'month',
+    'dd/mm/yyyy': 'date'
+};
 const timeList = [
     { id: 0, text: 'Không' },
-    { id: 1, text: 'Theo ngày bắt đầu nghỉ - ngày kết thúc nghỉ' },
-    { id: 2, text: 'Theo ngày bắt đầu đi làm lại' }
+    { id: 1, text: 'Theo ngày bắt đầu nghỉ' },
+    { id: 2, text: 'Theo ngày trở lại công tác' }
 ];
 
 class EditModal extends AdminModal {
     state = {
-        stt: null,
+        id: '',
         batDau: '',
         ketThuc: '',
+        batDauType: 'dd/mm/yyyy',
+        ketThucType: 'dd/mm/yyyy',
     };
 
     onShow = (item) => {
-        let { daNopHoSoThaiSan, ghiChu, hoSoThaiSanDuocDuyet, shcc, soBhxh,
-            soThangDuocNghi, stt, thoiGianBaoTangBenBhxh, thoiGianBatDauNghi, thoiGianDiLamLai,
-            thoiGianKetThucNghi } = item ? item : {
-                chucVu: '', daNopHoSoThaiSan: '', donVi: '', ghiChu: '', ho: '', hoSoThaiDuocDuyet: '', shcc: '', soBhxh: '',
-                soThangDuocNghi: '', stt: '', ten: '', thoiGianBaoTangBenBhxh: '', thoiGianBatDauNghi: '', thoiGianDiLamLai: '',
-                thoiGianKetThucNghi: ''
-            };
-        this.setState({ stt, item, thoiGianBatDauNghi, thoiGianKetThucNghi });
-
-        setTimeout(() => {
-            this.daNopHoSoThaiSan.value(daNopHoSoThaiSan ? 1 : 0);
-            this.ghiChu.value(ghiChu ? ghiChu : '');
-            this.hoSoThaiSanDuocDuyet.value(hoSoThaiSanDuocDuyet ? hoSoThaiSanDuocDuyet : '');
+        let { id, shcc, batDau, batDauType, ketThuc, ketThucType, noiDung, troLaiCongTac } = item ? item : {
+            id: '', shcc: '', batDau: null, batDauType: '', ketThuc: null, ketThucType: '', noiDung: '', troLaiCongTac: null
+        };
+        this.setState({
+            id, batDauType: batDauType ? batDauType : 'dd/mm/yyyy',
+            ketThucType: ketThucType ? ketThucType : 'dd/mm/yyyy',
+            batDau, ketThuc
+        }, () => {
             this.shcc.value(shcc ? shcc : this.props.shcc);
-            this.soBhxh.value(soBhxh ? soBhxh : '');
-            this.soThangDuocNghi.value(soThangDuocNghi ? soThangDuocNghi : '');
-            this.thoiGianBaoTangBenBhxh.value(thoiGianBaoTangBenBhxh ? thoiGianBaoTangBenBhxh : '');
-            this.thoiGianBatDauNghi.value(thoiGianBatDauNghi ? thoiGianBatDauNghi : '');
-            this.thoiGianDiLamLai.value(thoiGianDiLamLai ? thoiGianDiLamLai : '');
-            this.thoiGianKetThucNghi.value(thoiGianKetThucNghi ? thoiGianKetThucNghi : '');
-        }, 500);
+            this.noiDung.value(noiDung ? noiDung : '');
+            this.troLaiCongTac.value(troLaiCongTac ? troLaiCongTac : '');
+
+            this.batDauType.setText({ text: batDauType ? batDauType : 'dd/mm/yyyy' });
+            this.state.ketThuc != -1 && this.ketThucType.setText({ text: ketThucType ? ketThucType : 'dd/mm/yyyy' });
+            if (this.state.ketThuc == -1) {
+                this.setState({ denNay: true });
+                this.denNayCheck.value(true);
+                $('#ketThucDate').hide();
+            } else {
+                this.setState({ denNay: false });
+                this.denNayCheck.value(false);
+                $('#ketThucDate').show();
+            }
+            this.batDau.setVal(batDau ? batDau : '');
+            this.state.ketThuc != -1 && this.ketThuc.setVal(ketThuc ? ketThuc : '');
+        });
     };
 
-    changeKichHoat = (value, target) => target.value(value ? 1 : 0) || target.value(value);
     onSubmit = (e) => {
         e.preventDefault();
         const changes = {
-            daNopHoSoThaiSan: this.daNopHoSoThaiSan.value(),
-            ghiChu: this.ghiChu.value(),
-            hoSoThaiSanDuocDuyet: this.hoSoThaiSanDuocDuyet.value(),
             shcc: this.shcc.value(),
-            soBhxh: this.soBhxh.value(),
-            soThangDuocNghi: Number(this.soThangDuocNghi.value()),
-            thoiGianBaoTangBenBhxh: this.thoiGianBaoTangBenBhxh.value(),
-            thoiGianBatDauNghi: this.thoiGianBatDauNghi.value() ? Number(this.thoiGianBatDauNghi.value()) : null,
-            thoiGianDiLamLai: this.thoiGianDiLamLai.value() ? Number(this.thoiGianDiLamLai.value()) : null,
-            thoiGianKetThucNghi: this.thoiGianKetThucNghi.value() ? Number(this.thoiGianKetThucNghi.value()) : null,
+            noiDung: this.noiDung.value(),
+            troLaiCongTac: this.troLaiCongTac.value() ? Number(this.troLaiCongTac.value()) : '',
+            batDauType: this.state.batDauType,
+            batDau: this.batDau.getVal(),
+            ketThucType: !this.state.denNay ? this.state.ketThucType : '',
+            ketThuc: !this.state.denNay ? this.ketThuc.getVal() : -1,
         };
         if (!changes.shcc) {
             T.notify('Mã số cán bộ bị trống');
             this.shcc.focus();
+        } else if (!this.batDau.getVal()) {
+            T.notify('Ngày bắt đầu kéo dài công tác trống', 'danger');
+            this.batDau.focus();
+        } else if (!this.state.denNay && !this.ketThuc.getVal()) {
+            T.notify('Ngày kết thúc kéo dài công tác trống', 'danger');
+            this.ketThuc.focus();
+        } else if (!this.state.denNay && this.batDau.getVal() > this.ketThuc.getVal()) {
+            T.notify('Ngày bắt đầu lớn hơn ngày kết thúc', 'danger');
+            this.batDau.focus();
         } else {
-            this.state.stt ? this.props.update(this.state.stt, changes, this.hide) : this.props.create(changes, this.hide);
+            this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
+        }
+    }
+
+    handleKetThuc = (value) => {
+        value ? $('#ketThucDate').hide() : $('#ketThucDate').show();
+        this.setState({ denNay: value });
+        if (!value) {
+            this.ketThucType?.setText({ text: this.state.ketThucType ? this.state.ketThucType : 'dd/mm/yyyy' });
+        } else {
+            this.ketThucType?.setText({ text: '' });
         }
     }
 
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
-            title: this.state.stt ? 'Cập nhật nghỉ thai sản' : 'Tạo mới nghỉ thai sản',
+            title: this.state.id ? 'Cập nhật nghỉ thai sản' : 'Tạo mới nghỉ thai sản',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-6' ref={e => this.shcc = e} data={SelectAdapter_FwCanBo} label='Mã thẻ cán bộ' readOnly={true} />
-                <FormCheckbox className='col-md-12' ref={e => this.daNopHoSoThaiSan = e} label='Đã nộp hồ sơ' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
-                    onChange={value => this.changeKichHoat(value ? 1 : 0, this.daNopHoSoThaiSan)} />
-                <FormTextBox className='col-md-6' ref={e => this.hoSoThaiSanDuocDuyet = e} label='Đã duyệt hồ sơ' readOnly={readOnly} />
-                <FormTextBox type='text' className='col-md-6' ref={e => this.soBhxh = e} label='Bảo hiểm xã hội' readOnly={readOnly} />
-                <FormDatePicker className='col-md-3' ref={e => this.thoiGianBatDauNghi = e} label='Thời gian bắt đầu nghỉ' readOnly={readOnly} />
-                <FormDatePicker className='col-md-3' ref={e => this.thoiGianKetThucNghi = e} label='Thời gian kết thúc nghỉ' readOnly={readOnly} />
-                <FormTextBox type='text' className='col-md-3' ref={e => this.soThangDuocNghi = e} label='Số tháng được nghỉ' readOnly={readOnly} />
-                <FormDatePicker className='col-md-3' ref={e => this.thoiGianDiLamLai = e} label='Thời gian đi làm lại' readOnly={readOnly} />
-                <FormRichTextBox type='text' className='col-md-12' ref={e => this.thoiGianBaoTangBenBhxh = e} label='Thời gian báo Bhxh' readOnly={readOnly} />
-                <FormRichTextBox type='text' className='col-md-12' ref={e => this.ghiChu = e} label='Ghi chú' readOnly={readOnly} />
+                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.shcc = e} label='Cán bộ nữ' data={SelectAdapter_FwCanBo} readOnly={true} required />
+
+                <FormRichTextBox className='col-md-12' ref={e => this.noiDung = e} rows={2} readOnly={readOnly} label='Nội dung' placeholder='Nhập nội dung nghỉ thai sản (tối đa 200 ký tự)' maxLength={200} />
+
+                <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
+                    label={
+                        <div style={{ display: 'flex' }}>Thời gian bắt đầu (&nbsp; <Dropdown ref={e => this.batDauType = e}
+                            items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
+                            onSelected={item => this.setState({ batDauType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
+                    }
+                    type={this.state.batDauType ? typeMapper[this.state.batDauType] : null} readOnly={readOnly} /></div>
+                <FormCheckbox ref={e => this.denNayCheck = e} label='Đến nay' onChange={this.handleKetThuc} className='form-group col-md-3' />
+                <div className='form-group col-md-6' id='ketThucDate'><DateInput ref={e => this.ketThuc = e} placeholder='Thời gian kết thúc'
+                    label={
+                        <div style={{ display: 'flex' }}>Thời gian kết thúc (&nbsp; <Dropdown ref={e => this.ketThucType = e}
+                            items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
+                            onSelected={item => this.setState({ ketThucType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
+                    }
+                    type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} readOnly={readOnly} /></div>
+                <FormDatePicker className='col-md-6' type='date-mask' ref={e => this.troLaiCongTac = e} label='Ngày trở lại công tác' readOnly={readOnly} />
             </div>
         });
     }
@@ -97,31 +140,34 @@ class QtNghiThaiSanGroupPage extends AdminPage {
 
     componentDidMount() {
         T.ready('/user/tccb', () => {
+            T.clearSearchBox();
             const route = T.routeMatcher('/user/tccb/qua-trinh/nghi-thai-san/group/:shcc'),
                 params = route.parse(window.location.pathname);
             this.shcc = params.shcc;
             this.setState({ filter: { list_shcc: params.shcc, list_dv: '', timeType: 0 } });
-            T.onSearch = (searchText) => this.props.getQtNghiThaiSanPage(undefined, undefined, searchText || '');
+            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
+
             T.showSearchBox(() => {
                 this.timeType?.value(0);
                 this.fromYear?.value('');
                 this.toYear?.value('');
+                this.tinhTrang?.value('');
+                this.mucDich?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
-            this.props.getQtNghiThaiSanPage(undefined, undefined, undefined, this.state.filter, () => {
-                T.updatePage('pageQtNghiThaiSan', undefined, undefined, undefined, this.state.filter);
-            });
+            this.getPage();
         });
     }
 
     changeAdvancedSearch = (isInitial = false) => {
-        let { pageNumber, pageSize } = this.props && this.props.qtNghiThaiSan && this.props.qtNghiThaiSan.page ? this.props.qtNghiThaiSan.page : { pageNumber: 1, pageSize: 50 };
+        let { pageNumber, pageSize } = this.props && this.props.qtNghiThaiSan && this.props.qtNghiThaiSan.page_ma ? this.props.qtNghiThaiSan.page_ma : { pageNumber: 1, pageSize: 50 };
         const timeType = this.timeType?.value() || 0;
         const fromYear = this.fromYear?.value() == '' ? null : this.fromYear?.value().getTime();
         const toYear = this.toYear?.value() == '' ? null : this.toYear?.value().getTime();
         const list_dv = this.state.filter.list_dv;
         const list_shcc = this.state.filter.list_shcc;
-        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc, timeType };
+        const tinhTrang = this.tinhTrang?.value() == '' ? null : this.tinhTrang?.value();
+        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc, tinhTrang, timeType };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
@@ -129,14 +175,16 @@ class QtNghiThaiSanGroupPage extends AdminPage {
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
                     this.fromYear?.value(filter.fromYear || '');
                     this.toYear?.value(filter.toYear || '');
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.timeType)) this.showAdvanceSearch();
+                    this.timeType?.value(filter.timeType);
+                    this.tinhTrang?.value(filter.tinhTrang);
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.timeType || filter.tinhTrang )) this.showAdvanceSearch();
                 }
             });
         });
     }
 
     getPage = (pageN, pageS, pageC, done) => {
-        this.props.getQtNghiThaiSanPage(pageN, pageS, pageC, this.state.filter, done);
+        this.props.getQtNghiThaiSanGroupPageMa(pageN, pageS, pageC, this.state.filter, done);
     }
 
     showModal = (e) => {
@@ -145,55 +193,80 @@ class QtNghiThaiSanGroupPage extends AdminPage {
     }
 
     delete = (e, item) => {
-        T.confirm('Xóa thông tin nghỉ thai sản', 'Bạn có chắc bạn muốn xóa thông tin nghhỉ thai sản này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtNghiThaiSanGroupPageMa(item.stt, error => {
-                if (error) T.notify(error.message ? error.message : 'Xoá hợp thông tin nghỉ thai sản bị lỗi!', 'danger');
+        T.confirm('Xóa thông tin nghỉ thai sản', 'Bạn có chắc bạn muốn xóa thông tin nghỉ thai sản này?', 'warning', true, isConfirm => {
+            isConfirm && this.props.deleteQtNghiThaiSanGroupPageMa(item.id, error => {
+                if (error) T.notify(error.message ? error.message : 'Xoá thông tin nghỉ thai sản bị lỗi!', 'danger');
                 else T.alert('Xoá thông tin nghỉ thai sản thành công!', 'success', false, 800);
             });
         });
         e.preventDefault();
     }
 
+
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('qtNghiThaiSan', ['read', 'write', 'delete']);
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtNghiThaiSan && this.props.qtNghiThaiSan.page ?
-            this.props.qtNghiThaiSan.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list };
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtNghiThaiSan && this.props.qtNghiThaiSan.page_ma ? this.props.qtNghiThaiSan.page_ma : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
-                getDataSource: () => list, stickyHead: false,
+                getDataSource: () => list, stickyHead: true,
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: '30%', textAlign: 'center' }}>Cán bộ</th>
-                        <th style={{ width: '15%', textAlign: 'center' }}>Thời gian nghỉ</th>
-                        <th style={{ width: '15%', textAlign: 'center' }}>Thời gian đi làm lại</th>
-                        <th style={{ width: '20%', textAlign: 'center' }}>Thời gian báo tăng bên Bhxh</th>
-                        <th style={{ width: '20%', textAlign: 'center' }}>Ghi chú</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ nữ</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br/>Đơn vị công tác</th>
+                        <th style={{ width: '100%', whiteSpace: 'nowrap', textAlign: 'center' }}>Nội dung</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thời gian trở lại công tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tình trạng</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                        <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span>{item.ho + ' ' + item.ten}</span><br />
-                                <a href='#' onClick={() => this.modal.show(item)}>{item.shcc}</a>
+                                <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
+                                {item.shcc} <br/>
                             </>
                         )}
                         />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span style={{ whiteSpace: 'nowrap' }}>Từ: <span style={{ color: 'blue' }}>{item.thoiGianBatDauNghi ? new Date(item.thoiGianBatDauNghi).ddmmyyyy() : ''}</span></span><br />
-                                <span style={{ whiteSpace: 'nowrap' }}>Đến: <span style={{ color: 'blue' }}>{item.thoiGianKetThucNghi ? new Date(item.thoiGianKetThucNghi).ddmmyyyy() : ''}</span></span><br />
+                                {item.tenHocVi ? item.tenHocVi : ''}
                             </>
                         )}
                         />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={<span style={{ color: 'blue' }}>{item.thoiGianDiLamLai ? new Date(item.thoiGianDiLamLai).ddmmyyyy() : ''}</span>} />
-                        <TableCell type='text' content={item.thoiGianBaoTangBenBhxh} />
-                        <TableCell type='text' content={item.ghiChu} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                            <>
+                                {item.tenChucDanhNgheNghiep ? item.tenChucDanhNgheNghiep : ''}
+                            </>
+                        )}
+                        />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                            <>
+                                <span> { item.tenChucVu ? item.tenChucVu : '' } <br/> </span>
+                                {item.tenDonVi ? item.tenDonVi.normalizedName() : ''}
+                            </>
+                        )}
+                        />
+                        <TableCell type='text' content={(
+                            <>
+                                {item.noiDung ? <span><i>{item.noiDung}</i> <br /> <br /></span> : null}
+                                {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
+                                {item.ketThuc && item.ketThuc != -1 ? <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc && item.ketThuc != -1 ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
+                            </>
+                        )}
+                        />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={<span style={{ color: 'blue' }}>{item.troLaiCongTac ? T.dateToText(item.troLaiCongTac, 'dd/mm/yyyy') : ''}</span>} />
+                        <TableCell type='text' content={(
+                            <>
+                                <span>{(item.ketThuc == -1 || item.ketThuc >= item.today) ? <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đang diễn ra</span> : <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đã kết thúc</span>}</span>
+                            </>
+                        )}></TableCell>
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={e => this.delete(e, item)} />
                     </tr>
@@ -211,15 +284,22 @@ class QtNghiThaiSanGroupPage extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    <FormSelect className='col-12 col-md-4' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
-                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />}
-                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />}
+                    <FormSelect className='col-12 col-md-4' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    {(this.timeType && this.timeType.value() >= 1) &&
+                        <>
+                            <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />
+                            <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />
+                        </>}
+                    <FormSelect className='col-12 col-md-4' ref={e => this.tinhTrang = e} label='Tình trạng'
+                        data={[
+                            { id: 1, text: 'Đã kết thúc' }, { id: 2, text: 'Đang diễn ra' }
+                        ]} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
                 </div>
             </>,
             content: <>
                 <div className='tile'>{table}</div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                    getPage={this.props.getQtNghiThaiSanPage} />
+                    getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createQtNghiThaiSanGroupPageMa} update={this.props.updateQtNghiThaiSanGroupPageMa}
                     permissions={currentPermissions} shcc={this.shcc}
@@ -227,6 +307,12 @@ class QtNghiThaiSanGroupPage extends AdminPage {
             </>,
             backRoute: '/user/tccb/qua-trinh/nghi-thai-san',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+            onExport: (e) => {
+                e.preventDefault();
+                const { fromYear, toYear, list_shcc, list_dv, timeType, tinhTrang } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, tinhTrang: null };
+
+                T.download(T.url(`/api/qua-trinh/nghi-thai-san/download-excel/${list_shcc ? list_shcc : null}/${list_dv ? list_dv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${timeType}/${tinhTrang ? tinhTrang : null}`), 'nghithaisan.xlsx');
+            }
         });
     }
 }
@@ -234,6 +320,6 @@ class QtNghiThaiSanGroupPage extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtNghiThaiSan: state.tccb.qtNghiThaiSan });
 const mapActionsToProps = {
     deleteQtNghiThaiSanGroupPageMa, createQtNghiThaiSanGroupPageMa,
-    updateQtNghiThaiSanGroupPageMa, getQtNghiThaiSanPage
+    updateQtNghiThaiSanGroupPageMa, getQtNghiThaiSanGroupPageMa
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtNghiThaiSanGroupPage);

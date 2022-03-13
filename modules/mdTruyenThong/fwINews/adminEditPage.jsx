@@ -413,7 +413,7 @@ class adminINewsEdit extends React.Component {
 		this.typeEmail.current.show();
 	}
 	copyClipboard = () => {
-		let { html, attachments } = this.renderINews();
+		let { html } = this.renderINews();
 		copy(html);
 	}
 
