@@ -131,22 +131,26 @@ module.exports = app => {
                 }
                 else {
 
-                    const source = app.path.join(__dirname, 'resource', 'Mau-HD-LaoDong.docx');
+                    const source = app.path.join(__dirname, 'resource', 'hdld_word.docx');
 
                     new Promise(resolve => {
                         let hopDong = item.rows[0];
+                        console.log(hopDong);
                         const data = {
                             soHopDong: hopDong.soHopDong,
-                            hoTenNguoiKy: hopDong.hoNguoiKy + ' ' + hopDong.tenNguoiKy,
-                            chucVuNguoiKy: hopDong.maChucVuNguoiKy == '003' ? (hopDong.chucVuNguoiKy + ' ' + hopDong.donViNguoiKy) : hopDong.chucVuNguoiKy,
-                            hoTen: hopDong.ho + ' ' + hopDong.ten,
-                            quocTich: hopDong.quocTich ? hopDong.quocTich : '',
+                            daiDienKy: (hopDong.hoNguoiKy + ' ' + hopDong.tenNguoiKy).normalizedName(),
+                            chucVuDaiDienKy: hopDong.chucVuNguoiKy === '003' ? (hopDong.chucVuNguoiKy.normalizedName() + ' ' + hopDong.donViNguoiKy.normalizedName()) : hopDong.chucVuNguoiKy.normalizedName(),
+                            phaiNK: hopDong.phaiNK,
+                            quocTichKy: hopDong.quocTichKy ? hopDong.quocTichKy : 'Việt Nam',
+                            hoTenCanBo: (hopDong.ho + ' ' + hopDong.ten).normalizedName(),
+                            phai: hopDong.phai,
+                            quocTichCanBo: hopDong.quocTich ? hopDong.quocTich : '',
                             tonGiao: hopDong.tonGiao ? hopDong.tonGiao : '',
                             danToc: hopDong.danToc ? hopDong.danToc : '',
                             ngaySinh: hopDong.ngaySinh ? app.date.viDateFormat(new Date(hopDong.ngaySinh)) : '',
                             noiSinh: hopDong.noiSinh ? hopDong.noiSinh : '',
                             nguyenQuan: hopDong.nguyenQuan ? hopDong.nguyenQuan : '',
-                            cuTru: (hopDong.soNhaCuTru ? hopDong.soNhaCuTru + ', ' : '')
+                            hienTai: (hopDong.soNhaCuTru ? hopDong.soNhaCuTru + ', ' : '')
                                 + (hopDong.xaCuTru ? hopDong.xaCuTru + ', ' : '')
                                 + (hopDong.huyenCuTru ? hopDong.huyenCuTru + ', ' : '')
                                 + (hopDong.tinhCuTru ? hopDong.tinhCuTru : ''),
@@ -156,8 +160,8 @@ module.exports = app => {
                                 + (hopDong.tinhThuongTru ? hopDong.tinhThuongTru : ''),
 
                             dienThoai: hopDong.dienThoai ? hopDong.dienThoai : '',
-                            hocVanTrinhDo: hopDong.trinhDoHocVan ? hopDong.trinhDoHocVan : '',
-                            hocVanChuyenNganh: hopDong.hocVanChuyenNganh ? hopDong.hocVanChuyenNganh : '',
+                            hocVi: hopDong.trinhDoHocVan ? hopDong.trinhDoHocVan : '',
+                            chuyenNganh: hopDong.hocVanChuyenNganh ? hopDong.hocVanChuyenNganh : '',
 
                             cmnd: hopDong.cmnd ? hopDong.cmnd : '',
                             cmndNgayCap: hopDong.ngayCap ? app.date.viDateFormat(new Date(hopDong.ngayCap)) : '',
@@ -166,14 +170,17 @@ module.exports = app => {
                             loaiHopDong: hopDong.loaiHopDong ? hopDong.loaiHopDong : '',
                             batDauLamViec: hopDong.batDauLamViec ? app.date.viDateFormat(new Date(hopDong.batDauLamViec)) : '',
                             ketThucHopDong: hopDong.ketThucHopDong ? app.date.viDateFormat(new Date(hopDong.ketThucHopDong)) : '',
-                            diaDiemLamViec: hopDong.diaDiemLamViec ? hopDong.diaDiemLamViec : '',
-                            chucDanhChuyenMon: hopDong.chucDanhChuyenMon ? hopDong.chucDanhChuyenMon : '',
-                            chiuSuPhanCong: hopDong.chiuSuPhanCong ? hopDong.chiuSuPhanCong : '',
-
+                            diaDiemLamViec: hopDong.diaDiemLamViec ? hopDong.diaDiemLamViec.normalizedName() : '',
+                            ngach: hopDong.tenNgach ? hopDong.tenNgach : '',
+                            chiuSuPhanCong: hopDong.chiuSuPhanCong ? (hopDong.chiuSuPhanCong.length < 15 ? 'Theo sự phân công của Trưởng đơn vị: ' + hopDong.diaDiemLamViec.normalizedName() : hopDong.chiuSuPhanCong) : '',
+                            chiuTrachNhiem: 'Trưởng đơn vị: ' + hopDong.diaDiemLamViec.normalizedName(),
                             bac: hopDong.bac ? hopDong.bac : '',
                             heSo: hopDong.heSo ? hopDong.heSo : '',
-
-                            ngayKyHopDong: hopDong.ngayKyHopDong ? app.date.viDateFormat(new Date(hopDong.ngayKyHopDong)) : ''
+                            ngayKyHopDong: hopDong.ngayKyHopDong ? app.date.viDateFormat(new Date(hopDong.ngayKyHopDong)) : '',
+                            phanTramHuong: hopDong.phanTramHuong ? hopDong.phanTramHuong : '',
+                            hieuTruong: hopDong.maChucVuNguoiKy === '003' ? 'TL. HIỆU TRƯỞNG' : 'HIỆU TRƯỞNG',
+                            truongPhongTCCB: hopDong.maChucVuNguoiKy === '003' ? 'TRƯỞNG PHÒNG TC-CB' : '',
+                            isThuViec: hopDong.loaiHopDong.includes('thử việc') ? '(Thử việc)' : ''
                         };
                         resolve(data);
                     }).then((data) => {
