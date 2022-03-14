@@ -5,6 +5,7 @@ const sinhVienGetAll = 'sinhVien:GetAll';
 const sinhVienGetPage = 'sinhVien:GetPage';
 const sinhVienUpdate = 'sinhVien:Update';
 const sinhVienUserGet = 'sinhVien:UserGet';
+const sinhVienGetEditPage = 'sinhVien:GetEditPage';
 
 export default function sinhVienReducer(state = null, data) {
     switch (data.type) {
@@ -14,6 +15,8 @@ export default function sinhVienReducer(state = null, data) {
             return Object.assign({}, state, { page: data.page });
         case sinhVienUserGet:
             return Object.assign({}, state, { selectedItem: data.item });
+        case sinhVienGetEditPage:
+            return Object.assign({}, state, { items: data.items });
         case sinhVienUpdate:
             if (state) {
                 let updatedItems = Object.assign({}, state.items),
@@ -45,6 +48,79 @@ export default function sinhVienReducer(state = null, data) {
 }
 
 //ACTIONS--------------------------------------------------------------------------------------------------
+
+//Admin -----------------------------------------------------------------------------------------------------
+T.initPage('pageStudentsAdmin');
+export function getStudentsPage(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('pageStudentsAdmin', pageNumber, pageSize, pageCondition, filter);
+    return dispatch => {
+        const url = `/api/students/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách sinh viên, học sinh bị lỗi!', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (page.filter) data.page.filter = page.filter;
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                if (done) done(data.page);
+                dispatch({ type: sinhVienGetPage, page: data.page });
+            }
+        }, () => T.notify('Lấy danh sách sinh viên, học sinh bị lỗi!', 'danger'));
+    };
+}
+
+export function getStudentAdmin(mssv, done) {
+    return dispatch => {
+        const url = `/api/students/${mssv}`;
+        T.get(url, data => {
+            if (data.error) {
+                T.notify('Lấy thông tin sinh viên, học sinh không thành công!', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                done && done(data.items);
+                dispatch({ type: sinhVienGetEditPage, items: data.items });
+            }
+        });
+    };
+}
+
+export function updateStudentAdmin(mssv, changes, done) {
+    return dispatch => {
+        const url = `/api/students/${mssv}`;
+        T.put(url, { changes }, data => {
+            if (data.error) {
+                T.notify('Cập nhật không thành công!', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                T.notify('Cập nhật thành công!', 'success');
+                done && done(data.items);
+                dispatch({ type: sinhVienGetEditPage, items: data.items });
+            }
+        });
+    };
+}
+
+export function deleteSinhVienAdmin(mssv, done) {
+    return dispatch => {
+        const url = '/api/students';
+        T.delete(url, { mssv }, data => {
+            if (data.error) {
+                T.notify('Xoá sinh viên, học sinh không thành công!', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                done && done();
+                dispatch({ type: sinhVienGetPage });
+            }
+        });
+    };
+}
+
+
+//User -----------------------------------------------------------------------------------------------
 export function getSinhVienEditUser(done) {
     return dispatch => {
         const url = '/api/user/sinh-vien/edit/item';

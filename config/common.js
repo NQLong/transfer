@@ -92,6 +92,10 @@ module.exports = (app) => {
             index: 8000, title: 'Thư viện', link: '/user/library', icon: 'fa-th-large',
             subMenusRender: false
         },
+        students: {
+            index: 6100, title: 'Sinh viên', link: '/user/students', icon: 'fa-users',
+            subMenusRender: false
+        },
         category: {
             index: 4000, title: 'Danh mục', link: '/user/category', icon: 'fa-list-alt',
             subMenusRender: false,
