@@ -13,11 +13,11 @@ export default {
             component: Loadable({ loading: Loading, loader: () => import('./userPage') })
         },
         {
-            path: '/user/students/danh-sach-sinh-vien',
+            path: '/user/students/list',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
         {
-            path: '/user/students/:mssv',
+            path: '/user/students/item/:mssv',
             component: Loadable({ loading: Loading, loader: () => import('./adminEditPage') })
         }
     ],

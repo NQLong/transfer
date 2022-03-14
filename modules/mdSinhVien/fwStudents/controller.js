@@ -9,7 +9,7 @@ module.exports = app => {
     const menuStudents = {
         parentMenu: app.parentMenu.students,
         menus: {
-            1016: { title: 'Danh sách sinh viên', link: '/user/students/danh-sach-sinh-vien', icon: 'fa-users', backgroundColor: '#eb9834' },
+            6101: { title: 'Danh sách sinh viên', link: '/user/students/list', icon: 'fa-users', backgroundColor: '#eb9834' },
         },
     };
 
@@ -20,8 +20,8 @@ module.exports = app => {
         { name: 'student:delete' },
     );
     app.get('/user/sinh-vien/info', app.permission.check('student:login'), app.templates.admin);
-    app.get('/user/students/danh-sach-sinh-vien', app.permission.check('student:read'), app.templates.admin);
-    app.get('/user/students/:mssv', app.permission.check('student:write'), app.templates.admin);
+    app.get('/user/students/list', app.permission.check('student:read'), app.templates.admin);
+    app.get('/user/students/item/:mssv', app.permission.check('student:write'), app.templates.admin);
 
     //API----------------------------------------------------------------------------------------------------------------
     app.get('/api/user/sinh-vien/edit/item', app.permission.check('student:login'), (req, res) => {
@@ -56,8 +56,7 @@ module.exports = app => {
         app.model.fwStudents.get({ mssv }, (error, sinhVien) => {
             if (error) res.send({ error });
             else app.model.fwUser.get({ studentId: mssv }, (e1, data) => {
-                if (e1) res.send({ error: 'Sinh viên chưa có trong danh sách người dùng' });
-                else res.send({ items: Object.assign(sinhVien, { image: data.image }) });
+                res.send({ items: Object.assign(sinhVien, { image: data ? data.image : null }) });
             });
         });
     });

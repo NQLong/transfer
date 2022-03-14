@@ -103,10 +103,12 @@ class AdminStudentsPage extends AdminPage {
                 <tr key={index}>
                     <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                        <span>
-                            {item.ho + ' ' + item.ten} <br />
-                            {item.mssv}
-                        </span>
+                        <a href={`/user/students/item/${item.mssv}`} >
+                            <span>
+                                {item.ho + ' ' + item.ten} <br />
+                                {item.mssv}
+                            </span>
+                        </a>
                     )} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.khoa ? item.khoa.normalizedName() : ''} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.maNganh ? item.maNganh : ''} />
@@ -114,7 +116,7 @@ class AdminStudentsPage extends AdminPage {
                     <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.loaiHinhDaoTao ? item.loaiHinhDaoTao : ''} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.tinhTrangSinhVien ? item.tinhTrangSinhVien : ''} />
                     <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                        onEdit={`/user/students/${item.mssv}`} onDelete={this.delete} />
+                        onEdit={`/user/students/item/${item.mssv}`} onDelete={this.delete} />
                 </tr>
             )
         });

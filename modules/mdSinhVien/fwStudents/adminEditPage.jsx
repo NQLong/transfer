@@ -19,7 +19,7 @@ class SinhVienPage extends AdminPage {
 
     componentDidMount() {
         T.ready('/user/students', () => {
-            let route = T.routeMatcher('/user/students/:mssv'),
+            let route = T.routeMatcher('/user/students/item/:mssv'),
                 mssv = route.parse(window.location.pathname).mssv;
             this.setState({ isNew: mssv === 'new' }, () => {
                 this.setState({ mssv });
@@ -173,7 +173,8 @@ class SinhVienPage extends AdminPage {
             title: 'Lý lịch cá nhân sinh viên',
             subTitle: <i style={{ color: 'blue' }}>{item ? item.ho + ' ' + item.ten : ''}</i>,
             breadcrumb: [
-                <Link key={0} to='/user/'>Trang cá nhân</Link>,
+                <Link key={0} to='/user/students'>Sinh viên</Link>,
+                <Link key={1} to='/user/students/lists'>Danh sách</Link>,
                 'Lý lịch cá nhân sinh viên'
             ],
             content: <>
@@ -234,7 +235,7 @@ class SinhVienPage extends AdminPage {
                     </div>
                 </div>
             </>,
-            backRoute: '/user/students/danh-sach-sinh-vien',
+            backRoute: '/user/students/list',
             onSave: this.save,
         });
     }
