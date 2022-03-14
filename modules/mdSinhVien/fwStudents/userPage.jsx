@@ -31,7 +31,6 @@ class SinhVienPage extends AdminPage {
     }
 
     setVal = (data = {}) => {
-        console.log(data);
         this.mssv.value(data.mssv ? data.mssv : '');
         this.ho.value(data.ho ? data.ho : '');
         this.ten.value(data.ten ? data.ten : '');
@@ -69,61 +68,61 @@ class SinhVienPage extends AdminPage {
 
     getAndValidate = () => {
         try {
-                const {maTinhThanhPho: thuongTruMaTinh, maQuanHuyen: thuongTruMaHuyen, maPhuongXa: thuongTruMaXa, soNhaDuong: thuongTruSoNha} = this.thuongTru.value();
-                const { maTinhThanhPho: lienLacMaTinh, maQuanHuyen: lienLacMaHuyen, maPhuongXa: lienLacMaXa, soNhaDuong: lienLacSoNha} = this.lienLac.value();
-                const emailTruong = this.getValue(this.emailTruong);
-                const emailCaNhan = this.getValue(this.emailCaNhan);
+            const { maTinhThanhPho: thuongTruMaTinh, maQuanHuyen: thuongTruMaHuyen, maPhuongXa: thuongTruMaXa, soNhaDuong: thuongTruSoNha } = this.thuongTru.value();
+            const { maTinhThanhPho: lienLacMaTinh, maQuanHuyen: lienLacMaHuyen, maPhuongXa: lienLacMaXa, soNhaDuong: lienLacSoNha } = this.lienLac.value();
+            const emailTruong = this.getValue(this.emailTruong);
+            const emailCaNhan = this.getValue(this.emailCaNhan);
 
-                if (emailTruong && !T.validateEmail(emailTruong)) {
-                    this.emailTruong.focus();
-                    T.notify('Email trường không hợp lệ', 'danger');
-                    return false;
-                }
-
-                else if (emailCaNhan && !T.validateEmail(emailCaNhan)) {
-                    this.emailCaNhan.focus();
-                    T.notify('Email cá nhân không hợp lệ', 'danger');
-                    return false;
-                }
-
-                else {
-                    const data = {
-                        mssv: this.getValue(this.mssv),
-                        ho: this.getValue(this.ho),
-                        ten: this.getValue(this.ten),
-                        ngaySinh: this.getValue(this.ngaySinh) ? this.getValue(this.ngaySinh).getTime() : '',
-                        danToc: this.getValue(this.danToc),
-                        dienThoaiCaNhan: this.getValue(this.dienThoaiCaNhan),
-                        dienThoaiKhac: this.getValue(this.dienThoaiKhac),
-                        dienThoaiLienLac: this.getValue(this.dienThoaiLienLac),
-                        emailCaNhan, emailTruong,
-                        gioiTinh: this.getValue(this.gioiTinh),
-                        khoa: this.getValue(this.khoa),
-                        maKhoa: this.getValue(this.maKhoa),
-                        maNganh: this.getValue(this.maNganh),
-                        tenCha: this.getValue(this.tenCha),
-                        ngaySinhCha: this.getValue(this.ngaySinhCha) ? this.getValue(this.ngaySinhCha).getTime() : '',
-                        ngheNghiepCha: this.getValue(this.ngheNghiepCha),
-                        tenMe: this.getValue(this.tenMe),
-                        ngaySinhMe: this.getValue(this.ngaySinhMe) ? this.getValue(this.ngaySinhMe).getTime() : '',
-                        ngheNghiepMe: this.getValue(this.ngheNghiepMe),
-                        loaiHinhDaoTao: this.getValue(this.loaiHinhDaoTao),
-                        loaiSinhVien: this.getValue(this.loaiSinhVien),
-                        tinhTrang: this.getValue(this.tinhTrang),
-                        tonGiao: this.getValue(this.tonGiao),
-                        lop: this.getValue(this.lop),
-                        quocGia: this.getValue(this.quocTich),
-                        thuongTruMaHuyen, thuongTruMaTinh, thuongTruMaXa,  thuongTruSoNha,
-                        lienLacMaHuyen, lienLacMaTinh,  lienLacMaXa, lienLacSoNha,
-                        sdtCha: this.getValue(this.sdtCha),
-                        sdtMe: this.getValue(this.sdtMe),
-                        hoTenNguoiLienLac: this.getValue(this.hoTenNguoiLienLac),
-                        sdtNguoiLienLac: this.getValue(this.sdtNguoiLienLac),
-                    };
-                    return data;
-                }
+            if (emailTruong && !T.validateEmail(emailTruong)) {
+                this.emailTruong.focus();
+                T.notify('Email trường không hợp lệ', 'danger');
+                return false;
             }
-            
+
+            else if (emailCaNhan && !T.validateEmail(emailCaNhan)) {
+                this.emailCaNhan.focus();
+                T.notify('Email cá nhân không hợp lệ', 'danger');
+                return false;
+            }
+
+            else {
+                const data = {
+                    mssv: this.getValue(this.mssv),
+                    ho: this.getValue(this.ho),
+                    ten: this.getValue(this.ten),
+                    ngaySinh: this.getValue(this.ngaySinh) ? this.getValue(this.ngaySinh).getTime() : '',
+                    danToc: this.getValue(this.danToc),
+                    dienThoaiCaNhan: this.getValue(this.dienThoaiCaNhan),
+                    dienThoaiKhac: this.getValue(this.dienThoaiKhac),
+                    dienThoaiLienLac: this.getValue(this.dienThoaiLienLac),
+                    emailCaNhan, emailTruong,
+                    gioiTinh: this.getValue(this.gioiTinh),
+                    khoa: this.getValue(this.khoa),
+                    maKhoa: this.getValue(this.maKhoa),
+                    maNganh: this.getValue(this.maNganh),
+                    tenCha: this.getValue(this.tenCha),
+                    ngaySinhCha: this.getValue(this.ngaySinhCha) ? this.getValue(this.ngaySinhCha).getTime() : '',
+                    ngheNghiepCha: this.getValue(this.ngheNghiepCha),
+                    tenMe: this.getValue(this.tenMe),
+                    ngaySinhMe: this.getValue(this.ngaySinhMe) ? this.getValue(this.ngaySinhMe).getTime() : '',
+                    ngheNghiepMe: this.getValue(this.ngheNghiepMe),
+                    loaiHinhDaoTao: this.getValue(this.loaiHinhDaoTao),
+                    loaiSinhVien: this.getValue(this.loaiSinhVien),
+                    tinhTrang: this.getValue(this.tinhTrang),
+                    tonGiao: this.getValue(this.tonGiao),
+                    lop: this.getValue(this.lop),
+                    quocGia: this.getValue(this.quocTich),
+                    thuongTruMaHuyen, thuongTruMaTinh, thuongTruMaXa, thuongTruSoNha,
+                    lienLacMaHuyen, lienLacMaTinh, lienLacMaXa, lienLacSoNha,
+                    sdtCha: this.getValue(this.sdtCha),
+                    sdtMe: this.getValue(this.sdtMe),
+                    hoTenNguoiLienLac: this.getValue(this.hoTenNguoiLienLac),
+                    sdtNguoiLienLac: this.getValue(this.sdtNguoiLienLac),
+                };
+                return data;
+            }
+        }
+
         catch (selector) {
             selector.focus();
             T.notify('<b>' + (selector.props.label || 'Dữ liệu') + '</b> bị trống!', 'danger');
@@ -155,8 +154,8 @@ class SinhVienPage extends AdminPage {
     save = () => {
         const studentData = this.getAndValidate();
 
-        if(studentData) {
-           this.props.updateStudentUser(studentData, () => this.setState({ lastModified: new Date().getTime() }));
+        if (studentData) {
+            this.props.updateStudentUser(studentData, () => this.setState({ lastModified: new Date().getTime() }));
         }
     };
 
@@ -175,14 +174,14 @@ class SinhVienPage extends AdminPage {
                     <h3 className='tile-title'>Thông tin cơ bản</h3>
                     <div className='tile-body'>
                         <div className='row'>
-                            <FormImageBox 
+                            <FormImageBox
                                 ref={e => this.imageBox = e}
                                 style={{ display: 'block' }}
                                 label='Hình đại diện'
-                                postUrl='/user/upload' 
-                                uploadType='SinhVienImage' 
+                                postUrl='/user/upload'
+                                uploadType='SinhVienImage'
                                 onSuccess={this.imageChanged}
-                                className='form-group col-md-3' 
+                                className='form-group col-md-3'
                             />
                             <div className="form-group col-md-9">
                                 <div className="row">
@@ -191,9 +190,9 @@ class SinhVienPage extends AdminPage {
                                     <FormTextBox ref={e => this.ten = e} label='Tên' className='form-group col-md-4' readOnly />
                                     <FormSelect ref={e => this.gioiTinh = e} label='Giới tính' className='form-group col-md-4' readOnly data={SelectAdapter_DmGioiTinhV2} />
                                     <FormTextBox ref={e => this.khoa = e} label='Khoa' className='form-group col-md-4' readOnly />
-                                    <FormTextBox ref={e => this.maKhoa= e} label='Mã khoa' className='form-group col-md-4' readOnly />
+                                    <FormTextBox ref={e => this.maKhoa = e} label='Mã khoa' className='form-group col-md-4' readOnly />
                                     <FormTextBox ref={e => this.maNganh = e} label='Mã ngành' className='form-group col-md-4' readOnly />
-                                    <FormTextBox ref={e => this.lop = e} label='Lớp' className='form-group col-md-4' readOnly />    
+                                    <FormTextBox ref={e => this.lop = e} label='Lớp' className='form-group col-md-4' readOnly />
                                     <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Loại hình đào tạo' className='form-group col-md-4' readOnly data={SelectAdapter_DmLoaiHinhDaoTaoV2} />
                                     <FormSelect ref={e => this.loaiSinhVien = e} label='Loại sinh viên' className='form-group col-md-4' readOnly data={SelectAdapter_DmLoaiSinhVienV2} />
                                     <FormSelect ref={e => this.tinhTrang = e} label='Tình trạng' className='form-group col-md-4' readOnly data={SelectAdapter_DmTinhTrangSinhVienV2} />
