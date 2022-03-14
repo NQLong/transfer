@@ -313,7 +313,7 @@ class QtHoTroHocPhi extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Đơn vị công tác<br/>Chức vụ</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br/>Đơn vị công tác</th>
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày làm đơn</th>}
                         {!this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Nội dung hỗ trợ</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học kỳ, số tiền hỗ trợ</th>}
@@ -347,8 +347,8 @@ class QtHoTroHocPhi extends AdminPage {
                         />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span> { item.tenDonVi ? item.tenDonVi.normalizedName() : ''} <br/> </span>
-                                {item.tenChucVu ? item.tenChucVu : ''}
+                                <span> { item.tenChucVu ? item.tenChucVu : '' } <br/> </span>
+                                {item.tenDonVi ? item.tenDonVi.normalizedName() : ''}
                             </>
                         )}
                         />
