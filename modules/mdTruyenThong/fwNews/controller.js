@@ -32,7 +32,7 @@ module.exports = app => {
         { name: 'unit:draft' },
     );
 
-    ['/news/item/:newsId', '/tin-tuc/:link'].forEach(route => app.get(route, (req, res) => {
+    ['/news/item/:newsId', '/tin-tuc/:link', '/story/:link'].forEach(route => app.get(route, (req, res) => {
         const changeMeta = (news, data) => {
             let title, abstract;
             try {

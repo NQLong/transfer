@@ -16,6 +16,59 @@ module.exports = app => {
         },
     });
 
+    // Clear sessions ----------------------------------------------------------------------------------------------------------------------------------
+    app.readyHooks.add('clearSessionSchedule', {
+        ready: () => app.redis,
+        run: () => {
+            app.primaryWorker && app.schedule('5 0 * * *', () => { // 00h05 hằng ngày
+                console.log(' - Schedule: Clear session user');
+                const sessionPrefix = app.appName + '_sess:';
+                app.redis.keys(sessionPrefix + '*', async (error, keys) => {
+                    // Tính toán hôm nay và 7 ngày trước
+                    const today = new Date().yyyymmdd();
+                    let last7Day = new Date();
+                    last7Day.setDate(last7Day.getDate() - 7);
+                    last7Day = last7Day.yyyymmdd();
+
+                    if (!error) {
+                        // Lấy sessionUser
+                        const getKey = (key) => new Promise(resolve => {
+                            app.redis.get(key, (_, item) => resolve(JSON.parse(item)));
+                        });
+
+                        try {
+                            let deleteCounter = 0;
+                            console.log('Total sessions: ', keys.length); // Tổng cộng sessions
+                            for (const key of keys) {
+                                const sessionUser = await getKey(key);
+                                if (!sessionUser) { // Không có session
+                                    await app.redis.del(key);
+                                    deleteCounter++;
+                                } else if (sessionUser.user) { // Có login
+                                    // Nếu ko có today hoặc session lâu hơn 7 ngày => Xóa session
+                                    if (!sessionUser.today || parseInt(sessionUser.today) < parseInt(last7Day)) {
+                                        await app.redis.del(key);
+                                        deleteCounter++;
+                                    }
+                                } else {
+                                    // Không login
+                                    if (!sessionUser.today || today != sessionUser.today) { // Session cũ => Xóa session
+                                        await app.redis.del(key);
+                                        deleteCounter++;
+                                    }
+                                }
+                            }
+                            console.log(' - Number of deleted sessions: ', deleteCounter);
+                            console.log(' - Schedule: Clear session user done!');
+                        } catch (e) {
+                            console.error(e);
+                        }
+                    }
+                });
+            });
+        },
+    });
+
     // Upload ---------------------------------------------------------------------------------------------------------------------------------------
     app.post('/user/upload', app.permission.check(), (req, res) => {
         app.getUploadForm().parse(req, (error, fields, files) => {
