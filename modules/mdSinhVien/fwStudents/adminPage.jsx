@@ -146,7 +146,7 @@ class AdminStudentsPage extends AdminPage {
                     getPage={this.props.getStudentsPage} />
             </>
             ,
-            backRoute: 'user/students',
+            backRoute: '/user/students',
             onCreate: (e) => {
                 if (permission.write) {
                     e.preventDefault();
