@@ -130,5 +130,20 @@ module.exports = app => {
             const sql = 'SELECT COUNT(*) FROM QT_HO_TRO_HOC_PHI' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.dbConnection.execute(sql, parameter, (error, result) => done(error, result));
         },
+
+        searchPage: (pagenumber, pagesize, listShcc, listDv, fromyear, toyear, timetype, tinhtrang, loaihocvi, searchterm, done) => {
+            app.dbConnection.execute('BEGIN :ret:=qt_ho_tro_hoc_phi_search_page(:pagenumber, :pagesize, :listShcc, :listDv, :fromyear, :toyear, :timetype, :tinhtrang, :loaihocvi, :searchterm, :totalitem, :pagetotal); END;',
+                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, pagenumber: { val: pagenumber, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, pagesize: { val: pagesize, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, listShcc, listDv, fromyear, toyear, timetype, tinhtrang, loaihocvi, searchterm, totalitem: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pagetotal: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
+        },
+
+        groupPage: (pagenumber, pagesize, listShcc, listDv, fromyear, toyear, timetype, tinhtrang, loaihocvi, searchterm, done) => {
+            app.dbConnection.execute('BEGIN :ret:=qt_ho_tro_hoc_phi_group_page(:pagenumber, :pagesize, :listShcc, :listDv, :fromyear, :toyear, :timetype, :tinhtrang, :loaihocvi, :searchterm, :totalitem, :pagetotal); END;',
+                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, pagenumber: { val: pagenumber, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, pagesize: { val: pagesize, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, listShcc, listDv, fromyear, toyear, timetype, tinhtrang, loaihocvi, searchterm, totalitem: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pagetotal: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
+        },
+
+        download: (listShcc, listDv, fromyear, toyear, timetype, tinhtrang, loaihocvi, done) => {
+            app.dbConnection.execute('BEGIN :ret:=qt_ho_tro_hoc_phi_download_excel(:listShcc, :listDv, :fromyear, :toyear, :timetype, :tinhtrang, :loaihocvi); END;',
+                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, listShcc, listDv, fromyear, toyear, timetype, tinhtrang, loaihocvi }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
+        },
     };
 };

@@ -43,6 +43,7 @@ export default function DmHoTroHocPhiCoSoReducer(state = null, data) {
 
 // Actions ------------------------------------------------------------------------------------------------------------
 T.initPage('pageDmHoTroHocPhiCoSo');
+
 export function getDmHoTroHocPhiCoSoPage(pageNumber, pageSize, pageCondition, done) {
     const page = T.updatePage('pageDmHoTroHocPhiCoSo', pageNumber, pageSize, pageCondition);
     return dispatch => {
@@ -53,8 +54,8 @@ export function getDmHoTroHocPhiCoSoPage(pageNumber, pageSize, pageCondition, do
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
-                if (done) done(data.page);
                 dispatch({ type: DmHoTroHocPhiCoSoGetPage, page: data.page });
+                done && done(data.page);
             }
         }, error => T.notify('Lấy danh sách cơ sở đào tạo hỗ trợ học phí bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
     };
@@ -68,8 +69,8 @@ export function getDmHoTroHocPhiCoSoAll(done) {
                 T.notify('Lấy danh sách cơ sở đào tạo hỗ trợ học phí lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                if (done) done(data.items);
                 dispatch({ type: DmHoTroHocPhiCoSoGetAll, items: data.items ? data.items : [] });
+                done && done(data.items);
             }
         }, error => T.notify('Lấy danh sách cơ sở đào tạo hỗ trợ học phí bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
     };
@@ -100,7 +101,7 @@ export function createDmHoTroHocPhiCoSo(item, done) {
             } else {
                 T.notify('Tạo mới dữ liệu thành công!', 'success');
                 dispatch(getDmHoTroHocPhiCoSoPage());
-                if (done) done(data);
+                done && done(data);
             }
         }, error => T.notify('Tạo dữ liệu bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
     };
@@ -130,8 +131,8 @@ export function updateDmHoTroHocPhiCoSo(ma, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật dữ liệu thành công!', 'success');
-                done && done(data.item);
                 dispatch(getDmHoTroHocPhiCoSoPage());
+                done && done(data.item);
             }
         }, error => T.notify('Cập nhật dữ liệu bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
     };
@@ -142,7 +143,5 @@ export const SelectAdapter_DmHoTroHocPhiCoSo = {
     url: '/api/danh-muc/ho-tro-hoc-phi-co-so/page/1/20',
     data: params => ({ condition: params.term, kichHoat: 1 }),
     processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.ten })) : [] }),
-    fetchOne: (ma, done) => (getDmHoTroHocPhiCoSo(ma, item => item && done && done({ id: item.ma, text: item.ten })))(),
-    getOne: getDmHoTroHocPhiCoSo,
-    processResultOne: response => response && ({ value: response.ma, text: `${response.ma}: ${response.ten}` }),
+    fetchOne: (ma, done) => (getDmHoTroHocPhiCoSo(ma, item => item && done && done({ id: item.ma, text: item.ten })))()
 };

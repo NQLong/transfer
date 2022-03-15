@@ -2,13 +2,13 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.category,
         menus: {
-            4083: { title: 'Hỗ trợ học phí - cơ cở đào tạo', link: '/user/danh-muc/ho-tro-hoc-phi-co-so' },
-        },
+            4083: { title: 'Hỗ trợ học phí - cơ cở đào tạo', link: '/user/danh-muc/ho-tro-hoc-phi-co-so' }
+        }
     };
     app.permission.add(
         { name: 'dmHoTroHocPhiCoSo:read', menu },
         { name: 'dmHoTroHocPhiCoSo:write' },
-        { name: 'dmHoTroHocPhiCoSo:delete' },
+        { name: 'dmHoTroHocPhiCoSo:delete' }
     );
     app.get('/user/danh-muc/ho-tro-hoc-phi-co-so', app.permission.check('dmHoTroHocPhiCoSo:read'), app.templates.admin);
 
@@ -20,7 +20,7 @@ module.exports = app => {
         if (req.query.condition) {
             condition = {
                 statement: 'lower(ma) LIKE :searchText OR lower(ten) LIKE :searchText',
-                parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
+                parameter: { searchText: `%${req.query.condition.toLowerCase()}%` }
             };
         }
         app.model.dmHoTroHocPhiCoSo.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
@@ -48,5 +48,4 @@ module.exports = app => {
     app.delete('/api/danh-muc/ho-tro-hoc-phi-co-so', app.permission.check('dmHoTroHocPhiCoSo:delete'), (req, res) => {
         app.model.dmHoTroHocPhiCoSo.delete({ ma: req.body.ma }, error => res.send({ error }));
     });
-
 };
