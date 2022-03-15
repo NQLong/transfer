@@ -110,13 +110,13 @@ export default function QtHuongDanLuanVanReducer(state = null, data) {
         case QtHuongDanLuanVanGetAll:
             return Object.assign({}, state, { items: data.items });
         case QtHuongDanLuanVanGetGroupPage:
-            return Object.assign({}, state, { page_gr: data.page });
+            return Object.assign({}, state, { pageGr: data.page });
         case QtHuongDanLuanVanGetGroupPageMa:
-            return Object.assign({}, state, { page_ma: data.page });
+            return Object.assign({}, state, { pageMa: data.page });
         case QtHuongDanLuanVanGetPage:
             return Object.assign({}, state, { page: data.page });
         case QtHuongDanLuanVanGetUserPage:
-            return Object.assign({}, state, { user_page: data.page });
+            return Object.assign({}, state, { userPage: data.page });
         case QtHuongDanLuanVanGet:
             return Object.assign({}, state, { selectedItem: data.item });
         case QtHuongDanLuanVanUpdate:
