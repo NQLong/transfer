@@ -23,7 +23,7 @@ module.exports = app => {
     app.get('/user/nghi-thai-san', app.permission.check('staff:female'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:female')(req, res, next);
+    const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
 
     app.get('/api/qua-trinh/nghi-thai-san/page/:pageNumber/:pageSize', checkGetStaffPermission, (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
