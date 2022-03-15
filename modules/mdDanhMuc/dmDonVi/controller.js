@@ -71,13 +71,12 @@ module.exports = app => {
     });
     app.get('/api/danh-muc/don-vi/faculty', app.permission.check('user:login'), (req, res) => {
         let condition = {
-            statement: 'maPl IN (:maPl) OR ma IN (:ma)',
+            statement: 'maPl IN (:maPl)',
             parameter: {
                 maPl: '01',
-                ma: ['30', '57']
             },
         };
-        app.model.dmDonVi.getAll(condition, '*', null, (error, items) => res.send({ error, items }));
+        app.model.dmDonVi.getAll(condition, (error, items) => res.send({ error, items }));
     });
     app.get('/dm-don-vi/:idLoaiDonVi', (req, res) => {
         const condition = { maPl: req.params.idLoaiDonVi, kichHoat: 1 };

@@ -219,6 +219,8 @@ const T = {
         swal({ icon, title, content, dangerMode, buttons: { cancel: true, confirm: true }, }).then(done);
     },
 
+    mobileDisplay: mobile => mobile ? (mobile.length == 10 ? mobile.toString().replace(/(\d{4})(\d{3})(\d{3})/, '$1 $2 $3') : mobile.toString().replace(/(\d{3})(\d{4})(\d{4})/, '($1) $2 $3')) : '',
+
     confirm3: (title, html, icon, buttonDanger, buttonSuccess, done) => {
         var content = document.createElement('div');
         content.innerHTML = html;
@@ -228,8 +230,8 @@ const T = {
             dangerMode: true,
             buttons: {
                 cancel: { text: 'Huỷ', value: null, visible: true },
-                confirm: { text: buttonDanger, value: true },
-                false: { text: buttonSuccess, value: false }
+                false: { text: buttonDanger, value: false },
+                confirm: { text: buttonSuccess, value: true }
             }
         }).then(done)
     },

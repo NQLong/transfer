@@ -163,7 +163,7 @@ class EditModal extends React.Component {
 							<div className='form-group'>
 								<div style={{ display: 'inline-flex' }}>
 									<label>Loại thành phần:</label>&nbsp;&nbsp;
-                                    <Dropdown ref={this.type} text={this.state.type} items={this.items} onSelected={value => this.setState({ type: value })} />
+									<Dropdown ref={this.type} text={this.state.type} items={this.items} onSelected={value => this.setState({ type: value })} />
 								</div>
 							</div>
 							{data}
@@ -413,10 +413,8 @@ class adminINewsEdit extends React.Component {
 		this.typeEmail.current.show();
 	}
 	copyClipboard = () => {
-		let { html, attachments } = this.renderINews();
-		console.log(attachments);
+		let { html } = this.renderINews();
 		copy(html);
-
 	}
 
 	send = (mailTo) => {
@@ -565,7 +563,7 @@ class adminINewsEdit extends React.Component {
 									{permissionRead ?
 										<button className='btn btn-success mr-3' type='button' onClick={this.preview}>
 											<i className='fa fa-fw fa-lg fa-newspaper-o'></i>Xem trước
-                                		</button> : ''}
+										</button> : ''}
 									{/* {permissionRead ?
 										<button className='btn btn-warning' type='button' onClick={this.copyClipboard} disabled={this.state.sending}>
 											<i className='fa fa-fw fa-lg fa-paper-plane-o'></i>Sao chép
@@ -579,7 +577,7 @@ class adminINewsEdit extends React.Component {
 								{permissionWrite ?
 									<button className='btn btn-success' type='button' onClick={this.save}>
 										<i className='fa fa-fw fa-lg fa-save'></i>Lưu
-                                	</button> : ''}
+									</button> : ''}
 							</div>
 						</div>
 					</div>

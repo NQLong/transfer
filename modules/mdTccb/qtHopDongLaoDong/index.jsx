@@ -15,7 +15,7 @@ export default {
         },
         {
             path: '/user/tccb/qua-trinh/hop-dong-lao-dong/:ma',
-            component: Loadable({ loading: Loading, loader: () => import('./adminEditPage') })
+            component: Loadable({ loading: Loading, loader: () => import('./adminDetails') })
         },
         {
             path: '/user/tccb/qua-trinh/hop-dong-lao-dong',

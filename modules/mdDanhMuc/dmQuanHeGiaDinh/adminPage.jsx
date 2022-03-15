@@ -5,6 +5,11 @@ import Pagination from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
 import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
 
+const classifyRelation = {
+    0: 'Gia đình',
+    1: 'Huyết thống',
+    2: 'Gia đình vợ/chồng'
+};
 class EditModal extends AdminModal {
     state = { kichHoat: true, visible: false };
 
@@ -25,7 +30,7 @@ class EditModal extends AdminModal {
 
     onSubmit = (e) => {
         e.preventDefault();
-        const 
+        const
             changes = {
                 ma: this.ma.value().trim(),
                 ten: this.ten.value().trim(),
@@ -93,6 +98,7 @@ class DmQuanHeGiaDinhPage extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto' }}>Mã</th>
                         <th style={{ width: '100%' }}>Tên</th>
+                        <th style={{ width: 'auto' }}>Loại</th>
                         <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
                         <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
                     </tr>),
@@ -100,6 +106,7 @@ class DmQuanHeGiaDinhPage extends AdminPage {
                     <tr key={index}>
                         <TableCell type='link' content={item.ma ? item.ma : ''} onClick={() => this.modal.show(item)} />
                         <TableCell type='text' content={item.ten ? item.ten : ''} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.loai != null ? classifyRelation[item.loai] : ''} />
                         <TableCell type='checkbox' content={item.kichHoat} permission={permission}
                             onChanged={value => this.props.updateDmQuanHeGiaDinh(item.ma, { kichHoat: value ? 1 : 0, })} />
                         <TableCell type='buttons' content={item} permission={permission}

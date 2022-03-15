@@ -18,7 +18,6 @@ module.exports = app => {
     });
 
     app.put('/api/user/staff/to-chuc-khac', app.permission.check('staff:login'), (req, res) => {
-        console.log(req);
         if (req.body.changes && req.session.user) {
             app.model.tccbToChucKhac.get({ ma: req.body.ma }, (error, item) => {
                 if (error || item == null) {

@@ -96,6 +96,7 @@ export function createDmMucDichNuocNgoai(item, done) {
                 T.notify('Tạo mục đích nước ngoài bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`POST: ${url}.`, data.error);
             } else {
+                T.notify('Tạo mục đích nước ngoài thành công!', 'success');
                 dispatch(getDmMucDichNuocNgoaiAll());
                 if (done) done(data);
             }
@@ -128,6 +129,7 @@ export function updateDmMucDichNuocNgoai(ma, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật thông tin mục đích nước ngoài thành công!', 'success');
+                done && done();
                 dispatch(getDmMucDichNuocNgoaiAll());
             }
         }, (error) => T.notify('Cập nhật thông tin mục đích nước ngoài bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));

@@ -25,7 +25,7 @@ class EditAnswerModal extends React.Component {
     }
 
     show = (item, answers) => {
-        this.setState({ item: { ...item, record: answers } }, () => console.log(this.state));
+        this.setState({ item: { ...item, record: answers } });
         $(document).ready(() => {
             setTimeout(() => $(this.modal.current).modal('show'), 250);
         });

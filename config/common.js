@@ -1,4 +1,5 @@
 module.exports = (app) => {
+    const fse = require('fs-extra');
     app.adminRole = {};
     app.clone = function () {
         const length = arguments.length;
@@ -18,7 +19,12 @@ module.exports = (app) => {
         return result;
     };
 
-    app.fs.renameSync = (oldPath, newPath) => app.fs.copyFileSync(oldPath, newPath) && app.fs.unlinkSync(oldPath);
+    app.fs.renameSync = (oldPath, newPath) => {
+        fse.copySync(oldPath, newPath);
+        fse.removeSync(oldPath);
+    };
+
+    // app.fs.renameSync = (oldPath, newPath) => app.fs.copyFileSync(oldPath, newPath) && app.fs.unlinkSync(oldPath);
 
     // Template html file ---------------------------------------------------------------------------------------------------------------------------
     app.templates = {};
