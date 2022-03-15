@@ -34,7 +34,7 @@ module.exports = app => {
             if (error || items.length == 0) {
                 done('Họ và tên cán bộ không tồn tại !', null);
             } else {
-                let best_score = -1;
+                let bestScore = -1;
                 let shcc = null;
                 for (let idx = 0; idx < items.length; idx++) {
                     let score = 0;
@@ -47,8 +47,8 @@ module.exports = app => {
                             score += 0.2 - percent;
                         }
                     }
-                    if (score > best_score) {
-                        best_score = score;
+                    if (score > bestScore) {
+                        bestScore = score;
                         shcc = items[idx].shcc;
                     }
                 }

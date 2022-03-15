@@ -439,6 +439,6 @@ class QtCongTacTrongNuoc extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtCongTacTrongNuoc: state.tccb.qtCongTacTrongNuoc });
 const mapActionsToProps = {
     getQtCongTacTrongNuocPage, deleteQtCongTacTrongNuoc, createQtCongTacTrongNuoc,
-    updateQtCongTacTrongNuoc, getQtCongTacTrongNuocGroupPage
+    updateQtCongTacTrongNuoc, getQtCongTacTrongNuocGroupPage,
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtCongTacTrongNuoc);

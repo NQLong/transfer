@@ -10,7 +10,7 @@ function lcs(a, b) {
     return C[m][n];
 }
 
-function best_choice(s, t) {
+function bestChoice(s, t) {
     if (!s || !t) return 0;
     let n = s.length, m = t.length, cost = -1;
     if (m < n) {
@@ -19,8 +19,8 @@ function best_choice(s, t) {
     else {
         let i;
         for (i = 0; i < m - n + 1; i++) {
-            let sub_t = t.substring(i, i + n);
-            cost = Math.max(cost, lcs(s, sub_t));
+            let subT = t.substring(i, i + n);
+            cost = Math.max(cost, lcs(s, subT));
         }
     }
     return cost;
@@ -34,7 +34,7 @@ module.exports = app => {
             app.model.dmDonVi.getAll((error, itemsDv) => {
                 let bestScore = -1, maDv = null;
                 for (let idx = 0; idx < itemsDv.length; idx++) {
-                    let score = best_choice(ten, itemsDv[idx].ten.toLowerCase());
+                    let score = bestChoice(ten, itemsDv[idx].ten.toLowerCase());
                     if (score > bestScore) {
                         bestScore = score;
                         maDv = itemsDv[idx].ma;
