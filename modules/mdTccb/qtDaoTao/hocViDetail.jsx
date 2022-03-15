@@ -7,7 +7,7 @@ import { AdminModal, AdminPage, FormRichTextBox, FormSelect, FormTextBox, render
 import Dropdown from 'view/component/Dropdown';
 import { DateInput } from 'view/component/Input';
 import { getStaffEdit, userGetStaff } from '../tccbCanBo/redux';
-import { createQtDaoTao, createQtDaoTaoStaffUser } from './redux';
+import { createQtDaoTao, createQtDaoTaoStaffUser, updateQtDaoTaoStaffUser, updateQtDaoTao } from './redux';
 
 const EnumDateType = Object.freeze({
     0: { text: '' },
@@ -87,7 +87,7 @@ class EditModal extends AdminModal {
         } else if (!changes.chuyenNganh) {
             T.notify('Nội dung bị trống!', 'danger');
             this.chuyenNganh.focus();
-        } else this.state.id ? this.props.update(this.state.id, changes, this.hide, true) : this.props.create(changes, this.hide, true);
+        } else this.state.id ? this.props.update(this.state.id, changes, true, this.hide) : this.props.create(changes, true, this.hide);
     }
 
     handleBang = (value) => {
@@ -200,6 +200,7 @@ class HocViDetail extends AdminPage {
                     </button>
                 </div>
                 <EditModal ref={e => this.modal = e} hocVi={this.props.tenHocVi} value={this.value}
+                    update={this.props.tccb ? this.props.updateQtDaoTao : this.props.updateQtDaoTaoStaffUser}
                     create={this.props.tccb ? this.props.createQtDaoTao : this.props.createQtDaoTaoStaffUser} />
             </div>
             // (dataDaoTao && dataDaoTao.length > 0) ? renderHocVi(dataDaoTao) : (
@@ -218,6 +219,6 @@ class HocViDetail extends AdminPage {
 
 const mapStateToProps = state => ({ staff: state.tccb.staff, system: state.system });
 const mapActionsToProps = {
-    getStaffEdit, userGetStaff, createQtDaoTao, createQtDaoTaoStaffUser
+    getStaffEdit, userGetStaff, createQtDaoTao, createQtDaoTaoStaffUser, updateQtDaoTaoStaffUser, updateQtDaoTao
 };
 export default connect(mapStateToProps, mapActionsToProps, null, { forwardRef: true })(HocViDetail);

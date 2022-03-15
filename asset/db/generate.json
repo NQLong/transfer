@@ -5833,6 +5833,9 @@
         "active": true,
         "moduleName": "fwStudents",
         "modelName": "fwStudents",
+        "methods": {
+            "FW_STUDENT_SEARCH_PAGE": "searchPage"
+        },
         "columns": {
             "MSSV": {
                 "value": "mssv",
@@ -6099,13 +6102,6 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": "10,0"
-            },
-            "CMND": {
-                "value": "cmnd",
-                "dataType": "NVARCHAR2",
-                "dataDefault": "",
-                "nullable": true,
-                "size": 20
             }
         },
         "primaryKeys": [
