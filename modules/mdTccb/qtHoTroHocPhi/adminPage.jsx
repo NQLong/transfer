@@ -370,7 +370,7 @@ class QtHoTroHocPhi extends AdminPage {
                         {!this.checked && <TableCell type='text' content={(
                             <>
                                 <b> {item.hocKyHoTro ? item.hocKyHoTro : ''} </b> <br/><br/>
-                                {item.soTien ? <span style={{ whiteSpace: 'nowrap' }}>Số tiền hỗ trợ: {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.soTien)}<br /></span> : null}
+                                {item.soTien ? <span style={{ whiteSpace: 'nowrap' }}>Số tiền hỗ trợ: <b>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.soTien)}</b><br /></span> : null}
                             </>
                         )}
                         />}
