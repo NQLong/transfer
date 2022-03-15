@@ -74,7 +74,7 @@ class EditModal extends AdminModal {
             list_ma = [list_ma];
         }
         if (list_ma.length == 0) {
-            T.notify('Cán bộ bị trống', 'danger');
+            T.notify('Cán bộ nữ bị trống', 'danger');
             this.shcc.focus();
         } else if (!this.batDau.getVal()) {
             T.notify('Ngày bắt đầu kéo dài công tác trống', 'danger');
@@ -365,7 +365,7 @@ class QtNghiThaiSan extends AdminPage {
             advanceSearch: <>
                 <div className='row'>
                     <FormSelect className='col-12 col-md-4' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
-                    {(this.timeType && this.timeType.value() == 1) &&
+                    {(this.timeType && this.timeType.value() >= 1) &&
                         <>
                             <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-2' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />
                             <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-2' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />
