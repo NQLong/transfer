@@ -6,39 +6,32 @@ import Pagination from 'view/component/Pagination';
 import Dropdown from 'view/component/Dropdown';
 import { DateInput } from 'view/component/Input';
 import { SelectAdapter_FwCanBo } from '../tccbCanBo/redux';
-import {
-    getQtHoTroHocPhiGroupPageMa, deleteQtHoTroHocPhiGroupPageMa,
-    updateQtHoTroHocPhiGroupPageMa, createQtHoTroHocPhiGroupPageMa
-}
-    from './redux';
+import { getQtHoTroHocPhiGroupPageMa, deleteQtHoTroHocPhiGroupPageMa, updateQtHoTroHocPhiGroupPageMa, createQtHoTroHocPhiGroupPageMa } from './redux';
 import { SelectAdapter_DmHoTroHocPhiCoSo } from 'modules/mdDanhMuc/dmHoTroHocPhiCoSo/redux';
 
-const EnumDateType = Object.freeze({
+const EnumDateType = {
     0: { text: '' },
     1: { text: 'dd/mm/yyyy' },
     2: { text: 'mm/yyyy' },
-    3: { text: 'yyyy' },
-}), typeMapper = {
+    3: { text: 'yyyy' }
+}, typeMapper = {
     'yyyy': 'year',
     'mm/yyyy': 'month',
     'dd/mm/yyyy': 'date'
 };
+
 const timeList = [
     { id: 0, text: 'Không' },
     { id: 1, text: 'Theo ngày bắt đầu' },
     { id: 2, text: 'Theo ngày làm đơn' }
 ];
+
 class EditModal extends AdminModal {
-    state = {
-        id: null,
-        batDau: '',
-        ketThuc: '',
-        batDauType: 'dd/mm/yyyy',
-        ketThucType: 'dd/mm/yyyy',
-    };
+    state = { id: null, batDau: '', ketThuc: '', batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy' };
+
     onShow = (item) => {
         let { id, ngayLamDon, shcc, noiDung, coSoDaoTao, batDau, batDauType, ketThuc, ketThucType, hocKyHoTro, soTien, hoSo, ghiChu } = item ? item : {
-            id: '', ngayLamDon: null, shcc: '', noiDung: '', coSoDaoTao: '', batDau: null, batDauType: '', ketThucType: '', hocKyHoTro: '', soTien: '', hoSo: '', ghiChu: '',
+            id: '', ngayLamDon: null, shcc: '', noiDung: '', coSoDaoTao: '', batDau: null, batDauType: '', ketThucType: '', hocKyHoTro: '', soTien: '', hoSo: '', ghiChu: ''
         };
 
         this.setState({
@@ -132,21 +125,13 @@ class EditModal extends AdminModal {
                 <FormTextBox className='col-md-6' ref={e => this.soTien = e} type='number' label='Số tiền' readOnly={readOnly} />
                 <FormTextBox className='col-md-12' ref={e => this.hoSo = e} type='text' label='Hồ sơ đi kèm' readOnly={readOnly} />
 
-                <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} placeholder='Bắt đầu'
-                    label={
-                        <div style={{ display: 'flex' }}>Bắt đầu (định dạng:&nbsp; <Dropdown ref={e => this.batDauType = e}
-                            items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
-                            onSelected={item => this.setState({ batDauType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
-                    }
-                    type={this.state.batDauType ? typeMapper[this.state.batDauType] : null} readOnly={readOnly} /></div>
+                <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} placeholder='Bắt đầu' label={
+                    <div style={{ display: 'flex' }}>Bắt đầu (định dạng:&nbsp; <Dropdown ref={e => this.batDauType = e} items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]} onSelected={item => this.setState({ batDauType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
+                } type={this.state.batDauType ? typeMapper[this.state.batDauType] : null} readOnly={readOnly} /></div>
                 <FormCheckbox ref={e => this.denNayCheck = e} label='Đến nay' onChange={this.handleKetThuc} className='form-group col-md-3' />
-                <div className='form-group col-md-6' id='ketThucDate'><DateInput ref={e => this.ketThuc = e} placeholder='Kết thúc'
-                    label={
-                        <div style={{ display: 'flex' }}>Kết thúc (định dạng:&nbsp; <Dropdown ref={e => this.ketThucType = e}
-                            items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
-                            onSelected={item => this.setState({ ketThucType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
-                    }
-                    type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} readOnly={readOnly} /></div>
+                <div className='form-group col-md-6' id='ketThucDate'><DateInput ref={e => this.ketThuc = e} placeholder='Kết thúc' label={
+                    <div style={{ display: 'flex' }}>Kết thúc (định dạng:&nbsp; <Dropdown ref={e => this.ketThucType = e} items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]} onSelected={item => this.setState({ ketThucType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
+                } type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} readOnly={readOnly} /></div>
 
                 <FormRichTextBox className='col-md-12' ref={e => this.ghiChu = e} rows={2} readOnly={readOnly} label='Ghi chú' placeholder='Nhập ghi chú (tối đa 100 ký tự)' maxLength={100} />
             </div>
@@ -155,15 +140,14 @@ class EditModal extends AdminModal {
 }
 
 class QtHoTroHocPhiGroupPage extends AdminPage {
-    state = { filter: {} };
+    state = { filter: {}, shcc: null };
 
     componentDidMount() {
         T.ready('/user/tccb', () => {
             T.clearSearchBox();
             const route = T.routeMatcher('/user/tccb/qua-trinh/ho-tro-hoc-phi/group/:shcc'),
                 params = route.parse(window.location.pathname);
-            this.shcc = params.shcc;
-            this.setState({ filter: { list_shcc: params.shcc, list_dv: '', timeType: 0, loaiHocVi: null } });
+            this.setState({ shcc: params.shcc, filter: { list_shcc: params.shcc, list_dv: '', timeType: 0, loaiHocVi: null } });
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
 
             T.showSearchBox(() => {
@@ -237,7 +221,7 @@ class QtHoTroHocPhiGroupPage extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br/>Đơn vị công tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br />Đơn vị công tác</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày làm đơn</th>
                         <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Nội dung hỗ trợ</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học kỳ, số tiền hỗ trợ</th>
@@ -253,56 +237,48 @@ class QtHoTroHocPhiGroupPage extends AdminPage {
                                 <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
                                 {item.shcc}
                             </>
-                        )}
-                        />
+                        )} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 {item.tenHocVi ? item.tenHocVi : ''}
                             </>
-                        )}
-                        />
+                        )} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 {item.tenChucDanhNgheNghiep ? item.tenChucDanhNgheNghiep : ''}
                             </>
-                        )}
-                        />
+                        )} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span> { item.tenChucVu ? item.tenChucVu : '' } <br/> </span>
+                                <span> {item.tenChucVu ? item.tenChucVu : ''} <br /> </span>
                                 {item.tenDonVi ? item.tenDonVi.normalizedName() : ''}
                             </>
-                        )}
-                        />
+                        )} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 {item.ngayLamDon ? T.dateToText(item.ngayLamDon, 'dd/mm/yyyy') : ''}
                             </>
-                        )}
-                        />
+                        )} />
                         <TableCell type='text' content={(
                             <>
-                                <b> {item.noiDung ? item.noiDung : ''} </b> <br/><br/>
-                                {item.tenCoSoDaoTao ? <span style={{ whiteSpace: 'nowrap' }}>Cơ sở đào tạo: <i>{item.tenCoSoDaoTao}</i><br/><br/></span> : null}
+                                <b> {item.noiDung ? item.noiDung : ''} </b> <br /><br />
+                                {item.tenCoSoDaoTao ? <span style={{ whiteSpace: 'nowrap' }}>Cơ sở đào tạo: <i>{item.tenCoSoDaoTao}</i><br /><br /></span> : null}
                                 {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
                                 {item.ketThuc && item.ketThuc != -1 ? <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc && item.ketThuc != -1 ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
                             </>
-                        )}
-                        />
+                        )} />
                         <TableCell type='text' content={(
                             <>
-                                <b> {item.hocKyHoTro ? item.hocKyHoTro : ''} </b> <br/><br/>
+                                <b> {item.hocKyHoTro ? item.hocKyHoTro : ''} </b> <br /><br />
                                 {item.soTien ? <span style={{ whiteSpace: 'nowrap' }}>Số tiền hỗ trợ: <b>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.soTien)}</b><br /></span> : null}
                             </>
-                        )}
-                        />
+                        )} />
                         <TableCell type='text' content={(
                             <>
                                 <span>{(item.ketThuc == -1 || item.ketThuc >= item.today) ? <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đang diễn ra</span> : <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đã kết thúc</span>}</span>
                             </>
                         )}></TableCell>
-                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                            onEdit={() => this.modal.show(item)} onDelete={this.delete} >
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onEdit={() => this.modal.show(item)} onDelete={this.delete}>
                         </TableCell>
                     </tr>
                 )
@@ -321,33 +297,27 @@ class QtHoTroHocPhiGroupPage extends AdminPage {
                 <div className='row'>
                     <FormSelect className='col-12 col-md-4' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} minimumResultsForSearch={-1} allowClear={true} />
                     {(this.timeType && this.timeType.value() >= 1) &&
-                        <>
-                            <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />
-                            <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />
-                        </>}
-                    <FormSelect className='col-12 col-md-4' ref={e => this.tinhTrang = e} label='Tình trạng'
-                        data={[
-                            { id: 1, text: 'Đã kết thúc' }, { id: 2, text: 'Đang diễn ra' }
-                        ]} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <>
+                        <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />
+                        <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />
+                    </>}
+                    <FormSelect className='col-12 col-md-4' ref={e => this.tinhTrang = e} label='Tình trạng' data={[
+                        { id: 1, text: 'Đã kết thúc' }, { id: 2, text: 'Đang diễn ra' }
+                    ]} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
                 </div>
             </>,
             content: <>
                 <div className='tile'>
                     {table}
                 </div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                    getPage={this.getPage} />
-                <EditModal ref={e => this.modal = e} permission={permission} shcc={this.shcc}
-                    create={this.props.createQtHoTroHocPhiGroupPageMa} update={this.props.updateQtHoTroHocPhiGroupPageMa}
-                    permissions={currentPermissions}
-                />
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.getPage} />
+                <EditModal ref={e => this.modal = e} permission={permission} shcc={this.state.shcc} create={this.props.createQtHoTroHocPhiGroupPageMa} update={this.props.updateQtHoTroHocPhiGroupPageMa} permissions={currentPermissions} />
             </>,
             backRoute: '/user/tccb/qua-trinh/ho-tro-hoc-phi',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
             onExport: (e) => {
                 e.preventDefault();
-                const { fromYear, toYear, list_shcc, list_dv, timeType, tinhTrang, loaiHocVi } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, tinhTrang: null, loaiHocVi: null};
-
+                const { fromYear, toYear, list_shcc, list_dv, timeType, tinhTrang, loaiHocVi } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, tinhTrang: null, loaiHocVi: null };
                 T.download(T.url(`/api/qua-trinh/ho-tro-hoc-phi/download-excel/${list_shcc ? list_shcc : null}/${list_dv ? list_dv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${timeType}/${tinhTrang ? tinhTrang : null}/${loaiHocVi ? loaiHocVi : null}`), 'hotrohocphi.xlsx');
             }
         });
@@ -355,8 +325,5 @@ class QtHoTroHocPhiGroupPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, qtHoTroHocPhi: state.tccb.qtHoTroHocPhi });
-const mapActionsToProps = {
-    getQtHoTroHocPhiGroupPageMa, deleteQtHoTroHocPhiGroupPageMa, createQtHoTroHocPhiGroupPageMa,
-    updateQtHoTroHocPhiGroupPageMa,
-};
+const mapActionsToProps = { getQtHoTroHocPhiGroupPageMa, deleteQtHoTroHocPhiGroupPageMa, createQtHoTroHocPhiGroupPageMa, updateQtHoTroHocPhiGroupPageMa };
 export default connect(mapStateToProps, mapActionsToProps)(QtHoTroHocPhiGroupPage);
