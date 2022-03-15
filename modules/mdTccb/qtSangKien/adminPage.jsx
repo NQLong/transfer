@@ -85,7 +85,7 @@ class EditModal extends AdminModal {
 class QtSangKien extends AdminPage {
     checked = false;
     state = { filter: {} };
-    menu = '';
+    menu = 'tccb';
     componentDidMount() {
         T.ready('/user/tccb', () => {
             T.clearSearchBox();
@@ -212,7 +212,7 @@ class QtSangKien extends AdminPage {
             });
 
         return this.renderPage({
-            icon: 'fa fa-cogs',
+            icon: 'fa fa-lightbulb-o',
             title: ' Quá trình sáng kiến',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
