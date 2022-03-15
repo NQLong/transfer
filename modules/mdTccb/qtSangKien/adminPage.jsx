@@ -164,7 +164,7 @@ class QtSangKien extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh</th>
                         <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Chức vụ</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Mã số</th>
-                        <th style={{ width: '70%', whiteSpace: 'nowrap' }}>Tên phát minh</th>
+                        <th style={{ width: '70%', whiteSpace: 'nowrap' }}>Tên sáng kiến</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
@@ -213,7 +213,7 @@ class QtSangKien extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-lightbulb-o',
-            title: ' Quá trình sáng kiến',
+            title: 'Danh sách sáng kiến',
             breadcrumb: [
                 <Link key={0} to='/user/tccb'>Tổ chức cán bộ</Link>,
                 'Quá trình sáng kiến'
