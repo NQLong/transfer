@@ -1,9 +1,9 @@
-// Table name: FW_STUDENT { mssv, ho, ten, ngaySinh, gioiTinh, danToc, tonGiao, quocGia, thuongTruMaTinh, thuongTruMaHuyen, thuongTruMaXa, thuongTruSoNha, lienLacMaTinh, lienLacMaHuyen, lienLacMaXa, lienLacSoNha, loaiSinhVien, tinhTrang, dienThoaiKhac, dienThoaiCaNhan, dienThoaiLienLac, emailCaNhan, emailTruong, tenCha, ngheNghiepCha, ngaySinhCha, tenMe, ngheNghiepMe, ngaySinhMe, loaiHinhDaoTao, maKhoa, khoa, maNganh, lop, sdtCha, sdtMe, hoTenNguoiLienLac, sdtNguoiLienLac, cmnd }
-const keys = ['MSSV'];
-const obj2Db = { 'mssv': 'MSSV', 'ho': 'HO', 'ten': 'TEN', 'ngaySinh': 'NGAY_SINH', 'gioiTinh': 'GIOI_TINH', 'danToc': 'DAN_TOC', 'tonGiao': 'TON_GIAO', 'quocGia': 'QUOC_GIA', 'thuongTruMaTinh': 'THUONG_TRU_MA_TINH', 'thuongTruMaHuyen': 'THUONG_TRU_MA_HUYEN', 'thuongTruMaXa': 'THUONG_TRU_MA_XA', 'thuongTruSoNha': 'THUONG_TRU_SO_NHA', 'lienLacMaTinh': 'LIEN_LAC_MA_TINH', 'lienLacMaHuyen': 'LIEN_LAC_MA_HUYEN', 'lienLacMaXa': 'LIEN_LAC_MA_XA', 'lienLacSoNha': 'LIEN_LAC_SO_NHA', 'loaiSinhVien': 'LOAI_SINH_VIEN', 'tinhTrang': 'TINH_TRANG', 'dienThoaiKhac': 'DIEN_THOAI_KHAC', 'dienThoaiCaNhan': 'DIEN_THOAI_CA_NHAN', 'dienThoaiLienLac': 'DIEN_THOAI_LIEN_LAC', 'emailCaNhan': 'EMAIL_CA_NHAN', 'emailTruong': 'EMAIL_TRUONG', 'tenCha': 'TEN_CHA', 'ngheNghiepCha': 'NGHE_NGHIEP_CHA', 'ngaySinhCha': 'NGAY_SINH_CHA', 'tenMe': 'TEN_ME', 'ngheNghiepMe': 'NGHE_NGHIEP_ME', 'ngaySinhMe': 'NGAY_SINH_ME', 'loaiHinhDaoTao': 'LOAI_HINH_DAO_TAO', 'maKhoa': 'MA_KHOA', 'khoa': 'KHOA', 'maNganh': 'MA_NGANH', 'lop': 'LOP', 'sdtCha': 'SDT_CHA', 'sdtMe': 'SDT_ME', 'hoTenNguoiLienLac': 'HO_TEN_NGUOI_LIEN_LAC', 'sdtNguoiLienLac': 'SDT_NGUOI_LIEN_LAC', 'cmnd': 'CMND' };
+// Table name: DM_DON_VI_GUI_CV { id, ten, kichHoat }
+const keys = ['ID'];
+const obj2Db = { 'id': 'ID', 'ten': 'TEN', 'kichHoat': 'KICH_HOAT' };
 
 module.exports = app => {
-    app.model.fwStudents = {
+    app.model.dmDonViGuiCv = {
         create: (data, done) => {
             let statement = '', values = '', parameter = {};
             Object.keys(data).forEach(column => {
@@ -17,10 +17,10 @@ module.exports = app => {
             if (statement.length == 0) {
                 done('Data is empty!');
             } else {
-                const sql = 'INSERT INTO FW_STUDENT (' + statement.substring(2) + ') VALUES (' + values.substring(2) + ')';
+                const sql = 'INSERT INTO DM_DON_VI_GUI_CV (' + statement.substring(2) + ') VALUES (' + values.substring(2) + ')';
                 app.dbConnection.execute(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
-                        app.model.fwStudents.get({ rowId: resultSet.lastRowid }, done);
+                        app.model.dmDonViGuiCv.get({ rowId: resultSet.lastRowid }, done);
                     } else {
                         done(error ? error : 'Execute SQL command fail! Sql = ' + sql);
                     }
@@ -41,7 +41,7 @@ module.exports = app => {
             if (orderBy) Object.keys(obj2Db).sort((a, b) => b.length - a.length).forEach(key => orderBy = orderBy.replaceAll(key, obj2Db[key]));
             condition = app.dbConnection.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
-            const sql = 'SELECT ' + app.dbConnection.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT * FROM FW_STUDENT' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '') + ') WHERE ROWNUM=1';
+            const sql = 'SELECT ' + app.dbConnection.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT * FROM DM_DON_VI_GUI_CV' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '') + ') WHERE ROWNUM=1';
             app.dbConnection.execute(sql, parameter, (error, resultSet) => done(error, resultSet && resultSet.rows && resultSet.rows.length ? resultSet.rows[0] : null));
         },
 
@@ -58,7 +58,7 @@ module.exports = app => {
             if (orderBy) Object.keys(obj2Db).sort((a, b) => b.length - a.length).forEach(key => orderBy = orderBy.replaceAll(key, obj2Db[key]));
             condition = app.dbConnection.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
-            const sql = 'SELECT ' + app.dbConnection.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM FW_STUDENT' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '');
+            const sql = 'SELECT ' + app.dbConnection.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM DM_DON_VI_GUI_CV' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '');
             app.dbConnection.execute(sql, parameter, (error, resultSet) => done(error, resultSet && resultSet.rows ? resultSet.rows : []));
         },
 
@@ -76,14 +76,14 @@ module.exports = app => {
             condition = app.dbConnection.buildCondition(obj2Db, condition, ' AND ');
             let leftIndex = (pageNumber <= 1 ? 0 : pageNumber - 1) * pageSize,
                 parameter = condition.parameter ? condition.parameter : {};
-            const sql_count = 'SELECT COUNT(*) FROM FW_STUDENT' + (condition.statement ? ' WHERE ' + condition.statement : '');
+            const sql_count = 'SELECT COUNT(*) FROM DM_DON_VI_GUI_CV' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.dbConnection.execute(sql_count, parameter, (err, res) => {
                 let result = {};
                 let totalItem = res && res.rows && res.rows[0] ? res.rows[0]['COUNT(*)'] : 0;
                 result = { totalItem, pageSize, pageTotal: Math.ceil(totalItem / pageSize) };
                 result.pageNumber = Math.max(1, Math.min(pageNumber, result.pageTotal));
                 leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
-                const sql = 'SELECT ' + app.dbConnection.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT FW_STUDENT.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM FW_STUDENT' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
+                const sql = 'SELECT ' + app.dbConnection.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT DM_DON_VI_GUI_CV.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM DM_DON_VI_GUI_CV' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
                 app.dbConnection.execute(sql, parameter, (error, resultSet) => {
                     result.list = resultSet && resultSet.rows ? resultSet.rows : [];
                     done(error, result);
@@ -96,10 +96,10 @@ module.exports = app => {
             changes = app.dbConnection.buildCondition(obj2Db, changes, ', ', 'NEW_');
             if (changes.statement) {
                 const parameter = app.clone(condition.parameter ? condition.parameter : {}, changes.parameter ? changes.parameter : {});
-                const sql = 'UPDATE FW_STUDENT SET ' + changes.statement + (condition.statement ? ' WHERE ' + condition.statement : '');
+                const sql = 'UPDATE DM_DON_VI_GUI_CV SET ' + changes.statement + (condition.statement ? ' WHERE ' + condition.statement : '');
                 app.dbConnection.execute(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
-                        app.model.fwStudents.get({ rowId: resultSet.lastRowid }, done);
+                        app.model.dmDonViGuiCv.get({ rowId: resultSet.lastRowid }, done);
                     } else {
                         done(error);
                     }
@@ -116,7 +116,7 @@ module.exports = app => {
             }
             condition = app.dbConnection.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
-            const sql = 'DELETE FROM FW_STUDENT' + (condition.statement ? ' WHERE ' + condition.statement : '');
+            const sql = 'DELETE FROM DM_DON_VI_GUI_CV' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.dbConnection.execute(sql, parameter, error => done(error));
         },
 
@@ -127,13 +127,8 @@ module.exports = app => {
             }
             condition = app.dbConnection.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
-            const sql = 'SELECT COUNT(*) FROM FW_STUDENT' + (condition.statement ? ' WHERE ' + condition.statement : '');
+            const sql = 'SELECT COUNT(*) FROM DM_DON_VI_GUI_CV' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.dbConnection.execute(sql, parameter, (error, result) => done(error, result));
-        },
-
-        searchPage: (pagenumber, pagesize, listfaculty, listfromcity, listethnic, listnationality, listreligion, listloaihinhdaotao, listloaisinhvien, listtinhtrangsinhvien, gender, searchterm, done) => {
-            app.dbConnection.execute('BEGIN :ret:=fw_student_search_page(:pagenumber, :pagesize, :listfaculty, :listfromcity, :listethnic, :listnationality, :listreligion, :listloaihinhdaotao, :listloaisinhvien, :listtinhtrangsinhvien, :gender, :searchterm, :totalitem, :pagetotal); END;',
-                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, pagenumber: { val: pagenumber, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, pagesize: { val: pagesize, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, listfaculty, listfromcity, listethnic, listnationality, listreligion, listloaihinhdaotao, listloaisinhvien, listtinhtrangsinhvien, gender, searchterm, totalitem: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pagetotal: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
         },
     };
 };
