@@ -62,8 +62,8 @@ app.readyHooks.add('Run tool.qtHoTroHocPhi.js', {
                     let ho = (worksheet.getCell('C' + index).value || '').toString().trim();
                     let ten = (worksheet.getCell('D' + index).value || '').toString().trim();
                     let donvi = (worksheet.getCell('E' + index).value || '').toString().trim();
-                    let noidung = (worksheet.getCell('G' + index).value || '').toString().trim();
-                    let coso = (worksheet.getCell('I' + index).value || '').toString().trim();
+                    let noidung = (worksheet.getCell('H' + index).value || '').toString().trim();
+                    let coso = (worksheet.getCell('J' + index).value || '').toString().trim();
 
                     if (coso.includes('ĐHQG-HCM')) {
                         if (coso.includes('KHXH&NV')) coso = '01';
@@ -80,18 +80,18 @@ app.readyHooks.add('Run tool.qtHoTroHocPhi.js', {
                     if (coso.includes('BC&TT')) coso = '11';
                     if (coso.includes('Kinh tế')) coso = '12';
 
-                    let hocky = (worksheet.getCell('K' + index).value || '').toString().trim();
-                    let sotien = (worksheet.getCell('L' + index).value || '').toString().trim();
-                    let hoso = (worksheet.getCell('M' + index).value || '').toString().trim();
-                    let ghiChu = (worksheet.getCell('N' + index).value || '').toString().trim();
-                    let batDau = worksheet.getCell('O' + index).value, batDauType = '';
+                    let hocky = (worksheet.getCell('L' + index).value || '').toString().trim();
+                    let sotien = (worksheet.getCell('M' + index).value || '').toString().trim();
+                    let hoso = (worksheet.getCell('N' + index).value || '').toString().trim();
+                    let ghiChu = (worksheet.getCell('O' + index).value || '').toString().trim();
+                    let batDau = worksheet.getCell('P' + index).value, batDauType = '';
                     if (batDau != null) {
                         batDau = batDau.toString().trim();
                         let fm = getForm(batDau);
                         batDau = fm[0], batDauType = fm[1];
                         batDau = new Date(batDau).getTime();
                     }
-                    let ketthuc = worksheet.getCell('Q' + index).value, ketThucType = '';
+                    let ketthuc = worksheet.getCell('R' + index).value, ketThucType = '';
                     if (ketthuc != null) {
                         ketthuc = ketthuc.toString().trim();
                         let fm = getForm(ketthuc);
