@@ -39,11 +39,11 @@ const run = () => {
                 let ghiChuLoaiBangCap = worksheet.getCell('J' + index).value;
                 if (ghiChuHinhThuc) ghiChuHinhThuc = ghiChuHinhThuc.toString();
                 if (ghiChuLoaiBangCap) ghiChuLoaiBangCap = ghiChuLoaiBangCap.toString();
-                let ans_lbc = '10';
-                let ans_ht = '14';
-                let ans_lbc_ghichu = '';
-                let ans_ht_ghichu = '';
-                let ans_td = '';
+                let ansLbc = '10';
+                let ansHt = '14';
+                let ansLbcGhiChu = '';
+                let ansHtGhiChu = '';
+                let ansTd = '';
                 let print = false;
                 if (loaiBangCap) {
                     loaiBangCap = loaiBangCap.toString();
@@ -51,53 +51,53 @@ const run = () => {
                     if (loaiBangCap == 'chứng nhận' || loaiBangCap == 'chứng chỉ') {
                         left = Math.min(left, index);
                         right = Math.max(right, index);
-                        ans_lbc = '9';
+                        ansLbc = '9';
                         print = true;
                     }
                 }
-                // if (ans_lbc == '-1') {
+                // if (ansLbc == '-1') {
                 //     if (hinhThuc) {
                 //         hinhThuc = hinhThuc.toString();
                 //         hinhThuc = hinhThuc.toLowerCase();
                 //         if (hinhThuc == 'bồi dưỡng') {
-                //             ans_ht = '05';
-                //             ans_lbc = '05';
+                //             ansHt = '05';
+                //             ansLbc = '05';
                 //         }
                 //         if (hinhThuc == 'chính quy') {
-                //             ans_lbc = '05';
-                //             ans_ht = '01';
+                //             ansLbc = '05';
+                //             ansHt = '01';
                 //         }
                 //         if (hinhThuc == 'vừa học vừa làm' || hinhThuc == 'bán thời gian') {
-                //             ans_lbc = '05';
-                //             ans_ht = '02';
+                //             ansLbc = '05';
+                //             ansHt = '02';
                 //         }
                 //     }
-                //     if (ans_lbc == '-1') ans_lbc = '05';
+                //     if (ansLbc == '-1') ansLbc = '05';
                 // }
                 if (hinhThuc) {
                     hinhThuc = hinhThuc.toString();
                     hinhThuc = hinhThuc.toLowerCase();
-                    if (hinhThuc == 'chính quy') ans_ht = '1';
-                    if (hinhThuc == 'vừa học vừa làm' || hinhThuc == 'bán thời gian') ans_ht = '13';
-                    if (hinhThuc == 'tập trung') ans_ht = '8';
-                    if (hinhThuc == 'ngắn hạn') ans_ht = '7';
-                    if (hinhThuc == 'trực tuyến') ans_ht = '6';
-                    if (hinhThuc == 'văn bằng 2') ans_ht = '5';
-                    if (hinhThuc == 'tại chức') ans_ht = '4';
-                    if (hinhThuc == 'chuyên tu') ans_ht = '3';
-                    if (hinhThuc == 'bồi dưỡng') ans_ht = '2';
+                    if (hinhThuc == 'chính quy') ansHt = '1';
+                    if (hinhThuc == 'vừa học vừa làm' || hinhThuc == 'bán thời gian') ansHt = '13';
+                    if (hinhThuc == 'tập trung') ansHt = '8';
+                    if (hinhThuc == 'ngắn hạn') ansHt = '7';
+                    if (hinhThuc == 'trực tuyến') ansHt = '6';
+                    if (hinhThuc == 'văn bằng 2') ansHt = '5';
+                    if (hinhThuc == 'tại chức') ansHt = '4';
+                    if (hinhThuc == 'chuyên tu') ansHt = '3';
+                    if (hinhThuc == 'bồi dưỡng') ansHt = '2';
 
                 }
-                if (ans_lbc == '10') {
-                    if (ghiChuLoaiBangCap) ans_lbc_ghichu = ghiChuLoaiBangCap;
-                    else ans_lbc_ghichu = loaiBangCap ? loaiBangCap : '';
-                } else ans_lbc_ghichu = ghiChuLoaiBangCap ? ghiChuLoaiBangCap : '';
+                if (ansLbc == '10') {
+                    if (ghiChuLoaiBangCap) ansLbcGhiChu = ghiChuLoaiBangCap;
+                    else ansLbcGhiChu = loaiBangCap ? loaiBangCap : '';
+                } else ansLbcGhiChu = ghiChuLoaiBangCap ? ghiChuLoaiBangCap : '';
 
-                if (ans_ht == '14') {
-                    if (ghiChuHinhThuc) ans_ht_ghichu = ghiChuHinhThuc;
-                    else ans_ht_ghichu = hinhThuc ? hinhThuc : '';
-                } else ans_ht_ghichu = ghiChuHinhThuc ? ghiChuHinhThuc : '';
-                if (print) console.log(ans_ht + ',' + ans_lbc + ',' + ans_td + ',' + ans_ht_ghichu + ',' + ans_lbc_ghichu);
+                if (ansHt == '14') {
+                    if (ghiChuHinhThuc) ansHtGhiChu = ghiChuHinhThuc;
+                    else ansHtGhiChu = hinhThuc ? hinhThuc : '';
+                } else ansHtGhiChu = ghiChuHinhThuc ? ghiChuHinhThuc : '';
+                if (print) console.log(ansHt + ',' + ansLbc + ',' + ansTd + ',' + ansHtGhiChu + ',' + ansLbcGhiChu);
                 // 01	Chính quy
                 // 02	Vừa học vừa làm
                 // 03	Từ xa

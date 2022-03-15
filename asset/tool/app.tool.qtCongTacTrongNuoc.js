@@ -19,7 +19,7 @@ require('../../config/database')(app, package.db);
 
 // Init =======================================================================
 app.loadModules(false);
-const list_viet_tat =  [
+const listVietTat =  [
     'công tác',
     'hội thảo',
     'khóa học ngắn hạn',
@@ -57,7 +57,7 @@ const list_viet_tat =  [
     'học lớp trung cấp lý luận chính trị',
     'kỳ họp'
   ];
-const convert_vt = [
+const convertVt = [
     '01',
     '02',
     '27',
@@ -95,10 +95,6 @@ const convert_vt = [
     '25',
     '26'
 ]
-function max(a, b) {
-    if (a > b) return a;
-    return b;
-}
 function lcs(a, b) {
     var m = a.length, n = b.length,
         C = [], i, j;
@@ -106,11 +102,11 @@ function lcs(a, b) {
     for (j = 0; j < n; j++) C[0].push(0);
     for (i = 0; i < m; i++)
         for (j = 0; j < n; j++)
-            C[i+1][j+1] = a[i] === b[j] ? C[i][j]+1 : max(C[i+1][j], C[i][j+1]);
+            C[i+1][j+1] = a[i] === b[j] ? C[i][j]+1 : Math.max(C[i+1][j], C[i][j+1]);
     return C[m][n];
 }
 
-function best_choice(s, t) {
+function bestChoice(s, t) {
     var n = s.length, m = t.length, cost = -1;
     if (m < n) {
         cost = lcs(s, t);
@@ -118,26 +114,14 @@ function best_choice(s, t) {
     else {
         var i, j;
         for (i = 0; i < m - n + 1; i++) {
-            let sub_t = t.substring(i, i + n);
-            cost = max(cost, lcs(s, sub_t));
+            let subT = t.substring(i, i + n);
+            cost = Math.max(cost, lcs(s, subT));
         }
     }
     return cost;
 }
 
-function format_d(date) {
-    if (!date) return date;
-    if (date) date = date.toString();
-    let list = date.split('/');
-    if (list.length != 3) return date;
-    let dd = list[0], mm = list[1], yyyy = list[2];
-    if (dd.length < 2) dd = '0' + dd;
-    if (mm.length < 2) mm = '0' + mm;
-    if (yyyy.length == 2) yyyy = '20' + yyyy;
-    return mm + '/' + dd + '/' + yyyy;
-}
-
-const list_tinh =  [
+const listTinh =  [
     { ma: '01', ten: 'Thành phố Hà Nội', kichHoat: 1 },
     { ma: '02', ten: 'Tỉnh Hà Giang', kichHoat: 1 },
     { ma: '04', ten: 'Tỉnh Cao Bằng', kichHoat: 1 },
@@ -203,30 +187,30 @@ const list_tinh =  [
     { ma: '96', ten: 'Tỉnh Cà Mau', kichHoat: 1 }
   ]
 
-function convert_tinh(name) {
+function convertTinh(name) {
     if (name.includes('hcm')) return 49;
-    let id = -1, best_cost = -1;
-    for (let i = 0; i < list_tinh.length; i++) {
-        let cost = best_choice(name, list_tinh[i].ten.toLowerCase());
-        if (cost > best_cost) {
-            best_cost = cost;
+    let id = -1, bestCost = -1;
+    for (let i = 0; i < listTinh.length; i++) {
+        let cost = bestChoice(name, listTinh[i].ten.toLowerCase());
+        if (cost > bestCost) {
+            bestCost = cost;
             id = i;
         }
     }
     return id;
 }
 
-function convert_list_tinh(list_name) {
-    if (list_name == null) return '';
-    let list = list_name.split(',')
+function convertListTinh(listName) {
+    if (listName == null) return '';
+    let list = listName.split(',')
     let ans = '';
     for (let i = 0; i < list.length; i++) {
         let name = list[i];
         name = name.toLowerCase().trim();
-        let cv = convert_tinh(name);
+        let cv = convertTinh(name);
         if (cv != -1) {
             if (ans) ans += ',';
-            ans += list_tinh[cv].ma;
+            ans += listTinh[cv].ma;
         }
     }
     return ans;
@@ -240,15 +224,15 @@ const run = () => {
                 if (number == null) {
                     process.exit(1);
                 }
-                let ngay_qd = worksheet.getCell('B' + index).value;
-                if (ngay_qd != null) {
-                    ngay_qd = ngay_qd.toString().trim();
-                    ngay_qd = new Date(ngay_qd).getTime();
+                let ngayQd = worksheet.getCell('B' + index).value;
+                if (ngayQd != null) {
+                    ngayQd = ngayQd.toString().trim();
+                    ngayQd = new Date(ngayQd).getTime();
                 }
 
-                let so_cv = worksheet.getCell('C' + index).value;
-                if (so_cv != null) {
-                    so_cv = so_cv.toString().trim();
+                let soCv = worksheet.getCell('C' + index).value;
+                if (soCv != null) {
+                    soCv = soCv.toString().trim();
                 }
                 let ho = worksheet.getCell('E' + index).value;
                 if (ho != null) {
@@ -269,14 +253,14 @@ const run = () => {
                 if (noiden != null) {
                     noiden = noiden.toString().trim();
                 }
-                noiden = convert_list_tinh(noiden);
+                noiden = convertListTinh(noiden);
                 let viettat = worksheet.getCell('J' + index).value;
                 let convert = '99';
                 if (viettat != null) {
                     viettat = viettat.toString().trim().toLowerCase();
-                    for (let i = 0; i < list_viet_tat.length; i++) {
-                        if (list_viet_tat[i] == viettat) {
-                            convert = convert_vt[i];
+                    for (let i = 0; i < listVietTat.length; i++) {
+                        if (listVietTat[i] == viettat) {
+                            convert = convertVt[i];
                             break;
                         }
                     }
@@ -327,18 +311,18 @@ const run = () => {
                             if (hoten == 'SƠN THANH TÙNG' && donvi.toLowerCase().includes('đô thị học')) shcc = '401.001';
                             if (shcc == '-1') ok = 0;
                         }
-                        if (isNaN(ngay_qd) || isNaN(batdau) || isNaN(ketthuc)) ok = 0;
+                        if (isNaN(ngayQd) || isNaN(batdau) || isNaN(ketthuc)) ok = 0;
                         if (ok) {
                             let sql = 'insert into QT_CONG_TAC_TRONG_NUOC columns(NGAY_QUYET_DINH, SO_CV, SHCC, NOI_DEN, VIET_TAT, LY_DO, BAT_DAU, BAT_DAU_TYPE, KET_THUC, KET_THUC_TYPE, KINH_PHI, GHI_CHU) values(';
-                            if (ngay_qd != null) {
-                                sql += '\'' + ngay_qd + '\'';
+                            if (ngayQd != null) {
+                                sql += '\'' + ngayQd + '\'';
                                 sql += ',';
                             } else {
                                 sql += '\'' + '\'';
                                 sql += ',';
                             }
-                            if (so_cv != null) {
-                                sql += '\'' + so_cv + '\'';
+                            if (soCv != null) {
+                                sql += '\'' + soCv + '\'';
                                 sql += ',';
                             } else {
                                 sql += '\'' + '\'';
@@ -413,8 +397,8 @@ const run = () => {
                     }
                     solve(index + 1);
                 });
-                //console.log("ngay_qd = ", ngay_qd);
-                // if (isNaN(ngay_qd)) {
+                //console.log("ngayQd = ", ngayQd);
+                // if (isNaN(ngayQd)) {
                 //     console.log("index = ", index, worksheet.getCell('B' + index).value);
                 // }
             }

@@ -53,24 +53,24 @@ const run = () => {
             let idKeys = listCols.indexOf(keys); ///base 0th
             solve = (row = 2) => {
                 let cell = app.excel.numberToExcelColumn(idKeys + 1) + row;
-                let data_key = worksheet.getCell(cell).value;
-                if (data_key == null) process.exit(1);
-                else data_key = data_key.toString();
-                // console.log("Row = ", row, "Cell = ", cell, "Key = ", data_key);
-                app.model.canBo.get({shcc: data_key}, (error, data) => {
+                let dataKey = worksheet.getCell(cell).value;
+                if (dataKey == null) process.exit(1);
+                else dataKey = dataKey.toString();
+                // console.log("Row = ", row, "Cell = ", cell, "Key = ", dataKey);
+                app.model.canBo.get({shcc: dataKey}, (error, data) => {
                     if (data != null) { ///update data canbo from dev to prod, make sure that data canbo from dev is newest version
-                        // console.log("keys", "=", data_key);
+                        // console.log("keys", "=", dataKey);
                         sql = 'UPDATE TCHC_CAN_BO SET ';
                         params = '';
-                        for (let col = 0; col < numCols; col++) {
+                        for (let col = 0; col < nu_Cols; col++) {
                             let nameCol = listCols[col];
-                            let nameCol_model = getKeyByValue(obj2Db, nameCol);
-                            let data_col = worksheet.getCell(app.excel.numberToExcelColumn(col + 1) + row).value;
-                            if (true || (data_col != null)) {
-                                if (data_col != null) data_col = data_col.toString();
-                                else data_col = '';
+                            let nameColModel = getKeyByValue(obj2Db, nameCol);
+                            let dataCol = worksheet.getCell(app.excel.numberToExcelColumn(col + 1) + row).value;
+                            if (true || (dataCol != null)) {
+                                if (dataCol != null) dataCol = dataCol.toString();
+                                else dataCol = '';
                                 params += nameCol + '=';
-                                params += "'" + data_col + "'";
+                                params += "'" + dataCol + "'";
                                 params += ',';
                             }
                         }
@@ -78,12 +78,12 @@ const run = () => {
                             params = params.slice(0, -1);
                             sql += params;
                             sql += ' ';
-                            sql += 'WHERE SHCC = ' + "'" + data_key + "'" + ';';
+                            sql += 'WHERE SHCC = ' + "'" + dataKey + "'" + ';';
                             console.log(sql);
                         }
                     }
                     else { ///insert new canbo
-                        // console.log("keys", "=", data_key);
+                        // console.log("keys", "=", dataKey);
                         sql = 'INSERT INTO TCHC_CAN_BO (';
                         for (let col = 0; col < numCols; col++) {
                             sql += listCols[col];
