@@ -1,5 +1,5 @@
 module.exports = (app) => {
-    // const fse = require('fs-extra');
+    const fse = require('fs-extra');
     app.adminRole = {};
     app.clone = function () {
         const length = arguments.length;
@@ -19,12 +19,12 @@ module.exports = (app) => {
         return result;
     };
 
-    // app.fs.renameSync = (oldPath, newPath) => {
-    //     fse.copySync(oldPath, newPath);
-    //     fse.removeSync(oldPath);
-    // };
+    app.fs.renameSync = (oldPath, newPath) => {
+        fse.copySync(oldPath, newPath);
+        fse.removeSync(oldPath);
+    };
 
-    app.fs.renameSync = (oldPath, newPath) => app.fs.copyFileSync(oldPath, newPath) && app.fs.unlinkSync(oldPath);
+    // app.fs.renameSync = (oldPath, newPath) => app.fs.copyFileSync(oldPath, newPath) && app.fs.unlinkSync(oldPath);
 
     // Template html file ---------------------------------------------------------------------------------------------------------------------------
     app.templates = {};
@@ -90,6 +90,10 @@ module.exports = (app) => {
         },
         library: {
             index: 8000, title: 'Thư viện', link: '/user/library', icon: 'fa-th-large',
+            subMenusRender: false
+        },
+        students: {
+            index: 6100, title: 'Sinh viên', link: '/user/students', icon: 'fa-users',
             subMenusRender: false
         },
         category: {

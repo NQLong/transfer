@@ -13,6 +13,13 @@ module.exports = app => {
     app.get('/user/tccb/qua-trinh/chuc-vu/:stt', app.permission.check('qtChucVu:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/chuc-vu', app.permission.check('qtChucVu:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/chuc-vu/group/:shcc', app.permission.check('qtChucVu:read'), app.templates.admin);
+
+    // app.permissionHooks.add(
+    //     'staff', 'quanLyDonVi', (user, staff) => {
+    //         let chucVus = staff.chucVus;
+    //         chucVus.length && chucVus.some(chucVu => chucVu)
+    //     }
+    // );
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
 
     app.get('/api/tccb/qua-trinh/chuc-vu/page/:pageNumber/:pageSize', app.permission.check('qtChucVu:read'), (req, res) => {

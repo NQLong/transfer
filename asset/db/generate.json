@@ -5800,6 +5800,9 @@
         "active": true,
         "moduleName": "fwStudents",
         "modelName": "fwStudents",
+        "methods": {
+            "FW_STUDENT_SEARCH_PAGE": "searchPage"
+        },
         "columns": {
             "MSSV": {
                 "value": "mssv",
@@ -6038,6 +6041,34 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": 10
+            },
+            "SDT_CHA": {
+                "value": "sdtCha",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "10,0"
+            },
+            "SDT_ME": {
+                "value": "sdtMe",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "10,0"
+            },
+            "HO_TEN_NGUOI_LIEN_LAC": {
+                "value": "hoTenNguoiLienLac",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 100
+            },
+            "SDT_NGUOI_LIEN_LAC": {
+                "value": "sdtNguoiLienLac",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "10,0"
             }
         },
         "primaryKeys": [
