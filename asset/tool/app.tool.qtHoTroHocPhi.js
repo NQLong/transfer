@@ -20,49 +20,7 @@ require('../../config/database')(app, package);
 
 // Init =======================================================================
 app.loadModules(false);
-function max(a, b) {
-    if (a > b) return a;
-    return b;
-}
-function lcs(a, b) {
-    var m = a.length, n = b.length,
-        C = [], i, j;
-    for (i = 0; i <= m; i++) C.push([0]);
-    for (j = 0; j < n; j++) C[0].push(0);
-    for (i = 0; i < m; i++)
-        for (j = 0; j < n; j++)
-            C[i+1][j+1] = a[i] === b[j] ? C[i][j]+1 : max(C[i+1][j], C[i][j+1]);
-    return C[m][n];
-}
-
-function best_choice(s, t) {
-    var n = s.length, m = t.length, cost = -1;
-    if (m < n) {
-        cost = lcs(s, t);
-    }
-    else {
-        var i, j;
-        for (i = 0; i < m - n + 1; i++) {
-            let sub_t = t.substring(i, i + n);
-            cost = max(cost, lcs(s, sub_t));
-        }
-    }
-    return cost;
-}
-
-function format_d(date) {
-    if (!date) return date;
-    if (date) date = date.toString();
-    let list = date.split('/');
-    if (list.length != 3) return date;
-    let dd = list[0], mm = list[1], yyyy = list[2];
-    if (dd.length < 2) dd = '0' + dd;
-    if (mm.length < 2) mm = '0' + mm;
-    if (yyyy.length == 2) yyyy = '20' + yyyy;
-    return mm + '/' + dd + '/' + yyyy;
-}
-
-function get_form(date) {
+function getForm(date) {
     if (!date) return [null, null];
     let list = date.split('/');
     let size = list.length;
@@ -94,10 +52,10 @@ const run = () => {
                 if (number == null) {
                     process.exit(1);
                 }
-                let ngay_qd = worksheet.getCell('B' + index).value;
-                if (ngay_qd != null) {
-                    ngay_qd = ngay_qd.toString().trim();
-                    ngay_qd = new Date(ngay_qd).getTime();
+                let ngayQd = worksheet.getCell('B' + index).value;
+                if (ngayQd != null) {
+                    ngayQd = ngayQd.toString().trim();
+                    ngayQd = new Date(ngayQd).getTime();
                 }
                 
                 let ho = worksheet.getCell('C' + index).value;
@@ -156,18 +114,18 @@ const run = () => {
                 if (ghiChu != null) {
                     ghiChu = ghiChu.toString().trim();
                 }
-                let batdau = worksheet.getCell('O' + index).value, batdau_type = '';
-                if (batdau != null) {
-                    batdau = batdau.toString().trim();
-                    let fm = get_form(batdau);
-                    batdau = fm[0], batdau_type = fm[1];
-                    batdau = new Date(batdau).getTime();
+                let batDau = worksheet.getCell('O' + index).value, batDauType = '';
+                if (batDau != null) {
+                    batDau = batDau.toString().trim();
+                    let fm = getForm(batDau);
+                    batDau = fm[0], batDauType = fm[1];
+                    batDau = new Date(batDau).getTime();
                 }
-                let ketthuc = worksheet.getCell('Q' + index).value, ketthuc_type = '';
+                let ketthuc = worksheet.getCell('Q' + index).value, ketThucType = '';
                 if (ketthuc != null) {
                     ketthuc = ketthuc.toString().trim();
-                    let fm = get_form(ketthuc);
-                    ketthuc = fm[0], ketthuc_type = fm[1];
+                    let fm = getForm(ketthuc);
+                    ketthuc = fm[0], ketThucType = fm[1];
                     ketthuc = new Date(ketthuc).getTime();
                 }
                 app.model.canBo.getAll({ho: ho, ten: ten}, (error, items) => {
@@ -188,14 +146,14 @@ const run = () => {
                         }
                         if (ok) {
                             let sql = 'INSERT INTO QT_HO_TRO_HOC_PHI (NGAY_LAM_DON, SHCC, NOI_DUNG, CO_SO_DAO_TAO, BAT_DAU, BAT_DAU_TYPE, KET_THUC, KET_THUC_TYPE, HOC_KY_HO_TRO, SO_TIEN, HO_SO, GHI_CHU) VALUES(';
-                            sql += convert(ngay_qd);
+                            sql += convert(ngayQd);
                             sql += convert(shcc);
                             sql += convert(noidung);
                             sql += convert(coso);
-                            sql += convert(batdau);
-                            sql += convert(batdau_type);
+                            sql += convert(batDau);
+                            sql += convert(batDauType);
                             sql += convert(ketthuc);
-                            sql += convert(ketthuc_type);
+                            sql += convert(ketThucType);
                             sql += convert(hocky);
                             sql += convert(sotien);
                             sql += convert(hoso);
@@ -205,8 +163,8 @@ const run = () => {
                     }
                     solve(index + 1);
                 });
-                //console.log("ngay_qd = ", ngay_qd);
-                // if (isNaN(ngay_qd)) {
+                //console.log("ngayQd = ", ngayQd);
+                // if (isNaN(ngayQd)) {
                 //     console.log("index = ", index, worksheet.getCell('B' + index).value);
                 // }
             }
