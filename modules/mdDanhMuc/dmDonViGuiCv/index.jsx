@@ -10,10 +10,6 @@ export default {
     },
     routes: [
         {
-            path: '/user/danh-muc/don-vi-gui-cong-van/upload',
-            component: Loadable({ loading: Loading, loader: () => import('./adminUploadPage') })
-        },
-        {
             path: '/user/danh-muc/don-vi-gui-cong-van',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
