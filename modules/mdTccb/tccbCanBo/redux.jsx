@@ -164,7 +164,7 @@ export function deleteStaff(shcc, done) {
     };
 }
 
-//item = {ho, ten, ngaySinh, donVi: string}
+//item = {ho, ten, ngaySinh, maDonVi: string}
 export function getShccCanBo(item, done) {
     return () => {
         const url = '/api/staff/calc-shcc';

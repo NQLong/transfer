@@ -5,7 +5,7 @@ import { AdminModal, AdminPage, FormDatePicker, FormRichTextBox, FormSelect, For
 import Pagination from 'view/component/Pagination';
 import Dropdown from 'view/component/Dropdown';
 import { DateInput } from 'view/component/Input';
-import { SelectAdapter_FwCanBo, getShccCanBo } from '../tccbCanBo/redux';
+import { SelectAdapter_FwCanBo } from '../tccbCanBo/redux';
 import {
     getQtCongTacTrongNuocPage, deleteQtCongTacTrongNuoc, createQtCongTacTrongNuoc,
     updateQtCongTacTrongNuoc, getQtCongTacTrongNuocGroupPage
@@ -187,14 +187,6 @@ class QtCongTacTrongNuoc extends AdminPage {
 
     componentDidMount() {
         T.ready('/user/tccb', () => {
-            this.props.getShccCanBo({
-                ho: 'Ngô thị phương',
-                ten: 'Lan',
-                ngaySinh: null,
-                donVi: 'Ban giám hiệu'
-            }, data => {
-                console.log("data = ", data);
-            });
             T.clearSearchBox();
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
@@ -447,6 +439,6 @@ class QtCongTacTrongNuoc extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtCongTacTrongNuoc: state.tccb.qtCongTacTrongNuoc });
 const mapActionsToProps = {
     getQtCongTacTrongNuocPage, deleteQtCongTacTrongNuoc, createQtCongTacTrongNuoc,
-    updateQtCongTacTrongNuoc, getQtCongTacTrongNuocGroupPage, getShccCanBo
+    updateQtCongTacTrongNuoc, getQtCongTacTrongNuocGroupPage
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtCongTacTrongNuoc);
