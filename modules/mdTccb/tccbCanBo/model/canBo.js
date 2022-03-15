@@ -29,16 +29,14 @@ module.exports = app => {
     // app.model.canBo.foo = () => { };
     app.model.canBo.getShccCanBo = (data, done) => {
         const deltaTime = 86400 * 1000; ///1 day
-        let ho = data.ho, ten = data.ten, ngaySinh = data.ngaySinh, donVi = data.donVi;
+        let { ho, ten, ngaySinh, donVi } = data;
         if (ho) {
             ho = ho.toString().trim();
-            ho = ho.toUpperCase();
         }
         if (ten) {
             ten = ten.toString().trim();
-            ten = ten.toUpperCase();
         }
-        if (ngaySinh) {
+        if (ngaySinh) {//mm/dd/yyyy
             ngaySinh = ngaySinh.toString().trim();
             ngaySinh = new Date(ngaySinh).getTime();
             if (isNaN(ngaySinh)) {
@@ -51,7 +49,14 @@ module.exports = app => {
             donVi = donVi.toString().trim();
             donVi = donVi.toLowerCase();
         }
-        app.model.canBo.getAll({ho: ho, ten: ten}, (error, items) => {
+        let conditionn = {
+            statement: 'lower(ho) like lower(:ho) and lower(ten) like lower(:ten)',
+            parameter: {
+                ho: `%${ho}%`,
+                ten: `%${ten}%`,
+            }
+        }
+        app.model.canBo.getAll(conditionn, (error, items) => {
             if (error || items.length == 0) {
                 done('Họ và tên cán bộ không tồn tại !', null);
             } else {
