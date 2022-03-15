@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, FormTextBox, FormSelect, FormImageBox, FormDatePicker } from 'view/component/AdminPage';
-import { getSinhVienEditUser, updateStudentUser } from './redux';
+import { getStudentAdmin, updateStudentAdmin } from './redux';
 import { SelectAdapter_DmQuocGia } from 'modules/mdDanhMuc/dmQuocGia/redux';
 import { SelectAdapter_DmDanTocV2 } from 'modules/mdDanhMuc/dmDanToc/redux';
 import { ComponentDiaDiem } from 'modules/mdDanhMuc/dmDiaDiem/componentDiaDiem';
@@ -11,24 +11,31 @@ import { SelectAdapter_DmGioiTinhV2 } from 'modules/mdDanhMuc/dmGioiTinh/redux';
 import { SelectAdapter_DmLoaiSinhVienV2 } from 'modules/mdDanhMuc/dmLoaiSinhVien/redux';
 import { SelectAdapter_DmTinhTrangSinhVienV2 } from 'modules/mdDanhMuc/dmTinhTrangSinhVien/redux';
 import { SelectAdapter_DmLoaiHinhDaoTaoV2 } from 'modules/mdDanhMuc/dmLoaiHinhDaoTao/redux';
-import { updateSystemState } from 'modules/_default/_init/reduxSystem';
 import T from 'view/js/common';
+import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
 
 class SinhVienPage extends AdminPage {
-    state = { item: null, lastModified: null, image: '' }
+    state = { data: {}, lastModified: null, image: '', mssv: '' }
 
     componentDidMount() {
-        T.ready('/user', () => {
-            this.props.getSinhVienEditUser(data => {
-                if (data.error) {
-                    T.notify('Lấy thông tin sinh viên bị lỗi!', 'danger');
-                } else {
-                    this.setState({ item: data.item });
-                    this.setVal(data.item);
-                }
+        T.ready('/user/students', () => {
+            let route = T.routeMatcher('/user/students/item/:mssv'),
+                mssv = route.parse(window.location.pathname).mssv;
+            this.setState({ isNew: mssv === 'new' }, () => {
+                this.setState({ mssv });
+                !this.state.isNew && this.props.getStudentAdmin(mssv, data => {
+                    if (!data) {
+                        T.notify('Lấy thông tin sinh viên bị lỗi!', 'danger');
+                    } else {
+                        this.setState({ data });
+                        this.setVal(data);
+                    }
+                });
             });
+
         });
     }
+
 
     setVal = (data = {}) => {
         this.mssv.value(data.mssv ? data.mssv : '');
@@ -137,9 +144,8 @@ class SinhVienPage extends AdminPage {
     };
 
     imageChanged = (data) => {
-        if (data && data.image) {
-            const user = Object.assign({}, this.props.system.user, { image: data.image });
-            this.props.updateSystemState({ user });
+        if (data.error) {
+            T.notify(data.error, 'danger');
         }
     };
 
@@ -153,20 +159,22 @@ class SinhVienPage extends AdminPage {
 
     save = () => {
         const studentData = this.getAndValidate();
-
         if (studentData) {
-            this.props.updateStudentUser(studentData, () => this.setState({ lastModified: new Date().getTime() }));
+            this.state.isNew ? this.props.createStudentAdmin(studentData) : this.props.updateStudentAdmin(this.state.mssv, studentData);
         }
     };
 
     render() {
         let item = this.props.system && this.props.system.user ? this.props.system.user.student : null;
+        let permission = this.getUserPermission('student', ['read', 'write', 'delete']),
+            readOnly = !permission.write;
         return this.renderPage({
             icon: 'fa fa-user-circle-o',
             title: 'Lý lịch cá nhân sinh viên',
             subTitle: <i style={{ color: 'blue' }}>{item ? item.ho + ' ' + item.ten : ''}</i>,
             breadcrumb: [
-                <Link key={0} to='/user/'>Trang cá nhân</Link>,
+                <Link key={0} to='/user/students'>Sinh viên</Link>,
+                <Link key={1} to='/user/students/lists'>Danh sách</Link>,
                 'Lý lịch cá nhân sinh viên'
             ],
             content: <>
@@ -185,17 +193,17 @@ class SinhVienPage extends AdminPage {
                             />
                             <div className="form-group col-md-9">
                                 <div className="row">
-                                    <FormTextBox ref={e => this.mssv = e} label='Mã số sinh viên' className='form-group col-md-4' readOnly />
-                                    <FormTextBox ref={e => this.ho = e} label='Họ và tên lót' className='form-group col-md-4' readOnly />
-                                    <FormTextBox ref={e => this.ten = e} label='Tên' className='form-group col-md-4' readOnly />
-                                    <FormSelect ref={e => this.gioiTinh = e} label='Giới tính' className='form-group col-md-4' readOnly data={SelectAdapter_DmGioiTinhV2} />
-                                    <FormTextBox ref={e => this.khoa = e} label='Khoa' className='form-group col-md-4' readOnly />
-                                    <FormTextBox ref={e => this.maKhoa = e} label='Mã khoa' className='form-group col-md-4' readOnly />
-                                    <FormTextBox ref={e => this.maNganh = e} label='Mã ngành' className='form-group col-md-4' readOnly />
-                                    <FormTextBox ref={e => this.lop = e} label='Lớp' className='form-group col-md-4' readOnly />
-                                    <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Loại hình đào tạo' className='form-group col-md-4' readOnly data={SelectAdapter_DmLoaiHinhDaoTaoV2} />
-                                    <FormSelect ref={e => this.loaiSinhVien = e} label='Loại sinh viên' className='form-group col-md-4' readOnly data={SelectAdapter_DmLoaiSinhVienV2} />
-                                    <FormSelect ref={e => this.tinhTrang = e} label='Tình trạng' className='form-group col-md-4' readOnly data={SelectAdapter_DmTinhTrangSinhVienV2} />
+                                    <FormTextBox ref={e => this.mssv = e} label='Mã số sinh viên' className='form-group col-md-4' readOnly={readOnly} />
+                                    <FormTextBox ref={e => this.ho = e} label='Họ và tên lót' className='form-group col-md-4' readOnly={readOnly} />
+                                    <FormTextBox ref={e => this.ten = e} label='Tên' className='form-group col-md-4' readOnly={readOnly} />
+                                    <FormSelect ref={e => this.gioiTinh = e} label='Giới tính' className='form-group col-md-4' readOnly={readOnly} data={SelectAdapter_DmGioiTinhV2} />
+                                    <FormSelect ref={e => this.khoa = e} label='Khoa' className='form-group col-md-4' readOnly={readOnly} data={SelectAdapter_DmDonViFaculty_V2} />
+                                    <FormTextBox ref={e => this.maKhoa = e} label='Mã khoa' className='form-group col-md-4' readOnly={readOnly} />
+                                    <FormTextBox ref={e => this.maNganh = e} label='Mã ngành' className='form-group col-md-4' readOnly={readOnly} />
+                                    <FormTextBox ref={e => this.lop = e} label='Lớp' className='form-group col-md-4' readOnly={readOnly} />
+                                    <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Loại hình đào tạo' className='form-group col-md-4' readOnly={readOnly} data={SelectAdapter_DmLoaiHinhDaoTaoV2} />
+                                    <FormSelect ref={e => this.loaiSinhVien = e} label='Loại sinh viên' className='form-group col-md-4' readOnly={readOnly} data={SelectAdapter_DmLoaiSinhVienV2} />
+                                    <FormSelect ref={e => this.tinhTrang = e} label='Tình trạng' className='form-group col-md-4' readOnly={readOnly} data={SelectAdapter_DmTinhTrangSinhVienV2} />
                                 </div>
                             </div>
                             <FormDatePicker ref={e => this.ngaySinh = e} label='Ngày sinh' type='date-mask' className='form-group col-md-3' required />
@@ -227,7 +235,7 @@ class SinhVienPage extends AdminPage {
                     </div>
                 </div>
             </>,
-            backRoute: '/user',
+            backRoute: '/user/students/list',
             onSave: this.save,
         });
     }
@@ -235,6 +243,6 @@ class SinhVienPage extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, sinhVien: state.sinhVien });
 const mapActionsToProps = {
-    getSinhVienEditUser, updateStudentUser, updateSystemState,
+    getStudentAdmin, updateStudentAdmin,
 };
 export default connect(mapStateToProps, mapActionsToProps)(SinhVienPage);
