@@ -54,12 +54,12 @@ const run = () => {
                         else {
                             if (shcc != shccAns) {
                                 app.model.canBo.get({shcc: shcc}, (error, item) => {
-                                    if (!error || item) {
+                                    if (error || item == null) {
                                         app.model.canBo.get({shcc: shccAns}, (error, item2) => {
                                             app.model.dmDonVi.get({ma: item2.maDonVi}, (error, itemDv) => {
                                                 let nameDv = '';
                                                 if (itemDv != null) nameDv = itemDv.ten;
-                                                console.log(shcc + ' - ' + ho + ' ' + ten + ' - ' + donVi + "," + item2.shcc + ' - ' + item2.ho + ' ' + item2.ten + ' - ' + nameDv);
+                                                console.log('Trong file excel: ' + shcc + ' - ' + ho + ' ' + ten + ' - ' + donVi + '\nTrong cơ sở dữ liệu: ' + item2.shcc + ' - ' + item2.ho + ' ' + item2.ten + ' - ' + nameDv + '\n');
                                             });
                                         });
                                     }
