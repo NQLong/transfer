@@ -88,14 +88,16 @@ app.readyHooks.add('Run tool.qtHoTroHocPhi.js', {
                     if (batDau != null) {
                         batDau = batDau.toString().trim();
                         let fm = getForm(batDau);
-                        batDau = fm[0], batDauType = fm[1];
+                        batDau = fm[0];
+                        batDauType = fm[1];
                         batDau = new Date(batDau).getTime();
                     }
                     let ketthuc = worksheet.getCell('R' + index).value, ketThucType = '';
                     if (ketthuc != null) {
                         ketthuc = ketthuc.toString().trim();
                         let fm = getForm(ketthuc);
-                        ketthuc = fm[0], ketThucType = fm[1];
+                        ketthuc = fm[0];
+                        ketThucType = fm[1];
                         ketthuc = new Date(ketthuc).getTime();
                     }
 
