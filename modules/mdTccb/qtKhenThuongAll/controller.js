@@ -23,7 +23,7 @@ module.exports = app => {
         { name: 'qtKhenThuongAll:delete' },
     );
     app.get('/user/tccb/qua-trinh/khen-thuong-all', app.permission.check('qtKhenThuongAll:read'), app.templates.admin);
-    app.get('/user/tccb/qua-trinh/khen-thuong-all/group_dt/:loaiDoiTuong/:ma', app.permission.check('qtKhenThuongAll:read'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/khen-thuong-all/groupDt/:loaiDoiTuong/:ma', app.permission.check('qtKhenThuongAll:read'), app.templates.admin);
     app.get('/user/khen-thuong-all', app.permission.check('staff:login'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
@@ -78,8 +78,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, loaiDoiTuong, list_dv, list_shcc } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1', list_dv: null, list_shcc: null };
-        app.model.qtKhenThuongAll.searchPage(pageNumber, pageSize, loaiDoiTuong, fromYear, toYear, list_dv, list_shcc, searchTerm, (error, page) => {
+        const { fromYear, toYear, loaiDoiTuong, listDv, listShcc } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1', listDv: null, listShcc: null };
+        app.model.qtKhenThuongAll.searchPage(pageNumber, pageSize, loaiDoiTuong, fromYear, toYear, listDv, listShcc, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -95,8 +95,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, loaiDoiTuong, list_dv, list_shcc } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1', list_dv: null, list_shcc: null };
-        app.model.qtKhenThuongAll.searchPage(pageNumber, pageSize, loaiDoiTuong, fromYear, toYear, list_dv, list_shcc, searchTerm, (error, page) => {
+        const { fromYear, toYear, loaiDoiTuong, listDv, listShcc } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1', listDv: null, listShcc: null };
+        app.model.qtKhenThuongAll.searchPage(pageNumber, pageSize, loaiDoiTuong, fromYear, toYear, listDv, listShcc, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -111,8 +111,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, loaiDoiTuong, list_dv, list_shcc } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1', list_dv: null, list_shcc: null };
-        app.model.qtKhenThuongAll.groupPage(pageNumber, pageSize, loaiDoiTuong, fromYear, toYear, list_dv, list_shcc, searchTerm, (error, page) => {
+        const { fromYear, toYear, loaiDoiTuong, listDv, listShcc } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1', listDv: null, listShcc: null };
+        app.model.qtKhenThuongAll.groupPage(pageNumber, pageSize, loaiDoiTuong, fromYear, toYear, listDv, listShcc, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -147,13 +147,13 @@ module.exports = app => {
     app.delete('/api/tccb/qua-trinh/khen-thuong-all', app.permission.check('staff:write'), (req, res) =>
         app.model.qtKhenThuongAll.delete({ id: req.body.id }, (error) => res.send(error)));
 
-    app.get('/api/qua-trinh/khen-thuong-all/download-excel/:list_shcc/:list_dv/:fromYear/:toYear/:loaiDoiTuong', app.permission.check('qtKhenThuongAll:read'), (req, res) => {
-        let { list_shcc, list_dv, fromYear, toYear, loaiDoiTuong } = req.params ? req.params : { list_shcc: null, list_dv: null, fromYear: null, toYear: null, loaiDoiTuong: '-1' };
-        if (list_shcc == 'null') list_shcc = null;
-        if (list_dv == 'null') list_dv = null;
+    app.get('/api/qua-trinh/khen-thuong-all/download-excel/:listShcc/:listDv/:fromYear/:toYear/:loaiDoiTuong', app.permission.check('qtKhenThuongAll:read'), (req, res) => {
+        let { listShcc, listDv, fromYear, toYear, loaiDoiTuong } = req.params ? req.params : { listShcc: null, listDv: null, fromYear: null, toYear: null, loaiDoiTuong: '-1' };
+        if (listShcc == 'null') listShcc = null;
+        if (listDv == 'null') listDv = null;
         if (fromYear == 'null') fromYear = null;
         if (toYear == 'null') toYear = null;
-        app.model.qtKhenThuongAll.download(loaiDoiTuong, fromYear, toYear, list_dv, list_shcc, (error, page) => {
+        app.model.qtKhenThuongAll.download(loaiDoiTuong, fromYear, toYear, listDv, listShcc, (error, page) => {
             if (error) {
                 res.send({ error });
             } else {

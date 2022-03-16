@@ -14,13 +14,13 @@ export default function QtKhenThuongAllReducer(state = null, data) {
         case QtKhenThuongAllGetAll:
             return Object.assign({}, state, { items: data.items });
         case QtKhenThuongAllGetGroupPage:
-            return Object.assign({}, state, { page_gr: data.page });
+            return Object.assign({}, state, { pageGr: data.page });
         case QtKhenThuongAllGetGroupPageMa:
-            return Object.assign({}, state, { page_ma: data.page });
+            return Object.assign({}, state, { pageMa: data.page });
         case QtKhenThuongAllGetPage:
             return Object.assign({}, state, { page: data.page });
         case QtKhenThuongAllGetUserPage:
-            return Object.assign({}, state, { user_page: data.page });
+            return Object.assign({}, state, { userPage: data.page });
         case QtKhenThuongAllGet:
             return Object.assign({}, state, { selectedItem: data.item });
         case QtKhenThuongAllUpdate:

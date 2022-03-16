@@ -84,7 +84,7 @@ class QtKhenThuongAllUserPage extends AdminPage {
     componentDidMount() {
         T.ready('/user', () => {
             const { shcc } = this.props.system && this.props.system.user ? this.props.system.user : { shcc: '' };
-            this.setState({ filter: { list_dv: '', list_shcc: shcc, loaiDoiTuong: '02', fromYear: null, toYear: null } });
+            this.setState({ filter: { listDv: '', listShcc: shcc, loaiDoiTuong: '02', fromYear: null, toYear: null } });
             this.getPage();
         });
     }
@@ -120,7 +120,7 @@ class QtKhenThuongAllUserPage extends AdminPage {
         const { isStaff, shcc } = this.props.system && this.props.system.user ? this.props.system.user : { isStaff: false, shcc: '' };
         const { firstName, lastName } = isStaff && this.props.system.user || { firstName: '', lastName: '' };
         const name = isStaff ? `${lastName} ${firstName} (${shcc})` : '';
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.user_page ? this.props.qtKhenThuongAll.user_page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list };
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.userPage ? this.props.qtKhenThuongAll.userPage : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
