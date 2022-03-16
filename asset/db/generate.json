@@ -6315,6 +6315,9 @@
         "active": true,
         "moduleName": "hcthCongVanDen",
         "modelName": "hcthCongVanDen",
+        "methods": {
+            "HCTH_CONG_VAN_DEN_SEARCH_PAGE": "searchPage"
+        },
         "columns": {
             "ID": {
                 "value": "id",
