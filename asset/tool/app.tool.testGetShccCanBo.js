@@ -21,13 +21,13 @@ require('../../config/database')(app, package);
 // Init =======================================================================
 app.loadModules(false);
 const run = () => {
-    app.model.dmDonVi.getMaDonVi('Khoa Việt Nam học', maDv => {
-        app.model.canBo.getShccCanBo({ho: 'Nguyễn Thị Hoàng', ten: 'Yến', ngaySinh: '12/12/1964', maDonVi: maDv }, (error, shcc) => {
+    app.model.dmDonVi.getMaDonVi('Khoa Việt Nam học', (ma, ten) => {
+        app.model.canBo.getShccCanBo({ho: 'Nguyễn Thị Hoàng', ten: 'Yến', ngaySinh: '12/12/1964', maDonVi: ma }, (error, shcc) => {
             console.log("data1 = ", {error, shcc});
         });
     });
-    app.model.dmDonVi.getMaDonVi('Khoa Việt Nam học', maDv => {
-        app.model.canBo.getShccCanBo({ho: 'lƯu tuẤn', ten: 'Anh', ngaySinh: '12/12/1964', maDonVi: maDv }, (error, shcc) => {
+    app.model.dmDonVi.getMaDonVi('Khoa Việt Nam học', (ma, ten) => {
+        app.model.canBo.getShccCanBo({ho: 'lƯu tuẤn', ten: 'Anh', ngaySinh: '12/12/1964', maDonVi: ma }, (error, shcc) => {
             console.log("data2 = ", {error, shcc});
         });
     });

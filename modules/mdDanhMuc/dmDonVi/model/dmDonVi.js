@@ -29,18 +29,21 @@ module.exports = app => {
     // app.model.dmDonVi.foo = () => { };
     app.model.dmDonVi.getMaDonVi = (ten, done) => {
         if (!ten) {
-            done && done(null);
+            done && done(null, null);
         } else {
+            ten = ten.toString();
+            ten = ten.replace('K.', '');
+            ten = ten.trim();
             app.model.dmDonVi.getAll((error, itemsDv) => {
-                let bestScore = -1, maDv = null;
+                let bestScore = -1, ans = null;
                 for (let idx = 0; idx < itemsDv.length; idx++) {
-                    let score = bestChoice(ten, itemsDv[idx].ten.toLowerCase());
-                    if (score > bestScore) {
+                    let score = bestChoice(ten.toLowerCase(), itemsDv[idx].ten.toLowerCase());
+                    if (score > bestScore || (score == bestScore && itemsDv[ans].ma > itemsDv[idx].ma)) {
                         bestScore = score;
-                        maDv = itemsDv[idx].ma;
+                        ans = idx;
                     }
                 }
-                done && done(maDv);
+                done && done(itemsDv[ans].ma, itemsDv[ans].ten);
             });
         }
     };
