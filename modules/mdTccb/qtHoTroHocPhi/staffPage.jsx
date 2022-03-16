@@ -5,34 +5,31 @@ import { AdminModal, AdminPage, FormDatePicker, FormRichTextBox, FormSelect, For
 import Pagination from 'view/component/Pagination';
 import Dropdown from 'view/component/Dropdown';
 import { DateInput } from 'view/component/Input';
-import {
-    getQtHoTroHocPhiUserPage, deleteQtHoTroHocPhiUserPage,
-    updateQtHoTroHocPhiUserPage, createQtHoTroHocPhiUserPage
-}
-    from './redux';
+import { getQtHoTroHocPhiUserPage, deleteQtHoTroHocPhiUserPage, updateQtHoTroHocPhiUserPage, createQtHoTroHocPhiUserPage } from './redux';
 import { SelectAdapter_DmHoTroHocPhiCoSo } from 'modules/mdDanhMuc/dmHoTroHocPhiCoSo/redux';
 
 const EnumDateType = Object.freeze({
     0: { text: '' },
     1: { text: 'dd/mm/yyyy' },
     2: { text: 'mm/yyyy' },
-    3: { text: 'yyyy' },
+    3: { text: 'yyyy' }
 }), typeMapper = {
     'yyyy': 'year',
     'mm/yyyy': 'month',
     'dd/mm/yyyy': 'date'
 };
+
 class EditModal extends AdminModal {
     state = {
         id: null,
         batDau: '',
         ketThuc: '',
         batDauType: 'dd/mm/yyyy',
-        ketThucType: 'dd/mm/yyyy',
+        ketThucType: 'dd/mm/yyyy'
     };
     onShow = (item) => {
         let { id, ngayLamDon, noiDung, coSoDaoTao, batDau, batDauType, ketThuc, ketThucType, hocKyHoTro, soTien, hoSo, ghiChu } = item && item.item ? item.item : {
-            id: '', ngayLamDon: null, noiDung: '', coSoDaoTao: '', batDau: null, batDauType: '', ketThucType: '', hocKyHoTro: '', soTien: '', hoSo: '', ghiChu: '',
+            id: '', ngayLamDon: null, noiDung: '', coSoDaoTao: '', batDau: null, batDauType: '', ketThucType: '', hocKyHoTro: '', soTien: '', hoSo: '', ghiChu: ''
         };
 
         this.setState({
@@ -125,21 +122,13 @@ class EditModal extends AdminModal {
                 <FormTextBox className='col-md-6' ref={e => this.soTien = e} type='number' label='Số tiền' readOnly={readOnly} />
                 <FormTextBox className='col-md-12' ref={e => this.hoSo = e} type='text' label='Hồ sơ đi kèm' readOnly={readOnly} />
 
-                <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} placeholder='Bắt đầu'
-                    label={
-                        <div style={{ display: 'flex' }}>Bắt đầu (định dạng:&nbsp; <Dropdown ref={e => this.batDauType = e}
-                            items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
-                            onSelected={item => this.setState({ batDauType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
-                    }
-                    type={this.state.batDauType ? typeMapper[this.state.batDauType] : null} readOnly={readOnly} /></div>
+                <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} placeholder='Bắt đầu' label={
+                    <div style={{ display: 'flex' }}>Bắt đầu (định dạng:&nbsp; <Dropdown ref={e => this.batDauType = e} items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]} onSelected={item => this.setState({ batDauType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
+                } type={this.state.batDauType ? typeMapper[this.state.batDauType] : null} readOnly={readOnly} /></div>
                 <FormCheckbox ref={e => this.denNayCheck = e} label='Đến nay' onChange={this.handleKetThuc} className='form-group col-md-3' />
-                <div className='form-group col-md-6' id='ketThucDate'><DateInput ref={e => this.ketThuc = e} placeholder='Kết thúc'
-                    label={
-                        <div style={{ display: 'flex' }}>Kết thúc (định dạng:&nbsp; <Dropdown ref={e => this.ketThucType = e}
-                            items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
-                            onSelected={item => this.setState({ ketThucType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
-                    }
-                    type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} readOnly={readOnly} /></div>
+                <div className='form-group col-md-6' id='ketThucDate'><DateInput ref={e => this.ketThuc = e} placeholder='Kết thúc' label={
+                    <div style={{ display: 'flex' }}>Kết thúc (định dạng:&nbsp; <Dropdown ref={e => this.ketThucType = e} items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]} onSelected={item => this.setState({ ketThucType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
+                } type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} readOnly={readOnly} /></div>
 
                 <FormRichTextBox className='col-md-12' ref={e => this.ghiChu = e} rows={2} readOnly={readOnly} label='Ghi chú' placeholder='Nhập ghi chú (tối đa 100 ký tự)' maxLength={100} />
             </div>
@@ -149,10 +138,11 @@ class EditModal extends AdminModal {
 
 class QtHoTroHocPhiUserPage extends AdminPage {
     state = { filter: {} };
+
     componentDidMount() {
         T.ready('/user', () => {
             const { shcc } = this.props.system && this.props.system.user ? this.props.system.user : { shcc: '' };
-            this.setState({ filter: { list_shcc: shcc, list_dv: '', fromYear: null, toYear: null, timeType: 0, tinhTrang: null, loaiHocVi: null } });
+            this.setState({ filter: { listShcc: shcc, listDv: '', fromYear: null, toYear: null, timeType: 0, tinhTrang: null, loaiHocVi: null } });
             this.getPage();
         });
     }
@@ -163,7 +153,7 @@ class QtHoTroHocPhiUserPage extends AdminPage {
 
     showModal = (e) => {
         e.preventDefault();
-        this.modal.show({ item: null, shcc: this.state.filter.list_shcc });
+        this.modal.show({ item: null, shcc: this.state.filter.listShcc });
     }
 
     delete = (e, item) => {
@@ -188,7 +178,7 @@ class QtHoTroHocPhiUserPage extends AdminPage {
         const { isStaff, shcc } = this.props.system && this.props.system.user ? this.props.system.user : { isStaff: false, shcc: '' };
         const { firstName, lastName } = isStaff && this.props.system.user || { firstName: '', lastName: '' };
         const name = isStaff ? `${lastName} ${firstName} (${shcc})` : '';
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtHoTroHocPhi && this.props.qtHoTroHocPhi.user_page ? this.props.qtHoTroHocPhi.user_page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtHoTroHocPhi && this.props.qtHoTroHocPhi.userPage ? this.props.qtHoTroHocPhi.userPage : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -206,36 +196,27 @@ class QtHoTroHocPhiUserPage extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                {item.ngayLamDon ? T.dateToText(item.ngayLamDon, 'dd/mm/yyyy') : ''}
-                            </>
-                        )}
-                        />
+                        <TableCell type='date' dateFormat='dd/mm/yyyy' content={item.ngayLamDon} />
                         <TableCell type='text' content={(
                             <>
-                                <b> {item.noiDung ? item.noiDung : ''} </b> <br/><br/>
-                                {item.tenCoSoDaoTao ? <span style={{ whiteSpace: 'nowrap' }}>Cơ sở đào tạo: <i>{item.tenCoSoDaoTao}</i><br/><br/></span> : null}
+                                <b>{item.noiDung ? item.noiDung : ''} </b><br />
+                                {item.tenCoSoDaoTao ? <span style={{ whiteSpace: 'nowrap' }}>Cơ sở đào tạo: <i>{item.tenCoSoDaoTao}</i><br /></span> : null}
                                 {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
                                 {item.ketThuc && item.ketThuc != -1 ? <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc && item.ketThuc != -1 ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
                             </>
-                        )}
-                        />
+                        )} />
                         <TableCell type='text' content={(
                             <>
-                                <b> {item.hocKyHoTro ? item.hocKyHoTro : ''} </b> <br/><br/>
+                                <b>{item.hocKyHoTro ? item.hocKyHoTro : ''} </b><br />
                                 {item.soTien ? <span style={{ whiteSpace: 'nowrap' }}>Số tiền hỗ trợ: <b>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.soTien)}</b><br /></span> : null}
                             </>
-                        )}
-                        />
-                        <TableCell type='text' content={(
-                            <>
-                                <span>{(item.ketThuc == -1 || item.ketThuc >= item.today) ? <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đang diễn ra</span> : <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đã kết thúc</span>}</span>
-                            </>
-                        )}></TableCell>
-                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                            onEdit={() => this.modal.show({ item, shcc })} onDelete={this.delete} >
-                        </TableCell>
+                        )} />
+                        <TableCell type='text' content={
+                            (item.ketThuc == -1 || item.ketThuc >= item.today) ?
+                                <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đang diễn ra</span> :
+                                <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đã kết thúc</span>
+                        } />
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onEdit={() => this.modal.show({ item, shcc })} onDelete={this.delete} />
                     </tr>
                 )
             });
@@ -250,24 +231,16 @@ class QtHoTroHocPhiUserPage extends AdminPage {
                 'Công tác trong nước'
             ],
             content: <>
-                <div className='tile'>
-                    {table}
-                </div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                    getPage={this.getPage} />
-                <EditModal ref={e => this.modal = e} shcc={this.shcc} readOnly={!permission.write}
-                    create={this.props.createQtHoTroHocPhiUserPage} update={this.props.updateQtHoTroHocPhiUserPage}
-                />
+                <div className='tile'>{table}</div>
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.getPage} />
+                <EditModal ref={e => this.modal = e} shcc={this.shcc} readOnly={!permission.write} create={this.props.createQtHoTroHocPhiUserPage} update={this.props.updateQtHoTroHocPhiUserPage} />
             </>,
             backRoute: '/user',
-            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+            onCreate: permission && permission.write ? (e) => this.showModal(e) : null
         });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, qtHoTroHocPhi: state.tccb.qtHoTroHocPhi });
-const mapActionsToProps = {
-    getQtHoTroHocPhiUserPage, deleteQtHoTroHocPhiUserPage, createQtHoTroHocPhiUserPage,
-    updateQtHoTroHocPhiUserPage,
-};
+const mapActionsToProps = { getQtHoTroHocPhiUserPage, deleteQtHoTroHocPhiUserPage, createQtHoTroHocPhiUserPage, updateQtHoTroHocPhiUserPage };
 export default connect(mapStateToProps, mapActionsToProps)(QtHoTroHocPhiUserPage);

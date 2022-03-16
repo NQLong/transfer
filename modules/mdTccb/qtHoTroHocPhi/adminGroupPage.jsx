@@ -147,14 +147,14 @@ class QtHoTroHocPhiGroupPage extends AdminPage {
             T.clearSearchBox();
             const route = T.routeMatcher('/user/tccb/qua-trinh/ho-tro-hoc-phi/group/:shcc'),
                 params = route.parse(window.location.pathname);
-            this.setState({ shcc: params.shcc, filter: { list_shcc: params.shcc, list_dv: '', timeType: 0, loaiHocVi: null } });
+            this.setState({ shcc: params.shcc, filter: { listShcc: params.shcc, listDv: '', timeType: 0, loaiHocVi: null } });
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
 
             T.showSearchBox(() => {
-                this.timeType?.value(0);
-                this.fromYear?.value('');
-                this.toYear?.value('');
-                this.tinhTrang?.value('');
+                this.timeType.value(0);
+                this.fromYear.value('');
+                this.toYear.value('');
+                this.tinhTrang.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
             this.getPage();
@@ -163,24 +163,24 @@ class QtHoTroHocPhiGroupPage extends AdminPage {
 
     changeAdvancedSearch = (isInitial = false) => {
         let { pageNumber, pageSize } = this.props && this.props.qtHoTroHocPhi && this.props.qtHoTroHocPhi.page_ma ? this.props.qtHoTroHocPhi.page_ma : { pageNumber: 1, pageSize: 50 };
-        const timeType = this.timeType?.value() || 0;
-        const fromYear = this.fromYear?.value() == '' ? null : this.fromYear?.value().getTime();
-        const toYear = this.toYear?.value() == '' ? null : this.toYear?.value().getTime();
-        const list_dv = this.state.filter.list_dv;
-        const list_shcc = this.state.filter.list_shcc;
+        const timeType = this.timeType.value() || 0;
+        const fromYear = this.fromYear.value() == '' ? null : this.fromYear.value().getTime();
+        const toYear = this.toYear.value() == '' ? null : this.toYear.value().getTime();
+        const listDv = this.state.filter.listDv;
+        const listShcc = this.state.filter.listShcc;
         const loaiHocVi = this.state.filter.loaiHocVi;
         const tinhTrang = this.tinhTrang?.value() == '' ? null : this.tinhTrang?.value();
-        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc, tinhTrang, timeType, loaiHocVi };
+        const pageFilter = isInitial ? null : { listDv, fromYear, toYear, listShcc, tinhTrang, timeType, loaiHocVi };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
-                    this.fromYear?.value(filter.fromYear || '');
-                    this.toYear?.value(filter.toYear || '');
-                    this.timeType?.value(filter.timeType);
-                    this.tinhTrang?.value(filter.tinhTrang);
-                    this.mucDich?.value(filter.mucDich);
+                    this.fromYear.value(filter.fromYear || '');
+                    this.toYear.value(filter.toYear || '');
+                    this.timeType.value(filter.timeType);
+                    this.tinhTrang.value(filter.tinhTrang);
+                    this.mucDich.value(filter.mucDich);
                     if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.timeType || filter.tinhTrang)) this.showAdvanceSearch();
                 }
             });
@@ -238,48 +238,35 @@ class QtHoTroHocPhiGroupPage extends AdminPage {
                                 {item.shcc}
                             </>
                         )} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenHocVi || ''} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucDanhNgheNghiep || ''} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                {item.tenHocVi ? item.tenHocVi : ''}
-                            </>
-                        )} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                {item.tenChucDanhNgheNghiep ? item.tenChucDanhNgheNghiep : ''}
-                            </>
-                        )} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <span> {item.tenChucVu ? item.tenChucVu : ''} <br /> </span>
+                                {item.tenChucVu || ''}<br />
                                 {item.tenDonVi ? item.tenDonVi.normalizedName() : ''}
                             </>
                         )} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                {item.ngayLamDon ? T.dateToText(item.ngayLamDon, 'dd/mm/yyyy') : ''}
-                            </>
-                        )} />
+                        <TableCell type='date' dateFormat='dd/mm/yyyy' content={item.ngayLamDon} />
                         <TableCell type='text' content={(
                             <>
-                                <b> {item.noiDung ? item.noiDung : ''} </b> <br /><br />
-                                {item.tenCoSoDaoTao ? <span style={{ whiteSpace: 'nowrap' }}>Cơ sở đào tạo: <i>{item.tenCoSoDaoTao}</i><br /><br /></span> : null}
+                                <b>{item.noiDung || ''}</b><br />
+                                {item.tenCoSoDaoTao ? <span style={{ whiteSpace: 'nowrap' }}>Cơ sở đào tạo: <i>{item.tenCoSoDaoTao}</i><br /></span> : null}
                                 {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
-                                {item.ketThuc && item.ketThuc != -1 ? <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc && item.ketThuc != -1 ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
+                                {item.ketThuc && item.ketThuc != -1 ? <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc && item.ketThuc != -1 ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span></span> : null}
                             </>
                         )} />
                         <TableCell type='text' content={(
                             <>
-                                <b> {item.hocKyHoTro ? item.hocKyHoTro : ''} </b> <br /><br />
-                                {item.soTien ? <span style={{ whiteSpace: 'nowrap' }}>Số tiền hỗ trợ: <b>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.soTien)}</b><br /></span> : null}
+                                <b>{item.hocKyHoTro || ''}</b><br />
+                                {item.soTien ? <span style={{ whiteSpace: 'nowrap' }}>Số tiền hỗ trợ: <b>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.soTien)}</b></span> : null}
                             </>
                         )} />
-                        <TableCell type='text' content={(
-                            <>
-                                <span>{(item.ketThuc == -1 || item.ketThuc >= item.today) ? <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đang diễn ra</span> : <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đã kết thúc</span>}</span>
-                            </>
-                        )}></TableCell>
-                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onEdit={() => this.modal.show(item)} onDelete={this.delete}>
-                        </TableCell>
+                        <TableCell type='text' content={
+                            (item.ketThuc == -1 || item.ketThuc >= item.today) ?
+                                <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đang diễn ra</span> :
+                                <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đã kết thúc</span>
+                        } />
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onEdit={() => this.modal.show(item)} onDelete={this.delete} />
                     </tr>
                 )
             });
@@ -307,9 +294,7 @@ class QtHoTroHocPhiGroupPage extends AdminPage {
                 </div>
             </>,
             content: <>
-                <div className='tile'>
-                    {table}
-                </div>
+                <div className='tile'>{table}</div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} permission={permission} shcc={this.state.shcc} create={this.props.createQtHoTroHocPhiGroupPageMa} update={this.props.updateQtHoTroHocPhiGroupPageMa} permissions={currentPermissions} />
             </>,
@@ -317,8 +302,8 @@ class QtHoTroHocPhiGroupPage extends AdminPage {
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
             onExport: (e) => {
                 e.preventDefault();
-                const { fromYear, toYear, list_shcc, list_dv, timeType, tinhTrang, loaiHocVi } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, tinhTrang: null, loaiHocVi: null };
-                T.download(T.url(`/api/qua-trinh/ho-tro-hoc-phi/download-excel/${list_shcc ? list_shcc : null}/${list_dv ? list_dv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${timeType}/${tinhTrang ? tinhTrang : null}/${loaiHocVi ? loaiHocVi : null}`), 'hotrohocphi.xlsx');
+                const { fromYear, toYear, listShcc, listDv, timeType, tinhTrang, loaiHocVi } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, timeType: 0, tinhTrang: null, loaiHocVi: null };
+                T.download(T.url(`/api/qua-trinh/ho-tro-hoc-phi/download-excel/${listShcc ? listShcc : null}/${listDv ? listDv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${timeType}/${tinhTrang ? tinhTrang : null}/${loaiHocVi ? loaiHocVi : null}`), 'hotrohocphi.xlsx');
             }
         });
     }

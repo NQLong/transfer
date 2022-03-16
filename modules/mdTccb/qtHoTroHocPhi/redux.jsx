@@ -20,7 +20,7 @@ export default function QtHoTroHocPhiReducer(state = null, data) {
         case QtHoTroHocPhiGetPage:
             return Object.assign({}, state, { page: data.page });
         case QtHoTroHocPhiGetUserPage:
-            return Object.assign({}, state, { user_page: data.page });
+            return Object.assign({}, state, { userPage: data.page });
         case QtHoTroHocPhiGet:
             return Object.assign({}, state, { selectedItem: data.item });
         case QtHoTroHocPhiUpdate:
@@ -55,6 +55,7 @@ export default function QtHoTroHocPhiReducer(state = null, data) {
 
 // Actions ------------------------------------------------------------------------------------------------------------
 T.initPage('userPageQtHoTroHocPhi');
+
 export function getQtHoTroHocPhiUserPage(pageNumber, pageSize, pageCondition, filter, done) {
     if (typeof filter === 'function') {
         done = filter;
@@ -111,6 +112,7 @@ export function createQtHoTroHocPhiUserPage(data, done) {
         }, () => T.notify('Tạo hỗ trợ học phí bị lỗi!', 'danger'));
     };
 }
+
 export function deleteQtHoTroHocPhiUserPage(id, done) {
     return dispatch => {
         const url = '/api/user/qua-trinh/ho-tro-hoc-phi';
@@ -128,6 +130,7 @@ export function deleteQtHoTroHocPhiUserPage(id, done) {
 }
 
 T.initPage('pageQtHoTroHocPhi');
+
 export function getQtHoTroHocPhiPage(pageNumber, pageSize, pageCondition, filter, done) {
     if (typeof filter === 'function') {
         done = filter;
@@ -223,6 +226,7 @@ export function getQtHoTroHocPhiGroupPage(pageNumber, pageSize, pageCondition, f
 }
 
 T.initPage('groupPageMaQtHoTroHocPhi');
+
 export function getQtHoTroHocPhiGroupPageMa(pageNumber, pageSize, pageCondition, filter, done) {
     if (typeof filter === 'function') {
         done = filter;

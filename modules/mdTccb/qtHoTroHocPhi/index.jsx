@@ -20,6 +20,6 @@ export default {
         {
             path: '/user/ho-tro-hoc-phi',
             component: Loadable({ loading: Loading, loader: () => import('./staffPage') })
-        },
-    ],
+        }
+    ]
 };
