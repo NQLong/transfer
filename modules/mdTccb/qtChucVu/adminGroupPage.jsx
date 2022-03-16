@@ -150,7 +150,7 @@ class QtChucVuGroup extends AdminPage {
         T.ready('/user/tccb', () => {
             const route = T.routeMatcher('/user/tccb/qua-trinh/chuc-vu/group/:ma'),
                 params = route.parse(window.location.pathname);
-            this.setState({ filter: { list_shcc: params.ma, list_dv: '', timeType: 0, gioiTinh: null }, ma: params.ma });
+            this.setState({ filter: { listShcc: params.ma, listDv: '', timeType: 0, gioiTinh: null }, ma: params.ma });
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
 
             T.showSearchBox(() => {
@@ -164,14 +164,14 @@ class QtChucVuGroup extends AdminPage {
     }
 
     changeAdvancedSearch = (isInitial = false) => {
-        let { pageNumber, pageSize } = this.props && this.props.qtChucVu && this.props.qtChucVu.page_ma ? this.props.qtChucVu.page_ma : { pageNumber: 1, pageSize: 50 };
+        let { pageNumber, pageSize } = this.props && this.props.qtChucVu && this.props.qtChucVu.pageMa ? this.props.qtChucVu.pageMa : { pageNumber: 1, pageSize: 50 };
         const timeType = this.timeType?.value() || 0;
         const fromYear = this.fromYear?.value() == '' ? null : this.fromYear?.value().getTime();
         const toYear = this.toYear?.value() == '' ? null : this.toYear?.value().getTime();
-        const list_dv = this.state.filter.list_dv;
-        const list_shcc = this.state.filter.list_shcc;
-        const list_cv = this.mulMaChucVu?.value().toString() || '';
-        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc, timeType, list_cv };
+        const listDv = this.state.filter.listDv;
+        const listShcc = this.state.filter.listShcc;
+        const listCv = this.mulMaChucVu?.value().toString() || '';
+        const pageFilter = isInitial ? null : { listDv, fromYear, toYear, listShcc, timeType, listCv };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
@@ -180,8 +180,8 @@ class QtChucVuGroup extends AdminPage {
                     this.fromYear?.value(filter.fromYear || '');
                     this.toYear?.value(filter.toYear || '');
                     this.timeType?.value(filter.timeType);
-                    this.mulMaChucVu?.value(filter.list_cv);
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.timeType || filter.list_cv)) this.showAdvanceSearch();
+                    this.mulMaChucVu?.value(filter.listCv);
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.timeType || filter.listCv)) this.showAdvanceSearch();
                 }
             });
         });
@@ -209,8 +209,8 @@ class QtChucVuGroup extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('qtChucVu', ['read', 'write', 'delete']);
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtChucVu && this.props.qtChucVu.page_ma ?
-            this.props.qtChucVu.page_ma : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list };
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtChucVu && this.props.qtChucVu.pageMa ?
+            this.props.qtChucVu.pageMa : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -299,9 +299,9 @@ class QtChucVuGroup extends AdminPage {
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
             onExport: (e) => {
                 e.preventDefault();
-                const { list_dv, fromYear, toYear, list_shcc, timeType, list_cv, gioiTinh } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, list_cv: null, gioiTinh: null };
+                const { listDv, fromYear, toYear, listShcc, timeType, listCv, gioiTinh } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, timeType: 0, listCv: null, gioiTinh: null };
 
-                T.download(T.url(`/api/qua-trinh/chuc-vu/download-excel/${list_shcc ? list_shcc : null}/${list_dv ? list_dv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${timeType}/${list_cv ? list_cv : null}/${gioiTinh ? gioiTinh : null}`), 'chucvu.xlsx');
+                T.download(T.url(`/api/qua-trinh/chuc-vu/download-excel/${listShcc ? listShcc : null}/${listDv ? listDv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${timeType}/${listCv ? listCv : null}/${gioiTinh ? gioiTinh : null}`), 'chucvu.xlsx');
             }
         });
     }

@@ -31,14 +31,14 @@ module.exports = app => {
             { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, iShcc }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
     };
 
-    app.model.qtDaoTao.searchPage = (pagenumber, pagesize, list_shcc, list_dv, fromYear, toYear, list_loaiBang, searchterm, done) => {
-        app.dbConnection.execute('BEGIN :ret:=qt_dao_tao_search_page(:pagenumber, :pagesize, :list_shcc, :list_dv, :fromYear, :toYear, :list_loaiBang, :searchterm, :totalitem, :pagetotal); END;',
-            { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, pagenumber: { val: pagenumber, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, pagesize: { val: pagesize, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, list_shcc, list_dv, fromYear, toYear, list_loaiBang, searchterm, totalitem: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pagetotal: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
+    app.model.qtDaoTao.searchPage = (pagenumber, pagesize, listShcc, listDv, fromYear, toYear, listLoaiBang, searchterm, done) => {
+        app.dbConnection.execute('BEGIN :ret:=qt_dao_tao_search_page(:pagenumber, :pagesize, :listShcc, :listDv, :fromYear, :toYear, :listLoaiBang, :searchterm, :totalitem, :pagetotal); END;',
+            { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, pagenumber: { val: pagenumber, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, pagesize: { val: pagesize, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, listShcc, listDv, fromYear, toYear, listLoaiBang, searchterm, totalitem: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pagetotal: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
     };
 
-    app.model.qtDaoTao.groupPage = (pagenumber, pagesize, list_shcc, list_dv, fromYear, toYear, searchterm, done) => {
-        app.dbConnection.execute('BEGIN :ret:=qt_dao_tao_group_page(:pagenumber, :pagesize, :list_shcc, :list_dv, :fromYear, :toYear, :searchterm, :totalitem, :pagetotal); END;',
-            { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, pagenumber: { val: pagenumber, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, pagesize: { val: pagesize, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, list_shcc, list_dv, fromYear, toYear, searchterm, totalitem: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pagetotal: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
+    app.model.qtDaoTao.groupPage = (pagenumber, pagesize, listShcc, listDv, fromYear, toYear, searchterm, done) => {
+        app.dbConnection.execute('BEGIN :ret:=qt_dao_tao_group_page(:pagenumber, :pagesize, :listShcc, :listDv, :fromYear, :toYear, :searchterm, :totalitem, :pagetotal); END;',
+            { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, pagenumber: { val: pagenumber, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, pagesize: { val: pagesize, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, listShcc, listDv, fromYear, toYear, searchterm, totalitem: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pagetotal: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
     };
 
     app.model.qtDaoTao.getCurrentOfStaff = (iShcc, iTime, done) => {
@@ -46,8 +46,8 @@ module.exports = app => {
             { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, iShcc, iTime }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
     };
 
-    app.model.qtDaoTao.download = (list_shcc, list_dv, fromYear, toYear, list_loaiBang, done) => {
-        app.dbConnection.execute('BEGIN :ret:=qt_dao_tao_download_excel(:list_shcc, :list_dv, :fromYear, :toYear, :list_loaiBang); END;',
-            { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, list_shcc, list_dv, fromYear, toYear, list_loaiBang }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
+    app.model.qtDaoTao.download = (listShcc, listDv, fromYear, toYear, listLoaiBang, done) => {
+        app.dbConnection.execute('BEGIN :ret:=qt_dao_tao_download_excel(:listShcc, :listDv, :fromYear, :toYear, :listLoaiBang); END;',
+            { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, listShcc, listDv, fromYear, toYear, listLoaiBang }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
     };
 };
