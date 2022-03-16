@@ -55,4 +55,30 @@ module.exports = app => {
     app.delete('/api/danh-muc/quan-he-gia-dinh', app.permission.check('dmQuanHeGiaDinh:delete'), (req, res) => {
         app.model.dmQuanHeGiaDinh.delete({ ma: req.body.ma }, error => res.send({ error }));
     });
+
+    app.get('/api/danh-muc/quan-he-gia-dinh/filter/:loai', app.permission.check('user:login'), (req, res) => {
+        let loai = Number(req.params.loai),
+            condition = {};
+        if (req.query.condition) {
+            if (loai != -1) {
+                condition = {
+                    statement: 'lower(ten) LIKE :searchText AND loai = :loai',
+                    parameter: { searchText: `%${req.query.condition.toLowerCase()}%`, loai },
+                };
+            } else {
+                condition = {
+                    statement: 'lower(ten) LIKE :searchText',
+                    parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
+                };
+            }
+        } else {
+            if (loai != -1) {
+                condition = {
+                    statement: 'loai = :loai',
+                    parameter: { loai },
+                };
+            }
+        }
+        app.model.dmQuanHeGiaDinh.getAll(condition, (error, items) => res.send({ error, items }));
+    });
 };

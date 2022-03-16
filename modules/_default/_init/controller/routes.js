@@ -9,7 +9,7 @@ module.exports = app => {
         },
         { name: 'user:login', menu: { parentMenu: app.parentMenu.user } },
     );
-    
+
     app.get('/user', app.permission.check('user:login'), app.templates.admin);
     app.get('/user/dashboard', app.permission.check('dashboard:standard'), app.templates.admin);
     app.get('/user/truyen-thong/settings', app.permission.check('system:settings'), app.templates.admin);
@@ -21,66 +21,28 @@ module.exports = app => {
 
     // API ------------------------------------------------------------------------------------------------------------------------------------------
     app.put('/api/system', app.permission.check('system:settings'), (req, res) => {
-        const changes = {};
+        const { password, address, address2, email, mobile, fax, facebook, youtube, twitter, instagram, linkMap } = req.body;
 
         if (req.body.password) {
-            changes.emailPassword = req.body.password;
-            app.model.setting.setValue(changes, error => {
-                if (error) {
-                    res.send({ error: 'Lỗi khi cập nhật mật khẩu email!' });
-                } else {
-                    app.data.emailPassword = req.body.emailPassword;
-                    res.send(app.data);
-                }
+            app.state.set('emailPassword', password, error => {
+                res.send(error ? { error: 'Lỗi khi cập nhật mật khẩu email!' } : app.state.data);
             });
         } else {
-            if (req.body.address != null || req.body.address == '') {
-                changes.address = req.body.address.trim();
-            }
-            if (req.body.address2 != null || req.body.address2 == '') {
-                changes.address2 = req.body.address2.trim();
-            }
-            if (req.body.email && req.body.email != '') {
-                changes.email = req.body.email.trim();
-            }
-            if (req.body.mobile != null || req.body.mobile == '') {
-                changes.mobile = req.body.mobile.trim();
-            }
-            if (req.body.fax != null || req.body.fax == '') {
-                changes.fax = req.body.fax.trim();
-            }
-            if (req.body.facebook != null || req.body.facebook == '') {
-                changes.facebook = req.body.facebook.trim();
-            }
-            if (req.body.youtube != null || req.body.youtube == '') {
-                changes.youtube = req.body.youtube.trim();
-            }
-            if (req.body.twitter != null || req.body.twitter == '') {
-                changes.twitter = req.body.twitter.trim();
-            }
-            if (req.body.instagram != null || req.body.instagram == '') {
-                changes.instagram = req.body.instagram.trim();
-            }
-            if (req.body.linkMap != null || req.body.linkMap == '') {
-                changes.linkMap = req.body.linkMap.trim();
-            }
-            // if (req.body.latitude != null || req.body.latitude == '') {
-            //     changes.latitude = req.body.latitude.trim();
-            // }
-            // if (req.body.longitude != null || req.body.longitude == '') {
-            //     changes.longitude = req.body.longitude.trim();
-            // }
+            const changes = [];
+            if (address || address == '') changes.push('address', address.trim());
+            if (address2 || address2 == '') changes.push('address2', address2.trim());
+            if (email) changes.push('email', email.trim());
+            if (mobile || mobile == '') changes.push('mobile', mobile.trim());
+            if (fax || fax == '') changes.push('fax', fax.trim());
+            if (facebook || facebook == '') changes.push('facebook', facebook.trim());
+            if (youtube || youtube == '') changes.push('youtube', youtube.trim());
+            if (twitter || twitter == '') changes.push('twitter', twitter.trim());
+            if (instagram || instagram == '') changes.push('instagram', instagram.trim());
+            if (linkMap || linkMap == '') changes.push('linkMap', linkMap.trim());
 
-            app.model.setting.setValue(changes, error => {
-                if (error) {
-                    res.send({ error: 'Lỗi khi cập nhật mật khẩu email!' });
-                } else {
-                    if (changes.email) {
-                        app.data.email = changes.email;
-                    }
-                    app.data = app.clone(app.data, changes);
-                    res.send(app.data);
-                }
+            app.state.set(...changes, error => {
+                error && console.log('Error (/api/system):', error);
+                app.state.get((error, data) => res.send(error ? { error } : data));
             });
         }
     });
@@ -114,7 +76,9 @@ module.exports = app => {
                                 if (submenus) {
                                     data.submenus = submenus.slice();
                                 }
-                                app.model.setting.getValue(['headerTitle', 'headerLink', 'isShowHeaderTitle', 'address2', 'mapLink'], result => {
+                                app.model.setting.getValue(['header', 'address', 'headerTitle', 'headerLink', 'isShowHeaderTitle', 'address2', 'mapLink'], result => {
+                                    // data.header = result.header;
+                                    // data.address = result.address;
                                     data.headerTitle = result.headerTitle;
                                     data.headerLink = result.headerLink;
                                     data.address2 = result.address2;
@@ -215,53 +179,50 @@ module.exports = app => {
     app.get('/api/menu', (req, res) => {
         let pathname = app.url.parse(req.headers.referer).pathname;
         if (pathname.length > 1 && pathname.endsWith('/')) pathname = pathname.substring(0, pathname.length - 1);
-        const ready = () => {
-            if (app.menus && app.menus[pathname]) {
-                const menu = app.menus[pathname] || app.menus['/'];
-                if (menu) {
-                    const menuComponents = [];
-                    if (menu.component) {
-                        res.send(menu.component);
-                    } else if (menu.componentId) {
-                        //TODO
-                        getComponent(0, [menu.componentId], menuComponents, () => {
-                            const newComponents = menuComponents[0].components.sort((a, b) => a.priority - b.priority);
-                            menu.component = Object.assign(menuComponents[0], { components: newComponents });
-                            res.send(menu.component);
-                        });
-                    } else {
-                        res.send({ error: 'Menu không hợp lệ! 1' });
-                    }
-                } else {
-                    res.send({ error: 'Link không hợp lệ!' });
-                }
-            } else if (app.divisionMenus && app.divisionMenus[pathname]) {
-                const menu = app.divisionMenus[pathname];
-                if (menu) {
-                    const menuComponents = [];
-                    if (menu.component) {
-                        res.send(menu.component);
-                    } else if (menu.componentId) {
-                        //TODO
-                        getComponent(0, [menu.componentId], menuComponents, () => {
-                            const newComponents = menuComponents[0].components.sort((a, b) => a.priority - b.priority);
-                            menu.component = Object.assign(menuComponents[0], { components: newComponents });
-                            res.send(menu.component);
-                        });
-                    } else {
-                        console.log('Menu không hợp lệ! 2');
-                        res.send({ error: 'Menu không hợp lệ! 2' });
-                    }
-                } else {
-                    console.log('Menu không hợp lệ! ');
-                    res.send({ error: 'Link không hợp lệ!' });
-                }
-            } else {
-                console.log('Menu không hợp lệ! 3');
-                res.send({ error: 'Menu không hợp lệ! 3', pathname, divisionMenus: app.divisionMenus, menus: app.menus });
+
+        const promiseMenus = new Promise((resolve, reject) => app.redis.get(app.redis.menusKey, (error, menus) => {
+            error ? reject(error) : resolve(menus ? JSON.parse(menus) : {});
+        }));
+        const promiseDivisionMenus = new Promise((resolve, reject) => app.redis.get(app.redis.divisionMenusKey, (error, divisionMenus) => {
+            error ? reject(error) : resolve(divisionMenus ? JSON.parse(divisionMenus) : {});
+        }));
+
+        Promise.all([promiseMenus, promiseDivisionMenus]).then(([menus, divisionMenus]) => {
+            let menu = null, menuType = '';
+            if (menus && menus[pathname]) {
+                menu = menus[pathname];
+                menuType = 'common';
             }
-        };
-        ready();
+            if (!menu && divisionMenus && divisionMenus[pathname]) {
+                menu = divisionMenus[pathname];
+                menuType = 'division';
+            }
+
+            if (!menu) {
+                res.send({ error: 'Link không hợp lệ!' });
+            } else if (menu.component) {
+                res.send(menu.component);
+            } else if (menu.componentId) {
+                //TODO
+                const menuComponents = [];
+                getComponent(0, [menu.componentId], menuComponents, () => {
+                    const newComponents = menuComponents[0].components.sort((a, b) => a.priority - b.priority);
+                    menu.component = Object.assign(menuComponents[0], { components: newComponents });
+
+                    if (menuType == 'common') {
+                        menus[pathname] = menu;
+                        app.redis.set(app.redis.menusKey, JSON.stringify(menus));
+                    } else {
+                        divisionMenus[pathname] = menu;
+                        app.redis.set(app.redis.divisionMenusKey, JSON.stringify(divisionMenus));
+                    }
+
+                    res.send(menu.component);
+                });
+            } else {
+                res.send({ error: 'Menu không hợp lệ! 1' });
+            }
+        });
     });
 
     app.delete('/api/clear-session', app.permission.check(), (req, res) => {
@@ -277,68 +238,37 @@ module.exports = app => {
             const srcPath = files.SettingImage[0].path;
 
             if (fields.userData == 'logo') {
-                app.deleteImage(app.data.logo);
-                let destPath = '/img/favicon' + app.path.extname(srcPath);
-                app.fs.copyFile(srcPath, app.path.join(app.publicPath, destPath), error => {
-                    if (error == null) {
-                        app.deleteFile(srcPath);
-                        destPath += '?t=' + (new Date().getTime()).toString().slice(-8);
-                        app.model.setting.setValue({ logo: destPath }, error => {
-                            if (error == null) app.data.logo = destPath;
-                            done({ image: app.data.logo, error });
-                        });
-                    } else {
-                        done({ error });
-                    }
+                app.state.get(fields.userData, (_, oldImage) => {
+                    oldImage && app.deleteImage(oldImage);
+                    let destPath = `/img/favicon${app.path.extname(srcPath)}`;
+                    app.fs.rename(srcPath, app.path.join(app.publicPath, destPath), error => {
+                        if (error == null) {
+                            destPath += '?t=' + new Date().getTime().toString().slice(-8);
+                            app.state.set(fields.userData, destPath, (error) => done({ image: destPath, error }));
+                        } else {
+                            done({ error });
+                        }
+                    });
                 });
-            } else if (fields.userData == 'footer' && files.SettingImage && files.SettingImage.length > 0) {
-                app.deleteImage(app.data.footer);
-                let destPath = '/img/footer' + app.path.extname(srcPath);
-                app.fs.copyFile(srcPath, app.path.join(app.publicPath, destPath), error => {
-                    if (error == null) {
-                        app.deleteFile(srcPath);
-                        destPath += '?t=' + (new Date().getTime()).toString().slice(-8);
-                        app.model.setting.setValue({ footer: destPath }, error => {
-                            if (error == null) app.data.footer = destPath;
-                            done({ image: app.data.footer, error });
-                        });
-                    } else {
-                        done({ error });
-                    }
+            } else if (['footer', 'map', 'header'].includes(fields.userData.toString())) {
+                app.state.get(fields.userData, (_, oldImage) => {
+                    oldImage && app.deleteImage(oldImage);
+                    let destPath = `/img/${fields.userData}${app.path.extname(srcPath)}`;
+                    app.fs.rename(srcPath, app.path.join(app.publicPath, destPath), error => {
+                        if (error == null) {
+                            destPath += '?t=' + new Date().getTime().toString().slice(-8);
+                            app.state.set(fields.userData, destPath, (error) => done({ image: destPath, error }));
+                        } else {
+                            done({ error });
+                        }
+                    });
                 });
-            } else if (fields.userData == 'map' && files.SettingImage && files.SettingImage.length > 0) {
-                app.deleteImage(app.data.map);
-                let destPath = '/img/map' + app.path.extname(srcPath);
-                app.fs.copyFile(srcPath, app.path.join(app.publicPath, destPath), error => {
-                    if (error == null) {
-                        app.deleteFile(srcPath);
-                        destPath += '?t=' + (new Date().getTime()).toString().slice(-8);
-                        app.model.setting.setValue({ map: destPath }, error => {
-                            if (error == null) app.data.map = destPath;
-                            done({ image: app.data.map, error });
-                        });
-                    } else {
-                        done({ error });
-                    }
-                });
-            } else if (fields.userData == 'header' && files.SettingImage && files.SettingImage.length > 0) {
-                app.deleteImage(app.data.header);
-                let destPath = '/img/header' + app.path.extname(srcPath);
-                app.fs.copyFile(srcPath, app.path.join(app.publicPath, destPath), error => {
-                    if (error == null) {
-                        app.deleteFile(srcPath);
-                        destPath += '?t=' + (new Date().getTime()).toString().slice(-8);
-                        app.model.setting.setValue({ header: destPath }, error => {
-                            if (error == null) app.data.header = destPath;
-                            done({ image: app.data.header, error });
-                        });
-                    } else {
-                        done({ error });
-                    }
-                });
+            } else {
+                app.deleteImage(srcPath);
             }
         }
     };
+
     app.uploadHooks.add('uploadSettingImage', (req, fields, files, params, done) =>
         app.permission.has(req, () => uploadSettingImage(req, fields, files, params, done), done, 'system:settings'));
 };

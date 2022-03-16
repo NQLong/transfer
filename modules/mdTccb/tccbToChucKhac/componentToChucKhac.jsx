@@ -60,7 +60,6 @@ class ComponentToChucKhac extends AdminPage {
     }
 
     deleteToChucKhac = (e, item) => {
-        console.log(this.email);
         T.confirm('Xóa thông tin tổ chức tham gia', 'Bạn có chắc bạn muốn xóa mục này?', true, isConfirm =>
             isConfirm && (this.props.userEdit ? this.props.deleteToChucKhacStaffUser(item.ma, () => this.props.userGetStaff(this.email)) : this.props.deleteToChucKhacStaff(item.ma, () => this.props.getStaffEdit(this.shcc))));
         e.preventDefault();

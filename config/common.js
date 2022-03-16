@@ -1,4 +1,5 @@
-module.exports = app => {
+module.exports = (app) => {
+    const fse = require('fs-extra');
     app.adminRole = {};
     app.clone = function () {
         const length = arguments.length;
@@ -18,6 +19,13 @@ module.exports = app => {
         return result;
     };
 
+    app.fs.renameSync = (oldPath, newPath) => {
+        fse.copySync(oldPath, newPath);
+        fse.removeSync(oldPath);
+    };
+
+    // app.fs.renameSync = (oldPath, newPath) => app.fs.copyFileSync(oldPath, newPath) && app.fs.unlinkSync(oldPath);
+
     // Template html file ---------------------------------------------------------------------------------------------------------------------------
     app.templates = {};
     app.createTemplate = function () {
@@ -27,15 +35,12 @@ module.exports = app => {
             app.templates[templateName] = (req, res) => {
                 const today = new Date().yyyymmdd();
                 if (req.session.today != today) {
-                    // app.redis.incr(`${appName}:todayViews`);
-                    // app.redis.incr(`${appName}:allViews`);
-                    app.data.todayViews += 1;
-                    app.data.allViews += 1;
+                    app.redis.incr(`${app.appName}_state:todayViews`);
+                    app.redis.incr(`${app.appName}_state:allViews`);
                     req.session.today = today;
                 }
 
                 if (app.isDebug) {
-
                     const http = require('http');
                     http.get(`http://localhost:${(app.port + 1) + path}`, response => {
                         let data = '';
@@ -85,6 +90,10 @@ module.exports = app => {
         },
         library: {
             index: 8000, title: 'Thư viện', link: '/user/library', icon: 'fa-th-large',
+            subMenusRender: false
+        },
+        students: {
+            index: 6100, title: 'Sinh viên', link: '/user/students', icon: 'fa-users',
             subMenusRender: false
         },
         category: {

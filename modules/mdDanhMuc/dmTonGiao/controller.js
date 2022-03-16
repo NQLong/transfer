@@ -47,6 +47,10 @@ module.exports = app => {
         app.model.dmTonGiao.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
+    app.get('/api/danh-muc/ton-giao/item/:ma', app.permission.check('user:login'), (req, res) => {
+        app.model.dmTonGiao.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
+    });
+
     app.delete('/api/danh-muc/ton-giao', app.permission.check('dmTonGiao:delete'), (req, res) => {
         app.model.dmTonGiao.delete({ ma: req.body.ma }, error => res.send({ error }));
     });

@@ -226,7 +226,6 @@ export function deleteQtChucVuStaff(stt, isEdit, shcc = null) {
 }
 
 export function getQtChucVuAll(shcc, done) {
-    console.log('this is test');
     return dispatch => {
         const url = '/api/tccb/qua-trinh/chuc-vu/all';
         T.get(url, { shcc }, data => {

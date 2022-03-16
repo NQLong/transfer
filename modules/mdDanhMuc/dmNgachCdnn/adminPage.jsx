@@ -31,7 +31,7 @@ class EditModal extends AdminModal {
             nhom: this.nhom.value(),
             kichHoat: this.kichHoat.value() ? 1 : 0
         };
-        console.log(this.state.id);
+
         if (!this.state.ma && !this.ma.value()) {
             T.notify('Mã không được trống!', 'danger');
             this.ma.focus();

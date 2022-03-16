@@ -219,6 +219,8 @@ const T = {
         swal({ icon, title, content, dangerMode, buttons: { cancel: true, confirm: true }, }).then(done);
     },
 
+    mobileDisplay: mobile => mobile ? (mobile.length == 10 ? mobile.toString().replace(/(\d{4})(\d{3})(\d{3})/, '$1 $2 $3') : mobile.toString().replace(/(\d{3})(\d{4})(\d{4})/, '($1) $2 $3')) : '',
+
     confirm3: (title, html, icon, buttonDanger, buttonSuccess, done) => {
         var content = document.createElement('div');
         content.innerHTML = html;
@@ -228,8 +230,8 @@ const T = {
             dangerMode: true,
             buttons: {
                 cancel: { text: 'Huỷ', value: null, visible: true },
-                confirm: { text: buttonDanger, value: true },
-                false: { text: buttonSuccess, value: false }
+                false: { text: buttonDanger, value: false },
+                confirm: { text: buttonSuccess, value: true }
             }
         }).then(done)
     },
@@ -292,7 +294,7 @@ const T = {
     }
 };
 
-T.socket = T.debug ? io() : io.connect(T.rootUrl, { secure: true });
+T.socket = T.debug ? io('http://localhost:7012', { transports: ['websocket'] }) : io(T.rootUrl, { secure: true, transports: ['websocket'] });
 
 T.language = texts => {
     let lg = window.location.pathname.includes('/en')

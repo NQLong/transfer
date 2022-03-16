@@ -78,13 +78,13 @@ export function getRole(id, done) {
         const url = `/api/role/item/${id}`;
         T.get(url, data => {
             if (data.error) {
-                T.notify('Lấy thông tin vai trò bị lỗi!', 'danger');
-                console.error(`DELETE: ${url}. ${data.error}`);
+                T.notify('Lấy thông tin vai trò bị lỗi!', 'danger' +
+                    (data.error.message && (':<br>' + data.error.message)), 'danger');
+                console.error(`GET: ${url}.`, data.error);
             } else {
                 done && done(data.item);
-                T.alert('Lấy thông tin vai trò thành công!', 'error', false, 800);
             }
-        }, () => T.notify('Lấy thông tin vai trò bị lỗi', 'danger'));
+        }, error => console.error(`GET: ${url}.`, error));
     };
 }
 
@@ -148,3 +148,13 @@ export function changeRole(role) {
         }, () => T.notify('Change debug role error!', 'danger'));
     };
 }
+
+export const SelectAdapter_Roles = {
+    ajax: true,
+    url: '/api/role/all',
+    data: params => ({ condition: params.term }),
+    processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.id, text: item.name })) : [] }),
+    fetchOne: (id, done) => (getRole(id, item => item && done && done({ id: item.id, text: item.name })))(),
+    getOne: getRole,
+    processResultOne: response => response && ({ value: response.id, text: response.name }),
+};

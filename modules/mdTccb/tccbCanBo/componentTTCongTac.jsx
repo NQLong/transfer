@@ -66,7 +66,7 @@ class ComponentTTCongTac extends AdminPage {
             this.state.doiTuongBoiDuong ? this.tinhTrangBoiDuong.value(item.tinhTrangBoiDuong ? item.tinhTrangBoiDuong : 0) : null;
             this.state.doiTuongBoiDuong && this.state.tinhTrangBoiDuong ? this.namBoiDuong.value(item.namBoiDuong ? item.namBoiDuong : '') : null;
             this.state.doiTuongBoiDuong && this.state.tinhTrangBoiDuong ? this.khoaBoiDuong.value(item.khoaBoiDuong ? item.khoaBoiDuong : '') : null;
-            
+
             if (this.state.dangONuocNgoai) {
                 this.dangONuocNgoai.value(true);
                 let { quocGia, ngayDi, ngayDiType, ngayVe, ngayVeType, mucDich } = item.dangONuocNgoai;
@@ -89,11 +89,12 @@ class ComponentTTCongTac extends AdminPage {
         });
 
     }
-    getValue = (selector) => {
-        const data = selector.value();
+
+    getValue = (selector, date = null) => {
+        const data = date ? selector.value().getTime() : selector.value();
         const isRequired = selector.props.required;
         if (data || data === 0) return data;
-        if (isRequired) throw selector;
+        if (isRequired && !data) throw selector;
         return '';
     };
 
@@ -121,26 +122,20 @@ class ComponentTTCongTac extends AdminPage {
                 noiKhamChuaBenhBanDau: this.getValue(this.noiKhamBenhBanDau),
                 doiTuongBoiDuongKienThucQpan: Number(this.getValue(this.doiTuongBoiDuong)),
                 loaiDoiTuongBoiDuong: this.state.doiTuongBoiDuong ? this.getValue(this.loaiDoiTuongBoiDuong) : '',
-                daThamGiaBoiDuong: this.state.doiTuongBoiDuong ? Number(this.getValue(this.tinhTrangBoiDuong)) : 0,
-                namBoiDuong: this.state.doiTuongBoiDuong && this.state.tinhTrangBoiDuong ? (this.getValue(this.namBoiDuong) ? this.getValue(this.namBoiDuong).getTime() : '') : '',
-                khoaBoiDuong: this.state.doiTuongBoiDuong && this.state.tinhTrangBoiDuong ? (this.getValue(this.khoaBoiDuong) ? this.getValue(this.khoaBoiDuong).getTime() : '') : '',
-                // dangNghiTheoCheDo: Number(this.getValue(this.dangNghiTheoCheDo)),
-                // noiNgheTheoCheDo: this.state.dangNghiTheoCheDo ? this.getValue(this.noiNghi) : '',
-                // ngayBatDauNghiTheoCheDo: this.state.dangNghiTheoCheDo ? (this.getValue(this.ngayBatDauNghiTheoCheDo) ? this.getValue(this.ngayBatDauNghiTheoCheDo).getTime() : '') : '',
-                // ngayKetThucNghiTheoCheDo: this.state.dangNghiTheoCheDo ? (this.getValue(this.ngayKetThucNghiTheoCheDo) ? this.getValue(this.ngayKetThucNghiTheoCheDo).getTime() : '') : '',
-                // lyDoNghiTheoCheDo: this.state.dangNghiTheoCheDo ? this.getValue(this.lyDoNghiTheoCheDo) : '',
-                // daNghi: Number(this.getValue(this.daNghi)),
-                // ngayNghi: this.state.daNghi ? (this.getValue(this.ngayDaNghi) ? this.getValue(this.ngayDaNghi).getTime() : '') : '',
-                // soHieuDaNghi: this.state.daNghi ? this.getValue(this.soHieuDaNghi) : '',
-                // noiDungDaNghi: this.state.daNghi ? this.getValue(this.noiDungDaNghi) : ''
+                tinhTrangBoiDuong: this.state.doiTuongBoiDuong ? Number(this.getValue(this.tinhTrangBoiDuong)) : 0,
+                namBoiDuong: (this.state.doiTuongBoiDuong && this.state.tinhTrangBoiDuong) ? this.getValue(this.namBoiDuong) : null,
+                khoaBoiDuong: (this.state.doiTuongBoiDuong && this.state.tinhTrangBoiDuong) ? this.getValue(this.khoaBoiDuong) : '',
             };
             return data;
 
         }
         catch (selector) {
-            selector.focus();
-            T.notify('<b>' + (selector.props.label || 'Dữ liệu') + '</b> bị trống!', 'danger');
-            return false;
+            if (selector) {
+                console.log(selector);
+                selector.focus();
+                T.notify('<b>' + (selector.props.label || 'Dữ liệu') + '</b> bị trống!', 'danger');
+                return false;
+            }
         }
     }
 
@@ -177,10 +172,10 @@ class ComponentTTCongTac extends AdminPage {
                     <div className='form-group col-md-12'></div>
 
                     <FormCheckbox ref={e => this.doiTuongBoiDuong = e} label='Đối tượng bồi dưỡng kiến thức Quốc phòng và An ninh' onChange={value => this.setState({ doiTuongBoiDuong: value })} className='col-md-12' />
-                    {this.state.doiTuongBoiDuong ? <FormSelect ref={e => this.loaiDoiTuongBoiDuong = e} label='Loại đối tượng bồi dưỡng' data={[{ id: 2, text: 'Loại 2' }, { id: 3, text: 'Loại 3' }, { id: 4, text: 'Loại 4' }]} className='col-md-3' /> : null}
+                    {this.state.doiTuongBoiDuong ? <FormSelect ref={e => this.loaiDoiTuongBoiDuong = e} label='Loại đối tượng' data={[{ id: 2, text: 'Loại 2' }, { id: 3, text: 'Loại 3' }, { id: 4, text: 'Loại 4' }]} className='col-md-3' required={this.state.doiTuongBoiDuong} /> : null}
                     {this.state.doiTuongBoiDuong ? <FormCheckbox ref={e => this.tinhTrangBoiDuong = e} label='Đã tham gia bồi dưỡng' onChange={value => this.setState({ tinhTrangBoiDuong: value })} className='col-md-3' /> : null}
-                    {this.state.tinhTrangBoiDuong ? <FormTextBox type='year' ref={e => this.namBoiDuong = e} label='Năm bồi dưỡng' className='col-md-2' /> : null}
-                    {this.state.tinhTrangBoiDuong ? <FormTextBox ref={e => this.khoaBoiDuong = e} label='Khóa bồi dưỡng' placeholder='Ghi rõ khóa mấy, dành cho đối tượng nào' className='col-md-4' /> : null}
+                    {this.state.tinhTrangBoiDuong ? <FormTextBox type='year' ref={e => this.namBoiDuong = e} label='Năm bồi dưỡng' className='col-md-2' required={this.state.tinhTrangBoiDuong} /> : null}
+                    {this.state.tinhTrangBoiDuong ? <FormTextBox ref={e => this.khoaBoiDuong = e} label='Khóa bồi dưỡng' placeholder='Ghi rõ khóa mấy, dành cho đối tượng nào' className='col-md-4' required={this.state.tinhTrangBoiDuong} /> : null}
 
                     <div className='form-group col-md-12'></div>
                     <div className='form-group col-md-12'></div>
@@ -208,7 +203,7 @@ class ComponentTTCongTac extends AdminPage {
                     <FormCheckbox ref={e => this.daNghi = e} label='Đã nghỉ việc/Nghỉ hưu/Chuyển công tác' onChange={value => this.setState({ daNghi: value })} readOnly className='col-md-12' />
                     {this.state.daNghi ? <FormDatePicker type='date-mask' ref={e => this.ngayDaNghi = e} label='Thời điểm nghỉ' readOnly placeholder='Từ ngày, tháng, năm ...' className='col-md-3' /> : null}
                     {this.state.daNghi ? <FormTextBox ref={e => this.soHieuDaNghi = e} label='Số quyết định' readOnly className='col-md-3' /> : null}
-                    {this.state.daNghi ? <FormTextBox ref={e => this.noiDungDaNghi = e} label='Nội dung' className='col-md-6' readOnly/>
+                    {this.state.daNghi ? <FormTextBox ref={e => this.noiDungDaNghi = e} label='Nội dung' className='col-md-6' readOnly />
                         : null}
                 </div>
             </div>

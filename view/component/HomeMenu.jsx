@@ -53,6 +53,7 @@ class HomeMenu extends React.Component {
         };
         $(document).ready(ready);
     }
+
     onKeyPress = (searchValue) => {
         if (searchValue.key == 'Enter')
             console.log($('#inputID').val());
@@ -118,7 +119,6 @@ class HomeMenu extends React.Component {
         // if (window.location.hostname == 'localhost')
         languageToggle = <div className='ml-2'><LanguageSwitch address={this.state.otherWebAddress} /></div>;
         if (this.props.system && menus) {
-            console.log(this.state);
             submenus = menus.filter(item => item.parentId).forEach(element => {
                 menus.map(item => {
                     if (item.id === element.parentId) {

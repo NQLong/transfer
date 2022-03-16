@@ -41,7 +41,9 @@ html(lang='vi')
         script(type='text/javascript' src='/home/js/bootstrap-datepicker.js')
         script(type='text/javascript' src='/js/plugins/bootstrap-notify.min.js')
         script(type='text/javascript' src='/home/js/scrollax.min.js')
-        script(type='text/javascript' src=htmlWebpackPlugin.files.chunks.unit.entry)
+        each item in htmlWebpackPlugin.files.js
+            if item.indexOf('/js/unit.')==0
+                script(type='text/javascript' src=`${item.substring(0, item.indexOf('.js')+3)}?v=${htmlWebpackPlugin.options.version}`)
         script(type='text/javascript' src='/home/js/main.js')
         script(src='/home/js/chatfb.js')
 

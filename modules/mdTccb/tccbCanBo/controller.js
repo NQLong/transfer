@@ -26,14 +26,6 @@ module.exports = app => {
     app.get('/user/tccb/staff', app.permission.check('staff:read'), app.templates.admin);
     app.get('/user/tccb/staff/item/upload', app.permission.check('staff:write'), app.templates.admin);
 
-    app.readyHooks.add('readyUser', {
-        ready: () => app.dbConnection != null && app.model != null && app.model.canBo != null && app.model.canBo != null,
-
-        run: () => {
-            app.model.fwUser.count({}, (error, numberOfUser) => app.data.numberOfUser = error ? 0 : numberOfUser.rows[0]['COUNT(*)']);
-        }
-    });
-
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
 
@@ -1088,7 +1080,8 @@ module.exports = app => {
                 if (error || item == null) {
                     res.send({ error: 'Not found!' });
                 } else {
-                    if (item.email === req.session.user.email) {
+                    if (item.shcc === req.session.user.shcc) {
+                        console.log(req.body.id);
                         const changes = req.body.changes;
                         app.model.quanHeCanBo.update({ id: req.body.id }, changes, (error, item) => res.send({ error, item }));
                     } else {
@@ -1107,7 +1100,7 @@ module.exports = app => {
                 if (error || item == null) {
                     res.send({ error: 'Not found!' });
                 } else {
-                    if (item.email === req.session.user.email) {
+                    if (item.shcc === req.session.user.shcc) {
                         app.model.quanHeCanBo.delete({ id: req.body.id }, (error) => res.send(error));
                     } else {
                         res.send({ error: 'Not found!' });
@@ -1506,7 +1499,6 @@ module.exports = app => {
                     })).then((data) => {
                         app.docx.generateFile(source, data, (error, data) => {
                             if (error) {
-                                console.log(error);
                                 res.send({ error });
                             }
                             else
@@ -2238,7 +2230,7 @@ module.exports = app => {
         }
     };
     // Hook upload images ---------------------------------------------------------------------------------------------------------------------------
-    app.createFolder(app.path.join(app.publicPath, '/img/user/avatar'));
+    app.createFolder(app.path.join(app.publicPath, '/img/user'));
 
     const uploadCanBoImage = (req, fields, files, params, done) => {
         if (fields.userData && fields.userData.length && fields.userData[0].startsWith('CanBoImage:') && files.CanBoImage && files.CanBoImage.length) {
@@ -2249,14 +2241,14 @@ module.exports = app => {
                 } else {
                     app.deleteImage(item.image);
                     let srcPath = files.CanBoImage[0].path,
-                        image = '/img/user/avatar/' + item.ma + app.path.extname(srcPath);
+                        image = '/img/user/' + app.path.basename(srcPath);
                     app.fs.rename(srcPath, app.path.join(app.publicPath, image), error => {
                         if (error) {
                             done({ error });
                         } else {
                             image += '?t=' + (new Date().getTime()).toString().slice(-8);
                             app.model.fwUser.update({ email: item.email }, { image }, (error, item) => {
-                                if (error == null) {
+                                if (error == null && req.session.user.email === item.email) {
                                     app.io.emit('avatar-changed', item);
                                     req.session.user.image = image;
                                 }

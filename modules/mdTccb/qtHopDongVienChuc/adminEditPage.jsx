@@ -148,8 +148,6 @@ class QtHopDongVienChucEditPage extends QTForm {
     }
 
     setVal = (data = {}) => {
-        console.log(data.qtHopDongVienChuc);
-        console.log(data.canBoDuocThue);
         const {
             shcc = '',
             quocGia = '',
@@ -323,7 +321,6 @@ class QtHopDongVienChucEditPage extends QTForm {
     copyAddress = e => {
         e.preventDefault();
         const dataThuongTru = this.thuongTru.value();
-        console.log(dataThuongTru);
         this.cuTru.value(dataThuongTru.maTinhThanhPho, dataThuongTru.maQuanHuyen, dataThuongTru.maPhuongXa, dataThuongTru.soNhaDuong);
     }
     autoChucVu = (value) => {
