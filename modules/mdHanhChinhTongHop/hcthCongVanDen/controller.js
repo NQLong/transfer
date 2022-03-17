@@ -32,6 +32,23 @@ module.exports = (app) => {
         });
     });
 
+    app.get('/api/hcth/cong-van-den/page/:pageNumber/:pageSize', (req, res) => {
+        const pageNumber = parseInt(req.params.pageNumber),
+            pageSize = parseInt(req.params.pageSize);
+        let condition = { statement: null };
+        const statement = ['soCongVan', 'noiDung', 'chiDao']
+            .map(i => `lower(${i}) LIKE :searchText`).join(' OR ');
+        if (req.query.condition) {
+            condition = {
+                statement,
+                parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
+            };
+        }
+        app.model.hcthCongVanDen.getPage(pageNumber, pageSize, condition, (error, page) => {
+            res.send({ error, page });
+        });
+    });
+
     app.post('/api/hcth/cong-van-den', app.permission.check('staff:login'), (req, res) => {
         console.log(req.body);
         app.model.hcthCongVanDen.create(req.body.data, (error, item) => res.send({ error, item }));
@@ -45,4 +62,18 @@ module.exports = (app) => {
         app.model.hcthCongVanDen.delete({ id: req.body.id }, errors => res.send({ errors }));
     });
 
+    app.get('/api/hcth/cong-van-den/search/page/:pageNumber/:pageSize', app.permission.check('hcthCongVanDen:read'), (req, res) => {
+        const pageNumber = parseInt(req.params.pageNumber),
+            pageSize = parseInt(req.params.pageSize),
+            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+        app.model.hcthCongVanDen.searchPage(pageNumber, pageSize, searchTerm, (error, page) => {
+            if (error || page == null) {
+                res.send({ error });
+            } else {
+                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
+                const pageCondition = searchTerm;
+                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
+            }
+        });
+    });
 };

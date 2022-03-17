@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { AdminPage, AdminModal, FormDatePicker, renderTable, FormTextBox, FormSelect, TableCell } from 'view/component/AdminPage';
 import { Link } from 'react-router-dom';
-import { getHcthCongVanDenAll, getHcthCongVanDenPage, createHcthCongVanDen, updateHcthCongVanDen, deleteHcthCongVanDen } from './redux';
+import { getHcthCongVanDenAll, getHcthCongVanDenPage, createHcthCongVanDen, updateHcthCongVanDen, deleteHcthCongVanDen, getHcthCongVanDenSearchPage } from './redux';
 import { SelectAdapter_DmDonViGuiCongVan } from 'modules/mdDanhMuc/dmDonViGuiCv/redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
@@ -16,16 +16,16 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        let { id, ngayCongVan, ngayNhan, ngayHetHan, soCongVan, donViGui, donViNhan, canBoNhan, noiDung, chiDao } = item ? item : { id: '', ngayCV: '', ngayNhan: '', ngayHetHan: '', soCongVan: '', donViGuiCongVan: '', donViNhanCongVan: '', canBoNhanCongVan: '', noiDung: '', chiDao: '' };
+        let { id, ngayCongVan, ngayNhan, ngayHetHan, soCongVan, maDonViGuiCV, maDonVi, shcc, noiDung, chiDao } = item ? item : { id: '', ngayCV: '', ngayNhan: '', ngayHetHan: '', soCongVan: '', maDonViGuiCV: '', maDonVi: '', shcc: '', noiDung: '', chiDao: '' };
         // console.log(donViGui)
         this.setState({ id, item });
         this.ngayCV.value(ngayCongVan);
         this.ngayNhan.value(ngayNhan);
         this.ngayHetHan.value(ngayHetHan);
         this.soCV.value(soCongVan);
-        this.donViGuiCongVan.value(donViGui);
-        this.donViNhanCongVan.value(donViNhan ? donViNhan : '');
-        this.canBoNhanCongVan.value(canBoNhan ? canBoNhan : '');
+        this.donViGuiCongVan.value(maDonViGuiCV);
+        this.donViNhanCongVan.value(maDonVi ? maDonVi : '');
+        this.canBoNhanCongVan.value(shcc ? shcc : '');
         this.noiDung.value(noiDung);
         this.chiDao.value(chiDao);
     };
@@ -94,7 +94,7 @@ class HcthCongVanDen extends AdminPage {
     }
 
     getPage = (pageN, pageS, pageC, done) => {
-        this.props.getHcthCongVanDenPage(pageN, pageS, pageC, {}, done);
+        this.props.getHcthCongVanDenSearchPage(pageN, pageS, pageC, {}, done);
     }
 
 
@@ -108,6 +108,7 @@ class HcthCongVanDen extends AdminPage {
     }
 
     render() {
+        console.log(this.props);
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('hcthCongVanDen', ['read', 'write', 'delete']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.hcthCongVanDen ? this.props.hcthCongVanDen.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
@@ -132,18 +133,18 @@ class HcthCongVanDen extends AdminPage {
                     </tr>),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={index} />
-                        <TableCell type='text' style={{ textAlign: 'center' ,whiteSpace: 'nowrap'}} content={item.soCongVan} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
+                        <TableCell type='link' onClick={() => this.modal.show(item)} style={{ textAlign: 'center' ,whiteSpace: 'nowrap'}} content={item.soCongVan} />
                         <TableCell type='text' style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={T.dateToText(item.ngayCongVan, 'dd/mm/yyyy')} />
                         <TableCell type='text' style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={T.dateToText(item.ngayNhan, 'dd/mm/yyyy')} />
                         <TableCell type='text' style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={item.ngayHetHan ? T.dateToText(item.ngayHetHan, 'dd/mm/yyyy') : ''} />
-                        <TableCell type='text' style={{ textAlign: 'center' }} content={item.tenDonViGui} />
-                        <TableCell type='text' style={{ textAlign: 'center' }} content={item.tenDonViNhan} />
-                        <TableCell type='text' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
-                            item.canBoNhan &&
+                        <TableCell type='text' style={{ textAlign: 'center' }} content={item.tenDonViGuiCV} />
+                        <TableCell type='text' style={{ textAlign: 'center' }} content={item.tenDonVi} />
+                        <TableCell type='text' onClick={() => this.modal.show(item)} style={{}} content={(
+                            item.shcc &&
                             <>
                                 <span>{(item.hoCanBo ? item.hoCanBo : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo : ' ')}</span><br />
-                                {item.canBoNhan}
+                                {item.shcc}
                             </>
                         )}
                         />
@@ -176,5 +177,5 @@ class HcthCongVanDen extends AdminPage {
 
 
 const mapStateToProps = state => ({ system: state.system, hcthCongVanDen: state.hcth.hcthCongVanDen });
-const mapActionsToProps = { getHcthCongVanDenAll, getHcthCongVanDenPage, createHcthCongVanDen, updateHcthCongVanDen, deleteHcthCongVanDen };
+const mapActionsToProps = { getHcthCongVanDenAll, getHcthCongVanDenPage, createHcthCongVanDen, updateHcthCongVanDen, deleteHcthCongVanDen, getHcthCongVanDenSearchPage  };
 export default connect(mapStateToProps, mapActionsToProps)(HcthCongVanDen);
