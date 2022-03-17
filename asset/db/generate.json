@@ -6393,6 +6393,60 @@
         "foreignKeys": [],
         "type": "table"
     },
+    "HCTH_CONG_VAN_DI": {
+        "active": true,
+        "moduleName": "hcthCongVanDi",
+        "modelName": "hcthCongVanDi",
+        "columns": {
+            "ID": {
+                "value": "id",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": false,
+                "size": "22,0"
+            },
+            "NOI_DUNG": {
+                "value": "noiDung",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 1000
+            },
+            "NGAY_GUI": {
+                "value": "ngayGui",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "20,0"
+            },
+            "NGAY_KY": {
+                "value": "ngayKy",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "20,0"
+            },
+            "DON_VI_GUI": {
+                "value": "donViGui",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 200
+            },
+            "DON_VI_NHAN": {
+                "value": "donViNhan",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 200
+            }
+        },
+        "primaryKeys": [
+            "ID"
+        ],
+        "foreignKeys": [],
+        "type": "table"
+    },
     "QT_BAI_VIET_KHOA_HOC": {
         "active": true,
         "moduleName": "qtBaiVietKhoaHoc",
@@ -8036,7 +8090,7 @@
         "methods": {
             "qt_khen_thuong_all_search_page": "searchPage",
             "qt_khen_thuong_all_group_page": "groupPage",
-            "qt_khen_thuong_all_group_page_ma": "groupPageMa"
+            "QT_KY_LUAT_DOWNLOAD_EXCEL": "download"
         },
         "columns": {
             "LOAI_DOI_TUONG": {
@@ -8207,6 +8261,11 @@
         "active": true,
         "moduleName": "qtKyLuat",
         "modelName": "qtKyLuat",
+        "methods": {
+            "QT_KY_LUAT_SEARCH_PAGE": "searchPage",
+            "QT_KY_LUAT_GROUP_PAGE": "groupPage",
+            "QT_KY_LUAT_DOWNLOAD_EXCEL": "download"
+        },
         "columns": {
             "ID": {
                 "value": "id",
