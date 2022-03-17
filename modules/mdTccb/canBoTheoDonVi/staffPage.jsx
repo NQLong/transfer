@@ -47,7 +47,7 @@ class CanBoTheoDonVi extends AdminPage {
             subTitle: <span style={{ color: 'blue' }}>Đơn vị: {this.state.tenDonVi}</span>,
             breadcrumb: [
                 <Link key={0} to='/user'>Trang cá nhân</Link>,
-                'Thông tin cán bộ thuộc đơn vị'
+                'Danh sách cán bộ thuộc đơn vị'
             ],
             content: <>
                 <div className='tile'>
