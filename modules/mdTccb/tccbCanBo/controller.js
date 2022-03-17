@@ -63,6 +63,38 @@ module.exports = app => {
             res.send({ error, page });
         });
     });
+    app.get('/api/staff-female/page/:pageNumber/:pageSize', checkGetStaffPermission, (req, res) => {
+        let pageNumber = parseInt(req.params.pageNumber),
+            pageSize = parseInt(req.params.pageSize),
+            condition = { statement: null };
+        if (req.query.condition) {
+            if (typeof (req.query.condition) == 'object') {
+                if (req.query.condition.searchText) {
+                    condition = {
+                        statement: 'email LIKE :searchText OR lower(shcc) LIKE :searchText OR lower(ho || \' \' || ten) LIKE :searchText',
+                        parameter: { searchText: `%${req.query.condition.searchText.toLowerCase()}%` }
+                    };
+                }
+            } else {
+                condition = {
+                    statement: 'email LIKE :searchText OR lower(shcc) LIKE :searchText OR lower(ho || \' \' || ten) LIKE :searchText',
+                    parameter: { searchText: `%${req.query.condition.toLowerCase()}%` }
+                };
+            }
+        }
+        if (req.query.condition) {
+            condition.statement += ' AND phai = :phai';
+            condition.parameter.phai = '02';
+        } else {
+            condition.statement = 'phai = :phai';
+            condition.parameter = {
+                phai: '02'
+            };
+        }
+        app.model.canBo.getPage(pageNumber, pageSize, condition, '*', 'SHCC DESC, TEN ASC', (error, page) => {
+            res.send({ error, page });
+        });
+    });
 
     app.get('/api/staff/item/:shcc', checkGetStaffPermission, (req, res) => {
         app.model.canBo.get({ shcc: req.params.shcc }, (error, item) => res.send({ error, item }));

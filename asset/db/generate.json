@@ -8969,7 +8969,8 @@
         "modelName": "qtNghiThaiSan",
         "methods": {
             "qt_nghi_thai_san_search_page": "searchPage",
-            "qt_nghi_thai_san_group_page": "groupPage"
+            "qt_nghi_thai_san_group_page": "groupPage",
+            "qt_nghi_thai_san_download_excel": "download"
         },
         "columns": {
             "ID": {
