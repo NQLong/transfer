@@ -40,20 +40,18 @@ class EditModal extends AdminModal {
         });
 
         setTimeout(() => {
-            this.loaiDoiTuong.value(maLoaiDoiTuong ? maLoaiDoiTuong : '');
+            this.loaiDoiTuong.value(maLoaiDoiTuong || '');
             if (maLoaiDoiTuong == '02') this.maCanBo.value(ma ? ma : this.props.ma);
             else if (maLoaiDoiTuong == '03') this.maDonVi.value(ma ? ma : this.props.ma);
             else if (maLoaiDoiTuong == '04') this.maBoMon.value(ma ? ma : this.props.ma);
 
-            this.namDatDuoc.value(namDatDuoc ? namDatDuoc : '');
-            this.thanhTich.value(maThanhTich ? maThanhTich : '');
-            this.chuThich.value(maChuThich ? maChuThich : '');
+            this.namDatDuoc.value(namDatDuoc || '');
+            this.thanhTich.value(maThanhTich || '');
+            this.chuThich.value(maChuThich || '');
             this.diemThiDua.value(diemThiDua);
-            this.soQuyetDinh.value(soQuyetDinh ? soQuyetDinh : '');
+            this.soQuyetDinh.value(soQuyetDinh || '');
         }, 100);
     };
-
-    changeKichHoat = (value, target) => target.value(value ? 1 : 0) || target.value(value);
 
     onSubmit = (e) => {
         e.preventDefault();
@@ -126,11 +124,11 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                 params = route.parse(window.location.pathname);
             this.loaiDoiTuong = params.loaiDoiTuong;
             this.ma = params.ma;
-            this.setState({ filter: { loaiDoiTuong: this.loaiDoiTuong, listShcc: this.ma, listDv: ''} });
+            this.setState({ filter: { loaiDoiTuong: this.loaiDoiTuong, listShcc: this.loaiDoiTuong == '02' ? this.ma : '', listDv: ''} });
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
-                this.fromYear?.value('');
-                this.toYear?.value('');
+                this.fromYear.value('');
+                this.toYear.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
             this.getPage();
@@ -139,8 +137,8 @@ class QtKhenThuongAllGroupPage extends AdminPage {
 
     changeAdvancedSearch = (isInitial = false) => {
         let { pageNumber, pageSize } = this.props && this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.pageMa ? this.props.qtKhenThuongAll.pageMa : { pageNumber: 1, pageSize: 50 };
-        const fromYear = this.fromYear?.value() == '' ? null : Number(this.fromYear?.value());
-        const toYear = this.toYear?.value() == '' ? null : Number(this.toYear?.value());
+        const fromYear = this.fromYear.value() == '' ? null : Number(this.fromYear.value());
+        const toYear = this.toYear.value() == '' ? null : Number(this.toYear.value());
         const loaiDoiTuong = this.state.filter.loaiDoiTuong;
         const listShcc = this.state.filter.listShcc;
         const listDv = this.state.filter.listDv;
@@ -150,8 +148,8 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                 if (isInitial) {
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
-                    this.fromYear?.value(filter.fromYear || '');
-                    this.toYear?.value(filter.toYear || '');
+                    this.fromYear.value(filter.fromYear || '');
+                    this.toYear.value(filter.toYear || '');
                     if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear)) this.showAdvanceSearch();
                 }
             });

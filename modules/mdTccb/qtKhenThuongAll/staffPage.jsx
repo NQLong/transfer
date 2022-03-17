@@ -37,15 +37,13 @@ class EditModal extends AdminModal {
         });
 
         setTimeout(() => {
-            this.namDatDuoc.value(namDatDuoc ? namDatDuoc : '');
-            this.thanhTich.value(maThanhTich ? maThanhTich : '');
-            this.chuThich.value(maChuThich ? maChuThich : '');
+            this.namDatDuoc.value(namDatDuoc || '');
+            this.thanhTich.value(maThanhTich || '');
+            this.chuThich.value(maChuThich || '');
             this.diemThiDua.value(diemThiDua);
-            this.soQuyetDinh.value(soQuyetDinh ? soQuyetDinh : '');
+            this.soQuyetDinh.value(soQuyetDinh || '');
         }, 100);
     };
-
-    changeKichHoat = (value, target) => target.value(value ? 1 : 0) || target.value(value);
 
     onSubmit = (e) => {
         e.preventDefault();

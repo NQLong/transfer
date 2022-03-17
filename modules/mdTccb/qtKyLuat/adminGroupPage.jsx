@@ -29,11 +29,11 @@ class EditModal extends AdminModal {
         }, () => {
             this.maCanBo.value(maCanBo ? maCanBo : this.props.maCanBo);
             this.hinhThucKyLuat.value(lyDoHinhThuc);
-            this.capQuyetDinh.value(capQuyetDinh ? capQuyetDinh : '');
-            this.diemThiDua.value(diemThiDua ? diemThiDua : '');
-            this.noiDung.value(noiDung ? noiDung : '');
-            this.soQuyetDinh.value(soQuyetDinh ? soQuyetDinh : '');
-            this.ngayRaQuyetDinh.value(ngayRaQuyetDinh ? ngayRaQuyetDinh : '');
+            this.capQuyetDinh.value(capQuyetDinh || '');
+            this.diemThiDua.value(diemThiDua || '');
+            this.noiDung.value(noiDung || '');
+            this.soQuyetDinh.value(soQuyetDinh || '');
+            this.ngayRaQuyetDinh.value(ngayRaQuyetDinh || '');
         });
     };
 
@@ -95,8 +95,8 @@ class QtKyLuatGroupPage extends AdminPage {
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
 
             T.showSearchBox(() => {
-                this.fromYear?.value('');
-                this.toYear?.value('');
+                this.fromYear.value('');
+                this.toYear.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
             this.getPage();
@@ -105,8 +105,8 @@ class QtKyLuatGroupPage extends AdminPage {
 
     changeAdvancedSearch = (isInitial = false) => {
         let { pageNumber, pageSize } = this.props && this.props.qtKyLuat && this.props.qtKyLuat.pageMa ? this.props.qtKyLuat.pageMa : { pageNumber: 1, pageSize: 50 };
-        const fromYear = this.fromYear?.value() == '' ? null : this.fromYear?.value().getTime();
-        const toYear = this.toYear?.value() == '' ? null : this.toYear?.value().getTime();
+        const fromYear = this.fromYear.value() == '' ? null : this.fromYear.value().getTime();
+        const toYear = this.toYear.value() == '' ? null : this.toYear.value().getTime();
         const listDv = this.state.filter.listDv;
         const listShcc = this.state.filter.listShcc;
         const pageFilter = isInitial ? null : { listDv, fromYear, toYear, listShcc };
@@ -115,8 +115,8 @@ class QtKyLuatGroupPage extends AdminPage {
                 if (isInitial) {
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
-                    this.fromYear?.value(filter.fromYear || '');
-                    this.toYear?.value(filter.toYear || '');
+                    this.fromYear.value(filter.fromYear || '');
+                    this.toYear.value(filter.toYear || '');
                     if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear)) this.showAdvanceSearch();
                 }
             });
@@ -168,7 +168,7 @@ class QtKyLuatGroupPage extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                        <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
+                        <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
                                 {item.shcc} <br/>

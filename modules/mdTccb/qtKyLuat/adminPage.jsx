@@ -29,11 +29,11 @@ class EditModal extends AdminModal {
         }, () => {
             this.maCanBo.value(maCanBo);
             this.hinhThucKyLuat.value(lyDoHinhThuc);
-            this.capQuyetDinh.value(capQuyetDinh ? capQuyetDinh : '');
-            this.diemThiDua.value(diemThiDua ? diemThiDua : '');
-            this.noiDung.value(noiDung ? noiDung : '');
-            this.soQuyetDinh.value(soQuyetDinh ? soQuyetDinh : '');
-            this.ngayRaQuyetDinh.value(ngayRaQuyetDinh ? ngayRaQuyetDinh : '');
+            this.capQuyetDinh.value(capQuyetDinh || '');
+            this.diemThiDua.value(diemThiDua || '');
+            this.noiDung.value(noiDung || '');
+            this.soQuyetDinh.value(soQuyetDinh || '');
+            this.ngayRaQuyetDinh.value(ngayRaQuyetDinh || '');
         });
     };
 
@@ -86,7 +86,7 @@ class EditModal extends AdminModal {
             title: this.state.id ? 'Cập nhật quá trình kỷ luật' : 'Tạo mới quá trình kỷ luật',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={this.state.id ? true : false} required />
+                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={!!this.state.id} required />
 
                 <FormTextBox className='col-md-4' ref={e => this.soQuyetDinh = e} type='text' label='Số quyết định' readOnly={readOnly} required />
                 <FormDatePicker className='col-md-4' type='date-mask'  ref={e => this.ngayRaQuyetDinh = e} label='Ngày ra quyết định' readOnly={readOnly} required />
@@ -111,10 +111,10 @@ class QtKyLuat extends AdminPage {
             T.clearSearchBox();
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
-                this.fromYear?.value('');
-                this.toYear?.value('');
-                this.maDonVi?.value('');
-                this.mulCanBo?.value('');
+                this.fromYear.value('');
+                this.toYear.value('');
+                this.maDonVi.value('');
+                this.mulCanBo.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
             if (this.checked) {
@@ -133,20 +133,20 @@ class QtKyLuat extends AdminPage {
 
     changeAdvancedSearch = (isInitial = false) => {
         let { pageNumber, pageSize } = this.props && this.props.qtKyLuat && this.props.qtKyLuat.page ? this.props.qtKyLuat.page : { pageNumber: 1, pageSize: 50 };
-        const fromYear = this.fromYear?.value() == '' ? null : this.fromYear?.value().getTime();
-        const toYear = this.toYear?.value() == '' ? null : this.toYear?.value().getTime();
-        const listDv = this.maDonVi?.value().toString() || '';
-        const listShcc = this.mulCanBo?.value().toString() || '';
+        const fromYear = this.fromYear.value() == '' ? null : this.fromYear.value().getTime();
+        const toYear = this.toYear.value() == '' ? null : this.toYear.value().getTime();
+        const listDv = this.maDonVi.value().toString() || '';
+        const listShcc = this.mulCanBo.value().toString() || '';
         const pageFilter = isInitial ? null : { listDv, fromYear, toYear, listShcc };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
-                    this.fromYear?.value(filter.fromYear || '');
-                    this.toYear?.value(filter.toYear || '');
-                    this.maDonVi?.value(filter.listDv);
-                    this.mulCanBo?.value(filter.listShcc);
+                    this.fromYear.value(filter.fromYear || '');
+                    this.toYear.value(filter.toYear || '');
+                    this.maDonVi.value(filter.listDv);
+                    this.mulCanBo.value(filter.listShcc);
                     if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.listShcc || filter.listDv)) this.showAdvanceSearch();
                 }
             });
@@ -164,10 +164,24 @@ class QtKyLuat extends AdminPage {
         this.getPage();
     }
 
-    list = (text, i, j) => {
-        if (!text) return [];
-        let deTais = text.split('??').map(str => <div key={i--} >{j - i}. {str}</div>);
-        return deTais;
+    list = (danhSachKyLuat, danhSachNgayRaQd, soKyLuat) => {
+        if (soKyLuat == 0) return [];
+        let danhSachKyLuats = danhSachKyLuat.split('??');
+        let danhSachNgayRaQds = danhSachNgayRaQd.split('??');
+        let results = [];
+        for (let i = 0; i < soKyLuat; i++) {
+            danhSachKyLuats[i] = danhSachKyLuats[i].trim();
+            danhSachNgayRaQds[i] = danhSachNgayRaQds[i].trim();
+        }
+        for (let i = 0; i < soKyLuat; i++) {
+            let s = danhSachKyLuats[i];
+            s += ' (' + (danhSachNgayRaQds[i] ? T.dateToText(Number(danhSachNgayRaQds[i]), 'dd/mm/yyyy') : '') + ')';
+            results.push(<div> <span>
+                {i+1}. {s}
+            </span></div>);
+        }
+
+        return results;
     }
 
     delete = (e, item) => {
@@ -257,7 +271,7 @@ class QtKyLuat extends AdminPage {
                         )}
                         />}
                         {this.checked && <TableCell type='text' style={{ textAlign: 'left' }} content={item.soKyLuat} />}
-                        {this.checked && <TableCell type='text' content={this.list(item.danhSachKyLuat, item.soKyLuat, item.soKyLuat)} />}
+                        {this.checked && <TableCell type='text' content={this.list(item.danhSachKyLuat, item.danhSachNgayRaQd, item.soKyLuat)} />}
                         {!this.checked && <TableCell type='text' content={(
                             <>
                                 {item.capQuyetDinh ? item.capQuyetDinh : ''}

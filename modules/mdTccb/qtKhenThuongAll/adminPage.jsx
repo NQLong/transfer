@@ -38,19 +38,17 @@ class EditModal extends AdminModal {
             id: id, doiTuong: maLoaiDoiTuong
         });
 
-        this.loaiDoiTuong.value(maLoaiDoiTuong ? maLoaiDoiTuong : '');
+        this.loaiDoiTuong.value(maLoaiDoiTuong);
         if (maLoaiDoiTuong == '02') this.maCanBo.value(ma);
         else if (maLoaiDoiTuong == '03') this.maDonVi.value(ma);
-        else if (maLoaiDoiTuong == '04') this.maBoMon.value(ma ? ma : '');
+        else if (maLoaiDoiTuong == '04') this.maBoMon.value(ma);
 
-        this.namDatDuoc.value(namDatDuoc ? namDatDuoc : '');
-        this.thanhTich.value(maThanhTich ? maThanhTich : '');
-        this.chuThich.value(maChuThich ? maChuThich : '');
+        this.namDatDuoc.value(namDatDuoc || '');
+        this.thanhTich.value(maThanhTich);
+        this.chuThich.value(maChuThich);
         this.diemThiDua.value(diemThiDua);
-        this.soQuyetDinh.value(soQuyetDinh ? soQuyetDinh : '');
+        this.soQuyetDinh.value(soQuyetDinh || '');
     };
-
-    changeKichHoat = (value, target) => target.value(value ? 1 : 0) || target.value(value);
 
     onSubmit = (e) => {
         e.preventDefault();
@@ -111,19 +109,19 @@ class EditModal extends AdminModal {
             title: this.state.id ? 'Cập nhật quá trình khen thưởng' : 'Tạo mới quá trình khen thưởng',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-4' ref={e => this.loaiDoiTuong = e} label='Loại đối tượng' data={this.loaiDoiTuongTable} readOnly={this.state.id ? true : false} onChange={value => this.onChangeDT(value.id)} required />
+                <FormSelect className='col-md-4' ref={e => this.loaiDoiTuong = e} label='Loại đối tượng' data={this.loaiDoiTuongTable} readOnly={!!this.state.id} onChange={value => this.onChangeDT(value.id)} required />
 
                 <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo}
                     style={doiTuong == '02' ? {} : { display: 'none' }}
-                    readOnly={this.state.id ? true : false} required />
+                    readOnly={!!this.state.id} required />
 
                 <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi}
                     style={doiTuong == '03' ? {} : { display: 'none' }}
-                    readOnly={this.state.id ? true : false} required />
+                    readOnly={!!this.state.id} required />
 
                 <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maBoMon = e} label='Bộ môn' data={SelectAdapter_DmBoMon}
                     style={doiTuong == '04' ? {} : { display: 'none' }}
-                    readOnly={this.state.id ? true : false} required />
+                    readOnly={!!this.state.id} required />
 
                 <FormTextBox className='col-md-4' ref={e => this.soQuyetDinh = e} type='text' label='Số quyết định' readOnly={readOnly} />
                 <FormSelect className='col-md-8' ref={e => this.thanhTich = e} label='Thành tích' data={SelectAdapter_DmKhenThuongKyHieuV2} readOnly={readOnly} required />
@@ -143,7 +141,6 @@ class QtKhenThuongAll extends AdminPage {
         { 'id': '-1', 'text': 'Tất cả' }
     ];
     searchText = '';
-    curState = '-1';
     componentDidMount() {
         T.ready('/user/tccb', () => {
             T.clearSearchBox();
@@ -160,9 +157,9 @@ class QtKhenThuongAll extends AdminPage {
             });
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
-                this.fromYear?.value('');
-                this.toYear?.value('');
-                this.loaiDoiTuong?.value('');
+                this.fromYear.value('');
+                this.toYear.value('');
+                this.loaiDoiTuong.value('');
                 this.maDonVi?.value('');
                 this.mulCanBo?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
@@ -182,23 +179,22 @@ class QtKhenThuongAll extends AdminPage {
 
     changeAdvancedSearch = (isInitial = false) => {
         let { pageNumber, pageSize } = this.props && this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.page ? this.props.qtKhenThuongAll.page : { pageNumber: 1, pageSize: 50 };
-        const fromYear = this.fromYear?.value() == '' ? null : Number(this.fromYear?.value());
-        const toYear = this.toYear?.value() == '' ? null : Number(this.toYear?.value());
-        const loaiDoiTuong = this.loaiDoiTuong?.value() || '-1';
+        const fromYear = this.fromYear.value() == '' ? null : Number(this.fromYear.value());
+        const toYear = this.toYear.value() == '' ? null : Number(this.toYear.value());
+        const loaiDoiTuong = this.loaiDoiTuong.value() || '-1';
         const listDv = loaiDoiTuong == '02' ? (this.maDonVi?.value().toString() || '') : '';
         const listShcc = loaiDoiTuong == '02' ? (this.mulCanBo?.value().toString() || '') : '';
         const pageFilter = isInitial ? null : { fromYear, toYear, loaiDoiTuong, listDv, listShcc };
-        this.curState = loaiDoiTuong;
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
-                    this.fromYear?.value(filter.fromYear || '');
-                    this.toYear?.value(filter.toYear || '');
-                    this.loaiDoiTuong?.value(filter.loaiDoiTuong || '-1');
-                    this.listDv?.value(filter.listDv);
-                    this.listShcc?.value(filter.listShcc);
+                    this.fromYear.value(filter.fromYear || '');
+                    this.toYear.value(filter.toYear || '');
+                    this.loaiDoiTuong.value(filter.loaiDoiTuong || '-1');
+                    this.maDonVi?.value(filter.listDv);
+                    this.mulCanBo?.value(filter.listShcc);
                     if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.loaiDoiTuong || filter.listDv || filter.listShcc)) this.showAdvanceSearch();
                 }
             });

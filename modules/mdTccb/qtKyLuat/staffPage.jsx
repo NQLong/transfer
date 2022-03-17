@@ -25,11 +25,11 @@ class EditModal extends AdminModal {
             maCanBo: item.maCanBo
         }, () => {
             this.hinhThucKyLuat.value(lyDoHinhThuc);
-            this.capQuyetDinh.value(capQuyetDinh ? capQuyetDinh : '');
-            this.diemThiDua.value(diemThiDua ? diemThiDua : '');
-            this.noiDung.value(noiDung ? noiDung : '');
-            this.soQuyetDinh.value(soQuyetDinh ? soQuyetDinh : '');
-            this.ngayRaQuyetDinh.value(ngayRaQuyetDinh ? ngayRaQuyetDinh : '');
+            this.capQuyetDinh.value(capQuyetDinh || '');
+            this.diemThiDua.value(diemThiDua || '');
+            this.noiDung.value(noiDung || '');
+            this.soQuyetDinh.value(soQuyetDinh || '');
+            this.ngayRaQuyetDinh.value(ngayRaQuyetDinh || '');
         });
     };
 
