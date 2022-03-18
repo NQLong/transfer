@@ -124,6 +124,7 @@ export function getHcthCongVanDenSearchPage(pageNumber, pageSize, pageCondition,
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                if (page.filter) data.page.filter = page.filter;
                 done && done(data.page);
                 dispatch({ type: HcthCongVanDenSearchPage, page: data.page });
             }

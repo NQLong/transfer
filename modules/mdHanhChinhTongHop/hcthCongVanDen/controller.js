@@ -66,7 +66,8 @@ module.exports = (app) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        app.model.hcthCongVanDen.searchPage(pageNumber, pageSize, searchTerm, (error, page) => {
+        const { donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan } = (req.query.filter && req.query.filter != '%%%%%%') ? req.query.filter : { donViGuiCongVan: null, donViNhanCongVan: null, canBoNhanCongVan: null };
+        app.model.hcthCongVanDen.searchPage(pageNumber, pageSize, donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
