@@ -69,14 +69,14 @@ class EditModal extends AdminModal {
             size: 'large',
             body: (
                 <div className='form-group row'>
-                    <FormDatePicker type='date' className='col-md-6' ref={e => this.ngayCV = e} label='Ngày CV' readOnly={readOnly} required />
-                    <FormDatePicker type='date' className='col-md-6' ref={e => this.ngayNhan = e} label='Ngày nhận' readOnly={readOnly} required />
-                    <FormDatePicker type='date' className='col-md-6' ref={e => this.ngayHetHan = e} label='Ngày hết hạn' readOnly={readOnly} />
-                    <FormTextBox type='text' className='col-md-6' ref={e => this.soCV = e} label='Mã số CV' readOnly={readOnly} />
+                    <FormTextBox type='text' className='col-md-12' ref={e => this.soCV = e} label='Mã số CV' readOnly={readOnly} />
+                    <FormDatePicker type='date-mask' className='col-md-4' ref={e => this.ngayCV = e} label='Ngày CV' readOnly={readOnly} required />
+                    <FormDatePicker type='date-mask' className='col-md-4' ref={e => this.ngayNhan = e} label='Ngày nhận' readOnly={readOnly} required />
+                    <FormDatePicker type='date-mask' className='col-md-4' ref={e => this.ngayHetHan = e} label='Ngày hết hạn' readOnly={readOnly} />
                     <FormSelect className='col-md-12' ref={e => this.donViGuiCongVan = e} label='Đơn vị gửi công văn' data={SelectAdapter_DmDonViGuiCongVan} readOnly={readOnly} required />
+                    <FormTextBox type='text' className='col-md-12' ref={e => this.noiDung = e} label='Nội dung' readOnly={readOnly} required />
                     <FormSelect className='col-md-12' ref={e => this.donViNhanCongVan = e} label='Đơn vi nhận nhân văn' data={SelectAdapter_DmDonVi} readOnly={readOnly} />
                     <FormSelect className='col-md-12' ref={e => this.canBoNhanCongVan = e} label='Cán bộ nhận công văn' data={SelectAdapter_FwCanBo} readOnly={readOnly} />
-                    <FormTextBox type='text' className='col-md-12' ref={e => this.noiDung = e} label='Nội dung' readOnly={readOnly} required />
                     <FormTextBox type='text' className='col-md-12' ref={e => this.chiDao = e} label='Chỉ đạo' readOnly={readOnly} />
                 </div>
             )
@@ -125,9 +125,9 @@ class HcthCongVanDen extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Ngày nhận</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Ngày hết hạn</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Đơn vị gửi</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Đơn vị nhận</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ nhận</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Noi dung</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap', textAlign: 'center' }}>Nội dung</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap',  textAlign: 'center' }}>Đơn vị nhận</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Cán bộ nhận</th>
                         <th style={{ width: '20%' }}>Chỉ đạo</th>
                         <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                     </tr>),
@@ -137,18 +137,18 @@ class HcthCongVanDen extends AdminPage {
                         <TableCell type='link' onClick={() => this.modal.show(item)} style={{ textAlign: 'center' ,whiteSpace: 'nowrap'}} content={item.soCongVan} />
                         <TableCell type='text' style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={T.dateToText(item.ngayCongVan, 'dd/mm/yyyy')} />
                         <TableCell type='text' style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={T.dateToText(item.ngayNhan, 'dd/mm/yyyy')} />
-                        <TableCell type='text' style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={item.ngayHetHan ? T.dateToText(item.ngayHetHan, 'dd/mm/yyyy') : ''} />
+                        <TableCell type='text' style={{ textAlign: 'center', whiteSpace: 'nowrap', color:'red' }} content={item.ngayHetHan ? T.dateToText(item.ngayHetHan, 'dd/mm/yyyy') : ''} />
                         <TableCell type='text' style={{ textAlign: 'center' }} content={item.tenDonViGuiCV} />
-                        <TableCell type='text' style={{ textAlign: 'center' }} content={item.tenDonVi} />
+                        <TableCell type='text' style={{}} content={item.noiDung} />
+                        <TableCell type='text' style={{ textAlign: 'center' }} content={item.tenDonVi?.normalizedName()} />
                         <TableCell type='text' onClick={() => this.modal.show(item)} style={{}} content={(
                             item.shcc &&
                             <>
-                                <span>{(item.hoCanBo ? item.hoCanBo : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo : ' ')}</span><br />
+                                <span>{((item.hoCanBo ? item.hoCanBo : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo : ' ')).normalizedName()}</span><br />
                                 {item.shcc}
                             </>
                         )}
                         />
-                        <TableCell type='text' style={{}} content={item.noiDung} />
                         <TableCell type='text' style={{}} content={item.chiDao} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={() => this.onDelete(item.id)} permissions={currentPermissions}/>
