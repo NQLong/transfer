@@ -26,6 +26,13 @@ module.exports = app => {
     app.get('/user/tccb/staff', app.permission.check('staff:read'), app.templates.admin);
     app.get('/user/tccb/staff/item/upload', app.permission.check('staff:write'), app.templates.admin);
 
+
+    //Check role mangagers
+    app.permissionHooks.add('staff', 'manager', (user) => new Promise(resolve => {
+        if (app.checkChucVu(user, '*', '013') || app.checkChucVu(user, '*', '005') || app.checkChucVu(user, '*', '003') || app.checkChucVu(user, '*', '016') || app.checkChucVu(user, '*', '009') || app.checkChucVu(user, '*', '007') || app.checkChucVu(user, '*', '007')) app.permissionHooks.pushUserPermission(user, 'manager:read', 'manager:write'); 
+        resolve();
+    }));
+
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
 
@@ -58,6 +65,38 @@ module.exports = app => {
                     maDonVi: req.query.filter.maDonVi
                 };
             }
+        }
+        app.model.canBo.getPage(pageNumber, pageSize, condition, '*', 'SHCC DESC, TEN ASC', (error, page) => {
+            res.send({ error, page });
+        });
+    });
+    app.get('/api/staff-female/page/:pageNumber/:pageSize', checkGetStaffPermission, (req, res) => {
+        let pageNumber = parseInt(req.params.pageNumber),
+            pageSize = parseInt(req.params.pageSize),
+            condition = { statement: null };
+        if (req.query.condition) {
+            if (typeof (req.query.condition) == 'object') {
+                if (req.query.condition.searchText) {
+                    condition = {
+                        statement: 'email LIKE :searchText OR lower(shcc) LIKE :searchText OR lower(ho || \' \' || ten) LIKE :searchText',
+                        parameter: { searchText: `%${req.query.condition.searchText.toLowerCase()}%` }
+                    };
+                }
+            } else {
+                condition = {
+                    statement: 'email LIKE :searchText OR lower(shcc) LIKE :searchText OR lower(ho || \' \' || ten) LIKE :searchText',
+                    parameter: { searchText: `%${req.query.condition.toLowerCase()}%` }
+                };
+            }
+        }
+        if (req.query.condition) {
+            condition.statement += ' AND phai = :phai';
+            condition.parameter.phai = '02';
+        } else {
+            condition.statement = 'phai = :phai';
+            condition.parameter = {
+                phai: '02'
+            };
         }
         app.model.canBo.getPage(pageNumber, pageSize, condition, '*', 'SHCC DESC, TEN ASC', (error, page) => {
             res.send({ error, page });
