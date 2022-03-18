@@ -26,6 +26,13 @@ module.exports = app => {
     app.get('/user/tccb/staff', app.permission.check('staff:read'), app.templates.admin);
     app.get('/user/tccb/staff/item/upload', app.permission.check('staff:write'), app.templates.admin);
 
+
+    //Check role mangagers
+    app.permissionHooks.add('staff', 'manager', (user) => new Promise(resolve => {
+        if (app.checkChucVu(user, '*', '013') || app.checkChucVu(user, '*', '005') || app.checkChucVu(user, '*', '003') || app.checkChucVu(user, '*', '016') || app.checkChucVu(user, '*', '009') || app.checkChucVu(user, '*', '007') || app.checkChucVu(user, '*', '007')) app.permissionHooks.pushUserPermission(user, 'manager:read', 'manager:write'); 
+        resolve();
+    }));
+
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
 
