@@ -131,9 +131,9 @@ module.exports = app => {
             app.dbConnection.execute(sql, parameter, (error, result) => done(error, result));
         },
 
-        searchPage: (pagenumber, pagesize, searchterm, done) => {
-            app.dbConnection.execute('BEGIN :ret:=hcth_cong_van_den_search_page(:pagenumber, :pagesize, :searchterm, :totalitem, :pagetotal); END;',
-                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, pagenumber: { val: pagenumber, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, pagesize: { val: pagesize, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, searchterm, totalitem: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pagetotal: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
+        searchPage: (pagenumber, pagesize, donviguicv, donvi, shcc, searchterm, done) => {
+            app.dbConnection.execute('BEGIN :ret:=hcth_cong_van_den_search_page(:pagenumber, :pagesize, :donviguicv, :donvi, :shcc, :searchterm, :totalitem, :pagetotal); END;',
+                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, pagenumber: { val: pagenumber, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, pagesize: { val: pagesize, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, donviguicv, donvi, shcc, searchterm, totalitem: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pagetotal: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
         },
     };
 };
