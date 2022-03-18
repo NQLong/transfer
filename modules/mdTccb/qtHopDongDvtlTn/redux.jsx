@@ -15,9 +15,9 @@ export default function QtHopDongDvtlTnReducer(state = null, data) {
         case QtHopDongDvtlTnGetPage:
             return Object.assign({}, state, { page: data.page });
         case QtHopDongDvtlTnGetGroupPage:
-            return Object.assign({}, state, { page_gr: data.page });
+            return Object.assign({}, state, { pageGr: data.page });
         case QtHopDongDvtlTnGetGroupPageMa:
-            return Object.assign({}, state, { page_ma: data.page });
+            return Object.assign({}, state, { pageMa: data.page });
         case QtHopDongDvtlTnGet:
             return Object.assign({}, state, { selectedItem: data.item });
         case QtHopDongDvtlTnUpdate:
