@@ -1,7 +1,7 @@
 //TEMPLATES: admin
 import Loadable from 'react-loadable';
 import Loading from 'view/component/Loading';
-import hcthCongVanDi from './redux'
+import hcthCongVanDi from './redux';
 
 export default {
     redux: {
