@@ -176,7 +176,7 @@ class HcthCongVanDen extends AdminPage {
                             item.shcc &&
                             <>
                                 <span>{((item.hoCanBo ? item.hoCanBo : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo : ' ')).normalizedName()}</span><br />
-                                {item.shcc}
+                                {item.tenDonViCanBo?.normalizedName()}
                             </>
                         )}
                         />
