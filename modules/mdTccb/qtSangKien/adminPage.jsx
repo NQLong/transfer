@@ -15,10 +15,8 @@ class EditModal extends AdminModal {
     state = {
         id: null,
     };
-    multiple = false;
 
-    onShow = (item, multiple = true) => {
-        this.multiple = multiple;
+    onShow = (item) => {
         let { id, shcc, maSo, tenSangKien } = item ? item : {
             id: '', shcc: '', maSo: '', tenSangKien: ''
         };
@@ -34,11 +32,8 @@ class EditModal extends AdminModal {
 
     onSubmit = (e) => {
         e.preventDefault();
-        let list_ma = this.maCanBo.value();
-        if (!Array.isArray(list_ma)) {
-            list_ma = [list_ma];
-        }
-        if (list_ma.length == 0) {
+        let ma = this.maCanBo.value();
+        if (!ma) {
             T.notify('Danh sách cán bộ trống', 'danger');
             this.maCanBo.focus();
         } else if (!this.maSo.value()) {
@@ -48,23 +43,12 @@ class EditModal extends AdminModal {
             T.notify('Tên sáng kiến trống', 'danger');
             this.tenSangKien.focus();
         } else {
-            list_ma.forEach((ma, index) => {
-                const changes = {
-                    shcc: ma,
-                    maSo: this.maSo.value(),
-                    tenSangKien: this.tenSangKien.value(),
-                };
-                if (index == list_ma.length - 1) {
-                    this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
-                    this.setState({
-                        id: ''
-                    });
-                    this.maCanBo.reset();
-                }
-                else {
-                    this.state.id ? this.props.update(this.state.id, changes, null) : this.props.create(changes, null);
-                }
-            });
+            const changes = {
+                shcc: ma,
+                maSo: this.maSo.value(),
+                tenSangKien: this.tenSangKien.value(),
+            };
+            this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
         }
     }
 
@@ -74,7 +58,7 @@ class EditModal extends AdminModal {
             title: this.state.id ? 'Cập nhật danh sách sáng kiến' : 'Tạo mới danh sách sáng kiến',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={this.state.id ? true : false} required />
+                <FormSelect className='col-md-12' ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={this.state.id ? true : false} required />
                 <FormTextBox className='col-md-12' ref={e => this.maSo = e} label='Mã số sáng kiến' readOnly={readOnly} required />
                 <FormRichTextBox className='col-md-12' ref={e => this.tenSangKien = e} label='Tên sáng kiến' readOnly={readOnly} required /> 
             </div>
@@ -83,9 +67,8 @@ class EditModal extends AdminModal {
 }
 
 class QtSangKien extends AdminPage {
-    checked = false;
     state = { filter: {} };
-    menu = 'tccb';
+
     componentDidMount() {
         T.ready('/user/tccb', () => {
             T.clearSearchBox();
@@ -128,8 +111,6 @@ class QtSangKien extends AdminPage {
     }
 
     groupPage = () => {
-        this.checked = !this.checked;
-        T.cookie('hienThiTheoCanBo', this.checked ? 1 : 0);
         this.getPage();
     }
 
@@ -235,8 +216,8 @@ class QtSangKien extends AdminPage {
                     permissions={currentPermissions}
                 />
             </>,
-            backRoute: '/user/' + this.menu,
-            onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
+            backRoute: '/user/tccb',
+            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
         });
     }
 }

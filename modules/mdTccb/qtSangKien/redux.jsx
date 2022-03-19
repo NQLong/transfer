@@ -72,8 +72,8 @@ export function getQtSangKienUserPage(pageNumber, pageSize, pageCondition, filte
             } else {
                 if (page.filter) data.page.filter = page.filter;
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
-                if (done) done(data.page);
                 dispatch({ type: QtSangKienGetUserPage, page: data.page });
+                if (done) done(data.page);
             }
         }, () => T.notify('Lấy danh sách sáng kiến bị lỗi!', 'danger'));
     };
@@ -89,8 +89,8 @@ export function updateQtSangKienUserPage(id, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật sáng kiến thành công!', 'success');
-                done && done(data.item);
                 dispatch(getQtSangKienUserPage());
+                done && done(data.item);
             }
         }, () => T.notify('Cập nhật sáng kiến bị lỗi!', 'danger'));
     };
@@ -123,8 +123,8 @@ export function deleteQtSangKienUserPage(id, done) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('Xóa thành công!', 'success', false, 800);
-                done && done(data.item);
                 dispatch(getQtSangKienUserPage());
+                done && done(data.item);
             }
         }, () => T.notify('Xóa sáng kiến bị lỗi!', 'danger'));
     };
@@ -146,8 +146,8 @@ export function getQtSangKienPage(pageNumber, pageSize, pageCondition, filter, d
             } else {
                 if (page.filter) data.page.filter = page.filter;
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
-                if (done) done(data.page);
                 dispatch({ type: QtSangKienGetPage, page: data.page });
+                if (done) done(data.page);
             }
         }, () => T.notify('Lấy danh sách sáng kiến bị lỗi!', 'danger'));
     };
@@ -168,8 +168,8 @@ export function getQtSangKienGroupPage(pageNumber, pageSize, pageCondition, filt
             } else {
                 if (page.filter) data.page.filter = page.filter;
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
-                done && done(data.page);
                 dispatch({ type: QtSangKienGetGroupPage, page: data.page });
+                done && done(data.page);
             }
         }, error => console.error(`GET: ${url}.`, error));
     };
@@ -207,8 +207,8 @@ export function updateQtSangKienGroupPageMa(id, changes, done) {
                 console.error('PUT: ' + url + '. ' + data.error);
             } else if (data.item) {
                 T.notify('Cập nhật thông tin quá trình sáng kiến thành công!', 'info');
-                done && done(data.item);
                 dispatch(getQtSangKienGroupPageMa());
+                done && done(data.item);
             }
         }, () => T.notify('Cập nhật thông tin quá trình sáng kiến bị lỗi', 'danger'));
     };
@@ -223,8 +223,8 @@ export function deleteQtSangKienGroupPageMa(id, done) {
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
                 T.alert('Thông tin quá trình sáng kiến được xóa thành công!', 'info', false, 800);
-                done && done(data.item);
                 dispatch(getQtSangKienGroupPageMa());
+                done && done(data.item);
             }
         }, () => T.notify('Xóa thông tin quá trình sáng kiến bị lỗi', 'danger'));
     };
@@ -256,8 +256,8 @@ export function getQtSangKienAll(done) {
                 T.notify('Lấy danh sách sáng kiến bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                if (done) done(data.items);
                 dispatch({ type: QtSangKienGetAll, items: data.items ? data.items : {} });
+                if (done) done(data.items);
             }
         }, () => T.notify('Lấy danh sách sáng kiến bị lỗi!', 'danger'));
     };
@@ -302,8 +302,8 @@ export function updateQtSangKienStaff(id, changes, done) {
                 console.error('PUT: ' + url + '. ' + data.error);
             } else if (data.item) {
                 T.notify('Cập nhật thông tin quá trình sáng kiến thành công!', 'info');
-                done && done(data.item);
                 dispatch(getQtSangKienPage());
+                done && done(data.item);
             }
         }, () => T.notify('Cập nhật thông tin quá trình sáng kiến bị lỗi', 'danger'));
     };
@@ -334,8 +334,8 @@ export function createQtSangKienStaffUser(data, done) {
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
                 T.notify('Thêm thông tin quá trình sáng kiến thành công!', 'info');
-                if (done) done(data);
                 dispatch(userGetStaff(data.email));
+                if (done) done(data);
             }
         }, () => T.notify('Thêm thông tin quá trình sáng kiến bị lỗi', 'danger'));
     };
@@ -350,8 +350,8 @@ export function updateQtSangKienStaffUser(id, changes, done) {
                 console.error('PUT: ' + url + '. ' + data.error);
             } else if (data.item) {
                 T.notify('Cập nhật thông tin quá trình sáng kiến thành công!', 'info');
-                if (done) done();
                 dispatch(userGetStaff(changes.email));
+                if (done) done();
             }
         }, () => T.notify('Cập nhật thông tin quá trình sáng kiến bị lỗi', 'danger'));
     };
@@ -366,8 +366,8 @@ export function deleteQtSangKienStaffUser(id, email, done) {
                 console.error('DELETE: ' + url + '. ' + data.error);
             } else {
                 T.alert('Thông tin quá trình sáng kiến được xóa thành công!', 'info', false, 800);
-                done && done();
                 dispatch(userGetStaff(email));
+                done && done();
             }
         }, () => T.notify('Xóa thông tin quá trình sáng kiến bị lỗi', 'danger'));
     };
