@@ -6109,6 +6109,34 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": 20
+            },
+            "CMND_NOI_CAP": {
+                "value": "cmndNoiCap",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 50
+            },
+            "CMND_NGAY_CAP": {
+                "value": "cmndNgayCap",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "20,0"
+            },
+            "NAM_TUYEN_SINH": {
+                "value": "namTuyenSinh",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "4,0"
+            },
+            "NGAY_NHAP_HOC": {
+                "value": "ngayNhapHoc",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "20,0"
             }
         },
         "primaryKeys": [
@@ -10166,6 +10194,13 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": 200
+            },
+            "DA_NGHI": {
+                "value": "daNghi",
+                "dataType": "NUMBER",
+                "dataDefault": "0",
+                "nullable": true,
+                "size": "1,0"
             }
         },
         "primaryKeys": [
