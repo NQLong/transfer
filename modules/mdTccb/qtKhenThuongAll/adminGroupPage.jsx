@@ -30,8 +30,8 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        let { id, maLoaiDoiTuong, ma, namDatDuoc, maThanhTich, maChuThich, diemThiDua } = item ? item : {
-            id: '', maLoaiDoiTuong: '', ma: '', namDatDuoc: '', maThanhTich: '', maChuThich: '', diemThiDua: ''
+        let { id, maLoaiDoiTuong, ma, namDatDuoc, maThanhTich, maChuThich, diemThiDua, soQuyetDinh } = item ? item : {
+            id: '', maLoaiDoiTuong: '', ma: '', namDatDuoc: '', maThanhTich: '', maChuThich: '', diemThiDua: '', soQuyetDinh: ''
         };
 
         if (!maLoaiDoiTuong) maLoaiDoiTuong = this.props.loaiDoiTuong;
@@ -40,19 +40,18 @@ class EditModal extends AdminModal {
         });
 
         setTimeout(() => {
-            this.loaiDoiTuong.value(maLoaiDoiTuong ? maLoaiDoiTuong : '');
+            this.loaiDoiTuong.value(maLoaiDoiTuong || '');
             if (maLoaiDoiTuong == '02') this.maCanBo.value(ma ? ma : this.props.ma);
             else if (maLoaiDoiTuong == '03') this.maDonVi.value(ma ? ma : this.props.ma);
             else if (maLoaiDoiTuong == '04') this.maBoMon.value(ma ? ma : this.props.ma);
 
-            this.namDatDuoc.value(namDatDuoc ? namDatDuoc : '');
-            this.thanhTich.value(maThanhTich ? maThanhTich : '');
-            this.chuThich.value(maChuThich ? maChuThich : '');
+            this.namDatDuoc.value(namDatDuoc || '');
+            this.thanhTich.value(maThanhTich || '');
+            this.chuThich.value(maChuThich || '');
             this.diemThiDua.value(diemThiDua);
+            this.soQuyetDinh.value(soQuyetDinh || '');
         }, 100);
     };
-
-    changeKichHoat = (value, target) => target.value(value ? 1 : 0) || target.value(value);
 
     onSubmit = (e) => {
         e.preventDefault();
@@ -68,6 +67,7 @@ class EditModal extends AdminModal {
             thanhTich: this.thanhTich.value(),
             chuThich: this.chuThich.value(),
             diemThiDua: this.diemThiDua.value(),
+            soQuyetDinh: this.soQuyetDinh.value(),
         };
         if (!this.loaiDoiTuong.value()) {
             T.notify('Loại đối tượng trống', 'danger');
@@ -88,6 +88,7 @@ class EditModal extends AdminModal {
     }
     render = () => {
         const doiTuong = this.state.doiTuong;
+        const readOnly = this.props.readOnly;
         return this.renderModal({
             title: this.state.id ? 'Cập nhật quá trình khen thưởng' : 'Tạo mới quá trình khen thưởng',
             size: 'large',
@@ -104,10 +105,11 @@ class EditModal extends AdminModal {
 
                 <FormSelect className='col-md-12' ref={e => this.maBoMon = e} label='Bộ môn' data={SelectAdapter_DmBoMon} style={doiTuong == '04' ? {} : { display: 'none' }} readOnly={true} />
 
-                <FormSelect className='col-md-12' ref={e => this.thanhTich = e} label='Thành tích' data={SelectAdapter_DmKhenThuongKyHieuV2} readOnly={false} required />
-                <FormTextBox className='col-md-4' ref={e => this.namDatDuoc = e} label='Năm đạt được (yyyy)' type='year' readOnly={false} />
-                <FormSelect className='col-md-8' ref={e => this.chuThich = e} label='Chú thích' data={SelectAdapter_DmKhenThuongChuThichV2} readOnly={false} />
-                <FormTextBox className='col-md-4' ref={e => this.diemThiDua = e} type='number' label='Điểm thi đua' readOnly={false} />
+                <FormTextBox className='col-md-4' ref={e => this.soQuyetDinh = e} type='text' label='Số quyết định' readOnly={readOnly} />
+                <FormSelect className='col-md-8' ref={e => this.thanhTich = e} label='Thành tích' data={SelectAdapter_DmKhenThuongKyHieuV2} readOnly={readOnly} required />
+                <FormTextBox className='col-md-4' ref={e => this.namDatDuoc = e} label='Năm đạt được (yyyy)' type='year' readOnly={readOnly} />
+                <FormSelect className='col-md-8' ref={e => this.chuThich = e} label='Chú thích' data={SelectAdapter_DmKhenThuongChuThichV2} readOnly={readOnly} />
+                <FormTextBox className='col-md-4' ref={e => this.diemThiDua = e} type='number' label='Điểm thi đua' readOnly={readOnly} />
 
             </div>
         });
@@ -118,15 +120,15 @@ class QtKhenThuongAllGroupPage extends AdminPage {
     ma = ''; loaiDoiTuong = '-1';
     componentDidMount() {
         T.ready('/user/tccb', () => {
-            const route = T.routeMatcher('/user/tccb/qua-trinh/khen-thuong-all/group_dt/:loaiDoiTuong/:ma'),
+            const route = T.routeMatcher('/user/tccb/qua-trinh/khen-thuong-all/groupDt/:loaiDoiTuong/:ma'),
                 params = route.parse(window.location.pathname);
             this.loaiDoiTuong = params.loaiDoiTuong;
             this.ma = params.ma;
-            this.setState({ filter: { loaiDoiTuong: this.loaiDoiTuong, ma: this.ma } });
+            this.setState({ filter: { loaiDoiTuong: this.loaiDoiTuong, listShcc: this.loaiDoiTuong == '02' ? this.ma : '', listDv: ''} });
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
-                this.fromYear?.value('');
-                this.toYear?.value('');
+                this.fromYear.value('');
+                this.toYear.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
             this.getPage();
@@ -134,19 +136,20 @@ class QtKhenThuongAllGroupPage extends AdminPage {
     }
 
     changeAdvancedSearch = (isInitial = false) => {
-        let { pageNumber, pageSize } = this.props && this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.page_ma ? this.props.qtKhenThuongAll.page_ma : { pageNumber: 1, pageSize: 50 };
-        const fromYear = this.fromYear?.value() == '' ? null : Number(this.fromYear?.value());
-        const toYear = this.toYear?.value() == '' ? null : Number(this.toYear?.value());
+        let { pageNumber, pageSize } = this.props && this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.pageMa ? this.props.qtKhenThuongAll.pageMa : { pageNumber: 1, pageSize: 50 };
+        const fromYear = this.fromYear.value() == '' ? null : Number(this.fromYear.value());
+        const toYear = this.toYear.value() == '' ? null : Number(this.toYear.value());
         const loaiDoiTuong = this.state.filter.loaiDoiTuong;
-        const ma = this.state.filter.ma;
-        const pageFilter = isInitial ? null : { fromYear, toYear, loaiDoiTuong, ma };
+        const listShcc = this.state.filter.listShcc;
+        const listDv = this.state.filter.listDv;
+        const pageFilter = isInitial ? null : { fromYear, toYear, loaiDoiTuong, listShcc, listDv };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
-                    this.fromYear?.value(filter.fromYear || '');
-                    this.toYear?.value(filter.toYear || '');
+                    this.fromYear.value(filter.fromYear || '');
+                    this.toYear.value(filter.toYear || '');
                     if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear)) this.showAdvanceSearch();
                 }
             });
@@ -162,31 +165,6 @@ class QtKhenThuongAllGroupPage extends AdminPage {
         this.modal.show();
     }
 
-    downloadExcel = (e) => {
-        e.preventDefault();
-        let name = 'khen_thuong', loaiDoiTuong = this.loaiDoiTuong, maDoiTuong = this.ma;
-        const fromYear = this.fromYear?.value() == '' ? '$$$$' : this.fromYear?.value();
-        const toYear = this.toYear?.value() == '' ? '$$$$' : this.toYear?.value();
-        if (loaiDoiTuong == '-1') {
-            name += '_all';
-        }
-        else {
-            if (loaiDoiTuong == '01') {
-                name += '_truong';
-            }
-            else {
-                if (loaiDoiTuong == '02') name += '_canbo_';
-                if (loaiDoiTuong == '03') name += '_donvi_';
-                if (loaiDoiTuong == '04') name += '_bomon_';
-                if (maDoiTuong == '-1') name += 'all';
-                else name += maDoiTuong;
-            }
-        }
-        name += '_' + fromYear + '-' + toYear;
-        name += '.xlsx';
-        T.download(T.url(`/api/tccb/qua-trinh/khen-thuong-all/download-excel/${loaiDoiTuong}/${maDoiTuong}/${fromYear}/${toYear}`), name);
-    }
-
     delete = (e, item) => {
         T.confirm('Xóa khen thưởng', 'Bạn có chắc bạn muốn xóa khen thưởng này?', 'warning', true, isConfirm => {
             isConfirm && this.props.deleteQtKhenThuongAllGroupPageMa(item.id, error => {
@@ -200,17 +178,18 @@ class QtKhenThuongAllGroupPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('qtKhenThuongAll', ['read', 'write', 'delete']);
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.page_ma ? this.props.qtKhenThuongAll.page_ma : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list };
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.pageMa ? this.props.qtKhenThuongAll.pageMa : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
-                getDataSource: () => list, stickyHead: false,
+                getDataSource: () => list, stickyHead: true,
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Đối tượng</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Đối tượng</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm đạt được</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thành tích</th>
+                        <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Thành tích</th>
                         <th style={{ width: 'auto', textAlign: 'right', whiteSpace: 'nowrap' }}>Điểm thi đua</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Loại đối tượng</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
@@ -219,7 +198,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                        <TableCell type='link' onClick={() => this.modal.show(item)} content={(
+                        <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
                             item.maLoaiDoiTuong == '01' ?
                                 <>
                                     <span>
@@ -245,7 +224,13 @@ class QtKhenThuongAllGroupPage extends AdminPage {
 
                         )}
                         />
-                        <TableCell type='text' content={(
+                        <TableCell type='text' style={{ textAlign: 'center' }} content={(
+                            <>
+                                {item.soQuyetDinh ? item.soQuyetDinh : ''}
+                            </>
+                        )}
+                        />
+                        <TableCell type='text' style={{ textAlign: 'center' }} content={(
                             <>
                                 {item.namDatDuoc}
                             </>
@@ -295,15 +280,15 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                     permissions={currentPermissions} ma={this.ma} loaiDoiTuong={this.loaiDoiTuong}
                     getLoaiDoiTuong={this.props.getDmKhenThuongLoaiDoiTuongAll}
                 />
-                {
-                    permission.read &&
-                    <button className='btn btn-success btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px' }} onClick={this.downloadExcel} >
-                        <i className='fa fa-lg fa-print' />
-                    </button>
-                }
             </>,
             backRoute: '/user/tccb/qua-trinh/khen-thuong-all',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+            onExport: (e) => {
+                e.preventDefault();
+                const { fromYear, toYear, loaiDoiTuong, listDv, listShcc } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1', listDv: null, listShcc: null };
+
+                T.download(T.url(`/api/qua-trinh/khen-thuong-all/download-excel/${listShcc ? listShcc : null}/${listDv ? listDv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${loaiDoiTuong ? loaiDoiTuong : '-1'}`), 'khenthuong.xlsx');
+            }
         });
     }
 }

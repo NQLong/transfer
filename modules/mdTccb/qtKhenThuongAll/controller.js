@@ -23,7 +23,7 @@ module.exports = app => {
         { name: 'qtKhenThuongAll:delete' },
     );
     app.get('/user/tccb/qua-trinh/khen-thuong-all', app.permission.check('qtKhenThuongAll:read'), app.templates.admin);
-    app.get('/user/tccb/qua-trinh/khen-thuong-all/group_dt/:loaiDoiTuong/:ma', app.permission.check('qtKhenThuongAll:read'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/khen-thuong-all/groupDt/:loaiDoiTuong/:ma', app.permission.check('qtKhenThuongAll:read'), app.templates.admin);
     app.get('/user/khen-thuong-all', app.permission.check('staff:login'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
@@ -78,8 +78,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, loaiDoiTuong, ma } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1', ma: null };
-        app.model.qtKhenThuongAll.searchPage(pageNumber, pageSize, loaiDoiTuong, ma, fromYear, toYear, searchTerm, (error, page) => {
+        const { fromYear, toYear, loaiDoiTuong, listDv, listShcc } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1', listDv: null, listShcc: null };
+        app.model.qtKhenThuongAll.searchPage(pageNumber, pageSize, loaiDoiTuong, fromYear, toYear, listDv, listShcc, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -95,8 +95,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, loaiDoiTuong, ma } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1', ma: null };
-        app.model.qtKhenThuongAll.searchPage(pageNumber, pageSize, loaiDoiTuong, ma, fromYear, toYear, searchTerm, (error, page) => {
+        const { fromYear, toYear, loaiDoiTuong, listDv, listShcc } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1', listDv: null, listShcc: null };
+        app.model.qtKhenThuongAll.searchPage(pageNumber, pageSize, loaiDoiTuong, fromYear, toYear, listDv, listShcc, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -111,8 +111,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, loaiDoiTuong } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1' };
-        app.model.qtKhenThuongAll.groupPage(pageNumber, pageSize, loaiDoiTuong, fromYear, toYear, searchTerm, (error, page) => {
+        const { fromYear, toYear, loaiDoiTuong, listDv, listShcc } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1', listDv: null, listShcc: null };
+        app.model.qtKhenThuongAll.groupPage(pageNumber, pageSize, loaiDoiTuong, fromYear, toYear, listDv, listShcc, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -147,14 +147,13 @@ module.exports = app => {
     app.delete('/api/tccb/qua-trinh/khen-thuong-all', app.permission.check('staff:write'), (req, res) =>
         app.model.qtKhenThuongAll.delete({ id: req.body.id }, (error) => res.send(error)));
 
-    app.get('/api/tccb/qua-trinh/khen-thuong-all/download-excel/:loaiDoiTuong/:maDoiTuong/:fromYear/:toYear', app.permission.check('qtKhenThuongAll:read'), (req, res) => {
-        const pageNumber = 0,
-            pageSize = 1000000,
-            loaiDoiTuong = req.params.loaiDoiTuong,
-            maDoiTuong = req.params.maDoiTuong,
-            fromYear = req.params.fromYear,
-            toYear = req.params.toYear;
-        app.model.qtKhenThuongAll.downloadExcel(pageNumber, pageSize, loaiDoiTuong, maDoiTuong, fromYear, toYear, (error, page) => {
+    app.get('/api/qua-trinh/khen-thuong-all/download-excel/:listShcc/:listDv/:fromYear/:toYear/:loaiDoiTuong', app.permission.check('qtKhenThuongAll:read'), (req, res) => {
+        let { listShcc, listDv, fromYear, toYear, loaiDoiTuong } = req.params ? req.params : { listShcc: null, listDv: null, fromYear: null, toYear: null, loaiDoiTuong: '-1' };
+        if (listShcc == 'null') listShcc = null;
+        if (listDv == 'null') listDv = null;
+        if (fromYear == 'null') fromYear = null;
+        if (toYear == 'null') toYear = null;
+        app.model.qtKhenThuongAll.download(loaiDoiTuong, fromYear, toYear, listDv, listShcc, (error, page) => {
             if (error) {
                 res.send({ error });
             } else {
@@ -163,16 +162,16 @@ module.exports = app => {
                 new Promise(resolve => {
                     let cols = [];
                     if (loaiDoiTuong == '-1') {
-                        cols = ['STT', 'LOẠI ĐỐI TƯỢNG', 'ĐỐI TƯỢNG', 'NĂM ĐẠT ĐƯỢC', 'THÀNH TÍCH', 'CHÚ THÍCH', 'ĐIỂM THI ĐUA'];
+                        cols = ['STT', 'SỐ QUYẾT ĐỊNH', 'LOẠI ĐỐI TƯỢNG', 'ĐỐI TƯỢNG', 'NĂM ĐẠT ĐƯỢC', 'THÀNH TÍCH', 'CHÚ THÍCH', 'ĐIỂM THI ĐUA'];
                     }
                     if (loaiDoiTuong == '01') {
-                        cols = ['STT', 'NĂM ĐẠT ĐƯỢC', 'THÀNH TÍCH', 'CHÚ THÍCH', 'ĐIỂM THI ĐUA'];
+                        cols = ['STT', 'SỐ QUYẾT ĐỊNH', 'NĂM ĐẠT ĐƯỢC', 'THÀNH TÍCH', 'CHÚ THÍCH', 'ĐIỂM THI ĐUA'];
                     }
                     if (loaiDoiTuong == '02') {
-                        cols = ['STT', 'SHCC', 'HỌ', 'TÊN', 'NĂM ĐẠT ĐƯỢC', 'THÀNH TÍCH', 'CHÚ THÍCH', 'ĐIỂM THI ĐUA'];
+                        cols = ['STT', 'SỐ QUYẾT ĐỊNH', 'SHCC', 'HỌ', 'TÊN', 'NĂM ĐẠT ĐƯỢC', 'THÀNH TÍCH', 'CHÚ THÍCH', 'ĐIỂM THI ĐUA'];
                     }
                     if (loaiDoiTuong == '03' || loaiDoiTuong == '04') {
-                        cols = ['STT', 'ĐƠN VỊ', 'BỘ MÔN', 'NĂM ĐẠT ĐƯỢC', 'THÀNH TÍCH', 'CHÚ THÍCH', 'ĐIỂM THI ĐUA'];
+                        cols = ['STT', 'SỐ QUYẾT ĐỊNH', 'ĐƠN VỊ', 'BỘ MÔN', 'NĂM ĐẠT ĐƯỢC', 'THÀNH TÍCH', 'CHÚ THÍCH', 'ĐIỂM THI ĐUA'];
                     }
                     let cells = [];
                     for (let idx = 0; idx < cols.length; idx++) {
@@ -186,6 +185,7 @@ module.exports = app => {
                             let value = null;
                             let type = cols[idx];
                             if (type == 'LOẠI ĐỐI TƯỢNG') value = item.tenLoaiDoiTuong;
+                            if (type == 'SỐ QUYẾT ĐỊNH') value = item.soQuyetDinh;
                             if (type == 'ĐỐI TƯỢNG') {
                                 if (item.maLoaiDoiTuong == '01') {
                                     value = 'Trường Đai học Khoa học Xã Hội và Nhân Văn - Đại học Quốc Gia TP.HCM';
@@ -235,11 +235,8 @@ module.exports = app => {
                             if (loaiDoiTuong == '02') name += '_canbo_';
                             if (loaiDoiTuong == '03') name += '_donvi_';
                             if (loaiDoiTuong == '04') name += '_bomon_';
-                            if (maDoiTuong == '-1') name += 'all';
-                            else name += maDoiTuong;
                         }
                     }
-                    name += '_' + fromYear + '-' + toYear;
                     name += '.xlsx';
                     app.excel.attachment(workbook, res, name);
                 }).catch((error) => {
