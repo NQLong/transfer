@@ -6123,20 +6123,6 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": "20,0"
-            },
-            "NAM_TUYEN_SINH": {
-                "value": "namTuyenSinh",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "4,0"
-            },
-            "NGAY_NHAP_HOC": {
-                "value": "ngayNhapHoc",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": true,
-                "size": "20,0"
             }
         },
         "primaryKeys": [
@@ -6479,6 +6465,11 @@
         "active": true,
         "moduleName": "qtBaiVietKhoaHoc",
         "modelName": "qtBaiVietKhoaHoc",
+        "methods": {
+            "QT_BAI_VIET_KHOA_HOC_SEARCH_PAGE": "searchPage",
+            "QT_BAI_VIET_KHOA_HOC_GROUP_PAGE": "groupPage",
+            "QT_BAI_VIET_KHOA_HOC_DOWNLOAD_EXCEL": "download"
+        },
         "columns": {
             "ID": {
                 "value": "id",
@@ -6561,6 +6552,10 @@
         "active": true,
         "moduleName": "qtBangPhatMinh",
         "modelName": "qtBangPhatMinh",
+        "methods": {
+            "QT_BANG_PHAT_MINH_SEARCH_PAGE": "searchPage",
+            "QT_BANG_PHAT_MINH_GROUP_PAGE": "groupPage"
+        },
         "columns": {
             "ID": {
                 "value": "id",
@@ -6636,6 +6631,11 @@
         "active": true,
         "moduleName": "qtBaoHiemXaHoi",
         "modelName": "qtBaoHiemXaHoi",
+        "methods": {
+            "QT_BAO_HIEM_XA_HOI_SEARCH_PAGE": "searchPage",
+            "QT_BAO_HIEM_XA_HOI_GROUP_PAGE": "groupPage",
+            "QT_BAO_HIEM_XA_HOI_DOWNLOAD_EXCEL": "download"
+        },
         "columns": {
             "ID": {
                 "value": "id",
@@ -6778,7 +6778,10 @@
     "QT_CHUC_VU": {
         "active": true,
         "methods": {
-            "QT_CHUC_VU_SEARCH_PAGE": "searchPage"
+            "QT_CHUC_VU_SEARCH_PAGE": "searchPage",
+            "QT_CHUC_VU_GROUP_PAGE": "groupPage",
+            "QT_CHUC_VU_GET_BY_SHCC": "getByShcc",
+            "QT_CHUC_VU_DOWNLOAD_EXCEL": "download"
         },
         "moduleName": "qtChucVu",
         "modelName": "qtChucVu",
@@ -6878,6 +6881,11 @@
         "active": true,
         "moduleName": "qtCongTacTrongNuoc",
         "modelName": "qtCongTacTrongNuoc",
+        "methods": {
+            "QT_CONG_TAC_TRONG_NUOC_SEARCH_PAGE": "searchPage",
+            "QT_CONG_TAC_TRONG_NUOC_GROUP_PAGE": "groupPage",
+            "QT_CONG_TAC_TRONG_NUOC_DOWNLOAD_EXCEL": "download"
+        },
         "columns": {
             "ID": {
                 "value": "id",
@@ -6988,6 +6996,18 @@
         "active": true,
         "moduleName": "qtDaoTao",
         "modelName": "qtDaoTao",
+        "methods": {
+            "QT_DAO_TAO_GET_BY_SHCC": "getByShcc",
+            "QT_DAO_TAO_GET_TRINH_DO_CHINH_TRI_CAN_BO": "getTDCT",
+            "QT_DAO_TAO_GET_TRINH_DO_QLNN_CAN_BO": "getQLNN",
+            "QT_DAO_TAO_GET_TRINH_DO_TIN_HOC_CAN_BO": "getTH",
+            "QT_DAO_TAO_GET_HOC_VI_CAN_BO": "getHV",
+            "QT_DAO_TAO_GET_CC_CAN_BO": "getCC",
+            "QT_DAO_TAO_SEARCH_PAGE": "searchPage",
+            "QT_DAO_TAO_GROUP_PAGE": "groupPage",
+            "QT_DAO_TAO_GET_CURRENT_OF_STAFF": "getCurrentOfStaff",
+            "QT_DAO_TAO_DOWNLOAD_EXCEL": "download"
+        },
         "columns": {
             "SHCC": {
                 "value": "shcc",
@@ -7105,6 +7125,11 @@
         "active": true,
         "moduleName": "qtDiNuocNgoai",
         "modelName": "qtDiNuocNgoai",
+        "methods": {
+            "QT_DI_NUOC_NGOAI_SEARCH_PAGE": "searchPage",
+            "QT_DI_NUOC_NGOAI_GROUP_PAGE": "groupPage",
+            "QT_DI_NUOC_NGOAI_DOWNLOAD_EXCEL": "download"
+        },
         "columns": {
             "ID": {
                 "value": "id",
@@ -7215,6 +7240,10 @@
         "active": true,
         "moduleName": "qtGiaiThuong",
         "modelName": "qtGiaiThuong",
+        "methods": {
+            "QT_GIAI_THUONG_SEARCH_PAGE": "searchPage",
+            "QT_GIAI_THUONG_GROUP_PAGE": "groupPage"
+        },
         "columns": {
             "ID": {
                 "value": "id",
@@ -7269,6 +7298,10 @@
         "active": true,
         "moduleName": "qtHocTapCongTac",
         "modelName": "qtHocTapCongTac",
+        "methods": {
+            "QT_HOC_TAP_CONG_TAC_SEARCH_PAGE": "searchPage",
+            "QT_HOC_TAP_CONG_TAC_GROUP_PAGE": "groupPage"
+        },
         "columns": {
             "SHCC": {
                 "value": "shcc",
@@ -7332,7 +7365,8 @@
         "modelName": "qtHopDongDvtlTn",
         "methods": {
             "QT_HOP_DONG_DVTL_TN_SEARCH_PAGE": "searchPage",
-            "download_hop_dong_dvtl_tn": "download"
+            "download_hop_dong_dvtl_tn": "download",
+            "QT_HOP_DONG_DVTL_TN_GROUP_PAGE": "groupPage"
         },
         "columns": {
             "SO_HOP_DONG": {
@@ -7504,7 +7538,7 @@
             "QT_HOP_DONG_LAO_DONG_SEARCH_PAGE": "searchPage",
             "DOWNLOAD_HOP_DONG_LAO_DONG": "download",
             "QT_HOP_DONG_LAO_DONG_GROUP_PAGE": "groupPage",
-            "qt_hop_dong_lao_dong_shcc_group_page": "groupPageShcc"
+            "DOWNLOAD_EXCEL_QT_HOP_DONG_LAO_DONG": "downloadExcel"
         },
         "columns": {
             "LOAI_HOP_DONG": {
@@ -7651,6 +7685,10 @@
         "active": true,
         "moduleName": "qtHopDongVienChuc",
         "modelName": "qtHopDongVienChuc",
+        "methods": {
+            "QT_HOP_DONG_VIEN_CHUC_SEARCH_PAGE": "searchPage",
+            "QT_HOP_DONG_VIEN_CHUC_GROUP_PAGE": "groupPage"
+        },
         "columns": {
             "LOAI_HOP_DONG": {
                 "value": "loaiHopDong",
@@ -7911,6 +7949,10 @@
         "active": true,
         "moduleName": "qtHuongDanLuanVan",
         "modelName": "qtHuongDanLuanVan",
+        "methods": {
+            "QT_HUONG_DAN_LUAN_VAN_SEARCH_PAGE": "searchPage",
+            "QT_HUONG_DAN_LUAN_VAN_GROUP_PAGE": "groupPage"
+        },
         "columns": {
             "ID": {
                 "value": "id",
@@ -7972,6 +8014,10 @@
         "active": true,
         "moduleName": "qtKeoDaiCongTac",
         "modelName": "qtKeoDaiCongTac",
+        "methods": {
+            "QT_KEO_DAI_CONG_TAC_SEARCH_PAGE": "searchPage",
+            "QT_KEO_DAI_CONG_TAC_GROUP_PAGE": "groupPage"
+        },
         "columns": {
             "ID": {
                 "value": "id",
@@ -8050,7 +8096,6 @@
         "methods": {
             "qt_khen_thuong_all_search_page": "searchPage",
             "qt_khen_thuong_all_group_page": "groupPage",
-            "qt_khen_thuong_all_group_page_ma": "groupPageMa"
         },
         "columns": {
             "LOAI_DOI_TUONG": {
@@ -8120,6 +8165,11 @@
         "active": true,
         "moduleName": "qtKyLuat",
         "modelName": "qtKyLuat",
+        "methods": {
+            "QT_KY_LUAT_SEARCH_PAGE": "searchPage",
+            "QT_KY_LUAT_GROUP_PAGE": "groupPage",
+            "QT_KY_LUAT_DOWNLOAD_EXCEL": "download"
+        },
         "columns": {
             "ID": {
                 "value": "id",
@@ -8270,6 +8320,10 @@
         "active": true,
         "moduleName": "qtLamViecNgoai",
         "modelName": "qtLamViecNgoai",
+        "methods": {
+            "QT_LAM_VIEC_NGOAI_SEARCH_PAGE": "searchPage",
+            "QT_LAM_VIEC_NGOAI_GROUP_PAGE": "groupPage"
+        },
         "columns": {
             "ID": {
                 "value": "id",
@@ -8385,6 +8439,10 @@
         "active": true,
         "moduleName": "qtLuong",
         "modelName": "qtLuong",
+        "methods": {
+            "QT_LUONG_SEARCH_PAGE": "searchPage",
+            "QT_LUONG_GROUP_PAGE": "groupPage"
+        },
         "columns": {
             "BAT_DAU": {
                 "value": "batDau",
@@ -8618,6 +8676,9 @@
         "active": true,
         "moduleName": "qtNghiKhongLuong",
         "modelName": "qtNghiKhongLuong",
+        "methods": {
+            "QT_NGHI_KHONG_LUONG_SEARCH_PAGE": "searchPage"
+        },
         "columns": {
             "ID": {
                 "value": "id",
@@ -8763,6 +8824,10 @@
         "active": true,
         "moduleName": "qtNghiPhep",
         "modelName": "qtNghiPhep",
+        "methods": {
+            "QT_NGHI_PHEP_SEARCH_PAGE": "searchPage",
+            "QT_NGHI_PHEP_GROUP_PAGE": "groupPage"
+        },
         "columns": {
             "SHCC": {
                 "value": "shcc",
@@ -8882,7 +8947,8 @@
         "modelName": "qtNghiThaiSan",
         "methods": {
             "qt_nghi_thai_san_search_page": "searchPage",
-            "qt_nghi_thai_san_group_page": "groupPage"
+            "qt_nghi_thai_san_group_page": "groupPage",
+            "qt_nghi_thai_san_download_excel": "download"
         },
         "columns": {
             "ID": {
@@ -8952,6 +9018,10 @@
         "active": true,
         "moduleName": "qtNghiViec",
         "modelName": "qtNghiViec",
+        "methods": {
+            "QT_NGHI_VIEC_SEARCH_PAGE": "searchPage",
+            "QT_NGHI_VIEC_GROUP_PAGE": "groupPage"
+        },
         "columns": {
             "SHCC": {
                 "value": "shcc",
@@ -9192,6 +9262,10 @@
         "active": true,
         "moduleName": "sachGiaoTrinh",
         "modelName": "sachGiaoTrinh",
+        "methods": {
+            "SACH_GIAO_TRINH_SEARCH_PAGE": "searchPage",
+            "SACH_GIAO_TRINH_GROUP_PAGE": "groupPage"
+        },
         "columns": {
             "ID": {
                 "value": "id",
@@ -10193,13 +10267,6 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": 200
-            },
-            "DA_NGHI": {
-                "value": "daNghi",
-                "dataType": "NUMBER",
-                "dataDefault": "0",
-                "nullable": true,
-                "size": "1,0"
             }
         },
         "primaryKeys": [
@@ -10427,6 +10494,9 @@
         "active": true,
         "moduleName": "trinhDoNgoaiNgu",
         "modelName": "trinhDoNgoaiNgu",
+        "methods": {
+            "TRINH_DO_NGOAI_NGU_BY_SHCC": "getTrinhDoNNByShcc"
+        },
         "columns": {
             "ID": {
                 "value": "id",
