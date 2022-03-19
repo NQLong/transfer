@@ -139,7 +139,7 @@ class QtBaoHiemXaHoiUserPage extends AdminPage {
     componentDidMount() {
         T.ready('/user', () => {
             const { shcc } = this.props.system && this.props.system.user ? this.props.system.user : { shcc: '' };
-            this.setState({ filter: { list_shcc: shcc, list_dv: '', fromYear: null, toYear: null, timeType: 0, tinhTrang: null } });
+            this.setState({ filter: { listShcc: shcc, listDv: '', fromYear: null, toYear: null, timeType: 0, tinhTrang: null } });
             this.getPage();
         });
     }
@@ -150,7 +150,7 @@ class QtBaoHiemXaHoiUserPage extends AdminPage {
 
     showModal = (e) => {
         e.preventDefault();
-        this.modal.show({ item: null, shcc: this.state.filter.list_shcc });
+        this.modal.show({ item: null, shcc: this.state.filter.listShcc });
     }
 
     delete = (e, item) => {
@@ -174,7 +174,7 @@ class QtBaoHiemXaHoiUserPage extends AdminPage {
         const { isStaff, shcc } = this.props.system && this.props.system.user ? this.props.system.user : { isStaff: false, shcc: '' };
         const { firstName, lastName } = isStaff && this.props.system.user || { firstName: '', lastName: '' };
         const name = isStaff ? `${lastName} ${firstName} (${shcc})` : '';
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtBaoHiemXaHoi && this.props.qtBaoHiemXaHoi.user_page ? this.props.qtBaoHiemXaHoi.user_page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtBaoHiemXaHoi && this.props.qtBaoHiemXaHoi.userPage ? this.props.qtBaoHiemXaHoi.userPage : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({

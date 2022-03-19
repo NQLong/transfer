@@ -15,13 +15,13 @@ export default function QtBaoHiemXaHoiReducer(state = null, data) {
         case QtBaoHiemXaHoiGetAll:
             return Object.assign({}, state, { items: data.items });
         case QtBaoHiemXaHoiGetGroupPage:
-            return Object.assign({}, state, { page_gr: data.page });
+            return Object.assign({}, state, { pageGr: data.page });
         case QtBaoHiemXaHoiGetGroupPageMa:
-            return Object.assign({}, state, { page_ma: data.page });
+            return Object.assign({}, state, { pageMa: data.page });
         case QtBaoHiemXaHoiGetPage:
             return Object.assign({}, state, { page: data.page });
         case QtBaoHiemXaHoiGetUserPage:
-            return Object.assign({}, state, { user_page: data.page });
+            return Object.assign({}, state, { userPage: data.page });
         case QtBaoHiemXaHoiGet:
             return Object.assign({}, state, { selectedItem: data.item });
         case QtBaoHiemXaHoiUpdate:

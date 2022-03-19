@@ -92,8 +92,8 @@ class QtHopDongDvtlTn extends AdminPage {
     render() {
         const permission = this.getUserPermission('qtHopDongDvtlTn', ['read', 'write', 'delete']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ?
-            (this.props.qtHopDongDvtlTn && this.props.qtHopDongDvtlTn.page_gr ?
-                this.props.qtHopDongDvtlTn.page_gr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list })
+            (this.props.qtHopDongDvtlTn && this.props.qtHopDongDvtlTn.pageGr ?
+                this.props.qtHopDongDvtlTn.pageGr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list })
             : (this.props.qtHopDongDvtlTn && this.props.qtHopDongDvtlTn.page ? this.props.qtHopDongDvtlTn.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] });
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {

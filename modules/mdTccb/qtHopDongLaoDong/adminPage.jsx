@@ -36,9 +36,9 @@ class QtHopDongLaoDongPage extends AdminPage {
         let { pageNumber, pageSize } = this.props && this.props.qtHopDongLaoDong && this.props.qtHopDongLaoDong.page ? this.props.qtHopDongLaoDong.page : { pageNumber: 1, pageSize: 50 };
         const fromYear = this.fromYear?.value() == '' ? null : this.fromYear?.value().getTime();
         const toYear = this.toYear?.value() == '' ? null : this.toYear?.value().getTime();
-        const list_dv = this.maDonVi?.value().toString() || '';
-        const list_shcc = this.mulCanBo?.value().toString() || '';
-        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc };
+        const listDv = this.maDonVi?.value().toString() || '';
+        const listShcc = this.mulCanBo?.value().toString() || '';
+        const pageFilter = isInitial ? null : { listDv, fromYear, toYear, listShcc };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
@@ -46,9 +46,9 @@ class QtHopDongLaoDongPage extends AdminPage {
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
                     this.fromYear?.value(filter.fromYear || '');
                     this.toYear?.value(filter.toYear || '');
-                    this.maDonVi?.value(filter.list_dv);
-                    this.mulCanBo?.value(filter.list_shcc);
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.list_shcc || filter.list_dv)) this.showAdvanceSearch();
+                    this.maDonVi?.value(filter.listDv);
+                    this.mulCanBo?.value(filter.listShcc);
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.listShcc || filter.listDv)) this.showAdvanceSearch();
                 }
             });
         });
@@ -94,8 +94,8 @@ class QtHopDongLaoDongPage extends AdminPage {
     render() {
         const permission = this.getUserPermission('qtHopDongLaoDong', ['read', 'write', 'delete']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ?
-            (this.props.qtHopDongLaoDong && this.props.qtHopDongLaoDong.page_gr ?
-                this.props.qtHopDongLaoDong.page_gr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list })
+            (this.props.qtHopDongLaoDong && this.props.qtHopDongLaoDong.pageGr ?
+                this.props.qtHopDongLaoDong.pageGr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list })
             : (this.props.qtHopDongLaoDong && this.props.qtHopDongLaoDong.page ? this.props.qtHopDongLaoDong.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] });
         // let maDonVi = this.curState;        
         let table = 'Không có danh sách!';

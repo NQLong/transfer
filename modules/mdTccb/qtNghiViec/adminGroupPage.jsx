@@ -82,7 +82,7 @@ class QtNghiViecGroupPage extends AdminPage {
             const route = T.routeMatcher('/user/tccb/qua-trinh/nghi-viec/group/:ma'),
                 params = route.parse(window.location.pathname);
             this.ma = params.ma;
-            this.setState({ filter: { list_shcc: params.ma, list_dv: '' } });
+            this.setState({ filter: { listShcc: params.ma, listDv: '' } });
             T.onSearch = (searchText) => this.props.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
                 this.fromYear?.value('');
@@ -99,10 +99,10 @@ class QtNghiViecGroupPage extends AdminPage {
         let { pageNumber, pageSize } = this.props && this.props.qtNghiViec && this.props.qtNghiViec.page ? this.props.qtNghiViec.page : { pageNumber: 1, pageSize: 50 };
         const fromYear = this.fromYear?.value() == '' ? null : this.fromYear?.value().getTime();
         const toYear = this.toYear?.value() == '' ? null : this.toYear?.value().getTime();
-        const list_dv = this.maDonVi?.value().toString() || '';
-        const list_shcc = this.ma;
+        const listDv = this.maDonVi?.value().toString() || '';
+        const listShcc = this.ma;
         const dienNghi = this.dienNghi.value();
-        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc, dienNghi };
+        const pageFilter = isInitial ? null : { listDv, fromYear, toYear, listShcc, dienNghi };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
@@ -110,10 +110,10 @@ class QtNghiViecGroupPage extends AdminPage {
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
                     this.fromYear?.value(filter.fromYear || '');
                     this.toYear?.value(filter.toYear || '');
-                    this.maDonVi?.value(filter.list_dv);
-                    this.mulCanBo?.value(filter.list_shcc);
+                    this.maDonVi?.value(filter.listDv);
+                    this.mulCanBo?.value(filter.listShcc);
                     this.dienNghi?.value(filter.dienNghi);
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.list_shcc || filter.list_dv || filter.dienNghi)) this.showAdvanceSearch();
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.listShcc || filter.listDv || filter.dienNghi)) this.showAdvanceSearch();
                 }
             });
         });

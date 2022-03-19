@@ -13,9 +13,9 @@ export default function QtHopDongLaoDongReducer(state = null, data) {
         case QtHopDongLaoDongGetAll:
             return Object.assign({}, state, { items: data.items });
         case QtHopDongLaoDongGetGroupPage:
-            return Object.assign({}, state, { page_gr: data.page });
+            return Object.assign({}, state, { pageGr: data.page });
         case QtHopDongLaoDongGetGroupPageMa:
-            return Object.assign({}, state, { page_ma: data.page });
+            return Object.assign({}, state, { pageMa: data.page });
         case QtHopDongLaoDongGetPage:
             return Object.assign({}, state, { page: data.page });
         case QtHopDongLaoDongGet:

@@ -61,16 +61,16 @@ const run = () => app.excel.readFile(app.path.join(__dirname, 'DI_NUOC_NGOAI.xls
                     parameter: { searchT: `%${search.toLowerCase()}%` },
                 }
 
-                let search_country = country ? country.trim() : '';
-                if (search_country.toLowerCase().includes('châu')) search_country = '';
-                const condi_country = {
+                let searchCountry = country ? country.trim() : '';
+                if (searchCountry.toLowerCase().includes('châu')) searchCountry = '';
+                const condiCountry = {
                     statement: 'lower(ten_quoc_gia) LIKE :searchTe OR lower(country) LIKE :searchTe OR lower(ten_khac) LIKE :searchTe',
-                    parameter: { searchTe: `%${search_country.toLowerCase()}%` },
+                    parameter: { searchTe: `%${searchCountry.toLowerCase()}%` },
                 }
 
                 // console.log(search);
-                // app.model.dmQuocGia.get(condi_country, (e, d) => {
-                //     if (e || d == null) console.log(index + ': ' + search_country);
+                // app.model.dmQuocGia.get(condiCountry, (e, d) => {
+                //     if (e || d == null) console.log(index + ': ' + searchCountry);
                 //     else console.log(d.maCode);
                 //     solve(index + 1);
                 // });
@@ -114,9 +114,9 @@ const run = () => app.excel.readFile(app.path.join(__dirname, 'DI_NUOC_NGOAI.xls
                         // });
 
                         new Promise(resolve => {
-                            app.model.dmQuocGia.get(condi_country, (e, d) => {
-                                if (search_country == '') console.log('');
-                                else if (e || d == null) console.log(index + ': ' + search_country);
+                            app.model.dmQuocGia.get(condiCountry, (e, d) => {
+                                if (searchCountry == '') console.log('');
+                                else if (e || d == null) console.log(index + ': ' + searchCountry);
                                 else console.log(d.maCode);
                                 resolve();
                             });

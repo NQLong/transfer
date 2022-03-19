@@ -106,9 +106,9 @@ export class ComponentDieuKhoan extends React.Component {
                 data && data.thoiGian && this.setState({ thoiGianHD: data.thoiGian, isXacDinhTg: true });
                 let tuNgayValue = this.tuNgay.value();
                 if (tuNgayValue) {
-                    const new_date = moment(tuNgayValue).add(parseInt(data.thoiGian), 'M');
-                    this.denNgay.value(new_date.valueOf() - 24 * 3600000);
-                    this.ngayKyTiepTheo.value(new_date.valueOf());
+                    const newDate = moment(tuNgayValue).add(parseInt(data.thoiGian), 'M');
+                    this.denNgay.value(newDate.valueOf() - 24 * 3600000);
+                    this.ngayKyTiepTheo.value(newDate.valueOf());
                 }
             }
         });
@@ -116,9 +116,9 @@ export class ComponentDieuKhoan extends React.Component {
 
     handleTuNgay = (value) => {
         if (value && this.state.isXacDinhTg && this.state.thoiGianHD) {
-            const new_date = moment(value).add(parseInt(this.state.thoiGianHD), 'M');
-            this.denNgay.value(new_date.valueOf() - 24 * 3600000);
-            this.ngayKyTiepTheo.value(new_date.valueOf());
+            const newDate = moment(value).add(parseInt(this.state.thoiGianHD), 'M');
+            this.denNgay.value(newDate.valueOf() - 24 * 3600000);
+            this.ngayKyTiepTheo.value(newDate.valueOf());
         }
     }
 

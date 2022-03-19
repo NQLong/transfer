@@ -13,9 +13,9 @@ export default function QtGiaiThuongReducer(state = null, data) {
         case QtGiaiThuongGetAll:
             return Object.assign({}, state, { items: data.items });
         case QtGiaiThuongGetGroupPage:
-            return Object.assign({}, state, { page_gr: data.page });
+            return Object.assign({}, state, { pageGr: data.page });
         case QtGiaiThuongGetGroupPageMa:
-            return Object.assign({}, state, { page_ma: data.page });
+            return Object.assign({}, state, { pageMa: data.page });
         case QtGiaiThuongGetPage:
             return Object.assign({}, state, { page: data.page });
         case QtGiaiThuongGet:
