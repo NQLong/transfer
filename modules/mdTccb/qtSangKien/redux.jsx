@@ -16,13 +16,13 @@ export default function QtSangKienReducer(state = null, data) {
         case QtSangKienGetAll:
             return Object.assign({}, state, { items: data.items });
         case QtSangKienGetGroupPage:
-            return Object.assign({}, state, { page_gr: data.page });
+            return Object.assign({}, state, { pageGr: data.page });
         case QtSangKienGetGroupPageMa:
-            return Object.assign({}, state, { page_ma: data.page });
+            return Object.assign({}, state, { pageMa: data.page });
         case QtSangKienGetPage:
             return Object.assign({}, state, { page: data.page });
         case QtSangKienGetUserPage:
-            return Object.assign({}, state, { user_page: data.page });
+            return Object.assign({}, state, { userPage: data.page });
         case QtSangKienGet:
             return Object.assign({}, state, { selectedItem: data.item });
         case QtSangKienUpdate:

@@ -82,8 +82,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { list_shcc, list_dv } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { list_shcc: null, list_dv: null };
-        app.model.qtSangKien.searchPage(pageNumber, pageSize, list_shcc, list_dv, searchTerm, (error, page) => {
+        const { listShcc, listDv } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { listShcc: null, listDv: null };
+        app.model.qtSangKien.searchPage(pageNumber, pageSize, listShcc, listDv, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -99,8 +99,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { list_shcc, list_dv } = (req.query.filter && req.query.filter != '%%%%%%%%%%') ? req.query.filter : { list_shcc: null, list_dv: null };
-        app.model.qtSangKien.searchPage(pageNumber, pageSize, list_shcc, list_dv, searchTerm, (error, page) => {
+        const { listShcc, listDv } = (req.query.filter && req.query.filter != '%%%%%%%%%%') ? req.query.filter : { listShcc: null, listDv: null };
+        app.model.qtSangKien.searchPage(pageNumber, pageSize, listShcc, listDv, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -115,8 +115,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { list_shcc, list_dv } = (req.query.filter && req.query.filter != '%%%%%%%%%%') ? req.query.filter : { list_shcc: null, list_dv: null };
-        app.model.qtSangKien.groupPage(pageNumber, pageSize, list_shcc, list_dv, searchTerm, (error, page) => {
+        const { listShcc, listDv } = (req.query.filter && req.query.filter != '%%%%%%%%%%') ? req.query.filter : { listShcc: null, listDv: null };
+        app.model.qtSangKien.groupPage(pageNumber, pageSize, listShcc, listDv, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
