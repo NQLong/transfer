@@ -6400,6 +6400,9 @@
         "active": true,
         "moduleName": "hcthCongVanDi",
         "modelName": "hcthCongVanDi",
+        "methods": {
+            "HCTH_CONG_VAN_DI_SEARCH_PAGE": "searchPage"
+        },
         "columns": {
             "NOI_DUNG": {
                 "value": "noiDung",
