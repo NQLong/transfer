@@ -26,7 +26,7 @@ export function getHcthCongVanDenPage(pageNumber, pageSize, pageCondition, filte
         done = filter;
         filter = {};
     }
-    const page = T.updatePage('HcthCongVanDen', pageNumber, pageSize, pageCondition, filter);
+    const page = T.updatePage('pageHcthCongVanDen', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/hcth/cong-van-den/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
@@ -36,8 +36,8 @@ export function getHcthCongVanDenPage(pageNumber, pageSize, pageCondition, filte
             } else {
                 if (page.filter) data.page.filter = page.filter;
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
-                if (done) done(data.page);
                 dispatch({ type: HcthCongVanDenGetPage, page: data.page });
+                done && done(data.page);
             }
         }, () => T.notify('Lấy danh sách sách công văn đến bị lỗi!', 'danger'));
     };
@@ -52,9 +52,9 @@ export function createHcthCongVanDen(data, done) {
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
                 if (done) {
-                    T.notify('Thêm công văn đến thành công!', 'info');
-                    done(data);
+                    T.notify('Thêm công văn đến thành công!', 'success');
                     dispatch(getHcthCongVanDenSearchPage());
+                    done && done(data);
                 }
             }
         }, () => T.notify('Thêm công văn đến bị lỗi', 'danger'));
@@ -86,8 +86,8 @@ export function updateHcthCongVanDen(id, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật công văn đến thành công!', 'success');
-                done && done();
                 dispatch(getHcthCongVanDenSearchPage());
+                done && done();
             }
         }, () => T.notify('Cập nhật công văn đến học bị lỗi!', 'danger'));
     };
@@ -115,7 +115,7 @@ export function getHcthCongVanDenSearchPage(pageNumber, pageSize, pageCondition,
         done = filter;
         filter = {};
     }
-    const page = T.updatePage('searchPageHcthCongVanDen', pageNumber, pageSize, pageCondition, filter);
+    const page = T.updatePage('pageHcthCongVanDen', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
         const url = `/api/hcth/cong-van-den/search/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
@@ -125,8 +125,8 @@ export function getHcthCongVanDenSearchPage(pageNumber, pageSize, pageCondition,
             } else {
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 if (page.filter) data.page.filter = page.filter;
-                done && done(data.page);
                 dispatch({ type: HcthCongVanDenSearchPage, page: data.page });
+                done && done(data.page);
             }
         }, error => console.error(`GET: ${url}.`, error));
     };
