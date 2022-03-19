@@ -30,8 +30,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, list_shcc, list_dv, list_loaiBang } = (req.query.filter && req.query.filter != '%%%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1' };
-        app.model.qtDaoTao.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, list_loaiBang, searchTerm, (error, page) => {
+        const { fromYear, toYear, listShcc, listDv, listLoaiBang } = (req.query.filter && req.query.filter != '%%%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1' };
+        app.model.qtDaoTao.searchPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, listLoaiBang, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -46,8 +46,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, list_shcc, list_dv } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1' };
-        app.model.qtDaoTao.groupPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, searchTerm, (error, page) => {
+        const { fromYear, toYear, listShcc, listDv } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1' };
+        app.model.qtDaoTao.groupPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -113,14 +113,14 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/qua-trinh/dao-tao/download-excel/:list_shcc/:list_dv/:fromYear/:toYear/:list_loaiBang', app.permission.check('qtDaoTao:read'), (req, res) => {
-        let { list_shcc, list_dv, fromYear, toYear, list_loaiBang } = req.params ? req.params : { list_shcc: null, list_dv: null, fromYear: null, toYear: null, list_loaiBang: null };
-        if (list_shcc == 'null') list_shcc = null;
-        if (list_dv == 'null') list_dv = null;
+    app.get('/api/qua-trinh/dao-tao/download-excel/:listShcc/:listDv/:fromYear/:toYear/:listLoaiBang', app.permission.check('qtDaoTao:read'), (req, res) => {
+        let { listShcc, listDv, fromYear, toYear, listLoaiBang } = req.params ? req.params : { listShcc: null, listDv: null, fromYear: null, toYear: null, listLoaiBang: null };
+        if (listShcc == 'null') listShcc = null;
+        if (listDv == 'null') listDv = null;
         if (fromYear == 'null') fromYear = null;
         if (toYear == 'null') toYear = null;
-        if (list_loaiBang == 'null') list_loaiBang = null;
-        app.model.qtDaoTao.download(list_shcc, list_dv, fromYear, toYear, list_loaiBang, (err, result) => {
+        if (listLoaiBang == 'null') listLoaiBang = null;
+        app.model.qtDaoTao.download(listShcc, listDv, fromYear, toYear, listLoaiBang, (err, result) => {
             if (err || !result) {
                 res.send({ err });
             } else {

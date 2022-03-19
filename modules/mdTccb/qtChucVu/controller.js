@@ -20,8 +20,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, list_shcc, list_dv, timeType, list_cv, gioiTinh } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, list_cv: null, gioiTinh: null };
-        app.model.qtChucVu.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, timeType, list_cv, gioiTinh, searchTerm, (error, page) => {
+        const { fromYear, toYear, listShcc, listDv, timeType, listCv, gioiTinh } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, timeType: 0, listCv: null, gioiTinh: null };
+        app.model.qtChucVu.searchPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, timeType, listCv, gioiTinh, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -36,8 +36,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, list_shcc, list_dv, timeType, list_cv, gioiTinh } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, list_cv: null, gioiTinh: null };
-        app.model.qtChucVu.groupPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, timeType, list_cv, gioiTinh, searchTerm, (error, page) => {
+        const { fromYear, toYear, listShcc, listDv, timeType, listCv, gioiTinh } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, timeType: 0, listCv: null, gioiTinh: null };
+        app.model.qtChucVu.groupPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, timeType, listCv, gioiTinh, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -120,15 +120,15 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/qua-trinh/chuc-vu/download-excel/:list_shcc/:list_dv/:fromYear/:toYear/:timeType/:list_cv/:gioiTinh', app.permission.check('qtChucVu:read'), (req, res) => {
-        let { list_dv, fromYear, toYear, list_shcc, timeType, list_cv, gioiTinh } = req.params ? req.params : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, list_cv: null, gioiTinh: null };
-        if (list_shcc == 'null') list_shcc = null;
-        if (list_dv == 'null') list_dv = null;
+    app.get('/api/qua-trinh/chuc-vu/download-excel/:listShcc/:listDv/:fromYear/:toYear/:timeType/:listCv/:gioiTinh', app.permission.check('qtChucVu:read'), (req, res) => {
+        let { listDv, fromYear, toYear, listShcc, timeType, listCv, gioiTinh } = req.params ? req.params : { fromYear: null, toYear: null, listShcc: null, listDv: null, timeType: 0, listCv: null, gioiTinh: null };
+        if (listShcc == 'null') listShcc = null;
+        if (listDv == 'null') listDv = null;
         if (fromYear == 'null') fromYear = null;
         if (toYear == 'null') toYear = null;
-        if (list_cv == 'null') list_cv = null;
+        if (listCv == 'null') listCv = null;
         if (gioiTinh == 'null') gioiTinh = null;
-        app.model.qtChucVu.download(list_shcc, list_dv, fromYear, toYear, timeType, list_cv, gioiTinh, (err, result) => {
+        app.model.qtChucVu.download(listShcc, listDv, fromYear, toYear, timeType, listCv, gioiTinh, (err, result) => {
             if (err || !result) {
                 res.send({ err });
             } else {

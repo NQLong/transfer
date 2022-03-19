@@ -12,7 +12,7 @@ export default function QtHopDongVienChucReducer(state = null, data) {
         case QtHopDongVienChucGetAll:
             return Object.assign({}, state, { items: data.items });
         case QtHopDongVienChucGetGroupPage:
-            return Object.assign({}, state, { page_gr: data.page });
+            return Object.assign({}, state, { pageGr: data.page });
         case QtHopDongVienChucGetPage:
             return Object.assign({}, state, { page: data.page });
         case QtHopDongVienChucGet:

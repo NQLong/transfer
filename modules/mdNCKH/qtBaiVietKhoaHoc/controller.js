@@ -80,8 +80,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, list_shcc, list_dv, xuatBanRange } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, xuatBanRange: null };
-        app.model.qtBaiVietKhoaHoc.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, xuatBanRange, searchTerm, (error, page) => {
+        const { fromYear, toYear, listShcc, listDv, xuatBanRange } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, xuatBanRange: null };
+        app.model.qtBaiVietKhoaHoc.searchPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, xuatBanRange, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -97,8 +97,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, list_shcc, list_dv, xuatBanRange } = (req.query.filter && req.query.filter != '%%%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, xuatBanRange: null };
-        app.model.qtBaiVietKhoaHoc.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, xuatBanRange, searchTerm, (error, page) => {
+        const { fromYear, toYear, listShcc, listDv, xuatBanRange } = (req.query.filter && req.query.filter != '%%%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, xuatBanRange: null };
+        app.model.qtBaiVietKhoaHoc.searchPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, xuatBanRange, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -113,8 +113,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, list_shcc, list_dv, xuatBanRange } = (req.query.filter && req.query.filter != '%%%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, xuatBanRange: null };
-        app.model.qtBaiVietKhoaHoc.groupPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, xuatBanRange, searchTerm, (error, page) => {
+        const { fromYear, toYear, listShcc, listDv, xuatBanRange } = (req.query.filter && req.query.filter != '%%%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, xuatBanRange: null };
+        app.model.qtBaiVietKhoaHoc.groupPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, xuatBanRange, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -134,14 +134,14 @@ module.exports = app => {
     app.delete('/api/qua-trinh/bai-viet-khoa-hoc', app.permission.check('staff:write'), (req, res) =>
         app.model.qtBaiVietKhoaHoc.delete({ id: req.body.id }, (error) => res.send(error)));
 
-    app.get('/api/qua-trinh/bai-viet-khoa-hoc/download-excel/:list_shcc/:list_dv/:fromYear/:toYear/:xuatBanRange', app.permission.check('qtBaiVietKhoaHoc:read'), (req, res) => {
-        let { list_shcc, list_dv, fromYear, toYear, xuatBanRange } = req.params ? req.params : { list_shcc: null, list_dv: null, toYear: null, xuatBanRange: null };
-        if (list_shcc == 'null') list_shcc = null;
-        if (list_dv == 'null') list_dv = null;
+    app.get('/api/qua-trinh/bai-viet-khoa-hoc/download-excel/:listShcc/:listDv/:fromYear/:toYear/:xuatBanRange', app.permission.check('qtBaiVietKhoaHoc:read'), (req, res) => {
+        let { listShcc, listDv, fromYear, toYear, xuatBanRange } = req.params ? req.params : { listShcc: null, listDv: null, toYear: null, xuatBanRange: null };
+        if (listShcc == 'null') listShcc = null;
+        if (listDv == 'null') listDv = null;
         if (fromYear == 'null') fromYear = null;
         if (toYear == 'null') toYear = null;
         if (xuatBanRange == 'null') xuatBanRange = null;
-        app.model.qtBaiVietKhoaHoc.download(list_shcc, list_dv, fromYear, toYear, xuatBanRange, (err, result) => {
+        app.model.qtBaiVietKhoaHoc.download(listShcc, listDv, fromYear, toYear, xuatBanRange, (err, result) => {
             if (err || !result) {
                 res.send({ err });
             } else {

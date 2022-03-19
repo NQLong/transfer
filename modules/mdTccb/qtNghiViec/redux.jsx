@@ -14,7 +14,7 @@ export default function QtNghiViecReducer(state = null, data) {
         case QtNghiViecGetAll:
             return Object.assign({}, state, { items: data.items });
         case QtNghiViecGetGroupPage:
-            return Object.assign({}, state, { page_gr: data.page });
+            return Object.assign({}, state, { pageGr: data.page });
         case QtNghiViecGetPage:
             return Object.assign({}, state, { page: data.page });
         case QtNghiViecGet:
