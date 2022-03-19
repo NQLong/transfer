@@ -206,21 +206,7 @@ module.exports = app => {
 
                 // Add login permission => user.active == 1 => user:login
                 if (user.active == 1) app.permissionHooks.pushUserPermission(user, 'user:login');
-                new Promise(resolve => { // Check user is student
-                    if (user.isStudent) {
-                        app.permissionHooks.pushUserPermission(user, 'student:login'); // Add student permission: student:login,
-                        app.model.fwStudents.get({ mssv: user.studentId }, (error, student) => {
-                            if (student) {
-                                user.data = student;
-                                app.permissionHooks.run('student', user, student).then(() => resolve());
-                            } else {
-                                resolve();
-                            }
-                        });
-                    } else {
-                        resolve();
-                    }
-                }).then(() => new Promise(resolve => {
+                new Promise(resolve => {
                     app.model.canBo.get({ email: user.email }, (e, item) => {
                         if (e || item == null) {
                             user.isStaff = 0;
@@ -231,25 +217,28 @@ module.exports = app => {
                             user.shcc = item.shcc;
                             user.data = item;
                             app.permissionHooks.pushUserPermission(user, 'staff:login'); // Add staff permission: staff:login
-                            resolve();
+                            resolve();  
                         }
                     });
+                }).then(() => new Promise(resolve => {
+                    if (user.isStaff) {
+                        app.model.qtChucVu.getAll({ shcc: user.shcc }, 'maChucVu, maDonVi', null, (e, chucVus) => {
+                            user.data.chucVus = chucVus || [];
+                            app.permissionHooks.run('staff', user, user.data).then(() => resolve());
+                        });
+                    } else resolve();
                 })).then(() => new Promise(resolve => {
-                    app.model.qtChucVu.getAll({ shcc: user.shcc }, (e, re) => {
-                        if (e || re == null) resolve();
-                        else if (re && re.length > 0) {
-                            re.forEach(item => {
-                                if (item.maChucVu != '002' && item.maChucVu != '001' && item.maChucVu != '013' && item.maChucVu != '014') {
-                                    item.maDonVi && app.model.dmDonVi.get({ ma: item.maDonVi }, (er, resu) => {
-                                        user.donVi = resu.ten;
-                                        app.permissionHooks.pushUserPermission(user, 'quanLy:login');
-                                        resolve();
-                                    });
-                                }
-
-                            });
-                        } else resolve();
-                    });
+                    if (!user.isStaff && user.studentId) {
+                        app.model.fwStudents.get({ mssv: user.studentId }, (error, student) => {
+                            if (student) {
+                                app.permissionHooks.pushUserPermission(user, 'student:login');
+                                user.isStudent = 1;
+                                user.active = 1;
+                                user.data = student;
+                                resolve();
+                            } else resolve();
+                        });
+                    } else resolve();
                 })).then(() => {
                     user.menu = app.permission.tree();
                     Object.keys(user.menu).forEach(parentMenuIndex => {
