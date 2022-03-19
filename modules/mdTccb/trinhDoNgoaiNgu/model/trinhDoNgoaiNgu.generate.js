@@ -130,5 +130,10 @@ module.exports = app => {
             const sql = 'SELECT COUNT(*) FROM TRINH_DO_NGOAI_NGU' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.dbConnection.execute(sql, parameter, (error, result) => done(error, result));
         },
+
+        getTrinhDoNNByShcc: (isshcc, done) => {
+            app.dbConnection.execute('BEGIN :ret:=trinh_do_ngoai_ngu_by_shcc(:isshcc); END;',
+                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, isshcc }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
+        },
     };
 };
