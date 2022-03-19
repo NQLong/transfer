@@ -92,6 +92,10 @@ module.exports = (app) => {
             index: 8000, title: 'Thư viện', link: '/user/library', icon: 'fa-th-large',
             subMenusRender: false
         },
+        students: {
+            index: 6100, title: 'Sinh viên', link: '/user/students', icon: 'fa-users',
+            subMenusRender: false
+        },
         category: {
             index: 4000, title: 'Danh mục', link: '/user/category', icon: 'fa-list-alt',
             subMenusRender: false,
@@ -105,6 +109,11 @@ module.exports = (app) => {
             index: 1900, title: 'Website đơn vị', link: '/user/website', icon: 'fa-database',
             subMenusRender: false,
         },
+        hcth: {
+            index: 500, title: 'Hành chính tổng hợp', link: '/user/hcth', icon: 'fa-book',
+            subMenusRender: false,
+        }
+
     };
 
     // Ready Hook ----------------------------------------------------------------------------------------------------------------------------------
