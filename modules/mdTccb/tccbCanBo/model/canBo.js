@@ -23,14 +23,14 @@ module.exports = app => {
         if (maDonVi) {
             maDonVi = maDonVi.toString().trim();
         }
-        let conditionn = {
+        let condition = {
             statement: 'lower(ho) like lower(:ho) and lower(ten) like lower(:ten)',
             parameter: {
                 ho: `%${ho}%`,
                 ten: `%${ten}%`,
             }
         };
-        app.model.canBo.getAll(conditionn, (error, items) => {
+        app.model.canBo.getAll(condition, (error, items) => {
             if (error || items.length == 0) {
                 done('Họ và tên cán bộ không tồn tại !', null);
             } else {

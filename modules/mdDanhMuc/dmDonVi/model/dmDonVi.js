@@ -27,7 +27,7 @@ function bestChoice(s, t) {
 }
 module.exports = app => {
     // app.model.dmDonVi.foo = () => { };
-    app.model.dmDonVi.getMaDonVi = (ten, done) => {
+    app.model.dmDonVi.getMaDonVi = (ten, done) => { // Tìm mã đơn vị theo tên
         if (!ten) {
             done && done(null, null);
         } else {

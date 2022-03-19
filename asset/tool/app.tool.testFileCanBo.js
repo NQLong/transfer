@@ -7,7 +7,7 @@ const app = {
     //mongodb: 'mongodb://localhost:27017/' + package.db.name,
     publicPath: path.join(__dirname, package.path.public),
     assetPath: path.join(__dirname, '../'),
-    modulesPath: path.join(__dirname, '../../' + package.path.modules),
+    modulesPath: path.join(__dirname, '../../' + package.path.modules)
 };
 // Configure ==================================================================
 require('../../config/common')(app);
@@ -24,20 +24,16 @@ const run = () => {
     app.excel.readFile(app.path.join(__dirname, './data/DSCB-1-1.xlsx'), workbook => {
         if (workbook) {
             const worksheet = workbook.getWorksheet(4);
-            solve = (idx = 3) => {
+            const solve = (idx = 3) => {
                 let shcc = worksheet.getCell('A' + idx).value;
                 if (shcc == null) {
                     process.exit();
                 }
                 shcc = shcc.toString().trim();
-                //console.log("shcc = ", shcc, idx);
                 let hoten = worksheet.getCell('B' + idx).value.toString().trim();
-                let donvi = worksheet.getCell('C' + idx).value;
-                if (donvi) {
-                    donVi = donvi.toString().trim();
-                }
+                let donvi = (worksheet.getCell('C' + idx).value || '').trim();
                 let ghiChu = worksheet.getCell('D' + idx).value;
-                app.model.canBo.get({shcc: shcc}, (error, item) => {
+                app.model.canBo.get({ shcc }, (error, item) => {
                     if (error || item == null) {
                         console.log(shcc + ',' + hoten + ',' + donvi + ',' + ghiChu);
                     } else {
@@ -135,5 +131,5 @@ const run = () => {
 
 app.readyHooks.add('Run tool.testFileCanBo.js', {
     ready: () => app.dbConnection && app.model && app.model.canBo && app.model.dmDonVi,
-    run,
+    run
 });
