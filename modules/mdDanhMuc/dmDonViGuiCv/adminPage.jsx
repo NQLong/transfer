@@ -11,21 +11,23 @@ class EditModal extends AdminModal {
 
     componentDidMount() {
         $(document).ready(() => this.onShown(() => {
-            !this.id.value() ? this.id.focus() : this.ten.focus();
+            if (this.id) {
+                !this.id.value() ? this.id.focus() : this.ten.focus();
+            }
         }));
     }
 
     onShow = (item) => {
-        const { id, ten, kichHoat} = item && typeof item !== 'undefined' ? item : { id: null, ten: '', kichHoat: true };
-        this.setState({ id, item });
-        this.id.value(id);
+        const { id, ten, kichHoat} = item ? item : { id: null, ten: '', kichHoat: true };
+        this.setState({ id, item } , () => {
+            if (id) this.id.value(id);
+        });
         this.ten.value(ten);
         this.kichHoat.value(kichHoat);
     }
 
     onSubmit = (e) => {
         const changes = {
-            id: this.id.value(),
             ten: this.ten.value(),
             kichHoat: this.kichHoat.value() ? 1 : 0,
         };
@@ -49,13 +51,14 @@ class EditModal extends AdminModal {
         return this.renderModal({
             title: this.state.id ? 'Cập nhật đơn vị gửi công văn' : 'Tạo mới đơn vị gửi công văn',
             body: <div className='row'>
-                <FormTextBox type='number' className='col-md-6' ref={e => this.id = e} label='Mã đơn vị'
-                    readOnly={this.state.id ? true : readOnly} required />  
-                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true}
-                    readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
-                    onChange={value => this.changeKichHoat(value ? 1 : 0)} />
+                { this.state.id && <FormTextBox type='number' className='col-md-12' ref={e => this.id = e} label='Mã đơn vị'
+                    readOnly={this.state.id ? true : readOnly} required /> } 
                 <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên đơn vị'
                     readOnly={readOnly} required />
+
+                <FormCheckbox className='col-md-12' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true}
+                    readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
+                    onChange={value => this.changeKichHoat(value ? 1 : 0)} />
             </div>
         });
     }
@@ -95,16 +98,15 @@ class DmDonViGuiCvPage extends AdminPage {
                 getDataSource: () => list, stickyHead: false,
                 renderHead: () => (
                     <tr>
-                        <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
-                        <th style={{ width: '50%' }}>Tên đơn vị</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>#</th>
+                        <th style={{ width: '50%', textAlign: 'center' }}>Tên đơn vị</th>
+                        <th style={{ width: '30%', textAlign: 'center'}} nowrap='true'>Kích hoạt</th>
+                        <th style={{ width: '20%', textAlign: 'center' }} nowrap='true'>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='link' style={{ textAlign: 'right' }} content={item.id ? item.id : ''}
-                            onClick={() => this.modal.show(item)} />
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1}/>
                         <TableCell type='text' content={item.ten ? item.ten : ''} />
                         <TableCell type='checkbox' style={{ textAlign: 'center' }} content={item.kichHoat} permission={permission}
                             onChanged={() => this.changeActive(item)} />
