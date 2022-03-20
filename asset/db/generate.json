@@ -6391,17 +6391,17 @@
             },
             "DON_VI_NHAN": {
                 "value": "donViNhan",
-                "dataType": "NUMBER",
+                "dataType": "NVARCHAR2",
                 "dataDefault": "",
                 "nullable": true,
-                "size": "2,0"
+                "size": 100
             },
             "CAN_BO_NHAN": {
                 "value": "canBoNhan",
                 "dataType": "NVARCHAR2",
                 "dataDefault": "",
                 "nullable": true,
-                "size": 10
+                "size": 100
             },
             "NGAY_HET_HAN": {
                 "value": "ngayHetHan",
@@ -6432,6 +6432,13 @@
             "HCTH_CONG_VAN_DI_SEARCH_PAGE": "searchPage"
         },
         "columns": {
+            "ID": {
+                "value": "id",
+                "dataType": "NUMBER",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_99335\".nextval",
+                "nullable": false,
+                "size": "22,0"
+            },
             "NOI_DUNG": {
                 "value": "noiDung",
                 "dataType": "NVARCHAR2",
@@ -6467,12 +6474,12 @@
                 "nullable": true,
                 "size": 200
             },
-            "ID": {
-                "value": "id",
-                "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_97242\".nextval",
-                "nullable": false,
-                "size": "22,0"
+            "CAN_BO_NHAN": {
+                "value": "canBoNhan",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 200
             }
         },
         "primaryKeys": [
@@ -10290,13 +10297,6 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": 200
-            },
-            "DA_NGHI": {
-                "value": "daNghi",
-                "dataType": "NUMBER",
-                "dataDefault": "0",
-                "nullable": true,
-                "size": "1,0"
             }
         },
         "primaryKeys": [
