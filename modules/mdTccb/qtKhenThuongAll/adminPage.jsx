@@ -5,7 +5,7 @@ import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox,
 import Pagination from 'view/component/Pagination';
 import {
     getQtKhenThuongAllPage, updateQtKhenThuongAll,
-    deleteQtKhenThuongAll, createQtKhenThuongAll, getQtKhenThuongAllGroupPage,
+    deleteQtKhenThuongAll, createQtKhenThuongAll, getQtKhenThuongAllGroupPage
 } from './redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import { SelectAdapter_DmKhenThuongKyHieuV2 } from 'modules/mdDanhMuc/dmKhenThuongKyHieu/redux';
@@ -17,6 +17,7 @@ import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 class EditModal extends AdminModal {
     state = { id: '', doiTuong: '' };
     multiple = false;
+
     componentDidMount() {
         this.props.getLoaiDoiTuong(items => {
             if (items) {
@@ -31,40 +32,39 @@ class EditModal extends AdminModal {
 
     onShow = (item, multiple = true) => {
         this.multiple = multiple;
-        let { id, maLoaiDoiTuong, ma, namDatDuoc, maThanhTich, maChuThich, diemThiDua } = item ? item : {
-            id: '', maLoaiDoiTuong: '', ma: '', namDatDuoc: '', maThanhTich: '', maChuThich: '', diemThiDua: ''
+        let { id, maLoaiDoiTuong, ma, namDatDuoc, maThanhTich, maChuThich, diemThiDua, soQuyetDinh } = item ? item : {
+            id: '', maLoaiDoiTuong: '', ma: '', namDatDuoc: '', maThanhTich: '', maChuThich: '', diemThiDua: '', soQuyetDinh: ''
         };
         this.setState({
             id: id, doiTuong: maLoaiDoiTuong
         });
 
-        this.loaiDoiTuong.value(maLoaiDoiTuong ? maLoaiDoiTuong : '');
+        this.loaiDoiTuong.value(maLoaiDoiTuong);
         if (maLoaiDoiTuong == '02') this.maCanBo.value(ma);
         else if (maLoaiDoiTuong == '03') this.maDonVi.value(ma);
-        else if (maLoaiDoiTuong == '04') this.maBoMon.value(ma ? ma : '');
+        else if (maLoaiDoiTuong == '04') this.maBoMon.value(ma);
 
-        this.namDatDuoc.value(namDatDuoc ? namDatDuoc : '');
-        this.thanhTich.value(maThanhTich ? maThanhTich : '');
-        this.chuThich.value(maChuThich ? maChuThich : '');
+        this.namDatDuoc.value(namDatDuoc || '');
+        this.thanhTich.value(maThanhTich);
+        this.chuThich.value(maChuThich);
         this.diemThiDua.value(diemThiDua);
+        this.soQuyetDinh.value(soQuyetDinh || '');
     };
-
-    changeKichHoat = (value, target) => target.value(value ? 1 : 0) || target.value(value);
 
     onSubmit = (e) => {
         e.preventDefault();
-        let list_ma = [];
-        if (this.loaiDoiTuong.value() == '01') list_ma = ['01'];
-        if (this.loaiDoiTuong.value() == '02') list_ma = this.maCanBo.value();
-        if (this.loaiDoiTuong.value() == '03') list_ma = this.maDonVi.value();
-        if (this.loaiDoiTuong.value() == '04') list_ma = this.maBoMon.value();
-        if (!Array.isArray(list_ma)) {
-            list_ma = [list_ma];
+        let listMa = [];
+        if (this.loaiDoiTuong.value() == '01') listMa = ['01'];
+        if (this.loaiDoiTuong.value() == '02') listMa = this.maCanBo.value();
+        if (this.loaiDoiTuong.value() == '03') listMa = this.maDonVi.value();
+        if (this.loaiDoiTuong.value() == '04') listMa = this.maBoMon.value();
+        if (!Array.isArray(listMa)) {
+            listMa = [listMa];
         }
         if (!this.loaiDoiTuong.value()) {
             T.notify('Loại đối tượng trống', 'danger');
             this.loaiDoiTuong.focus();
-        } else if (list_ma.length == 0) {
+        } else if (listMa.length == 0) {
             T.notify('Danh sách mã số trống', 'danger');
             if (this.loaiDoiTuong.value() == '02') this.maCanBo.focus();
             if (this.loaiDoiTuong.value() == '03') this.maDonVi.focus();
@@ -73,7 +73,7 @@ class EditModal extends AdminModal {
             T.notify('Thành tích trống', 'danger');
             this.thanhTich.focus();
         } else {
-            list_ma.forEach((ma, index) => {
+            listMa.forEach((ma, index) => {
                 const changes = {
                     loaiDoiTuong: this.loaiDoiTuong.value(),
                     ma: ma,
@@ -81,8 +81,9 @@ class EditModal extends AdminModal {
                     thanhTich: this.thanhTich.value(),
                     chuThich: this.chuThich.value(),
                     diemThiDua: this.diemThiDua.value(),
+                    soQuyetDinh: this.soQuyetDinh.value()
                 };
-                if (index == list_ma.length - 1) {
+                if (index == listMa.length - 1) {
                     this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
                     this.setState({
                         id: '', doiTuong: ''
@@ -90,8 +91,7 @@ class EditModal extends AdminModal {
                     this.maCanBo.reset();
                     this.maDonVi.reset();
                     this.maBoMon.reset();
-                }
-                else {
+                } else {
                     this.state.id ? this.props.update(this.state.id, changes, null) : this.props.create(changes, null);
                 }
             });
@@ -104,29 +104,24 @@ class EditModal extends AdminModal {
 
     render = () => {
         const doiTuong = this.state.doiTuong;
-        const readOnly = this.state.id ? true : this.props.readOnly;
+        const readOnly = this.props.readOnly;
         return this.renderModal({
             title: this.state.id ? 'Cập nhật quá trình khen thưởng' : 'Tạo mới quá trình khen thưởng',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-4' ref={e => this.loaiDoiTuong = e} label='Loại đối tượng' data={this.loaiDoiTuongTable} readOnly={readOnly} onChange={value => this.onChangeDT(value.id)} required />
+                <FormSelect className='col-md-4' ref={e => this.loaiDoiTuong = e} label='Loại đối tượng' data={this.loaiDoiTuongTable} readOnly={!!this.state.id} onChange={value => this.onChangeDT(value.id)} required />
 
-                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo}
-                    style={doiTuong == '02' ? {} : { display: 'none' }}
-                    readOnly={readOnly} required />
+                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} style={doiTuong == '02' ? {} : { display: 'none' }} readOnly={!!this.state.id} required />
 
-                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi}
-                    style={doiTuong == '03' ? {} : { display: 'none' }}
-                    readOnly={readOnly} required />
+                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} style={doiTuong == '03' ? {} : { display: 'none' }} readOnly={!!this.state.id} required />
 
-                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maBoMon = e} label='Bộ môn' data={SelectAdapter_DmBoMon}
-                    style={doiTuong == '04' ? {} : { display: 'none' }}
-                    readOnly={readOnly} required />
+                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maBoMon = e} label='Bộ môn' data={SelectAdapter_DmBoMon} style={doiTuong == '04' ? {} : { display: 'none' }} readOnly={!!this.state.id} required />
 
-                <FormSelect className='col-md-12' ref={e => this.thanhTich = e} label='Thành tích' data={SelectAdapter_DmKhenThuongKyHieuV2} readOnly={false} required />
-                <FormTextBox className='col-md-4' ref={e => this.namDatDuoc = e} label='Năm đạt được (yyyy)' type='year' readOnly={false} />
-                <FormSelect className='col-md-8' ref={e => this.chuThich = e} label='Chú thích' data={SelectAdapter_DmKhenThuongChuThichV2} readOnly={false} />
-                <FormTextBox className='col-md-4' ref={e => this.diemThiDua = e} type='number' label='Điểm thi đua' readOnly={false} />
+                <FormTextBox className='col-md-4' ref={e => this.soQuyetDinh = e} type='text' label='Số quyết định' readOnly={readOnly} />
+                <FormSelect className='col-md-8' ref={e => this.thanhTich = e} label='Thành tích' data={SelectAdapter_DmKhenThuongKyHieuV2} readOnly={readOnly} required />
+                <FormTextBox className='col-md-4' ref={e => this.namDatDuoc = e} label='Năm đạt được (yyyy)' type='year' readOnly={readOnly} />
+                <FormSelect className='col-md-8' ref={e => this.chuThich = e} label='Chú thích' data={SelectAdapter_DmKhenThuongChuThichV2} readOnly={readOnly} />
+                <FormTextBox className='col-md-4' ref={e => this.diemThiDua = e} type='number' label='Điểm thi đua' readOnly={readOnly} />
 
             </div>
         });
@@ -134,32 +129,29 @@ class EditModal extends AdminModal {
 }
 
 class QtKhenThuongAll extends AdminPage {
-    checked = parseInt(T.cookie('hienThiTheoDoiTuong')) == 1 ? true : false;
+    checked = parseInt(T.cookie('hienThiTheoDoiTuong')) == 1;
     state = { filter: {} };
-    stateTable = [
-        { 'id': '-1', 'text': 'Tất cả' }
-    ];
+    stateTable = [{ 'id': '-1', 'text': 'Tất cả' }];
     searchText = '';
-    curState = '-1';
+
     componentDidMount() {
         T.ready('/user/tccb', () => {
             T.clearSearchBox();
             this.props.getDmKhenThuongLoaiDoiTuongAll(items => {
                 if (items) {
-                    this.stateTable = [
-                        { 'id': '-1', 'text': 'Tất cả' }
-                    ];
                     items.forEach(item => this.stateTable.push({
-                        'id': item.ma,
-                        'text': item.ten
+                        id: item.ma,
+                        text: item.ten
                     }));
                 }
             });
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
-                this.fromYear?.value('');
-                this.toYear?.value('');
-                this.loaiDoiTuong?.value('');
+                this.fromYear.value('');
+                this.toYear.value('');
+                this.loaiDoiTuong.value('');
+                this.maDonVi?.value('');
+                this.mulCanBo?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
             if (this.checked) {
@@ -177,21 +169,24 @@ class QtKhenThuongAll extends AdminPage {
 
     changeAdvancedSearch = (isInitial = false) => {
         let { pageNumber, pageSize } = this.props && this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.page ? this.props.qtKhenThuongAll.page : { pageNumber: 1, pageSize: 50 };
-        const fromYear = this.fromYear?.value() == '' ? null : Number(this.fromYear?.value());
-        const toYear = this.toYear?.value() == '' ? null : Number(this.toYear?.value());
-        const loaiDoiTuong = this.loaiDoiTuong?.value() || '-1';
-        const ma = null;
-        const pageFilter = isInitial ? null : { fromYear, toYear, loaiDoiTuong, ma };
-        this.curState = loaiDoiTuong;
+        const fromYear = this.fromYear.value() == '' ? null : Number(this.fromYear.value());
+        const toYear = this.toYear.value() == '' ? null : Number(this.toYear.value());
+        const loaiDoiTuong = this.loaiDoiTuong.value() || '-1';
+        const listDv = loaiDoiTuong == '02' ? (this.maDonVi?.value().toString() || '') : '';
+        const listShcc = loaiDoiTuong == '02' ? (this.mulCanBo?.value().toString() || '') : '';
+        const pageFilter = isInitial ? null : { fromYear, toYear, loaiDoiTuong, listDv, listShcc };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
                     const filter = page.filter || {};
-                    this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
-                    this.fromYear?.value(filter.fromYear || '');
-                    this.toYear?.value(filter.toYear || '');
-                    this.loaiDoiTuong?.value(filter.loaiDoiTuong || '-1');
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.loaiDoiTuong)) this.showAdvanceSearch();
+                    this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter }, () => {
+                        this.fromYear.value(filter.fromYear || '');
+                        this.toYear.value(filter.toYear || '');
+                        this.loaiDoiTuong.value(filter.loaiDoiTuong || '-1');
+                        this.maDonVi?.value(filter.listDv);
+                        this.mulCanBo?.value(filter.listShcc);
+                        if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.loaiDoiTuong || filter.listDv || filter.listShcc)) this.showAdvanceSearch();
+                    });
                 }
             });
         });
@@ -208,56 +203,27 @@ class QtKhenThuongAll extends AdminPage {
         this.getPage();
     }
 
-    list = (text, i) => {
+    list = (text, i, listYear) => {
         if (!text) return [];
         let deTais = text.split('??');
+        let years = listYear.split('??');
         let results = [];
-        let choose = i > 15 ? 15 : i;
+        let choose = i > 5 ? 5 : i;
         for (let k = 0; k < choose; k++) {
-            results.push(<p style={{ textTransform: 'uppercase' }}> <span>
-                Lần {k+1}. {deTais[k]}
-            </span></p>);
+            results.push(<div> <span>
+                Lần {k + 1}. {deTais[k]} ({years[k].trim()})
+            </span></div>);
         }
-        if (i > 15) {
-            results.push(<p style={{ textTransform: 'uppercase' }}> <span>
+        if (i > 5) {
+            results.push(<div> <span>
                 .........................................
-            </span></p>);
+            </span></div>);
             let k = i - 1;
-            results.push(<p style={{ textTransform: 'uppercase' }}> <span>
-                Lần {k+1}. {deTais[k]}
-            </span></p>);
+            results.push(<div> <span>
+                Lần {k + 1}. {deTais[k]} ({years[k].trim()})
+            </span></div>);
         }
         return results;
-    }
-
-    showModal = (e) => {
-        e.preventDefault();
-        this.modal.show();
-    }
-
-    downloadExcel = (e) => {
-        e.preventDefault();
-        let name = 'khen_thuong', loaiDoiTuong = this.curState, maDoiTuong = '-1';
-        const fromYear = this.fromYear?.value() == '' ? '$$$$' : this.fromYear?.value();
-        const toYear = this.toYear?.value() == '' ? '$$$$' : this.toYear?.value();
-        if (loaiDoiTuong == '-1') {
-            name += '_all';
-        }
-        else {
-            if (loaiDoiTuong == '01') {
-                name += '_truong';
-            }
-            else {
-                if (loaiDoiTuong == '02') name += '_canbo_';
-                if (loaiDoiTuong == '03') name += '_donvi_';
-                if (loaiDoiTuong == '04') name += '_bomon_';
-                if (maDoiTuong == '-1') name += 'all';
-                else name += maDoiTuong;
-            }
-        }
-        name += '_' + fromYear + '-' + toYear;
-        name += '.xlsx';
-        T.download(T.url(`/api/tccb/qua-trinh/khen-thuong-all/download-excel/${loaiDoiTuong}/${maDoiTuong}/${fromYear}/${toYear}`), name);
     }
 
     delete = (e, item) => {
@@ -274,23 +240,24 @@ class QtKhenThuongAll extends AdminPage {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('qtKhenThuongAll', ['read', 'write', 'delete']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ? (
-            this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.page_gr ?
-                this.props.qtKhenThuongAll.page_gr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
+                this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.pageGr ?
+                    this.props.qtKhenThuongAll.pageGr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
             : (this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.page ? this.props.qtKhenThuongAll.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] });
         let table = 'Không có danh sách';
         if (list && list.length > 0) {
             table = renderTable({
-                getDataSource: () => list, stickyHead: false,
+                getDataSource: () => list, stickyHead: true,
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Đối tượng</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Đối tượng</th>
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm đạt được</th>}
-                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thành tích</th>}
+                        {!this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Thành tích</th>}
                         {!this.checked && <th style={{ width: 'auto', textAlign: 'right', whiteSpace: 'nowrap' }}>Điểm thi đua</th>}
 
                         {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số thành tích đạt được</th>}
-                        {this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Danh sách thành tích</th>}
+                        {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách thành tích</th>}
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Loại đối tượng</th>
                         <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                     </tr>
@@ -322,32 +289,33 @@ class QtKhenThuongAll extends AdminPage {
                                             {'KHOA ' + item.tenDonViBoMon}
                                         </>
 
-                        )}
-                        />
+                        )} />
+                        {!this.checked && <TableCell type='text' style={{ textAlign: 'center' }} content={(
+                            <>
+                                {item.soQuyetDinh ? item.soQuyetDinh : ''}
+                            </>
+                        )} />}
                         {!this.checked && <TableCell type='text' style={{ textAlign: 'center' }} content={(
                             <>
                                 {item.namDatDuoc}
                             </>
-                        )}
-                        />}
+                        )} />}
                         {!this.checked && <TableCell type='text' content={(
                             <>
                                 {item.tenThanhTich}
                             </>
-                        )}
-                        />}
+                        )} />}
                         {!this.checked && <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemThiDua} />}
                         {this.checked && <TableCell type='text' style={{ textAlign: 'left' }} content={item.soKhenThuong} />}
-                        {this.checked && <TableCell type='text' content={this.list(item.danhSachKhenThuong, item.soKhenThuong)} />}
+                        {this.checked && <TableCell type='text' content={this.list(item.danhSachKhenThuong, item.soKhenThuong, item.danhSachNamDatDuoc)} />}
                         <TableCell type='text' content={item.tenLoaiDoiTuong} />
                         {
-                            !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                                onEdit={() => this.modal.show(item, false)} onDelete={this.delete} />
+                            !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onEdit={() => this.modal.show(item, false)} onDelete={this.delete} />
                         }
                         {
                             this.checked &&
-                            <TableCell type='buttons' style={{ textAlign: 'center', width: '45px' }} content={item} permission={permission} >
-                                <Link className='btn btn-success' to={`/user/tccb/qua-trinh/khen-thuong-all/group_dt/${item.maLoaiDoiTuong}/${item.ma}`} >
+                            <TableCell type='buttons' style={{ textAlign: 'center', width: '45px' }} content={item} permission={permission}>
+                                <Link className='btn btn-success' to={`/user/tccb/qua-trinh/khen-thuong-all/groupDt/${item.maLoaiDoiTuong}/${item.ma}`}>
                                     <i className='fa fa-lg fa-compress' />
                                 </Link>
                             </TableCell>
@@ -368,6 +336,11 @@ class QtKhenThuongAll extends AdminPage {
                 <div className='row'>
                     <FormTextBox className='col-md-4' ref={e => this.fromYear = e} label='Từ năm đạt được (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
                     <FormTextBox className='col-md-4' ref={e => this.toYear = e} label='Đến năm đạt được (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
+                    {(this.loaiDoiTuong && this.loaiDoiTuong.value() == '02') &&
+                    <>
+                        <FormSelect className='col-12 col-md-6' multiple ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear minimumResultsForSearch={-1} />
+                        <FormSelect className='col-12 col-md-6' multiple ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear minimumResultsForSearch={-1} />
+                    </>}
                 </div>
             </>,
             content: <>
@@ -376,22 +349,17 @@ class QtKhenThuongAll extends AdminPage {
                     <FormCheckbox label='Hiển thị theo đối tượng' style={{ position: 'absolute', right: '70px', top: '50px' }} ref={e => this.hienThiTheoDoiTuong = e} onChange={this.groupPage} />
                     {table}
                 </div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                    getPage={this.getPage} />
-                <EditModal ref={e => this.modal = e} permission={permission}
-                    create={this.props.createQtKhenThuongAll} update={this.props.updateQtKhenThuongAll}
-                    permissions={currentPermissions}
-                    getLoaiDoiTuong={this.props.getDmKhenThuongLoaiDoiTuongAll}
-                />
-                {
-                    permission.read && !this.checked &&
-                    <button className='btn btn-success btn-circle' style={{ position: 'fixed', right: '70px', bottom: '10px' }} onClick={this.downloadExcel} >
-                        <i className='fa fa-lg fa-print' />
-                    </button>
-                }
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.getPage} />
+                <EditModal ref={e => this.modal = e} permission={permission} create={this.props.createQtKhenThuongAll} update={this.props.updateQtKhenThuongAll} permissions={currentPermissions} getLoaiDoiTuong={this.props.getDmKhenThuongLoaiDoiTuongAll} />
             </>,
             backRoute: '/user/tccb',
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
+            onExport: !this.checked ? (e) => {
+                e.preventDefault();
+                const { fromYear, toYear, loaiDoiTuong, listDv, listShcc } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1', listDv: null, listShcc: null };
+
+                T.download(T.url(`/api/qua-trinh/khen-thuong-all/download-excel/${listShcc ? listShcc : null}/${listDv ? listDv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${loaiDoiTuong ? loaiDoiTuong : '-1'}`), 'khenthuong.xlsx');
+            } : null
         });
     }
 }
@@ -399,6 +367,6 @@ class QtKhenThuongAll extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtKhenThuongAll: state.tccb.qtKhenThuongAll });
 const mapActionsToProps = {
     getQtKhenThuongAllPage, deleteQtKhenThuongAll, createQtKhenThuongAll,
-    updateQtKhenThuongAll, getDmKhenThuongLoaiDoiTuongAll, getQtKhenThuongAllGroupPage,
+    updateQtKhenThuongAll, getDmKhenThuongLoaiDoiTuongAll, getQtKhenThuongAllGroupPage
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtKhenThuongAll);

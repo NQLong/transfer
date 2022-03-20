@@ -7,7 +7,7 @@ module.exports = app => {
     };
 
     app.permission.add(
-        { name: 'quanLy:login', menu: menuStaff },
+        { name: 'manager:read', menu: menuStaff },
     );
-    app.get('/user/danh-sach-can-bo-thuoc-don-vi', app.permission.check('quanLy:login'), app.templates.admin);
+    app.get('/user/danh-sach-can-bo-thuoc-don-vi', app.permission.check('manager:read'), app.templates.admin);
 };

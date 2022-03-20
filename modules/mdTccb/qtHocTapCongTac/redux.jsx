@@ -15,13 +15,13 @@ export default function QtHocTapCongTacReducer(state = null, data) {
         case QtHocTapCongTacGetAll:
             return Object.assign({}, state, { items: data.items });
         case QtHocTapCongTacGetGroupPage:
-            return Object.assign({}, state, { page_gr: data.page });
+            return Object.assign({}, state, { pageGr: data.page });
         case QtHocTapCongTacGetGroupPageMa:
-            return Object.assign({}, state, { page_ma: data.page });
+            return Object.assign({}, state, { pageMa: data.page });
         case QtHocTapCongTacGetPage:
             return Object.assign({}, state, { page: data.page });
         case QtHocTapCongTacGetUserPage:
-            return Object.assign({}, state, { user_page: data.page });
+            return Object.assign({}, state, { userPage: data.page });
         case QtHocTapCongTacGet:
             return Object.assign({}, state, { selectedItem: data.item });
         case QtHocTapCongTacUpdate:

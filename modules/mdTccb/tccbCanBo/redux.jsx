@@ -164,6 +164,20 @@ export function deleteStaff(shcc, done) {
     };
 }
 
+//item = {ho, ten, ngaySinh, maDonVi: string}
+export function getShccCanBo(item, done) {
+    return () => {
+        const url = '/api/staff/calc-shcc';
+        T.get(url, { item }, data => {
+            if (data.error) {
+                T.notify('Không tìm được mã cán bộ' + (data.error.message && (':<br> Lý do: ' + data.error.message)), 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else if (done) {
+                done(data);
+            }
+        }, error => console.error(`GET: ${url}.`, error));
+    };
+}
 export function getCanBoKy(shcc, done) {
     return () => {
         const url = `/api/can-bo-ky/${shcc}`;
@@ -229,6 +243,16 @@ export function deleteQuanHeCanBo(id, shcc) {
 export const SelectAdapter_FwCanBo = {
     ajax: true,
     url: '/api/staff/page/1/20',
+    data: params => ({ condition: params.term }),
+    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.shcc, text: `${item.shcc}: ${item.ho} ${item.ten}` })) : [] }),
+    getOne: getStaff,
+    fetchOne: (shcc, done) => (getStaff(shcc, ({ item }) => done && done({ id: item.shcc, text: `${item.shcc}: ${item.ho} ${item.ten}` })))(),
+    processResultOne: response => response && response.item && ({ value: response.item.shcc, text: `${response.item.shcc}: ${response.item.ho} ${response.item.ten}` }),
+};
+
+export const SelectAdapter_FwCanBoFemale = {
+    ajax: true,
+    url: '/api/staff-female/page/1/20',
     data: params => ({ condition: params.term }),
     processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.shcc, text: `${item.shcc}: ${item.ho} ${item.ten}` })) : [] }),
     getOne: getStaff,

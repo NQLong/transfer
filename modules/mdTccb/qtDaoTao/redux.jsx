@@ -16,9 +16,9 @@ export default function QtDaoTaoReducer(state = null, data) {
         case QtDaoTaoGetPage:
             return Object.assign({}, state, { page: data.page });
         case QtDaoTaoGetStaffPage:
-            return Object.assign({}, state, { staff_page: data.page });
+            return Object.assign({}, state, { staffPage: data.page });
         case QtDaoTaoGetGroupPage:
-            return Object.assign({}, state, { page_gr: data.page });
+            return Object.assign({}, state, { pageGr: data.page });
         case QtDaoTaoGet:
             return Object.assign({}, state, { selectedItem: data.item });
         case QtDaoTaoUpdate:

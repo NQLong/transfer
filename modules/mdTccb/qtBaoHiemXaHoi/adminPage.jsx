@@ -76,11 +76,11 @@ class EditModal extends AdminModal {
 
     onSubmit = (e) => {
         e.preventDefault();
-        let list_ma = this.shcc.value();
-        if (!Array.isArray(list_ma)) {
-            list_ma = [list_ma];
+        let listMa = this.shcc.value();
+        if (!Array.isArray(listMa)) {
+            listMa = [listMa];
         }
-        if (list_ma.length == 0) {
+        if (listMa.length == 0) {
             T.notify('Cán bộ bị trống', 'danger');
             this.shcc.focus();
         } else if (!this.batDau.getVal()) {
@@ -93,7 +93,7 @@ class EditModal extends AdminModal {
             T.notify('Ngày bắt đầu lớn hơn ngày kết thúc', 'danger');
             this.batDau.focus();
         } else {
-            list_ma.forEach((ma, index) => {
+            listMa.forEach((ma, index) => {
                 const changes = {
                     shcc: ma,
                     batDauType: this.state.batDauType,
@@ -107,7 +107,7 @@ class EditModal extends AdminModal {
                     phuCapThamNienNghe: this.phuCapThamNienNghe.value(),
                     tyLeDong: this.tyLeDong.value(),
                 };
-                if (index == list_ma.length - 1) {
+                if (index == listMa.length - 1) {
                     this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
                     this.setState({
                         id: ''
@@ -200,10 +200,10 @@ class QtBaoHiemXaHoi extends AdminPage {
         const timeType = this.timeType?.value() || 0;
         const fromYear = this.fromYear?.value() == '' ? null : this.fromYear?.value().getTime();
         const toYear = this.toYear?.value() == '' ? null : this.toYear?.value().getTime();
-        const list_dv = this.maDonVi?.value().toString() || '';
-        const list_shcc = this.mulCanBo?.value().toString() || '';
+        const listDv = this.maDonVi?.value().toString() || '';
+        const listShcc = this.mulCanBo?.value().toString() || '';
         const tinhTrang = this.tinhTrang?.value() == '' ? null : this.tinhTrang?.value();
-        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc, tinhTrang, timeType };
+        const pageFilter = isInitial ? null : { listDv, fromYear, toYear, listShcc, tinhTrang, timeType };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
@@ -211,11 +211,11 @@ class QtBaoHiemXaHoi extends AdminPage {
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
                     this.fromYear?.value(filter.fromYear || '');
                     this.toYear?.value(filter.toYear || '');
-                    this.maDonVi?.value(filter.list_dv);
-                    this.mulCanBo?.value(filter.list_shcc);
+                    this.maDonVi?.value(filter.listDv);
+                    this.mulCanBo?.value(filter.listShcc);
                     this.tinhTrang?.value(filter.tinhTrang);
                     this.timeType?.value(filter.timeType);
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.list_shcc || filter.list_dv || filter.tinhTrang || filter.timeType)) this.showAdvanceSearch();
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.listShcc || filter.listDv || filter.tinhTrang || filter.timeType)) this.showAdvanceSearch();
                 }
             });
         });
@@ -268,8 +268,8 @@ class QtBaoHiemXaHoi extends AdminPage {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('qtBaoHiemXaHoi', ['read', 'write', 'delete']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ? (
-            this.props.qtBaoHiemXaHoi && this.props.qtBaoHiemXaHoi.page_gr ?
-                this.props.qtBaoHiemXaHoi.page_gr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
+            this.props.qtBaoHiemXaHoi && this.props.qtBaoHiemXaHoi.pageGr ?
+                this.props.qtBaoHiemXaHoi.pageGr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
             : (this.props.qtBaoHiemXaHoi && this.props.qtBaoHiemXaHoi.page ? this.props.qtBaoHiemXaHoi.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] });
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
@@ -385,9 +385,9 @@ class QtBaoHiemXaHoi extends AdminPage {
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
             onExport: !this.checked ? (e) => {
                 e.preventDefault();
-                const { fromYear, toYear, list_shcc, list_dv, timeType, tinhTrang } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, tinhTrang: null };
+                const { fromYear, toYear, listShcc, listDv, timeType, tinhTrang } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, timeType: 0, tinhTrang: null };
 
-                T.download(T.url(`/api/qua-trinh/bao-hiem-xa-hoi/download-excel/${list_shcc ? list_shcc : null}/${list_dv ? list_dv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${timeType}/${tinhTrang ? tinhTrang : null}`), 'baohiemxahoi.xlsx');
+                T.download(T.url(`/api/qua-trinh/bao-hiem-xa-hoi/download-excel/${listShcc ? listShcc : null}/${listDv ? listDv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${timeType}/${tinhTrang ? tinhTrang : null}`), 'baohiemxahoi.xlsx');
             } : null
         });
     }
