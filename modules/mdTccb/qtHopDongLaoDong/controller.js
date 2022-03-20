@@ -130,12 +130,10 @@ module.exports = app => {
                     res.send({ error });
                 }
                 else {
-
                     const source = app.path.join(__dirname, 'resource', 'hdld_word.docx');
 
                     new Promise(resolve => {
                         let hopDong = item.rows[0];
-                        console.log(hopDong);
                         const data = {
                             soHopDong: hopDong.soHopDong,
                             daiDienKy: (hopDong.hoNguoiKy + ' ' + hopDong.tenNguoiKy).normalizedName(),
