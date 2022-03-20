@@ -3,27 +3,54 @@ import { connect } from 'react-redux';
 import { getHcthCongVanDiPage, getHcthCongVanDiAll, createHcthCongVanDi, updateHcthCongVanDi, deleteHcthCongVanDi } from './redux';
 import Pagination from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
-import { AdminPage, AdminModal, FormDatePicker, renderTable, FormRichTextBox, FormSelect, TableCell } from 'view/component/AdminPage';
+import { AdminPage, AdminModal, FormDatePicker, renderTable, FormRichTextBox, FormSelect, TableCell, FormCheckbox} from 'view/component/AdminPage';
 import T from 'view/js/common';
-import { SelectAdapter_DmDonViGuiCongVan } from 'modules/mdDanhMuc/dmDonViGuiCv/redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
+import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 
 
 class EditModal extends AdminModal {
-    state = {};
+    state = {id: null, isDonVi: 0, isCanBo: 0};
     componentDidMount() {
-        $(document).ready(() => this.onShown(() => { }));
+        // T.ready(() => this.onShown(() => this.ngayGui.focus()));
     }
 
     onShow = (item) => {
-        let { id, noiDung, ngayGui, ngayKy, maDonViGuiCV, maDonVi} = item ? item : { id: '', noiDung: '', ngayGui: '', ngayKy: '', maDonViGuiCV: '', maDonVi: ''};
-        console.log(item);
-        this.setState({ id, item });
-        this.noiDung.value(noiDung);
-        this.ngayGui.value(ngayGui);
-        this.ngayKy.value(ngayKy);
-        this.donViGui.value(maDonViGuiCV);
-        this.donViNhan.value(maDonVi);
+        let { id, noiDung, ngayGui, ngayKy, maDonViGui, maDonViNhan, maCanBoNhan, isDonVi, isCanBo } = item ? item : { id: '', noiDung: '', ngayGui: '', ngayKy: '', maDonViGui: '', maDonViNhan: '', maCanBoNhan: '', isDonVi: 0, isCanBo: 0};
+        this.setState({id, isDonVi, isCanBo});
+        // console.log(item);
+        this.setState({
+            isDonVi: isDonVi == 1 | isDonVi == '1',
+            isCanBo: isCanBo == 1 | isCanBo == '1'
+        }, () => {
+            this.noiDung.value(noiDung);
+            this.ngayGui.value(ngayGui);
+            this.ngayKy.value(ngayKy);
+            this.donViGui.value(maDonViGui);
+            // console.log("state don vi: " + this.state.isDonVi);
+            // console.log("state can bo: " + this.state.isCanBo);
+            this.isDonVi.value(this.state.isDonVi);
+            this.isCanBo.value(this.state.isCanBo);
+            if (this.state.isDonVi) {
+                $('#isdv').show();
+            } else {
+                $('#isdv').hide();
+            }
+            if (maDonViNhan) {
+                maDonViNhan = maDonViNhan.split(',');
+                this.donViNhan.value(maDonViNhan);
+            } else this.donViNhan.value('');
+            
+            if (this.state.isCanBo) {
+                $('#iscb').show();
+            } else {
+                $('#iscb').hide();
+            }
+            if (maCanBoNhan) {
+                maCanBoNhan = maCanBoNhan.split(',');
+                this.canBoNhan.value(maCanBoNhan);
+            } else this.canBoNhan.value('');
+        });
     };
 
     onSubmit = (e) => {
@@ -33,9 +60,14 @@ class EditModal extends AdminModal {
             ngayGui: Number(this.ngayGui.value()),
             ngayKy: Number(this.ngayKy.value()),
             donViGui: this.donViGui.value(),
-            donViNhan: this.donViNhan.value()
+            donViNhan: this.donViNhan.value().toString(),
+            canBoNhan: this.canBoNhan.value().toString(),
+            isDonVi: this.state.isDonVi ? 1 : 0,
+            isCanBo: this.state.isCanBo ? 1 : 0,
         };
-        console.log(changes);
+        // console.log(changes);
+        // console.log("don vi " + this.state.isDonVi);
+        // console.log("can bo " + this.state.isCanBo);
         if (!changes.noiDung) {
             T.notify('Nội dung bị trống', 'danger');
             this.noiDung.focus();
@@ -48,11 +80,8 @@ class EditModal extends AdminModal {
         } else if (!changes.donViGui) {
             T.notify('Đơn vị gửi bị trống', 'danger');
             this.donViGui.focus();
-        } else if (!changes.donViNhan) {
-            T.notify('Đơn vị nhận bị trống', 'danger');
-            this.donViNhan.focus();
         } else {
-            this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
+            (this.state.id && this.props.permission.write)? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
         }
     }
 
@@ -63,10 +92,21 @@ class EditModal extends AdminModal {
             size: 'large',
             body: (
                 <div className='form-group row'>
-                    <FormDatePicker type='date' className='col-md-6' ref={e => this.ngayGui = e} label='Ngày gửi' readOnly={readOnly} required />
-                    <FormDatePicker type='date' className='col-md-6' ref={e => this.ngayKy = e} label='Ngày ký' readOnly={readOnly} required />
-                    <FormSelect className='col-md-12' ref={e => this.donViGui = e} label='Đơn vị gửi công văn' data={SelectAdapter_DmDonViGuiCongVan} readOnly={readOnly} required />
-                    <FormSelect className='col-md-12' ref={e => this.donViNhan = e} label='Đơn vi nhận công văn' data={SelectAdapter_DmDonVi} readOnly={readOnly} />
+                    <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayGui = e} label='Ngày gửi' readOnly={readOnly} required />
+                    <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayKy = e} label='Ngày ký' readOnly={readOnly} required />
+                    <FormSelect className='col-md-12' ref={e => this.donViGui = e} label='Đơn vị gửi công văn' data={SelectAdapter_DmDonVi} readOnly={readOnly} required />
+                    <div className='col-md-12'>
+                        <div className='row'>
+                            <FormCheckbox isSwitch ref={e => this.isDonVi = e} className='col-md-12 formCheckDv' label='Đơn vị nhận' onChange={value => { value ? $('#isdv').show() : $('#isdv').hide(); this.setState({ isDonVi: value });}} />
+                            <div className='col-md-12' id='isdv'><FormSelect multiple={true} ref={e => this.donViNhan = e} data={SelectAdapter_DmDonVi} readOnly={readOnly} required={this.state.isDonVi} /></div>
+                        </div>
+                    </div>                    
+                    <div className='col-md-12'>
+                        <div className='row'>
+                            <FormCheckbox isSwitch ref={e => this.isCanBo = e} className='col-md-12 formCheckCb' label='Cán bộ nhận' onChange={value => { value ? $('#iscb').show() : $('#iscb').hide(); this.setState({ isCanBo: value});}} />
+                            <div className='col-md-12' id='iscb'><FormSelect multiple={true} ref={e => this.canBoNhan = e} data={SelectAdapter_FwCanBo} readOnly={readOnly} required={this.state.isCanBo} /></div>
+                        </div>
+                    </div>                    
                     <FormRichTextBox type='text' className='col-md-12' ref={e => this.noiDung = e} label='Nội dung' readOnly={readOnly} required />
                 </div>
             )
@@ -75,6 +115,7 @@ class EditModal extends AdminModal {
 }
 class HcthCongVanDi extends AdminPage {    
     state = { filter: {} };
+    // modal = React.createRef();
 
     componentDidMount() {
         T.ready('/user/hcth', () => {
@@ -82,6 +123,7 @@ class HcthCongVanDi extends AdminPage {
             T.onSearch = (searchText) => this.props.getHcthCongVanDiPage(undefined, undefined, searchText || '');      
             this.props.getHcthCongVanDiPage(undefined, undefined, '');
         });
+        this.props.getHcthCongVanDiPage(1, 50);
     }
 
     showModal = (e) => {
@@ -102,6 +144,7 @@ class HcthCongVanDi extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
         permission = this.getUserPermission('hcthCongVanDi', ['read', 'write', 'delete']);
+        let readOnly = !permission.write;
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.hcthCongVanDi ?
             this.props.hcthCongVanDi.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách công văn đi!';
@@ -111,24 +154,26 @@ class HcthCongVanDi extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                        <th style={{ width: '50%'}}>Nội dung</th>
+                        <th style={{ width: '40%'}}>Nội dung</th>
                         <th style={{ width: 'auto'}}>Ngày gửi</th>
                         <th style={{ width: 'auto'}}>Ngày ký</th>
-                        <th style={{ width: '20%'}}>Đơn vị gửi</th>
-                        <th style={{ width: '20%'}}>Đơn vị nhận</th>
+                        <th style={{ width: '15%'}}>Đơn vị gửi</th>
+                        <th style={{ width: '15%'}}>Đơn vị nhận</th>
+                        <th style={{ width: '20%'}}>Cán bộ nhận</th>
                         <th style={{ width: '10%', textAlign: 'center' }}>Thao tác</th>
                     </tr>),
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{textAlign: 'center'}} content={(pageNumber - 1) * pageSize + index + 1} />
-                        <TableCell type='text' content={item.noiDung ? item.noiDung : ''} />
+                        <TableCell type='link' content={item.noiDung ? item.noiDung : ''} onClick={() => this.modal.show(item)}/>
                         <TableCell type='text' content={T.dateToText(item.ngayGui, 'dd/mm/yyyy')} />
                         <TableCell type='text' content={T.dateToText(item.ngayKy, 'dd/mm/yyyy')} />
-                        <TableCell type='text' content={item.tenDonViGuiCV ? item.tenDonViGuiCV : ''} />
-                        <TableCell type='text' content={item.tenDonVi? item.tenDonVi : ''} />
+                        <TableCell type='text' content={item.tenDonViGui ? item.tenDonViGui : ''} />
+                        <TableCell type='text' content={item.danhSachDonViNhan? item.danhSachDonViNhan : ''} />                      
+                        <TableCell type='text' content={item.danhSachCanBoNhan? item.danhSachCanBoNhan : ''} />                      
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} 
-                        onEdit={() => this.modal.show(item)} onDelete={() => this.onDelete(item.id)} permissions={currentPermissions}/>                    
-                    </tr>
+                            onEdit={() => this.modal.show(item)} onDelete={() => this.onDelete(item.id)} permissions={currentPermissions}/>                    
+                        </tr>
                 )
             });
         }
@@ -144,7 +189,7 @@ class HcthCongVanDi extends AdminPage {
                 <div className="tile">{table}</div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getHcthCongVanDiPage} />
-                <EditModal ref={e => this.modal = e} readOnly={false} permission={permission}
+                <EditModal ref={e => this.modal = e} readOnly={readOnly} permission={permission}
                 create={this.props.createHcthCongVanDi} update={this.props.updateHcthCongVanDi} permissions={currentPermissions} />
                 </>,
             backRoute: '/user/hcth',

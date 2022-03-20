@@ -6480,6 +6480,20 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": 200
+            },
+            "IS_DON_VI": {
+                "value": "isDonVi",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "1,0"
+            },
+            "IS_CAN_BO": {
+                "value": "isCanBo",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "1,0"
             }
         },
         "primaryKeys": [

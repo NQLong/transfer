@@ -19,7 +19,7 @@ export default function hcthCongVanDiReducer(state = null, data) {
 export const PageName = 'pageHcthCongVanDi';
 T.initPage(PageName);
 export function getHcthCongVanDiPage(pageNumber, pageSize, pageCondition, done) {
-    const page = T.updatePage('HcthCongVanDi', pageNumber, pageSize, pageCondition);
+    const page = T.updatePage('pageHcthCongVanDi', pageNumber, pageSize, pageCondition);
     return dispatch => {
         const url = `/api/hcth/cong-van-di/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition }, data => {
@@ -77,7 +77,7 @@ export function createHcthCongVanDi(data, done){
                 if (done) {
                     T.notify('Thêm công văn đi thành công!', 'success');
                     dispatch(getHcthCongVanDiPage());
-                    done(data);
+                    if (done) done(data);
                 }
             }
         }, () => T.notify('Thêm công văn đi bị lỗi', 'danger'));

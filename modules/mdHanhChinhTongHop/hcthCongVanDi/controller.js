@@ -17,8 +17,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { donViGui, donViNhan} = (req.query.filter && req.query.filter != '%%%%%%') ? req.query.filter : { donViGui: null, donViNhan: null};
-        app.model.hcthCongVanDi.searchPage(pageNumber, pageSize, donViGui, donViNhan, searchTerm, (error, page) => {
+        const { donViGui, donViNhan, canBoNhan} = (req.query.filter && req.query.filter != '%%%%%%') ? req.query.filter : { donViGui: null, donViNhan: null};
+        app.model.hcthCongVanDi.searchPage(pageNumber, pageSize, canBoNhan, donViGui, donViNhan, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
