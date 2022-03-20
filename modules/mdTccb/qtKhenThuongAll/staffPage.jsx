@@ -27,8 +27,8 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        let { id, namDatDuoc, maThanhTich, maChuThich, diemThiDua } = item && item.item ? item.item : {
-            id: '', namDatDuoc: '', maThanhTich: '', maChuThich: '', diemThiDua: ''
+        let { id, namDatDuoc, maThanhTich, maChuThich, diemThiDua, soQuyetDinh } = item && item.item ? item.item : {
+            id: '', namDatDuoc: '', maThanhTich: '', maChuThich: '', diemThiDua: '', soQuyetDinh: ''
         };
 
         this.setState({
@@ -37,14 +37,13 @@ class EditModal extends AdminModal {
         });
 
         setTimeout(() => {
-            this.namDatDuoc.value(namDatDuoc ? namDatDuoc : '');
-            this.thanhTich.value(maThanhTich ? maThanhTich : '');
-            this.chuThich.value(maChuThich ? maChuThich : '');
+            this.namDatDuoc.value(namDatDuoc || '');
+            this.thanhTich.value(maThanhTich || '');
+            this.chuThich.value(maChuThich || '');
             this.diemThiDua.value(diemThiDua);
+            this.soQuyetDinh.value(soQuyetDinh || '');
         }, 100);
     };
-
-    changeKichHoat = (value, target) => target.value(value ? 1 : 0) || target.value(value);
 
     onSubmit = (e) => {
         e.preventDefault();
@@ -55,6 +54,7 @@ class EditModal extends AdminModal {
             thanhTich: this.thanhTich.value(),
             chuThich: this.chuThich.value(),
             diemThiDua: this.diemThiDua.value(),
+            soQuyetDinh: this.soQuyetDinh.value(),
         };
         if (!this.thanhTich.value()) {
             T.notify('Thành tích trống', 'danger');
@@ -68,11 +68,11 @@ class EditModal extends AdminModal {
             title: this.state.id ? 'Cập nhật quá trình khen thưởng' : 'Tạo mới quá trình khen thưởng',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12' ref={e => this.thanhTich = e} label='Thành tích' data={SelectAdapter_DmKhenThuongKyHieuV2} readOnly={readOnly} required />
+                <FormTextBox className='col-md-4' ref={e => this.soQuyetDinh = e} type='text' label='Số quyết định' readOnly={readOnly} />
+                <FormSelect className='col-md-8' ref={e => this.thanhTich = e} label='Thành tích' data={SelectAdapter_DmKhenThuongKyHieuV2} readOnly={readOnly} required />
                 <FormTextBox className='col-md-4' ref={e => this.namDatDuoc = e} label='Năm đạt được (yyyy)' type='year' readOnly={readOnly} />
                 <FormSelect className='col-md-8' ref={e => this.chuThich = e} label='Chú thích' data={SelectAdapter_DmKhenThuongChuThichV2} readOnly={readOnly} />
                 <FormTextBox className='col-md-4' ref={e => this.diemThiDua = e} type='number' label='Điểm thi đua' readOnly={readOnly} />
-
             </div>
         });
     }
@@ -82,7 +82,7 @@ class QtKhenThuongAllUserPage extends AdminPage {
     componentDidMount() {
         T.ready('/user', () => {
             const { shcc } = this.props.system && this.props.system.user ? this.props.system.user : { shcc: '' };
-            this.setState({ filter: { ma: shcc, loaiDoiTuong: '02', fromYear: null, toYear: null } });
+            this.setState({ filter: { listDv: '', listShcc: shcc, loaiDoiTuong: '02', fromYear: null, toYear: null } });
             this.getPage();
         });
     }
@@ -118,14 +118,15 @@ class QtKhenThuongAllUserPage extends AdminPage {
         const { isStaff, shcc } = this.props.system && this.props.system.user ? this.props.system.user : { isStaff: false, shcc: '' };
         const { firstName, lastName } = isStaff && this.props.system.user || { firstName: '', lastName: '' };
         const name = isStaff ? `${lastName} ${firstName} (${shcc})` : '';
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.user_page ? this.props.qtKhenThuongAll.user_page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list };
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.userPage ? this.props.qtKhenThuongAll.userPage : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
-                getDataSource: () => list, stickyHead: false,
+                getDataSource: () => list, stickyHead: true,
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>
                         <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Thành tích</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm đạt được</th>
                         <th style={{ width: 'auto', textAlign: 'right', whiteSpace: 'nowrap' }}>Điểm thi đua</th>
@@ -135,6 +136,12 @@ class QtKhenThuongAllUserPage extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
+                        <TableCell type='text' style={{ textAlign: 'center' }} content={(
+                            <>
+                                {item.soQuyetDinh ? item.soQuyetDinh : ''}
+                            </>
+                        )}
+                        />
                         <TableCell type='text' content={(
                             <>
                                 {item.tenThanhTich}

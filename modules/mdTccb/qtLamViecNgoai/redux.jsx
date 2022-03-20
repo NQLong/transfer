@@ -16,13 +16,13 @@ export default function QtLamViecNgoaiReducer(state = null, data) {
         case QtLamViecNgoaiGetAll:
             return Object.assign({}, state, { items: data.items });
         case QtLamViecNgoaiGetGroupPage:
-            return Object.assign({}, state, { page_gr: data.page });
+            return Object.assign({}, state, { pageGr: data.page });
         case QtLamViecNgoaiGetGroupPageMa:
-            return Object.assign({}, state, { page_ma: data.page });
+            return Object.assign({}, state, { pageMa: data.page });
         case QtLamViecNgoaiGetPage:
             return Object.assign({}, state, { page: data.page });
         case QtLamViecNgoaiGetUserPage:
-            return Object.assign({}, state, { user_page: data.page });
+            return Object.assign({}, state, { userPage: data.page });
         case QtLamViecNgoaiGet:
             return Object.assign({}, state, { selectedItem: data.item });
         case QtLamViecNgoaiUpdate:

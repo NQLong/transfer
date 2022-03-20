@@ -73,11 +73,11 @@ class EditModal extends AdminModal {
 
     onSubmit = (e) => {
         e.preventDefault();
-        let list_ma = this.shcc.value();
-        if (!Array.isArray(list_ma)) {
-            list_ma = [list_ma];
+        let listMa = this.shcc.value();
+        if (!Array.isArray(listMa)) {
+            listMa = [listMa];
         }
-        if (list_ma.length == 0) {
+        if (listMa.length == 0) {
             T.notify('Danh sách cán bộ trống', 'danger');
             this.shcc.focus();
         } else if (!this.ngayLamDon.value()) {
@@ -96,7 +96,7 @@ class EditModal extends AdminModal {
             T.notify('Bắt đầu lớn hơn kết thúc', 'danger');
             this.batDau.focus();
         } else {
-            list_ma.forEach((ma, index) => {
+            listMa.forEach((ma, index) => {
                 const changes = {
                     shcc: ma,
                     ngayLamDon: this.ngayLamDon.value() ? Number(this.ngayLamDon.value()) : '',
@@ -112,7 +112,7 @@ class EditModal extends AdminModal {
                     ketThucType: !this.state.denNay ? this.state.ketThucType : '',
                     ketThuc: !this.state.denNay ? this.ketThuc.getVal() : -1
                 };
-                if (index == list_ma.length - 1) {
+                if (index == listMa.length - 1) {
                     this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
                     this.setState({
                         id: ''
@@ -283,8 +283,8 @@ class QtHoTroHocPhi extends AdminPage {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('qtHoTroHocPhi', ['read', 'write', 'delete']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ? (
-                this.props.qtHoTroHocPhi && this.props.qtHoTroHocPhi.page_gr ?
-                    this.props.qtHoTroHocPhi.page_gr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
+                this.props.qtHoTroHocPhi && this.props.qtHoTroHocPhi.pageGr ?
+                    this.props.qtHoTroHocPhi.pageGr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
             : (this.props.qtHoTroHocPhi && this.props.qtHoTroHocPhi.page ? this.props.qtHoTroHocPhi.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] });
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {

@@ -88,6 +88,11 @@ module.exports = app => {
         app.model.canBo.get({ shcc: req.params.shcc }, (error, item) => res.send({ error, item }));
     });
 
+    app.get('/api/staff/calc-shcc', checkGetStaffPermission, (req, res) => {
+        app.model.canBo.getShccCanBo(req.query.item, (error, shcc) => {
+            res.send({error, shcc});
+        });
+    });
     app.get('/api/staff/:maDonVi', checkGetStaffPermission, (req, res) => {
         app.model.canBo.getAll({ maDonVi: req.params.maDonVi }, (error, item) => res.send({ error, item }));
     });

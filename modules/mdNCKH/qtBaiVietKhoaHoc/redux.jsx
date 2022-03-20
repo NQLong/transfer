@@ -14,13 +14,13 @@ export default function QtBaiVietKhoaHocReducer(state = null, data) {
         case QtBaiVietKhoaHocGetAll:
             return Object.assign({}, state, { items: data.items });
         case QtBaiVietKhoaHocGetGroupPage:
-            return Object.assign({}, state, { page_gr: data.page });
+            return Object.assign({}, state, { pageGr: data.page });
         case QtBaiVietKhoaHocGetGroupPageMa:
-            return Object.assign({}, state, { page_ma: data.page });
+            return Object.assign({}, state, { pageMa: data.page });
         case QtBaiVietKhoaHocGetPage:
             return Object.assign({}, state, { page: data.page });
         case QtBaiVietKhoaHocGetUserPage:
-            return Object.assign({}, state, { user_page: data.page });
+            return Object.assign({}, state, { userPage: data.page });
         case QtBaiVietKhoaHocGet:
             return Object.assign({}, state, { selectedItem: data.item });
         case QtBaiVietKhoaHocUpdate:
