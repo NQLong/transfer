@@ -14,13 +14,13 @@ export default function QtKhenThuongAllReducer(state = null, data) {
         case QtKhenThuongAllGetAll:
             return Object.assign({}, state, { items: data.items });
         case QtKhenThuongAllGetGroupPage:
-            return Object.assign({}, state, { page_gr: data.page });
+            return Object.assign({}, state, { pageGr: data.page });
         case QtKhenThuongAllGetGroupPageMa:
-            return Object.assign({}, state, { page_ma: data.page });
+            return Object.assign({}, state, { pageMa: data.page });
         case QtKhenThuongAllGetPage:
             return Object.assign({}, state, { page: data.page });
         case QtKhenThuongAllGetUserPage:
-            return Object.assign({}, state, { user_page: data.page });
+            return Object.assign({}, state, { userPage: data.page });
         case QtKhenThuongAllGet:
             return Object.assign({}, state, { selectedItem: data.item });
         case QtKhenThuongAllUpdate:
@@ -70,8 +70,8 @@ export function getQtKhenThuongAllUserPage(pageNumber, pageSize, pageCondition, 
             } else {
                 if (page.filter) data.page.filter = page.filter;
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
-                if (done) done(data.page);
                 dispatch({ type: QtKhenThuongAllGetUserPage, page: data.page });
+                if (done) done(data.page);
             }
         }, () => T.notify('Lấy danh sách khen thưởng bị lỗi!', 'danger'));
     };
@@ -87,8 +87,8 @@ export function updateQtKhenThuongAllUserPage(id, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật khen thưởng thành công!', 'success');
-                done && done(data.item);
                 dispatch(getQtKhenThuongAllUserPage());
+                done && done(data.item);
             }
         }, () => T.notify('Cập nhật khen thưởng bị lỗi!', 'danger'));
     };
@@ -120,8 +120,8 @@ export function deleteQtKhenThuongAllUserPage(id, done) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('khen thưởng đã xóa thành công!', 'success', false, 800);
-                done && done(data.item);
                 dispatch(getQtKhenThuongAllUserPage());
+                done && done(data.item);
             }
         }, () => T.notify('Xóa khen thưởng bị lỗi!', 'danger'));
     };
@@ -143,8 +143,8 @@ export function getQtKhenThuongAllPage(pageNumber, pageSize, pageCondition, filt
             } else {
                 if (page.filter) data.page.filter = page.filter;
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
-                if (done) done(data.page);
                 dispatch({ type: QtKhenThuongAllGetPage, page: data.page });
+                if (done) done(data.page);
             }
         }, () => T.notify('Lấy danh sách khen thưởng bị lỗi!', 'danger'));
     };
@@ -165,8 +165,8 @@ export function getQtKhenThuongAllGroupPage(pageNumber, pageSize, pageCondition,
             } else {
                 if (page.filter) data.page.filter = page.filter;
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
-                done && done(data.page);
                 dispatch({ type: QtKhenThuongAllGetGroupPage, page: data.page });
+                done && done(data.page);
             }
         }, error => console.error(`GET: ${url}.`, error));
     };
@@ -216,8 +216,8 @@ export function updateQtKhenThuongAll(id, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật khen thưởng thành công!', 'success');
-                done && done(data.item);
                 dispatch(getQtKhenThuongAllPage());
+                done && done(data.item);
             }
         }, () => T.notify('Cập nhật khen thưởng bị lỗi!', 'danger'));
     };
@@ -239,8 +239,8 @@ export function getQtKhenThuongAllGroupPageMa(pageNumber, pageSize, pageConditio
             } else {
                 if (page.filter) data.page.filter = page.filter;
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
-                if (done) done(data.page);
                 dispatch({ type: QtKhenThuongAllGetGroupPageMa, page: data.page });
+                if (done) done(data.page);
             }
         }, () => T.notify('Lấy danh sách khen thưởng bị lỗi!', 'danger'));
     };
@@ -256,8 +256,8 @@ export function updateQtKhenThuongAllGroupPageMa(id, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật khen thưởng thành công!', 'success');
-                done && done(data.item);
                 dispatch(getQtKhenThuongAllGroupPageMa());
+                done && done(data.item);
             }
         }, () => T.notify('Cập nhật khen thưởng bị lỗi!', 'danger'));
     };
@@ -289,8 +289,8 @@ export function deleteQtKhenThuongAllGroupPageMa(id, done) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('khen thưởng đã xóa thành công!', 'success', false, 800);
-                done && done(data.item);
                 dispatch(getQtKhenThuongAllGroupPageMa());
+                done && done(data.item);
             }
         }, () => T.notify('Xóa khen thưởng bị lỗi!', 'danger'));
     };
@@ -304,8 +304,8 @@ export function getQtKhenThuongAllAll(done) {
                 T.notify('Lấy danh sách khen thưởng bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                if (done) done(data.items);
                 dispatch({ type: QtKhenThuongAllGetAll, items: data.items ? data.items : {} });
+                if (done) done(data.items);
             }
         }, () => T.notify('Lấy danh sách khen thưởng bị lỗi!', 'danger'));
     };
@@ -333,8 +333,8 @@ export function getQtKhenThuongAllEdit(id, done) {
                 T.notify('Lấy thông tin khen thưởng bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                if (done) done(data);
                 dispatch({ type: QtKhenThuongAllGet, item: data.item });
+                if (done) done(data);
             }
         }, () => T.notify('Lấy thông tin khen thưởng bị lỗi', 'danger'));
     };

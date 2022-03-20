@@ -397,8 +397,8 @@ class QtHopDongDvtlTnEditPage extends QTForm {
 
     handleTuNgay = () => {
         if (this.ngayKyHopDong.current.getVal() && !this.state.hdkxdtg && this.state.thoiGianHd) {
-            const new_date = moment(this.ngayKyHopDong.current.getVal()).add(parseInt(this.state.thoiGianHd), 'M');
-            this.ketThucHopDong.current.setVal(new_date.valueOf() - 24 * 3600000);
+            const newDate = moment(this.ngayKyHopDong.current.getVal()).add(parseInt(this.state.thoiGianHd), 'M');
+            this.ketThucHopDong.current.setVal(newDate.valueOf() - 24 * 3600000);
         }
     }
 

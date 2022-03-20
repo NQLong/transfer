@@ -14,9 +14,9 @@ export default function QtHoTroHocPhiReducer(state = null, data) {
         case QtHoTroHocPhiGetAll:
             return Object.assign({}, state, { items: data.items });
         case QtHoTroHocPhiGetGroupPage:
-            return Object.assign({}, state, { page_gr: data.page });
+            return Object.assign({}, state, { pageGr: data.page });
         case QtHoTroHocPhiGetGroupPageMa:
-            return Object.assign({}, state, { page_ma: data.page });
+            return Object.assign({}, state, { pageMa: data.page });
         case QtHoTroHocPhiGetPage:
             return Object.assign({}, state, { page: data.page });
         case QtHoTroHocPhiGetUserPage:

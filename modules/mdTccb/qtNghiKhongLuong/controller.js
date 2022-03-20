@@ -74,8 +74,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, list_shcc, list_dv, tinhTrang, timeType } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, tinhTrang: null, timeType: 0 };
-        app.model.qtNghiKhongLuong.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, tinhTrang, timeType, searchTerm, (error, page) => {
+        const { fromYear, toYear, listShcc, listDv, tinhTrang, timeType } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, tinhTrang: null, timeType: 0 };
+        app.model.qtNghiKhongLuong.searchPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, tinhTrang, timeType, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -91,8 +91,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, list_shcc, list_dv, tinhTrang, timeType } = (req.query.filter && req.query.filter != '%%%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, tinhTrang: null, timeType: 0 };
-        app.model.qtNghiKhongLuong.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, tinhTrang, timeType, searchTerm, (error, page) => {
+        const { fromYear, toYear, listShcc, listDv, tinhTrang, timeType } = (req.query.filter && req.query.filter != '%%%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, tinhTrang: null, timeType: 0 };
+        app.model.qtNghiKhongLuong.searchPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, tinhTrang, timeType, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -107,8 +107,8 @@ module.exports = app => {
     //     const pageNumber = parseInt(req.params.pageNumber),
     //         pageSize = parseInt(req.params.pageSize),
     //         searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-    //     const { fromYear, toYear, list_shcc, list_dv, tinhTrang } = (req.query.filter && req.query.filter != '%%%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, tinhTrang: null };
-    //     app.model.qtNghiKhongLuong.groupPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, tinhTrang, searchTerm, (error, page) => {
+    //     const { fromYear, toYear, listShcc, listDv, tinhTrang } = (req.query.filter && req.query.filter != '%%%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, tinhTrang: null };
+    //     app.model.qtNghiKhongLuong.groupPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, tinhTrang, searchTerm, (error, page) => {
     //         if (error || page == null) {
     //             res.send({ error });
     //         } else {
