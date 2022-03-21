@@ -13,11 +13,11 @@ module.exports = app => {
     app.get('/user/hcth/cong-van-di', app.permission.check('staff:login'), app.templates.admin);
     
     // APIs ----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/hcth/cong-van-di/page/:pageNumber/:pageSize', (req, res) => {
+    app.get('/api/hcth/cong-van-di/search/page/:pageNumber/:pageSize', (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { donViGui, donViNhan, canBoNhan} = (req.query.filter && req.query.filter != '%%%%%%') ? req.query.filter : { donViGui: null, donViNhan: null};
+        const { donViGui, donViNhan, canBoNhan} = (req.query.filter && req.query.filter != '%%%%%%') ? req.query.filter : { donViGui: null, donViNhan: null, canBoNhan: null};
         app.model.hcthCongVanDi.searchPage(pageNumber, pageSize, canBoNhan, donViGui, donViNhan, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -48,6 +48,23 @@ module.exports = app => {
 
     app.delete('/api/hcth/cong-van-di', app.permission.check('hcthCongVanDi:delete'), (req, res) => {
         app.model.hcthCongVanDi.delete({ id: req.body.id }, errors => res.send({ errors }));
+    });
+
+    app.get('/api/hcth/cong-van-di/page/:pageNumber/:pageSize', (req, res) => {
+        const pageNumber = parseInt(req.params.pageNumber),
+            pageSize = parseInt(req.params.pageSize);
+        let condition = { statement: null };
+        const statement = ['noiDung']
+            .map(i => `lower(${i}) LIKE :searchText`).join(' OR ');
+        if (req.query.condition) {
+            condition = {
+                statement,
+                parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
+            };
+        }
+        app.model.hcthCongVanDi.getPage(pageNumber, pageSize, condition, (error, page) => {
+            res.send({ error, page });
+        });
     });
 };    
 

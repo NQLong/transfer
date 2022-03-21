@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getHcthCongVanDiPage, getHcthCongVanDiAll, createHcthCongVanDi, updateHcthCongVanDi, deleteHcthCongVanDi } from './redux';
+import { getHcthCongVanDiPage, getHcthCongVanDiAll, createHcthCongVanDi, updateHcthCongVanDi, deleteHcthCongVanDi, getHcthCongVanDiSearchPage } from './redux';
 import Pagination from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
 import { AdminPage, AdminModal, FormDatePicker, renderTable, FormRichTextBox, FormSelect, TableCell, FormCheckbox} from 'view/component/AdminPage';
@@ -27,8 +27,8 @@ class EditModal extends AdminModal {
             this.ngayGui.value(ngayGui);
             this.ngayKy.value(ngayKy);
             this.donViGui.value(maDonViGui);
-            console.log("state don vi: " + maDonViNhan);
-            console.log("state can bo: " + maCanBoNhan);
+            // console.log("state don vi: " + maDonViNhan);
+            // console.log("state can bo: " + maCanBoNhan);
             this.isDonVi.value(this.state.isDonVi);
             this.isCanBo.value(this.state.isCanBo);
             if (this.state.isDonVi) {
@@ -124,15 +124,44 @@ class EditModal extends AdminModal {
 }
 class HcthCongVanDi extends AdminPage {    
     state = { filter: {} };
+
     // modal = React.createRef();
 
     componentDidMount() {
         T.ready('/user/hcth', () => {
             T.clearSearchBox();
-            T.onSearch = (searchText) => this.props.getHcthCongVanDiPage(undefined, undefined, searchText || '');      
-            this.props.getHcthCongVanDiPage(undefined, undefined, '');
+            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');      
+            T.showSearchBox(() => {
+                this.maDonViGui?.value(0);
+                setTimeout(() => this.changeAdvancedSearch(), 50);
+            });
+            this.getPage();
+            this.changeAdvancedSearch(true);
         });
-        this.props.getHcthCongVanDiPage(1, 50);
+        // this.props.getHcthCongVanDiPage(1, 50);
+    }
+
+    changeAdvancedSearch = (isInitial = false) => {
+        let { pageNumber, pageSize } = this.props && this.props.hcthCongVanDi && this.props.hcthCongVanDi.page ? this.props.hcthCongVanDi.page : { pageNumber: 1, pageSize: 50 };
+        const donViGui = this.donViGui?.value();
+        const pageFilter = isInitial ? {} : { donViGui };
+        this.setState({ filter: pageFilter }, () => {
+            // console.log(this.state.filter);
+            this.getPage(pageNumber, pageSize, '', (page) => {
+                if (isInitial) {
+                    console.log('page filter' + page.filter);
+                    const filter = page.filter || {};
+                    this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
+                    this.donViGui.value(filter.donViGui || '');
+                    if (!$.isEmptyObject(filter) && filter && (filter.donViGui)) this.showAdvanceSearch();
+                }
+            });
+        });
+    };
+
+    getPage = (pageN, pageS, pageC, done) => {
+        this.props.getHcthCongVanDiSearchPage(pageN, pageS, pageC, this.state.filter, done);
+        // console.log('state.filter ' + this.state.filter);
     }
 
     showModal = (e) => {
@@ -197,16 +226,22 @@ class HcthCongVanDi extends AdminPage {
             content:<>
                 <div className="tile">{table}</div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                    getPage={this.props.getHcthCongVanDiPage} />
+                    getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} readOnly={readOnly} permission={permission}
                 create={this.props.createHcthCongVanDi} update={this.props.updateHcthCongVanDi} permissions={currentPermissions} />
                 </>,
             backRoute: '/user/hcth',
+            advanceSearch: <>
+                <div className="row">
+                    <FormSelect allowClear={true} className='col-md-4' ref={e => this.donViGui = e} label='Đơn vị gửi' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />
+                </div>
+            </>
+
         });
     }
 }
 
 
 const mapStateToProps = state => ({ system: state.system, hcthCongVanDi: state.hcth.hcthCongVanDi});
-const mapActionsToProps = { getHcthCongVanDiAll, getHcthCongVanDiPage, createHcthCongVanDi, updateHcthCongVanDi, deleteHcthCongVanDi};
+const mapActionsToProps = { getHcthCongVanDiAll, getHcthCongVanDiPage, createHcthCongVanDi, updateHcthCongVanDi, deleteHcthCongVanDi, getHcthCongVanDiSearchPage};
 export default connect(mapStateToProps, mapActionsToProps)(HcthCongVanDi);
