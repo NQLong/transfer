@@ -5837,13 +5837,6 @@
             "FW_STUDENT_SEARCH_PAGE": "searchPage"
         },
         "columns": {
-            "MSSV": {
-                "value": "mssv",
-                "dataType": "NUMBER",
-                "dataDefault": "",
-                "nullable": false,
-                "size": "10,0"
-            },
             "HO": {
                 "value": "ho",
                 "dataType": "NVARCHAR2",
@@ -5965,24 +5958,24 @@
             },
             "DIEN_THOAI_KHAC": {
                 "value": "dienThoaiKhac",
-                "dataType": "NUMBER",
+                "dataType": "NVARCHAR2",
                 "dataDefault": "",
                 "nullable": true,
-                "size": "10,0"
+                "size": 15
             },
             "DIEN_THOAI_CA_NHAN": {
                 "value": "dienThoaiCaNhan",
-                "dataType": "NUMBER",
+                "dataType": "NVARCHAR2",
                 "dataDefault": "",
                 "nullable": true,
-                "size": "10,0"
+                "size": 15
             },
             "DIEN_THOAI_LIEN_LAC": {
                 "value": "dienThoaiLienLac",
-                "dataType": "NUMBER",
+                "dataType": "NVARCHAR2",
                 "dataDefault": "",
                 "nullable": true,
-                "size": "10,0"
+                "size": 15
             },
             "EMAIL_CA_NHAN": {
                 "value": "emailCaNhan",
@@ -6077,17 +6070,17 @@
             },
             "SDT_CHA": {
                 "value": "sdtCha",
-                "dataType": "NUMBER",
+                "dataType": "NVARCHAR2",
                 "dataDefault": "",
                 "nullable": true,
-                "size": "10,0"
+                "size": 15
             },
             "SDT_ME": {
                 "value": "sdtMe",
-                "dataType": "NUMBER",
+                "dataType": "NVARCHAR2",
                 "dataDefault": "",
                 "nullable": true,
-                "size": "10,0"
+                "size": 15
             },
             "HO_TEN_NGUOI_LIEN_LAC": {
                 "value": "hoTenNguoiLienLac",
@@ -6098,10 +6091,10 @@
             },
             "SDT_NGUOI_LIEN_LAC": {
                 "value": "sdtNguoiLienLac",
-                "dataType": "NUMBER",
+                "dataType": "NVARCHAR2",
                 "dataDefault": "",
                 "nullable": true,
-                "size": "10,0"
+                "size": 15
             },
             "CMND": {
                 "value": "cmnd",
@@ -6115,7 +6108,7 @@
                 "dataType": "NVARCHAR2",
                 "dataDefault": "",
                 "nullable": true,
-                "size": 50
+                "size": 100
             },
             "CMND_NGAY_CAP": {
                 "value": "cmndNgayCap",
@@ -6137,6 +6130,13 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": "20,0"
+            },
+            "MSSV": {
+                "value": "mssv",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": false,
+                "size": 12
             }
         },
         "primaryKeys": [
@@ -6388,17 +6388,17 @@
             },
             "DON_VI_NHAN": {
                 "value": "donViNhan",
-                "dataType": "NUMBER",
+                "dataType": "NVARCHAR2",
                 "dataDefault": "",
                 "nullable": true,
-                "size": "2,0"
+                "size": 100
             },
             "CAN_BO_NHAN": {
                 "value": "canBoNhan",
                 "dataType": "NVARCHAR2",
                 "dataDefault": "",
                 "nullable": true,
-                "size": 10
+                "size": 100
             },
             "NGAY_HET_HAN": {
                 "value": "ngayHetHan",
@@ -6426,6 +6426,13 @@
         "moduleName": "hcthCongVanDi",
         "modelName": "hcthCongVanDi",
         "columns": {
+            "ID": {
+                "value": "id",
+                "dataType": "NUMBER",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_99335\".nextval",
+                "nullable": false,
+                "size": "22,0"
+            },
             "NOI_DUNG": {
                 "value": "noiDung",
                 "dataType": "NVARCHAR2",
@@ -6461,12 +6468,26 @@
                 "nullable": true,
                 "size": 200
             },
-            "ID": {
-                "value": "id",
+            "CAN_BO_NHAN": {
+                "value": "canBoNhan",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 200
+            },
+            "IS_DON_VI": {
+                "value": "isDonVi",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_97242\".nextval",
-                "nullable": false,
-                "size": "22,0"
+                "dataDefault": "",
+                "nullable": true,
+                "size": "1,0"
+            },
+            "IS_CAN_BO": {
+                "value": "isCanBo",
+                "dataType": "NUMBER",
+                "dataDefault": "",
+                "nullable": true,
+                "size": "1,0"
             }
         },
         "primaryKeys": [
@@ -10285,13 +10306,6 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": 200
-            },
-            "DA_NGHI": {
-                "value": "daNghi",
-                "dataType": "NUMBER",
-                "dataDefault": "0",
-                "nullable": true,
-                "size": "1,0"
             }
         },
         "primaryKeys": [
