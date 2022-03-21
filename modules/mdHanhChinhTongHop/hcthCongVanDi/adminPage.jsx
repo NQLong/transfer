@@ -27,29 +27,32 @@ class EditModal extends AdminModal {
             this.ngayGui.value(ngayGui);
             this.ngayKy.value(ngayKy);
             this.donViGui.value(maDonViGui);
-            // console.log("state don vi: " + this.state.isDonVi);
-            // console.log("state can bo: " + this.state.isCanBo);
+            console.log("state don vi: " + maDonViNhan);
+            console.log("state can bo: " + maCanBoNhan);
             this.isDonVi.value(this.state.isDonVi);
             this.isCanBo.value(this.state.isCanBo);
             if (this.state.isDonVi) {
                 $('#isdv').show();
+                if (maDonViNhan) {
+                    maDonViNhan = maDonViNhan.split(',');
+                    this.donViNhan.value(maDonViNhan);
+                }
             } else {
                 $('#isdv').hide();
+                this.donViNhan.value('');
             }
-            if (maDonViNhan) {
-                maDonViNhan = maDonViNhan.split(',');
-                this.donViNhan.value(maDonViNhan);
-            } else this.donViNhan.value('');
             
             if (this.state.isCanBo) {
                 $('#iscb').show();
+                if (maCanBoNhan) {
+                    maCanBoNhan = maCanBoNhan.split(',');
+                    this.canBoNhan.value(maCanBoNhan);
+                } 
+                // else this.canBoNhan.value('');
             } else {
                 $('#iscb').hide();
+                this.canBoNhan.value('');
             }
-            if (maCanBoNhan) {
-                maCanBoNhan = maCanBoNhan.split(',');
-                this.canBoNhan.value(maCanBoNhan);
-            } else this.canBoNhan.value('');
         });
     };
 
@@ -60,12 +63,12 @@ class EditModal extends AdminModal {
             ngayGui: Number(this.ngayGui.value()),
             ngayKy: Number(this.ngayKy.value()),
             donViGui: this.donViGui.value(),
-            donViNhan: this.donViNhan.value().toString(),
-            canBoNhan: this.canBoNhan.value().toString(),
+            donViNhan: this.state.isDonVi ? this.donViNhan.value().toString() : '',
+            canBoNhan: this.state.isCanBo ? this.canBoNhan.value().toString() : '',
             isDonVi: this.state.isDonVi ? 1 : 0,
             isCanBo: this.state.isCanBo ? 1 : 0,
         };
-        // console.log(changes);
+        console.log(changes);
         // console.log("don vi " + this.state.isDonVi);
         // console.log("can bo " + this.state.isCanBo);
         if (!changes.noiDung) {
@@ -80,6 +83,12 @@ class EditModal extends AdminModal {
         } else if (!changes.donViGui) {
             T.notify('Đơn vị gửi bị trống', 'danger');
             this.donViGui.focus();
+        } else if (changes.isDonVi == 1 && !changes.donViNhan) {
+            T.notify('Đơn vị nhận bị trống', 'danger');
+            this.donViNhan.focus();
+        } else if (changes.isCanBo == 1 && !changes.canBoNhan) {
+            T.notify('Cán bộ nhận bị trống', 'danger');
+            this.canBoNhan.focus();
         } else {
             (this.state.id && this.props.permission.write)? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
         }
