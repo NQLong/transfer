@@ -11,7 +11,6 @@ export default function HcthCongVanDenReducer(state = null, data) {
         case HcthCongVanDenGetAll:
             return Object.assign({}, state, { items: data.items });
         case HcthCongVanDenGetPage:
-            return Object.assign({}, state, { page: data.page });
         case HcthCongVanDenSearchPage:
             return Object.assign({}, state, { page: data.page });
         default:
@@ -51,11 +50,9 @@ export function createHcthCongVanDen(data, done) {
                 T.notify('Thêm công văn đến bị lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
-                if (done) {
-                    T.notify('Thêm công văn đến thành công!', 'success');
-                    dispatch(getHcthCongVanDenSearchPage());
-                    done && done(data);
-                }
+                T.notify('Thêm công văn đến thành công!', 'success');
+                dispatch(getHcthCongVanDenSearchPage());
+                done && done(data);
             }
         }, () => T.notify('Thêm công văn đến bị lỗi', 'danger'));
     };
@@ -69,8 +66,8 @@ export function getHcthCongVanDenAll(done) {
                 T.notify('Lấy thông tin công văn đến bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                done && done(data.items);
                 dispatch({ type: HcthCongVanDenGetAll, items: data.items ? data.items : [] });
+                done && done(data.items);
             }
         }, error => console.error(`GET: ${url}.`, error));
     };
@@ -108,8 +105,6 @@ export function deleteHcthCongVanDen(id) {
     };
 }
 
-
-T.initPage('searchPageHcthCongVanDen', true);
 export function getHcthCongVanDenSearchPage(pageNumber, pageSize, pageCondition, filter, done) {
     if (typeof filter === 'function') {
         done = filter;
