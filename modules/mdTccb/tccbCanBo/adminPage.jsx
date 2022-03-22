@@ -81,7 +81,7 @@ class StaffPage extends AdminPage {
     };
 
     render() {
-        const permission = this.getUserPermission('staff');
+        const permission = this.getUserPermission('staff', ['read', 'write', 'delete']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.staff && this.props.staff.page ?
             this.props.staff.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         const table = renderTable({
@@ -108,12 +108,12 @@ class StaffPage extends AdminPage {
                     <TableCell type='text' content={item.phai ? (item.phai == '01' ? 'Nam' : 'Nữ') : ''} style={{ whiteSpace: 'nowrap' }} />
                     <TableCell type='text' content={item.ngaySinh ? T.dateToText(item.ngaySinh, 'dd/mm/yyyy') : ''} style={{ whiteSpace: 'nowrap' }} />
                     <TableCell type='text' content={<>
-                        <span>{item.hocVi && item.hocVi}<br /></span>
+                        {item.hocVi && <span>{item.hocVi}<br /></span>}
                         {item.hocHam && item.hocHam}
                     </>} style={{ whiteSpace: 'nowrap' }} />
                     <TableCell type='text' content={item.ngach} style={{ whiteSpace: 'nowrap' }} />
                     <TableCell type='text' content={<>
-                        {item.chucVuChinh && <span style={{ color: 'red' }}>{item.chucVuChinh && item.chucVuChinh}<br /></span>}
+                        {item.chucVuChinh && <span style={{ color: 'red' }}>{item.chucVuChinh}<br /></span>}
                         {item.tenDonVi && item.tenDonVi.normalizedName()}
                     </>} style={{ whiteSpace: 'nowrap' }} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={

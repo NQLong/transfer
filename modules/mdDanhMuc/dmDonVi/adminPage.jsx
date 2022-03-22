@@ -1,11 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { createDmDonVi, getDmDonViPage, updateDmDonVi, deleteDmDonVi } from './redux';
-import { getDmLoaiDonViAll } from 'modules/mdDanhMuc/dmLoaiDonVi/redux';
+import { getDmLoaiDonViAll, SelectAdapter_DmLoaiDonVi } from 'modules/mdDanhMuc/dmLoaiDonVi/redux';
 import Pagination from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
-import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox, FormImageBox } from 'view/component/AdminPage';
-import { Select } from 'view/component/Input';
+import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox, FormImageBox, FormSelect } from 'view/component/AdminPage';
 
 class EditModal extends AdminModal {
     state = { active: true };
@@ -21,7 +20,7 @@ class EditModal extends AdminModal {
         this.setState({ ma, item });
         this.ma.value(ma);
         this.ten.value(ten);
-        this.loaiDonVi.setVal(maPl);
+        this.loaiDonVi.value(maPl);
         this.tenTiengAnh.value(tenTiengAnh ? tenTiengAnh : '');
         this.tenVietTat.value(tenVietTat ? tenVietTat : '');
         this.qdThanhLap.value(qdThanhLap ? qdThanhLap : '');
@@ -42,7 +41,7 @@ class EditModal extends AdminModal {
             tenTiengAnh: this.tenTiengAnh.value(),
             qdThanhLap: this.qdThanhLap.value(),
             qdXoaTen: this.qdXoaTen.value(),
-            maPl: this.loaiDonVi.getVal(),
+            maPl: this.loaiDonVi.value(),
             ghiChu: this.ghiChu.value(),
             kichHoat: this.kichHoat.value() ? 1 : 0,
             duongDan: this.duongDan.value(),
@@ -66,6 +65,7 @@ class EditModal extends AdminModal {
         const readOnly = this.props.readOnly;
         return this.renderModal({
             title: this.state.ma ? 'Cập nhật đơn vị' : 'Tạo mới đơn vị',
+            size: 'elarge',
             body: <div className='row'>
                 <FormTextBox type='number' className='col-md-6' ref={e => this.ma = e} label='Mã đơn vị'
                     readOnly={this.state.ma ? true : readOnly} required />
@@ -77,9 +77,7 @@ class EditModal extends AdminModal {
                 <FormTextBox type='text' className='col-md-6' ref={e => this.tenTiengAnh = e} label='Tên tiếng Anh' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.tenVietTat = e} label='Tên viết tắt' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.qdThanhLap = e} label='Quyết định thành lập' readOnly={readOnly} />
-                <div className='col-md-6'>
-                    <Select ref={e => this.loaiDonVi = e} data={this.props.loaiDonVi} label='Loại đơn vị' disabled={readOnly} />
-                </div>
+                <FormSelect ref={e => this.loaiDonVi = e} className='col-md-6' data={SelectAdapter_DmLoaiDonVi} label='Loại đơn vị' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.qdXoaTen = e} label='Quyết định xóa tên' readOnly={readOnly} />
                 <FormTextBox type='text' className='col-md-12' ref={e => this.duongDan = e} label='Đường dẫn' readOnly={readOnly} />
                 <FormImageBox className='col-12' ref={e => this.imageBox = e}
@@ -95,7 +93,7 @@ class EditModal extends AdminModal {
 }
 
 class DmDonViPage extends AdminPage {
-    state = { searching: false, loaiDonVi: [] };
+    loaiDonViMapper = {};
 
     componentDidMount() {
         T.ready('/user/category', () => {
@@ -103,7 +101,7 @@ class DmDonViPage extends AdminPage {
             T.showSearchBox();
             this.props.getDmDonViPage();
             this.props.getDmLoaiDonViAll(data => {
-                this.setState({ loaiDonVi: data.map(item => ({ value: item.ma, text: item.ten })) });
+                data.forEach(ldv => this.loaiDonViMapper[ldv.ma] = ldv.ten);
             });
         });
     }
@@ -146,7 +144,7 @@ class DmDonViPage extends AdminPage {
                             onClick={() => this.modal.show(item)} />
                         <TableCell type='text' content={item.ten ? item.ten : ''} />
                         <TableCell type='text' content={item.tenTiengAnh ? item.tenTiengAnh : ''} />
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={item.maPl ? item.maPl : ''} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.maPl ? this.loaiDonViMapper[item.maPl].normalizedName() : ''} />
                         <TableCell type='checkbox' style={{ textAlign: 'center' }} content={item.kichHoat} permission={permission}
                             onChanged={() => this.changeActive(item)} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
@@ -167,8 +165,8 @@ class DmDonViPage extends AdminPage {
                 <div className='tile'>{table}</div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getDmDonViPage} />
-                {!!this.state.loaiDonVi.length && <EditModal ref={e => this.modal = e} permission={permission} loaiDonVi={this.state.loaiDonVi}
-                    create={this.props.createDmDonVi} update={this.props.updateDmDonVi} permissions={currentPermissions} />}
+                <EditModal ref={e => this.modal = e} permission={permission}
+                    create={this.props.createDmDonVi} update={this.props.updateDmDonVi} permissions={currentPermissions} />
             </>,
             backRoute: '/user/category',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
