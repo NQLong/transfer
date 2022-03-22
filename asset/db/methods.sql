@@ -1,3 +1,14 @@
+CREATE OR REPLACE FUNCTION COMPARE_STRING_FILTER(INPUT IN STRING) RETURN VARCHAR2
+    IS OUTPUT VARCHAR2(500);
+BEGIN
+    SELECT regexp_substr(INPUT, '[^,]+', 1, level) INTO OUTPUT
+                                      from dual
+                                      connect by regexp_substr(INPUT, '[^,]+', 1, level) is not null;
+    RETURN OUTPUT;
+end;
+/
+--EndMethod--
+
 CREATE OR REPLACE FUNCTION "COMPONENT_CREATE_NEW" (
     class_name   IN   NVARCHAR2,
     style        IN   NVARCHAR2,
@@ -658,15 +669,18 @@ BEGIN
              LEFT JOIN DM_DAN_TOC DANTOC ON DANTOC.MA = STU.DAN_TOC
              LEFT JOIN DM_TON_GIAO TONGIAO ON TONGIAO.MA = STU.TON_GIAO
              LEFT JOIN DM_TINH_THANH_PHO TINHTHANH ON TINHTHANH.MA = STU.THUONG_TRU_MA_TINH
-             LEFT JOIN DM_DON_VI KHOA ON KHOA.MA = STU.KHOA AND KHOA.MA_PL = 1
+             LEFT JOIN DM_DON_VI KHOA ON KHOA.MA = STU.KHOA
              LEFT JOIN DM_TINH_TRANG_SINH_VIEN TTSV ON TTSV.MA = STU.TINH_TRANG
     WHERE ((listFaculty IS NULL AND listFromCity IS NULL AND listEthnic IS NULL AND
             listNationality IS NULL AND
             listReligion IS NULL AND
             listLoaiHinhDaoTao IS NULL AND
             listLoaiSinhVien IS NULL AND listTinhTrangSinhVien IS NULL AND gender IS NULL)
-        OR (listFaculty IS NOT NULL AND INSTR(listFaculty, STU.KHOA) != 0)
-        OR (gender IS NOT NULL AND STU.GIOI_TINH = gender)
+        OR (STU.KHOA IN (select regexp_substr(listFaculty, '[^,]+', 1, level)
+                         from dual
+                         connect by regexp_substr(listFaculty, '[^,]+', 1, level) is not null))
+--         OR (listFaculty IS NOT NULL AND INSTR(TO_CHAR(listFaculty), TO_CHAR(STU.KHOA)) != 0)
+        OR (gender IS NOT NULL AND ('0' + STU.GIOI_TINH) = gender)
         OR (listFromCity IS NOT NULL AND INSTR(listFromCity, STU.THUONG_TRU_MA_TINH) != 0)
         OR (listEthnic IS NOT NULL AND INSTR(listEthnic, STU.DAN_TOC) != 0)
         OR (listNationality IS NOT NULL AND INSTR(listNationality, STU.QUOC_GIA) != 0)
@@ -692,22 +706,25 @@ BEGIN
     OPEN STUDENT_INFO FOR
         SELECT *
         FROM (
-                 SELECT STU.MSSV          AS                 "mssv",
-                        STU.HO            AS                 "ho",
-                        STU.TEN           AS                 "ten",
-                        STU.EMAIL_CA_NHAN AS                 "emailCaNhan",
-                        STU.EMAIL_TRUONG  AS                 "emailTruong",
-                        STU.NGAY_SINH     AS                 "ngaySinh",
-                        STU.GIOI_TINH     AS                 "gioiTinh",
-                        DANTOC.TEN        AS                 "danToc",
-                        STU.DAN_TOC       AS                 "maDanToc",
-                        STU.QUOC_GIA      AS                 "maQuocGia",
-                        LSV.TEN           AS                 "loaiSinhVien",
-                        LHDT.TEN          AS                 "loaiHinhDaoTao",
-                        TTSV.TEN          AS                 "tinhTrangSinhVien",
-                        STU.KHOA          AS                 "khoa",
-                        STU.MA_NGANH      AS                 "maNganh",
-                        STU.LOP           AS                 "lop",
+                 SELECT STU.MSSV           AS                "mssv",
+                        STU.HO             AS                "ho",
+                        STU.TEN            AS                "ten",
+                        STU.EMAIL_CA_NHAN  AS                "emailCaNhan",
+                        STU.EMAIL_TRUONG   AS                "emailTruong",
+                        STU.NGAY_SINH      AS                "ngaySinh",
+                        STU.GIOI_TINH      AS                "gioiTinh",
+                        DANTOC.TEN         AS                "danToc",
+                        STU.DAN_TOC        AS                "maDanToc",
+                        STU.QUOC_GIA       AS                "maQuocGia",
+                        LSV.TEN            AS                "loaiSinhVien",
+                        LHDT.TEN           AS                "loaiHinhDaoTao",
+                        TTSV.TEN           AS                "tinhTrangSinhVien",
+                        STU.KHOA           AS                "khoa",
+                        KHOA.TEN           AS                "tenKhoa",
+                        STU.MA_NGANH       AS                "maNganh",
+                        STU.LOP            AS                "lop",
+                        STU.NAM_TUYEN_SINH AS                "namTuyenSinh",
+                        STU.NGAY_NHAP_HOC  AS                "ngayNhapHoc",
                         ROW_NUMBER() OVER (ORDER BY STU.TEN) R
                  FROM FW_STUDENT STU
                           LEFT JOIN DM_LOAI_HINH_DAO_TAO LHDT ON LHDT.MA = STU.LOAI_HINH_DAO_TAO
@@ -717,15 +734,18 @@ BEGIN
                           LEFT JOIN DM_DAN_TOC DANTOC ON DANTOC.MA = STU.DAN_TOC
                           LEFT JOIN DM_TON_GIAO TONGIAO ON TONGIAO.MA = STU.TON_GIAO
                           LEFT JOIN DM_TINH_THANH_PHO TINHTHANH ON TINHTHANH.MA = STU.THUONG_TRU_MA_TINH
-                          LEFT JOIN DM_DON_VI KHOA ON KHOA.MA = STU.KHOA AND KHOA.MA_PL = 1
+                          LEFT JOIN DM_DON_VI KHOA ON KHOA.MA = STU.KHOA
                           LEFT JOIN DM_TINH_TRANG_SINH_VIEN TTSV ON TTSV.MA = STU.TINH_TRANG
                  WHERE ((listFaculty IS NULL AND listFromCity IS NULL AND listEthnic IS NULL AND
                          listNationality IS NULL AND
                          listReligion IS NULL AND
                          listLoaiHinhDaoTao IS NULL AND
                          listLoaiSinhVien IS NULL AND listTinhTrangSinhVien IS NULL AND gender IS NULL)
-                     OR (listFaculty IS NOT NULL AND INSTR(listFaculty, STU.KHOA) != 0)
-                     OR (gender IS NOT NULL AND STU.GIOI_TINH = gender)
+                     OR (STU.KHOA IN (select regexp_substr(listFaculty, '[^,]+', 1, level)
+                                      from dual
+                                      connect by regexp_substr(listFaculty, '[^,]+', 1, level) is not null))
+--                       OR (listFaculty IS NOT NULL AND INSTR(TO_CHAR(listFaculty), TO_CHAR(STU.KHOA)) != 0)
+                     OR (gender IS NOT NULL AND ('0' + STU.GIOI_TINH) = gender)
                      OR (listFromCity IS NOT NULL AND INSTR(listFromCity, STU.THUONG_TRU_MA_TINH) != 0)
                      OR (listEthnic IS NOT NULL AND INSTR(listEthnic, STU.DAN_TOC) != 0)
                      OR (listNationality IS NOT NULL AND INSTR(listNationality, STU.QUOC_GIA) != 0)
@@ -741,7 +761,7 @@ BEGIN
                      OR LOWER(STU.DIEN_THOAI_CA_NHAN) LIKE sT
                      OR LOWER(STU.DIEN_THOAI_LIEN_LAC) LIKE sT
                      OR LOWER(STU.EMAIL_CA_NHAN) LIKE sT)
-                 ORDER BY STU.TEN
+                 ORDER BY STU.NAM_TUYEN_SINH NULLS LAST
              )
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
     RETURN STUDENT_INFO;
@@ -774,7 +794,7 @@ end;
 --EndMethod--
 
 CREATE OR REPLACE FUNCTION HCTH_CONG_VAN_DEN_SEARCH_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER,
-                                        donViGuiCV IN NUMBER, donVi in Number, maCanBo IN STRING, searchTerm IN STRING,
+                                        donViGuiCV IN STRING, donVi in STRING, maCanBo IN STRING, searchTerm IN STRING,
                                          totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
 AS
     my_cursor SYS_REFCURSOR;
@@ -834,24 +854,29 @@ BEGIN
 
                     ROW_NUMBER() OVER (ORDER BY hcthcvd.NGAY_CONG_VAN DESC) R
                  FROM HCTH_CONG_VAN_DEN hcthcvd
-                     --LEFT JOIN TCHC_CAN_BO cb on hcthcvd.CAN_BO_NHAN = cb.SHCC
                      LEFT JOIN DM_DON_VI_GUI_CV dvgcv on (hcthcvd.DON_VI_GUI = dvgcv.ID)
-                     -- LEFT JOIN DM_DON_VI dv on (hcthcvd.DON_VI_NHAN = dv.MA)
-                     -- LEFT JOIN DM_DON_VI dvcb on (cb.MA_DON_VI = dvcb.MA)
                 WHERE
-                    (donViGuiCV IS NULL OR hcthcvd.DON_VI_GUI = donViGuiCV)
-                    -- AND (donVi IS NULL OR hcthcvd.DON_VI_NHAN IS NULL OR hcthcvd.DON_VI_NHAN = donViGuiCV)
-                    -- AND (maCanBo IS NULL OR hcthcvd.CAN_BO_NHAN IS NULL OR hcthcvd.CAN_BO_NHAN = maCanBo)
+                    (donVi IS NULL OR ((INSTR(donVi, ',') != 0 AND INSTR(donVi, hcthcvd.DON_VI_NHAN) != 0) OR (donVi = hcthcvd.DON_VI_NHAN)))
+
                     AND (
-                        searchTerm = ''
-                        -- OR LOWER(cb.SHCC) LIKE sT
-                        -- OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
-                        OR LOWER(hcthcvd.NOI_DUNG) LIKE sT
-                        OR LOWER(hcthcvd.CHI_DAO) LIKE sT
-                        -- OR LOWER(dv.TEN) LIKE sT
+                        donViGuiCV IS NULL
+                        OR (
+                            (INSTR(donViGuiCV, ',') != 0 AND INSTR(donViGuiCV, hcthcvd.DON_VI_GUI) != 0)
+                            --OR (donViGuiCV = hcthcvd.DON_VI_GUI)
+                        )
                     )
 
-                 ORDER BY hcthcvd.NGAY_CONG_VAN DESC
+                    AND (maCanBo IS NULL OR ((INSTR(maCanBo, ',') != 0 AND INSTR(maCanBo, hcthcvd.CAN_BO_NHAN) != 0) 
+                                                 OR (maCanBo = hcthcvd.CAN_BO_NHAN)
+                        ))
+                    AND
+                    (
+                        searchTerm = ''
+                        OR LOWER(hcthcvd.NOI_DUNG) LIKE sT
+                        OR LOWER(hcthcvd.CHI_DAO) LIKE sT
+                    )
+
+                ORDER BY hcthcvd.NGAY_CONG_VAN DESC
              )
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
     RETURN my_cursor;
@@ -872,12 +897,10 @@ BEGIN
     INTO totalItem
     FROM HCTH_CONG_VAN_DI hcthCVD
         LEFT JOIN DM_DON_VI dvg on (hcthCVD.DON_VI_GUI = dvg.MA)
---         LEFT JOIN DM_DON_VI dv on (hcthCVD.DON_VI_NHAN = dv.MA)
---         LEFT JOIN TCHC_CAN_BO cb on (hcthCVD.CAN_BO_NHAN = cb.SHCC)
     WHERE
         (donViGui IS NULL OR hcthCVD.DON_VI_GUI = donViGui )
---         AND (donVi IS NULL OR hcthCVD.DON_VI_NHAN IS NULL OR hcthCVD.DON_VI_NHAN = donVi)
---         AND (maCanBo IS NULL OR hcthCVD.CAN_BO_NHAN IS NULL OR hcthCVD.CAN_BO_NHAN = maCanBo)
+--         AND (donVi IS NULL)
+--         AND (maCanBo IS NULL)
         AND (
             searchTerm = ''
 --             OR LOWER(dv.TEN) LIKE ST
@@ -908,13 +931,6 @@ BEGIN
                 dvg.MA                   AS     "maDonViGui",
                 dvg.TEN                  AS     "tenDonViGui",
 
---                 dv.MA                   AS      "maDonVi",
---                 dv.TEN                  AS      "tenDonVi",
-
---                 cb.HO                   AS       "hoCanBo",
---                 cb.TEN                  AS       "tenCanBo",
---                 cb.SHCC                 AS       "shcc",
-
                 (SELECT LISTAGG(dvn.TEN, ' - ') WITHIN GROUP (order by dvn.TEN)
                      FROM DM_DON_VI dvn
                      WHERE INSTR(hcthCVD.DON_VI_NHAN, dvn.MA) != 0
@@ -931,17 +947,11 @@ BEGIN
                 ROW_NUMBER() OVER (ORDER BY hcthcvd.NGAY_GUI DESC) R
             FROM HCTH_CONG_VAN_DI hcthCVD
                 LEFT JOIN DM_DON_VI dvg on (hcthCVD.DON_VI_GUI = dvg.MA)
---                 LEFT JOIN DM_DON_VI dv on (hcthCVD.DON_VI_NHAN = dv.MA)
---                 LEFT JOIN TCHC_CAN_BO cb on (hcthCVD.CAN_BO_NHAN = cb.SHCC)
---                 LEFT JOIN DM_DON_VI dvcb on (cb.MA_DON_VI = dvcb.MA)
             WHERE (
                 (donViGui IS NULL OR hcthCVD.DON_VI_GUI = donViGui)
---                 AND (donVi IS NULL OR hcthCVD.DON_VI_NHAN IS NULL OR hcthCVD.DON_VI_NHAN = donVi)
---                 AND (maCanBo IS NULL OR hcthCVD.CAN_BO_NHAN IS NULL OR hcthCVD.CAN_BO_NHAN = maCanBo)
                 AND (
                     searchTerm = ''
                     OR LOWER(hcthCVD.NOI_DUNG) LIKE ST
---                     OR LOWER(dv.TEN) LIKE ST
                     OR LOWER(dvg.TEN) LIKE ST
                         )
                     )
