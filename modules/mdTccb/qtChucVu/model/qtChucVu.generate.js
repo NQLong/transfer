@@ -135,5 +135,20 @@ module.exports = app => {
             app.dbConnection.execute('BEGIN :ret:=qt_chuc_vu_search_page(:pagenumber, :pagesize, :listShcc, :listDv, :fromyear, :toyear, :timetype, :listCv, :gioitinh, :searchterm, :totalitem, :pagetotal); END;',
                 { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, pagenumber: { val: pagenumber, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, pagesize: { val: pagesize, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, listShcc, listDv, fromyear, toyear, timetype, listCv, gioitinh, searchterm, totalitem: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pagetotal: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
         },
+
+        groupPage: (pagenumber, pagesize, listShcc, listDv, fromyear, toyear, timetype, listCv, gioitinh, searchterm, done) => {
+            app.dbConnection.execute('BEGIN :ret:=qt_chuc_vu_group_page(:pagenumber, :pagesize, :listShcc, :listDv, :fromyear, :toyear, :timetype, :listCv, :gioitinh, :searchterm, :totalitem, :pagetotal); END;',
+                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, pagenumber: { val: pagenumber, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, pagesize: { val: pagesize, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, listShcc, listDv, fromyear, toyear, timetype, listCv, gioitinh, searchterm, totalitem: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pagetotal: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
+        },
+
+        getByShcc: (isshcc, done) => {
+            app.dbConnection.execute('BEGIN :ret:=qt_chuc_vu_get_by_shcc(:isshcc); END;',
+                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, isshcc }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
+        },
+
+        download: (listShcc, listDv, fromyear, toyear, timetype, listCv, gioitinh, done) => {
+            app.dbConnection.execute('BEGIN :ret:=qt_chuc_vu_download_excel(:listShcc, :listDv, :fromyear, :toyear, :timetype, :listCv, :gioitinh); END;',
+                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, listShcc, listDv, fromyear, toyear, timetype, listCv, gioitinh }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
+        },
     };
 };

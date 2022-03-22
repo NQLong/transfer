@@ -16,11 +16,11 @@ export default function QtNghienCuuKhoaHocReducer(state = null, data) {
         case QtNghienCuuKhoaHocGetAll:
             return Object.assign({}, state, { items: data.items });
         case QtNghienCuuKhoaHocGetGroupPage:
-            return Object.assign({}, state, { page_gr: data.page });
+            return Object.assign({}, state, { pageGr: data.page });
         case QtNghienCuuKhoaHocGetPage:
             return Object.assign({}, state, { page: data.page });
         case QtNghienCuuKhoaHocGetGroupPageMa:
-            return Object.assign({}, state, { page_ma: data.page });
+            return Object.assign({}, state, { pageMa: data.page });
         case QtNghienCuuKhoaHocGet:
             return Object.assign({}, state, { selectedItem: data.item });
         case QtNghienCuuKhoaHocUpdate:
@@ -49,7 +49,7 @@ export default function QtNghienCuuKhoaHocReducer(state = null, data) {
                 return null;
             }
         case QtNghienCuuKhoaHocUserPage:
-            return Object.assign({}, state, { page_user: data.page });
+            return Object.assign({}, state, { pageUser: data.page });
         default:
             return state;
     }

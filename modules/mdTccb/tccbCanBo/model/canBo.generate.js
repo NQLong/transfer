@@ -131,6 +131,11 @@ module.exports = app => {
             app.dbConnection.execute(sql, parameter, (error, result) => done(error, result));
         },
 
+        searchPage: (pagenumber, pagesize, listdonvi, gender, listngach, listhocvi, listchucdanh, isbienche, searchterm, done) => {
+            app.dbConnection.execute('BEGIN :ret:=tccb_can_bo_search_page(:pagenumber, :pagesize, :listdonvi, :gender, :listngach, :listhocvi, :listchucdanh, :isbienche, :searchterm, :totalitem, :pagetotal); END;',
+                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, pagenumber: { val: pagenumber, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, pagesize: { val: pagesize, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, listdonvi, gender, listngach, listhocvi, listchucdanh, isbienche, searchterm, totalitem: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pagetotal: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
+        },
+
         tccbDasboardTotalGender: (done) => {
             app.dbConnection.execute('BEGIN :ret:=tccb_dashboard_total_gender(); END;',
                 { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));

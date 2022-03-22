@@ -74,8 +74,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, list_shcc, list_dv, timeType, tinhTrang } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, tinhTrang: null };
-        app.model.qtBaoHiemXaHoi.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang, searchTerm, (error, page) => {
+        const { fromYear, toYear, listShcc, listDv, timeType, tinhTrang } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, timeType: 0, tinhTrang: null };
+        app.model.qtBaoHiemXaHoi.searchPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, timeType, tinhTrang, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -91,8 +91,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, list_shcc, list_dv, timeType, tinhTrang } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, tinhTrang: null };
-        app.model.qtBaoHiemXaHoi.searchPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang, searchTerm, (error, page) => {
+        const { fromYear, toYear, listShcc, listDv, timeType, tinhTrang } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, timeType: 0, tinhTrang: null };
+        app.model.qtBaoHiemXaHoi.searchPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, timeType, tinhTrang, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -107,8 +107,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, list_shcc, list_dv, timeType, tinhTrang } = (req.query.filter && req.query.filter != '%%%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, timeType: 0, tinhTrang: null };
-        app.model.qtBaoHiemXaHoi.groupPage(pageNumber, pageSize, list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang, searchTerm, (error, page) => {
+        const { fromYear, toYear, listShcc, listDv, timeType, tinhTrang } = (req.query.filter && req.query.filter != '%%%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, timeType: 0, tinhTrang: null };
+        app.model.qtBaoHiemXaHoi.groupPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, timeType, tinhTrang, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -127,14 +127,14 @@ module.exports = app => {
     app.delete('/api/tccb/qua-trinh/bao-hiem-xa-hoi', app.permission.check('staff:write'), (req, res) =>
         app.model.qtBaoHiemXaHoi.delete({ id: req.body.id }, (error) => res.send(error)));
 
-    app.get('/api/qua-trinh/bao-hiem-xa-hoi/download-excel/:list_shcc/:list_dv/:fromYear/:toYear/:timeType/:tinhTrang', app.permission.check('qtBaoHiemXaHoi:read'), (req, res) => {
-        let { list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang } = req.params ? req.params : { list_shcc: null, list_dv: null, toYear: null, timeType: 0, tinhTrang: null};
-        if (list_shcc == 'null') list_shcc = null;
-        if (list_dv == 'null') list_dv = null;
+    app.get('/api/qua-trinh/bao-hiem-xa-hoi/download-excel/:listShcc/:listDv/:fromYear/:toYear/:timeType/:tinhTrang', app.permission.check('qtBaoHiemXaHoi:read'), (req, res) => {
+        let { listShcc, listDv, fromYear, toYear, timeType, tinhTrang } = req.params ? req.params : { listShcc: null, listDv: null, toYear: null, timeType: 0, tinhTrang: null};
+        if (listShcc == 'null') listShcc = null;
+        if (listDv == 'null') listDv = null;
         if (fromYear == 'null') fromYear = null;
         if (toYear == 'null') toYear = null;
         if (tinhTrang == 'null') tinhTrang = null;
-        app.model.qtBaoHiemXaHoi.download(list_shcc, list_dv, fromYear, toYear, timeType, tinhTrang, (err, result) => {
+        app.model.qtBaoHiemXaHoi.download(listShcc, listDv, fromYear, toYear, timeType, tinhTrang, (err, result) => {
             if (err || !result) {
                 res.send({ err });
             } else {

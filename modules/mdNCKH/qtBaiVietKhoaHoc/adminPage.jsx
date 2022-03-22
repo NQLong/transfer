@@ -22,9 +22,9 @@ class EditModal extends AdminModal {
         id: '',
     };
     multiple = false;
-    list_name = [];
+    listName = [];
     onShow = (item, multiple = true) => {
-        this.list_name = [];
+        this.listName = [];
         this.multiple = multiple;
 
         let { id, shcc, tenTacGia, namXuatBan, tenBaiViet, tenTapChi, soHieuIssn, sanPham, diemIf, quocTe } = item ? item : {
@@ -49,11 +49,11 @@ class EditModal extends AdminModal {
 
     onSubmit = (e) => {
         e.preventDefault();
-        let list_ma = this.maCanBo.value();
-        if (!Array.isArray(list_ma)) {
-            list_ma = [list_ma];
+        let listMa = this.maCanBo.value();
+        if (!Array.isArray(listMa)) {
+            listMa = [listMa];
         }
-        if (list_ma.length == 0) {
+        if (listMa.length == 0) {
             T.notify('Danh sách cán bộ trống', 'danger');
             this.maCanBo.focus();
         } else if (!this.tenTacGia.value()) {
@@ -69,7 +69,7 @@ class EditModal extends AdminModal {
             T.notify('Năm xuất bản trống', 'danger');
             this.namXuatBan.focus();
         } else {
-            list_ma.forEach((ma, index) => {
+            listMa.forEach((ma, index) => {
                 const changes = {
                     shcc: ma,
                     tenTacGia: this.tenTacGia.value(),
@@ -81,7 +81,7 @@ class EditModal extends AdminModal {
                     diemIf: this.diemIf.value(),
                     quocTe: this.quocTe.value(),
                 };
-                if (index == list_ma.length - 1) {
+                if (index == listMa.length - 1) {
                     this.state.id ? this.props.update(this.state.id, changes, this.hide, false) : this.props.create(changes, this.hide, false);
                     this.setState({
                         id: ''
@@ -95,17 +95,17 @@ class EditModal extends AdminModal {
         }
     }
 
-    removeName = (list_name, name) => {
-        const index = list_name.indexOf(name);
+    removeName = (listName, name) => {
+        const index = listName.indexOf(name);
         if (index > -1) {
-            list_name.splice(index, 1); // 2nd parameter means remove one item only
+            listName.splice(index, 1); // 2nd parameter means remove one item only
         }
     }
-    convertName = (list_name) => {
-        if (list_name.length == 0) return '';
+    convertName = (listName) => {
+        if (listName.length == 0) return '';
         let result = '';
-        for (let i = 0; i < list_name.length; i++) {
-            let name = list_name[i];
+        for (let i = 0; i < listName.length; i++) {
+            let name = listName[i];
             let index = name.indexOf(':');
             name = name.substring(index + 2);
             name = name.trim();
@@ -117,9 +117,9 @@ class EditModal extends AdminModal {
     }
     handleTacGia = (item) => {
         if (!this.state.id) {
-            if (item.selected) this.list_name.push(item.text);
-            else this.removeName(this.list_name, item.text);
-            this.tenTacGia.value(this.convertName(this.list_name));
+            if (item.selected) this.listName.push(item.text);
+            else this.removeName(this.listName, item.text);
+            this.tenTacGia.value(this.convertName(this.listName));
         }
     }
 
@@ -178,10 +178,10 @@ class QtBaiVietKhoaHoc extends AdminPage {
         let { pageNumber, pageSize } = this.props && this.props.qtBaiVietKhoaHoc && this.props.qtBaiVietKhoaHoc.page ? this.props.qtBaiVietKhoaHoc.page : { pageNumber: 1, pageSize: 50 };
         const fromYear = this.fromYear?.value() == '' ? null : Number(this.fromYear?.value());
         const toYear = this.toYear?.value() == '' ? null : Number(this.toYear?.value());
-        const list_dv = this.maDonVi?.value().toString() || '';
-        const list_shcc = this.mulCanBo?.value().toString() || '';
+        const listDv = this.maDonVi?.value().toString() || '';
+        const listShcc = this.mulCanBo?.value().toString() || '';
         const xuatBanRange = this.xuatBanRange?.value() == '' ? null : this.xuatBanRange?.value();
-        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc, xuatBanRange };
+        const pageFilter = isInitial ? null : { listDv, fromYear, toYear, listShcc, xuatBanRange };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
@@ -189,10 +189,10 @@ class QtBaiVietKhoaHoc extends AdminPage {
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
                     this.fromYear?.value(filter.fromYear || '');
                     this.toYear?.value(filter.toYear || '');
-                    this.maDonVi?.value(filter.list_dv);
-                    this.mulCanBo?.value(filter.list_shcc);
+                    this.maDonVi?.value(filter.listDv);
+                    this.mulCanBo?.value(filter.listShcc);
                     this.xuatBanRange?.value(filter.xuatBanRange);
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.list_shcc || filter.list_dv || filter.xuatBanRange)) this.showAdvanceSearch();
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.listShcc || filter.listDv || filter.xuatBanRange)) this.showAdvanceSearch();
                 }
             });
         });
@@ -229,8 +229,8 @@ class QtBaiVietKhoaHoc extends AdminPage {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('qtBaiVietKhoaHoc', ['read', 'write', 'delete']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ? (
-            this.props.qtBaiVietKhoaHoc && this.props.qtBaiVietKhoaHoc.page_gr ?
-                this.props.qtBaiVietKhoaHoc.page_gr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
+            this.props.qtBaiVietKhoaHoc && this.props.qtBaiVietKhoaHoc.pageGr ?
+                this.props.qtBaiVietKhoaHoc.pageGr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
             : (this.props.qtBaiVietKhoaHoc && this.props.qtBaiVietKhoaHoc.page ? this.props.qtBaiVietKhoaHoc.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] });
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
@@ -340,9 +340,9 @@ class QtBaiVietKhoaHoc extends AdminPage {
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
             onExport: !this.checked ? (e) => {
                 e.preventDefault();
-                const { fromYear, toYear, list_shcc, list_dv, xuatBanRange } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, xuatBanRange: null };
+                const { fromYear, toYear, listShcc, listDv, xuatBanRange } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, xuatBanRange: null };
 
-                T.download(T.url(`/api/qua-trinh/bai-viet-khoa-hoc/download-excel/${list_shcc ? list_shcc : null}/${list_dv ? list_dv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${xuatBanRange ? xuatBanRange : null}`), 'baivietkhoahoc.xlsx');
+                T.download(T.url(`/api/qua-trinh/bai-viet-khoa-hoc/download-excel/${listShcc ? listShcc : null}/${listDv ? listDv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${xuatBanRange ? xuatBanRange : null}`), 'baivietkhoahoc.xlsx');
             } : null
         });
     }

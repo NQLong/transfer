@@ -26,10 +26,32 @@ module.exports = app => {
     app.get('/user/tccb/staff', app.permission.check('staff:read'), app.templates.admin);
     app.get('/user/tccb/staff/item/upload', app.permission.check('staff:write'), app.templates.admin);
 
+
+    //Check role mangagers
+    app.permissionHooks.add('staff', 'manager', (user) => new Promise(resolve => {
+        if (app.checkChucVu(user, '*', '013') || app.checkChucVu(user, '*', '005') || app.checkChucVu(user, '*', '003') || app.checkChucVu(user, '*', '016') || app.checkChucVu(user, '*', '009') || app.checkChucVu(user, '*', '007') || app.checkChucVu(user, '*', '007')) app.permissionHooks.pushUserPermission(user, 'manager:read', 'manager:write'); 
+        resolve();
+    }));
+
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
 
     app.get('/api/staff/page/:pageNumber/:pageSize', checkGetStaffPermission, (req, res) => {
+        let pageNumber = parseInt(req.params.pageNumber),
+            pageSize = parseInt(req.params.pageSize),
+        searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+        const { listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe } = req.query.filter && req.query.filter != '%%%%%%%%%%%%' ? req.query.filter : { listDonVi: null, gender: null, listNgach: null, listHocVi: null, listChucDanh: null, isBienChe: null };
+        app.model.canBo.searchPage(pageNumber, pageSize, listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe, searchTerm, (error, page) => {
+            if (error || page == null) {
+                res.send({ error });
+            } else {
+                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
+                const pageCondition = searchTerm;
+                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
+            }
+        });
+    });
+    app.get('/api/staff-female/page/:pageNumber/:pageSize', checkGetStaffPermission, (req, res) => {
         let pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             condition = { statement: null };
@@ -48,16 +70,14 @@ module.exports = app => {
                 };
             }
         }
-        if (req.query.filter && req.query.filter.maDonVi) {
-            if (req.query.condition) {
-                condition.statement += ' AND maDonVi = :maDonVi';
-                condition.parameter.maDonVi = req.query.filter.maDonVi;
-            } else {
-                condition.statement = 'maDonVi = :maDonVi';
-                condition.parameter = {
-                    maDonVi: req.query.filter.maDonVi
-                };
-            }
+        if (req.query.condition) {
+            condition.statement += ' AND phai = :phai';
+            condition.parameter.phai = '02';
+        } else {
+            condition.statement = 'phai = :phai';
+            condition.parameter = {
+                phai: '02'
+            };
         }
         app.model.canBo.getPage(pageNumber, pageSize, condition, '*', 'SHCC DESC, TEN ASC', (error, page) => {
             res.send({ error, page });
@@ -68,6 +88,11 @@ module.exports = app => {
         app.model.canBo.get({ shcc: req.params.shcc }, (error, item) => res.send({ error, item }));
     });
 
+    app.get('/api/staff/calc-shcc', checkGetStaffPermission, (req, res) => {
+        app.model.canBo.getShccCanBo(req.query.item, (error, shcc) => {
+            res.send({error, shcc});
+        });
+    });
     app.get('/api/staff/:maDonVi', checkGetStaffPermission, (req, res) => {
         app.model.canBo.getAll({ maDonVi: req.params.maDonVi }, (error, item) => res.send({ error, item }));
     });
@@ -84,10 +109,7 @@ module.exports = app => {
             } else {
                 let curTime = new Date().getTime();
                 app.model.fwUser.get({ email: canBo.email }, (error, user) => {
-                    if (error || user == null) {
-                        res.send({ error: 'Lỗi khi lấy thông tin cán bộ !' });
-                    } else {
-                        let result = app.clone(canBo, { image: user.image });
+                        let result = app.clone(canBo, { image: user ? user.image : '' });
                         new Promise(resolve => {
                             app.model.quanHeCanBo.getQhByShcc(canBo.shcc, (error, items) => {
                                 if (error) {
@@ -220,7 +242,7 @@ module.exports = app => {
                                 else if (dataNghiViec == null) {
                                     result = app.clone(result, { dataNghiViec: null });
                                 } else {
-                                    result = app.clone(result, { dataNghiViec });
+                                    result = app.clone(result, { dataNghiViec }, {daNghi: 1});
                                 }
                                 resolve();
                             });
@@ -240,7 +262,7 @@ module.exports = app => {
                             res.send({ error, item: result });
                         });
                     }
-                });
+                );
 
             }
         });

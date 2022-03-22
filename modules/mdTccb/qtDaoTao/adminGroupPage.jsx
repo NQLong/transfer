@@ -271,8 +271,8 @@ class QtDaoTaoGroupPage extends AdminPage {
             backRoute: '/user/tccb/qua-trinh/dao-tao',
             onExport: (e) => {
                 e.preventDefault();
-                const list_shcc = this.ma;
-                T.download(T.url(`/api/qua-trinh/dao-tao/download-excel/${list_shcc ? list_shcc : null}/${null}/${null}/${null}/${null}`), 'daotaoboiduong.xlsx');
+                const listShcc = this.ma;
+                T.download(T.url(`/api/qua-trinh/dao-tao/download-excel/${listShcc ? listShcc : null}/${null}/${null}/${null}/${null}`), 'daotaoboiduong.xlsx');
             }
         });
     }

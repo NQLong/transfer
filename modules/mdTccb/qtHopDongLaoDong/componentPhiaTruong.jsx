@@ -23,8 +23,8 @@ export class ComponentPhiaTruong extends React.Component {
     }
 
     handleDaiDien = (shcc) => {
-        let shcc_daiDien = typeof (shcc) === 'object' ? shcc.id : shcc;
-        this.props.getDaiDienKyHopDong(shcc_daiDien, daiDien => {
+        let shccDaiDien = typeof (shcc) === 'object' ? shcc.id : shcc;
+        this.props.getDaiDienKyHopDong(shccDaiDien, daiDien => {
             this.daiDien.value(daiDien.item.shcc);
             this.nguoiKyChucVu.value(daiDien.item.chucVu);
             this.hoTenDaiDien.value(((daiDien.item.phai == '01' ? 'Ông: ' : 'Bà: ') + daiDien.item.ho + ' ' + daiDien.item.ten).normalizedName());
