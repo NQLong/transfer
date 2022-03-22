@@ -108,7 +108,7 @@ class QtBaiVietKhoaHocGroupPage extends AdminPage {
             const route = T.routeMatcher(`/user/${this.menu}/qua-trinh/bai-viet-khoa-hoc/group/:shcc`),
                 params = route.parse(window.location.pathname);
             this.shcc = params.shcc;
-            this.setState({ filter: { list_shcc: params.shcc, list_dv: '' } });
+            this.setState({ filter: { listShcc: params.shcc, listDv: '' } });
             this.props.getStaffEdit(this.shcc, (data) => {
                 if (data.error) T.alert('Cán bộ không tồn tại!');
                 else {
@@ -131,13 +131,13 @@ class QtBaiVietKhoaHocGroupPage extends AdminPage {
     }
 
     changeAdvancedSearch = (isInitial = false) => {
-        let { pageNumber, pageSize } = this.props && this.props.qtBaiVietKhoaHoc && this.props.qtBaiVietKhoaHoc.page_ma ? this.props.qtBaiVietKhoaHoc.page_ma : { pageNumber: 1, pageSize: 50 };
+        let { pageNumber, pageSize } = this.props && this.props.qtBaiVietKhoaHoc && this.props.qtBaiVietKhoaHoc.pageMa ? this.props.qtBaiVietKhoaHoc.pageMa : { pageNumber: 1, pageSize: 50 };
         const fromYear = this.fromYear?.value() == '' ? null : Number(this.fromYear?.value());
         const toYear = this.toYear?.value() == '' ? null : Number(this.toYear?.value());
-        const list_dv = this.state.filter.list_dv;
-        const list_shcc = this.state.filter.list_shcc;
+        const listDv = this.state.filter.listDv;
+        const listShcc = this.state.filter.listShcc;
         const xuatBanRange = this.xuatBanRange?.value() == '' ? null : this.xuatBanRange?.value();
-        const pageFilter = isInitial ? null : { list_dv, fromYear, toYear, list_shcc, xuatBanRange };
+        const pageFilter = isInitial ? null : { listDv, fromYear, toYear, listShcc, xuatBanRange };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
@@ -174,7 +174,7 @@ class QtBaiVietKhoaHocGroupPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('qtBaiVietKhoaHoc', ['read', 'write', 'delete']);
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtBaiVietKhoaHoc && this.props.qtBaiVietKhoaHoc.page_ma ? this.props.qtBaiVietKhoaHoc.page_ma : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtBaiVietKhoaHoc && this.props.qtBaiVietKhoaHoc.pageMa ? this.props.qtBaiVietKhoaHoc.pageMa : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
@@ -269,8 +269,8 @@ class QtBaiVietKhoaHocGroupPage extends AdminPage {
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
             onExport: (e) => {
                 e.preventDefault();
-                const { fromYear, toYear, list_shcc, list_dv, xuatBanRange } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, list_shcc: null, list_dv: null, xuatBanRange: null };
-                T.download(T.url(`/api/qua-trinh/bai-viet-khoa-hoc/download-excel/${list_shcc ? list_shcc : null}/${list_dv ? list_dv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${xuatBanRange ? xuatBanRange : null}`), 'baivietkhoahoc.xlsx');
+                const { fromYear, toYear, listShcc, listDv, xuatBanRange } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, xuatBanRange: null };
+                T.download(T.url(`/api/qua-trinh/bai-viet-khoa-hoc/download-excel/${listShcc ? listShcc : null}/${listDv ? listDv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${xuatBanRange ? xuatBanRange : null}`), 'baivietkhoahoc.xlsx');
             }
         });
     }

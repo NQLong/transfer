@@ -16,13 +16,13 @@ export default function QtNghiPhepReducer(state = null, data) {
         case QtNghiPhepGetAll:
             return Object.assign({}, state, { items: data.items });
         case QtNghiPhepGetGroupPage:
-            return Object.assign({}, state, { page_gr: data.page });
+            return Object.assign({}, state, { pageGr: data.page });
         case QtNghiPhepGetGroupPageMa:
-            return Object.assign({}, state, { page_ma: data.page });
+            return Object.assign({}, state, { pageMa: data.page });
         case QtNghiPhepGetPage:
             return Object.assign({}, state, { page: data.page });
         case QtNghiPhepGetUserPage:
-            return Object.assign({}, state, { user_page: data.page });
+            return Object.assign({}, state, { userPage: data.page });
         case QtNghiPhepGet:
             return Object.assign({}, state, { selectedItem: data.item });
         case QtNghiPhepUpdate:

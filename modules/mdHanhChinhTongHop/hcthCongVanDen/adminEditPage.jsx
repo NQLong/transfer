@@ -193,7 +193,7 @@ class AdminEditPage extends AdminPage {
             ],
             content: <>
                 <div className='tile'>
-                    <h3 className='tile-title'>{!this.state.id ? 'Tạo mới đề tài' : 'Cập nhật đề tài'}</h3>
+                    <h3 className='tile-title'>{!this.state.id ? 'Tạo mới công văn đến' : 'Cập nhật công văn đến'}</h3>
                     <div className='tile-body row'>
                         <FormTextBox type='text' className='col-md-12' ref={e => this.soCongVan = e} label='Mã số CV' readOnly={readOnly} />
                         <FormDatePicker type='date-mask' className='col-md-4' ref={e => this.ngayCongVan = e} label='Ngày CV' readOnly={readOnly} required />
