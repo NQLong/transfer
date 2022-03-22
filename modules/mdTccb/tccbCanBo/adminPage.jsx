@@ -151,7 +151,13 @@ class StaffPage extends AdminPage {
                 </div>
             </>,
             backRoute: '/user/tccb',
-            onCreate: permission ? e => this.create(e) : null
+            onCreate: permission ? e => this.create(e) : null,
+            onExport: (e) => {
+                e.preventDefault();
+                const { listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { listDonVi: null, gender: null, listNgach: null, listHocVi: null, listChucDanh: null, isBienChe: null };
+
+                T.download(T.url(`/api/staff/download-excel/${listDonVi ? listDonVi : null}/${gender ? gender : null}/${listNgach ? listNgach : null}/${listHocVi ? listHocVi : null}/${listChucDanh ? listChucDanh : null}/${isBienChe ? isBienChe : null}`), 'Danh sach can bo.xlsx');
+            }
         });
     }
 }
