@@ -1,8 +1,24 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { AdminPage, AdminModal, FormDatePicker, renderTable, FormTextBox, FormSelect, TableCell, FormRichTextBox } from 'view/component/AdminPage';
+import {
+    AdminPage,
+    AdminModal,
+    FormDatePicker,
+    renderTable,
+    FormTextBox,
+    FormSelect,
+    TableCell,
+    FormRichTextBox,
+} from 'view/component/AdminPage';
 import { Link } from 'react-router-dom';
-import { getHcthCongVanDenAll, getHcthCongVanDenPage, createHcthCongVanDen, updateHcthCongVanDen, deleteHcthCongVanDen, getHcthCongVanDenSearchPage } from './redux';
+import {
+    getHcthCongVanDenAll,
+    getHcthCongVanDenPage,
+    createHcthCongVanDen,
+    updateHcthCongVanDen,
+    deleteHcthCongVanDen,
+    getHcthCongVanDenSearchPage
+} from './redux';
 import { SelectAdapter_DmDonViGuiCongVan } from 'modules/mdDanhMuc/dmDonViGuiCv/redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
@@ -13,11 +29,11 @@ const timeList = [
     { id: 1, text: 'Theo ngày công văn' },
     { id: 2, text: 'Theo ngày nhận' },
     { id: 3, text: 'Theo ngày hết hạn' },
-]
+];
 
 
 class EditModal extends AdminModal {
-    state = { id: null };
+    state = { id: null, listFile: [] };
     componentDidMount() {
         T.ready(() => this.onShown(() => { this.soCongVan.focus(); }));
     }
@@ -26,10 +42,10 @@ class EditModal extends AdminModal {
         let { id, ngayCongVan, ngayNhan, ngayHetHan, soCongVan, maDonViGuiCV, maDonViNhan, maCanBoNhan, noiDung, chiDao } = item ? item :
             { id: '', ngayCongVan: '', ngayNhan: '', ngayHetHan: '', soCongVan: '', maDonViGuiCV: '', maDonViNhan: '', shcc: '', noiDung: '', chiDao: '' };
         if (maDonViNhan) {
-            maDonViNhan = maDonViNhan.split(',')
+            maDonViNhan = maDonViNhan.split(',');
         }
         if (maCanBoNhan) {
-            maCanBoNhan = maCanBoNhan.split(',')
+            maCanBoNhan = maCanBoNhan.split(',');
         }
         this.setState({ id });
         this.ngayCongVan.value(ngayCongVan);
@@ -132,9 +148,9 @@ class HcthCongVanDen extends AdminPage {
 
     changeAdvancedSearch = (isInitial = false) => {
         let { pageNumber, pageSize } = this.props && this.props.hcthCongVanDen && this.props.hcthCongVanDen.page ? this.props.hcthCongVanDen.page : { pageNumber: 1, pageSize: 50 };
-        let donViGuiCongVan = this.donViGuiCongVan?.value().toString();
-        let donViNhanCongVan = this.donViNhanCongVan?.value().toString();
-        let canBoNhanCongVan = this.canBoNhanCongVan?.value().toString();
+        let donViGuiCongVan = this.donViGuiCongVan?.value();
+        let donViNhanCongVan = this.donViNhanCongVan?.value();
+        let canBoNhanCongVan = this.canBoNhanCongVan?.value();
         const pageFilter = isInitial ? {} : { donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
@@ -218,7 +234,7 @@ class HcthCongVanDen extends AdminPage {
                             )) : null} />
                         <TableCell type='text' style={{}} content={item.chiDao} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onEdit={() => this.modal.show(item)} onDelete={(e) => this.onDelete(e, item)} permissions={currentPermissions} />
-                    </tr>)
+                    </tr>);
             }
         });
         return this.renderPage({
@@ -238,9 +254,9 @@ class HcthCongVanDen extends AdminPage {
                             <FormDatePicker type='date-mask' className='col-md-3' ref={e => this.toDate = e} label='Đến ngày' />
                         </>)}
                     </div>
-                    <FormSelect multiple={true} allowClear={true} className='col-md-4' ref={e => this.donViGuiCongVan = e} label='Đơn vị gửi công văn' data={SelectAdapter_DmDonViGuiCongVan} onChange={() => this.changeAdvancedSearch()} />
-                    <FormSelect multiple={true} allowClear={true} className='col-md-4' ref={e => this.donViNhanCongVan = e} label='Đơn vị nhận công văn' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />
-                    <FormSelect multiple={true} allowClear={true} className='col-md-4' ref={e => this.canBoNhanCongVan = e} label='Cán bộ nhận công văn' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect allowClear={true} className='col-md-4' ref={e => this.donViGuiCongVan = e} label='Đơn vị gửi công văn' data={SelectAdapter_DmDonViGuiCongVan} onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect allowClear={true} className='col-md-4' ref={e => this.donViNhanCongVan = e} label='Đơn vị nhận công văn' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect allowClear={true} className='col-md-4' ref={e => this.canBoNhanCongVan = e} label='Cán bộ nhận công văn' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} />
                 </div>
             </>,
             content: <div className='tile'>
