@@ -66,5 +66,59 @@ module.exports = app => {
             res.send({ error, page });
         });
     });
+
+
+    // User API  -----------------------------------------------------------------------------------------------
+    app.createFolder(app.path.join(app.assetPath, '/congVanDi'));
+
+    app.get('/api/hcth/cong-van-di/download/:id/:fileName', app.permission.check('staff:login'), (req, res) => {
+        const { id, fileName } = req.params;
+        const dir = app.path.join(app.assetPath, `/congVanDi/${id}`);
+
+        if (app.fs.existsSync(dir)) {
+            const serverFileNames = app.fs.readdirSync(dir).filter(v => app.fs.lstatSync(app.path.join(dir, v)).isFile());
+            for (const serverFileName of serverFileNames) {
+                const clientFileIndex = serverFileName.indexOf(fileName);
+                if (clientFileIndex !== -1 && serverFileName.slice(clientFileIndex) === fileName) {
+                    return res.sendFile(app.path.join(dir, serverFileName));
+                }
+            }
+        }
+
+        res.status(400).send('Không tìm thấy tập tin');
+
+    });
+
+    app.uploadHooks.add('hcthCongVanDiFile', (req, fields, files, params, done) =>
+        app.permission.has(req, () => hcthCongVanDiFile(req, fields, files, params, done), done, 'staff:login'));
+
+    const hcthCongVanDiFile = (req, fields, files, params, done) => {
+        if (fields.userData && fields.userData[0] && fields.userData[0].startsWith('hcthCongVanDiFile') && files.hcthCongVanDiFile && files.hcthCongVanDiFile.length > 0) {
+            const user = req.session.user,
+                srcPath = files.hcthCongVanDiFile[0].path,
+                filePath = (fields.userData[0].substring(19) != 'new' ? '/' + fields.userData[0].substring(19) : '/new') + '/' + user.shcc + '_' + (new Date().getTime()).toString() + '_' + files.deTaiNCKHStaffFile[0].originalFilename,
+                destPath = app.assetPath + '/congVanDi' + filePath,
+                validUploadFileType = ['.xls', '.xlsx', '.doc', '.docx', '.pdf', '.png', '.jpg'],
+                baseNamePath = app.path.extname(srcPath);
+            if (!validUploadFileType.includes(baseNamePath.toLowerCase())) {
+                done({ error: 'Định dạng tập tin không hợp lệ!' });
+                app.deleteFile(srcPath);
+            } else {
+                app.createFolder(
+                    app.path.join(app.assetPath, '/congVanDi/' + (fields.userData[0].substring(19) != 'new' ? '/' + fields.userData[0].substring(19) : '/new'))
+                );
+                app.fs.rename(srcPath, destPath, error => {
+                    if (error) {
+                        done({ error });
+                    } else {
+                        done({ data: filePath });
+                    }
+                });
+            }
+        }
+    };
+    
+    // Delete File
+    
 };    
 

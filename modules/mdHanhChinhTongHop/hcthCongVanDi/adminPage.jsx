@@ -132,28 +132,34 @@ class HcthCongVanDi extends AdminPage {
             T.clearSearchBox();
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');      
             T.showSearchBox(() => {
-                this.maDonViGui?.value(0);
+                this.maDonViGui?.value('');
+                this.maDonViNhan?.value('');
+                this.maCanBoNhan?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
             this.getPage();
             this.changeAdvancedSearch(true);
         });
-        // this.props.getHcthCongVanDiPage(1, 50);
     }
 
     changeAdvancedSearch = (isInitial = false) => {
         let { pageNumber, pageSize } = this.props && this.props.hcthCongVanDi && this.props.hcthCongVanDi.page ? this.props.hcthCongVanDi.page : { pageNumber: 1, pageSize: 50 };
-        const donViGui = this.donViGui?.value();
-        const pageFilter = isInitial ? {} : { donViGui };
+        let donViGui = this.donViGui?.value();
+        let donViNhan = this.donViNhan?.value();
+        let canBoNhan = this.canBoNhan?.value();
+        const pageFilter = isInitial ? {} : { donViGui, donViNhan, canBoNhan };
         this.setState({ filter: pageFilter }, () => {
             // console.log(this.state.filter);
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
-                    console.log('page filter' + page.filter);
+                    // console.log('page filter' + page.filter);
+                    
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
                     this.donViGui.value(filter.donViGui || '');
-                    if (!$.isEmptyObject(filter) && filter && (filter.donViGui)) this.showAdvanceSearch();
+                    this.donViNhan.value(filter.donViNhan || '');
+                    this.canBoNhan.value(filter.canBoNhan || '');
+                    if (!$.isEmptyObject(filter) && filter && (filter.donViGui || filter.donViNhan || filter.canBoNhan)) this.showAdvanceSearch();
                 }
             });
         });
@@ -161,7 +167,7 @@ class HcthCongVanDi extends AdminPage {
 
     getPage = (pageN, pageS, pageC, done) => {
         this.props.getHcthCongVanDiSearchPage(pageN, pageS, pageC, this.state.filter, done);
-        // console.log('state.filter ' + this.state.filter);
+        console.log('state.filter ' + this.state.filter);
     }
 
     showModal = (e) => {
@@ -192,27 +198,47 @@ class HcthCongVanDi extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                        <th style={{ width: '40%'}}>Nội dung</th>
+                        <th style={{ width: '45%'}}>Nội dung</th>
                         <th style={{ width: 'auto'}}>Ngày gửi</th>
                         <th style={{ width: 'auto'}}>Ngày ký</th>
                         <th style={{ width: '15%'}}>Đơn vị gửi</th>
                         <th style={{ width: '15%'}}>Đơn vị nhận</th>
-                        <th style={{ width: '20%'}}>Cán bộ nhận</th>
+                        <th style={{ width: '15%'}}>Cán bộ nhận</th>
                         <th style={{ width: '10%', textAlign: 'center' }}>Thao tác</th>
                     </tr>),
-                renderRow: (item, index) => (
-                    <tr key={index}>
-                        <TableCell type='text' style={{textAlign: 'center'}} content={(pageNumber - 1) * pageSize + index + 1} />
-                        <TableCell type='link' content={item.noiDung ? item.noiDung : ''} onClick={() => this.modal.show(item)}/>
-                        <TableCell type='text' content={T.dateToText(item.ngayGui, 'dd/mm/yyyy')} />
-                        <TableCell type='text' content={T.dateToText(item.ngayKy, 'dd/mm/yyyy')} />
-                        <TableCell type='text' content={item.tenDonViGui ? item.tenDonViGui : ''} />
-                        <TableCell type='text' content={item.danhSachDonViNhan? item.danhSachDonViNhan : ''} />                      
-                        <TableCell type='text' content={item.danhSachCanBoNhan? item.danhSachCanBoNhan : ''} />                      
-                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} 
-                            onEdit={() => this.modal.show(item)} onDelete={() => this.onDelete(item.id)} permissions={currentPermissions}/>                    
-                        </tr>
-                )
+                renderRow: (item, index) => {
+                    let danhSachCanBoNhan = item.danhSachCanBoNhan?.split(';');
+                    let danhSachDonViNhan = item.danhSachDonViNhan?.split(';');
+
+                    // console.log(danhSachCanBoNhan);
+                    return(
+                        <tr key={index}>
+                            <TableCell type='text' style={{textAlign: 'center'}} content={(pageNumber - 1) * pageSize + index + 1} />
+                            <TableCell type='link' content={item.noiDung ? item.noiDung : ''} onClick={() => this.modal.show(item)}/>
+                            <TableCell type='text' content={T.dateToText(item.ngayGui, 'dd/mm/yyyy')} />
+                            <TableCell type='text' content={T.dateToText(item.ngayKy, 'dd/mm/yyyy')} />
+                            <TableCell type='text' content={item.tenDonViGui ? item.tenDonViGui : ''} />
+                            <TableCell type='text' content={
+                                danhSachDonViNhan && danhSachDonViNhan.length > 0 ? danhSachDonViNhan.map((item, index) => (
+                                    <span key={index}>
+                                        <span >{item?.normalizedName()}</span>
+                                        <br />
+                                    </span>
+                                )) : null
+                            } />                             
+                            <TableCell type='text' content={
+                                danhSachCanBoNhan && danhSachCanBoNhan.length > 0 ? danhSachCanBoNhan.map((item, index) => (
+                                    <span key={index}>
+                                        <span >{item?.normalizedName()}</span>
+                                        <br />
+                                    </span>
+                                )) : null} />                            
+                            <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} 
+                                onEdit={() => this.modal.show(item)} onDelete={() => this.onDelete(item.id)} permissions={currentPermissions}/>                    
+                            </tr>
+
+                    );
+                }
             });
         }
         return this.renderPage({
@@ -234,6 +260,8 @@ class HcthCongVanDi extends AdminPage {
             advanceSearch: <>
                 <div className="row">
                     <FormSelect allowClear={true} className='col-md-4' ref={e => this.donViGui = e} label='Đơn vị gửi' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect allowClear={true} className='col-md-4' ref={e => this.donViNhan = e} label='Đơn vị nhận' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect allowClear={true} className='col-md-4' ref={e => this.canBoNhan = e} label='Cán bộ nhận' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} />
                 </div>
             </>
 
