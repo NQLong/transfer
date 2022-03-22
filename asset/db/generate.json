@@ -1906,13 +1906,6 @@
         "moduleName": "dmLoaiHinhDaoTao",
         "modelName": "dmLoaiHinhDaoTao",
         "columns": {
-            "MA": {
-                "value": "ma",
-                "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_95210\".nextval",
-                "nullable": false,
-                "size": "22,0"
-            },
             "TEN": {
                 "value": "ten",
                 "dataType": "NVARCHAR2",
@@ -1926,6 +1919,13 @@
                 "dataDefault": "1",
                 "nullable": false,
                 "size": "1,0"
+            },
+            "MA": {
+                "value": "ma",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": false,
+                "size": 10
             }
         },
         "primaryKeys": [
@@ -2026,13 +2026,6 @@
         "moduleName": "dmLoaiSinhVien",
         "modelName": "dmLoaiSinhVien",
         "columns": {
-            "MA": {
-                "value": "ma",
-                "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88816\".nextval",
-                "nullable": false,
-                "size": "22,0"
-            },
             "TEN": {
                 "value": "ten",
                 "dataType": "NVARCHAR2",
@@ -2046,6 +2039,13 @@
                 "dataDefault": "1",
                 "nullable": false,
                 "size": "1,0"
+            },
+            "MA": {
+                "value": "ma",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": false,
+                "size": 10
             }
         },
         "primaryKeys": [
@@ -3275,9 +3275,9 @@
             "MA": {
                 "value": "ma",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_95200\".nextval",
+                "dataDefault": "",
                 "nullable": false,
-                "size": "22,0"
+                "size": "2,0"
             }
         },
         "primaryKeys": [
@@ -5944,10 +5944,10 @@
             },
             "LOAI_SINH_VIEN": {
                 "value": "loaiSinhVien",
-                "dataType": "NUMBER",
+                "dataType": "NVARCHAR2",
                 "dataDefault": "",
                 "nullable": true,
-                "size": "22,0"
+                "size": 5
             },
             "TINH_TRANG": {
                 "value": "tinhTrang",
@@ -6035,17 +6035,17 @@
             },
             "LOAI_HINH_DAO_TAO": {
                 "value": "loaiHinhDaoTao",
-                "dataType": "NUMBER",
+                "dataType": "NVARCHAR2",
                 "dataDefault": "",
                 "nullable": true,
-                "size": "22,0"
+                "size": 10
             },
             "MA_KHOA": {
                 "value": "maKhoa",
                 "dataType": "NVARCHAR2",
                 "dataDefault": "",
                 "nullable": true,
-                "size": 10
+                "size": 15
             },
             "KHOA": {
                 "value": "khoa",
@@ -6059,14 +6059,14 @@
                 "dataType": "NVARCHAR2",
                 "dataDefault": "",
                 "nullable": true,
-                "size": 5
+                "size": 20
             },
             "LOP": {
                 "value": "lop",
                 "dataType": "NVARCHAR2",
                 "dataDefault": "",
                 "nullable": true,
-                "size": 10
+                "size": 20
             },
             "SDT_CHA": {
                 "value": "sdtCha",
@@ -6137,6 +6137,20 @@
                 "dataDefault": "",
                 "nullable": false,
                 "size": 12
+            },
+            "NIEN_KHOA": {
+                "value": "nienKhoa",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 10
+            },
+            "MA_CTDT": {
+                "value": "maCtdt",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 50
             }
         },
         "primaryKeys": [
@@ -6347,7 +6361,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_97008\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_99947\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },

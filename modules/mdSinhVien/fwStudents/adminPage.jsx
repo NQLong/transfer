@@ -4,6 +4,8 @@ import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux
 import { SelectAdapter_DmGioiTinhV2 } from 'modules/mdDanhMuc/dmGioiTinh/redux';
 import { SelectAdapter_DmLoaiHinhDaoTaoV2 } from 'modules/mdDanhMuc/dmLoaiHinhDaoTao/redux';
 import { SelectAdapter_DmLoaiSinhVienV2 } from 'modules/mdDanhMuc/dmLoaiSinhVien/redux';
+import { SelectAdapter_DmQuocGia } from 'modules/mdDanhMuc/dmQuocGia/redux';
+import { SelectAdapter_DmTinhTrangSinhVienV2 } from 'modules/mdDanhMuc/dmTinhTrangSinhVien/redux';
 import { SelectAdapter_DmTonGiaoV2 } from 'modules/mdDanhMuc/dmTonGiao/redux';
 import React from 'react';
 import { connect } from 'react-redux';
@@ -34,8 +36,7 @@ class AdminStudentsPage extends AdminPage {
     }
 
     changeAdvancedSearch = (isInitial = false) => {
-        //listFaculty, listFromCity, listEthnic, listNationality, listReligion, listLoaiHinhDaoTao, listLoaiSinhVien, listTinhTrangSinhVien, gender
-        let { pageNumber, pageSize } = this.props && this.props.sinhVien && this.props.sinhVien.page ? this.props.sinhVien.page : { pageNumber: 1, pageSize: 50 };
+        let { pageNumber, pageSize } = this.props && this.props.sinhVien && this.props.sinhVien.page ? this.props.sinhVien.page : { pageNumber: 1, pageSize: 1000 };
         const listFaculty = this.listFaculty.value().toString() || '';
         const listFromCity = this.listFromCity.value().toString() || '';
         const listEthnic = this.listEthnic.value().toString() || '';
@@ -81,7 +82,7 @@ class AdminStudentsPage extends AdminPage {
         let permission = this.getUserPermission('student', ['read', 'write', 'delete']);
 
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.sinhVien && this.props.sinhVien.page ?
-            this.props.sinhVien.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list };
+            this.props.sinhVien.page : { pageNumber: 1, pageSize: 1000, pageTotal: 1, totalItem: 0, pageCondition: {}, list };
 
         let table = renderTable({
             emptyTable: 'Không có dữ liệu sinh viên',
@@ -91,11 +92,14 @@ class AdminStudentsPage extends AdminPage {
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'right' }}>STT</th>
                     <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Sinh viên</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Phái</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Dân tộc<br />Quốc tịch</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tôn giáo</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thường trú</th>
                     <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Khoa</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Mã ngành</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Lớp</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }}>Loại hình đào tạo</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }}>Tình trạng</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Năm TS</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Ngày nhập học</th>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Tình trạng</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                 </tr>
             ),
@@ -110,11 +114,20 @@ class AdminStudentsPage extends AdminPage {
                             </span>
                         </a>
                     )} />
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.khoa ? item.khoa.normalizedName() : ''} />
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.maNganh ? item.maNganh : ''} />
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.lop ? item.lop : ''} />
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.loaiHinhDaoTao ? item.loaiHinhDaoTao : ''} />
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.tinhTrangSinhVien ? item.tinhTrangSinhVien : ''} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.gioiTinh ? (item.gioiTinh === 1 ? 'Nam' : 'Nữ') : ''} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={<>
+                        <span><b>Dân tộc: </b>{item.danToc}<br /></span>
+                        <span><b>Quốc tịch: </b>{item.quocTich.normalizedName()}</span>
+                    </>} />
+                    <TableCell type='text' content={item.tonGiao ? item.tonGiao : ''} />
+
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tinhThanhThuongTru ? item.tinhThanhThuongTru : ''} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenKhoa ? item.tenKhoa.normalizedName() : ''} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={
+                        item.namTuyenSinh ? <b>{item.namTuyenSinh}</b> : ''
+                    } />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.ngayNhapHoc ? T.dateToText(item.ngayNhapHoc, 'dd/mm/yyyy') : ''} />
+                    <TableCell type='text' style={{ textAlign: 'center', color: 'red' }} content={item.tinhTrangSinhVien ? item.tinhTrangSinhVien : ''} />
                     <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                         onEdit={`/user/students/item/${item.mssv}`} onDelete={this.delete} />
                 </tr>
@@ -130,10 +143,10 @@ class AdminStudentsPage extends AdminPage {
                 <div className='row'>
                     {/*listFaculty, listFromCity, listEthnic, listNationality, listReligion, listLoaiHinhDaoTao, listLoaiSinhVien, listTinhTrangSinhVien, gender*/}
                     <FormSelect multiple ref={e => this.listFaculty = e} data={SelectAdapter_DmDonViFaculty_V2} label='Lọc theo khoa' className='col-md-4' minimumResultsForSearch={-1} allowClear onChange={() => this.changeAdvancedSearch()} />
-                    <FormSelect multiple ref={e => this.listLoaiSinhVien = e} data={SelectAdapter_DmLoaiSinhVienV2} label='Lọc theo loại SV' className='col-md-4' minimumResultsForSearch={-1} allowClear onChange={() => this.changeAdvancedSearch()} />
-                    <FormSelect multiple ref={e => this.listTinhTrangSinhVien = e} data={SelectAdapter_DmDonViFaculty_V2} label='Lọc theo tình trạng SV' className='col-md-4' minimumResultsForSearch={-1} allowClear onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect multiple ref={e => this.listLoaiSinhVien = e} data={SelectAdapter_DmLoaiSinhVienV2} label='Lọc theo loại SV' style={{}} className='col-md-4' minimumResultsForSearch={-1} allowClear onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect multiple ref={e => this.listTinhTrangSinhVien = e} data={SelectAdapter_DmTinhTrangSinhVienV2} label='Lọc theo tình trạng SV' className='col-md-4' minimumResultsForSearch={-1} allowClear onChange={() => this.changeAdvancedSearch()} />
                     <FormSelect ref={e => this.gender = e} data={SelectAdapter_DmGioiTinhV2} label='Lọc theo giới tính' className='col-md-3' minimumResultsForSearch={-1} allowClear onChange={() => this.changeAdvancedSearch()} />
-                    <FormSelect multiple ref={e => this.listNationality = e} data={SelectAdapter_DmGioiTinhV2} label='Lọc theo quốc tịch' className='col-md-3' minimumResultsForSearch={-1} allowClear onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect multiple ref={e => this.listNationality = e} data={SelectAdapter_DmQuocGia} label='Lọc theo quốc tịch' className='col-md-3' minimumResultsForSearch={-1} allowClear onChange={() => this.changeAdvancedSearch()} />
                     <FormSelect multiple ref={e => this.listEthnic = e} data={SelectAdapter_DmDanTocV2} label='Lọc theo dân tộc' className='col-md-3' minimumResultsForSearch={-1} allowClear onChange={() => this.changeAdvancedSearch()} />
                     <FormSelect multiple ref={e => this.listReligion = e} data={SelectAdapter_DmTonGiaoV2} label='Lọc theo tôn giáo' className='col-md-3' minimumResultsForSearch={-1} allowClear onChange={() => this.changeAdvancedSearch()} />
                     <FormSelect multiple ref={e => this.listFromCity = e} data={ajaxSelectTinhThanhPho} label='Lọc theo tỉnh/thành thường trú' className='col-md-6' minimumResultsForSearch={-1} allowClear onChange={() => this.changeAdvancedSearch()} />
