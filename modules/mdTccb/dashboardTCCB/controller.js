@@ -59,7 +59,7 @@ module.exports = app => {
                     else result = app.clone(result, { totalFaculty: re.rows[0]['COUNT(*)'] });
                     resolve();
                 })).then(() => new Promise(resolve => app.model.dmDonVi.count({
-                    statement: 'maPl IN (:maPl)', parameter: { maPl: '01' }
+                    maPl: 1
                 }, (e, re) => {
                     if (e || !re) {
                         result = app.clone(result, { totalKhoa: 0 });

@@ -151,7 +151,7 @@ export const SelectAdapter_DmGioiTinh = {
 };
 
 export const SelectAdapter_DmGioiTinhV2 = {
-    ajax: false,
+    ajax: true,
     data: () => ({ condition: { kichHoat: 1 } }),
     url: '/api/danh-muc/gioi-tinh/all',
     getOne: getDmGioiTinh,
