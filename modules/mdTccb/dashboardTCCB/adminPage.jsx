@@ -4,7 +4,7 @@ import CountUp from 'view/js/countUp';
 import { getTotalGender } from './redux';
 import { getStaffAll } from 'modules/mdTccb/tccbCanBo/redux';
 import { AdminPage } from 'view/component/AdminPage';
-import { BarChart, DefaultColors, DoughnutChart, PieChart } from 'view/component/Chart';
+import { AdminChart, DefaultColors } from 'view/component/Chart';
 import { Link } from 'react-router-dom';
 
 class DashboardIcon extends React.Component {
@@ -48,21 +48,15 @@ class Dashboard extends AdminPage {
         totalStaff: 0,
         listStaffFaculty: {
             labels: null,
-            datasets: null,
-            yTitle: 'Số lượng cán bộ',
-            xTitle: 'Khoa, bộ môn',
+            datasets: null
         },
         listDiNuocNgoai: {
             labels: null,
-            datasets: null,
-            yTitle: 'Số lượng cán bộ',
-            xTitle: 'Mục đích',
+            datasets: null
         },
         listCongTacTrongNuoc: {
             labels: null,
-            datasets: null,
-            yTitle: 'Số lượng cán bộ',
-            xTitle: 'Mục đích',
+            datasets: null
         },
     };
 
@@ -71,10 +65,10 @@ class Dashboard extends AdminPage {
             this.props.getTotalGender(data => {
                 let { listStaffFaculty, listDiNuocNgoai, listCongTacTrongNuoc } = data ? data : { listStaffFaculty, listDiNuocNgoai, listCongTacTrongNuoc };
                 let dataStaffFaculty = {
-                        labels: [],
-                        datasets: [
-                            { data: [], label: 'Số lượng', backgroundColor: DefaultColors.info }
-                        ]
+                    labels: [],
+                    datasets: [
+                        { data: [], label: 'Số lượng', backgroundColor: DefaultColors.info }
+                    ]
                 };
                 let dataDiNuocNgoai = {
                     labels: [],
@@ -93,9 +87,9 @@ class Dashboard extends AdminPage {
                         dataStaffFaculty.labels.push(faculty.tenDonVi);
                         dataStaffFaculty.datasets[0].data.push(faculty.numOfStaff);
                     });
-                    listDiNuocNgoai.length && this.state.listDiNuocNgoai.forEach((item) => {
+                    listDiNuocNgoai.length && this.state.listDiNuocNgoai.forEach(item => {
                         dataDiNuocNgoai.labels.push(item.tenMucDich);
-                        dataDiNuocNgoai.datasets[0].data.push(item.numOfStaff);
+                        dataDiNuocNgoai.datasets[0].data.push(item.numOfStaff || 0);
                     });
                     listCongTacTrongNuoc.length && this.state.listCongTacTrongNuoc.forEach((item) => {
                         dataCongTacTrongNuoc.labels.push(item.tenMucDich);
@@ -130,26 +124,26 @@ class Dashboard extends AdminPage {
             labels: ['Nam', 'Nữ']
         },
             dataLevelByGender = {
-                    labels: ['Tiến sĩ', 'Thạc sĩ', 'Cử nhân'],
-                    datasets: [
+                labels: ['Tiến sĩ', 'Thạc sĩ', 'Cử nhân'],
+                datasets: [
                     {
                         label: 'Nam',
                         data: [totalMalePhD, totalMaleMaster, totalMaleBachelor],
                         note: 'Số lượng',
                         backgroundColor: DefaultColors.red,
                     },
-                        {
-                            label: 'Nữ',
-                            data: [totalFemalePhD, totalFemaleMaster, totalFemaleBachelor],
-                            note: 'Số lượng',
-                            backgroundColor: DefaultColors.blue,
-                        },
-                    ],
+                    {
+                        label: 'Nữ',
+                        data: [totalFemalePhD, totalFemaleMaster, totalFemaleBachelor],
+                        note: 'Số lượng',
+                        backgroundColor: DefaultColors.blue,
+                    },
+                ],
                 yTitle: 'Số lượng cán bộ',
                 xTitle: 'Trình độ'
             };
-        
-        
+
+
         return this.renderPage({
             icon: 'fa fa-bar-chart',
             title: 'Dashboard Phòng Tổ chức cán bộ',
@@ -169,34 +163,32 @@ class Dashboard extends AdminPage {
                 <div className='col-lg-6'>
                     <div className='tile'>
                         <div className='tile-title'>Giới tính</div>
-                        <DoughnutChart data={dataGender} />
+                        <AdminChart type='doughnut' data={dataGender} />
                     </div>
                 </div>
                 <div className='col-lg-6'>
                     <div className='tile'>
-                        {/* <div className='rows'></div> */}
                         <div className='tile-title'>Trình độ học vị
-                            {/* <div style={{ textAlign: 'right' }} > <i className='fa fa-lg fa-filter' /></div> */}
                         </div>
-                        <BarChart data={dataLevelByGender} />
+                        <AdminChart data={dataLevelByGender} type='bar' />
                     </div>
                 </div>
                 <div className='col-lg-12'>
                     <div className='tile'>
                         <div className='tile-title'>Nhân sự các khoa, bộ môn</div>
-                        <BarChart data={this.state.listStaffFaculty} />
+                        <AdminChart data={this.state.listStaffFaculty} type='bar' />
                     </div>
                 </div>
                 <div className='col-lg-6'>
                     <div className='tile'>
                         <div className='tile-title'>Cán bộ đang công tác trong nước</div>
-                        <PieChart data={this.state.listCongTacTrongNuoc} />
+                        <AdminChart type='doughnut' data={this.state.listCongTacTrongNuoc} />
                     </div>
                 </div>
                 <div className='col-lg-6'>
                     <div className='tile'>
                         <div className='tile-title'>Cán bộ đang ở nước ngoài</div>
-                        <PieChart data={this.state.listDiNuocNgoai} />
+                        <AdminChart type='doughnut' data={this.state.listDiNuocNgoai} />
                     </div>
                 </div>
             </div>,

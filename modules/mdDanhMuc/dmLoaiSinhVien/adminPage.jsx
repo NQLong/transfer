@@ -14,10 +14,10 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        let { ma, ten, kichHoat } = item ? item : { ma: '', ten: '', kichHoat: 1 };
+        let { ma, ten, kichHoat } = item ? item : { ma: null, ten: '', kichHoat: 1 };
 
         this.setState({ ma, item });
-        this.ma.value(ma);
+        this.ma.value(ma ? ma : '');
         this.ten.value(ten);
         this.kichHoat.value(kichHoat ? 1 : 0);
     };
@@ -25,10 +25,15 @@ class EditModal extends AdminModal {
     onSubmit = (e) => {
         e.preventDefault();
         const changes = {
+            ma: this.ma.value(),
             ten: this.ten.value(),
             kichHoat: this.kichHoat.value() ? 1 : 0,
         };
-        if (changes.ten == '') {
+        if (!changes.ma) {
+            T.notify('Mã không được trống!', 'danger');
+            this.ma.focus();
+        }
+        else if (!changes.ten) {
             T.notify('Tên không được trống!', 'danger');
             this.ten.focus();
         } else {
@@ -40,21 +45,21 @@ class EditModal extends AdminModal {
     changeKichHoat = value => this.kichHoat.value(value ? 1 : 0) || this.kichHoat.value(value);
 
     render = () => {
-        const readOnly = this.props.readOnly;
+        const readOnly = !!this.state.ma;
         return this.renderModal({
             title: this.state.ma ? 'Cập nhật loại sinh viên' : 'Tạo mới loại sinh viên',
             body: <div className='row'>
-                <FormTextBox type='text' className='col-md-12' ref={e => this.ma = e} label='Mã loại sinh viên' readOnly style={{display: 'none'}} />
-                <FormTextBox 
-                    type='text' 
-                    className='col-md-12' 
-                    ref={e => this.ten = e} 
-                    label='Tên loại sinh viên' 
-                    placeholder='Tên loại sinh viên' 
-                    readOnly={readOnly} 
-                    required 
+                <FormTextBox type='text' className='col-md-12' ref={e => this.ma = e} label='Mã loại sinh viên' readOnly={readOnly} required />
+                <FormTextBox
+                    type='text'
+                    className='col-md-12'
+                    ref={e => this.ten = e}
+                    label='Tên loại sinh viên'
+                    placeholder='Tên loại sinh viên'
+
+                    required
                 />
-                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly}
+                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true}
                     onChange={value => this.changeKichHoat(value ? 1 : 0)} />
             </div>
         }
@@ -101,13 +106,15 @@ class dmLoaiSinhVienAdminPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto' }} nowrap='true'>#</th>
+                        <th style={{ width: 'auto' }} nowrap='true'>Mã</th>
                         <th style={{ width: '100%' }}>Tên</th>
                         <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
                         <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
                     </tr>),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' content={index} style={{ textAlign: 'center' }} />
+                        <TableCell type='text' content={index + 1} style={{ textAlign: 'center' }} />
+                        <TableCell type='text' content={item.ma} style={{ whiteSpace: 'nowrap' }} />
                         <TableCell type='link' content={item.ten ? item.ten : ''} onClick={() => this.modal.show(item)} />
                         <TableCell type='checkbox' content={item.kichHoat} permission={permission}
                             onChanged={value => this.props.updateDmLoaiSinhVien(item.ma, { kichHoat: value ? 1 : 0, })} />
