@@ -6467,6 +6467,13 @@
                 "nullable": true,
                 "size": 200
             },
+            "CAN_BO_NHAN": {
+                "value": "canBoNhan",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 200
+            },
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
@@ -7809,6 +7816,11 @@
         "active": true,
         "moduleName": "qtHoTroHocPhi",
         "modelName": "qtHoTroHocPhi",
+        "methods": {
+            "qt_ho_tro_hoc_phi_search_page": "searchPage",
+            "qt_ho_tro_hoc_phi_group_page": "groupPage",
+            "qt_ho_tro_hoc_phi_download_excel": "download"
+        },
         "columns": {
             "ID": {
                 "value": "id",
@@ -8883,7 +8895,8 @@
         "modelName": "qtNghiThaiSan",
         "methods": {
             "qt_nghi_thai_san_search_page": "searchPage",
-            "qt_nghi_thai_san_group_page": "groupPage"
+            "qt_nghi_thai_san_group_page": "groupPage",
+            "qt_nghi_thai_san_download_excel": "download"
         },
         "columns": {
             "ID": {
