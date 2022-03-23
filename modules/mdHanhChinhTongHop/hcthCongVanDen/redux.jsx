@@ -4,10 +4,13 @@ import T from 'view/js/common';
 const HcthCongVanDenGetAll = 'HcthCongVanDen:GetAll';
 const HcthCongVanDenGetPage = 'HcthCongVanDen:GetPage';
 const HcthCongVanDenSearchPage = 'HcthCongVanDen:SearchPage';
+const HcthCongVanDenGet = 'HcthCongVanDen:Get';
 // const HcthCongVanDenUpdate = 'HcthCongVanDen:Update';
 
 export default function HcthCongVanDenReducer(state = null, data) {
     switch (data.type) {
+        case HcthCongVanDenGet:
+            return Object.assign({}, state, { item: data.item });
         case HcthCongVanDenGetAll:
             return Object.assign({}, state, { items: data.items });
         case HcthCongVanDenGetPage:
@@ -124,5 +127,37 @@ export function getHcthCongVanDenSearchPage(pageNumber, pageSize, pageCondition,
                 done && done(data.page);
             }
         }, error => console.error(`GET: ${url}.`, error));
+    };
+}
+
+export function deleteFile(id, index, file, done) {
+    return () => {
+        const url = '/api/hcth/cong-van-den/delete-file';
+        T.put(url, { id, index, file }, data => {
+            if (data.error) {
+                console.error('PUT: ' + url + '.', data.error);
+                T.notify('Xóa file đính kèm lỗi!', 'danger');
+            } else {
+                T.notify('Xóa file đính kèm thành công!', 'success');
+                done && done();
+            }
+        }, () => T.notify('Xóa file đính kèm bị lỗi!', 'danger'));
+    };
+}
+
+
+export function getCongVanDen(id, done) {
+    return dispatch => {
+        const url = `/api/hcth/cong-van-den/${id}`;
+        T.get(url, data => {
+            if (data.error) {
+                console.error('GET: ' + url + '.', data.error);
+                T.notify('Lấy công văn đến bị lỗi!', 'danger');
+            } else {
+                T.notify('Lấy công văn đến thành công!', 'success');
+                dispatch({ type: HcthCongVanDenGet, item: data.item });
+                done && done(data.item);
+            }
+        }, () => T.notify('Xóa file đính kèm bị lỗi!', 'danger'));
     };
 }

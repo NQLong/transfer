@@ -5,12 +5,15 @@ module.exports = (app) => {
             501: { title: 'Công văn đến', link: '/user/hcth/cong-van-den', icon: 'fa-caret-square-o-left', backgroundColor: '#00aa00' },
         },
     };
-    app.permission.add({ name: 'staff:login', menu });
-    app.permission.add({ name: 'hcthCongVanDen:read' });
+    app.permission.add({ name: 'hcthCongVanDen:read', menu });
     app.permission.add({ name: 'hcthCongVanDen:write' });
     app.permission.add({ name: 'hcthCongVanDen:delete' });
-    app.get('/user/hcth/cong-van-den', app.permission.check('staff:login'), app.templates.admin);
 
+    app.get('/user/hcth/cong-van-den', app.permission.check('staff:login'), app.templates.admin);
+    app.get('/user/hcth/cong-van-den/:id', app.permission.check('staff:login'), app.templates.admin);
+
+
+    //api
     app.get('/api/hcth/cong-van-den/all', app.permission.check('staff:login'), (req, res) => {
         app.model.hcthCongVanDen.getAll((error, items) => res.send({ error, items }));
     });
@@ -50,7 +53,6 @@ module.exports = (app) => {
     });
 
     app.post('/api/hcth/cong-van-den', app.permission.check('staff:login'), (req, res) => {
-        console.log(req.body);
         app.model.hcthCongVanDen.create(req.body.data, (error, item) => res.send({ error, item }));
     });
 
@@ -78,14 +80,22 @@ module.exports = (app) => {
         });
     });
 
+    app.createFolder(app.path.join(app.assetPath, '/congVanDen'));
+
+
     app.uploadHooks.add('hcthCongVanDenFile', (req, fields, files, params, done) =>
         app.permission.has(req, () => hcthCongVanDenFile(req, fields, files, params, done), done, 'staff:login'));
 
     const hcthCongVanDenFile = (req, fields, files, params, done) => {
-        if (fields.userData && fields.userData[0] && fields.userData[0].startsWith('hcthCongVanDenFile') && files.deTaiNCKHStaffFile && files.deTaiNCKHStaffFile.length > 0) {
+        if (
+            fields.userData &&
+            fields.userData[0] &&
+            fields.userData[0].startsWith('hcthCongVanDenFile') &&
+            files.hcthCongVanDenFile &&
+            files.hcthCongVanDenFile.length > 0) {
             const user = req.session.user,
                 srcPath = files.hcthCongVanDenFile[0].path,
-                filePath = (fields.userData[0].substring(19) != 'new' ? '/' + fields.userData[0].substring(19) : '/new') + '/' + user.shcc + '_' + (new Date().getTime()).toString() + '_' + files.hcthCongVanDenFile[0].originalFilename,
+                filePath = '/' + user.shcc + '_' + (new Date().getTime()).toString() + '_' + files.hcthCongVanDenFile[0].originalFilename,
                 destPath = app.assetPath + '/congVanDen' + filePath,
                 validUploadFileType = ['.xls', '.xlsx', '.doc', '.docx', '.pdf', '.png', '.jpg'],
                 baseNamePath = app.path.extname(srcPath);
@@ -93,9 +103,6 @@ module.exports = (app) => {
                 done({ error: 'Định dạng tập tin không hợp lệ!' });
                 app.deleteFile(srcPath);
             } else {
-                app.createFolder(
-                    app.path.join(app.assetPath, '/congVanDen/' + (fields.userData[0].substring(19) != 'new' ? '/' + fields.userData[0].substring(19) : '/new'))
-                );
                 app.fs.rename(srcPath, destPath, error => {
                     if (error) {
                         done({ error });
@@ -106,4 +113,52 @@ module.exports = (app) => {
             }
         }
     };
+
+    //Delete file
+    app.put('/api/hcth/cong-van-den/delete-file', app.permission.check('staff:login'), (req, res) => {
+        const id = req.body.id,
+            index = req.body.index,
+            file = req.body.file;
+        app.model.hcthCongVanDen.get({ id: id }, (error, item) => {
+            if (error) {
+                res.send({ error });
+            } else if (item && item.linkCongVan) {
+                let newList = JSON.parse(item.fileMinhChung);
+                app.deleteFile(app.assetPath + '/congVanDen' + newList[index]);
+                newList.splice(index, 1);
+                app.model.hcthCongVanDen.update(id, { linkCongVan: JSON.stringify(newList) }, (error, item) => {
+                    res.send({ error, item });
+                });
+            } else {
+                const filePath = app.path.join(app.assetPath, '/congVanDen', file);
+                if (app.fs.existsSync(filePath)) {
+                    app.deleteFile(filePath);
+                    res.send({ error: null });
+                } else {
+                    res.send({ error: 'Không tìm thấy đề tài' });
+                }
+            }
+        });
+    });
+
+    app.get('/api/hcth/cong-van-den/download/:fileName', app.permission.check('staff:login'), (req, res) => {
+        const { fileName } = req.params;
+        const dir = app.path.join(app.assetPath, `/congVanDen/${fileName}`);
+
+        if (app.fs.existsSync(dir)) {
+            const serverFileNames = app.fs.readdirSync(dir).filter(v => app.fs.lstatSync(app.path.join(dir, v)).isFile());
+            for (const serverFileName of serverFileNames) {
+                const clientFileIndex = serverFileName.indexOf(fileName);
+                if (clientFileIndex !== -1 && serverFileName.slice(clientFileIndex) === fileName) {
+                    return res.sendFile(app.path.join(dir, serverFileName));
+                }
+            }
+        }
+
+        res.status(400).send('Không tìm thấy tập tin');
+    });
+
+    app.get('/api/hcth/cong-van-den/:id', app.permission.check('staff:login'), (req, res) => {
+        app.model.hcthCongVanDen.get({ id: req.params.id }, (error, item) => res.send({ error, item }));
+    });
 };

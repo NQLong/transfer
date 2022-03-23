@@ -7,10 +7,16 @@ import hcthCongVanDen from './redux';
 export default {
     redux: {
         parent: 'hcth',
-        reducers: {hcthCongVanDen}
+        reducers: { hcthCongVanDen }
     },
-    routes: [{
-        path: '/user/hcth/cong-van-den',
-        component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
-    }]
+    routes: [
+        {
+            path: '/user/hcth/cong-van-den',
+            component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
+        },
+        {
+            path: '/user/hcth/cong-van-den/:id',
+            component: Loadable({ loading: Loading, loader: () => import('./adminEditPage') })
+        },
+    ]
 };
