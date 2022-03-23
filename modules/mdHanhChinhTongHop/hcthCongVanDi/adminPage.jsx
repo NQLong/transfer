@@ -217,7 +217,7 @@ class HcthCongVanDi extends AdminPage {
                             <TableCell type='link' content={item.noiDung ? item.noiDung : ''} onClick={() => this.modal.show(item)}/>
                             <TableCell type='text' content={T.dateToText(item.ngayGui, 'dd/mm/yyyy')} />
                             <TableCell type='text' content={T.dateToText(item.ngayKy, 'dd/mm/yyyy')} />
-                            <TableCell type='text' content={item.tenDonViGui ? item.tenDonViGui : ''} />
+                            <TableCell type='text' content={item.tenDonViGui ? item.tenDonViGui.normalizedName() : ''} />
                             <TableCell type='text' content={
                                 danhSachDonViNhan && danhSachDonViNhan.length > 0 ? danhSachDonViNhan.map((item, index) => (
                                     <span key={index}>
