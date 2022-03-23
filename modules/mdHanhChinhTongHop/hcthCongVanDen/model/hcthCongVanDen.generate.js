@@ -5,6 +5,7 @@ const obj2Db = { 'id': 'ID', 'ngayNhan': 'NGAY_NHAN', 'donViGui': 'DON_VI_GUI', 
 module.exports = app => {
     app.model.hcthCongVanDen = {
         create: (data, done) => {
+            console.log('data 2 = ');
             let statement = '', values = '', parameter = {};
             Object.keys(data).forEach(column => {
                 if (obj2Db[column]) {
@@ -13,12 +14,17 @@ module.exports = app => {
                     parameter[column] = data[column];
                 }
             });
-
+            
+            console.log(statement);
+            console.log(values);
+            console.log(parameter);
             if (statement.length == 0) {
                 done('Data is empty!');
             } else {
                 const sql = 'INSERT INTO HCTH_CONG_VAN_DEN (' + statement.substring(2) + ') VALUES (' + values.substring(2) + ')';
+                console.log(sql);
                 app.dbConnection.execute(sql, parameter, (error, resultSet) => {
+                    console.log(resultSet);
                     if (error == null && resultSet && resultSet.lastRowid) {
                         app.model.hcthCongVanDen.get({ rowId: resultSet.lastRowid }, done);
                     } else {
