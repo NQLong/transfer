@@ -1,15 +1,16 @@
 //TEMPLATES: admin
 import Loadable from 'react-loadable';
 import Loading from 'view/component/Loading';
-import qtKhenThuongCaNhan from './redux';
+import dmLoaiHinhDaoTao from './redux';
 
 export default {
     redux: {
-        qtKhenThuongCaNhan,
+        parent: 'danhMuc',
+        reducers: { dmLoaiHinhDaoTao, }
     },
     routes: [
         {
-            path: '/user/tccb/qua-trinh/khen-thuong-ca-nhan',
+            path: '/user/danh-muc/loai-hinh-dao-tao',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
     ],

@@ -15,13 +15,13 @@ export default function QtKeoDaiCongTacReducer(state = null, data) {
         case QtKeoDaiCongTacGetAll:
             return Object.assign({}, state, { items: data.items });
         case QtKeoDaiCongTacGetGroupPage:
-            return Object.assign({}, state, { page_gr: data.page });
+            return Object.assign({}, state, { pageGr: data.page });
         case QtKeoDaiCongTacGetGroupPageMa:
-            return Object.assign({}, state, { page_ma: data.page });
+            return Object.assign({}, state, { pageMa: data.page });
         case QtKeoDaiCongTacGetPage:
             return Object.assign({}, state, { page: data.page });
         case QtKeoDaiCongTacGetUserPage:
-            return Object.assign({}, state, { user_page: data.page });            
+            return Object.assign({}, state, { userPage: data.page });            
         case QtKeoDaiCongTacGet:
             return Object.assign({}, state, { selectedItem: data.item });
         case QtKeoDaiCongTacUpdate:

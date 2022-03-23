@@ -16,13 +16,13 @@ export default function QtNghiKhongLuongReducer(state = null, data) {
         case QtNghiKhongLuongGetAll:
             return Object.assign({}, state, { items: data.items });
         case QtNghiKhongLuongGetGroupPage:
-            return Object.assign({}, state, { page_gr: data.page });
+            return Object.assign({}, state, { pageGr: data.page });
         case QtNghiKhongLuongGetGroupPageMa:
-            return Object.assign({}, state, { page_ma: data.page });
+            return Object.assign({}, state, { pageMa: data.page });
         case QtNghiKhongLuongGetPage:
             return Object.assign({}, state, { page: data.page });
         case QtNghiKhongLuongGetUserPage:
-            return Object.assign({}, state, { user_page: data.page });
+            return Object.assign({}, state, { userPage: data.page });
         case QtNghiKhongLuongGet:
             return Object.assign({}, state, { selectedItem: data.item });
         case QtNghiKhongLuongUpdate:
