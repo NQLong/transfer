@@ -12,14 +12,14 @@ import Pagination from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
 import { 
     AdminPage, 
-    AdminModal, 
-    FormDatePicker, 
+    // AdminModal, 
+    // FormDatePicker, 
     renderTable, 
-    FormRichTextBox, 
+    // FormRichTextBox, 
     FormSelect, 
     TableCell, 
-    FormCheckbox, 
-    FormFileBox
+    // FormCheckbox, 
+    // FormFileBox
 } from 'view/component/AdminPage';
 import T from 'view/js/common';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
