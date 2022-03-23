@@ -6494,6 +6494,13 @@
                 "dataDefault": "",
                 "nullable": true,
                 "size": "1,0"
+            },
+            "LINK_CONG_VAN": {
+                "value": "linkCongVan",
+                "dataType": "NVARCHAR2",
+                "dataDefault": "",
+                "nullable": true,
+                "size": 1000
             }
         },
         "primaryKeys": [

@@ -8,8 +8,14 @@ export default {
         parent: 'hcth',
         reducers: { hcthCongVanDi }
     },
-    routes: [{
+    routes: [
+        {
         path: '/user/hcth/cong-van-di',
         component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
-    }]
+        },
+        {
+        path: '/user/hcth/cong-van-di/:id',
+        component: Loadable({ loading: Loading, loader: () => import('./adminEditPage') })
+        }
+    ]
 };

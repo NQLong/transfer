@@ -4,6 +4,7 @@ import T from 'view/js/common';
 const hcthCongVanDiGetAll = 'hcthCongVanDi:GetAll';
 const hcthCongVanDiGetPage = 'hcthCongVanDi:GetPage';
 const hcthCongVanDiSearchPage = 'hcthCongVanDi:SearchPage';
+const hcthCongVanDiGet = 'hcthCongVanDi:Get';
 
 export default function hcthCongVanDiReducer(state = null, data) {
     switch (data.type) {
@@ -13,6 +14,8 @@ export default function hcthCongVanDiReducer(state = null, data) {
             return Object.assign({}, state, { page: data.page });
         case hcthCongVanDiSearchPage:
             return Object.assign({}, state, { page: data.page });
+        case hcthCongVanDiGet:
+            return Object.assign({}, state, { page: data.item });
         default:
             return state;
     }
@@ -145,5 +148,37 @@ export function getHcthCongVanDiSearchPage(pageNumber, pageSize, pageCondition, 
                 done && done(data.page);
             }
         }, error => console.error(`GET: ${url}.`, error));
+    };
+}
+
+export function deleteFile(id, index, file, done) {
+    return () => {
+        const url = '/api/hcth/cong-van-di/delete-file';
+        T.put(url, { id, index, file }, data => {
+            if (data.error) {
+                console.error('PUT: ' + url + '.', data.error);
+                T.notify('Xóa file đính kèm lỗi!', 'danger');
+            } else {
+                T.notify('Xóa file đính kèm thành công!', 'success');
+                done && done();
+            }
+        }, () => T.notify('Xóa file đính kèm bị lỗi!', 'danger'));
+    };
+}
+
+
+export function getCongVanDi(id, done) {
+    return dispatch => {
+        const url = `/api/hcth/cong-van-di/${id}`;
+        T.get(url, data => {
+            if (data.error) {
+                console.error('GET: ' + url + '.', data.error);
+                T.notify('Lấy công văn đi bị lỗi!', 'danger');
+            } else {
+                T.notify('Lấy công văn đi thành công!', 'success');
+                dispatch({ type: hcthCongVanDiGet, item: data.item });
+                done && done(data.item);
+            }
+        }, () => T.notify('Xóa file đính kèm bị lỗi!', 'danger'));
     };
 }
