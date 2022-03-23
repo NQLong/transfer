@@ -11,210 +11,104 @@ export const DefaultColors = {
     grey: 'rgb(201, 203, 207)',
     purple: 'rgb(153, 102, 255)',
 };
+export class AdminChart extends React.Component {
 
-export class ChartBase extends React.Component {
-    canvas = React.createRef();
+    optionChart = (type, isPercent = null) => {
+        return {
+            aspectRatio: 1.7,
+            events: false,
+            legend: {
+                position: 'bottom'
+            },
+            layout: {
+                padding: {
+                    left: 0,
+                    right: 0,
+                    top: 20,
+                    bottom: 0
+                }
+            },
+            animation: {
+                duration: 1000,
+                easing: 'easeOutQuart',
+                onComplete: function () {
+                    let chartInstance = this.chart,
+                        ctx = chartInstance.ctx;
+                    ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'bottom';
+                    if (type === 'pie' || type === 'doughnut') {
+                        this.data.datasets.forEach(function (dataset) {
 
-    // static dataToConfig = (data, backgroundColor) => ({});
-    static dataToConfig = () => ({});
+                            for (let i = 0; i < dataset.data.length; i++) {
+                                let model = dataset._meta[Object.keys(dataset._meta)[0]].data[i]._model,
+
+                                    mid_radius = model.innerRadius + (model.outerRadius - model.innerRadius) / 2,
+                                    start_angle = model.startAngle,
+                                    end_angle = model.endAngle,
+                                    mid_angle = start_angle + (end_angle - start_angle) / 2;
+
+                                let x = mid_radius * Math.cos(mid_angle);
+                                let y = mid_radius * Math.sin(mid_angle);
+
+                                ctx.fillStyle = '#fff';
+                                if (i == 3) { // Darker text color for lighter background
+                                    ctx.fillStyle = '#444';
+                                }
+
+                                let valueDisplay = dataset.data[i];
+                                if (isPercent) {
+                                    let total = dataset._meta[Object.keys(dataset._meta)[0]].total,
+                                        percent = String(Math.round(dataset.data[i] / total * 100)) + '%';
+                                    valueDisplay = percent;
+                                }
+                                //Don't Display if value is 0
+                                if (dataset.data[i] != 0) {
+                                    ctx.fillText(valueDisplay, model.x + x, model.y + y + 5);
+                                }
+                            }
+                        });
+                    } else if (type === 'bar' || type === 'line') {
+                        this.data.datasets.forEach(function (dataset, i) {
+                            let meta = chartInstance.controller.getDatasetMeta(i);
+                            meta.data.forEach(function (bar, index) {
+                                let data = dataset.data[index];
+                                ctx.fillText(data, bar._model.x, bar._model.y - 6);
+                            });
+                        });
+                    }
+                }
+            }
+        };
+    }
 
     componentDidMount() {
-        this.chart = new window.Chart(this.canvas.current, this.constructor.dataToConfig(this.props.data, this.props.color));
+        let { type = null, data = {}, percent = null } = this.props;
+        this.chart = new window.Chart(this.canvasChart, this.init(type, data, percent));
     }
 
     componentDidUpdate(prevProps) {
-        const prevConfig =  prevProps.data;
+        const prevConfig = prevProps.data;
         const config = this.props.data;
 
         const prevDatasets = prevConfig.datasets ? prevConfig.datasets : [];
         const thisDatasets = config.datasets ? config.datasets : [];
-        // if (!_.isEqual(prevConfig, config)) {
         if (prevDatasets.length || (thisDatasets.length && JSON.stringify(prevDatasets) !== JSON.stringify(thisDatasets))) {
             this.chart.data = config;
             this.chart.update();
         }
     }
 
-    render = () => <canvas ref={this.canvas} />;
-}
-
-export class DoughnutChart extends ChartBase {
-    static dataToConfig = (data) => {
-
-        if (!data || !data.map) data = [];
-        const datasets = data.data ? data.datasets : [];
-        const dataLabels = data.data ? data.labels : [];
+    init = (type, data, percent) => {
         return {
-            type: 'doughnut',
+            type: type,
             data: {
-                datasets: datasets,
-                labels: dataLabels,
+                datasets: data.datasets,
+                labels: data.labels
             },
-            options: {
-                responsive: true
-            }
+            options: this.optionChart(type, percent)
         };
     }
-}
 
-export class PieChart extends ChartBase {
-    static dataToConfig = (data) => {
-        //         //#region explain
-        //         // data = [{ value: 20, title: 'nam'}, {value: 12, title: 'nu'}];
-        //         // =>
-        //         // config = {
-        //         //     ...,
-        //         //     data: {
-        //         //         datasets: [{
-        //         //             data: [20, 12],
-        //         //             backgroundColor: [...]
-        //         //         }],
-        //         //         label: ['nam', 'nu']
-        //         //     }
-        //         // }
-        //         //#endregion explain
-
-        //         if (!data || !data.map) data = [];
-        //         const dataValue = data.map(item => item.value);
-        //         const dataLabels = data.map(item => item.title);
-        if (!data || !data.map) data = [];
-        const datasets = data.data ? data.datasets : [];
-        const dataLabels = data.data ? data.labels : [];
-        return {
-            type: 'pie',
-            data: {
-                datasets: datasets,
-                labels: dataLabels,
-            },
-            options: {
-                responsive: true
-            }
-        };
-    }
-}
-
-export class LineChart extends ChartBase {
-    // static dataToConfig = (data, backgroundColor = Object.values(DefaultColors)) => {
-    static dataToConfig = (data) => {
-        //#region explain
-        // data = [{ x: Date.newDate(-10), y: 10}, { x: Date.newDate(-9), y: 15}, { x: Date.newDate(-5), y: 20}, { x: new Date(), y: 5}];
-        // =>
-        // config = {
-        //     ...,
-        //     data: {
-        //         datasets: [{
-        //             data: [
-        //                 { x: Date.newDate(-10), y: 10 },
-        //                 { x: Date.newDate(-9), y: 15 },
-        //                 { x: Date.newDate(-5), y: 20 },
-        //                 { x: new Date(), y: 5 },
-        //             ],
-        //             backgroundColor: [...]
-        //         }],
-        //     }
-        // }
-        //#endregion explain
-        const dataLabels = data.map(item => item.x || item.t);
-        // let timeFormat = 'MM/DD/YYYY HH:mm';
-        if (!data || !data.map) data = [];
-        return {
-            type: 'line',
-            data: {
-                datasets: [{
-                    data,
-                    // backgroundColor,
-                    label: 'Hồ sơ',
-                    backgroundColor: Chart.helpers.color(DefaultColors.red).alpha(0.5).rgbString(),
-                    borderColor: DefaultColors.red,
-                    fill: false,
-                }],
-                labels: dataLabels
-            },
-            options: {
-                responsive: true,
-                title: {
-                    text: 'Chart.js Time Scale'
-                },
-                scales: {
-                    xAxes: [{
-                        type: 'time',
-                        time: {
-                            round: 'day',
-                            tooltipFormat: 'll HH:mm'
-                        },
-                        scaleLabel: {
-                            display: true,
-                            labelString: 'Date'
-                        }
-                    }],
-                    yAxes: [{
-                        scaleLabel: {
-                            display: true,
-                            labelString: 'value'
-                        },
-                        ticks: {
-                            beginAtZero: true
-                        }
-                    }]
-                },
-            }
-
-        };
-    }
-}
-export class BarChart extends ChartBase {
-
-    static dataToConfig = (data) => {
-        //#region explain
-        // data = [{ value: 20, title: 'nam'}, {value: 12, title: 'nu'}];
-        // =>
-        // config = {
-        //     ...,
-        //     data: {
-        //         datasets: [{
-        //             data: [20, 12],
-        //             backgroundColor: [...]
-        //         }],
-        //         label: ['nam', 'nu']
-        //     }
-        // }
-        //#endregion explain
-        // if (!data || !data.map) data = [];
-        if (!data) data = {};
-        // const dataValue = data.data.value.map(item => item);
-        const dataLabels = data.data && data.data.labels.length > 0 ? data.labels.map(item => item) : [];
-        const datasets = data.data ? data.datasets : [];
-        return {
-            type: 'bar',
-            data: {
-                ticks: {
-                    align: 'bottom'
-                },
-                datasets: datasets,
-                labels: dataLabels
-            },
-            options: {
-                aspectRatio: 2,
-                responsive: true,
-                scales: {
-                    xAxes: [{
-                        scaleLabel: {
-                            display: true,
-                            labelString: data.xTitle,
-                        },
-
-                    }],
-                    yAxes: [{
-                        scaleLabel: {
-                            display: true,
-                            labelString: data.yTitle,
-                        },
-                        ticks: {
-                            beginAtZero: true
-                        }
-                    }]
-                },
-            }
-        };
-    }
+    render = () => <canvas ref={e => this.canvasChart = e} />;
 }
