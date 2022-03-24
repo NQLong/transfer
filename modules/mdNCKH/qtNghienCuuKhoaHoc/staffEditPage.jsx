@@ -56,10 +56,10 @@ class StaffEditNCKH extends AdminPage {
             tenDeTai, maSoCapQuanLy, kinhPhi, vaiTro, ngayNghiemThu, ketQua, ngayNghiemThuType
         }
             = data && data.item ? data.item :
-            {
-                id: null, shcc: shcc ? shcc : data.shcc, batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', batDau: null, ketThuc: null, tenDeTai: '', inLLKH: 0,
-                maSoCapQuanLy: '', kinhPhi: '', vaiTro: '', ngayNghiemThu: null, ketQua: '', ngayNghiemThuType: 'dd/mm/yyyy', fileMinhChung: '[]'
-            };
+                {
+                    id: null, shcc: shcc ? shcc : data.shcc, batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', batDau: null, ketThuc: null, tenDeTai: '', inLLKH: 0,
+                    maSoCapQuanLy: '', kinhPhi: '', vaiTro: '', ngayNghiemThu: null, ketQua: '', ngayNghiemThuType: 'dd/mm/yyyy', fileMinhChung: '[]'
+                };
         this.setState({
             ownerShcc: shcc,
             batDauType: batDauType ? batDauType : 'dd/mm/yyyy', listFile: fileMinhChung ? JSON.parse(fileMinhChung) : [],
@@ -109,8 +109,14 @@ class StaffEditNCKH extends AdminPage {
         if (response.data) {
             let listFile = this.state.listFile.length ? [...this.state.listFile] : [];
             listFile.push(response.data);
-            if (this.state.id) this.props.updateQtNckhStaffUser(this.state.id, { fileMinhChung: JSON.stringify(listFile) }, () => { this.setState({ listFile }); });
-            else this.setState({ listFile });
+            try {
+                let fileMinhChung = JSON.stringify(listFile);
+                if (!fileMinhChung) throw ('Lỗi tên file');
+                else this.props.updateQtNckhStaffUser(this.state.id, { fileMinhChung });
+                this.setState({ listFile });
+            } catch (error) {
+                T.notify(error, 'danger');
+            }
         } else if (response.error) T.notify(response.error, 'danger');
     }
 
@@ -218,6 +224,8 @@ class StaffEditNCKH extends AdminPage {
     }
 
     checkDieuKienIn = () => {
+        /* Tạm thời pending */
+
         // if (value) { }
         // if (value && this.state.listFile.length == 0) {
         //     T.notify('Đề tài chưa có minh chứng', 'danger');
@@ -235,7 +243,15 @@ class StaffEditNCKH extends AdminPage {
         if (data) {
             if (this.state.id) this.props.updateQtNckhStaffUser(this.state.id, data, null, data.inLlkh);
             else {
-                if (this.state.listFile) data.fileMinhChung = JSON.stringify(this.state.listFile);
+                if (this.state.listFile) {
+                    try {
+                        data.fileMinhChung = JSON.stringify(this.state.listFile);
+                        if (!data.fileMinhChung) throw ('Lỗi đọc tên file');
+
+                    } catch (error) {
+                        T.notify(error, 'danger');
+                    }
+                }
                 this.props.createQtNckhStaffUser(data, this.props.history.push('/user/nghien-cuu-khoa-hoc'));
             }
         }

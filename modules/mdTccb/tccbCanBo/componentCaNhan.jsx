@@ -10,12 +10,18 @@ import { SelectAdapter_DmDanTocV2 } from 'modules/mdDanhMuc/dmDanToc/redux';
 import { SelectAdapter_DmTonGiaoV2 } from 'modules/mdDanhMuc/dmTonGiao/redux';
 import { SelectAdapter_DmNhomMauV2 } from 'modules/mdDanhMuc/dmBenhVien/reduxNhomMau';
 import ComponentToChucKhac from '../tccbToChucKhac/componentToChucKhac';
+import { getStaffEdit } from './redux';
 
 class ComponentCaNhan extends React.Component {
     state = { image: '' };
     shcc = ''; email = '';
-    componentDidMount() {
 
+    handleHo = (e) => {
+        this.ho.value(e.target.value.toUpperCase());
+    }
+
+    handleTen = (e) => {
+        this.ten.value(e.target.value.toUpperCase());
     }
 
     value = function (item) {
@@ -81,7 +87,7 @@ class ComponentCaNhan extends React.Component {
     imageChanged = (data) => {
         if (data && data.image) {
             const user = Object.assign({}, this.props.system.user, { image: data.image });
-            this.props.userEdit && this.props.updateSystemState({ user });
+            this.props.readOnly && this.props.updateSystemState({ user });
         }
     };
 
@@ -98,6 +104,20 @@ class ComponentCaNhan extends React.Component {
         if (isRequired) throw selector;
         return '';
     };
+
+    handleNewShcc = (value) => {
+        let curShcc = value.currentTarget.value;
+        if (curShcc && curShcc != '' && curShcc.length == 8 && curShcc != this.shcc) {
+            this.props.getStaffEdit(curShcc, data => {
+                if (data.item && !data.error) {
+                    T.confirm('Cảnh báo', `Mã số <b>${data.item.shcc}</b> đã tồn tại trong dữ liệu cán bộ: <br/><br/> <b>${(data.item.ho + ' ' + data.item.ten).normalizedName()}</b> <br/> ${data.item.tenDonVi.normalizedName()
+                        }. <br/><br/> Vui lòng nhập mã số khác!`, 'warning', true, isConfirm => {
+                            isConfirm && this.shcc.value('');
+                        });
+                }
+            });
+        }
+    }
 
     getAndValidate = () => {
         try {
@@ -174,6 +194,7 @@ class ComponentCaNhan extends React.Component {
     }
 
     render = () => {
+        const readOnly = this.props.readOnly, create = this.props.create;
         return (
             <div className='tile'>
                 <h3 className='tile-title'>Thông tin cá nhân</h3>
@@ -183,11 +204,11 @@ class ComponentCaNhan extends React.Component {
 
                     <div className='form-group col-md-9'>
                         <div className='row'>
-                            <FormTextBox ref={e => this.maTheCanBo = e} label='Mã số cán bộ' className='form-group col-md-4' readOnly={this.props.userEdit} required maxLength={10} />
-                            <FormSelect ref={e => this.donVi = e} label='Đơn vị công tác' className='form-group col-md-8' readOnly={this.props.userEdit} required data={SelectAdapter_DmDonVi} />
-                            <FormTextBox ref={e => this.ho = e} label='Họ và tên lót' className='form-group col-md-4' readOnly={this.props.userEdit} required maxLength={100} />
-                            <FormTextBox ref={e => this.ten = e} label='Tên' className='form-group col-md-4' readOnly={this.props.userEdit} required maxLength={30} />
-                            <FormSelect ref={e => this.phai = e} label='Giới tính' className='form-group col-md-4' readOnly={this.props.userEdit} required data={SelectAdapter_DmGioiTinhV2} />
+                            <FormTextBox ref={e => this.maTheCanBo = e} label='Mã số cán bộ' className='form-group col-md-4' readOnly={readOnly} required maxLength={10} onChange={this.handleNewShcc} />
+                            <FormSelect ref={e => this.donVi = e} label='Đơn vị công tác' className='form-group col-md-8' readOnly={readOnly} required data={SelectAdapter_DmDonVi} />
+                            <FormTextBox ref={e => this.ho = e} label='Họ và tên lót' style={{ textTransform: 'uppercase' }} className='col-xl-4 col-md-6' onChange={this.handleHo} required maxLength={100} />
+                            <FormTextBox ref={e => this.ten = e} label='Tên' style={{ textTransform: 'uppercase' }} className='col-xl-4 col-md-6' onChange={this.handleTen} required maxLength={100} />
+                            <FormSelect ref={e => this.phai = e} label='Giới tính' className='form-group col-md-4' required data={SelectAdapter_DmGioiTinhV2} />
                             <FormTextBox ref={e => this.biDanh = e} label='Bí danh' className='form-group col-md-4' maxLength={30} />
                             <FormDatePicker ref={e => this.ngaySinh = e} type='date-mask' className='form-group col-md-4' label='Ngày sinh' required />
                             <FormSelect ref={e => this.quocTich = e} label='Quốc tịch' className='form-group col-md-4' data={SelectAdapter_DmQuocGia} />
@@ -214,7 +235,7 @@ class ComponentCaNhan extends React.Component {
                     <FormTextBox ref={e => this.soDienThoaiBaoTin = e} label='Số điện thoại báo tin' className='form-group col-md-6' maxLength={10} />
 
                     <FormTextBox ref={e => this.emailCaNhan = e} label='Email cá nhân' className='form-group col-md-6' />
-                    <FormTextBox ref={e => this.emailTruong = e} label='Email trường' className='form-group col-md-6' readOnly={this.props.userEdit} />
+                    <FormTextBox ref={e => this.emailTruong = e} label='Email trường' className='form-group col-md-6' readOnly={readOnly} />
 
                     <div className='form-group col-md-12'></div>
 
@@ -244,9 +265,9 @@ class ComponentCaNhan extends React.Component {
                     {this.state.congDoan ? <FormDatePicker ref={e => this.ngayVaoCongDoan = e} type='date-mask' label='Ngày vào Công đoàn' className='form-group col-md-3' /> : null}
                     {this.state.congDoan ? <FormTextBox ref={e => this.noiVaoCongDoan = e} label='Nơi vào Công đoàn' className='form-group col-md-3' /> : null}
 
-                    <div className='form-group col-md-12'>
-                        <ComponentToChucKhac ref={e => this.componentToChucKhac = e} label='Tổ chức chính trị - xã hội, nghề nghiệp khác' userEdit={this.props.isStaff} />
-                    </div>
+                    {!create && <div className='form-group col-md-12'>
+                        <ComponentToChucKhac ref={e => this.componentToChucKhac = e} label='Tổ chức chính trị - xã hội, nghề nghiệp khác' userEdit={this.props.readOnly} />
+                    </div>}
 
                     <div className='form-group col-md-12' />
 
@@ -264,5 +285,5 @@ class ComponentCaNhan extends React.Component {
 }
 
 const mapStateToProps = state => ({ staff: state.tccb.staff, system: state.system });
-const mapActionsToProps = { updateSystemState };
+const mapActionsToProps = { updateSystemState, getStaffEdit };
 export default connect(mapStateToProps, mapActionsToProps, null, { forwardRef: true })(ComponentCaNhan);
