@@ -44,7 +44,7 @@ class EditModal extends AdminModal {
         e.preventDefault();
     }
 
-    changeKichHoat = value => this.kichHoat.value(value ? 1 : 0) || this.kichHoat.value(value);
+    changeKichHoat = value => this.kichHoat.value(value);
 
     render = () => {
         const readOnly = this.props.readOnly;
