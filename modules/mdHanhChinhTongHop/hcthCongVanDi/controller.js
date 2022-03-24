@@ -44,11 +44,26 @@ module.exports = app => {
                 res.send({ error, item });
             else {
                 let { id, linkCongVan } = item;
-                updateListFile(JSON.parse(linkCongVan), id, ({ error, listFile }) => {
+                let listCongVan = null;
+                try {
+                    listCongVan = JSON.parse(linkCongVan);
+                }
+                catch {
+                    listCongVan = [];
+                }
+                updateListFile(linkCongVan, id, ({ error, listFile }) => {
                     if (error) {
                         app.model.hcthCongVanDi.delete({ id }, () => res.send({ error }));
-                    } else
-                        app.model.hcthCongVanDi.update({ id }, { 'linkCongVan': JSON.stringify(listFile) }, (errors, item) => res.send({ errors, item }));
+                    } else {
+                        let listCv = null;
+                        try {
+                            listCv = JSON.stringify(listFile);
+                        } catch {
+                            listCv = '[]';
+                        }
+                        app.model.hcthCongVanDi.update({ id }, { 'linkCongVan': listCv }, (errors, item) => res.send({ errors, item }));
+
+                    }
                 });
             }
         });    
@@ -155,14 +170,19 @@ module.exports = app => {
             if (error) {
                 res.send({ error });
             } else if (item && item.linkCongVan) {
-                let newList = JSON.parse(item.linkCongVan);
-                const filePath = app.assetPath + '/congVanDi' + newList[index];
-                if (app.fs.existsSync(filePath))
-                    app.deleteFile(filePath);                
-                newList.splice(index, 1);
-                app.model.hcthCongVanDi.update(id, { linkCongVan: JSON.stringify(newList) }, (error, item) => {
-                    res.send({ error, item });
-                });
+                try {
+                    let newList = JSON.parse(item.linkCongVan);
+                    const filePath = app.assetPath + '/congVanDi' + newList[index];
+                    newList.splice(index, 1);
+                    const newListStr = JSON.stringify(newList);
+                    if (app.fs.existsSync(filePath))
+                        app.deleteFile(filePath);
+                    app.model.hcthCongVanDi.update(id, { linkCongVan: newListStr }, (error, item) => {
+                        res.send({ error, item });
+                    });
+                } catch {
+                    res.send({ error: 'Cập nhật danh sách tệp tin thất bại' });
+                }
             } else {
                 const filePath = app.path.join(app.assetPath, '/congVanDi', file);
                 if (app.fs.existsSync(filePath)) {
