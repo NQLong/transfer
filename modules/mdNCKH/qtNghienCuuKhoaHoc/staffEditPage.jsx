@@ -109,14 +109,15 @@ class StaffEditNCKH extends AdminPage {
         if (response.data) {
             let listFile = this.state.listFile.length ? [...this.state.listFile] : [];
             listFile.push(response.data);
+            let fileMinhChung = '[]';
             try {
-                let fileMinhChung = JSON.stringify(listFile);
-                if (!fileMinhChung) throw ('Lỗi tên file');
-                else this.props.updateQtNckhStaffUser(this.state.id, { fileMinhChung });
-                this.setState({ listFile });
-            } catch (error) {
-                T.notify(error, 'danger');
+                fileMinhChung = JSON.stringify(listFile);
+            } catch (exception) {
+                T.notify(exception, 'danger');
+                return;
             }
+            this.state.id && this.props.updateQtNckhStaffUser(this.state.id, { fileMinhChung });
+            this.setState({ listFile });
         } else if (response.error) T.notify(response.error, 'danger');
     }
 
