@@ -138,3 +138,13 @@ export function updateDmDonViGuiCv(id, changes, done) {
         }, (error) => T.notify('Cập nhật thông tin đơn vị gửi công văn bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
+
+export const SelectAdapter_DmDonViGuiCongVan = {
+    ajax: true,
+    url: '/api/danh-muc/don-vi-gui-cong-van/page/1/20',
+    data: params => ({ condition: params.term }),
+    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.id, text: item.ten })) : [] }),
+    getOne: getDmDonViGuiCv,
+    fetchOne: (id, done) => (getDmDonViGuiCv(id, ( item ) => done && done({ id: item.id, text: item.ten })))(),
+    processResultOne: response => response &&  ({ value: response.id, text: response.ten }),
+};

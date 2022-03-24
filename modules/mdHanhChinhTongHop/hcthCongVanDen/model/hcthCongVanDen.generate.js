@@ -1,6 +1,6 @@
 // Table name: HCTH_CONG_VAN_DEN { id, ngayNhan, donViGui, soCongVan, ngayCongVan, noiDung, donViNhan, canBoNhan, ngayHetHan, chiDao }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'ngayNhan': 'NGAY_NHAN', 'donViGui': 'DON_VI_GUI', 'soCongVan': 'SO_CONG_VAN', 'ngayCongVan': 'NGAY_CONG_VAN', 'noiDung': 'NOI_DUNG', 'donViNhan': 'DON_VI_NHAN', 'canBoNhan': 'CAN_BO_NHAN', 'ngayHetHan': 'NGAY_HET_HAN', 'chiDao': 'CHI_DAO' };
+const obj2Db = { 'id': 'ID', 'ngayNhan': 'NGAY_NHAN', 'donViGui': 'DON_VI_GUI', 'soCongVan': 'SO_CONG_VAN', 'ngayCongVan': 'NGAY_CONG_VAN', 'noiDung': 'NOI_DUNG', 'donViNhan': 'DON_VI_NHAN', 'canBoNhan': 'CAN_BO_NHAN', 'ngayHetHan': 'NGAY_HET_HAN', 'chiDao': 'CHI_DAO', 'linkCongVan': 'LINK_CONG_VAN' };
 
 module.exports = app => {
     app.model.hcthCongVanDen = {
@@ -137,9 +137,9 @@ module.exports = app => {
             app.dbConnection.execute(sql, parameter, (error, result) => done(error, result));
         },
 
-        searchPage: (pagenumber, pagesize, donviguicv, donvi, macanbo, searchterm, done) => {
-            app.dbConnection.execute('BEGIN :ret:=hcth_cong_van_den_search_page(:pagenumber, :pagesize, :donviguicv, :donvi, :macanbo, :searchterm, :totalitem, :pagetotal); END;',
-                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, pagenumber: { val: pagenumber, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, pagesize: { val: pagesize, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, donviguicv, donvi, macanbo, searchterm, totalitem: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pagetotal: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
+        searchPage: (pagenumber, pagesize, donviguicv, donvi, macanbo, timetype, fromtime, totime, searchterm, done) => {
+            app.dbConnection.execute('BEGIN :ret:=hcth_cong_van_den_search_page(:pagenumber, :pagesize, :donviguicv, :donvi, :macanbo, :timetype, :fromtime, :totime, :searchterm, :totalitem, :pagetotal); END;',
+                { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, pagenumber: { val: pagenumber, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, pagesize: { val: pagesize, dir: app.oracleDB.BIND_INOUT, type: app.oracleDB.NUMBER }, donviguicv, donvi, macanbo, timetype, fromtime, totime, searchterm, totalitem: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, pagetotal: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER } }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
         },
     };
 };
