@@ -109,6 +109,11 @@ module.exports = (app) => {
             index: 1900, title: 'Website đơn vị', link: '/user/website', icon: 'fa-database',
             subMenusRender: false,
         },
+        hcth: {
+            index: 500, title: 'Hành chính tổng hợp', link: '/user/hcth', icon: 'fa-book',
+            subMenusRender: false,
+        }
+
     };
 
     // Ready Hook ----------------------------------------------------------------------------------------------------------------------------------

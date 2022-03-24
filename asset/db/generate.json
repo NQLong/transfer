@@ -6550,6 +6550,9 @@
         "active": true,
         "moduleName": "hcthCongVanDen",
         "modelName": "hcthCongVanDen",
+        "methods": {
+            "HCTH_CONG_VAN_DEN_SEARCH_PAGE": "searchPage"
+        },
         "columns": {
             "ID": {
                 "value": "id",
@@ -6639,6 +6642,9 @@
         "active": true,
         "moduleName": "hcthCongVanDi",
         "modelName": "hcthCongVanDi",
+        "methods": {
+            "HCTH_CONG_VAN_DI_SEARCH_PAGE": "searchPage"
+        },
         "columns": {
             "ID": {
                 "value": "id",
