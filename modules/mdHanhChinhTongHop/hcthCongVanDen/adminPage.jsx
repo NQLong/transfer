@@ -2,13 +2,10 @@ import React from 'react';
 import { connect } from 'react-redux';
 import {
     AdminPage,
-    // AdminModal,
     FormDatePicker,
     renderTable,
-    // FormTextBox,
     FormSelect,
     TableCell,
-    // FormRichTextBox,
 } from 'view/component/AdminPage';
 import { Link } from 'react-router-dom';
 import {
@@ -22,7 +19,6 @@ import {
 import { SelectAdapter_DmDonViGuiCongVan } from 'modules/mdDanhMuc/dmDonViGuiCv/redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
-import T from 'view/js/common';
 import Pagination from 'view/component/Pagination';
 
 const timeList = [

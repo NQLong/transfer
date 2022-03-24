@@ -5,7 +5,6 @@ import { getDmLoaiDonViAll } from 'modules/mdDanhMuc/dmLoaiDonVi/redux';
 import Pagination from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
 import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
-import T from 'view/js/common';
 
 class EditModal extends AdminModal {
     state = { active: true };
