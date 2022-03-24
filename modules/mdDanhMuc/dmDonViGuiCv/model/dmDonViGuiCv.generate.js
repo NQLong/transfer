@@ -29,6 +29,7 @@ module.exports = app => {
         },
 
         get: (condition, selectedColumns, orderBy, done) => {
+            console.log(condition.statement);
             if (typeof condition == 'function') {
                 done = condition;
                 condition = {};
@@ -40,8 +41,12 @@ module.exports = app => {
 
             if (orderBy) Object.keys(obj2Db).sort((a, b) => b.length - a.length).forEach(key => orderBy = orderBy.replaceAll(key, obj2Db[key]));
             condition = app.dbConnection.buildCondition(obj2Db, condition, ' AND ');
+            console.log(condition);
             const parameter = condition.parameter ? condition.parameter : {};
-            const sql = 'SELECT ' + app.dbConnection.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT * FROM DM_DON_VI_GUI_CV' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '') + ') WHERE ROWNUM=1';
+            const query = condition.statement ? ' WHERE ' + condition.statement : '';
+            console.log('query = ', query);
+            const sql = 'SELECT ' + app.dbConnection.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT * FROM DM_DON_VI_GUI_CV' + query + (orderBy ? ' ORDER BY ' + orderBy : '') + ')';
+            console.log(sql);
             app.dbConnection.execute(sql, parameter, (error, resultSet) => done(error, resultSet && resultSet.rows && resultSet.rows.length ? resultSet.rows[0] : null));
         },
 
