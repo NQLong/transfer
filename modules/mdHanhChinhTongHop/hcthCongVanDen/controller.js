@@ -159,7 +159,7 @@ module.exports = (app) => {
                 id = fields.userData[0].substring(19),
                 filePath = (isNew ? '/new/' : `/${id}/`) + (new Date().getTime()).toString() + '_' + files.hcthCongVanDenFile[0].originalFilename,
                 destPath = app.assetPath + '/congVanDen' + filePath,
-                validUploadFileType = ['.xls', '.xlsx', '.doc', '.docx', '.pdf', '.png', '.jpg'],
+                validUploadFileType = ['.xls', '.xlsx', '.doc', '.docx', '.pdf', '.png', '.jpg', '.jpeg'],
                 baseNamePath = app.path.extname(srcPath);
             if (!validUploadFileType.includes(baseNamePath.toLowerCase())) {
                 done({ error: 'Định dạng tập tin không hợp lệ!' });

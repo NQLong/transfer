@@ -201,30 +201,30 @@ class ComponentChucVu extends AdminPage {
         );
 
         return (
-            (display || !this.props.userEdit) ? 
-            <div className='col-md-12 form-group'>
-                <div>{this.props.label}
-                    <div className='tile-body'>
-                        {
-                            this.props.userEdit ?
-                                (this.state.data && renderTableChucVu(this.state.data))
-                                :
-                                (dataChucVu && renderTableChucVu(dataChucVu))
-                        }
-                        {
-                            !this.props.userEdit ? <div className='tile-footer' style={{ textAlign: 'right' }}>
-                                <button className='btn btn-info' type='button' onClick={e => this.showModal(e, this.state.shcc)}>
-                                    <i className='fa fa-fw fa-lg fa-plus' />Thêm {this.loaiChucVuMap[this.state.type ? 1 : 0]}
-                                </button>
-                            </div> : null
-                        }
-                        <EditModal ref={e => this.modal = e} type={this.state.type ? 1 : 0} readOnly={this.props.userEdit}
-                            getQtChucVuAll={this.props.getQtChucVuAll} getData={this.props.getStaffEdit}
-                            create={this.props.createQtChucVu} update={this.props.updateQtChucVu}
-                        />
+            (display || !this.props.userEdit) ?
+                <>
+                    <div>{this.props.label}
+                        <div className='tile-body'>
+                            {
+                                this.props.userEdit ?
+                                    (this.state.data && renderTableChucVu(this.state.data))
+                                    :
+                                    (dataChucVu && renderTableChucVu(dataChucVu))
+                            }
+                            {
+                                !this.props.userEdit ? <div className='tile-footer' style={{ textAlign: 'right' }}>
+                                    <button className='btn btn-info' type='button' onClick={e => this.showModal(e, this.state.shcc)}>
+                                        <i className='fa fa-fw fa-lg fa-plus' />Thêm {this.loaiChucVuMap[this.state.type ? 1 : 0]}
+                                    </button>
+                                </div> : null
+                            }
+                            <EditModal ref={e => this.modal = e} type={this.state.type ? 1 : 0} readOnly={this.props.userEdit}
+                                getQtChucVuAll={this.props.getQtChucVuAll} getData={this.props.getStaffEdit}
+                                create={this.props.createQtChucVu} update={this.props.updateQtChucVu}
+                            />
+                        </div>
                     </div>
-                </div>
-            </div> : null
+                </> : null
         );
 
     }

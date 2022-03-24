@@ -108,7 +108,7 @@ module.exports = app => {
     });
 
     app.get('/api/tccb/qua-trinh/hop-dong-lao-dong/newest/:shcc', app.permission.check('staff:login'), (req, res) => {
-        app.model.qtHopDongLaoDong.get({ nguoiDuocThue: req.params.shcc }, 'ngayKyHopDong', 'ngayKyHopDong DESC', (error, result) => res.send({ error, result }));
+        app.model.qtHopDongLaoDong.get({ nguoiDuocThue: req.params.shcc }, 'ngayKyHopDong', 'NGAY_KY_HOP_DONG DESC', (error, result) => res.send({ error, result }));
     });
     
     app.post('/api/tccb/qua-trinh/hop-dong-lao-dong', app.permission.check('qtHopDongLaoDong:write'), (req, res) => {

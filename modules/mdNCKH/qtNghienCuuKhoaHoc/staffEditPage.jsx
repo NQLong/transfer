@@ -54,15 +54,19 @@ class StaffEditNCKH extends AdminPage {
         let {
             id, shcc, batDauType, ketThucType, batDau, ketThuc, fileMinhChung, inLLKH,
             tenDeTai, maSoCapQuanLy, kinhPhi, vaiTro, ngayNghiemThu, ketQua, ngayNghiemThuType
+        } = data && data.item ? data.item : {
+            id: null, shcc: shcc ? shcc : data.shcc, batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', batDau: null, ketThuc: null, tenDeTai: '', inLLKH: 0,
+            maSoCapQuanLy: '', kinhPhi: '', vaiTro: '', ngayNghiemThu: null, ketQua: '', ngayNghiemThuType: 'dd/mm/yyyy', fileMinhChung: '[]'
+        };
+        let listFile = [];
+        try {
+            listFile = JSON.parse(fileMinhChung);
+        } catch (exception) {
+            console.error(exception);
         }
-            = data && data.item ? data.item :
-            {
-                id: null, shcc: shcc ? shcc : data.shcc, batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', batDau: null, ketThuc: null, tenDeTai: '', inLLKH: 0,
-                maSoCapQuanLy: '', kinhPhi: '', vaiTro: '', ngayNghiemThu: null, ketQua: '', ngayNghiemThuType: 'dd/mm/yyyy', fileMinhChung: '[]'
-            };
         this.setState({
             ownerShcc: shcc,
-            batDauType: batDauType ? batDauType : 'dd/mm/yyyy', listFile: fileMinhChung ? JSON.parse(fileMinhChung) : [],
+            batDauType: batDauType ? batDauType : 'dd/mm/yyyy', listFile: listFile,
             ketThucType: ketThucType ? ketThucType : 'dd/mm/yyyy',
             ngayNghiemThuType: ngayNghiemThuType ? ngayNghiemThuType : 'dd/mm/yyyy',
             id, batDau, ketThuc, ngayNghiemThu,
@@ -109,8 +113,15 @@ class StaffEditNCKH extends AdminPage {
         if (response.data) {
             let listFile = this.state.listFile.length ? [...this.state.listFile] : [];
             listFile.push(response.data);
-            if (this.state.id) this.props.updateQtNckhStaffUser(this.state.id, { fileMinhChung: JSON.stringify(listFile) }, () => { this.setState({ listFile }); });
-            else this.setState({ listFile });
+            let fileMinhChung = '[]';
+            try {
+                fileMinhChung = JSON.stringify(listFile);
+            } catch (exception) {
+                T.notify(exception, 'danger');
+                return;
+            }
+            this.state.id && this.props.updateQtNckhStaffUser(this.state.id, { fileMinhChung });
+            this.setState({ listFile });
         } else if (response.error) T.notify(response.error, 'danger');
     }
 
@@ -218,6 +229,8 @@ class StaffEditNCKH extends AdminPage {
     }
 
     checkDieuKienIn = () => {
+        /* Tạm thời pending */
+
         // if (value) { }
         // if (value && this.state.listFile.length == 0) {
         //     T.notify('Đề tài chưa có minh chứng', 'danger');
@@ -235,7 +248,14 @@ class StaffEditNCKH extends AdminPage {
         if (data) {
             if (this.state.id) this.props.updateQtNckhStaffUser(this.state.id, data, null, data.inLlkh);
             else {
-                if (this.state.listFile) data.fileMinhChung = JSON.stringify(this.state.listFile);
+                if (this.state.listFile) {
+                    try {
+                        data.fileMinhChung = JSON.stringify(this.state.listFile);
+                    } catch (exception) {
+                        T.notify(exception, 'danger');
+                        return;
+                    }
+                }
                 this.props.createQtNckhStaffUser(data, this.props.history.push('/user/nghien-cuu-khoa-hoc'));
             }
         }
