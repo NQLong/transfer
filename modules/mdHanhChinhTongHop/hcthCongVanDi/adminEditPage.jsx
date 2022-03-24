@@ -10,11 +10,9 @@ import {
     deleteFile,
     getCongVanDi
 } from './redux';
-// import Pagination from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
 import { 
     AdminPage, 
-    //AdminModal, 
     FormDatePicker, 
     renderTable, 
     FormRichTextBox, 
@@ -23,7 +21,6 @@ import {
     FormCheckbox, 
     FormFileBox
 } from 'view/component/AdminPage';
-// import T from 'view/js/common';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 
@@ -124,7 +121,7 @@ class AdminEditPage extends AdminPage {
             isCanBo: this.state.isCanBo ? 1 : 0,
             linkCongVan: this.state.listFile ? JSON.stringify(this.state.listFile) : '[]'
         };
-        console.log(changes);
+        // console.log(changes);
         // console.log("don vi " + this.state.isDonVi);
         // console.log("can bo " + this.state.isCanBo);
         if (!changes.noiDung) {
@@ -149,7 +146,9 @@ class AdminEditPage extends AdminPage {
             if (this.state.id) {
                 this.props.updateHcthCongVanDi(this.state.id, changes, this.getData);
             } else {
+                T.notify('Thêm công văn đi thành công!', 'success');
                 this.props.createHcthCongVanDi(changes, () => this.props.history.push('/user/hcth/cong-van-di'));
+                this.props.history.push('/user/hcth/cong-van-di');
             }        
         }
     }

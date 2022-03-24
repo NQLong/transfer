@@ -19,7 +19,7 @@ import {
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 
-class HcthCongVanDi extends AdminPage {    
+export class HcthCongVanDi extends AdminPage {    
     state = { filter: {} };
 
     componentDidMount() {
@@ -39,16 +39,15 @@ class HcthCongVanDi extends AdminPage {
 
     changeAdvancedSearch = (isInitial = false) => {
         let { pageNumber, pageSize } = this.props && this.props.hcthCongVanDi && this.props.hcthCongVanDi.page ? this.props.hcthCongVanDi.page : { pageNumber: 1, pageSize: 50 };
-        let donViGui = this.donViGui?.value();
-        let donViNhan = this.donViNhan?.value();
-        let canBoNhan = this.canBoNhan?.value();
+        let donViGui = this.donViGui?.value() || null;
+        let donViNhan = this.donViNhan?.value() || null;
+        let canBoNhan = this.canBoNhan?.value() || null;
         const pageFilter = isInitial ? {} : { donViGui, donViNhan, canBoNhan };
         this.setState({ filter: pageFilter }, () => {
             // console.log(this.state.filter);
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
-                    // console.log('page filter' + page.filter);
-                    
+                    // console.log('page filter' + pageFilter.donViNhan);
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
                     this.donViGui?.value(filter.donViGui || '');
@@ -62,22 +61,19 @@ class HcthCongVanDi extends AdminPage {
 
     getPage = (pageN, pageS, pageC, done) => {
         this.props.getHcthCongVanDiSearchPage(pageN, pageS, pageC, this.state.filter, done);
-        console.log('state.filter ' + this.state.filter);
+        // console.log('state.filter ' + this.state.filter);
     }
 
-    showModal = (e) => {
+    // showModal = (e) => {
+    //     e.preventDefault();
+    //     this.modal.show();
+    // }
+
+    onDelete = (e, item) => {
         e.preventDefault();
-        this.modal.show();
-    }
+        T.confirm('Xóa công văn', 'Bạn có chắc bạn muốn xóa công văn này?', true,
+            isConfirm => isConfirm && this.props.deleteHcthCongVanDi(item.id));
 
-    onDelete = (id) => {
-        console.log(id);
-        T.confirm('Xóa công văn', 'Xác nhận?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteHcthCongVanDi(id, false, null, error => {
-                if (error) T.notify(error.message ? error.message : 'Xoá công văn bị lỗi!', 'danger');
-                else T.alert('Xoá công văn đi thành công!', 'success', false, 800);
-            });
-        });
     }
 
     render() {
@@ -170,8 +166,6 @@ class HcthCongVanDi extends AdminPage {
                 <div className="tile">{table}</div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
-                {/* <EditModal ref={e => this.modal = e} readOnly={readOnly} permission={permission}
-                create={this.props.createHcthCongVanDi} update={this.props.updateHcthCongVanDi} permissions={currentPermissions} /> */}
                 </>,
             backRoute: '/user/hcth',
             advanceSearch: <>

@@ -84,11 +84,10 @@ export function createHcthCongVanDi(data, done){
                 T.notify('Thêm công văn đi bị lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
-                if (done) {
-                    T.notify('Thêm công văn đi thành công!', 'success');
-                    dispatch(getHcthCongVanDiSearchPage());
-                    done && done(data);
-                }
+                // console.log(data);
+                T.notify('Thêm công văn đi thành công!', 'success');
+                dispatch(getHcthCongVanDiSearchPage());
+                done && done(data);
             }
         }, () => T.notify('Thêm công văn đi bị lỗi', 'danger'));
     };
@@ -126,7 +125,7 @@ export function deleteHcthCongVanDi(id) {
     };
 }
 
-T.initPage('searchPageHcthCongVanDi', true);
+// T.initPage('searchPageHcthCongVanDi', true);
 export function getHcthCongVanDiSearchPage(pageNumber, pageSize, pageCondition, filter, done) {
     if (typeof filter === 'function') {
         done = filter;
@@ -141,7 +140,7 @@ export function getHcthCongVanDiSearchPage(pageNumber, pageSize, pageCondition, 
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 // T.notify(page.filter)
-            //    console.log("data" + data);
+                // console.log("data" + data);
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 if (page.filter) data.page.filter = page.filter;
                 dispatch({ type: hcthCongVanDiSearchPage, page: data.page });
@@ -176,7 +175,7 @@ export function getCongVanDi(id, done) {
                 T.notify('Lấy công văn đi bị lỗi!', 'danger');
             } else {
                 // T.notify('Lấy công văn đi thành công!', 'success');
-                console.log(data.item);
+                // console.log(data.item);
                 dispatch({ type: hcthCongVanDiGet, item: data.item });
                 done && done(data.item);
             }

@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.hcth,
         menus: {
-            531: { title: 'Công văn đi', link: '/user/hcth/cong-van-di', icon: 'fa-caret-square-o-right', backgroundColor: '#00aa00' },
+            531: { title: 'Công văn đi', link: '/user/hcth/cong-van-di', icon: 'fa-caret-square-o-right', backgroundColor: '#0B86AA' },
         },
     };
     app.permission.add(
