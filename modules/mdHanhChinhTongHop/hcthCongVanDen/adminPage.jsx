@@ -29,7 +29,6 @@ const timeList = [
 
 
 class HcthCongVanDen extends AdminPage {
-    modal = React.createRef();
 
     state = { filter: {} };
 
@@ -96,7 +95,6 @@ class HcthCongVanDen extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('hcthCongVanDen', ['read', 'write', 'delete']);
-        // let readOnly = !permission.write;
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.hcthCongVanDen && this.props.hcthCongVanDen.page ? this.props.hcthCongVanDen.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = renderTable({
             getDataSource: () => list,
@@ -118,6 +116,13 @@ class HcthCongVanDen extends AdminPage {
             renderRow: (item, index) => {
                 let danhSachCanBoNhan = item.danhSachCanBoNhan?.split(';');
                 let danhSachDonViNhan = item.danhSachDonViNhan?.split(';');
+                let hasFile;
+                try {
+                    hasFile = item.linkCongVan && JSON.parse(item.linkCongVan).length > 0;
+                }
+                catch (error) {
+                    hasFile = false;
+                }
                 return (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
@@ -161,7 +166,7 @@ class HcthCongVanDen extends AdminPage {
                             )) : null} />
                         <TableCell type='text' style={{}} content={item.chiDao} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
-                            item.linkCongVan && JSON.parse(item.linkCongVan).length > 0 ?
+                            hasFile ?
                                 (<span style={{ color: 'blue' }}>Có tệp tin</span>) :
                                 (<span style={{ color: 'red' }}>Chưa có tệp tin</span>)
                         } />

@@ -2,7 +2,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 import {
     AdminPage,
-    // AdminModal,
     FormDatePicker,
     renderTable,
     FormTextBox,
@@ -25,7 +24,7 @@ import {
 import { SelectAdapter_DmDonViGuiCongVan } from 'modules/mdDanhMuc/dmDonViGuiCv/redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
-import T from 'view/js/common';
+
 
 
 class AdminEditPage extends AdminPage {
@@ -170,10 +169,7 @@ class AdminEditPage extends AdminPage {
     }
 
     render() {
-        const permission = {
-            write: true,
-            delete: true
-        };
+        const permission = this.getUserPermission('hcthCongVanDen', ['read', 'write', 'delete']);
         const readOnly = !permission.write;
         const isNew = !this.state.id;
         return this.renderPage({
