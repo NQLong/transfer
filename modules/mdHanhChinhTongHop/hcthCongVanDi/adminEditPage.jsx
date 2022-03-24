@@ -50,11 +50,19 @@ class AdminEditPage extends AdminPage {
         let { id, noiDung, ngayGui, ngayKy, donViGui, donViNhan, canBoNhan, isDonVi, isCanBo, linkCongVan } = data ? data : 
         { id: '', noiDung: '', ngayGui: '', ngayKy: '', donViGui: '', donViNhan: '', canBoNhan: '', isDonVi: 0, isCanBo: 0, linkCongVan: '[]'};
         this.setState({id, isDonVi, isCanBo});
+        if (linkCongVan && linkCongVan.length > 0) {
+            try {
+                linkCongVan = JSON.parse(linkCongVan);
+            }
+            catch {
+                linkCongVan = [];
+            }
+        }
         // console.log(item);
         this.setState({
             isDonVi: isDonVi == 1 | isDonVi == '1',
             isCanBo: isCanBo == 1 | isCanBo == '1',
-            listFile: (linkCongVan && linkCongVan.length > 0) ? JSON.parse(linkCongVan) : []
+            listFile: linkCongVan
         }, () => {
             this.noiDung.value(noiDung);
             this.ngayGui.value(ngayGui);
@@ -94,7 +102,16 @@ class AdminEditPage extends AdminPage {
         if (response.data) {
             let listFile = this.state.listFile.length ? [...this.state.listFile] : [];
             listFile.push(response.data);
-            if (this.state.id) this.props.updateHcthCongVanDi(this.state.id, { linkCongVan: JSON.stringify(listFile) }, () => { this.setState({ listFile }); });
+            if (this.state.id) {
+                let list = null;
+                try {
+                    list = JSON.stringify(listFile);
+                }
+                catch {
+                    list = '[]';
+                }
+                this.props.updateHcthCongVanDi(this.state.id, { linkCongVan: list }, () => { this.setState({ listFile }); });
+            }    
             else this.setState({ listFile });
         } else if (response.error) T.notify(response.error, 'danger');
     }
@@ -110,6 +127,13 @@ class AdminEditPage extends AdminPage {
     }
 
     save = () => {
+        let list = null;
+        try {
+            list = JSON.stringify(this.state.listFile);
+        }
+        catch {
+            list = '[]';
+        }
         const changes = {
             noiDung: this.noiDung.value(),
             ngayGui: Number(this.ngayGui.value()),
@@ -119,7 +143,7 @@ class AdminEditPage extends AdminPage {
             canBoNhan: this.state.isCanBo ? this.canBoNhan.value().toString() : null,
             isDonVi: this.state.isDonVi ? 1 : 0,
             isCanBo: this.state.isCanBo ? 1 : 0,
-            linkCongVan: this.state.listFile ? JSON.stringify(this.state.listFile) : '[]'
+            linkCongVan: list
         };
         // console.log(changes);
         // console.log("don vi " + this.state.isDonVi);

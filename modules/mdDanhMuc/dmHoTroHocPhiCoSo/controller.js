@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.category,
         menus: {
-            4085: { title: 'Hỗ trợ học phí - cơ cở đào tạo', link: '/user/danh-muc/ho-tro-hoc-phi-co-so' }
+            4083: { title: 'Hỗ trợ học phí - cơ cở đào tạo', link: '/user/danh-muc/ho-tro-hoc-phi-co-so' }
         }
     };
     app.permission.add(

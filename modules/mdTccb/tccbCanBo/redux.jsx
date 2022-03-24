@@ -242,7 +242,7 @@ export function deleteQuanHeCanBo(id, shcc) {
 
 export const SelectAdapter_FwCanBo = {
     ajax: true,
-    url: '/api/staff/page/1/1000',
+    url: '/api/staff/page/1/50',
     data: params => ({ condition: params.term }),
     processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.shcc, text: `${item.shcc}: ${item.ho} ${item.ten}` })) : [] }),
     getOne: getStaff,
