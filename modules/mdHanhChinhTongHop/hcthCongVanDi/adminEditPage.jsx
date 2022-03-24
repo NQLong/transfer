@@ -23,7 +23,7 @@ import {
     FormCheckbox, 
     FormFileBox
 } from 'view/component/AdminPage';
-import T from 'view/js/common';
+// import T from 'view/js/common';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 
@@ -37,15 +37,14 @@ class AdminEditPage extends AdminPage {
     componentDidMount() {
         T.ready('/user/hcth', () => {
             const params = T.routeMatcher('/user/hcth/cong-van-di/:id').parse(window.location.pathname);
-            this.setState({ params }, () => this.getData());
+            this.setState({ id: params.id === 'new' ? null : params.id }, () => this.getData());
         });
     }
 
     getData = () => {
-        const id = this.state.params?.id;
-        const isCreate = id === 'new';
+        const isCreate = !this.state.id;
         if (!isCreate) {
-            this.props.getCongVanDi(Number(this.state.params.id), (item) => this.setData(item));
+            this.props.getCongVanDi(Number(this.state.id), (item) => this.setData(item));
         }
         else this.setData(null);
     }
@@ -63,7 +62,7 @@ class AdminEditPage extends AdminPage {
             this.noiDung.value(noiDung);
             this.ngayGui.value(ngayGui);
             this.ngayKy.value(ngayKy);
-            this.donViGui.value(donViGui);
+            this.donViGui.value(donViGui ? donViGui : '');
             // console.log("state don vi: " + donViNhan);
             // console.log("state can bo: " + canBoNhan);
             this.isDonVi.value(this.state.isDonVi);
@@ -98,7 +97,7 @@ class AdminEditPage extends AdminPage {
         if (response.data) {
             let listFile = this.state.listFile.length ? [...this.state.listFile] : [];
             listFile.push(response.data);
-            if (this.state.id) this.props.updateHcthCongVanDi(this.state.params.id, { linkCongVan: JSON.stringify(listFile) }, () => { this.setState({ listFile }); });
+            if (this.state.id) this.props.updateHcthCongVanDi(this.state.id, { linkCongVan: JSON.stringify(listFile) }, () => { this.setState({ listFile }); });
             else this.setState({ listFile });
         } else if (response.error) T.notify(response.error, 'danger');
     }
@@ -106,7 +105,7 @@ class AdminEditPage extends AdminPage {
     deleteFile = (e, index, item) => {
         e.preventDefault();
         T.confirm('Tập tin đính kèm', 'Bạn có chắc muốn xóa tập tin đính kèm này, tập tin sau khi xóa sẽ không thể khôi phục lại được', 'warning', true, isConfirm =>
-            isConfirm && this.props.deleteFile(this.state.id, index, item, () => {
+            isConfirm && this.props.deleteFile(this.state.id ? this.state.id : null, index, item, () => {
                 let listFile = [...this.state.listFile];
                 listFile.splice(index, 1);
                 this.setState({ listFile });
@@ -148,7 +147,7 @@ class AdminEditPage extends AdminPage {
             this.canBoNhan.focus();
         } else {
             if (this.state.id) {
-                this.props.update(this.state.id, changes, this.hide);
+                this.props.updateHcthCongVanDi(this.state.id, changes, this.getData);
             } else {
                 this.props.createHcthCongVanDi(changes, () => this.props.history.push('/user/hcth/cong-van-di'));
             }        
@@ -167,28 +166,29 @@ class AdminEditPage extends AdminPage {
                 <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
             </tr>
         ),
-        renderRow: (item, index) => (
-            <tr key={index}>
-                <TableCell style={{ textAlign: 'right' }} content={index + 1} />
-                <TableCell type='text' style={{ wordBreak: 'break-all' }} content={<>
-                    <a href={'/api/hcth/cong-van-di/download' + item.substring(1)} download>{item.substring(24)}</a>
-                </>
-                } />
-                <TableCell style={{ textAlign: 'center' }} content={T.dateToText(parseInt(item.substring(10, 23)), 'dd/mm/yyyy HH:MM')}></TableCell>
-                <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onDelete={e => this.deleteFile(e, index, item)}>
-                    <a className='btn btn-info' href={`/api/hcth/cong-van-di/download${item}`} download>
-                        <i className='fa fa-lg fa-download' />
-                    </a>
-                </TableCell>
-            </tr>
-        )
+        renderRow: (item, index) => {
+            const timeStamp = parseInt(item.split('/')[2].substring(0, 13));
+            const originalName = item.split('/')[2].substring(14);
+            return (
+                <tr key={index}>
+                    <TableCell style={{ textAlign: 'right' }} content={index + 1} />
+                    <TableCell type='text' style={{ wordBreak: 'break-all' }} content={<>
+                        <a href={'/api/hcth/cong-van-di/download' + item} download>{originalName}</a>
+                    </>
+                    } />
+                    <TableCell style={{ textAlign: 'center' }} content={T.dateToText(timeStamp, 'dd/mm/yyyy HH:MM')}></TableCell>
+                    <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onDelete={e => this.deleteFile(e, index, item)}>
+                        <a className='btn btn-info' href={`/api/hcth/cong-van-di/download${item}`} download>
+                            <i className='fa fa-lg fa-download' />
+                        </a>
+                    </TableCell>
+                </tr>
+            );
+        }
     });
 
     render = () => {
-        const permission = {
-            write: true,
-            delete: true
-        };
+        const permission = this.getUserPermission('hcthCongVanDen', ['read', 'write', 'delete']);
         const readOnly = this.props.readOnly;
         return this.renderPage({
             icon: 'fa fa-caret-square-o-right',

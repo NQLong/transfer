@@ -21,7 +21,7 @@ import {
     // FormCheckbox, 
     // FormFileBox
 } from 'view/component/AdminPage';
-import T from 'view/js/common';
+// import T from 'view/js/common';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 
@@ -237,9 +237,9 @@ class HcthCongVanDi extends AdminPage {
                     
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
-                    this.donViGui.value(filter.donViGui || '');
-                    this.donViNhan.value(filter.donViNhan || '');
-                    this.canBoNhan.value(filter.canBoNhan || '');
+                    this.donViGui?.value(filter.donViGui || '');
+                    this.donViNhan?.value(filter.donViNhan || '');
+                    this.canBoNhan?.value(filter.canBoNhan || '');
                     if (!$.isEmptyObject(filter) && filter && (filter.donViGui || filter.donViNhan || filter.canBoNhan)) this.showAdvanceSearch();
                 }
             });
@@ -270,7 +270,7 @@ class HcthCongVanDi extends AdminPage {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
         permission = this.getUserPermission('hcthCongVanDi', ['read', 'write', 'delete']);
         // let readOnly = !permission.write;
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.hcthCongVanDi ?
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.hcthCongVanDi && this.props.hcthCongVanDi.page ?
             this.props.hcthCongVanDi.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách công văn đi!';
         if (list && list.length > 0) {

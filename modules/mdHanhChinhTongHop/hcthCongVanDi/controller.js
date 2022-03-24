@@ -17,7 +17,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { donViGui, donViNhan, canBoNhan} = (req.query.filter && req.query.filter != '%%%%%%') ? req.query.filter : { donViGui: null, donViNhan: null, canBoNhan: null};
+        let { donViGui, donViNhan, canBoNhan} = (req.query.filter && req.query.filter != '%%%%%%') ? req.query.filter : { donViGui: null, donViNhan: null, canBoNhan: null};
         app.model.hcthCongVanDi.searchPage(pageNumber, pageSize, canBoNhan, donViGui, donViNhan, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -39,15 +39,53 @@ module.exports = app => {
 
     app.post('/api/hcth/cong-van-di', app.permission.check('staff:login'), (req, res) => {
         // console.log(req.body);
-        app.model.hcthCongVanDi.create(req.body.data, (error, item) => res.send({ error, item }));
+        app.model.hcthCongVanDi.create(req.body.data, (error, item) => {
+            if (error)
+                res.send({ error, item });
+            else {
+                let { id, linkCongVan } = item;
+                updateListFile(JSON.parse(linkCongVan), id, ({ error, listFile }) => {
+                    if (error) {
+                        app.model.hcthCongVanDi.delete({ id }, () => res.send({ error }));
+                    } else
+                        app.model.hcthCongVanDi.update({ id }, { 'linkCongVan': JSON.stringify(listFile) }, (errors, item) => res.send({ errors, item }));
+                });
+            }
+        });    
     });
+
+    const updateListFile = (listFile, id, done) => {
+        if (!listFile || listFile.length == 0) return listFile;
+        app.createFolder(
+            app.path.join(app.assetPath, `/congVanDi/${id}`)
+        );
+        const pattern = /\/new.*/;
+        const newList = listFile.map(fileName => {
+            if (pattern.test(fileName)) {
+                const
+                    destFile = fileName.replace('new', `${id}`),
+                    destPath = app.assetPath + '/congVanDi' + destFile,
+                    srcPath = app.assetPath + '/congVanDi' + fileName;
+                app.fs.rename(srcPath, destPath, error => {
+                    if (error)
+                        done && done({ error });
+                });
+                return destFile;
+            }
+            return fileName;
+        });
+        done && done({ error: null, listFile: newList });
+    };
 
     app.put('/api/hcth/cong-van-di', app.permission.check('hcthCongVanDi:write'), (req, res) => {
         app.model.hcthCongVanDi.update({ id: req.body.id }, req.body.changes, (errors, items) => res.send({ errors, items }));
     });
 
     app.delete('/api/hcth/cong-van-di', app.permission.check('hcthCongVanDi:delete'), (req, res) => {
-        app.model.hcthCongVanDi.delete({ id: req.body.id }, errors => res.send({ errors }));
+        app.model.hcthCongVanDi.delete({ id: req.body.id }, errors => {
+            app.deleteFolder(app.assetPath + '/congVanDi/' + req.body.id);
+            res.send({ errors });
+        });    
     });
 
     app.get('/api/hcth/cong-van-di/page/:pageNumber/:pageSize', (req, res) => {
@@ -82,9 +120,11 @@ module.exports = app => {
             fields.userData[0].startsWith('hcthCongVanDiFile') &&
             files.hcthCongVanDiFile &&
             files.hcthCongVanDiFile.length > 0) {
-            const user = req.session.user,
+            const
                 srcPath = files.hcthCongVanDiFile[0].path,
-                filePath = '/' + user.shcc + '_' + (new Date().getTime()).toString() + '_' + files.hcthCongVanDiFile[0].originalFilename,
+                isNew = fields.userData[0].substring(19) == 'new',
+                id = fields.userData[0].substring(19),
+                filePath = (isNew ? '/new/' : `/${id}/`) + (new Date().getTime()).toString() + '_' + files.hcthCongVanDiFile[0].originalFilename,
                 destPath = app.assetPath + '/congVanDi' + filePath,
                 validUploadFileType = ['.xls', '.xlsx', '.doc', '.docx', '.pdf', '.png', '.jpg'],
                 baseNamePath = app.path.extname(srcPath);
@@ -92,6 +132,9 @@ module.exports = app => {
                 done({ error: 'Định dạng tập tin không hợp lệ!' });
                 app.deleteFile(srcPath);
             } else {
+                app.createFolder(
+                    app.path.join(app.assetPath, '/congVanDi/' + (isNew ? '/new' : '/' + id))
+                );
                 app.fs.rename(srcPath, destPath, error => {
                     if (error) {
                         done({ error });
@@ -113,7 +156,9 @@ module.exports = app => {
                 res.send({ error });
             } else if (item && item.linkCongVan) {
                 let newList = JSON.parse(item.linkCongVan);
-                app.deleteFile(app.assetPath + '/congVanDi' + newList[index]);
+                const filePath = app.assetPath + '/congVanDi' + newList[index];
+                if (app.fs.existsSync(filePath))
+                    app.deleteFile(filePath);                
                 newList.splice(index, 1);
                 app.model.hcthCongVanDi.update(id, { linkCongVan: JSON.stringify(newList) }, (error, item) => {
                     res.send({ error, item });
@@ -130,10 +175,9 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/hcth/cong-van-di/download/:fileName', app.permission.check('staff:login'), (req, res) => {
-        const { fileName } = req.params;
-        const dir = app.path.join(app.assetPath, `/congVanDi/${fileName}`);
-
+    app.get('/api/hcth/cong-van-di/download/:id/:fileName', app.permission.check('staff:login'), (req, res) => {
+        const { id, fileName } = req.params;
+        const dir = app.path.join(app.assetPath, `/congVanDi/${id}`);
         if (app.fs.existsSync(dir)) {
             const serverFileNames = app.fs.readdirSync(dir).filter(v => app.fs.lstatSync(app.path.join(dir, v)).isFile());
             for (const serverFileName of serverFileNames) {
@@ -143,7 +187,6 @@ module.exports = app => {
                 }
             }
         }
-
         res.status(400).send('Không tìm thấy tập tin');
     });
 

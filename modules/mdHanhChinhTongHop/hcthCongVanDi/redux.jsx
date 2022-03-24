@@ -175,7 +175,8 @@ export function getCongVanDi(id, done) {
                 console.error('GET: ' + url + '.', data.error);
                 T.notify('Lấy công văn đi bị lỗi!', 'danger');
             } else {
-                T.notify('Lấy công văn đi thành công!', 'success');
+                // T.notify('Lấy công văn đi thành công!', 'success');
+                console.log(data.item);
                 dispatch({ type: hcthCongVanDiGet, item: data.item });
                 done && done(data.item);
             }
