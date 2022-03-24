@@ -32,101 +32,6 @@ const timeList = [
 ];
 
 
-// class EditModal extends AdminModal {
-//     state = { id: null, listFile: [] };
-//     componentDidMount() {
-//         T.ready(() => this.onShown(() => { this.soCongVan.focus(); }));
-//     }
-
-//     onShow = (item) => {
-//         console.log(item)
-//         let { id, ngayCongVan, ngayNhan, ngayHetHan, soCongVan, maDonViGuiCV, maDonViNhan, maCanBoNhan, noiDung, chiDao } = item ? item :
-//             { id: '', ngayCongVan: '', ngayNhan: '', ngayHetHan: '', soCongVan: '', maDonViGuiCV: '', maDonViNhan: '', maCanBoNhan: '', noiDung: '', chiDao: '' };
-//         if (maDonViNhan) {
-//             maDonViNhan = maDonViNhan.split(',');
-//         }
-//         if (maCanBoNhan) {
-//             maCanBoNhan = maCanBoNhan.split(',');
-//         }
-//         this.setState({ id });
-//         this.ngayCongVan.value(ngayCongVan);
-//         this.ngayNhan.value(ngayNhan);
-//         this.ngayHetHan.value(ngayHetHan);
-//         this.soCongVan.value(soCongVan ? soCongVan : '');
-//         this.maDonViGuiCV.value(maDonViGuiCV);
-//         this.maDonViNhan.value(maDonViNhan ? maDonViNhan : '');
-//         this.maCanBoNhan.value(maCanBoNhan ? maCanBoNhan : '');
-//         this.noiDung.value(noiDung);
-//         this.chiDao.value(chiDao);
-//     };
-
-
-//     onSubmit = (e) => {
-//         e.preventDefault();
-//         const changes = {
-//             ngayCongVan: Number(this.ngayCongVan.value()),
-//             ngayNhan: Number(this.ngayNhan.value()),
-//             ngayHetHan: Number(this.ngayHetHan.value()),
-//             soCongVan: this.soCongVan.value(),
-//             donViGui: this.maDonViGuiCV.value(),
-//             donViNhan: this.maDonViNhan.value().toString() || null,
-//             canBoNhan: this.maCanBoNhan.value().toString() || null,
-//             noiDung: this.noiDung.value(),
-//             chiDao: this.chiDao.value()
-//         };
-//         if (!changes.ngayCongVan) {
-//             T.notify('Ngày công văn bị trống', 'danger');
-//             this.ngayCongVan.focus();
-//         } else if (!changes.ngayNhan) {
-//             T.notify('Ngày nhận công văn bị trống', 'danger');
-//             this.ngayNhan.focus();
-//         } else if (!changes.donViGui || (Array.isArray(changes.donViGui) && changes.donViGui.length === 0)) {
-//             T.notify('Đơn vị gửi bị trống', 'danger');
-//             this.maDonViGuiCV.focus();
-//         } else if (!changes.noiDung) {
-//             T.notify('Nội dung công văn bị trống', 'danger');
-//             this.noiDung.focus();
-//         } else if (changes.ngayNhan < changes.ngayCongVan) {
-//             T.notify('Ngày nhận công văn trước ngày công văn', 'danger');
-//             this.ngayNhan.focus();
-//         } else if (changes.ngayHetHan && changes.ngayHetHan < changes.ngayCongVan) {
-//             T.notify('Ngày công văn hết hạn trước ngày công văn', 'danger');
-//             this.ngayNhan.focus();
-//         }
-//         else {
-//             if (this.props.permission.write) {
-//                 if (this.state.id) {
-//                     this.props.update(this.state.id, changes, this.hide);
-//                 } else {
-//                     this.props.create(changes, this.hide);
-//                 }
-//             }
-//         }
-//     }
-
-//     render = () => {
-//         const readOnly = this.props.readOnly;
-//         return this.renderModal({
-//             title: this.state.id ? 'Cập nhật Công văn đến' : 'Tạo mới Công văn đến',
-//             size: 'large',
-//             body: (
-//                 <div className='form-group row'>
-//                     <FormTextBox type='text' className='col-md-12' ref={e => this.soCongVan = e} label='Mã số CV' readOnly={readOnly} />
-//                     <FormDatePicker type='date-mask' className='col-md-4' ref={e => this.ngayCongVan = e} label='Ngày CV' readOnly={readOnly} required />
-//                     <FormDatePicker type='date-mask' className='col-md-4' ref={e => this.ngayNhan = e} label='Ngày nhận' readOnly={readOnly} required />
-//                     <FormDatePicker type='date-mask' className='col-md-4' ref={e => this.ngayHetHan = e} label='Ngày hết hạn' readOnly={readOnly} />
-//                     <FormSelect className='col-md-12' ref={e => this.maDonViGuiCV = e} label='Đơn vị gửi công văn' data={SelectAdapter_DmDonViGuiCongVan} readOnly={readOnly} required />
-//                     <FormRichTextBox type='text' className='col-md-12' ref={e => this.noiDung = e} label='Nội dung' readOnly={readOnly} required />
-//                     <FormSelect multiple={true} className='col-md-12' ref={e => this.maDonViNhan = e} label='Đơn vi nhận công văn' data={SelectAdapter_DmDonVi} readOnly={readOnly} />
-//                     <FormSelect multiple={true} className='col-md-12' ref={e => this.maCanBoNhan = e} label='Cán bộ nhận công văn' data={SelectAdapter_FwCanBo} readOnly={readOnly} />
-//                     <FormRichTextBox type='text' className='col-md-12' ref={e => this.chiDao = e} label='Chỉ đạo' readOnly={readOnly} />
-//                 </div>
-//             )
-//         });
-//     }
-// }
-
-
 class HcthCongVanDen extends AdminPage {
     modal = React.createRef();
 
@@ -140,6 +45,9 @@ class HcthCongVanDen extends AdminPage {
                 this.maDonViGuiCV?.value('');
                 this.donViNhanCongVan?.value('');
                 this.canBoNhanCongVan?.value('');
+                this.timeType?.value('');
+                this.fromTime?.value('');
+                this.toTime?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
             this.getPage();
@@ -149,10 +57,13 @@ class HcthCongVanDen extends AdminPage {
 
     changeAdvancedSearch = (isInitial = false) => {
         let { pageNumber, pageSize } = this.props && this.props.hcthCongVanDen && this.props.hcthCongVanDen.page ? this.props.hcthCongVanDen.page : { pageNumber: 1, pageSize: 50 };
-        let donViGuiCongVan = this.donViGuiCongVan?.value();
-        let donViNhanCongVan = this.donViNhanCongVan?.value();
-        let canBoNhanCongVan = this.canBoNhanCongVan?.value();
-        const pageFilter = isInitial ? {} : { donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan };
+        let donViGuiCongVan = this.donViGuiCongVan?.value() || null;
+        let donViNhanCongVan = this.donViNhanCongVan?.value().toString() || null;
+        let canBoNhanCongVan = this.canBoNhanCongVan?.value() || null;
+        let timeType = this.timeType?.value() || null;
+        let fromTime = this.fromTime?.value() ? Number(this.fromTime.value()) :null;
+        let toTime = this.toTime?.value() ? Number(this.toTime.value()) :null;
+        const pageFilter = isInitial ? {} : { donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, timeType, fromTime, toTime };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
@@ -160,8 +71,11 @@ class HcthCongVanDen extends AdminPage {
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
                     this.donViGuiCongVan?.value(filter.donViGuiCongVan || '');
                     this.donViNhanCongVan?.value(filter.donViNhanCongVan || '');
-                    this.canBoNhanCongVan?.value(filter.canBoNhanCongVan);
-                    if (!$.isEmptyObject(filter) && filter && (filter.donViGuiCongVan || filter.donViNhanCongVan || filter.canBoNhanCongVan)) this.showAdvanceSearch();
+                    this.canBoNhanCongVan?.value(filter.canBoNhanCongVan || '');
+                    this.timeType?.value(filter.timeType || '');
+                    this.fromTime?.value(filter.fromTime || '');
+                    this.toTime?.value(filter.toTime || '');
+                    if (!$.isEmptyObject(filter) && filter && (filter.donViGuiCongVan || filter.donViNhanCongVan || filter.canBoNhanCongVan || filter.timeType || filter.fromTime || filter.toTime)) this.showAdvanceSearch();
                 }
             });
         });
@@ -187,7 +101,7 @@ class HcthCongVanDen extends AdminPage {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('hcthCongVanDen', ['read', 'write', 'delete']);
         // let readOnly = !permission.write;
-        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.hcthCongVanDen ? this.props.hcthCongVanDen.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
+        let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.hcthCongVanDen && this.props.hcthCongVanDen.page ? this.props.hcthCongVanDen.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = renderTable({
             getDataSource: () => list,
             emptyTable: 'Không dữ liệu công văn đến',
@@ -196,14 +110,13 @@ class HcthCongVanDen extends AdminPage {
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', }}>Số CV</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày nhận</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày hết hạn</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>
                     <th style={{ width: '15%', whiteSpace: 'nowrap' }}>Đơn vị gửi</th>
                     <th style={{ width: '45%', whiteSpace: 'nowrap' }}>Nội dung</th>
                     <th style={{ width: '10%', whiteSpace: 'nowrap' }}>Đơn vị nhận</th>
                     <th style={{ width: '10%', whiteSpace: 'nowrap' }}>Cán bộ nhận</th>
                     <th style={{ width: '20%' }}>Chỉ đạo</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tình trạng</th>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                 </tr>),
             renderRow: (item, index) => {
@@ -212,10 +125,27 @@ class HcthCongVanDen extends AdminPage {
                 return (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                        <TableCell type='link' onClick={() => this.props.history.push(`/user/hcth/cong-van-den/${item.id}`)} style={{ whiteSpace: 'nowrap' }} content={item.soCongVan} />
-                        <TableCell type='text' style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={item.ngayCongVan ? T.dateToText(item.ngayCongVan, 'dd/mm/yyyy') : ''} />
-                        <TableCell type='text' style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={item.ngayCongVan ? T.dateToText(item.ngayNhan, 'dd/mm/yyyy') : ''} />
-                        <TableCell type='text' style={{ textAlign: 'center', whiteSpace: 'nowrap', color: 'red' }} content={item.ngayHetHan ? T.dateToText(item.ngayHetHan, 'dd/mm/yyyy') : ''} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
+                            <>
+                                <Link to={`/user/hcth/cong-van-den/${item.id}`}>{item.soCongVan}</Link>
+                                {item.ngayCongVan ? <span><br />{'Ngày: ' + T.dateToText(item.ngayCongVan, 'dd/mm/yyyy')}</span> : null}
+                            </>
+                        } />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
+                            <>
+                                {
+                                    item.ngayNhan ? (<>
+                                        <span>Nhận :</span><span style={{ color: 'blue' }}> {T.dateToText(item.ngayNhan, 'dd/mm/yyyy')}</span>
+                                    </>) : null
+                                }
+                                {item.ngayNhan && item.ngayHetHan ? <br /> : null}
+                                {
+                                    item.ngayHetHan ? (<>
+                                        <span>Hết hạn:</span><span style={{ color: 'red' }}> {T.dateToText(item.ngayHetHan, 'dd/mm/yyyy')}</span>
+                                    </>) : null
+                                }
+                            </>
+                        } />
                         <TableCell type='text' style={{}} content={item.tenDonViGuiCV} />
                         <TableCell type='text' style={{}} content={item.noiDung} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
@@ -234,6 +164,11 @@ class HcthCongVanDen extends AdminPage {
                                 </span>
                             )) : null} />
                         <TableCell type='text' style={{}} content={item.chiDao} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
+                            item.linkCongVan && JSON.parse(item.linkCongVan).length > 0 ?
+                                (<span style={{ color: 'blue' }}>Có tệp tin</span>) :
+                                (<span style={{ color: 'red' }}>Chưa có tệp tin</span>)
+                        } />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onEdit={() => this.props.history.push(`/user/hcth/cong-van-den/${item.id}`)} onDelete={(e) => this.onDelete(e, item)} permissions={currentPermissions} />
                     </tr>);
             }
@@ -251,12 +186,12 @@ class HcthCongVanDen extends AdminPage {
 
                         <FormSelect allowClear={true} className='col-md-3' ref={e => this.timeType = e} label='Theo thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
                         {this.timeType?.value() && (<>
-                            <FormDatePicker type='date-mask' className='col-md-3' ref={e => this.fromDate = e} label='Từ ngày' />
-                            <FormDatePicker type='date-mask' className='col-md-3' ref={e => this.toDate = e} label='Đến ngày' />
+                            <FormDatePicker type='date' className='col-md-3' ref={e => this.fromTime = e} label='Từ ngày' onChange={() => this.changeAdvancedSearch()}/>
+                            <FormDatePicker type='date' className='col-md-3' ref={e => this.toTime = e} label='Đến ngày' onChange={() => this.changeAdvancedSearch()}/>
                         </>)}
                     </div>
                     <FormSelect allowClear={true} className='col-md-4' ref={e => this.donViGuiCongVan = e} label='Đơn vị gửi công văn' data={SelectAdapter_DmDonViGuiCongVan} onChange={() => this.changeAdvancedSearch()} />
-                    <FormSelect allowClear={true} className='col-md-4' ref={e => this.donViNhanCongVan = e} label='Đơn vị nhận công văn' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect multiple={true} allowClear={true} className='col-md-4' ref={e => this.donViNhanCongVan = e} label='Đơn vị nhận công văn' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />
                     <FormSelect allowClear={true} className='col-md-4' ref={e => this.canBoNhanCongVan = e} label='Cán bộ nhận công văn' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} />
                 </div>
             </>,

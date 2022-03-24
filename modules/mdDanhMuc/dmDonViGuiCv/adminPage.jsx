@@ -5,23 +5,18 @@ import { getDmLoaiDonViAll } from 'modules/mdDanhMuc/dmLoaiDonVi/redux';
 import Pagination from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
 import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
+import T from 'view/js/common';
 
 class EditModal extends AdminModal {
     state = { active: true };
 
     componentDidMount() {
-        $(document).ready(() => this.onShown(() => {
-            if (this.id) {
-                !this.id.value() ? this.id.focus() : this.ten.focus();
-            }
-        }));
+        T.ready(() => this.onShown(() => this.ten.focus()));
     }
 
     onShow = (item) => {
-        const { id, ten, kichHoat} = item ? item : { id: null, ten: '', kichHoat: true };
-        this.setState({ id, item } , () => {
-            if (id) this.id.value(id);
-        });
+        const { id, ten, kichHoat } = item ? item : { id: null, ten: '', kichHoat: true };
+        this.setState({ id, item });
         this.ten.value(ten);
         this.kichHoat.value(kichHoat);
     }
@@ -31,16 +26,12 @@ class EditModal extends AdminModal {
             ten: this.ten.value(),
             kichHoat: this.kichHoat.value() ? 1 : 0,
         };
-        if (changes.id == '') {
-            T.notify('Mã đơn vị gửi công văn bị trống!', 'danger');
-            this.id.focus();
-        } else
-            if (changes.ten == '') {
-                T.notify('Tên đơn vị công văn bị trống!', 'danger');
-                this.ten.focus();
-            } else {
-                this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
-            }
+        if (changes.ten == '') {
+            T.notify('Tên đơn vị công văn bị trống!', 'danger');
+            this.ten.focus();
+        } else {
+            this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
+        }
         e.preventDefault();
     }
 
@@ -51,8 +42,6 @@ class EditModal extends AdminModal {
         return this.renderModal({
             title: this.state.id ? 'Cập nhật đơn vị gửi công văn' : 'Tạo mới đơn vị gửi công văn',
             body: <div className='row'>
-                { this.state.id && <FormTextBox type='number' className='col-md-12' ref={e => this.id = e} label='Mã đơn vị'
-                    readOnly={this.state.id ? true : readOnly} required /> } 
                 <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên đơn vị'
                     readOnly={readOnly} required />
 
@@ -99,14 +88,14 @@ class DmDonViGuiCvPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>#</th>
-                        <th style={{ width: '50%', textAlign: 'center' }}>Tên đơn vị</th>
-                        <th style={{ width: '30%', textAlign: 'center'}} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: '20%', textAlign: 'center' }} nowrap='true'>Thao tác</th>
+                        <th style={{ width: '100%', textAlign: 'center' }}>Tên đơn vị</th>
+                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Kích hoạt</th>
+                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1}/>
+                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='text' content={item.ten ? item.ten : ''} />
                         <TableCell type='checkbox' style={{ textAlign: 'center' }} content={item.kichHoat} permission={permission}
                             onChanged={() => this.changeActive(item)} />
@@ -128,11 +117,11 @@ class DmDonViGuiCvPage extends AdminPage {
                 <div className='tile'>{table}</div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getDmDonViGuiCongVanPage} />
-                <EditModal ref={e => this.modal = e} 
-                    permission={permission} 
-                    create={this.props.createDmDonViGuiCv} 
-                    update={this.props.updateDmDonViGuiCv} 
-                    permissions={currentPermissions} 
+                <EditModal ref={e => this.modal = e}
+                    permission={permission}
+                    create={this.props.createDmDonViGuiCv}
+                    update={this.props.updateDmDonViGuiCv}
+                    permissions={currentPermissions}
                 />
             </>,
             backRoute: '/user/category',

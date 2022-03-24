@@ -30,21 +30,21 @@ import T from 'view/js/common';
 
 class AdminEditPage extends AdminPage {
     state = {
+        id: null,
         listFile: []
     }
 
     componentDidMount() {
         T.ready('/user/hcth', () => {
             const params = T.routeMatcher('/user/hcth/cong-van-den/:id').parse(window.location.pathname);
-            this.setState({ params }, () => this.getData());
+            this.setState({ id: params.id === 'new' ? null : params.id }, () => this.getData());
         });
     }
 
     getData = () => {
-        const id = this.state.params?.id;
-        const isCreate = id === 'new';
+        const isCreate = !this.state.id;
         if (!isCreate) {
-            this.props.getCongVanDen(Number(this.state.params.id), (item) => this.setData(item));
+            this.props.getCongVanDen(Number(this.state.id), (item) => this.setData(item));
         }
         else this.setData(null);
     }
@@ -58,15 +58,15 @@ class AdminEditPage extends AdminPage {
         if (canBoNhan) {
             canBoNhan = canBoNhan.split(',');
         }
-        this.ngayCongVan.value(ngayCongVan);
-        this.ngayNhan.value(ngayNhan);
-        this.ngayHetHan.value(ngayHetHan);
+        this.ngayCongVan.value(ngayCongVan || '');
+        this.ngayNhan.value(ngayNhan || '');
+        this.ngayHetHan.value(ngayHetHan || '');
         this.soCongVan.value(soCongVan ? soCongVan : '');
-        this.donViGui.value(donViGui);
+        this.donViGui.value(donViGui || '');
         this.donViNhan.value(donViNhan ? donViNhan : '');
         this.canBoNhan.value(canBoNhan ? canBoNhan : '');
-        this.noiDung.value(noiDung);
-        this.chiDao.value(chiDao);
+        this.noiDung.value(noiDung || '');
+        this.chiDao.value(chiDao || '');
         if (linkCongVan && linkCongVan.length > 0) {
             linkCongVan = JSON.parse(linkCongVan);
             this.setState({ listFile: linkCongVan });
@@ -78,7 +78,7 @@ class AdminEditPage extends AdminPage {
         if (response.data) {
             let listFile = this.state.listFile.length ? [...this.state.listFile] : [];
             listFile.push(response.data);
-            if (this.state.id) this.props.updateHcthCongVanDen(this.state.params.id, { linkConVan: JSON.stringify(listFile) }, () => { this.setState({ listFile }); });
+            if (this.state.id) this.props.updateHcthCongVanDen(this.state.id, { linkCongVan: JSON.stringify(listFile) }, () => { this.setState({ listFile }); });
             else this.setState({ listFile });
         } else if (response.error) T.notify(response.error, 'danger');
     }
@@ -86,24 +86,12 @@ class AdminEditPage extends AdminPage {
     deleteFile = (e, index, item) => {
         e.preventDefault();
         T.confirm('Tập tin đính kèm', 'Bạn có chắc muốn xóa tập tin đính kèm này, tập tin sau khi xóa sẽ không thể khôi phục lại được', 'warning', true, isConfirm =>
-            isConfirm && this.props.deleteFile(this.state.ownerShcc, this.state.id, index, item, () => {
+            isConfirm && this.props.deleteFile(this.state.id ? this.state.id : null, index, item, () => {
                 let listFile = [...this.state.listFile];
                 listFile.splice(index, 1);
                 this.setState({ listFile });
             }));
     }
-
-
-    deleteFile = (e, index, item) => {
-        e.preventDefault();
-        T.confirm('Tập tin đính kèm', 'Bạn có chắc muốn xóa tập tin đính kèm này', 'warning', true, isConfirm =>
-            isConfirm && this.props.deleteFile(this.state.id, index, item, () => {
-                let listFile = [...this.state.listFile];
-                listFile.splice(index, 1);
-                this.setState({ listFile });
-            }));
-    }
-
 
 
     tableListFile = (data, id, permission) => renderTable({
@@ -114,25 +102,30 @@ class AdminEditPage extends AdminPage {
             <tr>
                 <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>#</th>
                 <th style={{ width: '100%' }}>Tên tập tin</th>
-                <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Ngày upload</th>
+                <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thời gian</th>
                 <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
             </tr>
         ),
-        renderRow: (item, index) => (
-            <tr key={index}>
-                <TableCell style={{ textAlign: 'right' }} content={index + 1} />
-                <TableCell type='text' style={{ wordBreak: 'break-all' }} content={<>
-                    <a href={'/api/hcth/cong-van-den/download' + item.substring(1)} download>{item.substring(24)}</a>
-                </>
-                } />
-                <TableCell style={{ textAlign: 'center' }} content={T.dateToText(parseInt(item.substring(10, 23)), 'dd/mm/yyyy HH:MM')}></TableCell>
-                <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onDelete={e => this.deleteFile(e, index, item)}>
-                    <a className='btn btn-info' href={`/api/hcth/cong-van-den/download${item}`} download>
-                        <i className='fa fa-lg fa-download' />
-                    </a>
-                </TableCell>
-            </tr>
-        )
+        renderRow: (item, index) => {
+            const
+                timeStamp = parseInt(item.split('/')[2].substring(0, 13)),
+                originalName = item.split('/')[2].substring(14);
+            return (
+                <tr key={index}>
+                    <TableCell style={{ textAlign: 'right' }} content={index + 1} />
+                    <TableCell type='text' style={{ wordBreak: 'break-all' }} content={<>
+                        <a href={'/api/hcth/cong-van-den/download' + item} download>{originalName}</a>
+                    </>
+                    } />
+                    <TableCell style={{ textAlign: 'center' }} content={T.dateToText(timeStamp, 'dd/mm/yyyy HH:MM')}></TableCell>
+                    <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onDelete={e => this.deleteFile(e, index, item)}>
+                        <a className='btn btn-info' href={`/api/hcth/cong-van-den/download${item}`} download>
+                            <i className='fa fa-lg fa-download' />
+                        </a>
+                    </TableCell>
+                </tr>
+            );
+        }
     });
 
     save = () => {
@@ -169,7 +162,7 @@ class AdminEditPage extends AdminPage {
         }
         else {
             if (this.state.id) {
-                this.props.update(this.state.id, changes, this.hide);
+                this.props.updateHcthCongVanDen(this.state.id, changes, this.getData);
             } else {
                 this.props.createHcthCongVanDen(changes, () => this.props.history.push('/user/hcth/cong-van-den'));
             }

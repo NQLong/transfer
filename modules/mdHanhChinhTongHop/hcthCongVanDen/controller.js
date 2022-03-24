@@ -53,23 +53,69 @@ module.exports = (app) => {
     });
 
     app.post('/api/hcth/cong-van-den', app.permission.check('staff:login'), (req, res) => {
-        app.model.hcthCongVanDen.create(req.body.data, (error, item) => res.send({ error, item }));
+        app.model.hcthCongVanDen.create(req.body.data, (error, item) => {
+            if (error)
+                res.send({ error, item });
+            else {
+                let { id, linkCongVan } = item;
+                updateListFile(JSON.parse(linkCongVan), id, ({ error, listFile }) => {
+                    if (error) {
+                        app.model.hcthCongVanDen.delete({ id }, () => res.send({ error }));
+                    } else
+                        app.model.hcthCongVanDen.update({ id }, { 'linkCongVan': JSON.stringify(listFile) }, (errors, item) => res.send({ errors, item }));
+                });
+            }
+        });
     });
+
+    const updateListFile = (listFile, id, done) => {
+        if (!listFile || listFile.length == 0) return listFile;
+        app.createFolder(
+            app.path.join(app.assetPath, `/congVanDen/${id}`)
+        );
+        const pattern = /\/new.*/;
+        const newList = listFile.map(fileName => {
+            if (pattern.test(fileName)) {
+                const
+                    destFile = fileName.replace('new', `${id}`),
+                    destPath = app.assetPath + '/congVanDen' + destFile,
+                    srcPath = app.assetPath + '/congVanDen' + fileName;
+                app.fs.rename(srcPath, destPath, error => {
+                    if (error)
+                        done && done({ error });
+                });
+                return destFile;
+            }
+            return fileName;
+        });
+        done && done({ error: null, listFile: newList });
+    };
+
 
     app.put('/api/hcth/cong-van-den', app.permission.check('hcthCongVanDen:write'), (req, res) => {
         app.model.hcthCongVanDen.update({ id: req.body.id }, req.body.changes, (errors, items) => res.send({ errors, items }));
     });
 
     app.delete('/api/hcth/cong-van-den', app.permission.check('hcthCongVanDen:delete'), (req, res) => {
-        app.model.hcthCongVanDen.delete({ id: req.body.id }, errors => res.send({ errors }));
+        app.model.hcthCongVanDen.delete({ id: req.body.id }, errors => {
+            app.deleteFolder(app.assetPath + '/congVanDen/' + req.body.id);
+            res.send({ errors });
+        });
     });
 
     app.get('/api/hcth/cong-van-den/search/page/:pageNumber/:pageSize', app.permission.check('hcthCongVanDen:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan } = (req.query.filter && req.query.filter != '%%%%%%') ? req.query.filter : { donViGuiCongVan: null, donViNhanCongVan: null, canBoNhanCongVan: null };
-        app.model.hcthCongVanDen.searchPage(pageNumber, pageSize, donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, searchTerm, (error, page) => {
+        let { donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, timeType, fromTime, toTime } = (req.query.filter && req.query.filter != '%%%%%%') ? req.query.filter :
+            { donViGuiCongVan: null, donViNhanCongVan: null, canBoNhanCongVan: null, timeType: null, fromTime: null, toTime: null };
+        donViGuiCongVan = donViGuiCongVan || null;
+        donViNhanCongVan = donViNhanCongVan || null;
+        canBoNhanCongVan = canBoNhanCongVan || null;
+        timeType = timeType || null;
+        fromTime = fromTime || null;
+        toTime = toTime || null;
+        app.model.hcthCongVanDen.searchPage(pageNumber, pageSize, donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, timeType, fromTime, toTime, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -93,9 +139,11 @@ module.exports = (app) => {
             fields.userData[0].startsWith('hcthCongVanDenFile') &&
             files.hcthCongVanDenFile &&
             files.hcthCongVanDenFile.length > 0) {
-            const user = req.session.user,
+            const
                 srcPath = files.hcthCongVanDenFile[0].path,
-                filePath = '/' + user.shcc + '_' + (new Date().getTime()).toString() + '_' + files.hcthCongVanDenFile[0].originalFilename,
+                isNew = fields.userData[0].substring(19) == 'new',
+                id = fields.userData[0].substring(19),
+                filePath = (isNew ? '/new/' : `/${id}/`) + (new Date().getTime()).toString() + '_' + files.hcthCongVanDenFile[0].originalFilename,
                 destPath = app.assetPath + '/congVanDen' + filePath,
                 validUploadFileType = ['.xls', '.xlsx', '.doc', '.docx', '.pdf', '.png', '.jpg'],
                 baseNamePath = app.path.extname(srcPath);
@@ -103,6 +151,9 @@ module.exports = (app) => {
                 done({ error: 'Định dạng tập tin không hợp lệ!' });
                 app.deleteFile(srcPath);
             } else {
+                app.createFolder(
+                    app.path.join(app.assetPath, '/congVanDen/' + (isNew ? '/new' : '/' + id))
+                );
                 app.fs.rename(srcPath, destPath, error => {
                     if (error) {
                         done({ error });
@@ -116,15 +167,18 @@ module.exports = (app) => {
 
     //Delete file
     app.put('/api/hcth/cong-van-den/delete-file', app.permission.check('staff:login'), (req, res) => {
-        const id = req.body.id,
+        const
+            id = req.body.id,
             index = req.body.index,
             file = req.body.file;
         app.model.hcthCongVanDen.get({ id: id }, (error, item) => {
             if (error) {
                 res.send({ error });
             } else if (item && item.linkCongVan) {
-                let newList = JSON.parse(item.fileMinhChung);
-                app.deleteFile(app.assetPath + '/congVanDen' + newList[index]);
+                let newList = JSON.parse(item.linkCongVan);
+                const filePath = app.assetPath + '/congVanDen' + newList[index];
+                if (app.fs.existsSync(filePath))
+                    app.deleteFile(filePath);
                 newList.splice(index, 1);
                 app.model.hcthCongVanDen.update(id, { linkCongVan: JSON.stringify(newList) }, (error, item) => {
                     res.send({ error, item });
@@ -135,16 +189,15 @@ module.exports = (app) => {
                     app.deleteFile(filePath);
                     res.send({ error: null });
                 } else {
-                    res.send({ error: 'Không tìm thấy đề tài' });
+                    res.send({ error: 'Không tìm thấy công văn' });
                 }
             }
         });
     });
 
-    app.get('/api/hcth/cong-van-den/download/:fileName', app.permission.check('staff:login'), (req, res) => {
-        const { fileName } = req.params;
-        const dir = app.path.join(app.assetPath, `/congVanDen/${fileName}`);
-
+    app.get('/api/hcth/cong-van-den/download/:id/:fileName', app.permission.check('staff:login'), (req, res) => {
+        const { id, fileName } = req.params;
+        const dir = app.path.join(app.assetPath, `/congVanDen/${id}`);
         if (app.fs.existsSync(dir)) {
             const serverFileNames = app.fs.readdirSync(dir).filter(v => app.fs.lstatSync(app.path.join(dir, v)).isFile());
             for (const serverFileName of serverFileNames) {

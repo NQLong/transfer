@@ -154,7 +154,6 @@ export function getCongVanDen(id, done) {
                 console.error('GET: ' + url + '.', data.error);
                 T.notify('Lấy công văn đến bị lỗi!', 'danger');
             } else {
-                T.notify('Lấy công văn đến thành công!', 'success');
                 dispatch({ type: HcthCongVanDenGet, item: data.item });
                 done && done(data.item);
             }

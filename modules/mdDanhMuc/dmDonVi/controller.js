@@ -71,9 +71,9 @@ module.exports = app => {
     });
     app.get('/api/danh-muc/don-vi/faculty', app.permission.check('user:login'), (req, res) => {
         let condition = {
-            statement: 'maPl IN (:maPl)',
+            statement: 'maPl = :maPl',
             parameter: {
-                maPl: '01',
+                maPl: 1,
             },
         };
         app.model.dmDonVi.getAll(condition, (error, items) => res.send({ error, items }));
