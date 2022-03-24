@@ -6,7 +6,7 @@ import Pagination from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
 import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
 
-class EditModal extends AdminModal {
+export class EditModal extends AdminModal {
     state = { active: true };
 
     componentDidMount() {

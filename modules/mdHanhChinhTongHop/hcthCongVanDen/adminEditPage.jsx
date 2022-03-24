@@ -24,8 +24,8 @@ import {
 import { SelectAdapter_DmDonViGuiCongVan } from 'modules/mdDanhMuc/dmDonViGuiCv/redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
-
-
+import { EditModal } from 'modules/mdDanhMuc/dmDonViGuiCv/adminPage';
+import { createDmDonViGuiCv } from 'modules/mdDanhMuc/dmDonViGuiCv/redux';
 
 class AdminEditPage extends AdminPage {
     state = {
@@ -168,8 +168,20 @@ class AdminEditPage extends AdminPage {
         }
     }
 
+    onCreateDonviGui = (data, done) => {
+        this.props.createDmDonViGuiCv(data, ({error, item}) => {
+            if (!error) {
+                const { id } = item;
+                this.donViGui?.value(id);
+                done && done({error, item});
+            }
+            this.modal.hide();
+        });
+    }
+
     render() {
         const permission = this.getUserPermission('hcthCongVanDen', ['read', 'write', 'delete']);
+        const donViguiPermission = this.getUserPermission('dmDonViGuiCv', ['read', 'write', 'delete']);
         const readOnly = !permission.write;
         const isNew = !this.state.id;
         return this.renderPage({
@@ -188,7 +200,10 @@ class AdminEditPage extends AdminPage {
                         <FormDatePicker type='date-mask' className='col-md-4' ref={e => this.ngayCongVan = e} label='Ngày CV' readOnly={readOnly} required />
                         <FormDatePicker type='date-mask' className='col-md-4' ref={e => this.ngayNhan = e} label='Ngày nhận' readOnly={readOnly} required />
                         <FormDatePicker type='date-mask' className='col-md-4' ref={e => this.ngayHetHan = e} label='Ngày hết hạn' readOnly={readOnly} />
-                        <FormSelect className='col-md-12' ref={e => this.donViGui = e} label='Đơn vị gửi công văn' data={SelectAdapter_DmDonViGuiCongVan} readOnly={readOnly} required />
+                        <div className='col-md-12' style={{paddingTop: 0}}>
+                            <span>Chưa có <b>Đơn vị gửi công văn</b>? <Link to='#' onClick={() => this.modal.show(null)}>Tạo mới</Link></span>
+                        </div>
+                        <FormSelect className='col-md-12' ref={e => this.donViGui = e} label={'Đơn vị gửi công văn'} data={SelectAdapter_DmDonViGuiCongVan} readOnly={readOnly} required />
                         <FormRichTextBox type='text' className='col-md-12' ref={e => this.noiDung = e} label='Nội dung' readOnly={readOnly} required />
                         <FormSelect multiple={true} className='col-md-6' ref={e => this.donViNhan = e} label='Đơn vi nhận công văn' data={SelectAdapter_DmDonVi} readOnly={readOnly} />
                         <FormSelect multiple={true} className='col-md-6' ref={e => this.canBoNhan = e} label='Cán bộ nhận công văn' data={SelectAdapter_FwCanBo} readOnly={readOnly} />
@@ -205,8 +220,11 @@ class AdminEditPage extends AdminPage {
                             <FormFileBox className='col-md-4' ref={e => this.fileBox = e} label='Tải lên tập tin công văn' postUrl='/user/upload' uploadType='hcthCongVanDenFile' userData='hcthCongVanDenFile' style={{ width: '100%', backgroundColor: '#fdfdfd' }} onSuccess={this.onSuccess} />
                         </div>
                     </div>
-
                 </div>
+                <EditModal ref={e => this.modal = e}
+                    permissions={donViguiPermission}
+                    create={this.onCreateDonviGui}
+                />
 
             </>,
             backRoute: '/user/hcth/cong-van-den',
@@ -224,6 +242,7 @@ const mapActionsToProps = {
     deleteHcthCongVanDen,
     getHcthCongVanDenSearchPage,
     getCongVanDen,
-    deleteFile
+    deleteFile,
+    createDmDonViGuiCv
 };
 export default connect(mapStateToProps, mapActionsToProps)(AdminEditPage);
