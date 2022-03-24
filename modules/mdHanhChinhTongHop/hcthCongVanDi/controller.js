@@ -51,7 +51,7 @@ module.exports = app => {
                 catch {
                     listCongVan = [];
                 }
-                updateListFile(linkCongVan, id, ({ error, listFile }) => {
+                updateListFile(listCongVan, id, ({ error, listFile }) => {
                     if (error) {
                         app.model.hcthCongVanDi.delete({ id }, () => res.send({ error }));
                     } else {
