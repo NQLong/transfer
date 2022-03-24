@@ -54,15 +54,19 @@ class StaffEditNCKH extends AdminPage {
         let {
             id, shcc, batDauType, ketThucType, batDau, ketThuc, fileMinhChung, inLLKH,
             tenDeTai, maSoCapQuanLy, kinhPhi, vaiTro, ngayNghiemThu, ketQua, ngayNghiemThuType
+        } = data && data.item ? data.item : {
+            id: null, shcc: shcc ? shcc : data.shcc, batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', batDau: null, ketThuc: null, tenDeTai: '', inLLKH: 0,
+            maSoCapQuanLy: '', kinhPhi: '', vaiTro: '', ngayNghiemThu: null, ketQua: '', ngayNghiemThuType: 'dd/mm/yyyy', fileMinhChung: '[]'
+        };
+        let listFile = [];
+        try {
+            listFile = JSON.parse(fileMinhChung);
+        } catch (exception) {
+            console.error(exception);
         }
-            = data && data.item ? data.item :
-                {
-                    id: null, shcc: shcc ? shcc : data.shcc, batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', batDau: null, ketThuc: null, tenDeTai: '', inLLKH: 0,
-                    maSoCapQuanLy: '', kinhPhi: '', vaiTro: '', ngayNghiemThu: null, ketQua: '', ngayNghiemThuType: 'dd/mm/yyyy', fileMinhChung: '[]'
-                };
         this.setState({
             ownerShcc: shcc,
-            batDauType: batDauType ? batDauType : 'dd/mm/yyyy', listFile: fileMinhChung ? JSON.parse(fileMinhChung) : [],
+            batDauType: batDauType ? batDauType : 'dd/mm/yyyy', listFile: listFile,
             ketThucType: ketThucType ? ketThucType : 'dd/mm/yyyy',
             ngayNghiemThuType: ngayNghiemThuType ? ngayNghiemThuType : 'dd/mm/yyyy',
             id, batDau, ketThuc, ngayNghiemThu,
@@ -247,10 +251,9 @@ class StaffEditNCKH extends AdminPage {
                 if (this.state.listFile) {
                     try {
                         data.fileMinhChung = JSON.stringify(this.state.listFile);
-                        if (!data.fileMinhChung) throw ('Lỗi đọc tên file');
-
-                    } catch (error) {
-                        T.notify(error, 'danger');
+                    } catch (exception) {
+                        T.notify(exception, 'danger');
+                        return;
                     }
                 }
                 this.props.createQtNckhStaffUser(data, this.props.history.push('/user/nghien-cuu-khoa-hoc'));
