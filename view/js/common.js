@@ -219,6 +219,11 @@ const T = {
         swal({ icon, title, content, dangerMode, buttons: { cancel: true, confirm: true }, }).then(done);
     },
 
+    randomHexColor: () => {
+        let n = (Math.random() * 0xfffff * 1000000).toString(16);
+        return '#' + n.slice(0, 6);
+    },
+
     mobileDisplay: mobile => mobile ? (mobile.length == 10 ? mobile.toString().replace(/(\d{4})(\d{3})(\d{3})/, '$1 $2 $3') : mobile.toString().replace(/(\d{3})(\d{4})(\d{4})/, '($1) $2 $3')) : '',
 
     confirm3: (title, html, icon, buttonDanger, buttonSuccess, done) => {
@@ -489,6 +494,16 @@ String.prototype.numberWithCommas = function () {
 //Array prototype -----------------------------------------------------------------------------------------------------
 Array.prototype.contains = function (...pattern) {
     return pattern.reduce((result, item) => result && this.includes(item), true);
+};
+
+Array.prototype.groupBy = function (key) {
+    return this.reduce(
+        (result, item) => ({
+            ...result,
+            [item[key]]: [...(result[item[key]] || []), item,],
+        }),
+        {},
+    );
 };
 
 Date.prototype.getText = function () {
