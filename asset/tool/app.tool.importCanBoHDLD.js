@@ -58,6 +58,6 @@ const run = () => {
 }
 
 app.readyHooks.add('Run tool.importCanBoHDLD.js', {
-    ready: () => app.dbConnection && app.model && app.model.canBo && app.model.dmDienHopDong && app.model.qtHopDongLaoDong,
+    ready: () => app.database.oracle.connected && app.model && app.model.canBo && app.model.dmDienHopDong && app.model.qtHopDongLaoDong,
     run,
 });

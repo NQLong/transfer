@@ -110,6 +110,6 @@ const run = () => {
 }
 
 app.readyHooks.add('Run tool.updateCanBoFromDevToProd.js', {
-    ready: () => app.dbConnection && app.model && app.model.canBo,
+    ready: () => app.database.oracle.connected && app.model && app.model.canBo,
     run,
 });

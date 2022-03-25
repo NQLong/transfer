@@ -19,7 +19,7 @@ module.exports = app => {
                 done('Data is empty!');
             } else {
                 const sql = 'INSERT INTO FW_EVENT (' + statement.substring(2) + ') VALUES (' + values.substring(2) + ')';
-                app.dbConnection.execute(sql, parameter, (error, resultSet) => {
+                app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
                         app.model.fwEvent.get({ rowId: resultSet.lastRowid }, (error, event) => {
                             if (error) {
@@ -103,7 +103,7 @@ module.exports = app => {
                 done('Data is empty!');
             } else {
                 const sql = 'INSERT INTO FW_EVENT (' + statement.substring(2) + ') VALUES (' + values.substring(2) + ')';
-                app.dbConnection.execute(sql, parameter, (error, resultSet) => {
+                app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
                         app.model.fwEvent.get({ rowId: resultSet.lastRowid }, done);
                     } else {
@@ -126,7 +126,7 @@ module.exports = app => {
                                 FROM HCMUSSH.FW_EVENT t
                                 ORDER BY PRIORITY${order}
                             ) WHERE PRIORITY ${operator} :priority AND ROWNUM <= :limit`;
-                app.dbConnection.execute(sql, { priority: item1.priority, limit: 1 }, (error, { rows }) => {
+                app.database.oracle.connection.main.execute(sql, { priority: item1.priority, limit: 1 }, (error, { rows }) => {
                     if (error) {
                         done(error);
                     } else if (rows === null || rows.length === 0) {
@@ -179,7 +179,7 @@ module.exports = app => {
             selectedColumns = '*';
         }
         if (orderBy) Object.keys(obj2Db).sort((a, b) => b.length - a.length).forEach(key => orderBy = orderBy.replaceAll(key, obj2Db[key]));
-        condition = app.dbConnection.buildCondition(obj2Db, condition, ' AND ');
+        condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
         let leftIndex = (pageNumber <= 1 ? 0 : pageNumber - 1) * pageSize,
             parameter = condition.parameter ? condition.parameter : {};
         const sql_count = `SELECT COUNT(*)
@@ -188,16 +188,16 @@ module.exports = app => {
                                         INNER JOIN FW_EVENT_CATEGORY FNC on FN.ID = FNC.EVENT_ID
                                         INNER JOIN FW_CATEGORY FC on FNC.CATEGORY_ID = FC.ID)
                                     WHERE CATEGORY_ID IN (` + category + ')' + (condition.statement ? ' AND ' + condition.statement.replaceAll('FN.ACTIVE', 'ACTIVE') : '');
-        app.dbConnection.execute(sql_count, parameter, (err, res) => {
+        app.database.oracle.connection.main.execute(sql_count, parameter, (err, res) => {
             let result = {};
             let totalItem = res && res.rows && res.rows[0] ? res.rows[0]['COUNT(*)'] : 0;
             result = { totalItem, pageSize, pageTotal: Math.ceil(totalItem / pageSize) };
             result.pageNumber = pageNumber === -1 ? 1 : Math.min(pageNumber, result.pageTotal);
             leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
-            const sql = 'SELECT ' + app.dbConnection.parseSelectedColumns(obj2Db, selectedColumns) + ', CATEGORY_ID AS "category_Id", CATEGORY_TITLE AS "category_Title" ' + 'FROM (SELECT FN.*, COUNT(*) over (partition by FN.ID) AS CNT, FC.ID AS CATEGORY_ID, FC.TITLE AS CATEGORY_TITLE, ROW_NUMBER() OVER (ORDER BY '
+            const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ', CATEGORY_ID AS "category_Id", CATEGORY_TITLE AS "category_Title" ' + 'FROM (SELECT FN.*, COUNT(*) over (partition by FN.ID) AS CNT, FC.ID AS CATEGORY_ID, FC.TITLE AS CATEGORY_TITLE, ROW_NUMBER() OVER (ORDER BY '
                 + (orderBy ? ' FN.' + orderBy : ' FN.' + keys) + ') R FROM FW_EVENT FN INNER JOIN FW_EVENT_CATEGORY FNC on FN.ID = FNC.EVENT_ID INNER JOIN FW_CATEGORY FC on FNC.CATEGORY_ID = FC.ID WHERE CATEGORY_ID IN( '
                 + category + ')' + (condition.statement ? ' AND ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize) + (condition.statement ? ' AND CNT = 1' : '');
-            app.dbConnection.execute(sql, parameter, (error, resultSet) => {
+            app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
                 result.list = resultSet && resultSet.rows ? resultSet.rows : [];
                 done(error, result);
             });

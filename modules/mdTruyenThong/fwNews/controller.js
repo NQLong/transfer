@@ -726,7 +726,7 @@ module.exports = app => {
 
     // Hook ready -----------------------------------------------------------------------------------------------------------------------------------
     app.readyHooks.add('readyNews', {
-        ready: () => app.dbConnection != null && app.model != null && app.model.fwNews != null,
+        ready: () => app.database.oracle.connected && app.model.fwNews,
         run: () => app.model.fwNews.count((error, numberOfNews) => {
             if (error == null) {
                 numberOfNews = Number(numberOfNews);

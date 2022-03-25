@@ -22,7 +22,7 @@ module.exports = app => {
             done('Data is empty!');
         } else {
             const sql = 'INSERT INTO FW_ANSWER_RECORD (' + statement.substring(2) + ') VALUES (' + values.substring(2) + ')';
-            app.dbConnection.executeMany(sql, parameter, (error, resultSet) => {
+            app.database.oracle.connection.main.executeMany(sql, parameter, (error, resultSet) => {
                 if (!error || !resultSet.rowsAffected) {
                     done();
                 } else {

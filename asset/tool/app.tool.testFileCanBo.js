@@ -130,6 +130,6 @@ const run = () => {
 };
 
 app.readyHooks.add('Run tool.testFileCanBo.js', {
-    ready: () => app.dbConnection && app.model && app.model.canBo && app.model.dmDonVi,
+    ready: () => app.database.oracle.connected && app.model && app.model.canBo && app.model.dmDonVi,
     run
 });

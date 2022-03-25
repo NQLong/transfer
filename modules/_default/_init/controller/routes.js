@@ -59,7 +59,7 @@ module.exports = app => {
                 if (app.isDebug) data.isDebug = true;
                 if (req.session.user) data.user = req.session.user;
                 const ready = () => {
-                    if (app.dbConnection && app.model && app.model.fwMenu && app.model.fwSubmenu) {
+                    if (app.database.oracle.connected && app.model && app.model.fwMenu && app.model.fwSubmenu) {
                         app.model.fwMenu.getAll({}, '*', 'priority', (error, menus) => {
                             if (menus) {
                                 data.menus = [];

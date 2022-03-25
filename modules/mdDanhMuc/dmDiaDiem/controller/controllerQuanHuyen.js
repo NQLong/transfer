@@ -42,7 +42,7 @@ module.exports = app => {
 	});
 
 	app.get('/api/danh-muc/quan-huyen/item/:maQuanHuyen', app.permission.check('user:login'), (req, res) => {
-		app.model.dmQuanHuyen.get({maQuanHuyen: req.params.maQuanHuyen}, (error, item) => res.send({ error, item }));
+		app.model.dmQuanHuyen.get({ maQuanHuyen: req.params.maQuanHuyen }, (error, item) => res.send({ error, item }));
 	});
 
 	app.post('/api/danh-muc/quan-huyen', app.permission.check('dmQuanHuyen:write'), (req, res) => {
@@ -64,7 +64,7 @@ module.exports = app => {
 			batchErrors: true
 		};
 		const sql = 'INSERT INTO DM_QUAN_HUYEN (MA_QUAN_HUYEN, MA_TINH_THANH_PHO, TEN_QUAN_HUYEN, KICH_HOAT) VALUES (:maQuanHuyen, :maTinhThanhPho, :tenQuanHuyen, :kichHoat)';
-		app.dbConnection.executeMany(sql, dataUpload, options, (err, result) => {
+		app.database.oracle.connection.main.executeMany(sql, dataUpload, options, (err, result) => {
 			res.send(result);
 		});
 	});

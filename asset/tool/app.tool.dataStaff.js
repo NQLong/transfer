@@ -204,6 +204,6 @@ const run = () => app.excel.readFile(app.path.join(__dirname, 'DSCB.xlsx'), work
     }
 });
 app.readyHooks.add('Run tool.dataStaff.js', {
-    ready: () => app.dbConnection && app.model && app.model.canBo && app.model.dmDonVi,
+    ready: () => app.database.oracle.connected && app.model && app.model.canBo && app.model.dmDonVi,
     run,
 });

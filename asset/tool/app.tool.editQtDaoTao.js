@@ -64,6 +64,6 @@ const run = () => {
 }
 
 app.readyHooks.add('Run tool.editQtDaoTao.js', {
-    ready: () => app.dbConnection && app.model && app.model.dmHinhThucDaoTao && app.model.qtDaoTao && app.model.dmLoaiBangCap && app.model.canBo,
+    ready: () => app.database.oracle.connected && app.model && app.model.dmHinhThucDaoTao && app.model.qtDaoTao && app.model.dmLoaiBangCap && app.model.canBo,
     run,
 });

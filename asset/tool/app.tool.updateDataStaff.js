@@ -90,6 +90,6 @@ const run = () => app.excel.readFile(app.path.join(__dirname, 'DSCB.xlsx'), work
     }
 });
 app.readyHooks.add('Run tool.qtDiNuocNgoai.js', {
-    ready: () => app.dbConnection && app.model && app.model.qtDiNuocNgoai && app.model.canBo && app.model.dmMucDichNuocNgoai && app.model.dmQuocGia,
+    ready: () => app.database.oracle.connected && app.model && app.model.qtDiNuocNgoai && app.model.canBo && app.model.dmMucDichNuocNgoai && app.model.dmQuocGia,
     run,
 });

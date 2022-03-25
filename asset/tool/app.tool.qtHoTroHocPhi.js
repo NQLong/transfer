@@ -43,7 +43,7 @@ const convert = (s, c = ',') => {
 }
 
 app.readyHooks.add('Run tool.qtHoTroHocPhi.js', {
-    ready: () => app.dbConnection && app.model && app.model.canBo,
+    ready: () => app.database.oracle.connected && app.model && app.model.canBo,
     run: () => {
         app.excel.readFile('./data/hocphi.xlsx', workbook => {
             if (workbook) {

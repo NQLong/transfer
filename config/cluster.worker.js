@@ -47,7 +47,6 @@ module.exports = (cluster, isDebug) => {
     require('./authentication')(app);
     require('./permission')(app);
     require('./authentication.google')(app, appConfig);
-    // require('./ldap')(app);
 
     // Init -----------------------------------------------------------------------------------------------------------
     app.createTemplate('home', 'admin', 'unit');

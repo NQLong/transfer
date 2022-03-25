@@ -43,7 +43,7 @@ module.exports = app => {
 	});
 
 	app.get('/api/danh-muc/phuong-xa/item/:maPhuongXa', app.permission.check('user:login'), (req, res) => {
-		app.model.dmPhuongXa.get({maPhuongXa: req.params.maPhuongXa}, (error, item) => res.send({ error, item }));
+		app.model.dmPhuongXa.get({ maPhuongXa: req.params.maPhuongXa }, (error, item) => res.send({ error, item }));
 	});
 
 	app.post('/api/danh-muc/phuong-xa', app.permission.check('dmPhuongXa:write'), (req, res) => {
@@ -66,7 +66,7 @@ module.exports = app => {
 			batchErrors: true
 		};
 		const sql = 'INSERT INTO DM_PHUONG_XA (MA_PHUONG_XA, MA_QUAN_HUYEN, TEN_PHUONG_XA, KICH_HOAT) VALUES (:maPhuongXa, :maQuanHuyen, :tenPhuongXa, :kichHoat)';
-		app.dbConnection.executeMany(sql, dataUpload, options, (err, result) => {
+		app.database.oracle.connection.main.executeMany(sql, dataUpload, options, (err, result) => {
 			res.send(result);
 		});
 	});

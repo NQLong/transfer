@@ -9,7 +9,7 @@ module.exports = app => {
 
     // Init -----------------------------------------------------------------------------------------------------------------------------------------
     const init = () => {
-        if (app.dbConnection && app.model && app.model.setting) {
+        if (app.database.oracle.connected && app.model && app.model.setting) {
             app.model.setting.init({
                 emailRegisterMemberTitle: 'HCMUSSH: Chào mừng thành viên mới!',
                 emailRegisterMemberText: 'Xin chào {name}, Trường Đại học Khoa học Xã hội và Nhân văn (HCMUSSH) chào mừng bạn là thành viên mới. Trước khi bạn có thể đăng nhập, bạn vui lòng kích hoạt tài khoản bằng cách nhấp vào  {url}. Trân trọng, Trường Đại học Khoa học Xã hội và Nhân văn (HCMUSSH), Website: ' + app.rootUrl + '',

@@ -39,6 +39,6 @@ const run = () => {
 }
 
 app.readyHooks.add('Run tool.chucVu.js', {
-    ready: () => app.dbConnection && app.model && app.model.canBo && app.model.dmChucVu && app.model.qtChucVu,
+    ready: () => app.database.oracle.connected && app.model && app.model.canBo && app.model.dmChucVu && app.model.qtChucVu,
     run,
 });

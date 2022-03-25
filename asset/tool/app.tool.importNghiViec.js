@@ -39,6 +39,6 @@ const run = () => {
 }
 
 app.readyHooks.add('Run tool.importNghiViec.js', {
-    ready: () => app.dbConnection && app.model && app.model.canBo && app.model.qtNghiViec,
+    ready: () => app.database.oracle.connected && app.model && app.model.canBo && app.model.qtNghiViec,
     run,
 });

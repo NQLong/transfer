@@ -20,7 +20,7 @@ module.exports = app => {
                 done('Data is empty!');
             } else {
                 const sql = 'INSERT INTO FW_NEWS (' + statement.substring(2) + ') VALUES (' + values.substring(2) + ')';
-                app.dbConnection.execute(sql, parameter, (error, resultSet) => {
+                app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
                         app.model.fwNews.get({ rowId: resultSet.lastRowid }, (error, news) => {
                             if (error) {
@@ -125,7 +125,7 @@ module.exports = app => {
                                 FROM HCMUSSH.FW_NEWS t
                                 ORDER BY PRIORITY${order}
                             ) WHERE PRIORITY ${operator} :priority AND ROWNUM <= :limit`;
-                app.dbConnection.execute(sql, { priority: item1.priority, limit: 1 }, (error, { rows }) => {
+                app.database.oracle.connection.main.execute(sql, { priority: item1.priority, limit: 1 }, (error, { rows }) => {
                     if (error) {
                         done(error);
                     } else if (rows === null || rows.length === 0) {
@@ -155,7 +155,7 @@ module.exports = app => {
         }
 
         if (orderBy) Object.keys(obj2Db).sort((a, b) => b.length - a.length).forEach(key => orderBy = orderBy.replaceAll(key, obj2Db[key]));
-        condition = app.dbConnection.buildCondition(obj2Db, condition, ' AND ');
+        condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
         let leftIndex = (pageNumber <= 1 ? 0 : pageNumber - 1) * pageSize,
             parameter = condition.parameter ? condition.parameter : {};
         const sql_count = `SELECT COUNT(DISTINCT ID)
@@ -164,15 +164,15 @@ module.exports = app => {
                                     INNER JOIN FW_NEWS_CATEGORY FNC on FN.ID = FNC.NEWS_ID
                                     INNER JOIN FW_CATEGORY FC on FNC.CATEGORY_ID = FC.ID)
                                 WHERE CATEGORY_ID IN(` + category + ')' + (condition.statement ? ' AND ' + condition.statement.replace('FN.ACTIVE', 'ACTIVE') : '');
-        app.dbConnection.execute(sql_count, parameter, (err, res) => {
+        app.database.oracle.connection.main.execute(sql_count, parameter, (err, res) => {
             let result = {};
             let totalItem = res && res.rows && res.rows[0] ? res.rows[0]['COUNT(DISTINCTID)'] : 0;
             result = { totalItem, pageSize, pageTotal: Math.ceil(totalItem / pageSize) };
             result.pageNumber = pageNumber === -1 ? 1 : Math.min(pageNumber, result.pageTotal);
             leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
-            const sql = 'SELECT DISTINCT ID,' + app.dbConnection.parseSelectedColumns(obj2DbFilter, selectedColumns) + 'FROM (SELECT FN.*, COUNT(*) over (partition by FN.ID) AS CNT, FC.ID AS CATEGORY_ID, FC.TITLE AS CATEGORY_TITLE, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : ' FN.' + keys) + ') R FROM FW_NEWS FN INNER JOIN FW_NEWS_CATEGORY FNC on FN.ID = FNC.NEWS_ID INNER JOIN FW_CATEGORY FC on FNC.CATEGORY_ID = FC.ID WHERE CATEGORY_ID IN ('
+            const sql = 'SELECT DISTINCT ID,' + app.database.oracle.parseSelectedColumns(obj2DbFilter, selectedColumns) + 'FROM (SELECT FN.*, COUNT(*) over (partition by FN.ID) AS CNT, FC.ID AS CATEGORY_ID, FC.TITLE AS CATEGORY_TITLE, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : ' FN.' + keys) + ') R FROM FW_NEWS FN INNER JOIN FW_NEWS_CATEGORY FNC on FN.ID = FNC.NEWS_ID INNER JOIN FW_CATEGORY FC on FNC.CATEGORY_ID = FC.ID WHERE CATEGORY_ID IN ('
                 + category + ')' + (condition.statement ? ' AND ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize) + ' ORDER BY pinned DESC, START_POST DESC';
-            app.dbConnection.execute(sql, parameter, (error, resultSet) => {
+            app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
                 result.list = resultSet && resultSet.rows ? resultSet.rows : [];
                 done(error, result);
             });

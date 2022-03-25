@@ -142,7 +142,7 @@ module.exports = app => {
 
     // Hook ready -----------------------------------------------------------------------------------------------------------------------------------
     // app.readyHooks.add('readyDmDonVi', {
-    //     ready: () => app.dbConnection != null && app.model != null && app.model.dmDonVi != null,
+    //     ready: () => app.database.oracle.connected!= null &&  app.model.dmDonVi,
     //     run: () => app.model.dmDonVi.count((error, numberOfDonVi) => app.data.numberOfDonVi = error ? 0 : numberOfDonVi),
     // });
 };

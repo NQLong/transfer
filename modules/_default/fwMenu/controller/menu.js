@@ -46,7 +46,7 @@ module.exports = app => {
 
     // Hook readyHooks ------------------------------------------------------------------------------------------------------------------------------
     app.readyHooks.add('readyMenu', {
-        ready: () => app.database.redis && app.dbConnection && app.dbConnection.buildCondition,
+        ready: () => app.database.redis && app.database.oracle.connected && app.database.oracle.buildCondition,
         run: () => {
             app.database.redis.menusKey = app.appName + '_menus';
             app.database.redis.divisionMenusKey = app.appName + '_divisionMenus';
@@ -64,7 +64,7 @@ module.exports = app => {
     });
 
     app.readyHooks.add('readyDivisionMenu', {
-        ready: () => app.database.redis && app.dbConnection && app.dbConnection.buildCondition,
+        ready: () => app.database.redis && app.database.oracle.connected && app.database.oracle.buildCondition,
         run: () => app.primaryWorker && app.model.dvWebsite.getAll((err, dvWebsites) => {
             if (err) {
                 console.error('Get unit website has errors!');

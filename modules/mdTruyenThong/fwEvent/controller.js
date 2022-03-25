@@ -352,7 +352,7 @@ module.exports = app => {
 
     // Hook ready -----------------------------------------------------------------------------------------------------------------------------------
     app.readyHooks.add('readyEvent', {
-        ready: () => app.dbConnection != null && app.model != null && app.model.fwEvent != null,
+        ready: () => app.database.oracle.connected && app.model.fwEvent,
         run: () => app.model.fwEvent.count((error, numberOfEvent) => {
             numberOfEvent = Number(numberOfEvent);
             app.model.setting.setValue({ numberOfEvent: isNaN(numberOfEvent) ? 0 : numberOfEvent });

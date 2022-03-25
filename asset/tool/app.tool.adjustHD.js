@@ -102,6 +102,6 @@ const run = () => {
 };
 
 app.readyHooks.add('Run tool.adjustHD.js', {
-    ready: () => app.dbConnection && app.model && app.model.canBo && app.model.qtHopDongLaoDong && app.model.dmTinhThanhPho && app.model.dmQuanHuyen && app.model.dmPhuongXa && app.model.dmTrinhDo,
+    ready: () => app.database.oracle.connected && app.model.canBo && app.model.qtHopDongLaoDong && app.model.dmTinhThanhPho && app.model.dmQuanHuyen && app.model.dmPhuongXa && app.model.dmTrinhDo,
     run,
 });
