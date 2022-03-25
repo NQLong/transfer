@@ -48,10 +48,12 @@ module.exports = app => {
             }
         });
 
-        app.model.canBo.getAll({}, 'shcc,ngach,hocVi,phai,ngayNghi,chucDanh', null, (error, data) => {
+        app.model.canBo.getAll({}, 'shcc,ngach,hocVi,phai,ngayNghi,chucDanh,ngayBienChe', null, (error, data) => {
             if (!error) listCanBo = data.filter(canBo => !canBo.ngayNghi).map(canBo => {
-                let gioiTinh = canBo.phai ? (canBo.phai === '01' ? 'Nam' : 'Nữ') : 'Chưa xác định';
-                canBo = app.clone(canBo, { gioiTinh });
+                let gioiTinh = canBo.phai ? (canBo.phai === '01' ? 'Nam' : 'Nữ') : null,
+                    namBienChe = canBo.ngayBienChe ? (canBo.ngayBienChe != 1 ? new Date(canBo.ngayBienChe).getFullYear() : null) : null;
+                
+                canBo = app.clone(canBo, { gioiTinh, namBienChe });
                 return canBo;
             });
         });

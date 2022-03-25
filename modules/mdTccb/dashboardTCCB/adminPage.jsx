@@ -62,6 +62,7 @@ class Dashboard extends AdminPage {
                     listDonVi: allDonVi.groupBy('maPl'),
                     allDonVi,
                     listHocHam: this.setUp(listCanBo, 'chucDanh', null, { '01': 'Giáo sư', '02': 'Phó giáo sư' }),
+                    listBienChe: this.setUp(listCanBo, 'namBienChe', DefaultColors.orange)
                 });
             });
         });
@@ -173,6 +174,12 @@ class Dashboard extends AdminPage {
                     <div className='tile'>
                         <div className='tile-title'>Học hàm</div>
                         <AdminChart type='pie' data={this.state.listHocHam || {}} />
+                    </div>
+                </div>
+                <div className='col-lg-12'>
+                    <div className='tile'>
+                        <div className='tile-title'>Cán bộ vào biên chế theo từng năm</div>
+                        <AdminChart type='line' data={this.state.listBienChe || {}} />
                     </div>
                 </div>
             </div>,
