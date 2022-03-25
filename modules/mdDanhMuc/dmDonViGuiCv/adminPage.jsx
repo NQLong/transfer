@@ -6,7 +6,7 @@ import Pagination from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
 import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
 
-class EditModal extends AdminModal {
+export class EditModal extends AdminModal {
     state = { active: true };
 
     componentDidMount() {
@@ -34,7 +34,7 @@ class EditModal extends AdminModal {
         e.preventDefault();
     }
 
-    changeKichHoat = value => this.kichHoat.value(value ? 1 : 0) || this.kichHoat.value(value);
+    changeKichHoat = value => this.kichHoat.value(value);
 
     render = () => {
         const readOnly = this.props.readOnly;

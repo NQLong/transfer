@@ -10,7 +10,6 @@ module.exports = app => {
         { name: 'dmDonViGuiCv:write' },
         { name: 'dmDonViGuiCv:delete' },
         { name: 'dmDonViGuiCv:upload' },
-        { name: 'staff:login', menu },
     );
 
     app.get('/user/danh-muc/don-vi-gui-cong-van', app.permission.check('dmDonViGuiCv:read'), app.templates.admin);
