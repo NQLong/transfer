@@ -3,15 +3,17 @@ import React from 'react';
 
 export const DefaultColors = {
     red: '#dc3545',
-    orange: 'rgb(255, 159, 64)',
-    yellow: '#ffc107',
-    green: '#28a745',
     blue: '#007bff',
+    yellow: '#ffc107',
     info: '#11a2b8',
+    green: '#28a745',
+    orange: 'rgb(255, 159, 64)',
     grey: 'rgb(201, 203, 207)',
     purple: 'rgb(153, 102, 255)',
 };
+
 export class AdminChart extends React.Component {
+    // canvasChart = React.ref()
 
     optionChart = (type, isPercent = null) => {
         return {
@@ -52,7 +54,7 @@ export class AdminChart extends React.Component {
                                 let y = mid_radius * Math.sin(mid_angle);
 
                                 ctx.fillStyle = '#fff';
-                                if (i == 3) { // Darker text color for lighter background
+                                if (i == 2) { // Darker text color for lighter background
                                     ctx.fillStyle = '#444';
                                 }
 
@@ -83,31 +85,48 @@ export class AdminChart extends React.Component {
     }
 
     componentDidMount() {
-        let { type = null, data = {}, percent = null } = this.props;
-        this.chart = new window.Chart(this.canvasChart, this.init(type, data, percent));
+        let { type = '', data = {}, percent = null } = this.props;
+        this.init(type, data, percent);
     }
 
     componentDidUpdate(prevProps) {
         const prevConfig = prevProps.data;
-        const config = this.props.data;
-
-        const prevDatasets = prevConfig.datasets ? prevConfig.datasets : [];
-        const thisDatasets = config.datasets ? config.datasets : [];
-        if (prevDatasets.length || (thisDatasets.length && JSON.stringify(prevDatasets) !== JSON.stringify(thisDatasets))) {
-            this.chart.data = config;
-            this.chart.update();
+        let { type = '', data = {}, percent = null } = this.props;
+        if (JSON.stringify(Object.values(prevConfig)) !== JSON.stringify(Object.values(data))) {
+            this.init(type, data, percent);
         }
     }
 
     init = (type, data, percent) => {
-        return {
-            type: type,
-            data: {
-                datasets: data.datasets,
-                labels: data.labels
-            },
-            options: this.optionChart(type, percent)
-        };
+        let { labels = [], datas = {}, colors = null } = data;
+        let datasets = [];
+        new Promise(resolve => {
+            if (!data) resolve({});
+            else
+                Object.keys(datas).forEach((label, index, array) => {
+                    datasets.push({
+                        label: label,
+                        data: Object.values(datas)[index],
+                        backgroundColor: colors ? (typeof colors === 'object' &&
+                            !Array.isArray(colors) ? colors[label] : colors) : Object.values(DefaultColors)
+                    });
+                    if (index === array.length - 1) {
+                        resolve({
+                            type: type,
+                            data: {
+                                datasets: datasets,
+                                labels: labels
+                            },
+                            options: this.optionChart(type, percent)
+                        });
+                    }
+                });
+        }).then((initData) => {
+            this.chart = new window.Chart(this.canvasChart, initData);
+            this.chart.data = initData.data;
+            this.chart.update();
+        });
+
     }
 
     render = () => <canvas ref={e => this.canvasChart = e} />;

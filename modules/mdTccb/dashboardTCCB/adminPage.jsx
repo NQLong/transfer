@@ -6,7 +6,7 @@ import { getStaffAll } from 'modules/mdTccb/tccbCanBo/redux';
 import { AdminPage } from 'view/component/AdminPage';
 import { AdminChart, DefaultColors } from 'view/component/Chart';
 import { Link } from 'react-router-dom';
-
+import { getDmNgachCdnnAll } from 'modules/mdDanhMuc/dmNgachCdnn/redux';
 class DashboardIcon extends React.Component {
     componentDidMount() {
         setTimeout(() => {
@@ -44,151 +44,135 @@ class DashboardIcon extends React.Component {
 }
 
 class Dashboard extends AdminPage {
-    state = {
-        totalStaff: 0,
-        listStaffFaculty: {
-            labels: null,
-            datasets: null
-        },
-        listDiNuocNgoai: {
-            labels: null,
-            datasets: null
-        },
-        listCongTacTrongNuoc: {
-            labels: null,
-            datasets: null
-        },
-    };
-
+    state = {}
+    ngachMapper = {}
     componentDidMount() {
         T.ready('/user/tccb', () => {
+            this.props.getDmNgachCdnnAll(data => {
+                data.forEach(item => this.ngachMapper[item.ma] = item.ten);
+            });
             this.props.getTotalGender(data => {
-                let { listStaffFaculty, listDiNuocNgoai, listCongTacTrongNuoc } = data ? data : { listStaffFaculty, listDiNuocNgoai, listCongTacTrongNuoc };
-                let dataStaffFaculty = {
-                    labels: [],
-                    datasets: [
-                        { data: [], label: 'Số lượng', backgroundColor: DefaultColors.info }
-                    ]
-                };
-                let dataDiNuocNgoai = {
-                    labels: [],
-                    datasets: [
-                        { data: [], label: 'Số lượng', backgroundColor: Object.values(DefaultColors) }
-                    ]
-                };
-                let dataCongTacTrongNuoc = {
-                    labels: [],
-                    datasets: [
-                        { data: [], label: 'Số lượng', backgroundColor: Object.values(DefaultColors) }
-                    ]
-                };
-                this.setState({ listStaffFaculty, listDiNuocNgoai, listCongTacTrongNuoc }, () => {
-                    listStaffFaculty.length && this.state.listStaffFaculty.forEach(faculty => {
-                        dataStaffFaculty.labels.push(faculty.tenDonVi);
-                        dataStaffFaculty.datasets[0].data.push(faculty.numOfStaff);
-                    });
-                    listDiNuocNgoai.length && this.state.listDiNuocNgoai.forEach(item => {
-                        dataDiNuocNgoai.labels.push(item.tenMucDich);
-                        dataDiNuocNgoai.datasets[0].data.push(item.numOfStaff || 0);
-                    });
-                    listCongTacTrongNuoc.length && this.state.listCongTacTrongNuoc.forEach((item) => {
-                        dataCongTacTrongNuoc.labels.push(item.tenMucDich);
-                        dataCongTacTrongNuoc.datasets[0].data.push(item.numOfStaff);
-                    });
-                    this.setState({ listStaffFaculty: dataStaffFaculty, listDiNuocNgoai: dataDiNuocNgoai, listCongTacTrongNuoc: dataCongTacTrongNuoc });
+                let { listStaffFaculty = [], listDiNuocNgoai = [], listCongTacTrongNuoc = [], listCanBo = [], allDonVi = [] } = data;
+                this.setState({
+                    listStaffFaculty: this.setUp(listStaffFaculty, 'tenDonVi', DefaultColors.info),
+                    listStaffGender: this.setUp(listCanBo, 'gioiTinh'),
+                    listDiNuocNgoai: this.setUp(listDiNuocNgoai, 'tenMucDich', DefaultColors.yellow),
+                    listCongTacTrongNuoc: this.setUp(listCongTacTrongNuoc, 'tenMucDich'),
+                    listNgach: this.setUp(listCanBo, 'ngach', DefaultColors.green, this.ngachMapper,),
+                    listDonVi: allDonVi.groupBy('maPl'),
+                    allDonVi,
+                    listHocHam: this.setUp(listCanBo, 'chucDanh', null, { '01': 'Giáo sư', '02': 'Phó giáo sư' }),
                 });
-
             });
         });
     }
 
+    setUp = (data = [], keyGroup, colors, mapper) => {
+        let dataGroupBy = data.groupBy(keyGroup);
+        delete dataGroupBy[null];
+        return {
+            labels: Object.keys(dataGroupBy).map(item => {
+                if (mapper) return mapper[item] || 'Chưa xác định';
+                else return item.normalizedName();
+            }),
+            datas: {
+                'Số lượng': Object.values(dataGroupBy).map(item => {
+                    if (item[0] && item[0].numOfStaff) return item[0].numOfStaff;
+                    else {
+                        return item.length;
+                    }
+                })
+            },
+            colors: colors
+        };
+    }
     render() {
-        let { totalMale, totalFemale, totalStaff, totalFaculty, totalPB,
-            totalMalePhD, totalFemalePhD, totalKhoa,
+        let { totalStaff,
+            totalMalePhD, totalFemalePhD,
             totalMaleMaster, totalFemaleMaster,
             totalMaleBachelor, totalFemaleBachelor
         } = this.props.dashboardTccb && this.props.dashboardTccb.page ? this.props.dashboardTccb.page :
                 {
-                    totalMale: 0, totalFemale: 0, totalStaff: 0, totalFaculty: 0, totalPB: 0,
-                    totalMalePhD: 0, totalFemalePhD: 0, totalKhoa: 0,
+                    totalMalePhD: 0, totalFemalePhD: 0,
                     totalMaleMaster: 0, totalFemaleMaster: 0,
                     totalMaleBachelor: 0, totalFemaleBachelor: 0
                 };
-        let dataGender = {
-            datasets: [
-                {
-                    data: [totalMale, totalFemale],
-                    backgroundColor: [DefaultColors.red, DefaultColors.blue]
-                }
-            ],
-            labels: ['Nam', 'Nữ']
-        },
-            dataLevelByGender = {
-                labels: ['Tiến sĩ', 'Thạc sĩ', 'Cử nhân'],
-                datasets: [
-                    {
-                        label: 'Nam',
-                        data: [totalMalePhD, totalMaleMaster, totalMaleBachelor],
-                        note: 'Số lượng',
-                        backgroundColor: DefaultColors.red,
-                    },
-                    {
-                        label: 'Nữ',
-                        data: [totalFemalePhD, totalFemaleMaster, totalFemaleBachelor],
-                        note: 'Số lượng',
-                        backgroundColor: DefaultColors.blue,
-                    },
-                ],
-                yTitle: 'Số lượng cán bộ',
-                xTitle: 'Trình độ'
-            };
+        let dataLevelByGender = {
+            labels: ['Tiến sĩ', 'Thạc sĩ', 'Cử nhân'],
+            datas: {
+                'Nam': [totalMalePhD, totalMaleMaster, totalMaleBachelor],
+                'Nữ': [totalFemalePhD, totalFemaleMaster, totalFemaleBachelor],
+            },
+            colors: {
+                'Nam': DefaultColors.red,
+                'Nữ': DefaultColors.blue
+            }
+        };
 
 
         return this.renderPage({
             icon: 'fa fa-bar-chart',
             title: 'Dashboard Phòng Tổ chức cán bộ',
             content: <div className='row'>
-                <div className='col-md-6 col-lg-3'>
+                <div className='col-md-6 col-lg-4'>
                     <DashboardIcon type='primary' icon='fa-users' title='Cán bộ' value={totalStaff} link='/user/tccb/staff' />
                 </div>
-                <div className='col-md-6 col-lg-3'>
-                    <DashboardIcon type='warning' icon='fa-modx' title='Đơn vị' value={totalFaculty} link='/user/danh-muc/don-vi' />
+                <div className='col-md-6 col-lg-4'>
+                    <DashboardIcon type='warning' icon='fa-modx' title='Đơn vị' value={this.state.allDonVi?.length || 0} link='/user/danh-muc/don-vi' />
                 </div>
-                <div className='col-md-6 col-lg-3'>
-                    <DashboardIcon type='info' icon='fa-tags' title='Khoa - Bộ môn' value={totalKhoa} link='/user/danh-muc/don-vi' />
+                <div className='col-md-6 col-lg-4'>
+                    <DashboardIcon type='danger' icon='fa-tags' title='Khoa - Bộ môn' value={this.state.listDonVi ? this.state.listDonVi[1].length : 0} link='/user/danh-muc/don-vi' />
                 </div>
-                <div className='col-md-6 col-lg-3'>
-                    <DashboardIcon type='danger' icon='fa-sticky-note' title='Phòng ban' value={totalPB} link='/user/danh-muc/don-vi' />
+                <div className='col-md-6 col-lg-4'>
+                    <DashboardIcon type='info' icon='fa-sticky-note' title='Phòng ban' value={this.state.listDonVi ? this.state.listDonVi[2].length : 0} link='/user/danh-muc/don-vi' />
+                </div>
+                <div className='col-md-6 col-lg-4'>
+                    <DashboardIcon type='info' icon='fa-building' title='Trung tâm - công ty' value={this.state.listDonVi ? this.state.listDonVi[3].length : 0} link='/user/danh-muc/don-vi' />
+                </div>
+                <div className='col-md-6 col-lg-4'>
+                    <DashboardIcon type='info' icon='fa-fire' title='Đoàn thể' value={this.state.listDonVi ? this.state.listDonVi[4].length : 0} link='/user/danh-muc/don-vi' />
                 </div>
                 <div className='col-lg-6'>
                     <div className='tile'>
                         <div className='tile-title'>Giới tính</div>
-                        <AdminChart type='doughnut' data={dataGender} />
+                        <AdminChart type='doughnut' data={this.state.listStaffGender || {}} />
                     </div>
                 </div>
                 <div className='col-lg-6'>
                     <div className='tile'>
                         <div className='tile-title'>Trình độ học vị
                         </div>
-                        <AdminChart data={dataLevelByGender} type='bar' />
+                        <AdminChart data={dataLevelByGender || {}} type='bar' />
                     </div>
                 </div>
                 <div className='col-lg-12'>
                     <div className='tile'>
                         <div className='tile-title'>Nhân sự các khoa, bộ môn</div>
-                        <AdminChart data={this.state.listStaffFaculty} type='bar' />
+                        <AdminChart data={this.state.listStaffFaculty || {}} type='bar' />
                     </div>
                 </div>
                 <div className='col-lg-6'>
                     <div className='tile'>
                         <div className='tile-title'>Cán bộ đang công tác trong nước</div>
-                        <AdminChart type='doughnut' data={this.state.listCongTacTrongNuoc} />
+                        <AdminChart type='doughnut' data={this.state.listCongTacTrongNuoc || {}} />
                     </div>
                 </div>
                 <div className='col-lg-6'>
                     <div className='tile'>
                         <div className='tile-title'>Cán bộ đang ở nước ngoài</div>
-                        <AdminChart type='doughnut' data={this.state.listDiNuocNgoai} />
+                        <AdminChart type='bar' data={this.state.listDiNuocNgoai || {}} />
+                    </div>
+                </div>
+                <div className='col-lg-6'>
+                    <div className='tile'>
+                        <div className='tile-title'>Chức danh nghề nghiệp</div>
+                        <AdminChart type='bar' data={this.state.listNgach || {}} />
+                    </div>
+                </div>
+                <div className='col-lg-6'>
+                    <div className='tile'>
+                        <div className='tile-title'>Học hàm</div>
+                        <AdminChart type='pie' data={this.state.listHocHam || {}} />
                     </div>
                 </div>
             </div>,
@@ -199,6 +183,6 @@ class Dashboard extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, dashboardTccb: state.tccb.dashboardTccb });
 const mapActionsToProps = {
-    getStaffAll, getTotalGender
+    getStaffAll, getTotalGender, getDmNgachCdnnAll
 };
 export default connect(mapStateToProps, mapActionsToProps)(Dashboard);
