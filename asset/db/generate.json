@@ -6557,7 +6557,7 @@
             "ID": {
                 "value": "id",
                 "dataType": "NUMBER",
-                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_99947\".nextval",
+                "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_100561\".nextval",
                 "nullable": false,
                 "size": "22,0"
             },

@@ -56,8 +56,8 @@ class HcthCongVanDen extends AdminPage {
         let donViNhanCongVan = this.donViNhanCongVan?.value().toString() || null;
         let canBoNhanCongVan = this.canBoNhanCongVan?.value() || null;
         let timeType = this.timeType?.value() || null;
-        let fromTime = this.fromTime?.value() ? Number(this.fromTime.value()) :null;
-        let toTime = this.toTime?.value() ? Number(this.toTime.value()) :null;
+        let fromTime = this.fromTime?.value() ? Number(this.fromTime.value()) : null;
+        let toTime = this.toTime?.value() ? Number(this.toTime.value()) : null;
         const pageFilter = isInitial ? {} : { donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, timeType, fromTime, toTime };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
@@ -105,11 +105,10 @@ class HcthCongVanDen extends AdminPage {
                     <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', }}>Số CV</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>
-                    <th style={{ width: '15%', whiteSpace: 'nowrap' }}>Đơn vị gửi</th>
-                    <th style={{ width: '45%', whiteSpace: 'nowrap' }}>Nội dung</th>
-                    <th style={{ width: '10%', whiteSpace: 'nowrap' }}>Đơn vị nhận</th>
-                    <th style={{ width: '10%', whiteSpace: 'nowrap' }}>Cán bộ nhận</th>
-                    <th style={{ width: '20%' }}>Chỉ đạo</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Đơn vị gửi</th>
+                    <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Nội dung</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Đơn vị, người nhận</th>
+                    <th style={{ width: 'auto' }}>Chỉ đạo của hiệu trưởng</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tình trạng</th>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                 </tr>),
@@ -126,17 +125,17 @@ class HcthCongVanDen extends AdminPage {
                 return (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
+                        <TableCell type='text' content={
                             <>
-                                <Link to={`/user/hcth/cong-van-den/${item.id}`}>{item.soCongVan}</Link>
-                                {item.ngayCongVan ? <span><br />{'Ngày: ' + T.dateToText(item.ngayCongVan, 'dd/mm/yyyy')}</span> : null}
+                                {item.soCongVan && <Link to={`/user/hcth/cong-van-den/${item.id}`}>{item.soCongVan}</Link>}
+                                {item.ngayCongVan ? <span style={{ whiteSpace: 'nowrap' }}><br />{'Ngày CV: ' + T.dateToText(item.ngayCongVan, 'dd/mm/yyyy')}</span> : null}
                             </>
                         } />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
                             <>
                                 {
                                     item.ngayNhan ? (<>
-                                        <span>Nhận :</span><span style={{ color: 'blue' }}> {T.dateToText(item.ngayNhan, 'dd/mm/yyyy')}</span>
+                                        <span>Ngày nhận:</span><span style={{ color: 'blue' }}> {T.dateToText(item.ngayNhan, 'dd/mm/yyyy')}</span>
                                     </>) : null
                                 }
                                 {item.ngayNhan && item.ngayHetHan ? <br /> : null}
@@ -147,24 +146,28 @@ class HcthCongVanDen extends AdminPage {
                                 }
                             </>
                         } />
-                        <TableCell type='text' style={{}} content={item.tenDonViGuiCV} />
-                        <TableCell type='text' style={{}} content={item.noiDung} />
+                        <TableCell type='text' contentClassName='multiple-lines' content={item.tenDonViGuiCV} />
+                        <TableCell type='text' contentClassName='multiple-lines' content={item.noiDung} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
-                            danhSachDonViNhan && danhSachDonViNhan.length > 0 ? danhSachDonViNhan.map((item, index) => (
-                                <span key={index}>
-                                    <span >{item?.normalizedName()}</span>
-                                    <br />
+                            <>
+                                <span>{danhSachCanBoNhan && danhSachCanBoNhan.length > 0 ? danhSachCanBoNhan.map((item, index) => (
+                                    <span key={index}>
+                                        <b style={{ color: 'blue' }}>{item.normalizedName()}</b>
+                                        <br />
+                                    </span>
+                                )) : null}
                                 </span>
-                            )) : null
+                                <span>{danhSachDonViNhan && danhSachDonViNhan.length > 0 ? danhSachDonViNhan.map((item, index) => (
+                                    <span key={index}>
+                                        <b>{item?.normalizedName()}</b>
+                                        <br />
+                                    </span>
+                                )) : null
+                                }</span>
+                            </>
                         } />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
-                            danhSachCanBoNhan && danhSachCanBoNhan.length > 0 ? danhSachCanBoNhan.map((item, index) => (
-                                <span key={index}>
-                                    <span >{item?.normalizedName()}</span>
-                                    <br />
-                                </span>
-                            )) : null} />
-                        <TableCell type='text' style={{}} content={item.chiDao} />
+
+                        <TableCell type='text' contentClassName='multiple-lines' content={item.chiDao} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
                             hasFile ?
                                 (<span style={{ color: 'blue' }}>Có tệp tin</span>) :
@@ -187,8 +190,8 @@ class HcthCongVanDen extends AdminPage {
 
                         <FormSelect allowClear={true} className='col-md-3' ref={e => this.timeType = e} label='Theo thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
                         {this.timeType?.value() && (<>
-                            <FormDatePicker type='date' className='col-md-3' ref={e => this.fromTime = e} label='Từ ngày' onChange={() => this.changeAdvancedSearch()}/>
-                            <FormDatePicker type='date' className='col-md-3' ref={e => this.toTime = e} label='Đến ngày' onChange={() => this.changeAdvancedSearch()}/>
+                            <FormDatePicker type='date' className='col-md-3' ref={e => this.fromTime = e} label='Từ ngày' onChange={() => this.changeAdvancedSearch()} />
+                            <FormDatePicker type='date' className='col-md-3' ref={e => this.toTime = e} label='Đến ngày' onChange={() => this.changeAdvancedSearch()} />
                         </>)}
                     </div>
                     <FormSelect allowClear={true} className='col-md-4' ref={e => this.donViGuiCongVan = e} label='Đơn vị gửi công văn' data={SelectAdapter_DmDonViGuiCongVan} onChange={() => this.changeAdvancedSearch()} />
