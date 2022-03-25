@@ -1,31 +1,31 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { 
-    getHcthCongVanDiPage, 
-    getHcthCongVanDiAll, 
-    createHcthCongVanDi, 
-    updateHcthCongVanDi, 
-    deleteHcthCongVanDi, 
+import {
+    getHcthCongVanDiPage,
+    getHcthCongVanDiAll,
+    createHcthCongVanDi,
+    updateHcthCongVanDi,
+    deleteHcthCongVanDi,
     getHcthCongVanDiSearchPage
 } from './redux';
 import Pagination from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
-import { 
-    AdminPage, 
-    renderTable, 
-    FormSelect, 
-    TableCell, 
+import {
+    AdminPage,
+    renderTable,
+    FormSelect,
+    TableCell,
 } from 'view/component/AdminPage';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 
-export class HcthCongVanDi extends AdminPage {    
+export class HcthCongVanDi extends AdminPage {
     state = { filter: {} };
 
     componentDidMount() {
         T.ready('/user/hcth', () => {
             T.clearSearchBox();
-            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');      
+            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
                 this.maDonViGui?.value('');
                 this.maDonViNhan?.value('');
@@ -44,10 +44,8 @@ export class HcthCongVanDi extends AdminPage {
         let canBoNhan = this.canBoNhan?.value() || null;
         const pageFilter = isInitial ? {} : { donViGui, donViNhan, canBoNhan };
         this.setState({ filter: pageFilter }, () => {
-            // console.log(this.state.filter);
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
-                    // console.log('page filter' + pageFilter.donViNhan);
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
                     this.donViGui?.value(filter.donViGui || '');
@@ -61,13 +59,7 @@ export class HcthCongVanDi extends AdminPage {
 
     getPage = (pageN, pageS, pageC, done) => {
         this.props.getHcthCongVanDiSearchPage(pageN, pageS, pageC, this.state.filter, done);
-        // console.log('state.filter ' + this.state.filter);
     }
-
-    // showModal = (e) => {
-    //     e.preventDefault();
-    //     this.modal.show();
-    // }
 
     onDelete = (e, item) => {
         e.preventDefault();
@@ -78,41 +70,39 @@ export class HcthCongVanDi extends AdminPage {
 
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-        permission = this.getUserPermission('hcthCongVanDi', ['read', 'write', 'delete']);
-        // let readOnly = !permission.write;
+            permission = this.getUserPermission('hcthCongVanDi', ['read', 'write', 'delete']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.hcthCongVanDi && this.props.hcthCongVanDi.page ?
             this.props.hcthCongVanDi.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
-        let table = 'Không có danh sách công văn đi!';
-        if (list && list.length > 0) {
-            table = renderTable({
-                getDataSource: () => list, stickyHead: false,
-                renderHead: () => (
-                    <tr>
-                        <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                        <th style={{ width: '45%'}}>Nội dung</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap'}}>Thời gian</th>
-                        <th style={{ width: '15%'}}>Đơn vị gửi</th>
-                        <th style={{ width: '15%'}}>Đơn vị nhận</th>
-                        <th style={{ width: '15%'}}>Cán bộ nhận</th>
-                        <th style={{ width: 'auto'}}>Tình trạng</th>
-                        <th style={{ width: '10%', textAlign: 'center' }}>Thao tác</th>
-                    </tr>),
-                renderRow: (item, index) => {
-                    let danhSachDonViNhan = item.danhSachDonViNhan?.split(';');
-                    let danhSachCanBoNhan = item.danhSachCanBoNhan?.split(';');
-                    let hasFile;
-                    try {
-                        hasFile = item.linkCongVan && JSON.parse(item.linkCongVan).length > 0;
-                    }
-                    catch (error) {
-                        hasFile = false;
-                    }
-                    return(
-                        <tr key={index}>
-                            <TableCell type='text' style={{textAlign: 'center'}} content={(pageNumber - 1) * pageSize + index + 1} />
-                            <TableCell type='link' content={item.noiDung ? item.noiDung : ''} onClick={() => this.props.history.push(`/user/hcth/cong-van-di/${item.id}`)}/>
-                            <TableCell type='text' content={
-                                <>
+        let table = renderTable({
+            emptyTable: 'Chưa có dữ liệu công văn các phòng',
+            getDataSource: () => list, stickyHead: false,
+            renderHead: () => (
+                <tr>
+                    <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
+                    <th style={{ width: '45%' }}>Nội dung</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>
+                    <th style={{ width: '15%' }}>Đơn vị gửi</th>
+                    <th style={{ width: '15%' }}>Đơn vị nhận</th>
+                    <th style={{ width: '15%' }}>Cán bộ nhận</th>
+                    <th style={{ width: 'auto' }}>Tình trạng</th>
+                    <th style={{ width: '10%', textAlign: 'center' }}>Thao tác</th>
+                </tr>),
+            renderRow: (item, index) => {
+                let danhSachDonViNhan = item.danhSachDonViNhan?.split(';');
+                let danhSachCanBoNhan = item.danhSachCanBoNhan?.split(';');
+                let hasFile;
+                try {
+                    hasFile = item.linkCongVan && JSON.parse(item.linkCongVan).length > 0;
+                }
+                catch (error) {
+                    hasFile = false;
+                }
+                return (
+                    <tr key={index}>
+                        <TableCell type='text' style={{ textAlign: 'center' }} content={(pageNumber - 1) * pageSize + index + 1} />
+                        <TableCell type='link' content={item.noiDung || ''} onClick={() => this.props.history.push(`/user/hcth/cong-van-di/${item.id}`)} />
+                        <TableCell type='text' content={
+                            <>
                                 {
                                     item.ngayGui ? (<>
                                         <span>Ngày gửi:</span><span style={{ color: 'blue' }}> {T.dateToText(item.ngayGui, 'dd/mm/yyyy')}</span>
@@ -124,36 +114,36 @@ export class HcthCongVanDi extends AdminPage {
                                         <span>Ngày ký:</span><span style={{ color: 'red' }}> {T.dateToText(item.ngayKy, 'dd/mm/yyyy')}</span>
                                     </>) : null
                                 }
-                                </>
-                            } />
-                            <TableCell type='text' content={item.tenDonViGui ? item.tenDonViGui.normalizedName() : ''} />
-                            <TableCell type='text' content={
-                                danhSachDonViNhan && danhSachDonViNhan.length > 0 ? danhSachDonViNhan.map((item, index) => (
-                                    <span key={index}>
-                                        <span >{item?.normalizedName()}</span>
-                                        <br />
-                                    </span>
-                                )) : null
-                            } />                             
-                            <TableCell type='text' content={
-                                danhSachCanBoNhan && danhSachCanBoNhan.length > 0 ? danhSachCanBoNhan.map((item, index) => (
-                                    <span key={index}>
-                                        <span >{item?.normalizedName()}</span>
-                                        <br />
-                                    </span>
-                                )) : null} />
-                            <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
-                                hasFile ?
-                                    (<span style={{ color: 'blue' }}>Có tệp tin</span>) :
-                                    (<span style={{ color: 'red' }}>Chưa có tệp tin</span>)
-                            } />                            
-                            <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onEdit={() => this.props.history.push(`/user/hcth/cong-van-di/${item.id}`)} onDelete={(e) => this.onDelete(e, item)} permissions={currentPermissions} />
-                            </tr>
+                            </>
+                        } />
+                        <TableCell type='text' content={item.tenDonViGui ? item.tenDonViGui.normalizedName() : ''} />
+                        <TableCell type='text' content={
+                            danhSachDonViNhan && danhSachDonViNhan.length > 0 ? danhSachDonViNhan.map((item, index) => (
+                                <span key={index}>
+                                    <span >{item?.normalizedName()}</span>
+                                    <br />
+                                </span>
+                            )) : null
+                        } />
+                        <TableCell type='text' content={
+                            danhSachCanBoNhan && danhSachCanBoNhan.length > 0 ? danhSachCanBoNhan.map((item, index) => (
+                                <span key={index}>
+                                    <span >{item?.normalizedName()}</span>
+                                    <br />
+                                </span>
+                            )) : null} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
+                            hasFile ?
+                                (<span style={{ color: 'blue' }}>Có tệp tin</span>) :
+                                (<span style={{ color: 'red' }}>Chưa có tệp tin</span>)
+                        } />
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onEdit={() => this.props.history.push(`/user/hcth/cong-van-di/${item.id}`)} onDelete={(e) => this.onDelete(e, item)} permissions={currentPermissions} />
+                    </tr>
 
-                    );
-                }
-            });
-        }
+                );
+            }
+        });
+
         return this.renderPage({
             icon: 'fa fa-caret-square-o-left',
             title: 'Công văn đi',
@@ -162,11 +152,11 @@ export class HcthCongVanDi extends AdminPage {
                 'Công văn đi'
             ],
             onCreate: permission && permission.write ? () => this.props.history.push('/user/hcth/cong-van-di/new') : null,
-            content:<>
+            content: <>
                 <div className="tile">{table}</div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
-                </>,
+            </>,
             backRoute: '/user/hcth',
             advanceSearch: <>
                 <div className="row">
@@ -181,13 +171,13 @@ export class HcthCongVanDi extends AdminPage {
 }
 
 
-const mapStateToProps = state => ({ system: state.system, hcthCongVanDi: state.hcth.hcthCongVanDi});
-const mapActionsToProps = { 
-    getHcthCongVanDiAll, 
-    getHcthCongVanDiPage, 
-    createHcthCongVanDi, 
-    updateHcthCongVanDi, 
-    deleteHcthCongVanDi, 
+const mapStateToProps = state => ({ system: state.system, hcthCongVanDi: state.hcth.hcthCongVanDi });
+const mapActionsToProps = {
+    getHcthCongVanDiAll,
+    getHcthCongVanDiPage,
+    createHcthCongVanDi,
+    updateHcthCongVanDi,
+    deleteHcthCongVanDi,
     getHcthCongVanDiSearchPage
 };
 export default connect(mapStateToProps, mapActionsToProps)(HcthCongVanDi);
