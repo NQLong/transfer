@@ -9,16 +9,16 @@ module.exports = (app) => {
     app.permission.add({ name: 'hcthCongVanDen:write' });
     app.permission.add({ name: 'hcthCongVanDen:delete' });
 
-    app.get('/user/hcth/cong-van-den', app.permission.check('staff:login'), app.templates.admin);
-    app.get('/user/hcth/cong-van-den/:id', app.permission.check('staff:login'), app.templates.admin);
+    app.get('/user/hcth/cong-van-den', app.permission.check('hcthCongVanDen:read'), app.templates.admin);
+    app.get('/user/hcth/cong-van-den/:id', app.permission.check('hcthCongVanDen:read'), app.templates.admin);
 
 
     //api
-    app.get('/api/hcth/cong-van-den/all', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/cong-van-den/all', app.permission.check('hcthCongVanDen:read'), (req, res) => {
         app.model.hcthCongVanDen.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/hcth/cong-van-den/page/:pageNumber/:pageSize', (req, res) => {
+    app.get('/api/hcth/cong-van-den/page/:pageNumber/:pageSize', app.permission.check('hcthCongVanDen:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         let condition = { statement: null };
@@ -35,7 +35,7 @@ module.exports = (app) => {
         });
     });
 
-    app.get('/api/hcth/cong-van-den/page/:pageNumber/:pageSize', (req, res) => {
+    app.get('/api/hcth/cong-van-den/page/:pageNumber/:pageSize', app.permission.check('hcthCongVanDen:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         let condition = { statement: null };
@@ -52,7 +52,7 @@ module.exports = (app) => {
         });
     });
 
-    app.post('/api/hcth/cong-van-den', app.permission.check('staff:login'), (req, res) => {
+    app.post('/api/hcth/cong-van-den', app.permission.check('hcthCongVanDen:write'), (req, res) => {
         app.model.hcthCongVanDen.create(req.body.data, (error, item) => {
             if (error)
                 res.send({ error, item });
@@ -180,7 +180,7 @@ module.exports = (app) => {
     };
 
     //Delete file
-    app.put('/api/hcth/cong-van-den/delete-file', app.permission.check('staff:login'), (req, res) => {
+    app.put('/api/hcth/cong-van-den/delete-file', app.permission.check('hcthCongVanDen:delete'), (req, res) => {
         const
             id = req.body.id,
             index = req.body.index,
@@ -214,7 +214,7 @@ module.exports = (app) => {
         });
     });
 
-    app.get('/api/hcth/cong-van-den/download/:id/:fileName', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/cong-van-den/download/:id/:fileName', app.permission.check('hcthCongVanDen:read'), (req, res) => {
         const { id, fileName } = req.params;
         const dir = app.path.join(app.assetPath, `/congVanDen/${id}`);
         if (app.fs.existsSync(dir)) {
@@ -230,7 +230,7 @@ module.exports = (app) => {
         res.status(400).send('Không tìm thấy tập tin');
     });
 
-    app.get('/api/hcth/cong-van-den/:id', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/cong-van-den/:id', app.permission.check('hcthCongVanDen:read'), (req, res) => {
         app.model.hcthCongVanDen.get({ id: req.params.id }, (error, item) => res.send({ error, item }));
     });
 };

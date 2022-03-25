@@ -6,18 +6,19 @@ module.exports = app => {
         },
     };
     app.permission.add(
-        { name: 'hcthCongVanDi:read', menu},
-        { name: 'hcthCongVanDi:write'},
-        { name: 'hcthCongVanDi:delete'},
-        { name: 'staff:login'});
-    app.get('/user/hcth/cong-van-di', app.permission.check('staff:login'), app.templates.admin);
-    
+        { name: 'hcthCongVanDi:read', menu },
+        { name: 'hcthCongVanDi:write' },
+        { name: 'hcthCongVanDi:delete' },
+    );
+    app.get('/user/hcth/cong-van-di', app.permission.check('hcthCongVanDi:read'), app.templates.admin);
+    app.get('/user/hcth/cong-van-di/:id', app.permission.check('hcthCongVanDen:read'), app.templates.admin);
+
     // APIs ----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/hcth/cong-van-di/search/page/:pageNumber/:pageSize', (req, res) => {
+    app.get('/api/hcth/cong-van-di/search/page/:pageNumber/:pageSize', app.permission.check('hcthCongVanDi:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        let { donViGui, donViNhan, canBoNhan} = (req.query.filter && req.query.filter != '%%%%%%') ? req.query.filter : { donViGui: null, donViNhan: null, canBoNhan: null};
+        let { donViGui, donViNhan, canBoNhan } = (req.query.filter && req.query.filter != '%%%%%%') ? req.query.filter : { donViGui: null, donViNhan: null, canBoNhan: null };
         app.model.hcthCongVanDi.searchPage(pageNumber, pageSize, canBoNhan, donViGui, donViNhan, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -28,17 +29,16 @@ module.exports = app => {
             }
         });
     });
-    
-    app.get('/api/hcth/cong-van-di/all', app.permission.check('staff:login'), (req, res) => {
+
+    app.get('/api/hcth/cong-van-di/all', app.permission.check('hcthCongVanDi:read'), (req, res) => {
         app.model.hcthCongVanDi.getAll((error, items) => res.send({ error, items }));
     });
-    
-    app.get('/api/hcth/cong-van-di/item/:id', app.permission.check('staff:login'), (req, res) => {
+
+    app.get('/api/hcth/cong-van-di/item/:id', app.permission.check('hcthCongVanDi:read'), (req, res) => {
         app.model.hcthCongVanDi.get({ id: req.params.id }, (error, item) => res.send({ error, item }));
     });
 
-    app.post('/api/hcth/cong-van-di', app.permission.check('staff:login'), (req, res) => {
-        // console.log(req.body);
+    app.post('/api/hcth/cong-van-di', app.permission.check('hcthCongVanDi:read'), (req, res) => {
         app.model.hcthCongVanDi.create(req.body.data, (error, item) => {
             if (error)
                 res.send({ error, item });
@@ -66,7 +66,7 @@ module.exports = app => {
                     }
                 });
             }
-        });    
+        });
     });
 
     const updateListFile = (listFile, id, done) => {
@@ -100,10 +100,10 @@ module.exports = app => {
         app.model.hcthCongVanDi.delete({ id: req.body.id }, errors => {
             app.deleteFolder(app.assetPath + '/congVanDi/' + req.body.id);
             res.send({ errors });
-        });    
+        });
     });
 
-    app.get('/api/hcth/cong-van-di/page/:pageNumber/:pageSize', (req, res) => {
+    app.get('/api/hcth/cong-van-di/page/:pageNumber/:pageSize', app.permission.check('hcthCongVanDi:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         let condition = { statement: null };
@@ -137,8 +137,8 @@ module.exports = app => {
             files.hcthCongVanDiFile.length > 0) {
             const
                 srcPath = files.hcthCongVanDiFile[0].path,
-                isNew = fields.userData[0].substring(19) == 'new',
-                id = fields.userData[0].substring(19),
+                isNew = fields.userData[0].substring(18) == 'new',
+                id = fields.userData[0].substring(18),
                 filePath = (isNew ? '/new/' : `/${id}/`) + (new Date().getTime()).toString() + '_' + files.hcthCongVanDiFile[0].originalFilename,
                 destPath = app.assetPath + '/congVanDi' + filePath,
                 validUploadFileType = ['.xls', '.xlsx', '.doc', '.docx', '.pdf', '.png', '.jpg'],
@@ -213,5 +213,5 @@ module.exports = app => {
     app.get('/api/hcth/cong-van-di/:id', app.permission.check('staff:login'), (req, res) => {
         app.model.hcthCongVanDi.get({ id: req.params.id }, (error, item) => res.send({ error, item }));
     });
-};    
+};
 

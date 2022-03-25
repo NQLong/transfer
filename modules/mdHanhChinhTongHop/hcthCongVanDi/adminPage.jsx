@@ -79,13 +79,12 @@ export class HcthCongVanDi extends AdminPage {
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                    <th style={{ width: '45%' }}>Nội dung</th>
+                    <th style={{ width: '100%' }}>Nội dung</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>
-                    <th style={{ width: '15%' }}>Đơn vị gửi</th>
-                    <th style={{ width: '15%' }}>Đơn vị nhận</th>
-                    <th style={{ width: '15%' }}>Cán bộ nhận</th>
+                    <th style={{ width: 'auto' }}>Đơn vị gửi</th>
+                    <th style={{ width: 'auto' }}>Đơn vị, nguời nhận</th>
                     <th style={{ width: 'auto' }}>Tình trạng</th>
-                    <th style={{ width: '10%', textAlign: 'center' }}>Thao tác</th>
+                    <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                 </tr>),
             renderRow: (item, index) => {
                 let danhSachDonViNhan = item.danhSachDonViNhan?.split(';');
@@ -101,7 +100,7 @@ export class HcthCongVanDi extends AdminPage {
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'center' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='link' content={item.noiDung || ''} onClick={() => this.props.history.push(`/user/hcth/cong-van-di/${item.id}`)} />
-                        <TableCell type='text' content={
+                        <TableCell type='text' style={{whiteSpace: 'nowrap'}} content={
                             <>
                                 {
                                     item.ngayGui ? (<>
@@ -116,25 +115,28 @@ export class HcthCongVanDi extends AdminPage {
                                 }
                             </>
                         } />
-                        <TableCell type='text' content={item.tenDonViGui ? item.tenDonViGui.normalizedName() : ''} />
-                        <TableCell type='text' content={
-                            danhSachDonViNhan && danhSachDonViNhan.length > 0 ? danhSachDonViNhan.map((item, index) => (
-                                <span key={index}>
-                                    <span >{item?.normalizedName()}</span>
-                                    <br />
+                        <TableCell type='text' contentClassName='multiple-lines' content={item.tenDonViGui ? item.tenDonViGui.normalizedName() : ''} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
+                            <>
+                                <span>{danhSachCanBoNhan && danhSachCanBoNhan.length > 0 ? danhSachCanBoNhan.map((item, index) => (
+                                    <span key={index}>
+                                        <b style={{ color: 'blue' }}>{item.normalizedName()}</b>
+                                        <br />
+                                    </span>
+                                )) : null}
                                 </span>
-                            )) : null
+                                <span>{danhSachDonViNhan && danhSachDonViNhan.length > 0 ? danhSachDonViNhan.map((item, index) => (
+                                    <span key={index}>
+                                        <b>{item?.normalizedName()}</b>
+                                        <br />
+                                    </span>
+                                )) : null
+                                }</span>
+                            </>
                         } />
-                        <TableCell type='text' content={
-                            danhSachCanBoNhan && danhSachCanBoNhan.length > 0 ? danhSachCanBoNhan.map((item, index) => (
-                                <span key={index}>
-                                    <span >{item?.normalizedName()}</span>
-                                    <br />
-                                </span>
-                            )) : null} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
                             hasFile ?
-                                (<span style={{ color: 'blue' }}>Có tệp tin</span>) :
+                                (<span style={{ color: 'blue' }}>Đã có tệp tin</span>) :
                                 (<span style={{ color: 'red' }}>Chưa có tệp tin</span>)
                         } />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onEdit={() => this.props.history.push(`/user/hcth/cong-van-di/${item.id}`)} onDelete={(e) => this.onDelete(e, item)} permissions={currentPermissions} />

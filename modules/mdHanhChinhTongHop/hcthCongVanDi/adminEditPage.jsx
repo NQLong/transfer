@@ -1,33 +1,15 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { 
-    getHcthCongVanDiPage, 
-    getHcthCongVanDiAll, 
-    createHcthCongVanDi, 
-    updateHcthCongVanDi, 
-    deleteHcthCongVanDi, 
-    getHcthCongVanDiSearchPage,
-    deleteFile,
-    getCongVanDi
-} from './redux';
+import { getHcthCongVanDiPage, getHcthCongVanDiAll, createHcthCongVanDi, updateHcthCongVanDi, deleteHcthCongVanDi, getHcthCongVanDiSearchPage, deleteFile, getCongVanDi } from './redux';
 import { Link } from 'react-router-dom';
-import { 
-    AdminPage, 
-    FormDatePicker, 
-    renderTable, 
-    FormRichTextBox, 
-    FormSelect, 
-    TableCell, 
-    FormCheckbox, 
-    FormFileBox
-} from 'view/component/AdminPage';
+import { AdminPage, FormDatePicker, renderTable, FormRichTextBox, FormSelect, TableCell, FormCheckbox, FormFileBox } from 'view/component/AdminPage';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 
 class AdminEditPage extends AdminPage {
     state = {
-        id: null, 
-        isDonVi: 0, 
+        id: null,
+        isDonVi: 0,
         isCanBo: 0,
         listFile: []
     };
@@ -43,22 +25,22 @@ class AdminEditPage extends AdminPage {
         if (!isCreate) {
             this.props.getCongVanDi(Number(this.state.id), (item) => this.setData(item));
         }
-        else this.setData(null);
+        else this.setData();
     }
 
-    setData = (data) => {
-        let { id, noiDung, ngayGui, ngayKy, donViGui, donViNhan, canBoNhan, isDonVi, isCanBo, linkCongVan } = data ? data : 
-        { id: '', noiDung: '', ngayGui: '', ngayKy: '', donViGui: '', donViNhan: '', canBoNhan: '', isDonVi: 0, isCanBo: 0, linkCongVan: '[]'};
-        this.setState({id, isDonVi, isCanBo});
+    setData = (data = null) => {
+        let { id, noiDung, ngayGui, ngayKy, donViGui, donViNhan, canBoNhan, isDonVi, isCanBo, linkCongVan } = data ? data :
+            { id: '', noiDung: '', ngayGui: '', ngayKy: '', donViGui: '', donViNhan: '', canBoNhan: '', isDonVi: 0, isCanBo: 0, linkCongVan: '[]' };
+        this.setState({ id, isDonVi, isCanBo });
         if (linkCongVan && linkCongVan.length > 0) {
             try {
                 linkCongVan = JSON.parse(linkCongVan);
             }
-            catch {
+            catch (error){
+                T.notify(error, 'danger');
                 linkCongVan = [];
             }
         }
-        // console.log(item);
         this.setState({
             isDonVi: isDonVi == 1 | isDonVi == '1',
             isCanBo: isCanBo == 1 | isCanBo == '1',
@@ -68,8 +50,6 @@ class AdminEditPage extends AdminPage {
             this.ngayGui.value(ngayGui);
             this.ngayKy.value(ngayKy);
             this.donViGui.value(donViGui ? donViGui : '');
-            // console.log("state don vi: " + donViNhan);
-            // console.log("state can bo: " + canBoNhan);
             this.isDonVi.value(this.state.isDonVi);
             this.isCanBo.value(this.state.isCanBo);
             if (this.state.isDonVi) {
@@ -82,19 +62,19 @@ class AdminEditPage extends AdminPage {
                 $('#isdv').hide();
                 this.donViNhan.value('');
             }
-            
+
             if (this.state.isCanBo) {
                 $('#iscb').show();
                 if (canBoNhan) {
                     canBoNhan = canBoNhan.split(',');
                     this.canBoNhan.value(canBoNhan);
-                } 
+                }
                 // else this.canBoNhan.value('');
             } else {
                 $('#iscb').hide();
                 this.canBoNhan.value('');
             }
-            this.fileBox.setData('hcthCongVanDiFile:' + (this.state.id ? this.state.id: 'new'));
+            this.fileBox.setData('hcthCongVanDiFile:' + (this.state.id ? this.state.id : 'new'));
         });
     }
 
@@ -102,17 +82,15 @@ class AdminEditPage extends AdminPage {
         if (response.data) {
             let listFile = this.state.listFile.length ? [...this.state.listFile] : [];
             listFile.push(response.data);
-            if (this.state.id) {
-                let list = null;
-                try {
-                    list = JSON.stringify(listFile);
-                }
-                catch {
-                    list = '[]';
-                }
-                this.props.updateHcthCongVanDi(this.state.id, { linkCongVan: list }, () => { this.setState({ listFile }); });
-            }    
-            else this.setState({ listFile });
+            let linkCongVan = '[]';
+            try {
+                linkCongVan = JSON.stringify(listFile);
+            } catch (exception) {
+                T.notify(exception, 'danger');
+                return;
+            }
+            this.state.id && this.props.updateHcthCongVanDi(this.state.id, { linkCongVan });
+            this.setState({ listFile });
         } else if (response.error) T.notify(response.error, 'danger');
     }
 
@@ -145,9 +123,6 @@ class AdminEditPage extends AdminPage {
             isCanBo: this.state.isCanBo ? 1 : 0,
             linkCongVan: list
         };
-        // console.log(changes);
-        // console.log("don vi " + this.state.isDonVi);
-        // console.log("can bo " + this.state.isCanBo);
         if (!changes.noiDung) {
             T.notify('Nội dung bị trống', 'danger');
             this.noiDung.focus();
@@ -173,7 +148,7 @@ class AdminEditPage extends AdminPage {
                 T.notify('Thêm công văn đi thành công!', 'success');
                 this.props.createHcthCongVanDi(changes, () => this.props.history.push('/user/hcth/cong-van-di'));
                 this.props.history.push('/user/hcth/cong-van-di');
-            }        
+            }
         }
     }
 
@@ -230,16 +205,16 @@ class AdminEditPage extends AdminPage {
                         <FormSelect className='col-md-12' ref={e => this.donViGui = e} label='Đơn vị gửi công văn' data={SelectAdapter_DmDonVi} readOnly={readOnly} required />
                         <div className='col-md-12'>
                             <div className='row'>
-                                <FormCheckbox isSwitch ref={e => this.isDonVi = e} className='col-md-12 formCheckDv' label='Đơn vị nhận' onChange={value => { value ? $('#isdv').show() : $('#isdv').hide(); this.setState({ isDonVi: value });}} />
+                                <FormCheckbox isSwitch ref={e => this.isDonVi = e} className='col-md-12 formCheckDv' label='Đơn vị nhận' onChange={value => { value ? $('#isdv').show() : $('#isdv').hide(); this.setState({ isDonVi: value }); }} />
                                 <div className='col-md-12' id='isdv'><FormSelect multiple={true} ref={e => this.donViNhan = e} data={SelectAdapter_DmDonVi} readOnly={readOnly} required={this.state.isDonVi} /></div>
                             </div>
-                        </div>                    
+                        </div>
                         <div className='col-md-12'>
                             <div className='row'>
-                                <FormCheckbox isSwitch ref={e => this.isCanBo = e} className='col-md-12 formCheckCb' label='Cán bộ nhận' onChange={value => { value ? $('#iscb').show() : $('#iscb').hide(); this.setState({ isCanBo: value});}} />
+                                <FormCheckbox isSwitch ref={e => this.isCanBo = e} className='col-md-12 formCheckCb' label='Cán bộ nhận' onChange={value => { value ? $('#iscb').show() : $('#iscb').hide(); this.setState({ isCanBo: value }); }} />
                                 <div className='col-md-12' id='iscb'><FormSelect multiple={true} ref={e => this.canBoNhan = e} data={SelectAdapter_FwCanBo} readOnly={readOnly} required={this.state.isCanBo} /></div>
                             </div>
-                        </div>                    
+                        </div>
                         <FormRichTextBox type='text' className='col-md-12' ref={e => this.noiDung = e} label='Nội dung' readOnly={readOnly} required />
                     </div>
                 </div>
@@ -261,13 +236,13 @@ class AdminEditPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, hcthCongVanDi: state.hcth.hcthCongVanDi});
-const mapActionsToProps = { 
-    getHcthCongVanDiAll, 
-    getHcthCongVanDiPage, 
-    createHcthCongVanDi, 
-    updateHcthCongVanDi, 
-    deleteHcthCongVanDi, 
+const mapStateToProps = state => ({ system: state.system, hcthCongVanDi: state.hcth.hcthCongVanDi });
+const mapActionsToProps = {
+    getHcthCongVanDiAll,
+    getHcthCongVanDiPage,
+    createHcthCongVanDi,
+    updateHcthCongVanDi,
+    deleteHcthCongVanDi,
     getHcthCongVanDiSearchPage,
     deleteFile,
     getCongVanDi
