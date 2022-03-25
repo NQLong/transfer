@@ -39,17 +39,17 @@ module.exports = app => {
             }
 
             // Lưu vào trong redis
-            app.redis.set(app.redis.menusKey, JSON.stringify(menus));
-            app.redis.set(app.redis.divisionMenusKey, JSON.stringify(divisionMenus));
+            app.database.redis.set(app.database.redis.menusKey, JSON.stringify(menus));
+            app.database.redis.set(app.database.redis.divisionMenusKey, JSON.stringify(divisionMenus));
         });
     };
 
     // Hook readyHooks ------------------------------------------------------------------------------------------------------------------------------
     app.readyHooks.add('readyMenu', {
-        ready: () => app.redis && app.dbConnection && app.dbConnection.buildCondition,
+        ready: () => app.database.redis && app.dbConnection && app.dbConnection.buildCondition,
         run: () => {
-            app.redis.menusKey = app.appName + '_menus';
-            app.redis.divisionMenusKey = app.appName + '_divisionMenus';
+            app.database.redis.menusKey = app.appName + '_menus';
+            app.database.redis.divisionMenusKey = app.appName + '_divisionMenus';
 
             app.primaryWorker && app.model.fwMenu.get({ link: '/' }, (error, menu) => {
                 if (error) {
@@ -64,7 +64,7 @@ module.exports = app => {
     });
 
     app.readyHooks.add('readyDivisionMenu', {
-        ready: () => app.redis && app.dbConnection && app.dbConnection.buildCondition,
+        ready: () => app.database.redis && app.dbConnection && app.dbConnection.buildCondition,
         run: () => app.primaryWorker && app.model.dvWebsite.getAll((err, dvWebsites) => {
             if (err) {
                 console.error('Get unit website has errors!');
