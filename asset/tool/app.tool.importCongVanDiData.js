@@ -23,7 +23,7 @@ require('../../config/lib/excel')(app);
 require('../../config/lib/fs')(app);
 require('../../config/io')(app);
 require('../../config/lib/string')(app);
-require('../../config/database')(app, package);
+require('../../config/database.oracleDB')(app, package);
 
 // Init =======================================================================
 app.loadModules(false);
@@ -62,7 +62,7 @@ const run = () => {
                 },
                 "K HQH": {
                     id: "8",
-                    isGroup:1
+                    isGroup: 1
                 },
                 "Vũ Thị Bắc": {
                     id: "****445",
@@ -218,57 +218,57 @@ const run = () => {
                         return val;
                     }
                 }
-                
+
                 if (worksheet.getCell('B' + index).value === null) {
-                        process.stdout.clearLine();
-                        process.stdout.cursorTo(0);
-                        console.log('Running done!');
-                        if (errorList.length)
-                            console.log(`Error on line(s): ${errorList.join(', ')}.`);
-                        else console.log('All successfully');
-                        process.exit();
+                    process.stdout.clearLine();
+                    process.stdout.cursorTo(0);
+                    console.log('Running done!');
+                    if (errorList.length)
+                        console.log(`Error on line(s): ${errorList.join(', ')}.`);
+                    else console.log('All successfully');
+                    process.exit();
                 };
-                
+
                 let record = {
                     noiDung: getVal('D', 'text'),
                     ngayGui: getVal('B', 'date'),
                     ngayKy: getVal('C', 'date'),
                     donViGui: 30
                 };
-                
-                    let donViNhanArr = [];
-                    let nguoiNhanArr = [];
-                    const donViAndNguoiNhan = getVal('E', 'text');
-                    let donViAndNguoiNhanArr = [];
-                    if (donViAndNguoiNhan) {
-                        if (donViAndNguoiNhan.indexOf(';') > 0) donViAndNguoiNhanArr = donViAndNguoiNhan.split(';') 
-                        else donViAndNguoiNhanArr = donViAndNguoiNhan.split('\n');
-                    };
-                    donViAndNguoiNhanArr.length > 0 && donViAndNguoiNhanArr.forEach((item) => {
-                        if (object.hasOwnProperty(item)) {
-                            if (object[item].isGroup === 1) donViNhanArr.push(object[item].id);
-                            else nguoiNhanArr.push(object[item].id);
-                        }
-                    });
-                    let donViNhanStr = donViNhanArr.join(';');
-                    let nguoiNhanStr = nguoiNhanArr.join(';');
-                    record.donViNhan = donViNhanStr;
-                    record.canBoNhan = nguoiNhanStr;
-                    process.stdout.clearLine();
-                    process.stdout.cursorTo(0);
-                    process.stdout.write(`Importing line ${index} (shcc=${record.donViGui})`);
-                                    
-                     await app.model.hcthCongVanDi.create(record, error => {
-                            if (error) {
-                                console.log(` => Thêm qtNuocNgoai ${index} bị lỗi\n - data: ${JSON.stringify(record, null, 4)}\n - error: ${error}`);
-                                errorList.push(index);
-                            }
-                            solve(index + 1)
-                    });
 
-            
-               // }
-            }    
+                let donViNhanArr = [];
+                let nguoiNhanArr = [];
+                const donViAndNguoiNhan = getVal('E', 'text');
+                let donViAndNguoiNhanArr = [];
+                if (donViAndNguoiNhan) {
+                    if (donViAndNguoiNhan.indexOf(';') > 0) donViAndNguoiNhanArr = donViAndNguoiNhan.split(';')
+                    else donViAndNguoiNhanArr = donViAndNguoiNhan.split('\n');
+                };
+                donViAndNguoiNhanArr.length > 0 && donViAndNguoiNhanArr.forEach((item) => {
+                    if (object.hasOwnProperty(item)) {
+                        if (object[item].isGroup === 1) donViNhanArr.push(object[item].id);
+                        else nguoiNhanArr.push(object[item].id);
+                    }
+                });
+                let donViNhanStr = donViNhanArr.join(';');
+                let nguoiNhanStr = nguoiNhanArr.join(';');
+                record.donViNhan = donViNhanStr;
+                record.canBoNhan = nguoiNhanStr;
+                process.stdout.clearLine();
+                process.stdout.cursorTo(0);
+                process.stdout.write(`Importing line ${index} (shcc=${record.donViGui})`);
+
+                await app.model.hcthCongVanDi.create(record, error => {
+                    if (error) {
+                        console.log(` => Thêm qtNuocNgoai ${index} bị lỗi\n - data: ${JSON.stringify(record, null, 4)}\n - error: ${error}`);
+                        errorList.push(index);
+                    }
+                    solve(index + 1)
+                });
+
+
+                // }
+            }
             if (worksheet) solve();
 
             // sheet 2
@@ -288,55 +288,55 @@ const run = () => {
                         return val;
                     }
                 }
-                
+
                 if (worksheet1.getCell('D' + index).value === null) {
-                        process.stdout.clearLine();
-                        process.stdout.cursorTo(0);
-                        console.log('Running done!');
-                        if (errorList.length)
-                            console.log(`Error on line(s): ${errorList.join(', ')}.`);
-                        else console.log('All successfully');
-                        process.exit();
+                    process.stdout.clearLine();
+                    process.stdout.cursorTo(0);
+                    console.log('Running done!');
+                    if (errorList.length)
+                        console.log(`Error on line(s): ${errorList.join(', ')}.`);
+                    else console.log('All successfully');
+                    process.exit();
                 };
-                
+
                 let record = {
                     noiDung: getVal('D', 'text'),
                     ngayGui: getVal('B', 'date'),
                     ngayKy: getVal('C', 'date'),
                     donViGui: 33
                 };
-                
-                    let donViNhanArr = [];
-                    let nguoiNhanArr = [];
-                    const donViAndNguoiNhan = getVal('E', 'text');
-                    let donViAndNguoiNhanArr = [];
-                    if (donViAndNguoiNhan) {
-                        if (donViAndNguoiNhan.indexOf(';') > 0) donViAndNguoiNhanArr = donViAndNguoiNhan.split(';') 
-                        else donViAndNguoiNhanArr = donViAndNguoiNhan.split('\n');
-                    };
-                    donViAndNguoiNhanArr.length > 0 && donViAndNguoiNhanArr.forEach((item) => {
-                        if (object.hasOwnProperty(item)) {
-                            if (object[item].isGroup === 1) donViNhanArr.push(object[item].id);
-                            else nguoiNhanArr.push(object[item].id);
-                        }
-                    });
-                    let donViNhanStr = donViNhanArr.join(';');
-                    let nguoiNhanStr = nguoiNhanArr.join(';');
-                    record.donViNhan = donViNhanStr;
-                    record.canBoNhan = nguoiNhanStr;
-                    process.stdout.clearLine();
-                    process.stdout.cursorTo(0);
-                    process.stdout.write(`Importing line ${index} (shcc=${record.donViGui})`);
-                                    
-                     await app.model.hcthCongVanDi.create(record, error => {
-                            if (error) {
-                                console.log(` => Thêm qtNuocNgoai ${index} bị lỗi\n - data: ${JSON.stringify(record, null, 4)}\n - error: ${error}`);
-                                errorList.push(index);
-                            }
-                            solve1(index + 1)
-                    });
-               // }
-            }    
+
+                let donViNhanArr = [];
+                let nguoiNhanArr = [];
+                const donViAndNguoiNhan = getVal('E', 'text');
+                let donViAndNguoiNhanArr = [];
+                if (donViAndNguoiNhan) {
+                    if (donViAndNguoiNhan.indexOf(';') > 0) donViAndNguoiNhanArr = donViAndNguoiNhan.split(';')
+                    else donViAndNguoiNhanArr = donViAndNguoiNhan.split('\n');
+                };
+                donViAndNguoiNhanArr.length > 0 && donViAndNguoiNhanArr.forEach((item) => {
+                    if (object.hasOwnProperty(item)) {
+                        if (object[item].isGroup === 1) donViNhanArr.push(object[item].id);
+                        else nguoiNhanArr.push(object[item].id);
+                    }
+                });
+                let donViNhanStr = donViNhanArr.join(';');
+                let nguoiNhanStr = nguoiNhanArr.join(';');
+                record.donViNhan = donViNhanStr;
+                record.canBoNhan = nguoiNhanStr;
+                process.stdout.clearLine();
+                process.stdout.cursorTo(0);
+                process.stdout.write(`Importing line ${index} (shcc=${record.donViGui})`);
+
+                await app.model.hcthCongVanDi.create(record, error => {
+                    if (error) {
+                        console.log(` => Thêm qtNuocNgoai ${index} bị lỗi\n - data: ${JSON.stringify(record, null, 4)}\n - error: ${error}`);
+                        errorList.push(index);
+                    }
+                    solve1(index + 1)
+                });
+                // }
+            }
             if (worksheet1) solve1();
 
             // sheet 3
@@ -356,55 +356,55 @@ const run = () => {
                         return val;
                     }
                 }
-                
+
                 if (worksheet2.getCell('D' + index).value === null) {
-                        process.stdout.clearLine();
-                        process.stdout.cursorTo(0);
-                        console.log('Running done!');
-                        if (errorList.length)
-                            console.log(`Error on line(s): ${errorList.join(', ')}.`);
-                        else console.log('All successfully');
-                        process.exit();
+                    process.stdout.clearLine();
+                    process.stdout.cursorTo(0);
+                    console.log('Running done!');
+                    if (errorList.length)
+                        console.log(`Error on line(s): ${errorList.join(', ')}.`);
+                    else console.log('All successfully');
+                    process.exit();
                 };
-                
+
                 let record = {
                     noiDung: getVal('D', 'text'),
                     ngayGui: getVal('B', 'date'),
                     ngayKy: getVal('C', 'date'),
                     donViGui: 35
                 };
-                
-                    let donViNhanArr = [];
-                    let nguoiNhanArr = [];
-                    const donViAndNguoiNhan = getVal('E', 'text');
-                    let donViAndNguoiNhanArr = [];
-                    if (donViAndNguoiNhan) {
-                        if (donViAndNguoiNhan.indexOf(';') > 0) donViAndNguoiNhanArr = donViAndNguoiNhan.split(';') 
-                        else donViAndNguoiNhanArr = donViAndNguoiNhan.split('\n');
-                    };
-                    donViAndNguoiNhanArr.length > 0 && donViAndNguoiNhanArr.forEach((item) => {
-                        if (object.hasOwnProperty(item)) {
-                            if (object[item].isGroup === 1) donViNhanArr.push(object[item].id);
-                            else nguoiNhanArr.push(object[item].id);
-                        }
-                    });
-                    let donViNhanStr = donViNhanArr.join(';');
-                    let nguoiNhanStr = nguoiNhanArr.join(';');
-                    record.donViNhan = donViNhanStr;
-                    record.canBoNhan = nguoiNhanStr;
-                    process.stdout.clearLine();
-                    process.stdout.cursorTo(0);
-                    process.stdout.write(`Importing line ${index} (shcc=${record.donViGui})`);
-                                    
-                     await app.model.hcthCongVanDi.create(record, error => {
-                            if (error) {
-                                console.log(` => Thêm qtNuocNgoai ${index} bị lỗi\n - data: ${JSON.stringify(record, null, 4)}\n - error: ${error}`);
-                                errorList.push(index);
-                            }
-                            solve2(index + 1)
-                    });
-               // }
-            }    
+
+                let donViNhanArr = [];
+                let nguoiNhanArr = [];
+                const donViAndNguoiNhan = getVal('E', 'text');
+                let donViAndNguoiNhanArr = [];
+                if (donViAndNguoiNhan) {
+                    if (donViAndNguoiNhan.indexOf(';') > 0) donViAndNguoiNhanArr = donViAndNguoiNhan.split(';')
+                    else donViAndNguoiNhanArr = donViAndNguoiNhan.split('\n');
+                };
+                donViAndNguoiNhanArr.length > 0 && donViAndNguoiNhanArr.forEach((item) => {
+                    if (object.hasOwnProperty(item)) {
+                        if (object[item].isGroup === 1) donViNhanArr.push(object[item].id);
+                        else nguoiNhanArr.push(object[item].id);
+                    }
+                });
+                let donViNhanStr = donViNhanArr.join(';');
+                let nguoiNhanStr = nguoiNhanArr.join(';');
+                record.donViNhan = donViNhanStr;
+                record.canBoNhan = nguoiNhanStr;
+                process.stdout.clearLine();
+                process.stdout.cursorTo(0);
+                process.stdout.write(`Importing line ${index} (shcc=${record.donViGui})`);
+
+                await app.model.hcthCongVanDi.create(record, error => {
+                    if (error) {
+                        console.log(` => Thêm qtNuocNgoai ${index} bị lỗi\n - data: ${JSON.stringify(record, null, 4)}\n - error: ${error}`);
+                        errorList.push(index);
+                    }
+                    solve2(index + 1)
+                });
+                // }
+            }
             if (worksheet2) solve2();
         }
     });

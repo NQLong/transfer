@@ -15,7 +15,7 @@ require('../../config/common')(app);
 require('../../config/lib/excel')(app);
 require('../../config/lib/fs')(app);
 require('../../config/lib/string')(app);
-require('../../config/database')(app, package.db);
+require('../../config/database.oracleDB')(app, package.db);
 
 // Init =======================================================================
 app.loadModules(false);
@@ -31,7 +31,7 @@ const obj2Db = { 'ten': 'TEN', 'ho': 'HO', 'phai': 'PHAI', 'dienThoaiCaNhan': 'D
 
 function getKeyByValue(object, value) {
     return Object.keys(object).find(key => object[key] === value);
-  }
+}
 
 const run = () => {
     app.excel.readFile(app.path.join(app.assetPath, './data/TCHC_CAN_BO.xlsx'), workbook => {
@@ -48,7 +48,7 @@ const run = () => {
                 listCols.push(name);
                 numCols += 1;
             }
-            
+
             let keys = 'SHCC';
             let idKeys = listCols.indexOf(keys); ///base 0th
             solve = (row = 2) => {
@@ -57,7 +57,7 @@ const run = () => {
                 if (dataKey == null) process.exit(1);
                 else dataKey = dataKey.toString();
                 // console.log("Row = ", row, "Cell = ", cell, "Key = ", dataKey);
-                app.model.canBo.get({shcc: dataKey}, (error, data) => {
+                app.model.canBo.get({ shcc: dataKey }, (error, data) => {
                     if (data != null) { ///update data canbo from dev to prod, make sure that data canbo from dev is newest version
                         // console.log("keys", "=", dataKey);
                         sql = 'UPDATE TCHC_CAN_BO SET ';
@@ -103,7 +103,7 @@ const run = () => {
                     }
                     solve(row + 1);
                 });
-            }    
+            }
             if (worksheet) solve();
         }
     });

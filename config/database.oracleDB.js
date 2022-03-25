@@ -1,22 +1,6 @@
 module.exports = (app, appConfig) => {
-    const db = appConfig.db, redisDB = appConfig.redisDB;
-    // Connect RedisDB ------------------------------------------------------------------------------------------------------------------------------
-    const redis = require('redis');
-    app.redis = app.isDebug ? redis.createClient() : redis.createClient({ host: redisDB.host, port: redisDB.port, password: redisDB.auth });
-    // app.redis = app.isDebug ? redis.createClient() : redis.createClient(redisDB.port, redisDB.host, { enable_offline_queue: false });
-    // !app.isDebug && app.redis.auth(redisDB.auth);
+    const db = appConfig.db.main;
 
-    app.redis.on('connect', () => {
-        console.log(` - #${process.pid}: The Redis connection succeeded.`);
-        app.onRedisConnect();
-    });
-
-    app.redis.on('error', error => {
-        console.log(` - #${process.pid}: The Redis connection failed!`, error.message);
-        app.redis.end(true);
-    });
-
-    // Connect OracleDB -----------------------------------------------------------------------------------------------------------------------------
     app.oracleDB = require('oracledb');
     app.oracleDB.autoCommit = true;
     app.oracleDB.outFormat = app.oracleDB.OBJECT; // other option is 'oracleDB.ARRAY'
@@ -135,7 +119,4 @@ module.exports = (app, appConfig) => {
         console.error(error);
         process.exit(1);
     });
-
-    // Define all models --------------------------------------------------------------------------
-    app.model = {};
 };

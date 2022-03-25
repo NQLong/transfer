@@ -34,11 +34,14 @@ module.exports = (cluster, isDebug) => {
     app.uploadPath = app.path.join(__dirname, '..', appConfig.path.upload);
     app.documentPath = app.path.join(__dirname, '..', appConfig.path.document);
     app.faviconPath = app.path.join(__dirname, '..', appConfig.path.favicon);
+    app.database = {};
+    app.model = {};
 
     // Configure ------------------------------------------------------------------------------------------------------
     require('./common')(app, appConfig.name);
     require('./view')(app, express);
-    require('./database')(app, appConfig);
+    require('./database.redisDB')(app, appConfig);
+    require('./database.oracleDB')(app, appConfig);
     require('./io')(app, server, appConfig);
     require('./packages')(app, server, appConfig);
     require('./authentication')(app);

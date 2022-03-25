@@ -15,7 +15,7 @@ require('../../config/common')(app);
 require('../../config/lib/excel')(app);
 require('../../config/lib/fs')(app);
 require('../../config/lib/string')(app);
-require('../../config/database')(app, package.db);
+require('../../config/database.oracleDB')(app, package.db);
 
 // Init =======================================================================
 app.loadModules(false);
@@ -39,7 +39,7 @@ const run = () => {
 
                 // let noiSinh = worksheet.getCell('K' + index).value;
                 // let nguyenQuan = worksheet.getCell('L' + index).value;
-                let trinhDo =  worksheet.getCell('N' + index).value;
+                let trinhDo = worksheet.getCell('N' + index).value;
                 let shcc = worksheet.getCell('M' + index).value;
                 const searchTerm = trinhDo ? trinhDo : '';
                 const condition = {

@@ -15,7 +15,7 @@ require('../../config/common')(app);
 require('../../config/lib/excel')(app);
 require('../../config/lib/fs')(app);
 require('../../config/lib/string')(app);
-require('../../config/database')(app, package.db);
+require('../../config/database.oracleDB')(app, package.db);
 
 // Init =======================================================================
 app.loadModules(false);
@@ -26,7 +26,7 @@ const run = () => {
         if (result) {
             result.forEach(canBo => {
                 if ((canBo.hocVi || canBo.chucDanh || canBo.chuyenNganh) && !canBo.trinhDoPhoThong) {
-                    app.model.canBo.update({shcc: canBo.shcc}, {trinhDoPhoThong: '12/12'}, (er, out) => {
+                    app.model.canBo.update({ shcc: canBo.shcc }, { trinhDoPhoThong: '12/12' }, (er, out) => {
                         console.log(i++);
                     })
                 }

@@ -13,7 +13,7 @@ require('../../config/lib/excel')(app);
 require('../../config/io')(app);
 require('../../config/lib/fs')(app);
 require('../../config/lib/string')(app);
-require('../../config/database')(app, package);
+require('../../config/database.oracleDB')(app, package);
 
 
 // Init =======================================================================

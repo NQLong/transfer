@@ -15,7 +15,7 @@ require('../../config/common')(app);
 require('../../config/lib/excel')(app);
 require('../../config/lib/fs')(app);
 require('../../config/lib/string')(app);
-require('../../config/database')(app, package.db);
+require('../../config/database.oracleDB')(app, package.db);
 
 // Init =======================================================================
 app.loadModules(false);
@@ -26,11 +26,11 @@ const run = () => {
         if (result) {
             result.forEach(canBo => {
                 if (canBo.daNghi) {
-                    app.model.qtNghiViec.create({shcc: canBo.shcc, ngayNghi: canBo.ngayNghi}, (err, res) => {
+                    app.model.qtNghiViec.create({ shcc: canBo.shcc, ngayNghi: canBo.ngayNghi }, (err, res) => {
                         if (res) {
                             console.log(i++);
                         }
-                    })                                                                                              
+                    })
                 }
 
             });
