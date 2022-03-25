@@ -10,6 +10,7 @@ export const DefaultColors = {
     orange: 'rgb(255, 159, 64)',
     grey: 'rgb(201, 203, 207)',
     purple: 'rgb(153, 102, 255)',
+    darkGrey: '#565656'
 };
 
 export class AdminChart extends React.Component {
@@ -29,6 +30,10 @@ export class AdminChart extends React.Component {
                     top: 20,
                     bottom: 0
                 }
+            },
+            interaction: {
+                mode: 'index',
+                intersect: false
             },
             animation: {
                 duration: 1000,
@@ -55,7 +60,7 @@ export class AdminChart extends React.Component {
 
                                 ctx.fillStyle = '#fff';
                                 if (i == 2) { // Darker text color for lighter background
-                                    ctx.fillStyle = '#444';
+                                    ctx.fillStyle = '#000';
                                 }
 
                                 let valueDisplay = dataset.data[i];
@@ -107,8 +112,10 @@ export class AdminChart extends React.Component {
                     datasets.push({
                         label: label,
                         data: Object.values(datas)[index],
-                        backgroundColor: colors ? (typeof colors === 'object' &&
-                            !Array.isArray(colors) ? colors[label] : colors) : Object.values(DefaultColors)
+                        fill: false,
+                        backgroundColor: type !== 'line' ? (colors ? (typeof colors === 'object' &&
+                            !Array.isArray(colors) ? colors[label] : colors) : Object.values(DefaultColors)) : DefaultColors.darkGrey,
+                        borderColor: type === 'line' ? colors : undefined
                     });
                     if (index === array.length - 1) {
                         resolve({

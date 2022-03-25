@@ -61,7 +61,9 @@ class Dashboard extends AdminPage {
                     listNgach: this.setUp(listCanBo, 'ngach', DefaultColors.green, this.ngachMapper,),
                     listDonVi: allDonVi.groupBy('maPl'),
                     allDonVi,
+                    listCanBo,
                     listHocHam: this.setUp(listCanBo, 'chucDanh', null, { '01': 'Giáo sư', '02': 'Phó giáo sư' }),
+                    listBienChe: this.setUp(listCanBo, 'namBienChe', DefaultColors.orange)
                 });
             });
         });
@@ -87,16 +89,9 @@ class Dashboard extends AdminPage {
         };
     }
     render() {
-        let { totalStaff,
-            totalMalePhD, totalFemalePhD,
-            totalMaleMaster, totalFemaleMaster,
-            totalMaleBachelor, totalFemaleBachelor
+        let { totalMalePhD, totalFemalePhD, totalMaleMaster, totalFemaleMaster, totalMaleBachelor, totalFemaleBachelor
         } = this.props.dashboardTccb && this.props.dashboardTccb.page ? this.props.dashboardTccb.page :
-                {
-                    totalMalePhD: 0, totalFemalePhD: 0,
-                    totalMaleMaster: 0, totalFemaleMaster: 0,
-                    totalMaleBachelor: 0, totalFemaleBachelor: 0
-                };
+                { totalMalePhD: 0, totalFemalePhD: 0, totalMaleMaster: 0, totalFemaleMaster: 0, totalMaleBachelor: 0, totalFemaleBachelor: 0 };
         let dataLevelByGender = {
             labels: ['Tiến sĩ', 'Thạc sĩ', 'Cử nhân'],
             datas: {
@@ -115,7 +110,7 @@ class Dashboard extends AdminPage {
             title: 'Dashboard Phòng Tổ chức cán bộ',
             content: <div className='row'>
                 <div className='col-md-6 col-lg-4'>
-                    <DashboardIcon type='primary' icon='fa-users' title='Cán bộ' value={totalStaff} link='/user/tccb/staff' />
+                    <DashboardIcon type='primary' icon='fa-users' title='Cán bộ' value={this.state.listCanBo?.length || 0} link='/user/tccb/staff' />
                 </div>
                 <div className='col-md-6 col-lg-4'>
                     <DashboardIcon type='warning' icon='fa-modx' title='Đơn vị' value={this.state.allDonVi?.length || 0} link='/user/danh-muc/don-vi' />
@@ -173,6 +168,12 @@ class Dashboard extends AdminPage {
                     <div className='tile'>
                         <div className='tile-title'>Học hàm</div>
                         <AdminChart type='pie' data={this.state.listHocHam || {}} />
+                    </div>
+                </div>
+                <div className='col-lg-12'>
+                    <div className='tile'>
+                        <div className='tile-title'>Cán bộ vào biên chế theo từng năm</div>
+                        <AdminChart type='line' data={this.state.listBienChe || {}} />
                     </div>
                 </div>
             </div>,
