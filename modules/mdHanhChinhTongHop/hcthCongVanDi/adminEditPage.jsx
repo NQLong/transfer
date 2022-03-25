@@ -145,7 +145,7 @@ class AdminEditPage extends AdminPage {
             if (this.state.id) {
                 this.props.updateHcthCongVanDi(this.state.id, changes, this.getData);
             } else {
-                T.notify('Thêm công văn đi thành công!', 'success');
+                T.notify('Thêm công văn thành công!', 'success');
                 this.props.createHcthCongVanDi(changes, () => this.props.history.push('/user/hcth/cong-van-di'));
                 this.props.history.push('/user/hcth/cong-van-di');
             }
@@ -190,15 +190,15 @@ class AdminEditPage extends AdminPage {
         const readOnly = this.props.readOnly;
         return this.renderPage({
             icon: 'fa fa-caret-square-o-right',
-            title: 'Công văn đi',
+            title: 'Công văn giữa các phòng',
             breadcrumb: [
                 <Link key={0} to='/user/hcth'>Hành chính tổng hợp </Link>,
-                <Link key={1} to='/user/hcth/cong-van-di'>Công văn đi</Link>,
+                <Link key={1} to='/user/hcth/cong-van-di'>Công văn giữa các phòng</Link>,
                 this.state.id ? 'Cập nhật' : 'Tạo mới'
             ],
             content: <>
                 <div className='tile'>
-                    <h3 className='tile-title'>{!this.state.id ? 'Tạo mới công văn đi' : 'Cập nhật công văn đi'}</h3>
+                    <h3 className='tile-title'>{!this.state.id ? 'Tạo mới công văn giữa các phòng' : 'Cập nhật công văn giữa các phòng'}</h3>
                     <div className='tile-body row'>
                         <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayGui = e} label='Ngày gửi' readOnly={readOnly} required />
                         <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayKy = e} label='Ngày ký' readOnly={readOnly} required />

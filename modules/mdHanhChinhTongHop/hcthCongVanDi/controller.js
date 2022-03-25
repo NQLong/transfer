@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.hcth,
         menus: {
-            531: { title: 'Công văn đi', link: '/user/hcth/cong-van-di', icon: 'fa-caret-square-o-right', backgroundColor: '#0B86AA' },
+            531: { title: 'Công văn giữa các phòng', link: '/user/hcth/cong-van-di', icon: 'fa-caret-square-o-right', backgroundColor: '#0B86AA' },
         },
     };
     app.permission.add(
@@ -189,7 +189,7 @@ module.exports = app => {
                     app.deleteFile(filePath);
                     res.send({ error: null });
                 } else {
-                    res.send({ error: 'Không tìm thấy công văn đi' });
+                    res.send({ error: 'Không tìm thấy công văn' });
                 }
             }
         });

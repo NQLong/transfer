@@ -82,7 +82,7 @@ export class HcthCongVanDi extends AdminPage {
                     <th style={{ width: '100%' }}>Nội dung</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>
                     <th style={{ width: 'auto' }}>Đơn vị gửi</th>
-                    <th style={{ width: 'auto' }}>Đơn vị, nguời nhận</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Đơn vị, nguời nhận</th>
                     <th style={{ width: 'auto' }}>Tình trạng</th>
                     <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                 </tr>),
@@ -116,7 +116,7 @@ export class HcthCongVanDi extends AdminPage {
                             </>
                         } />
                         <TableCell type='text' contentClassName='multiple-lines' content={item.tenDonViGui ? item.tenDonViGui.normalizedName() : ''} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
+                        <TableCell type='text' style={{  }} contentStyle={{width: '10rem'}} content={
                             <>
                                 <span>{danhSachCanBoNhan && danhSachCanBoNhan.length > 0 ? danhSachCanBoNhan.map((item, index) => (
                                     <span key={index}>
@@ -148,10 +148,10 @@ export class HcthCongVanDi extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-caret-square-o-left',
-            title: 'Công văn đi',
+            title: 'Công văn giữa các phòng',
             breadcrumb: [
                 <Link key={0} to='/user/hcth'>Hành chính tổng hơp</Link>,
-                'Công văn đi'
+                'Công văn giữa các phòng'
             ],
             onCreate: permission && permission.write ? () => this.props.history.push('/user/hcth/cong-van-di/new') : null,
             content: <>
