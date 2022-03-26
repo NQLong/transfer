@@ -132,8 +132,8 @@ class StaffPage extends AdminPage {
                             <span>{item.loaiCanBo}<br/></span>
                             <small style={{ color: 'blue' }}>{item.ngayBienChe ? T.dateToText(item.ngayBienChe, 'dd/mm/yyyy') : ''}</small>
                         </>} style={{ whiteSpace: 'nowrap', textAlign: 'center' }} />
-                    <TableCell dateFormat='dd/mm/yyyy' type='date' content={item.ngayCapNhatTienSi} style={{ whiteSpace: 'nowrap', textAlign: 'center' }} />
-                    <TableCell dateFormat='dd/mm/yyyy' type='date' content={item.ngayCapNhatThacSi} style={{ whiteSpace: 'nowrap', textAlign: 'center' }} />
+                    <TableCell type='text' content={item.tienSi ? (item.ngayCapNhatTienSi ? T.dateToText(item.ngayCapNhatTienSi, 'dd/mm/yyyy') : 'x') : ''} style={{ whiteSpace: 'nowrap', textAlign: 'center' }} />
+                    <TableCell type='text' content={item.thacSi ? (item.ngayCapNhatThacSi ? T.dateToText(item.ngayCapNhatThacSi, 'dd/mm/yyyy') : 'x') : ''} style={{ whiteSpace: 'nowrap', textAlign: 'center' }} />
                     <TableCell type='buttons' content={item} permission={permission} onEdit={`/user/tccb/staff/${item.shcc}`} onDelete={this.delete}></TableCell>
                 </tr>)
         });
