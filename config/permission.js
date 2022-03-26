@@ -144,7 +144,7 @@ module.exports = app => {
         } else {
             const staffChucVus = user && user.staff && user.staff.chucVus ? user.staff.chucVus : [];
             return staffChucVus.some(item => (maDonVi == '*' || item.maDonVi == maDonVi) && (maChucVu == '*' || item.maChucVu == maChucVu));
-        } 
+        }
     };
 
     const hasPermission = (userPermissions, menuPermissions) => {
@@ -188,7 +188,7 @@ module.exports = app => {
                             user.shcc = item.shcc;
                             user.staff = item;
                             app.permissionHooks.pushUserPermission(user, 'staff:login'); // Add staff permission: staff:login
-                            app.model.qtChucVu.getAll({shcc: user.shcc}, 'maChucVu,maDonVi', null, (e, chucVus) => {
+                            app.model.qtChucVu.getAll({ shcc: user.shcc }, 'maChucVu,maDonVi', null, (e, chucVus) => {
                                 user.staff.chucVus = chucVus || [];
                                 app.permissionHooks.run('staff', user, user.staff).then(() => resolve());
                             });
@@ -285,7 +285,7 @@ module.exports = app => {
 
     // Hook readyHooks ------------------------------------------------------------------------------------------------------------------------------
     app.readyHooks.add('permissionInit', {
-        ready: () => app.dbConnection != null && app.model != null && app.model.fwRole != null,
+        ready: () => app.database.oracle.connected && app.model.fwRole != null,
         run: () => app.isDebug && app.permission.getTreeMenuText(),
     });
 };

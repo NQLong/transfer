@@ -15,7 +15,7 @@ module.exports = app => {
                                 FROM HCMUSSH.FW_INEWS_ITEM t
                                 ORDER BY PRIORITY${order}
                             ) WHERE INEWS_ID = :inewsId AND PRIORITY ${operator} :priority AND ROWNUM <= :limit`;
-                app.dbConnection.execute(sql, { priority: item1.priority, limit: 1, inewsId }, (error, { rows }) => {
+                app.database.oracle.connection.main.execute(sql, { priority: item1.priority, limit: 1, inewsId }, (error, { rows }) => {
                     if (error) {
                         done && done(error);
                     } else if (rows === null || rows.length === 0) {
@@ -51,7 +51,7 @@ module.exports = app => {
                 done('Data is empty!');
             } else {
                 const sql = 'INSERT INTO FW_INEWS_ITEM (' + statement.substring(2) + ') VALUES (' + values.substring(2) + ')';
-                app.dbConnection.execute(sql, parameter, (error, resultSet) => {
+                app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
                         app.model.fwInewsItem.get({ rowId: resultSet.lastRowid }, done);
                     } else {

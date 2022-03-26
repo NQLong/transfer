@@ -19,7 +19,7 @@ module.exports = app => {
         }
     });
     app.readyHooks.add('readyRole', {
-        ready: () => app.dbConnection != null && app.model != null && app.model.fwRole != null,
+        ready: () => app.database.oracle.connected && app.model.fwRole != null,
         run: () => getActivedRoles(),
     });
 

@@ -15,7 +15,7 @@ require('../../config/io')(app);
 require('../../config/lib/excel')(app);
 require('../../config/lib/fs')(app);
 require('../../config/lib/string')(app);
-require('../../config/database')(app, package);
+require('../../config/database.oracleDB')(app, package);
 
 // Init =======================================================================
 app.loadModules(false);
@@ -43,7 +43,7 @@ const convert = (s, c = ',') => {
 }
 
 app.readyHooks.add('Run tool.qtHoTroHocPhi.js', {
-    ready: () => app.dbConnection && app.model && app.model.canBo,
+    ready: () => app.database.oracle.connected && app.model && app.model.canBo,
     run: () => {
         app.excel.readFile('./data/hocphi.xlsx', workbook => {
             if (workbook) {

@@ -12,7 +12,7 @@ require('../../config/common')(app);
 require('../../config/lib/excel')(app);
 require('../../config/lib/fs')(app);
 require('../../config/lib/string')(app);
-require('../../config/database')(app, package);
+require('../../config/database.oracleDB')(app, package);
 require('../../config/io')(app);
 // Init =======================================================================
 app.loadModules(false);
@@ -204,6 +204,6 @@ const run = () => app.excel.readFile(app.path.join(__dirname, 'DSCB.xlsx'), work
     }
 });
 app.readyHooks.add('Run tool.dataStaff.js', {
-    ready: () => app.dbConnection && app.model && app.model.canBo && app.model.dmDonVi,
+    ready: () => app.database.oracle.connected && app.model && app.model.canBo && app.model.dmDonVi,
     run,
 });

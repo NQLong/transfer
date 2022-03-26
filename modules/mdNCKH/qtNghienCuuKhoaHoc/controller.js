@@ -36,7 +36,7 @@ module.exports = app => {
     app.get('/user/nghien-cuu-khoa-hoc/:id/:ownerShcc', app.permission.check('staff:login'), app.templates.admin);
     // Hook ready -----------------------------------------------------------------------------------------------------------------------------------
     app.readyHooks.add('readyQtNghienCuuKhoaHoc', {
-        ready: () => app.dbConnection && app.model && app.model.qtNghienCuuKhoaHoc,
+        ready: () => app.database.oracle.connected && app.model && app.model.qtNghienCuuKhoaHoc,
         run: () => app.model.qtNghienCuuKhoaHoc.count((error, number) => {
             if (error == null) {
                 number = Number(number);
@@ -100,7 +100,7 @@ module.exports = app => {
         app.model.qtNghienCuuKhoaHoc.delete({ id: req.body.id }, (error) => res.send(error)));
 
     app.get('/api/qua-trinh/nckh/download-excel/:maDonVi/:fromYear/:toYear/:loaiHocVi/:maSoCanBo/:timeType', app.permission.check('qtNghienCuuKhoaHoc:read'), (req, res) => {
-        let { maDonVi, fromYear, toYear, loaiHocVi, maSoCanBo, timeType } = req.params ? req.params : { maDonVi: '', fromYear: null, toYear: null, loaiHocVi: '', maSoCanBo: '', timeType: 0};
+        let { maDonVi, fromYear, toYear, loaiHocVi, maSoCanBo, timeType } = req.params ? req.params : { maDonVi: '', fromYear: null, toYear: null, loaiHocVi: '', maSoCanBo: '', timeType: 0 };
         if (maDonVi == 'null') maDonVi = null;
         if (fromYear == 'null') fromYear = null;
         if (toYear == 'null') toYear = null;

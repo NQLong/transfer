@@ -15,7 +15,7 @@ module.exports = app => {
     app.get('/user/member', app.permission.check('user:read'), app.templates.admin);
 
     app.readyHooks.add('readyUser', {
-        ready: () => app.dbConnection != null && app.model != null && app.model.fwRole != null && app.model.fwUser != null,
+        ready: () => app.database.oracle.connected && app.model.fwRole != null && app.model.fwUser != null,
         run: () => {
             app.model.fwUser.count({}, (error, numberOfUser) => {
                 if (error == null) {
