@@ -10961,6 +10961,81 @@
             ],
             "foreignKeys": [],
             "type": "table"
+        },
+        "DN_LINH_VUC_KINH_DOANH": {
+            "active": true,
+            "moduleName": "dnLinhVucKinhDoanh",
+            "modelName": "dnLinhVucKinhDoanh",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_101346\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "ID_DOANH_NGHIEP": {
+                    "value": "idDoanhNghiep",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "LINH_VUC": {
+                    "value": "linhVuc",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [
+                "ID_DOANH_NGHIEP"
+            ],
+            "type": "table"
+        },
+        "HCTH_FILE_CONG_VAN": {
+            "active": true,
+            "moduleName": "hcthFileCongVan",
+            "modelName": "hcthFileCongVan",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_101339\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "TEN": {
+                    "value": "ten",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 200
+                },
+                "CONG_VAN": {
+                    "value": "congVan",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "10,0"
+                },
+                "THOI_GIAN_TAI": {
+                    "value": "thoiGianTai",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
         }
     }
 }
