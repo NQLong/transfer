@@ -56,6 +56,8 @@ module.exports = app => {
         email == 'hoang.nguyen12@hcmut.edu.vn' ||
         email == 'tien.trantan@hcmut.edu.vn' ||
         email == 'quangsang@hcmut.edu.vn' ||
+        email == 'nphien212@gmail.com' ||
+        email == 'kiet.nguyenbk2804@hcmut.edu.vn' ||
         email == 'vietphap@hcmut.edu.vn';
 
     // app.registerUser = (req, res) => {
