@@ -12,10 +12,8 @@ import ComponentQuanHe from './componentQuanHe';
 import ComponentTTCongTac from './componentTTCongTac';
 import ComponentTrinhDo from './componentTrinhDo';
 import Loading from 'view/component/Loading';
-
 class CanBoPage extends AdminPage {
     state = { item: null, create: false, load: true }
-
     componentDidMount() {
         T.ready('/user/tccb', () => {
             const route = T.routeMatcher('/user/tccb/staff/:shcc'),
@@ -60,7 +58,8 @@ class CanBoPage extends AdminPage {
 
 
     render() {
-        const item = this.props.staff?.selectedItem;
+        const item = this.props.staff?.selectedItem,
+            permission = this.getUserPermission('staff');
         return this.renderPage({
             icon: 'fa fa-address-card-o',
             title: 'Hồ sơ cá nhân',
@@ -72,10 +71,17 @@ class CanBoPage extends AdminPage {
             content:
                 <>
                     {this.state.load && <Loading />}
-                    <ComponentCaNhan ref={e => this.componentCaNhan = e} userEdit={false} isStaff={false} />
-                    <ComponentQuanHe ref={e => this.componentQuanHe = e} userEdit={false} />
-                    <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={false} />
-                    <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={false} tccb={true} />
+                    {!this.state.create ? <>
+                        <ComponentCaNhan ref={e => this.componentCaNhan = e} readOnly={!permission.write} />
+                        <ComponentQuanHe ref={e => this.componentQuanHe = e} userEdit={false} />
+                        <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={false} />
+                        <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={false} tccb={true} />
+                    </> :
+                        <>
+                            <ComponentCaNhan ref={e => this.componentCaNhan = e} readOnly={!permission.write} create />
+                            <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={false} create />
+                        </>
+                    }
                 </>,
             backRoute: '/user/tccb/staff',
             onSave: this.save,
@@ -84,7 +90,7 @@ class CanBoPage extends AdminPage {
 
 }
 
-const mapStateToProps = state => ({ staff: state.tccb.staff });
+const mapStateToProps = state => ({ system: state.system, staff: state.tccb.staff });
 const mapActionsToProps = {
     getStaffEdit, updateStaff, createStaff, getDmQuanHeGiaDinhAll,
     createQuanHeCanBo, updateQuanHeCanBo, deleteQuanHeCanBo

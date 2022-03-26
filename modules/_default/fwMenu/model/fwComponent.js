@@ -95,7 +95,7 @@ module.exports = app => {
         });
     };
     app.model.fwComponent.createNew = (className, style, viewType, viewId, detail, done) => {
-        app.dbConnection.execute('BEGIN :ret:=component_create_new(:className, :style, :viewType, :viewId, :detail); END;',
-            { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.NUMBER }, className, style, viewType, viewId, detail }, done);
+        app.database.oracle.connection.main.execute('BEGIN :ret:=component_create_new(:className, :style, :viewType, :viewId, :detail); END;',
+            { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, className, style, viewType, viewId, detail }, done);
     };
 };

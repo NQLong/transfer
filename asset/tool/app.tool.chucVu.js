@@ -15,7 +15,7 @@ require('../../config/common')(app);
 require('../../config/lib/excel')(app);
 require('../../config/lib/fs')(app);
 require('../../config/lib/string')(app);
-require('../../config/database')(app, package.db);
+require('../../config/database.oracleDB')(app, package.db);
 
 // Init =======================================================================
 app.loadModules(false);
@@ -27,7 +27,7 @@ const run = () => {
                 if (item.chucVuChinh) {
                     app.model.canBo.get({ shcc: item.shcc }, (error, canBo) => {
                         if (canBo) {
-                            app.model.canBo.update({ shcc: item.shcc }, { maChucVu: item.maChucVu, maDonVi: item.maDonVi}, (error, output) => {
+                            app.model.canBo.update({ shcc: item.shcc }, { maChucVu: item.maChucVu, maDonVi: item.maDonVi }, (error, output) => {
                                 console.log(output);
                             });
                         }
@@ -39,6 +39,6 @@ const run = () => {
 }
 
 app.readyHooks.add('Run tool.chucVu.js', {
-    ready: () => app.dbConnection && app.model && app.model.canBo && app.model.dmChucVu && app.model.qtChucVu,
+    ready: () => app.database.oracle.connected && app.model && app.model.canBo && app.model.dmChucVu && app.model.qtChucVu,
     run,
 });

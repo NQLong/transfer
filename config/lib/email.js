@@ -47,8 +47,7 @@ module.exports = app => {
         },
 
         validateEmail: email => {
-            const atpos = email.indexOf('@'), dotpos = email.lastIndexOf('.');
-            return (atpos < 1 || dotpos < atpos + 2 || dotpos + 2 >= email.length);
+            return (/^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i).test(String(email).toLowerCase());
         },
 
         isHCMUSSH: email => {

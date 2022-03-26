@@ -6,24 +6,24 @@ module.exports = app => {
 
     // Count views ----------------------------------------------------------------------------------------------------------------------------------
     app.readyHooks.add('todaySchedule', {
-        ready: () => app.redis,
+        ready: () => app.database.redis,
         run: () => {
             app.primaryWorker && app.schedule('0 0 * * *', () => {
                 // const today = new Date();
                 // Cập nhật biến đếm ngày hôm nay về 0
-                app.redis.set(`${app.appName}_state:todayViews`, 0);
+                app.database.redis.set(`${app.appName}_state:todayViews`, 0);
             });
         },
     });
 
     // Clear sessions ----------------------------------------------------------------------------------------------------------------------------------
     app.readyHooks.add('clearSessionSchedule', {
-        ready: () => app.redis,
+        ready: () => app.database.redis,
         run: () => {
             app.primaryWorker && app.schedule('5 0 * * *', () => { // 00h05 hằng ngày
                 console.log(' - Schedule: Clear session user');
                 const sessionPrefix = app.appName + '_sess:';
-                app.redis.keys(sessionPrefix + '*', async (error, keys) => {
+                app.database.redis.keys(sessionPrefix + '*', async (error, keys) => {
                     // Tính toán hôm nay và 7 ngày trước
                     const today = new Date().yyyymmdd();
                     let last7Day = new Date();
@@ -33,7 +33,7 @@ module.exports = app => {
                     if (!error) {
                         // Lấy sessionUser
                         const getKey = (key) => new Promise(resolve => {
-                            app.redis.get(key, (_, item) => resolve(JSON.parse(item)));
+                            app.database.redis.get(key, (_, item) => resolve(JSON.parse(item)));
                         });
 
                         try {
@@ -42,18 +42,18 @@ module.exports = app => {
                             for (const key of keys) {
                                 const sessionUser = await getKey(key);
                                 if (!sessionUser) { // Không có session
-                                    await app.redis.del(key);
+                                    await app.database.redis.del(key);
                                     deleteCounter++;
                                 } else if (sessionUser.user) { // Có login
                                     // Nếu ko có today hoặc session lâu hơn 7 ngày => Xóa session
                                     if (!sessionUser.today || parseInt(sessionUser.today) < parseInt(last7Day)) {
-                                        await app.redis.del(key);
+                                        await app.database.redis.del(key);
                                         deleteCounter++;
                                     }
                                 } else {
                                     // Không login
                                     if (!sessionUser.today || today != sessionUser.today) { // Session cũ => Xóa session
-                                        await app.redis.del(key);
+                                        await app.database.redis.del(key);
                                         deleteCounter++;
                                     }
                                 }
@@ -314,10 +314,10 @@ module.exports = app => {
             header: '/img/header.jpg'
         },
 
-        init: () => app.redis.keys(`${app.appName}_state:*`, (_, keys) => {
+        init: () => app.database.redis.keys(`${app.appName}_state:*`, (_, keys) => {
             keys && Object.keys(app.state.initState).forEach(key => {
                 const redisKey = `${app.appName}_state:${key}`;
-                if (!keys.includes(redisKey) && app.state.initState[key]) app.redis.set(redisKey, app.state.initState[key]);
+                if (!keys.includes(redisKey) && app.state.initState[key]) app.database.redis.set(redisKey, app.state.initState[key]);
             });
         }),
 
@@ -327,7 +327,7 @@ module.exports = app => {
             if (n >= 1 && typeof params[n - 1] == 'function') {
                 const done = params.pop(); // done(error, values)
                 const keys = n == 1 ? app.state.keys : params.map(key => `${app.appName}_state:${key}`); // get chỉ có done => đọc hết app.state
-                app.redis.mget(keys, (error, values) => {
+                app.database.redis.mget(keys, (error, values) => {
                     if (error || values == null) {
                         done(error || 'Error when get Redis value!');
                     } else if (n == 2) {
@@ -348,7 +348,7 @@ module.exports = app => {
             if (n >= 1 && typeof params[n - 1] == 'function') {
                 const done = (n % 2) ? params.pop() : null;
                 for (let i = 0; i < n - 1; i += 2) params[i] = app.state.prefixKey + params[i];
-                n == 1 ? done() : app.redis.mset(params, error => done && done(error));
+                n == 1 ? done() : app.database.redis.mset(params, error => done && done(error));
             } else {
                 console.log('Error when set app.state');
             }
@@ -358,7 +358,7 @@ module.exports = app => {
 
     // Hook readyHooks ------------------------------------------------------------------------------------------------------------------------------
     app.readyHooks.add('readyInitState', {
-        ready: () => app.redis,
+        ready: () => app.database.redis,
         run: () => app.primaryWorker && app.state.init(),
     });
 };

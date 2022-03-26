@@ -16,7 +16,7 @@ module.exports = app => {
     //API------------------------------------------------------------------------------------------------------------------------------
 
     app.get('/api/tccb/dashboard/total-gender', app.permission.check('staff:read'), (req, res) => {
-        let listStaff = [], listStaffFaculty = [], listStaffPB = [],
+        let listStaff = [], listStaffFaculty = [], listStaffPB = [], listCanBo = [],
             now = new Date().getTime(), numDiNuocNgoai = '', listDiNuocNgoai = [], listCongTacTrongNuoc = [];
         app.model.canBo.tccbDashboardStaffByDV((error, data) => {
             if (!error) {
@@ -47,35 +47,28 @@ module.exports = app => {
                 listCongTacTrongNuoc = data.rows.filter(item => item.numOfStaff != 0);
             }
         });
+
+        app.model.canBo.getAll({}, 'shcc,ngach,hocVi,phai,ngayNghi,chucDanh,ngayBienChe', null, (error, data) => {
+            if (!error) listCanBo = data.filter(canBo => !canBo.ngayNghi).map(canBo => {
+                let gioiTinh = canBo.phai ? (canBo.phai === '01' ? 'Nam' : 'Nữ') : null,
+                    namBienChe = canBo.ngayBienChe ? (canBo.ngayBienChe != 1 ? new Date(canBo.ngayBienChe).getFullYear() : null) : null;
+                
+                canBo = app.clone(canBo, { gioiTinh, namBienChe });
+                return canBo;
+            });
+        });
         
         app.model.canBo.tccbDasboardTotalGender((error, data) => {
             if (error || !data) res.send({ error });
             else {
-                let result = app.clone(data.rows[0], {listStaff, listStaffFaculty, listStaffPB, numDiNuocNgoai, listDiNuocNgoai, listCongTacTrongNuoc });
-                new Promise(resolve => app.model.dmDonVi.count((e, re) => {
-                    if (e || !re) {
-                        result = app.clone(result, { totalFaculty: 0 });
+                let result = app.clone(data.rows[0], { listStaff, listStaffFaculty, listStaffPB, numDiNuocNgoai, listDiNuocNgoai, listCongTacTrongNuoc, listCanBo });
+                new Promise(resolve => app.model.dmDonVi.getAll((error, items) => {
+                    if (error || !items) {
+                        result = app.clone(result, { allDonVi: [] });
                     }
-                    else result = app.clone(result, { totalFaculty: re.rows[0]['COUNT(*)'] });
+                    else result = app.clone(result, { allDonVi: items });
                     resolve();
-                })).then(() => new Promise(resolve => app.model.dmDonVi.count({
-                    maPl: 1
-                }, (e, re) => {
-                    if (e || !re) {
-                        result = app.clone(result, { totalKhoa: 0 });
-                    }
-                    else result = app.clone(result, { totalKhoa: re.rows[0]['COUNT(*)'] });
-                    resolve();
-                }))).then(() => new Promise(resolve => app.model.dmDonVi.count({
-                    statement: 'maPl IN (:maPl)', parameter: { maPl: '02' },
-                }, (e, re) => {
-                    if (e || !re) {
-                        result = app.clone(result, { totalPB: 0 });
-                    }
-                    else result = app.clone(result, { totalPB: re.rows[0]['COUNT(*)'] });
-                    resolve();
-                }))).then(() => res.send({ error, data: result })
-                ).catch((reason) => res.send({ error: reason }));
+                })).then(() => res.send({ error, data: result }));
             }
         });
     });

@@ -16,7 +16,7 @@ require('../../config/common')(app);
 require('../../config/lib/excel')(app);
 require('../../config/lib/fs')(app);
 require('../../config/lib/string')(app);
-require('../../config/database')(app, package.db);
+require('../../config/database.oracleDB')(app, package.db);
 
 // Init =======================================================================
 app.loadModules(false);
@@ -92,6 +92,6 @@ const run = () => app.excel.readFile(app.path.join(__dirname, 'qtDiNuocNgoai.xls
     }
 });
 app.readyHooks.add('Run tool.qtDiNuocNgoai.js', {
-    ready: () => app.dbConnection && app.model && app.model.qtDiNuocNgoai && app.model.canBo && app.model.dmMucDichNuocNgoai && app.model.dmQuocGia,
+    ready: () => app.database.oracle.connected && app.model && app.model.qtDiNuocNgoai && app.model.canBo && app.model.dmMucDichNuocNgoai && app.model.dmQuocGia,
     run,
 });

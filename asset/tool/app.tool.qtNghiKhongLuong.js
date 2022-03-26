@@ -15,7 +15,7 @@ require('../../config/common')(app);
 require('../../config/lib/excel')(app);
 require('../../config/lib/fs')(app);
 require('../../config/lib/string')(app);
-require('../../config/database')(app, package.db);
+require('../../config/database.oracleDB')(app, package.db);
 
 // Init =======================================================================
 app.loadModules(false);
@@ -42,13 +42,13 @@ const run = () => {
                     console.log(mm + '/' + dd + '/' + yyyy);
                 }
                 solve(index + 1);
-            }    
+            }
             if (worksheet) solve();
         }
     });
 }
 
 app.readyHooks.add('Run tool.qtNghiKhongLuong.js', {
-    ready: () => app.dbConnection && app.model && app.model.canBo,
+    ready: () => app.database.oracle.connected && app.model && app.model.canBo,
     run,
 });

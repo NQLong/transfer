@@ -35,8 +35,8 @@ module.exports = (app) => {
             app.templates[templateName] = (req, res) => {
                 const today = new Date().yyyymmdd();
                 if (req.session.today != today) {
-                    app.redis.incr(`${app.appName}_state:todayViews`);
-                    app.redis.incr(`${app.appName}_state:allViews`);
+                    app.database.redis.incr(`${app.appName}_state:todayViews`);
+                    app.database.redis.incr(`${app.appName}_state:allViews`);
                     req.session.today = today;
                 }
 
@@ -109,6 +109,11 @@ module.exports = (app) => {
             index: 1900, title: 'Website đơn vị', link: '/user/website', icon: 'fa-database',
             subMenusRender: false,
         },
+        hcth: {
+            index: 500, title: 'Hành chính tổng hợp', link: '/user/hcth', icon: 'fa-book',
+            subMenusRender: false,
+        }
+
     };
 
     // Ready Hook ----------------------------------------------------------------------------------------------------------------------------------

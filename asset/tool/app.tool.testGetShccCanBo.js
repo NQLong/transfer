@@ -16,7 +16,7 @@ require('../../config/io')(app);
 require('../../config/lib/excel')(app);
 require('../../config/lib/fs')(app);
 require('../../config/lib/string')(app);
-require('../../config/database')(app, package);
+require('../../config/database.oracleDB')(app, package);
 
 // Init =======================================================================
 app.loadModules(false);
@@ -34,6 +34,6 @@ const run = () => {
 };
 
 app.readyHooks.add('Run tool.testGetShccCanBo.js', {
-    ready: () => app.dbConnection && app.model && app.model.canBo && app.model.dmDonVi,
+    ready: () => app.database.oracle.connected && app.model && app.model.canBo && app.model.dmDonVi,
     run
 });

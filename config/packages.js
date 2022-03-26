@@ -39,9 +39,9 @@ module.exports = (app, http, config) => {
         }
     };
 
-    if (config && app.redis) {
+    if (config && app.database.redis) {
         const redisStore = require('connect-redis')(session);
-        sessionOptions.store = new redisStore({ client: app.redis, prefix: sessionIdPrefix });
+        sessionOptions.store = new redisStore({ client: app.database.redis, prefix: sessionIdPrefix });
         app.use(session(sessionOptions));
     }
 

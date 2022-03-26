@@ -34,6 +34,7 @@ class StaffUserPage extends AdminPage {
                     if (data.error) {
                         T.notify('Lấy thông tin cán bộ bị lỗi!', 'danger');
                     } else if (data.item) {
+                        this.setState({ lastModified: data.item.lastModified });
                         this.setUp(data.item);
                     }
                     else {
@@ -58,25 +59,26 @@ class StaffUserPage extends AdminPage {
         const trinhDoData = this.componentTrinhDo.getAndValidate();
         if (this.emailCanBo) {
             if (caNhanData && congTacData && trinhDoData) {
-                this.props.updateStaffUser(this.emailCanBo, { ...caNhanData, ...congTacData, ...trinhDoData, userModified: this.emailCanBo, lastModified: new Date().getTime() }, () => this.setState({ lastModified: new Date().getTime() }) );
+                this.props.updateStaffUser(this.emailCanBo, { ...caNhanData, ...congTacData, ...trinhDoData, userModified: this.emailCanBo, lastModified: new Date().getTime() }, () => this.setState({ lastModified: new Date().getTime() }));
             }
         }
     }
 
 
     render() {
-        const { data } = this.props.system && this.props.system.user ? this.props.system.user : { data: null };
+        const { staff } = this.props.system && this.props.system.user ? this.props.system.user : { staff: null },
+            permission = this.getUserPermission('staff');
         return this.renderPage({
             icon: 'fa fa-address-card-o',
             title: 'HỒ SƠ CÁ NHÂN',
-            subTitle: data ? <small style={{ color: 'blue' }}>Chỉnh sửa lần cuối lúc {T.dateToText(this.state.lastModified ? this.state.lastModified : data.lastModified, 'hh:mm:ss dd/mm/yyyy')}</small> : '',
+            subTitle: staff ? <span>Chỉnh sửa lần cuối lúc <span style={{ color: 'blue' }}>{T.dateToText(this.state.lastModified ? this.state.lastModified : staff.lastModified)}</span></span> : '',
             breadcrumb: [
                 <Link key={0} to='/user'>Trang cá nhân</Link>,
                 'Hồ sơ',
             ],
             content: <>
                 {!this.state.item && <Loading />}
-                <ComponentCaNhan ref={e => this.componentCaNhan = e} userEdit={true} isStaff={true} />
+                <ComponentCaNhan ref={e => this.componentCaNhan = e} readOnly={!permission.write} />
                 <ComponentQuanHe ref={e => this.componentQuanHe = e} userEdit={true} />
                 <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={true} />
                 <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={true} tccb={false} />
