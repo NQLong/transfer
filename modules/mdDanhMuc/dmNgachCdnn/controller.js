@@ -23,7 +23,7 @@ module.exports = app => {
                 parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
             };
         }
-        app.model.dmNgachCdnn.getPage(pageNumber, pageSize, searchTerm, (error, page) => res.send({ error, page }));
+        app.model.dmNgachCdnn.getPage(pageNumber, pageSize, searchTerm, '*', 'nhom,ten', (error, page) => res.send({ error, page }));
     });
 
     app.get('/api/danh-muc/ngach-cdnn/all', app.permission.check('user:login'), (req, res) => {

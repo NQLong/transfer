@@ -2,9 +2,23 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getDmNgachCdnnPage, createDmNgachCdnn, deleteDmNgachCdnn, updateDmNgachCdnn } from './redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, AdminModal, FormTextBox, FormCheckbox, FormSelect } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 
+const typeNhomNgach = {
+    1: 'Viên chức giảng dạy',
+    2: 'Viên chức chuyên ngành khoa học',
+    3: 'Viên chức hành chính',
+    4: 'Nhân viên',
+    5: 'Khác',
+};
+const nhomNgachList = [
+    { id: 1, text: 'Viên chức giảng dạy' },
+    { id: 2, text: 'Viên chức chuyên ngành khoa học' },
+    { id: 3, text: 'Viên chức hành chính', },
+    { id: 4, text: 'Nhân viên' },
+    { id: 5, text: 'Khác' }
+];
 class EditModal extends AdminModal {
     componentDidMount() {
         $(document).ready(() => this.onShown(() => {
@@ -13,10 +27,9 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        const { id, ma, maSoCdnn, ten, nhom, kichHoat } = item ? item : { id: '', ma: '', maSoCdnn: '', ten: '', nhom: '', kichHoat: true };
+        const { id, ma, ten, nhom, kichHoat } = item ? item : { id: '', ma: '', ten: '', nhom: '', kichHoat: true };
         this.setState({ id, ma, item });
         this.ma.value(ma);
-        this.maSoCdnn.value(maSoCdnn);
         this.ten.value(ten);
         this.nhom.value(nhom ? nhom : '');
         this.kichHoat.value(kichHoat ? 1 : 0);
@@ -26,7 +39,6 @@ class EditModal extends AdminModal {
         e.preventDefault();
         const changes = {
             ma: this.ma.value(),
-            maSoCdnn: this.maSoCdnn.value(),
             ten: this.ten.value(),
             nhom: this.nhom.value(),
             kichHoat: this.kichHoat.value() ? 1 : 0
@@ -38,12 +50,7 @@ class EditModal extends AdminModal {
         } else if (!changes.ten) {
             T.notify('Tên không được trống!', 'danger');
             this.ten.focus();
-        }
-        else if (!changes.maSoCdnn) {
-            T.notify('Mã số chức danh nghề nghiệp không được trống!', 'danger');
-            this.maSoCdnn.focus();
-        }
-        else {
+        } else {
             this.state.ma ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
         }
     }
@@ -57,9 +64,8 @@ class EditModal extends AdminModal {
             size: 'large',
             body: <div className='row'>
                 <FormTextBox type='text' className='col-12' ref={e => this.ma = e} label='Mã' readOnly={this.state.ma ? true : readOnly} placeholder='Mã' required />
-                <FormTextBox type='text' className='col-12' ref={e => this.maSoCdnn = e} label='Mã số ngạch CDNN' readOnly={readOnly} placeholder='Mã số ngạch CDNN' required />
                 <FormTextBox type='text' className='col-12' ref={e => this.ten = e} label='Tên ngạch' readOnly={readOnly} placeholder='Tên ngạch' required />
-                <FormTextBox type='text' className='col-12' ref={e => this.nhom = e} label='Nhóm ngạch' readOnly={readOnly} placeholder='Nhóm ngạch' />
+                <FormSelect className='col-12' ref={e => this.nhom = e} label='Nhóm ngạch' data={nhomNgachList} readOnly={readOnly} placeholder='Nhóm ngạch' />
                 <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
                     onChange={value => this.changeKichHoat(value ? 1 : 0)} />
             </div>
@@ -106,8 +112,7 @@ class DmNgachCdnnPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto' }}>#</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Mã</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Mã số CDNN</th>
+                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Mã ngạch</th>
                         <th style={{ width: '50%' }}>Tên ngạch</th>
                         <th style={{ width: '50%' }}>Nhóm ngạch</th>
                         <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
@@ -117,9 +122,8 @@ class DmNgachCdnnPage extends AdminPage {
                     <tr key={index}>
                         <TableCell type='number' content={index + 1} style={{ textAlign: 'right' }} />
                         <TableCell type='link' content={item.ma} style={{ textAlign: 'right' }} onClick={() => this.modal.show(item)} />
-                        <TableCell type='text' content={item.maSoCdnn} />
                         <TableCell type='text' content={item.ten} />
-                        <TableCell type='text' content={item.nhom} />
+                        <TableCell type='text' content={item.nhom ? typeNhomNgach[item.nhom] : ''} />
                         <TableCell type='checkbox' content={item.kichHoat} permission={permission}
                             onChanged={value => this.props.updateDmNgachCdnn(item.id, { kichHoat: value ? 1 : 0, })} />
                         <TableCell type='buttons' content={item} permission={permission}
