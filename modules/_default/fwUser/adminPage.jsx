@@ -105,8 +105,6 @@ class UserPage extends AdminPage {
                         {permission.write ? <a className='btn btn-warning' href='#' onClick={e => this.refreshSessionUser(e, item.email)}>
                             <i className='fa fa-lg fa-refresh' />
                         </a> : null}
-                        {!item.default && !item.email?.endsWith('@hcmussh.edu.vn') ?
-                            <a className='btn btn-info' href='#' onClick={e => this.changePassword(e, item)}><i className='fa fa-lg fa-key' /></a> : null}
                     </TableCell>
                 </tr>
             )
