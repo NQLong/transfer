@@ -52,13 +52,7 @@ module.exports = app => {
 
     app.isHCMUSSH = email => email.endsWith('@hcmussh.edu.vn') ||
         email == app.defaultAdminEmail ||
-        email == 'hung@hcmut.edu.vn' ||
-        email == 'hoang.nguyen12@hcmut.edu.vn' ||
-        email == 'tien.trantan@hcmut.edu.vn' ||
-        email == 'quangsang@hcmut.edu.vn' ||
-        email == 'nphien212@gmail.com' ||
-        email == 'kiet.nguyenbk2804@hcmut.edu.vn' ||
-        email == 'vietphap@hcmut.edu.vn';
+        app.isAdmin(email);
 
     // app.registerUser = (req, res) => {
     //     if (req.session.user != null) {
