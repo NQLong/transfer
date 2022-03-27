@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getUserPage, createUser, updateUser, deleteUser, changeUser } from './reduxUser';
+import { getUserPage, createUser, updateUser, deleteUser, changeUser, refreshSessionUser } from './reduxUser';
 import { getRoleAll } from '../fwRole/redux';
 import Pagination from 'view/component/Pagination';
 import { AdminModal, AdminPage, renderTable, TableCell } from 'view/component/AdminPage';
@@ -32,7 +32,6 @@ class UserModal extends AdminModal {
             </div>
         });
     }
-
 }
 
 class UserPage extends AdminPage {
@@ -45,6 +44,12 @@ class UserPage extends AdminPage {
         });
         this.props.getUserPage();
     }
+
+    refreshSessionUser = (e, email) => {
+        e.preventDefault();
+        T.confirm('Người dùng: Cập nhật session', 'Bạn có chắc bạn muốn cập nhật session của người dùng này?', true, isConfirm =>
+            isConfirm && this.props.refreshSessionUser(email));
+    };
 
     edit = (e, item) => {
         e.preventDefault();
@@ -97,7 +102,11 @@ class UserPage extends AdminPage {
                         '<nothing>'} />
                     <TableCell type='checkbox' content={item.active} permission={permission} onChanged={() => this.changeActive(item, index)} />
                     <TableCell type='buttons' permission={{ write: permission.write, delete: permission.delete && !item.default }} content={item} onEdit={e => this.edit(e, item)} onDelete={this.delete}>
-                        {!item.default && !item.email?.endsWith('@hcmussh.edu.vn') ? <a className='btn btn-info' href='#' onClick={e => this.changePassword(e, item)}><i className='fa fa-lg fa-key' /></a> : ''}
+                        {permission.write ? <a className='btn btn-warning' href='#' onClick={e => this.refreshSessionUser(e, item.email)}>
+                            <i className='fa fa-lg fa-refresh' />
+                        </a> : null}
+                        {!item.default && !item.email?.endsWith('@hcmussh.edu.vn') ?
+                            <a className='btn btn-info' href='#' onClick={e => this.changePassword(e, item)}><i className='fa fa-lg fa-key' /></a> : null}
                     </TableCell>
                 </tr>
             )
@@ -118,5 +127,5 @@ class UserPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, division: state.division, user: state.user, role: state.role });
-const mapActionsToProps = { getUserPage, createUser, updateUser, deleteUser, changeUser, getRoleAll };
+const mapActionsToProps = { getUserPage, createUser, updateUser, deleteUser, changeUser, getRoleAll, refreshSessionUser };
 export default connect(mapStateToProps, mapActionsToProps)(UserPage);
