@@ -96,6 +96,11 @@ class StaffPage extends AdminPage {
                     <th style={{ width: 'auto', textAlign: 'center' }}>Chức danh nghề nghiệp</th>
                     <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Đơn vị</th>
                     <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Email</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>CMND</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Hệ số lương</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Loại cán bộ</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tiến sĩ</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thạc sĩ</th>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                 </tr>),
             renderRow: (item, index) => (
@@ -120,6 +125,15 @@ class StaffPage extends AdminPage {
                         <>
                             <span>{item.email}</span>
                         </>} />
+                    <TableCell type='text' content={item.cmnd} style={{ whiteSpace: 'nowrap', textAlign: 'center' }} />
+                    <TableCell type='number' content={item.heSoLuong?.toFixed(2)} style={{ whiteSpace: 'nowrap', textAlign: 'center' }} />
+                    <TableCell type='text' content={ 
+                        <>
+                            <span>{item.loaiCanBo}<br/></span>
+                            <small style={{ color: 'blue' }}>{item.ngayBienChe ? T.dateToText(item.ngayBienChe, 'dd/mm/yyyy') : ''}</small>
+                        </>} style={{ whiteSpace: 'nowrap', textAlign: 'center' }} />
+                    <TableCell type='text' content={item.tienSi ? (item.ngayCapNhatTienSi ? T.dateToText(item.ngayCapNhatTienSi, 'dd/mm/yyyy') : 'x') : ''} style={{ whiteSpace: 'nowrap', textAlign: 'center' }} />
+                    <TableCell type='text' content={item.thacSi ? (item.ngayCapNhatThacSi ? T.dateToText(item.ngayCapNhatThacSi, 'dd/mm/yyyy') : 'x') : ''} style={{ whiteSpace: 'nowrap', textAlign: 'center' }} />
                     <TableCell type='buttons' content={item} permission={permission} onEdit={`/user/tccb/staff/${item.shcc}`} onDelete={this.delete}></TableCell>
                 </tr>)
         });
