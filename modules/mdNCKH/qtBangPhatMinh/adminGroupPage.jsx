@@ -158,6 +158,9 @@ class QtBangPhatMinhGroupPage extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br/>Đơn vị công tác</th>
                         <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Tên bằng</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số hiệu</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm cấp</th>
@@ -171,8 +174,27 @@ class QtBangPhatMinhGroupPage extends AdminPage {
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span>{(item.hoCanBo ? item.hoCanBo : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo : ' ')}</span><br />
-                                {item.shcc}
+                                <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
+                                {item.shcc} <br/>
+                            </>
+                        )}
+                        />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                            <>
+                                {item.tenHocVi ? item.tenHocVi : ''}
+                            </>
+                        )}
+                        />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                            <>
+                                {item.tenChucDanhNgheNghiep ? item.tenChucDanhNgheNghiep : ''}
+                            </>
+                        )}
+                        />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                            <>
+                                <span> { item.tenChucVu ? item.tenChucVu : '' } <br/> </span>
+                                {item.tenDonVi ? item.tenDonVi.normalizedName() : ''}
                             </>
                         )}
                         />

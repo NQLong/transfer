@@ -44,7 +44,7 @@ class EditModal extends AdminModal {
             tenDeTai, maSoCapQuanLy, kinhPhi, vaiTro, ngayNghiemThu, ketQua, ngayNghiemThuType }
             = data ? data :
                 {
-                    id: null, shcc: shcc ? shcc : data.shcc, batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', batDau: null, ketThuc: null, tenDeTai: '',
+                    id: null, shcc: null, batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', batDau: null, ketThuc: null, tenDeTai: '',
                     maSoCapQuanLy: '', kinhPhi: '', vaiTro: '', ngayNghiemThu: null, ketQua: '', ngayNghiemThuType: 'dd/mm/yyyy', fileMinhChung: '[]'
                 };
         this.setState({
@@ -348,15 +348,18 @@ class QtNghienCuuKhoaHoc extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br/>Đơn vị công tác</th>
                         {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tổng đề tài</th>}
                         {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách</th>}
-                        {!this.checked && <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Đề tài nghiên cứu khoa học</th>}
-                        {!this.checked && <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Mã số và cấp quản lý</th>}
-                        {!this.checked && <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Thời gian thực hiện</th>}
+                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Đề tài nghiên cứu khoa học</th>}
+                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Mã số và cấp quản lý</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian thực hiện</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Kinh phí <br /><small>(triệu đồng)</small></th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Vai trò</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Nghiệm thu</th>}
-                        {!this.checked && <th style={{ width: '10%', whiteSpace: 'nowrap', textAlign: 'center' }}>Kết quả</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Kết quả</th>}
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
@@ -364,12 +367,29 @@ class QtNghienCuuKhoaHoc extends AdminPage {
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
 
+                        <TableCell type='link' onClick={(e) => { e.preventDefault(); this.modal.show(item, false); }} style={{ whiteSpace: 'nowrap' }} content={(
+                            <>
+                                <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
+                                {item.shcc} <br/>
+                            </>
+                        )}
+                        />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                {!this.checked ? <span><a href='#' onClick={(e) => { e.preventDefault(); this.modal.show(item, false); }}>{(item.hoCanBo ? item.hoCanBo : '') + ' ' + (item.tenCanBo ? item.tenCanBo : '')}</a><br /></span> :
-                                    <span style={{ color: 'blue' }}>{(item.hoCanBo ? item.hoCanBo : '') + ' ' + (item.tenCanBo ? item.tenCanBo : '')}<br /></span>}
-                                {item.shcc + (item.hocViCanBo ? ' - ' + item.hocViCanBo : '')}<br />
-
+                                {item.tenHocVi ? item.tenHocVi : ''}
+                            </>
+                        )}
+                        />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                            <>
+                                {item.tenChucDanhNgheNghiep ? item.tenChucDanhNgheNghiep : ''}
+                            </>
+                        )}
+                        />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                            <>
+                                <span> { item.tenChucVu ? item.tenChucVu : '' } <br/> </span>
+                                {item.tenDonVi ? item.tenDonVi.normalizedName() : ''}
                             </>
                         )}
                         />

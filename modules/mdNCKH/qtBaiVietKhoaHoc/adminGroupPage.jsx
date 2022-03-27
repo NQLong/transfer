@@ -182,10 +182,11 @@ class QtBaiVietKhoaHocGroupPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tác giả</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Bài viết</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tạp chí xuất bản</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Điểm IF</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thông tin xuất bản</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tạp chí</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số hiệu ISSN</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Xuất bản</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
@@ -199,25 +200,23 @@ class QtBaiVietKhoaHocGroupPage extends AdminPage {
                             </>
                         )}
                         /> */}
-                        <TableCell type='text' content={(
+                        <TableCell type='link' onClick={() => this.modal.show(item)} content={(
                             <>
-                                <a href='#' onClick={() => this.modal.show(item, false)}>
-                                    <span style={{ color: 'blue' }}>{item.tenBaiViet ? item.tenBaiViet : ''}</span> <br />
-                                </a>
-                                <span>Tác giả:
-                                    <span style={{ color: 'black' }}>{' ' + item.tenTacGia} </span>
-                                </span>
+                                {item.tenTacGia ? item.tenTacGia : ''}
                             </>
-
                         )} />
                         <TableCell type='text' content={(
                             <>
-                                <span><span><i>{item.tenTapChi ? item.tenTapChi : ''}</i></span> </span> <br />
-                                {item.soHieuIssn ? <span style={{ whiteSpace: 'nowrap' }}>ISSN: <span style={{ color: 'blue' }}>{item.soHieuIssn}</span> </span> : null}
+                                <b>{item.tenBaiViet}</b>
+                            </>
+                        )} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                            <>
+                                <i>{item.tenTapChi}</i>
                             </>
                         )}
                         />
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemIf} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.soHieuIssn} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 {item.quocTe != null && <span>{item.quocTe == '0' ? <span style={{ color: 'red' }}>Trong nước</span>

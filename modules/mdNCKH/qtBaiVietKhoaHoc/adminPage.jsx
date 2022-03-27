@@ -176,22 +176,22 @@ class QtBaiVietKhoaHoc extends AdminPage {
 
     changeAdvancedSearch = (isInitial = false) => {
         let { pageNumber, pageSize } = this.props && this.props.qtBaiVietKhoaHoc && this.props.qtBaiVietKhoaHoc.page ? this.props.qtBaiVietKhoaHoc.page : { pageNumber: 1, pageSize: 50 };
-        const fromYear = this.fromYear?.value() == '' ? null : Number(this.fromYear?.value());
-        const toYear = this.toYear?.value() == '' ? null : Number(this.toYear?.value());
-        const listDv = this.maDonVi?.value().toString() || '';
-        const listShcc = this.mulCanBo?.value().toString() || '';
-        const xuatBanRange = this.xuatBanRange?.value() == '' ? null : this.xuatBanRange?.value();
+        const fromYear = this.fromYear.value() == '' ? null : Number(this.fromYear.value());
+        const toYear = this.toYear.value() == '' ? null : Number(this.toYear.value());
+        const listDv = this.maDonVi.value().toString() || '';
+        const listShcc = this.mulCanBo.value().toString() || '';
+        const xuatBanRange = this.xuatBanRange.value() == '' ? null : this.xuatBanRange.value();
         const pageFilter = isInitial ? null : { listDv, fromYear, toYear, listShcc, xuatBanRange };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
-                    this.fromYear?.value(filter.fromYear || '');
-                    this.toYear?.value(filter.toYear || '');
-                    this.maDonVi?.value(filter.listDv);
-                    this.mulCanBo?.value(filter.listShcc);
-                    this.xuatBanRange?.value(filter.xuatBanRange);
+                    this.fromYear.value(filter.fromYear || '');
+                    this.toYear.value(filter.toYear || '');
+                    this.maDonVi.value(filter.listDv);
+                    this.mulCanBo.value(filter.listShcc);
+                    this.xuatBanRange.value(filter.xuatBanRange);
                     if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.listShcc || filter.listDv || filter.xuatBanRange)) this.showAdvanceSearch();
                 }
             });
@@ -209,12 +209,28 @@ class QtBaiVietKhoaHoc extends AdminPage {
         this.getPage();
     }
 
-    list = (text, i, j) => {
-        if (i == 0) return [];
-        let deTais = text.split('??').map(str => <p key={i--} style={{ textTransform: 'uppercase' }}>{j - i}. {str}</p>);
-        return deTais;
+    list = (text, i, listYear) => {
+        if (!text) return [];
+        let deTais = text.split('??');
+        let years = listYear.split('??');
+        let results = [];
+        let choose = i > 5 ? 5 : i;
+        for (let k = 0; k < choose; k++) {
+            results.push(<div> <span>
+                {k + 1}. {deTais[k]} ({years[k].trim()})
+            </span></div>);
+        }
+        if (i > 5) {
+            results.push(<div> <span>
+                .........................................
+            </span></div>);
+            let k = i - 1;
+            results.push(<div> <span>
+                {k + 1}. {deTais[k]} ({years[k].trim()})
+            </span></div>);
+        }
+        return results;
     }
-
 
     delete = (e, item) => {
         T.confirm('Xóa bài viết khoa học', 'Bạn có chắc bạn muốn xóa bài viết khoa học này?', 'warning', true, isConfirm => {
@@ -235,14 +251,18 @@ class QtBaiVietKhoaHoc extends AdminPage {
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
-                getDataSource: () => list, stickyHead: false,
+                getDataSource: () => list, stickyHead: true,
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br/>Đơn vị công tác</th>
+                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tác giả</th>}
                         {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Bài viết</th>}
-                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tạp chí</th>}
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Điểm IF</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tạp chí</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số hiệu ISSN</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Xuất bản</th>}
                         {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số bài viết</th>}
                         {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách bài viết</th>}
@@ -254,30 +274,47 @@ class QtBaiVietKhoaHoc extends AdminPage {
                         <TableCell type='text' style={{ textAlign: 'right' }} content={((pageNumber - 1) * pageSize + index + 1)} />
                         <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span>{(item.hoCanBo ? item.hoCanBo : '') + ' ' + (item.tenCanBo ? item.tenCanBo : '')}</span><br />
-                                {item.shcc}
+                                <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
+                                {item.shcc} <br/>
                             </>
                         )}
                         />
-                        {!this.checked && <TableCell type='text' content={(
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span><b>{item.tenBaiViet}</b></span> <br />
-                                <span>Tác giả:
-                                    <a href='#' onClick={() => this.modal.show(item, false)}>
-                                        <span style={{ color: 'blue' }}>{' ' + item.tenTacGia} </span>
-                                    </a>
-                                </span>
-
+                                {item.tenHocVi ? item.tenHocVi : ''}
+                            </>
+                        )}
+                        />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                            <>
+                                {item.tenChucDanhNgheNghiep ? item.tenChucDanhNgheNghiep : ''}
+                            </>
+                        )}
+                        />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                            <>
+                                <span> { item.tenChucVu ? item.tenChucVu : '' } <br/> </span>
+                                {item.tenDonVi ? item.tenDonVi.normalizedName() : ''}
+                            </>
+                        )}
+                        />
+                        {!this.checked && <TableCell type='link' onClick={() => this.modal.show(item, false)} content={(
+                            <>
+                                {item.tenTacGia ? item.tenTacGia : ''}
                             </>
                         )} />}
                         {!this.checked && <TableCell type='text' content={(
                             <>
-                                <span>Tên: <span><i>{item.tenTapChi}</i></span> </span> <br />
-                                <span style={{ whiteSpace: 'nowrap' }}>Số hiệu ISSN: <span style={{ color: 'blue' }}>{item.soHieuIssn}</span> </span> <br /> <br />
+                                <b>{item.tenBaiViet}</b>
+                            </>
+                        )} />}
+                        {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                            <>
+                                <i>{item.tenTapChi}</i>
                             </>
                         )}
                         />}
-                        {!this.checked && <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemIf} />}
+                        {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.soHieuIssn} />}
                         {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 {item.quocTe != null && <span>{item.quocTe == '0' ? <span style={{ color: 'red' }}>Trong nước</span>
@@ -290,7 +327,7 @@ class QtBaiVietKhoaHoc extends AdminPage {
                         )}
                         />}
                         {this.checked && <TableCell type='text' content={item.soBaiViet} />}
-                        {this.checked && <TableCell type='text' content={this.list(item.danhSachBaiViet, item.soBaiViet, item.soBaiViet)} />}
+                        {this.checked && <TableCell type='text' content={this.list(item.danhSachBaiViet, item.soBaiViet, item.danhSachNamXuatBan)} />}
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                                 onEdit={() => this.modal.show(item, false)} onDelete={this.delete} >
