@@ -8375,7 +8375,8 @@
             "modelName": "qtKhenThuongAll",
             "methods": {
                 "qt_khen_thuong_all_search_page": "searchPage",
-                "qt_khen_thuong_all_group_page": "groupPage"
+                "qt_khen_thuong_all_group_page": "groupPage",
+                "QT_KHEN_THUONG_ALL_DOWNLOAD_EXCEL": "download"
             },
             "columns": {
                 "LOAI_DOI_TUONG": {
