@@ -9,7 +9,7 @@ import Editor from 'view/component/CkEditor4';
 import { Select } from 'view/component/Input';
 
 class UnitNewsEditPage extends React.Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.state = { item: null, draft: true, draftId: '', displayCover: 1 };
         this.newsLink = React.createRef();
@@ -21,7 +21,7 @@ class UnitNewsEditPage extends React.Component {
 
     }
     componentDidMount() {
-        T.ready('/user/truyen-thong', () => {
+        T.ready('/user/ocer', () => {
             this.getData();
             $('#neNewsViTitle').focus();
             $('#neNewsCategories').select2();
@@ -248,7 +248,7 @@ class UnitNewsEditPage extends React.Component {
                                 <div className='tile-footer'>
                                     <button className='btn btn-danger' type='button' onClick={() => this.checkLink(item)}>
                                         <i className='fa fa-fw fa-lg fa-check-circle' />Kiểm tra link
-                                </button>
+                                    </button>
                                 </div>
                             }
                         </div>

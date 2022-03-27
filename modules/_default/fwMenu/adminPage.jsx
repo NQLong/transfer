@@ -113,7 +113,7 @@ class MenuPage extends React.Component {
             $('#headerLink').val(data.headerLink || 'a');
             this.setState({ isShowHeaderTitle: data.isShowHeaderTitle == '1' ? true : false });
         });
-        T.ready(('/user/truyen-thong'), () => {
+        T.ready(('/user/ocer'), () => {
             $('.menuList').sortable({ update: () => this.updateMenuPriorities() });
             $('.menuList').disableSelection();
             $('.menuSub').sortable({

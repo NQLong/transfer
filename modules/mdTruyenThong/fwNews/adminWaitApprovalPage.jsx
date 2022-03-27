@@ -59,7 +59,7 @@ class RejectModal extends React.Component {
     }
 }
 class NewsWaitApprovalPage extends React.Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
     }
 
@@ -67,7 +67,7 @@ class NewsWaitApprovalPage extends React.Component {
 
     componentDidMount() {
         this.props.getDraftNewsInPage(null, null, { isDraftApproved: 1, isTranslated: { $ne: 'in progress' } });
-        T.ready('/user/truyen-thong');
+        T.ready('/user/ocer');
     }
     create = (e) => {
         this.props.createDraftNewsDefault(data => this.props.history.push('/user/news/draft/edit/' + data.item.id));

@@ -59,14 +59,14 @@ class RejectModal extends React.Component {
     }
 }
 class NewsWaitApprovalPage extends React.Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
     }
 
     reject = React.createRef();
 
     componentDidMount() {
-        T.ready('/user/truyen-thong', () => {
+        T.ready('/user/ocer', () => {
             this.props.getDraftAdmissionNewsInPage(null, null, { isDraftApproved: 1, isTranslated: { $ne: 'in progress' } }, data => {
                 this.setState({ ...data });
             });

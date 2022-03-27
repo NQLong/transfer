@@ -8,7 +8,7 @@ import FeaturePage from './adminFeatureView';
 
 class ComponentPage extends React.Component {
     componentDidMount() {
-        T.ready('/user/truyen-thong', () => {
+        T.ready('/user/ocer', () => {
             let tabIndex = parseInt(T.cookie('componentPageTab')),
                 navTabs = $('#componentPage ul.nav.nav-tabs');
             if (isNaN(tabIndex) || tabIndex < 0 || tabIndex >= navTabs.children().length) tabIndex = 0;

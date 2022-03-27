@@ -5,12 +5,12 @@ import { Link } from 'react-router-dom';
 import Pagination from 'view/component/Pagination';
 
 class NewsWaitApprovalPage extends React.Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
     }
     componentDidMount() {
         this.props.getTranslateDraftNewsInPage(null, null, { isDraftApproved: 1, isTranslated: 'in progress' });
-        T.ready('/user/truyen-thong');
+        T.ready('/user/ocer');
     }
 
     changeTranslated(item) {

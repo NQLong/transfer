@@ -43,14 +43,14 @@ class RejectModal extends React.Component {
 }
 
 class UnitNewsPage extends React.Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
     }
     reject = React.createRef();
 
     componentDidMount() {
         this.props.getUnitDraftNewsInPage(null, null, { isUnitApproved: 1, isDraftApproved: 0 });
-        T.ready('/user/truyen-thong');
+        T.ready('/user/ocer');
     }
     create = (e) => {
         this.props.createUnitDraftNewsDean(data => this.props.history.push('/user/news/unit/edit/' + data.item.id));

@@ -3,7 +3,7 @@ import Init from '../../_default/_init';
 
 export default class NewsCategoryPage extends React.Component {
     componentDidMount() {
-        T.ready('/user/truyen-thong');
+        T.ready('/user/ocer');
     }
 
     render() {

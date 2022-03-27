@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import Pagination from 'view/component/Pagination';
 
 class EventPage extends React.Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
     }
     state = { searchText: '' };
@@ -13,7 +13,7 @@ class EventPage extends React.Component {
 
 
     componentDidMount() {
-        T.ready('/user/truyen-thong', () => {
+        T.ready('/user/ocer', () => {
             this.props.getEventInPage(null, null, {});
         });
     }

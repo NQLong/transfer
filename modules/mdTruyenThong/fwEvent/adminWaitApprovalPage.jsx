@@ -5,13 +5,13 @@ import { Link } from 'react-router-dom';
 import Pagination from 'view/component/Pagination';
 
 class EventWaitApprovalPage extends React.Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
     }
 
     componentDidMount() {
         this.props.getDraftEventInPage();
-        T.ready('/user/truyen-thong');
+        T.ready('/user/ocer');
     }
 
     create = (e) => {

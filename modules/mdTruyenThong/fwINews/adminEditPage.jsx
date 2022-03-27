@@ -264,7 +264,7 @@ class adminINewsEdit extends React.Component {
 	state = { iNewsComs: [], inewsId: '', sending: false };
 
 	componentDidMount() {
-		T.ready('/user/truyen-thong', () => {
+		T.ready('/user/ocer', () => {
 			const route = T.routeMatcher('/user/inews/edit/:id'),
 				id = route.parse(window.location.pathname).id;
 			this.props.getInews(id, (item, list) => {

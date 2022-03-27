@@ -9,7 +9,7 @@ import { SelectAdapter_FwStorage } from 'modules/_default/fwStorage/redux';
 import { Select } from 'view/component/Input';
 
 class UnitDraftNewsEditPage extends React.Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.state = { item: null, draft: true, draftId: '', displayCover: 1, donVi: 0 };
         this.newsLink = React.createRef();
@@ -22,7 +22,7 @@ class UnitDraftNewsEditPage extends React.Component {
 
     }
     componentDidMount() {
-        T.ready('/user/truyen-thong', () => {
+        T.ready('/user/ocer', () => {
             this.getData();
             $('#neNewsViTitle').focus();
             $('#neNewsCategories').select2();
@@ -250,7 +250,7 @@ class UnitDraftNewsEditPage extends React.Component {
                                 <div className='tile-footer'>
                                     <button className='btn btn-danger' type='button' onClick={() => this.checkLink(item)}>
                                         <i className='fa fa-fw fa-lg fa-check-circle' />Kiểm tra link
-                                </button>
+                                    </button>
                                 </div>
                             }
                         </div>

@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import Pagination from 'view/component/Pagination';
 
 class adminEventPage extends React.Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
     }
     state = {
@@ -17,7 +17,7 @@ class adminEventPage extends React.Component {
 
 
     componentDidMount() {
-        T.ready('/user/truyen-thong', () => {
+        T.ready('/user/ocer', () => {
             this.props.getTuyenSinh('event', category => {
                 let valueCate = category.map(item => item.id.toString());
                 this.props.getEventByCategoryAdmin(valueCate, data => {

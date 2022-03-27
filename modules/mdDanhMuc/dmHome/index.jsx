@@ -14,8 +14,8 @@ export default {
             component: () => <SubMenusPage menuLink='/user/tccb' menuKey={3000} headerIcon='fa-list-alt' />
         },
         {
-            path: '/user/truyen-thong',
-            component: () => <SubMenusPage menuLink='/user/truyen-thong' menuKey={5000} headerIcon='fa-list-alt' />
+            path: '/user/ocer',
+            component: () => <SubMenusPage menuLink='/user/ocer' menuKey={5000} headerIcon='fa-list-alt' />
         },
         {
             path: '/user/settings',

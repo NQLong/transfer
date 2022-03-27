@@ -96,7 +96,7 @@ class EditFooterModal extends React.Component {
 
 class SettingsPage extends React.Component {
     modal = React.createRef();
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.enAddress = React.createRef();
         this.viAddress = React.createRef();
@@ -120,7 +120,7 @@ class SettingsPage extends React.Component {
 
     componentDidMount() {
         this.getFooterSystem();
-        T.ready('/user/truyen-thong', () => {
+        T.ready('/user/ocer', () => {
             $('.menuList').sortable({
                 start: (e, ui) => {
                     $(this).attr('data-prevIndex', ui.item.index());
@@ -354,7 +354,7 @@ class SettingsPage extends React.Component {
                                                         }}>
                                                         {T.language.parse(menu.title, true).vi}
                                                     </a>&nbsp;
-                                                {/* {menu.link ? <p>(<a href={menu.link} target='_blank' style={{ color: 'blue' }}>{menu.link}</a>)</p> : null} */}
+                                                    {/* {menu.link ? <p>(<a href={menu.link} target='_blank' style={{ color: 'blue' }}>{menu.link}</a>)</p> : null} */}
                                                 </div>
                                                 <div className='buttons btn-group btn-group-sm'>
                                                     <a href='#' className={menu.active ? 'btn btn-warning' : 'btn btn-secondary'} onClick={e => this.changeFooterActive(e, menu)}>

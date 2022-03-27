@@ -11,7 +11,7 @@ export default {
     },
     routes: [
         {
-            path: '/user/truyen-thong/settings',
+            path: '/user/ocer/settings',
             component: Loadable({ loading: Loading, loader: () => import('./adminSettingsPage') })
         },
         {

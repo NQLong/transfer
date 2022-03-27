@@ -296,8 +296,29 @@ const T = {
         } else if (language == 'en' && !item.linkEn) {
             return ('/news-en/item/' + item.id);
         }
+    },
+
+
+    //JSON Operate---------------------------------------------------------------------------------------------
+    stringify: (value, defaultValue = '') => {
+        try {
+            return JSON.stringify(value);
+        } catch (exception) {
+            T.notify(`Lỗi stringify: ${exception}, đặt theo giá trị mặc định: ${defaultValue}`, 'danger');
+            return defaultValue;
+        }
+    },
+
+    parse: (value, defaultValue = '') => {
+        try {
+            return JSON.parse(value);
+        } catch (exception) {
+            T.notify(`Lỗi parse: ${exception}, đặt theo giá trị mặc định: ${defaultValue}`, 'danger');
+            return defaultValue;
+        }
     }
-};
+}
+
 
 T.socket = T.debug ? io('http://localhost:7012', { transports: ['websocket'] }) : io(T.rootUrl, { secure: true, transports: ['websocket'] });
 
