@@ -8,7 +8,7 @@ module.exports = (app) => {
         callbackURL: '/auth/google/callback'
     };
 
-    passport.use(new GoogleStrategy(GoogleStrategyConfig, (accessToken, refreshToken, profile, done) => {
+    passport.use(new GoogleStrategy(GoogleStrategyConfig, async (accessToken, refreshToken, profile, done) => {
         // Check no email
         if (profile.emails.length == 0) {
             return done(null, false, { 'loginMessage': 'Fail to login!' });
@@ -16,7 +16,10 @@ module.exports = (app) => {
 
         // Check wether you are HCMUSSH or not
         const email = profile.emails[0].value;
-        if (!app.isHCMUSSH(email) && !(app.isDebug && email.endsWith('@gmail.com'))) {
+
+        const isAdmin = await app.isAdmin(email);
+
+        if (!(isAdmin || app.isHCMUSSH(email) || (app.isDebug && email.endsWith('@gmail.com')))) {
             return done(null, false, { 'loginMessage': 'Fail to login!' });
         }
 
@@ -54,13 +57,6 @@ module.exports = (app) => {
         } else {
             res.redirect('/login'); // If they aren't redirect them to the home page
         }
-    };
-
-    app.isAdmin = function (email) {
-        app.fwUserRole.get({ email, roleId: 7 }, (error, user) => {
-            if (error || !user) return false;
-            return true;
-        });
     };
 
     // Do Google login action

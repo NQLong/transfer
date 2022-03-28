@@ -309,7 +309,7 @@ const T = {
         }
     },
 
-    parse: (value, defaultValue = '') => {
+    parse: (value, defaultValue = {}) => {
         try {
             return JSON.parse(value);
         } catch (exception) {

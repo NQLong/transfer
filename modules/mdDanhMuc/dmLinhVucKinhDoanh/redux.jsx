@@ -147,6 +147,4 @@ export const SelectAdapter_DmLinhVucKinhDoanhAll = {
     data: params => ({ condition: params.term }),
     processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.ma, text: item.ten })) : [] }),
     fetchOne: (ma, done) => (getDmLinhVucKinhDoanh(ma, (item) => done && done({ id: item.ma, text: item.ten })))(),
-    getOne: getDmLinhVucKinhDoanh,
-    processResultOne: response => response && ({ value: response.ma, text: response.ten }),
 };

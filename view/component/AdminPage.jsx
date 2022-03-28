@@ -142,7 +142,7 @@ export class FormTabs extends React.Component {
         });
 
         return <>
-            <ul ref={e => this.tabs = e} className={'nav nav-tabs' + tabClassName}>{tabLinks}</ul>
+            <ul ref={e => this.tabs = e} className={'nav nav-tabs ' + tabClassName}>{tabLinks}</ul>
             <div className={'tab-content ' + contentClassName}>{tabPanes}</div>
         </>;
     }

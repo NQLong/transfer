@@ -23,7 +23,6 @@ module.exports = (app) => {
         fse.copySync(oldPath, newPath);
         fse.removeSync(oldPath);
     };
-
     // app.fs.renameSync = (oldPath, newPath) => app.fs.copyFileSync(oldPath, newPath) && app.fs.unlinkSync(oldPath);
 
     // Template html file ---------------------------------------------------------------------------------------------------------------------------
@@ -101,7 +100,7 @@ module.exports = (app) => {
             subMenusRender: false,
         },
         truyenThong: {
-            index: 5000, title: 'Truyền thông & QHDN', link: '/user/ocer', icon: 'fa-comments-o',
+            index: 5000, title: 'Truyền thông', link: '/user/ocer', icon: 'fa-comments-o',
             subMenusRender: false,
             groups: ['Cấu hình', 'Bài viết', 'Sự kiện', 'Tuyển sinh', 'Doanh nghiệp']
         },
