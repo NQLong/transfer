@@ -236,9 +236,12 @@ class QtDiNuocNgoaiGroupPage extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br/>Đơn vị công tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày quyết định</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thông tin chuyến đi</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nội dung</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Nơi đến</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Mục đích</th>
+                        <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Nội dung</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tình trạng</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
@@ -272,25 +275,40 @@ class QtDiNuocNgoaiGroupPage extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' content={(
+                        <TableCell type='text' style={{color: 'blue'}} content={(
                             <>
-                                <b> {item.soQuyetDinh ? item.soQuyetDinh : ''} </b> <br/><br/>
-                                {item.ngayQuyetDinh ? <span style={{ whiteSpace: 'nowrap' }}>Ngày quyết định: <span style={{ color: 'blue' }}>{item.ngayQuyetDinh ? T.dateToText(item.ngayQuyetDinh, 'dd/mm/yyyy') : ''}</span><br /></span> : null}
+                                {item.ngayQuyetDinh ? T.dateToText(item.ngayQuyetDinh, 'dd/mm/yyyy') : ''}
                             </>
                         )}
                         />
                         <TableCell type='text' content={(
                             <>
-                                <span>Nơi đến: <span>{item.danhSachQuocGia ? item.danhSachQuocGia : ''}</span></span> <br/> <br/>
-                                <span>Mục đích: <span><b>{item.tenMucDich ? item.tenMucDich : ''}</b></span></span> <br/> <br/>
-                                {item.ngayDi ? <span style={{ whiteSpace: 'nowrap' }}>Ngày đi: <span style={{ color: 'blue' }}>{item.ngayDi ? T.dateToText(item.ngayDi, item.ngayDiType ? item.ngayDiType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
-                                {item.ngayVe && item.ngayVe != -1 ? <span style={{ whiteSpace: 'nowrap' }}>Ngày về: <span style={{ color: 'blue' }}>{item.ngayVe && item.ngayVe != -1 ? T.dateToText(item.ngayVe, item.ngayVeType ? item.ngayVeType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
+                                <b> {item.soQuyetDinh ? item.soQuyetDinh : ''} </b> 
+                            </>
+                        )}
+                        />
+                        <TableCell type='text' style={{color: 'blue'}} content={(
+                            <>
+                                {item.danhSachQuocGia ? item.danhSachQuocGia : ''}
+                            </>
+                        )}
+                        />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                            <>
+                                <b>{item.tenMucDich ? item.tenMucDich : ''}</b>
                             </>
                         )}
                         />
                         <TableCell type='text' content={(
                             <>
                                 {item.noiDung ? item.noiDung : ''}
+                            </>
+                        )}
+                        />
+                        <TableCell type='text' content={(
+                            <>
+                                {item.ngayDi ? <span style={{ whiteSpace: 'nowrap' }}>Ngày đi: <span style={{ color: 'blue' }}>{item.ngayDi ? T.dateToText(item.ngayDi, item.ngayDiType ? item.ngayDiType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
+                                {item.ngayVe && item.ngayVe != -1 ? <span style={{ whiteSpace: 'nowrap' }}>Ngày về: <span style={{ color: 'blue' }}>{item.ngayVe && item.ngayVe != -1 ? T.dateToText(item.ngayVe, item.ngayVeType ? item.ngayVeType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
                             </>
                         )}
                         />

@@ -273,22 +273,22 @@ class QtCongTacTrongNuoc extends AdminPage {
             s += ' (' + (batDaus[i] ? T.dateToText(Number(batDaus[i]), batDauTypes[i] ? batDauTypes[i] : 'dd/mm/yyyy') : '') + ' - ';
             s += ketThucs[i] ? (ketThucs[i] != '-1' ? T.dateToText(Number(ketThucs[i]), ketThucTypes[i] ? ketThucTypes[i] : 'dd/mm/yyyy') : 'Đến nay') : '';
             s += ')';
-            results.push(<p style={{ textTransform: 'uppercase' }}> <span>
+            results.push(<div> <span>
                 Lần {i+1}. {s}
-            </span></p>);
+            </span></div>);
         }
         if (soQt > 15) {
             let i = soQt - 1;
-            results.push(<p style={{ textTransform: 'uppercase' }}> <span>
+            results.push(<div> <span>
                 ........................
-            </span></p>);
+            </span></div>);
             let s = danhSachMucDichs[i];
             s += ' (' + (batDaus[i] ? T.dateToText(Number(batDaus[i]), batDauTypes[i] ? batDauTypes[i] : 'dd/mm/yyyy') : '') + ' - ';
             s += ketThucs[i] ? (ketThucs[i] != '-1' ? T.dateToText(Number(ketThucs[i]), ketThucTypes[i] ? ketThucTypes[i] : 'dd/mm/yyyy') : 'Đến nay') : '';
             s += ')';
-            results.push(<p style={{ textTransform: 'uppercase' }}> <span>
+            results.push(<div> <span>
                 Lần {i + 1}. {s}
-            </span></p>);
+            </span></div>);
         }
         return results;
     }
@@ -313,7 +313,7 @@ class QtCongTacTrongNuoc extends AdminPage {
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
-                getDataSource: () => list, stickyHead: false,
+                getDataSource: () => list, stickyHead: true,
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
@@ -321,12 +321,15 @@ class QtCongTacTrongNuoc extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br/>Đơn vị công tác</th>
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày quyết định</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số công văn</th>}
-                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Thông tin chuyến đi</th>}
-                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nội dung</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Nơi đến</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Mục đích</th>}
+                        {!this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Nội dung</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tình trạng</th>}
                         {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quá trình</th>}
                         {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách</th>}
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tình trạng</th>}
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
@@ -359,25 +362,40 @@ class QtCongTacTrongNuoc extends AdminPage {
                             </>
                         )}
                         />
-                        {!this.checked && <TableCell type='text' content={(
+                        {!this.checked && <TableCell type='text' style={{color: 'blue'}} content={(
                             <>
-                                <b> {item.soCv ? item.soCv : ''} </b> <br/><br/>
-                                {item.ngayQuyetDinh ? <span style={{ whiteSpace: 'nowrap' }}>Ngày quyết định: <span style={{ color: 'blue' }}>{item.ngayQuyetDinh ? T.dateToText(item.ngayQuyetDinh, 'dd/mm/yyyy') : ''}</span><br /></span> : null}
+                                {item.ngayQuyetDinh ? T.dateToText(item.ngayQuyetDinh, 'dd/mm/yyyy') : ''}
                             </>
                         )}
                         />}
                         {!this.checked && <TableCell type='text' content={(
                             <>
-                                <span>Nơi đến: <span>{item.danhSachTinh ? item.danhSachTinh : ''}</span></span> <br/> <br/>
-                                <span>Mục đích: <span><b>{item.tenMucDich ? item.tenMucDich : ''}</b></span></span> <br/> <br/>
-                                {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Ngày đi: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
-                                {item.ketThuc && item.ketThuc != -1 ? <span style={{ whiteSpace: 'nowrap' }}>Ngày về: <span style={{ color: 'blue' }}>{item.ketThuc && item.ketThuc != -1 ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
+                                <b> {item.soCv ? item.soCv : ''} </b> 
+                            </>
+                        )}
+                        />}
+                        {!this.checked && <TableCell type='text' style={{color: 'blue'}} content={(
+                            <>
+                                {item.danhSachTinh ? item.danhSachTinh : ''}
+                            </>
+                        )}
+                        />}
+                        {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                            <>
+                                <b>{item.tenMucDich ? item.tenMucDich : ''}</b>
                             </>
                         )}
                         />}
                         {!this.checked && <TableCell type='text' content={(
                             <>
                                 {item.lyDo ? item.lyDo : ''}
+                            </>
+                        )}
+                        />}
+                        {!this.checked && <TableCell type='text' content={(
+                            <>
+                                {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Ngày đi: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
+                                {item.ketThuc && item.ketThuc != -1 ? <span style={{ whiteSpace: 'nowrap' }}>Ngày về: <span style={{ color: 'blue' }}>{item.ketThuc && item.ketThuc != -1 ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
                             </>
                         )}
                         />}
