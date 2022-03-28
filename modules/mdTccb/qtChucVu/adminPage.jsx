@@ -21,7 +21,7 @@ const timeList = [
 ];
 
 export class EditModal extends AdminModal {
-    state = { shcc: null, stt: '', chucVuChinh: 0, thoiChucVu: 0, donVi: 0, capChucVu: 1 };
+    state = { shcc: null, stt: '', chucVuChinh: 0, thoiChucVu: 0, donVi: 0, capChucVu: 0 };
     componentDidMount() {
 
     }
@@ -32,14 +32,14 @@ export class EditModal extends AdminModal {
             shcc: '', maChucVu: '', maDonVi: '', soQuyetDinh: '', ngayRaQuyetDinh: '', chucVuChinh: 0, maBoMon: '',
             ngayRaQd: '', soQd: '', thoiChucVu: 0, ngayRaQdThoiChucVu: '', ngayThoiChucVu: '', soQdThoiChucVu: '', capChucVu: 0
         };
-        this.setState({ shcc, stt, item, chucVuChinh, thoiChucVu: thoiChucVu ? 1 : 0 }, () => {
+        this.setState({ shcc, stt, item, chucVuChinh, thoiChucVu: thoiChucVu ? 1 : 0, capChucVu: capChucVu }, () => {
             this.shcc.value(shcc ? shcc : '');
             this.maChucVu.value(maChucVu ? maChucVu : '');
             this.maDonVi.value(maDonVi ? maDonVi : '');
             this.soQuyetDinh.value(soQd ? soQd : (soQuyetDinh ? soQuyetDinh : ''));
             this.ngayRaQuyetDinh.value(ngayRaQd ? ngayRaQd : (ngayRaQuyetDinh ? ngayRaQuyetDinh : ''));
             this.chucVuChinh.value(chucVuChinh ? 1 : 0);
-            capChucVu ? $('#boMon').hide() : this.maBoMon.value(maBoMon ? maBoMon : '');
+            this.maBoMon.value(maBoMon ? maBoMon : '');
             this.thoiChucVu.value(thoiChucVu ? 1 : 0);
             this.state.thoiChucVu ? this.soQdThoiChucVu.value(soQdThoiChucVu ? soQdThoiChucVu : '') : $('#soQdThoiChucVu').hide();
             this.state.thoiChucVu ? this.ngayRaQdThoiChucVu.value(ngayRaQdThoiChucVu ? ngayRaQdThoiChucVu : '') : $('#ngayRaQdThoiChucVu').hide();
@@ -123,17 +123,12 @@ export class EditModal extends AdminModal {
     }
 
     handleChucVu = (data) => {
-        if (data) {
-            this.props.getDmChucVu(data.id, (item) => {
-                this.setState({ capChucVu: item.isCapTruong }, () => {
-                    this.maDonVi.value('');
-                    this.maBoMon.value('');
-                    item.isCapTruong ? $('#boMon').hide() : $('#boMon').show();
-                });
+        data && this.props.getDmChucVu(data.id, (item) => {
+            this.setState({ capChucVu: item.isCapTruong }, () => {
+                this.maDonVi.value('');
+                this.maBoMon.value('');
             });
-        } else {
-            $('#boMon').hide();
-        }
+        });
     }
 
     render = () => {
@@ -144,8 +139,8 @@ export class EditModal extends AdminModal {
             body: <div className='row'>
                 <FormSelect className='col-md-6' ref={e => this.shcc = e} label='Cán bộ' data={SelectAdapter_FwCanBo} allowClear={true} readOnly={readOnly} />
                 <FormSelect className='col-md-6' ref={e => this.maChucVu = e} label='Chức vụ' data={SelectAdapter_DmChucVuV2} onChange={this.handleChucVu} allowClear={true} readOnly={readOnly} />
-                <div className='col-md-12' id='donVi'><FormSelect ref={e => this.maDonVi = e} label='Đơn vị của chức vụ' data={SelectAdapter_DmDonVi} onChange={this.handleDonVi} allowClear={true} readOnly={readOnly} /></div>
-                <div className='col-md-12' id='boMon'><FormSelect ref={e => this.maBoMon = e} label='Bộ môn của chức vụ' data={SelectAdapter_DmBoMonTheoDonVi(this.state.donVi)} allowClear={true} readOnly={readOnly} /></div>
+                <FormSelect className='col-md-12' ref={e => this.maDonVi = e} label='Đơn vị của chức vụ' data={SelectAdapter_DmDonVi} onChange={this.handleDonVi} allowClear={true} readOnly={readOnly} />
+                <FormSelect className='col-md-12' ref={e => this.maBoMon = e} style={{ display: this.state.capChucVu ? 'none' : '' }} label='Bộ môn của chức vụ' data={SelectAdapter_DmBoMonTheoDonVi(this.state.donVi)} allowClear={true} readOnly={readOnly} />
                 <FormCheckbox className='col-md-12' ref={e => this.chucVuChinh = e} label='Chức vụ chính' readOnly={this.checkChucVuSwitch()} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.soQuyetDinh = e} label='Số quyết định bổ nhiệm' readOnly={readOnly} />
                 <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayRaQuyetDinh = e} label='Ngày ra quyết định bổ nhiệm' readOnly={readOnly} />
