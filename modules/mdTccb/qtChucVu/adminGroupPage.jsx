@@ -7,7 +7,7 @@ import {
     getQtChucVuGroupPageMa, getQtChucVuAll, updateQtChucVuGroupPageMa,
     deleteQtChucVuGroupPageMa, createQtChucVuGroupPageMa,
 } from './redux';
-import { SelectAdapter_DmChucVuV2 } from 'modules/mdDanhMuc/dmChucVu/redux';
+import { SelectAdapter_DmChucVuV2, getDmChucVu } from 'modules/mdDanhMuc/dmChucVu/redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_DmBoMonTheoDonVi } from 'modules/mdDanhMuc/dmBoMon/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
@@ -20,18 +20,18 @@ const timeList = [
 ];
 
 export class EditModal extends AdminModal {
-    state = { shcc: null, stt: '', chucVuChinh: 0, thoiChucVu: 0, donVi: 0 };
+    state = { shcc: null, stt: '', chucVuChinh: 0, thoiChucVu: 0, donVi: 0, capChucVu: 1 };
     componentDidMount() {
 
     }
 
     onShow = (item, maCanBo) => {
-        let { stt, shcc, maChucVu, maDonVi, soQuyetDinh, ngayRaQuyetDinh, ngayRaQd, soQd, chucVuChinh, maBoMon, thoiChucVu, soQdThoiChucVu, ngayRaQdThoiChucVu, ngayThoiChucVu } = item ? item : {
+        let { stt, shcc, maChucVu, maDonVi, soQuyetDinh, ngayRaQuyetDinh, ngayRaQd, soQd, chucVuChinh, maBoMon, thoiChucVu, soQdThoiChucVu, ngayRaQdThoiChucVu, ngayThoiChucVu, capChucVu } = item ? item : {
             stt: '',
             shcc: '', maChucVu: '', maDonVi: '', soQuyetDinh: '', ngayRaQuyetDinh: '', chucVuChinh: '', maBoMon: '',
-            ngayRaQd: '', soQd: '', thoiChucVu: '', ngayRaQdThoiChucVu: '', ngayThoiChucVu: '', soQdThoiChucVu: ''
+            ngayRaQd: '', soQd: '', thoiChucVu: '', ngayRaQdThoiChucVu: '', ngayThoiChucVu: '', soQdThoiChucVu: '', capChucVu: 0,
         };
-        this.setState({ shcc, stt, item, chucVuChinh, thoiChucVu: thoiChucVu ? 1 : 0, maCanBo }, () => {
+        this.setState({ shcc, stt, item, chucVuChinh, thoiChucVu: thoiChucVu ? 1 : 0, maCanBo, capChucVu: capChucVu }, () => {
             this.shcc.value(shcc ? shcc : (maCanBo ? maCanBo : ''));
             this.maChucVu.value(maChucVu ? maChucVu : '');
             this.maDonVi.value(maDonVi ? maDonVi : '');
@@ -121,6 +121,15 @@ export class EditModal extends AdminModal {
         this.setState({ thoiChucVu: value });
     }
 
+    handleChucVu = (data) => {
+        data && this.props.getDmChucVu(data.id, (item) => {
+            this.setState({ capChucVu: item.isCapTruong }, () => {
+                this.maDonVi.value('');
+                this.maBoMon.value('');
+            });
+        });
+    }
+
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
@@ -128,9 +137,9 @@ export class EditModal extends AdminModal {
             size: 'large',
             body: <div className='row'>
                 <FormSelect className='col-md-12' ref={e => this.shcc = e} label='Cán bộ' data={SelectAdapter_FwCanBo} allowClear={true} readOnly={true} />
-                <FormSelect className='col-md-4' ref={e => this.maChucVu = e} label='Chức vụ' data={SelectAdapter_DmChucVuV2} allowClear={true} readOnly={readOnly} />
-                <FormSelect className='col-md-4' ref={e => this.maDonVi = e} label='Đơn vị của chức vụ' data={SelectAdapter_DmDonVi} onChange={this.handleDonVi} allowClear={true} readOnly={readOnly} />
-                <FormSelect className='col-md-4' ref={e => this.maBoMon = e} label='Bộ môn của chức vụ' data={SelectAdapter_DmBoMonTheoDonVi(this.state.donVi)} allowClear={true} readOnly={readOnly} />
+                <FormSelect className='col-md-12' ref={e => this.maChucVu = e} label='Chức vụ' data={SelectAdapter_DmChucVuV2} onChange={this.handleChucVu} allowClear={true} readOnly={readOnly} />
+                <FormSelect className='col-md-12' ref={e => this.maDonVi = e} label='Đơn vị của chức vụ' data={SelectAdapter_DmDonVi} onChange={this.handleDonVi} allowClear={true} readOnly={readOnly} />
+                <FormSelect className='col-md-12' ref={e => this.maBoMon = e} style={{ display: this.state.capChucVu ? 'none' : '' }} label='Bộ môn của chức vụ' data={SelectAdapter_DmBoMonTheoDonVi(this.state.donVi)} allowClear={true} readOnly={readOnly} />
                 <FormCheckbox className='col-md-12' ref={e => this.chucVuChinh = e} label='Chức vụ chính' readOnly={this.checkChucVuSwitch()} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.soQuyetDinh = e} label='Số quyết định bổ nhiệm' readOnly={readOnly} />
                 <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayRaQuyetDinh = e} label='Ngày ra quyết định bổ nhiệm' readOnly={readOnly} />
@@ -222,8 +231,6 @@ class QtChucVuGroup extends AdminPage {
                         <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Chức vụ</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Quyết định bổ nhiệm</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Chức vụ chính</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thôi chức vụ</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Quyết định thôi chức vụ</th>
                         <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                     </tr>
                 ),
@@ -252,8 +259,6 @@ class QtChucVuGroup extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='checkbox' content={item.chucVuChinh} />
-                        <TableCell type='checkbox' content={item.thoiChucVu} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>Số: {item.soQdThoiChucVu}</span><br />
@@ -292,7 +297,7 @@ class QtChucVuGroup extends AdminPage {
                     getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} permission={currentPermissions}
                     getQtChucVuAll={this.props.getQtChucVuAll}
-                    create={this.props.createQtChucVuGroupPageMa} update={this.props.updateQtChucVuGroupPageMa}
+                    create={this.props.createQtChucVuGroupPageMa} update={this.props.updateQtChucVuGroupPageMa} getDmChucVu={this.props.getDmChucVu}
                 />
             </>,
             backRoute: '/user/tccb/qua-trinh/chuc-vu',
@@ -310,6 +315,6 @@ class QtChucVuGroup extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtChucVu: state.tccb.qtChucVu });
 const mapActionsToProps = {
     getQtChucVuAll, getQtChucVuGroupPageMa, deleteQtChucVuGroupPageMa, createQtChucVuGroupPageMa,
-    updateQtChucVuGroupPageMa,
+    updateQtChucVuGroupPageMa, getDmChucVu
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtChucVuGroup);
