@@ -6,12 +6,12 @@ import Pagination from 'view/component/Pagination';
 import {
     getQtChucVuPage, updateQtChucVuStaff,
     deleteQtChucVuStaff, createQtChucVuStaff, getQtChucVuGroupPage,
-    getQtChucVuAll, 
+    getQtChucVuAll,
 } from './redux';
 import { SelectAdapter_DmChucVuV2, getDmChucVu } from 'modules/mdDanhMuc/dmChucVu/redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_DmBoMonTheoDonVi } from 'modules/mdDanhMuc/dmBoMon/redux';
-import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux'; 
+import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 
 const timeList = [
     { id: 0, text: 'Không' },
@@ -317,11 +317,11 @@ class QtChucVu extends AdminPage {
                     <FormSelect className='col-lg-3 col-md-12' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
 
                     {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-3' label='Từ' onChange={() => this.changeAdvancedSearch()} />}
-                    
+
                     {(this.timeType && this.timeType.value() && this.timeType.value() != 0) ? <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-3' label='Đến' onChange={() => this.changeAdvancedSearch()} /> : <div className='col-lg-9' />}
-                    
+
                     <FormSelect className='col-12 col-md-4' multiple={true} ref={e => this.maDonVi = e} label='Theo đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} placeHolder='Có thể chọn nhiều đơn vị' />
-                    
+
                     <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.mulCanBo = e} label='Theo cán bộ cụ thể' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
 
                     <FormSelect ref={e => this.gioiTinh = e} label='Theo giới tính' className='col-12 col-md-2' data={[
