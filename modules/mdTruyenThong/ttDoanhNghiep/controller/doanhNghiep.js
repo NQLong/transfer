@@ -4,7 +4,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.truyenThong,
         menus: {
-            5020: { title: 'Doanh nghiệp', link: '/user/ocer/doanh-nghiep', icon: 'fa-university', backgroundColor: '#ffb300', groupIndex: 4 },
+            5020: { title: 'Doanh nghiệp', link: '/user/truyen-thong/doanh-nghiep', icon: 'fa-university', backgroundColor: '#ffb300', groupIndex: 4 },
         }
     };
 
@@ -21,8 +21,8 @@ module.exports = app => {
         { name: 'dnDoanhNghiep:delete' }
     );
 
-    app.get('/user/ocer/doanh-nghiep', app.permission.check('dnDoanhNghiep:read'), app.templates.admin);
-    app.get('/user/ocer/doanh-nghiep/edit/:doanhNghiepId', app.permission.check('dnDoanhNghiep:read'), app.templates.admin);
+    app.get('/user/truyen-thong/doanh-nghiep', app.permission.check('dnDoanhNghiep:read'), app.templates.admin);
+    app.get('/user/truyen-thong/doanh-nghiep/edit/:doanhNghiepId', app.permission.check('dnDoanhNghiep:read'), app.templates.admin);
 
     app.get('/doanh-nghiep/:hiddenShortName', app.templates.home);
 

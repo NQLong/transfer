@@ -17,7 +17,7 @@ class adminEventPage extends React.Component {
 
 
     componentDidMount() {
-        T.ready('/user/ocer', () => {
+        T.ready('/user/truyen-thong', () => {
             this.props.getTuyenSinh('event', category => {
                 let valueCate = category.map(item => item.id.toString());
                 this.props.getEventByCategoryAdmin(valueCate, data => {

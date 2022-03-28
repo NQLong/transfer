@@ -11,7 +11,7 @@ class EventWaitApprovalPage extends React.Component {
 
     componentDidMount() {
         this.props.getDraftEventInPage();
-        T.ready('/user/ocer');
+        T.ready('/user/truyen-thong');
     }
 
     create = (e) => {

@@ -16,8 +16,8 @@ class DnDoanhNghiepEditPage extends AdminPage {
     isNew = false;
     componentDidMount() {
 
-        T.ready('/user/ocer', () => {
-            const route = T.routeMatcher('/user/ocer/doanh-nghiep/edit/:doanhNghiepId'),
+        T.ready('/user/truyen-thong', () => {
+            const route = T.routeMatcher('/user/truyen-thong/doanh-nghiep/edit/:doanhNghiepId'),
                 doanhNghiepId = route.parse(window.location.pathname).doanhNghiepId;
             this.setState({ id: doanhNghiepId !== 'new' ? doanhNghiepId : null }, () => {
                 this.state.id ? this.props.getDnDoanhNghiep(this.state.id, data => {
@@ -138,7 +138,7 @@ class DnDoanhNghiepEditPage extends AdminPage {
         let data = this.onGetData(), id = this.state.id;
         if (data) {
             id ? this.props.updateDnDoanhNghiep(id, data) : this.props.createDnDoanhNghiep(data, result => {
-                this.props.history.push(`/user/ocer/doanh-nghiep/edit/${result.id}`);
+                this.props.history.push(`/user/truyen-thong/doanh-nghiep/edit/${result.id}`);
                 this.setState({ id: result.id });
             });
         }
@@ -185,7 +185,7 @@ class DnDoanhNghiepEditPage extends AdminPage {
             icon: 'fa fa-university',
             title: <span>Doanh nghiệp: {doanhNghiep && doanhNghiep.tenDayDu ? (<b>{doanhNghiep.tenDayDu.viText()}</b>) : 'Tạo mới'}</span>,
             breadcrumb: [
-                <Link to='/user/ocer/doanh-nghiep' key={0}> Danh sách doanh nghiệp</Link>,
+                <Link to='/user/truyen-thong/doanh-nghiep' key={0}> Danh sách doanh nghiệp</Link>,
                 doanhNghiep && doanhNghiep.tenDayDu ? 'Chỉnh sửa ' : 'Tạo mới'],
             content:
                 <>
@@ -329,7 +329,7 @@ class DnDoanhNghiepEditPage extends AdminPage {
                     <LoaiDoanhNghiepEditModal ref={e => this.modalLoaiDN = e}
                         create={this.onCreateDmLoaiDoanhNghiep} permissions={dmLoaiDoanhNghiepPermission} />
                 </>,
-            backRoute: '/user/ocer/doanh-nghiep',
+            backRoute: '/user/truyen-thong/doanh-nghiep',
             onSave: permission.write ? this.save : null
         });
     }

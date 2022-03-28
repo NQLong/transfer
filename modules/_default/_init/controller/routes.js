@@ -4,7 +4,7 @@ module.exports = app => {
         {
             name: 'system:settings', menu: {
                 parentMenu: app.parentMenu.truyenThong,
-                menus: { 2010: { title: 'Thông tin chung', link: '/user/ocer/settings', groupIndex: 0, icon: 'fa-gear', backgroundColor: '#2962ff' } }
+                menus: { 2010: { title: 'Thông tin chung', link: '/user/truyen-thong/settings', groupIndex: 0, icon: 'fa-gear', backgroundColor: '#2962ff' } }
             },
         },
         { name: 'user:login', menu: { parentMenu: app.parentMenu.user } },
@@ -12,7 +12,7 @@ module.exports = app => {
 
     app.get('/user', app.permission.check('user:login'), app.templates.admin);
     app.get('/user/dashboard', app.permission.check('dashboard:standard'), app.templates.admin);
-    app.get('/user/ocer/settings', app.permission.check('system:settings'), app.templates.admin);
+    app.get('/user/truyen-thong/settings', app.permission.check('system:settings'), app.templates.admin);
 
 
     // Home -----------------------------------------------------------------------------------------------------------------------------------------

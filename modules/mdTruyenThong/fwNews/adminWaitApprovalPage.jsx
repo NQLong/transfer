@@ -67,7 +67,7 @@ class NewsWaitApprovalPage extends React.Component {
 
     componentDidMount() {
         this.props.getDraftNewsInPage(null, null, { isDraftApproved: 1, isTranslated: { $ne: 'in progress' } });
-        T.ready('/user/ocer');
+        T.ready('/user/truyen-thong');
     }
     create = (e) => {
         this.props.createDraftNewsDefault(data => this.props.history.push('/user/news/draft/edit/' + data.item.id));

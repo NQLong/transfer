@@ -20,8 +20,8 @@ export default {
         reducers: { doanhNghiep },
     },
     routes: [
-        { path: '/user/ocer/doanh-nghiep', component: Loadable({ loading: Loading, loader: () => import('./adminDoanhNghiep') }) },
-        { path: '/user/ocer/doanh-nghiep/edit/:doanhNghiepId', component: Loadable({ loading: Loading, loader: () => import('./adminDoanhNghiepEditPage') }) },
+        { path: '/user/truyen-thong/doanh-nghiep', component: Loadable({ loading: Loading, loader: () => import('./adminDoanhNghiep') }) },
+        { path: '/user/truyen-thong/doanh-nghiep/edit/:doanhNghiepId', component: Loadable({ loading: Loading, loader: () => import('./adminDoanhNghiepEditPage') }) },
         { path: '/doanh-nghiep/:hiddenShortName', component: Loadable({ loading: Loading, loader: () => import('./PageCompany') }) },
     ]
 };

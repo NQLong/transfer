@@ -10,7 +10,7 @@ class NewsWaitApprovalPage extends React.Component {
     }
     componentDidMount() {
         this.props.getTranslateDraftNewsInPage(null, null, { isDraftApproved: 1, isTranslated: 'in progress' });
-        T.ready('/user/ocer');
+        T.ready('/user/truyen-thong');
     }
 
     changeTranslated(item) {

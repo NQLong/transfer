@@ -3,7 +3,7 @@ import Init from '../../_default/_init';
 
 export default class EventCategoryPage extends React.Component {
     componentDidMount() {
-        T.ready('/user/ocer');
+        T.ready('/user/truyen-thong');
     }
 
     render() {

@@ -50,7 +50,7 @@ class UnitNewsPage extends React.Component {
 
     componentDidMount() {
         this.props.getUnitDraftNewsInPage(null, null, { isUnitApproved: 1, isDraftApproved: 0 });
-        T.ready('/user/ocer');
+        T.ready('/user/truyen-thong');
     }
     create = (e) => {
         this.props.createUnitDraftNewsDean(data => this.props.history.push('/user/news/unit/edit/' + data.item.id));

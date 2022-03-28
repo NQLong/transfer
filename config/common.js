@@ -100,7 +100,7 @@ module.exports = (app) => {
             subMenusRender: false,
         },
         truyenThong: {
-            index: 5000, title: 'Truyền thông', link: '/user/ocer', icon: 'fa-comments-o',
+            index: 5000, title: 'Truyền thông', link: '/user/truyen-thong', icon: 'fa-comments-o',
             subMenusRender: false,
             groups: ['Cấu hình', 'Bài viết', 'Sự kiện', 'Tuyển sinh', 'Doanh nghiệp']
         },

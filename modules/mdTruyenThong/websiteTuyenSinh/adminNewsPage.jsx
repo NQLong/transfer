@@ -17,7 +17,7 @@ class adminNewsPage extends React.Component {
     searchTextBox = React.createRef();
 
     componentDidMount() {
-        T.ready('/user/ocer', () => {
+        T.ready('/user/truyen-thong', () => {
             this.getData();
         });
     }

@@ -79,7 +79,7 @@ class DraftNewsEditPage extends React.Component {
 
     }
     componentDidMount() {
-        T.ready('/user/ocer', () => {
+        T.ready('/user/truyen-thong', () => {
             this.getData();
             $('#neNewsViTitle').focus();
             $('#neNewsCategories').select2();

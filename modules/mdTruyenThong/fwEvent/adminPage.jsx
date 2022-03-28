@@ -13,7 +13,7 @@ class EventPage extends React.Component {
 
 
     componentDidMount() {
-        T.ready('/user/ocer', () => {
+        T.ready('/user/truyen-thong', () => {
             this.props.getEventInPage(null, null, {});
         });
     }

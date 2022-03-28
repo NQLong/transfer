@@ -8,7 +8,7 @@ class DoanhNghiepAdminPage extends AdminPage {
     state = { linhVucKinhDoanh: [], quocGia: [] }
 
     componentDidMount() {
-        T.ready('/user/ocer', () => {
+        T.ready('/user/truyen-thong', () => {
             T.onSearch = (searchText) => this.props.getDnDoanhNghiepPage(undefined, undefined, searchText || '');
             T.showSearchBox();
             this.props.getDnDoanhNghiepPage(undefined, undefined, undefined, page => {
@@ -48,13 +48,13 @@ class DoanhNghiepAdminPage extends AdminPage {
             renderRow: (item, index) => (
                 <tr key={index}>
                     <TableCell style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                    <TableCell type='link' url={'/user/ocer/doanh-nghiep/edit/' + item.id} style={{ color: item.confirm == 0 ? 'red' : '' }} content={(item.tenDayDu || '').viText()} />
+                    <TableCell type='link' url={'/user/truyen-thong/doanh-nghiep/edit/' + item.id} style={{ color: item.confirm == 0 ? 'red' : '' }} content={(item.tenDayDu || '').viText()} />
                     <TableCell content={item.tenVietTat} />
                     <TableCell style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={item.tenQuocGia} />
                     <TableCell type='image' content={item.image || '/img/hcmussh.png'} />
                     <TableCell type='checkbox' content={item.doiTac} permission={permission} onChanged={() => this.changeDoiTac(item)} />
                     <TableCell type='checkbox' content={item.kichHoat} permission={permission} onChanged={() => this.changeActive(item)} />
-                    <TableCell content={item} type='buttons' style={{ textAlign: 'center' }} permission={permission} onEdit={'/user/ocer/doanh-nghiep/edit/' + item.id} onDelete={this.delete}>
+                    <TableCell content={item} type='buttons' style={{ textAlign: 'center' }} permission={permission} onEdit={'/user/truyen-thong/doanh-nghiep/edit/' + item.id} onDelete={this.delete}>
                     </TableCell>
                 </tr>
             ),
@@ -64,7 +64,7 @@ class DoanhNghiepAdminPage extends AdminPage {
             icon: 'fa fa-university',
             title: 'Doanh nghiệp',
             breadcrumb: [
-                <Link to='/user/ocer' key={0}>Truyền thông & QHDN</Link>,
+                <Link to='/user/truyen-thong' key={0}>Truyền thông & QHDN</Link>,
                 'Doanh Nghiệp'
             ],
             content:
@@ -72,8 +72,8 @@ class DoanhNghiepAdminPage extends AdminPage {
                     <div className='tile'>{table}</div>
                     <Pagination style={{ marginLeft: '70px' }} pageNumber={pageNumber} pageSize={pageSize} pageTotal={pageTotal} totalItem={totalItem} pageCondition={pageCondition} getPage={this.props.getDnDoanhNghiepPage} />
                 </>,
-            backRoute: '/user/ocer',
-            onCreate: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/ocer/doanh-nghiep/edit/new') : null,
+            backRoute: '/user/truyen-thong',
+            onCreate: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/truyen-thong/doanh-nghiep/edit/new') : null,
         });
     }
 }

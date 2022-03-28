@@ -120,7 +120,7 @@ class SettingsPage extends React.Component {
 
     componentDidMount() {
         this.getFooterSystem();
-        T.ready('/user/ocer', () => {
+        T.ready('/user/truyen-thong', () => {
             $('.menuList').sortable({
                 start: (e, ui) => {
                     $(this).attr('data-prevIndex', ui.item.index());
