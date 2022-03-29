@@ -2,7 +2,7 @@ module.exports = app => {
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1021: { title: 'Danh sách cán bộ thuộc đơn vị', link: '/user/danh-sach-can-bo-thuoc-don-vi', icon: 'fa-user-circle-o', backgroundColor: '#e30000', pin: true },
+            1021: { title: 'Danh sách nhân sự đơn vị', link: '/user/nhan-su-don-vi', icon: 'fa-user-circle-o', backgroundColor: '#e30000', pin: true },
         },
     };
 
@@ -10,7 +10,7 @@ module.exports = app => {
         { name: 'manager:read', menu: menuStaff },
         { name: 'manager:write' }
     );
-    app.get('/user/danh-sach-can-bo-thuoc-don-vi', app.permission.check('manager:read'), app.templates.admin);
+    app.get('/user/nhan-su-don-vi', app.permission.check('manager:read'), app.templates.admin);
 
     //Manager hook -------------------------------------------------------------------------------------------------
 
@@ -21,7 +21,7 @@ module.exports = app => {
         resolve();
     }));
 
-    app.get('/api/nhanSuDonVi', app.permission.check('manager:read'), (req, res) => {
+    app.get('/api/nhan-su-don-vi', app.permission.check('manager:read'), (req, res) => {
         let listDonVi = req.query.listDonVi || [],
             condition = {
                 statement: 'maDonVi IN (:listDonVi)',

@@ -17,7 +17,7 @@ T.initPage('pageNhanSuDonVi');
 export function getNhanSuDonVi(listDonVi, done) {
     T.updatePage('pageNhanSuDonVi');
     return dispatch => {
-        const url = '/api/nhanSuDonVi';
+        const url = '/api/nhan-su-don-vi';
         T.get(url, { listDonVi }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách cán bộ bị lỗi!', 'danger');

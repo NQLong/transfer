@@ -26,6 +26,13 @@ module.exports = app => {
     app.get('/user/tccb/staff', app.permission.check('staff:read'), app.templates.admin);
     app.get('/user/tccb/staff/item/upload', app.permission.check('staff:write'), app.templates.admin);
 
+    app.getEmailByShcc = (shcc) => new Promise(resolve => {
+        if (!shcc) resolve();
+        app.model.canBo.get({ shcc }, 'email', null, (error, item) => {
+            if (!error && item) resolve(item.email);
+            else resolve();
+        });
+    });
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);

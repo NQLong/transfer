@@ -65,15 +65,6 @@ module.exports = app => {
         });
     });
 
-    app.getEmailByShcc = (shcc) => new Promise(resolve => {
-        if (!shcc) resolve();
-        app.model.canBo.get({ shcc }, 'email', null, (error, item) => {
-            if (!error && item) resolve(item.email);
-            else resolve();
-        });
-    });
-
-
     app.put('/api/tccb/qua-trinh/chuc-vu', app.permission.check('qtChucVu:write'), async (req, res) => {
         let targetEmail = await app.getEmailByShcc(req.body.changes.shcc);
         app.model.qtChucVu.update({ stt: req.body.stt }, req.body.changes, (error, item) => {
