@@ -45,6 +45,77 @@ module.exports = (app, http, config) => {
         app.use(session(sessionOptions));
     }
 
+    app.session = {
+        getId: req => sessionIdPrefix + req.sessionID,
+
+        deleteByCasTicket: (casTicket) => {
+            app.database.redis && app.database.redis.keys(sessionIdPrefix + '*', (error, keys) => {
+                if (keys && keys.length) {
+                    const solve = (index = 0, step = 50) => {
+                        if (index < keys.length) {
+                            const subKeys = keys.slice(index, index + step);
+                            app.database.redis.mget(subKeys, (error, items) => {
+                                if (items) {
+                                    for (let i = 0; i < subKeys.length; i++) {
+                                        const key = subKeys[i], item = JSON.parse(items[i]);
+                                        // Delete user's session
+                                        if (item && item.casTicket == casTicket) {
+                                            const { email, shcc, studentId } = item.user;
+                                            delete item.casTicket;
+                                            delete item.casUser;
+                                            delete item.casUserInfo;
+                                            delete item.user;
+                                            app.database.redis.set(key, JSON.stringify(item), () => {
+                                                console.log(' - Delete session ticket:', casTicket);
+                                                app.io.emit('force', 'logout', { email, shcc, studentId });
+                                            });
+                                        }
+                                    }
+                                }
+
+                                solve(index + step);
+                            });
+                        }
+                    };
+                    solve();
+                }
+            });
+        },
+
+        refresh: (...emails) => {
+            app.database.redis && app.database.redis.keys(sessionIdPrefix + '*', (error, keys) => {
+                if (keys && keys.length) {
+                    const solve = (index = 0, step = 50) => {
+                        if (index < keys.length) {
+                            const subKeys = keys.slice(index, index + step);
+                            app.database.redis.mget(subKeys, (error, items) => {
+                                if (items) {
+                                    for (let i = 0; i < subKeys.length; i++) {
+                                        const key = subKeys[i], item = JSON.parse(items[i]);
+                                        // Refresh user's session
+                                        if (item && item.user && emails.includes(item.user.email)) {
+                                            app.model.fwUser.get({ email: item.user.email }, (error, user) => {
+                                                user && app.updateSessionUser(null, user, sessionUser => {
+                                                    if (sessionUser) {
+                                                        item.user = sessionUser;
+                                                        app.database.redis.set(key, JSON.stringify(item), () => console.log(' - Update session', key, ':', sessionUser.email));
+                                                    }
+                                                });
+                                            });
+                                        }
+                                    }
+                                }
+
+                                solve(index + step);
+                            });
+                        }
+                    };
+                    solve();
+                }
+            });
+        }
+    };
+
     // Read cookies (needed for auth)
     const cookieParser = require('cookie-parser');
     app.use(cookieParser());

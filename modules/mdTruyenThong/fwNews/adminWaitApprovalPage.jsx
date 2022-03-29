@@ -59,7 +59,7 @@ class RejectModal extends React.Component {
     }
 }
 class NewsWaitApprovalPage extends React.Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
     }
 

@@ -43,7 +43,7 @@ class RejectModal extends React.Component {
 }
 
 class UnitNewsPage extends React.Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
     }
     reject = React.createRef();
