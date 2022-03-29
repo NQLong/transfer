@@ -30,7 +30,7 @@ export default {
         // { path: '/:websiteDv/news/item/:newsId', component: Loadable({ loading: Loading, loader: () => import('./homeNewsDetail') }) },
         { path: '/tin-tuc/:link', component: Loadable({ loading: Loading, loader: () => import('./homeNewsDetail') }) },
         { path: '/article/:link', component: Loadable({ loading: Loading, loader: () => import('./homeNewsDetail') }) },
-        { path: '/story/:link', component: Loadable({ loading: Loading, loader: () => import('./homeStory') }) },
+        { path: '/megastory/:link', component: Loadable({ loading: Loading, loader: () => import('./homeStory') }) },
 
         // { path: '/news/list/:category', component: Loadable({ loading: Loading, loader: () => import('./homeNewsList') }) }
     ],
