@@ -51,15 +51,17 @@ module.exports = app => {
     };
 
     app.isHCMUSSH = email => email.endsWith('@hcmussh.edu.vn') ||
-        email == app.defaultAdminEmail ||
-        email == 'hung@hcmut.edu.vn' ||
-        email == 'hoang.nguyen12@hcmut.edu.vn' ||
-        email == 'tien.trantan@hcmut.edu.vn' ||
-        email == 'quangsang@hcmut.edu.vn' ||
-        email == 'nphien212@gmail.com' ||
-        email == 'kiet.nguyenbk2804@hcmut.edu.vn' ||
-        email == 'vietphap@hcmut.edu.vn';
+        email == app.defaultAdminEmail;
 
+
+    app.isAdmin = (email) => new Promise(resolve =>
+        app.model.fwRole.get({ name: 'admin' }, (error, item) => {
+            if (error || !item) resolve(false);
+            else {
+                app.model.fwUserRole.get({ email, roleId: item.id }, (error, user) => resolve(!error && user));
+            }
+        })
+    );
     // app.registerUser = (req, res) => {
     //     if (req.session.user != null) {
     //         res.send({ error: 'You are logged in!' });

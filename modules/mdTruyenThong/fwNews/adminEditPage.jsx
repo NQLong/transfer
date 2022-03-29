@@ -15,7 +15,7 @@ const languageOption = [
 ];
 
 class NewsEditPage extends React.Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.state = { item: null, displayCover: 1 };
         // this.newsLink = React.createRef();
@@ -239,14 +239,14 @@ class NewsEditPage extends React.Component {
                                         {currentPermissions.includes('news:write')
                                             || currentPermissions.includes('news:tuyensinh')
                                             || currentPermissions.includes('website:write') ? <div className='form-group' style={{ display: 'inline-flex', margin: 0 }}>
-                                                <label className='control-label'>Kích hoạt:&nbsp;</label>
-                                                <div className='toggle'>
-                                                    <label>
-                                                        <input type='checkbox' checked={item.active} onChange={this.changeActive} disabled={readOnly} />
-                                                        <span className='button-indecator' />
-                                                    </label>
-                                                </div>
-                                            </div> : null}
+                                            <label className='control-label'>Kích hoạt:&nbsp;</label>
+                                            <div className='toggle'>
+                                                <label>
+                                                    <input type='checkbox' checked={item.active} onChange={this.changeActive} disabled={readOnly} />
+                                                    <span className='button-indecator' />
+                                                </label>
+                                            </div>
+                                        </div> : null}
                                         <div className='form-group'>
                                             <label className='control-label'>Tin nội bộ:&nbsp;</label>
                                             <span className='toggle'>
@@ -325,7 +325,7 @@ class NewsEditPage extends React.Component {
                                 <div className='tile-footer'>
                                     <button className='btn btn-danger' type='button' onClick={() => this.checkLink(item)}>
                                         <i className='fa fa-fw fa-lg fa-check-circle' />Kiểm tra link
-                                </button>
+                                    </button>
                                 </div>
                             }
                         </div>
