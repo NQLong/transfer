@@ -78,13 +78,18 @@ export class HcthCongVanDi extends AdminPage {
             getDataSource: () => list, stickyHead: false,
             renderHead: () => (
                 <tr>
-                    <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                    <th style={{ width: '100%' }}>Nội dung</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>
-                    <th style={{ width: 'auto' }}>Đơn vị gửi</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Đơn vị, nguời nhận</th>
-                    <th style={{ width: 'auto' }}>Tình trạng</th>
-                    <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
+                    <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle'}}>#</th>
+                    <th style={{ width: '100%', verticalAlign: 'middle' }}>Nội dung</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Thời gian</th>
+                    <th style={{ width: 'auto' }}>
+                        {/* <div className="row"> */}
+                            Đơn vị gửi 
+                            {/* <FormSelect allowClear={true} className='col-md-12' label='Đơn vị gửi' ref={e => this.donViGui = e} data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} /> */}
+                        {/* </div> */}
+                        </th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Đơn vị, nguời nhận</th>
+                    <th style={{ width: 'auto', verticalAlign: 'middle' }}>Tình trạng</th>
+                    <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }}>Thao tác</th>
                 </tr>),
             renderRow: (item, index) => {
                 let danhSachDonViNhan = item.danhSachDonViNhan?.split(';');
