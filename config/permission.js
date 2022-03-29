@@ -209,6 +209,20 @@ module.exports = app => {
                         }
                     });
                 }).then(() => new Promise(resolve => {
+                    //Check cán bộ đặc biệt
+                    if (user.isStaff) {
+                        if (user.staff.maDonVi == 68) {
+                            app.permissionHooks.pushUserPermission(user, 'rectors:login');
+                            if (user.staff.listChucVu.some(item => item.maChucVu == '001')) {
+                                app.permissionHooks.pushUserPermission(user, 'president:login');
+                                resolve();
+                            } else {
+                                app.permissionHooks.pushUserPermission(user, 'vice-president:login');
+                                resolve();
+                            }
+                        } else resolve();
+                    } else resolve();
+                })).then(() => new Promise(resolve => {
                     if (!user.isStaff && user.studentId) {
                         app.model.fwStudents.get({ mssv: user.studentId }, (error, student) => {
                             if (student) {
