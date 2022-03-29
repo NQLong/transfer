@@ -231,7 +231,7 @@ class QtChucVu extends AdminPage {
         for (let i = 0; i < dsChucVuSplitted.length; i++) {
             dsDonViSplitted[i] = dsDonViSplitted[i].trim();
             dsBomonSplitted[i] = dsBomonSplitted[i].trim();
-            danhSach.push(<span key={i}>{i+1}. {dsChucVuSplitted[i]} ({dsBomonSplitted[i] ? dsBomonSplitted[i] : (dsDonViSplitted[i] ? dsDonViSplitted[i] : '')}){i != dsChucVuSplitted.length - 1 ? <br></br> : ''}</span>);
+            danhSach.push(<span key={i}>{i+1}. {dsChucVuSplitted[i]} ({dsBomonSplitted[i] ? dsBomonSplitted[i] : (dsDonViSplitted[i] ? dsDonViSplitted[i] : '')}){i != dsChucVuSplitted.length - 1 ? <br/> : ''}</span>);
         }
         return danhSach;
     }
@@ -281,30 +281,10 @@ class QtChucVu extends AdminPage {
                             </>
                         )}
                         />
-                        {!this.checked && <TableCell type='text' content={(
-                            <>
-                                <b>{item.tenChucVu}</b><br/>
-                            </>
-                        )}
-                        />}
-                        {!this.checked && <TableCell type='text' content={(
-                            <>
-                                {item.tenDonVi}
-                            </>
-                        )}
-                        />}
-                        {!this.checked && <TableCell type='text' content={(
-                            <>
-                                {item.tenBoMon}
-                            </>
-                        )}
-                        />}
-                        {!this.checked && <TableCell type='text' style={{ textAlign: 'center' }} content={(
-                            <>
-                                {item.phuCap}
-                            </>
-                        )}
-                        />}
+                        {!this.checked && <TableCell type='text' content={item.tenChucVu}/>}
+                        {!this.checked && <TableCell type='text' content={item.tenDonVi}/>}
+                        {!this.checked && <TableCell type='text' content={item.tenBoMon}/>}
+                        {!this.checked && <TableCell type='text' style={{ textAlign: 'center' }} content={item.phuCap}/>}
                         {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>Số: {item.soQuyetDinh}</span><br />

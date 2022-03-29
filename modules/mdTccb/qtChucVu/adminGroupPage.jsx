@@ -247,30 +247,10 @@ class QtChucVuGroup extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' content={(
-                            <>
-                                <span><b>{item.tenChucVu}</b></span><br />
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' content={(
-                            <>
-                                <span>{item.tenDonVi}</span><br />
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' content={(
-                            <>
-                                <span>{item.tenBoMon}</span><br />
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' style={{ textAlign: 'center' }} content={(
-                            <>
-                                <span>{item.phuCap}</span><br />
-                            </>
-                        )}
-                        />
+                        <TableCell type='text' content={item.tenChucVu}/>
+                        <TableCell type='text' content={item.tenDonVi}/>
+                        <TableCell type='text' content={item.tenBoMon}/>
+                        <TableCell type='text' style={{ textAlign: 'center' }} content={item.phuCap}/>
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>Số: {item.soQuyetDinh}</span><br />
