@@ -6,12 +6,12 @@ import Pagination from 'view/component/Pagination';
 import {
     getQtChucVuPage, updateQtChucVuStaff,
     deleteQtChucVuStaff, createQtChucVuStaff, getQtChucVuGroupPage,
-    getQtChucVuAll, 
+    getQtChucVuAll,
 } from './redux';
 import { SelectAdapter_DmChucVuV2, getDmChucVu } from 'modules/mdDanhMuc/dmChucVu/redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_DmBoMonTheoDonVi } from 'modules/mdDanhMuc/dmBoMon/redux';
-import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux'; 
+import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 
 const timeList = [
     { id: 0, text: 'Không' },
@@ -238,8 +238,8 @@ class QtChucVu extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa chức vụ', 'Bạn có chắc bạn muốn xóa chức vụ này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtChucVuStaff(item.stt, false, null, error => {
-                if  (error) T.notify(error.message ? error.message : 'Xoá chức vụ bị lỗi!', 'danger');
+            isConfirm && this.props.deleteQtChucVuStaff({ stt: item.stt, shcc: item.shcc }, false, null, error => {
+                if (error) T.notify(error.message ? error.message : 'Xoá chức vụ bị lỗi!', 'danger');
                 else T.alert('Xoá chức vụ thành công!', 'success', false, 800);
             });
         });

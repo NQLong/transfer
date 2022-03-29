@@ -149,10 +149,27 @@ class QtGiaiThuong extends AdminPage {
         this.getPage();
     }
 
-    list = (text, i, j) => {
-        if (!text) return '';
-        let deTais = text.split('??').map(str => <p key={i--} style={{ textTransform: 'uppercase' }}>{j - i}. {str}</p>);
-        return deTais;
+    list = (text, i, listYear) => {
+        if (!text) return [];
+        let deTais = text.split('??');
+        let years = listYear.split('??');
+        let results = [];
+        let choose = i > 5 ? 5 : i;
+        for (let k = 0; k < choose; k++) {
+            results.push(<div> <span>
+                {k + 1}. {deTais[k]} ({years[k].trim()})
+            </span></div>);
+        }
+        if (i > 5) {
+            results.push(<div> <span>
+                .........................................
+            </span></div>);
+            let k = i - 1;
+            results.push(<div> <span>
+                {k + 1}. {deTais[k]} ({years[k].trim()})
+            </span></div>);
+        }
+        return results;
     }
 
     showModal = (e) => {
@@ -180,51 +197,50 @@ class QtGiaiThuong extends AdminPage {
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
-                getDataSource: () => list, stickyHead: false,
+                getDataSource: () => list, stickyHead: true,
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>}
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br/>Đơn vị công tác</th>
+                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Giải thưởng</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm đạt giải</th>}
+                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nơi cấp</th>}
                         {this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Số giải thưởng</th>}
                         {this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Danh sách giải thưởng</th>}
-                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Giải thưởng</th>}
-                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nơi cấp, năm đạt giải</th>}
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                        {this.checked && <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
+                        <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span>{(item.hoCanBo ? item.hoCanBo : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo : ' ')}</span><br />
+                                <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
                                 {item.shcc}
                             </>
-                        )}
-                        />}
-                        {this.checked && <TableCell type='text' content={item.soGiaiThuong} />}
-                        {this.checked && <TableCell type='text' content={this.list(item.danhSachGiaiThuong, item.soGiaiThuong, item.soGiaiThuong)} />}
+                        )} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenHocVi || ''} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucDanhNgheNghiep || ''} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                            <>
+                                <span> {item.tenChucVu || ''}<br /> </span>
+                                {(item.tenDonVi || '').normalizedName()}
+                            </>
+                        )} />
                         {!this.checked && <TableCell type='text' content={(
                             <>
                                 <span><b>{item.tenGiaiThuong}</b></span> <br />
-                                <span><i>{item.noiDung}</i></span> <br /> <br />
-                                <span>Cán bộ đạt giải:
-                                    <a href='#' onClick={() => this.modal.show(item, false)}>
-                                        <span style={{ color: 'blue' }}>{' ' + (item.hoCanBo ? item.hoCanBo : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo : ' ') + ' - ' + item.shcc} </span>
-                                    </a>
-                                </span>
-
+                                <span><i>{item.noiDung}</i></span>
                             </>
 
                         )} />}
-                        {!this.checked && <TableCell type='text' content={(
-                            <>
-                                <span>Nơi cấp giải thưởng: <span><i>{item.noiCap}</i></span></span> <br /> <br />
-                                <span>Năm đạt giải: <span style={{ color: 'blue' }}>{item.namCap}</span></span>
-
-                            </>
-                        )}
-                        />}
+                        {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap', color: 'blue'}} content={(item.namCap)} />}
+                        {!this.checked && <TableCell type='text' content={(<i>{item.noiCap}</i>)} />}
+                        {this.checked && <TableCell type='text' content={item.soGiaiThuong} />}
+                        {this.checked && <TableCell type='text' content={this.list(item.danhSachGiaiThuong, item.soGiaiThuong, item.danhSachNamCap)} />}
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                                 onEdit={() => this.modal.show(item, false)} onDelete={this.delete} >

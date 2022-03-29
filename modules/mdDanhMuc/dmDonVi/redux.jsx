@@ -178,30 +178,24 @@ export const SelectAdapter_DmDonVi = {
     ajax: true,
     url: '/api/danh-muc/don-vi/page/1/50',
     data: params => ({ condition: params.term, kichHoat: 1 }),
-    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.ten.normalizedName() })) : [] }),
-    fetchOne: (id, done) => (getDmDonVi(id, item => item && done && done({ id: item.ma, text: item.ten.normalizedName() })))(),
-    getOne: getDmDonVi,
-    processResultOne: response => response && ({ value: response.ma, text: `${response.ten.normalizedName()}` }),
+    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.ten })) : [] }),
+    fetchOne: (id, done) => (getDmDonVi(id, item => item && done && done({ id: item.ma, text: item.ten })))(),
 };
 
 export const SelectAdapter_DmDonViFaculty = {
-    ajax: false,
+    ajax: true,
     getAll: getDmDonViFaculty,
     processResults: response => ({ results: response ? response.items.map(item => ({ value: item.ma, text: item.ten })) : [] }),
+    fetchOne: (id, done) => (getDmDonVi(id, item => item && done && done({ id: item.ma, text: item.ten })))(),
     condition: { kichHoat: 1 },
 };
 
 export const SelectAdapter_DmDonViFaculty_V2 = {
     ajax: true,
     url: '/api/danh-muc/don-vi/faculty',
-    data: params => ({ condition: params.term, kichHoat: 1 }),
+    data: params => ({ condition: params.term }),
     processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.ma, text: item.ten.normalizedName() })) : [] }),
-    fetchOne: (id, done) => (getDmDonVi(id, item => item && done && done({ id: item.ma, text: item.ten.normalizedName() })))(),
-    getOne: getDmDonVi,
-    processResultOne: response => response && ({
-        value: response.ma, text: `${response.ten.normalizedName()
-            }`
-    }),
+    fetchOne: (id, done) => (getDmDonVi(id, item => item && done && done({ id: item.ma, text: item.ten })))(),
 };
 
 export const SelectAdapter_NoiKyHopDong = {
@@ -219,15 +213,12 @@ export const SelectAdapter_NoiKyHopDong = {
     processResultOne: response => response && ({ value: response.ma, text: response.ma + ': ' + response.ten }),
 };
 
-export const SelectAdapter_DmDonViFilter = {
-    ajax: true,
-    url: '/api/danh-muc/don-vi/page/1/40',
-    data: params => ({ condition: params.term }),
-    processResults: data => {
-        const results = data && data.page && data.page.list ? data.page.list.map(item => ({ id: item.ma, text: `${item.ma}: ${item.ten}` })) : [];
-        results.unshift({ id: '00', text: 'Chọn tất cả' });
-        return { results };
-    },
-    getOne: getDmDonVi,
-    processResultOne: response => response && ({ value: response.ma, text: response.ma + ': ' + response.ten }),
+export const SelectAdapter_DmDonViFilter = (listDonViQuanLy) => {
+    return {
+        ajax: true,
+        url: '/api/danh-muc/don-vi/get-in-list',
+        data: () => ({ condition: listDonViQuanLy }),
+        processResults: data => data && data.items ? data.items.map(item => ({ id: item.ma, text: item.ten })) : [],
+        fetchOne: (id, done) => (getDmDonVi(id, item => item && done && done({ id: item.ma, text: item.ten })))()
+    };
 };

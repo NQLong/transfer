@@ -178,14 +178,15 @@ class QtBaiVietKhoaHocGroupPage extends AdminPage {
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
-                getDataSource: () => list, stickyHead: false,
+                getDataSource: () => list, stickyHead: true,
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tác giả</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Bài viết</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tạp chí xuất bản</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Điểm IF</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thông tin xuất bản</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tạp chí</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số hiệu ISSN</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Xuất bản</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
@@ -199,25 +200,10 @@ class QtBaiVietKhoaHocGroupPage extends AdminPage {
                             </>
                         )}
                         /> */}
-                        <TableCell type='text' content={(
-                            <>
-                                <a href='#' onClick={() => this.modal.show(item, false)}>
-                                    <span style={{ color: 'blue' }}>{item.tenBaiViet ? item.tenBaiViet : ''}</span> <br />
-                                </a>
-                                <span>Tác giả:
-                                    <span style={{ color: 'black' }}>{' ' + item.tenTacGia} </span>
-                                </span>
-                            </>
-
-                        )} />
-                        <TableCell type='text' content={(
-                            <>
-                                <span><span><i>{item.tenTapChi ? item.tenTapChi : ''}</i></span> </span> <br />
-                                {item.soHieuIssn ? <span style={{ whiteSpace: 'nowrap' }}>ISSN: <span style={{ color: 'blue' }}>{item.soHieuIssn}</span> </span> : null}
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemIf} />
+                        <TableCell type='link' onClick={() => this.modal.show(item)} content={(item.tenTacGia || '')} />
+                        <TableCell type='text' content={(<b>{item.tenBaiViet}</b>)} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(<i>{item.tenTapChi}</i>)} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.soHieuIssn} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 {item.quocTe != null && <span>{item.quocTe == '0' ? <span style={{ color: 'red' }}>Trong nước</span>
