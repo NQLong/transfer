@@ -208,7 +208,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                                 :
                                 item.maLoaiDoiTuong == '02' ?
                                     <>
-                                        <span>{item.hoCanBo + ' ' + item.tenCanBo}</span><br />
+                                        <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
                                         {item.ma}
                                     </>
                                     : item.maLoaiDoiTuong == '03' ?
@@ -219,29 +219,14 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                                         </>
                                         : <>
                                             <span>{item.tenBoMon}</span> <br />
-                                            {'KHOA ' + item.tenDonViBoMon}
+                                            {item.tenDonViBoMon}
                                         </>
 
                         )}
                         />
-                        <TableCell type='text' style={{ textAlign: 'center' }} content={(
-                            <>
-                                {item.soQuyetDinh ? item.soQuyetDinh : ''}
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' style={{ textAlign: 'center' }} content={(
-                            <>
-                                {item.namDatDuoc}
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' content={(
-                            <>
-                                {item.tenThanhTich}
-                            </>
-                        )}
-                        />
+                        <TableCell type='text' style={{ textAlign: 'center' }} content={(item.soQuyetDinh || '')} />
+                        <TableCell type='text' style={{ textAlign: 'center' }} content={(item.namDatDuoc)} />
+                        <TableCell type='text' content={(item.tenThanhTich)} />
                         <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemThiDua} />
                         <TableCell type='text' content={item.tenLoaiDoiTuong} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
