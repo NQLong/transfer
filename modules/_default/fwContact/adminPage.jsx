@@ -42,7 +42,6 @@ class ContactPage extends React.Component {
         const readStyle = { textDecorationLine: 'none', fontWeight: 'normal', color: 'black' },
             unreadStyle = { textDecorationLine: 'none', fontWeight: 'bold' };
         let table = 'Không có tin nhắn!';
-        console.log(this.state);
         if (this.props.contact && this.props.contact.page && this.props.contact.page.list && this.props.contact.page.list.length > 0) {
             table = (
                 <table className='table table-hover table-bordered'>

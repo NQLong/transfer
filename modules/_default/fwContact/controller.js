@@ -90,7 +90,6 @@ module.exports = app => {
                     //     });
                     // });
                 } else {
-                    console.log(error);
                     res.send({ error });
                 }
             });
