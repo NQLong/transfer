@@ -1,4 +1,6 @@
 module.exports = (app) => {
+    const FILE_TYPE = 'DEN';
+
     const menu = {
         parentMenu: app.parentMenu.hcth,
         menus: {
@@ -53,69 +55,89 @@ module.exports = (app) => {
     });
 
     app.post('/api/hcth/cong-van-den', app.permission.check('hcthCongVanDen:write'), (req, res) => {
-        app.model.hcthCongVanDen.create(req.body.data, (error, item) => {
+        const { fileList, ...data } = req.body.data;
+        app.model.hcthCongVanDen.create(data, (error, item) => {
             if (error)
                 res.send({ error, item });
             else {
-                let { id, linkCongVan } = item;
-                let listCongVan = null;
-                try {
-                    listCongVan = JSON.parse(linkCongVan);
-                }
-                catch {
-                    listCongVan = [];
-                }
-                updateListFile(listCongVan, id, ({ error, listFile }) => {
-                    if (error) {
-                        app.model.hcthCongVanDen.delete({ id }, () => res.send({ error }));
-                    } else {
-                        let listCongVanStr = null;
-                        try {
-                            listCongVanStr = JSON.stringify(listFile);
-                        } catch {
-                            listCongVanStr = '[]';
+                let { id } = item;
+                app.createFolder(app.path.join(app.assetPath, `/congVanDen/${id}`));
+                if (fileList && fileList.length > 0) {
+                    updateListFile(fileList, id, ({ error }) => {
+                        if (error) {
+                            deleteCongVan(id, () => res.send({ error }));
                         }
-                        app.model.hcthCongVanDen.update({ id }, { 'linkCongVan': listCongVanStr }, (errors, item) => res.send({ errors, item }));
-                    }
-                });
+                        else
+                            res.send({ item });
+                    });
+                }
+                else res.send({ item });
             }
         });
     });
 
-    const updateListFile = (listFile, id, done) => {
-        if (!listFile || listFile.length == 0) return listFile;
-        app.createFolder(
-            app.path.join(app.assetPath, `/congVanDen/${id}`)
-        );
-        const pattern = /\/new.*/;
-        const newList = listFile.map(fileName => {
-            if (pattern.test(fileName)) {
-                const
-                    destFile = fileName.replace('new', `${id}`),
-                    destPath = app.assetPath + '/congVanDen' + destFile,
-                    srcPath = app.assetPath + '/congVanDen' + fileName;
-                app.fs.rename(srcPath, destPath, error => {
-                    if (error)
-                        done && done({ error });
+    const updateListFile = (listFile, congVanId, done) => {
+        const [{ id, ...changes }] = listFile.splice(0, 1),
+            sourcePath = app.path.join(app.assetPath, `/congVanDen/new/${changes.ten}`),
+            destPath = app.path.join(app.assetPath, `/congVanDen/${congVanId}/${changes.ten}`);
+        if (!changes.congVan)
+            app.fs.rename(sourcePath, destPath, error => {
+                if (error) done && done({ error });
+                else
+                    app.model.hcthFileCongVan.update({ id }, { ...changes, congVan: congVanId }, (error, item) => {
+                        if (error)
+                            done && done({ error });
+                        else {
+                            if (listFile.length > 0)
+                                updateListFile(listFile, congVanId, done);
+                            else
+                                done && done({ error, item });
+                        }
+                    });
+            });
+        else
+            app.model.hcthFileCongVan.update({ id }, { ...changes }, (error, item) => {
+                if (error)
+                    done && done({ error });
+                else {
+                    if (listFile.length > 0)
+                        updateListFile(listFile, congVanId, done);
+                    else
+                        done && done({ error, item });
+                }
+            });
+    };
+
+    const deleteCongVan = (id, done) => {
+        app.model.hcthFileCongVan.delete({ congVan: id }, (error) => {
+            if (error) done && done({ error });
+            else
+                app.model.hcthCongVanDen.delete({ id }, error => {
+                    app.deleteFolder(app.assetPath + '/congVanDen/' + id);
+                    done && done({ error });
                 });
-                return destFile;
-            }
-            return fileName;
         });
-        done && done({ error: null, listFile: newList });
     };
 
 
     app.put('/api/hcth/cong-van-den', app.permission.check('hcthCongVanDen:write'), (req, res) => {
-        app.model.hcthCongVanDen.update({ id: req.body.id }, req.body.changes, (errors, items) => res.send({ errors, items }));
+        const { fileList, ...changes } = req.body.changes;
+        app.model.hcthCongVanDen.update({ id: req.body.id }, changes, (errors, item) => {
+            if (errors)
+                res.send({ errors, item });
+            else {
+                if (fileList && fileList.length > 0) {
+                    updateListFile(fileList, req.body.id, ({ error }) => res.send({ error }));
+                }
+                else res.send({ item });
+            }
+        });
     });
 
     app.delete('/api/hcth/cong-van-den', app.permission.check('hcthCongVanDen:delete'), (req, res) => {
-        app.model.hcthCongVanDen.delete({ id: req.body.id }, errors => {
-            app.deleteFolder(app.assetPath + '/congVanDen/' + req.body.id);
-            res.send({ errors });
-        });
+        deleteCongVan(req.body.id, ({ error }) => res.send({ error }));
     });
+
 
     app.get('/api/hcth/cong-van-den/search/page/:pageNumber/:pageSize', app.permission.check('hcthCongVanDen:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
@@ -157,12 +179,13 @@ module.exports = (app) => {
                 srcPath = files.hcthCongVanDenFile[0].path,
                 isNew = fields.userData[0].substring(19) == 'new',
                 id = fields.userData[0].substring(19),
-                filePath = (isNew ? '/new/' : `/${id}/`) + (new Date().getTime()).toString() + '_' + files.hcthCongVanDenFile[0].originalFilename,
+                originalFilename = files.hcthCongVanDenFile[0].originalFilename,
+                filePath = (isNew ? '/new/' : `/${id}/`) + originalFilename,
                 destPath = app.assetPath + '/congVanDen' + filePath,
                 validUploadFileType = ['.xls', '.xlsx', '.doc', '.docx', '.pdf', '.png', '.jpg', '.jpeg'],
                 baseNamePath = app.path.extname(srcPath);
             if (!validUploadFileType.includes(baseNamePath.toLowerCase())) {
-                done({ error: 'Định dạng tập tin không hợp lệ!' });
+                done && done({ error: 'Định dạng tập tin không hợp lệ!' });
                 app.deleteFile(srcPath);
             } else {
                 app.createFolder(
@@ -170,9 +193,9 @@ module.exports = (app) => {
                 );
                 app.fs.rename(srcPath, destPath, error => {
                     if (error) {
-                        done({ error });
+                        done && done({ error });
                     } else {
-                        done({ data: filePath });
+                        app.model.hcthFileCongVan.create({ ten: originalFilename, thoiGian: new Date().getTime(), loai: FILE_TYPE, congVan: id === 'new' ? null : id }, (error, item) => done && done({ error, item }));
                     }
                 });
             }
@@ -183,33 +206,18 @@ module.exports = (app) => {
     app.put('/api/hcth/cong-van-den/delete-file', app.permission.check('hcthCongVanDen:delete'), (req, res) => {
         const
             id = req.body.id,
-            index = req.body.index,
-            file = req.body.file;
-        app.model.hcthCongVanDen.get({ id: id }, (error, item) => {
+            fileId = req.body.fileId,
+            file = req.body.file,
+            congVan = id || null,
+            filePath = app.assetPath + '/congVanDen/' + (id ? id + '/' : 'new/') + file;
+        app.model.hcthFileCongVan.delete({ id: fileId, congVan }, (error) => {
             if (error) {
                 res.send({ error });
-            } else if (item && item.linkCongVan) {
-                try {
-                    let newList = JSON.parse(item.linkCongVan);
-                    const filePath = app.assetPath + '/congVanDen' + newList[index];
-                    newList.splice(index, 1);
-                    const newListStr = JSON.stringify(newList);
-                    if (app.fs.existsSync(filePath))
-                        app.deleteFile(filePath);
-                    app.model.hcthCongVanDen.update(id, { linkCongVan: newListStr }, (error, item) => {
-                        res.send({ error, item });
-                    });
-                } catch {
-                    res.send({ error: 'Cập nhật danh sách tệp tin công văn thấ t bại' });
-                }
-            } else {
-                const filePath = app.path.join(app.assetPath, '/congVanDen', file);
-                if (app.fs.existsSync(filePath)) {
+            }
+            else {
+                if (app.fs.existsSync(filePath))
                     app.deleteFile(filePath);
-                    res.send({ error: null });
-                } else {
-                    res.send({ error: 'Không tìm thấy công văn' });
-                }
+                res.send({ error: null });
             }
         });
     });
@@ -231,6 +239,13 @@ module.exports = (app) => {
     });
 
     app.get('/api/hcth/cong-van-den/:id', app.permission.check('hcthCongVanDen:read'), (req, res) => {
-        app.model.hcthCongVanDen.get({ id: req.params.id }, (error, item) => res.send({ error, item }));
+        const id = req.params.id;
+        app.model.hcthCongVanDen.get({ id }, (error, item) => {
+            if (error)
+                res.send({ error, item });
+            else
+                app.model.hcthFileCongVan.getAll({ congVan: id, loai: FILE_TYPE }, '*', 'thoiGian', (error, files) => res.send({ error, item: { ...item, listFile: files || [] } }));
+        });
     });
+
 };

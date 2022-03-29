@@ -1,6 +1,6 @@
 // Table name: HCTH_FILE_CONG_VAN { id, ten, congVan, thoiGianTai }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'ten': 'TEN', 'congVan': 'CONG_VAN', 'thoiGianTai': 'THOI_GIAN_TAI' };
+const obj2Db = { 'id': 'ID', 'ten': 'TEN', 'viTri': 'VI_TRI', 'thoiGian': 'THOI_GIAN', 'loai': 'LOAI', 'congVan': 'CONG_VAN' };
 
 module.exports = app => {
     app.model.hcthFileCongVan = {

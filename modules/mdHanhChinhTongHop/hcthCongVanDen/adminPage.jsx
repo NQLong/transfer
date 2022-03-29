@@ -115,13 +115,6 @@ class HcthCongVanDen extends AdminPage {
             renderRow: (item, index) => {
                 let danhSachCanBoNhan = item.danhSachCanBoNhan?.split(';');
                 let danhSachDonViNhan = item.danhSachDonViNhan?.split(';');
-                let hasFile;
-                try {
-                    hasFile = item.linkCongVan && JSON.parse(item.linkCongVan).length > 0;
-                }
-                catch (error) {
-                    hasFile = false;
-                }
                 return (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
@@ -169,8 +162,8 @@ class HcthCongVanDen extends AdminPage {
 
                         <TableCell type='text' contentClassName='multiple-lines' content={item.chiDao} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
-                            hasFile ?
-                                (<span style={{ color: 'blue' }}>Có tệp tin</span>) :
+                            item.hasFile ?
+                                (<span style={{ color: 'blue' }}>Đã có tệp tin</span>) :
                                 (<span style={{ color: 'red' }}>Chưa có tệp tin</span>)
                         } />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onEdit={() => this.props.history.push(`/user/hcth/cong-van-den/${item.id}`)} onDelete={(e) => this.onDelete(e, item)} permissions={currentPermissions} />
