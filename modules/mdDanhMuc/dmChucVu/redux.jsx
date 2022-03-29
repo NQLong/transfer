@@ -177,10 +177,8 @@ export const SelectAdapter_DmChucVuV1 = {
 };
 
 export const SelectAdapter_DmChucVuV0 = {
-    ajax: false,
-    data: () => ({ condition: { kichHoat: 1, phuCap: 0.00 } }),
+    ajax: true,
+    data: () => ({ condition: { kichHoat: 1 } }),
     url: '/api/danh-muc/chuc-vu/all',
-    getOne: getDmChucVu,
     processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.ma, text: item.ten })) : [] }),
-    fetchOne: (ma, done) => (getDmChucVu(ma, item => done && done({ id: item.ma, text: item.ten })))(),
 };
