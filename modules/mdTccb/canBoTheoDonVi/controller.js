@@ -10,4 +10,15 @@ module.exports = app => {
         { name: 'manager:read', menu: menuStaff },
     );
     app.get('/user/danh-sach-can-bo-thuoc-don-vi', app.permission.check('manager:read'), app.templates.admin);
+
+    //Manager hook -------------------------------------------------------------------------------------------------
+
+    //Check role mangagers
+    app.permissionHooks.add('staff', 'manager', async (user) => {
+        user.staff.donViQuanLy = await app.initChucVu(user, ['013', '005', '003', '016', '009', '007']);
+        new Promise((resolve) => {
+            app.permissionHooks.pushUserPermission(user, 'manager:read', 'manager:write');
+            resolve();
+        });
+    });
 };

@@ -138,15 +138,23 @@ module.exports = app => {
     };
 
     // Update user's session ------------------------------------------------------------------------------------------------------------------------
-    app.checkChucVu = (user, maDonVi, maChucVu) => {
-        if (user.roles && user.roles.some(item => item.name == 'admin')) {
-            return true;
+    app.initChucVu = (user, chucVu) => new Promise(solve => {
+        if (!(user && user.staff && user.staff.chucVus && user.staff.chucVus.length)) {
+            solve({});
         } else {
-            const staffChucVus = user && user.staff && user.staff.chucVus ? user.staff.chucVus : [];
-            return staffChucVus.some(item => (maDonVi == '*' || item.maDonVi == maDonVi) && (maChucVu == '*' || item.maChucVu == maChucVu));
+            const staffChucVus = user.staff.chucVus, initList = [];
+            // return staffChucVus.some(item => (maDonVi == '*' || item.maDonVi == maDonVi) && (maChucVu == '*' || item.maChucVu == maChucVu));
+            staffChucVus.forEach((item, index, array) => {
+                if (chucVu.includes(item['maChucVu'])) {
+                    item.isManager = true;
+                    initList.push(item);
+                }
+                if (index === array.length - 1) {
+                    solve(initList);
+                }
+            });
         }
-    };
-
+    });
     const hasPermission = (userPermissions, menuPermissions) => {
         for (let i = 0; i < menuPermissions.length; i++) {
             if (userPermissions.includes(menuPermissions[i])) return true;
@@ -190,7 +198,9 @@ module.exports = app => {
                             app.permissionHooks.pushUserPermission(user, 'staff:login'); // Add staff permission: staff:login
                             app.model.qtChucVu.getAll({ shcc: user.shcc }, 'maChucVu,maDonVi', null, (e, chucVus) => {
                                 user.staff.chucVus = chucVus || [];
-                                app.permissionHooks.run('staff', user, user.staff).then(() => resolve());
+                                app.permissionHooks.run('staff', user, user.staff).then(() => {
+                                    resolve();
+                                });
                             });
                         }
                     });

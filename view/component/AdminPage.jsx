@@ -850,8 +850,8 @@ export class AdminPage extends React.Component {
                         <h1><i className={icon} /> {title}</h1>
                         <p>{subTitle}</p>
                     </div>
-                    <ul className='app-breadcrumb breadcrumb'>
-                        {header}
+                    <ul className='app-breadcrumb breadcrumb' style={{ alignItems: 'center' }}>
+                        <div style={{ display: 'flex', marginRight: '15px' }} >{header}</div>
                         {breadcrumb != null ? <Link to='/user'><i className='fa fa-home fa-lg' /></Link> : ''}
                         {breadcrumb != null ? breadcrumb.map((item, index) => <span key={index}>&nbsp;/&nbsp;{item}</span>) : ''}
                     </ul>

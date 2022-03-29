@@ -230,7 +230,7 @@ class QtChucVu extends AdminPage {
 
     delete = (e, item) => {
         T.confirm('Xóa chức vụ', 'Bạn có chắc bạn muốn xóa chức vụ này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtChucVuStaff(item.stt, false, null, error => {
+            isConfirm && this.props.deleteQtChucVuStaff({ stt: item.stt, shcc: item.shcc }, false, null, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá chức vụ bị lỗi!', 'danger');
                 else T.alert('Xoá chức vụ thành công!', 'success', false, 800);
             });
