@@ -366,43 +366,30 @@ class QtNghienCuuKhoaHoc extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-
-                        <TableCell type='link' onClick={(e) => { e.preventDefault(); this.modal.show(item, false); }} style={{ whiteSpace: 'nowrap' }} content={(
+                        <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
-                                {item.shcc} <br/>
+                                {item.shcc}
                             </>
-                        )}
-                        />
+                        )} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenHocVi || ''} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucDanhNgheNghiep || ''} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                {item.tenHocVi ? item.tenHocVi : ''}
+                                <span> {item.tenChucVu || ''}<br /> </span>
+                                {(item.tenDonVi || '').normalizedName()}
                             </>
-                        )}
-                        />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                {item.tenChucDanhNgheNghiep ? item.tenChucDanhNgheNghiep : ''}
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <span> { item.tenChucVu ? item.tenChucVu : '' } <br/> </span>
-                                {item.tenDonVi ? item.tenDonVi.normalizedName() : ''}
-                            </>
-                        )}
-                        />
+                        )} />
                         {this.checked && <TableCell type='text' style={{ textAlign: 'center' }} content={item.soDeTai} />}
                         <TableCell type='text' content={
                             !this.checked ? <>
-                                <div><br />{item.tenDeTai ? item.tenDeTai : ''}</div> <br />
+                                <div><br />{item.tenDeTai || ''}</div> <br />
                             </> : <>
                                 {this.list(item.danhSachDeTai, item.soDeTai, item.soDeTai)}
                             </>
                         }
                         />
-                        {!this.checked && <TableCell type='text' content={item.maSoCapQuanLy ? item.maSoCapQuanLy : ''} />}
+                        {!this.checked && <TableCell type='text' content={item.maSoCapQuanLy || ''} />}
                         {!this.checked && <TableCell type='text' content={(
                             <>
                                 {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
@@ -412,7 +399,7 @@ class QtNghienCuuKhoaHoc extends AdminPage {
                         )}
                         />}
                         {!this.checked &&
-                            <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={(item.kinhPhi ? item.kinhPhi : '').numberWithCommas()} />
+                            <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={(item.kinhPhi || '').numberWithCommas()} />
                         }
                         {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.vaiTro == 'CN' ? 'Chủ nhiệm' : 'Tham gia'} />}
                         {!this.checked &&
@@ -421,7 +408,7 @@ class QtNghienCuuKhoaHoc extends AdminPage {
                                     <span style={{ color: 'red' }}>{item.ngayNghiemThu == -1 ? 'Chưa nghiệm thu' : T.dateToText(item.ngayNghiemThu, item.ngayNghiemThuType ? item.ngayNghiemThuType : 'dd/mm/yyyy')}</span>
                                     : ''} />
                         }
-                        {!this.checked && <TableCell type='text' content={item.ketQua ? item.ketQua : ''} />}
+                        {!this.checked && <TableCell type='text' content={item.ketQua || ''} />}
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                                 onEdit={() => this.modal.show(item, false)} onDelete={this.delete} >

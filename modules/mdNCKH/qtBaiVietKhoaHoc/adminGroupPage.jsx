@@ -200,22 +200,9 @@ class QtBaiVietKhoaHocGroupPage extends AdminPage {
                             </>
                         )}
                         /> */}
-                        <TableCell type='link' onClick={() => this.modal.show(item)} content={(
-                            <>
-                                {item.tenTacGia ? item.tenTacGia : ''}
-                            </>
-                        )} />
-                        <TableCell type='text' content={(
-                            <>
-                                <b>{item.tenBaiViet}</b>
-                            </>
-                        )} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <i>{item.tenTapChi}</i>
-                            </>
-                        )}
-                        />
+                        <TableCell type='link' onClick={() => this.modal.show(item)} content={(item.tenTacGia || '')} />
+                        <TableCell type='text' content={(<b>{item.tenBaiViet}</b>)} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(<i>{item.tenTapChi}</i>)} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.soHieuIssn} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>

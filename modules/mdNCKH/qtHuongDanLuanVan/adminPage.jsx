@@ -158,23 +158,23 @@ class QtHuongDanLuanVan extends AdminPage {
         return deTais;
     }
 
-    list2 = (text, i, listYear) => {
+    list2 = (text, n, listYear) => {
         if (!text) return [];
         let deTais = text.split('??');
         let years = listYear.split('??');
         let results = [];
-        let choose = i > 5 ? 5 : i;
+        let choose = n > 5 ? 5 : n;
         for (let k = 0; k < choose; k++) {
-            results.push(<div> <span>
+            results.push(<div key={results.length}> <span>
                 {k + 1}. {deTais[k]} ({years[k].trim()})
             </span></div>);
         }
-        if (i > 5) {
-            results.push(<div> <span>
+        if (n > 5) {
+            results.push(<div key={results.length}> <span>
                 .........................................
             </span></div>);
-            let k = i - 1;
-            results.push(<div> <span>
+            let k = n - 1;
+            results.push(<div key={results.length}> <span>
                 {k + 1}. {deTais[k]} ({years[k].trim()})
             </span></div>);
         }
@@ -223,34 +223,22 @@ class QtHuongDanLuanVan extends AdminPage {
                         <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
-                                {item.shcc} <br/>
+                                {item.shcc}
                             </>
-                        )}
-                        />
+                        )} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenHocVi || ''} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucDanhNgheNghiep || ''} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                {item.tenHocVi ? item.tenHocVi : ''}
+                                <span> {item.tenChucVu || ''}<br /> </span>
+                                {(item.tenDonVi || '').normalizedName()}
                             </>
-                        )}
-                        />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                {item.tenChucDanhNgheNghiep ? item.tenChucDanhNgheNghiep : ''}
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <span> { item.tenChucVu ? item.tenChucVu : '' } <br/> </span>
-                                {item.tenDonVi ? item.tenDonVi.normalizedName() : ''}
-                            </>
-                        )}
-                        />
+                        )} />
                         {this.checked && <TableCell type='text' style={{ textAlign: 'center'}} content={item.soDeTai} />}
                         {!this.checked && <TableCell type='text' content={item.hoTen} />}
                         {!this.checked && <TableCell type='text' style={{}} content={<>
                             <span><i>{item.tenLuanVan}</i></span><br />
-                            {item.sanPham ? <span>Sản phẩm: {item.sanPham ? item.sanPham : ''}</span> : null}
+                            {item.sanPham ? <span>Sản phẩm: {item.sanPham || ''}</span> : null}
                         </>} />}
                         {this.checked && <TableCell type='text' content={this.list2(item.danhSachDeTai, item.soDeTai, item.danhSachNamTotNghiep)} />}
                         {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.namTotNghiep} />}

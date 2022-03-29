@@ -209,23 +209,23 @@ class QtBaiVietKhoaHoc extends AdminPage {
         this.getPage();
     }
 
-    list = (text, i, listYear) => {
+    list = (text, n, listYear) => {
         if (!text) return [];
         let deTais = text.split('??');
         let years = listYear.split('??');
         let results = [];
-        let choose = i > 5 ? 5 : i;
+        let choose = n > 5 ? 5 : n;
         for (let k = 0; k < choose; k++) {
-            results.push(<div> <span>
+            results.push(<div key={results.length}> <span>
                 {k + 1}. {deTais[k]} ({years[k].trim()})
             </span></div>);
         }
-        if (i > 5) {
-            results.push(<div> <span>
+        if (n > 5) {
+            results.push(<div key={results.length}> <span>
                 .........................................
             </span></div>);
-            let k = i - 1;
-            results.push(<div> <span>
+            let k = n - 1;
+            results.push(<div key={results.length}> <span>
                 {k + 1}. {deTais[k]} ({years[k].trim()})
             </span></div>);
         }
@@ -275,45 +275,20 @@ class QtBaiVietKhoaHoc extends AdminPage {
                         <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
-                                {item.shcc} <br/>
+                                {item.shcc}
                             </>
-                        )}
-                        />
+                        )} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenHocVi || ''} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucDanhNgheNghiep || ''} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                {item.tenHocVi ? item.tenHocVi : ''}
+                                <span> {item.tenChucVu || ''}<br /> </span>
+                                {(item.tenDonVi || '').normalizedName()}
                             </>
-                        )}
-                        />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                {item.tenChucDanhNgheNghiep ? item.tenChucDanhNgheNghiep : ''}
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <span> { item.tenChucVu ? item.tenChucVu : '' } <br/> </span>
-                                {item.tenDonVi ? item.tenDonVi.normalizedName() : ''}
-                            </>
-                        )}
-                        />
-                        {!this.checked && <TableCell type='link' onClick={() => this.modal.show(item, false)} content={(
-                            <>
-                                {item.tenTacGia ? item.tenTacGia : ''}
-                            </>
-                        )} />}
-                        {!this.checked && <TableCell type='text' content={(
-                            <>
-                                <b>{item.tenBaiViet}</b>
-                            </>
-                        )} />}
-                        {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <i>{item.tenTapChi}</i>
-                            </>
-                        )}
-                        />}
+                        )} />
+                        {!this.checked && <TableCell type='link' onClick={() => this.modal.show(item, false)} content={(item.tenTacGia || '')} />}
+                        {!this.checked && <TableCell type='text' content={(<b>{item.tenBaiViet}</b>)} />}
+                        {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(<i>{item.tenTapChi}</i>)} />}
                         {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.soHieuIssn} />}
                         {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>

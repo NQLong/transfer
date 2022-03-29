@@ -154,22 +154,9 @@ class QtBaiVietKhoaHocUserPage extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                        <TableCell type='link' onClick={() => this.modal.show({ item, shcc })} content={(
-                            <>
-                                {item.tenTacGia ? item.tenTacGia : ''}
-                            </>
-                        )} />
-                        <TableCell type='text' content={(
-                            <>
-                                <b>{item.tenBaiViet}</b>
-                            </>
-                        )} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <i>{item.tenTapChi}</i>
-                            </>
-                        )}
-                        />
+                        <TableCell type='link' onClick={() => this.modal.show({ item, shcc })} content={(item.tenTacGia || '')} />
+                        <TableCell type='text' content={(<b>{item.tenBaiViet}</b>)} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(<i>{item.tenTapChi}</i>)} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.soHieuIssn} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
