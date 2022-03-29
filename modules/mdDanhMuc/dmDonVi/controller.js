@@ -18,18 +18,12 @@ module.exports = app => {
     // APIs ----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/danh-muc/don-vi/page/:pageNumber/:pageSize', (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize);
-        let condition = { statement: null };
-        const statement = ['ma', 'ten', 'tenTiengAnh', 'tenVietTat']
-            .map(i => `lower(${i}) LIKE :searchText`).join(' OR ');
-        if (req.query.condition) {
-            condition = {
-                statement,
-                parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
-            };
-        }
-        app.model.dmDonVi.getPage(pageNumber, pageSize, condition, (error, page) => {
-            res.send({ error, page });
+            pageSize = parseInt(req.params.pageSize),
+            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+        app.model.dmDonVi.searchPage(pageNumber, pageSize, searchTerm, (error, page) => {
+            const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
+            const pageCondition = searchTerm;
+            res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
         });
     });
 
