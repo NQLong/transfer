@@ -298,31 +298,16 @@ class QtNghiPhep extends AdminPage {
                             </>
                         )}
                         />}
-                        {!this.checked && <TableCell type='text' content={(
-                            <>
-                                {item.lyDoNghi ? item.lyDoNghi : ''}
-                            </>
-                        )}
-                        />}
-                        {!this.checked && <TableCell type='text' content={(
-                            <>
-                                <span>{item.noiDen}</span>
-                            </>
-                        )}
-                        />}
-                        {!this.checked && <TableCell type='text' content={(
-                            <>
-                                <span>{item.thamNien}</span>
-                            </>
-                        )}
-                        />}
-                        {this.checked && <TableCell type='text' content={item.soLanNghi} />}
-                        {this.checked && <TableCell type='text' content={this.list(item.danhSachLyDoNghi, item.soLanNghi, item.soLanNghi)} />}
+                        {!this.checked && <TableCell type='text' content={(item.lyDoNghi || '')} />}
+                        {!this.checked && <TableCell type='text' content={(<span>{item.noiDen}</span>)} />}
+                        {!this.checked && <TableCell type='text' content={(<span>{item.thamNien}</span>)} />}
                         {!this.checked && <TableCell type='text' content={(
                             <>
                                 <span>{(item.ketThuc == -1 || item.ketThuc >= item.today) ? <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đang nghỉ</span> : <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đã kết thúc nghỉ</span>}</span>
                             </>
                         )}></TableCell>}
+                        {this.checked && <TableCell type='text' content={item.soLanNghi} />}
+                        {this.checked && <TableCell type='text' content={this.list(item.danhSachLyDoNghi, item.soLanNghi, item.soLanNghi)} />}
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                                 onEdit={() => this.modal.show(item, false)} onDelete={this.delete} >

@@ -176,7 +176,7 @@ class QtKyLuat extends AdminPage {
         for (let i = 0; i < soKyLuat; i++) {
             let s = danhSachKyLuats[i];
             s += ' (' + (danhSachNgayRaQds[i] ? T.dateToText(Number(danhSachNgayRaQds[i]), 'dd/mm/yyyy') : '') + ')';
-            results.push(<div> <span>
+            results.push(<div key={results.length}> <span>
                 {i+1}. {s}
             </span></div>);
         }
@@ -229,57 +229,25 @@ class QtKyLuat extends AdminPage {
                         <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
-                                {item.shcc} <br/>
+                                {item.shcc}
                             </>
-                        )}
-                        />
+                        )} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenHocVi || ''} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucDanhNgheNghiep || ''} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                {item.tenHocVi ? item.tenHocVi : ''}
+                                <span> {item.tenChucVu || ''}<br /> </span>
+                                {(item.tenDonVi || '').normalizedName()}
                             </>
-                        )}
-                        />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                {item.tenChucDanhNgheNghiep ? item.tenChucDanhNgheNghiep : ''}
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <span> { item.tenChucVu ? item.tenChucVu : '' } <br/> </span>
-                                {item.tenDonVi ? item.tenDonVi.normalizedName() : ''}
-                            </>
-                        )}
-                        />
+                        )} />
                         {!this.checked && <TableCell type='date' style={{color: 'blue'}} dateFormat='dd/mm/yyyy' content={item.ngayRaQuyetDinh} />}
-                        {!this.checked && <TableCell type='text' content={(
-                            <>
-                                <b> {item.soQuyetDinh ? item.soQuyetDinh : ''} </b>
-                            </>
-                        )}
-                        />}
-                        {!this.checked && <TableCell type='text' content={(
-                            <>
-                                {item.noiDung ? item.noiDung : ''}
-                            </>
-                        )}
-                        />}
-                        {!this.checked && <TableCell type='text' style={{ color: 'red' }} content={(
-                            <>
-                                <span><b>{item.tenKyLuat ? item.tenKyLuat : ''}</b></span>
-                            </>
-                        )}
-                        />}
+                        {!this.checked && <TableCell type='text' content={(<b> {item.soQuyetDinh || ''} </b>)} />}
+                        {!this.checked && <TableCell type='text' content={(item.noiDung || '')} />}
+                        {!this.checked && <TableCell type='text' style={{ color: 'red' }} content={(<span><b>{item.tenKyLuat || ''}</b></span>)} />}
+                        {!this.checked && <TableCell type='text' content={(item.capQuyetDinh || '')} />}
+                        {!this.checked && <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemThiDua} />}
                         {this.checked && <TableCell type='text' style={{ textAlign: 'left' }} content={item.soKyLuat} />}
                         {this.checked && <TableCell type='text' content={this.list(item.danhSachKyLuat, item.danhSachNgayRaQd, item.soKyLuat)} />}
-                        {!this.checked && <TableCell type='text' content={(
-                            <>
-                                {item.capQuyetDinh ? item.capQuyetDinh : ''}
-                            </>
-                        )}
-                        />}
-                        {!this.checked && <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemThiDua} />}
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                                 onEdit={() => this.modal.show(item, false)} onDelete={this.delete} >

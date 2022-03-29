@@ -272,35 +272,18 @@ class QtHocTapCongTac extends AdminPage {
                         <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
-                                {item.shcc} <br/>
+                                {item.shcc}
                             </>
-                        )}
-                        />
+                        )} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenHocVi || ''} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucDanhNgheNghiep || ''} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                {item.tenHocVi ? item.tenHocVi : ''}
+                                <span> {item.tenChucVu || ''}<br /> </span>
+                                {(item.tenDonVi || '').normalizedName()}
                             </>
-                        )}
-                        />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                {item.tenChucDanhNgheNghiep ? item.tenChucDanhNgheNghiep : ''}
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <span> { item.tenChucVu ? item.tenChucVu : '' } <br/> </span>
-                                {item.tenDonVi ? item.tenDonVi.normalizedName() : ''}
-                            </>
-                        )}
-                        />
-                        {!this.checked && <TableCell type='text' content={(
-                            <>
-                                <i>{item.noiDung ? item.noiDung : ''}</i>
-                            </>
-                        )}
-                        />}
+                        )} />
+                        {!this.checked && <TableCell type='text' content={(<i>{item.noiDung || ''}</i>)} />}
                         {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}

@@ -281,18 +281,8 @@ class QtLamViecNgoai extends AdminPage {
                             </>
                         )}
                         />}
-                        {!this.checked && <TableCell type='text' content={(
-                            <>
-                                {item.noiDung ? item.noiDung : ''}
-                            </>
-                        )}
-                        />}
-                        {!this.checked && <TableCell type='text' content={(
-                            <>
-                                <span>{item.noiLamViec}</span>
-                            </>
-                        )}
-                        />}
+                        {!this.checked && <TableCell type='text' content={(item.noiDung || '')} />}
+                        {!this.checked && <TableCell type='text' content={(<span>{item.noiLamViec}</span>)} />}
                         {!this.checked && <TableCell type='text' content={(
                             <>
                                 <span>{(item.ketThuc == -1 || item.ketThuc >= item.today) ? <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đang diễn ra</span> : <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đã kết thúc</span>}</span>

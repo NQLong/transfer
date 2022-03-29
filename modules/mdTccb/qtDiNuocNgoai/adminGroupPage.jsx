@@ -252,59 +252,22 @@ class QtDiNuocNgoaiGroupPage extends AdminPage {
                         <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
-                                {item.shcc} <br/>
+                                {item.shcc}
                             </>
-                        )}
-                        />
+                        )} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenHocVi || ''} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucDanhNgheNghiep || ''} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                {item.tenHocVi ? item.tenHocVi : ''}
+                                <span> {item.tenChucVu || ''}<br /> </span>
+                                {(item.tenDonVi || '').normalizedName()}
                             </>
-                        )}
-                        />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                {item.tenChucDanhNgheNghiep ? item.tenChucDanhNgheNghiep : ''}
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <span> { item.tenChucVu ? item.tenChucVu : '' } <br/> </span>
-                                {item.tenDonVi ? item.tenDonVi.normalizedName() : ''}
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' style={{color: 'blue'}} content={(
-                            <>
-                                {item.ngayQuyetDinh ? T.dateToText(item.ngayQuyetDinh, 'dd/mm/yyyy') : ''}
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' content={(
-                            <>
-                                <b> {item.soQuyetDinh ? item.soQuyetDinh : ''} </b> 
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' style={{color: 'blue'}} content={(
-                            <>
-                                {item.danhSachQuocGia ? item.danhSachQuocGia : ''}
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <b>{item.tenMucDich ? item.tenMucDich : ''}</b>
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' content={(
-                            <>
-                                {item.noiDung ? item.noiDung : ''}
-                            </>
-                        )}
-                        />
+                        )} />
+                        <TableCell type='text' style={{color: 'blue'}} content={(item.ngayQuyetDinh ? T.dateToText(item.ngayQuyetDinh, 'dd/mm/yyyy') : '')} />
+                        <TableCell type='text' content={(<b> {item.soQuyetDinh || ''} </b>)} />
+                        <TableCell type='text' style={{color: 'blue'}} content={(item.danhSachQuocGia || '')} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(<b>{item.tenMucDich || ''}</b>)} />
+                        <TableCell type='text' content={(item.noiDung || '')} />
                         <TableCell type='text' content={(
                             <>
                                 {item.ngayDi ? <span style={{ whiteSpace: 'nowrap' }}>Ngày đi: <span style={{ color: 'blue' }}>{item.ngayDi ? T.dateToText(item.ngayDi, item.ngayDiType ? item.ngayDiType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}

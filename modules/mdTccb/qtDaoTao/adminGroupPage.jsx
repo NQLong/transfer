@@ -205,37 +205,25 @@ class QtDaoTaoGroupPage extends AdminPage {
                         <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
-                                {item.shcc} <br/>
+                                {item.shcc}
                             </>
-                        )}
-                        />
+                        )} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenHocVi || ''} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucDanhNgheNghiep || ''} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                {item.tenHocVi ? item.tenHocVi : ''}
+                                <span> {item.tenChucVu || ''}<br /> </span>
+                                {(item.tenDonVi || '').normalizedName()}
                             </>
-                        )}
-                        />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                {item.tenChucDanhNgheNghiep ? item.tenChucDanhNgheNghiep : ''}
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <span> { item.tenChucVu ? item.tenChucVu : '' } <br/> </span>
-                                {item.tenDonVi ? item.tenDonVi.normalizedName() : ''}
-                            </>
-                        )}
-                        />
+                        )} />
                         <TableCell type='text' style={{}} content={item.chuyenNganh} />
                         <TableCell type='text' style={{}} content={item.tenCoSoDaoTao} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.hinhThuc ? item.tenHinhThuc : ''} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenHinhThuc || ''} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={<>
                             {item.batDau && <span>Từ: <span style={{ color: 'blue' }}>{T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy')}</span><br /></span>}
                             {item.ketThuc && <span>Đến: <span style={{ color: 'blue' }}>{T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy')}</span></span>}
                         </>} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.kinhPhi ? item.kinhPhi : ''} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.kinhPhi || ''} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={<>
                             {item.loaiBangCap && <span style={{ color: 'blue' }}>{item.tenLoaiBangCap}<br /></span>}
                             {item.trinhDo && <span>Kết quả: <span style={{ color: 'blue' }}>{item.tenTrinhDo ? item.tenTrinhDo : item.trinhDo}<br /></span></span>}

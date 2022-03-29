@@ -173,6 +173,7 @@ class QtNghiThaiSanUserPage extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: '100%', whiteSpace: 'nowrap', textAlign: 'center' }}>Nội dung</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thời gian nghỉ</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thời gian trở lại công tác</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tình trạng</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
@@ -181,9 +182,9 @@ class QtNghiThaiSanUserPage extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
+                        <TableCell type='text' content={(<i>{item.noiDung}</i>)} />
                         <TableCell type='text' content={(
                             <>
-                                {item.noiDung ? <span><i>{item.noiDung}</i> <br /> <br /></span> : null}
                                 {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
                                 {item.ketThuc && item.ketThuc != -1 ? <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc && item.ketThuc != -1 ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
                             </>

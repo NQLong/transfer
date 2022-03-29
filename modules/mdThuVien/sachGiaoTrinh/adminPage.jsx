@@ -248,12 +248,7 @@ class SachGiaoTrinh extends AdminPage {
                             </>
                         )}
                         />}
-                        {!this.checked && <TableCell type='text' content={(
-                            <>
-                                <span>{item.sanPham}</span>
-                            </>
-                        )}
-                        />}
+                        {!this.checked && <TableCell type='text' content={(<span>{item.sanPham}</span>)} />}
                         {/* {this.checked && <TableCell type='text' style={{ textAlign: 'center' }} content={item.soLuong} />} */}
                         {this.checked && <TableCell type='text' content={this.list(item.danhSach, item.soLuong, item.soLuong)} />}
                         {

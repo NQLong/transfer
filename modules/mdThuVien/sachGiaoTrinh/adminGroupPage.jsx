@@ -196,12 +196,7 @@ class SachGiaoTrinhGroupPage extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' content={(
-                            <>
-                                <span>{item.sanPham ? item.sanPham : ''}</span>
-                            </>
-                        )}
-                        />
+                        <TableCell type='text' content={(<span>{item.sanPham}</span>)} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={this.delete} >
                         </TableCell>

@@ -200,32 +200,16 @@ class QtHoTroHocPhiUserPage extends AdminPage {
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='date' dateFormat='dd/mm/yyyy' content={item.ngayLamDon} />
-                        <TableCell type='text' content={(
-                            <>
-                                <i> {item.noiDung ? item.noiDung : ''}</i>
-                            </>
-                        )} />
-                        <TableCell type='text' content={(
-                            <>
-                                <b> {item.tenCoSoDaoTao ? item.tenCoSoDaoTao : ''}</b>
-                            </>
-                        )} />
+                        <TableCell type='text' content={(<i> {item.noiDung || ''}</i>)} />
+                        <TableCell type='text' content={(<b> {item.tenCoSoDaoTao || ''}</b>)} />
                         <TableCell type='text' content={(
                             <>
                                 {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
                                 {item.ketThuc && item.ketThuc != -1 ? <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc && item.ketThuc != -1 ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span></span> : null}
                             </>
                         )} />
-                        <TableCell type='text' content={(
-                            <>
-                                <b> {item.hocKyHoTro ? item.hocKyHoTro : ''} </b>
-                            </>
-                        )} />
-                        <TableCell type='text' content={(
-                            <>
-                                <b>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.soTien)}</b>
-                            </>
-                        )} />
+                        <TableCell type='text' content={(<b> {item.hocKyHoTro || ''} </b>)} />
+                        <TableCell type='text' content={(<b>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.soTien)}</b>)} />
                         <TableCell type='text' content={
                             (item.ketThuc == -1 || item.ketThuc >= item.today) ?
                                 <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đang diễn ra</span> :

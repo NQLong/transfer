@@ -237,20 +237,20 @@ class QtNghiThaiSan extends AdminPage {
             s += ' (' + (batDaus[i] ? T.dateToText(Number(batDaus[i]), batDauTypes[i] ? batDauTypes[i] : 'dd/mm/yyyy') : '') + ' - ';
             s += ketThucs[i] ? (ketThucs[i] != '-1' ? T.dateToText(Number(ketThucs[i]), ketThucTypes[i] ? ketThucTypes[i] : 'dd/mm/yyyy') : 'Đến nay') : '';
             s += ')';
-            results.push(<div> <span>
+            results.push(<div key={results.length}> <span>
                 {i+1}. {s}
             </span></div>);
         }
         if (soQt > 15) {
             let i = soQt - 1;
-            results.push(<div> <span>
+            results.push(<div key={results.length}> <span>
                 ........................
             </span></div>);
             let s = danhSachNoiDungs[i];
             s += ' (' + (batDaus[i] ? T.dateToText(Number(batDaus[i]), batDauTypes[i] ? batDauTypes[i] : 'dd/mm/yyyy') : '') + ' - ';
             s += ketThucs[i] ? (ketThucs[i] != '-1' ? T.dateToText(Number(ketThucs[i]), ketThucTypes[i] ? ketThucTypes[i] : 'dd/mm/yyyy') : 'Đến nay') : '';
             s += ')';
-            results.push(<div> <span>
+            results.push(<div key={results.length}> <span>
                 {i + 1}. {s}
             </span></div>);
         }
@@ -286,6 +286,7 @@ class QtNghiThaiSan extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br/>Đơn vị công tác</th>
                         {!this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap', textAlign: 'center' }}>Nội dung</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thời gian nghỉ</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thời gian trở lại công tác</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tình trạng</th>}
                         {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Số lần nghỉ</th>}
@@ -299,32 +300,20 @@ class QtNghiThaiSan extends AdminPage {
                         <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
-                                {item.shcc} <br/>
+                                {item.shcc}
                             </>
-                        )}
-                        />
+                        )} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenHocVi || ''} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucDanhNgheNghiep || ''} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                {item.tenHocVi ? item.tenHocVi : ''}
+                                <span> {item.tenChucVu || ''}<br /> </span>
+                                {(item.tenDonVi || '').normalizedName()}
                             </>
-                        )}
-                        />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                {item.tenChucDanhNgheNghiep ? item.tenChucDanhNgheNghiep : ''}
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <span> { item.tenChucVu ? item.tenChucVu : '' } <br/> </span>
-                                {item.tenDonVi ? item.tenDonVi.normalizedName() : ''}
-                            </>
-                        )}
-                        />
+                        )} />
+                        {!this.checked && <TableCell type='text' content={(<i>{item.noiDung}</i>)} />}
                         {!this.checked && <TableCell type='text' content={(
                             <>
-                                {item.noiDung ? <span><i>{item.noiDung}</i> <br /> <br /></span> : null}
                                 {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
                                 {item.ketThuc && item.ketThuc != -1 ? <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc && item.ketThuc != -1 ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
                             </>

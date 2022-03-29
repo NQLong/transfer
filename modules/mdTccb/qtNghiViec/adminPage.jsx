@@ -222,12 +222,7 @@ class QtNghiViec extends AdminPage {
                             </>
                         )}
                         />}
-                        {!this.checked && <TableCell type='text' content={(
-                            <>
-                                <span>{item.ngayNghi ? T.dateToText(item.ngayNghi, 'dd/mm/yyyy') : ''}</span>
-                            </>
-                        )}
-                        />}
+                        {!this.checked && <TableCell type='text' content={(<span>{item.ngayNghi ? T.dateToText(item.ngayNghi, 'dd/mm/yyyy') : ''}</span>)} />}
                         {!this.checked && <TableCell type='text' content={(
                             <>
                                 <span><i>{item.noiDung}</i></span><br />

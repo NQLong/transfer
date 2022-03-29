@@ -183,12 +183,7 @@ class QtNghiViecGroupPage extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' content={(
-                            <>
-                                <span>{item.ngayNghi ? T.dateToText(item.ngayNghi, 'dd/mm/yyyy') : ''}</span>
-                            </>
-                        )}
-                        />
+                        <TableCell type='text' content={(<span>{item.ngayNghi ? T.dateToText(item.ngayNghi, 'dd/mm/yyyy') : ''}</span>)} />
                         <TableCell type='text' content={(
                             <>
                                 <span><i>{item.noiDung}</i></span><br />

@@ -327,32 +327,16 @@ class QtHoTroHocPhi extends AdminPage {
                             </>
                         )} />
                         {!this.checked && <TableCell type='date' dateFormat='dd/mm/yyyy' content={item.ngayLamDon} />}
-                        {!this.checked && <TableCell type='text' content={(
-                            <>
-                                <i> {item.noiDung ? item.noiDung : ''}</i>
-                            </>
-                        )} />}
-                        {!this.checked && <TableCell type='text' content={(
-                            <>
-                                <b> {item.tenCoSoDaoTao ? item.tenCoSoDaoTao : ''}</b>
-                            </>
-                        )} />}
+                        {!this.checked && <TableCell type='text' content={(<i> {item.noiDung || ''}</i>)} />}
+                        {!this.checked && <TableCell type='text' content={(<b> {item.tenCoSoDaoTao || ''}</b>)} />}
                         {!this.checked && <TableCell type='text' content={(
                             <>
                                 {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
                                 {item.ketThuc && item.ketThuc != -1 ? <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc && item.ketThuc != -1 ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span></span> : null}
                             </>
                         )} />}
-                        {!this.checked && <TableCell type='text' content={(
-                            <>
-                                <b> {item.hocKyHoTro ? item.hocKyHoTro : ''} </b>
-                            </>
-                        )} />}
-                        {!this.checked && <TableCell type='text' content={(
-                            <>
-                                <b>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.soTien)}</b>
-                            </>
-                        )} />}
+                        {!this.checked && <TableCell type='text' content={(<b> {item.hocKyHoTro || ''} </b>)} />}
+                        {!this.checked && <TableCell type='text' content={(<b>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.soTien)}</b>)} />}
                         {!this.checked && <TableCell type='text' content={
                             (item.ketThuc == -1 || item.ketThuc >= item.today) ?
                                 <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đang diễn ra</span> :

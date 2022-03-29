@@ -179,12 +179,7 @@ class QtHocTapCongTacUserPage extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                        <TableCell type='text' content={(
-                            <>
-                                <i>{item.noiDung ? item.noiDung : ''}</i>
-                            </>
-                        )}
-                        />
+                        <TableCell type='text' content={(<i>{item.noiDung ? item.noiDung : ''}</i>)} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}

@@ -158,29 +158,17 @@ class QtGiaiThuongGroupPage extends AdminPage {
                         <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
-                                {item.shcc} <br/>
+                                {item.shcc}
                             </>
-                        )}
-                        />
+                        )} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenHocVi || ''} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucDanhNgheNghiep || ''} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                {item.tenHocVi ? item.tenHocVi : ''}
+                                <span> {item.tenChucVu || ''}<br /> </span>
+                                {(item.tenDonVi || '').normalizedName()}
                             </>
-                        )}
-                        />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                {item.tenChucDanhNgheNghiep ? item.tenChucDanhNgheNghiep : ''}
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <span> { item.tenChucVu ? item.tenChucVu : '' } <br/> </span>
-                                {item.tenDonVi ? item.tenDonVi.normalizedName() : ''}
-                            </>
-                        )}
-                        />
+                        )} />
                         <TableCell type='text' content={(
                             <>
                                 <span><b>{item.tenGiaiThuong}</b></span> <br />
@@ -188,18 +176,8 @@ class QtGiaiThuongGroupPage extends AdminPage {
                             </>
 
                         )} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap', color: 'blue'}} content={(
-                            <>
-                                {item.namCap}
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' content={(
-                            <>
-                                <i>{item.noiCap}</i>
-                            </>
-                        )}
-                        />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap', color: 'blue'}} content={(item.namCap)}/>
+                        <TableCell type='text' content={(<i>{item.noiCap}</i>)} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={this.delete} >
                         </TableCell>

@@ -172,54 +172,22 @@ class QtKyLuatGroupPage extends AdminPage {
                         <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
-                                {item.shcc} <br/>
+                                {item.shcc}
                             </>
-                        )}
-                        />
+                        )} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenHocVi || ''} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucDanhNgheNghiep || ''} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                {item.tenHocVi ? item.tenHocVi : ''}
+                                <span> {item.tenChucVu || ''}<br /> </span>
+                                {(item.tenDonVi || '').normalizedName()}
                             </>
-                        )}
-                        />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                {item.tenChucDanhNgheNghiep ? item.tenChucDanhNgheNghiep : ''}
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <span> { item.tenChucVu ? item.tenChucVu : '' } <br/> </span>
-                                {item.tenDonVi ? item.tenDonVi.normalizedName() : ''}
-                            </>
-                        )}
-                        />
+                        )} />
                         <TableCell type='date' style={{color: 'blue'}} dateFormat='dd/mm/yyyy' content={item.ngayRaQuyetDinh} />
-                        <TableCell type='text' content={(
-                            <>
-                                <b> {item.soQuyetDinh ? item.soQuyetDinh : ''} </b>
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' content={(
-                            <>
-                                {item.noiDung ? item.noiDung : ''}
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' style={{ color: 'red' }} content={(
-                            <>
-                                <span><b>{item.tenKyLuat ? item.tenKyLuat : ''}</b></span>
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' content={(
-                            <>
-                                {item.capQuyetDinh ? item.capQuyetDinh : ''}
-                            </>
-                        )}
-                        />
+                        <TableCell type='text' content={(<b> {item.soQuyetDinh || ''} </b>)} />
+                        <TableCell type='text' content={(item.noiDung || '')} />
+                        <TableCell type='text' style={{ color: 'red' }} content={(<span><b>{item.tenKyLuat || ''}</b></span>)} />
+                        <TableCell type='text' content={(item.capQuyetDinh || '')} />
                         <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemThiDua} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={this.delete} >

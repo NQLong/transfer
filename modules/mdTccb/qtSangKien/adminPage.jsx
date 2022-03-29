@@ -167,18 +167,8 @@ class QtSangKien extends AdminPage {
                                 {(item.tenDonVi || '').normalizedName()}
                             </>
                         )} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                {item.maSo ? item.maSo : ''}
-                            </>
-                        )}
-                        />  
-                        <TableCell type='text' content={(
-                            <>
-                                {item.tenSangKien ? item.tenSangKien : ''}
-                            </>
-                        )}
-                        />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(item.maSo || '')} />  
+                        <TableCell type='text' content={(item.tenSangKien || '')} />
                         {
                             <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                                 onEdit={() => this.modal.show(item)} onDelete={this.delete} >

@@ -262,7 +262,7 @@ class QtDiNuocNgoai extends AdminPage {
             s += ' (' + (ngayDis[i] ? T.dateToText(Number(ngayDis[i]), ngayDiTypes[i] ? ngayDiTypes[i] : 'dd/mm/yyyy') : '') + ' - ';
             s += ngayVes[i] ? (ngayVes[i] != '-1' ? T.dateToText(Number(ngayVes[i]), ngayVeTypes[i] ? ngayVeTypes[i] : 'dd/mm/yyyy') : 'Đến nay') : '';
             s += ')';
-            results.push(<div> <span>
+            results.push(<div key={results.length}> <span>
                 Lần {i+1}. {s}
             </span></div>);
         }
@@ -315,59 +315,22 @@ class QtDiNuocNgoai extends AdminPage {
                         <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
-                                {item.shcc} <br/>
+                                {item.shcc}
                             </>
-                        )}
-                        />
+                        )} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenHocVi || ''} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucDanhNgheNghiep || ''} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                {item.tenHocVi ? item.tenHocVi : ''}
+                                <span> {item.tenChucVu || ''}<br /> </span>
+                                {(item.tenDonVi || '').normalizedName()}
                             </>
-                        )}
-                        />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                {item.tenChucDanhNgheNghiep ? item.tenChucDanhNgheNghiep : ''}
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <span> { item.tenChucVu ? item.tenChucVu : '' } <br/> </span>
-                                {item.tenDonVi ? item.tenDonVi.normalizedName() : ''}
-                            </>
-                        )}
-                        />
-                        {!this.checked && <TableCell type='text' style={{color: 'blue'}} content={(
-                            <>
-                                {item.ngayQuyetDinh ? T.dateToText(item.ngayQuyetDinh, 'dd/mm/yyyy') : ''}
-                            </>
-                        )}
-                        />}
-                        {!this.checked && <TableCell type='text' content={(
-                            <>
-                                <b> {item.soQuyetDinh ? item.soQuyetDinh : ''} </b> 
-                            </>
-                        )}
-                        />}
-                        {!this.checked && <TableCell type='text' style={{color: 'blue'}} content={(
-                            <>
-                                {item.danhSachQuocGia ? item.danhSachQuocGia : ''}
-                            </>
-                        )}
-                        />}
-                        {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <b>{item.tenMucDich ? item.tenMucDich : ''}</b>
-                            </>
-                        )}
-                        />}
-                        {!this.checked && <TableCell type='text' content={(
-                            <>
-                                {item.noiDung ? item.noiDung : ''}
-                            </>
-                        )}
-                        />}
+                        )} />
+                        {!this.checked && <TableCell type='text' style={{color: 'blue'}} content={(item.ngayQuyetDinh ? T.dateToText(item.ngayQuyetDinh, 'dd/mm/yyyy') : '')} />}
+                        {!this.checked && <TableCell type='text' content={(<b> {item.soQuyetDinh || ''} </b>)} />}
+                        {!this.checked && <TableCell type='text' style={{color: 'blue'}} content={(item.danhSachQuocGia || '')} />}
+                        {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(<b>{item.tenMucDich || ''}</b>)} />}
+                        {!this.checked && <TableCell type='text' content={(item.noiDung || '')} />}
                         {!this.checked && <TableCell type='text' content={(
                             <>
                                 {item.ngayDi ? <span style={{ whiteSpace: 'nowrap' }}>Ngày đi: <span style={{ color: 'blue' }}>{item.ngayDi ? T.dateToText(item.ngayDi, item.ngayDiType ? item.ngayDiType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}

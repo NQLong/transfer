@@ -140,30 +140,10 @@ class QtKyLuatUserPage extends AdminPage {
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='date' style={{color: 'blue'}} dateFormat='dd/mm/yyyy' content={item.ngayRaQuyetDinh} />
-                        <TableCell type='text' content={(
-                            <>
-                                <b> {item.soQuyetDinh ? item.soQuyetDinh : ''} </b>
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' content={(
-                            <>
-                                {item.noiDung ? item.noiDung : ''}
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' style={{ color: 'red' }} content={(
-                            <>
-                                <span><b>{item.tenKyLuat ? item.tenKyLuat : ''}</b></span>
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' content={(
-                            <>
-                                {item.capQuyetDinh ? item.capQuyetDinh : ''}
-                            </>
-                        )}
-                        />
+                        <TableCell type='text' content={(<b> {item.soQuyetDinh || ''} </b>)} />
+                        <TableCell type='text' content={(item.noiDung || '')} />
+                        <TableCell type='text' style={{ color: 'red' }} content={(<span><b>{item.tenKyLuat || ''}</b></span>)} />
+                        <TableCell type='text' content={(item.capQuyetDinh || '')} />
                         <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemThiDua} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show({ item, maCanBo: shcc })} onDelete={this.delete} >

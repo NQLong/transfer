@@ -224,24 +224,9 @@ class QtKhenThuongAllGroupPage extends AdminPage {
 
                         )}
                         />
-                        <TableCell type='text' style={{ textAlign: 'center' }} content={(
-                            <>
-                                {item.soQuyetDinh ? item.soQuyetDinh : ''}
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' style={{ textAlign: 'center' }} content={(
-                            <>
-                                {item.namDatDuoc}
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' content={(
-                            <>
-                                {item.tenThanhTich}
-                            </>
-                        )}
-                        />
+                        <TableCell type='text' style={{ textAlign: 'center' }} content={(item.soQuyetDinh || '')} />
+                        <TableCell type='text' style={{ textAlign: 'center' }} content={(item.namDatDuoc)} />
+                        <TableCell type='text' content={(item.tenThanhTich)} />
                         <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemThiDua} />
                         <TableCell type='text' content={item.tenLoaiDoiTuong} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}

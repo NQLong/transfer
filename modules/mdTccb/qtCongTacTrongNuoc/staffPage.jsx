@@ -216,36 +216,11 @@ class QtCongTacTrongNuocUserPage extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                        <TableCell type='text' style={{color: 'blue'}} content={(
-                            <>
-                                {item.ngayQuyetDinh ? T.dateToText(item.ngayQuyetDinh, 'dd/mm/yyyy') : ''}
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' content={(
-                            <>
-                                <b> {item.soCv ? item.soCv : ''} </b> 
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' style={{color: 'blue'}} content={(
-                            <>
-                                {item.danhSachTinh ? item.danhSachTinh : ''}
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <b>{item.tenMucDich ? item.tenMucDich : ''}</b>
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' content={(
-                            <>
-                                {item.lyDo ? item.lyDo : ''}
-                            </>
-                        )}
-                        />
+                        <TableCell type='text' style={{color: 'blue'}} content={(item.ngayQuyetDinh ? T.dateToText(item.ngayQuyetDinh, 'dd/mm/yyyy') : '')} />
+                        <TableCell type='text' content={(<b> {item.soCv || ''} </b>)} />
+                        <TableCell type='text' style={{color: 'blue'}} content={(item.danhSachTinh || '')} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(<b>{item.tenMucDich || ''}</b>)} />
+                        <TableCell type='text' content={(item.lyDo || '')} />
                         <TableCell type='text' content={(
                             <>
                                 {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Ngày đi: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
