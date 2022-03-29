@@ -12,13 +12,7 @@ const typeNhomNgach = {
     4: 'Nhân viên',
     5: 'Khác',
 };
-const nhomNgachList = [
-    { id: 1, text: 'Viên chức giảng dạy' },
-    { id: 2, text: 'Viên chức chuyên ngành khoa học' },
-    { id: 3, text: 'Viên chức hành chính', },
-    { id: 4, text: 'Nhân viên' },
-    { id: 5, text: 'Khác' }
-];
+const nhomNgachList = Object.keys(typeNhomNgach).map(key => ({ id: key, text: typeNhomNgach[key] }));
 class EditModal extends AdminModal {
     componentDidMount() {
         $(document).ready(() => this.onShown(() => {
