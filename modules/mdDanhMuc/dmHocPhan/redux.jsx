@@ -1,17 +1,17 @@
 import T from 'view/js/common';
 
 // Reducer ------------------------------------------------------------------------------------------------------------
-const DmMonHocGetAll = 'DmMonHoc:GetAll';
-const DmMonHocGetPage = 'DmMonHoc:GetPage';
-const DmMonHocUpdate = 'DmMonHoc:Update';
+const DmHocPhanGetAll = 'DmHocPhan:GetAll';
+const DmHocPhanGetPage = 'DmHocPhan:GetPage';
+const DmHocPhanUpdate = 'DmHocPhan:Update';
 
-export default function dmMonHocReducer(state = null, data) {
+export default function dmHocPhanReducer(state = null, data) {
     switch (data.type) {
-        case DmMonHocGetAll:
+        case DmHocPhanGetAll:
             return Object.assign({}, state, { items: data.items });
-        case DmMonHocGetPage:
+        case DmHocPhanGetPage:
             return Object.assign({}, state, { page: data.page });
-        case DmMonHocUpdate:
+        case DmHocPhanUpdate:
             if (state) {
                 let updatedItems = Object.assign({}, state.items),
                     updatedPage = Object.assign({}, state.page),
@@ -42,88 +42,88 @@ export default function dmMonHocReducer(state = null, data) {
 }
 
 // Actions ------------------------------------------------------------------------------------------------------------
-export function getDmMonHocAll(condition, done) {
+export function getDmHocPhanAll(condition, done) {
     if (typeof condition === 'function') {
         done = condition;
         condition = {};
     }
     return dispatch => {
-        const url = '/api/danh-muc/mon-hoc/all';
+        const url = '/api/danh-muc/hoc-phan/all';
         T.get(url, { condition }, data => {
             if (data.error) {
-                T.notify('Lấy danh sách môn học bị lỗi', 'danger');
+                T.notify('Lấy danh sách học phần bị lỗi', 'danger');
                 console.error(`GET ${url}. ${data.error}`);
             } else {
                 if (done) done(data.items);
-                dispatch({ type: DmMonHocGetAll, items: data.items ? data.items : [] });
+                dispatch({ type: DmHocPhanGetAll, items: data.items ? data.items : [] });
             }
         });
     };
 }
 
-T.initPage('pageDmMonHoc');
-export function getDmMonHocPage(pageNumber, pageSize, done) {
-    const page = T.updatePage('pageDmMonHoc', pageNumber, pageSize);
+T.initPage('pageDmHocPhan');
+export function getDmHocPhanPage(pageNumber, pageSize, done) {
+    const page = T.updatePage('pageDmHocPhan', pageNumber, pageSize);
     return dispatch => {
-        const url = `/api/danh-muc/mon-hoc/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/danh-muc/hoc-phan/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, data => {
             if (data.error) {
-                T.notify('Lấy danh sách môn học bị lỗi!', 'danger');
+                T.notify('Lấy danh sách học phần bị lỗi!', 'danger');
                 console.error(`GET ${url}. ${data.error}`);
             } else {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
-                dispatch({ type: DmMonHocGetPage, page: data.page });
+                dispatch({ type: DmHocPhanGetPage, page: data.page });
             }
         });
     };
 }
 
-export function createDmMonHoc(item, done) {
+export function createDmHocPhan(item, done) {
     return dispatch => {
-        const url = '/api/danh-muc/mon-hoc';
+        const url = '/api/danh-muc/hoc-phan';
         T.post(url, { item }, data => {
             if (data.error) {
-                T.notify('Tạo môn học bị lỗi!', 'danger');
+                T.notify('Tạo học phần bị lỗi!', 'danger');
                 console.error(`POST ${url}. ${data.error}`);
             } else {
                 if (done) done(data.items);
-                dispatch(getDmMonHocAll());
+                dispatch(getDmHocPhanAll());
             }
         });
     };
 }
 
-export function deleteDmMonHoc(ma) {
+export function deleteDmHocPhan(ma) {
     return dispatch => {
-        const url = '/api/danh-muc/mon-hoc';
+        const url = '/api/danh-muc/hoc-phan';
         T.delete(url, { ma }, data => {
             if (data.error) {
-                T.notify('Xóa môn học bị lỗi!', 'danger');
+                T.notify('Xóa học phần bị lỗi!', 'danger');
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
-                T.alert('Môn học đã xóa thành công!', 'success', false, 800);
-                dispatch(getDmMonHocAll());
+                T.alert('Học phần đã xóa thành công!', 'success', false, 800);
+                dispatch(getDmHocPhanAll());
             }
-        }, () => T.notify('Xóa môn học bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa học phần bị lỗi!', 'danger'));
     };
 }
 
-export function updateDmMonHoc(ma, changes, done) {
+export function updateDmHocPhan(ma, changes, done) {
     return dispatch => {
-        const url = '/api/danh-muc/mon-hoc';
+        const url = '/api/danh-muc/hoc-phan';
         T.put(url, { ma, changes }, data => {
             if (data.error) {
-                T.notify('Cập nhật môn học bị lỗi!', 'danger');
+                T.notify('Cập nhật học phần bị lỗi!', 'danger');
                 console.error(`PUT ${url}. ${data.error}`);
                 done && done(data.error);
             } else {
-                T.notify('Cập nhật thông tin môn học thành công!', 'success');
-                dispatch(getDmMonHocAll());
+                T.notify('Cập nhật thông tin học phần thành công!', 'success');
+                dispatch(getDmHocPhanAll());
             }
-        }, () => T.notify('Cập nhật thông tin môn học bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin học phần bị lỗi!', 'danger'));
     };
 }
 
-export function changeDmMonHoc(item) {
-    return { type: DmMonHocUpdate, item };
+export function changeDmHocPhan(item) {
+    return { type: DmHocPhanUpdate, item };
 }
