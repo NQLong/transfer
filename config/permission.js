@@ -138,23 +138,15 @@ module.exports = app => {
     };
 
     // Update user's session ------------------------------------------------------------------------------------------------------------------------
-    app.initChucVu = (user, chucVu) => new Promise(solve => {
+    app.initChucVu = (user, ...chucVus) => {
         if (!(user && user.staff && user.staff.chucVus && user.staff.chucVus.length)) {
-            solve({});
+            return [];
         } else {
-            const staffChucVus = user.staff.chucVus, initList = [];
-            // return staffChucVus.some(item => (maDonVi == '*' || item.maDonVi == maDonVi) && (maChucVu == '*' || item.maChucVu == maChucVu));
-            staffChucVus.forEach((item, index, array) => {
-                if (chucVu.includes(item['maChucVu'])) {
-                    item.isManager = true;
-                    initList.push(item);
-                }
-                if (index === array.length - 1) {
-                    solve(initList);
-                }
-            });
+            const staffChucVus = user.staff.chucVus;
+            return staffChucVus.filter(item => chucVus.includes(item.maChucVu)).map(item => app.clone(item, { isManger: true }));
         }
-    });
+    };
+
     const hasPermission = (userPermissions, menuPermissions) => {
         for (let i = 0; i < menuPermissions.length; i++) {
             if (userPermissions.includes(menuPermissions[i])) return true;

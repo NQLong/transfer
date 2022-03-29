@@ -8,17 +8,16 @@ module.exports = app => {
 
     app.permission.add(
         { name: 'manager:read', menu: menuStaff },
+        { name: 'manager:write' }
     );
     app.get('/user/danh-sach-can-bo-thuoc-don-vi', app.permission.check('manager:read'), app.templates.admin);
 
     //Manager hook -------------------------------------------------------------------------------------------------
 
-    //Check role mangagers
-    app.permissionHooks.add('staff', 'manager', async (user) => {
-        user.staff.donViQuanLy = await app.initChucVu(user, ['013', '005', '003', '016', '009', '007']);
-        new Promise((resolve) => {
-            app.permissionHooks.pushUserPermission(user, 'manager:read', 'manager:write');
-            resolve();
-        });
-    });
+    //Check role managers
+    app.permissionHooks.add('staff', 'manager', user => new Promise(resolve => {
+        user.staff.donViQuanLy = app.initChucVu(user, '013', '005', '003', '016', '009', '007');
+        user.staff.donViQuanLy.length && app.permissionHooks.pushUserPermission(user, 'manager:read', 'manager:write');
+        resolve();
+    }));
 };
