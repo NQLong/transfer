@@ -18,7 +18,6 @@ module.exports = app => {
                 done('Data is empty!');
             } else {
                 const sql = 'INSERT INTO DM_MON_HOC (' + statement.substring(2) + ') VALUES (' + values.substring(2) + ')';
-                console.log(sql);
                 app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
                         app.model.dmMonHoc.get({ rowId: resultSet.lastRowid }, done);
