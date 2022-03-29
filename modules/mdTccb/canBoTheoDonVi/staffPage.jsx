@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, FormSelect } from 'view/component/AdminPage';
 import { getNhanSuDonVi } from './redux';
-import { getStaffAll } from 'modules/mdTccb/tccbCanBo/redux';
 import { getDmDonVi, SelectAdapter_DmDonViFilter } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { getDmChucVu } from 'modules/mdDanhMuc/dmChucVu/redux';
 class CanBoTheoDonVi extends AdminPage {
@@ -11,12 +10,19 @@ class CanBoTheoDonVi extends AdminPage {
 
     componentDidMount() {
         T.ready('/user', () => {
-            let listDonViQuanLy = this.props.system.user.staff.donViQuanLy, shcc = this.props.system.user.staff.shcc;
-            const { maDonVi = null } = this.props.system.user.staff.donViQuanLy[0];
-            this.props.getNhanSuDonVi(maDonVi, items => {
-                this.setState({ listDonViQuanLy: listDonViQuanLy.filter(item => item.isManager).map(item => item.maDonVi), shcc, listStaffAll: items.filter(item => !item.ngayNghi).groupBy('maDonVi') }, () => {
-                    this.setData(this.state.listStaffAll, maDonVi);
-                });
+            let listDonViQuanLy = this.props.system && this.props.system.user.staff && this.props.system.user.staff.donViQuanLy ? this.props.system.user.staff.donViQuanLy : [];
+            this.getData(listDonViQuanLy.filter(item => item.isManager).map(item => item.maDonVi));
+        });
+    }
+
+    getData = (listDonVi, maDonVi = listDonVi[0]) => {
+        this.setState({ listDonVi });
+        this.props.getNhanSuDonVi(listDonVi, items => {
+            this.setState({
+                listDonViQuanLy: listDonVi,
+                listNhanSuAll: items.filter(item => !item.ngayNghi).groupBy('maDonVi')
+            }, () => {
+                this.setData(this.state.listNhanSuAll, maDonVi);
             });
         });
     }
@@ -54,7 +60,7 @@ class CanBoTheoDonVi extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-user-circle-o',
-            header: <FormSelect style={{ width: '300px', marginBottom: '0' }} placeholder='Danh sách đơn vị quản lý' ref={e => this.donVi = e} onChange={value => this.setData(this.state.listStaffAll, value.id)} data={SelectAdapter_DmDonViFilter(this.state.listDonViQuanLy)
+            header: <FormSelect style={{ width: '300px', marginBottom: '0' }} placeholder='Danh sách đơn vị quản lý' ref={e => this.donVi = e} onChange={value => this.getData(this.state.listDonVi, value.id)} data={SelectAdapter_DmDonViFilter(this.state.listDonViQuanLy)
             } />,
             title: 'Danh sách nhân sự thuộc đơn vị quản lý',
             breadcrumb: [
@@ -73,6 +79,6 @@ class CanBoTheoDonVi extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, canBoTheoDonVi: state.tccb.canBoTheoDonVi });
 const mapActionsToProps = {
-    getNhanSuDonVi, getDmDonVi, getStaffAll, getDmChucVu
+    getNhanSuDonVi, getDmDonVi, getDmChucVu
 };
 export default connect(mapStateToProps, mapActionsToProps)(CanBoTheoDonVi);

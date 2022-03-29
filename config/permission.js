@@ -138,12 +138,12 @@ module.exports = app => {
     };
 
     // Update user's session ------------------------------------------------------------------------------------------------------------------------
-    app.initChucVu = (user, ...chucVus) => {
-        if (!(user && user.staff && user.staff.chucVus && user.staff.chucVus.length)) {
+    app.initManager = (user, ...listChucVuTruong) => {
+        if (!(user && user.staff && user.staff.listChucVu && user.staff.listChucVu.length)) {
             return [];
         } else {
-            const staffChucVus = user.staff.chucVus;
-            return staffChucVus.filter(item => chucVus.includes(item.maChucVu)).map(item => app.clone(item, { isManger: true }));
+            const listChucVu = user.staff.listChucVu;
+            return listChucVu.filter(item => listChucVuTruong.includes(item.maChucVu)).map(item => app.clone(item, { isManager: true }));
         }
     };
 
@@ -186,10 +186,22 @@ module.exports = app => {
                             user.isStaff = 1;
                             item.phai == '02' && app.permissionHooks.pushUserPermission(user, 'staff:female');
                             user.shcc = item.shcc;
-                            user.staff = item;
+                            user.firstName = item.ten;
+                            user.lastName = item.ho;
+                            user.staff = {
+                                listChucVu: [],
+                                maDonVi: item.maDonVi,
+                            };
+                            const condition = {
+                                statement: 'shcc = :shcc AND (ngayRaQd < :today) AND (ngayRaQdThoiChucVu < :today)',
+                                parameter: {
+                                    shcc: item.shcc,
+                                    today: new Date().getTime()
+                                }
+                            };
                             app.permissionHooks.pushUserPermission(user, 'staff:login'); // Add staff permission: staff:login
-                            app.model.qtChucVu.getAll({ shcc: user.shcc }, 'maChucVu,maDonVi', null, (e, chucVus) => {
-                                user.staff.chucVus = chucVus || [];
+                            app.model.qtChucVu.getAll(condition, 'maChucVu,maDonVi', null, (e, listChucVu) => {
+                                user.staff.listChucVu = listChucVu || [];
                                 app.permissionHooks.run('staff', user, user.staff).then(() => {
                                     resolve();
                                 });
