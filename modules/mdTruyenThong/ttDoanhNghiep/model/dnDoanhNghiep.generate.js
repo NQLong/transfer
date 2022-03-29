@@ -1,6 +1,6 @@
-// Table name: DN_DOANH_NGHIEP { id, quocGia, tenVietTat, tenDayDu, linhVucKinhDoanh, moTa, kichHoat, namThanhLap, theManh, diaChi, email, phone, image, ownerEmail, capDo, doiTac, quocGiaTemp, tenVietTatTemp, moTaTemp, namThanhLapTemp, theManhTemp, diaChiTemp, emailTemp, phoneTemp, imageTemp, confirm, hiddenShortName, tenDayDuTemp, linhVucKinhDoanhTemp, website, websiteTemp }
+// Table name: DN_DOANH_NGHIEP { id, quocGia, tenVietTat, tenDayDu, moTa, kichHoat, namThanhLap, theManh, diaChi, email, phone, image, doiTac, hiddenShortName, website, moTaHopTac, ketQuaHopTac, ghiChu, donViPhuTrach }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'quocGia': 'QUOC_GIA', 'tenVietTat': 'TEN_VIET_TAT', 'tenDayDu': 'TEN_DAY_DU', 'linhVucKinhDoanh': 'LINH_VUC_KINH_DOANH', 'moTa': 'MO_TA', 'kichHoat': 'KICH_HOAT', 'namThanhLap': 'NAM_THANH_LAP', 'theManh': 'THE_MANH', 'diaChi': 'DIA_CHI', 'email': 'EMAIL', 'phone': 'PHONE', 'image': 'IMAGE', 'ownerEmail': 'OWNER_EMAIL', 'capDo': 'CAP_DO', 'doiTac': 'DOI_TAC', 'quocGiaTemp': 'QUOC_GIA_TEMP', 'tenVietTatTemp': 'TEN_VIET_TAT_TEMP', 'moTaTemp': 'MO_TA_TEMP', 'namThanhLapTemp': 'NAM_THANH_LAP_TEMP', 'theManhTemp': 'THE_MANH_TEMP', 'diaChiTemp': 'DIA_CHI_TEMP', 'emailTemp': 'EMAIL_TEMP', 'phoneTemp': 'PHONE_TEMP', 'imageTemp': 'IMAGE_TEMP', 'confirm': 'CONFIRM', 'hiddenShortName': 'HIDDEN_SHORT_NAME', 'tenDayDuTemp': 'TEN_DAY_DU_TEMP', 'linhVucKinhDoanhTemp': 'LINH_VUC_KINH_DOANH_TEMP', 'website': 'WEBSITE', 'websiteTemp': 'WEBSITE_TEMP' };
+const obj2Db = { 'id': 'ID', 'quocGia': 'QUOC_GIA', 'tenVietTat': 'TEN_VIET_TAT', 'tenDayDu': 'TEN_DAY_DU', 'moTa': 'MO_TA', 'kichHoat': 'KICH_HOAT', 'namThanhLap': 'NAM_THANH_LAP', 'theManh': 'THE_MANH', 'diaChi': 'DIA_CHI', 'email': 'EMAIL', 'phone': 'PHONE', 'image': 'IMAGE', 'doiTac': 'DOI_TAC', 'hiddenShortName': 'HIDDEN_SHORT_NAME', 'website': 'WEBSITE', 'moTaHopTac': 'MO_TA_HOP_TAC', 'ketQuaHopTac': 'KET_QUA_HOP_TAC', 'ghiChu': 'GHI_CHU', 'donViPhuTrach': 'DON_VI_PHU_TRACH' };
 
 module.exports = app => {
     app.model.dnDoanhNghiep = {
@@ -134,11 +134,6 @@ module.exports = app => {
         searchPage: (pagenumber, pagesize, searchterm, done) => {
             app.database.oracle.connection.main.execute('BEGIN :ret:=dn_doanh_nghiep_search_page(:pagenumber, :pagesize, :searchterm, :totalitem, :pagetotal); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
-        },
-
-        searchAll: (loaidoanhnghiep, kichhoat, searchterm, done) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=dn_doanh_nghiep_search_all(:loaidoanhnghiep, :kichhoat, :searchterm); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, loaidoanhnghiep, kichhoat, searchterm }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
     };
 };

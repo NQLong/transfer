@@ -6,9 +6,9 @@ import Pagination from 'view/component/Pagination';
 import {
     getQtChucVuPage, updateQtChucVuStaff,
     deleteQtChucVuStaff, createQtChucVuStaff, getQtChucVuGroupPage,
-    getQtChucVuAll
+    getQtChucVuAll,
 } from './redux';
-import { SelectAdapter_DmChucVuV2 } from 'modules/mdDanhMuc/dmChucVu/redux';
+import { SelectAdapter_DmChucVuV2, getDmChucVu } from 'modules/mdDanhMuc/dmChucVu/redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_DmBoMonTheoDonVi } from 'modules/mdDanhMuc/dmBoMon/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
@@ -21,18 +21,18 @@ const timeList = [
 ];
 
 export class EditModal extends AdminModal {
-    state = { shcc: null, stt: '', chucVuChinh: 0, thoiChucVu: 0, donVi: 0 };
+    state = { shcc: null, stt: '', chucVuChinh: 0, thoiChucVu: 0, donVi: 0, capChucVu: 0 };
     componentDidMount() {
 
     }
 
     onShow = (item) => {
-        let { stt, shcc, maChucVu, maDonVi, soQuyetDinh, ngayRaQuyetDinh, ngayRaQd, soQd, chucVuChinh, maBoMon, thoiChucVu, soQdThoiChucVu, ngayRaQdThoiChucVu, ngayThoiChucVu } = item ? item : {
+        let { stt, shcc, maChucVu, maDonVi, soQuyetDinh, ngayRaQuyetDinh, ngayRaQd, soQd, chucVuChinh, maBoMon, thoiChucVu, soQdThoiChucVu, ngayRaQdThoiChucVu, ngayThoiChucVu, capChucVu } = item ? item : {
             stt: '',
             shcc: '', maChucVu: '', maDonVi: '', soQuyetDinh: '', ngayRaQuyetDinh: '', chucVuChinh: 0, maBoMon: '',
-            ngayRaQd: '', soQd: '', thoiChucVu: 0, ngayRaQdThoiChucVu: '', ngayThoiChucVu: '', soQdThoiChucVu: ''
+            ngayRaQd: '', soQd: '', thoiChucVu: 0, ngayRaQdThoiChucVu: '', ngayThoiChucVu: '', soQdThoiChucVu: '', capChucVu: 0
         };
-        this.setState({ shcc, stt, item, chucVuChinh, thoiChucVu: thoiChucVu ? 1 : 0 }, () => {
+        this.setState({ shcc, stt, item, chucVuChinh, thoiChucVu: thoiChucVu ? 1 : 0, capChucVu: capChucVu }, () => {
             this.shcc.value(shcc ? shcc : '');
             this.maChucVu.value(maChucVu ? maChucVu : '');
             this.maDonVi.value(maDonVi ? maDonVi : '');
@@ -122,16 +122,25 @@ export class EditModal extends AdminModal {
         this.setState({ thoiChucVu: value });
     }
 
+    handleChucVu = (data) => {
+        data && this.props.getDmChucVu(data.id, (item) => {
+            this.setState({ capChucVu: item.isCapTruong }, () => {
+                this.maDonVi.value('');
+                this.maBoMon.value('');
+            });
+        });
+    }
+
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
             title: this.state.shcc ? 'Cập nhật quá trình chức vụ' : 'Tạo mới quá trình chức vụ',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12' ref={e => this.shcc = e} label='Cán bộ' data={SelectAdapter_FwCanBo} allowClear={true} readOnly={readOnly} />
-                <FormSelect className='col-md-4' ref={e => this.maChucVu = e} label='Chức vụ' data={SelectAdapter_DmChucVuV2} allowClear={true} readOnly={readOnly} />
-                <FormSelect className='col-md-4' ref={e => this.maDonVi = e} label='Đơn vị của chức vụ' data={SelectAdapter_DmDonVi} onChange={this.handleDonVi} allowClear={true} readOnly={readOnly} />
-                <FormSelect className='col-md-4' ref={e => this.maBoMon = e} label='Bộ môn của chức vụ' data={SelectAdapter_DmBoMonTheoDonVi(this.state.donVi)} allowClear={true} readOnly={readOnly} />
+                <FormSelect className='col-md-6' ref={e => this.shcc = e} label='Cán bộ' data={SelectAdapter_FwCanBo} allowClear={true} readOnly={readOnly} />
+                <FormSelect className='col-md-6' ref={e => this.maChucVu = e} label='Chức vụ' data={SelectAdapter_DmChucVuV2} onChange={this.handleChucVu} allowClear={true} readOnly={readOnly} />
+                <FormSelect className='col-md-12' ref={e => this.maDonVi = e} label='Đơn vị của chức vụ' data={SelectAdapter_DmDonVi} onChange={this.handleDonVi} allowClear={true} readOnly={readOnly} />
+                <FormSelect className='col-md-12' ref={e => this.maBoMon = e} style={{ display: this.state.capChucVu ? 'none' : '' }} label='Bộ môn của chức vụ' data={SelectAdapter_DmBoMonTheoDonVi(this.state.donVi)} allowClear={true} readOnly={readOnly} />
                 <FormCheckbox className='col-md-12' ref={e => this.chucVuChinh = e} label='Chức vụ chính' readOnly={this.checkChucVuSwitch()} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.soQuyetDinh = e} label='Số quyết định bổ nhiệm' readOnly={readOnly} />
                 <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayRaQuyetDinh = e} label='Ngày ra quyết định bổ nhiệm' readOnly={readOnly} />
@@ -213,15 +222,23 @@ class QtChucVu extends AdminPage {
         this.modal.show();
     }
 
-    list = (text, i, j) => {
-        if (!text) return '';
-        let danhSach = text.split('??').map(str => <p key={i--} style={{ textTransform: 'uppercase' }}>{j - i}. {str}</p>);
+    list = (dsChucVu, dsDonVi, dsBomon) => {
+        if (!dsChucVu) return '';
+        let dsChucVuSplitted = dsChucVu.split('??');
+        let dsDonViSplitted = dsDonVi.split('??');
+        let dsBomonSplitted = dsBomon.split('??');
+        const danhSach = [];
+        for (let i = 0; i < dsChucVuSplitted.length; i++) {
+            dsDonViSplitted[i] = dsDonViSplitted[i].trim();
+            dsBomonSplitted[i] = dsBomonSplitted[i].trim();
+            danhSach.push(<span key={i}>{i+1}. {dsChucVuSplitted[i]} ({dsBomonSplitted[i] ? dsBomonSplitted[i] : (dsDonViSplitted[i] ? dsDonViSplitted[i] : '')}){i != dsChucVuSplitted.length - 1 ? <br/> : ''}</span>);
+        }
         return danhSach;
     }
 
     delete = (e, item) => {
         T.confirm('Xóa chức vụ', 'Bạn có chắc bạn muốn xóa chức vụ này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtChucVuStaff(item.stt, false, null, error => {
+            isConfirm && this.props.deleteQtChucVuStaff({ stt: item.stt, shcc: item.shcc }, false, null, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá chức vụ bị lỗi!', 'danger');
                 else T.alert('Xoá chức vụ thành công!', 'success', false, 800);
             });
@@ -243,11 +260,12 @@ class QtChucVu extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        {!this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Chức vụ</th>}
+                        {!this.checked && <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Chức vụ</th>}
+                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Đơn vị cấp trường</th>}
+                        {!this.checked && <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Đơn vị cấp khoa</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Hệ số phụ cấp</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Quyết định bổ nhiệm</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Chức vụ chính</th>}
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thôi chức vụ</th>}
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Quyết định thôi chức vụ</th>}
                         {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số chức vụ</th>}
                         {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách chức vụ</th>}
                         <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
@@ -263,14 +281,10 @@ class QtChucVu extends AdminPage {
                             </>
                         )}
                         />
-                        {!this.checked && <TableCell type='text' content={(
-                            <>
-                                <b>{item.tenChucVu}</b><br />
-                                <span>{!item.tenBoMon ? (item.tenDonVi ? 'Đơn vị: ' + item.tenDonVi.toUpperCase() : '') : (item.tenBoMon ? item.tenBoMon.toUpperCase() : '')}</span><br />
-                                <span>Hệ số phụ cấp: {item.phuCap}</span>
-                            </>
-                        )}
-                        />}
+                        {!this.checked && <TableCell type='text' content={item.tenChucVu}/>}
+                        {!this.checked && <TableCell type='text' content={item.tenDonVi}/>}
+                        {!this.checked && <TableCell type='text' content={item.tenBoMon}/>}
+                        {!this.checked && <TableCell type='text' style={{ textAlign: 'center' }} content={item.phuCap}/>}
                         {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>Số: {item.soQuyetDinh}</span><br />
@@ -279,16 +293,8 @@ class QtChucVu extends AdminPage {
                         )}
                         />}
                         {!this.checked && <TableCell type='checkbox' content={item.chucVuChinh} />}
-                        {!this.checked && <TableCell type='checkbox' content={item.thoiChucVu} />}
-                        {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <span>Số: {item.soQdThoiChucVu}</span><br />
-                                <span>Ngày: <span style={{ color: 'blue' }}>{item.ngayRaQdThoiChucVu ? new Date(item.ngayRaQdThoiChucVu).ddmmyyyy() : ''}</span></span>
-                            </>
-                        )}
-                        />}
                         {this.checked && <TableCell type='text' content={item.soChucVu} />}
-                        {this.checked && <TableCell type='text' content={this.list(item.danhSachChucVu, item.soChucVu, item.soChucVu)} />}
+                        {this.checked && <TableCell type='text' content={this.list(item.danhSachChucVu, item.danhSachDonVi, item.danhSachBoMon)} />}
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                                 onEdit={() => this.modal.show(item)} onDelete={this.delete} >
@@ -315,22 +321,22 @@ class QtChucVu extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    <FormSelect className='col-lg-3 col-md-12' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect className='col-lg-4 col-md-12' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
 
-                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-3' label='Từ' onChange={() => this.changeAdvancedSearch()} />}
+                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ' onChange={() => this.changeAdvancedSearch()} />}
                     
-                    {(this.timeType && this.timeType.value() && this.timeType.value() != 0) ? <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-3' label='Đến' onChange={() => this.changeAdvancedSearch()} /> : <div className='col-lg-9' />}
+                    {(this.timeType && this.timeType.value() && this.timeType.value() != 0) ? <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến' onChange={() => this.changeAdvancedSearch()} /> : <div className='col-lg-9' />}
                     
                     <FormSelect className='col-12 col-md-4' multiple={true} ref={e => this.maDonVi = e} label='Theo đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} placeHolder='Có thể chọn nhiều đơn vị' />
                     
-                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.mulCanBo = e} label='Theo cán bộ cụ thể' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-12 col-md-4' multiple={true} ref={e => this.mulCanBo = e} label='Theo cán bộ cụ thể' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
 
-                    <FormSelect ref={e => this.gioiTinh = e} label='Theo giới tính' className='col-12 col-md-2' data={[
+                    <FormSelect ref={e => this.gioiTinh = e} label='Theo giới tính' className='col-12 col-md-4' data={[
                         { id: '01', text: 'Nam' },
                         { id: '02', text: 'Nữ' },
                     ]} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
 
-                    <FormSelect className='col-md-6' multiple={true} ref={e => this.mulMaChucVu = e} label='Theo chức vụ' data={SelectAdapter_DmChucVuV2} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-md-12' multiple={true} ref={e => this.mulMaChucVu = e} label='Theo chức vụ' data={SelectAdapter_DmChucVuV2} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
                 </div>
             </>,
             content: <>
@@ -341,7 +347,7 @@ class QtChucVu extends AdminPage {
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} permission={permission} getQtChucVuAll={this.props.getQtChucVuAll}
-                    create={this.props.createQtChucVuStaff} update={this.props.updateQtChucVuStaff}
+                    create={this.props.createQtChucVuStaff} update={this.props.updateQtChucVuStaff} getDmChucVu={this.props.getDmChucVu}
                 />
             </>,
             backRoute: '/user/tccb',
@@ -359,6 +365,6 @@ class QtChucVu extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtChucVu: state.tccb.qtChucVu });
 const mapActionsToProps = {
     getQtChucVuPage, deleteQtChucVuStaff, createQtChucVuStaff,
-    updateQtChucVuStaff, getQtChucVuGroupPage, getQtChucVuAll
+    updateQtChucVuStaff, getQtChucVuGroupPage, getQtChucVuAll, getDmChucVu
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtChucVu);

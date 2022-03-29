@@ -103,6 +103,7 @@ export function renderTable({
 
 // Form components ----------------------------------------------------------------------------------------------------
 export class FormTabs extends React.Component {
+    randomKey = T.randomPassword(8)
     state = { tabIndex: 0 };
 
     componentDidMount() {
@@ -125,12 +126,16 @@ export class FormTabs extends React.Component {
 
     selectedTabIndex = () => this.state.tabIndex;
 
+    tabClick = (e, index) => {
+        e && e.preventDefault();
+        $(`a[href='#${(this.props.id || 'tab')}_${index}${this.randomKey}']`).click();
+    }
     render() {
         const { tabClassName = '', contentClassName = '', tabs = [] } = this.props,
             id = this.props.id || 'tab',
             tabLinks = [], tabPanes = [];
         tabs.forEach((item, index) => {
-            const tabId = id + '_' + T.randomPassword(8),
+            const tabId = id + '_' + index + this.randomKey,
                 className = (index == this.state.tabIndex ? ' active show' : '');
             tabLinks.push(<li key={index} className={'nav-item' + className}><a className='nav-link' data-toggle='tab' href={'#' + tabId} onClick={e => this.onSelectTab(e, index)}>{item.title}</a></li>);
             tabPanes.push(<div key={index} className={'tab-pane fade' + className} id={tabId}>{item.component}</div>);
@@ -845,8 +850,8 @@ export class AdminPage extends React.Component {
                         <h1><i className={icon} /> {title}</h1>
                         <p>{subTitle}</p>
                     </div>
-                    <ul className='app-breadcrumb breadcrumb'>
-                        {header}
+                    <ul className='app-breadcrumb breadcrumb' style={{ alignItems: 'center' }}>
+                        <div style={{ display: 'flex', marginRight: '15px' }} >{header}</div>
                         {breadcrumb != null ? <Link to='/user'><i className='fa fa-home fa-lg' /></Link> : ''}
                         {breadcrumb != null ? breadcrumb.map((item, index) => <span key={index}>&nbsp;/&nbsp;{item}</span>) : ''}
                     </ul>

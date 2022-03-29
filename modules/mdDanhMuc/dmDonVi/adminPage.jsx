@@ -16,7 +16,7 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        const { ma, ten, tenTiengAnh, tenVietTat, qdThanhLap, qdXoaTen, maPl, ghiChu, kichHoat, duongDan, image, imageDisplay, imageDisplayTa } = item ? item : { ma: null, ten: '', tenTiengAnh: '', tenVietTat: '', qdThanhLap: '', qdXoaTen: '', maPl: '', ghiChu: '', kichHoat: true, duongDan: '', image: null, imageDisplay: null, imageDisplayTa: null };
+        const { ma, ten, tenTiengAnh, tenVietTat, qdThanhLap, qdXoaTen, maPl, ghiChu, kichHoat, duongDan, image, imageDisplay, imageDisplayTa, preShcc } = item ? item : { ma: null, ten: '', tenTiengAnh: '', tenVietTat: '', qdThanhLap: '', qdXoaTen: '', maPl: '', ghiChu: '', kichHoat: true, duongDan: '', image: null, imageDisplay: null, imageDisplayTa: null, preShcc: null };
         this.setState({ ma, item });
         this.ma.value(ma);
         this.ten.value(ten);
@@ -28,10 +28,10 @@ class EditModal extends AdminModal {
         this.ghiChu.value(ghiChu ? ghiChu : '');
         this.kichHoat.value(kichHoat);
         this.duongDan.value(duongDan ? duongDan : '');
+        this.preShcc.value(preShcc || '');
         this.imageBox.setData('dmDonVi:' + (ma ? ma : 'new'), image ? image : '/img/avatar.png');
         this.imageBox1.setData('dmDonViImage:' + (ma ? ma : 'new'), imageDisplay ? imageDisplay : '/img/avatar.png');
         this.imageBox2.setData('dmDonViImageTA:' + (ma ? ma : 'new'), imageDisplayTa ? imageDisplayTa : '/img/avatar.png');
-
     }
 
     onSubmit = (e) => {
@@ -45,17 +45,21 @@ class EditModal extends AdminModal {
             ghiChu: this.ghiChu.value(),
             kichHoat: this.kichHoat.value() ? 1 : 0,
             duongDan: this.duongDan.value(),
+            preShcc: this.preShcc.value(),
         };
         if (changes.ma == '') {
             T.notify('Mã đơn vị bị trống!', 'danger');
             this.ma.focus();
-        } else
-            if (changes.ten == '') {
-                T.notify('Tên đơn vị bị trống!', 'danger');
-                this.ten.focus();
-            } else {
-                this.state.ma ? this.props.update(this.state.ma, changes, this.hide) : this.props.create(changes, this.hide);
-            }
+        } else if (changes.ten == '') {
+            T.notify('Tên đơn vị bị trống!', 'danger');
+            this.ten.focus();
+        } else if (changes.preShcc && changes.preShcc.length != 3) {
+            T.notify('Độ dài tiền tố mã thẻ cán bộ phải là 3!', 'danger');
+            this.preShcc.value('');
+            this.preShcc.focus();
+        } else {
+            this.state.ma ? this.props.update(this.state.ma, changes, this.hide) : this.props.create(changes, this.hide);
+        }
         e.preventDefault();
     }
 
@@ -87,22 +91,18 @@ class EditModal extends AdminModal {
                 <FormImageBox className='col-md-6' ref={e => this.imageBox2 = e}
                     postUrl='/user/upload' uploadType='DmDonViImageDisplayTA' label='Hiện thị trang Tiếng Anh' />
                 <FormTextBox type='text' className='col-12' ref={e => this.ghiChu = e} label='Ghi chú' readOnly={readOnly} />
+                <FormTextBox type='text' className='col-md-6' ref={e => this.preShcc = e} label='Mã thẻ cán bộ (3 chữ số đầu)' readOnly={readOnly} />
             </div>
         });
     }
 }
 
 class DmDonViPage extends AdminPage {
-    loaiDonViMapper = {};
-
     componentDidMount() {
         T.ready('/user/category', () => {
             T.onSearch = (searchText) => this.props.getDmDonViPage(undefined, undefined, searchText || '');
             T.showSearchBox();
             this.props.getDmDonViPage();
-            this.props.getDmLoaiDonViAll(data => {
-                data.forEach(ldv => this.loaiDonViMapper[ldv.ma] = ldv.ten);
-            });
         });
     }
 
@@ -144,7 +144,7 @@ class DmDonViPage extends AdminPage {
                             onClick={() => this.modal.show(item)} />
                         <TableCell type='text' content={item.ten ? item.ten : ''} />
                         <TableCell type='text' content={item.tenTiengAnh ? item.tenTiengAnh : ''} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.maPl ? this.loaiDonViMapper[item.maPl].normalizedName() : ''} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenLoaiDonVi ? item.tenLoaiDonVi.normalizedName() : ''} />
                         <TableCell type='checkbox' style={{ textAlign: 'center' }} content={item.kichHoat} permission={permission}
                             onChanged={() => this.changeActive(item)} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
@@ -170,7 +170,7 @@ class DmDonViPage extends AdminPage {
             </>,
             backRoute: '/user/category',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
-            onImport: permission && permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/danh-muc/don-vi/upload') : null
+            // onImport: permission && permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/danh-muc/don-vi/upload') : null
         });
     }
 }
