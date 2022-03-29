@@ -120,7 +120,7 @@ class QtBangPhatMinhUserPage extends AdminPage {
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
-                getDataSource: () => list, stickyHead: false,
+                getDataSource: () => list, stickyHead: true,
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
@@ -137,48 +137,13 @@ class QtBangPhatMinhUserPage extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                        <TableCell type='text' content={(
-                            <>
-                                {item.tenBang ? item.tenBang : ''}
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' content={(
-                            <>
-                                {item.soHieu ? item.soHieu : ''}
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' content={(
-                            <>
-                                <span style={{ color: 'blue' }}>{item.namCap}</span>
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' content={(
-                            <>
-                                <span>{item.noiCap}</span>
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' content={(
-                            <>
-                                {item.tacGia}
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' content={(
-                            <>
-                                {item.sanPham}
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' content={(
-                            <>
-                                {item.loaiBang}
-                            </>
-                        )}
-                        />
+                        <TableCell type='text' content={(item.tenBang || '')} />
+                        <TableCell type='text' content={(item.soHieu || '')} />
+                        <TableCell type='text' content={(<span style={{ color: 'blue' }}>{item.namCap}</span>)} />
+                        <TableCell type='text' content={(item.noiCap)} />
+                        <TableCell type='text' content={(item.tacGia)} />
+                        <TableCell type='text' content={(item.sanPham)} />
+                        <TableCell type='text' content={(item.loaiBang)} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show({ item, shcc })} onDelete={this.delete} >
                         </TableCell>

@@ -26,12 +26,13 @@ module.exports = app => {
     app.get('/user/tccb/staff', app.permission.check('staff:read'), app.templates.admin);
     app.get('/user/tccb/staff/item/upload', app.permission.check('staff:write'), app.templates.admin);
 
-
-    //Check role mangagers
-    app.permissionHooks.add('staff', 'manager', (user) => new Promise(resolve => {
-        if (app.checkChucVu(user, '*', '013') || app.checkChucVu(user, '*', '005') || app.checkChucVu(user, '*', '003') || app.checkChucVu(user, '*', '016') || app.checkChucVu(user, '*', '009') || app.checkChucVu(user, '*', '007') || app.checkChucVu(user, '*', '007')) app.permissionHooks.pushUserPermission(user, 'manager:read', 'manager:write'); 
-        resolve();
-    }));
+    app.getEmailByShcc = (shcc) => new Promise(resolve => {
+        if (!shcc) resolve();
+        app.model.canBo.get({ shcc }, 'email', null, (error, item) => {
+            if (!error && item) resolve(item.email);
+            else resolve();
+        });
+    });
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
@@ -39,7 +40,7 @@ module.exports = app => {
     app.get('/api/staff/page/:pageNumber/:pageSize', checkGetStaffPermission, (req, res) => {
         let pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
-        searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
         const { listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe } = req.query.filter && req.query.filter != '%%%%%%%%%%%%' ? req.query.filter : { listDonVi: null, gender: null, listNgach: null, listHocVi: null, listChucDanh: null, isBienChe: null };
         app.model.canBo.searchPage(pageNumber, pageSize, listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe, searchTerm, (error, page) => {
             if (error || page == null) {
@@ -88,21 +89,23 @@ module.exports = app => {
         app.model.canBo.get({ shcc: req.params.shcc }, (error, item) => res.send({ error, item }));
     });
 
-    app.get('/api/staff/calc-shcc', checkGetStaffPermission, (req, res) => {
-        app.model.canBo.getShccCanBo(req.query.item, (error, shcc) => {
-            res.send({error, shcc});
-        });
-    });
-    app.get('/api/staff/:maDonVi', checkGetStaffPermission, (req, res) => {
-        app.model.canBo.getAll({ maDonVi: req.params.maDonVi }, (error, item) => res.send({ error, item }));
-    });
+    // app.get('/api/staff/calc-shcc', checkGetStaffPermission, (req, res) => {
+    //     app.model.canBo.getShccCanBo(req.query.item, (error, shcc) => {
+    //         res.send({ error, shcc });
+    //     });
+    // });
+    // app.get('/api/staff/:maDonVi', checkGetStaffPermission, (req, res) => {
+    //     app.model.canBo.getAll({ maDonVi: req.params.maDonVi }, (error, item) => res.send({ error, item }));
+    // });
 
-    app.get('/api/staff/all', checkGetStaffPermission, (req, res) => {
-        app.model.canBo.getAll((error, items) => res.send({ error, items }));
+    app.get('/api/staff/all', app.permission.check('staff:login'), (req, res) => {
+        app.model.canBo.getAll({
+        }, (error, items) => {
+            res.send({ error, items });
+        });
     });
 
     app.get('/api/staff/edit/item/:shcc', app.permission.check('staff:read'), async (req, res) => {
-
         app.model.canBo.get({ shcc: req.params.shcc }, (error, canBo) => {
             if (error || canBo == null) {
                 res.send({ error: 'Lỗi khi lấy thông tin cán bộ !' });
@@ -833,7 +836,7 @@ module.exports = app => {
                 resolve();
             });
         })).then(() => new Promise(resolve => {
-            app.model.dmDonVi.get({ma: canBo.maDonVi, kichHoat: 1}, (error, item) => {
+            app.model.dmDonVi.get({ ma: canBo.maDonVi, kichHoat: 1 }, (error, item) => {
                 if (error) {
                     res.send({ error: 'Lỗi khi lấy thông tin đơn vị cán bộ !' });
                 }
@@ -1036,7 +1039,6 @@ module.exports = app => {
                     res.send({ error: 'Not found!' });
                 } else {
                     if (item.shcc === req.session.user.shcc) {
-                        console.log(req.body.id);
                         const changes = req.body.changes;
                         app.model.quanHeCanBo.update({ id: req.body.id }, changes, (error, item) => res.send({ error, item }));
                     } else {
@@ -2220,5 +2222,5 @@ module.exports = app => {
 
     app.uploadHooks.add('staffData', (req, fields, files, params, done) =>
         app.permission.has(req, () => staffImportData(req, fields, files, params, done), done, 'staff:write'));
-    
+
 };

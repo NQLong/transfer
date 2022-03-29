@@ -210,16 +210,16 @@ class QtKhenThuongAll extends AdminPage {
         let results = [];
         let choose = i > 5 ? 5 : i;
         for (let k = 0; k < choose; k++) {
-            results.push(<div> <span>
+            results.push(<div key={results.length}> <span>
                 Lần {k + 1}. {deTais[k]} ({years[k].trim()})
             </span></div>);
         }
         if (i > 5) {
-            results.push(<div> <span>
+            results.push(<div key={results.length}> <span>
                 .........................................
             </span></div>);
             let k = i - 1;
-            results.push(<div> <span>
+            results.push(<div key={results.length}> <span>
                 Lần {k + 1}. {deTais[k]} ({years[k].trim()})
             </span></div>);
         }
@@ -275,7 +275,7 @@ class QtKhenThuongAll extends AdminPage {
                                 :
                                 item.maLoaiDoiTuong == '02' ?
                                     <>
-                                        <span>{item.hoCanBo + ' ' + item.tenCanBo}</span><br />
+                                        <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
                                         {item.maCanBo}
                                     </>
                                     : item.maLoaiDoiTuong == '03' ?
@@ -286,25 +286,13 @@ class QtKhenThuongAll extends AdminPage {
                                         </>
                                         : <>
                                             <span>{item.tenBoMon}</span> <br />
-                                            {'KHOA ' + item.tenDonViBoMon}
+                                            {item.tenDonViBoMon}
                                         </>
 
                         )} />
-                        {!this.checked && <TableCell type='text' style={{ textAlign: 'center' }} content={(
-                            <>
-                                {item.soQuyetDinh ? item.soQuyetDinh : ''}
-                            </>
-                        )} />}
-                        {!this.checked && <TableCell type='text' style={{ textAlign: 'center' }} content={(
-                            <>
-                                {item.namDatDuoc}
-                            </>
-                        )} />}
-                        {!this.checked && <TableCell type='text' content={(
-                            <>
-                                {item.tenThanhTich}
-                            </>
-                        )} />}
+                        {!this.checked && <TableCell type='text' style={{ textAlign: 'center' }} content={(item.soQuyetDinh || '')} />}
+                        {!this.checked && <TableCell type='text' style={{ textAlign: 'center' }} content={(item.namDatDuoc)} />}
+                        {!this.checked && <TableCell type='text' content={(item.tenThanhTich)} />}
                         {!this.checked && <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemThiDua} />}
                         {this.checked && <TableCell type='text' style={{ textAlign: 'left' }} content={item.soKhenThuong} />}
                         {this.checked && <TableCell type='text' content={this.list(item.danhSachKhenThuong, item.soKhenThuong, item.danhSachNamDatDuoc)} />}

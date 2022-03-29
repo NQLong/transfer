@@ -92,7 +92,8 @@ class StaffPage extends AdminPage {
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Phái</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày sinh</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị <br /> Học hàm</th>
+                    <th style={{ width: 'auto', textAlign: 'center' }}>Học vị <br /> Học hàm</th>
+                    <th style={{ width: 'auto', textAlign: 'center' }}>Chuyên ngành</th>
                     <th style={{ width: 'auto', textAlign: 'center' }}>Chức danh nghề nghiệp</th>
                     <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Đơn vị</th>
                     <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Email</th>
@@ -115,7 +116,8 @@ class StaffPage extends AdminPage {
                     <TableCell type='text' content={<>
                         {item.hocVi && <span>{item.hocVi}<br /></span>}
                         {item.hocHam && item.hocHam}
-                    </>} style={{ whiteSpace: 'nowrap' }} />
+                    </>} style={{ whiteSpace: 'nowrap', textAlign: 'center' }} />
+                    <TableCell type='text' content={item.chuyenNganh} style={{ whiteSpace: 'nowrap' }} />
                     <TableCell type='text' content={item.ngach} style={{ whiteSpace: 'nowrap' }} />
                     <TableCell type='text' content={<>
                         {item.chucVuChinh && <span style={{ color: 'red' }}>{item.chucVuChinh}<br /></span>}

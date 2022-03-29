@@ -23,7 +23,7 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        let { ma, ten, kichHoat, phuCap, ghiChu, loaiChucVu } = item ? item : { ma: '', ten: '', kichHoat: 1, phuCap: '', ghiChu: '', loaiChucVu: '' };
+        let { ma, ten, kichHoat, phuCap, ghiChu, loaiChucVu, isCapTruong } = item ? item : { ma: '', ten: '', kichHoat: 1, phuCap: '', ghiChu: '', loaiChucVu: '', isCapTruong: '' };
         this.setState({ ma, item });
         this.ma.value(ma);
         this.ten.value(ten);
@@ -31,6 +31,7 @@ class EditModal extends AdminModal {
         this.phuCap.value(phuCap ? phuCap.toFixed(2) : '');
         this.ghiChu.value(ghiChu ? ghiChu : '');
         this.kichHoat.value(kichHoat ? 1 : 0);
+        this.isCapTruong.value(isCapTruong ? 1 : 0);
     };
 
     changeKichHoat = value => this.kichHoat.value(value ? 1 : 0) || this.kichHoat.value(value);
@@ -45,6 +46,7 @@ class EditModal extends AdminModal {
                 ghiChu: this.ghiChu.value(),
                 loaiChucVu: this.loaiChucVu.value(),
                 kichHoat: this.kichHoat.value() ? 1 : 0,
+                isCapTruong: this.isCapTruong.value() ? 1 : 0,
             };
         if (!this.state.ma && !this.ma.value()) {
             T.notify('Mã không được trống!', 'danger');
@@ -67,6 +69,7 @@ class EditModal extends AdminModal {
                 <FormTextBox type='number' className='col-md-12' ref={e => this.phuCap = e} label='Phụ cấp' readOnly={readOnly} step={0.01} />
                 <FormSelect className='col-md-12' ref={e => this.loaiChucVu = e} label='Loại chức vụ' minimumResultsForSearch={-1} 
                 readOnly={readOnly} data = {this.state.listChucVu} required />
+                <FormCheckbox className='col-md-6' ref={e => this.isCapTruong = e} label='Chức vụ cấp trường' isSwitch={true} readOnly={readOnly} onChange={value => this.isCapTruong.value(value ? 1 : 0)} />
                 <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} onChange={value => this.changeKichHoat(value ? 1 : 0)} />
                 <FormTextBox type='text' className='col-md-12' ref={e => this.ghiChu = e} label='Ghi chú' readOnly={readOnly} />
             </div>
@@ -124,6 +127,7 @@ class DmChucVuPage extends AdminPage {
                         <th style={{ width: '50%' }}>Tên</th>
                         <th style={{ width: '50%' }}>Loại chức vụ</th>
                         <th style={{ width: 'auto' }} nowrap='true'>Phụ cấp</th>
+                        <th style={{ width: 'auto' }} nowrap='true'>Cấp chức vụ</th>
                         <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
                         <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
                     </tr>),
@@ -133,6 +137,7 @@ class DmChucVuPage extends AdminPage {
                         <TableCell type='text' content={item.ten ? item.ten : ''} />
                         <TableCell type='text' content={item.loaiChucVu ? this.loaiChucVuMap[item.loaiChucVu] : ''} />
                         <TableCell type='number' content={item.phuCap ? item.phuCap : ''} />
+                        <TableCell type='text' content={item.isCapTruong ? 'Cấp trường' : 'Cấp khoa'} />
                         <TableCell type='checkbox' content={item.kichHoat} permission={permission}
                             onChanged={value => this.props.updateDmChucVu(item.ma, { kichHoat: value ? 1 : 0, })} />
                         <TableCell type='buttons' content={item} permission={permission}

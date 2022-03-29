@@ -138,40 +138,46 @@ class QtGiaiThuongGroupPage extends AdminPage {
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
-                getDataSource: () => list, stickyHead: false,
+                getDataSource: () => list, stickyHead: true,
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br/>Đơn vị công tác</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Giải thưởng</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nơi cấp, năm cấp</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm đạt giải</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nơi cấp</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                        <TableCell type='text' content={(
+                        <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span><b>{item.tenGiaiThuong}</b></span> <br />
-                                <span><i>{item.noiDung}</i></span> <br /> <br />
-                                <span>Cán bộ đạt giải:
-                                    <a href='#' onClick={() => this.modal.show(item)}>
-                                        <span style={{ color: 'blue' }}>{' ' + (item.hoCanBo ? item.hoCanBo : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo : ' ') + ' - ' + item.shcc} </span>
-                                    </a>
-                                </span>
-
+                                <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
+                                {item.shcc}
                             </>
-
+                        )} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenHocVi || ''} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucDanhNgheNghiep || ''} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                            <>
+                                <span> {item.tenChucVu || ''}<br /> </span>
+                                {(item.tenDonVi || '').normalizedName()}
+                            </>
                         )} />
                         <TableCell type='text' content={(
                             <>
-                                <span>Nơi cấp giải thưởng: <span><i>{item.noiCap}</i></span></span> <br /> <br />
-                                <span>Năm cấp giải thưởng: <span style={{ color: 'blue' }}>{item.namCap}</span></span>
-
+                                <span><b>{item.tenGiaiThuong}</b></span> <br />
+                                <span><i>{item.noiDung}</i></span>
                             </>
 
-                        )}
-                        />
+                        )} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap', color: 'blue'}} content={(item.namCap)}/>
+                        <TableCell type='text' content={(<i>{item.noiCap}</i>)} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={this.delete} >
                         </TableCell>

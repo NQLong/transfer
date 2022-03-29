@@ -23,7 +23,6 @@ module.exports = (app) => {
         fse.copySync(oldPath, newPath);
         fse.removeSync(oldPath);
     };
-
     // app.fs.renameSync = (oldPath, newPath) => app.fs.copyFileSync(oldPath, newPath) && app.fs.unlinkSync(oldPath);
 
     // Template html file ---------------------------------------------------------------------------------------------------------------------------
@@ -96,14 +95,18 @@ module.exports = (app) => {
             index: 6100, title: 'Sinh viên', link: '/user/students', icon: 'fa-users',
             subMenusRender: false
         },
+        daoTao: {
+            index: 7000, title: 'Đào tạo', link: '/user/pdt', icon: 'fa-diamond',
+            subMenusRender: false
+        },
         category: {
             index: 4000, title: 'Danh mục', link: '/user/category', icon: 'fa-list-alt',
             subMenusRender: false,
         },
         truyenThong: {
-            index: 5000, title: 'Truyền thông', link: '/user/truyen-thong', icon: 'fa-comments-o',
+            index: 6000, title: 'Truyền thông', link: '/user/truyen-thong', icon: 'fa-comments-o',
             subMenusRender: false,
-            groups: ['Cấu hình', 'Bài viết', 'Sự kiện', 'Tuyển sinh']
+            groups: ['Cấu hình', 'Bài viết', 'Sự kiện', 'Tuyển sinh', 'Doanh nghiệp']
         },
         websiteDv: {
             index: 1900, title: 'Website đơn vị', link: '/user/website', icon: 'fa-database',

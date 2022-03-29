@@ -91,18 +91,18 @@ module.exports = app => {
                                         delete data.user.menu['5100'];
                                     }
                                     if (data.user && data.user.permissions && data.user.permissions.includes('news:write')) {
-                                        delete data.user.menu['5000'].menus['5004'];
-                                        delete data.user.menu['5000'].menus['5005'];
-                                        delete data.user.menu['5000'].menus['5006'];
-                                        delete data.user.menu['5000'].menus['5008'];
+                                        delete data.user.menu['6000'].menus['6004'];
+                                        delete data.user.menu['6000'].menus['6005'];
+                                        delete data.user.menu['6000'].menus['6006'];
+                                        delete data.user.menu['6000'].menus['6008'];
 
                                     }
                                     // else if (data.user && data.user.permissions
                                     //     && data.user.permissions.includes('unit:write')
-                                    //     && !data.user.permissions.includes('news:write') && data.user.menu['5000']) {
-                                    //     delete data.user.menu['5000'].menus['5001'];
-                                    //     delete data.user.menu['5000'].menus['5002'];
-                                    //     delete data.user.menu['5000'].menus['5003'];
+                                    //     && !data.user.permissions.includes('news:write') && data.user.menu['6000']) {
+                                    //     delete data.user.menu['6000'].menus['6001'];
+                                    //     delete data.user.menu['6000'].menus['6002'];
+                                    //     delete data.user.menu['6000'].menus['6003'];
                                     // }
                                     if (data.user && data.user.permissions
                                         && data.user.permissions.includes('website:write')

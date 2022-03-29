@@ -147,7 +147,8 @@ class SachGiaoTrinhUserPage extends AdminPage {
                         <TableCell type='text' content={(
                             <>
                                 <span>Tên: <i>{item.ten}</i></span><br /> <br />
-                                <span>Thể loại: <span style={{ color: 'blue' }}>{item.theLoai}</span></span>
+                                {item.theLoai ? <span><b>Thể loại: </b><span style={{ whiteSpace: 'nowrap' }}>{item.theLoai}<br /></span></span> : null}
+                                {item.butDanh ? <span><b>Bút danh: </b><i>{item.butDanh}</i></span> : null}
                             </>
                         )}
                         />
@@ -159,13 +160,7 @@ class SachGiaoTrinhUserPage extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' content={(
-                            <>
-                                <span>Tên: {item.sanPham}</span><br />
-                                <span>Bút danh: <span style={{ color: 'blue' }}>{item.butDanh}</span></span>
-                            </>
-                        )}
-                        />
+                        <TableCell type='text' content={(<span>{item.sanPham}</span>)} />
                         <TableCell type='text' content={(
                             item.quocTe == '0' ? <span> Xuất bản trong nước</span>
                                 : item.quocTe == '1' ? <span> Xuất bản quốc tế</span>
