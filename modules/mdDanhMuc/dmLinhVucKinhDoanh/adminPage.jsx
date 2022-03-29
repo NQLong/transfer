@@ -3,9 +3,9 @@ import { connect } from 'react-redux';
 import { getDmLinhVucKinhDoanhAll, deleteDmLinhVucKinhDoanh, createDmLinhVucKinhDoanh, updateDmLinhVucKinhDoanh, getDmLinhVucKinhDoanhPage } from './redux';
 import Pagination from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
-import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox} from 'view/component/AdminPage';
+import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox } from 'view/component/AdminPage';
 
-class EditModal extends AdminModal {
+export class EditModal extends AdminModal {
     state = { kichHoat: true };
 
     componentDidMount() {
@@ -16,7 +16,7 @@ class EditModal extends AdminModal {
 
     onShow = (item) => {
         let { ma, ten, moTa, kichHoat } = item ? item : { ma: '', ten: '', moTa: '', kichHoat: true };
-        this.setState({ma, item});
+        this.setState({ ma, item });
         this.ten.value(ten);
         this.moTa.value(moTa ? moTa : '');
         this.kichHoat.value(kichHoat);
@@ -44,11 +44,11 @@ class EditModal extends AdminModal {
         return this.renderModal({
             title: this.state.ma ? 'Cập nhật lĩnh vực kinh doanh' : 'Tạo mới lĩnh vực kinh doanh',
             body: <div className='row'>
-                <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên' 
+                <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên'
                     readOnly={readOnly} required />
-                <FormTextBox type='text' className='col-md-12' ref={e => this.moTa = e} label='Mô tả' 
+                <FormTextBox type='text' className='col-md-12' ref={e => this.moTa = e} label='Mô tả'
                     readOnly={readOnly} />
-                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} 
+                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true}
                     readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
                     onChange={value => this.changeKichHoat(value ? 1 : 0)} />
             </div>
@@ -122,7 +122,7 @@ class DmLinhVucKinhDoanhPage extends AdminPage {
             ],
             content: <>
                 <div className='tile'>{table}</div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} 
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getDmLinhVucKinhDoanhPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
                     create={this.props.createDmLinhVucKinhDoanh} update={this.props.updateDmLinhVucKinhDoanh} permissions={currentPermissions} />

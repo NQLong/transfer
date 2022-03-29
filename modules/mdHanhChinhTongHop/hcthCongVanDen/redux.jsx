@@ -130,10 +130,10 @@ export function getHcthCongVanDenSearchPage(pageNumber, pageSize, pageCondition,
     };
 }
 
-export function deleteFile(id, index, file, done) {
+export function deleteFile(id, fileId, file, done) {
     return () => {
         const url = '/api/hcth/cong-van-den/delete-file';
-        T.put(url, { id, index, file }, data => {
+        T.put(url, { id, fileId, file }, data => {
             if (data.error) {
                 console.error('PUT: ' + url + '.', data.error);
                 T.notify('Xóa file đính kèm lỗi!', 'danger');

@@ -65,7 +65,7 @@ class RejectModal extends React.Component {
 }
 
 class DraftNewsEditPage extends React.Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.state = { item: null, draft: true, draftId: '' };
         this.newsLink = React.createRef();
@@ -309,7 +309,7 @@ class DraftNewsEditPage extends React.Component {
                                 <div className='tile-footer'>
                                     <button className='btn btn-danger' type='button' onClick={() => this.checkLink(item)}>
                                         <i className='fa fa-fw fa-lg fa-check-circle' />Kiểm tra link
-                                </button>
+                                    </button>
                                 </div>
                             }
                         </div>

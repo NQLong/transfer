@@ -140,3 +140,11 @@ export function updateDmLinhVucKinhDoanh(ma, changes, done) {
 export function changeDmLinhVucKinhDoanh(item) {
     return { type: DmLinhVucKinhDoanhUpdate, item };
 }
+
+export const SelectAdapter_DmLinhVucKinhDoanhAll = {
+    ajax: true,
+    url: '/api/danh-muc/linh-vuc-kinh-doanh/all',
+    data: params => ({ condition: params.term }),
+    processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.ma, text: item.ten })) : [] }),
+    fetchOne: (ma, done) => (getDmLinhVucKinhDoanh(ma, (item) => done && done({ id: item.ma, text: item.ten })))(),
+};

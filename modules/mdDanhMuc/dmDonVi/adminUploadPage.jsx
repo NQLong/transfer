@@ -58,6 +58,9 @@ class UploadDmDonVi extends React.Component {
                 <td>
                     <input id='ghiChu${index}' type='string' value='${data['GHI_CHU'] != undefined ? data['GHI_CHU'] : ''}' />
                 </td>
+                <td>
+                    <input id='preShcc${index}' type='string' value='${data['PRE_SHCC'] != undefined ? data['PRE_SHCC'] : ''}' />
+                </td>
             </tr>
         `;
     }
@@ -138,6 +141,7 @@ class UploadDmDonVi extends React.Component {
                 qdXoaTen: $(`#kichHoat${i}`).is(':checked') ? '0' : '1',
                 maPL: $(`#maPL${i}`).val(),
                 ghiChu: $(`#ghiChu${i}`).val(),
+                preShcc: $(`#preShcc${i}`).val(),
             });
         }
         this.props.uploadDmDonVi(params, this.props.history);
@@ -173,6 +177,7 @@ class UploadDmDonVi extends React.Component {
                                     <td style={{ width: 'auto' }} nowrap='true'>QĐ xóa tên</td>
                                     <td style={{ width: 'auto' }}>Mã PL</td>
                                     <td style={{ width: 'auto' }}>Ghi chú</td>
+                                    <td style={{ width: 'auto' }}>Mã thẻ cán bộ (3 chữ số đầu)</td>
                                 </tr>
                             </thead>
                             <tbody id='tbodyTableDmDonVi'></tbody>
