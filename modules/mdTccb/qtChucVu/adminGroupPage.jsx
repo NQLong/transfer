@@ -138,8 +138,8 @@ export class EditModal extends AdminModal {
             body: <div className='row'>
                 <FormSelect className='col-md-12' ref={e => this.shcc = e} label='Cán bộ' data={SelectAdapter_FwCanBo} allowClear={true} readOnly={true} />
                 <FormSelect className='col-md-12' ref={e => this.maChucVu = e} label='Chức vụ' data={SelectAdapter_DmChucVuV2} onChange={this.handleChucVu} allowClear={true} readOnly={readOnly} />
-                <FormSelect className='col-md-12' ref={e => this.maDonVi = e} label='Đơn vị của chức vụ' data={SelectAdapter_DmDonVi} onChange={this.handleDonVi} allowClear={true} readOnly={readOnly} />
-                <FormSelect className='col-md-12' ref={e => this.maBoMon = e} style={{ display: this.state.capChucVu ? 'none' : '' }} label='Bộ môn của chức vụ' data={SelectAdapter_DmBoMonTheoDonVi(this.state.donVi)} allowClear={true} readOnly={readOnly} />
+                <FormSelect className='col-md-12' ref={e => this.maDonVi = e} label='Đơn vị cấp trường của chức vụ' data={SelectAdapter_DmDonVi} onChange={this.handleDonVi} allowClear={true} readOnly={readOnly} />
+                <FormSelect className='col-md-12' ref={e => this.maBoMon = e} style={{ display: this.state.capChucVu ? 'none' : '' }} label='Đơn vị cấp khoa của chức vụ' data={SelectAdapter_DmBoMonTheoDonVi(this.state.donVi)} allowClear={true} readOnly={readOnly} />
                 <FormCheckbox className='col-md-12' ref={e => this.chucVuChinh = e} label='Chức vụ chính' readOnly={this.checkChucVuSwitch()} />
                 <FormTextBox type='text' className='col-md-6' ref={e => this.soQuyetDinh = e} label='Số quyết định bổ nhiệm' readOnly={readOnly} />
                 <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayRaQuyetDinh = e} label='Ngày ra quyết định bổ nhiệm' readOnly={readOnly} />
@@ -228,7 +228,10 @@ class QtChucVuGroup extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Chức vụ</th>
+                        <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Chức vụ</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Đơn vị cấp trường</th>
+                        <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Đơn vị cấp khoa</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Hệ số phụ cấp</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Quyết định bổ nhiệm</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Chức vụ chính</th>
                         <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
@@ -244,14 +247,10 @@ class QtChucVuGroup extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' content={(
-                            <>
-                                <span>{item.tenChucVu}</span><br />
-                                {!item.tenDonVi ? (item.tenDonVi ? item.tenDonVi.toUpperCase() : '') : (item.tenDonVi ? item.tenDonVi.toUpperCase() : '')}<br />
-                                {!item.tenBoMon ? (item.tenBoMon ? item.tenBoMon.toUpperCase() : '') : (item.tenBoMon ? item.tenBoMon.toUpperCase() : '')}
-                            </>
-                        )}
-                        />
+                        <TableCell type='text' content={item.tenChucVu}/>
+                        <TableCell type='text' content={item.tenDonVi}/>
+                        <TableCell type='text' content={item.tenBoMon}/>
+                        <TableCell type='text' style={{ textAlign: 'center' }} content={item.phuCap}/>
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>Số: {item.soQuyetDinh}</span><br />
@@ -259,13 +258,7 @@ class QtChucVuGroup extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <span>Số: {item.soQdThoiChucVu}</span><br />
-                                <span>Ngày: <span style={{ color: 'blue' }}>{item.ngayRaQdThoiChucVu ? new Date(item.ngayRaQdThoiChucVu).ddmmyyyy() : ''}</span></span>
-                            </>
-                        )}
-                        />
+                        <TableCell type='checkbox' style={{ whiteSpace: 'nowrap' }} content={item.chucVuChinh}/>
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show(item, this.state.ma)} onDelete={this.delete} >
                         </TableCell>
