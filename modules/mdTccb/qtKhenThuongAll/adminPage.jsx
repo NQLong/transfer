@@ -275,7 +275,7 @@ class QtKhenThuongAll extends AdminPage {
                                 :
                                 item.maLoaiDoiTuong == '02' ?
                                     <>
-                                        <span>{item.hoCanBo + ' ' + item.tenCanBo}</span><br />
+                                        <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
                                         {item.maCanBo}
                                     </>
                                     : item.maLoaiDoiTuong == '03' ?
@@ -286,7 +286,7 @@ class QtKhenThuongAll extends AdminPage {
                                         </>
                                         : <>
                                             <span>{item.tenBoMon}</span> <br />
-                                            {'KHOA ' + item.tenDonViBoMon}
+                                            {item.tenDonViBoMon}
                                         </>
 
                         )} />

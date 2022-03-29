@@ -48,7 +48,7 @@ class QtNghienCuuKhoaHocStaffUserPage extends AdminPage {
 
         let table = renderTable({
             emptyTable: 'Cán bộ chưa có công trình NCKH nào!',
-            getDataSource: () => list, stickyHead: false,
+            getDataSource: () => list, stickyHead: true,
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'right' }}>#</th>

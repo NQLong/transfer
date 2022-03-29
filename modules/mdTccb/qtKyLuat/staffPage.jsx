@@ -127,6 +127,7 @@ class QtKyLuatUserPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày ra quyết định</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nội dung kỷ luật</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Hình thức kỷ luật</th>
@@ -138,10 +139,10 @@ class QtKyLuatUserPage extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
+                        <TableCell type='date' style={{color: 'blue'}} dateFormat='dd/mm/yyyy' content={item.ngayRaQuyetDinh} />
                         <TableCell type='text' content={(
                             <>
-                                <b> {item.soQuyetDinh ? item.soQuyetDinh : ''} </b> <br/>
-                                {item.ngayRaQuyetDinh ? <span style={{ whiteSpace: 'nowrap' }}>Ngày ra quyết định: <span style={{ color: 'blue' }}>{item.ngayRaQuyetDinh ? T.dateToText(item.ngayRaQuyetDinh, 'dd/mm/yyyy') : ''}</span><br /></span> : null}
+                                <b> {item.soQuyetDinh ? item.soQuyetDinh : ''} </b>
                             </>
                         )}
                         />
