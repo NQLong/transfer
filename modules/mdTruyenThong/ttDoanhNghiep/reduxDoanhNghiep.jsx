@@ -70,71 +70,6 @@ export function getDnDoanhNghiepPage(pageNumber, pageSize, pageCondition, done) 
     };
 }
 
-T.initPage('pageDnDaiDienDoanhNghiep', true);
-
-export function getDnUserDoanhNghiepPage(pageNumber, pageSize, pageCondition, done) {
-    const page = T.updatePage('pageDnDaiDienDoanhNghiep', pageNumber, pageSize, pageCondition);
-    return dispatch => {
-        const url = `/api/doi-ngoai/dai-dien-doanh-nghiep/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition }, data => {
-            if (data.error) {
-                T.notify('Lấy danh sách người dùng bị lỗi!', 'danger');
-                console.error(`GET: ${url}.`, data.error);
-            } else {
-                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
-                done && done(data.page);
-                dispatch({ type: UserGetPage, page: data.page });
-            }
-        }, () => T.notify('Lấy danh sách người dùng bị lỗi!', 'danger'));
-    };
-}
-
-export function createUserDoanhNghiep(changes, companies, done) {
-    return dispatch => {
-        const url = '/api/doi-ngoai/dai-dien-doanh-nghiep';
-        T.post(url, { changes, companies }, data => {
-            if (data.error) {
-                T.notify(data.error.message || 'Tạo người dùng bị lỗi!', 'danger');
-                console.error(`POST: ${url}.`, data.error);
-            } else {
-                dispatch(getDnUserDoanhNghiepPage());
-                T.notify('Tạo người dùng thành công!', 'success');
-                done && done(data.item);
-            }
-        }, () => T.notify('Tạo người dùng bị lỗi!', 'danger'));
-    };
-}
-
-export function updateUserDoanhNghiep(email, changes, companies, done) {
-    return dispatch => {
-        const url = '/api/doi-ngoai/dai-dien-doanh-nghiep';
-        T.put(url, { email, changes, companies }, data => {
-            if (data.error) {
-                T.notify(data.error.message || 'Cập nhật người dùng bị lỗi!', 'danger');
-                console.error(`PUT: ${url}.`, data.error);
-            } else {
-                dispatch(getDnUserDoanhNghiepPage());
-                done && done(data.item);
-            }
-        }, () => T.notify('Cập nhật người dùng bị lỗi!', 'danger'));
-    };
-}
-
-export function deleteUserDoanhNghiep(email, done) {
-    return dispatch => {
-        const url = '/api/doi-ngoai/dai-dien-doanh-nghiep';
-        T.delete(url, { email }, data => {
-            if (data.error) {
-                T.notify(data.error.message || 'Loại bỏ người dùng bị lỗi!', 'danger');
-                console.error(`DELETE: ${url}.`, data.error);
-            } else {
-                dispatch(getDnUserDoanhNghiepPage());
-                T.alert('Loại bỏ người dùng thành công!', 'success', false, 800);
-                done && done();
-            }
-        }, () => T.notify('Cập nhật người dùng bị lỗi!', 'danger'));
-    };
-}
 
 export function getDnDoanhNghiepAll(condition, done) {
     return dispatch => {
@@ -282,52 +217,6 @@ export function homeGetCompanyDoiTac(hiddenShortName, done) {
                 done && done(data.item);
             }
         }, error => console.error(`GET: ${url}.`, error));
-    };
-}
-
-// Owner cua doanh nghiep ---------------------------------------------------------------------------------------------------------
-export function ownerGetDnDoanhNghiep(id, done) {
-    return dispatch => {
-        const url = `/api/doi-ngoai/owner-doanh-nghiep/item/${id}`;
-        T.get(url, data => {
-            if (data.error) {
-                T.notify('Lấy thông tin doanh nghiệp bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
-                console.error(`GET: ${url}.`, data.error);
-            } else {
-                dispatch({ type: DnDoanhNghiepGetItem, item: data.item });
-            }
-            done && done(data);
-        }, error => console.error(`GET: ${url}.`, error));
-    };
-}
-
-export function ownerGetAllDoanhNghiep(done) {
-    return dispatch => {
-        const url = '/api/doi-ngoai/owner-doanh-nghiep/all';
-        T.get(url, data => {
-            if (data.error) {
-                T.notify('Lấy danh sách doanh nghiệp bị lỗi', 'danger');
-                console.error(`GET: ${url}.`, data.error);
-            } else {
-                dispatch({ type: DnDoanhNghiepGetAll, items: data.companies });
-                done && done(data.companies);
-            }
-        }, () => T.notify('Lấy danh sách doanh nghiệp bị lỗi', 'danger'));
-    };
-}
-
-export function updateOwnerDnDoanhNghiep(id, changes, done) {
-    return () => {
-        const url = '/api/doi-ngoai/owner-doanh-nghiep';
-        T.put(url, { id, changes }, data => {
-            if (data.error || changes == null) {
-                T.notify('Cập nhật thông tin doanh nghiệp bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
-                console.error(`PUT: ${url}.`, data.error);
-                done && done(data.error);
-            } else {
-                T.notify('Cập nhật thông tin doanh nghiệp thành công!', 'success');
-            }
-        }, error => T.notify('Cập nhật thông tin doanh nghiệp bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
     };
 }
 

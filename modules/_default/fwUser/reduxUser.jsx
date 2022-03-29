@@ -162,6 +162,11 @@ export function deleteUser(email, done) {
     };
 }
 
+export function refreshSessionUser(email) {
+    const url = '/api/user/session';
+    T.put(url, { email }, () => T.notify('Cập nhật session thành công!', 'success'), () => T.notify('Cập nhật session bị lỗi!', 'danger'));
+}
+
 export function changeUser(user) {
     return { type: UserUpdate, item: user };
 }
