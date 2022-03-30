@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import Pagination from 'view/component/Pagination';
 
 class EventWaitApprovalPage extends React.Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
     }
 

@@ -158,6 +158,28 @@ class QtHuongDanLuanVan extends AdminPage {
         return deTais;
     }
 
+    list2 = (text, n, listYear) => {
+        if (!text) return [];
+        let deTais = text.split('??');
+        let years = listYear.split('??');
+        let results = [];
+        let choose = n > 5 ? 5 : n;
+        for (let k = 0; k < choose; k++) {
+            results.push(<div key={results.length}> <span>
+                {k + 1}. {deTais[k]} ({years[k].trim()})
+            </span></div>);
+        }
+        if (n > 5) {
+            results.push(<div key={results.length}> <span>
+                .........................................
+            </span></div>);
+            let k = n - 1;
+            results.push(<div key={results.length}> <span>
+                {k + 1}. {deTais[k]} ({years[k].trim()})
+            </span></div>);
+        }
+        return results;
+    }
 
     delete = (e, item) => {
         T.confirm('Xóa hướng dẫn luận văn', 'Bạn có chắc bạn muốn xóa hướng dẫn luận văn này?', 'warning', true, isConfirm => {
@@ -178,11 +200,14 @@ class QtHuongDanLuanVan extends AdminPage {
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
             table = renderTable({
-                getDataSource: () => list, stickyHead: false,
+                getDataSource: () => list, stickyHead: true,
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br/>Đơn vị công tác</th>
                         {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số đề tài hướng dẫn</th>}
                         {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách luận văn</th>}
                         {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Họ tên sinh viên</th>}
@@ -197,18 +222,25 @@ class QtHuongDanLuanVan extends AdminPage {
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span>{(item.hoCanBo ? item.hoCanBo : '') + ' ' + (item.tenCanBo ? item.tenCanBo : '')}</span><br />
+                                <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
                                 {item.shcc}
                             </>
-                        )}
-                        />
+                        )} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenHocVi || ''} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucDanhNgheNghiep || ''} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                            <>
+                                <span> {item.tenChucVu || ''}<br /> </span>
+                                {(item.tenDonVi || '').normalizedName()}
+                            </>
+                        )} />
                         {this.checked && <TableCell type='text' style={{ textAlign: 'center'}} content={item.soDeTai} />}
                         {!this.checked && <TableCell type='text' content={item.hoTen} />}
                         {!this.checked && <TableCell type='text' style={{}} content={<>
                             <span><i>{item.tenLuanVan}</i></span><br />
-                            {item.sanPham ? <span>Sản phẩm: {item.sanPham ? item.sanPham : ''}</span> : null}
+                            {item.sanPham ? <span>Sản phẩm: {item.sanPham || ''}</span> : null}
                         </>} />}
-                        {this.checked && <TableCell type='text' content={this.list(item.danhSachDeTai, item.soDeTai, item.soDeTai)} />}
+                        {this.checked && <TableCell type='text' content={this.list2(item.danhSachDeTai, item.soDeTai, item.danhSachNamTotNghiep)} />}
                         {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.namTotNghiep} />}
                         {!this.checked && <TableCell type='text' content={item.bacDaoTao} style={{ whiteSpace: 'nowrap' }} />}
                         {

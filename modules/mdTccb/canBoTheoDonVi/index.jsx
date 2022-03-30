@@ -10,7 +10,7 @@ export default {
     },
     routes: [
         {
-            path: '/user/danh-sach-can-bo-thuoc-don-vi',
+            path: '/user/nhan-su-don-vi',
             component: Loadable({ loading: Loading, loader: () => import('./staffPage') })
         },
     ],

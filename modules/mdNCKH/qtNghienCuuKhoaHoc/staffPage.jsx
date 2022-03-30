@@ -48,17 +48,17 @@ class QtNghienCuuKhoaHocStaffUserPage extends AdminPage {
 
         let table = renderTable({
             emptyTable: 'Cán bộ chưa có công trình NCKH nào!',
-            getDataSource: () => list, stickyHead: false,
+            getDataSource: () => list, stickyHead: true,
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                    <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Đề tài</th>
-                    <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Mã số và cấp quản lý</th>
-                    <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Thời gian thực hiện</th>
+                    <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Đề tài</th>
+                    <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Mã số và cấp quản lý</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian thực hiện</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Kinh phí <br /><small>(triệu đồng)</small></th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Vai trò</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Nghiệm thu</th>
-                    <th style={{ width: '10%', whiteSpace: 'nowrap', textAlign: 'center' }}>Kết quả</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Kết quả</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>In trong LLKH</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                 </tr>
@@ -67,10 +67,10 @@ class QtNghienCuuKhoaHocStaffUserPage extends AdminPage {
                 <tr key={index}>
                     <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                     <TableCell type='text' content={<>
-                        <div><br />{item.tenDeTai ? item.tenDeTai : ''}</div> <br />
+                        <div><br />{item.tenDeTai || ''}</div> <br />
                     </>
                     } />
-                    <TableCell type='text' content={item.maSoCapQuanLy ? item.maSoCapQuanLy : ''} />
+                    <TableCell type='text' content={item.maSoCapQuanLy || ''} />
                     <TableCell type='text' content={(
                         <>
                             {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
@@ -79,13 +79,13 @@ class QtNghienCuuKhoaHocStaffUserPage extends AdminPage {
                         </>
                     )}
                     />
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={(item.kinhPhi ? item.kinhPhi : '').numberWithCommas()} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'right' }} content={(item.kinhPhi || '').numberWithCommas()} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.vaiTro == 'CN' ? 'Chủ nhiệm' : 'Tham gia'} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={
                         item.ngayNghiemThu ?
                             <span style={{ color: 'red' }}>{item.ngayNghiemThu == -1 ? 'Chưa nghiệm thu' : T.dateToText(item.ngayNghiemThu, item.ngayNghiemThuType ? item.ngayNghiemThuType : 'dd/mm/yyyy')}</span>
                             : ''} />
-                    <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.ketQua ? item.ketQua : ''} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.ketQua} />
                     <TableCell type='checkbox' style={{ whiteSpace: 'nowrap' }} content={item.inLLKH} permission={permission}
                         onChanged={value => {
                             this.props.updateQtNckhStaffPage(item.id, { inLlkh: value ? 1 : 0 },

@@ -59,6 +59,7 @@ module.exports = app => {
         let id = null, link = null;
         if (req.originalUrl.startsWith('/news/item/')) id = req.originalUrl.substring('/news/item/'.length).split('?')[0];
         if (req.originalUrl.startsWith('/tin-tuc/')) link = req.originalUrl.substring('/tin-tuc/'.length).split('?')[0];
+        if (req.originalUrl.startsWith('/megastory/')) link = req.originalUrl.substring('/megastory/'.length).split('?')[0];
         app.model.fwNews.get(id ? { id } : { link }, (error, item) => {
             if (error || !item) {
                 app.templates.home(req, res);
