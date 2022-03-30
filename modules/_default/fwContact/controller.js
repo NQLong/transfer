@@ -12,7 +12,6 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         // app.model.fwContact.searchPage(pageNumber, pageSize, -1, '', (error, page) => {
-        //     console.log(error);
         //     if (error || page == null) {
         //         res.send({ error });
         //     } else {

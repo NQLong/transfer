@@ -121,7 +121,6 @@ class ComponentTTCongTac extends AdminPage {
         }
         catch (selector) {
             if (selector) {
-                console.log(selector);
                 selector.focus();
                 T.notify('<b>' + (selector.props.label || 'Dữ liệu') + '</b> bị trống!', 'danger');
                 return false;

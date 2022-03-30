@@ -84,7 +84,6 @@ export function createHcthCongVanDi(data, done) {
                 T.notify('Thêm công văn đi của các đơn vị bị lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
-                // console.log(data);
                 T.notify('Thêm công văn đi của các đơn vị thành công!', 'success');
                 dispatch(getHcthCongVanDiSearchPage());
                 done && done(data);
@@ -139,8 +138,6 @@ export function getHcthCongVanDiSearchPage(pageNumber, pageSize, pageCondition, 
                 T.notify('Lấy danh sách công văn đến bị lỗi, s1' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                // T.notify(page.filter)
-                // console.log("data" + data);
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 if (page.filter) data.page.filter = page.filter;
                 dispatch({ type: hcthCongVanDiSearchPage, page: data.page });
@@ -175,7 +172,6 @@ export function getCongVanDi(id, done) {
                 T.notify('Lấy công văn đi của các đơn vị bị lỗi!', 'danger');
             } else {
                 // T.notify('Lấy công văn đi của các đơn vị thành công!', 'success');
-                // console.log(data.item);
                 dispatch({ type: hcthCongVanDiGet, item: data.item });
                 done && done(data.item);
             }
