@@ -36,7 +36,7 @@ class AdminEditPage extends AdminPage {
             try {
                 linkCongVan = JSON.parse(linkCongVan);
             }
-            catch (error){
+            catch (error) {
                 T.notify(error, 'danger');
                 linkCongVan = [];
             }
@@ -190,15 +190,15 @@ class AdminEditPage extends AdminPage {
         const readOnly = this.props.readOnly;
         return this.renderPage({
             icon: 'fa fa-caret-square-o-right',
-            title: 'Công văn giữa các phòng',
+            title: 'Công văn đi của các đơn vị',
             breadcrumb: [
                 <Link key={0} to='/user/hcth'>Hành chính tổng hợp </Link>,
-                <Link key={1} to='/user/hcth/cong-van-di'>Công văn giữa các phòng</Link>,
+                <Link key={1} to='/user/hcth/cong-van-di'>Công văn đi của các đơn vị</Link>,
                 this.state.id ? 'Cập nhật' : 'Tạo mới'
             ],
             content: <>
                 <div className='tile'>
-                    <h3 className='tile-title'>{!this.state.id ? 'Tạo mới công văn giữa các phòng' : 'Cập nhật công văn giữa các phòng'}</h3>
+                    <h3 className='tile-title'>{!this.state.id ? 'Tạo mới công văn đi của các đơn vị' : 'Cập nhật công văn đi của các đơn vị'}</h3>
                     <div className='tile-body row'>
                         <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayGui = e} label='Ngày gửi' readOnly={readOnly} required />
                         <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayKy = e} label='Ngày ký' readOnly={readOnly} required />
