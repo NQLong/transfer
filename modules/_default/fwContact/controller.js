@@ -1,5 +1,5 @@
 module.exports = app => {
-    const menu = { parentMenu: { index: 6000, title: 'Liên hệ', icon: 'fa-dashboard', link: '/user/contact' } };
+    const menu = { parentMenu: { index: 6050, title: 'Liên hệ', icon: 'fa-dashboard', link: '/user/contact' } };
     app.permission.add(
         { name: 'contact:read', menu },
         { name: 'contact:delete' }
