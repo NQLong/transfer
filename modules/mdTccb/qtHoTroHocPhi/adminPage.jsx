@@ -299,7 +299,10 @@ class QtHoTroHocPhi extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br />Đơn vị công tác</th>
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày làm đơn</th>}
                         {!this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Nội dung hỗ trợ</th>}
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học kỳ, số tiền hỗ trợ</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cơ sở đào tạo</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian/Khóa học</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học kỳ hỗ trợ</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số tiền hỗ trợ</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tình trạng</th>}
                         {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}> Số quá trình </th>}
                         {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách</th>}
@@ -309,7 +312,7 @@ class QtHoTroHocPhi extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                        <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
+                        <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
                                 {item.shcc}
@@ -319,32 +322,28 @@ class QtHoTroHocPhi extends AdminPage {
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucDanhNgheNghiep || ''} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                {item.tenChucVu || ''}<br />
+                                <span> {item.tenChucVu || ''}<br /> </span>
                                 {(item.tenDonVi || '').normalizedName()}
                             </>
                         )} />
                         {!this.checked && <TableCell type='date' dateFormat='dd/mm/yyyy' content={item.ngayLamDon} />}
+                        {!this.checked && <TableCell type='text' content={(<i> {item.noiDung || ''}</i>)} />}
+                        {!this.checked && <TableCell type='text' content={(<b> {item.tenCoSoDaoTao || ''}</b>)} />}
                         {!this.checked && <TableCell type='text' content={(
                             <>
-                                <b> {item.noiDung ? item.noiDung : ''}</b><br />
-                                {item.tenCoSoDaoTao ? <span style={{ whiteSpace: 'nowrap' }}>Cơ sở đào tạo: <i>{item.tenCoSoDaoTao}</i><br /></span> : null}
                                 {item.batDau ? <span style={{ whiteSpace: 'nowrap' }}>Bắt đầu: <span style={{ color: 'blue' }}>{item.batDau ? T.dateToText(item.batDau, item.batDauType ? item.batDauType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
                                 {item.ketThuc && item.ketThuc != -1 ? <span style={{ whiteSpace: 'nowrap' }}>Kết thúc: <span style={{ color: 'blue' }}>{item.ketThuc && item.ketThuc != -1 ? T.dateToText(item.ketThuc, item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''}</span></span> : null}
                             </>
                         )} />}
-                        {!this.checked && <TableCell type='text' content={(
-                            <>
-                                <b> {item.hocKyHoTro ? item.hocKyHoTro : ''} </b><br />
-                                {item.soTien ? <span style={{ whiteSpace: 'nowrap' }}>Số tiền hỗ trợ: <b>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.soTien)}</b></span> : null}
-                            </>
-                        )} />}
-                        {this.checked && <TableCell type='text' content={item.soQuaTrinh} />}
-                        {this.checked && <TableCell type='text' content={this.list(item.danhSachNoiDung, item.danhSachBatDau, item.danhSachKetThuc, item.danhSachBatDauType, item.danhSachKetThucType, item.soQuaTrinh)} />}
+                        {!this.checked && <TableCell type='text' content={(<b> {item.hocKyHoTro || ''} </b>)} />}
+                        {!this.checked && <TableCell type='text' content={(<b>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.soTien)}</b>)} />}
                         {!this.checked && <TableCell type='text' content={
                             (item.ketThuc == -1 || item.ketThuc >= item.today) ?
                                 <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đang diễn ra</span> :
                                 <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đã kết thúc</span>
                         } />}
+                        {this.checked && <TableCell type='text' content={item.soQuaTrinh} />}
+                        {this.checked && <TableCell type='text' content={this.list(item.danhSachNoiDung, item.danhSachBatDau, item.danhSachKetThuc, item.danhSachBatDauType, item.danhSachKetThucType, item.soQuaTrinh)} />}
                         {!this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onEdit={() => this.modal.show(item)} onDelete={this.delete} />}
                         {
                             this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}>

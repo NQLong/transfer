@@ -136,24 +136,9 @@ class QtKhenThuongAllUserPage extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                        <TableCell type='text' style={{ textAlign: 'center' }} content={(
-                            <>
-                                {item.soQuyetDinh ? item.soQuyetDinh : ''}
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' content={(
-                            <>
-                                {item.tenThanhTich}
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' content={(
-                            <>
-                                {item.namDatDuoc}
-                            </>
-                        )}
-                        />
+                        <TableCell type='text' style={{ textAlign: 'center' }} content={(item.soQuyetDinh || '')} />
+                        <TableCell type='text' style={{ textAlign: 'center' }} content={(item.namDatDuoc)} />
+                        <TableCell type='text' content={(item.tenThanhTich)} />
                         <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemThiDua} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show({ item, ma: shcc })} onDelete={this.delete} />

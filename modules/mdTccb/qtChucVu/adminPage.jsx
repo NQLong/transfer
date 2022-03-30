@@ -6,12 +6,12 @@ import Pagination from 'view/component/Pagination';
 import {
     getQtChucVuPage, updateQtChucVuStaff,
     deleteQtChucVuStaff, createQtChucVuStaff, getQtChucVuGroupPage,
-    getQtChucVuAll, 
+    getQtChucVuAll,
 } from './redux';
 import { SelectAdapter_DmChucVuV2, getDmChucVu } from 'modules/mdDanhMuc/dmChucVu/redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_DmBoMonTheoDonVi } from 'modules/mdDanhMuc/dmBoMon/redux';
-import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux'; 
+import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 
 const timeList = [
     { id: 0, text: 'Không' },
@@ -222,15 +222,23 @@ class QtChucVu extends AdminPage {
         this.modal.show();
     }
 
-    list = (text, i, j) => {
-        if (!text) return '';
-        let danhSach = text.split('??').map(str => <p key={i--} style={{ textTransform: 'uppercase' }}>{j - i}. {str}</p>);
+    list = (dsChucVu, dsDonVi, dsBomon) => {
+        if (!dsChucVu) return '';
+        let dsChucVuSplitted = dsChucVu.split('??');
+        let dsDonViSplitted = dsDonVi.split('??');
+        let dsBomonSplitted = dsBomon.split('??');
+        const danhSach = [];
+        for (let i = 0; i < dsChucVuSplitted.length; i++) {
+            dsDonViSplitted[i] = dsDonViSplitted[i].trim();
+            dsBomonSplitted[i] = dsBomonSplitted[i].trim();
+            danhSach.push(<span key={i}>{i+1}. {dsChucVuSplitted[i]} ({dsBomonSplitted[i] ? dsBomonSplitted[i] : (dsDonViSplitted[i] ? dsDonViSplitted[i] : '')}){i != dsChucVuSplitted.length - 1 ? <br/> : ''}</span>);
+        }
         return danhSach;
     }
 
     delete = (e, item) => {
         T.confirm('Xóa chức vụ', 'Bạn có chắc bạn muốn xóa chức vụ này?', 'warning', true, isConfirm => {
-            isConfirm && this.props.deleteQtChucVuStaff(item.stt, false, null, error => {
+            isConfirm && this.props.deleteQtChucVuStaff({ stt: item.stt, shcc: item.shcc }, false, null, error => {
                 if (error) T.notify(error.message ? error.message : 'Xoá chức vụ bị lỗi!', 'danger');
                 else T.alert('Xoá chức vụ thành công!', 'success', false, 800);
             });
@@ -252,7 +260,10 @@ class QtChucVu extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        {!this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Chức vụ</th>}
+                        {!this.checked && <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Chức vụ</th>}
+                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Đơn vị cấp trường</th>}
+                        {!this.checked && <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Đơn vị cấp khoa</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Hệ số phụ cấp</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Quyết định bổ nhiệm</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Chức vụ chính</th>}
                         {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số chức vụ</th>}
@@ -270,14 +281,10 @@ class QtChucVu extends AdminPage {
                             </>
                         )}
                         />
-                        {!this.checked && <TableCell type='text' content={(
-                            <>
-                                <b>{item.tenChucVu}</b><br />
-                                <span>{!item.tenBoMon ? (item.tenDonVi ? 'Đơn vị: ' + item.tenDonVi.toUpperCase() : '') : (item.tenBoMon ? item.tenBoMon.toUpperCase() : '')}</span><br />
-                                <span>Hệ số phụ cấp: {item.phuCap}</span>
-                            </>
-                        )}
-                        />}
+                        {!this.checked && <TableCell type='text' content={item.tenChucVu}/>}
+                        {!this.checked && <TableCell type='text' content={item.tenDonVi}/>}
+                        {!this.checked && <TableCell type='text' content={item.tenBoMon}/>}
+                        {!this.checked && <TableCell type='text' style={{ textAlign: 'center' }} content={item.phuCap}/>}
                         {!this.checked && <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>Số: {item.soQuyetDinh}</span><br />
@@ -287,7 +294,7 @@ class QtChucVu extends AdminPage {
                         />}
                         {!this.checked && <TableCell type='checkbox' content={item.chucVuChinh} />}
                         {this.checked && <TableCell type='text' content={item.soChucVu} />}
-                        {this.checked && <TableCell type='text' content={this.list(item.danhSachChucVu, item.soChucVu, item.soChucVu)} />}
+                        {this.checked && <TableCell type='text' content={this.list(item.danhSachChucVu, item.danhSachDonVi, item.danhSachBoMon)} />}
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                                 onEdit={() => this.modal.show(item)} onDelete={this.delete} >
@@ -314,22 +321,22 @@ class QtChucVu extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    <FormSelect className='col-lg-3 col-md-12' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect className='col-lg-4 col-md-12' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
 
-                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-3' label='Từ' onChange={() => this.changeAdvancedSearch()} />}
+                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ' onChange={() => this.changeAdvancedSearch()} />}
                     
-                    {(this.timeType && this.timeType.value() && this.timeType.value() != 0) ? <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-3' label='Đến' onChange={() => this.changeAdvancedSearch()} /> : <div className='col-lg-9' />}
+                    {(this.timeType && this.timeType.value() && this.timeType.value() != 0) ? <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến' onChange={() => this.changeAdvancedSearch()} /> : <div className='col-lg-9' />}
                     
                     <FormSelect className='col-12 col-md-4' multiple={true} ref={e => this.maDonVi = e} label='Theo đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} placeHolder='Có thể chọn nhiều đơn vị' />
                     
-                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.mulCanBo = e} label='Theo cán bộ cụ thể' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-12 col-md-4' multiple={true} ref={e => this.mulCanBo = e} label='Theo cán bộ cụ thể' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
 
-                    <FormSelect ref={e => this.gioiTinh = e} label='Theo giới tính' className='col-12 col-md-2' data={[
+                    <FormSelect ref={e => this.gioiTinh = e} label='Theo giới tính' className='col-12 col-md-4' data={[
                         { id: '01', text: 'Nam' },
                         { id: '02', text: 'Nữ' },
                     ]} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
 
-                    <FormSelect className='col-md-6' multiple={true} ref={e => this.mulMaChucVu = e} label='Theo chức vụ' data={SelectAdapter_DmChucVuV2} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-md-12' multiple={true} ref={e => this.mulMaChucVu = e} label='Theo chức vụ' data={SelectAdapter_DmChucVuV2} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
                 </div>
             </>,
             content: <>

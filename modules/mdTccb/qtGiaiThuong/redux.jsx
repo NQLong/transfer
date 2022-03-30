@@ -181,7 +181,7 @@ export function updateQtGiaiThuongGroupPageMa(id, changes, done) {
             } else {
                 T.notify('Cập nhật giải thưởng thành công!', 'success');
                 done && done(data.item);
-                dispatch(getQtGiaiThuongPage());
+                dispatch(getQtGiaiThuongGroupPageMa());
             }
         }, () => T.notify('Cập nhật giải thưởng bị lỗi!', 'danger'));
     };
@@ -197,8 +197,8 @@ export function createQtGiaiThuongGroupPageMa(data, done) {
             } else {
                 if (done) {
                     T.notify('Tạo giải thưởng thành công!', 'success');
-                    dispatch(getQtGiaiThuongPage());
                     done && done(data);
+                    dispatch(getQtGiaiThuongGroupPageMa());
                 }
             }
         }, () => T.notify('Tạo giải thưởng bị lỗi!', 'danger'));
@@ -214,7 +214,7 @@ export function deleteQtGiaiThuongGroupPageMa(id, done) {
             } else {
                 T.alert('giải thưởng đã xóa thành công!', 'success', false, 800);
                 done && done(data.item);
-                dispatch(getQtGiaiThuongPage());
+                dispatch(getQtGiaiThuongGroupPageMa());
             }
         }, () => T.notify('Xóa giải thưởng bị lỗi!', 'danger'));
     };
