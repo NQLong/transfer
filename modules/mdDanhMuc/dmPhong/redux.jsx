@@ -79,9 +79,9 @@ export function getDmPhongPage(pageNumber, pageSize, done) {
     };
 }
 
-export function getDmPhong(ma, done) {
+export function getDmPhong(ten, done) {
     return () => {
-        const url = `/api/danh-muc/phong/item/${ma}`;
+        const url = `/api/danh-muc/phong/item/${ten}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy thông tin phòng học bị lỗi!', 'danger');
@@ -109,10 +109,10 @@ export function createDmPhong(item, done) {
     };
 }
 
-export function deleteDmPhong(ma) {
+export function deleteDmPhong(ten) {
     return dispatch => {
         const url = '/api/danh-muc/phong';
-        T.delete(url, { ma }, data => {
+        T.delete(url, { ten }, data => {
             if (data.error) {
                 T.notify('Xóa phòng học bị lỗi!', 'danger');
                 console.error(`DELETE: ${url}.`, data.error);
@@ -124,10 +124,10 @@ export function deleteDmPhong(ma) {
     };
 }
 
-export function updateDmPhong(ma, changes, done) {
+export function updateDmPhong(ten, changes, done) {
     return dispatch => {
         const url = '/api/danh-muc/phong';
-        T.put(url, { ma, changes }, data => {
+        T.put(url, { ten, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông phòng học bị lỗi!', 'danger');
                 console.error(`PUT: ${url}.`, data.error);
@@ -157,3 +157,11 @@ export function createDmPhongByUpload(item, done) {
 export function changeDmPhong(item) {
     return { type: DmPhongUpdate, item };
 }
+
+export const SelectAdapter_DmPhong = {
+    ajax: true,
+    url: '/api/danh-muc/phong/page/1/20',
+    data: params => ({ condition: params.term }),
+    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ten, text: item.ten })) : [] }),
+    fetchOne: (ma, done) => (getDmPhong(ma, item => done && done({ id: item.ten, text: `${item.ten}` })))(),
+};

@@ -35,7 +35,7 @@ class EditModal extends AdminModal {
 
     onSubmit = (e) => {
         e.preventDefault();
-        const 
+        const
             changes = {
                 ten: { vi: this.tenvi.value(), en: this.tenen.value() },
                 moTa: { vi: this.editorVi, en: this.editorEn },
@@ -43,10 +43,10 @@ class EditModal extends AdminModal {
                 kichHoat: this.state.active ? '1' : '0',
             };
         if (changes.ten.vi == '') {
-            T.notify('Tên tòa nhà bị trống!', 'danger');
+            T.notify('Tên dãy nhà bị trống!', 'danger');
             this.tenvi.focus();
         } else if (changes.ten.en == '') {
-            T.notify('Tên tòa nhà bị trống!', 'danger');
+            T.notify('Tên dãy nhà bị trống!', 'danger');
             this.tenen.focus();
         } else if (changes.coSo == null) {
             T.notify('Cơ sở chưa được chọn!', 'danger');
@@ -68,7 +68,7 @@ class EditModal extends AdminModal {
                 <form className='modal-dialog modal-lg' role='document' onSubmit={this.onSubmit}>
                     <div className='modal-content'>
                         <div className='modal-header'>
-                            <h5 className='modal-title'>Thông tin tòa nhà</h5>
+                            <h5 className='modal-title'>Thông tin dãy nhà</h5>
                             <button type='button' className='close' data-dismiss='modal' aria-label='Close'>
                                 <span aria-hidden='true'>&times;</span>
                             </button>
@@ -97,8 +97,8 @@ class EditModal extends AdminModal {
                             <div className='tab-content' style={{ marginTop: 8 }}>
                                 <div id='dmToaNhaTabVi' className='tab-pane fade show active'>
                                     <div className='form-group'>
-                                        <label htmlFor='dmToaNhaNameVi'>Tên Tòa nhà</label>
-                                        <input className='form-control' id='dmToaNhaNameVi' type='text' placeholder='Tên Tòa nhà' readOnly={readOnly} />
+                                        <label htmlFor='dmToaNhaNameVi'>Tên Dãy nhà</label>
+                                        <input className='form-control' id='dmToaNhaNameVi' type='text' placeholder='Tên Dãy nhà' readOnly={readOnly} />
                                     </div>
                                     <div className='form-group'>
                                         <label>Mô tả</label>
@@ -150,14 +150,14 @@ class DmToaNhaPage extends AdminPage {
 
     delete = (e, item) => {
         e.preventDefault();
-        T.confirm('Xóa tòa nhà', 'Bạn có chắc bạn muốn xóa tòa nhà này?', true, isConfirm =>
+        T.confirm('Xóa dãy nhà', 'Bạn có chắc bạn muốn xóa dãy nhà này?', true, isConfirm =>
             isConfirm && this.props.deleteDmToaNha(item.ma));
     }
 
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('dmToaNha', ['read', 'write', 'delete']);
-        let table = 'Không có tòa nhà!';
+        let table = 'Không có dãy nhà!';
         let coSoList = this.props.categoryCampus && this.props.categoryCampus.items ? this.props.categoryCampus.items : [];
         if (typeof (coSoList) == 'object') { coSoList = Object.values(coSoList); }
 
@@ -167,7 +167,7 @@ class DmToaNhaPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                        <th style={{ width: '50%' }}>Tòa nhà</th>
+                        <th style={{ width: '50%' }}>Dãy nhà</th>
                         <th style={{ width: '50%' }}>Cơ sở</th>
                         <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
                         <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
@@ -187,10 +187,10 @@ class DmToaNhaPage extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-list-alt',
-            title: 'Danh mục Tòa nhà',
+            title: 'Danh mục Dãy nhà',
             breadcrumb: [
                 <Link key={0} to='/user/category'>Danh mục</Link>,
-                'Danh mục Tòa nhà'
+                'Danh mục Dãy nhà'
             ],
             content: <>
                 <div className='tile'>{table}</div>

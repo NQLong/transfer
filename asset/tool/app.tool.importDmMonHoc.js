@@ -1,0 +1,112 @@
+let package = require('../../package');
+const path = require('path');
+// Variables ==================================================================
+const app = {
+  model: {},
+  isDebug: !path.join(__dirname, '../../').startsWith('/var/www/'),
+  fs: require('fs'), path,
+  database: {},
+  publicPath: path.join(__dirname, package.path.public),
+  modulesPath: path.join(__dirname, '../../' + package.path.modules)
+};
+// Configure ==================================================================
+require('../../config/database.oracleDB')(app, package);
+require('../../config/common')(app);
+require('../../config/io')(app);
+require('../../config/lib/excel')(app);
+require('../../config/lib/fs')(app);
+require('../../config/lib/string')(app);
+
+
+// Init =======================================================================
+
+app.loadModules(false);
+const errorList = [];
+
+const run = () => app.excel.readFile(app.path.join(__dirname, 'danhMucMonHoc.xlsx'), workbook => {
+  if (workbook) {
+    let errors = '';
+    const worksheet = workbook.getWorksheet(1),
+      solve = (index = 2) => {
+        const getVal = (column, type = null, Default = null) => {
+          if (type === 'text' || !type) {
+            Default = Default ? Default : null;
+            const val = worksheet.getCell(column + index).text.trim();
+            return val === '' ? Default : (val == null ? '' : val);
+          }
+        }
+        if (worksheet.getCell('A' + index).value == null) {
+          process.stdout.clearLine();
+          process.stdout.cursorTo(0);
+          console.log('Running done!');
+          if (errorList.length)
+            console.log(`Error on line(s): ${errorList.join(', ')}.`);
+          else console.log('All successfully');
+          process.exit();
+        }
+        const record = {
+          ma: getVal('A', 'text'),
+          ten: getVal('B', 'text'),
+          soTinChi: getVal('C', 'text', 0),
+          tongSoTiet: getVal('D', 'text', 0),
+          soTietLt: getVal('E', 'text', 0),
+          soTietTh: getVal('F', 'text', 0),
+          soTietTt: getVal('G', 'text', 0),
+          soTietTl: getVal('H', 'text', 0),
+          soTietDa: getVal('I', 'text', 0),
+          soTietLa: getVal('J', 'text', 0),
+          tenTiengAnh: getVal('L', 'text', ''),
+          donVi: getVal('M'),
+          ghiChu: getVal('P', 'text', ''),
+          maCtdt: getVal('Q', 'text', ''),
+          tenCtdt: getVal('R', 'text', ''),
+          boMon: ''
+        }
+        if (record) {
+          process.stdout.clearLine();
+          process.stdout.cursorTo(0);
+          process.stdout.write(`Importing line ${index})`);
+          new Promise(resolve => {
+            app.model.dmDonVi.get({
+              statement: 'lower(ten) LIKE :tenDonVi',
+              parameter: {
+                tenDonVi: record.donVi.toLowerCase().trim()
+              }
+            }, (error, item) => {
+              if (error || !item) {
+                record.boMon = '';
+                resolve();
+              }
+              else {
+                record.boMon = item.ma;
+                resolve();
+              }
+            });
+          }).then(() => {
+            app.model.dmMonHoc.create(record, error => {
+              if (error) {
+                console.log(` => Thêm dòng ${index} bị lỗi\n - data: ${JSON.stringify(record, null, 4)}\n - error: ${error}`);
+                errorList.push(index);
+              }
+              solve(index + 1);
+            });
+          });
+
+        } else {
+          if (errors) console.log('\nError:', errors);
+          else console.log('\nDone');
+        };
+
+
+      }
+    if (worksheet) {
+      solve();
+    }
+
+  }
+});
+
+app.readyHooks.add('Run tool.importDmMonHoc.js', {
+  ready: () => app.database.oracle.connected && app.model && app.model.dmMonHoc && app.model.dmDonVi,
+  run
+});

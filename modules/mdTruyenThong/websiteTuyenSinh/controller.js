@@ -2,9 +2,9 @@ module.exports = app => {
     const menuTuyenSinh = {
         parentMenu: app.parentMenu.truyenThong,
         menus: {
-            7001: { title: 'Danh sách bài viết', link: '/user/news/admission', groupIndex: 3, icon: 'fa-list-alt', backgroundColor: '#00b8d4' },
-            7002: { title: 'Danh sách sự kiện', link: '/user/event/admission', groupIndex: 3, icon: 'fa-file-o', backgroundColor: '#22e5b4' },
-            7003: { title: 'Bài viết chờ duyệt', link: '/user/news/draft-admission', groupIndex: 3, icon: 'fa-file-o', backgroundColor: '#a1cc1f', },
+            6009: { title: 'Danh sách bài viết', link: '/user/news/admission', groupIndex: 3, icon: 'fa-list-alt', backgroundColor: '#00b8d4' },
+            6010: { title: 'Danh sách sự kiện', link: '/user/event/admission', groupIndex: 3, icon: 'fa-file-o', backgroundColor: '#22e5b4' },
+            6011: { title: 'Bài viết chờ duyệt', link: '/user/news/draft-admission', groupIndex: 3, icon: 'fa-file-o', backgroundColor: '#a1cc1f', },
             // 7004: { title: 'Chờ duyệt sự kiện', link: '/user/event/draft-admission' },
 
         },

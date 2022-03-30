@@ -15,7 +15,7 @@ export default {
         },
         {
             path: '/user/truyen-thong',
-            component: () => <SubMenusPage menuLink='/user/truyen-thong' menuKey={5000} headerIcon='fa-list-alt' />
+            component: () => <SubMenusPage menuLink='/user/truyen-thong' menuKey={6000} headerIcon='fa-list-alt' />
         },
         {
             path: '/user/settings',
@@ -32,6 +32,10 @@ export default {
         {
             path: '/user/library',
             component: () => <SubMenusPage menuLink='/user/library' menuKey={8000} headerIcon='fa-th-large' />
+        },
+        {
+            path: '/user/pdt',
+            component: () => <SubMenusPage menuLink='/user/pdt' menuKey={7000} headerIcon='fa-diamond' />
         },
         {
             path: '/user/khcn',

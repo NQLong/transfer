@@ -95,12 +95,16 @@ module.exports = (app) => {
             index: 6100, title: 'Sinh viên', link: '/user/students', icon: 'fa-users',
             subMenusRender: false
         },
+        daoTao: {
+            index: 7000, title: 'Đào tạo', link: '/user/pdt', icon: 'fa-diamond',
+            subMenusRender: false
+        },
         category: {
             index: 4000, title: 'Danh mục', link: '/user/category', icon: 'fa-list-alt',
             subMenusRender: false,
         },
         truyenThong: {
-            index: 5000, title: 'Truyền thông', link: '/user/truyen-thong', icon: 'fa-comments-o',
+            index: 6000, title: 'Truyền thông', link: '/user/truyen-thong', icon: 'fa-comments-o',
             subMenusRender: false,
             groups: ['Cấu hình', 'Bài viết', 'Sự kiện', 'Tuyển sinh', 'Doanh nghiệp']
         },
