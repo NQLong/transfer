@@ -100,8 +100,12 @@ class SubMenusPage extends AdminPage {
 
     search = (searchValue) => {
         const menus = this.state.menus.slice();
-        for (let i = 0; i < menus.length; i++)
-            menus[i].show = compareSearch(menus[i].title, searchValue);
+        for (let i = 0; i < menus.length; i++) {
+            if (menus[i].subTitle) {
+                menus[i].show = compareSearch(menus[i].subTitle, searchValue);
+            }
+            if (!menus[i].show) menus[i].show = compareSearch(menus[i].title, searchValue);
+        }
         this.setState({ menus });
     }
 
@@ -168,7 +172,7 @@ class SubMenusPage extends AdminPage {
             }
         }
         );
-    
+
         // let edit = isEditMode ?
         //     <React.Fragment>
         //         <button type='button' className='btn btn-danger btn-circle' title='Ẩn tất cả' style={{ position: 'fixed', right: '200px', bottom: '10px' }} onClick={() => this.selectAllIcons(false)}>

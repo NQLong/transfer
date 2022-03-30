@@ -1,7 +1,7 @@
 module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.truyenThong,
-        menus: { 5007: { title: 'iNews', link: '/user/inews', groupIndex: 1 } },
+        menus: { 6007: { title: 'iNews', link: '/user/inews', groupIndex: 1 } },
     };
 
     app.permission.add(

@@ -2,23 +2,23 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.truyenThong,
         menus: {
-            5001: { title: 'Danh mục tin tức', link: '/user/news/category', groupIndex: 1, icon: 'fa-list-alt', backgroundColor: '#00b8d4', },
-            5002: { title: 'Danh sách bài viết', link: '/user/news/list', groupIndex: 1, icon: 'fa-file-o', backgroundColor: '#22e5b4', },
-            5003: { title: 'Chờ duyệt', link: '/user/news/draft', groupIndex: 1, icon: 'fa-file-o', backgroundColor: '#a1cc1f', },
+            6001: { title: 'Danh mục tin tức', link: '/user/news/category', groupIndex: 1, icon: 'fa-list-alt', backgroundColor: '#00b8d4', },
+            6002: { title: 'Danh sách bài viết', link: '/user/news/list', groupIndex: 1, icon: 'fa-file-o', backgroundColor: '#22e5b4', },
+            6003: { title: 'Chờ duyệt', link: '/user/news/draft', groupIndex: 1, icon: 'fa-file-o', backgroundColor: '#a1cc1f', },
         },
     };
     const menuTranslate = {
         parentMenu: app.parentMenu.truyenThong,
         menus: {
-            5004: { title: 'Dịch Tiếng Anh', link: '/user/news/draft/translate', groupIndex: 1 },
+            6004: { title: 'Dịch Tiếng Anh', link: '/user/news/draft/translate', groupIndex: 1 },
         }
     };
     const menuUnit = {
         parentMenu: app.parentMenu.truyenThong,
         menus: {
-            5005: { title: 'Danh sách bài viết', link: '/user/news/unit/list', groupIndex: 1, icon: 'fa-file-o', backgroundColor: '#a1cc1f', },
-            5006: { title: 'Chờ duyệt', link: '/user/news/unit/draft', groupIndex: 1, icon: 'fa-file-o', backgroundColor: '#a1cc1f', },
-            5008: { title: 'Danh sách bài viết chính thức', link: '/user/news/list', groupIndex: 1, icon: 'fa-list-alt', backgroundColor: '#00b8d4', },
+            6005: { title: 'Danh sách bài viết', link: '/user/news/unit/list', groupIndex: 1, icon: 'fa-file-o', backgroundColor: '#a1cc1f', },
+            6006: { title: 'Chờ duyệt', link: '/user/news/unit/draft', groupIndex: 1, icon: 'fa-file-o', backgroundColor: '#a1cc1f', },
+            6008: { title: 'Danh sách bài viết chính thức', link: '/user/news/list', groupIndex: 1, icon: 'fa-list-alt', backgroundColor: '#00b8d4', },
         }
     };
     app.permission.add(
@@ -59,6 +59,7 @@ module.exports = app => {
         let id = null, link = null;
         if (req.originalUrl.startsWith('/news/item/')) id = req.originalUrl.substring('/news/item/'.length).split('?')[0];
         if (req.originalUrl.startsWith('/tin-tuc/')) link = req.originalUrl.substring('/tin-tuc/'.length).split('?')[0];
+        if (req.originalUrl.startsWith('/megastory/')) link = req.originalUrl.substring('/megastory/'.length).split('?')[0];
         app.model.fwNews.get(id ? { id } : { link }, (error, item) => {
             if (error || !item) {
                 app.templates.home(req, res);

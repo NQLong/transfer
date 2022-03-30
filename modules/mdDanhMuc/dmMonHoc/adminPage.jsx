@@ -1,9 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getDmMonHocAll, createDmMonHoc, updateDmMonHoc, deleteDmMonHoc } from './redux';
+import { getDmMonHocPage, createDmMonHoc, updateDmMonHoc, deleteDmMonHoc } from './redux';
 import { Link } from 'react-router-dom';
-import { getDmDonViAll} from 'modules/mdDanhMuc/dmDonVi/redux';
-import { AdminPage, AdminModal, renderTable, TableCell, FormTextBox, FormCheckbox, FormSelect } from 'view/component/AdminPage';
+import { getDmDonViAll } from 'modules/mdDanhMuc/dmDonVi/redux';
+import { AdminPage, AdminModal, renderTable, TableCell, FormTextBox, FormCheckbox, FormSelect, FormRichTextBox } from 'view/component/AdminPage';
+import Pagination from 'view/component/Pagination';
+import { SelectAdapter_DmSvLoaiHinhDaoTao } from '../dmSvLoaiHinhDaoTao/redux';
 
 class EditModal extends AdminModal {
     state = { active: true, ma: '' };
@@ -95,25 +97,26 @@ class EditModal extends AdminModal {
         const readOnly = this.props.readOnly;
         return this.renderModal({
             title: this.state.ma ? 'Cập nhật môn học' : 'Tạo mới môn học',
+            size: 'elarge',
             body: <div className='row'>
                 <FormTextBox type='text' className='col-12' ref={e => this.ma = e} label='Mã môn học' readOnly={this.state.ma ? true : readOnly} placeholder='Mã môn học' required />
                 <FormTextBox type='text' className='col-12' ref={e => this.ten = e} label='Tên môn học' readOnly={readOnly} placeholder='Tên môn học' required />
+                <FormTextBox type='text' className='col-12' ref={e => this.tenTiengAnh = e} label='Tên tiếng Anh' readOnly={readOnly} placeholder='Tên tiếng Anh' />
                 <FormTextBox type='number' className='col-6' ref={e => this.soTinChi = e} label='Số tín chỉ' readOnly={readOnly} placeholder='Số tín chỉ' required />
                 <FormTextBox type='number' className='col-6' ref={e => this.tongSoTiet = e} label='Tổng số tiết' readOnly={readOnly} placeholder='Tổng số tiết' required />
-                <FormTextBox type='number' className='col-4' ref={e => this.soTietLt = e} label='Số tiết LT' readOnly={readOnly} placeholder='Số tiết LT' required />
-                <FormTextBox type='number' className='col-4' ref={e => this.soTietTh = e} label='Số tiết TH' readOnly={readOnly} placeholder='Số tiết TH' required />
-                <FormTextBox type='number' className='col-4' ref={e => this.soTietTt = e} label='Số tiết TT' readOnly={readOnly} placeholder='Số tiết TT' required />
-                <FormTextBox type='number' className='col-4' ref={e => this.soTietTl = e} label='Số tiết TL' readOnly={readOnly} placeholder='Số tiết TL' required />
-                <FormTextBox type='number' className='col-4' ref={e => this.soTietDa = e} label='Số tiết DA' readOnly={readOnly} placeholder='Số tiết DA' required />
-                <FormTextBox type='number' className='col-4' ref={e => this.soTietLa = e} label='Số tiết LA' readOnly={readOnly} placeholder='Số tiết LA' required />
+                <FormTextBox type='number' className='col-2' ref={e => this.soTietLt = e} label='Số tiết LT' readOnly={readOnly} placeholder='Số tiết LT' required />
+                <FormTextBox type='number' className='col-2' ref={e => this.soTietTh = e} label='Số tiết TH' readOnly={readOnly} placeholder='Số tiết TH' required />
+                <FormTextBox type='number' className='col-2' ref={e => this.soTietTt = e} label='Số tiết TT' readOnly={readOnly} placeholder='Số tiết TT' required />
+                <FormTextBox type='number' className='col-2' ref={e => this.soTietTl = e} label='Số tiết TL' readOnly={readOnly} placeholder='Số tiết TL' required />
+                <FormTextBox type='number' className='col-2' ref={e => this.soTietDa = e} label='Số tiết DA' readOnly={readOnly} placeholder='Số tiết DA' required />
+                <FormTextBox type='number' className='col-2' ref={e => this.soTietLa = e} label='Số tiết LA' readOnly={readOnly} placeholder='Số tiết LA' required />
                 <FormTextBox type='text' className='col-12' ref={e => this.tinhChatPhong = e} label='Tính chất phòng' readOnly={readOnly} placeholder='Tính chất phòng' />
-                <FormTextBox type='text' className='col-12' ref={e => this.tenTiengAnh = e} label='Tên tiếng Anh' readOnly={readOnly} placeholder='Tên tiếng Anh' />
                 <FormSelect className='col-12' ref={e => this.boMon = e} data={this.DonViTable} label='Khoa/Bộ Môn' required />
-                <FormTextBox type='text' className='col-6' ref={e => this.loaiHinh = e} label='Loại hình' readOnly={readOnly} placeholder='Loại hình' />
+                <FormSelect type='text' className='col-6' ref={e => this.loaiHinh = e} label='Loại hình' readOnly={readOnly} data={SelectAdapter_DmSvLoaiHinhDaoTao} placeholder='Loại hình' />
                 <FormTextBox type='text' className='col-6' ref={e => this.chuyenNganh = e} label='Chuyên ngành' readOnly={readOnly} placeholder='Chuyên ngành' />
                 <FormTextBox type='text' className='col-12' ref={e => this.ghiChu = e} label='Ghi chú' readOnly={readOnly} placeholder='Ghi chú' />
-                <FormTextBox type='text' className='col-6' ref={e => this.maCtdt = e} label='Mã CTĐT' readOnly={readOnly} placeholder='Mã CTĐT' />
-                <FormTextBox type='text' className='col-6' ref={e => this.tenCtdt = e} label='Tên CTĐT' readOnly={readOnly} placeholder='Tên CTĐT' />
+                <FormRichTextBox rows='5' className='col-6' ref={e => this.maCtdt = e} label='Mã CTĐT' readOnly={readOnly} placeholder='Mã CTĐT' />
+                <FormRichTextBox rows='5' className='col-6' ref={e => this.tenCtdt = e} label='Tên CTĐT' readOnly={readOnly} placeholder='Tên CTĐT' />
                 <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
                     onChange={value => this.changeKichHoat(value ? 1 : 0)} />
             </div>
@@ -132,7 +135,9 @@ class DmMonHocPage extends AdminPage {
             }
         });
         T.ready('/user/category', () => {
-            this.props.getDmMonHocAll();
+            T.onSearch = (searchText) => this.props.getDmMonHocPage(undefined, undefined, searchText || '');
+            T.showSearchBox();
+            this.props.getDmMonHocPage();
         });
     }
 
@@ -140,8 +145,6 @@ class DmMonHocPage extends AdminPage {
         e.preventDefault();
         this.modal.show();
     }
-
-    changeActive = item => this.props.updateDmMonHoc(item.ma, { kichHoat: item.kichHoat == '1' ? '0' : '1' });
 
     delete = (e, item) => {
         e.preventDefault();
@@ -152,33 +155,57 @@ class DmMonHocPage extends AdminPage {
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('dmMonHoc', ['read', 'write', 'delete']);
-        let table = 'Không có môn học!';
+        const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmMonHoc && this.props.dmMonHoc.page ?
+            this.props.dmMonHoc.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: [] };
 
-        if (this.props.dmMonHoc && this.props.dmMonHoc.items && this.props.dmMonHoc.items.length > 0) {
-            table = renderTable({
-                getDataSource: () => this.props.dmMonHoc.items, stickyHead: false,
-                renderHead: () => (
+        let table = renderTable({
+            emptyTable: 'Không có dữ liệu môn học',
+            getDataSource: () => list, stickyHead: false,
+            renderHead: () => (
+                <>
                     <tr>
-                        <th style={{ width: 'auto', textAlign: 'center' }}>Mã</th>
-                        <th style={{ width: '50%' }}>Môn học</th>
-                        <th style={{ width: '10%' }}>Số tín chỉ</th>
-                        <th style={{ width: '40%' }}>Khoa/Bộ môn</th>
-                        <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
-                    </tr>),
-                renderRow: (item, index) => (
-                    <tr key={index}>
-                        <TableCell type='link' content={item.ma} style={{ textAlign: 'right' }} onClick={() => this.modal.show(item)} />
-                        <TableCell type='text' content={item.ten} />
-                        <TableCell type='number' content={item.soTinChi} />
-                        <TableCell type='text' content={this.donViMapper && this.donViMapper[item.boMon] ? this.donViMapper[item.boMon] : ''} />
-                        <TableCell type='checkbox' content={item.kichHoat} permission={permission}
-                            onChanged={value => this.props.updateDmLoaiDonVi(item.ma, { kichHoat: value ? 1 : 0, })} />
-                        <TableCell type='buttons' content={item} permission={permission}
-                            onEdit={() => this.modal.show(item)} onDelete={this.delete} />
-                    </tr>)
-            });
-        }
+                        <th rowSpan='2' style={{ width: 'auto', textAlign: 'right', verticalAlign: 'middle' }}>#</th>
+                        <th rowSpan='2' style={{ width: 'auto', verticalAlign: 'middle' }}>Mã</th>
+                        <th rowSpan='2' style={{ width: '50%', verticalAlign: 'middle' }}>Tên môn học</th>
+                        <th rowSpan='2' style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center', verticalAlign: 'middle' }}>Số tín chỉ</th>
+                        <th rowSpan='2' style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center', verticalAlign: 'middle' }}>Tổng số tiết</th>
+                        <th colSpan='6' rowSpan='1' style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Số tiết
+                        </th>
+                        <th rowSpan='2' style={{ width: '50%', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Khoa/Bộ môn</th>
+                        <th rowSpan='2' style={{ width: 'auto', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Danh sách CTĐT</th>
+                        <th rowSpan='2' style={{ width: 'auto', verticalAlign: 'middle' }} nowrap='true'>Kích hoạt</th>
+                        <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Thao tác</th>
+                    </tr>
+                    <tr>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>LT</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>TH</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>TT</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>TL</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>ĐA</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>LA</th>
+                    </tr>
+                </>),
+            renderRow: (item, index) => (
+                <tr key={index}>
+                    <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
+                    <TableCell type='link' content={item.ma} onClick={() => this.modal.show(item)} />
+                    <TableCell type='text' content={item.ten} />
+                    <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTinChi} />
+                    <TableCell type='number' style={{ textAlign: 'center' }} content={item.tongSoTiet} />
+                    <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietLt} />
+                    <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietTh} />
+                    <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietTt} />
+                    <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietTl} />
+                    <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietDa} />
+                    <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietLa} />
+                    <TableCell type='text' content={this.donViMapper && this.donViMapper[item.boMon] ? this.donViMapper[item.boMon] : ''} />
+                    <TableCell contentClassName='multiple-lines-4' content={item.tenCtdt?.split(',').map(ctdt => <div key={index}>{ctdt} <br /></div>)} />
+                    <TableCell type='checkbox' content={item.kichHoat} permission={permission}
+                        onChanged={value => this.props.updateDmMonHoc(item.ma, { kichHoat: value ? 1 : 0, })} />
+                    <TableCell type='buttons' content={item} permission={permission}
+                        onEdit={() => this.modal.show(item)} onDelete={this.delete} />
+                </tr>)
+        });
 
         return this.renderPage({
             icon: 'fa fa-list-alt',
@@ -189,7 +216,9 @@ class DmMonHocPage extends AdminPage {
             ],
             content: <>
                 <div className='tile'>{table}</div>
-                <EditModal ref={e => this.modal = e} permission={permission} getDataSelect = {this.props.getDmDonViAll}
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
+                    getPage={this.props.getDmMonHocPage} />
+                <EditModal ref={e => this.modal = e} permission={permission} getDataSelect={this.props.getDmDonViAll}
                     create={this.props.createDmMonHoc} update={this.props.updateDmMonHoc} permissions={currentPermissions} />
             </>,
             backRoute: '/user/category',
@@ -198,6 +227,6 @@ class DmMonHocPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, dmMonHoc: state.danhMuc.dmMonHoc, dmDonVi: state.danhMuc.dmDonVi  });
-const mapActionsToProps = { getDmDonViAll, getDmMonHocAll, createDmMonHoc, updateDmMonHoc, deleteDmMonHoc };
+const mapStateToProps = state => ({ system: state.system, dmMonHoc: state.danhMuc.dmMonHoc, dmDonVi: state.danhMuc.dmDonVi });
+const mapActionsToProps = { getDmDonViAll, getDmMonHocPage, createDmMonHoc, updateDmMonHoc, deleteDmMonHoc };
 export default connect(mapStateToProps, mapActionsToProps)(DmMonHocPage);

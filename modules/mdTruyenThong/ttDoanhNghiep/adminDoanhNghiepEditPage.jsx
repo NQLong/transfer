@@ -47,7 +47,6 @@ class DnDoanhNghiepEditPage extends AdminPage {
         this.dnDoanhNghiepEditNamThanhLap.value(namThanhLap || '');
         this.dnDoanhNghiepEditSoDienThoai.value(phone || '');
         this.dnDoanhNghiepEditCapDo.value(capDo || 1);
-        console.log(listLoaiDoanhNghiep);
         this.dnLoai.value((listLoaiDoanhNghiep || []).map(item => item.loai));
         this.dnDoanhNghiepEditEmail.value(email || '');
         this.dnDoanhNghiepEditWebsite.value(website || '');

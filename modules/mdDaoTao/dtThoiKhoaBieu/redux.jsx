@@ -62,11 +62,11 @@ export function getDtThoiKhoaBieuAll(condition, done) {
 }
 
 T.initPage('pageDtThoiKhoaBieu');
-export function getDtThoiKhoaBieuPage(pageNumber, pageSize, done) {
-    const page = T.updatePage('pageDtThoiKhoaBieu', pageNumber, pageSize);
+export function getDtThoiKhoaBieuPage(pageNumber, pageSize, pageCondition, done) {
+    const page = T.updatePage('pageDtThoiKhoaBieu', pageNumber, pageSize, pageCondition);
     return dispatch => {
         const url = `/api/pdt/thoi-khoa-bieu/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, data => {
+        T.get(url, { condition: pageCondition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách thời khoá biểu bị lỗi!', 'danger');
                 console.error(`GET ${url}. ${data.error}`);
@@ -86,8 +86,9 @@ export function createDtThoiKhoaBieu(item, done) {
                 T.notify('Tạo thời khoá biểu bị lỗi!', 'danger');
                 console.error(`POST ${url}. ${data.error}`);
             } else {
-                if (done) done(data.items);
-                dispatch(getDtThoiKhoaBieuAll());
+                T.notify('Tạo thời khoá biểu thành công!', 'success');
+                if (done) done();
+                dispatch(getDtThoiKhoaBieuPage());
             }
         });
     };
@@ -102,7 +103,7 @@ export function deleteDtThoiKhoaBieu(id) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('Thời khoá biểu đã xóa thành công!', 'success', false, 800);
-                dispatch(getDtThoiKhoaBieuAll());
+                dispatch(getDtThoiKhoaBieuPage());
             }
         }, () => T.notify('Xóa thời khoá biểu bị lỗi!', 'danger'));
     };
@@ -118,7 +119,7 @@ export function updateDtThoiKhoaBieu(id, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật thông tin thời khoá biểu thành công!', 'success');
-                dispatch(getDtThoiKhoaBieuAll());
+                dispatch(getDtThoiKhoaBieuPage());
             }
         }, () => T.notify('Cập nhật thông tin thời khoá biểu bị lỗi!', 'danger'));
     };
