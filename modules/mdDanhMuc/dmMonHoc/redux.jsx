@@ -48,7 +48,7 @@ export function getDmMonHocAll(condition, done) {
         condition = {};
     }
     return dispatch => {
-        const url = '/api/danh-muc/mon-hoc/all';
+        const url = '/api/danh-muc/dao-tao/mon-hoc/all';
         T.get(url, { condition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách môn học bị lỗi', 'danger');
@@ -62,11 +62,11 @@ export function getDmMonHocAll(condition, done) {
 }
 
 T.initPage('pageDmMonHoc');
-export function getDmMonHocPage(pageNumber, pageSize, done) {
-    const page = T.updatePage('pageDmMonHoc', pageNumber, pageSize);
+export function getDmMonHocPage(pageNumber, pageSize, pageCondition, done) {
+    const page = T.updatePage('pageDmMonHoc', pageNumber, pageSize, pageCondition);
     return dispatch => {
-        const url = `/api/danh-muc/mon-hoc/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, data => {
+        const url = `/api/danh-muc/dao-tao/mon-hoc/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: pageCondition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách môn học bị lỗi!', 'danger');
                 console.error(`GET ${url}. ${data.error}`);
@@ -80,7 +80,7 @@ export function getDmMonHocPage(pageNumber, pageSize, done) {
 
 export function createDmMonHoc(item, done) {
     return dispatch => {
-        const url = '/api/danh-muc/mon-hoc';
+        const url = '/api/danh-muc/dao-tao/mon-hoc';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo môn học bị lỗi!', 'danger');
@@ -93,9 +93,24 @@ export function createDmMonHoc(item, done) {
     };
 }
 
+export function getDmMonHoc(ma, done) {
+    return () => {
+        const url = `/api/danh-muc/dao-tao/mon-hoc/item/${ma}`;
+        T.get(url, data => {
+            if (data.error) {
+                T.notify('Lấy thông tin môn học bị lỗi!', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (done) done(data.item);
+            }
+        }, error => console.error(`GET: ${url}.`, error));
+    };
+}
+
+
 export function deleteDmMonHoc(ma) {
     return dispatch => {
-        const url = '/api/danh-muc/mon-hoc';
+        const url = '/api/danh-muc/dao-tao/mon-hoc';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa môn học bị lỗi!', 'danger');
@@ -110,7 +125,7 @@ export function deleteDmMonHoc(ma) {
 
 export function updateDmMonHoc(ma, changes, done) {
     return dispatch => {
-        const url = '/api/danh-muc/mon-hoc';
+        const url = '/api/danh-muc/dao-tao/mon-hoc';
         T.put(url, { ma, changes }, data => {
             if (data.error) {
                 T.notify('Cập nhật môn học bị lỗi!', 'danger');
@@ -127,3 +142,12 @@ export function updateDmMonHoc(ma, changes, done) {
 export function changeDmMonHoc(item) {
     return { type: DmMonHocUpdate, item };
 }
+
+export const SelectAdapter_DmMonHoc = {
+    ajax: true,
+    url: '/api/danh-muc/dao-tao/mon-hoc/page/1/20',
+    data: params => ({ condition: params.term }),
+    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: `${item.ma}: ${item.ten}` })) : [] }),
+    fetchOne: (ma, done) => (getDmMonHoc(ma, item => done && done({ id: item.ma, text: `${item.ma}: ${item.ten}` })))(),
+
+};

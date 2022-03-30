@@ -17,8 +17,17 @@ module.exports = app => {
   // APIs -----------------------------------------------------------------------------------------------------------------------------------------
   app.get('/api/pdt/thoi-khoa-bieu/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
     const pageNumber = parseInt(req.params.pageNumber),
-      pageSize = parseInt(req.params.pageSize);
-    app.model.dtThoiKhoaBieu.getPage(pageNumber, pageSize, {}, (error, page) => res.send({ error, page }));
+      pageSize = parseInt(req.params.pageSize),
+      searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+    app.model.dtThoiKhoaBieu.searchPage(pageNumber, pageSize, searchTerm, (error, page) => {
+      if (error || page == null) {
+        res.send({ error });
+      } else {
+        const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
+        const pageCondition = searchTerm;
+        res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
+      }
+    });
   });
 
   app.get('/api/pdt/thoi-khoa-bieu/all', app.permission.check('user:login'), (req, res) => {
@@ -32,7 +41,22 @@ module.exports = app => {
   });
 
   app.post('/api/pdt/thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:write'), (req, res) => {
-    app.model.dtThoiKhoaBieu.create(req.body.item, (error, item) => res.send({ error, item }));
+    let item = req.body.item,
+      soNhom = item.nhom;
+    const onCreate = (index = 1) => {
+      if (index - 1 == Number(soNhom)) {
+        res.send({ item: 'OK' });
+        return;
+      }
+      app.model.dtThoiKhoaBieu.get({ maHocPhan: item.maHocPhan, nhom: index, maHocKy: item.maHocKy }, 'id', null, (error, tkb) => {
+        if (!error && !tkb) {
+          item.nhom = index;
+          app.model.dtThoiKhoaBieu.create(item, error => error && res.send({ error }));
+        }
+        onCreate(index + 1);
+      });
+    };
+    onCreate();
   });
 
   app.put('/api/pdt/thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:write'), (req, res) => {

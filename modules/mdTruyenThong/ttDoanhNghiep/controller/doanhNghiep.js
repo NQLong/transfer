@@ -4,7 +4,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.truyenThong,
         menus: {
-            5020: { title: 'Doanh nghiệp', link: '/user/truyen-thong/doanh-nghiep', icon: 'fa-university', backgroundColor: '#ffb300', groupIndex: 4 },
+            6020: { title: 'Doanh nghiệp', link: '/user/truyen-thong/doanh-nghiep', icon: 'fa-university', backgroundColor: '#ffb300', groupIndex: 4 },
         }
     };
 

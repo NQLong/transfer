@@ -2664,20 +2664,6 @@
             "moduleName": "dmPhong",
             "modelName": "dmPhong",
             "columns": {
-                "MA": {
-                    "value": "ma",
-                    "dataType": "NUMBER",
-                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_88854\".nextval",
-                    "nullable": false,
-                    "size": "22,0"
-                },
-                "TEN": {
-                    "value": "ten",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": false,
-                    "size": 2000
-                },
                 "TOA_NHA": {
                     "value": "toaNha",
                     "dataType": "NUMBER",
@@ -2698,10 +2684,17 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "1,0"
+                },
+                "TEN": {
+                    "value": "ten",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 10
                 }
             },
             "primaryKeys": [
-                "MA"
+                "TEN"
             ],
             "foreignKeys": [],
             "type": "table"
@@ -11113,14 +11106,14 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 200
+                    "size": 2000
                 },
                 "TEN_CTDT": {
                     "value": "tenCtdt",
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 200
+                    "size": 2000
                 }
             },
             "primaryKeys": [
@@ -11501,6 +11494,9 @@
             "active": true,
             "moduleName": "dtThoiKhoaBieu",
             "modelName": "dtThoiKhoaBieu",
+            "methods": {
+                "DT_THOI_KHOA_BIEU_SEARCH_PAGE": "searchPage"
+            },
             "columns": {
                 "ID": {
                     "value": "id",
@@ -11587,7 +11583,7 @@
                 "LOAI": {
                     "value": "loai",
                     "dataType": "NVARCHAR2",
-                    "dataDefault": "",
+                    "dataDefault": "'DEN'",
                     "nullable": true,
                     "size": 5
                 },
@@ -11604,6 +11600,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 20
+                },
+                "THOI_GIAN": {
+                    "value": "thoiGian",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
                 }
             },
             "primaryKeys": [
