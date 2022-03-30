@@ -131,19 +131,19 @@ module.exports = app => {
             app.database.oracle.connection.main.execute(sql, parameter, (error, result) => done(error, result));
         },
 
-        searchPage: (pagenumber, pagesize, listShcc, listDv, fromyear, toyear, searchterm, done) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=qt_ky_luat_search_page(:pagenumber, :pagesize, :listShcc, :listDv, :fromyear, :toyear, :searchterm, :totalitem, :pagetotal); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, listShcc, listDv, fromyear, toyear, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
+        searchPage: (pagenumber, pagesize, listShcc, listDv, fromyear, toyear, listHinhThucKyLuat, searchterm, done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=qt_ky_luat_search_page(:pagenumber, :pagesize, :listShcc, :listDv, :fromyear, :toyear, :listHinhThucKyLuat, :searchterm, :totalitem, :pagetotal); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, listShcc, listDv, fromyear, toyear, listHinhThucKyLuat, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
 
-        groupPage: (pagenumber, pagesize, listShcc, listDv, fromyear, toyear, searchterm, done) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=qt_ky_luat_group_page(:pagenumber, :pagesize, :listShcc, :listDv, :fromyear, :toyear, :searchterm, :totalitem, :pagetotal); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, listShcc, listDv, fromyear, toyear, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
+        groupPage: (pagenumber, pagesize, listShcc, listDv, fromyear, toyear, listHinhThucKyLuat, searchterm, done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=qt_ky_luat_group_page(:pagenumber, :pagesize, :listShcc, :listDv, :fromyear, :toyear, :listHinhThucKyLuat, :searchterm, :totalitem, :pagetotal); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, listShcc, listDv, fromyear, toyear, listHinhThucKyLuat, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
 
-        download: (listShcc, listDv, fromyear, toyear, done) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=qt_ky_luat_download_excel(:listShcc, :listDv, :fromyear, :toyear); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, listShcc, listDv, fromyear, toyear }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
+        download: (listShcc, listDv, fromyear, toyear, listHinhThucKyLuat, done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=qt_ky_luat_download_excel(:listShcc, :listDv, :fromyear, :toyear, :listHinhThucKyLuat); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, listShcc, listDv, fromyear, toyear, listHinhThucKyLuat }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
     };
 };

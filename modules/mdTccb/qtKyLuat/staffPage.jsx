@@ -16,8 +16,8 @@ class EditModal extends AdminModal {
 
     onShow = (item) => {
 
-        let { id, lyDoHinhThuc, capQuyetDinh, diemThiDua, noiDung, soQuyetDinh, ngayRaQuyetDinh} = item && item.item ? item.item : {
-            id: '', lyDoHinhThuc: '', capQuyetDinh: '', diemThiDua: '', noiDung: '', soQuyetDinh: '', ngayRaQuyetDinh: ''
+        let { id, lyDoHinhThuc, diemThiDua, noiDung, soQuyetDinh, ngayRaQuyetDinh} = item && item.item ? item.item : {
+            id: '', lyDoHinhThuc: '', diemThiDua: '', noiDung: '', soQuyetDinh: '', ngayRaQuyetDinh: ''
         };
 
         this.setState({
@@ -25,7 +25,6 @@ class EditModal extends AdminModal {
             maCanBo: item.maCanBo
         }, () => {
             this.hinhThucKyLuat.value(lyDoHinhThuc);
-            this.capQuyetDinh.value(capQuyetDinh || '');
             this.diemThiDua.value(diemThiDua || '');
             this.noiDung.value(noiDung || '');
             this.soQuyetDinh.value(soQuyetDinh || '');
@@ -68,9 +67,7 @@ class EditModal extends AdminModal {
                 <FormDatePicker className='col-md-4' type='date-mask'  ref={e => this.ngayRaQuyetDinh = e} label='Ngày ra quyết định' readOnly={readOnly} required />
                 <FormSelect className='col-md-4' ref={e => this.hinhThucKyLuat = e} label='Hình thức kỷ luật' data={SelectAdapter_DmKyLuatV2} readOnly={readOnly} required />
 
-                <FormRichTextBox className='col-md-12' ref={e => this.noiDung = e} rows={2} readOnly={readOnly} label='Nội dung kỷ luật' placeholder='Nhập nội dung kỷ luật (tối đa 100 ký tự)' maxLength={100} />
-
-                <FormTextBox className='col-md-12' ref={e => this.capQuyetDinh = e} type='text' label='Cấp quyết định' readOnly={readOnly} />
+                <FormRichTextBox className='col-md-12' ref={e => this.noiDung = e} rows={4} readOnly={readOnly} label='Nội dung kỷ luật' placeholder='Nhập nội dung kỷ luật (tối đa 1000 ký tự)' maxLength={1000} />
 
                 <FormTextBox className='col-md-4' ref={e => this.diemThiDua = e} type='number' label='Điểm thi đua' readOnly={readOnly} />
 
@@ -83,7 +80,7 @@ class QtKyLuatUserPage extends AdminPage {
     componentDidMount() {
         T.ready('/user', () => {
             const { shcc } = this.props.system && this.props.system.user ? this.props.system.user : { shcc: '' };
-            this.setState({ filter: { listShcc: shcc, listDv: '', fromYear: null, toYear: null } });
+            this.setState({ filter: { listShcc: shcc, listDv: '', fromYear: null, toYear: null, listHinhThucKyLuat: null } });
             this.getPage();
         });
     }
@@ -131,7 +128,6 @@ class QtKyLuatUserPage extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nội dung kỷ luật</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Hình thức kỷ luật</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cấp quyết định</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Điểm thi đua</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                     </tr>
@@ -139,11 +135,10 @@ class QtKyLuatUserPage extends AdminPage {
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                        <TableCell type='date' style={{color: 'blue'}} dateFormat='dd/mm/yyyy' content={item.ngayRaQuyetDinh} />
-                        <TableCell type='text' content={(<b> {item.soQuyetDinh || ''} </b>)} />
-                        <TableCell type='text' content={(item.noiDung || '')} />
                         <TableCell type='text' style={{ color: 'red' }} content={(<span><b>{item.tenKyLuat || ''}</b></span>)} />
-                        <TableCell type='text' content={(item.capQuyetDinh || '')} />
+                        <TableCell type='text' content={(item.noiDung || '')} />
+                        <TableCell type='text' content={(<b> {item.soQuyetDinh || ''} </b>)} />
+                        <TableCell type='date' style={{color: 'blue'}} dateFormat='dd/mm/yyyy' content={item.ngayRaQuyetDinh} />
                         <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemThiDua} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show({ item, maCanBo: shcc })} onDelete={this.delete} >

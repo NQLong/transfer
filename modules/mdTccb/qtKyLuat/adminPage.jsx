@@ -20,8 +20,8 @@ class EditModal extends AdminModal {
     onShow = (item, multiple = true) => {
         this.multiple = multiple;
 
-        let { id, maCanBo, lyDoHinhThuc, capQuyetDinh, diemThiDua, noiDung, soQuyetDinh, ngayRaQuyetDinh} = item ? item : {
-            id: '', maCanBo: '', lyDoHinhThuc: '', capQuyetDinh: '', diemThiDua: '', noiDung: '', soQuyetDinh: '', ngayRaQuyetDinh: ''
+        let { id, maCanBo, lyDoHinhThuc, diemThiDua, noiDung, soQuyetDinh, ngayRaQuyetDinh} = item ? item : {
+            id: '', maCanBo: '', lyDoHinhThuc: '', diemThiDua: '', noiDung: '', soQuyetDinh: '', ngayRaQuyetDinh: ''
         };
 
         this.setState({
@@ -29,7 +29,6 @@ class EditModal extends AdminModal {
         }, () => {
             this.maCanBo.value(maCanBo);
             this.hinhThucKyLuat.value(lyDoHinhThuc);
-            this.capQuyetDinh.value(capQuyetDinh || '');
             this.diemThiDua.value(diemThiDua || '');
             this.noiDung.value(noiDung || '');
             this.soQuyetDinh.value(soQuyetDinh || '');
@@ -60,7 +59,6 @@ class EditModal extends AdminModal {
                 const changes = {
                     shcc: ma,
                     lyDoHinhThuc: this.hinhThucKyLuat.value(),
-                    capQuyetDinh: this.capQuyetDinh.value(),
                     diemThiDua: this.diemThiDua.value(),
                     noiDung: this.noiDung.value(),
                     soQuyetDinh: this.soQuyetDinh.value(),
@@ -92,9 +90,7 @@ class EditModal extends AdminModal {
                 <FormDatePicker className='col-md-4' type='date-mask'  ref={e => this.ngayRaQuyetDinh = e} label='Ngày ra quyết định' readOnly={readOnly} required />
                 <FormSelect className='col-md-4' ref={e => this.hinhThucKyLuat = e} label='Hình thức kỷ luật' data={SelectAdapter_DmKyLuatV2} readOnly={readOnly} required />
 
-                <FormRichTextBox className='col-md-12' ref={e => this.noiDung = e} rows={2} readOnly={readOnly} label='Nội dung kỷ luật' placeholder='Nhập nội dung kỷ luật (tối đa 100 ký tự)' maxLength={100} />
-
-                <FormTextBox className='col-md-12' ref={e => this.capQuyetDinh = e} type='text' label='Cấp quyết định' readOnly={readOnly} />
+                <FormRichTextBox className='col-md-12' ref={e => this.noiDung = e} rows={4} readOnly={readOnly} label='Nội dung kỷ luật' placeholder='Nhập nội dung kỷ luật (tối đa 1000 ký tự)' maxLength={1000} />
 
                 <FormTextBox className='col-md-4' ref={e => this.diemThiDua = e} type='number' label='Điểm thi đua' readOnly={readOnly} />
 
@@ -137,7 +133,8 @@ class QtKyLuat extends AdminPage {
         const toYear = this.toYear.value() == '' ? null : this.toYear.value().getTime();
         const listDv = this.maDonVi.value().toString() || '';
         const listShcc = this.mulCanBo.value().toString() || '';
-        const pageFilter = isInitial ? null : { listDv, fromYear, toYear, listShcc };
+        const listHinhThucKyLuat = this.hinhThucKyLuat.value().toString() || '';
+        const pageFilter = isInitial ? null : { listDv, fromYear, toYear, listShcc, listHinhThucKyLuat };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
@@ -147,7 +144,8 @@ class QtKyLuat extends AdminPage {
                     this.toYear.value(filter.toYear || '');
                     this.maDonVi.value(filter.listDv);
                     this.mulCanBo.value(filter.listShcc);
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.listShcc || filter.listDv)) this.showAdvanceSearch();
+                    this.hinhThucKyLuat.value(filter.listHinhThucKyLuat);
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.listShcc || filter.listDv || filter.listHinhThucKyLuat)) this.showAdvanceSearch();
                 }
             });
         });
@@ -212,11 +210,10 @@ class QtKyLuat extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br/>Đơn vị công tác</th>
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày ra quyết định</th>}
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>}
-                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nội dung kỷ luật</th>}
                         {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Hình thức kỷ luật</th>}
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cấp quyết định</th>}
+                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nội dung kỷ luật</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày ra quyết định</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Điểm thi đua</th>}
                         {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số lần bị kỷ luật</th>}
                         {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách hình thức kỷ luật</th>}
@@ -240,11 +237,10 @@ class QtKyLuat extends AdminPage {
                                 {(item.tenDonVi || '').normalizedName()}
                             </>
                         )} />
-                        {!this.checked && <TableCell type='date' style={{color: 'blue'}} dateFormat='dd/mm/yyyy' content={item.ngayRaQuyetDinh} />}
-                        {!this.checked && <TableCell type='text' content={(<b> {item.soQuyetDinh || ''} </b>)} />}
-                        {!this.checked && <TableCell type='text' content={(item.noiDung || '')} />}
                         {!this.checked && <TableCell type='text' style={{ color: 'red' }} content={(<span><b>{item.tenKyLuat || ''}</b></span>)} />}
-                        {!this.checked && <TableCell type='text' content={(item.capQuyetDinh || '')} />}
+                        {!this.checked && <TableCell type='text' content={(item.noiDung || '')} />}
+                        {!this.checked && <TableCell type='text' content={(<b> {item.soQuyetDinh || ''} </b>)} />}
+                        {!this.checked && <TableCell type='date' style={{color: 'blue'}} dateFormat='dd/mm/yyyy' content={item.ngayRaQuyetDinh} />}
                         {!this.checked && <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemThiDua} />}
                         {this.checked && <TableCell type='text' style={{ textAlign: 'left' }} content={item.soKyLuat} />}
                         {this.checked && <TableCell type='text' content={this.list(item.danhSachKyLuat, item.danhSachNgayRaQd, item.soKyLuat)} />}
@@ -278,6 +274,7 @@ class QtKyLuat extends AdminPage {
                     <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-2' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />
                     <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
                     <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.hinhThucKyLuat = e} label='Hình thức kỷ luật' data={SelectAdapter_DmKyLuatV2} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
                 </div>
             </>,
             content: <>
