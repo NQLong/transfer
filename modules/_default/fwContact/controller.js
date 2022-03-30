@@ -1,8 +1,7 @@
 module.exports = app => {
-    // const menu = { parentMenu: { index: 6000, title: 'Liên hệ', icon: 'fa-dashboard', link: '/user/contact' } };
+    const menu = { parentMenu: { index: 6000, title: 'Liên hệ', icon: 'fa-dashboard', link: '/user/contact' } };
     app.permission.add(
-        // { name: 'contact:read' },
-        { name: 'contact:read', },
+        { name: 'contact:read', menu },
         { name: 'contact:delete' }
     );
     app.get('/user/contact', app.permission.check('contact:read'), app.templates.admin);
@@ -13,7 +12,6 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         // app.model.fwContact.searchPage(pageNumber, pageSize, -1, '', (error, page) => {
-        //     console.log(error);
         //     if (error || page == null) {
         //         res.send({ error });
         //     } else {
@@ -65,7 +63,7 @@ module.exports = app => {
 
     // Home -----------------------------------------------------------------------------------------------------------------------------------------
     app.post('/api/contact', (req, res) => {
-        const { name, subject, message } = req.body.contact;
+        const { name, subject, message, phoneNumber, email, maDonVi } = req.body.contact;
         if (name == null || subject == null || message == null) {
             res.send({ error: 'Thông tin bạn gửi không hợp lệ!' });
         } else {
@@ -75,7 +73,7 @@ module.exports = app => {
             //         mailHtml = result.emailContactHtml.replaceAll('{name}', name).replaceAll('{title}', subject).replaceAll('{message}', message);
             // });
 
-            app.model.fwContact.create({ name, email: '', subject, message, read: 0, createdDate: new Date().getTime() }, (error, item) => {
+            app.model.fwContact.create({ name, email, phoneNumber, subject, message, read: 0, maDonVi, createdDate: new Date().getTime() }, (error, item) => {
                 if (item) {
                     res.send({ item });
                     // app.model.setting.getValue(['emailContactTitle', 'emailContactText', 'emailContactHtml'], result => {
