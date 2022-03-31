@@ -78,8 +78,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, loaiDoiTuong, listDv, listShcc } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1', listDv: null, listShcc: null };
-        app.model.qtKhenThuongAll.searchPage(pageNumber, pageSize, loaiDoiTuong, fromYear, toYear, listDv, listShcc, searchTerm, (error, page) => {
+        const filter = JSON.stringify(req.query.filter || {});
+        app.model.qtKhenThuongAll.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -95,8 +95,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, loaiDoiTuong, listDv, listShcc } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1', listDv: null, listShcc: null };
-        app.model.qtKhenThuongAll.searchPage(pageNumber, pageSize, loaiDoiTuong, fromYear, toYear, listDv, listShcc, searchTerm, (error, page) => {
+        const filter = JSON.stringify(req.query.filter || {});
+        app.model.qtKhenThuongAll.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -111,8 +111,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, loaiDoiTuong, listDv, listShcc } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1', listDv: null, listShcc: null };
-        app.model.qtKhenThuongAll.groupPage(pageNumber, pageSize, loaiDoiTuong, fromYear, toYear, listDv, listShcc, searchTerm, (error, page) => {
+        const filter = JSON.stringify(req.query.filter || {});
+        app.model.qtKhenThuongAll.groupPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -147,13 +147,8 @@ module.exports = app => {
     app.delete('/api/tccb/qua-trinh/khen-thuong-all', app.permission.check('staff:write'), (req, res) =>
         app.model.qtKhenThuongAll.delete({ id: req.body.id }, (error) => res.send(error)));
 
-    app.get('/api/qua-trinh/khen-thuong-all/download-excel/:listShcc/:listDv/:fromYear/:toYear/:loaiDoiTuong', app.permission.check('qtKhenThuongAll:read'), (req, res) => {
-        let { listShcc, listDv, fromYear, toYear, loaiDoiTuong } = req.params ? req.params : { listShcc: null, listDv: null, fromYear: null, toYear: null, loaiDoiTuong: '-1' };
-        if (listShcc == 'null') listShcc = null;
-        if (listDv == 'null') listDv = null;
-        if (fromYear == 'null') fromYear = null;
-        if (toYear == 'null') toYear = null;
-        app.model.qtKhenThuongAll.download(loaiDoiTuong, fromYear, toYear, listDv, listShcc, (error, page) => {
+    app.get('/api/qua-trinh/khen-thuong-all/download-excel/:filter', app.permission.check('qtKhenThuongAll:read'), (req, res) => {
+        app.model.qtKhenThuongAll.download(req.params.filter, (error, page) => {
             if (error) {
                 res.send({ error });
             } else {
@@ -161,18 +156,7 @@ module.exports = app => {
                     worksheet = workbook.addWorksheet('Worksheet');
                 new Promise(resolve => {
                     let cols = [];
-                    if (loaiDoiTuong == '-1') {
-                        cols = ['STT', 'SỐ QUYẾT ĐỊNH', 'LOẠI ĐỐI TƯỢNG', 'ĐỐI TƯỢNG', 'NĂM ĐẠT ĐƯỢC', 'THÀNH TÍCH', 'CHÚ THÍCH', 'ĐIỂM THI ĐUA'];
-                    }
-                    if (loaiDoiTuong == '01') {
-                        cols = ['STT', 'SỐ QUYẾT ĐỊNH', 'NĂM ĐẠT ĐƯỢC', 'THÀNH TÍCH', 'CHÚ THÍCH', 'ĐIỂM THI ĐUA'];
-                    }
-                    if (loaiDoiTuong == '02') {
-                        cols = ['STT', 'SỐ QUYẾT ĐỊNH', 'SHCC', 'HỌ', 'TÊN', 'NĂM ĐẠT ĐƯỢC', 'THÀNH TÍCH', 'CHÚ THÍCH', 'ĐIỂM THI ĐUA'];
-                    }
-                    if (loaiDoiTuong == '03' || loaiDoiTuong == '04') {
-                        cols = ['STT', 'SỐ QUYẾT ĐỊNH', 'ĐƠN VỊ', 'BỘ MÔN', 'NĂM ĐẠT ĐƯỢC', 'THÀNH TÍCH', 'CHÚ THÍCH', 'ĐIỂM THI ĐUA'];
-                    }
+                    cols = ['STT', 'SỐ QUYẾT ĐỊNH', 'LOẠI ĐỐI TƯỢNG', 'CÁ NHÂN', 'TẬP THỂ', 'NĂM ĐẠT ĐƯỢC', 'THÀNH TÍCH', 'CHÚ THÍCH', 'ĐIỂM THI ĐUA'];
                     let cells = [];
                     for (let idx = 0; idx < cols.length; idx++) {
                         let chr = String.fromCharCode(65 + idx); // where n is 0, 1, 2 ...                            
@@ -184,32 +168,23 @@ module.exports = app => {
                             let chr = String.fromCharCode(65 + idx); // where n is 0, 1, 2 ...                            
                             let value = null;
                             let type = cols[idx];
-                            if (type == 'LOẠI ĐỐI TƯỢNG') value = item.tenLoaiDoiTuong;
                             if (type == 'SỐ QUYẾT ĐỊNH') value = item.soQuyetDinh;
-                            if (type == 'ĐỐI TƯỢNG') {
-                                if (item.maLoaiDoiTuong == '01') {
-                                    value = 'Trường Đai học Khoa học Xã Hội và Nhân Văn - Đại học Quốc Gia TP.HCM';
-                                }
-                                if (item.maLoaiDoiTuong == '02') {
-                                    value = item.hoCanBo + ' ' + item.tenCanBo + ' - ' + item.maCanBo;
-                                }
-                                if (item.maLoaiDoiTuong == '03') {
-                                    value = item.tenDonVi;
-                                }
-                                if (item.maLoaiDoiTuong == '04') {
-                                    value = item.tenBoMon + ' (' + item.tenDonViBoMon + ')';
-                                }
+                            if (type == 'LOẠI ĐỐI TƯỢNG') value = item.tenLoaiDoiTuong;
+                            if (type == 'CÁ NHÂN') {
+                                if (item.maLoaiDoiTuong == '02') value = item.hoCanBo + ' ' + item.tenCanBo + ' - ' + item.maCanBo;
+                                if (item.maLoaiDoiTuong == '04') value = item.tenBoMon;
                             }
-                            if (type == 'SHCC') value = item.ma;
-                            if (type == 'HỌ') value = item.hoCanBo;
-                            if (type == 'TÊN') value = item.tenCanBo;
-                            if (type == 'ĐƠN VỊ') {
-                                if (loaiDoiTuong == '03') value = item.tenDonVi;
-                                if (loaiDoiTuong == '04') value = item.tenDonViBoMon;
+                            if (type == 'TẬP THỂ') {
+                                if (item.maLoaiDoiTuong == '01') value = 'Trường Đai học Khoa học Xã Hội và Nhân Văn - Đại học Quốc Gia TP.HCM';
+                                if (item.maLoaiDoiTuong == '02') value = item.tenDonViCanBo;
+                                if (item.maLoaiDoiTuong == '03') value = item.tenDonVi;
+                                if (item.maLoaiDoiTuong == '04') value = item.tenDonViBoMon;
                             }
-                            if (type == 'BỘ MÔN') value = item.tenBoMon;
                             if (type == 'NĂM ĐẠT ĐƯỢC') value = item.namDatDuoc;
-                            if (type == 'THÀNH TÍCH') value = item.tenThanhTich;
+                            if (type == 'THÀNH TÍCH') {
+                                value = item.tenThanhTich;
+                                if (item.tenChuThich) value += ' (' + item.tenChuThich + ')';
+                            }
                             if (type == 'CHÚ THÍCH') value = item.tenChuThich;
                             if (type == 'ĐIỂM THI ĐUA') value = item.diemThiDua;
                             let add = {
@@ -223,22 +198,7 @@ module.exports = app => {
                     resolve(cells);
                 }).then((cells) => {
                     app.excel.write(worksheet, cells);
-                    let name = 'khen_thuong';
-                    if (loaiDoiTuong == '-1') {
-                        name += '_all';
-                    }
-                    else {
-                        if (loaiDoiTuong == '01') {
-                            name += '_truong';
-                        }
-                        else {
-                            if (loaiDoiTuong == '02') name += '_canbo_';
-                            if (loaiDoiTuong == '03') name += '_donvi_';
-                            if (loaiDoiTuong == '04') name += '_bomon_';
-                        }
-                    }
-                    name += '.xlsx';
-                    app.excel.attachment(workbook, res, name);
+                    app.excel.attachment(workbook, res, 'khenthuong.xlsx');
                 }).catch((error) => {
                     res.send({ error });
                 });

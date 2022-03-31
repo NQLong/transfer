@@ -116,7 +116,7 @@ class EditModal extends AdminModal {
     }
 }
 class QtKhenThuongAllGroupPage extends AdminPage {
-    state = { filter: {} };
+    state = { filter: { loaiDoiTuong: '-1' } };
     ma = ''; loaiDoiTuong = '-1';
     componentDidMount() {
         T.ready('/user/tccb', () => {
@@ -142,7 +142,8 @@ class QtKhenThuongAllGroupPage extends AdminPage {
         const loaiDoiTuong = this.state.filter.loaiDoiTuong;
         const listShcc = this.state.filter.listShcc;
         const listDv = this.state.filter.listDv;
-        const pageFilter = isInitial ? null : { fromYear, toYear, loaiDoiTuong, listShcc, listDv };
+        const listThanhTich = this.listThanhTich.value().toString() || '';
+        const pageFilter = isInitial ? null : { fromYear, toYear, loaiDoiTuong, listDv, listShcc, listThanhTich };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
@@ -150,7 +151,8 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
                     this.fromYear.value(filter.fromYear || '');
                     this.toYear.value(filter.toYear || '');
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear)) this.showAdvanceSearch();
+                    this.listThanhTich.value(filter.listThanhTich);
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.listThanhTich )) this.showAdvanceSearch();
                 }
             });
         });
@@ -187,9 +189,9 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Đối tượng</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm đạt được</th>
                         <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Thành tích</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>
                         <th style={{ width: 'auto', textAlign: 'right', whiteSpace: 'nowrap' }}>Điểm thi đua</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Loại đối tượng</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
@@ -224,9 +226,9 @@ class QtKhenThuongAllGroupPage extends AdminPage {
 
                         )}
                         />
-                        <TableCell type='text' style={{ textAlign: 'center' }} content={(item.soQuyetDinh || '')} />
                         <TableCell type='text' style={{ textAlign: 'center' }} content={(item.namDatDuoc)} />
                         <TableCell type='text' content={(item.tenThanhTich)} />
+                        <TableCell type='text' style={{ textAlign: 'center' }} content={(item.soQuyetDinh || '')} />
                         <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemThiDua} />
                         <TableCell type='text' content={item.tenLoaiDoiTuong} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
@@ -254,6 +256,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                 <div className='row'>
                     <FormTextBox className='col-md-4' ref={e => this.fromYear = e} label='Năm đạt được (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
                     <FormTextBox className='col-md-4' ref={e => this.toYear = e} label='Năm đạt được (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect className='col-12 col-md-6' multiple ref={e => this.listThanhTich = e} label='Thành tích' data={SelectAdapter_DmKhenThuongKyHieuV2} onChange={() => this.changeAdvancedSearch()} allowClear minimumResultsForSearch={-1} />
                 </div>
             </>,
             content: <>
@@ -270,9 +273,9 @@ class QtKhenThuongAllGroupPage extends AdminPage {
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
             onExport: (e) => {
                 e.preventDefault();
-                const { fromYear, toYear, loaiDoiTuong, listDv, listShcc } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1', listDv: null, listShcc: null };
+                const filter = JSON.stringify(this.state.filter || {});
 
-                T.download(T.url(`/api/qua-trinh/khen-thuong-all/download-excel/${listShcc ? listShcc : null}/${listDv ? listDv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${loaiDoiTuong ? loaiDoiTuong : '-1'}`), 'khenthuong.xlsx');
+                T.download(T.url(`/api/qua-trinh/khen-thuong-all/download-excel/${filter}`), 'khenthuong.xlsx');
             }
         });
     }
