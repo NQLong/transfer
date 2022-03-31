@@ -87,7 +87,7 @@ export function createDmNgayLe(item, done) {
                 console.error(`POST ${url}. ${data.error}`);
             } else {
                 if (done) done(data.items);
-                dispatch(getDmNgayLeAll());
+                dispatch(getDmNgayLePage());
             }
         });
     };
@@ -117,7 +117,7 @@ export function deleteDmNgayLe(id) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('Ngày lễ đã xóa thành công!', 'success', false, 800);
-                dispatch(getDmNgayLeAll());
+                dispatch(getDmNgayLePage());
             }
         }, () => T.notify('Xóa ngày lễ bị lỗi!', 'danger'));
     };
@@ -133,7 +133,7 @@ export function updateDmNgayLe(id, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật thông tin ngày lễ thành công!', 'success');
-                dispatch(getDmNgayLeAll());
+                dispatch(getDmNgayLePage());
             }
         }, () => T.notify('Cập nhật thông tin ngày lễ bị lỗi!', 'danger'));
     };
