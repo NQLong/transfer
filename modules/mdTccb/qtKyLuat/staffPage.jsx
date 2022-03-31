@@ -124,10 +124,10 @@ class QtKyLuatUserPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày ra quyết định</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Hình thức kỷ luật</th>
+                        <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Nội dung kỷ luật</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nội dung kỷ luật</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Hình thức kỷ luật</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày ra quyết định</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Điểm thi đua</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                     </tr>
