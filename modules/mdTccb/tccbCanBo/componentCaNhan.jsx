@@ -188,11 +188,6 @@ class ComponentCaNhan extends React.Component {
         }
     }
 
-    showModal = (e, item) => {
-        e.preventDefault();
-        this.modal.show({ item: item, shcc: this.shcc, email: this.email });
-    }
-
     render = () => {
         const readOnly = this.props.readOnly, create = this.props.create;
         return (
@@ -200,14 +195,18 @@ class ComponentCaNhan extends React.Component {
                 <h3 className='tile-title'>Thông tin cá nhân</h3>
                 <div className='tile-body row'>
                     <FormImageBox ref={e => this.imageBox = e} style={{ display: 'block' }} label='Hình đại diện'
-                        postUrl='/user/upload' uploadType='CanBoImage' onSuccess={this.imageChanged} className='form-group col-md-3' />
+                        postUrl='/user/upload' uploadType='CanBoImage' onSuccess={this.imageChanged} className='form-group col-md-3 rounded-circle' isProfile={true} />
 
                     <div className='form-group col-md-9'>
+                        <br />
                         <div className='row'>
-                            <FormTextBox ref={e => this.maTheCanBo = e} label='Mã số cán bộ' className='form-group col-md-4' readOnly={readOnly} required maxLength={10} onChange={this.handleNewShcc} />
-                            <FormSelect ref={e => this.donVi = e} label='Đơn vị công tác' className='form-group col-md-8' readOnly={readOnly} required data={SelectAdapter_DmDonVi} />
-                            <FormTextBox ref={e => this.ho = e} label='Họ và tên lót' style={{ textTransform: 'uppercase' }} className='col-xl-4 col-md-6' onChange={this.handleHo} required maxLength={100} />
-                            <FormTextBox ref={e => this.ten = e} label='Tên' style={{ textTransform: 'uppercase' }} className='col-xl-4 col-md-6' onChange={this.handleTen} required maxLength={100} />
+                            <FormTextBox ref={e => this.ho = e} label='Họ và tên lót' style={{ textTransform: 'uppercase', display: readOnly ? 'none' : 'block' }} className='col-md-8' onChange={this.handleHo} required maxLength={100} readOnly={readOnly} />
+                            <FormTextBox ref={e => this.ten = e} label='Tên' style={{ textTransform: 'uppercase', display: readOnly ? 'none' : 'block' }} className='col-md-4' onChange={this.handleTen} required maxLength={100} readOnly={readOnly} />
+                            <FormTextBox ref={e => this.ten = e} label='Tên' style={{ textTransform: 'uppercase', display: readOnly ? 'none' : 'block' }} className='col-md-4' onChange={this.handleTen} required maxLength={100} readOnly={readOnly} />
+
+                            <FormTextBox ref={e => this.maTheCanBo = e} label='Mã số cán bộ' className='form-group col-md-12' readOnly={readOnly} required maxLength={10} onChange={this.handleNewShcc} />
+                            <FormSelect ref={e => this.donVi = e} label='Đơn vị công tác' className='form-group col-md-12' readOnly={readOnly} required data={SelectAdapter_DmDonVi} />
+
                             <FormSelect ref={e => this.phai = e} label='Giới tính' className='form-group col-md-4' required data={SelectAdapter_DmGioiTinhV2} />
                             <FormTextBox ref={e => this.biDanh = e} label='Bí danh' className='form-group col-md-4' maxLength={30} />
                             <FormDatePicker ref={e => this.ngaySinh = e} type='date-mask' className='form-group col-md-4' label='Ngày sinh' required />
