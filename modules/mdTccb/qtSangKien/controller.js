@@ -78,12 +78,12 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/user/qua-trinh/sang-kien/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/sang-kien/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { listShcc, listDv } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { listShcc: null, listDv: null };
-        app.model.qtSangKien.searchPage(pageNumber, pageSize, listShcc, listDv, searchTerm, (error, page) => {
+        let filter = JSON.stringify(req.query.filter || {});
+        app.model.qtSangKien.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -93,8 +93,7 @@ module.exports = app => {
             }
         });
     });
-    ///END USER ACTIONS
-    
+
     app.get('/api/tccb/qua-trinh/sang-kien/page/:pageNumber/:pageSize', app.permission.check('qtSangKien:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
@@ -110,6 +109,7 @@ module.exports = app => {
             }
         });
     });
+    ///END USER ACTIONS
 
     app.get('/api/tccb/qua-trinh/sang-kien/group/page/:pageNumber/:pageSize', app.permission.check('qtSangKien:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
@@ -126,8 +126,8 @@ module.exports = app => {
             }
         });
     });
-    
-    app.post('/api/qua-trinh/sang-kien', app.permission.check('qtSangKien:write'), (req, res) => 
+
+    app.post('/api/qua-trinh/sang-kien', app.permission.check('qtSangKien:write'), (req, res) =>
         app.model.qtSangKien.create(req.body.data, (error, item) => res.send({ error, item })));
 
     app.put('/api/qua-trinh/sang-kien', app.permission.check('qtSangKien:write'), (req, res) =>

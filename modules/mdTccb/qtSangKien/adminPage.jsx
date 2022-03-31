@@ -60,7 +60,7 @@ class EditModal extends AdminModal {
             body: <div className='row'>
                 <FormSelect className='col-md-12' ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={this.state.id ? true : false} required />
                 <FormTextBox className='col-md-12' ref={e => this.maSo = e} label='Mã số sáng kiến' readOnly={readOnly} required />
-                <FormRichTextBox className='col-md-12' ref={e => this.tenSangKien = e} label='Tên sáng kiến' readOnly={readOnly} required /> 
+                <FormRichTextBox className='col-md-12' ref={e => this.tenSangKien = e} label='Tên sáng kiến' readOnly={readOnly} required />
             </div>
         });
     }
@@ -90,17 +90,17 @@ class QtSangKien extends AdminPage {
 
     changeAdvancedSearch = (isInitial = false) => {
         let { pageNumber, pageSize } = this.props && this.props.qtSangKien && this.props.qtSangKien.page ? this.props.qtSangKien.page : { pageNumber: 1, pageSize: 50 };
-        const listDv = this.maDonVi?.value().toString() || '';
+        const listDonVi = this.maDonVi?.value().toString() || '';
         const listShcc = this.mulCanBo?.value().toString() || '';
-        const pageFilter = isInitial ? null : { listDv, listShcc };
+        const pageFilter = isInitial ? null : { listDonVi, listShcc };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
-                    this.maDonVi?.value(filter.listDv);
+                    this.maDonVi?.value(filter.listDonVi);
                     this.mulCanBo?.value(filter.listShcc);
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.listShcc || filter.listDv)) this.showAdvanceSearch();
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.listShcc || filter.listDonVi)) this.showAdvanceSearch();
                 }
             });
         });
@@ -134,49 +134,49 @@ class QtSangKien extends AdminPage {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('qtSangKien', ['read', 'write', 'delete']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtSangKien && this.props.qtSangKien.page ? this.props.qtSangKien.page
-         : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
-        let table  = renderTable({
+            : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
+        let table = renderTable({
             emptyTable: 'Không có dữ liệu về sáng kiến',
-                getDataSource: () => list, stickyHead: true,
-                renderHead: () => (
-                    <tr>
-                        <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br />Đơn vị công tác</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Mã số</th>
-                        <th style={{ width: '70%', whiteSpace: 'nowrap' }}>Tên sáng kiến</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
-                    </tr>
-                ),
-                renderRow: (item, index) => (
-                    <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                        <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
-                                {item.shcc}
-                            </>
-                        )} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenHocVi || ''} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucDanhNgheNghiep || ''} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <span> {item.tenChucVu || ''}<br /> </span>
-                                {(item.tenDonVi || '').normalizedName()}
-                            </>
-                        )} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(item.maSo || '')} />  
-                        <TableCell type='text' content={(item.tenSangKien || '')} />
-                        {
-                            <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                                onEdit={() => this.modal.show(item)} onDelete={this.delete} >
-                            </TableCell>
-                        }
-                    </tr>
-                )
-            });
+            getDataSource: () => list, stickyHead: true,
+            renderHead: () => (
+                <tr>
+                    <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br />Đơn vị công tác</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Mã số</th>
+                    <th style={{ width: '70%', whiteSpace: 'nowrap' }}>Tên sáng kiến</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
+                </tr>
+            ),
+            renderRow: (item, index) => (
+                <tr key={index}>
+                    <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
+                    <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
+                        <>
+                            <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
+                            {item.shcc}
+                        </>
+                    )} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenHocVi || ''} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucDanhNgheNghiep || ''} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                        <>
+                            <span> {item.tenChucVu || ''}<br /> </span>
+                            {(item.tenDonVi || '').normalizedName()}
+                        </>
+                    )} />
+                    <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(item.maSo || '')} />
+                    <TableCell type='text' content={(item.tenSangKien || '')} />
+                    {
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
+                            onEdit={() => this.modal.show(item)} onDelete={this.delete} >
+                        </TableCell>
+                    }
+                </tr>
+            )
+        });
 
         return this.renderPage({
             icon: 'fa fa-lightbulb-o',
