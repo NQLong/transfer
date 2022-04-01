@@ -1,4 +1,4 @@
-// Table name: HCTH_CHI_DAO { id, chiDao, loai, congVan, canBo }
+// Table name: HCTH_CHI_DAO { id, chiDao, loai, congVan, canBo, thoiGian }
 const keys = ['ID'];
 const obj2Db = { 'id': 'ID', 'chiDao': 'CHI_DAO', 'loai': 'LOAI', 'congVan': 'CONG_VAN', 'canBo': 'CAN_BO', 'thoiGian': 'THOI_GIAN' };
 

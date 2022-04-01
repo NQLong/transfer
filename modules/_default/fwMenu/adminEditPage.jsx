@@ -85,6 +85,10 @@ export class ComponentModal extends React.Component {
             $('#comDisplay').css('display', 'block');
             $('#titleCom').css('display', 'block');
             $('#divLinkSeeAll').css('display', 'none');
+        } else if (selectedType == 'all companies') {
+            $('#comDisplay').css('display', 'none');
+            $('#titleCom').css('display', 'none');
+            $('#divLinkSeeAll').css('display', 'none');
         } else {
             $('#comDisplay').css('display', 'none');
             $('#titleCom').css('display', 'none');
@@ -398,6 +402,9 @@ export class MenuEditPage extends React.Component {
             } else if (component.viewName == 'all divisions') {
                 // component.viewName = '';
                 mainStyle.backgroundColor = '#66f9b0';
+            } else if (component.viewName == '\'all companies\'') {
+                // component.viewName = '';
+                mainStyle.backgroundColor = '#34fa45';
             }
         }
         let displayText = component.viewType + (component.viewName ? ' - ' + T.language.parse(component.viewName) + ' ' : '');
