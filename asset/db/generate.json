@@ -9437,6 +9437,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 255
+                },
+                "SO_QUYET_DINH": {
+                    "value": "soQuyetDinh",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 255
                 }
             },
             "primaryKeys": [
@@ -11705,6 +11712,46 @@
             },
             "primaryKeys": [
                 "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "DM_SV_KHU_VUC_TUYEN_SINH": {
+            "active": true,
+            "moduleName": "dmSvKhuVucTuyenSinh",
+            "modelName": "dmSvKhuVucTuyenSinh",
+            "columns": {
+                "MA": {
+                    "value": "ma",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 200
+                },
+                "TEN": {
+                    "value": "ten",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 50
+                },
+                "MO_TA": {
+                    "value": "moTa",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 1024
+                },
+                "KICH_HOAT": {
+                    "value": "kichHoat",
+                    "dataType": "NUMBER",
+                    "dataDefault": "1",
+                    "nullable": false,
+                    "size": "1,0"
+                }
+            },
+            "primaryKeys": [
+                "MA"
             ],
             "foreignKeys": [],
             "type": "table"

@@ -672,6 +672,7 @@ BEGIN
              LEFT JOIN TCHC_CAN_BO TCB on TKB.CBGD = TCB.SHCC
 
     WHERE searchTerm = ''
+       OR LOWER(TRIM(DMMH.TEN)) LIKE sT
        OR LOWER(TRIM(DV.TEN)) LIKE sT
        OR LOWER(TRIM(TKB.MA_HOC_PHAN)) LIKE sT
        OR LOWER(TRIM(TKB.MA_HOC_KY)) LIKE sT
@@ -695,6 +696,7 @@ BEGIN
                         TKB.NGAY_BAT_DAU  AS                "ngayBatDau",
                         TKB.NHOM          AS                "nhom",
                         DV.TEN            AS                "tenKhoaBoMon",
+                        DV.MA             AS                "maKhoaBoMon",
                         DMMH.TEN          AS                "tenMonHoc",
                         DMMH.SO_TIN_CHI   AS                "soTinChi",
                         DMMH.TONG_SO_TIET AS                "tongSoTiet",
@@ -712,6 +714,7 @@ BEGIN
                           LEFT JOIN TCHC_CAN_BO TCB on TKB.CBGD = TCB.SHCC
 
                  WHERE searchTerm = ''
+                    OR LOWER(TRIM(DMMH.TEN)) LIKE sT
                     OR LOWER(TRIM(DV.TEN)) LIKE sT
                     OR LOWER(TRIM(TKB.MA_HOC_PHAN)) LIKE sT
                     OR LOWER(TRIM(TKB.MA_HOC_KY)) LIKE sT
@@ -948,7 +951,7 @@ BEGIN
     INTO totalItem
 
     FROM FW_STUDENT STU
-             LEFT JOIN DM_LOAI_HINH_DAO_TAO LHDT ON LHDT.MA = STU.LOAI_HINH_DAO_TAO
+             LEFT JOIN DM_SV_LOAI_HINH_DAO_TAO LHDT ON LHDT.MA = STU.LOAI_HINH_DAO_TAO
              LEFT JOIN DM_LOAI_SINH_VIEN LSV on LSV.MA = STU.LOAI_SINH_VIEN
              LEFT JOIN DM_GIOI_TINH GT ON GT.MA = STU.GIOI_TINH
              LEFT JOIN DM_QUOC_GIA QG ON QG.MA_CODE = STU.QUOC_GIA
@@ -1009,7 +1012,7 @@ BEGIN
                         STU.NGAY_NHAP_HOC  AS                                                     "ngayNhapHoc",
                         ROW_NUMBER() OVER (ORDER BY STU.NAM_TUYEN_SINH DESC NULLS LAST, STU.TEN ) R
                  FROM FW_STUDENT STU
-                          LEFT JOIN DM_LOAI_HINH_DAO_TAO LHDT ON LHDT.MA = STU.LOAI_HINH_DAO_TAO
+                          LEFT JOIN DM_SV_LOAI_HINH_DAO_TAO LHDT ON LHDT.MA = STU.LOAI_HINH_DAO_TAO
                           LEFT JOIN DM_LOAI_SINH_VIEN LSV on LSV.MA = STU.LOAI_SINH_VIEN
                           LEFT JOIN DM_GIOI_TINH GT ON GT.MA = STU.GIOI_TINH
                           LEFT JOIN DM_QUOC_GIA QG ON QG.MA_CODE = STU.QUOC_GIA
@@ -1075,6 +1078,36 @@ BEGIN
     Select max(MA) into max_ma from DM_DON_VI;
     return max_ma;
 end;
+/
+--EndMethod--
+
+CREATE OR REPLACE FUNCTION HCTH_CONG_VAN_DEN_GET_ALL_CHI_DAO(
+    idCongVan IN NUMBER
+)   RETURN SYS_REFCURSOR AS
+my_cursor SYS_REFCURSOR;
+BEGIN
+
+OPEN my_cursor FOR
+SELECT
+    cd.id               as  "id",
+    cd.CHI_DAO          as  "chiDao",
+    cd.THOI_GIAN        as  "thoiGian",
+    cd.CAN_BO           as  "canBo",
+    CASE
+        WHEN cb.HO IS NULL THEN cb.TEN
+        WHEN cb.TEN IS NULL THEN cb.HO
+        WHEN DMCV.TEN IS NULL THEN CONCAT(CONCAT(cb.HO, ' '), cb.TEN)
+        ELSE CONCAT(CONCAT(CONCAT(DMCV.TEN, ' - '), CONCAT(cb.HO, ' ')), cb.TEN)
+    END as "hoTenDayDu"
+
+FROM HCTH_CHI_DAO cd
+    LEFT JOIN TCHC_CAN_BO cb on cd.CAN_BO = cb.SHCC
+    LEFT JOIN QT_CHUC_VU qtcv ON cb.SHCC = qtcv.SHCC AND CHUC_VU_CHINH = 1
+    LEFT JOIN DM_CHUC_VU DMCV ON DMCV.MA = qtcv.MA_CHUC_VU
+WHERE (idCongVan is not null and cd.CONG_VAN=idCongVan)
+ORDER BY THOI_GIAN ASC;
+RETURN my_cursor;
+END;
 /
 --EndMethod--
 
@@ -4736,7 +4769,6 @@ BEGIN
                         cbk.SHCC                            as "shccNguoiKy",
                         cbk.HO                                as "hoNguoiKy",
                         cbk.TEN                             as "tenNguoiKy",
-                        cbk.CHUC_VU_KIEM_NHIEM               as "chucVuNguoiKy",
                         hd.SO_HOP_DONG as "soHopDong",
                         dhd.TEN as "dienHopDong",
                         hd.KIEU_HOP_DONG as "kieuHopDong",
