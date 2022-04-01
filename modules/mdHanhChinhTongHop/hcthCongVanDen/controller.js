@@ -1,5 +1,5 @@
 module.exports = (app) => {
-    const FILE_TYPE = 'DEN';
+    const CONG_VAN_TYPE = 'DEN';
 
     const menu = {
         parentMenu: app.parentMenu.hcth,
@@ -55,84 +55,97 @@ module.exports = (app) => {
     });
 
     app.post('/api/hcth/cong-van-den', app.permission.check('hcthCongVanDen:write'), (req, res) => {
-        const { fileList, ...data } = req.body.data;
+        const { fileList, chiDao, ...data } = req.body.data;
         app.model.hcthCongVanDen.create(data, (error, item) => {
             if (error)
                 res.send({ error, item });
             else {
                 let { id } = item;
                 app.createFolder(app.path.join(app.assetPath, `/congVanDen/${id}`));
-                if (fileList && fileList.length > 0) {
-                    updateListFile(fileList, id, ({ error }) => {
-                        if (error) {
-                            deleteCongVan(id, () => res.send({ error }));
-                        }
-                        else
-                            res.send({ item });
-                    });
-                }
-                else res.send({ item });
+                createChiDaoFromList(chiDao, id, ({ error }) => {
+                    if (error)
+                        res.send({ error, item });
+                    else
+                        updateListFile(fileList, id, ({ error }) => {
+                            if (error) {
+                                deleteCongVan(id, () => res.send({ error }));
+                            }
+                            else
+                                res.send({ item });
+                        });
+                });
             }
         });
     });
 
+
     const updateListFile = (listFile, congVanId, done) => {
-        const [{ id, ...changes }] = listFile.splice(0, 1),
-            sourcePath = app.path.join(app.assetPath, `/congVanDen/new/${changes.ten}`),
-            destPath = app.path.join(app.assetPath, `/congVanDen/${congVanId}/${changes.ten}`);
-        if (!changes.congVan)
-            app.fs.rename(sourcePath, destPath, error => {
-                if (error) done && done({ error });
-                else
-                    app.model.hcthFileCongVan.update({ id }, { ...changes, congVan: congVanId }, (error, item) => {
-                        if (error)
-                            done && done({ error });
-                        else {
-                            if (listFile.length > 0)
-                                updateListFile(listFile, congVanId, done);
-                            else
-                                done && done({ error, item });
-                        }
-                    });
-            });
-        else
-            app.model.hcthFileCongVan.update({ id }, { ...changes }, (error, item) => {
-                if (error)
-                    done && done({ error });
-                else {
-                    if (listFile.length > 0)
-                        updateListFile(listFile, congVanId, done);
+        if (listFile && listFile.length > 0) {
+            const [{ id, ...changes }] = listFile.splice(0, 1),
+                sourcePath = app.path.join(app.assetPath, `/congVanDen/new/${changes.ten}`),
+                destPath = app.path.join(app.assetPath, `/congVanDen/${congVanId}/${changes.ten}`);
+            if (!changes.congVan)
+                app.fs.rename(sourcePath, destPath, error => {
+                    if (error) done && done({ error });
                     else
-                        done && done({ error, item });
-                }
-            });
+                        app.model.hcthFileCongVan.update({ id }, { ...changes, congVan: congVanId }, (error) => {
+                            if (error)
+                                done && done({ error });
+                            else updateListFile(listFile, congVanId, done);
+                        });
+                });
+            else
+                app.model.hcthFileCongVan.update({ id }, { ...changes }, (error) => {
+                    if (error)
+                        done && done({ error });
+                    else
+                        updateListFile(listFile, congVanId, done);
+                });
+        } else
+            done && done({});
     };
 
     const deleteCongVan = (id, done) => {
         app.model.hcthFileCongVan.delete({ congVan: id }, (error) => {
             if (error) done && done({ error });
             else
-                app.model.hcthCongVanDen.delete({ id }, error => {
-                    app.deleteFolder(app.assetPath + '/congVanDen/' + id);
-                    done && done({ error });
+                app.model.hcthChiDao.delete({ congVann: id }, (error) => {
+                    if (error) done && done({ error });
+                    else
+                        app.model.hcthCongVanDen.delete({ id }, error => {
+                            app.deleteFolder(app.assetPath + '/congVanDen/' + id);
+                            done && done({ error });
+                        });
                 });
         });
     };
 
 
-    app.put('/api/hcth/cong-van-den', app.permission.check('hcthCongVanDen:write'), (req, res) => {
-        const { fileList, ...changes } = req.body.changes;
+    app.put('/api/hcth/cong-van-den', app.permission.check('staff:login'), (req, res) => {
+        const { fileList, chiDao, ...changes } = req.body.changes;
         app.model.hcthCongVanDen.update({ id: req.body.id }, changes, (errors, item) => {
             if (errors)
                 res.send({ errors, item });
-            else {
-                if (fileList && fileList.length > 0) {
-                    updateListFile(fileList, req.body.id, ({ error }) => res.send({ error }));
-                }
-                else res.send({ item });
-            }
+            else
+                createChiDaoFromList(chiDao, req.body.id, () => {
+                    updateListFile(fileList, req.body.id, ({ error }) => res.send({ error, item }));
+                });
         });
     });
+
+
+    const createChiDaoFromList = (listChiDao, congVanId, done) => {
+        if (listChiDao && listChiDao.length > 0) {
+            const [chiDao] = listChiDao.splice(0, 1);
+            app.model.hcthChiDao.create({ ...chiDao, congVan: congVanId, loai: CONG_VAN_TYPE }, (error) => {
+                if (error)
+                    done && done({ error });
+                else createChiDaoFromList(listChiDao, congVanId, done);
+            });
+        }
+        else
+            done && done({ error: null });
+    };
 
     app.delete('/api/hcth/cong-van-den', app.permission.check('hcthCongVanDen:delete'), (req, res) => {
         deleteCongVan(req.body.id, ({ error }) => res.send({ error }));
@@ -140,19 +153,22 @@ module.exports = (app) => {
 
 
     app.get('/api/hcth/cong-van-den/search/page/:pageNumber/:pageSize', app.permission.check('hcthCongVanDen:read'), (req, res) => {
-        const pageNumber = parseInt(req.params.pageNumber),
+        const
+            obj2Db = { 'ngayHetHan': 'NGAY_HET_HAN', 'ngayNhan': 'NGAY_NHAN' },
+            pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        let { donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, timeType, fromTime, toTime } = (req.query.filter && req.query.filter != '%%%%%%') ? req.query.filter :
-            { donViGuiCongVan: null, donViNhanCongVan: null, canBoNhanCongVan: null, timeType: null, fromTime: null, toTime: null };
-        donViGuiCongVan = donViGuiCongVan || null;
-        donViNhanCongVan = donViNhanCongVan || null;
-        canBoNhanCongVan = canBoNhanCongVan || null;
-        timeType = timeType || null;
-        fromTime = fromTime || null;
-        toTime = toTime || null;
-        app.model.hcthCongVanDen.searchPage(pageNumber, pageSize, donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, timeType, fromTime, toTime, searchTerm, (error, page) => {
+        let { donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, timeType, fromTime, toTime, congVanYear, sortBy, sortType } = (req.query.filter && req.query.filter != '%%%%%%') ? req.query.filter :
+            { donViGuiCongVan: null, donViNhanCongVan: null, canBoNhanCongVan: null, timeType: null, fromTime: null, toTime: null, congVanYear: null };
+
+        if (congVanYear && Number(congVanYear) > 1900) {
+            timeType = 2;
+            fromTime = new Date(`${congVanYear}-01-01`).getTime();
+            toTime = new Date(`${Number(congVanYear) + 1}-01-01`).getTime();
+        }
+        app.model.hcthCongVanDen.searchPage(pageNumber, pageSize, donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, timeType, fromTime, toTime, obj2Db[sortBy] || '', sortType, searchTerm, (error, page) => {
             if (error || page == null) {
+
                 res.send({ error });
             } else {
                 const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
@@ -195,7 +211,7 @@ module.exports = (app) => {
                     if (error) {
                         done && done({ error });
                     } else {
-                        app.model.hcthFileCongVan.create({ ten: originalFilename, thoiGian: new Date().getTime(), loai: FILE_TYPE, congVan: id === 'new' ? null : id }, (error, item) => done && done({ error, item }));
+                        app.model.hcthFileCongVan.create({ ten: originalFilename, thoiGian: new Date().getTime(), loai: CONG_VAN_TYPE, congVan: id === 'new' ? null : id }, (error, item) => done && done({ error, item }));
                     }
                 });
             }
@@ -244,8 +260,11 @@ module.exports = (app) => {
             if (error)
                 res.send({ error, item });
             else
-                app.model.hcthFileCongVan.getAll({ congVan: id, loai: FILE_TYPE }, '*', 'thoiGian', (error, files) => res.send({ error, item: { ...item, listFile: files || [] } }));
+                app.model.hcthFileCongVan.getAll({ congVan: id, loai: CONG_VAN_TYPE }, '*', 'thoiGian', (error, files) => {
+                    app.model.hcthCongVanDen.getAllChiDao(id, (errors, chiDao) => {
+                        res.send({ error: error || errors, item: { ...item, listFile: files || [], danhSachChiDao: chiDao?.rows || [] } });
+                    });
+                });
         });
     });
-
 };

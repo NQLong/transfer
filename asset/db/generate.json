@@ -6510,7 +6510,8 @@
             "moduleName": "hcthCongVanDen",
             "modelName": "hcthCongVanDen",
             "methods": {
-                "HCTH_CONG_VAN_DEN_SEARCH_PAGE": "searchPage"
+                "HCTH_CONG_VAN_DEN_SEARCH_PAGE": "searchPage",
+                "HCTH_CONG_VAN_DEN_GET_ALL_CHI_DAO": "getAllChiDao"
             },
             "columns": {
                 "ID": {
