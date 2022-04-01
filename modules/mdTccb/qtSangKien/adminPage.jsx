@@ -17,16 +17,17 @@ class EditModal extends AdminModal {
     };
 
     onShow = (item) => {
-        let { id, shcc, maSo, tenSangKien } = item ? item : {
-            id: '', shcc: '', maSo: '', tenSangKien: ''
+        let { id, shcc, maSo, tenSangKien, soQuyetDinh } = item ? item : {
+            id: '', shcc: '', maSo: '', tenSangKien: '', soQuyetDinh: ''
         };
 
         this.setState({
             id
         }, () => {
             this.maCanBo.value(shcc);
-            this.maSo.value(maSo);
-            this.tenSangKien.value(tenSangKien);
+            this.maSo.value(maSo ? maSo : '');
+            this.tenSangKien.value(tenSangKien ? tenSangKien : '');
+            this.soQuyetDinh.value(soQuyetDinh ? soQuyetDinh : '');
         });
     };
 
@@ -42,11 +43,15 @@ class EditModal extends AdminModal {
         } else if (!this.tenSangKien.value()) {
             T.notify('Tên sáng kiến trống', 'danger');
             this.tenSangKien.focus();
+        } else if (!this.soQuyetDinh.value()) {
+            T.notify('Số quyết định trống', 'danger');
+            this.soQuyetDinh.focus();
         } else {
             const changes = {
                 shcc: ma,
                 maSo: this.maSo.value(),
                 tenSangKien: this.tenSangKien.value(),
+                soQuyetDinh: this.soQuyetDinh.value(),
             };
             this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
         }
@@ -59,8 +64,9 @@ class EditModal extends AdminModal {
             size: 'large',
             body: <div className='row'>
                 <FormSelect className='col-md-12' ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={this.state.id ? true : false} required />
-                <FormTextBox className='col-md-12' ref={e => this.maSo = e} label='Mã số sáng kiến' readOnly={readOnly} required />
-                <FormRichTextBox className='col-md-12' ref={e => this.tenSangKien = e} label='Tên sáng kiến' readOnly={readOnly} required />
+                <FormTextBox className='col-md-6' ref={e => this.maSo = e} label='Mã số sáng kiến' readOnly={readOnly} required />
+                <FormTextBox className='col-md-6' ref={e => this.soQuyetDinh = e} label='Số quyết định' readOnly={readOnly} required />
+                <FormRichTextBox className='col-md-12' ref={e => this.tenSangKien = e} label='Tên sáng kiến' readOnly={readOnly} required /> 
             </div>
         });
     }
@@ -147,6 +153,7 @@ class QtSangKien extends AdminPage {
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br />Đơn vị công tác</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Mã số</th>
                     <th style={{ width: '70%', whiteSpace: 'nowrap' }}>Tên sáng kiến</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                 </tr>
             ),
@@ -169,6 +176,7 @@ class QtSangKien extends AdminPage {
                     )} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(item.maSo || '')} />
                     <TableCell type='text' content={(item.tenSangKien || '')} />
+                    <TableCell type='text' content={(item.soQuyetDinh || '')} />
                     {
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={this.delete} >
