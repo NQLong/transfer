@@ -324,10 +324,15 @@ class QtKhenThuongAll extends AdminPage {
                 </div>
             </>,
             content: <>
+                {!this.checked && <div className='tile'>
+                    <div className='tile-title'>
+                        Thống kê
+                    </div>
+                    <b>{'Số lượng: ' + totalItem.toString()}</b>
+                </div>}
                 <div className='tile'>
                     <FormSelect className='col-md-3' ref={e => this.loaiDoiTuong = e} label='Chọn loại đối tượng' data={this.stateTable} onChange={() => this.changeAdvancedSearch()} />
                     <FormCheckbox label='Hiển thị theo đối tượng' style={{ position: 'absolute', right: '70px', top: '70px' }} ref={e => this.hienThiTheoDoiTuong = e} onChange={this.groupPage} />
-                    {!this.checked && <FormTextBox type='text' style={{ color:'blue', position: 'absolute', right: '70px', top: '50px' }} label={'Số lượng ' + totalItem.toString()} readOnly />}
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.getPage} />

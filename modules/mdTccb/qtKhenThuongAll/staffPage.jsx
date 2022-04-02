@@ -130,7 +130,7 @@ class QtKhenThuongAllUserPage extends AdminPage {
                         <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Thành tích</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>
                         <th style={{ width: 'auto', textAlign: 'right', whiteSpace: 'nowrap' }}>Điểm thi đua</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
+                        <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
@@ -156,7 +156,15 @@ class QtKhenThuongAllUserPage extends AdminPage {
                 'Khen thưởng'
             ],
             content: <>
-                <div className='tile'>{table}</div>
+                <div className='tile'>
+                    <div className='tile-title'>
+                        Thống kê
+                    </div>
+                    <b>{'Số lượng: ' + totalItem.toString()}</b>
+                </div>
+                <div className='tile'>
+                    {table}
+                </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e}

@@ -189,43 +189,35 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Đối tượng</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cá nhân</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tập thể</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm đạt được</th>
                         <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Thành tích</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>
                         <th style={{ width: 'auto', textAlign: 'right', whiteSpace: 'nowrap' }}>Điểm thi đua</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Loại đối tượng</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
+                        <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                        <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
-                            item.maLoaiDoiTuong == '01' ?
+                        <TableCell type='text' content={item.tenLoaiDoiTuong} />
+                        <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
+                            item.maLoaiDoiTuong == '02' ?
                                 <>
-                                    <span>
-                                        {'Trường Đại học Khoa học Xã hội và Nhân Văn, TP. HCM'}
-                                    </span>
+                                    <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
+                                    {item.maCanBo}
                                 </>
-                                :
-                                item.maLoaiDoiTuong == '02' ?
-                                    <>
-                                        <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
-                                        {item.ma}
-                                    </>
-                                    : item.maLoaiDoiTuong == '03' ?
-                                        <>
-                                            <span>
-                                                {item.tenDonVi}
-                                            </span>
-                                        </>
-                                        : <>
-                                            <span>{item.tenBoMon}</span> <br />
-                                            {item.tenDonViBoMon}
-                                        </>
+                                : item.maLoaiDoiTuong == '04' ? item.tenBoMon : ''
 
-                        )}
-                        />
+                        )} />
+                        <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
+                            item.maLoaiDoiTuong == '01' ? 'Trường Đại học Khoa học Xã hội và Nhân Văn, TP. HCM'
+                                : item.maLoaiDoiTuong == '02' ? item.tenDonViCanBo
+                                    : item.maLoaiDoiTuong == '03' ? item.tenDonVi
+                                        : item.tenDonViBoMon
+                        )} />
                         <TableCell type='text' style={{ textAlign: 'center' }} content={(item.namDatDuoc)} />
                         <TableCell type='text' content={(item.tenThanhTich)} />
                         <TableCell type='text' style={{ textAlign: 'center' }} content={(item.soQuyetDinh || '')} />
@@ -260,7 +252,15 @@ class QtKhenThuongAllGroupPage extends AdminPage {
                 </div>
             </>,
             content: <>
-                <div className='tile'>{table}</div>
+                <div className='tile'>
+                    <div className='tile-title'>
+                        Thống kê
+                    </div>
+                    <b>{'Số lượng: ' + totalItem.toString()}</b>
+                </div>
+                <div className='tile'>
+                    {table}
+                </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e} permission={permission}
