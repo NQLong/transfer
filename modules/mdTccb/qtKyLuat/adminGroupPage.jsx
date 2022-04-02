@@ -181,7 +181,7 @@ class QtKyLuatGroupPage extends AdminPage {
                             </>
                         )} />
                         <TableCell type='text' style={{ color: 'red' }} content={(<span><b>{item.tenKyLuat || ''}</b></span>)} />
-                        <TableCell type='text' content={(item.noiDung || '')} />
+                        <TableCell type='text' contentClassName='multiple-lines-5' content={(item.noiDung || '')} />
                         <TableCell type='text' content={(<b> {item.soQuyetDinh || ''} </b>)} />
                         <TableCell type='date' style={{color: 'blue'}} dateFormat='dd/mm/yyyy' content={item.ngayRaQuyetDinh} />
                         <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemThiDua} />
@@ -210,6 +210,12 @@ class QtKyLuatGroupPage extends AdminPage {
             </>,
             content: <>
                 <div className='tile'>
+                    <div className='tile-title'>
+                        Thống kê
+                    </div>
+                    <b>{'Số lượng: ' + totalItem.toString()}</b>
+                </div>
+                <div className='tile'>
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
@@ -223,9 +229,9 @@ class QtKyLuatGroupPage extends AdminPage {
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
             onExport: (e) => {
                 e.preventDefault();
-                const { fromYear, toYear, listShcc, listDv, listHinhThucKyLuat } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, listHinhThucKyLuat: null };
+                const filter = JSON.stringify(this.state.filter || {});
 
-                T.download(T.url(`/api/qua-trinh/ky-luat/download-excel/${listShcc ? listShcc : null}/${listDv ? listDv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${listHinhThucKyLuat ? listHinhThucKyLuat : null}`), 'kyluat.xlsx');
+                T.download(T.url(`/api/qua-trinh/ky-luat/download-excel/${filter}`), 'kyluat.xlsx');
             }
         });
     }

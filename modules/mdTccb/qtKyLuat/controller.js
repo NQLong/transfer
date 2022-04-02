@@ -75,8 +75,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, listShcc, listDv, listHinhThucKyLuat } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, listHinhThucKyLuat: null };
-        app.model.qtKyLuat.searchPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, listHinhThucKyLuat, searchTerm, (error, page) => {
+        const filter = JSON.stringify(req.query.filter || {});
+        app.model.qtKyLuat.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -92,8 +92,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, listShcc, listDv, listHinhThucKyLuat } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, listHinhThucKyLuat: null};
-        app.model.qtKyLuat.searchPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, listHinhThucKyLuat, searchTerm, (error, page) => {
+        const filter = JSON.stringify(req.query.filter || {});
+        app.model.qtKyLuat.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -108,8 +108,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, listShcc, listDv, listHinhThucKyLuat } = (req.query.filter && req.query.filter != '%%%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, listHinhThucKyLuat: null };
-        app.model.qtKyLuat.groupPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, listHinhThucKyLuat, searchTerm, (error, page) => {
+        const filter = JSON.stringify(req.query.filter || {});
+        app.model.qtKyLuat.groupPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -144,14 +144,8 @@ module.exports = app => {
     app.delete('/api/tccb/qua-trinh/ky-luat', app.permission.check('staff:write'), (req, res) =>
         app.model.qtKyLuat.delete({ id: req.body.id }, (error) => res.send(error)));
 
-    app.get('/api/qua-trinh/ky-luat/download-excel/:listShcc/:listDv/:fromYear/:toYear/:listHinhThucKyLuat', app.permission.check('qtKyLuat:read'), (req, res) => {
-        let { listShcc, listDv, fromYear, toYear, listHinhThucKyLuat } = req.params ? req.params : { listShcc: null, listDv: null, toYear: null, listHinhThucKyLuat: null };
-        if (listShcc == 'null') listShcc = null;
-        if (listDv == 'null') listDv = null;
-        if (fromYear == 'null') fromYear = null;
-        if (toYear == 'null') toYear = null;
-        if (listHinhThucKyLuat == 'null') listHinhThucKyLuat = null;
-        app.model.qtKyLuat.download(listShcc, listDv, fromYear, toYear, listHinhThucKyLuat, (err, result) => {
+    app.get('/api/qua-trinh/ky-luat/download-excel/:filter', app.permission.check('qtKyLuat:read'), (req, res) => {
+        app.model.qtKyLuat.download(req.params.filter, (err, result) => {
             if (err || !result) {
                 res.send({ err });
             } else {

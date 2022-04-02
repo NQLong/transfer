@@ -238,7 +238,7 @@ class QtKyLuat extends AdminPage {
                             </>
                         )} />
                         {!this.checked && <TableCell type='text' style={{ color: 'red' }} content={(<span><b>{item.tenKyLuat || ''}</b></span>)} />}
-                        {!this.checked && <TableCell type='text' content={(item.noiDung || '')} />}
+                        {!this.checked && <TableCell type='text' contentClassName='multiple-lines-5' content={(item.noiDung || '')} />}
                         {!this.checked && <TableCell type='text' content={(<b> {item.soQuyetDinh || ''} </b>)} />}
                         {!this.checked && <TableCell type='date' style={{color: 'blue'}} dateFormat='dd/mm/yyyy' content={item.ngayRaQuyetDinh} />}
                         {!this.checked && <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemThiDua} />}
@@ -278,6 +278,12 @@ class QtKyLuat extends AdminPage {
                 </div>
             </>,
             content: <>
+                {!this.checked && <div className='tile'>
+                    <div className='tile-title'>
+                        Thống kê
+                    </div>
+                    <b>{'Số lượng: ' + totalItem.toString()}</b>
+                </div>}
                 <div className='tile'>
                     <FormCheckbox label='Hiển thị theo cán bộ' ref={e => this.hienThiTheoCanBo = e} onChange={this.groupPage} />
                     {table}
@@ -293,9 +299,9 @@ class QtKyLuat extends AdminPage {
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
             onExport: !this.checked ? (e) => {
                 e.preventDefault();
-                const { fromYear, toYear, listShcc, listDv, listHinhThucKyLuat } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, listHinhThucKyLuat: null };
+                const filter = JSON.stringify(this.state.filter || {});
 
-                T.download(T.url(`/api/qua-trinh/ky-luat/download-excel/${listShcc ? listShcc : null}/${listDv ? listDv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${listHinhThucKyLuat ? listHinhThucKyLuat : null}`), 'kyluat.xlsx');
+                T.download(T.url(`/api/qua-trinh/ky-luat/download-excel/${filter}`), 'kyluat.xlsx');
             } : null
         });
     }

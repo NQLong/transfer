@@ -136,7 +136,7 @@ class QtKyLuatUserPage extends AdminPage {
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='text' style={{ color: 'red' }} content={(<span><b>{item.tenKyLuat || ''}</b></span>)} />
-                        <TableCell type='text' content={(item.noiDung || '')} />
+                        <TableCell type='text' contentClassName='multiple-lines-5' content={(item.noiDung || '')} />
                         <TableCell type='text' content={(<b> {item.soQuyetDinh || ''} </b>)} />
                         <TableCell type='date' style={{color: 'blue'}} dateFormat='dd/mm/yyyy' content={item.ngayRaQuyetDinh} />
                         <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemThiDua} />
@@ -157,6 +157,12 @@ class QtKyLuatUserPage extends AdminPage {
                 'Kỷ luật'
             ],
             content: <>
+                <div className='tile'>
+                    <div className='tile-title'>
+                        Thống kê
+                    </div>
+                    <b>{'Số lượng: ' + totalItem.toString()}</b>
+                </div>
                 <div className='tile'>
                     {table}
                 </div>

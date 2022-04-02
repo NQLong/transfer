@@ -31,10 +31,10 @@ class EditModal extends AdminModal {
         };
 
         if (changes.ma == '') {
-            T.notify('Mã kỷ luật bị trống!', 'danger');
+            T.notify('Mã hình thức kỷ luật bị trống!', 'danger');
             this.ma.focus();
         } else if (changes.ten == '') {
-            T.notify('Tên kỷ luật bị trống!', 'danger');
+            T.notify('Tên hình thức kỷ luật bị trống!', 'danger');
             this.ten.focus();
         } else {
             this.state.ma ? this.props.update(this.state.ma, changes, this.hide) : this.props.create(changes, this.hide);
@@ -46,11 +46,11 @@ class EditModal extends AdminModal {
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
-            title: this.state.ma ? 'Cập nhật kỷ luật' : 'Tạo mới kỷ luật',
+            title: this.state.ma ? 'Cập nhật hình thức kỷ luật' : 'Tạo mới hình thức kỷ luật',
             body: <div className='row'>
-                <FormTextBox type='text' className='col-md-6' ref={e => this.ma = e} label='Mã kỷ luật' 
+                <FormTextBox type='text' className='col-md-6' ref={e => this.ma = e} label='Mã hình thức kỷ luật' 
                     readOnly={this.state.ma ? true : readOnly} required />
-                <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên kỷ luật' 
+                <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên hình thức kỷ luật' 
                     readOnly={readOnly} required />
                 <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} 
                     readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
@@ -78,7 +78,7 @@ class dmKyLuatPage extends AdminPage {
 
     delete = (e, item) => {
         e.preventDefault();
-        T.confirm('Xóa danh mục kỷ luật', 'Bạn có chắc bạn muốn xóa kỷ luật này?', true, isConfirm =>
+        T.confirm('Xóa danh mục hình thức kỷ luật', 'Bạn có chắc bạn muốn xóa hình thức kỷ luật này?', true, isConfirm =>
             isConfirm && this.props.deleteDmKyLuat(item.ma));
     }
 
@@ -87,7 +87,7 @@ class dmKyLuatPage extends AdminPage {
             permission = this.getUserPermission('dmKyLuat', ['read', 'write', 'delete']);
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmKyLuat && this.props.dmKyLuat.page ?
             this.props.dmKyLuat.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null };
-        let table = 'Không có danh sách kỷ luật!';
+        let table = 'Không có danh sách hình thức kỷ luật!';
         if (list && list.length > 0) {
             table = renderTable({
                 getDataSource: () => list, stickyHead: false,
@@ -115,10 +115,10 @@ class dmKyLuatPage extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-list-alt',
-            title: 'Danh mục kỷ luật',
+            title: 'Danh mục hình thức kỷ luật',
             breadcrumb: [
                 <Link key={0} to='/user/category'>Danh mục</Link>,
-                'Danh mục kỷ luật'
+                'Danh mục hình thức kỷ luật'
             ],
             content: <>
                 <div className='tile'>{table}</div>
