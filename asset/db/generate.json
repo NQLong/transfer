@@ -11766,6 +11766,46 @@
             ],
             "foreignKeys": [],
             "type": "table"
+        },
+        "TCCB_STAFF_LOG": {
+            "active": true,
+            "moduleName": "tccbStaffLog",
+            "modelName": "tccbStaffLog",
+            "columns": {
+                "EMAIL": {
+                    "value": "email",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 100
+                },
+                "THAO_TAC": {
+                    "value": "thaoTac",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
+                },
+                "QUA_TRINH": {
+                    "value": "quaTrinh",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
+                },
+                "NGAY": {
+                    "value": "ngay",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                }
+            },
+            "primaryKeys": [
+                "EMAIL"
+            ],
+            "foreignKeys": [],
+            "type": "table"
         }
     }
 }
