@@ -31,7 +31,7 @@ module.exports = app => {
     });
 
     app.get('/api/danh-muc/quan-he-gia-dinh/item/:ma', app.permission.check('user:login'), (req, res) => {
-        app.model.dmQuanHeGiaDinh.get({ma: req.params.ma}, (error, item) => res.send({ error, item }));
+        app.model.dmQuanHeGiaDinh.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
     });
 
 
@@ -59,6 +59,7 @@ module.exports = app => {
     app.get('/api/danh-muc/quan-he-gia-dinh/filter/:loai', app.permission.check('user:login'), (req, res) => {
         let loai = Number(req.params.loai),
             condition = {};
+        console.log(loai);
         if (req.query.condition) {
             if (loai != -1) {
                 condition = {

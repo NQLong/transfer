@@ -15,8 +15,22 @@ const UploadBoxStyle = {
     cursor: 'pointer'
 };
 
+const UploadProfileStyle = {
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+    backgroundSize: 'contain',
+    width: '100%',
+    paddingBottom: '80%',
+    fontSize: '64px',
+    color: 'black',
+    textAlign: 'center',
+    border: '1px dashed #333',
+    cursor: 'pointer',
+    borderRadius: '20%'
+};
+
 export default class ImageBox extends React.Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.state = { isUploading: false, userData: null, image: null };
         this.box = React.createRef();
@@ -150,7 +164,7 @@ export default class ImageBox extends React.Component {
 
     render() {
         const backgroundImage = `url('${(this.state.image ? this.state.image : this.props.image)}')`,
-            boxStyle = Object.assign({}, UploadBoxStyle, { backgroundImage });
+            boxStyle = this.props.isProfile ? Object.assign({}, UploadProfileStyle, { backgroundImage }) : Object.assign({}, UploadBoxStyle, { backgroundImage });
         return (
             <div style={this.props.style} className={this.props.className}>
                 <div ref={this.box} id={this.props.uploadType} style={boxStyle}

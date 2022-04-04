@@ -14,29 +14,25 @@ export class ComponentDiaDiem extends React.Component {
             if (maTinhThanhPho) {
                 this.setState({ maTinhThanhPho }, () => {
                     this.dmTinhThanhPho.value(maTinhThanhPho);
-                    if (!this.props.onlyTinhThanh) {
-                        if (maQuanHuyen) {
-                            this.setState({ maQuanHuyen }, () => {
-                                this.dmQuanHuyen.value(maQuanHuyen);
-                                if (maPhuongXa) {
-                                    this.dmPhuongXa.value(maPhuongXa);
-                                } else {
-                                    this.dmPhuongXa.value(null);
-                                    maPhuongXa = '';
-                                }
-                            });
-                        } else {
-                            this.dmQuanHuyen.value(null); this.dmPhuongXa.value(null);
-                            maQuanHuyen = maPhuongXa = '';
-                        }
+                    if (maQuanHuyen) {
+                        this.setState({ maQuanHuyen }, () => {
+                            this.dmQuanHuyen.value(maQuanHuyen);
+                            if (maPhuongXa) {
+                                this.dmPhuongXa.value(maPhuongXa);
+                            } else {
+                                this.dmPhuongXa.value(null);
+                                maPhuongXa = '';
+                            }
+                        });
+                    } else {
+                        this.dmQuanHuyen.value(null); this.dmPhuongXa.value(null);
+                        maQuanHuyen = maPhuongXa = '';
                     }
                 });
             } else {
                 this.dmTinhThanhPho.value(null);
-                if (this.props.onlyTinhThanh == false) {
-                    this.dmQuanHuyen.value(null);
-                    this.dmPhuongXa.value(null);
-                }
+                this.dmQuanHuyen.value(null);
+                this.dmPhuongXa.value(null);
                 maTinhThanhPho = maQuanHuyen = maPhuongXa = '';
             }
             if (this.props.requiredSoNhaDuong) this.soNhaDuong.value(soNhaDuong || '');
@@ -44,27 +40,25 @@ export class ComponentDiaDiem extends React.Component {
         } else { // get value
             return ({
                 maTinhThanhPho: this.dmTinhThanhPho.value(),
-                maQuanHuyen: !this.props.onlyTinhThanh ? this.dmQuanHuyen.value() : null,
-                maPhuongXa: !this.props.onlyTinhThanh ? this.dmPhuongXa.value() : null,
-                soNhaDuong: !this.props.onlyTinhThanh && this.props.requiredSoNhaDuong ? this.soNhaDuong.value() : null,
+                maQuanHuyen: this.dmQuanHuyen.value(),
+                maPhuongXa: this.dmPhuongXa.value(),
+                soNhaDuong: this.props.requiredSoNhaDuong ? this.soNhaDuong.value() : null,
             });
         }
     }
 
     changeTinhThanhPho = (value) => {
-        if (!this.props.onlyTinhThanh) {
-            if (this.state.maTinhThanhPho != value) {
-                this.setState({ maTinhThanhPho: value }, () => {
-                    this.dmQuanHuyen.value(null); this.dmPhuongXa.value(null);
-                    this.dmQuanHuyen.focus();
-                });
-            }
+        if (this.state.maTinhThanhPho != value.id) {
+            this.setState({ maTinhThanhPho: value.id }, () => {
+                this.dmQuanHuyen.value(null); this.dmPhuongXa.value(null);
+                this.dmQuanHuyen.focus();
+            });
         }
     }
 
     changeQuanHuyen = (value) => {
-        if (this.state.maQuanHuyen != value) {
-            this.setState({ maQuanHuyen: value }, () => {
+        if (this.state.maQuanHuyen != value.id) {
+            this.setState({ maQuanHuyen: value.id }, () => {
                 this.dmPhuongXa.value(null);
                 this.dmPhuongXa.focus();
             });
@@ -72,26 +66,28 @@ export class ComponentDiaDiem extends React.Component {
     }
 
     changePhuongXa = (value) => {
-        if (this.state.maPhuongXa != value) {
-            this.setState({ maPhuongXa: value }, () => {
+        if (this.state.maPhuongXa != value.id) {
+            this.setState({ maPhuongXa: value.id }, () => {
                 this.soNhaDuong && this.soNhaDuong.focus();
             });
         }
     }
 
     render = () => {
-        // const { label, className, style, readOnly = false, requiredTinh = true, requiredHuyen = true, requiredXa = true, requiredSoNhaDuong = false } = this.props;
-        const { label, className, style, readOnly = false, requiredSoNhaDuong = false, onlyTinhThanh = false } = this.props;
+        const { label, className, style, readOnly = false, requiredSoNhaDuong = false } = this.props;
         const { maTinhThanhPho = '', maQuanHuyen = '' } = this.state;
+
         return (
             <div className={(className || '')} style={style}>
-                <label>{label || ''}:</label>
-                <div className='row'>
-                    <FormSelect ref={e => this.dmTinhThanhPho = e} data={ajaxSelectTinhThanhPho} onChange={value => this.changeTinhThanhPho(value.id)} readOnly={readOnly} className={onlyTinhThanh ? 'col-md-12' : 'col-md-4'} placeholder='Thành phố / Tỉnh' />
-                    {!onlyTinhThanh ? <FormSelect ref={e => this.dmQuanHuyen = e} data={maTinhThanhPho ? ajaxSelectQuanHuyen(maTinhThanhPho) : []} onChange={value => this.changeQuanHuyen(value.id)} readOnly={readOnly} className='col-md-4' placeholder='Quận / Huyện' /> : null}
-                    {!onlyTinhThanh ? <FormSelect ref={e => this.dmPhuongXa = e} data={maQuanHuyen ? ajaxSelectPhuongXa(maQuanHuyen) : []} onChange={value => this.changePhuongXa(value.id)} readOnly={readOnly} className='col-md-4' placeholder='Phường / Xã' /> : null}
-                    {!onlyTinhThanh ? <FormTextBox ref={e => this.soNhaDuong = e} type='text' style={{ display: requiredSoNhaDuong ? 'block' : 'none' }} placeholder='Số nhà, đường' readOnly={readOnly} className='col-md-6' /> : null}
-                </div>
-            </div>);
+                <span>
+                    <label>{label || 'Địa chỉ'}:</label>
+                    <div className='row'>
+                        <FormSelect ref={e => this.dmTinhThanhPho = e} data={ajaxSelectTinhThanhPho} onChange={value => this.changeTinhThanhPho(value)} readOnly={readOnly} className='col-4' label={readOnly ? 'Thành phố, tỉnh' : null} placeholder='Thành phố, tỉnh' />
+                        <FormSelect ref={e => this.dmQuanHuyen = e} data={maTinhThanhPho ? ajaxSelectQuanHuyen(maTinhThanhPho) : []} onChange={value => this.changeQuanHuyen(value.id)} readOnly={readOnly} className='col-4' label={readOnly ? 'Quận, huyện' : null} placeholder='Quận, huyện' />
+                        <FormSelect ref={e => this.dmPhuongXa = e} data={maQuanHuyen ? ajaxSelectPhuongXa(maQuanHuyen) : []} onChange={value => this.changePhuongXa(value.id)} readOnly={readOnly} className='col-4' label={readOnly ? 'Phường, xã' : null} placeholder='Phường, xã' />
+                        <FormTextBox ref={e => this.soNhaDuong = e} type='text' style={{ display: requiredSoNhaDuong ? 'block' : 'none' }} label={readOnly ? 'Số nhà, đường' : null} placeholder='Số nhà, đường' readOnly={readOnly} className='col-6' />
+                    </div>
+                </span>
+            </div >);
     }
 }

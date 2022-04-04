@@ -8307,6 +8307,9 @@
             "active": true,
             "moduleName": "hcthChiDao",
             "modelName": "hcthChiDao",
+            "methods": {
+                "HCTH_CHI_DAO_GET_CONG_VAN_CHI_DAO": "getCongVanChiDao"
+            },
             "columns": {
                 "ID": {
                     "value": "id",
