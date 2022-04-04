@@ -20,8 +20,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, listShcc, listDv, timeType, listCv, gioiTinh } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, timeType: 0, listCv: null, gioiTinh: null };
-        app.model.qtChucVu.searchPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, timeType, listCv, gioiTinh, searchTerm, (error, page) => {
+        const { fromYear, toYear, listShcc, listDv, timeType, listCv, listCd, gioiTinh } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, timeType: 0, listCv: null, listCd: null, gioiTinh: null };
+        app.model.qtChucVu.searchPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, timeType, listCv, listCd, gioiTinh, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -36,8 +36,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, listShcc, listDv, timeType, listCv, gioiTinh } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, timeType: 0, listCv: null, gioiTinh: null };
-        app.model.qtChucVu.groupPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, timeType, listCv, gioiTinh, searchTerm, (error, page) => {
+        const { fromYear, toYear, listShcc, listDv, timeType, listCv, listCd, gioiTinh } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, timeType: 0, listCv: null, listCd: null, gioiTinh: null };
+        app.model.qtChucVu.groupPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, timeType, listCv, listCd, gioiTinh, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
