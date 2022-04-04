@@ -11,6 +11,7 @@ import { SelectAdapter_DmTonGiaoV2 } from 'modules/mdDanhMuc/dmTonGiao/redux';
 import { SelectAdapter_DmNhomMauV2 } from 'modules/mdDanhMuc/dmBenhVien/reduxNhomMau';
 import ComponentToChucKhac from '../tccbToChucKhac/componentToChucKhac';
 import { getStaffEdit } from './redux';
+import { SelectAdapter_DmHangThuongBinh } from 'modules/mdDanhMuc/dmHangThuongBinh/redux';
 
 class ComponentCaNhan extends React.Component {
     state = { image: '' };
@@ -212,13 +213,13 @@ class ComponentCaNhan extends React.Component {
 
                                 <FormDatePicker ref={e => this.ngaySinh = e} type='date-mask' className='col-sm-8' label='Ngày sinh' required readOnly={readOnly} />
                                 <FormSelect ref={e => this.phai = e} label='Giới tính' className='col-sm-4' required data={SelectAdapter_DmGioiTinhV2} readOnly={readOnly} />
-                                <ComponentDiaDiem ref={e => this.noiSinh = e} label='Nơi sinh' className='form-group col-sm-12' readOnly={readOnly} />
-                                <ComponentDiaDiem ref={e => this.nguyenQuan = e} label='Nguyên quán' className='form-group col-sm-12' readOnly={readOnly} />
+                                <ComponentDiaDiem ref={e => this.noiSinh = e} label='Nơi sinh' className='col-sm-12' readOnly={readOnly} />
+                                <ComponentDiaDiem ref={e => this.nguyenQuan = e} label='Nguyên quán' className='col-sm-12' readOnly={readOnly} />
                             </div>
                         </div>
                     </div>
-                    <ComponentDiaDiem ref={e => this.thuongTru = e} label='Địa chỉ thường trú' className='form-group col-md-12' requiredSoNhaDuong={true} />
-                    <ComponentDiaDiem ref={e => this.hienTai = e} label={<span>Nơi ở hiện tại (<a href='#' onClick={e => this.copyAddress(e)}>Nhấn vào đây nếu giống <b>thường trú</b></a>)</span>} className='form-group col-md-12' requiredSoNhaDuong={true} />
+                    <ComponentDiaDiem ref={e => this.thuongTru = e} label='Địa chỉ thường trú' className='form-group col-12' requiredSoNhaDuong={true} />
+                    <ComponentDiaDiem ref={e => this.hienTai = e} label={<span>Nơi ở hiện tại (<a href='#' onClick={e => this.copyAddress(e)}>Nhấn vào đây nếu giống <b>thường trú</b></a>)</span>} className='form-group col-12' requiredSoNhaDuong={true} />
 
                     <FormTextBox ref={e => this.cmnd = e} label='CMND/CCCD' className='form-group col-md-4' />
                     <FormDatePicker ref={e => this.cmndNgayCap = e} type='date-mask' label='Ngày cấp CMND/CCCD' className='form-group col-md-4' />
@@ -268,7 +269,7 @@ class ComponentCaNhan extends React.Component {
                     <FormTextBox className='form-group col-md-3' type='year' ref={e => this.namNhapNgu = e} label='Năm nhập ngũ' />
                     <FormTextBox className='form-group col-md-3' type='year' ref={e => this.namXuatNgu = e} label='Năm xuất ngũ' />
                     <FormTextBox className='form-group col-md-3' ref={e => this.capBacCaoNhat = e} label='Quân hàm/Cấp bậc cao nhất' />
-                    <FormTextBox className='form-group col-md-3' ref={e => this.hangThuongBinh = e} label='Hạng thương binh' />
+                    <FormSelect className='form-group col-md-3' data={SelectAdapter_DmHangThuongBinh} ref={e => this.hangThuongBinh = e} label='Hạng thương binh' />
 
                     <FormTextBox className='form-group col-md-6' ref={e => this.giaDinhChinhSach = e} label='Gia đình chính sách' />
                     <FormTextBox className='form-group col-md-6' ref={e => this.danhHieuPhongTangCaoNhat = e} label='Danh hiệu được phong tặng cao nhất' />

@@ -347,7 +347,7 @@ class ComponentTrinhDo extends AdminPage {
                     <HocViDetail ref={e => this.hocViTienSi = e} tenHocVi='Tiến sĩ' shcc={this.state.shcc} email={this.state.email}
                         tccb={this.props.tccb} style={{ display: this.state.tienSi ? 'block' : 'none' }} />
 
-                    <FormSelect ref={e => this.chucDanh = e} label='Chức danh' data={[{ id: 'PGS', text: 'Phó giáo sư' }, { id: 'GS', text: 'Giáo sư' }]} className='form-group col-md-3' allowClear />
+                    <FormSelect ref={e => this.chucDanh = e} label='Chức danh' data={[{ id: '02', text: 'Phó giáo sư' }, { id: '01', text: 'Giáo sư' }]} className='form-group col-md-3' allowClear />
                     <FormTextBox ref={e => this.chuyenNganh = e} label='Chuyên ngành chức danh' className='form-group col-md-3' />
                     <FormTextBox type='year' ref={e => this.namChucDanh = e} label='Năm công nhận chức danh' className='form-group col-md-3' />
                     <FormTextBox ref={e => this.coSoChucDanh = e} label='Cơ sở giáo dục công nhận' className='form-group col-md-3' />
