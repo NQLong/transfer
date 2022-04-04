@@ -6541,8 +6541,8 @@
                     "nullable": true,
                     "size": "20,0"
                 },
-                "NOI_DUNG": {
-                    "value": "noiDung",
+                "TRICH_YEU": {
+                    "value": "trichYeu",
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
@@ -6569,19 +6569,19 @@
                     "nullable": true,
                     "size": "20,0"
                 },
-                "CHI_DAO": {
-                    "value": "chiDao",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 500
-                },
                 "QUYEN_CHI_DAO": {
                     "value": "quyenChiDao",
                     "dataType": "NVARCHAR2",
                     "dataDefault": "'001.0068'",
                     "nullable": true,
                     "size": 100
+                },
+                "CHI_DAO": {
+                    "value": "chiDao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 255
                 }
             },
             "primaryKeys": [
@@ -9436,7 +9436,7 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 255
+                    "size": 1023
                 },
                 "SO_QUYET_DINH": {
                     "value": "soQuyetDinh",
@@ -10860,7 +10860,8 @@
             "moduleName": "ttDoanhNghiep",
             "modelName": "dnDoanhNghiep",
             "methods": {
-                "DN_DOANH_NGHIEP_SEARCH_PAGE": "searchPage"
+                "DN_DOANH_NGHIEP_SEARCH_PAGE": "searchPage",
+                "DN_DOANH_NGHIEP_SEARCH_ALL": "searchAll"
             },
             "columns": {
                 "ID": {
@@ -10896,7 +10897,7 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 500
+                    "size": 2000
                 },
                 "KICH_HOAT": {
                     "value": "kichHoat",
@@ -11005,7 +11006,7 @@
         },
         "DN_LINH_VUC_KINH_DOANH": {
             "active": true,
-            "moduleName": "dnLinhVucKinhDoanh",
+            "moduleName": "ttDoanhNghiep",
             "modelName": "dnLinhVucKinhDoanh",
             "columns": {
                 "ID": {
@@ -11272,7 +11273,7 @@
         },
         "DN_LOAI_DOANH_NGHIEP": {
             "active": true,
-            "moduleName": "dnLoaiDoanhNghiep",
+            "moduleName": "ttDoanhNghiep",
             "modelName": "dnLoaiDoanhNghiep",
             "columns": {
                 "LOAI": {
@@ -11291,39 +11292,6 @@
                 }
             },
             "primaryKeys": [],
-            "foreignKeys": [],
-            "type": "table"
-        },
-        "DM_DON_VI_GUI_CV_STAGING": {
-            "active": true,
-            "moduleName": "dmDonViGuiCvStaging",
-            "modelName": "dmDonViGuiCvStaging",
-            "columns": {
-                "ID": {
-                    "value": "id",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": false,
-                    "size": "22,0"
-                },
-                "TEN": {
-                    "value": "ten",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 255
-                },
-                "KICH_HOAT": {
-                    "value": "kichHoat",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "1,0"
-                }
-            },
-            "primaryKeys": [
-                "ID"
-            ],
             "foreignKeys": [],
             "type": "table"
         },
@@ -11747,6 +11715,46 @@
                     "dataType": "NUMBER",
                     "dataDefault": "1",
                     "nullable": false,
+                    "size": "1,0"
+                }
+            },
+            "primaryKeys": [
+                "MA"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "DM_HANG_THUONG_BINH": {
+            "active": true,
+            "moduleName": "dmHangThuongBinh",
+            "modelName": "dmHangThuongBinh",
+            "columns": {
+                "MA": {
+                    "value": "ma",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 5
+                },
+                "TEN": {
+                    "value": "ten",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "MO_TA": {
+                    "value": "moTa",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 500
+                },
+                "KICH_HOAT": {
+                    "value": "kichHoat",
+                    "dataType": "NUMBER",
+                    "dataDefault": "1",
+                    "nullable": true,
                     "size": "1,0"
                 }
             },

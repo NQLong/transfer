@@ -5,33 +5,55 @@ module.exports = app => {
             9503: { title: 'Quá trình sáng kiến', link: '/user/tccb/qua-trinh/sang-kien', icon: 'fa fa-lightbulb-o', color: '#000000', backgroundColor: '#ffff19', groupIndex: 3 },
         },
     };
-    // const menuStaff = {
-    //     parentMenu: app.parentMenu.user,
-    //     menus: {
-    //         1030: { title: 'Danh sách sáng kiến', link: '/user/sang-kien', icon: 'fa fa-cogs', backgroundColor: '#00e34c', groupIndex: 4 },
-    //     },
-    // };
-
-    // const menuTCCB = {
-    //     parentMenu: app.parentMenu.tccb,
-    //     menus: {
-    //         3070: { title: 'Danh sách sáng kiến', link: '/user/tccb/qua-trinh/sang-kien', icon: 'fa fa-cogs', backgroundColor: '#00e34c', groupIndex: 3 },
-    //     },
-    // };
+    const menuStaff = {
+        parentMenu: app.parentMenu.user,
+        menus: {
+            1036: { title: 'Danh sách sáng kiến', link: '/user/sang-kien', icon: 'fa fa-lightbulb-o', color: '#000000', backgroundColor: '#ffff19', groupIndex: 2 },
+        },
+    };
 
     app.permission.add(
-        // { name: 'staff:login', menu: menuStaff },
-        // { name: 'qtSangKien:read', menu: menuTCCB },
+        { name: 'staff:login', menu: menuStaff },
         { name: 'qtSangKien:read', menu },
         { name: 'qtSangKien:write' },
         { name: 'qtSangKien:delete' },
     );
     app.get('/user/tccb/qua-trinh/sang-kien', app.permission.check('qtSangKien:read'), app.templates.admin);
-    // app.get('/user/tccb/qua-trinh/sang-kien/group/:shcc', app.permission.check('qtSangKien:read'), app.templates.admin);
-    // app.get('/user/sang-kien', app.permission.check('staff:login'), app.templates.admin);
+    app.get('/user/sang-kien', app.permission.check('staff:login'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    // //User Actions:
+
+    // End APIS -------------------------------------------------------------------------------------------------------------------------------------
+
+    // TCCB APIs ------------------------------------------------------------------------------------------------------------------------------------
+    app.get('/api/tccb/qua-trinh/sang-kien/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+        const pageNumber = parseInt(req.params.pageNumber),
+            pageSize = parseInt(req.params.pageSize),
+            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '',
+            filter = JSON.stringify(req.query.filter || {});
+        app.model.qtSangKien.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
+            if (error || page == null) {
+                res.send({ error });
+            } else {
+                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
+                const pageCondition = searchTerm;
+                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
+            }
+        });
+    });
+
+    app.post('/api/tccb/qua-trinh/sang-kien', app.permission.check('qtSangKien:write'), (req, res) =>
+        app.model.qtSangKien.create(req.body.data, (error, item) => res.send({ error, item })));
+
+    app.put('/api/tccb/qua-trinh/sang-kien', app.permission.check('qtSangKien:write'), (req, res) =>
+        app.model.qtSangKien.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })));
+
+    app.delete('/api/tccb/qua-trinh/sang-kien', app.permission.check('qtSangKien:write'), (req, res) =>
+        app.model.qtSangKien.delete({ id: req.body.id }, (error) => res.send(error)));
+
+    // End TCCB APIs ---------------------------------------------------------------------------------------------------------------------------
+
+    // User APIs -------------------------------------------------------------------------------------------------------------------------------
     app.post('/api/user/qua-trinh/sang-kien', app.permission.check('staff:login'), (req, res) => {
         if (req.body.data && req.session.user) {
             const data = req.body.data;
@@ -81,8 +103,8 @@ module.exports = app => {
     app.get('/api/tccb/qua-trinh/sang-kien/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
-            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        let filter = JSON.stringify(req.query.filter || {});
+            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '',
+            filter = JSON.stringify(req.query.filter || {});
         app.model.qtSangKien.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -93,47 +115,5 @@ module.exports = app => {
             }
         });
     });
-
-    app.get('/api/tccb/qua-trinh/sang-kien/page/:pageNumber/:pageSize', app.permission.check('qtSangKien:read'), (req, res) => {
-        const pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize),
-            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { listShcc, listDv } = (req.query.filter && req.query.filter != '%%%%%%%%%%') ? req.query.filter : { listShcc: null, listDv: null };
-        app.model.qtSangKien.searchPage(pageNumber, pageSize, listShcc, listDv, searchTerm, (error, page) => {
-            if (error || page == null) {
-                res.send({ error });
-            } else {
-                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
-                const pageCondition = searchTerm;
-                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
-            }
-        });
-    });
-    ///END USER ACTIONS
-
-    app.get('/api/tccb/qua-trinh/sang-kien/group/page/:pageNumber/:pageSize', app.permission.check('qtSangKien:read'), (req, res) => {
-        const pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize),
-            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { listShcc, listDv } = (req.query.filter && req.query.filter != '%%%%%%%%%%') ? req.query.filter : { listShcc: null, listDv: null };
-        app.model.qtSangKien.groupPage(pageNumber, pageSize, listShcc, listDv, searchTerm, (error, page) => {
-            if (error || page == null) {
-                res.send({ error });
-            } else {
-                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
-                const pageCondition = searchTerm;
-                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
-            }
-        });
-    });
-
-    app.post('/api/qua-trinh/sang-kien', app.permission.check('qtSangKien:write'), (req, res) =>
-        app.model.qtSangKien.create(req.body.data, (error, item) => res.send({ error, item })));
-
-    app.put('/api/qua-trinh/sang-kien', app.permission.check('qtSangKien:write'), (req, res) =>
-        app.model.qtSangKien.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })));
-
-    app.delete('/api/qua-trinh/sang-kien', app.permission.check('qtSangKien:write'), (req, res) =>
-        app.model.qtSangKien.delete({ id: req.body.id }, (error) => res.send(error)));
-
+    // End User APIs ---------------------------------------------------------------------------------------------------------------- 
 };

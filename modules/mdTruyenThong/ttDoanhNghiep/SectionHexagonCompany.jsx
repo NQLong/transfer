@@ -148,11 +148,12 @@ class SectionHexagonCompany extends React.Component {
 
     handleClick = (e, company) => {
         e.preventDefault();
-        if (company.doiTac) {
-            this.props.history.push(`/doanh-nghiep/${company.hiddenShortName}?${T.language.getLanguage()}`);
-        } else {
-            this.modal.show(company);
-        }
+        this.props.history.push(`/doanh-nghiep/${company.hiddenShortName}`);
+        // if (company.doiTac) {
+        //     this.props.history.push(`/doanh-nghiep/${company.hiddenShortName}?${T.language.getLanguage()}`);
+        // } else {
+        //     this.modal.show(company);
+        // }
     }
 
     showTooltip = (evt, text) => {
