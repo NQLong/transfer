@@ -23,14 +23,22 @@ import { getDvWebsiteAll } from 'modules/_default/websiteDonVi/redux';
 
 // Load modules -------------------------------------------------------------------------------------------------------------------------------------
 import { modules } from './modules';
-const reducers = {}, routeMapper = {},
+const reducers = {}, reducerContainer = {}, routeMapper = {},
     addRoute = route => {
         if (!route.path.startsWith('/user')) routeMapper[route.path] = <Route key={route.path} exact {...route} />;
     };
 modules.forEach(module => {
-    Object.keys(module.redux).forEach(key => reducers[key] = module.redux[key]);
     module.routes.forEach(addRoute);
+    if (module.redux) {
+        if (module.redux.parent && module.redux.reducers) {
+            if (!reducerContainer[module.redux.parent]) reducerContainer[module.redux.parent] = {};
+            reducerContainer[module.redux.parent] = Object.assign({}, reducerContainer[module.redux.parent], module.redux.reducers);
+        } else {
+            Object.keys(module.redux).forEach(key => reducers[key] = module.redux[key]);
+        }
+    }
 });
+Object.keys(reducerContainer).forEach(key => reducers[key] = combineReducers(reducerContainer[key]));
 const store = createStore(combineReducers(reducers), {}, composeWithDevTools(applyMiddleware(thunk)));
 window.T = T;
 
