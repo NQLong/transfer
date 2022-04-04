@@ -17,12 +17,12 @@ module.exports = app => {
             return workbook.xlsx.readFile(path);
         },
 
-        attachment: (workbook, respone, filename) => {
-            respone.attachment(filename);
-            workbook.xlsx.write(respone);
+        attachment: (workbook, response, filename) => {
+            response.attachment(filename);
+            workbook.xlsx.write(response);
         },
 
-        write: (worksheet, items, done) => {
+        write: (worksheet, items) => {
             if (items.constructor !== Array) items = [items];
             for (let i = 0; i < items.length; i++) {
                 let item = items[i],
@@ -41,13 +41,7 @@ module.exports = app => {
                 } else if (item.value) {
                     cell.value = item.value;
                 }
-                if (item.dateFormat) {
-                    cell.dataValidation = {
-                        type: 'list',
-                        allowBlank: false,
-                        formulae: ['"yyyy,mm/yyyy,dd/mm/yyyy"']
-                      };
-                }
+
                 if (item.border) {
                     let border = {}, strBorder = item.border.toString();
                     if (strBorder.indexOf('1') >= 0) border.top = { style: 'thin' };
@@ -61,11 +55,11 @@ module.exports = app => {
 
                 cell.font = {
                     name: item.font && item.font.font ? item.font.font : 'Times New Roman',
-                    size: item.font && item.font.size ? item.font.size : 10
+                    size: item.font && item.font.size ? item.font.size : 10,
                 };
+                if (item.font && item.font.color) cell.font.color = item.font.color;
                 if (item.bold != null && item.bold !== undefined) cell.font.bold = item.bold;
             }
-            if (done) done();
             return worksheet.getCell(items[0].cell);
         },
 
@@ -87,5 +81,15 @@ module.exports = app => {
                 return letter;
             }
         }
+    };
+
+    excel.Workbook.prototype.createRefSheet = function (wsName, data = []) {
+        const ws = this.addWorksheet(wsName);
+        if (!data) data = [];
+        if (!Array.isArray(data)) data = [data];
+        ws.columns = [{ key: 'dataRef', width: 30 }];
+        data = data.map(item => ({ dataRef: item }));
+        ws.addRows(data);
+        return { ws, dataRange: `${wsName}!$A$1:$A$${data.length}` };
     };
 };

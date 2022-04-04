@@ -340,6 +340,7 @@ class QtKhenThuongAll extends AdminPage {
             </>,
             backRoute: '/user/tccb',
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
+            onImport: !this.checked ? (e) => e.preventDefault() || this.props.history.push('/user/tccb/qua-trinh/khen-thuong-all/upload') : null,
             onExport: !this.checked ? (e) => {
                 e.preventDefault();
                 const filter = JSON.stringify(this.state.filter || {});

@@ -385,3 +385,17 @@ export function deleteQtKhenThuongAllUser(id, done) {
         }, () => T.notify('Xóa thông tin quá trình khen thưởng bị lỗi', 'danger'));
     };
 }
+
+export function createMultiQtKhenThuongAll(qtKhenThuongAll, done) {
+    return () => {
+        const url = '/api/tccb/qua-trinh/khen-thuong-all/multiple';
+        T.post(url, { qtKhenThuongAll }, data => {
+            if (data.error && data.error.length) {
+                T.notify('Cập nhật dữ liệu bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                console.error('PUT: ' + url + '. ' + data.error.toString());
+            } else {
+                done && done(data.item);
+            }
+        }, () => T.notify('Cập nhật dữ liệu bị lỗi!', 'danger'));
+    };
+}
