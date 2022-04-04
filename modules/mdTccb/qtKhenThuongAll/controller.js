@@ -1,3 +1,34 @@
+function getKey(input) {
+    if (!input.includes(':')) return null;
+    return input.split(':')[0];
+}
+// eslint-disable-next-line no-unused-vars
+// source: https://en.wikipedia.org/wiki/Longest_common_subsequence_problem
+function lcs(a, b) {
+    let m = a.length, n = b.length, C = [], i, j;
+    for (i = 0; i <= m; i++) C.push([0]);
+    for (j = 0; j < n; j++) C[0].push(0);
+    for (i = 0; i < m; i++)
+        for (j = 0; j < n; j++)
+            C[i+1][j+1] = a[i] === b[j] ? C[i][j]+1 : Math.max(C[i+1][j], C[i][j+1]);
+    return C[m][n];
+}
+
+function bestChoice(s, t) {
+    if (!s || !t) return 0;
+    let n = s.length, m = t.length, cost = -1;
+    if (m < n) {
+        cost = lcs(s, t);
+    }
+    else {
+        let i;
+        for (i = 0; i < m - n + 1; i++) {
+            let subT = t.substring(i, i + n);
+            cost = Math.max(cost, lcs(s, subT));
+        }
+    }
+    return cost;
+}
 module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
@@ -21,8 +52,10 @@ module.exports = app => {
         { name: 'qtKhenThuongAll:read', menu },
         { name: 'qtKhenThuongAll:write' },
         { name: 'qtKhenThuongAll:delete' },
+        { name: 'qtKhenThuongAll:upload' },
     );
     app.get('/user/tccb/qua-trinh/khen-thuong-all', app.permission.check('qtKhenThuongAll:read'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/khen-thuong-all/upload', app.permission.check('qtKhenThuongAll:write'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/khen-thuong-all/groupDt/:loaiDoiTuong/:ma', app.permission.check('qtKhenThuongAll:read'), app.templates.admin);
     app.get('/user/khen-thuong-all', app.permission.check('staff:login'), app.templates.admin);
 
@@ -141,6 +174,20 @@ module.exports = app => {
         app.model.qtKhenThuongAll.create(req.body.items, (error, item) => res.send({ error, item }));
     });
 
+    app.post('/api/tccb/qua-trinh/khen-thuong-all/multiple', app.permission.check('qtKhenThuongAll:write'), (req, res) => {
+        const qtKhenThuongAll = req.body.qtKhenThuongAll, errorList = [];
+        for (let i = 0; i <= qtKhenThuongAll.length; i++) {
+            if (i == qtKhenThuongAll.length) {
+                res.send({ error: errorList });
+            } else {
+                const item = qtKhenThuongAll[i];
+                app.model.qtKhenThuongAll.create(item, (error,) => {
+                    if (error) errorList.push(error);
+                });
+            }
+        }
+    });
+
     app.put('/api/tccb/qua-trinh/khen-thuong-all', app.permission.check('staff:write'), (req, res) =>
         app.model.qtKhenThuongAll.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })));
 
@@ -203,6 +250,223 @@ module.exports = app => {
                     res.send({ error });
                 });
             }
+        });
+    });
+
+    const khenThuongImportData = (fields, files, done) => {
+        let worksheet = null;
+        new Promise((resolve, reject) => {
+            if (fields.userData && fields.userData[0] && fields.userData[0] == 'KhenThuongAllDataFile' && files.KhenThuongAllDataFile && files.KhenThuongAllDataFile.length) {
+                const srcPath = files.KhenThuongAllDataFile[0].path;
+                const workbook = app.excel.create();
+                workbook.xlsx.readFile(srcPath).then(() => {
+                    app.deleteFile(srcPath);
+                    worksheet = workbook.getWorksheet(1);
+                    worksheet ? resolve() : reject('File dữ liệu không hợp lệ!');
+                });
+            }
+        }).then(() => {
+            const pendingLoaiDoiTuong = new Promise(resolve => app.model.dmKhenThuongLoaiDoiTuong.getAll((error, items) => resolve((items || []).map(item => item.ma + ':' + item.ten))));
+            const pendingCanBo = new Promise(resolve => app.model.canBo.getAll((error, items) => resolve((items || []).map(item => item.shcc.toString()))));
+            const pendingBoMon = new Promise(resolve => app.model.dmBoMon.getAll((error, items) => resolve((items || []).map(item => item.ma.toString()))));
+            const pendingDonVi = new Promise(resolve => app.model.dmDonVi.getAll((error, items) => resolve((items || []).map(item => item.ma.toString()))));
+            const pendingThanhTich = new Promise(resolve => app.model.dmKhenThuongKyHieu.getAll((error, items) => resolve((items || []).map(item => item.ma + ':' + item.ten))));
+            const pendingChuThich = new Promise(resolve => app.model.dmKhenThuongChuThich.getAll((error, items) => resolve((items || []).map(item => item.ma + ':' + item.ten))));
+            Promise.all([pendingLoaiDoiTuong, pendingCanBo, pendingBoMon, pendingDonVi, pendingThanhTich, pendingChuThich])
+            .then(([danhSachLoaiDoiTuong, danhSachCanBo, danhSachBoMon, danhSachDonVi, danhSachThanhTich, danhSachChuThich]) => {
+                let items = [];
+                const solve = (index = 2) => {
+                    let soQuyetDinh = (worksheet.getCell('A' + index).value || '').toString().trim();
+                    let loaiDoiTuong = (worksheet.getCell('B' + index).value || '').toString().trim();
+                    let canBo = (worksheet.getCell('C' + index).value || '').toString().trim();
+                    let donVi = (worksheet.getCell('D' + index).value || '').toString().trim();
+                    let boMon = (worksheet.getCell('E' + index).value || '').toString().trim();
+                    let namDatDuoc = (worksheet.getCell('F' + index).value || '').toString().trim();
+                    let thanhTich = (worksheet.getCell('G' + index).value || '').toString().trim();
+                    let chuThich = (worksheet.getCell('H' + index).value || '').toString().trim();
+                    let diemThiDua = (worksheet.getCell('I' + index).value || '').toString().trim();
+                    loaiDoiTuong = getKey(loaiDoiTuong);
+                    let shcc = getKey(canBo);
+                    let maDonVi = getKey(donVi);
+                    let maBoMon = getKey(boMon);
+                    let maThanhTich = getKey(thanhTich);
+                    let maChuThich = getKey(chuThich);
+                    if (soQuyetDinh.length == 0) {
+                        done({ items });
+                        return;
+                    }
+                    let ansMaLoaiDoiTuong = '-1';
+                    {
+                        for (let idx = 0; idx < danhSachLoaiDoiTuong.length; idx++) {
+                            let arr = danhSachLoaiDoiTuong[idx].split(':');
+                            let ma = arr[0];
+                            if (ma == loaiDoiTuong) {
+                                ansMaLoaiDoiTuong = idx;
+                                break;
+                            }
+                        }
+                    }
+                    if (ansMaLoaiDoiTuong == '-1') {
+                        done({ error: 'Sai định dạng cột loại đối tượng' });
+                        solve(index + 1);
+                    }
+                    let ma = '-1';
+                    if (loaiDoiTuong == '02') {
+                        if (!danhSachCanBo.includes(shcc)) {
+                            done({ error: 'Sai định dạng cột cán bộ' });
+                            solve(index + 1);
+                        }
+                        ma = shcc;
+                    }
+                    if (loaiDoiTuong == '03') {
+                        if (!danhSachDonVi.includes(maDonVi)) {
+                            done({ error: 'Sai định dạng cột đơn vị' });
+                            solve(index + 1);
+                        }
+                        ma = maDonVi;
+                    }
+                    if (loaiDoiTuong == '04') {
+                        if (!danhSachBoMon.includes(maBoMon)) {
+                            done({ error: 'Sai định dạng cột bộ môn' });
+                            solve(index + 1);
+                        }
+                        ma = maBoMon;
+                    }
+                    if (namDatDuoc.length != 4) {
+                        done({ error: 'Sai định dạng cột năm đạt được' });
+                        solve(index + 1);
+                    }
+                    let ansMaThanhTich = null;
+                    { ///find ma thanh tich
+                        let bestScore = -1;
+                        for (let idx = 0; idx < danhSachThanhTich.length; idx++) {
+                            let arr = danhSachThanhTich[idx].split(':');
+                            let ma = arr[0], ten = arr[1];
+                            if (ma == maThanhTich) {
+                                ansMaThanhTich = idx;
+                                break;
+                            }
+                            let score = bestChoice(thanhTich.toLowerCase(), ten.toLowerCase());
+                            if (score > bestScore) {
+                                bestScore = score;
+                                ansMaThanhTich = idx;
+                            }
+                        }
+                    }
+                    let ansMaChuThich = null;
+                    { ///find ma thanh tich chú thích
+                        let bestScore = -1;
+                        for (let idx = 0; idx < danhSachChuThich.length; idx++) {
+                            let arr = danhSachChuThich[idx].split(':');
+                            let ma = arr[0], ten = arr[1];
+                            if (ma == maChuThich) {
+                                ansMaChuThich = idx;
+                                break;
+                            }
+                            let score = bestChoice(chuThich.toLowerCase(), ten.toLowerCase());
+                            if (score > bestScore) {
+                                bestScore = score;
+                                ansMaChuThich = idx;
+                            }
+                        }
+                    }
+                    let hoCanBo = '', tenCanBo = '', maCanBo = '', tenBoMon = '', tenDonViBoMon = '', tenDonViCanBo = '', tenDonVi = '';
+                    if (loaiDoiTuong == '01') {
+                        items.push({ soQuyetDinh, diemThiDua, ma, namDatDuoc,
+                            loaiDoiTuong, thanhTich: ansMaThanhTich ? danhSachThanhTich[ansMaThanhTich].split(':')[0] : '', chuThich: ansMaChuThich ? danhSachChuThich[ansMaChuThich].split(':')[0] : '',
+                            hoCanBo, tenCanBo, maCanBo, tenBoMon, tenDonViBoMon, tenDonViCanBo, tenDonVi,
+                            tenLoaiDoiTuong: danhSachLoaiDoiTuong[ansMaLoaiDoiTuong].split(':')[1],
+                            tenThanhTich: ansMaThanhTich ? danhSachThanhTich[ansMaThanhTich].split(':')[1] : '',
+                        });
+                        solve(index + 1);
+                    } else if (loaiDoiTuong == '02') {
+                        app.model.canBo.get({ shcc }, (error, item) => {
+                            hoCanBo = item.ho;
+                            tenCanBo = item.ten;
+                            maCanBo = shcc;
+                            app.model.dmDonVi.get({ ma: item.maDonVi }, (error, itemDonVi) => {
+                                if (itemDonVi) tenDonViCanBo = itemDonVi.ten;
+                                items.push({ soQuyetDinh, diemThiDua, ma, namDatDuoc,
+                                    loaiDoiTuong, thanhTich: ansMaThanhTich ? danhSachThanhTich[ansMaThanhTich].split(':')[0] : '', chuThich: ansMaChuThich ? danhSachChuThich[ansMaChuThich].split(':')[0] : '',
+                                    hoCanBo, tenCanBo, maCanBo, tenBoMon, tenDonViBoMon, tenDonViCanBo, tenDonVi,
+                                    tenLoaiDoiTuong: danhSachLoaiDoiTuong[ansMaLoaiDoiTuong].split(':')[1],
+                                    tenThanhTich: ansMaThanhTich ? danhSachThanhTich[ansMaThanhTich].split(':')[1] : '',
+                                });
+                                solve(index + 1);
+                            });
+                        });
+                    } else if (loaiDoiTuong == '03') {
+                        app.model.dmDonVi.get({ ma: maDonVi }, (error, item) => {
+                            tenDonVi = item.ten;
+                            items.push({ soQuyetDinh, diemThiDua, ma, namDatDuoc,
+                                loaiDoiTuong, thanhTich: ansMaThanhTich ? danhSachThanhTich[ansMaThanhTich].split(':')[0] : '', chuThich: ansMaChuThich ? danhSachChuThich[ansMaChuThich].split(':')[0] : '',
+                                hoCanBo, tenCanBo, maCanBo, tenBoMon, tenDonViBoMon, tenDonViCanBo, tenDonVi,
+                                tenLoaiDoiTuong: danhSachLoaiDoiTuong[ansMaLoaiDoiTuong].split(':')[1],
+                                tenThanhTich: ansMaThanhTich ? danhSachThanhTich[ansMaThanhTich].split(':')[1] : '',
+                            });
+                            solve(index + 1);
+                        });
+                    } else {
+                        app.model.dmBoMon.get({ ma: maBoMon}, (error, item) => {
+                            tenBoMon = item.ten;
+                            items.push({ soQuyetDinh, diemThiDua, ma, namDatDuoc,
+                                loaiDoiTuong, thanhTich: ansMaThanhTich ? danhSachThanhTich[ansMaThanhTich].split(':')[0] : '', chuThich: ansMaChuThich ? danhSachChuThich[ansMaChuThich].split(':')[0] : '',
+                                hoCanBo, tenCanBo, maCanBo, tenBoMon, tenDonViBoMon, tenDonViCanBo, tenDonVi,
+                                tenLoaiDoiTuong: danhSachLoaiDoiTuong[ansMaLoaiDoiTuong].split(':')[1],
+                                tenThanhTich: ansMaThanhTich ? danhSachThanhTich[ansMaThanhTich].split(':')[1] : '',
+                            });
+                            solve(index + 1);
+                        });
+                    }
+                };
+                solve();
+            });
+        }).catch(error => done({ error }));
+    };
+
+    app.uploadHooks.add('KhenThuongAllDataFile', (req, fields, files, params, done) =>
+        app.permission.has(req, () => khenThuongImportData(fields, files, done), done, 'qtKhenThuongAll:write'));
+
+    app.get('/api/qua-trinh/khen-thuong-all/download-template', app.permission.check('qtKhenThuongAll:write'), (req, res) => {
+        const workBook = app.excel.create();
+        const ws = workBook.addWorksheet('Khen_thuong_Template');
+        const defaultColumns = [
+            { header: 'SỐ QUYẾT ĐỊNH', key: 'soQuyetDinh', width: 15 },
+            { header: 'LOẠI ĐỐI TƯỢNG', key: 'loaiDoiTuong', width: 10 },
+            { header: 'CÁN BỘ', key: 'canBo', width: 10 },
+            { header: 'ĐƠN VỊ', key: 'donVi', width: 10 },
+            { header: 'BỘ MÔN', key: 'boMon', width: 10 },
+            { header: 'NĂM ĐẠT ĐƯỢC', key: 'namDatDuoc', width: 15 },
+            { header: 'THÀNH TÍCH', key: 'thanhTich', width: 20 },
+            { header: 'CHÚ THÍCH', key: 'chuThich', width: 20 },
+            { header: 'ĐIỂM THI ĐUA', key: 'diemThiDua', width: 15 },
+        ];
+        ws.columns = defaultColumns;
+        ws.getRow(1).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', horizontal: 'center' };
+        const pendingLoaiDoiTuong = new Promise(resolve => app.model.dmKhenThuongLoaiDoiTuong.getAll((error, items) => resolve((items || []).map(item => item.ma + ': ' + item.ten))));
+        const pendingCanBo = new Promise(resolve => app.model.canBo.getAll((error, items) => resolve((items || []).map(item => item.shcc + ': ' + item.ho + ' ' + item.ten))));
+        const pendingBoMon = new Promise(resolve => app.model.dmBoMon.getAll((error, items) => resolve((items || []).map(item => item.ma + ': ' + item.ten))));
+        const pendingDonVi = new Promise(resolve => app.model.dmDonVi.getAll((error, items) => resolve((items || []).map(item => item.ma + ': ' + item.ten))));
+        const pendingThanhTich = new Promise(resolve => app.model.dmKhenThuongKyHieu.getAll((error, items) => resolve((items || []).map(item => item.ma + ': ' + item.ten))));
+        const pendingChuThich = new Promise(resolve => app.model.dmKhenThuongChuThich.getAll((error, items) => resolve((items || []).map(item => item.ma + ': ' + item.ten))));
+        Promise.all([pendingLoaiDoiTuong, pendingCanBo, pendingBoMon, pendingDonVi, pendingThanhTich, pendingChuThich])
+        .then(([danhSachLoaiDoiTuong, danhSachCanBo, danhSachBoMon, danhSachDonVi, danhSachThanhTich, danhSachChuThich]) => {
+            const rows = ws.getRows(2, 1000);
+            const { dataRange: loaiDoiTuongRange } = workBook.createRefSheet('KHEN_THUONG_LOAI_DOI_TUONG', danhSachLoaiDoiTuong);
+            const { dataRange: canBoRange } = workBook.createRefSheet('CAN_BO', danhSachCanBo);
+            const { dataRange: donViRange } = workBook.createRefSheet('DON_VI', danhSachDonVi);
+            const { dataRange: boMonRange } = workBook.createRefSheet('BO_MON', danhSachBoMon);
+            const { dataRange: thanhTichRange } = workBook.createRefSheet('KHEN_THUONG_THANH_TICH', danhSachThanhTich);
+            const { dataRange: chuThichRange } = workBook.createRefSheet('KHEN_THUONG_CHU_THICH', danhSachChuThich);
+            rows.forEach((row) => {
+                row.getCell('loaiDoiTuong').dataValidation = { type: 'list', allowBlank: true, formulae: [loaiDoiTuongRange] };
+                row.getCell('canBo').dataValidation = { type: 'list', allowBlank: true, formulae: [canBoRange] };
+                row.getCell('donVi').dataValidation = { type: 'list', allowBlank: true, formulae: [donViRange] };
+                row.getCell('boMon').dataValidation = { type: 'list', allowBlank: true, formulae: [boMonRange] };
+                row.getCell('thanhTich').dataValidation = { type: 'list', allowBlank: true, formulae: [thanhTichRange] };
+                row.getCell('chuThich').dataValidation = { type: 'list', allowBlank: true, formulae: [chuThichRange] };
+            });
+            app.excel.attachment(workBook, res, 'Khen_thuong_Template.xlsx');
         });
     });
 };
