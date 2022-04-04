@@ -17,9 +17,9 @@ export default {
             path: '/user/tccb/qua-trinh/sang-kien',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
-        // {
-        //     path: '/user/sang-kien',
-        //     component: Loadable({ loading: Loading, loader: () => import('./staffPage') })
-        // },
+        {
+            path: '/user/sang-kien',
+            component: Loadable({ loading: Loading, loader: () => import('./staffPage') })
+        },
     ],
 };
