@@ -217,7 +217,7 @@ class FormNumberBox extends React.Component {
     }
 
     render() {
-        let { smallText = '', label = '', placeholder = '', className = '', style = {}, readOnly = false, onChange = null, required = false, step = false } = this.props,
+        let { smallText = '', label = '', placeholder = '', className = '', style = {}, readOnly = false, onChange = null, required = false, step = false, prefix = '', suffix = '' } = this.props,
             readOnlyText = this.exactValue ? this.exactValue : this.state.value;
         const properties = {
             className: 'form-control',
@@ -247,7 +247,7 @@ class FormNumberBox extends React.Component {
         return (
             <div className={'form-group ' + (className || '')} style={style}>
                 {displayElement}
-                <NumberFormat style={{ display: readOnly ? 'none' : 'block' }} {...properties} />
+                <NumberFormat prefix={prefix} suffix={suffix} style={{ display: readOnly ? 'none' : 'block' }} {...properties} />
                 {smallText ? <small>{smallText}</small> : null}
             </div>);
     }
@@ -635,13 +635,13 @@ export class FormImageBox extends React.Component {
     setData = (data, image) => this.imageBox.setData(data, image);
 
     render() {
-        let { label = '', className = '', style = {}, readOnly = false, postUrl = '/user/upload', uploadType = '', image = null, onDelete = null, onSuccess = null } = this.props;
+        let { label = '', className = '', style = {}, readOnly = false, postUrl = '/user/upload', uploadType = '', image = null, onDelete = null, onSuccess = null, isProfile = null, description = null } = this.props;
         return (
             <div className={'form-group ' + className} style={style}>
                 <label>{label}&nbsp;</label>
                 {!readOnly && image && onDelete ?
                     <a href='#' className='text-danger' onClick={onDelete}><i className='fa fa-fw fa-lg fa-trash' /></a> : null}
-                <ImageBox ref={e => this.imageBox = e} postUrl={postUrl} uploadType={uploadType} image={image} readOnly={readOnly} success={data => onSuccess && onSuccess(data)} />
+                <ImageBox ref={e => this.imageBox = e} postUrl={postUrl} uploadType={uploadType} image={image} readOnly={readOnly} success={data => onSuccess && onSuccess(data)} isProfile={isProfile} description={description} />
             </div>);
     }
 }

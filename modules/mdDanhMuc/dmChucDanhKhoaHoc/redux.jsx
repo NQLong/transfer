@@ -140,8 +140,9 @@ export function changeDmChucDanhKhoaHoc(item) {
 }
 
 export const SelectAdapter_DmChucDanhKhoaHoc = {
-    ajax: false,
-    getAll: getDmChucDanhKhoaHocAll,
-    processResults: response => ({ results: response ? response.map(item => ({ value: item.ma, text: item.ten })) : [] }),
-    condition: { kichHoat: 1 },
+    ajax: true,
+    url: '/api/danh-muc/chuc-danh-khoa-hoc/page/1/20',
+    data: params => ({ condition: params.term }),
+    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.ten })) : [] }),
+    fetchOne: (ma, done) => (getDmChucDanhKhoaHoc(ma, item => done && done({ id: item.ma, text: item.ten })))(),
 };

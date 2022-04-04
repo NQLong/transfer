@@ -1,4 +1,4 @@
-//TEMPLATES: admin
+//TEMPLATES: admin|home|unit
 // eslint-disable-next-line no-unused-vars
 import React from 'react';
 import Loadable from 'react-loadable';

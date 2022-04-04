@@ -26,7 +26,7 @@ class DoanhNghiepAdminPage extends AdminPage {
     }
 
     render() {
-        const permission = this.getUserPermission('dnDoanhNghiep', ['write', 'delete']);
+        const permission = this.getUserPermission('dnDoanhNghiep');
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dnDoanhNghiep && this.props.dnDoanhNghiep.page ?
             this.props.dnDoanhNghiep.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         const table = renderTable({
@@ -54,8 +54,7 @@ class DoanhNghiepAdminPage extends AdminPage {
                     <TableCell type='image' content={item.image || '/img/hcmussh.png'} />
                     <TableCell type='checkbox' content={item.doiTac} permission={permission} onChanged={() => this.changeDoiTac(item)} />
                     <TableCell type='checkbox' content={item.kichHoat} permission={permission} onChanged={() => this.changeActive(item)} />
-                    <TableCell content={item} type='buttons' style={{ textAlign: 'center' }} permission={permission} onEdit={'/user/truyen-thong/doanh-nghiep/edit/' + item.id} onDelete={this.delete}>
-                    </TableCell>
+                    <TableCell content={item} type='buttons' style={{ textAlign: 'center' }} permission={permission} onEdit={'/user/truyen-thong/doanh-nghiep/edit/' + item.id} onDelete={this.delete}/>
                 </tr>
             ),
         });

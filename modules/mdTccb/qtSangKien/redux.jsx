@@ -1,7 +1,5 @@
 import T from 'view/js/common';
 
-import { userGetStaff } from '../../mdTccb/tccbCanBo/redux';
-
 // Reducer ------------------------------------------------------------------------------------------------------------
 const QtSangKienGetAll = 'QtSangKien:GetAll';
 const QtSangKienGetPage = 'QtSangKien:GetPage';
@@ -56,6 +54,108 @@ export default function QtSangKienReducer(state = null, data) {
 }
 
 // Actions ------------------------------------------------------------------------------------------------------------
+
+// End Actions---------------------------------------------------------------------------------------------------------
+
+// TCCB Actions--------------------------------------------------------------------------------------------------------
+// Admin Page
+T.initPage('pageQtSangKien');
+export function getQtSangKienPage(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('pageQtSangKien', pageNumber, pageSize, pageCondition, filter);
+    return dispatch => {
+        const url = `/api/tccb/qua-trinh/sang-kien/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách sáng kiến bị lỗi!', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (page.filter) data.page.filter = page.filter;
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                dispatch({ type: QtSangKienGetPage, page: data.page });
+                if (done) done(data.page);
+            }
+        }, () => T.notify('Lấy danh sách sáng kiến bị lỗi!', 'danger'));
+    };
+}
+
+export function createQtSangKienStaff(data, done) {
+    return dispatch => {
+        const url = '/api/tccb/qua-trinh/sang-kien';
+        T.post(url, { data }, res => {
+            if (res.error) {
+                T.notify('Thêm thông tin quá trình sáng kiến bị lỗi', 'danger');
+                console.error('POST: ' + url + '. ' + res.error);
+            } else {
+                T.notify('Thêm thông tin quá trình sáng kiến thành công!', 'info');
+                dispatch(getQtSangKienPage());
+                done && done(data);
+            }
+        }, () => T.notify('Thêm thông tin quá trình sáng kiến bị lỗi', 'danger'));
+    };
+}
+
+export function updateQtSangKienStaff(id, changes, done) {
+    return dispatch => {
+        const url = '/api/tccb/qua-trinh/sang-kien';
+        T.put(url, { id, changes }, data => {
+            if (data.error) {
+                T.notify('Cập nhật thông tin quá trình sáng kiến bị lỗi', 'danger');
+                console.error('PUT: ' + url + '. ' + data.error);
+            } else if (data.item) {
+                T.notify('Cập nhật thông tin quá trình sáng kiến thành công!', 'info');
+                dispatch(getQtSangKienPage());
+                done && done(data.item);
+            }
+        }, () => T.notify('Cập nhật thông tin quá trình sáng kiến bị lỗi', 'danger'));
+    };
+}
+
+export function deleteQtSangKienStaff(id, done) {
+    return dispatch => {
+        const url = '/api/tccb/qua-trinh/sang-kien';
+        T.delete(url, { id }, data => {
+            if (data.error) {
+                T.notify('Xóa thông tin quá trình sáng kiến bị lỗi', 'danger');
+                console.error('DELETE: ' + url + '. ' + data.error);
+            } else {
+                T.alert('Thông tin quá trình sáng kiến được xóa thành công!', 'info', false, 800);
+                dispatch(getQtSangKienPage());
+                done && done(data.item);
+            }
+        }, () => T.notify('Xóa thông tin quá trình sáng kiến bị lỗi', 'danger'));
+    };
+}
+
+// GroupPage
+export function getQtSangKienGroupPage(pageNumber, pageSize, pageCondition, filter, done) {
+    if (typeof filter === 'function') {
+        done = filter;
+        filter = {};
+    }
+    const page = T.updatePage('pageQtSangKien', pageNumber, pageSize, pageCondition, filter);
+    return dispatch => {
+        const url = `/api/tccb/qua-trinh/sang-kien/group/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách sáng kiến bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (page.filter) data.page.filter = page.filter;
+                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
+                dispatch({ type: QtSangKienGetGroupPage, page: data.page });
+                done && done(data.page);
+            }
+        }, error => console.error(`GET: ${url}.`, error));
+    };
+}
+
+// End TCCB Actions -------------------------------------------------------------------------------------------------------------
+
+// User Actions -----------------------------------------------------------------------------------------------------------------
 T.initPage('userPageQtSangKien');
 export function getQtSangKienUserPage(pageNumber, pageSize, pageCondition, filter, done) {
     if (typeof filter === 'function') {
@@ -130,245 +230,4 @@ export function deleteQtSangKienUserPage(id, done) {
     };
 }
 
-T.initPage('pageQtSangKien');
-export function getQtSangKienPage(pageNumber, pageSize, pageCondition, filter, done) {
-    if (typeof filter === 'function') {
-        done = filter;
-        filter = {};
-    }
-    const page = T.updatePage('pageQtSangKien', pageNumber, pageSize, pageCondition, filter);
-    return dispatch => {
-        const url = `/api/tccb/qua-trinh/sang-kien/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
-            if (data.error) {
-                T.notify('Lấy danh sách sáng kiến bị lỗi!', 'danger');
-                console.error(`GET: ${url}.`, data.error);
-            } else {
-                if (page.filter) data.page.filter = page.filter;
-                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
-                dispatch({ type: QtSangKienGetPage, page: data.page });
-                if (done) done(data.page);
-            }
-        }, () => T.notify('Lấy danh sách sáng kiến bị lỗi!', 'danger'));
-    };
-}
-
-export function getQtSangKienGroupPage(pageNumber, pageSize, pageCondition, filter, done) {
-    if (typeof filter === 'function') {
-        done = filter;
-        filter = {};
-    }
-    const page = T.updatePage('pageQtSangKien', pageNumber, pageSize, pageCondition, filter);
-    return dispatch => {
-        const url = `/api/tccb/qua-trinh/sang-kien/group/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
-            if (data.error) {
-                T.notify('Lấy danh sách sáng kiến bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
-                console.error(`GET: ${url}.`, data.error);
-            } else {
-                if (page.filter) data.page.filter = page.filter;
-                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
-                dispatch({ type: QtSangKienGetGroupPage, page: data.page });
-                done && done(data.page);
-            }
-        }, error => console.error(`GET: ${url}.`, error));
-    };
-}
-
-T.initPage('groupPageMaQtSangKien');
-export function getQtSangKienGroupPageMa(pageNumber, pageSize, pageCondition, filter, done) {
-    if (typeof filter === 'function') {
-        done = filter;
-        filter = {};
-    }
-    const page = T.updatePage('groupPageMaQtSangKien', pageNumber, pageSize, pageCondition, filter);
-    return dispatch => {
-        const url = `/api/tccb/qua-trinh/sang-kien/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
-            if (data.error) {
-                T.notify('Lấy danh sách sáng kiến bị lỗi!', 'danger');
-                console.error(`GET: ${url}.`, data.error);
-            } else {
-                if (page.filter) data.page.filter = page.filter;
-                if (page.pageCondition) data.page.pageCondition = page.pageCondition;
-                if (done) done(data.page);
-                dispatch({ type: QtSangKienGetGroupPageMa, page: data.page });
-            }
-        }, () => T.notify('Lấy danh sách sáng kiến bị lỗi!', 'danger'));
-    };
-}
-
-export function updateQtSangKienGroupPageMa(id, changes, done) {
-    return dispatch => {
-        const url = '/api/qua-trinh/sang-kien';
-        T.put(url, { id, changes }, data => {
-            if (data.error) {
-                T.notify('Cập nhật thông tin quá trình sáng kiến bị lỗi', 'danger');
-                console.error('PUT: ' + url + '. ' + data.error);
-            } else if (data.item) {
-                T.notify('Cập nhật thông tin quá trình sáng kiến thành công!', 'info');
-                dispatch(getQtSangKienGroupPageMa());
-                done && done(data.item);
-            }
-        }, () => T.notify('Cập nhật thông tin quá trình sáng kiến bị lỗi', 'danger'));
-    };
-}
-
-export function deleteQtSangKienGroupPageMa(id, done) {
-    return dispatch => {
-        const url = '/api/qua-trinh/sang-kien';
-        T.delete(url, { id }, data => {
-            if (data.error) {
-                T.notify('Xóa thông tin quá trình sáng kiến bị lỗi', 'danger');
-                console.error('DELETE: ' + url + '. ' + data.error);
-            } else {
-                T.alert('Thông tin quá trình sáng kiến được xóa thành công!', 'info', false, 800);
-                dispatch(getQtSangKienGroupPageMa());
-                done && done(data.item);
-            }
-        }, () => T.notify('Xóa thông tin quá trình sáng kiến bị lỗi', 'danger'));
-    };
-}
-
-export function createQtSangKienGroupPageMa(data, done) {
-    return dispatch => {
-        const url = '/api/qua-trinh/sang-kien';
-        T.post(url, { data }, res => {
-            if (res.error) {
-                T.notify('Tạo sáng kiến bị lỗi!', 'danger');
-                console.error(`POST: ${url}.`, res.error);
-            } else {
-                if (done) {
-                    T.notify('Tạo sáng kiến thành công!', 'success');
-                    dispatch(getQtSangKienGroupPageMa());
-                    done && done(data);
-                }
-            }
-        }, () => T.notify('Tạo sáng kiến bị lỗi!', 'danger'));
-    };
-}
-
-export function getQtSangKienAll(done) {
-    return dispatch => {
-        const url = '/api/tccb/qua-trinh/sang-kien/all';
-        T.get(url, data => {
-            if (data.error) {
-                T.notify('Lấy danh sách sáng kiến bị lỗi!', 'danger');
-                console.error(`GET: ${url}.`, data.error);
-            } else {
-                dispatch({ type: QtSangKienGetAll, items: data.items ? data.items : {} });
-                if (done) done(data.items);
-            }
-        }, () => T.notify('Lấy danh sách sáng kiến bị lỗi!', 'danger'));
-    };
-}
-
-export function getQtSangKien(id, done) {
-    return () => {
-        const url = `/api/tccb/qua-trinh/sang-kien/item/${id}`;
-        T.get(url, data => {
-            if (data.error) {
-                T.notify('Lấy sáng kiến bị lỗi!', 'danger');
-                console.error(`GET: ${url}.`, data.error);
-            } else {
-                if (done) done(data.item);
-            }
-        }, error => console.error(`GET: ${url}.`, error));
-    };
-}
-
-export function createQtSangKienStaff(data, done) {
-    return dispatch => {
-        const url = '/api/qua-trinh/sang-kien';
-        T.post(url, { data }, res => {
-            if (res.error) {
-                T.notify('Thêm thông tin quá trình sáng kiến bị lỗi', 'danger');
-                console.error('POST: ' + url + '. ' + res.error);
-            } else {
-                T.notify('Thêm thông tin quá trình sáng kiến thành công!', 'info');
-                dispatch(getQtSangKienPage());
-                done && done(data);
-            }
-        }, () => T.notify('Thêm thông tin quá trình sáng kiến bị lỗi', 'danger'));
-    };
-}
-
-export function updateQtSangKienStaff(id, changes, done) {
-    return dispatch => {
-        const url = '/api/qua-trinh/sang-kien';
-        T.put(url, { id, changes }, data => {
-            if (data.error) {
-                T.notify('Cập nhật thông tin quá trình sáng kiến bị lỗi', 'danger');
-                console.error('PUT: ' + url + '. ' + data.error);
-            } else if (data.item) {
-                T.notify('Cập nhật thông tin quá trình sáng kiến thành công!', 'info');
-                dispatch(getQtSangKienPage());
-                done && done(data.item);
-            }
-        }, () => T.notify('Cập nhật thông tin quá trình sáng kiến bị lỗi', 'danger'));
-    };
-}
-
-export function deleteQtSangKienStaff(id, done) {
-    return dispatch => {
-        const url = '/api/qua-trinh/sang-kien';
-        T.delete(url, { id }, data => {
-            if (data.error) {
-                T.notify('Xóa thông tin quá trình sáng kiến bị lỗi', 'danger');
-                console.error('DELETE: ' + url + '. ' + data.error);
-            } else {
-                T.alert('Thông tin quá trình sáng kiến được xóa thành công!', 'info', false, 800);
-                dispatch(getQtSangKienPage());
-                done && done(data.item);
-            }
-        }, () => T.notify('Xóa thông tin quá trình sáng kiến bị lỗi', 'danger'));
-    };
-}
-
-export function createQtSangKienStaffUser(data, done) {
-    return dispatch => {
-        const url = '/api/user/qua-trinh/sang-kien';
-        T.post(url, { data }, res => {
-            if (res.error) {
-                T.notify('Thêm thông tin quá trình sáng kiến bị lỗi', 'danger');
-                console.error('POST: ' + url + '. ' + res.error);
-            } else {
-                T.notify('Thêm thông tin quá trình sáng kiến thành công!', 'info');
-                dispatch(userGetStaff(data.email));
-                if (done) done(data);
-            }
-        }, () => T.notify('Thêm thông tin quá trình sáng kiến bị lỗi', 'danger'));
-    };
-}
-
-export function updateQtSangKienStaffUser(id, changes, done) {
-    return dispatch => {
-        const url = '/api/user/qua-trinh/sang-kien';
-        T.put(url, { id, changes }, data => {
-            if (data.error) {
-                T.notify('Cập nhật thông tin quá trình sáng kiến bị lỗi', 'danger');
-                console.error('PUT: ' + url + '. ' + data.error);
-            } else if (data.item) {
-                T.notify('Cập nhật thông tin quá trình sáng kiến thành công!', 'info');
-                dispatch(userGetStaff(changes.email));
-                if (done) done();
-            }
-        }, () => T.notify('Cập nhật thông tin quá trình sáng kiến bị lỗi', 'danger'));
-    };
-}
-
-export function deleteQtSangKienStaffUser(id, email, done) {
-    return dispatch => {
-        const url = '/api/user/qua-trinh/sang-kien';
-        T.delete(url, { id }, data => {
-            if (data.error) {
-                T.notify('Xóa thông tin quá trình sáng kiến bị lỗi', 'danger');
-                console.error('DELETE: ' + url + '. ' + data.error);
-            } else {
-                T.alert('Thông tin quá trình sáng kiến được xóa thành công!', 'info', false, 800);
-                dispatch(userGetStaff(email));
-                done && done();
-            }
-        }, () => T.notify('Xóa thông tin quá trình sáng kiến bị lỗi', 'danger'));
-    };
-}
+// End User Actions-----------------------------------------------------------------------------------------------
