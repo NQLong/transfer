@@ -219,6 +219,6 @@ export const SelectAdapter_DmDonViFilter = (listDonViQuanLy) => {
         url: '/api/danh-muc/don-vi/get-in-list',
         data: () => ({ condition: listDonViQuanLy }),
         processResults: data => data && data.items ? data.items.map(item => ({ id: item.ma, text: item.ten })) : [],
-        fetchOne: (id, done) => (getDmDonVi(id, item => item && done && done({ id: item.ma, text: item.ten })))()
+        fetchOne: (ma, done) => (getDmDonVi(ma, item => item && done && done({ id: item.ma, text: item.ten })))()
     };
 };

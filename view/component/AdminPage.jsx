@@ -19,7 +19,7 @@ export class TableCell extends React.Component { // type = number | date | link 
         } else if (type == 'number') {
             return <td className={className} style={{ textAlign: 'right', ...style }} rowSpan={rowSpan} colSpan={colSpan}>{content && !isNaN(content) ? T.numberDisplay(content) : content}</td>;
         } else if (type == 'date') {
-            return <td className={className} style={{ ...style }} rowSpan={rowSpan} colSpan={colSpan}>{dateFormat ? T.dateToText(content, dateFormat) : new Date(content).getText()}</td>;
+            return <td className={className} style={{ ...style }} rowSpan={rowSpan} colSpan={colSpan}>{content ? (dateFormat ? T.dateToText(content, dateFormat) : new Date(content).getText()) : ''}</td>;
         } else if (type == 'link') {
             let url = this.props.url ? this.props.url.trim() : '',
                 onClick = this.props.onClick;
@@ -535,12 +535,12 @@ export class FormSelect extends React.Component {
     };
 
     render = () => {
-        const { className = '', style = {}, labelStyle = {}, label = '', multiple = false, readOnly = false, required = false } = this.props;
+        const { className = '', style = {}, labelStyle = {}, label = '', multiple = false, readOnly = false, required = false, disabled = false } = this.props;
         return (
             <div className={'form-group admin-form-select ' + className} style={style}>
                 {label ? <label style={labelStyle} onClick={this.focus}>{label}{!readOnly && required ? <span style={{ color: 'red' }}> *</span> : ''}{readOnly ? ':' : ''}</label> : null} {readOnly ? <b>{this.state.valueText}</b> : ''}
                 <div style={{ width: '100%', display: readOnly ? 'none' : 'inline-flex' }}>
-                    <select ref={e => this.input = e} multiple={multiple} disabled={readOnly} />
+                    <select ref={e => this.input = e} multiple={multiple} disabled={disabled || readOnly} />
                 </div>
             </div>
         );

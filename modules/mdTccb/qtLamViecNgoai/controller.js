@@ -86,7 +86,7 @@ module.exports = app => {
         });
     });
     ///END USER ACTIONS
-    
+
     app.get('/api/tccb/qua-trinh/lam-viec-ngoai/page/:pageNumber/:pageSize', app.permission.check('qtLamViecNgoai:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
@@ -118,14 +118,23 @@ module.exports = app => {
             }
         });
     });
-    
+
     app.post('/api/qua-trinh/lam-viec-ngoai', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtLamViecNgoai.create(req.body.data, (error, item) => res.send({ error, item })));
+        app.model.qtLamViecNgoai.create(req.body.data, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'CR', 'Làm việc ngoài');
+            res.send({ error, item });
+        }));
 
     app.put('/api/qua-trinh/lam-viec-ngoai', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtLamViecNgoai.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })));
+        app.model.qtLamViecNgoai.update({ id: req.body.id }, req.body.changes, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'U', 'Làm việc ngoài');
+            res.send({ error, item });
+        }));
 
     app.delete('/api/qua-trinh/lam-viec-ngoai', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtLamViecNgoai.delete({ id: req.body.id }, (error) => res.send(error)));
+        app.model.qtLamViecNgoai.delete({ id: req.body.id }, (error) => {
+            app.tccbSaveCRUD(req.session.user.email, 'D', 'Làm việc ngoài');
+            res.send(error);
+        }));
 
 };
