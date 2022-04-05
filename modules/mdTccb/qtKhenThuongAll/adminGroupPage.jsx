@@ -259,9 +259,9 @@ class QtKhenThuongAllGroupPage extends AdminPage {
             </>,
             content: <>
                 <div className='tile'>
-                    <div className='tile-title'>
+                    <h3 className='tile-title'>
                         Thống kê
-                    </div>
+                    </h3>
                     <b>{'Số lượng: ' + totalItem.toString()}</b>
                 </div>
                 <div className='tile'>
