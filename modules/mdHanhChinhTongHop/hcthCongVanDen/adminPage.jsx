@@ -6,6 +6,7 @@ import {
     renderTable,
     FormSelect,
     TableCell,
+    TableHeader
 } from 'view/component/AdminPage';
 import { Link } from 'react-router-dom';
 import {
@@ -37,53 +38,7 @@ const
     }));
 
 
-class TableHeader extends React.Component {
-    state = {
-        type: null,
-        filter: {}
-    }
-
-
-    onSortChange = (e, done) => {
-        e.preventDefault();
-        this.setState({ type: this.state.type ? 0 : 1 }, () => {
-            done && done(this.state.type ? 'ASC' : 'DESC');
-        });
-    }
-
-
-    render() {
-        let noType = 'fa fa-sort',
-            desc = 'fa fa-sort-desc',
-            asc = 'fa fa-sort-asc',
-            { style, className, children, sort, isSorted = null, onSort } = this.props,
-            type = this.state.type,
-            sortType = null;
-
-        if (isSorted === null) {
-            sortType = type !== null ? (type === 0 ? desc : asc) : noType;
-        }
-        else {
-            sortType = isSorted && type !== null ? (type === 0 ? desc : asc) : noType;
-        }
-
-        return (
-            <th style={style} className={className}>
-                {
-                    sort ? <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                        <span style={{ flex: 1 }}>
-                            {children}
-                        </span>
-                        <i className={sortType} aria-hidden='true' onClick={(e) => this.onSortChange(e, onSort)} />
-                    </div>
-                        : children
-                }
-            </th>
-        );
-    }
-}
-
-class HcthCongVanDen extends AdminPage {
+class HcthCongVanDenStaffPage extends AdminPage {
 
     state = { filter: {}, sortBy: '', sortType: '' };
 
@@ -153,7 +108,7 @@ class HcthCongVanDen extends AdminPage {
     }
 
     onSort = (value, type) => {
-        this.setState({ sortBy: value, sortType: type }, () => this.changeAdvancedSearch());
+        this.setState({ sortBy: type && value, sortType: type }, () => this.changeAdvancedSearch());
     }
 
     render() {
@@ -173,7 +128,7 @@ class HcthCongVanDen extends AdminPage {
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Đơn vị gửi</th>
                     <th style={{ width: '80%', whiteSpace: 'nowrap' }}>Trích yếu</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Đơn vị, người nhận</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tình trạng</th>
+                    <TableHeader style={{ width: 'auto', whiteSpace: 'nowrap' }} sort isSorted={this.state.sortBy == 'tinhTrang'} onSort={(type) => this.onSort('tinhTrang', type)}>Tình trạng</TableHeader>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                 </tr>),
             renderRow: (item, index) => {
@@ -184,7 +139,7 @@ class HcthCongVanDen extends AdminPage {
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='text' content={
                             <>
-                                {item.soCongVan && <Link to={`/user/hcth/cong-van-den/${item.id}`}>{item.soCongVan}</Link>}
+                                <Link to={`/user/hcth/cong-van-den/${item.id}`}>{item.soCongVan || 'Chưa có số công văn'}</Link>
                                 {item.ngayCongVan ? <span style={{ whiteSpace: 'nowrap' }}><br />{'Ngày CV: ' + T.dateToText(item.ngayCongVan, 'dd/mm/yyyy')}</span> : null}
                             </>
                         } />
@@ -220,9 +175,9 @@ class HcthCongVanDen extends AdminPage {
                         } />
 
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
-                            item.hasFile ?
-                                (<span style={{ color: 'blue' }}>Đã có tệp tin</span>) :
-                                (<span style={{ color: 'red' }}>Chưa có tệp tin</span>)
+                            item.hasChiDao ?
+                                (<span style={{ color: 'blue' }}>Đã chỉ đạo</span>) :
+                                (<span style={{ color: 'red' }}>Chưa chỉ đạo</span>)
                         } />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onEdit={() => this.props.history.push(`/user/hcth/cong-van-den/${item.id}`)} onDelete={(e) => this.onDelete(e, item)} permissions={currentPermissions} />
                     </tr>);
@@ -235,6 +190,7 @@ class HcthCongVanDen extends AdminPage {
                 <Link key={0} to='/user/hcth'>Hành chính tổng hợp</Link>,
                 'Công văn đến'
             ],
+            header: <FormSelect style={{ width: '300px', marginBottom: '0' }} allowClear={true} ref={e => this.congVanYear = e} placeholder='Năm' onChange={() => this.changeAdvancedSearch()} data={yearSelector} />,
             advanceSearch: <>
                 <div className='row'>
                     <div className='col-12 col-md-12 row'>
@@ -252,7 +208,6 @@ class HcthCongVanDen extends AdminPage {
             </>,
             content: <div className='tile'>
                 {/* <FormTextBox type='year' ref={e => this.congVanYear = e} label='Năm' onChange={() => this.changeAdvancedSearch()} /> */}
-                <FormSelect allowClear={true} ref={e => this.congVanYear = e} label='Năm' onChange={() => this.changeAdvancedSearch()} data={yearSelector} />
                 {table}
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
@@ -267,4 +222,4 @@ class HcthCongVanDen extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, hcthCongVanDen: state.hcth.hcthCongVanDen });
 const mapActionsToProps = { getHcthCongVanDenAll, getHcthCongVanDenPage, createHcthCongVanDen, updateHcthCongVanDen, deleteHcthCongVanDen, getHcthCongVanDenSearchPage };
-export default connect(mapStateToProps, mapActionsToProps)(HcthCongVanDen);
+export default connect(mapStateToProps, mapActionsToProps)(HcthCongVanDenStaffPage);

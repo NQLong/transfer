@@ -130,5 +130,11 @@ module.exports = app => {
             const sql = 'SELECT COUNT(*) FROM HCTH_CHI_DAO' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.database.oracle.connection.main.execute(sql, parameter, (error, result) => done(error, result));
         },
+
+        getCongVanChiDao: (idcongvan, type, done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_chi_dao_get_cong_van_chi_dao(:idcongvan, :type); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, idcongvan, type }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
+        },
+
     };
 };
