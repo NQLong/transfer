@@ -56,6 +56,7 @@ class PageCompany extends React.Component {
         $(document).ready(() => {
             let hiddenShortName = this.props.match.params.hiddenShortName;
             this.props.homeGetCompanyDoiTac(hiddenShortName, company => {
+                console.log(company);
                 this.setState({ company });
             });
         });
@@ -66,73 +67,73 @@ class PageCompany extends React.Component {
     render() {
         const { company } = this.state;
         const language = T.language(texts);
-        const hopTacBox = (company.listKyKet && company.listKyKet.length ? company.listKyKet : []).map((item, index) => {
-            return (
-                <div key={index}>
-                    {index != 0 && <div style={{ padding: '20px 0' }}><hr width='50%' align='center' /></div>}
-                    <h4 className='text-uppercase' style={h4Style}>{item.tieuDe}</h4>
-                    {item.thoiGian && 
-                        <>
-                        <h6 style={h6Style}>
-                            Thời gian diễn ra buổi ký kết:&nbsp;
-                            <span className='text-success'>{T.dateToText(item.thoiGian, 'dd/mm/yyyy')}</span></h6>
-                        </>
-                    }
-                    {item.diaDiem && T.language.parse(item.diaDiem) && 
-                        <h6 style={h6Style}>
-                        Nơi diễn ra buổi ký kết: &nbsp;
-                        <span className='text-success'>{T.language.parse(item.diaDiem)}</span></h6>
-                    }
-                    
+        // const hopTacBox = (company.listKyKet && company.listKyKet.length ? company.listKyKet : []).map((item, index) => {
+        //     return (
+        //         <div key={index}>
+        //             {index != 0 && <div style={{ padding: '20px 0' }}><hr width='50%' align='center' /></div>}
+        //             <h4 className='text-uppercase' style={h4Style}>{item.tieuDe}</h4>
+        //             {item.thoiGian &&
+        //                 <>
+        //                 <h6 style={h6Style}>
+        //                     Thời gian diễn ra buổi ký kết:&nbsp;
+        //                     <span className='text-success'>{T.dateToText(item.thoiGian, 'dd/mm/yyyy')}</span></h6>
+        //                 </>
+        //             }
+        //             {item.diaDiem && T.language.parse(item.diaDiem) &&
+        //                 <h6 style={h6Style}>
+        //                 Nơi diễn ra buổi ký kết: &nbsp;
+        //                 <span className='text-success'>{T.language.parse(item.diaDiem)}</span></h6>
+        //             }
+        //
+        //
+        //             {item.image && (
+        //                 <div style={{
+        //                     textAlign: 'center',
+        //                     height: '400px',
+        //                     backgroundImage: `url(${item.image || '/img/bk.png'})`,
+        //                     backgroundPosition: 'center',
+        //                     backgroundRepeat: 'no-repeat',
+        //                     backgroundSize: 'contain'
+        //                 }}/>
+        //             )}
+        //         </div>
+        //     );
+        // });
 
-                    {item.image && (
-                        <div style={{
-                            textAlign: 'center',
-                            height: '400px',
-                            backgroundImage: `url(${item.image || '/img/bk.png'})`,
-                            backgroundPosition: 'center',
-                            backgroundRepeat: 'no-repeat',
-                            backgroundSize: 'contain'
-                        }}/>
-                    )}
-                </div>
-            );
-        });
-
-        const tiepDoanBox = (company.listTiepDoan && company.listTiepDoan.length ? company.listTiepDoan : []).map((item, index) => {
-            return (
-                <div key={index}>
-                    {index != 0 && <div style={{ padding: '20px 0' }}><hr width='50%' align='center' /></div>}
-                    <h4 className='text-uppercase' style={h4Style}>{T.language.parse(item.ten)}</h4>
-                    {item.ngayTiep && 
-                        <h6 style={h6Style}>
-                        Thời gian diễn ra buổi tiếp đoàn:&nbsp;
-                        <span className='text-success'>{T.dateToText(item.ngayTiep, 'dd/mm/yyyy')}</span></h6>
-
-                    }
-                    {item.diaDiem && T.language.parse(item.diaDiem) &&
-                        <h6 style={h6Style}>
-                        Nơi diễn ra buổi tiếp đoàn: &nbsp;
-                        <span className='text-success'>{T.language.parse(item.diaDiem)}</span></h6>
-                    }
-                    {item.ketQua && 
-                        <h6 style={h6Style}>{language.recpResult}: &nbsp;
-                        <span className='text-success'>{T.language.parse(item.ketQua)}</span></h6>
-                    }
-                    {item.noiDungDuKien && 
-                        <>
-                        <h6 style={h6Style}>Nội dung của buổi tiếp đoàn:&nbsp;</h6>
-                        <p className='text-justify'>{T.language.parse(item.noiDungDuKien)}</p>
-                        </>
-                    }
-                    {item.ketQua &&
-                        <><h6 style={h6Style}>Kết quả của buổi tiếp đoàn:&nbsp;</h6>
-                        <p className='text-justify'>{T.language.parse(item.ketQua)}</p>
-                        </>
-                    }
-                </div>
-            );
-        });
+        // const tiepDoanBox = (company.listTiepDoan && company.listTiepDoan.length ? company.listTiepDoan : []).map((item, index) => {
+        //     return (
+        //         <div key={index}>
+        //             {index != 0 && <div style={{ padding: '20px 0' }}><hr width='50%' align='center' /></div>}
+        //             <h4 className='text-uppercase' style={h4Style}>{T.language.parse(item.ten)}</h4>
+        //             {item.ngayTiep &&
+        //                 <h6 style={h6Style}>
+        //                 Thời gian diễn ra buổi tiếp đoàn:&nbsp;
+        //                 <span className='text-success'>{T.dateToText(item.ngayTiep, 'dd/mm/yyyy')}</span></h6>
+        //
+        //             }
+        //             {item.diaDiem && T.language.parse(item.diaDiem) &&
+        //                 <h6 style={h6Style}>
+        //                 Nơi diễn ra buổi tiếp đoàn: &nbsp;
+        //                 <span className='text-success'>{T.language.parse(item.diaDiem)}</span></h6>
+        //             }
+        //             {item.ketQua &&
+        //                 <h6 style={h6Style}>{language.recpResult}: &nbsp;
+        //                 <span className='text-success'>{T.language.parse(item.ketQua)}</span></h6>
+        //             }
+        //             {item.noiDungDuKien &&
+        //                 <>
+        //                 <h6 style={h6Style}>Nội dung của buổi tiếp đoàn:&nbsp;</h6>
+        //                 <p className='text-justify'>{T.language.parse(item.noiDungDuKien)}</p>
+        //                 </>
+        //             }
+        //             {item.ketQua &&
+        //                 <><h6 style={h6Style}>Kết quả của buổi tiếp đoàn:&nbsp;</h6>
+        //                 <p className='text-justify'>{T.language.parse(item.ketQua)}</p>
+        //                 </>
+        //             }
+        //         </div>
+        //     );
+        // });
 
 
         return (
@@ -144,7 +145,7 @@ class PageCompany extends React.Component {
                                 <div className='clever-description'>
                                     <div className='about-course mb-30' style={{ padding: '30px', boxShadow: '0 0 10px rgba(0, 0, 0, 0.15)', marginBottom: '30px' }}>
                                         <a href='#' onClick={(e) => company.website ? window.open(company.website, '_blank') : e.preventDefault()}>
-                                            <img src={company.image || '/img/bk.png'} width='100%' alt={T.language.parse(company.tenDayDu)} />
+                                            <img src={company.image || '/img/a_cong.png'} width='100%' alt={T.language.parse(company.tenDayDu)} />
                                         </a>
                                     </div>
                                 </div>
@@ -154,49 +155,49 @@ class PageCompany extends React.Component {
                             <div className='course--content'>
                                 <div className='about-course mb-30' style={{ padding: '40px', boxShadow: '0 0 10px rgba(0, 0, 0, 0.15)' }}>
                                     <h4 className='text-center  text-uppercase' style={h4Style}>{T.language.parse(company.tenDayDu)}</h4>
-                                    <div className='row' style={{ marginBottom: '8px' }}>
-                                        {company.quocGia && 
-                                            <div className='col-12 col-md-6'>
-                                                <h6 style={h6Style}>{language.nationInfo}: &nbsp;<span className='text-success'>{T.language.parse(company.tenQuocGia)}</span></h6>
-                                            </div>
+                                    <div className='row' style={{ margin: '0 -15px 8px -15px' }}>
+                                        {company.quocGia &&
+                                        <div className='col-12 col-md-6'>
+                                            <h6 style={h6Style}>{language.nationInfo}: &nbsp;<span className='text-success'>{T.language.parse(company.tenQuocGia)}</span></h6>
+                                        </div>
                                         }
-                                        
-                                        {company.namThanhLap && 
-                                            <div className='col-12 col-md-6'>
-                                                <h6 style={h6Style}>{language.foundedYearInfo}:&nbsp;<span className='text-success'>{company.namThanhLap}</span></h6>
-                                            </div>
+
+                                        {company.namThanhLap &&
+                                        <div className='col-12 col-md-6'>
+                                            <h6 style={h6Style}>{language.foundedYearInfo}:&nbsp;<span className='text-success'>{company.namThanhLap}</span></h6>
+                                        </div>
                                         }
                                     </div>
-                                    <div className='row' style={{ marginBottom: '8px' }}>
-                                        {company.phone  &&
-                                            <div className='col-12 col-md-6'>
-                                                <h6 style={h6Style}>{language.phoneNumberInfo}:&nbsp;<span className='text-success'>{company.phone}</span></h6>
-                                            </div>
+                                    <div className='row' style={{ margin: '0 -15px 8px -15px' }}>
+                                        {company.phone &&
+                                        <div className='col-12 col-md-6'>
+                                            <h6 style={h6Style}>{language.phoneNumberInfo}:&nbsp;<span className='text-success'>{company.phone}</span></h6>
+                                        </div>
                                         }
                                         {company.email &&
-                                            <div className='col-12 col-md-6'>
-                                                <h6 style={h6Style}>Email:&nbsp;<span className='text-success'>{company.email}</span></h6>
-                                            </div>
+                                        <div className='col-12 col-md-6'>
+                                            <h6 style={h6Style}>Email:&nbsp;<span className='text-success'>{company.email}</span></h6>
+                                        </div>
                                         }
                                     </div>
 
                                     {company.diaChi && T.language.parse(company.diaChi) &&
-                                        <>
+                                    <>
                                         <h6 style={h6Style}>{language.addressInfo}:&nbsp;</h6>
                                         <p className='text-justify'>{T.language.parse(company.diaChi)}</p>
-                                        </>
+                                    </>
                                     }
                                     {company.theManh && T.language.parse(company.theManh) &&
-                                        <>
+                                    <>
                                         <h6 style={h6Style}>{language.strengths}:&nbsp;</h6>
                                         <p className='text-justify'>{T.language.parse(company.theManh)}</p>
-                                        </>
+                                    </>
                                     }
 
                                     {company.tenCacLinhVuc ? (
                                         <div>
                                             <h6 style={h6Style}>{language.areaActivityInfo}:</h6>
-                                            {company.tenCacLinhVuc.map((linhvuc, index) => <p key={index} style={{ color: '#666', fontSize: '18px' }}>-{linhvuc.TEN}</p>)}
+                                            {company.tenCacLinhVuc.map((linhvuc, index) => <p key={index} style={{ color: '#666', fontSize: '18px', marginBottom: '0' }}>- {linhvuc.ten}</p>)}
                                         </div>
                                     ) : null}
 
@@ -206,39 +207,39 @@ class PageCompany extends React.Component {
                                             <p className='text-justify' dangerouslySetInnerHTML={{ __html: T.language.parse(company.moTa) }} />
                                         </div>
                                     ) : null}
-                                    {company.website && 
-                                        <h6 style={h6Style}>Website:&nbsp;
-                                            <a href={company.website} target='_blank' rel='noreferrer'><span type='primary' style={{ fontSize: '18px', fontWeight: '300', lineHeight: '1.8' }}>{company.website}</span></a>
-                                        </h6>
+                                    {company.website &&
+                                    <h6 style={h6Style}>Website:&nbsp;
+                                        <a href={company.website} target='_blank' rel='noreferrer'><span type='primary' style={{ fontSize: '18px', fontWeight: '300', lineHeight: '1.8' }}>{company.website}</span></a>
+                                    </h6>
                                     }
 
                                 </div>
                             </div>
                         </div>
-                        {company.listKyKet && company.listKyKet.length ?
-                            <div className='col-12' style={{ marginBottom: '100px' }}>
-                                <div className='course--content'>
-                                    <div className='about-course mb-30' style={{ padding: '40px', boxShadow: '0 0 10px rgba(0, 0, 0, 0.15)' }}>
-                                        <h4 className='text-center text-uppercase' style={h4Style}>
-                                            Các buổi ký kết thỏa thuận hợp tác với doanh nghiệp
-                                        </h4>
-                                        {hopTacBox}
-                                    </div>
-                                </div>
-                            </div>: null
-                            }
-                        {company.listTiepDoan && company.listTiepDoan.length?
-                            <div className='col-12' style={{ marginBottom: '100px' }}>
-                                <div className='course--content'>
-                                    <div className='about-course mb-30' style={{ padding: '40px', boxShadow: '0 0 10px rgba(0, 0, 0, 0.15)' }}>
-                                        <h4 className='text-center text-uppercase' style={h4Style}>
-                                            Các buổi tiếp đoàn với doanh nghiệp
-                                        </h4>
-                                        {tiepDoanBox}
-                                    </div>
-                                </div>
-                            </div>: null
-                        }
+                        {/*{company.listKyKet && company.listKyKet.length ?*/}
+                        {/*    <div className='col-12' style={{ marginBottom: '100px' }}>*/}
+                        {/*        <div className='course--content'>*/}
+                        {/*            <div className='about-course mb-30' style={{ padding: '40px', boxShadow: '0 0 10px rgba(0, 0, 0, 0.15)' }}>*/}
+                        {/*                <h4 className='text-center text-uppercase' style={h4Style}>*/}
+                        {/*                    Các buổi ký kết thỏa thuận hợp tác với doanh nghiệp*/}
+                        {/*                </h4>*/}
+                        {/*                {hopTacBox}*/}
+                        {/*            </div>*/}
+                        {/*        </div>*/}
+                        {/*    </div>: null*/}
+                        {/*    }*/}
+                        {/*{company.listTiepDoan && company.listTiepDoan.length?*/}
+                        {/*    <div className='col-12' style={{ marginBottom: '100px' }}>*/}
+                        {/*        <div className='course--content'>*/}
+                        {/*            <div className='about-course mb-30' style={{ padding: '40px', boxShadow: '0 0 10px rgba(0, 0, 0, 0.15)' }}>*/}
+                        {/*                <h4 className='text-center text-uppercase' style={h4Style}>*/}
+                        {/*                    Các buổi tiếp đoàn với doanh nghiệp*/}
+                        {/*                </h4>*/}
+                        {/*                {tiepDoanBox}*/}
+                        {/*            </div>*/}
+                        {/*        </div>*/}
+                        {/*    </div>: null*/}
+                        {/*}*/}
                     </div>
                 ) : <p>{language.noInfo}</p>}
             </div>

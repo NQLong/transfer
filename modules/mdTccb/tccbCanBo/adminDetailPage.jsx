@@ -15,6 +15,7 @@ import Loading from 'view/component/Loading';
 class CanBoPage extends AdminPage {
     state = { item: null, create: false, load: true }
     componentDidMount() {
+        T.hideSearchBox();
         T.ready('/user/tccb', () => {
             const route = T.routeMatcher('/user/tccb/staff/:shcc'),
                 shcc = route.parse(window.location.pathname).shcc;
@@ -52,7 +53,6 @@ class CanBoPage extends AdminPage {
             caNhanData && congTacData && trinhDoData && this.props.updateStaff(this.urlSHCC, { ...caNhanData, ...congTacData, ...trinhDoData, userModified: this.emailCanBo, lastModified: new Date().getTime() });
         } else {
             caNhanData && congTacData && trinhDoData && this.props.createStaff({ ...caNhanData, ...congTacData, ...trinhDoData, userModified: this.emailCanBo, lastModified: new Date().getTime() }, () => this.props.history.push('/user/tccb/staff'));
-
         }
     }
 
@@ -75,7 +75,7 @@ class CanBoPage extends AdminPage {
                         <ComponentCaNhan ref={e => this.componentCaNhan = e} readOnly={!permission.write} />
                         <ComponentQuanHe ref={e => this.componentQuanHe = e} userEdit={false} />
                         <ComponentTTCongTac ref={e => this.componentTTCongTac = e} userEdit={false} />
-                        <ComponentTrinhDo ref={e => this.componentTrinhDo = e} userEdit={false} tccb={true} />
+                        <ComponentTrinhDo ref={e => this.componentTrinhDo = e} readOnly={!permission.write} userEdit={false} tccb={true} />
                     </> :
                         <>
                             <ComponentCaNhan ref={e => this.componentCaNhan = e} readOnly={!permission.write} create />

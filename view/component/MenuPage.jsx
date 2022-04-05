@@ -6,7 +6,7 @@ import fwContact from 'modules/_default/fwContact/index';
 import fWLoaiDonVi from 'modules/mdDanhMuc/dmLoaiDonVi/index';
 import fwThuVien from 'modules/_default/fwThuvien/index';
 import ttDoanhNghiep from 'modules/mdTruyenThong/ttDoanhNghiep/index';
-
+// import SectionHexagonCompany from 'modules/mdTruyenThong/ttDoanhNghiep/SectionHexagonCompany';
 export default class MenuPage extends React.Component {
     state = { component: null };
 
