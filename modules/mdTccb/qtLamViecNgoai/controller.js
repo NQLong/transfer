@@ -121,7 +121,7 @@ module.exports = app => {
 
     app.post('/api/qua-trinh/lam-viec-ngoai', app.permission.check('staff:write'), (req, res) =>
         app.model.qtLamViecNgoai.create(req.body.data, (error, item) => {
-            app.tccbSaveCRUD(req.session.user.email, 'CR', 'Làm việc ngoài');
+            app.tccbSaveCRUD(req.session.user.email, 'C', 'Làm việc ngoài');
             res.send({ error, item });
         }));
 

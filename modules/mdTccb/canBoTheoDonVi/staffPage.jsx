@@ -7,7 +7,8 @@ import { getDmDonVi, SelectAdapter_DmDonViFilter } from 'modules/mdDanhMuc/dmDon
 import { getDmChucVu } from 'modules/mdDanhMuc/dmChucVu/redux';
 
 const CRUD = {
-    'CR': 'Tạo',
+    'C': 'Tạo',
+    'R': 'Đọc',
     'U': 'Cập nhật',
     'D': 'Xóa'
 };
