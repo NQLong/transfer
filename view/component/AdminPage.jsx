@@ -315,7 +315,7 @@ export class FormTextBox extends React.Component {
     clear = () => this.input.clear();
 
     render() {
-        let { type = 'text', smallText = '', label = '', placeholder = '', className = '', style = {}, readOnly = false, onChange = null, required = false } = this.props,
+        let { type = 'text', smallText = '', label = '', placeholder = '', className = '', style = {}, readOnly = false, onChange = null, required = false, maxLength = 100 } = this.props,
             readOnlyText = this.state.value;
         type = type.toLowerCase(); // type = text | number | email | password | phone | year
         if (type == 'number') {
@@ -335,7 +335,10 @@ export class FormTextBox extends React.Component {
                 if (readOnlyText) readOnlyText = T.mobileDisplay(readOnlyText);
                 properties.onKeyPress = e => ((!/[0-9]/.test(e.key)) && e.preventDefault());
             }
-            let displayElement = '';
+            let displayElement = '', help = null;
+            if (this.state.value.length > maxLength) {
+                help = <small id='help' className='form-text text-muted'>Chuỗi nhập chỉ được phép chứa tối đa {maxLength} kí tự <br/>Số kí tự hiện tại: {this.state.value.length} </small>;
+            }
             if (label) {
                 displayElement = <><label onClick={() => this.input.focus()}>{label}{!readOnly && required ? <span style={{ color: 'red' }}> *</span> : ''}</label>{readOnly ? <>: <b>{readOnlyText}</b></> : ''}</>;
             } else {
@@ -345,6 +348,7 @@ export class FormTextBox extends React.Component {
             return (
                 <div className={'form-group ' + (className || '')} style={style}>
                     {displayElement}
+                    {help}
                     <input ref={e => this.input = e} style={{ display: readOnly ? 'none' : 'block' }}{...properties} />
                     {smallText ? <small>{smallText}</small> : null}
                 </div>);
@@ -367,8 +371,11 @@ export class FormRichTextBox extends React.Component {
     focus = () => this.input.focus();
 
     render() {
-        const { style = {}, rows = 3, label = '', placeholder = '', className = '', readOnly = false, onChange = null, required = false } = this.props;
-        let displayElement = '';
+        const { style = {}, rows = 3, label = '', placeholder = '', className = '', readOnly = false, onChange = null, required = false, maxLength = 200 } = this.props;
+        let displayElement = '', help = null;
+        if (this.state.value.length > maxLength) {
+            help = <small id='help' className='form-text text-muted'>Chuỗi nhập chỉ được phép chứa tối đa {maxLength} kí tự <br/>Số kí tự hiện tại: {this.state.value.length} </small>;
+        }
         if (label) {
             displayElement = <><label onClick={() => this.input.focus()}>{label}{!readOnly && required ? <span style={{ color: 'red' }}> *</span> : ''}</label>{readOnly && this.state.value ? <>: <br /> <b>{this.state.value}</b></> : ''}</>;
         } else {
@@ -377,6 +384,7 @@ export class FormRichTextBox extends React.Component {
         return (
             <div className={'form-group ' + (className ? className : '')} style={style}>
                 {displayElement}
+                {help}
                 <textarea ref={e => this.input = e} className='form-control' style={{ display: readOnly ? 'none' : 'block' }} placeholder={placeholder ? placeholder : label} value={this.state.value} rows={rows} onChange={e => this.setState({ value: e.target.value }) || onChange && onChange(e)} />
             </div>);
     }
