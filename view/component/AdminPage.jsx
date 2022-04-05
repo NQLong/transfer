@@ -19,7 +19,7 @@ export class TableCell extends React.Component { // type = number | date | link 
         } else if (type == 'number') {
             return <td className={className} style={{ textAlign: 'right', ...style }} rowSpan={rowSpan} colSpan={colSpan}>{content && !isNaN(content) ? T.numberDisplay(content) : content}</td>;
         } else if (type == 'date') {
-            return <td className={className} style={{ ...style }} rowSpan={rowSpan} colSpan={colSpan}>{dateFormat ? T.dateToText(content, dateFormat) : new Date(content).getText()}</td>;
+            return <td className={className} style={{ ...style }} rowSpan={rowSpan} colSpan={colSpan}>{content ? (dateFormat ? T.dateToText(content, dateFormat) : new Date(content).getText()) : ''}</td>;
         } else if (type == 'link') {
             let url = this.props.url ? this.props.url.trim() : '',
                 onClick = this.props.onClick;
@@ -89,7 +89,6 @@ export class TableHeader extends React.Component {
 
 
     render() {
-        console.log(this.state.type, this.sortSwitcher[this.state.type].value);
         let
             { style, className, children, sort, isSorted = true, onSort } = this.props,
             type = this.state.type,
@@ -102,7 +101,7 @@ export class TableHeader extends React.Component {
                         <span style={{ flex: 1 }}>
                             {children}
                         </span>
-                        <i className={sortType.className} aria-hidden='true' onClick={(e) => this.onSortChange(e, onSort)} />
+                        <i className={sortType.className} ariaHidden='true' onClick={(e) => this.onSortChange(e, onSort)} />
                     </div>
                         : children
                 }
@@ -317,7 +316,7 @@ class FormNumberBox extends React.Component {
     }
 
     render() {
-        let { smallText = '', label = '', placeholder = '', className = '', style = {}, readOnly = false, onChange = null, required = false, step = false } = this.props,
+        let { smallText = '', label = '', placeholder = '', className = '', style = {}, readOnly = false, onChange = null, required = false, step = false, prefix = '', suffix = '' } = this.props,
             readOnlyText = this.exactValue ? this.exactValue : this.state.value;
         const properties = {
             className: 'form-control',
@@ -347,7 +346,7 @@ class FormNumberBox extends React.Component {
         return (
             <div className={'form-group ' + (className || '')} style={style}>
                 {displayElement}
-                <NumberFormat style={{ display: readOnly ? 'none' : 'block' }} {...properties} />
+                <NumberFormat prefix={prefix} suffix={suffix} style={{ display: readOnly ? 'none' : 'block' }} {...properties} />
                 {smallText ? <small>{smallText}</small> : null}
             </div>);
     }
@@ -721,7 +720,7 @@ export class FormDatePicker extends React.Component {
         let { label = '', type = 'date', className = '', readOnly = false, required = false, style = {}, readOnlyEmptyText = '' } = this.props; // type = date || time || date-mask || time-mask || month-mask
         return (
             <div className={'form-group ' + (className || '')} style={style}>
-                <label onClick={() => this.focus()}>{label}{!readOnly && required ? <span style={{ color: 'red' }}> *</span> : ''}</label>{readOnly && this.state.value ? <>: <b>{this.state.readOnlyText}</b></> : readOnlyEmptyText && <b>: {readOnlyEmptyText}</b>}
+                <label onClick={() => this.focus()}>{label}{!readOnly && required ? <span style={{ color: 'red' }}> *</span> : ''}</label>{readOnly && this.state.value ? <>: <b>{this.state.readOnlyText}</b></> : readOnly && readOnlyEmptyText && <b>: {readOnlyEmptyText}</b>}
                 {(type.endsWith('-mask') || type == 'date-month') ? (
                     <InputMask ref={e => this.input = e} className='form-control' mask={this.mask[type]} onChange={this.handleChange} style={{ display: readOnly ? 'none' : '' }} formatChars={{ '2': '[12]', '0': '[09]', '1': '[01]', '3': '[0-3]', '9': '[0-9]', '5': '[0-5]', 'h': '[0-2]' }} value={this.state.value} readOnly={readOnly} placeholder={label} />
                 ) : (
@@ -735,13 +734,13 @@ export class FormImageBox extends React.Component {
     setData = (data, image) => this.imageBox.setData(data, image);
 
     render() {
-        let { label = '', className = '', style = {}, readOnly = false, postUrl = '/user/upload', uploadType = '', image = null, onDelete = null, onSuccess = null } = this.props;
+        let { label = '', className = '', style = {}, readOnly = false, postUrl = '/user/upload', uploadType = '', image = null, onDelete = null, onSuccess = null, isProfile = null, description = null } = this.props;
         return (
             <div className={'form-group ' + className} style={style}>
                 <label>{label}&nbsp;</label>
                 {!readOnly && image && onDelete ?
                     <a href='#' className='text-danger' onClick={onDelete}><i className='fa fa-fw fa-lg fa-trash' /></a> : null}
-                <ImageBox ref={e => this.imageBox = e} postUrl={postUrl} uploadType={uploadType} image={image} readOnly={readOnly} success={data => onSuccess && onSuccess(data)} />
+                <ImageBox ref={e => this.imageBox = e} postUrl={postUrl} uploadType={uploadType} image={image} readOnly={readOnly} success={data => onSuccess && onSuccess(data)} isProfile={isProfile} description={description} />
             </div>);
     }
 }

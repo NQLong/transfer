@@ -231,6 +231,15 @@ class AdminHeader extends AdminPage {
                 this.props.addNotification(notifyItem);
             }
         });
+
+        T.initAdvancedSearch = (onAdvanceSearch = null) => {
+            this.advancedSearch && $(this.advancedSearch).css('display', 'flex');
+            if (onAdvanceSearch && typeof onAdvanceSearch == 'function') {
+                T.onAdvanceSearchHide = onAdvanceSearch;
+            } else {
+                T.onAdvanceSearchHide = null;
+            }
+        };
     }
 
     willUnmount = () => {

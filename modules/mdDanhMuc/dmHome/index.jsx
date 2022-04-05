@@ -1,5 +1,6 @@
 //TEMPLATES: admin
 import React from 'react';
+import SubMenusCategory from 'view/component/SubMenusCategory';
 import SubMenusPage from 'view/component/SubMenusPage';
 
 export default {
@@ -11,7 +12,7 @@ export default {
         // },
         {
             path: '/user/tccb',
-            component: () => <SubMenusPage menuLink='/user/tccb' menuKey={3000} headerIcon='fa-list-alt' />
+            component: () => <SubMenusPage menuLink='/user/tccb' menuKey={3000} headerIcon='fa-pie-chart' />
         },
         {
             path: '/user/truyen-thong',
@@ -23,7 +24,7 @@ export default {
         },
         {
             path: '/user/category',
-            component: () => <SubMenusPage menuLink='/user/category' menuKey={4000} headerIcon='fa-list-alt' />
+            component: () => <SubMenusCategory menuLink='/user/category' menuKey={4000} headerIcon='fa-list-alt' />
         },
         {
             path: '/user/websites',
