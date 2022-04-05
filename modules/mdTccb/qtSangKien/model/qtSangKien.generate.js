@@ -1,6 +1,6 @@
-// Table name: QT_SANG_KIEN { id, shcc, maSo, tenSangKien }
+// Table name: QT_SANG_KIEN { id, shcc, maSo, tenSangKien, soQuyetDinh }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'shcc': 'SHCC', 'maSo': 'MA_SO', 'tenSangKien': 'TEN_SANG_KIEN' };
+const obj2Db = { 'id': 'ID', 'shcc': 'SHCC', 'maSo': 'MA_SO', 'tenSangKien': 'TEN_SANG_KIEN', 'soQuyetDinh': 'SO_QUYET_DINH' };
 
 module.exports = app => {
     app.model.qtSangKien = {

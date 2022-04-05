@@ -105,7 +105,7 @@ export class HcthCongVanDi extends AdminPage {
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'center' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='link' content={item.noiDung || ''} onClick={() => this.props.history.push(`/user/hcth/cong-van-di/${item.id}`)} />
-                        <TableCell type='text' style={{whiteSpace: 'nowrap'}} content={
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
                             <>
                                 {
                                     item.ngayGui ? (<>
@@ -121,7 +121,7 @@ export class HcthCongVanDi extends AdminPage {
                             </>
                         } />
                         <TableCell type='text' contentClassName='multiple-lines' content={item.tenDonViGui ? item.tenDonViGui.normalizedName() : ''} />
-                        <TableCell type='text' style={{  }} contentStyle={{width: '10rem'}} content={
+                        <TableCell type='text' style={{}} contentStyle={{ width: '10rem' }} content={
                             <>
                                 <span>{danhSachCanBoNhan && danhSachCanBoNhan.length > 0 ? danhSachCanBoNhan.map((item, index) => (
                                     <span key={index}>
@@ -153,10 +153,10 @@ export class HcthCongVanDi extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-caret-square-o-left',
-            title: 'Công văn giữa các phòng',
+            title: 'Công văn đi của các đơn vị',
             breadcrumb: [
                 <Link key={0} to='/user/hcth'>Hành chính tổng hơp</Link>,
-                'Công văn giữa các phòng'
+                'Công văn đi của các đơn vị'
             ],
             onCreate: permission && permission.write ? () => this.props.history.push('/user/hcth/cong-van-di/new') : null,
             content: <>

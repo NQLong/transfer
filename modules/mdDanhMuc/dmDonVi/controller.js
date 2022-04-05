@@ -31,6 +31,13 @@ module.exports = app => {
         app.model.dmDonVi.getAll((error, items) => res.send({ error, items }));
     });
 
+    app.get('/api/danh-muc/don-vi/get-in-list', app.permission.check('user:login'), (req, res) => {
+        app.model.dmDonVi.getAll({
+            statement: 'ma IN (:list)',
+            parameter: { list: req.query.condition || [] }
+        }, (error, items) => res.send({ error, items }));
+    });
+
     app.get('/api/danh-muc/don-vi/item/:id', app.permission.check('user:login'), (req, res) => {
         app.model.dmDonVi.get({ ma: req.params.id }, (error, item) => res.send({ error, item }));
     });
@@ -65,9 +72,10 @@ module.exports = app => {
     });
     app.get('/api/danh-muc/don-vi/faculty', app.permission.check('user:login'), (req, res) => {
         let condition = {
-            statement: 'maPl = :maPl',
+            statement: 'maPl = :maPl AND kichHoat = :kichHoat',
             parameter: {
                 maPl: 1,
+                kichHoat: 1
             },
         };
         app.model.dmDonVi.getAll(condition, (error, items) => res.send({ error, items }));

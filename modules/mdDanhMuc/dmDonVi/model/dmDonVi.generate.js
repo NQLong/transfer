@@ -1,6 +1,7 @@
 // Table name: DM_DON_VI { ma, ten, tenTiengAnh, tenVietTat, kichHoat, qdThanhLap, maPl, qdXoaTen, ghiChu, image, duongDan, imageDisplay, imageDisplayTa, preShcc }
 const keys = ['MA'];
 const obj2Db = { 'ma': 'MA', 'ten': 'TEN', 'tenTiengAnh': 'TEN_TIENG_ANH', 'tenVietTat': 'TEN_VIET_TAT', 'kichHoat': 'KICH_HOAT', 'qdThanhLap': 'QD_THANH_LAP', 'maPl': 'MA_PL', 'qdXoaTen': 'QD_XOA_TEN', 'ghiChu': 'GHI_CHU', 'image': 'IMAGE', 'duongDan': 'DUONG_DAN', 'imageDisplay': 'IMAGE_DISPLAY', 'imageDisplayTa': 'IMAGE_DISPLAY_TA', 'preShcc': 'PRE_SHCC' };
+
 module.exports = app => {
     app.model.dmDonVi = {
         create: (data, done) => {
@@ -12,6 +13,7 @@ module.exports = app => {
                     parameter[column] = data[column];
                 }
             });
+
             if (statement.length == 0) {
                 done('Data is empty!');
             } else {
@@ -25,6 +27,7 @@ module.exports = app => {
                 });
             }
         },
+
         get: (condition, selectedColumns, orderBy, done) => {
             if (typeof condition == 'function') {
                 done = condition;
@@ -34,12 +37,14 @@ module.exports = app => {
                 done = selectedColumns;
                 selectedColumns = '*';
             }
+
             if (orderBy) Object.keys(obj2Db).sort((a, b) => b.length - a.length).forEach(key => orderBy = orderBy.replaceAll(key, obj2Db[key]));
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
             const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT * FROM DM_DON_VI' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '') + ') WHERE ROWNUM=1';
             app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => done(error, resultSet && resultSet.rows && resultSet.rows.length ? resultSet.rows[0] : null));
         },
+
         getAll: (condition, selectedColumns, orderBy, done) => {
             if (typeof condition == 'function') {
                 done = condition;
@@ -49,12 +54,14 @@ module.exports = app => {
                 done = selectedColumns;
                 selectedColumns = '*';
             }
+
             if (orderBy) Object.keys(obj2Db).sort((a, b) => b.length - a.length).forEach(key => orderBy = orderBy.replaceAll(key, obj2Db[key]));
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             const parameter = condition.parameter ? condition.parameter : {};
             const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM DM_DON_VI' + (condition.statement ? ' WHERE ' + condition.statement : '') + (orderBy ? ' ORDER BY ' + orderBy : '');
             app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => done(error, resultSet && resultSet.rows ? resultSet.rows : []));
         },
+
         getPage: (pageNumber, pageSize, condition, selectedColumns, orderBy, done) => {
             if (typeof condition == 'function') {
                 done = condition;
@@ -64,6 +71,7 @@ module.exports = app => {
                 done = selectedColumns;
                 selectedColumns = '*';
             }
+
             if (orderBy) Object.keys(obj2Db).sort((a, b) => b.length - a.length).forEach(key => orderBy = orderBy.replaceAll(key, obj2Db[key]));
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             let leftIndex = (pageNumber <= 1 ? 0 : pageNumber - 1) * pageSize,
@@ -82,6 +90,7 @@ module.exports = app => {
                 });
             });
         },
+
         update: (condition, changes, done) => {
             condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
             changes = app.database.oracle.buildCondition(obj2Db, changes, ', ', 'NEW_');
@@ -99,6 +108,7 @@ module.exports = app => {
                 done('No changes!');
             }
         },
+
         delete: (condition, done) => {
             if (done == null) {
                 done = condition;
@@ -109,6 +119,7 @@ module.exports = app => {
             const sql = 'DELETE FROM DM_DON_VI' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.database.oracle.connection.main.execute(sql, parameter, error => done(error));
         },
+
         count: (condition, done) => {
             if (done == null) {
                 done = condition;
@@ -119,6 +130,7 @@ module.exports = app => {
             const sql = 'SELECT COUNT(*) FROM DM_DON_VI' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.database.oracle.connection.main.execute(sql, parameter, (error, result) => done(error, result));
         },
+
         searchPage: (pagenumber, pagesize, searchterm, done) => {
             app.database.oracle.connection.main.execute('BEGIN :ret:=dm_don_vi_search_page(:pagenumber, :pagesize, :searchterm, :totalitem, :pagetotal); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));

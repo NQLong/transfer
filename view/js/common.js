@@ -14,6 +14,7 @@ const T = {
         'all news',
         'all events',
         'all divisions',
+        'all companies',
         'carousel',
         'last events',
         'last news',

@@ -201,18 +201,8 @@ class QtLamViecNgoaiUserPage extends AdminPage {
                             </>
                         )}
                         />
-                        <TableCell type='text' content={(
-                            <>
-                                {item.noiDung ? item.noiDung : ''}
-                            </>
-                        )}
-                        />
-                        <TableCell type='text' content={(
-                            <>
-                                <span>{item.noiLamViec}</span>
-                            </>
-                        )}
-                        />
+                        <TableCell type='text' content={(item.noiDung || '')} />
+                        <TableCell type='text' content={(<span>{item.noiLamViec}</span>)} />
                         <TableCell type='text' content={(
                             <>
                                 <span>{(item.ketThuc == -1 || item.ketThuc >= item.today) ? <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đang diễn ra</span> : <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đã kết thúc</span>}</span>

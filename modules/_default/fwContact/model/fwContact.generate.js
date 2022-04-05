@@ -1,6 +1,6 @@
-// Table name: FW_CONTACT { id, email, name, subject, message, read, createdDate }
+// Table name: FW_CONTACT { id, email, name, subject, message, read, createdDate, phoneNumber, maDonVi }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'email': 'EMAIL', 'name': 'NAME', 'subject': 'SUBJECT', 'message': 'MESSAGE', 'read': 'READ', 'createdDate': 'CREATED_DATE' };
+const obj2Db = { 'id': 'ID', 'email': 'EMAIL', 'name': 'NAME', 'subject': 'SUBJECT', 'message': 'MESSAGE', 'read': 'READ', 'createdDate': 'CREATED_DATE', 'phoneNumber': 'PHONE_NUMBER', 'maDonVi': 'MA_DON_VI' };
 
 module.exports = app => {
     app.model.fwContact = {
