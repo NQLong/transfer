@@ -172,7 +172,7 @@ class QtChucVuGroup extends AdminPage {
         });
     }
 
-    changeAdvancedSearch = (isInitial = false) => {
+    changeAdvancedSearch = (isInitial = false, isReset = false) => {
         let { pageNumber, pageSize } = this.props && this.props.qtChucVu && this.props.qtChucVu.pageMa ? this.props.qtChucVu.pageMa : { pageNumber: 1, pageSize: 50 };
         const timeType = this.timeType?.value() || 0;
         const fromYear = this.fromYear?.value() == '' ? null : this.fromYear?.value().getTime();
@@ -181,7 +181,7 @@ class QtChucVuGroup extends AdminPage {
         const listShcc = this.state.filter.listShcc;
         const listChucVu = this.mulMaChucVu?.value().toString() || '';
         const pageFilter = isInitial ? null : { listDonVi, fromYear, toYear, listShcc, timeType, listChucVu };
-        this.setState({ filter: pageFilter }, () => {
+        this.setState({ filter: isReset ? { listShcc: this.state.filter.listShcc } : pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
                     const filter = page.filter || {};
@@ -277,10 +277,18 @@ class QtChucVuGroup extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    <FormSelect className='col-12 col-md-4' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
-                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />}
-                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />}
-                    <FormSelect className='col-md-12' multiple={true} ref={e => this.mulMaChucVu = e} label='Chức vụ' data={SelectAdapter_DmChucVuV2} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-12 col-md-4' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} />
+                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian' />}
+                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' />}
+                    <FormSelect className='col-md-12' multiple={true} ref={e => this.mulMaChucVu = e} label='Chức vụ' data={SelectAdapter_DmChucVuV2} allowClear={true} minimumResultsForSearch={-1} />
+                    <div className='form-group col-12' style={{ justifyContent: 'end', display: 'flex' }}>
+                        <button className='btn btn-danger' style={{ marginRight: '10px' }} type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch(null, true)}>
+                            <i className='fa fa-fw fa-lg fa-times' />Xóa bộ lọc
+                        </button>
+                        <button className='btn btn-info' type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch()}>
+                            <i className='fa fa-fw fa-lg fa-search-plus' />Tìm kiếm
+                        </button>
+                    </div>
                 </div>
             </>,
             content: <>

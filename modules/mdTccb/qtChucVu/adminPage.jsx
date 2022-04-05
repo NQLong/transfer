@@ -176,7 +176,7 @@ class QtChucVu extends AdminPage {
         });
     }
 
-    changeAdvancedSearch = (isInitial = false) => {
+    changeAdvancedSearch = (isInitial = false, isReset = false) => {
         let { pageNumber, pageSize } = this.props && this.props.qtChucVu && this.props.qtChucVu.page ? this.props.qtChucVu.page : { pageNumber: 1, pageSize: 50 };
         const timeType = this.timeType?.value() || 0;
         const fromYear = this.fromYear?.value() == '' ? null : this.fromYear?.value().getTime();
@@ -189,7 +189,7 @@ class QtChucVu extends AdminPage {
         const fromAge = this.fromAge?.value();
         const toAge = this.toAge?.value();
         const pageFilter = isInitial ? null : { listDonVi, fromYear, toYear, listShcc, timeType, listChucVu, gioiTinh, listChucDanh, fromAge, toAge };
-        this.setState({ filter: pageFilter }, () => {
+        this.setState({ filter: isReset ? {} : pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
                     const filter = page.filter || {};
@@ -345,20 +345,32 @@ class QtChucVu extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    <FormSelect className='col-lg-4 col-md-12' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
-                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ' onChange={() => this.changeAdvancedSearch()} />}
-                    {(this.timeType && this.timeType.value() && this.timeType.value() != 0) ? <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến' onChange={() => this.changeAdvancedSearch()} /> : <div className='col-lg-9' />} 
-                    <FormSelect className='col-12 col-md-4' multiple={true} ref={e => this.maDonVi = e} label='Theo đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} placeHolder='Có thể chọn nhiều đơn vị' />
-                    <FormSelect className='col-12 col-md-4' multiple={true} ref={e => this.mulCanBo = e} label='Theo cán bộ cụ thể' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-lg-4 col-md-12' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} />
+                    {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ'/>}
+                    {(this.timeType && this.timeType.value() && this.timeType.value() != 0) ? <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến' /> : <div className='col-lg-9' />} 
+                    <FormSelect className='col-12 col-md-4' multiple={true} ref={e => this.maDonVi = e} label='Theo đơn vị' data={SelectAdapter_DmDonVi} allowClear={true} minimumResultsForSearch={-1} placeHolder='Có thể chọn nhiều đơn vị' />
+                    <FormSelect className='col-12 col-md-4' multiple={true} ref={e => this.mulCanBo = e} label='Theo cán bộ cụ thể' data={SelectAdapter_FwCanBo} allowClear={true} minimumResultsForSearch={-1} />
                     <FormSelect ref={e => this.gioiTinh = e} label='Theo giới tính' className='col-12 col-md-4' data={[
                         { id: '01', text: 'Nam' },
                         { id: '02', text: 'Nữ' },
-                    ]} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
-                    <FormSelect className='col-md-3' multiple={true} ref={e => this.mulMaChucVu = e} label='Theo chức vụ' data={SelectAdapter_DmChucVuV2} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
-                    <FormSelect className='col-md-3' multiple={true} ref={e => this.mulMaChucDanh = e} label='Theo chức danh nghề nghiệp' data={SelectAdapter_DmNgachCdnnV2} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
-                    <FormTextBox type='number' className='col-md-3' ref={e => this.fromAge = e} label='Từ độ tuổi' onChange={() => this.changeAdvancedSearch()} />
-                    <FormTextBox type='number' className='col-md-3' ref={e => this.toAge = e} label='Tới độ tuổi' onChange={() => this.changeAdvancedSearch()} />
-                    <span className='col-md-12'>Tìm thấy: <b>{totalItem}</b> kết quả</span>
+                    ]} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-md-3' multiple={true} ref={e => this.mulMaChucVu = e} label='Theo chức vụ' data={SelectAdapter_DmChucVuV2} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-md-3' multiple={true} ref={e => this.mulMaChucDanh = e} label='Theo chức danh nghề nghiệp' data={SelectAdapter_DmNgachCdnnV2} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormTextBox type='number' className='col-md-3' ref={e => this.fromAge = e} label='Từ độ tuổi' />
+                    <FormTextBox type='number' className='col-md-3' ref={e => this.toAge = e} label='Tới độ tuổi'    />
+                    <div className='col-12'>
+                        <div className='row justify-content-between'>
+                            <div className='col-md-6'>Tìm thấy: <b>{totalItem}</b> kết quả</div>
+                            <div className='form-group col-md-6' style={{ textAlign:'right' }}>
+                                <button className='btn btn-danger' style={{ marginRight: '10px' }} type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch(null, true)}>
+                                    <i className='fa fa-fw fa-lg fa-times' />Xóa bộ lọc
+                                </button>
+                                <button className='btn btn-info' type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch()}>
+                                    <i className='fa fa-fw fa-lg fa-search-plus' />Tìm kiếm
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </>,
             content: <>
