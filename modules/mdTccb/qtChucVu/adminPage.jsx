@@ -181,12 +181,14 @@ class QtChucVu extends AdminPage {
         const timeType = this.timeType?.value() || 0;
         const fromYear = this.fromYear?.value() == '' ? null : this.fromYear?.value().getTime();
         const toYear = this.toYear?.value() == '' ? null : this.toYear?.value().getTime();
-        const listDv = this.maDonVi?.value().toString() || '';
+        const listDonVi = this.maDonVi?.value().toString() || '';
         const listShcc = this.mulCanBo?.value().toString() || '';
-        const listCv = this.mulMaChucVu?.value().toString() || '';
+        const listChucVu = this.mulMaChucVu?.value().toString() || '';
         const gioiTinh = this.gioiTinh?.value() == '' ? null : this.gioiTinh?.value();
-        const listCd = this.mulMaChucDanh?.value().toString() || '';
-        const pageFilter = isInitial ? null : { listDv, fromYear, toYear, listShcc, timeType, listCv, gioiTinh, listCd };
+        const listChucDanh = this.mulMaChucDanh?.value().toString() || '';
+        const fromAge = this.fromAge?.value();
+        const toAge = this.toAge?.value();
+        const pageFilter = isInitial ? null : { listDonVi, fromYear, toYear, listShcc, timeType, listChucVu, gioiTinh, listChucDanh, fromAge, toAge };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
@@ -194,13 +196,15 @@ class QtChucVu extends AdminPage {
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
                     this.fromYear?.value(filter.fromYear || '');
                     this.toYear?.value(filter.toYear || '');
-                    this.maDonVi?.value(filter.listDv);
+                    this.maDonVi?.value(filter.listDonVi);
                     this.mulCanBo?.value(filter.listShcc);
                     this.timeType?.value(filter.timeType);
-                    this.mulMaChucVu?.value(filter.listCv);
+                    this.mulMaChucVu?.value(filter.listChucVu);
                     this.gioiTinh?.value(filter.gioiTinh);
-                    this.mulMaChucDanh?.value(filter.listCd);
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.listShcc || filter.listDv || filter.timeType || filter.listCv || filter.gioiTinh || filter.listCd)) this.showAdvanceSearch();
+                    this.mulMaChucDanh?.value(filter.listChucDanh);
+                    this.fromAge?.value(filter.fromAge);
+                    this.toAge?.value(filter.toAge);
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.listShcc || filter.listDonVi || filter.timeType || filter.listChucVu || filter.gioiTinh || filter.listChucDanh || filter.fromAge || filter.toYear)) this.showAdvanceSearch();
                 }
             });
         });
@@ -258,6 +262,7 @@ class QtChucVu extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày sinh</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
                         <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Chức vụ</th>
                         <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Đơn vị cấp trường</th>
@@ -278,6 +283,7 @@ class QtChucVu extends AdminPage {
                             </>
                         )}
                         />
+                        <TableCell type='text' content={item.ngayRaQuyetDinh ? new Date(item.ngaySinh).ddmmyyyy() : ''}/>
                         <TableCell type='text' content={item.chucDanhNgheNghiep}/>
                         <TableCell type='text' content={item.tenChucVu}/>
                         <TableCell type='text' content={item.tenDonVi}/>
@@ -348,8 +354,11 @@ class QtChucVu extends AdminPage {
                         { id: '01', text: 'Nam' },
                         { id: '02', text: 'Nữ' },
                     ]} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
-                    <FormSelect className='col-md-6' multiple={true} ref={e => this.mulMaChucVu = e} label='Theo chức vụ' data={SelectAdapter_DmChucVuV2} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
-                    <FormSelect className='col-md-6' multiple={true} ref={e => this.mulMaChucDanh = e} label='Theo chức danh nghề nghiệp' data={SelectAdapter_DmNgachCdnnV2} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-md-3' multiple={true} ref={e => this.mulMaChucVu = e} label='Theo chức vụ' data={SelectAdapter_DmChucVuV2} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-md-3' multiple={true} ref={e => this.mulMaChucDanh = e} label='Theo chức danh nghề nghiệp' data={SelectAdapter_DmNgachCdnnV2} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormTextBox type='number' className='col-md-3' ref={e => this.fromAge = e} label='Từ độ tuổi' onChange={() => this.changeAdvancedSearch()} />
+                    <FormTextBox type='number' className='col-md-3' ref={e => this.toAge = e} label='Tới độ tuổi' onChange={() => this.changeAdvancedSearch()} />
+                    <span className='col-md-12'>Tìm thấy: <b>{totalItem}</b> kết quả</span>
                 </div>
             </>,
             content: <>

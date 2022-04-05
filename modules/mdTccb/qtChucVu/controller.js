@@ -15,13 +15,13 @@ module.exports = app => {
     app.get('/user/tccb/qua-trinh/chuc-vu/group/:shcc', app.permission.check('qtChucVu:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-
+    /// TCCB Apis -----------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/tccb/qua-trinh/chuc-vu/page/:pageNumber/:pageSize', app.permission.check('qtChucVu:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
-            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, listShcc, listDv, timeType, listCv, listCd, gioiTinh } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, timeType: 0, listCv: null, listCd: null, gioiTinh: null };
-        app.model.qtChucVu.searchPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, timeType, listCv, listCd, gioiTinh, searchTerm, (error, page) => {
+            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '',
+            filter = JSON.stringify(req.query.filter || {});
+        app.model.qtChucVu.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -35,9 +35,9 @@ module.exports = app => {
     app.get('/api/tccb/qua-trinh/chuc-vu/group/page/:pageNumber/:pageSize', app.permission.check('qtChucVu:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
-            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, listShcc, listDv, timeType, listCv, listCd, gioiTinh } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, timeType: 0, listCv: null, listCd: null, gioiTinh: null };
-        app.model.qtChucVu.groupPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, timeType, listCv, listCd, gioiTinh, searchTerm, (error, page) => {
+            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '',
+            filter = JSON.stringify(req.query.filter || {});
+        app.model.qtChucVu.groupPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -51,11 +51,6 @@ module.exports = app => {
     app.get('/api/tccb/qua-trinh/chuc-vu/all', app.permission.check('qtChucVu:read'), (req, res) => {
         app.model.qtChucVu.getByShcc(req.query.shcc, (error, items) => res.send({ error, items }));
     });
-
-
-    // app.get('/api/tccb/qua-trinh/chuc-vu/all', app.permission.check('qtChucVu:read'), (req, res) => {
-    //     app.model.qtChucVu.getAll((error, items) => res.send({ error, items }));
-    // });
 
     app.post('/api/tccb/qua-trinh/chuc-vu', app.permission.check('qtChucVu:write'), async (req, res) => {
         let targetEmail = await app.getEmailByShcc(req.body.data.shcc);
@@ -81,58 +76,9 @@ module.exports = app => {
         });
     });
 
-    // app.post('/api/user/qua-trinh/chuc-vu', app.permission.check('staff:login'), (req, res) => {
-    //     if (req.body.data && req.session.user) {
-    //         const data = req.body.data;
-    //         app.model.qtChucVu.create(data, (error, item) => res.send({ error, item }));
-    //     } else {
-    //         res.send({ error: 'Invalstt parameter!' });
-    //     }
-    // });
+/// End TCCB Apis --------------------------------------------------------------------------------------------------------------------------------------------
 
-    // app.put('/api/user/qua-trinh/chuc-vu', app.permission.check('staff:login'), (req, res) => {
-    //     if (req.body.changes && req.session.user) {
-    //         app.model.qtChucVu.get({ stt: req.body.stt }, (error, item) => {
-    //             if (error || item == null) {
-    //                 res.send({ error: 'Not found!' });
-    //             } else {
-    //                 if (item.email === req.session.user.email) {
-    //                     const changes = req.body.changes;
-    //                     app.model.qtChucVu.update({ stt: req.body.stt }, changes, (error, item) => res.send({ error, item }));
-    //                 } else {
-    //                     res.send({ error: 'Not found!' });
-    //                 }
-    //             }
-    //         });
-    //     } else {
-    //         res.send({ error: 'Invalstt parameter!' });
-    //     }
-    // });
-
-    // app.delete('/api/user/qua-trinh/chuc-vu', app.permission.check('staff:login'), (req, res) => {
-    //     if (req.session.user) {
-    //         app.model.qtChucVu.get({ stt: req.body.stt }, (error, item) => {
-    //             if (error || item == null) {
-    //                 res.send({ error: 'Not found!' });
-    //             } else {
-    //                 if (item.email === req.session.user.email) {
-    //                     app.model.qtChucVu.delete({ stt: req.body.stt }, (error) => res.send(error));
-    //                 } else {
-    //                     res.send({ error: 'Not found!' });
-    //                 }
-    //             }
-    //         });
-    //     } else {
-    //         res.send({ error: 'Invalstt parameter!' });
-    //     }
-    // });
-
-    app.get('/api/tccb/qua-trinh/chuc-vu-by-shcc/:shcc', app.permission.check('staff:login'), (req, res) => {
-        app.model.qtChucVu.getByShcc(req.params.shcc, (error, item) => {
-            if (item && item.rows.length > 0) res.send({ error, item: item.rows });
-        });
-    });
-
+/// Others APIs ----------------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/qua-trinh/chuc-vu/download-excel/:listShcc/:listDv/:fromYear/:toYear/:timeType/:listCv/:gioiTinh', app.permission.check('qtChucVu:read'), (req, res) => {
         let { listDv, fromYear, toYear, listShcc, timeType, listCv, gioiTinh } = req.params ? req.params : { fromYear: null, toYear: null, listShcc: null, listDv: null, timeType: 0, listCv: null, gioiTinh: null };
         if (listShcc == 'null') listShcc = null;
@@ -230,7 +176,8 @@ module.exports = app => {
                             cells.push({ cell: String.fromCharCode(65 + col + 2) + (index + 2), border: '1234', value: '' });
                             cells.push({ cell: String.fromCharCode(65 + col + 3) + (index + 2), border: '1234', value: '' });
                             cells.push({ cell: String.fromCharCode(65 + col + 4) + (index + 2), border: '1234', value: '' });
-                            col += 5;
+                            cells.push({ cell: String.fromCharCode(65 + col + 5) + (index + 2), border: '1234', value: '' });
+                            col += 6;
                         }
                     });
                     resolve(cells);
@@ -245,3 +192,5 @@ module.exports = app => {
 
     });
 };
+
+/// End Others APIs -------------------------------------------------------------------------------------------------------------------------------

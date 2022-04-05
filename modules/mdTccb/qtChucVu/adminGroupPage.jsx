@@ -177,10 +177,10 @@ class QtChucVuGroup extends AdminPage {
         const timeType = this.timeType?.value() || 0;
         const fromYear = this.fromYear?.value() == '' ? null : this.fromYear?.value().getTime();
         const toYear = this.toYear?.value() == '' ? null : this.toYear?.value().getTime();
-        const listDv = this.state.filter.listDv;
+        const listDonVi = this.state.filter.listDv;
         const listShcc = this.state.filter.listShcc;
-        const listCv = this.mulMaChucVu?.value().toString() || '';
-        const pageFilter = isInitial ? null : { listDv, fromYear, toYear, listShcc, timeType, listCv };
+        const listChucVu = this.mulMaChucVu?.value().toString() || '';
+        const pageFilter = isInitial ? null : { listDonVi, fromYear, toYear, listShcc, timeType, listChucVu };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
@@ -189,8 +189,8 @@ class QtChucVuGroup extends AdminPage {
                     this.fromYear?.value(filter.fromYear || '');
                     this.toYear?.value(filter.toYear || '');
                     this.timeType?.value(filter.timeType);
-                    this.mulMaChucVu?.value(filter.listCv);
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.timeType || filter.listCv)) this.showAdvanceSearch();
+                    this.mulMaChucVu?.value(filter.listChucVu);
+                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.timeType || filter.listChucVu)) this.showAdvanceSearch();
                 }
             });
         });
@@ -277,10 +277,10 @@ class QtChucVuGroup extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    <FormSelect className='col-12 col-md-6' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect className='col-12 col-md-4' ref={e => this.timeType = e} label='Chọn loại thời gian' data={timeList} onChange={() => this.changeAdvancedSearch()} />
                     {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />}
                     {this.timeType && this.timeType.value() && this.timeType.value() != 0 && <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />}
-                    <FormSelect className='col-md-6' multiple={true} ref={e => this.mulMaChucVu = e} label='Chức vụ' data={SelectAdapter_DmChucVuV2} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-md-12' multiple={true} ref={e => this.mulMaChucVu = e} label='Chức vụ' data={SelectAdapter_DmChucVuV2} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
                 </div>
             </>,
             content: <>
