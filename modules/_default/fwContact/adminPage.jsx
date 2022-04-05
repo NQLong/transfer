@@ -91,7 +91,7 @@ class ContactPage extends React.Component {
                     <h1><i className='fa fa fa-envelope-o' /> Liên hệ</h1>
                 </div>
                 <div className='tile'>{table}
-                    <Pagination name='pageContact' pageNumber={pageNumber} pageSize={pageSize} pageTotal={pageTotal} totalItem={totalItem}
+                    <Pagination name='pageContact' {...{ pageNumber, pageSize, pageTotal, totalItem }}
                         getPage={this.props.getContactPage} />
                     <AdminContactModal ref={this.modal} />
                 </div>

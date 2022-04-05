@@ -91,7 +91,7 @@ class FileModal extends React.Component {
 }
 
 class StoragePage extends React.Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.fileModal = React.createRef();
     }
@@ -205,7 +205,7 @@ class StoragePage extends React.Component {
                 </div>
                 <div className='row tile'>{table}</div>
                 <Pagination name='pageFwStorage'
-                    pageNumber={pageNumber} pageSize={pageSize} pageTotal={pageTotal} totalItem={totalItem} getPage={this.props.getFwStoragePage} />
+                    pageNumber={pageNumber} {...{ pageNumber, pageSize, pageTotal, totalItem }} getPage={this.props.getFwStoragePage} />
                 <button type='button' className='btn btn-primary btn-circle' style={{ position: 'fixed', right: '10px', bottom: '10px' }} onClick={this.show}>
                     <i className='fa fa-lg fa-plus' />
                 </button>

@@ -22,7 +22,7 @@ module.exports = app => {
     app.get('/user/sang-kien', app.permission.check('staff:login'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    
+
     // End APIS -------------------------------------------------------------------------------------------------------------------------------------
 
     // TCCB APIs ------------------------------------------------------------------------------------------------------------------------------------
@@ -100,7 +100,7 @@ module.exports = app => {
         }
     });
 
-    app.get('/api/user/qua-trinh/sang-kien/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/tccb/qua-trinh/sang-kien/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '',

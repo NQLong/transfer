@@ -66,7 +66,7 @@ class EditModal extends AdminModal {
                 <FormSelect className='col-md-12' ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={this.state.id ? true : false} required />
                 <FormTextBox className='col-md-6' ref={e => this.maSo = e} label='Mã số sáng kiến' readOnly={readOnly} required />
                 <FormTextBox className='col-md-6' ref={e => this.soQuyetDinh = e} label='Số quyết định' readOnly={readOnly} required />
-                <FormRichTextBox className='col-md-12' ref={e => this.tenSangKien = e} label='Tên sáng kiến' readOnly={readOnly} required /> 
+                <FormRichTextBox className='col-md-12' ref={e => this.tenSangKien = e} label='Tên sáng kiến' readOnly={readOnly} required />
             </div>
         });
     }

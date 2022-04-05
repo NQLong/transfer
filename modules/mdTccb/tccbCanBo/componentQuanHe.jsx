@@ -14,8 +14,8 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        let { id, hoTen, moiQuanHe, namSinh, ngheNghiep, noiCongTac, diaChi, queQuan, loai } = item && item.item ? item.item : { id: null, hoTen: '', moiQuanHe: '', namSinh: '', ngheNghiep: '', noiCongTac: '', diaChi: '', queQuan: '', loai: -1 };
-        this.setState({ item, email: item.email, id, loai, shcc: item.shcc }, () => {
+        let { id, hoTen, moiQuanHe, namSinh, ngheNghiep, noiCongTac, diaChi, queQuan } = item && item.item ? item.item : { id: null, hoTen: '', moiQuanHe: '', namSinh: '', ngheNghiep: '', noiCongTac: '', diaChi: '', queQuan: '' };
+        this.setState({ item, email: item.email, id, loai: item.loai, shcc: item.shcc }, () => {
             this.hoTen.value(hoTen ? hoTen : '');
             this.moiQuanHe.value(moiQuanHe ? moiQuanHe : null);
             this.namSinh.value(namSinh ? namSinh : '');
@@ -124,7 +124,7 @@ class ComponentQuanHe extends AdminPage {
                     <TableCell type='text' content={item.tenMoiQuanHe} />
                     <TableCell type='text' content={item.ngheNghiep} />
                     <TableCell type='text' content={item.diaChi} />
-                    <TableCell type='buttons' content={item} permission={permission} permissionDelete={true}
+                    <TableCell type='buttons' content={item} permission={permission}
                         onEdit={e => this.editQuanHe(e, item, type)}
                         onDelete={e => this.deleteQuanHe(e, item)}></TableCell>
                 </tr>),
@@ -133,7 +133,8 @@ class ComponentQuanHe extends AdminPage {
 
     render() {
         const dataQuanHe = this.props.userEdit ? this.props.staff?.userItem?.items : this.props.staff?.selectedItem?.items;
-        const permission = {
+        let permission = this.getUserPermission('staff', ['login']);
+        if (permission.login) permission = {
             write: true,
             read: true,
             delete: true
@@ -141,24 +142,17 @@ class ComponentQuanHe extends AdminPage {
 
         let familyTabs = [
             {
-                title: 'Về gia đình',
-                component: <div style={{ marginTop: 8 }}>
-                    <p>Gồm {this.state.voChongText} và các con</p>
-                    {this.renderQuanHeTable(dataQuanHe ? dataQuanHe.filter(i => i.loai == 0) : [], 0, permission)}
-                </div>
-            },
-            {
                 title: 'Về bản thân',
                 component: <div style={{ marginTop: 8 }}>
-                    <p>Gồm người thân ruột, huyết thống</p>
-                    {this.renderQuanHeTable(dataQuanHe ? dataQuanHe.filter(i => i.loai == 1) : [], 1, permission)}
+                    <p>Gồm người thân ruột, huyết thống của mình, {this.state.voChongText} và các con</p>
+                    {this.renderQuanHeTable(dataQuanHe ? dataQuanHe.filter(i => !i.loai) : [], 0, permission)}
                 </div>
             },
             {
                 title: 'Về bên ' + this.state.voChongText,
                 component: <div style={{ marginTop: 8 }}>
                     <p>Gồm người thân ruột, huyết thống của {this.state.voChongText}</p>
-                    {this.renderQuanHeTable(dataQuanHe ? dataQuanHe.filter(i => i.type == 2) : [], 2, permission)}
+                    {this.renderQuanHeTable(dataQuanHe ? dataQuanHe.filter(i => i.loai) : [], 1, permission)}
                 </div>
             },
         ];
@@ -167,9 +161,9 @@ class ComponentQuanHe extends AdminPage {
             <div className='tile'>
                 <FormTabs ref={e => this.tab = e} tabClassName='col-md-12' tabs={familyTabs} />
                 <div className='tile-footer' style={{ textAlign: 'right' }}>
-                    <button className='btn btn-info' type='button' onClick={e => this.createRelation(e)}>
+                    {permission.write && <button className='btn btn-info' type='button' onClick={e => this.createRelation(e, this.tab.selectedTabIndex())}>
                         <i className='fa fa-fw fa-lg fa-plus' />Thêm thông tin người thân
-                    </button>
+                    </button>}
                 </div>
                 <EditModal ref={e => this.modal = e}
                     create={this.props.userEdit ? this.props.createQuanHeStaffUser : this.props.createQuanHeCanBo}

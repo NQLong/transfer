@@ -8307,6 +8307,9 @@
             "active": true,
             "moduleName": "hcthChiDao",
             "modelName": "hcthChiDao",
+            "methods": {
+                "HCTH_CHI_DAO_GET_CONG_VAN_CHI_DAO": "getCongVanChiDao"
+            },
             "columns": {
                 "ID": {
                     "value": "id",
@@ -11271,6 +11274,60 @@
             "foreignKeys": [],
             "type": "table"
         },
+        "HCTH_PHAN_HOI": {
+            "active": true,
+            "moduleName": "hcthPhanHoi",
+            "modelName": "hcthPhanHoi",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_105419\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "NOI_DUNG": {
+                    "value": "noiDung",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 255
+                },
+                "CAN_BO_GUI": {
+                    "value": "canBoGui",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 28
+                },
+                "CAN_BO_NHAN": {
+                    "value": "canBoNhan",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 28
+                },
+                "MA_NHIEM_VU": {
+                    "value": "maNhiemVu",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "20,0"
+                },
+                "NGAY_TAO": {
+                    "value": "ngayTao",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "20,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
         "DN_LOAI_DOANH_NGHIEP": {
             "active": true,
             "moduleName": "ttDoanhNghiep",
@@ -11760,6 +11817,46 @@
             },
             "primaryKeys": [
                 "MA"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "TCCB_STAFF_LOG": {
+            "active": true,
+            "moduleName": "tccbStaffLog",
+            "modelName": "tccbStaffLog",
+            "columns": {
+                "EMAIL": {
+                    "value": "email",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 100
+                },
+                "THAO_TAC": {
+                    "value": "thaoTac",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
+                },
+                "QUA_TRINH": {
+                    "value": "quaTrinh",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
+                },
+                "NGAY": {
+                    "value": "ngay",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                }
+            },
+            "primaryKeys": [
+                "EMAIL"
             ],
             "foreignKeys": [],
             "type": "table"
