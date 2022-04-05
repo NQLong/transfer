@@ -164,6 +164,6 @@ export const SelectAdapter_DmKhenThuongKyHieuV2 = {
     data: params => ({ condition: params.term }),
     url: '/api/danh-muc/khen-thuong-ky-hieu/page/1/20',
     getOne: getDmKhenThuongKyHieu,
-    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.ten })) : [] }),
+    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.ten })) : [] }), 
     fetchOne: (ma, done) => (getDmKhenThuongKyHieu(ma, item => done && done({ id: item.ma, text: item.ten })))(),
 };

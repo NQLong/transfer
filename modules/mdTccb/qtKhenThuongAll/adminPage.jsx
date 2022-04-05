@@ -146,17 +146,19 @@ class QtKhenThuongAll extends AdminPage {
             });
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
-                this.fromYear.value('');
-                this.toYear.value('');
-                this.loaiDoiTuong.value('');
-                this.maDonVi?.value('');
-                this.mulCanBo?.value('');
+                let filterCookie = T.getCookiePage('pageQtKhenThuongAll', 'F'),
+                    { fromYear = '', toYear = '', loaiDoiTuong = '-1', listDv = '', listShcc = '', listThanhTich = '' } = filterCookie;
+                this.fromYear.value(fromYear);
+                this.toYear.value(toYear);
+                this.loaiDoiTuong.value(loaiDoiTuong);
+                this.maDonVi?.value(listDv);
+                this.mulCanBo?.value(listShcc);
+                this.listThanhTich.value(listThanhTich);
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
             if (this.checked) {
                 this.hienThiTheoDoiTuong.value(true);
             }
-            this.getPage();
             this.changeAdvancedSearch(true);
         });
     }
@@ -166,17 +168,20 @@ class QtKhenThuongAll extends AdminPage {
         this.modal.show();
     }
 
-    changeAdvancedSearch = (isInitial = false) => {
-        let { pageNumber, pageSize } = this.props && this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.page ? this.props.qtKhenThuongAll.page : { pageNumber: 1, pageSize: 50 };
+    changeAdvancedSearch = (isInitial = false, isReset = false) => {
+        let { pageNumber, pageSize, pageCondition } = this.props && this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.page ? this.props.qtKhenThuongAll.page : { pageNumber: 1, pageSize: 50, pageCondition: {}};
+
+        if (pageCondition && (typeof pageCondition == 'string')) T.setTextSearchBox(pageCondition);
+
         const fromYear = this.fromYear.value() == '' ? null : Number(this.fromYear.value());
         const toYear = this.toYear.value() == '' ? null : Number(this.toYear.value());
         const loaiDoiTuong = this.loaiDoiTuong.value() || '-1';
         const listDv = loaiDoiTuong == '02' ? (this.maDonVi?.value().toString() || '') : '';
         const listShcc = loaiDoiTuong == '02' ? (this.mulCanBo?.value().toString() || '') : '';
         const listThanhTich = this.listThanhTich.value().toString() || '';
-        const pageFilter = isInitial ? null : { fromYear, toYear, loaiDoiTuong, listDv, listShcc, listThanhTich };
+        const pageFilter = isInitial ? null : (isReset ? { loaiDoiTuong: '-1' } : { fromYear, toYear, loaiDoiTuong, listDv, listShcc, listThanhTich });
         this.setState({ filter: pageFilter }, () => {
-            this.getPage(pageNumber, pageSize, '', (page) => {
+            this.getPage(pageNumber, pageSize, pageCondition, (page) => {
                 if (isInitial) {
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter }, () => {
@@ -188,6 +193,13 @@ class QtKhenThuongAll extends AdminPage {
                         this.listThanhTich.value(filter.listThanhTich);
                         if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.loaiDoiTuong || filter.listDv || filter.listShcc || filter.listThanhTich)) this.showAdvanceSearch();
                     });
+                } else if (isReset) {
+                    this.fromYear.value('');
+                    this.toYear.value('');
+                    this.loaiDoiTuong.value('-1');
+                    this.maDonVi?.value('');
+                    this.mulCanBo?.value('');
+                    this.listThanhTich.value('');
                 }
             });
         });
@@ -313,14 +325,22 @@ class QtKhenThuongAll extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    <FormTextBox className='col-md-4' ref={e => this.fromYear = e} label='Từ năm đạt được (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
-                    <FormTextBox className='col-md-4' ref={e => this.toYear = e} label='Đến năm đạt được (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
+                    <FormTextBox className='col-md-4' ref={e => this.fromYear = e} label='Từ năm đạt được (yyyy)' type='year' />
+                    <FormTextBox className='col-md-4' ref={e => this.toYear = e} label='Đến năm đạt được (yyyy)' type='year' />
                     {(this.loaiDoiTuong && this.loaiDoiTuong.value() == '02') &&
                     <>
-                        <FormSelect className='col-12 col-md-6' multiple ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear minimumResultsForSearch={-1} />
-                        <FormSelect className='col-12 col-md-6' multiple ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear minimumResultsForSearch={-1} />
+                        <FormSelect className='col-12 col-md-6' multiple ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} allowClear minimumResultsForSearch={-1} />
+                        <FormSelect className='col-12 col-md-6' multiple ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} allowClear minimumResultsForSearch={-1} />
                     </>}
-                    <FormSelect className='col-12 col-md-6' multiple ref={e => this.listThanhTich = e} label='Thành tích' data={SelectAdapter_DmKhenThuongKyHieuV2} onChange={() => this.changeAdvancedSearch()} allowClear minimumResultsForSearch={-1} />
+                    <FormSelect className='col-12 col-md-6' multiple ref={e => this.listThanhTich = e} label='Thành tích' data={SelectAdapter_DmKhenThuongKyHieuV2} allowClear minimumResultsForSearch={-1} />
+                    <div className='form-group col-12' style={{ justifyContent: 'end', display: 'flex' }}>
+                        <button className='btn btn-danger' style={{ marginRight: '10px' }} type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch(null, true)}>
+                            <i className='fa fa-fw fa-lg fa-times' />Xóa bộ lọc
+                        </button>
+                        <button className='btn btn-info' type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch()}>
+                            <i className='fa fa-fw fa-lg fa-search-plus' />Tìm kiếm
+                        </button>
+                    </div>
                 </div>
             </>,
             content: <>

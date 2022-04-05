@@ -27,10 +27,10 @@ class EditModal extends AdminModal {
         });
     }
 
-    onShow = (index, item) => {
-        let { loaiDoiTuong, ma, namDatDuoc, thanhTich, chuThich, diemThiDua, soQuyetDinh } = item ? item : {
+    onShow = (item) => {
+        let { loaiDoiTuong, ma, namDatDuoc, thanhTich, chuThich, diemThiDua, soQuyetDinh } = item ? item.item : {
             loaiDoiTuong: '', ma: '', namDatDuoc: '', thanhTich: '', chuThich: '', diemThiDua: '', soQuyetDinh: ''
-        };
+        }, index = item.index;
 
         this.setState({ doiTuong: loaiDoiTuong, index });
 
@@ -56,6 +56,7 @@ class EditModal extends AdminModal {
         if (this.loaiDoiTuong.value() == '04') ma = this.maBoMon.value();
 
         const changes = {
+            tenThanhTich: this.thanhTich.data().text,
             loaiDoiTuong: this.loaiDoiTuong.value(),
             ma: ma,
             namDatDuoc: this.namDatDuoc.value(),
@@ -121,30 +122,36 @@ class QtKhenThuongAllImportPage extends AdminPage {
     onSuccess = (response) => {
         this.setState({
             qtKhenThuongAll: response.items,
-            message: <p className='text-center' style={{ color: 'green' }}>{response.items.length} hàng được tải lên thành công</p>,
+            message: `${response.items.length} hàng được tải lên thành công`,
             isDisplay: false,
             displayState: 'data'
-        });
+        }, () => T.notify(this.state.message, 'success'));
     };
 
     showEdit = (e, index, item) => {
         e.preventDefault();
-        this.modal.show(index, item);
+        this.modal.show({index, item});
     };
 
     update = (index, changes, done) => {
         const qtKhenThuongAll = this.state.qtKhenThuongAll, currentValue = qtKhenThuongAll[index];
         const updateValue = Object.assign({}, currentValue, changes);
         qtKhenThuongAll.splice(index, 1, updateValue);
-        this.setState({ qtKhenThuongAll });
+        this.setState({ qtKhenThuongAll }
+        , () => T.notify('Cập nhật dữ liệu thành công', 'success'));
         done && done();
     };
 
     delete = (e, index) => {
         e.preventDefault();
-        const qtKhenThuongAll = this.state.qtKhenThuongAll;
-        qtKhenThuongAll.splice(index, 1);
-        this.setState({ qtKhenThuongAll });
+        T.confirm('Xóa dữ liệu', 'Bạn có muốn xóa dữ liệu khen thưởng này không?', 'warning', true, isConfirm => {
+            if (isConfirm) {
+                const qtKhenThuongAll = this.state.qtKhenThuongAll;
+                qtKhenThuongAll.splice(index, 1);
+                this.setState({ qtKhenThuongAll },
+                () => T.notify('Xóa dữ liệu thành công', 'success'));
+            }
+        });
     };
 
     save = (e) => {
@@ -176,7 +183,7 @@ class QtKhenThuongAllImportPage extends AdminPage {
         let table = 'Không có dữ liệu!';
         if (qtKhenThuongAll && qtKhenThuongAll.length > 0) {
             table = renderTable({
-                getDataSource: () => qtKhenThuongAll, stickyHead: false,
+                getDataSource: () => qtKhenThuongAll, stickyHead: true,
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
@@ -193,7 +200,7 @@ class QtKhenThuongAllImportPage extends AdminPage {
                     <tr key={index}>
                         <TableCell type='number' content={index + 1} />
                         <TableCell type='text' content={item.tenLoaiDoiTuong} />
-                        <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
+                        <TableCell type='link' onClick={() => this.modal.show({ index, item })} style={{ whiteSpace: 'nowrap' }} content={(
                             item.loaiDoiTuong == '02' ?
                                 <>
                                     <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
@@ -202,7 +209,7 @@ class QtKhenThuongAllImportPage extends AdminPage {
                                 : item.loaiDoiTuong == '04' ? item.tenBoMon : ''
 
                         )} />
-                        <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
+                        <TableCell type='link' onClick={() => this.modal.show({ index, item })} style={{ whiteSpace: 'nowrap' }} content={(
                             item.loaiDoiTuong == '01' ? 'Trường Đại học Khoa học Xã hội và Nhân Văn, TP. HCM'
                                 : item.loaiDoiTuong == '02' ? item.tenDonViCanBo
                                     : item.loaiDoiTuong == '03' ? item.tenDonVi
@@ -212,7 +219,7 @@ class QtKhenThuongAllImportPage extends AdminPage {
                         <TableCell type='text' content={(item.tenThanhTich)} />
                         <TableCell type='text' style={{ textAlign: 'center' }} content={(item.soQuyetDinh || '')} />
                         <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemThiDua} />
-                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={{ ...item, index: index }} permission={permission} onEdit={() => this.modal.show({ index: index, ...item,})} onDelete={(e) => this.delete(e, index)} />
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onEdit={() => this.modal.show({ index, item })} onDelete={(e) => this.delete(e, index)} />
                     </tr>)
             });
         }
@@ -222,22 +229,28 @@ class QtKhenThuongAllImportPage extends AdminPage {
             title: 'Import Khen thưởng',
             breadcrumb: [<Link key={0} to='/user/tccb/qua-trinh/khen-thuong-all'>Quá trình khen thưởng</Link>, 'Import'],
             content: <>
-                <FileBox postUrl='/user/upload' uploadType='KhenThuongAllDataFile' userData={'KhenThuongAllDataFile'} className='tile' 
-                    accept='.csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'
-                    style={{ width: '50%', margin: '0 auto', display: displayState == 'import' ? 'block' : 'none' }}
-                    ajax={true} success={this.onSuccess} error={this.onError} />
+                <div className='tile rows' style={{ textAlign: 'right',  display: displayState == 'import' ? 'block' : 'none'}}>
+                    <FileBox postUrl='/user/upload' uploadType='KhenThuongAllDataFile' userData={'KhenThuongAllDataFile'} 
+                            accept='.csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'
+                            style={{ width: '80%', margin: '0 auto' }}
+                            ajax={true} success={this.onSuccess} error={this.onError} />
+                        <button className='btn btn-warning' type='button' onClick={e => e.preventDefault() || T.download('/api/qua-trinh/khen-thuong-all/download-template')}>
+                            <i className='fa fa-fw fa-lg fa-arrow-circle-down' />Tải file mẫu tại đây
+                        </button>
+                </div>
+
                 <div className='tile' style={{ display: displayState == 'import' ? 'none' : 'block' }}>{table}</div>
                 <EditModal ref={e => this.modal = e} permission={permission} readOnly={!permission.write} update={this.update} getLoaiDoiTuong={this.props.getDmKhenThuongLoaiDoiTuongAll} />
             </>,
             onSave: displayState == 'data' ? (e) => this.save(e) : null,
-            onImport: displayState == 'data' ? () => this.setState({ displayState: 'import', items: null }) : null,
-            onExport: displayState == 'import' ? () => T.download('/api/qua-trinh/khen-thuong-all/download-template') : null,
+            onReload: displayState == 'data' ? () => this.setState({ displayState: 'import', items: null }) : null,
+            // onExport: displayState == 'import' ? () => T.download('/api/qua-trinh/khen-thuong-all/download-template') : null,
             backRoute: '/user/tccb/qua-trinh/khen-thuong-all',
         });
     }
 }
 
-const mapStateToProps = () => ({});
+const mapStateToProps = (state) => ({ system: state.system });
 const mapActionsToProps = {
     getDmKhenThuongLoaiDoiTuongAll, createMultiQtKhenThuongAll
 };

@@ -432,7 +432,7 @@ module.exports = app => {
         const ws = workBook.addWorksheet('Khen_thuong_Template');
         const defaultColumns = [
             { header: 'SỐ QUYẾT ĐỊNH', key: 'soQuyetDinh', width: 15 },
-            { header: 'LOẠI ĐỐI TƯỢNG', key: 'loaiDoiTuong', width: 10 },
+            { header: 'LOẠI ĐỐI TƯỢNG', key: 'loaiDoiTuong', width: 15 },
             { header: 'CÁN BỘ', key: 'canBo', width: 10 },
             { header: 'ĐƠN VỊ', key: 'donVi', width: 10 },
             { header: 'BỘ MÔN', key: 'boMon', width: 10 },
