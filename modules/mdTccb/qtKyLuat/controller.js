@@ -145,9 +145,9 @@ module.exports = app => {
         app.model.qtKyLuat.delete({ id: req.body.id }, (error) => res.send(error)));
 
     app.get('/api/qua-trinh/ky-luat/download-excel/:filter', app.permission.check('qtKyLuat:read'), (req, res) => {
-        app.model.qtKyLuat.download(req.params.filter, (err, result) => {
-            if (err || !result) {
-                res.send({ err });
+        app.model.qtKyLuat.download(req.params.filter, (error, result) => {
+            if (error || !result) {
+                res.send({ error });
             } else {
                 const workbook = app.excel.create(),
                     worksheet = workbook.addWorksheet('kyluat');

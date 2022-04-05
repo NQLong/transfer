@@ -136,7 +136,7 @@ class QtKyLuat extends AdminPage {
         if (pageCondition && (typeof pageCondition == 'string')) T.setTextSearchBox(pageCondition);
 
         const fromYear = this.fromYear.value() == '' ? null : this.fromYear.value().getTime();
-        const toYear = this.toYear.value() == '' ? null : this.toYear.value().getTime();
+        const toYear = this.toYear.value() == '' ? null : this.toYear.value().getTime() + 43200000;
         const listDv = this.maDonVi.value().toString() || '';
         const listShcc = this.mulCanBo.value().toString() || '';
         const listHinhThucKyLuat = this.hinhThucKyLuat.value().toString() || '';
@@ -282,8 +282,8 @@ class QtKyLuat extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-2' label='Từ thời gian'  />
-                    <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-2' label='Đến thời gian'  />
+                    <FormDatePicker type='date-mask' ref={e => this.fromYear = e} className='col-12 col-md-3' label='Từ thời gian'  />
+                    <FormDatePicker type='date-mask' ref={e => this.toYear = e} className='col-12 col-md-3' label='Đến thời gian'  />
                     <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi}  allowClear={true} minimumResultsForSearch={-1} />
                     <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo}  allowClear={true} minimumResultsForSearch={-1} />
                     <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.hinhThucKyLuat = e} label='Hình thức kỷ luật' data={SelectAdapter_DmKyLuatV2}  allowClear={true} minimumResultsForSearch={-1} />
@@ -299,9 +299,9 @@ class QtKyLuat extends AdminPage {
             </>,
             content: <>
                 {!this.checked && <div className='tile'>
-                    <div className='tile-title'>
+                    <h3 className='tile-title'>
                         Thống kê
-                    </div>
+                    </h3>
                     <b>{'Số lượng: ' + totalItem.toString()}</b>
                 </div>}
                 <div className='tile'>

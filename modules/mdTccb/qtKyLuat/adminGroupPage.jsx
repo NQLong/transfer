@@ -109,7 +109,7 @@ class QtKyLuatGroupPage extends AdminPage {
         if (pageCondition && (typeof pageCondition == 'string')) T.setTextSearchBox(pageCondition);
 
         const fromYear = this.fromYear.value() == '' ? null : this.fromYear.value().getTime();
-        const toYear = this.toYear.value() == '' ? null : this.toYear.value().getTime();
+        const toYear = this.toYear.value() == '' ? null : this.toYear.value().getTime() + 43200000;
         const listDv = this.state.filter.listDv;
         const listShcc = this.state.filter.listShcc;
         const listHinhThucKyLuat = this.hinhThucKyLuat.value().toString() || '';
@@ -214,9 +214,9 @@ class QtKyLuatGroupPage extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian' />
-                    <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' />
-                    <FormSelect className='col-12 col-md-4' multiple={true} ref={e => this.hinhThucKyLuat = e} label='Hình thức kỷ luật' data={SelectAdapter_DmKyLuatV2} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormDatePicker type='date-mask' ref={e => this.fromYear = e} className='col-12 col-md-3' label='Từ thời gian' />
+                    <FormDatePicker type='date-mask' ref={e => this.toYear = e} className='col-12 col-md-3' label='Đến thời gian' />
+                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.hinhThucKyLuat = e} label='Hình thức kỷ luật' data={SelectAdapter_DmKyLuatV2} allowClear={true} minimumResultsForSearch={-1} />
                     <div className='form-group col-12' style={{ justifyContent: 'end', display: 'flex' }}>
                         <button className='btn btn-danger' style={{ marginRight: '10px' }} type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch(null, true)}>
                             <i className='fa fa-fw fa-lg fa-times' />Xóa bộ lọc
@@ -229,9 +229,9 @@ class QtKyLuatGroupPage extends AdminPage {
             </>,
             content: <>
                 <div className='tile'>
-                    <div className='tile-title'>
+                    <h3 className='tile-title'>
                         Thống kê
-                    </div>
+                    </h3>
                     <b>{'Số lượng: ' + totalItem.toString()}</b>
                 </div>
                 <div className='tile'>
