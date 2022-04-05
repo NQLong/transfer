@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.hcth,
         menus: {
-            531: { title: 'Công văn đi của các đơn vị', link: '/user/hcth/cong-van-di', icon: 'fa-caret-square-o-right', backgroundColor: '#0B86AA' },
+            531: { title: 'Công văn giữa các phòng', link: '/user/hcth/cong-van-di', icon: 'fa-caret-square-o-right', backgroundColor: '#0B86AA' },
         },
     };
     app.permission.add(
@@ -107,7 +107,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         let condition = { statement: null };
-        const statement = ['noiDung']
+        const statement = ['noiDung', 'donViGui']
             .map(i => `lower(${i}) LIKE :searchText`).join(' OR ');
         if (req.query.condition) {
             condition = {

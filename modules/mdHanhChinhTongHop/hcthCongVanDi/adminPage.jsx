@@ -27,6 +27,7 @@ export class HcthCongVanDi extends AdminPage {
             T.clearSearchBox();
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
+                // this.donViGui?.value('');
                 this.maDonViGui?.value('');
                 this.maDonViNhan?.value('');
                 this.maCanBoNhan?.value('');
@@ -79,12 +80,11 @@ export class HcthCongVanDi extends AdminPage {
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle'}}>#</th>
-                    <th style={{ width: '100%', verticalAlign: 'middle' }}>Nội dung</th>
+                    <th style={{ width: '100%', verticalAlign: 'middle' }}>Trích yếu</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Thời gian</th>
                     <th style={{ width: 'auto' }}>
                         {/* <div className="row"> */}
                             Đơn vị gửi 
-                            {/* <FormSelect allowClear={true} className='col-md-12' label='Đơn vị gửi' ref={e => this.donViGui = e} data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} /> */}
                         {/* </div> */}
                         </th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Đơn vị, nguời nhận</th>
@@ -152,22 +152,29 @@ export class HcthCongVanDi extends AdminPage {
         });
 
         return this.renderPage({
+            // header:
+            //     <div style={{width: '200px'}}>
+            //         <FormSelect allowClear={true} ref={e => this.donViGui = e} data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />
+            //     </div>,
             icon: 'fa fa-caret-square-o-left',
-            title: 'Công văn đi của các đơn vị',
+            title: 'Công văn giữa các phòng',
             breadcrumb: [
                 <Link key={0} to='/user/hcth'>Hành chính tổng hơp</Link>,
-                'Công văn đi của các đơn vị'
+                'Công văn giữa các phòng'
             ],
             onCreate: permission && permission.write ? () => this.props.history.push('/user/hcth/cong-van-di/new') : null,
             content: <>
-                <div className="tile">{table}</div>
+                <div className="tile">
+                    <FormSelect allowClear={true} ref={e => this.donViGui = e} label="Đơn vị gửi" data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />
+                    {table}
+                </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
             </>,
             backRoute: '/user/hcth',
             advanceSearch: <>
                 <div className="row">
-                    <FormSelect allowClear={true} className='col-md-4' ref={e => this.donViGui = e} label='Đơn vị gửi' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />
+                    {/* <FormSelect allowClear={true} className='col-md-4' ref={e => this.donViGui = e} label='Đơn vị gửi' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} /> */}
                     <FormSelect allowClear={true} className='col-md-4' ref={e => this.donViNhan = e} label='Đơn vị nhận' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />
                     <FormSelect allowClear={true} className='col-md-4' ref={e => this.canBoNhan = e} label='Cán bộ nhận' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} />
                 </div>
