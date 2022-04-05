@@ -75,8 +75,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, listShcc, listDv, listHinhThucKyLuat } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, listHinhThucKyLuat: null };
-        app.model.qtKyLuat.searchPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, listHinhThucKyLuat, searchTerm, (error, page) => {
+        const { fromYear, toYear, listShcc, listDv } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null };
+        app.model.qtKyLuat.searchPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -92,8 +92,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, listShcc, listDv, listHinhThucKyLuat } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, listHinhThucKyLuat: null};
-        app.model.qtKyLuat.searchPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, listHinhThucKyLuat, searchTerm, (error, page) => {
+        const { fromYear, toYear, listShcc, listDv } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null };
+        app.model.qtKyLuat.searchPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -108,8 +108,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, listShcc, listDv, listHinhThucKyLuat } = (req.query.filter && req.query.filter != '%%%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, listHinhThucKyLuat: null };
-        app.model.qtKyLuat.groupPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, listHinhThucKyLuat, searchTerm, (error, page) => {
+        const { fromYear, toYear, listShcc, listDv } = (req.query.filter && req.query.filter != '%%%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null };
+        app.model.qtKyLuat.groupPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -144,14 +144,13 @@ module.exports = app => {
     app.delete('/api/tccb/qua-trinh/ky-luat', app.permission.check('staff:write'), (req, res) =>
         app.model.qtKyLuat.delete({ id: req.body.id }, (error) => res.send(error)));
 
-    app.get('/api/qua-trinh/ky-luat/download-excel/:listShcc/:listDv/:fromYear/:toYear/:listHinhThucKyLuat', app.permission.check('qtKyLuat:read'), (req, res) => {
-        let { listShcc, listDv, fromYear, toYear, listHinhThucKyLuat } = req.params ? req.params : { listShcc: null, listDv: null, toYear: null, listHinhThucKyLuat: null };
+    app.get('/api/qua-trinh/ky-luat/download-excel/:listShcc/:listDv/:fromYear/:toYear', app.permission.check('qtKyLuat:read'), (req, res) => {
+        let { listShcc, listDv, fromYear, toYear } = req.params ? req.params : { listShcc: null, listDv: null, toYear: null };
         if (listShcc == 'null') listShcc = null;
         if (listDv == 'null') listDv = null;
         if (fromYear == 'null') fromYear = null;
         if (toYear == 'null') toYear = null;
-        if (listHinhThucKyLuat == 'null') listHinhThucKyLuat = null;
-        app.model.qtKyLuat.download(listShcc, listDv, fromYear, toYear, listHinhThucKyLuat, (err, result) => {
+        app.model.qtKyLuat.download(listShcc, listDv, fromYear, toYear, (err, result) => {
             if (err || !result) {
                 res.send({ err });
             } else {
@@ -166,11 +165,12 @@ module.exports = app => {
                         { cell: 'E1', value: 'Tên', bold: true, border: '1234' },
                         { cell: 'F1', value: 'Chức vụ', bold: true, border: '1234' },
                         { cell: 'G1', value: 'Đơn vị', bold: true, border: '1234' },
-                        { cell: 'H1', value: 'Hình thức kỷ luật', bold: true, border: '1234' },
-                        { cell: 'I1', value: 'Nội dung', bold: true, border: '1234' },
-                        { cell: 'J1', value: 'Số quyết định', bold: true, border: '1234' },
-                        { cell: 'K1', value: 'Ngày ra quyết định', bold: true, border: '1234' },
-                        { cell: 'L1', value: 'Điểm thi đua', bold: true, border: '1234' },
+                        { cell: 'H1', value: 'Số quyết định', bold: true, border: '1234' },
+                        { cell: 'I1', value: 'Ngày ra quyết định', bold: true, border: '1234' },
+                        { cell: 'J1', value: 'Hình thức kỷ luật', bold: true, border: '1234' },
+                        { cell: 'K1', value: 'Cấp quyết định', bold: true, border: '1234' },
+                        { cell: 'L1', value: 'Nội dung', bold: true, border: '1234' },
+                        { cell: 'M1', value: 'Điểm thi đua', bold: true, border: '1234' },
                     ];
                     result.rows.forEach((item, index) => {
                         cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
@@ -180,11 +180,12 @@ module.exports = app => {
                         cells.push({ cell: 'E' + (index + 2), border: '1234', value: item.tenCanBo });
                         cells.push({ cell: 'F' + (index + 2), border: '1234', value: item.tenChucVu });
                         cells.push({ cell: 'G' + (index + 2), border: '1234', value: item.tenDonVi });
-                        cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.tenKyLuat });
-                        cells.push({ cell: 'I' + (index + 2), alignment: 'center', border: '1234', value: item.noiDung });
-                        cells.push({ cell: 'J' + (index + 2), border: '1234', value: item.soQuyetDinh });
-                        cells.push({ cell: 'K' + (index + 2), border: '1234', value: item.ngayRaQuyetDinh ? app.date.dateTimeFormat(new Date(item.ngayRaQuyetDinh), 'dd/mm/yyyy') : ''  });
-                        cells.push({ cell: 'L' + (index + 2), border: '1234', value: item.diemThiDua });
+                        cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.soQuyetDinh });
+                        cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.ngayRaQuyetDinh ? app.date.dateTimeFormat(new Date(item.ngayRaQuyetDinh), 'dd/mm/yyyy') : ''  });
+                        cells.push({ cell: 'J' + (index + 2), border: '1234', value: item.tenKyLuat });
+                        cells.push({ cell: 'K' + (index + 2), border: '1234', value: item.capQuyetDinh });
+                        cells.push({ cell: 'L' + (index + 2), alignment: 'center', border: '1234', value: item.noiDung });
+                        cells.push({ cell: 'M' + (index + 2), border: '1234', value: item.diemThiDua });
                     });
                     resolve(cells);
                 }).then((cells) => {
