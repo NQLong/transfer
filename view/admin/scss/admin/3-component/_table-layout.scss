@@ -1,0 +1,20 @@
+.multiple-lines {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 5; /* number of lines to show */
+  -webkit-box-orient: vertical;
+  width: 15rem; /* 3 x number of lines */
+}
+
+@for $i from 1 through 5 {
+  $width: 4rem * $i;
+  .multiple-lines-#{$i} {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: $i; /* number of lines to show */
+    -webkit-box-orient: vertical;
+    width: $width;
+  }
+}

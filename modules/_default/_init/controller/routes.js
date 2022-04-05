@@ -59,7 +59,7 @@ module.exports = app => {
                 if (app.isDebug) data.isDebug = true;
                 if (req.session.user) data.user = req.session.user;
                 const ready = () => {
-                    if (app.dbConnection && app.model && app.model.fwMenu && app.model.fwSubmenu) {
+                    if (app.database.oracle.connected && app.model && app.model.fwMenu && app.model.fwSubmenu) {
                         app.model.fwMenu.getAll({}, '*', 'priority', (error, menus) => {
                             if (menus) {
                                 data.menus = [];
@@ -91,18 +91,18 @@ module.exports = app => {
                                         delete data.user.menu['5100'];
                                     }
                                     if (data.user && data.user.permissions && data.user.permissions.includes('news:write')) {
-                                        delete data.user.menu['5000'].menus['5004'];
-                                        delete data.user.menu['5000'].menus['5005'];
-                                        delete data.user.menu['5000'].menus['5006'];
-                                        delete data.user.menu['5000'].menus['5008'];
+                                        delete data.user.menu['6000'].menus['6004'];
+                                        delete data.user.menu['6000'].menus['6005'];
+                                        delete data.user.menu['6000'].menus['6006'];
+                                        delete data.user.menu['6000'].menus['6008'];
 
                                     }
                                     // else if (data.user && data.user.permissions
                                     //     && data.user.permissions.includes('unit:write')
-                                    //     && !data.user.permissions.includes('news:write') && data.user.menu['5000']) {
-                                    //     delete data.user.menu['5000'].menus['5001'];
-                                    //     delete data.user.menu['5000'].menus['5002'];
-                                    //     delete data.user.menu['5000'].menus['5003'];
+                                    //     && !data.user.permissions.includes('news:write') && data.user.menu['6000']) {
+                                    //     delete data.user.menu['6000'].menus['6001'];
+                                    //     delete data.user.menu['6000'].menus['6002'];
+                                    //     delete data.user.menu['6000'].menus['6003'];
                                     // }
                                     if (data.user && data.user.permissions
                                         && data.user.permissions.includes('website:write')
@@ -180,10 +180,10 @@ module.exports = app => {
         let pathname = app.url.parse(req.headers.referer).pathname;
         if (pathname.length > 1 && pathname.endsWith('/')) pathname = pathname.substring(0, pathname.length - 1);
 
-        const promiseMenus = new Promise((resolve, reject) => app.redis.get(app.redis.menusKey, (error, menus) => {
+        const promiseMenus = new Promise((resolve, reject) => app.database.redis.get(app.database.redis.menusKey, (error, menus) => {
             error ? reject(error) : resolve(menus ? JSON.parse(menus) : {});
         }));
-        const promiseDivisionMenus = new Promise((resolve, reject) => app.redis.get(app.redis.divisionMenusKey, (error, divisionMenus) => {
+        const promiseDivisionMenus = new Promise((resolve, reject) => app.database.redis.get(app.database.redis.divisionMenusKey, (error, divisionMenus) => {
             error ? reject(error) : resolve(divisionMenus ? JSON.parse(divisionMenus) : {});
         }));
 
@@ -211,10 +211,10 @@ module.exports = app => {
 
                     if (menuType == 'common') {
                         menus[pathname] = menu;
-                        app.redis.set(app.redis.menusKey, JSON.stringify(menus));
+                        app.database.redis.set(app.database.redis.menusKey, JSON.stringify(menus));
                     } else {
                         divisionMenus[pathname] = menu;
-                        app.redis.set(app.redis.divisionMenusKey, JSON.stringify(divisionMenus));
+                        app.database.redis.set(app.database.redis.divisionMenusKey, JSON.stringify(divisionMenus));
                     }
 
                     res.send(menu.component);

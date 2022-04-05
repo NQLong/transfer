@@ -10,7 +10,7 @@ class NewsDetail extends React.Component {
 
   componentDidMount() {
     let url = window.location.pathname,
-      params = T.routeMatcher('/story/:link').parse(url);
+      params = T.routeMatcher('/megastory/:link').parse(url);
     this.setState({
       id: null,
       link: params.link,

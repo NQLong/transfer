@@ -42,7 +42,6 @@ export class ComponentPhiaCanBo extends React.Component {
     })
 
     setVal = (data = null) => {
-        console.log(data);
         if (data) {
             if (data.isTaoMoi)
                 this.setState({ isCanBoCu: true });

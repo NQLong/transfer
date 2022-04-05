@@ -1,10 +1,10 @@
+//TEMPLATES: admin|home|unit
 // eslint-disable-next-line no-unused-vars
 import React from 'react';
 import Loadable from 'react-loadable';
 import Loading from 'view/component/Loading';
-import nguoiLienHe from './reduxNguoiLienHe';
 import doanhNghiep from './reduxDoanhNghiep';
-// import SectionHexagonCompany from './SectionHexagonCompany';
+import SectionHexagonCompany from './SectionHexagonCompany';
 
 export default {
     // init: () => {
@@ -17,13 +17,13 @@ export default {
     // },
     redux: {
         parent: 'doiNgoai',
-        reducers: { nguoiLienHe, doanhNghiep },
+        reducers: { doanhNghiep },
     },
     routes: [
-        { path: '/user/ero/nguoi-lien-he', component: Loadable({ loading: Loading, loader: () => import('./adminNguoiLienHe') }) },
-        { path: '/user/ero/doanh-nghiep', component: Loadable({ loading: Loading, loader: () => import('./adminDoanhNghiep') }) },
-        { path: '/user/ero/doanh-nghiep/edit/:doanhNghiepId', component: Loadable({ loading: Loading, loader: () => import('./adminDoanhNghiepEditPage') }) },
-        { path: '/user/ero/dai-dien-doanh-nghiep', component: Loadable({ loading: Loading, loader: () => import('./adminDaiDienDoanhNghiepPage') }) },
+        { path: '/user/truyen-thong/doanh-nghiep', component: Loadable({ loading: Loading, loader: () => import('./adminDoanhNghiep') }) },
+        { path: '/user/truyen-thong/doanh-nghiep/edit/:doanhNghiepId', component: Loadable({ loading: Loading, loader: () => import('./adminDoanhNghiepEditPage') }) },
         { path: '/doanh-nghiep/:hiddenShortName', component: Loadable({ loading: Loading, loader: () => import('./PageCompany') }) },
-    ]
+    ], Section: {
+        SectionHexagonCompany
+    }
 };

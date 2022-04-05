@@ -138,13 +138,13 @@ module.exports = app => {
     };
 
     // Update user's session ------------------------------------------------------------------------------------------------------------------------
-    app.checkChucVu = (user, maDonVi, maChucVu) => {
-        if (user.roles && user.roles.some(item => item.name == 'admin')) {
-            return true;
+    app.initManager = (user, ...listChucVuTruong) => {
+        if (!(user && user.staff && user.staff.listChucVu && user.staff.listChucVu.length)) {
+            return [];
         } else {
-            const staffChucVus = user && user.staff && user.staff.chucVus ? user.staff.chucVus : [];
-            return staffChucVus.some(item => (maDonVi == '*' || item.maDonVi == maDonVi) && (maChucVu == '*' || item.maChucVu == maChucVu));
-        } 
+            const listChucVu = user.staff.listChucVu;
+            return listChucVu.filter(item => listChucVuTruong.includes(item.maChucVu)).map(item => app.clone(item, { isManager: true }));
+        }
     };
 
     const hasPermission = (userPermissions, menuPermissions) => {
@@ -186,15 +186,43 @@ module.exports = app => {
                             user.isStaff = 1;
                             item.phai == '02' && app.permissionHooks.pushUserPermission(user, 'staff:female');
                             user.shcc = item.shcc;
-                            user.staff = item;
+                            user.firstName = item.ten;
+                            user.lastName = item.ho;
+                            user.staff = {
+                                listChucVu: [],
+                                maDonVi: item.maDonVi,
+                            };
+                            const condition = {
+                                statement: 'shcc = :shcc AND (ngayRaQd < :today) AND (ngayRaQdThoiChucVu < :today)',
+                                parameter: {
+                                    shcc: item.shcc,
+                                    today: new Date().getTime()
+                                }
+                            };
                             app.permissionHooks.pushUserPermission(user, 'staff:login'); // Add staff permission: staff:login
-                            app.model.qtChucVu.getAll({shcc: user.shcc}, 'maChucVu,maDonVi', null, (e, chucVus) => {
-                                user.staff.chucVus = chucVus || [];
-                                app.permissionHooks.run('staff', user, user.staff).then(() => resolve());
+                            app.model.qtChucVu.getAll(condition, 'maChucVu,maDonVi', null, (e, listChucVu) => {
+                                user.staff.listChucVu = listChucVu || [];
+                                app.permissionHooks.run('staff', user, user.staff).then(() => {
+                                    resolve();
+                                });
                             });
                         }
                     });
                 }).then(() => new Promise(resolve => {
+                    //Check cán bộ đặc biệt
+                    if (user.isStaff) {
+                        if (user.staff.maDonVi == 68) {
+                            app.permissionHooks.pushUserPermission(user, 'rectors:login');
+                            if (user.staff.listChucVu.some(item => item.maChucVu == '001')) {
+                                app.permissionHooks.pushUserPermission(user, 'president:login');
+                                resolve();
+                            } else {
+                                app.permissionHooks.pushUserPermission(user, 'vice-president:login');
+                                resolve();
+                            }
+                        } else resolve();
+                    } else resolve();
+                })).then(() => new Promise(resolve => {
                     if (!user.isStaff && user.studentId) {
                         app.model.fwStudents.get({ mssv: user.studentId }, (error, student) => {
                             if (student) {
@@ -285,7 +313,7 @@ module.exports = app => {
 
     // Hook readyHooks ------------------------------------------------------------------------------------------------------------------------------
     app.readyHooks.add('permissionInit', {
-        ready: () => app.dbConnection != null && app.model != null && app.model.fwRole != null,
+        ready: () => app.database.oracle.connected && app.model.fwRole != null,
         run: () => app.isDebug && app.permission.getTreeMenuText(),
     });
 };

@@ -43,7 +43,6 @@ module.exports = app => {
     });
     app.get('/api/danh-muc/max-bac-luong/:idNgach', app.permission.check('user:login'), (req, res) => {
         const idNgach = req.params.idNgach;
-        console.log(idNgach);
         app.model.dmNgachLuong.getAll({ idNgach: idNgach }, '*', 'bac', (error, items) => {
             res.send({ error, item: items[items.length - 1] });
         });

@@ -18,22 +18,25 @@ class StaffPage extends AdminPage {
             T.clearSearchBox();
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
-                this.listDonVi.value('');
-                this.gender.value('');
-                this.listNgach.value('');
-                this.listHocVi.value('');
-                this.listChucDanh.value('');
-                this.isBienChe.value('');
+                let filterCookie = T.getCookiePage(PageName, 'F'),
+                    { listDonVi = '', gender = '', listNgach = '', listHocVi = '', listChucDanh = '', isBienChe = '' } = filterCookie;
+                this.listDonVi.value(listDonVi);
+                this.gender.value(gender);
+                this.listNgach.value(listNgach);
+                this.listHocVi.value(listHocVi);
+                this.listChucDanh.value(listChucDanh);
+                this.isBienChe.value(isBienChe);
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
-            this.getPage();
             this.changeAdvancedSearch(true);
         });
     }
 
-    changeAdvancedSearch = (isInitial = false) => {
+    changeAdvancedSearch = (isInitial = false, isReset = false) => {
         //listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe
-        let { pageNumber, pageSize } = this.props && this.props.staff && this.props.staff.page ? this.props.staff.page : { pageNumber: 1, pageSize: 50 };
+        let { pageNumber, pageSize, pageCondition } = this.props && this.props.staff && this.props.staff.page ? this.props.staff.page : { pageNumber: 1, pageSize: 50, pageCondition: {} };
+
+        if (pageCondition && (typeof pageCondition == 'string')) T.setTextSearchBox(pageCondition);
 
         const listDonVi = this.listDonVi.value().toString() || '',
             listChucDanh = this.listChucDanh.value().toString() || '',
@@ -42,15 +45,14 @@ class StaffPage extends AdminPage {
             listHocVi = this.listHocVi.value().toString() || '',
             isBienChe = this.isBienChe.value() == '' ? null : this.isBienChe.value();
         const pageFilter = isInitial ? null : { listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe };
-        this.setState({ filter: pageFilter }, () => {
-            this.getPage(pageNumber, pageSize, '', (page) => {
+        this.setState({ filter: isReset ? {} : pageFilter }, () => {
+            this.getPage(pageNumber, pageSize, pageCondition, (page) => {
                 if (isInitial) {
                     // Initial
                     const filter = page.filter || {};
-                    let { listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe } = filter ? filter : {
-                        listDonVi: '', gender: '', listNgach: '', listHocVi: '', listChucDanh: '', isBienChe: ''
-                    };
+                    let { listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe } = filter;
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
+
                     this.listDonVi.value(listDonVi);
                     this.gender.value(gender);
                     this.listNgach.value(listNgach);
@@ -58,7 +60,14 @@ class StaffPage extends AdminPage {
                     this.listChucDanh.value(listChucDanh);
                     this.isBienChe.value(isBienChe);
 
-                    if (!$.isEmptyObject(filter) && filter && ({ listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe })) this.showAdvanceSearch();
+                    if (!$.isEmptyObject(filter) && filter && listDonVi && gender && listNgach && listHocVi && listChucDanh && isBienChe) this.showAdvanceSearch();
+                } else if (isReset) {
+                    this.listDonVi.value('');
+                    this.gender.value('');
+                    this.listNgach.value('');
+                    this.listHocVi.value('');
+                    this.listChucDanh.value('');
+                    this.isBienChe.value('');
                 }
             });
         });
@@ -92,10 +101,16 @@ class StaffPage extends AdminPage {
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Phái</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày sinh</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị <br /> Học hàm</th>
+                    <th style={{ width: 'auto', textAlign: 'center' }}>Học vị <br /> Học hàm</th>
+                    <th style={{ width: 'auto', textAlign: 'center' }}>Chuyên ngành</th>
                     <th style={{ width: 'auto', textAlign: 'center' }}>Chức danh nghề nghiệp</th>
                     <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Đơn vị</th>
                     <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Email</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>CMND</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Hệ số lương</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Loại cán bộ</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tiến sĩ</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thạc sĩ</th>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                 </tr>),
             renderRow: (item, index) => (
@@ -110,7 +125,8 @@ class StaffPage extends AdminPage {
                     <TableCell type='text' content={<>
                         {item.hocVi && <span>{item.hocVi}<br /></span>}
                         {item.hocHam && item.hocHam}
-                    </>} style={{ whiteSpace: 'nowrap' }} />
+                    </>} style={{ whiteSpace: 'nowrap', textAlign: 'center' }} />
+                    <TableCell type='text' content={item.chuyenNganh} style={{ whiteSpace: 'nowrap' }} />
                     <TableCell type='text' content={item.ngach} style={{ whiteSpace: 'nowrap' }} />
                     <TableCell type='text' content={<>
                         {item.chucVuChinh && <span style={{ color: 'red' }}>{item.chucVuChinh}<br /></span>}
@@ -120,6 +136,15 @@ class StaffPage extends AdminPage {
                         <>
                             <span>{item.email}</span>
                         </>} />
+                    <TableCell type='text' content={item.cmnd} style={{ whiteSpace: 'nowrap', textAlign: 'center' }} />
+                    <TableCell type='number' content={item.heSoLuong?.toFixed(2)} style={{ whiteSpace: 'nowrap', textAlign: 'center' }} />
+                    <TableCell type='text' content={
+                        <>
+                            <span>{item.loaiCanBo}<br /></span>
+                            <small style={{ color: 'blue' }}>{item.ngayBienChe ? T.dateToText(item.ngayBienChe, 'dd/mm/yyyy') : ''}</small>
+                        </>} style={{ whiteSpace: 'nowrap', textAlign: 'center' }} />
+                    <TableCell type='text' content={item.tienSi ? (item.ngayCapNhatTienSi ? T.dateToText(item.ngayCapNhatTienSi, 'dd/mm/yyyy') : 'x') : ''} style={{ whiteSpace: 'nowrap', textAlign: 'center' }} />
+                    <TableCell type='text' content={item.thacSi ? (item.ngayCapNhatThacSi ? T.dateToText(item.ngayCapNhatThacSi, 'dd/mm/yyyy') : 'x') : ''} style={{ whiteSpace: 'nowrap', textAlign: 'center' }} />
                     <TableCell type='buttons' content={item} permission={permission} onEdit={`/user/tccb/staff/${item.shcc}`} onDelete={this.delete}></TableCell>
                 </tr>)
         });
@@ -133,17 +158,30 @@ class StaffPage extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    <FormSelect ref={e => this.listDonVi = e} className='col-md-6' label='Lọc theo đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} minimumResultsForSearch={-1} multiple={true} allowClear={true} />
-                    <FormSelect ref={e => this.gender = e} data={SelectAdapter_DmGioiTinhV2} label='Lọc theo giới tính' className='col-md-3' minimumResultsForSearch={-1} allowClear onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect ref={e => this.listDonVi = e} className='col-md-6' label='Lọc theo đơn vị' data={SelectAdapter_DmDonVi} minimumResultsForSearch={-1} multiple={true} allowClear={true} />
+                    <FormSelect ref={e => this.gender = e} data={SelectAdapter_DmGioiTinhV2} label='Lọc theo giới tính' className='col-md-3' minimumResultsForSearch={-1} allowClear />
                     <FormSelect ref={e => this.isBienChe = e} data={
                         [{ id: 0, text: 'Biên chế' }, { id: 1, text: 'Hợp đồng' }]
-                    } className='col-md-3' minimumResultsForSearch={-1} allowClear onChange={() => this.changeAdvancedSearch()} label='Lọc theo loại CB' />
-                    <FormSelect className='col-md-4' ref={e => this.listNgach = e} data={SelectAdapter_DmNgachCdnnV2} onChange={() => this.changeAdvancedSearch()} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo chức danh nghề nghiệp' />
-                    <FormSelect className='col-md-4' ref={e => this.listHocVi = e} data={SelectAdapter_DmTrinhDoV2} onChange={() => this.changeAdvancedSearch()} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo học vị' />
-                    <FormSelect className='col-md-4' ref={e => this.listChucDanh = e} data={SelectAdapter_DmChucDanhKhoaHoc} onChange={() => this.changeAdvancedSearch()} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo học hàm' />
+                    } className='col-md-3' minimumResultsForSearch={-1} allowClear label='Lọc theo loại CB' />
+                    <FormSelect className='col-md-4' ref={e => this.listNgach = e} data={SelectAdapter_DmNgachCdnnV2} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo chức danh nghề nghiệp' />
+                    <FormSelect className='col-md-4' ref={e => this.listHocVi = e} data={SelectAdapter_DmTrinhDoV2} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo học vị' />
+                    <FormSelect className='col-md-4' ref={e => this.listChucDanh = e} data={SelectAdapter_DmChucDanhKhoaHoc} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo học hàm' />
+                    <div className='form-group col-12' style={{ justifyContent: 'end', display: 'flex' }}>
+                        <button className='btn btn-danger' style={{ marginRight: '10px' }} type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch(null, true)}>
+                            <i className='fa fa-fw fa-lg fa-times' />Xóa bộ lọc
+                        </button>
+                        <button className='btn btn-info' type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch()}>
+                            <i className='fa fa-fw fa-lg fa-search-plus' />Tìm kiếm
+                        </button>
+                    </div>
                 </div>
             </>,
             content: <>
+                <div className='tile'>
+                    <div className='tile-title'>Thống kê</div>
+                    <div className='row col-sm-12'>Tổng cán bộ: &nbsp;{<b>{totalItem}</b>}</div>
+                    <div className='row col-sm-12'>Cán bộ nam: &nbsp;{<b>{list.groupBy('phai')['01']?.length}</b>}</div>
+                </div>
                 <div className='tile'>
                     {!this.state.searching ? table : <OverlayLoading text='Đang tải..' />}
                     <Pagination style={{ marginLeft: '70px' }} name={PageName} pageNumber={pageNumber} pageSize={pageSize} pageTotal={pageTotal} totalItem={totalItem} pageCondition={pageCondition}

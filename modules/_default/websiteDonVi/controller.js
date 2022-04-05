@@ -316,7 +316,7 @@ module.exports = app => {
 
     // Hook readyHooks ------------------------------------------------------------------------------------------------------------------------------
     app.readyHooks.add('readyDvWebsite', {
-        ready: () => app.dbConnection != null && app.model != null && app.model.dvWebsite != null,
+        ready: () => app.database.oracle.connected && app.model.dvWebsite,
         run: () => app.model.dvWebsite.count((error, numberOfDvWebsite) => {
             if (error == null) {
                 numberOfDvWebsite = Number(numberOfDvWebsite);

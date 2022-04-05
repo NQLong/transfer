@@ -15,7 +15,7 @@ require('../../config/common')(app);
 require('../../config/lib/excel')(app);
 require('../../config/lib/fs')(app);
 require('../../config/lib/string')(app);
-require('../../config/database')(app, package.db);
+require('../../config/database.oracleDB')(app, package.db);
 
 // Init =======================================================================
 app.loadModules(false);
@@ -54,7 +54,7 @@ const run = () => {
                 if (nam_tot_nghiep != null) nam_tot_nghiep = nam_tot_nghiep.toString();
                 let nghe_nghiep = worksheet.getCell('O' + index).value;
                 if (nghe_nghiep != null) nghe_nghiep = nghe_nghiep.toString();
-                
+
                 let ngay_sinh = worksheet.getCell('P' + index).value;
                 if (ngay_sinh != null) {
                     ngay_sinh = ngay_sinh.toString();
@@ -106,7 +106,7 @@ const run = () => {
 
                 let dien_thoai = worksheet.getCell('AG' + index).value;
                 if (dien_thoai != null) dien_thoai = dien_thoai.toString();
-                
+
                 let CMND = worksheet.getCell('AH' + index).value;
                 if (CMND != null) CMND = CMND.toString();
 
@@ -142,7 +142,7 @@ const run = () => {
                     NGAY_SINH: ngay_sinh,
                     MA_TINH_NOI_SINH: noi_sinh,
                     MA_TINH_NGUYEN_QUAN: nguyen_quan,
-                    DAN_TOC: dan_toc, 
+                    DAN_TOC: dan_toc,
                     TON_GIAO: ton_giao,
                     DIA_CHI_HIEN_TAI: noi_o,
                     HIEN_TAI_MA_TINH: noi_o_tinh,
@@ -171,13 +171,13 @@ const run = () => {
                 sql += 'WHERE SHCC = ' + "'" + shcc + "'" + ';';
                 console.log(sql);
                 solve(index + 1);
-            }    
+            }
             if (worksheet) solve();
         }
     });
 }
 
 app.readyHooks.add('Run tool.hopDongVienChuc.js', {
-    ready: () => app.dbConnection && app.model && app.model.canBo,
+    ready: () => app.database.oracle.connected && app.model && app.model.canBo,
     run,
 });

@@ -1,0 +1,78 @@
+.hexagon-item.scale {
+  transform: scale(1);
+  transition: all 0.4s!important;
+  z-index: 2;
+
+  &:hover {
+    transform: scale(1.2);
+    z-index: 50;
+  }
+}
+
+.hex {
+  cursor: pointer;
+  //stroke: #eee;
+  stroke: #1488db;
+  stroke-width: 1;
+  transition: all 1s;
+
+  &.animate {
+    $transition: 7px;
+    transform: translateX(0) translateY(0);
+    &:hover {
+      transform: translateX($transition) translateY($transition);
+    }
+  }
+}
+
+.net-line {
+  fill: none;
+  stroke: #1488db;
+  //stroke-miterlimit: 10;
+  stroke-width: 2;
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: draw 3s linear forwards;
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.main-net-area {
+  position: relative;
+  left: 0;
+  //margin-top: 10px;
+  width: 100%;
+  .underlay {
+    position: absolute;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 100%;
+    height: 100%;
+    opacity: 0.3;
+    z-index: -1;
+  }
+}
+
+.hexagon-category {
+  button {
+    background: #FFF;
+    color: #000;
+    outline: none;
+    border: 2px solid #132d65;
+    padding: 10px 15px;
+    margin: auto 10px 10px 10px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+
+    &:hover, &.active {
+      background: #132d65;
+      color: #FFF;
+    }
+  }
+}

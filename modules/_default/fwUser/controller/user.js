@@ -15,7 +15,7 @@ module.exports = app => {
     app.get('/user/member', app.permission.check('user:read'), app.templates.admin);
 
     app.readyHooks.add('readyUser', {
-        ready: () => app.dbConnection != null && app.model != null && app.model.fwRole != null && app.model.fwUser != null,
+        ready: () => app.database.oracle.connected && app.model.fwRole != null && app.model.fwUser != null,
         run: () => {
             app.model.fwUser.count({}, (error, numberOfUser) => {
                 if (error == null) {
@@ -140,7 +140,6 @@ module.exports = app => {
         }
 
         app.model.fwUser.getPage(pageNumber, pageSize, condition, '*', 'email ASC', (error1, page) => {
-            console.log(page);
             if (page && page.list) {
                 let mapperUser = {},
                     emails = page.list.map(user => {
@@ -169,6 +168,11 @@ module.exports = app => {
 
     app.get('/api/user/:email', app.permission.check('user:read'), (req, res) => {
         app.model.fwUser.get({ email: req.params.email }, (error, user) => res.send({ error, user }));
+    });
+
+    app.put('/api/user/session', app.permission.check('user:write'), (req, res) => {
+        app.session.refresh(req.body.email);
+        res.send('OK');
     });
 
     app.post('/api/user', app.permission.check('user:write'), (req, res) => {

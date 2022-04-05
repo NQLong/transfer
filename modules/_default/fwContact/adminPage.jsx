@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { getContactPage, getContact, updateContact, deleteContact } from './redux';
+import { getDmDonViAll } from 'modules/mdDanhMuc/dmDonVi/redux';
 import AdminContactModal from 'view/component/AdminContactModal';
 import Pagination from 'view/component/Pagination';
 
@@ -9,6 +10,15 @@ class ContactPage extends React.Component {
 
     componentDidMount() {
         this.props.getContactPage();
+        this.props.getDmDonViAll(data => {
+            if (data.length) {
+                const donVi = { '0': 'Cổng thông tin trường' };
+                data.forEach(element => {
+                    donVi[element.ma] = element.ten;
+                });
+                this.setState({ donVi });
+            }
+        });
         T.ready('/user/contact');
     }
 
@@ -38,8 +48,9 @@ class ContactPage extends React.Component {
                     <thead>
                         <tr>
                             <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                            <th style={{ width: '60%' }}>Chủ đề</th>
-                            <th style={{ width: '40%' }}>Tên & Email</th>
+                            <th style={{ width: '100%' }}>Chủ đề</th>
+                            <th style={{ width: 'auto' }}>Tên & Email</th>
+                            <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Đơn vị</th>
                             <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                         </tr>
                     </thead>
@@ -53,6 +64,9 @@ class ContactPage extends React.Component {
                                     {new Date(item.createdDate).getText()}
                                 </td>
                                 <td>{item.name}<br />{item.email}</td>
+                                <td style={{ width: 'auto', whiteSpace: 'nowrap' }}>
+                                    {item.maDonVi && this.state?.donVi ? this.state?.donVi[item.maDonVi] : ''}
+                                </td>
                                 <td>
                                     <div className='btn-group'>
                                         <a className='btn btn-primary' href='#' onClick={e => this.showContact(e, item.id)}>
@@ -77,7 +91,7 @@ class ContactPage extends React.Component {
                     <h1><i className='fa fa fa-envelope-o' /> Liên hệ</h1>
                 </div>
                 <div className='tile'>{table}
-                    <Pagination name='pageContact' pageNumber={pageNumber} pageSize={pageSize} pageTotal={pageTotal} totalItem={totalItem}
+                    <Pagination name='pageContact' {...{ pageNumber, pageSize, pageTotal, totalItem }}
                         getPage={this.props.getContactPage} />
                     <AdminContactModal ref={this.modal} />
                 </div>
@@ -87,5 +101,5 @@ class ContactPage extends React.Component {
 }
 
 const mapStateToProps = state => ({ contact: state.contact });
-const mapActionsToProps = { getContactPage, getContact, updateContact, deleteContact };
+const mapActionsToProps = { getContactPage, getContact, updateContact, deleteContact, getDmDonViAll };
 export default connect(mapStateToProps, mapActionsToProps)(ContactPage);

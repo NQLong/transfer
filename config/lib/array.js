@@ -10,4 +10,17 @@ module.exports = () => {
       this.splice(index, 1);
     }
   };
+
+  Array.prototype.groupBy = function (key) {
+    return this.reduce(
+      (result, item) => ({
+        ...result,
+        [key && item[key]]: [
+          ...(result[item[key]] || []),
+          item,
+        ],
+      }),
+      {},
+    );
+  };
 };

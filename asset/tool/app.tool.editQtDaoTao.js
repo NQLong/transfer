@@ -15,7 +15,7 @@ require('../../config/common')(app);
 require('../../config/lib/excel')(app);
 require('../../config/lib/fs')(app);
 require('../../config/lib/string')(app);
-require('../../config/database')(app, package.db);
+require('../../config/database.oracleDB')(app, package.db);
 
 // Init =======================================================================
 app.loadModules(false);
@@ -48,14 +48,14 @@ const run = () => {
 
                         if (result) {
                             if (item.loaiBangCap == 'Cử nhân' && result.cuNhan == null) {
-                                app.model.canBo.update({ shcc: item.shcc }, { cuNhan: 1});
+                                app.model.canBo.update({ shcc: item.shcc }, { cuNhan: 1 });
                             } else if (item.loaiBangCap == 'Thạc sĩ' && result.thacSi == null) {
-                                app.model.canBo.update({ shcc: item.shcc }, { thacSi: 1});
+                                app.model.canBo.update({ shcc: item.shcc }, { thacSi: 1 });
                             } else if (item.loaiBangCap == 'Tiến sĩ' && result.tienSi == null) {
-                                app.model.canBo.update({ shcc: item.shcc }, { tienSi: 1});
+                                app.model.canBo.update({ shcc: item.shcc }, { tienSi: 1 });
                             }
                             console.log(i++);
-                        } 
+                        }
                     });
                 }
             });
@@ -64,6 +64,6 @@ const run = () => {
 }
 
 app.readyHooks.add('Run tool.editQtDaoTao.js', {
-    ready: () => app.dbConnection && app.model && app.model.dmHinhThucDaoTao && app.model.qtDaoTao && app.model.dmLoaiBangCap && app.model.canBo,
+    ready: () => app.database.oracle.connected && app.model && app.model.dmHinhThucDaoTao && app.model.qtDaoTao && app.model.dmLoaiBangCap && app.model.canBo,
     run,
 });

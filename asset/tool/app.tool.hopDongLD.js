@@ -15,7 +15,7 @@ require('../../config/common')(app);
 require('../../config/lib/excel')(app);
 require('../../config/lib/fs')(app);
 require('../../config/lib/string')(app);
-require('../../config/database')(app, package.db);
+require('../../config/database.oracleDB')(app, package.db);
 
 // Init =======================================================================
 app.loadModules(false);
@@ -46,6 +46,6 @@ const run = () => {
 }
 
 app.readyHooks.add('Run tool.hopDong.js', {
-    ready: () => app.dbConnection && app.model && app.model.canBo && app.model.dmDienHopDong && app.model.qtHopDongLaoDong,
+    ready: () => app.database.oracle.connected && app.model && app.model.canBo && app.model.dmDienHopDong && app.model.qtHopDongLaoDong,
     run,
 });

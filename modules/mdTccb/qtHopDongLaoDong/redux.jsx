@@ -146,7 +146,6 @@ export function getHopDongMoiNhat(shcc, done) {
                 T.notify('Lấy danh sách hợp đồng bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                console.log(data.result);
                 if (done) done(data.result);
             }
         });

@@ -202,20 +202,21 @@ class SinhVienPage extends AdminPage {
                             <div className="form-group col-md-9">
                                 <div className="row">
                                     <FormTextBox ref={e => this.mssv = e} label='Mã số sinh viên' className='form-group col-md-4' readOnly />
-                                    <FormTextBox ref={e => this.ho = e} label='Họ và tên lót' className='form-group col-md-4' />
-                                    <FormTextBox ref={e => this.ten = e} label='Tên' className='form-group col-md-4' />
-                                    <FormSelect ref={e => this.gioiTinh = e} label='Giới tính' className='form-group col-md-3' data={SelectAdapter_DmGioiTinhV2} />
+                                    <FormTextBox ref={e => this.ho = e} label='Họ và tên lót' className='form-group col-md-4' readOnly />
+                                    <FormTextBox ref={e => this.ten = e} label='Tên' className='form-group col-md-4' readOnly />
+                                    <FormSelect ref={e => this.gioiTinh = e} label='Giới tính' className='form-group col-md-3' data={SelectAdapter_DmGioiTinhV2} readOnly />
                                     <FormSelect ref={e => this.khoa = e} label='Khoa' className='form-group col-md-6' data={SelectAdapter_DmDonViFaculty_V2} readOnly />
                                     <FormTextBox type='year' ref={e => this.namTuyenSinh = e} label='Năm tuyển sinh' className='col-md-3' readOnly />
+
+                                    <FormTextBox ref={e => this.nienKhoa = e} label='Niên khóa' className='form-group col-md-3' readOnly />
+                                    <FormTextBox ref={e => this.maKhoa = e} label='Mã khóa' className='form-group col-md-3' readOnly />
+                                    <FormTextBox ref={e => this.maNganh = e} label='Mã ngành' className='form-group col-md-3' readOnly />
+                                    <FormTextBox ref={e => this.lop = e} label='Lớp' className='form-group col-md-3' readOnly />
+                                    <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Loại hình đào tạo' className='form-group col-md-4' data={SelectAdapter_DmLoaiHinhDaoTaoV2} readOnly />
+                                    <FormSelect ref={e => this.loaiSinhVien = e} label='Loại sinh viên' className='form-group col-md-4' data={SelectAdapter_DmLoaiSinhVienV2} readOnly />
+                                    <FormSelect ref={e => this.tinhTrang = e} label='Tình trạng' className='form-group col-md-4' data={SelectAdapter_DmTinhTrangSinhVienV2} readOnly />
                                 </div>
                             </div>
-                            <FormTextBox ref={e => this.nienKhoa = e} label='Niên khóa' className='form-group col-md-3' readOnly />
-                            <FormTextBox ref={e => this.maKhoa = e} label='Mã khóa' className='form-group col-md-3' readOnly />
-                            <FormTextBox ref={e => this.maNganh = e} label='Mã ngành' className='form-group col-md-3' readOnly />
-                            <FormTextBox ref={e => this.lop = e} label='Lớp' className='form-group col-md-3' readOnly />
-                            <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Loại hình đào tạo' className='form-group col-md-4' data={SelectAdapter_DmLoaiHinhDaoTaoV2} readOnly />
-                            <FormSelect ref={e => this.loaiSinhVien = e} label='Loại sinh viên' className='form-group col-md-4' data={SelectAdapter_DmLoaiSinhVienV2} readOnly />
-                            <FormSelect ref={e => this.tinhTrang = e} label='Tình trạng' className='form-group col-md-4' data={SelectAdapter_DmTinhTrangSinhVienV2} readOnly />
                             <FormDatePicker ref={e => this.ngaySinh = e} label='Ngày sinh' type='date-mask' className='form-group col-md-3' required />
                             <FormSelect ref={e => this.quocTich = e} label='Quốc tịch' className='form-group col-md-3' data={SelectAdapter_DmQuocGia} />
                             <FormSelect ref={e => this.danToc = e} label='Dân tộc' className='form-group col-md-3' data={SelectAdapter_DmDanTocV2} />

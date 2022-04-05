@@ -36,7 +36,7 @@ class AdminStudentsPage extends AdminPage {
     }
 
     changeAdvancedSearch = (isInitial = false) => {
-        let { pageNumber, pageSize } = this.props && this.props.sinhVien && this.props.sinhVien.page ? this.props.sinhVien.page : { pageNumber: 1, pageSize: 1000 };
+        let { pageNumber, pageSize } = this.props && this.props.sinhVien && this.props.sinhVien.page ? this.props.sinhVien.page : { pageNumber: 1, pageSize: 500 };
         const listFaculty = this.listFaculty.value().toString() || '';
         const listFromCity = this.listFromCity.value().toString() || '';
         const listEthnic = this.listEthnic.value().toString() || '';
@@ -82,7 +82,7 @@ class AdminStudentsPage extends AdminPage {
         let permission = this.getUserPermission('student', ['read', 'write', 'delete']);
 
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.sinhVien && this.props.sinhVien.page ?
-            this.props.sinhVien.page : { pageNumber: 1, pageSize: 1000, pageTotal: 1, totalItem: 0, pageCondition: {}, list };
+            this.props.sinhVien.page : { pageNumber: 1, pageSize: 500, pageTotal: 1, totalItem: 0, pageCondition: {}, list };
 
         let table = renderTable({
             emptyTable: 'Không có dữ liệu sinh viên',

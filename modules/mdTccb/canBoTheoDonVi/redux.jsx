@@ -13,19 +13,18 @@ export default function canBoTheoDonViReducer(state = null, data) {
 }
 
 // Actions ------------------------------------------------------------------------------------------------------------
-T.initPage('pageCanBoTheoDonVi');
-export function getCanBoTheoDonViAll(maDonVi, done) {
-    const page = T.updatePage('pageCanBoTheoDonVi', maDonVi);
+T.initPage('pageNhanSuDonVi');
+export function getNhanSuDonVi(listDonVi, done) {
+    T.updatePage('pageNhanSuDonVi');
     return dispatch => {
-        const url = `/api/staff/${maDonVi}`;
-        T.get(url, data => {
+        const url = '/api/nhan-su-don-vi';
+        T.get(url, { listDonVi }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách cán bộ bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                if (page.maDonVi) data.page.maDonVi = page.maDonVi;
-                if (done) done(data.item);
-                dispatch({ type: canBoTheoDonViGetAll, items: data.item });
+                if (done) done(data.items);
+                dispatch({ type: canBoTheoDonViGetAll, items: data.items ? data.items : [] });
             }
         }, () => T.notify('Lấy danh sách cán bộ bị lỗi!', 'danger'));
     };

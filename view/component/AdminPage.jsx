@@ -11,7 +11,7 @@ import 'react-datetime/css/react-datetime.css';
 // Table components ---------------------------------------------------------------------------------------------------
 export class TableCell extends React.Component { // type = number | date | link | image | checkbox | buttons | text (default)
     render() {
-        let { type = 'text', content = '', permission = {}, className = '', style = {}, contentStyle = {}, alt = '', display = true, rowSpan = 1, colSpan = 1, dateFormat } = this.props;
+        let { type = 'text', content = '', permission = {}, className = '', style = {}, contentStyle = {}, alt = '', display = true, rowSpan = 1, colSpan = 1, dateFormat, contentClassName = '' } = this.props;
         if (style == null) style = {};
 
         if (display != true) {
@@ -61,7 +61,7 @@ export class TableCell extends React.Component { // type = number | date | link 
                     </div>
                 </td>);
         } else {
-            return <td className={className} style={{ ...style }} rowSpan={rowSpan} colSpan={colSpan}>{content}</td>;
+            return <td className={className} style={{ ...style }} rowSpan={rowSpan} colSpan={colSpan}><div style={contentStyle} className={contentClassName}>{content}</div></td>;
         }
     }
 }
@@ -103,6 +103,7 @@ export function renderTable({
 
 // Form components ----------------------------------------------------------------------------------------------------
 export class FormTabs extends React.Component {
+    randomKey = T.randomPassword(8)
     state = { tabIndex: 0 };
 
     componentDidMount() {
@@ -125,12 +126,16 @@ export class FormTabs extends React.Component {
 
     selectedTabIndex = () => this.state.tabIndex;
 
+    tabClick = (e, index) => {
+        e && e.preventDefault();
+        $(`a[href='#${(this.props.id || 'tab')}_${index}${this.randomKey}']`).click();
+    }
     render() {
         const { tabClassName = '', contentClassName = '', tabs = [] } = this.props,
             id = this.props.id || 'tab',
             tabLinks = [], tabPanes = [];
         tabs.forEach((item, index) => {
-            const tabId = id + '_' + T.randomPassword(8),
+            const tabId = id + '_' + index + this.randomKey,
                 className = (index == this.state.tabIndex ? ' active show' : '');
             tabLinks.push(<li key={index} className={'nav-item' + className}><a className='nav-link' data-toggle='tab' href={'#' + tabId} onClick={e => this.onSelectTab(e, index)}>{item.title}</a></li>);
             tabPanes.push(<div key={index} className={'tab-pane fade' + className} id={tabId}>{item.component}</div>);
@@ -212,7 +217,7 @@ class FormNumberBox extends React.Component {
     }
 
     render() {
-        let { smallText = '', label = '', placeholder = '', className = '', style = {}, readOnly = false, onChange = null, required = false, step = false } = this.props,
+        let { smallText = '', label = '', placeholder = '', className = '', style = {}, readOnly = false, onChange = null, required = false, step = false, prefix = '', suffix = '' } = this.props,
             readOnlyText = this.exactValue ? this.exactValue : this.state.value;
         const properties = {
             className: 'form-control',
@@ -242,7 +247,7 @@ class FormNumberBox extends React.Component {
         return (
             <div className={'form-group ' + (className || '')} style={style}>
                 {displayElement}
-                <NumberFormat style={{ display: readOnly ? 'none' : 'block' }} {...properties} />
+                <NumberFormat prefix={prefix} suffix={suffix} style={{ display: readOnly ? 'none' : 'block' }} {...properties} />
                 {smallText ? <small>{smallText}</small> : null}
             </div>);
     }
@@ -630,13 +635,13 @@ export class FormImageBox extends React.Component {
     setData = (data, image) => this.imageBox.setData(data, image);
 
     render() {
-        let { label = '', className = '', style = {}, readOnly = false, postUrl = '/user/upload', uploadType = '', image = null, onDelete = null, onSuccess = null } = this.props;
+        let { label = '', className = '', style = {}, readOnly = false, postUrl = '/user/upload', uploadType = '', image = null, onDelete = null, onSuccess = null, isProfile = null, description = null } = this.props;
         return (
             <div className={'form-group ' + className} style={style}>
                 <label>{label}&nbsp;</label>
                 {!readOnly && image && onDelete ?
                     <a href='#' className='text-danger' onClick={onDelete}><i className='fa fa-fw fa-lg fa-trash' /></a> : null}
-                <ImageBox ref={e => this.imageBox = e} postUrl={postUrl} uploadType={uploadType} image={image} readOnly={readOnly} success={data => onSuccess && onSuccess(data)} />
+                <ImageBox ref={e => this.imageBox = e} postUrl={postUrl} uploadType={uploadType} image={image} readOnly={readOnly} success={data => onSuccess && onSuccess(data)} isProfile={isProfile} description={description} />
             </div>);
     }
 }
@@ -845,8 +850,8 @@ export class AdminPage extends React.Component {
                         <h1><i className={icon} /> {title}</h1>
                         <p>{subTitle}</p>
                     </div>
-                    <ul className='app-breadcrumb breadcrumb'>
-                        {header}
+                    <ul className='app-breadcrumb breadcrumb' style={{ alignItems: 'center' }}>
+                        <div style={{ display: 'flex', marginRight: '15px' }} >{header}</div>
                         {breadcrumb != null ? <Link to='/user'><i className='fa fa-home fa-lg' /></Link> : ''}
                         {breadcrumb != null ? breadcrumb.map((item, index) => <span key={index}>&nbsp;/&nbsp;{item}</span>) : ''}
                     </ul>

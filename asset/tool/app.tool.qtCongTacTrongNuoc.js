@@ -15,11 +15,11 @@ require('../../config/common')(app);
 require('../../config/lib/excel')(app);
 require('../../config/lib/fs')(app);
 require('../../config/lib/string')(app);
-require('../../config/database')(app, package.db);
+require('../../config/database.oracleDB')(app, package.db);
 
 // Init =======================================================================
 app.loadModules(false);
-const listVietTat =  [
+const listVietTat = [
     'công tác',
     'hội thảo',
     'khóa học ngắn hạn',
@@ -56,7 +56,7 @@ const listVietTat =  [
     'lễ kỷ niệm',
     'học lớp trung cấp lý luận chính trị',
     'kỳ họp'
-  ];
+];
 const convertVt = [
     '01',
     '02',
@@ -102,7 +102,7 @@ function lcs(a, b) {
     for (j = 0; j < n; j++) C[0].push(0);
     for (i = 0; i < m; i++)
         for (j = 0; j < n; j++)
-            C[i+1][j+1] = a[i] === b[j] ? C[i][j]+1 : Math.max(C[i+1][j], C[i][j+1]);
+            C[i + 1][j + 1] = a[i] === b[j] ? C[i][j] + 1 : Math.max(C[i + 1][j], C[i][j + 1]);
     return C[m][n];
 }
 
@@ -121,7 +121,7 @@ function bestChoice(s, t) {
     return cost;
 }
 
-const listTinh =  [
+const listTinh = [
     { ma: '01', ten: 'Thành phố Hà Nội', kichHoat: 1 },
     { ma: '02', ten: 'Tỉnh Hà Giang', kichHoat: 1 },
     { ma: '04', ten: 'Tỉnh Cao Bằng', kichHoat: 1 },
@@ -185,7 +185,7 @@ const listTinh =  [
     { ma: '94', ten: 'Tỉnh Sóc Trăng', kichHoat: 1 },
     { ma: '95', ten: 'Tỉnh Bạc Liêu', kichHoat: 1 },
     { ma: '96', ten: 'Tỉnh Cà Mau', kichHoat: 1 }
-  ]
+]
 
 function convertTinh(name) {
     if (name.includes('hcm')) return 49;
@@ -289,7 +289,7 @@ const run = () => {
                 if (ghiChu != null) {
                     ghiChu = ghiChu.toString().trim();
                 }
-                app.model.canBo.getAll({ho: ho, ten: ten}, (error, items) => {
+                app.model.canBo.getAll({ ho: ho, ten: ten }, (error, items) => {
                     if (items.length > 0) {
                         let shcc = '-1', ok = 1;
                         if (items.length == 1) {
@@ -408,6 +408,6 @@ const run = () => {
 };
 
 app.readyHooks.add('Run tool.qtCongTacTrongNuoc.js', {
-    ready: () => app.dbConnection && app.model && app.model.canBo && app.model.dmTinhThanhPho,
+    ready: () => app.database.oracle.connected && app.model && app.model.canBo && app.model.dmTinhThanhPho,
     run,
 });

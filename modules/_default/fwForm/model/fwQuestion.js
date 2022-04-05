@@ -24,7 +24,7 @@ module.exports = app => {
             done('Data is empty!');
         } else {
             const sql = 'INSERT INTO FW_QUESTION (' + statement.substring(2) + ') VALUES (' + values.substring(2) + ')';
-            app.dbConnection.executeMany(sql, parameter, (error, resultSet) => {
+            app.database.oracle.connection.main.executeMany(sql, parameter, (error, resultSet) => {
                 if (!error || !resultSet.rowsAffected) {
                     done();
                 } else {
@@ -46,7 +46,7 @@ module.exports = app => {
                                 FROM HCMUSSH.FW_QUESTION t
                                 ORDER BY PRIORITY${order}
                             ) WHERE FORM_ID = :formId AND PRIORITY ${operator} :priority AND ROWNUM <= :limit`;
-                app.dbConnection.execute(sql, { priority: item1.priority, limit: 1, formId }, (error, { rows }) => {
+                app.database.oracle.connection.main.execute(sql, { priority: item1.priority, limit: 1, formId }, (error, { rows }) => {
                     if (error) {
                         done && done(error);
                     } else if (rows === null || rows.length === 0) {
@@ -83,7 +83,7 @@ module.exports = app => {
                 done('Data is empty!');
             } else {
                 const sql = 'INSERT INTO FW_QUESTION (' + statement.substring(2) + ') VALUES (' + values.substring(2) + ')';
-                app.dbConnection.execute(sql, parameter, (error, resultSet) => {
+                app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
                     if (error == null && resultSet && resultSet.lastRowid) {
                         app.model.fwQuestion.get({ rowId: resultSet.lastRowid }, done);
                     } else {

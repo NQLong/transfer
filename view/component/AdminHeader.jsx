@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { withRouter } from 'react-router-dom';
 import { changeRole } from 'modules/_default/fwRole/redux';
-import { getUnreadContacts, getContact } from 'modules/_default/fwContact/redux';
+import { getContact } from 'modules/_default/fwContact/redux';
 import { getUnreadNotification, addNotification, readNotification } from 'modules/_default/fwNotification/redux';
 import { updateSystemState, logout } from 'modules/_default/_init/reduxSystem';
 import { SelectAdapter_FwUser, switchUser } from 'modules/_default/fwUser/reduxUser';
@@ -90,8 +90,8 @@ class NotificationItem extends AdminPage {
     componentDidMount() {
         const handleGetNotification = () => {
             if (this.props.system && this.props.system.user) {
-                const contactRead = this.getUserPermission('contact', ['read']).read;
-                if (contactRead) this.props.getUnreadContacts();
+                // const contactRead = this.getUserPermission('contact', ['read']).read;
+                // if (contactRead) this.props.getUnreadContacts();
                 this.props.getUnreadNotification(1, 10);
             } else setTimeout(handleGetNotification, 250);
         };
@@ -138,25 +138,8 @@ class NotificationItem extends AdminPage {
     }
 
     render() {
-        const contactRead = this.getUserPermission('contact', ['read']).read;
-        const contacts = this.props.contact && this.props.contact.unreads ? this.props.contact.unreads : [];
         const notifications = this.props.notification && this.props.notification.unread && this.props.notification.unread ? this.props.notification.unread : [];
-        const notificationLength = contacts.length + notifications.length;
-        const contactElements = contacts.map((item, index) => (
-            <li key={index}>
-                <a className='app-notification__item' href='#' onClick={e => this.props.showContact(e, item.id)}>
-                    <span className='app-notification__icon'>
-                        <span className='fa-stack fa-lg'>
-                            <i className='fa fa-circle fa-stack-2x text-primary' />
-                            <i className='fa fa-envelope fa-stack-1x fa-inverse' />
-                        </span>
-                    </span>
-                    <div>
-                        <p className='app-notification__message' style={{ fontWeight: 'bold' }}>{item.subject}</p>
-                        <p className='app-notification__meta'>{new Date(item.createdDate).getText()}</p>
-                    </div>
-                </a>
-            </li>));
+        const notificationLength = notifications.length;
         const notificationElements = notifications.map((item, index) => {
             let buttons;
             try {
@@ -206,14 +189,6 @@ class NotificationItem extends AdminPage {
                 </a>
                 <ul className='app-notification dropdown-menu dropdown-menu-right'>
                     <li className='app-notification__title'>{notificationLength ? `Bạn có ${notificationLength} thông báo mới` : 'Bạn không có thông báo mới nào'}</li>
-                    {contactRead && (<>
-                        <div className='app-notification__content'>
-                            {contactElements}
-                        </div>
-                        <li className='app-notification__footer'>
-                            <Link to='/user/contact'>Đến trang liên hệ</Link>
-                        </li>
-                    </>)}
 
                     <div className='app-notification__content'>
                         {notificationElements}
@@ -227,7 +202,7 @@ class NotificationItem extends AdminPage {
     }
 }
 
-const SectionNotification = withRouter(connect(state => ({ system: state.system, notification: state.notification, contact: state.contact }), { getUnreadNotification, readNotification, getUnreadContacts })(NotificationItem));
+const SectionNotification = withRouter(connect(state => ({ system: state.system, notification: state.notification }), { getUnreadNotification, readNotification })(NotificationItem));
 
 class AdminHeader extends AdminPage {
     componentDidMount() {
@@ -256,6 +231,15 @@ class AdminHeader extends AdminPage {
                 this.props.addNotification(notifyItem);
             }
         });
+
+        T.initAdvancedSearch = (onAdvanceSearch = null) => {
+            this.advancedSearch && $(this.advancedSearch).css('display', 'flex');
+            if (onAdvanceSearch && typeof onAdvanceSearch == 'function') {
+                T.onAdvanceSearchHide = onAdvanceSearch;
+            } else {
+                T.onAdvanceSearchHide = null;
+            }
+        };
     }
 
     willUnmount = () => {
@@ -312,7 +296,7 @@ class AdminHeader extends AdminPage {
                             <i className='fa fa-search-plus fa-lg' />
                         </a>
                     </li>
-                    <SectionNotification showContact={this.showContact} />
+                    <SectionNotification />
                     <li>
                         <Link className='app-nav__item' to='/user'>
                             <i className='fa fa-user fa-lg' />
@@ -331,6 +315,6 @@ class AdminHeader extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, contact: state.contact, role: state.role });
+const mapStateToProps = state => ({ system: state.system, role: state.role });
 const mapActionsToProps = { changeRole, updateSystemState, switchUser, logout, getContact, addNotification };
 export default connect(mapStateToProps, mapActionsToProps)(AdminHeader);

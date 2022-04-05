@@ -23,7 +23,6 @@ module.exports = (app) => {
         fse.copySync(oldPath, newPath);
         fse.removeSync(oldPath);
     };
-
     // app.fs.renameSync = (oldPath, newPath) => app.fs.copyFileSync(oldPath, newPath) && app.fs.unlinkSync(oldPath);
 
     // Template html file ---------------------------------------------------------------------------------------------------------------------------
@@ -35,8 +34,8 @@ module.exports = (app) => {
             app.templates[templateName] = (req, res) => {
                 const today = new Date().yyyymmdd();
                 if (req.session.today != today) {
-                    app.redis.incr(`${app.appName}_state:todayViews`);
-                    app.redis.incr(`${app.appName}_state:allViews`);
+                    app.database.redis.incr(`${app.appName}_state:todayViews`);
+                    app.database.redis.incr(`${app.appName}_state:allViews`);
                     req.session.today = today;
                 }
 
@@ -81,7 +80,7 @@ module.exports = (app) => {
             subMenusRender: false, groups: ['Thông tin cá nhân', 'Công tác', 'Khen thưởng - kỷ luật', 'Nghỉ', 'Chuyên môn']
         },
         tccb: {
-            index: 3000, title: 'Tổ chức cán bộ', link: '/user/tccb', icon: 'fa-sort-alpha-asc',
+            index: 3000, title: 'Tổ chức cán bộ', link: '/user/tccb', icon: 'fa-pie-chart',
             subMenusRender: false, groups: ['Cán bộ', 'Công tác', 'Hợp đồng', 'Khen thưởng - Kỷ luật', 'Nghỉ', 'Chuyên môn']
         },
         khcn: {
@@ -96,19 +95,28 @@ module.exports = (app) => {
             index: 6100, title: 'Sinh viên', link: '/user/students', icon: 'fa-users',
             subMenusRender: false
         },
+        daoTao: {
+            index: 7000, title: 'Đào tạo', link: '/user/pdt', icon: 'fa-diamond',
+            subMenusRender: false
+        },
         category: {
             index: 4000, title: 'Danh mục', link: '/user/category', icon: 'fa-list-alt',
             subMenusRender: false,
         },
         truyenThong: {
-            index: 5000, title: 'Truyền thông', link: '/user/truyen-thong', icon: 'fa-comments-o',
+            index: 6000, title: 'Truyền thông', link: '/user/truyen-thong', icon: 'fa-comments-o',
             subMenusRender: false,
-            groups: ['Cấu hình', 'Bài viết', 'Sự kiện', 'Tuyển sinh']
+            groups: ['Cấu hình', 'Bài viết', 'Sự kiện', 'Tuyển sinh', 'Doanh nghiệp']
         },
         websiteDv: {
             index: 1900, title: 'Website đơn vị', link: '/user/website', icon: 'fa-database',
             subMenusRender: false,
         },
+        hcth: {
+            index: 500, title: 'Hành chính tổng hợp', link: '/user/hcth', icon: 'fa-book',
+            subMenusRender: false,
+        }
+
     };
 
     // Ready Hook ----------------------------------------------------------------------------------------------------------------------------------

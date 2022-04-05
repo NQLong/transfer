@@ -39,17 +39,17 @@ module.exports = app => {
             }
 
             // Lưu vào trong redis
-            app.redis.set(app.redis.menusKey, JSON.stringify(menus));
-            app.redis.set(app.redis.divisionMenusKey, JSON.stringify(divisionMenus));
+            app.database.redis.set(app.database.redis.menusKey, JSON.stringify(menus));
+            app.database.redis.set(app.database.redis.divisionMenusKey, JSON.stringify(divisionMenus));
         });
     };
 
     // Hook readyHooks ------------------------------------------------------------------------------------------------------------------------------
     app.readyHooks.add('readyMenu', {
-        ready: () => app.redis && app.dbConnection && app.dbConnection.buildCondition,
+        ready: () => app.database.redis && app.database.oracle.connected && app.database.oracle.buildCondition,
         run: () => {
-            app.redis.menusKey = app.appName + '_menus';
-            app.redis.divisionMenusKey = app.appName + '_divisionMenus';
+            app.database.redis.menusKey = app.appName + '_menus';
+            app.database.redis.divisionMenusKey = app.appName + '_divisionMenus';
 
             app.primaryWorker && app.model.fwMenu.get({ link: '/' }, (error, menu) => {
                 if (error) {
@@ -64,7 +64,7 @@ module.exports = app => {
     });
 
     app.readyHooks.add('readyDivisionMenu', {
-        ready: () => app.redis && app.dbConnection && app.dbConnection.buildCondition,
+        ready: () => app.database.redis && app.database.oracle.connected && app.database.oracle.buildCondition,
         run: () => app.primaryWorker && app.model.dvWebsite.getAll((err, dvWebsites) => {
             if (err) {
                 console.error('Get unit website has errors!');
@@ -146,7 +146,9 @@ module.exports = app => {
                                             viewType = 'fw' + viewType[0].toUpperCase() + viewType.substring(1);
                                         }
                                         app.model[viewType].get({ id: component.viewId }, (error, item) => getNextComponent(item ? item.title : '<empty>'));
-                                    } else if (['all events', 'all jobs', 'last news', 'last events', 'all events', 'hot events', 'last jobs', 'jobs carousel', 'subscribe', 'all staffs', 'contact'].indexOf(viewType) != -1) {
+                                    } else if (viewType == 'all companies') {
+                                        app.model.dmLoaiDoanhNghiep.get({ id: component.viewId }, (error, item) => getNextComponent(item ? item.ten : '<empty>'));
+                                    }  else if (['all events', 'all jobs', 'last news', 'last events', 'all events', 'hot events', 'last jobs', 'jobs carousel', 'subscribe', 'all staffs', 'contact'].indexOf(viewType) != -1) {
                                         getNextComponent(viewType);
                                     } else {
                                         getNextComponent('<empty>');

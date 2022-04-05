@@ -14,6 +14,7 @@ const T = {
         'all news',
         'all events',
         'all divisions',
+        'all companies',
         'carousel',
         'last events',
         'last news',
@@ -219,6 +220,11 @@ const T = {
         swal({ icon, title, content, dangerMode, buttons: { cancel: true, confirm: true }, }).then(done);
     },
 
+    randomHexColor: () => {
+        let n = (Math.random() * 0xfffff * 1000000).toString(16);
+        return '#' + n.slice(0, 6);
+    },
+
     mobileDisplay: mobile => mobile ? (mobile.length == 10 ? mobile.toString().replace(/(\d{4})(\d{3})(\d{3})/, '$1 $2 $3') : mobile.toString().replace(/(\d{3})(\d{4})(\d{4})/, '($1) $2 $3')) : '',
 
     confirm3: (title, html, icon, buttonDanger, buttonSuccess, done) => {
@@ -291,8 +297,29 @@ const T = {
         } else if (language == 'en' && !item.linkEn) {
             return ('/news-en/item/' + item.id);
         }
+    },
+
+
+    //JSON Operate---------------------------------------------------------------------------------------------
+    stringify: (value, defaultValue = '') => {
+        try {
+            return JSON.stringify(value);
+        } catch (exception) {
+            T.notify(`Lỗi stringify: ${exception}, đặt theo giá trị mặc định: ${defaultValue}`, 'danger');
+            return defaultValue;
+        }
+    },
+
+    parse: (value, defaultValue = {}) => {
+        try {
+            return JSON.parse(value);
+        } catch (exception) {
+            T.notify(`Lỗi parse: ${exception}, đặt theo giá trị mặc định: ${defaultValue}`, 'danger');
+            return defaultValue;
+        }
     }
-};
+}
+
 
 T.socket = T.debug ? io('http://localhost:7012', { transports: ['websocket'] }) : io(T.rootUrl, { secure: true, transports: ['websocket'] });
 
@@ -489,6 +516,16 @@ String.prototype.numberWithCommas = function () {
 //Array prototype -----------------------------------------------------------------------------------------------------
 Array.prototype.contains = function (...pattern) {
     return pattern.reduce((result, item) => result && this.includes(item), true);
+};
+
+Array.prototype.groupBy = function (key) {
+    return this.reduce(
+        (result, item) => ({
+            ...result,
+            [item[key]]: [...(result[item[key]] || []), item,],
+        }),
+        {},
+    );
 };
 
 Date.prototype.getText = function () {

@@ -15,7 +15,7 @@ require('../../config/common')(app);
 require('../../config/lib/excel')(app);
 require('../../config/lib/fs')(app);
 require('../../config/lib/string')(app);
-require('../../config/database')(app, package.db);
+require('../../config/database.oracleDB')(app, package.db);
 
 // Init =======================================================================
 app.loadModules(false);
@@ -25,17 +25,17 @@ const run = () => {
         if (result) {
             result.forEach(canBo => {
                 if (canBo.hocVi == '02') {
-                    app.model.canBo.update({shcc: canBo.shcc}, {tienSi: 1}, (err, out) => {
+                    app.model.canBo.update({ shcc: canBo.shcc }, { tienSi: 1 }, (err, out) => {
                         console.log(canBo.shcc);
                     })
                 } else if (canBo.hocVi == '03') {
-                    app.model.canBo.update({shcc: canBo.shcc}, {thacSi: 1}, (err, out) => {
+                    app.model.canBo.update({ shcc: canBo.shcc }, { thacSi: 1 }, (err, out) => {
                         console.log(canBo.shcc);
                     })
                 } else if (canBo.hocVi == '04') {
-                    app.model.canBo.update({shcc: canBo.shcc}, {cuNhan: 1}, (err, out) => {
+                    app.model.canBo.update({ shcc: canBo.shcc }, { cuNhan: 1 }, (err, out) => {
                         console.log(canBo.shcc);
-                    })                                                                                                         
+                    })
                 }
 
             });
@@ -44,6 +44,6 @@ const run = () => {
 }
 
 app.readyHooks.add('Run tool.adjustHocVi.js', {
-    ready: () => app.dbConnection && app.model && app.model.canBo,
+    ready: () => app.database.oracle.connected && app.model && app.model.canBo,
     run,
 });
