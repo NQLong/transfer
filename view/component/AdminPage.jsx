@@ -535,12 +535,12 @@ export class FormSelect extends React.Component {
     };
 
     render = () => {
-        const { className = '', style = {}, labelStyle = {}, label = '', multiple = false, readOnly = false, required = false, disabled = false } = this.props;
+        const { className = '', style = {}, labelStyle = {}, label = '', multiple = false, readOnly = false, required = false } = this.props;
         return (
             <div className={'form-group admin-form-select ' + className} style={style}>
                 {label ? <label style={labelStyle} onClick={this.focus}>{label}{!readOnly && required ? <span style={{ color: 'red' }}> *</span> : ''}{readOnly ? ':' : ''}</label> : null} {readOnly ? <b>{this.state.valueText}</b> : ''}
                 <div style={{ width: '100%', display: readOnly ? 'none' : 'inline-flex' }}>
-                    <select ref={e => this.input = e} multiple={multiple} disabled={disabled || readOnly} />
+                    <select ref={e => this.input = e} multiple={multiple} disabled={readOnly} />
                 </div>
             </div>
         );
