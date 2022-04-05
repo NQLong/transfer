@@ -11860,6 +11860,46 @@
             ],
             "foreignKeys": [],
             "type": "table"
+        },
+        "HCTH_DON_VI_NHAN_CONG_VAN": {
+            "active": true,
+            "moduleName": "hcthDonViNhanCongVan",
+            "modelName": "hcthDonViNhanCongVan",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_105690\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "DON_VI_NHAN": {
+                    "value": "donViNhan",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "10,0"
+                },
+                "CONG_VAN": {
+                    "value": "congVan",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "10,0"
+                },
+                "LOAI": {
+                    "value": "loai",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 5
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
         }
     }
 }
