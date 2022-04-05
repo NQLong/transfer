@@ -19,7 +19,7 @@ export class TableCell extends React.Component { // type = number | date | link 
         } else if (type == 'number') {
             return <td className={className} style={{ textAlign: 'right', ...style }} rowSpan={rowSpan} colSpan={colSpan}>{content && !isNaN(content) ? T.numberDisplay(content) : content}</td>;
         } else if (type == 'date') {
-            return <td className={className} style={{ ...style }} rowSpan={rowSpan} colSpan={colSpan}>{dateFormat ? T.dateToText(content, dateFormat) : new Date(content).getText()}</td>;
+            return <td className={className} style={{ ...style }} rowSpan={rowSpan} colSpan={colSpan}>{content ? (dateFormat ? T.dateToText(content, dateFormat) : new Date(content).getText()) : ''}</td>;
         } else if (type == 'link') {
             let url = this.props.url ? this.props.url.trim() : '',
                 onClick = this.props.onClick;
