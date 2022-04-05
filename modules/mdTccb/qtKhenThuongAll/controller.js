@@ -432,21 +432,55 @@ module.exports = app => {
         const ws = workBook.addWorksheet('Khen_thuong_Template');
         const defaultColumns = [
             { header: 'SỐ QUYẾT ĐỊNH', key: 'soQuyetDinh', width: 15 },
-            { header: 'LOẠI ĐỐI TƯỢNG', key: 'loaiDoiTuong', width: 15 },
-            { header: 'CÁN BỘ', key: 'canBo', width: 10 },
-            { header: 'ĐƠN VỊ', key: 'donVi', width: 10 },
-            { header: 'BỘ MÔN', key: 'boMon', width: 10 },
+            { header: 'LOẠI ĐỐI TƯỢNG', key: 'loaiDoiTuong', width: 20 },
+            { header: 'CÁN BỘ', key: 'canBo', width: 60 },
+            { header: 'ĐƠN VỊ', key: 'donVi', width: 50 },
+            { header: 'BỘ MÔN', key: 'boMon', width: 50 },
             { header: 'NĂM ĐẠT ĐƯỢC', key: 'namDatDuoc', width: 15 },
-            { header: 'THÀNH TÍCH', key: 'thanhTich', width: 20 },
-            { header: 'CHÚ THÍCH', key: 'chuThich', width: 20 },
+            { header: 'THÀNH TÍCH', key: 'thanhTich', width: 30 },
+            { header: 'CHÚ THÍCH', key: 'chuThich', width: 30 },
             { header: 'ĐIỂM THI ĐUA', key: 'diemThiDua', width: 15 },
         ];
         ws.columns = defaultColumns;
         ws.getRow(1).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', horizontal: 'center' };
-        const pendingLoaiDoiTuong = new Promise(resolve => app.model.dmKhenThuongLoaiDoiTuong.getAll((error, items) => resolve((items || []).map(item => item.ma + ': ' + item.ten))));
-        const pendingCanBo = new Promise(resolve => app.model.canBo.getAll((error, items) => resolve((items || []).map(item => item.shcc + ': ' + item.ho + ' ' + item.ten))));
-        const pendingBoMon = new Promise(resolve => app.model.dmBoMon.getAll((error, items) => resolve((items || []).map(item => item.ma + ': ' + item.ten))));
-        const pendingDonVi = new Promise(resolve => app.model.dmDonVi.getAll((error, items) => resolve((items || []).map(item => item.ma + ': ' + item.ten))));
+        const pendingLoaiDoiTuong = new Promise(resolve => app.model.dmKhenThuongLoaiDoiTuong.getAll({}, '*', 'ma', (error, items) => resolve((items || []).map(item => item.ma + ': ' + item.ten))));
+        const pendingCanBo = new Promise(resolve => {
+            const condition = {
+                statement: 'ngayNghi IS NULL',
+                parameter: {},
+            };
+            app.model.canBo.getAll(condition, '*', 'ho,ten', (error, items) => {
+                let data = [];
+                const traverse = (idx = 0) => {
+                    if (idx == items.length) {
+                        resolve(data);
+                        return;
+                    }
+                    app.model.dmDonVi.get({ ma: items[idx].maDonVi }, (error, itemDonVi) => {
+                        let tenDonVi = '';
+                        if (itemDonVi) tenDonVi = 'Khoa ' + itemDonVi.ten;
+                        data.push(items[idx].shcc + ': ' + items[idx].ho + ' ' + items[idx].ten + ' - ' + tenDonVi);
+                        traverse(idx + 1);
+                    });
+                };
+                traverse();
+            });
+        });
+        const pendingBoMon = new Promise(resolve => app.model.dmBoMon.getAll({}, '*', 'ma', (error, items) => {
+            let data = [];
+            const traverse = (idx = 0) => {
+                if (idx == items.length) {
+                    resolve(data);
+                    return;
+                }
+                app.model.dmDonVi.get({ ma: items[idx].maDv }, (error, itemDonVi) => {
+                    data.push(items[idx].ma + ': ' + items[idx].ten + ' - ' + 'Khoa ' + itemDonVi.ten);
+                    traverse(idx + 1);
+                });
+            };
+            traverse();
+        }));
+        const pendingDonVi = new Promise(resolve => app.model.dmDonVi.getAll({}, '*', 'ma', (error, items) => resolve((items || []).map(item => item.ma + ': ' + item.ten))));
         const pendingThanhTich = new Promise(resolve => app.model.dmKhenThuongKyHieu.getAll((error, items) => resolve((items || []).map(item => item.ma + ': ' + item.ten))));
         const pendingChuThich = new Promise(resolve => app.model.dmKhenThuongChuThich.getAll((error, items) => resolve((items || []).map(item => item.ma + ': ' + item.ten))));
         Promise.all([pendingLoaiDoiTuong, pendingCanBo, pendingBoMon, pendingDonVi, pendingThanhTich, pendingChuThich])
