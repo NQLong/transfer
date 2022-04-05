@@ -91,24 +91,31 @@ class QtKyLuatGroupPage extends AdminPage {
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
 
             T.showSearchBox(() => {
-                this.fromYear.value('');
-                this.toYear.value('');
+                let filterCookie = T.getCookiePage('groupPageMaQtKyLuat', 'F'), {
+                    fromYear = '', toYear = '', listHinhThucKyLuat = ''
+                } = filterCookie;
+                this.fromYear.value(fromYear);
+                this.toYear.value(toYear);
+                this.hinhThucKyLuat.value(listHinhThucKyLuat);
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
             this.getPage();
         });
     }
 
-    changeAdvancedSearch = (isInitial = false) => {
-        let { pageNumber, pageSize } = this.props && this.props.qtKyLuat && this.props.qtKyLuat.pageMa ? this.props.qtKyLuat.pageMa : { pageNumber: 1, pageSize: 50 };
+    changeAdvancedSearch = (isInitial = false, isReset = false) => {
+        let { pageNumber, pageSize, pageCondition } = this.props && this.props.qtKyLuat && this.props.qtKyLuat.page ? this.props.qtKyLuat.page : { pageNumber: 1, pageSize: 50, pageCondition: {} };
+
+        if (pageCondition && (typeof pageCondition == 'string')) T.setTextSearchBox(pageCondition);
+
         const fromYear = this.fromYear.value() == '' ? null : this.fromYear.value().getTime();
         const toYear = this.toYear.value() == '' ? null : this.toYear.value().getTime();
         const listDv = this.state.filter.listDv;
         const listShcc = this.state.filter.listShcc;
         const listHinhThucKyLuat = this.hinhThucKyLuat.value().toString() || '';
-        const pageFilter = isInitial ? null : { listDv, fromYear, toYear, listShcc, listHinhThucKyLuat };
+        const pageFilter = isInitial ? null : (isReset ? { listShcc, listDv } : { listDv, fromYear, toYear, listShcc, listHinhThucKyLuat });
         this.setState({ filter: pageFilter }, () => {
-            this.getPage(pageNumber, pageSize, (page) => {
+            this.getPage(pageNumber, pageSize, pageCondition, (page) => {
                 if (isInitial) {
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
@@ -116,6 +123,10 @@ class QtKyLuatGroupPage extends AdminPage {
                     this.toYear.value(filter.toYear || '');
                     this.hinhThucKyLuat.value(filter.listHinhThucKyLuat);
                     if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.listHinhThucKyLuat)) this.showAdvanceSearch();
+                } else if (isReset) {
+                    this.fromYear.value('');
+                    this.toYear.value('');
+                    this.hinhThucKyLuat.value('');
                 }
             });
         });
@@ -203,9 +214,17 @@ class QtKyLuatGroupPage extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />
-                    <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />
-                    <FormSelect className='col-12 col-md-4' multiple={true} ref={e => this.hinhThucKyLuat = e} label='Hình thức kỷ luật' data={SelectAdapter_DmKyLuatV2} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-4' label='Từ thời gian' />
+                    <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-4' label='Đến thời gian' />
+                    <FormSelect className='col-12 col-md-4' multiple={true} ref={e => this.hinhThucKyLuat = e} label='Hình thức kỷ luật' data={SelectAdapter_DmKyLuatV2} allowClear={true} minimumResultsForSearch={-1} />
+                    <div className='form-group col-12' style={{ justifyContent: 'end', display: 'flex' }}>
+                        <button className='btn btn-danger' style={{ marginRight: '10px' }} type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch(null, true)}>
+                            <i className='fa fa-fw fa-lg fa-times' />Xóa bộ lọc
+                        </button>
+                        <button className='btn btn-info' type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch()}>
+                            <i className='fa fa-fw fa-lg fa-search-plus' />Tìm kiếm
+                        </button>
+                    </div>
                 </div>
             </>,
             content: <>

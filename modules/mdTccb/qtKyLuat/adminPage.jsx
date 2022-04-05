@@ -107,16 +107,19 @@ class QtKyLuat extends AdminPage {
             T.clearSearchBox();
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
-                this.fromYear.value('');
-                this.toYear.value('');
-                this.maDonVi.value('');
-                this.mulCanBo.value('');
+                let filterCookie = T.getCookiePage('pageQtKyLuat', 'F'), {
+                    fromYear = '', toYear = '', listDv = '', listShcc = '', listHinhThucKyLuat = ''
+                } = filterCookie;
+                this.fromYear.value(fromYear);
+                this.toYear.value(toYear);
+                this.maDonVi.value(listDv);
+                this.mulCanBo.value(listShcc);
+                this.hinhThucKyLuat.value(listHinhThucKyLuat);
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
             if (this.checked) {
                 this.hienThiTheoCanBo.value(true);
             }
-            this.getPage();
             this.changeAdvancedSearch(true);
         });
     }
@@ -127,16 +130,19 @@ class QtKyLuat extends AdminPage {
     }
 
 
-    changeAdvancedSearch = (isInitial = false) => {
-        let { pageNumber, pageSize } = this.props && this.props.qtKyLuat && this.props.qtKyLuat.page ? this.props.qtKyLuat.page : { pageNumber: 1, pageSize: 50 };
+    changeAdvancedSearch = (isInitial = false, isReset = false) => {
+        let { pageNumber, pageSize, pageCondition } = this.props && this.props.qtKyLuat && this.props.qtKyLuat.page ? this.props.qtKyLuat.page : { pageNumber: 1, pageSize: 50, pageCondition: {} };
+
+        if (pageCondition && (typeof pageCondition == 'string')) T.setTextSearchBox(pageCondition);
+
         const fromYear = this.fromYear.value() == '' ? null : this.fromYear.value().getTime();
         const toYear = this.toYear.value() == '' ? null : this.toYear.value().getTime();
         const listDv = this.maDonVi.value().toString() || '';
         const listShcc = this.mulCanBo.value().toString() || '';
         const listHinhThucKyLuat = this.hinhThucKyLuat.value().toString() || '';
-        const pageFilter = isInitial ? null : { listDv, fromYear, toYear, listShcc, listHinhThucKyLuat };
+        const pageFilter = isInitial ? null : (isReset ? {} : { listDv, fromYear, toYear, listShcc, listHinhThucKyLuat });
         this.setState({ filter: pageFilter }, () => {
-            this.getPage(pageNumber, pageSize, '', (page) => {
+            this.getPage(pageNumber, pageSize, pageCondition, (page) => {
                 if (isInitial) {
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
@@ -146,6 +152,12 @@ class QtKyLuat extends AdminPage {
                     this.mulCanBo.value(filter.listShcc);
                     this.hinhThucKyLuat.value(filter.listHinhThucKyLuat);
                     if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.listShcc || filter.listDv || filter.listHinhThucKyLuat)) this.showAdvanceSearch();
+                } else if (isReset) {
+                    this.fromYear.value('');
+                    this.toYear.value('');
+                    this.maDonVi.value('');
+                    this.mulCanBo.value('');
+                    this.hinhThucKyLuat.value('');
                 }
             });
         });
@@ -270,11 +282,19 @@ class QtKyLuat extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-2' label='Từ thời gian' onChange={() => this.changeAdvancedSearch()} />
-                    <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-2' label='Đến thời gian' onChange={() => this.changeAdvancedSearch()} />
-                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
-                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
-                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.hinhThucKyLuat = e} label='Hình thức kỷ luật' data={SelectAdapter_DmKyLuatV2} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormDatePicker type='month-mask' ref={e => this.fromYear = e} className='col-12 col-md-2' label='Từ thời gian'  />
+                    <FormDatePicker type='month-mask' ref={e => this.toYear = e} className='col-12 col-md-2' label='Đến thời gian'  />
+                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi}  allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo}  allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.hinhThucKyLuat = e} label='Hình thức kỷ luật' data={SelectAdapter_DmKyLuatV2}  allowClear={true} minimumResultsForSearch={-1} />
+                    <div className='form-group col-12' style={{ justifyContent: 'end', display: 'flex' }}>
+                        <button className='btn btn-danger' style={{ marginRight: '10px' }} type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch(null, true)}>
+                            <i className='fa fa-fw fa-lg fa-times' />Xóa bộ lọc
+                        </button>
+                        <button className='btn btn-info' type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch()}>
+                            <i className='fa fa-fw fa-lg fa-search-plus' />Tìm kiếm
+                        </button>
+                    </div>
                 </div>
             </>,
             content: <>
