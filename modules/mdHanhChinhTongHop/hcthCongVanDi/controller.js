@@ -11,7 +11,7 @@ module.exports = app => {
         { name: 'hcthCongVanDi:delete' },
     );
     app.get('/user/hcth/cong-van-di', app.permission.check('hcthCongVanDi:read'), app.templates.admin);
-    app.get('/user/hcth/cong-van-di/:id', app.permission.check('hcthCongVanDen:read'), app.templates.admin);
+    app.get('/user/hcth/cong-van-di/:id', app.permission.check('hcthCongVanDi:read'), app.templates.admin);
 
     // APIs ----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/hcth/cong-van-di/search/page/:pageNumber/:pageSize', app.permission.check('hcthCongVanDi:read'), (req, res) => {

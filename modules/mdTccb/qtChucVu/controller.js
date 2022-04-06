@@ -15,13 +15,18 @@ module.exports = app => {
     app.get('/user/tccb/qua-trinh/chuc-vu/group/:shcc', app.permission.check('qtChucVu:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-
+    /// TCCB Apis -----------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/tccb/qua-trinh/chuc-vu/page/:pageNumber/:pageSize', app.permission.check('qtChucVu:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, listShcc, listDv, timeType, listCv, listCd, gioiTinh } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, timeType: 0, listCv: null, listCd: null, gioiTinh: null };
-        app.model.qtChucVu.searchPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, timeType, listCv, listCd, gioiTinh, searchTerm, (error, page) => {
+            let filter = '{}';
+            try {
+                filter = JSON.stringify(req.query.filter || {});
+            } catch(error) {
+                console.log(error);
+            }
+        app.model.qtChucVu.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -36,8 +41,13 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, listShcc, listDv, timeType, listCv, listCd, gioiTinh } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, timeType: 0, listCv: null, listCd: null, gioiTinh: null };
-        app.model.qtChucVu.groupPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, timeType, listCv, listCd, gioiTinh, searchTerm, (error, page) => {
+            let filter = '{}';
+            try {
+                filter = JSON.stringify(req.query.filter || {});
+            } catch(error) {
+                console.log(error);
+            }
+        app.model.qtChucVu.groupPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -51,11 +61,6 @@ module.exports = app => {
     app.get('/api/tccb/qua-trinh/chuc-vu/all', app.permission.check('qtChucVu:read'), (req, res) => {
         app.model.qtChucVu.getByShcc(req.query.shcc, (error, items) => res.send({ error, items }));
     });
-
-
-    // app.get('/api/tccb/qua-trinh/chuc-vu/all', app.permission.check('qtChucVu:read'), (req, res) => {
-    //     app.model.qtChucVu.getAll((error, items) => res.send({ error, items }));
-    // });
 
     app.post('/api/tccb/qua-trinh/chuc-vu', app.permission.check('qtChucVu:write'), async (req, res) => {
         let targetEmail = await app.getEmailByShcc(req.body.data.shcc);
@@ -81,58 +86,9 @@ module.exports = app => {
         });
     });
 
-    // app.post('/api/user/qua-trinh/chuc-vu', app.permission.check('staff:login'), (req, res) => {
-    //     if (req.body.data && req.session.user) {
-    //         const data = req.body.data;
-    //         app.model.qtChucVu.create(data, (error, item) => res.send({ error, item }));
-    //     } else {
-    //         res.send({ error: 'Invalstt parameter!' });
-    //     }
-    // });
+/// End TCCB Apis --------------------------------------------------------------------------------------------------------------------------------------------
 
-    // app.put('/api/user/qua-trinh/chuc-vu', app.permission.check('staff:login'), (req, res) => {
-    //     if (req.body.changes && req.session.user) {
-    //         app.model.qtChucVu.get({ stt: req.body.stt }, (error, item) => {
-    //             if (error || item == null) {
-    //                 res.send({ error: 'Not found!' });
-    //             } else {
-    //                 if (item.email === req.session.user.email) {
-    //                     const changes = req.body.changes;
-    //                     app.model.qtChucVu.update({ stt: req.body.stt }, changes, (error, item) => res.send({ error, item }));
-    //                 } else {
-    //                     res.send({ error: 'Not found!' });
-    //                 }
-    //             }
-    //         });
-    //     } else {
-    //         res.send({ error: 'Invalstt parameter!' });
-    //     }
-    // });
-
-    // app.delete('/api/user/qua-trinh/chuc-vu', app.permission.check('staff:login'), (req, res) => {
-    //     if (req.session.user) {
-    //         app.model.qtChucVu.get({ stt: req.body.stt }, (error, item) => {
-    //             if (error || item == null) {
-    //                 res.send({ error: 'Not found!' });
-    //             } else {
-    //                 if (item.email === req.session.user.email) {
-    //                     app.model.qtChucVu.delete({ stt: req.body.stt }, (error) => res.send(error));
-    //                 } else {
-    //                     res.send({ error: 'Not found!' });
-    //                 }
-    //             }
-    //         });
-    //     } else {
-    //         res.send({ error: 'Invalstt parameter!' });
-    //     }
-    // });
-
-    app.get('/api/tccb/qua-trinh/chuc-vu-by-shcc/:shcc', app.permission.check('staff:login'), (req, res) => {
-        app.model.qtChucVu.getByShcc(req.params.shcc, (error, item) => {
-            if (item && item.rows.length > 0) res.send({ error, item: item.rows });
-        });
-    });
-
+/// Others APIs ----------------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/qua-trinh/chuc-vu/download-excel/:listShcc/:listDv/:fromYear/:toYear/:timeType/:listCv/:gioiTinh', app.permission.check('qtChucVu:read'), (req, res) => {
         let { listDv, fromYear, toYear, listShcc, timeType, listCv, gioiTinh } = req.params ? req.params : { fromYear: null, toYear: null, listShcc: null, listDv: null, timeType: 0, listCv: null, gioiTinh: null };
         if (listShcc == 'null') listShcc = null;
@@ -168,26 +124,28 @@ module.exports = app => {
                         { cell: 'D1', value: 'NGÀY THÁNG NĂM SINH', bold: true, border: '1234' },
                         { cell: 'E1', value: 'GIỚI TÍNH', bold: true, border: '1234' },
                         { cell: 'F1', value: 'ĐƠN VỊ CÔNG TÁC', bold: true, border: '1234' },
-                        { cell: 'G1', value: 'CHỨC VỤ CHÍNH', bold: true, border: '1234' },
-                        { cell: 'H1', value: 'HỆ SỐ PHỤ CẤP', bold: true, border: '1234' },
-                        { cell: 'I1', value: 'SỐ QĐ BỔ NHIỆM', bold: true, border: '1234' },
-                        { cell: 'J1', value: 'NGÀY RA QĐ', bold: true, border: '1234' },
+                        { cell: 'G1', value: 'BỘ MÔN', bold: true, border: '1234' },
+                        { cell: 'H1', value: 'CHỨC VỤ CHÍNH', bold: true, border: '1234' },
+                        { cell: 'I1', value: 'HỆ SỐ PHỤ CẤP', bold: true, border: '1234' },
+                        { cell: 'J1', value: 'SỐ QĐ BỔ NHIỆM', bold: true, border: '1234' },
+                        { cell: 'K1', value: 'NGÀY RA QĐ', bold: true, border: '1234' },
                     ];
-                    for (let idx = 0, col = 10; idx < maxSoLuongKiemNhiem; idx++) {
+                    for (let idx = 0, col = 11; idx < maxSoLuongKiemNhiem; idx++) {
                         cells.push({ cell: String.fromCharCode(65 + col) + '1', value: 'CHỨC VỤ KIÊM NHIỆM ' + (idx + 1).toString(), bold: true, border: '1234' });
                         cells.push({ cell: String.fromCharCode(65 + col + 1) + '1', value: 'ĐƠN VỊ CÔNG TÁC', bold: true, border: '1234' });
-                        cells.push({ cell: String.fromCharCode(65 + col + 2) + '1', value: 'HỆ SỐ PHỤ CẤP', bold: true, border: '1234' });
-                        cells.push({ cell: String.fromCharCode(65 + col + 3) + '1', value: 'SỐ QĐ BỔ NHIỆM', bold: true, border: '1234' });
-                        cells.push({ cell: String.fromCharCode(65 + col + 4) + '1', value: 'NGÀY RA QĐ', bold: true, border: '1234' });
-                        col += 5;
+                        cells.push({ cell: String.fromCharCode(65 + col + 2) + '1', value: 'BỘ MÔN', bold: true, border: '1234' });
+                        cells.push({ cell: String.fromCharCode(65 + col + 3) + '1', value: 'HỆ SỐ PHỤ CẤP', bold: true, border: '1234' });
+                        cells.push({ cell: String.fromCharCode(65 + col + 4) + '1', value: 'SỐ QĐ BỔ NHIỆM', bold: true, border: '1234' });
+                        cells.push({ cell: String.fromCharCode(65 + col + 5) + '1', value: 'NGÀY RA QĐ', bold: true, border: '1234' });
+                        col += 6;
                     }
                     newRows.forEach((item, index) => {
-                        let danhSachChinh = null, chucVuChinh = null, ngayRaQdChinh = null, soQdChinh = null, heSoPhuCap = null;
+                        let danhSachChinh = null, chucVuChinh = null, donViChinh = null, boMonChinh = null, ngayRaQdChinh = null, soQdChinh = null, heSoPhuCap = null;
                         if (item.itemChinh) {
                             danhSachChinh = item.itemChinh.split('??');
                             chucVuChinh = danhSachChinh[0].trim();
-                            // donViChinh = danhSachChinh[1].trim();
-                            // boMonChinh = danhSachChinh[2].trim();
+                            donViChinh = danhSachChinh[1].trim();
+                            boMonChinh = danhSachChinh[2].trim();
                             ngayRaQdChinh = Number(danhSachChinh[3].trim());
                             soQdChinh = danhSachChinh[4].trim();
                             heSoPhuCap = parseFloat(danhSachChinh[5].trim());
@@ -195,28 +153,31 @@ module.exports = app => {
                         let hoTen = item.ho + ' ' + item.ten;
                         cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
                         cells.push({ cell: 'B' + (index + 2), border: '1234', value: item.shcc });
-                        cells.push({ cell: 'C' + (index + 2), border: '1234', value: hoTen });
+                        cells.push({ cell: 'C' + (index + 2), border: '1234', value: hoTen });  
                         cells.push({ cell: 'D' + (index + 2), alignment: 'center', border: '1234', value: item.ngaySinh ? app.date.dateTimeFormat(new Date(item.ngaySinh), 'dd/mm/yyyy') : '' });
                         cells.push({ cell: 'E' + (index + 2), border: '1234', value: item.gioiTinh == '01' ? 'Nam' : 'Nữ' });
-                        cells.push({ cell: 'F' + (index + 2), border: '1234', value: item.tenDonVi });
-                        cells.push({ cell: 'G' + (index + 2), border: '1234', value: chucVuChinh });
-                        cells.push({ cell: 'H' + (index + 2), border: '1234', value: heSoPhuCap });
-                        cells.push({ cell: 'I' + (index + 2), border: '1234', value: soQdChinh });
-                        cells.push({ cell: 'J' + (index + 2), border: '1234', value: ngayRaQdChinh ? app.date.dateTimeFormat(new Date(ngayRaQdChinh), 'dd/mm/yyyy') : '' });
-                        let idx = 0, col = 10;
+                        cells.push({ cell: 'F' + (index + 2), border: '1234', value: donViChinh });
+                        cells.push({ cell: 'G' + (index + 2), border: '1234', value: boMonChinh });
+                        cells.push({ cell: 'H' + (index + 2), border: '1234', value: chucVuChinh });
+                        cells.push({ cell: 'I' + (index + 2), border: '1234', value: heSoPhuCap });
+                        cells.push({ cell: 'J' + (index + 2), border: '1234', value: soQdChinh });
+                        cells.push({ cell: 'K' + (index + 2), border: '1234', value: ngayRaQdChinh ? app.date.dateTimeFormat(new Date(ngayRaQdChinh), 'dd/mm/yyyy') : '' });
+                        let idx = 0, col = 11;
                         if (item.soChucVuKiemNhiem > 0) {
                             let danhSachChucVuKiemNhiem = item.danhSachChucVuKiemNhiem.split('??');
                             let danhSachSoQdKiemNhiem = item.danhSachSoQdKiemNhiem.split('??');
                             let danhSachNgayQdKiemNhiem = item.danhSachNgayQdKiemNhiem.split('??');
                             let danhSachHeSoPhuCapKiemNhiem = item.danhSachHeSoPhuCapKiemNhiem.split('??');
                             let danhSachDonViKiemNhiem = item.danhSachDonViKiemNhiem.split('??');
+                            let danhSachBoMonKiemNhiem = item.danhSachBoMonKiemNhiem.split('??');
                             for (; idx < item.soChucVuKiemNhiem; idx++) {
                                 cells.push({ cell: String.fromCharCode(65 + col) + (index + 2), border: '1234', value: danhSachChucVuKiemNhiem[idx].trim() });
                                 cells.push({ cell: String.fromCharCode(65 + col + 1) + (index + 2), border: '1234', value: danhSachDonViKiemNhiem[idx].trim() });
-                                cells.push({ cell: String.fromCharCode(65 + col + 2) + (index + 2), border: '1234', value: parseFloat(danhSachHeSoPhuCapKiemNhiem[idx].trim()) });
-                                cells.push({ cell: String.fromCharCode(65 + col + 3) + (index + 2), border: '1234', value: danhSachSoQdKiemNhiem[idx].trim() });
-                                cells.push({ cell: String.fromCharCode(65 + col + 4) + (index + 2), border: '1234', value: danhSachNgayQdKiemNhiem[idx].trim() ? app.date.dateTimeFormat(new Date(Number(danhSachNgayQdKiemNhiem[idx].trim())), 'dd/mm/yyyy') : '' });
-                                col += 5;
+                                cells.push({ cell: String.fromCharCode(65 + col + 2) + (index + 2), border: '1234', value: danhSachBoMonKiemNhiem[idx].trim() });
+                                cells.push({ cell: String.fromCharCode(65 + col + 3) + (index + 2), border: '1234', value: parseFloat(danhSachHeSoPhuCapKiemNhiem[idx].trim()) });
+                                cells.push({ cell: String.fromCharCode(65 + col + 4) + (index + 2), border: '1234', value: danhSachSoQdKiemNhiem[idx].trim() });
+                                cells.push({ cell: String.fromCharCode(65 + col + 5) + (index + 2), border: '1234', value: danhSachNgayQdKiemNhiem[idx].trim() ? app.date.dateTimeFormat(new Date(Number(danhSachNgayQdKiemNhiem[idx].trim())), 'dd/mm/yyyy') : '' });
+                                col += 6;
                             }
                         }
                         for (; idx < maxSoLuongKiemNhiem; idx++) {
@@ -225,7 +186,8 @@ module.exports = app => {
                             cells.push({ cell: String.fromCharCode(65 + col + 2) + (index + 2), border: '1234', value: '' });
                             cells.push({ cell: String.fromCharCode(65 + col + 3) + (index + 2), border: '1234', value: '' });
                             cells.push({ cell: String.fromCharCode(65 + col + 4) + (index + 2), border: '1234', value: '' });
-                            col += 5;
+                            cells.push({ cell: String.fromCharCode(65 + col + 5) + (index + 2), border: '1234', value: '' });
+                            col += 6;
                         }
                     });
                     resolve(cells);
@@ -240,3 +202,5 @@ module.exports = app => {
 
     });
 };
+
+/// End Others APIs -------------------------------------------------------------------------------------------------------------------------------
