@@ -243,7 +243,6 @@ class QtKhenThuongAllImportPage extends AdminPage {
                 <EditModal ref={e => this.modal = e} permission={permission} readOnly={!permission.write} update={this.update} getLoaiDoiTuong={this.props.getDmKhenThuongLoaiDoiTuongAll} />
             </>,
             onSave: displayState == 'data' ? (e) => this.save(e) : null,
-            onReload: displayState == 'data' ? () => this.setState({ displayState: 'import', items: null }) : null,
             // onExport: displayState == 'import' ? () => T.download('/api/qua-trinh/khen-thuong-all/download-template') : null,
             backRoute: '/user/tccb/qua-trinh/khen-thuong-all',
         });
