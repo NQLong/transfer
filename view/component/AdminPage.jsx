@@ -823,9 +823,9 @@ export class AdminPage extends React.Component {
 
     showAdvanceSearch = () => $(this.advanceSearchBox).addClass('show');
 
-    renderPage = ({ icon, title, subTitle, header, breadcrumb, advanceSearch, content, backRoute, onCreate, onSave, onExport, onImport, onReload }) => {
+    renderPage = ({ icon, title, subTitle, header, breadcrumb, advanceSearch, content, backRoute, onCreate, onSave, onExport, onImport }) => {
 
-        let right = 10, createButton, saveButton, exportButton, importButton, reloadButton;
+        let right = 10, createButton, saveButton, exportButton, importButton;
         if (onCreate) {
             createButton = <CirclePageButton type='create' onClick={onCreate} style={{ right }} />;
             right += 60;
@@ -840,10 +840,6 @@ export class AdminPage extends React.Component {
         }
         if (onImport) {
             importButton = <CirclePageButton type='import' onClick={onImport} style={{ right }} />;
-            right += 60;
-        }
-        if (onReload) {
-            reloadButton = <CirclePageButton type='custom' customClassName='btn-warning' customIcon='fa-refresh' onClick={onReload} style={{ right }} />;
             right += 60;
         }
 
@@ -866,7 +862,7 @@ export class AdminPage extends React.Component {
                 </div>
                 {content}
                 {backRoute ? <CirclePageButton type='back' to={backRoute} /> : null}
-                {reloadButton} {importButton} {exportButton} {saveButton} {createButton}
+                {importButton} {exportButton} {saveButton} {createButton}
             </main>);
     }
 
