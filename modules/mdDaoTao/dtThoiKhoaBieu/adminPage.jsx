@@ -42,7 +42,7 @@ class EditModal extends AdminModal {
         this.setState({ maHocPhan: id }, () => {
             this.soTinChi?.value(this.monHocMapper[id].soTinChi);
             this.tongSoTiet?.value(this.monHocMapper[id].tongSoTiet);
-            this.boMon?.value(this.donviMapper[this.monHocMapper[id].boMon]);
+            this.boMon?.value(this.monHocMapper[id].boMon);
         });
     }
 

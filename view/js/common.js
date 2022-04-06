@@ -81,6 +81,11 @@ const T = {
         link.click();
     },
 
+    getCookiePage: (cookieName, key) => {
+        const pageData = T.storage(cookieName);
+        return pageData && pageData[key] ? pageData[key] : '';
+    },
+
     cookie: (cname, cvalue, exdays) => {
         if (cvalue === undefined) {
             const name = cname + '=';
