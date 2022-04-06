@@ -15,7 +15,7 @@ class AdminEditPage extends AdminPage {
     };
     componentDidMount() {
         T.ready('/user/hcth', () => {
-            const params = T.routeMatcher('/user/hcth/cong-van-di/:id').parse(window.location.pathname);
+            const params = T.routeMatcher('/user/hcth/cong-van-cac-phong/:id').parse(window.location.pathname);
             this.setState({ id: params.id === 'new' ? null : params.id }, () => this.getData());
         });
     }
@@ -124,7 +124,7 @@ class AdminEditPage extends AdminPage {
             linkCongVan: list
         };
         if (!changes.noiDung) {
-            T.notify('Nội dung bị trống', 'danger');
+            T.notify('Trích yếu bị trống', 'danger');
             this.noiDung.focus();
         } else if (!changes.ngayGui) {
             T.notify('Ngày gửi công văn bị trống', 'danger');
@@ -146,8 +146,8 @@ class AdminEditPage extends AdminPage {
                 this.props.updateHcthCongVanDi(this.state.id, changes, this.getData);
             } else {
                 T.notify('Thêm công văn thành công!', 'success');
-                this.props.createHcthCongVanDi(changes, () => this.props.history.push('/user/hcth/cong-van-di'));
-                this.props.history.push('/user/hcth/cong-van-di');
+                this.props.createHcthCongVanDi(changes, () => this.props.history.push('/user/hcth/cong-van-cac-phong'));
+                // this.props.history.push('/user/hcth/cong-van-cac-phong');
             }
         }
     }
@@ -171,12 +171,12 @@ class AdminEditPage extends AdminPage {
                 <tr key={index}>
                     <TableCell style={{ textAlign: 'right' }} content={index + 1} />
                     <TableCell type='text' style={{ wordBreak: 'break-all' }} content={<>
-                        <a href={'/api/hcth/cong-van-di/download' + item} download>{originalName}</a>
+                        <a href={'/api/hcth/cong-van-cac-phong/download' + item} download>{originalName}</a>
                     </>
                     } />
                     <TableCell style={{ textAlign: 'center' }} content={T.dateToText(timeStamp, 'dd/mm/yyyy HH:MM')}></TableCell>
                     <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onDelete={e => this.deleteFile(e, index, item)}>
-                        <a className='btn btn-info' href={`/api/hcth/cong-van-di/download${item}`} download>
+                        <a className='btn btn-info' href={`/api/hcth/cong-van-cac-phong/download${item}`} download>
                             <i className='fa fa-lg fa-download' />
                         </a>
                     </TableCell>
@@ -190,15 +190,15 @@ class AdminEditPage extends AdminPage {
         const readOnly = this.props.readOnly;
         return this.renderPage({
             icon: 'fa fa-caret-square-o-right',
-            title: 'Công văn đi của các đơn vị',
+            title: 'Công văn giữa các phòng',
             breadcrumb: [
                 <Link key={0} to='/user/hcth'>Hành chính tổng hợp </Link>,
-                <Link key={1} to='/user/hcth/cong-van-di'>Công văn đi của các đơn vị</Link>,
+                <Link key={1} to='/user/hcth/cong-van-cac-phong'>Công văn giữa các phòng</Link>,
                 this.state.id ? 'Cập nhật' : 'Tạo mới'
             ],
             content: <>
                 <div className='tile'>
-                    <h3 className='tile-title'>{!this.state.id ? 'Tạo mới công văn đi của các đơn vị' : 'Cập nhật công văn đi của các đơn vị'}</h3>
+                    <h3 className='tile-title'>{!this.state.id ? 'Tạo mới công văn giữa các phòng' : 'Cập nhật công văn giữa các phòng'}</h3>
                     <div className='tile-body row'>
                         <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayGui = e} label='Ngày gửi' readOnly={readOnly} required />
                         <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayKy = e} label='Ngày ký' readOnly={readOnly} required />
@@ -215,7 +215,7 @@ class AdminEditPage extends AdminPage {
                                 <div className='col-md-12' id='iscb'><FormSelect multiple={true} ref={e => this.canBoNhan = e} data={SelectAdapter_FwCanBo} readOnly={readOnly} required={this.state.isCanBo} /></div>
                             </div>
                         </div>
-                        <FormRichTextBox type='text' className='col-md-12' ref={e => this.noiDung = e} label='Nội dung' readOnly={readOnly} required />
+                        <FormRichTextBox type='text' className='col-md-12' ref={e => this.noiDung = e} label='Trích yếu' readOnly={readOnly} required />
                     </div>
                 </div>
                 <div className="tile">
@@ -230,7 +230,7 @@ class AdminEditPage extends AdminPage {
                     </div>
                 </div>
             </>,
-            backRoute: '/user/hcth/cong-van-di',
+            backRoute: '/user/hcth/cong-van-cac-phong',
             onSave: permission && permission.write ? this.save : null
         });
     }
