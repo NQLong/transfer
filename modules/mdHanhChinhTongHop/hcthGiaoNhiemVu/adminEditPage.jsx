@@ -33,44 +33,44 @@ class AdminEditPage extends AdminPage {
         listCanBo: []
     }
 
-    renderPhanHoi = (listPhanHoi) => {
-        const
-            contentStyle = {
-                display: 'flex',
-                flexDirection: 'column',
-                flex: 1,
-                backgroundColor: '#E3E3E3',
-                padding: '10px 10px 10px 10px',
-                borderRadius: '5px',
-            },
-            containerStyle = {
-                display: 'flex',
-                flexDirection: 'row',
-                gap: '15px'
-            };
-        return (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '10px' }}>
-                {(!listPhanHoi || listPhanHoi.length == 0) ? <span>Chưa có phản hồi</span> : (
+    // renderPhanHoi = (listPhanHoi) => {
+    //     const
+    //         contentStyle = {
+    //             display: 'flex',
+    //             flexDirection: 'column',
+    //             flex: 1,
+    //             backgroundColor: '#E3E3E3',
+    //             padding: '10px 10px 10px 10px',
+    //             borderRadius: '5px',
+    //         },
+    //         containerStyle = {
+    //             display: 'flex',
+    //             flexDirection: 'row',
+    //             gap: '15px'
+    //         };
+    //     return (
+    //         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '10px' }}>
+    //             {(!listPhanHoi || listPhanHoi.length == 0) ? <span>Chưa có phản hồi</span> : (
 
-                    listPhanHoi.map((item, index) => {
-                        let { ho, ten, image, ngayTao, noiDung } = item;
-                        return (
-                            <div key={index} style={containerStyle}>
-                                <div style={{}}><img src={image || '/img/avatar.png'} style={{ width: '48px', height: 'auto', paddingTop: '5px' }} /></div>
-                                <div style={contentStyle}>
-                                    <div style={{ borderBottom: '1px solid #000000 ', paddingLeft: '5px', ...containerStyle }}>
-                                        <b style={{ flex: 1 }}>{ho?.normalizedName()} {ten?.normalizedName()}</b>
-                                        <span>{T.dateToText(ngayTao, 'dd/mm/yyyy HH:MM')}</span>
-                                    </div>
-                                    <div style={{ paddingTop: '5px' }}>{noiDung}</div>
-                                </div>
-                            </div>
-                        );
-                    })
-                )}
-            </div>
-        );
-    }
+    //                 listPhanHoi.map((item, index) => {
+    //                     let { ho, ten, image, ngayTao, noiDung } = item;
+    //                     return (
+    //                         <div key={index} style={containerStyle}>
+    //                             <div style={{}}><img src={image || '/img/avatar.png'} style={{ width: '48px', height: 'auto', paddingTop: '5px' }} /></div>
+    //                             <div style={contentStyle}>
+    //                                 <div style={{ borderBottom: '1px solid #000000 ', paddingLeft: '5px', ...containerStyle }}>
+    //                                     <b style={{ flex: 1 }}>{ho?.normalizedName()} {ten?.normalizedName()}</b>
+    //                                     <span>{T.dateToText(ngayTao, 'dd/mm/yyyy HH:MM')}</span>
+    //                                 </div>
+    //                                 <div style={{ paddingTop: '5px' }}>{noiDung}</div>
+    //                             </div>
+    //                         </div>
+    //                     );
+    //                 })
+    //             )}
+    //         </div>
+    //     );
+    // }
 
 
     componentDidMount() {
@@ -85,10 +85,10 @@ class AdminEditPage extends AdminPage {
                 user
             }, () => this.getData());
 
-            if (staff && staff.maDonVi)
-                SelectAdapter_FwCanBo.getListByMaDonVi(staff.maDonVi, (item) => {
-                    this.setState({ listCanBo: item });
-                });
+            // if (staff && staff.maDonVi)
+            //     SelectAdapter_FwCanBo.getListByMaDonVi(staff.maDonVi, (item) => {
+            //         this.setState({ listCanBo: item });
+            //     });
         });
     }
 
@@ -256,11 +256,11 @@ class AdminEditPage extends AdminPage {
                         { presidentPermission && presidentPermission.login && 
                             <FormSelect multiple={true} className='col-md-6' ref={e => this.donViNhan = e} label='Đơn vị nhận công việc' data={SelectAdapter_DmDonVi} readOnly={readOnly} />
                         }
-                        <FormSelect multiple={true} className='col-md-6' ref={e => this.canBoNhan = e} label='Cán bộ nhận công việc' data={SelectAdapter_FwCanBo} readOnly={readOnly} />
+                        <FormSelect multiple={true} className='col-md-6' ref={e => this.canBoNhan = e} label='Cán bộ nhận công văn' data={SelectAdapter_FwCanBo} readOnly={readOnly} />
                         <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayHetHan = e} label='Ngày hết hạn' readOnly={readOnly} required />
                     </div>
                 </div>
-                <div className='tile'>
+                {/* <div className='tile'>
                     <div className='form-group'>
                         <h3 className='tile-title'>Phản hồi</h3>
                         <div className='tile-body row'>
@@ -278,7 +278,7 @@ class AdminEditPage extends AdminPage {
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> */}
                 <EditModal ref={e => this.modal = e}
                     permissions={dmDonViGuiCvPermission}
                     create={this.onCreateDonviGui}
