@@ -41,8 +41,9 @@ module.exports = app => {
         let pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe } = req.query.filter && req.query.filter != '%%%%%%%%%%%%' ? req.query.filter : { listDonVi: null, gender: null, listNgach: null, listHocVi: null, listChucDanh: null, isBienChe: null };
-        app.model.canBo.searchPage(pageNumber, pageSize, listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe, searchTerm, (error, page) => {
+        const filter = JSON.stringify(req.query.filter || {});
+
+        app.model.canBo.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -2223,4 +2224,52 @@ module.exports = app => {
     app.uploadHooks.add('staffData', (req, fields, files, params, done) =>
         app.permission.has(req, () => staffImportData(req, fields, files, params, done), done, 'staff:write'));
 
+    app.get('/api/staff/download-excel/:filter', checkGetStaffPermission, (req, res) => {
+        app.model.canBo.download(req.params.filter, (err, result) => {
+            if (err || !result) {
+                res.send({ err });
+            } else {
+                const workbook = app.excel.create(),
+                    worksheet = workbook.addWorksheet('Sheet1');
+                new Promise(resolve => {
+                    let cells = [
+                        // Table name: TCHC_CAN_BO { ten, ho, phai, dienThoaiCaNhan, email, ngaySinh, ngayBatDauCongTac, ngayCbgd, ngayBienChe, ngayNghi, ngach, heSoLuong, bacLuong, mocNangLuong, ngayHuongLuong, tyLeVuotKhung, maChucVu, chucVuDoanThe, chucVuDang, chucVuKiemNhiem, hoKhau, diaChiHienTai, danToc, tonGiao, dangVien, maDonVi, phucLoi, nhaGiaoNhanDan, nhaGiaoUuTu, ghiChu, shcc, emailCaNhan, biDanh, dienThoaiBaoTin, ngheNghiepCu, cmnd, cmndNgayCap, cmndNoiCap, chucVuKhac, quocGia, chucDanh, trinhDoPhoThong, hocVi, chuyenNganh, sucKhoe, canNang, chieuCao, ngayNhapNgu, ngayXuatNgu, quanHamCaoNhat, hangThuongBinh, giaDinhChinhSach, danhHieu, maXaNoiSinh, maHuyenNoiSinh, maTinhNoiSinh, maXaNguyenQuan, maHuyenNguyenQuan, maTinhNguyenQuan, ngayVaoDang, ngayVaoDangChinhThuc, noiDangDb, noiDangCt, ngayVaoDoan, noiVaoDoan, soTheDang, soTruong, nhomMau, soBhxh, doanVien, namChucDanh, namHocVi, noiSinh, queQuan, thuongTruMaHuyen, thuongTruMaTinh, thuongTruMaXa, thuongTruSoNha, hienTaiMaHuyen, hienTaiMaTinh, hienTaiMaXa, hienTaiSoNha, hopDongCanBo, hopDongCanBoNgay, userModified, lastModified, dangNghiThaiSan, ngayBatDauNghiThaiSan, ngayKetThucNghiThaiSan, congDoan, ngayVaoCongDoan, maTheBhyt, noiKhamChuaBenhBanDau, quyenLoiKhamChuaBenh, dangNghiKhongHuongLuong, ngayBatDauNghiKhongHuongLuong, ngayKetThucNghiKhongHuongLuong, lyDoNghiKhongHuongLuong, doiTuongBoiDuongKienThucQpan, ngayBatDauBhxh, ngayKetThucBhxh, tuNhanXet, tinhTrangBoiDuong, namBoiDuong, khoaBoiDuong, trinhDoChuyenMon, namTotNghiep, phuCapChucVu, tyLePhuCapThamNien, tyLePhuCapUuDai, loaiDoiTuongBoiDuong, loaiHopDong, cuNhan, thacSi, tienSi, chuyenNganhChucDanh, coSoChucDanh }
+                        { cell: 'A1', value: 'STT', bold: true, border: '1234' },
+                        { cell: 'B1', value: 'MÃ SỐ CÁN BỘ', bold: true, border: '1234' },
+                        { cell: 'C1', value: 'HỌ', bold: true, border: '1234' },
+                        { cell: 'D1', value: 'TÊN', bold: true, border: '1234' },
+                        { cell: 'E1', value: 'NGÀY SINH', bold: true, border: '1234' },
+                        { cell: 'F1', value: 'QUÊ QUÁN', bold: true, border: '1234' },
+                        { cell: 'G1', value: 'DÂN TỘC', bold: true, border: '1234' },
+                        { cell: 'H1', value: 'TÔN GIÁO', bold: true, border: '1234' },
+                        { cell: 'I1', value: 'CHỨC VỤ', bold: true, border: '1234' },
+                        { cell: 'J1', value: 'BỔ NHIỆM NGÀY', bold: true, border: '1234' },
+                        { cell: 'K1', value: 'ĐƠN VỊ CÔNG TÁC', bold: true, border: '1234' },
+                        { cell: 'L1', value: 'CHỨC DANH NGHỀ NGHIỆP', bold: true, border: '1234' },
+                    ];
+                    result.rows.forEach((item, index) => {
+                        cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
+                        cells.push({ cell: 'B' + (index + 2), border: '1234', value: item.shcc });
+                        cells.push({ cell: 'C' + (index + 2), border: '1234', value: item.ho });
+                        cells.push({ cell: 'D' + (index + 2), border: '1234', value: item.ten });
+                        cells.push({ cell: 'E' + (index + 2), alignment: 'center', border: '1234', value: item.ngaySinh ? app.date.dateTimeFormat(new Date(item.ngaySinh), 'dd/mm/yyyy') : '' });
+                        cells.push({ cell: 'F' + (index + 2), border: '1234', value: item.queQuan });
+                        cells.push({ cell: 'G' + (index + 2), border: '1234', value: item.tenDanToc });
+                        cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.tenTonGiao });
+                        cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.chucVuChinh });
+                        cells.push({ cell: 'J' + (index + 2), alignment: 'center', border: '1234', value: item.boNhiemNgay ? app.date.dateTimeFormat(new Date(item.boNhiemNgay), 'dd/mm/yyyy') : '' });
+                        cells.push({ cell: 'K' + (index + 2), border: '1234', value: item.tenDonVi });
+                        cells.push({ cell: 'L' + (index + 2), border: '1234', value: item.chucDanhNgheNghiep });
+                    });
+                    resolve(cells);
+                }).then((cells) => {
+                    app.excel.write(worksheet, cells);
+                    app.excel.attachment(workbook, res, 'Danh sach can bo.xlsx');
+                }).catch((error) => {
+                    res.send({ error });
+                });
+            }
+        });
+
+    });
 };
