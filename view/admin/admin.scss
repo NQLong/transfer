@@ -57,6 +57,10 @@
     width: 100% !important;
 }
 
+.select2-container li:only-child, .select2-container input:placeholder-shown {
+    width: 100% !important;
+}
+
 .menuList > li {
     width: "100%";
     margin-top: 10px;

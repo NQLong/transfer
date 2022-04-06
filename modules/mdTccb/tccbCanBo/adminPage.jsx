@@ -50,17 +50,18 @@ class StaffPage extends AdminPage {
                 if (isInitial) {
                     // Initial
                     const filter = page.filter || {};
+                    const filterCookie = T.getCookiePage(PageName, 'F');
                     let { listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe } = filter;
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
 
-                    this.listDonVi.value(listDonVi);
-                    this.gender.value(gender);
-                    this.listNgach.value(listNgach);
-                    this.listHocVi.value(listHocVi);
-                    this.listChucDanh.value(listChucDanh);
-                    this.isBienChe.value(isBienChe);
-
-                    if (!$.isEmptyObject(filter) && filter && listDonVi && gender && listNgach && listHocVi && listChucDanh && isBienChe) this.showAdvanceSearch();
+                    this.listDonVi.value(listDonVi || filterCookie.listDonVi || '');
+                    this.gender.value(gender || filterCookie.gender || '');
+                    this.listNgach.value(listNgach || filterCookie.listNgach || '');
+                    this.listHocVi.value(listHocVi || filterCookie.listHocVi || '');
+                    this.listChucDanh.value(listChucDanh || filterCookie.listChucDanh || '');
+                    this.isBienChe.value(isBienChe || filterCookie.listChucDanh || '');
+                    if (this.listDonVi.value() || this.gender.value() || this.listNgach.value() ||
+                        this.listHocVi.value() || this.listChucDanh.value() || this.isBienChe.value()) this.showAdvanceSearch();
                 } else if (isReset) {
                     this.listDonVi.value('');
                     this.gender.value('');

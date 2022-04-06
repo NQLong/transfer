@@ -27,6 +27,28 @@ module.exports = app => {
                 statement: 'maDonVi IN (:listDonVi)',
                 parameter: { listDonVi }
             };
-        listDonVi.length ? app.model.canBo.getAll(condition, 'ho,ten,email,dienThoaiCaNhan,ngach,maDonVi,ngayNghi', 'maDonVi', (error, items) => res.send({ error, items })) : res.send({ items: [] });
+        listDonVi.length ? app.model.canBo.getAll(condition, 'shcc,ho,ten,email,dienThoaiCaNhan,ngach,maDonVi,ngayNghi', 'ten', (error, items) => {
+            if (error || !items) res.send({ error });
+            else if (listDonVi.includes('30')) {
+                let result = [];
+                items.forEach((tccbStaff, index, list) =>
+                    app.model.tccbStaffLog.get({ email: tccbStaff.email }, (error, tccbLog) => {
+                        if (error) {
+                            res.send({ error });
+                        } else {
+                            app.model.dmNgachCdnn.get({ ma: tccbStaff.ngach }, (error, ngachCDNN) => {
+                                if (!error && ngachCDNN) {
+                                    tccbStaff = app.clone(tccbStaff, { tccbLog, tenNgach: ngachCDNN.ten });
+                                    result.push(tccbStaff);
+                                    if (index === list.length - 1) res.send({ error, items: result });
+                                }
+                            });
+                        }
+                    }
+                    ));
+            } else {
+                res.send({ error, items });
+            }
+        }) : res.send({ items: [] });
     });
 };

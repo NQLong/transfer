@@ -19,7 +19,7 @@ export class TableCell extends React.Component { // type = number | date | link 
         } else if (type == 'number') {
             return <td className={className} style={{ textAlign: 'right', ...style }} rowSpan={rowSpan} colSpan={colSpan}>{content && !isNaN(content) ? T.numberDisplay(content) : content}</td>;
         } else if (type == 'date') {
-            return <td className={className} style={{ ...style }} rowSpan={rowSpan} colSpan={colSpan}>{dateFormat ? T.dateToText(content, dateFormat) : new Date(content).getText()}</td>;
+            return <td className={className} style={{ ...style }} rowSpan={rowSpan} colSpan={colSpan}>{content ? (dateFormat ? T.dateToText(content, dateFormat) : new Date(content).getText()) : ''}</td>;
         } else if (type == 'link') {
             let url = this.props.url ? this.props.url.trim() : '',
                 onClick = this.props.onClick;
@@ -53,7 +53,7 @@ export class TableCell extends React.Component { // type = number | date | link 
                         {permission.write && onSwap ?
                             <a className='btn btn-warning' href='#' onClick={e => e.preventDefault() || onSwap(e, content, false)}><i className='fa fa-lg fa-arrow-down' /></a> : null}
                         {onEdit && typeof onEdit == 'function' ?
-                            <a className='btn btn-primary' href='#' title='Chỉnh sửa' onClick={e => e.preventDefault() || onEdit(e, content)}><i className={'fa fa-lg ' + (permission.write ? 'fa-edit' : 'fa-eye')} /></a> : null}
+                            <a className='btn btn-primary' href='#' title={permission.write ? 'Chỉnh sửa' : 'Xem'} onClick={e => e.preventDefault() || onEdit(e, content)}><i className={'fa fa-lg ' + (permission.write ? 'fa-edit' : 'fa-eye')} /></a> : null}
                         {onEdit && typeof onEdit == 'string' ?
                             <Link to={onEdit} className='btn btn-primary'><i className='fa fa-lg fa-edit' /></Link> : null}
                         {permission.delete && onDelete ?
@@ -63,6 +63,50 @@ export class TableCell extends React.Component { // type = number | date | link 
         } else {
             return <td className={className} style={{ ...style }} rowSpan={rowSpan} colSpan={colSpan}><div style={contentStyle} className={contentClassName}>{content}</div></td>;
         }
+    }
+}
+
+export class TableHeader extends React.Component {
+    state = {
+        type: 0,
+        filter: {}
+    }
+
+    sortSwitcher = [
+        { className: 'fa fa-sort', value: null },
+        { className: 'fa fa-sort-desc', value: 'DESC' },
+        { className: 'fa fa-sort-asc', value: 'ASC' }
+    ]
+
+
+
+    onSortChange = (e, done) => {
+        e.preventDefault();
+        this.setState({ type: (this.state.type + 1) % 3 }, () => {
+            done && done(this.sortSwitcher[this.state.type].value);
+        });
+    }
+
+
+    render() {
+        let
+            { style, className, children, sort, isSorted = true, onSort } = this.props,
+            type = this.state.type,
+            sortType = isSorted ? this.sortSwitcher[type] : this.sortSwitcher[0];
+
+        return (
+            <th style={style} className={className}>
+                {
+                    sort ? <div style={{ display: 'flex', flexDirection: 'row', gap: '10px', alignItems: 'center' }}>
+                        <span style={{ flex: 1 }}>
+                            {children}
+                        </span>
+                        <i className={sortType.className} ariaHidden='true' onClick={(e) => this.onSortChange(e, onSort)} />
+                    </div>
+                        : children
+                }
+            </th>
+        );
     }
 }
 
@@ -99,6 +143,61 @@ export function renderTable({
     } else {
         return <b>{emptyTable}</b>;
     }
+}
+
+
+export function renderComment({
+    renderAvatar = () => null, renderName = () => null, renderContent = () => null, renderTime = () => null, getDataSource = () => null, loadingText = 'Đang tải ...',
+    emptyComment = 'Chưa có phản hồi'
+}) {
+    const list = getDataSource();
+    if (list == null) {
+        return (
+            <div className='overlay' style={{ minHeight: '120px' }}>
+                <div className='m-loader mr-4'>
+                    <svg className='m-circular' viewBox='25 25 50 50'>
+                        <circle className='path' cx='50' cy='50' r='20' fill='none' strokeWidth='4' strokeMiterlimit='10' />
+                    </svg>
+                </div>
+                <h3 className='l-text'>{loadingText}</h3>
+            </div>);
+    } else if (list.length) {
+        const
+            contentStyle = {
+                display: 'flex',
+                flexDirection: 'column',
+                flex: 1,
+                backgroundColor: '#E3E3E3',
+                padding: '10px 10px 10px 10px',
+                borderRadius: '5px',
+            },
+            flexRow = {
+                display: 'flex',
+                flexDirection: 'row',
+                gap: '15px'
+            };
+        return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '10px' }}>
+                {
+                    list.map((item, index) => {
+                        return (
+                            <div key={index} style={flexRow}>
+                                <div >{renderAvatar(item)}</div>
+                                <div style={contentStyle}>
+                                    <div style={{ borderBottom: '1px solid #000000 ', paddingLeft: '5px', ...flexRow }}>
+                                        <b style={{ flex: 1 }}>{renderName(item)}</b>
+                                        <span>{renderTime(item)}</span>
+                                    </div>
+                                    <div style={{ paddingTop: '5px' }}>{renderContent(item)}</div>
+                                </div>
+                            </div>
+                        );
+                    })
+                }
+            </div>
+        );
+    } else
+        return <b>{emptyComment}</b>;
 }
 
 // Form components ----------------------------------------------------------------------------------------------------
@@ -160,23 +259,23 @@ export class FormCheckbox extends React.Component {
         }
     }
 
-    onCheck = () => this.props.readOnly || this.setState({ checked: !this.state.checked }, () => this.props.onChange && this.props.onChange(this.state.checked));
+    onCheck = () => this.props.disabled || this.props.readOnly || this.setState({ checked: !this.state.checked }, () => this.props.onChange && this.props.onChange(this.state.checked));
 
     render() {
-        let { className = '', label, style, isSwitch = false, trueClassName = 'text-primary', falseClassName = 'text', inline = true } = this.props;
+        let { className = '', label, style, isSwitch = false, trueClassName = 'text-primary', falseClassName = 'text', inline = true, disabled = false } = this.props;
         if (style == null) style = {};
         return isSwitch ? (
             <div className={className} style={{ ...style, display: inline ? 'inline-flex' : '' }}>
                 <label style={{ cursor: 'pointer' }} onClick={this.onCheck}>{label}:&nbsp;</label>
                 <div className='toggle'>
                     <label style={{ marginBottom: 0 }}>
-                        <input type='checkbox' checked={this.state.checked} onChange={this.onCheck} /><span className='button-indecator' />
+                        <input type='checkbox' disabled={disabled} checked={this.state.checked} onChange={this.onCheck} /><span className='button-indecator' />
                     </label>
                 </div>
             </div>) : (
             <div className={'animated-checkbox ' + className} style={style}>
                 <label>
-                    <input type='checkbox' checked={this.state.checked} onChange={this.onCheck} />
+                    <input type='checkbox' disabled={disabled} checked={this.state.checked} onChange={this.onCheck} />
                     <span className={'label-text ' + (this.props.readOnly ? 'text-secondary' : (this.state.checked ? trueClassName : falseClassName))}>{label}</span>
                 </label>
             </div>
@@ -315,7 +414,7 @@ export class FormTextBox extends React.Component {
     clear = () => this.input.clear();
 
     render() {
-        let { type = 'text', smallText = '', label = '', placeholder = '', className = '', style = {}, readOnly = false, onChange = null, required = false, maxLength = 100 } = this.props,
+        let { type = 'text', smallText = '', label = '', placeholder = '', className = '', style = {}, readOnly = false, onChange = null, required = false, maxLength = 100, readOnlyEmptyText = '' } = this.props,
             readOnlyText = this.state.value;
         type = type.toLowerCase(); // type = text | number | email | password | phone | year
         if (type == 'number') {
@@ -340,9 +439,9 @@ export class FormTextBox extends React.Component {
                 help = <small id='help' className='form-text text-muted'>Chuỗi nhập chỉ được phép chứa tối đa {maxLength} kí tự <br/>Số kí tự hiện tại: {this.state.value.length} </small>;
             }
             if (label) {
-                displayElement = <><label onClick={() => this.input.focus()}>{label}{!readOnly && required ? <span style={{ color: 'red' }}> *</span> : ''}</label>{readOnly ? <>: <b>{readOnlyText}</b></> : ''}</>;
+                displayElement = <><label onClick={() => this.input.focus()}>{label}{!readOnly && required ? <span style={{ color: 'red' }}> *</span> : ''}</label>{readOnly ? <>: <b>{readOnlyText || readOnlyEmptyText}</b></> : ''}</>;
             } else {
-                displayElement = readOnly ? <b>{readOnlyText}</b> : '';
+                displayElement = readOnly ? <b>{readOnlyText || readOnlyEmptyText}</b> : '';
             }
 
             return (
@@ -626,10 +725,10 @@ export class FormDatePicker extends React.Component {
     }
 
     render() {
-        let { label = '', type = 'date', className = '', readOnly = false, required = false, style = {} } = this.props; // type = date || time || date-mask || time-mask || month-mask
+        let { label = '', type = 'date', className = '', readOnly = false, required = false, style = {}, readOnlyEmptyText = '' } = this.props; // type = date || time || date-mask || time-mask || month-mask
         return (
             <div className={'form-group ' + (className || '')} style={style}>
-                <label onClick={() => this.focus()}>{label}{!readOnly && required ? <span style={{ color: 'red' }}> *</span> : ''}</label>{readOnly && this.state.value ? <>: <b>{this.state.readOnlyText}</b></> : ''}
+                <label onClick={() => this.focus()}>{label}{!readOnly && required ? <span style={{ color: 'red' }}> *</span> : ''}</label>{readOnly && this.state.value ? <>: <b>{this.state.readOnlyText}</b></> : readOnly && readOnlyEmptyText && <b>: {readOnlyEmptyText}</b>}
                 {(type.endsWith('-mask') || type == 'date-month') ? (
                     <InputMask ref={e => this.input = e} className='form-control' mask={this.mask[type]} onChange={this.handleChange} style={{ display: readOnly ? 'none' : '' }} formatChars={{ '2': '[12]', '0': '[09]', '1': '[01]', '3': '[0-3]', '9': '[0-9]', '5': '[0-5]', 'h': '[0-2]' }} value={this.state.value} readOnly={readOnly} placeholder={label} />
                 ) : (
