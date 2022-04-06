@@ -9,6 +9,7 @@ const texts = {
         address: 'Địa chỉ',
         yourName: 'Tên của bạn',
         yourEmail: 'Email của bạn',
+        yourPhone: 'Số điện thoại liên hệ',
         subject: 'Tiêu đề thư',
         message: 'Nội dung',
         sendMessage: 'Gửi',
@@ -25,6 +26,7 @@ const texts = {
         address: 'Address',
         yourName: 'Your name',
         yourEmail: 'Your email',
+        yourPhone: 'Your phone number',
         subject: 'Subject',
         message: 'Message',
         sendMessage: 'Send message',
@@ -44,6 +46,8 @@ class SectionContact extends React.Component {
         this.email = React.createRef();
         this.subject = React.createRef();
         this.message = React.createRef();
+        this.phoneNumber = React.createRef();
+
         this.state = {
             address: ''
         };
@@ -61,14 +65,14 @@ class SectionContact extends React.Component {
             T.notify(language.alertEmptyName, 'danger');
             (this.name.current).focus();
         }
-        // else if (this.email.current.value == '') {
-        //     T.notify(language.alertEmptyEmail, 'danger');
-        //     (this.email.current).focus();
-        // } 
-        // else if (!T.validateEmail(this.email.current.value)) {
-        //     T.notify(language.alertInvalidEmail, 'danger');
-        //     (this.email.current).focus();
-        // } 
+        else if (this.email.current.value == '') {
+            T.notify(language.alertEmptyEmail, 'danger');
+            (this.email.current).focus();
+        }
+        else if (!T.validateEmail(this.email.current.value)) {
+            T.notify(language.alertInvalidEmail, 'danger');
+            (this.email.current).focus();
+        }
         else if (this.subject.current.value == '') {
             T.notify(language.alertEmptySubject, 'danger');
             (this.subject.current).focus();
@@ -78,11 +82,17 @@ class SectionContact extends React.Component {
         } else {
             this.props.createContact({
                 name: this.name.current.value,
-                // email: this.email.current.value,
+                email: this.email.current.value,
                 subject: this.subject.current.value,
-                message: this.message.current.value
+                message: this.message.current.value,
+                phoneNumber: this.phoneNumber.current.value,
+                maDonVi: this.state.maDonVi || '0',
             }, () => {
-                this.name.current.value = this.subject.current.value = this.message.current.value = '';
+                this.name.current.value
+                    = this.subject.current.value
+                    = this.message.current.value
+                    = this.email.current.value
+                    = this.phoneNumber.current.value = '';
                 T.notify(language.sendSuccess, 'success', true, 3000);
             });
         }
@@ -91,7 +101,6 @@ class SectionContact extends React.Component {
     render() {
         const language = T.language(texts);
         let { map, linkMap } = this.props.system ? this.props.system : { map: '', linkMap: '' };
-        // address = T.language.parse(address);
         return (
             <section className='contact-section ftco-degree-bg' style={{ padding: '5em 0' }}>
                 <div className='container'>
@@ -116,9 +125,12 @@ class SectionContact extends React.Component {
                                 <div className='form-group'>
                                     <input type='text' className='form-control' autoComplete='off' style={{ fontSize: '17px' }} ref={this.name} placeholder={language.yourName} />
                                 </div>
-                                {/* <div className='form-group'>
+                                <div className='form-group'>
                                     <input type='email' className='form-control' autoComplete='off' style={{ fontSize: '17px' }} ref={this.email} placeholder={language.yourEmail} />
-                                </div> */}
+                                </div>
+                                <div className='form-group'>
+                                    <input type='phone' className='form-control' autoComplete='off' style={{ fontSize: '17px' }} ref={this.phoneNumber} placeholder={language.yourPhone} />
+                                </div>
                                 <div className='form-group'>
                                     <input type='text' className='form-control' autoComplete='off' style={{ fontSize: '17px' }} ref={this.subject} placeholder={language.subject} />
                                 </div>

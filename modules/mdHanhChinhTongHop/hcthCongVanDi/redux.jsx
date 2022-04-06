@@ -30,7 +30,7 @@ export function getHcthCongVanDiPage(pageNumber, pageSize, pageCondition, filter
     }
     const page = T.updatePage('pageHcthCongVanDi', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
-        const url = `/api/hcth/cong-van-di/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/hcth/cong-van-cac-phong/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách sách công văn giữa các phòng bị lỗi!, 1', 'danger');
@@ -47,7 +47,7 @@ export function getHcthCongVanDiPage(pageNumber, pageSize, pageCondition, filter
 
 export function getHcthCongVanDiAll(done) {
     return dispatch => {
-        const url = '/api/hcth/cong-van-di/all';
+        const url = '/api/hcth/cong-van-cac-phong/all';
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy danh sách công văn giữa các phòng bị lỗi, 3' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -62,7 +62,7 @@ export function getHcthCongVanDiAll(done) {
 
 export function getHcthCongVanDi(id, done) {
     return () => {
-        const url = `/api/hcth/cong-van-di/item/${id}`;
+        const url = `/api/hcth/cong-van-cac-phong/item/${id}`;
         T.get(url, { id }, data => {
             if (data.error) {
                 T.notify('Lấy thông tin đơn vị gửi công văn bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -76,15 +76,14 @@ export function getHcthCongVanDi(id, done) {
     };
 }
 
-export function createHcthCongVanDi(data, done){
+export function createHcthCongVanDi(data, done) {
     return dispatch => {
-        const url = '/api/hcth/cong-van-di';
+        const url = '/api/hcth/cong-van-cac-phong';
         T.post(url, { data }, res => {
             if (res.error) {
                 T.notify('Thêm công văn giữa các phòng bị lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
-                // console.log(data);
                 T.notify('Thêm công văn giữa các phòng thành công!', 'success');
                 dispatch(getHcthCongVanDiSearchPage());
                 done && done(data);
@@ -95,7 +94,7 @@ export function createHcthCongVanDi(data, done){
 
 export function updateHcthCongVanDi(id, changes, done) {
     return dispatch => {
-        const url = '/api/hcth/cong-van-di';
+        const url = '/api/hcth/cong-van-cac-phong';
         T.put(url, { id, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật công văn giữa các phòng bị lỗi!', 'danger');
@@ -112,7 +111,7 @@ export function updateHcthCongVanDi(id, changes, done) {
 
 export function deleteHcthCongVanDi(id) {
     return dispatch => {
-        const url = '/api/hcth/cong-van-di';
+        const url = '/api/hcth/cong-van-cac-phong';
         T.delete(url, { id }, data => {
             if (data.error) {
                 T.notify('Xóa công văn giữa các phòng bị lỗi!, lỗi 1', 'danger');
@@ -133,14 +132,12 @@ export function getHcthCongVanDiSearchPage(pageNumber, pageSize, pageCondition, 
     }
     const page = T.updatePage('pageHcthCongVanDi', pageNumber, pageSize, pageCondition, filter);
     return dispatch => {
-        const url = `/api/hcth/cong-van-di/search/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/hcth/cong-van-cac-phong/search/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách công văn đến bị lỗi, s1' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                // T.notify(page.filter)
-                // console.log("data" + data);
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 if (page.filter) data.page.filter = page.filter;
                 dispatch({ type: hcthCongVanDiSearchPage, page: data.page });
@@ -152,7 +149,7 @@ export function getHcthCongVanDiSearchPage(pageNumber, pageSize, pageCondition, 
 
 export function deleteFile(id, index, file, done) {
     return () => {
-        const url = '/api/hcth/cong-van-di/delete-file';
+        const url = '/api/hcth/cong-van-cac-phong/delete-file';
         T.put(url, { id, index, file }, data => {
             if (data.error) {
                 console.error('PUT: ' + url + '.', data.error);
@@ -168,14 +165,13 @@ export function deleteFile(id, index, file, done) {
 
 export function getCongVanDi(id, done) {
     return dispatch => {
-        const url = `/api/hcth/cong-van-di/${id}`;
+        const url = `/api/hcth/cong-van-cac-phong/${id}`;
         T.get(url, data => {
             if (data.error) {
                 console.error('GET: ' + url + '.', data.error);
                 T.notify('Lấy công văn giữa các phòng bị lỗi!', 'danger');
             } else {
                 // T.notify('Lấy công văn giữa các phòng thành công!', 'success');
-                // console.log(data.item);
                 dispatch({ type: hcthCongVanDiGet, item: data.item });
                 done && done(data.item);
             }

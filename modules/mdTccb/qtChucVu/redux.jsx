@@ -210,10 +210,10 @@ export function updateQtChucVuStaff(stt, changes, done, isEdit = null) {
     };
 }
 
-export function deleteQtChucVuStaff(stt, isEdit, shcc = null) {
+export function deleteQtChucVuStaff(item, isEdit, shcc = null) {
     return dispatch => {
         const url = '/api/tccb/qua-trinh/chuc-vu';
-        T.delete(url, { stt }, data => {
+        T.delete(url, item, data => {
             if (data.error) {
                 T.notify('Xóa thông tin chức vụ bị lỗi', 'danger');
                 console.error('DELETE: ' + url + '. ' + data.error);

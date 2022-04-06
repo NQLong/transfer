@@ -130,10 +130,10 @@ export function getHcthCongVanDenSearchPage(pageNumber, pageSize, pageCondition,
     };
 }
 
-export function deleteFile(id, index, file, done) {
+export function deleteFile(id, fileId, file, done) {
     return () => {
         const url = '/api/hcth/cong-van-den/delete-file';
-        T.put(url, { id, index, file }, data => {
+        T.put(url, { id, fileId, file }, data => {
             if (data.error) {
                 console.error('PUT: ' + url + '.', data.error);
                 T.notify('Xóa file đính kèm lỗi!', 'danger');
@@ -160,3 +160,21 @@ export function getCongVanDen(id, done) {
         }, () => T.notify('Xóa file đính kèm bị lỗi!', 'danger'));
     };
 }
+
+
+export function createChiDao(data, done) {
+    return dispatch => {
+        const url = '/api/hcth/cong-van-den/chi-dao';
+        T.post(url, { data }, res => {
+            if (res.error) {
+                T.notify('Thêm chỉ đạo bị lỗi', 'danger');
+                console.error('POST: ' + url + '. ' + res.error);
+            } else {
+                T.notify('Thêm chỉ đạo thành công!', 'success');
+                dispatch(getHcthCongVanDenSearchPage());
+                done && done(data);
+            }
+        }, () => T.notify('Thêm chỉ đạo bị lỗi', 'danger'));
+    };
+}
+

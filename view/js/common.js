@@ -14,6 +14,7 @@ const T = {
         'all news',
         'all events',
         'all divisions',
+        'all companies',
         'carousel',
         'last events',
         'last news',
@@ -78,6 +79,11 @@ const T = {
         link.download = name;
         link.href = url;
         link.click();
+    },
+
+    getCookiePage: (cookieName, key) => {
+        const pageData = T.storage(cookieName);
+        return pageData && pageData[key] ? pageData[key] : '';
     },
 
     cookie: (cname, cvalue, exdays) => {
@@ -296,8 +302,29 @@ const T = {
         } else if (language == 'en' && !item.linkEn) {
             return ('/news-en/item/' + item.id);
         }
+    },
+
+
+    //JSON Operate---------------------------------------------------------------------------------------------
+    stringify: (value, defaultValue = '') => {
+        try {
+            return JSON.stringify(value);
+        } catch (exception) {
+            T.notify(`Lỗi stringify: ${exception}, đặt theo giá trị mặc định: ${defaultValue}`, 'danger');
+            return defaultValue;
+        }
+    },
+
+    parse: (value, defaultValue = {}) => {
+        try {
+            return JSON.parse(value);
+        } catch (exception) {
+            T.notify(`Lỗi parse: ${exception}, đặt theo giá trị mặc định: ${defaultValue}`, 'danger');
+            return defaultValue;
+        }
     }
-};
+}
+
 
 T.socket = T.debug ? io('http://localhost:7012', { transports: ['websocket'] }) : io(T.rootUrl, { secure: true, transports: ['websocket'] });
 

@@ -1,5 +1,6 @@
 //TEMPLATES: admin
 import React from 'react';
+import SubMenusCategory from 'view/component/SubMenusCategory';
 import SubMenusPage from 'view/component/SubMenusPage';
 
 export default {
@@ -11,11 +12,11 @@ export default {
         // },
         {
             path: '/user/tccb',
-            component: () => <SubMenusPage menuLink='/user/tccb' menuKey={3000} headerIcon='fa-list-alt' />
+            component: () => <SubMenusPage menuLink='/user/tccb' menuKey={3000} headerIcon='fa-pie-chart' />
         },
         {
             path: '/user/truyen-thong',
-            component: () => <SubMenusPage menuLink='/user/truyen-thong' menuKey={5000} headerIcon='fa-list-alt' />
+            component: () => <SubMenusPage menuLink='/user/truyen-thong' menuKey={6000} headerIcon='fa-list-alt' />
         },
         {
             path: '/user/settings',
@@ -23,7 +24,7 @@ export default {
         },
         {
             path: '/user/category',
-            component: () => <SubMenusPage menuLink='/user/category' menuKey={4000} headerIcon='fa-list-alt' />
+            component: () => <SubMenusCategory menuLink='/user/category' menuKey={4000} headerIcon='fa-list-alt' />
         },
         {
             path: '/user/websites',
@@ -32,6 +33,10 @@ export default {
         {
             path: '/user/library',
             component: () => <SubMenusPage menuLink='/user/library' menuKey={8000} headerIcon='fa-th-large' />
+        },
+        {
+            path: '/user/pdt',
+            component: () => <SubMenusPage menuLink='/user/pdt' menuKey={7000} headerIcon='fa-diamond' />
         },
         {
             path: '/user/khcn',

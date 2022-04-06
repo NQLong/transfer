@@ -90,7 +90,6 @@ class SectionSideBar extends React.Component {
                     this.props.getNewsFeedByCategory(categories[0]);
                 }
             } else {
-                console.log('maDonVi', 2);
                 this.props.getNewsFeed(maDonVi);
             }
         });

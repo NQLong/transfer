@@ -7,7 +7,6 @@ module.exports = app => {
         // Redirect to webpack server
         app.get('/*.js', (req, res, next) => {
             if (req.originalUrl.endsWith('.min.js')) {
-                console.log(req.originalUrl);
                 next();
             } else {
                 const http = require('http');

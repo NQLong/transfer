@@ -1,8 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
-import { homeGetAllCompanies, homeGetCompanies } from './reduxDoanhNghiep';
-import '../dnSetting/sectionHexagon.scss';
+import { homeGetAllCompanies } from './reduxDoanhNghiep';
+import './sectionHexagon.scss';
 
 const settings = {
     maxColumns: 10,
@@ -15,121 +15,6 @@ const logoBoxStyle = {
     position: 'absolute',
     overflow: 'visible'
 };
-
-const texts = {
-    vi: {
-        companyInfo: 'Thông tin doanh nghiệp',
-        nationInfo: 'Quốc gia',
-        foundedYearInfo: 'Năm thành lập',
-        phoneNumberInfo: 'Số điện thoại',
-        addressInfo: 'Địa chỉ',
-        statusUpdate: 'Chưa cập nhật',
-        strengths: 'Thế mạnh',
-        descriptionInfo: 'Mô tả về doanh nghiệp',
-        noInfo: 'Không có thông tin',
-        areaActivityInfo: 'Lĩnh vực hoạt động của doanh nghiệp',
-        close: 'Đóng'
-    }, en: {
-        companyInfo: 'Company information',
-        nationInfo: 'Nation',
-        foundedYearInfo: 'Founded year',
-        phoneNumberInfo: 'Phone number',
-        addressInfo: 'Address',
-        statusUpdate: 'Not updated',
-        strengths: 'Strengths',
-        descriptionInfo: 'Description about the company',
-        noInfo: 'No informations',
-        areaActivityInfo: 'Area of company activities',
-        close: 'Close'
-    }
-};
-
-class CompanyModal extends React.Component {
-    state = { company: null };
-    modal = React.createRef();
-
-    show = (item) => {
-        this.props.homeGetCompanies(item.id, (item) => {
-            this.setState({ company: item }, () => {
-                $(this.modal.current).modal('show');
-            });
-        });
-    }
-
-    render() {
-        const { company } = this.state;
-        const language = T.language(texts);
-        return (
-            <div className='modal fade' tabIndex='-1' role='dialog' ref={this.modal}>
-                <div className='modal-dialog' role='document' style={{ maxWidth: '90%' }}>
-                    <div className='modal-content'>
-                        <div className='modal-header'>
-                            <h5 className='modal-title'>{language.companyInfo}</h5>
-                            <button type='button' className='close' data-dismiss='modal' aria-label='Close'>
-                                <span aria-hidden='true'>&times;</span>
-                            </button>
-                        </div>
-                        <div className='modal-body'>
-                            <div className='col-12'>
-                                {company ? (
-                                    <div className='course--content'>
-                                        <div className='about-course mb-30'>
-                                            <h4 className='text-center  text-uppercase' style={{ fontSize: '1.5rem', lineHeight: '1.3', color: 'rgba(0, 0, 0, 0.8)', fontWeight: '700' }}>{T.language.parse(company.tenDayDu)}</h4>
-                                            <div className='row' style={{ marginBottom: '8px' }}>
-                                                <div className='col-12 col-md-6'>
-                                                    <h6 style={{ color: 'rgba(0, 0, 0, 0.8)', lineHeight: 1.3, fontWeight: 700 }}>{language.nationInfo}: &nbsp;
-                                                        <span className='text-success'>{company.quocGia ? T.language.parse(company.tenQuocGia) : language.statusUpdate}</span></h6>
-                                                </div>
-                                                <div className='col-12 col-md-6'>
-                                                    <h6 style={{ color: 'rgba(0, 0, 0, 0.8)', lineHeight: 1.3, fontWeight: 700 }}>{language.foundedYearInfo}:&nbsp;
-                                                        <span className='text-success'>{company.namThanhLap || language.statusUpdate}</span></h6>
-                                                </div>
-                                            </div>
-                                            <div className='row' style={{ marginBottom: '8px' }}>
-                                                <div className='col-12 col-md-6'>
-                                                    <h6 style={{ color: 'rgba(0, 0, 0, 0.8)', lineHeight: 1.3, fontWeight: 700 }}>{language.phoneNumberInfo}:&nbsp;
-                                                        <span className='text-success'>{company.phone || language.statusUpdate}</span></h6>
-                                                </div>
-                                                <div className='col-12 col-md-6'>
-                                                    <h6 style={{ color: 'rgba(0, 0, 0, 0.8)', lineHeight: 1.3, fontWeight: 700 }}>Email:&nbsp;
-                                                        <span className='text-success'>{company.email || language.statusUpdate}</span></h6>
-                                                </div>
-                                            </div>
-
-                                            <h6 style={{ color: 'rgba(0, 0, 0, 0.8)', lineHeight: 1.3, fontWeight: 700 }}>{language.addressInfo}:&nbsp;</h6>
-                                            <p className='text-justify'>{T.language.parse(company.diaChi) || language.statusUpdate}</p>
-
-                                            <h6 style={{ color: 'rgba(0, 0, 0, 0.8)', lineHeight: 1.3, fontWeight: 700 }}>{language.strengths}:&nbsp;</h6>
-                                            <p className='text-justify'>{T.language.parse(company.theManh)}</p>
-
-                                            {company.tenCacLinhVuc ? (
-                                                <h6 style={{ color: 'rgba(0, 0, 0, 0.8)', lineHeight: 1.3, fontWeight: 700 }}>{language.areaActivityInfo}:&nbsp;
-                                                    <span style={{ color: '#666', fontSize: '18px', fontWeight: '300', lineHeight: '1.8' }}>{company.tenCacLinhVuc.map(linhvuc => linhvuc.TEN).join(', ')}</span>
-                                                </h6>
-                                            ) : null}
-                                            {company.moTa ? (
-                                                <div>
-                                                    <h6 style={{ color: 'rgba(0, 0, 0, 0.8)', lineHeight: 1.3, fontWeight: 700 }}>{language.descriptionInfo}:</h6>
-                                                    <p className='text-justify' dangerouslySetInnerHTML={{ __html: T.language.parse(company.moTa) }} />
-                                                </div>
-                                            ) : null}
-                                            <h6 style={{ color: 'rgba(0, 0, 0, 0.8)', lineHeight: 1.3, fontWeight: 700 }}>Website:&nbsp;
-                                                {company.website ? (<a href={company.website} target='_blank' rel='noreferrer'><span type='primary' style={{ fontSize: '18px', fontWeight: '300', lineHeight: '1.8' }}>{company.website}</span></a>) : (<span style={{ color: '#666', fontSize: '18px', fontWeight: '300', lineHeight: '1.8' }}>{language.statusUpdate}</span>)}
-                                            </h6>
-                                        </div>
-                                    </div>
-                                ) : <p>{language.noInfo}</p>}
-                            </div>
-                        </div>
-                        <div className='modal-footer'>
-                            <button type='button' className='btn btn-secondary' data-dismiss='modal'>{language.close}</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-}
 
 class SectionHexagonCompany extends React.Component {
     state = { boxes: null, companies: [] };
@@ -162,7 +47,7 @@ class SectionHexagonCompany extends React.Component {
         $('footer').fadeIn();
     }
 
-    onResize = (initial, done = () => {}) => {
+    onResize = (initial, done = () => { }) => {
         const windowWidth = window.innerWidth;
         // Responsive: 0, 576, 768, 992, 1200
         let boxMargin, columns;
@@ -263,11 +148,12 @@ class SectionHexagonCompany extends React.Component {
 
     handleClick = (e, company) => {
         e.preventDefault();
-        if (company.doiTac) {
-            this.props.history.push('/doanh-nghiep/' + company.hiddenShortName);
-        } else {
-            this.modal.show(company);
-        }
+        this.props.history.push(`/doanh-nghiep/${company.hiddenShortName}`);
+        // if (company.doiTac) {
+        //     this.props.history.push(`/doanh-nghiep/${company.hiddenShortName}?${T.language.getLanguage()}`);
+        // } else {
+        //     this.modal.show(company);
+        // }
     }
 
     showTooltip = (evt, text) => {
@@ -289,11 +175,10 @@ class SectionHexagonCompany extends React.Component {
                 {this.state.boxes}
             </div>
             <div id='tooltip' ref={e => this.tooltipArea = e} style={{ position: 'absolute', display: 'none', background: 'rgba(0, 0, 0, 0.8)', color: '#fff', borderRadius: '5px', padding: '5px 10px' }} />
-            <CompanyModal ref={e => this.modal = e} homeGetCompanies={this.props.homeGetCompanies} />
         </>;
     }
 }
 
-const mapStateToProps = state => ({ doanhNghiep: state.doiNgoai.doanhNghiep });
-const mapActionsToProps = { homeGetAllCompanies, homeGetCompanies };
+const mapStateToProps = state => ({ dnDoanhNghiep: state.doiNgoai.doanhNghiep });
+const mapActionsToProps = { homeGetAllCompanies };
 export default withRouter(connect(mapStateToProps, mapActionsToProps)(SectionHexagonCompany));
