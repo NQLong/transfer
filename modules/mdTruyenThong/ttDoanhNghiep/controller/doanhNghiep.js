@@ -4,7 +4,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.truyenThong,
         menus: {
-            6020: { title: 'Doanh nghiệp', link: '/user/truyen-thong/doanh-nghiep', icon: 'fa-university', backgroundColor: '#ffb300', groupIndex: 4 },
+            6020: { title: 'Doanh nghiệp', link: '/user/truyen-thong/doanh-nghiep', icon: 'fa-university', backgroundColor: '#ffb300', groupIndex: 4 }
         }
     };
 
@@ -23,7 +23,6 @@ module.exports = app => {
 
     app.get('/user/truyen-thong/doanh-nghiep', app.permission.check('dnDoanhNghiep:read'), app.templates.admin);
     app.get('/user/truyen-thong/doanh-nghiep/edit/:doanhNghiepId', app.permission.check('dnDoanhNghiep:read'), app.templates.admin);
-
     app.get('/doanh-nghiep/:hiddenShortName', app.templates.home);
 
     // APIs Admin Doanh nghiep -----------------------------------------------------------------------------------------
@@ -47,7 +46,6 @@ module.exports = app => {
             app.model.dnLinhVucKinhDoanh.getAll({ idDoanhNghiep: req.params.id }, (error1, listLV) => {
                 item.listLV = listLV || [];
                 app.model.dnLoaiDoanhNghiep.getAll({ doanhNghiep: req.params.id }, (error2, listLoaiDoanhNghiep) => {
-                    console.log(error2, listLoaiDoanhNghiep);
                     item.listLoaiDoanhNghiep = listLoaiDoanhNghiep || [];
                     res.send({ error, item });
                 });
@@ -94,7 +92,7 @@ module.exports = app => {
     app.put('/api/doi-ngoai/doanh-nghiep', app.permission.check('dnDoanhNghiep:write'), async (req, res) => {
         const changes = req.body.changes, id = req.body.id;
         const updateLoaiDoanhNghiep = (listLoaiDoanhNghiep) => new Promise((resolve, reject) => {
-            app.model.dnLoaiDoanhNghiep.delete({ idDoanhNghiep: id }, (error) => {
+            app.model.dnLoaiDoanhNghiep.delete({ doanhNghiep: id }, (error) => {
                 if (error) reject(error);
                 else {
                     const newLoaiDoanhNghiep = [];
@@ -140,22 +138,25 @@ module.exports = app => {
         });
 
         try {
-            let listLV = await updateLinhVucKinhDoanh(changes.linhVucs),
-                listLoaiDoanhNghiep = await updateLoaiDoanhNghiep(changes.listLoaiDoanhNghiep);
-            const hiddenShortName = app.toEngWord(changes.tenVietTat).toLowerCase().replaceAll(' ', '-');
-            app.model.dnDoanhNghiep.getAll({ hiddenShortName }, (error, items) => {
-                console.log(error, items);
-                if (error) {
-                    res.send({ error });
-                } else if (items && items.length > 1) {
-                    res.send({ duplicateShortName: true });
-                } else if (items && items.length == 1 && items[0].id != req.body.id) {
-                    res.send({ duplicateShortName: true });
-                } else {
-                    changes.hiddenShortName = hiddenShortName;
-                    app.model.dnDoanhNghiep.update({ id: req.body.id }, changes, (error, item) => res.send({ error, item: app.clone(item, { listLV, listLoaiDoanhNghiep }) }));
-                }
-            });
+            let listLV = changes.linhVucs && changes.linhVucs.length ? await updateLinhVucKinhDoanh(changes.linhVucs) : [],
+                listLoaiDoanhNghiep = changes.listLoaiDoanhNghiep && changes.listLoaiDoanhNghiep.length ? await updateLoaiDoanhNghiep(changes.listLoaiDoanhNghiep) : [];
+            if (changes.tenVietTat) {
+                const hiddenShortName = app.toEngWord(changes.tenVietTat).toLowerCase().replaceAll(' ', '-');
+                app.model.dnDoanhNghiep.getAll({ hiddenShortName }, (error, items) => {
+                    if (error) {
+                        res.send({ error });
+                    } else if (items && items.length > 1) {
+                        res.send({ duplicateShortName: true });
+                    } else if (items && items.length == 1 && items[0].id != req.body.id) {
+                        res.send({ duplicateShortName: true });
+                    } else {
+                        changes.hiddenShortName = hiddenShortName;
+                        app.model.dnDoanhNghiep.update({ id: req.body.id }, changes, (error, item) => res.send({ error, item: app.clone(item, { listLV, listLoaiDoanhNghiep }) }));
+                    }
+                });
+            } else {
+                app.model.dnDoanhNghiep.update({ id: req.body.id }, changes, (error, item) => res.send({ error, item: app.clone(item, { listLV, listLoaiDoanhNghiep }) }));
+            }
         } catch (error) {
             res.send({ error });
         }
@@ -232,7 +233,7 @@ module.exports = app => {
 
     app.get('/user/doi-ngoai/doanh-nghiep/doitac/:hiddenShortName', (req, res) => {
         new Promise((resolve, reject) => {
-            app.model.dnDoanhNghiep.get({ hiddenShortName: req.params.hiddenShortName }, 'id, quocGia, tenVietTat, tenDayDu, linhVucKinhDoanh, moTa, namThanhLap, theManh, diaChi, email, phone, image, website', 'id', (error, item) => {
+            app.model.dnDoanhNghiep.get({ hiddenShortName: req.params.hiddenShortName }, 'id, quocGia, tenVietTat, tenDayDu, moTa, namThanhLap, theManh, diaChi, email, phone, image, website', 'id', (error, item) => {
                 if (error || !item) {
                     reject(error);
                 } else {
@@ -243,15 +244,19 @@ module.exports = app => {
                             } else {
                                 if (quocGia) {
                                     item.tenQuocGia = JSON.stringify({ vi: quocGia.tenQuocGia, en: quocGia.country });
-                                    if (item.linhVucKinhDoanh) {
-                                        let linhVucKinhDoanh = item.linhVucKinhDoanh.split(',');
-                                        app.model.dnDoanhNghiep.getLinhVucKinhDoanh(linhVucKinhDoanh, (error, tenCacLinhVuc) => {
-                                            item.tenCacLinhVuc = tenCacLinhVuc;
-                                            resolve(item);
-                                        });
-                                    } else {
-                                        resolve(item);
-                                    }
+                                    app.model.dnLinhVucKinhDoanh.getAll({ idDoanhNghiep: item.id }, (error, linhVucKinhDoanh) => {
+                                        if (error) reject(error);
+                                        else {
+                                            const condition = {
+                                                statement: 'ma IN (:linhVucKinhDoanh)',
+                                                parameter: { linhVucKinhDoanh: (linhVucKinhDoanh || []).map(item => item.linhVuc) }
+                                            };
+                                            app.model.dmLinhVucKinhDoanh.getAll(condition, 'ten', null, (error, items) => {
+                                                item.tenCacLinhVuc = items;
+                                                resolve(item);
+                                            });
+                                        }
+                                    });
                                 }
                             }
                         });
@@ -260,34 +265,30 @@ module.exports = app => {
                     }
                 }
             });
-        }).then(company => new Promise((resolve, reject) => {
-            app.model.dnKyKetDoiTac.getAll({ doanhNghiepId: company.id }, (error, items) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    if (items.length) {
-                        const condition = {
-                            statement: 'id IN (:ids) AND kichHoat=1',
-                            parameter: {
-                                ids: items.map(item => item.idKyKet)
-                            }
-                        };
-
-                        app.model.dnKyKet.getAll(condition, (error, items) => {
-                            company.listKyKet = !error && items ? items : [];
-                            resolve(company);
-                        });
-                    } else {
-                        company.listKyKet = [];
-                        resolve(company);
-                    }
-                }
-            });
-        })).then(company => {
-            app.model.dnTiepDoan.getAll({ donViTiep: company.id }, (error, items) => {
-                company.listTiepDoan = !error && items ? items : [];
-                res.send({ item: company });
-            });
+        }).then(company => {
+            res.send({ item: company });
+            // app.model.dnKyKetDoiTac.getAll({ doanhNghiepId: company.id }, (error, items) => {
+            //     if (error) {
+            //         reject(error);
+            //     } else {
+            //         if (items.length) {
+            //             const condition = {
+            //                 statement: 'id IN (:ids) AND kichHoat=1',
+            //                 parameter: {
+            //                     ids: items.map(item => item.idKyKet)
+            //                 }
+            //             };
+            //
+            //             app.model.dnKyKet.getAll(condition, (error, items) => {
+            //                 company.listKyKet = !error && items ? items : [];
+            //                 resolve(company);
+            //             });
+            //         } else {
+            //             company.listKyKet = [];
+            //             resolve(company);
+            //         }
+            //     }
+            // });
         }).catch(error => res.send({ error }));
     });
 

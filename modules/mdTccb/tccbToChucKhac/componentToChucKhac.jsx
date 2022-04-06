@@ -75,6 +75,7 @@ class ComponentToChucKhac extends AdminPage {
 
         const renderTableToChucKhac = (items) => (
             renderTable({
+                emptyTable: 'Không tham gia tổ chức nào',
                 getDataSource: () => items, stickyHead: false,
                 renderHead: () => (
                     <tr>
@@ -93,11 +94,11 @@ class ComponentToChucKhac extends AdminPage {
             })
         );
         return (
-            <div>{this.props.label}
+            <div style={{ marginTop: '1rem' }}>{this.props.label}
                 <div className='tile-body'>{dataToChucKhac ? renderTableToChucKhac(dataToChucKhac) : renderTableToChucKhac([])}</div>
                 <div className='tile-footer' style={{ textAlign: 'right' }}>
                     <button className='btn btn-info' type='button' onClick={e => this.showModal(e, null)}>
-                        <i className='fa fa-fw fa-lg fa-plus' />Thêm tổ chức chính trị - xã hội, nghề nghiệp khác
+                        <i className='fa fa-fw fa-lg fa-plus' />Thêm
                     </button>
                 </div>
                 <ToChucKhacModal ref={e => this.modal = e} shcc={this.shcc} email={this.email}

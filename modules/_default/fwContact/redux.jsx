@@ -51,7 +51,7 @@ export default function contactReducer(state = null, data) {
 // Actions ------------------------------------------------------------------------------------------------------------
 // T.initPage('pageContact');
 T.initPage('pageContact');
-export function getContactPage(pageNumber, pageSize, done) {
+export function getContactPage(pageNumber, pageSize) {
     const page = T.updatePage('pageContact', pageNumber, pageSize);
     return dispatch => {
         const url = `/api/contact/page/${page.pageNumber}/${page.pageSize}`;
@@ -60,7 +60,6 @@ export function getContactPage(pageNumber, pageSize, done) {
                 T.notify('Lấy danh sách liên hệ bị lỗi!', 'danger');
                 console.error('GET: ' + url + '. ' + data.error);
             } else {
-                if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: ContactGetPage, page: data.page });
             }
         }, () => T.notify('Lấy danh sách liên hệ bị lỗi!', 'danger'));

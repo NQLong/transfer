@@ -160,3 +160,21 @@ export function getCongVanDen(id, done) {
         }, () => T.notify('Xóa file đính kèm bị lỗi!', 'danger'));
     };
 }
+
+
+export function createChiDao(data, done) {
+    return dispatch => {
+        const url = '/api/hcth/cong-van-den/chi-dao';
+        T.post(url, { data }, res => {
+            if (res.error) {
+                T.notify('Thêm chỉ đạo bị lỗi', 'danger');
+                console.error('POST: ' + url + '. ' + res.error);
+            } else {
+                T.notify('Thêm chỉ đạo thành công!', 'success');
+                dispatch(getHcthCongVanDenSearchPage());
+                done && done(data);
+            }
+        }, () => T.notify('Thêm chỉ đạo bị lỗi', 'danger'));
+    };
+}
+

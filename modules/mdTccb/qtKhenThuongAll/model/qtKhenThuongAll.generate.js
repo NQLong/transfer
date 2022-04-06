@@ -131,19 +131,19 @@ module.exports = app => {
             app.database.oracle.connection.main.execute(sql, parameter, (error, result) => done(error, result));
         },
 
-        searchPage: (pagenumber, pagesize, loaidoituong, fromyear, toyear, listDv, listShcc, searchterm, done) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=qt_khen_thuong_all_search_page(:pagenumber, :pagesize, :loaidoituong, :fromyear, :toyear, :listDv, :listShcc, :searchterm, :totalitem, :pagetotal); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, loaidoituong, fromyear, toyear, listDv, listShcc, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
+        searchPage: (pagenumber, pagesize, filter, searchterm, done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=qt_khen_thuong_all_search_page(:pagenumber, :pagesize, :filter, :searchterm, :totalitem, :pagetotal); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, filter, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
 
-        groupPage: (pagenumber, pagesize, loaidoituong, fromyear, toyear, listDv, listShcc, searchterm, done) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=qt_khen_thuong_all_group_page(:pagenumber, :pagesize, :loaidoituong, :fromyear, :toyear, :listDv, :listShcc, :searchterm, :totalitem, :pagetotal); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, loaidoituong, fromyear, toyear, listDv, listShcc, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
+        groupPage: (pagenumber, pagesize, filter, searchterm, done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=qt_khen_thuong_all_group_page(:pagenumber, :pagesize, :filter, :searchterm, :totalitem, :pagetotal); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, filter, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
 
-        download: (loaidoituong, fromyear, toyear, listDv, listShcc, done) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=qt_khen_thuong_all_download_excel(:loaidoituong, :fromyear, :toyear, :listDv, :listShcc); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, loaidoituong, fromyear, toyear, listDv, listShcc }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
+        download: (filter, done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=qt_khen_thuong_all_download_excel(:filter); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, filter }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
     };
 };

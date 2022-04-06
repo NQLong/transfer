@@ -87,7 +87,7 @@ export function createDmMonHoc(item, done) {
                 console.error(`POST ${url}. ${data.error}`);
             } else {
                 if (done) done(data.items);
-                dispatch(getDmMonHocAll());
+                dispatch(getDmMonHocPage());
             }
         });
     };
@@ -117,7 +117,7 @@ export function deleteDmMonHoc(ma) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('Môn học đã xóa thành công!', 'success', false, 800);
-                dispatch(getDmMonHocAll());
+                dispatch(getDmMonHocPage());
             }
         }, () => T.notify('Xóa môn học bị lỗi!', 'danger'));
     };
@@ -133,7 +133,7 @@ export function updateDmMonHoc(ma, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật thông tin môn học thành công!', 'success');
-                dispatch(getDmMonHocAll());
+                dispatch(getDmMonHocPage());
             }
         }, () => T.notify('Cập nhật thông tin môn học bị lỗi!', 'danger'));
     };
