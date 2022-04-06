@@ -3,9 +3,7 @@ import { connect } from 'react-redux';
 import {
     AdminPage,
     FormDatePicker,
-    renderTable,
     FormSelect,
-    TableCell,
     FormRichTextBox,
 } from 'view/component/AdminPage';
 import { Link } from 'react-router-dom';
@@ -16,13 +14,10 @@ import {
     updateHcthGiaoNhiemVu,
     deleteHcthGiaoNhiemVu,
     getHcthGiaoNhiemVuSearchPage,
-    deleteFile,
-    getCongVanDen
+    getGiaoNhiemVu
 } from './redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
-import { EditModal } from 'modules/mdDanhMuc/dmDonViGuiCv/adminPage';
-import { createDmDonViGuiCv } from 'modules/mdDanhMuc/dmDonViGuiCv/redux';
 
 class AdminEditPage extends AdminPage {
     state = {
@@ -94,7 +89,7 @@ class AdminEditPage extends AdminPage {
 
     getData = () => {
         if (this.state.id) {
-            this.props.getCongVanDen(Number(this.state.id), (item) => this.setData(item));
+            this.props.getGiaoNhiemVu(Number(this.state.id), (item) => this.setData(item));
         }
         else this.setData();
     }
@@ -117,52 +112,6 @@ class AdminEditPage extends AdminPage {
             phanHoi: danhSachPhanHoi
         });
     };
-
-    deleteFile = (e, index, item) => {
-        e.preventDefault();
-        T.confirm('Tập tin đính kèm', 'Bạn có chắc muốn xóa tập tin đính kèm này, tập tin sau khi xóa sẽ không thể khôi phục lại được', 'warning', true, isConfirm =>
-            isConfirm && this.props.deleteFile(this.state.id ? this.state.id : null, index, item, () => {
-                let listFile = [...this.state.listFile];
-                listFile.splice(index, 1);
-                this.setState({ listFile });
-            }));
-    }
-
-
-    tableListFile = (data, permission) => renderTable({
-        getDataSource: () => data,
-        stickyHead: false,
-        emptyTable: 'Chưa có file công văn nào!',
-        renderHead: () => (
-            <tr>
-                <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>#</th>
-                <th style={{ width: '100%' }}>Tên tập tin</th>
-                <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thời gian</th>
-                <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
-            </tr>
-        ),
-        renderRow: (item, index) => {
-            const
-                timeStamp = parseInt(item.split('/')[2].substring(0, 13)),
-                originalName = item.split('/')[2].substring(14);
-            return (
-                <tr key={index}>
-                    <TableCell style={{ textAlign: 'right' }} content={index + 1} />
-                    <TableCell type='text' style={{ wordBreak: 'break-all' }} content={<>
-                        <a href={'/api/hcth/giao-nhiem-vu/download' + item} download>{originalName}</a>
-                    </>
-                    } />
-                    <TableCell style={{ textAlign: 'center' }} content={T.dateToText(timeStamp, 'dd/mm/yyyy HH:MM')}></TableCell>
-                    <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onDelete={e => this.deleteFile(e, index, item)}>
-                        <a className='btn btn-info' href={`/api/hcth/giao-nhiem-vu/download${item}`} download>
-                            <i className='fa fa-lg fa-download' />
-                        </a>
-                    </TableCell>
-                </tr>
-            );
-        }
-    });
-
     save = () => {
         const changes = {
             canBoNhan: this.canBoNhan.value().toString() || null,
@@ -189,17 +138,6 @@ class AdminEditPage extends AdminPage {
             }
         }
         //console.log(this.props.system);
-    }
-
-    onCreateDonviGui = (data, done) => {
-        this.props.createDmDonViGuiCv(data, ({ error, item }) => {
-            if (!error) {
-                const { id } = item;
-                this.donViGui?.value(id);
-                done && done({ error, item });
-            }
-            this.modal.hide();
-        });
     }
 
     onCreatePhanHoi = (e) => {
@@ -236,7 +174,6 @@ class AdminEditPage extends AdminPage {
 
     render() {
         const permission = this.getUserPermission('hcthGiaoNhiemVu', ['read', 'write', 'delete']),
-            dmDonViGuiCvPermission = this.getUserPermission('dmDonViGuiCv', ['read', 'write', 'delete']),
             presidentPermission = this.getUserPermission('president', ['login']),
             readOnly = !permission.read;
         const isNew = !this.state.id;
@@ -279,10 +216,6 @@ class AdminEditPage extends AdminPage {
                         </div>
                     </div>
                 </div> */}
-                <EditModal ref={e => this.modal = e}
-                    permissions={dmDonViGuiCvPermission}
-                    create={this.onCreateDonviGui}
-                />
 
             </>,
             backRoute: '/user/hcth/giao-nhiem-vu',
@@ -299,8 +232,6 @@ const mapActionsToProps = {
     updateHcthGiaoNhiemVu,
     deleteHcthGiaoNhiemVu,
     getHcthGiaoNhiemVuSearchPage,
-    getCongVanDen,
-    deleteFile,
-    createDmDonViGuiCv
+    getGiaoNhiemVu,
 };
 export default connect(mapStateToProps, mapActionsToProps)(AdminEditPage);

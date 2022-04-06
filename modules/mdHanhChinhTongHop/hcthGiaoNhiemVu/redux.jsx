@@ -176,7 +176,7 @@ export function deleteFile(id, index, file, done) {
 }
 
 
-export function getCongVanDen(id, done) {
+export function getGiaoNhiemVu(id, done) {
     return dispatch => {
         const url = `/api/hcth/giao-nhiem-vu/${id}`;
         T.get(url, data => {
