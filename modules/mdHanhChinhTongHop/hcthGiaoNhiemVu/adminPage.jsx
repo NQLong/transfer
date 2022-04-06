@@ -16,7 +16,6 @@ class hcthGiaoNhiemVuPage extends AdminPage {
         T.ready('/user/hcth', () => {
             T.clearSearchBox();
             T.onSearch = (searchText) => this.props.getHcthGiaoNhiemVuPage(undefined, undefined, searchText || '');
-            console.log(new Date());
             T.showSearchBox(() => {
                 this.donViNhan?.value('');
                 this.canBoNhan?.value('');
@@ -30,20 +29,16 @@ class hcthGiaoNhiemVuPage extends AdminPage {
     }
 
     changeAdvancedSearch = (isInitial = false) => {
-        console.log(Number(this.ngayHetHan?.value()));
         let { pageNumber, pageSize } = this.props && this.props.hcthCongVanDen && this.props.hcthCongVanDen.page ? this.props.hcthCongVanDen.page : { pageNumber: 1, pageSize: 50 };
         let donViNhan = this.donViNhan?.value().toString() || null;
         let canBoNhan = this.canBoNhan?.value() || null;
         // let timeType = this.timeType?.value() || null;
         // let fromTime = this.fromTime?.value() ? Number(this.fromTime.value()) : null;
         let ngayHetHan = this.ngayHetHan?.value() ? Number(this.ngayHetHan.value()) : null;
-        console.log(ngayHetHan);
         const userId = this.props.system.user.ma;
-        console.log('uswser id : ', userId);
         const pageFilter = isInitial ? { userId } : { donViNhan, canBoNhan, userId , ngayHetHan};
         
         this.setState({ filter: pageFilter }, () => {
-            console.log(this.state.filter);
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
                     const filter = page.filter || {};
@@ -83,8 +78,7 @@ class hcthGiaoNhiemVuPage extends AdminPage {
         //presidentPermission = this.getUserPermission('president', ['login']);
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.hcthGiaoNhiemVu && this.props.hcthGiaoNhiemVu.page ?
             this.props.hcthGiaoNhiemVu.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null };
-        console.log('data :', this.props.hcthGiaoNhiemVu);
-        console.log('list user :', this.props.system);
+
         let table = 'Không có danh sách giao nhiệm vụ!';
         if (list && list.length > 0) {
             table = renderTable({

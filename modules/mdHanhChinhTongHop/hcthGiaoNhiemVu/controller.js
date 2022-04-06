@@ -11,8 +11,8 @@ module.exports = (app) => {
     app.permission.add({ name: 'hcthGiaoNhiemVu:write' });
     app.permission.add({ name: 'hcthGiaoNhiemVu:delete' });
 
-    app.get('/user/hcth/giao-nhiem-vu', app.permission.check('hcthGiaoNhiemVu:read', 'president:login'), app.templates.admin);
-    app.get('/user/hcth/giao-nhiem-vu/:id', app.permission.check('hcthGiaoNhiemVu:read', 'president:login'), app.templates.admin);
+    app.get('/user/hcth/giao-nhiem-vu', app.permission.check('hcthGiaoNhiemVu:read'), app.templates.admin);
+    app.get('/user/hcth/giao-nhiem-vu/:id', app.permission.check('hcthGiaoNhiemVu:read'), app.templates.admin);
 
     //api
     app.get('/api/hcth/giao-nhiem-vu/all', app.permission.check('hcthGiaoNhiemVu:read'), (req, res) => {

@@ -33,7 +33,7 @@ class AdminEditPage extends AdminPage {
         listCanBo: []
     }
 
-    renderComment = (comment) => {
+    renderPhanHoi = (listPhanHoi) => {
         const
             contentStyle = {
                 display: 'flex',
@@ -50,9 +50,9 @@ class AdminEditPage extends AdminPage {
             };
         return (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '10px' }}>
-                {(!comment || comment.length == 0) ? <span>Chưa có phản hồi</span> : (
+                {(!listPhanHoi || listPhanHoi.length == 0) ? <span>Chưa có phản hồi</span> : (
 
-                    comment.map((item, index) => {
+                    listPhanHoi.map((item, index) => {
                         let { ho, ten, image, ngayTao, noiDung } = item;
                         return (
                             <div key={index} style={containerStyle}>
@@ -171,8 +171,7 @@ class AdminEditPage extends AdminPage {
         };
         if (this.donViNhan) changes.donViNhan = this.donViNhan.value().toString();
         
-        console.log(changes);
-       if (!changes.noiDung) {
+        if (!changes.noiDung) {
             T.notify('Nội dung công việc bị trống', 'danger');
             this.noiDung.focus();
         } 
@@ -182,7 +181,7 @@ class AdminEditPage extends AdminPage {
         }
         else {
             changes.nguoiTao = this.props.system.user.ma;
-            console.log(changes);
+
             if (this.state.id) {
                 this.props.updateHcthGiaoNhiemVu(this.state.id, changes, this.getData);
             } else {
@@ -214,7 +213,7 @@ class AdminEditPage extends AdminPage {
                 ngayTao: new Date().getTime(),
                 maNhiemVu: this.props.match.params.id
             };
-            console.log(newPhanHoi);
+
             this.setState({
                 newPhanHoi: [...this.state.newPhanHoi, newPhanHoi],
                 phanHoi: [...this.state.phanHoi, {
@@ -236,8 +235,6 @@ class AdminEditPage extends AdminPage {
     }
 
     render() {
-        console.log(this.state.listCanBo);
-        console.log(SelectAdapter_DmDonVi);
         const permission = this.getUserPermission('hcthGiaoNhiemVu', ['read', 'write', 'delete']),
             dmDonViGuiCvPermission = this.getUserPermission('dmDonViGuiCv', ['read', 'write', 'delete']),
             presidentPermission = this.getUserPermission('president', ['login']),
@@ -269,7 +266,7 @@ class AdminEditPage extends AdminPage {
                         <div className='tile-body row'>
                             <div className='col-md-12'>
                                 {
-                                    this.renderComment(this.state.phanHoi)
+                                    this.renderPhanHoi(this.state.phanHoi)
                                 }
                             </div>
 
