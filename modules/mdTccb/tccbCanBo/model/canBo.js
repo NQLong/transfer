@@ -2,10 +2,6 @@
 
 module.exports = app => {
     // app.model.canBo.foo = () => { };
-    app.model.canBo.download = (filter, done) => {
-        app.dbConnection.execute('BEGIN :ret:=tccb_can_bo_download_excel(:filter); END;',
-            { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, filter }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
-    },
     app.model.canBo.getShccCanBo = (data, done) => {
         const deltaTime = 86400 * 1000; ///1 day
         let { ho, ten, ngaySinh, maDonVi } = data;
