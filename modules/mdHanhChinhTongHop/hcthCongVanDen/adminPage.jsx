@@ -6,6 +6,7 @@ import {
     renderTable,
     FormSelect,
     TableCell,
+    TableHeader
 } from 'view/component/AdminPage';
 import { Link } from 'react-router-dom';
 import {
@@ -28,15 +29,25 @@ const timeList = [
 ];
 
 
-class HcthCongVanDen extends AdminPage {
+const
+    start = new Date().getFullYear(),
+    end = 1900,
+    yearSelector = [...Array(start - end + 1).keys()].map(i => ({
+        id: start - i,
+        text: start - i
+    }));
 
-    state = { filter: {} };
+
+class HcthCongVanDenStaffPage extends AdminPage {
+
+    state = { filter: {}, sortBy: '', sortType: '' };
 
     componentDidMount() {
         T.ready('/user/hcth', () => {
             T.clearSearchBox();
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
+                this.congVanYear?.value(0);
                 this.maDonViGuiCV?.value('');
                 this.donViNhanCongVan?.value('');
                 this.canBoNhanCongVan?.value('');
@@ -58,7 +69,9 @@ class HcthCongVanDen extends AdminPage {
         let timeType = this.timeType?.value() || null;
         let fromTime = this.fromTime?.value() ? Number(this.fromTime.value()) : null;
         let toTime = this.toTime?.value() ? Number(this.toTime.value()) : null;
-        const pageFilter = isInitial ? {} : { donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, timeType, fromTime, toTime };
+        let congVanYear = this.congVanYear?.value() || null;
+
+        const pageFilter = isInitial ? {} : { donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, timeType, fromTime, toTime, congVanYear };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
@@ -70,6 +83,7 @@ class HcthCongVanDen extends AdminPage {
                     this.timeType?.value(filter.timeType || '');
                     this.fromTime?.value(filter.fromTime || '');
                     this.toTime?.value(filter.toTime || '');
+                    this.congVanYear?.value(filter.congVanYear || '');
                     if (!$.isEmptyObject(filter) && filter && (filter.donViGuiCongVan || filter.donViNhanCongVan || filter.canBoNhanCongVan || filter.timeType || filter.fromTime || filter.toTime)) this.showAdvanceSearch();
                 }
             });
@@ -77,8 +91,9 @@ class HcthCongVanDen extends AdminPage {
     };
 
     getPage = (pageN, pageS, pageC, done) => {
-        this.props.getHcthCongVanDenSearchPage(pageN, pageS, pageC, this.state.filter, done);
+        this.props.getHcthCongVanDenSearchPage(pageN, pageS, pageC, { ...this.state.filter, sortBy: this.state.sortBy, sortType: this.state.sortType }, done);
     }
+
 
 
     showModal = (e) => {
@@ -90,6 +105,10 @@ class HcthCongVanDen extends AdminPage {
         e.preventDefault();
         T.confirm('Xóa công văn đến', 'Bạn có chắc bạn muốn xóa công văn này?', true,
             isConfirm => isConfirm && this.props.deleteHcthCongVanDen(item.id));
+    }
+
+    onSort = (value, type) => {
+        this.setState({ sortBy: type && value, sortType: type }, () => this.changeAdvancedSearch());
     }
 
     render() {
@@ -104,51 +123,39 @@ class HcthCongVanDen extends AdminPage {
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', }}>Số CV</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>
+                    <TableHeader style={{ width: '10%', whiteSpace: 'nowrap' }} sort isSorted={this.state.sortBy == 'ngayNhan'} onSort={(type) => this.onSort('ngayNhan', type)}>Ngày nhận</TableHeader>
+                    <TableHeader style={{ width: '10%', whiteSpace: 'nowrap' }} sort isSorted={this.state.sortBy == 'ngayHetHan'} onSort={(type) => this.onSort('ngayHetHan', type)}>Hết hạn</TableHeader>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Đơn vị gửi</th>
-                    <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Nội dung</th>
+                    <th style={{ width: '80%', whiteSpace: 'nowrap' }}>Trích yếu</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Đơn vị, người nhận</th>
-                    <th style={{ width: 'auto' }}>Chỉ đạo của hiệu trưởng</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tình trạng</th>
+                    <TableHeader style={{ width: 'auto', whiteSpace: 'nowrap' }} sort isSorted={this.state.sortBy == 'tinhTrang'} onSort={(type) => this.onSort('tinhTrang', type)}>Tình trạng</TableHeader>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                 </tr>),
             renderRow: (item, index) => {
                 let danhSachCanBoNhan = item.danhSachCanBoNhan?.split(';');
                 let danhSachDonViNhan = item.danhSachDonViNhan?.split(';');
-                let hasFile;
-                try {
-                    hasFile = item.linkCongVan && JSON.parse(item.linkCongVan).length > 0;
-                }
-                catch (error) {
-                    hasFile = false;
-                }
                 return (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='text' content={
                             <>
-                                {item.soCongVan && <Link to={`/user/hcth/cong-van-den/${item.id}`}>{item.soCongVan}</Link>}
+                                <Link to={`/user/hcth/cong-van-den/${item.id}`}>{item.soCongVan || 'Chưa có số công văn'}</Link>
                                 {item.ngayCongVan ? <span style={{ whiteSpace: 'nowrap' }}><br />{'Ngày CV: ' + T.dateToText(item.ngayCongVan, 'dd/mm/yyyy')}</span> : null}
                             </>
                         } />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
-                            <>
-                                {
-                                    item.ngayNhan ? (<>
-                                        <span>Ngày nhận:</span><span style={{ color: 'blue' }}> {T.dateToText(item.ngayNhan, 'dd/mm/yyyy')}</span>
-                                    </>) : null
-                                }
-                                {item.ngayNhan && item.ngayHetHan ? <br /> : null}
-                                {
-                                    item.ngayHetHan ? (<>
-                                        <span>Hết hạn:</span><span style={{ color: 'red' }}> {T.dateToText(item.ngayHetHan, 'dd/mm/yyyy')}</span>
-                                    </>) : null
-                                }
-                            </>
+                            item.ngayNhan ? (<>
+                                <span style={{ color: 'blue' }}> {T.dateToText(item.ngayNhan, 'dd/mm/yyyy')}</span>
+                            </>) : null
+                        } />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
+                            item.ngayHetHan ? (<>
+                                <span style={{ color: 'red' }}> {T.dateToText(item.ngayHetHan, 'dd/mm/yyyy')}</span>
+                            </>) : null
                         } />
                         <TableCell type='text' contentClassName='multiple-lines' content={item.tenDonViGuiCV} />
-                        <TableCell type='text' contentClassName='multiple-lines' content={item.noiDung} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
+                        <TableCell type='text' content={item.trichYeu} />
+                        <TableCell type='text' contentClassName='multiple-lines' style={{ whiteSpace: 'nowrap' }} content={
                             <>
                                 <span>{danhSachCanBoNhan && danhSachCanBoNhan.length > 0 ? danhSachCanBoNhan.map((item, index) => (
                                     <span key={index}>
@@ -167,11 +174,10 @@ class HcthCongVanDen extends AdminPage {
                             </>
                         } />
 
-                        <TableCell type='text' contentClassName='multiple-lines' content={item.chiDao} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
-                            hasFile ?
-                                (<span style={{ color: 'blue' }}>Có tệp tin</span>) :
-                                (<span style={{ color: 'red' }}>Chưa có tệp tin</span>)
+                            item.hasChiDao ?
+                                (<span style={{ color: 'blue' }}>Đã chỉ đạo</span>) :
+                                (<span style={{ color: 'red' }}>Chưa chỉ đạo</span>)
                         } />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onEdit={() => this.props.history.push(`/user/hcth/cong-van-den/${item.id}`)} onDelete={(e) => this.onDelete(e, item)} permissions={currentPermissions} />
                     </tr>);
@@ -184,6 +190,7 @@ class HcthCongVanDen extends AdminPage {
                 <Link key={0} to='/user/hcth'>Hành chính tổng hợp</Link>,
                 'Công văn đến'
             ],
+            header: <FormSelect style={{ width: '300px', marginBottom: '0' }} allowClear={true} ref={e => this.congVanYear = e} placeholder='Năm' onChange={() => this.changeAdvancedSearch()} data={yearSelector} />,
             advanceSearch: <>
                 <div className='row'>
                     <div className='col-12 col-md-12 row'>
@@ -200,10 +207,10 @@ class HcthCongVanDen extends AdminPage {
                 </div>
             </>,
             content: <div className='tile'>
+                {/* <FormTextBox type='year' ref={e => this.congVanYear = e} label='Năm' onChange={() => this.changeAdvancedSearch()} /> */}
                 {table}
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
-                {/* <EditModal ref={e => this.modal = e} readOnly={readOnly} create={this.props.createHcthCongVanDen} update={this.props.updateHcthCongVanDen} permission={permission} /> */}
             </div>,
 
             onCreate: permission && permission.write ? () => this.props.history.push('/user/hcth/cong-van-den/new') : null,
@@ -215,4 +222,4 @@ class HcthCongVanDen extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, hcthCongVanDen: state.hcth.hcthCongVanDen });
 const mapActionsToProps = { getHcthCongVanDenAll, getHcthCongVanDenPage, createHcthCongVanDen, updateHcthCongVanDen, deleteHcthCongVanDen, getHcthCongVanDenSearchPage };
-export default connect(mapStateToProps, mapActionsToProps)(HcthCongVanDen);
+export default connect(mapStateToProps, mapActionsToProps)(HcthCongVanDenStaffPage);
