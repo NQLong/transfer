@@ -154,29 +154,29 @@ class PageCompany extends React.Component {
                         <div className='col-12' style={{ marginBottom: '100px' }}>
                             <div className='course--content'>
                                 <div className='about-course mb-30' style={{ padding: '40px', boxShadow: '0 0 10px rgba(0, 0, 0, 0.15)' }}>
-                                    <h4 className='text-center  text-uppercase' style={h4Style}>{T.language.parse(company.tenDayDu)}</h4>
+                                    <h4 className='text-center text-uppercase' style={h4Style}>{T.language.parse(company.tenDayDu)}</h4>
                                     <div className='row' style={{ margin: '0 -15px 8px -15px' }}>
                                         {company.quocGia &&
                                         <div className='col-12 col-md-6'>
-                                            <h6 style={h6Style}>{language.nationInfo}: &nbsp;<span className='text-success'>{T.language.parse(company.tenQuocGia)}</span></h6>
+                                            <h6 style={h6Style}>{language.nationInfo}: &nbsp;<span style={{ color: 'rgb(1, 57, 166)' }}>{T.language.parse(company.tenQuocGia)}</span></h6>
                                         </div>
                                         }
 
                                         {company.namThanhLap &&
                                         <div className='col-12 col-md-6'>
-                                            <h6 style={h6Style}>{language.foundedYearInfo}:&nbsp;<span className='text-success'>{company.namThanhLap}</span></h6>
+                                            <h6 style={h6Style}>{language.foundedYearInfo}:&nbsp;<span style={{ color: 'rgb(1, 57, 166)' }}>{company.namThanhLap}</span></h6>
                                         </div>
                                         }
                                     </div>
                                     <div className='row' style={{ margin: '0 -15px 8px -15px' }}>
                                         {company.phone &&
                                         <div className='col-12 col-md-6'>
-                                            <h6 style={h6Style}>{language.phoneNumberInfo}:&nbsp;<span className='text-success'>{company.phone}</span></h6>
+                                            <h6 style={h6Style}>{language.phoneNumberInfo}:&nbsp;<span style={{ color: 'rgb(1, 57, 166)' }}>{company.phone}</span></h6>
                                         </div>
                                         }
                                         {company.email &&
                                         <div className='col-12 col-md-6'>
-                                            <h6 style={h6Style}>Email:&nbsp;<span className='text-success'>{company.email}</span></h6>
+                                            <h6 style={h6Style}>Email:&nbsp;<span style={{ color: 'rgb(1, 57, 166)' }}>{company.email}</span></h6>
                                         </div>
                                         }
                                     </div>
@@ -197,7 +197,7 @@ class PageCompany extends React.Component {
                                     {company.tenCacLinhVuc ? (
                                         <div>
                                             <h6 style={h6Style}>{language.areaActivityInfo}:</h6>
-                                            {company.tenCacLinhVuc.map((linhvuc, index) => <p key={index} style={{ color: '#666', fontSize: '18px', marginBottom: '0' }}>- {linhvuc.ten}</p>)}
+                                            {company.tenCacLinhVuc.map((linhvuc, index) => <p key={index}>- {linhvuc.ten}</p>)}
                                         </div>
                                     ) : null}
 
@@ -209,7 +209,7 @@ class PageCompany extends React.Component {
                                     ) : null}
                                     {company.website &&
                                     <h6 style={h6Style}>Website:&nbsp;
-                                        <a href={company.website} target='_blank' rel='noreferrer'><span type='primary' style={{ fontSize: '18px', fontWeight: '300', lineHeight: '1.8' }}>{company.website}</span></a>
+                                        <a href={company.website} target='_blank' rel='noreferrer'><span style={{ fontWeight: '300' }}>{company.website}</span></a>
                                     </h6>
                                     }
 

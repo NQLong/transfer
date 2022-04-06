@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.hcth,
         menus: {
-            531: { title: 'Công văn đi của các đơn vị', link: '/user/hcth/cong-van-di', icon: 'fa-caret-square-o-right', backgroundColor: '#0B86AA' },
+            531: { title: 'Công văn giữa các phòng', link: '/user/hcth/cong-van-cac-phong', icon: 'fa fa-building-o', backgroundColor: '#0B86AA' },
         },
     };
     app.permission.add(
@@ -10,11 +10,11 @@ module.exports = app => {
         { name: 'hcthCongVanDi:write' },
         { name: 'hcthCongVanDi:delete' },
     );
-    app.get('/user/hcth/cong-van-di', app.permission.check('hcthCongVanDi:read'), app.templates.admin);
-    app.get('/user/hcth/cong-van-di/:id', app.permission.check('hcthCongVanDen:read'), app.templates.admin);
+    app.get('/user/hcth/cong-van-cac-phong', app.permission.check('hcthCongVanDi:read'), app.templates.admin);
+    app.get('/user/hcth/cong-van-cac-phong/:id', app.permission.check('hcthCongVanDi:read'), app.templates.admin);
 
     // APIs ----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/hcth/cong-van-di/search/page/:pageNumber/:pageSize', app.permission.check('hcthCongVanDi:read'), (req, res) => {
+    app.get('/api/hcth/cong-van-cac-phong/search/page/:pageNumber/:pageSize', app.permission.check('hcthCongVanDi:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -30,15 +30,15 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/hcth/cong-van-di/all', app.permission.check('hcthCongVanDi:read'), (req, res) => {
+    app.get('/api/hcth/cong-van-cac-phong/all', app.permission.check('hcthCongVanDi:read'), (req, res) => {
         app.model.hcthCongVanDi.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/hcth/cong-van-di/item/:id', app.permission.check('hcthCongVanDi:read'), (req, res) => {
+    app.get('/api/hcth/cong-van-cac-phong/item/:id', app.permission.check('hcthCongVanDi:read'), (req, res) => {
         app.model.hcthCongVanDi.get({ id: req.params.id }, (error, item) => res.send({ error, item }));
     });
 
-    app.post('/api/hcth/cong-van-di', app.permission.check('hcthCongVanDi:read'), (req, res) => {
+    app.post('/api/hcth/cong-van-cac-phong', app.permission.check('hcthCongVanDi:read'), (req, res) => {
         app.model.hcthCongVanDi.create(req.body.data, (error, item) => {
             if (error)
                 res.send({ error, item });
@@ -92,22 +92,22 @@ module.exports = app => {
         done && done({ error: null, listFile: newList });
     };
 
-    app.put('/api/hcth/cong-van-di', app.permission.check('hcthCongVanDi:write'), (req, res) => {
+    app.put('/api/hcth/cong-van-cac-phong', app.permission.check('hcthCongVanDi:write'), (req, res) => {
         app.model.hcthCongVanDi.update({ id: req.body.id }, req.body.changes, (errors, items) => res.send({ errors, items }));
     });
 
-    app.delete('/api/hcth/cong-van-di', app.permission.check('hcthCongVanDi:delete'), (req, res) => {
+    app.delete('/api/hcth/cong-van-cac-phong', app.permission.check('hcthCongVanDi:delete'), (req, res) => {
         app.model.hcthCongVanDi.delete({ id: req.body.id }, errors => {
             app.deleteFolder(app.assetPath + '/congVanDi/' + req.body.id);
             res.send({ errors });
         });
     });
 
-    app.get('/api/hcth/cong-van-di/page/:pageNumber/:pageSize', app.permission.check('hcthCongVanDi:read'), (req, res) => {
+    app.get('/api/hcth/cong-van-cac-phong/page/:pageNumber/:pageSize', app.permission.check('hcthCongVanDi:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         let condition = { statement: null };
-        const statement = ['noiDung']
+        const statement = ['noiDung', 'donViGui']
             .map(i => `lower(${i}) LIKE :searchText`).join(' OR ');
         if (req.query.condition) {
             condition = {
@@ -162,7 +162,7 @@ module.exports = app => {
     };
 
     //Delete file
-    app.put('/api/hcth/cong-van-di/delete-file', app.permission.check('staff:login'), (req, res) => {
+    app.put('/api/hcth/cong-van-cac-phong/delete-file', app.permission.check('staff:login'), (req, res) => {
         const id = req.body.id,
             index = req.body.index,
             file = req.body.file;
@@ -195,7 +195,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/hcth/cong-van-di/download/:id/:fileName', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/cong-van-cac-phong/download/:id/:fileName', app.permission.check('staff:login'), (req, res) => {
         const { id, fileName } = req.params;
         const dir = app.path.join(app.assetPath, `/congVanDi/${id}`);
         if (app.fs.existsSync(dir)) {
@@ -210,7 +210,7 @@ module.exports = app => {
         res.status(400).send('Không tìm thấy tập tin');
     });
 
-    app.get('/api/hcth/cong-van-di/:id', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/cong-van-cac-phong/:id', app.permission.check('staff:login'), (req, res) => {
         app.model.hcthCongVanDi.get({ id: req.params.id }, (error, item) => res.send({ error, item }));
     });
 };

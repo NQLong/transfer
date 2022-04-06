@@ -58,21 +58,23 @@ class StaffPage extends AdminPage {
                 if (isInitial) {
                     // Initial
                     const filter = page.filter || {};
+                    const filterCookie = T.getCookiePage(PageName, 'F');
                     let { listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe, fromYear, toYear, listDanToc, listTonGiao } = filter;
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
 
-                    this.listDonVi.value(listDonVi);
-                    this.gender.value(gender);
-                    this.listNgach.value(listNgach);
-                    this.listHocVi.value(listHocVi);
-                    this.listChucDanh.value(listChucDanh);
-                    this.isBienChe.value(isBienChe);
-                    this.fromYear.value(fromYear);
-                    this.toYear.value(toYear);
-                    this.listDanToc.value(listDanToc);
-                    this.listTonGiao.value(listTonGiao);
-
-                    if (!$.isEmptyObject(filter) && filter && listDonVi && gender && listNgach && listHocVi && listChucDanh && isBienChe || fromYear || toYear || listDanToc || listTonGiao) this.showAdvanceSearch();
+                    this.listDonVi.value(listDonVi || filterCookie.listDonVi || '');
+                    this.gender.value(gender || filterCookie.gender || '');
+                    this.listNgach.value(listNgach || filterCookie.listNgach || '');
+                    this.listHocVi.value(listHocVi || filterCookie.listHocVi || '');
+                    this.listChucDanh.value(listChucDanh || filterCookie.listChucDanh || '');
+                    this.isBienChe.value(isBienChe || filterCookie.listChucDanh || '');
+                    this.fromYear.value(fromYear || filterCookie.fromYear || '');
+                    this.toYear.value(toYear || filterCookie.toYear || '');
+                    this.listDanToc.value(listDanToc || filter.listDanToc || '');
+                    this.listTonGiao.value(listTonGiao || filter.listTonGiao || '');
+                    if (this.listDonVi.value() || this.gender.value() || this.listNgach.value() ||
+                        this.listHocVi.value() || this.listChucDanh.value() || this.isBienChe.value() || this.fromYear.value() || this.toYear.value()
+                        || this.listDanToc.value() || this.listTonGiao.value()) this.showAdvanceSearch();
                 } else if (isReset) {
                     this.listDonVi.value('');
                     this.gender.value('');
