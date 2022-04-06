@@ -104,7 +104,7 @@ export class HcthCongVanDi extends AdminPage {
                 return (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'center' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                        <TableCell type='link' content={item.noiDung || ''} onClick={() => this.props.history.push(`/user/hcth/cong-van-di/${item.id}`)} />
+                        <TableCell type='link' content={item.noiDung || ''} onClick={() => this.props.history.push(`/user/hcth/cong-van-cac-phong/${item.id}`)} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
                             <>
                                 {
@@ -144,7 +144,7 @@ export class HcthCongVanDi extends AdminPage {
                                 (<span style={{ color: 'blue' }}>Đã có tệp tin</span>) :
                                 (<span style={{ color: 'red' }}>Chưa có tệp tin</span>)
                         } />
-                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onEdit={() => this.props.history.push(`/user/hcth/cong-van-di/${item.id}`)} onDelete={(e) => this.onDelete(e, item)} permissions={currentPermissions} />
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onEdit={() => this.props.history.push(`/user/hcth/cong-van-cac-phong/${item.id}`)} onDelete={(e) => this.onDelete(e, item)} permissions={currentPermissions} />
                     </tr>
 
                 );
@@ -162,10 +162,10 @@ export class HcthCongVanDi extends AdminPage {
                 <Link key={0} to='/user/hcth'>Hành chính tổng hơp</Link>,
                 'Công văn giữa các phòng'
             ],
-            onCreate: permission && permission.write ? () => this.props.history.push('/user/hcth/cong-van-di/new') : null,
+            onCreate: permission && permission.write ? () => this.props.history.push('/user/hcth/cong-van-cac-phong/new') : null,
+            header: <FormSelect style={{ width: '300px', marginBottom: '0' }} allowClear={true} ref={e => this.donViGui = e} placeholder="Đơn vị gửi" data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />,
             content: <>
                 <div className="tile">
-                    <FormSelect allowClear={true} ref={e => this.donViGui = e} label="Đơn vị gửi" data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
