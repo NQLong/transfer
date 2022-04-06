@@ -204,6 +204,10 @@ module.exports = app => {
             app.model.fwCategory.getAll(condition, '*', 'priority DESC', (error, items) => {
                 res.send({ error, items: items.map(item => ({ id: item.id, text: JSON.parse(item.title).vi })) });
             });
+        } else if (pageType == 'all companies') {
+            app.model.dmLoaiDoanhNghiep.getAll((error, items) => {
+                res.send({ error, items: items.map(item => ({ id: item.id, text: item.ten })) });
+            });
         } else {
             res.send({ error: 'Invalid page type!' });
         }

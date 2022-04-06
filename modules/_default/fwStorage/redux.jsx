@@ -58,7 +58,7 @@ export function getFwStorageAll(done) {
 }
 
 T.initPage('pageFwStorage');
-export function getFwStoragePage(pageNumber, pageSize, done) {
+export function getFwStoragePage(pageNumber, pageSize) {
     const page = T.updatePage('pageFwStorage', pageNumber, pageSize);
     return dispatch => {
         const url = `/api/storage/page/${page.pageNumber}/${page.pageSize}`;
@@ -67,7 +67,7 @@ export function getFwStoragePage(pageNumber, pageSize, done) {
                 T.notify('Lấy danh sách lưu trữ bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
-                if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
+                // if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
                 dispatch({ type: FwStorageGetPage, page: data.page });
             }
         }, () => T.notify('Lấy danh sách lưu trữ bị lỗi!', 'danger'));

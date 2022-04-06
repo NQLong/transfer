@@ -146,7 +146,9 @@ module.exports = app => {
                                             viewType = 'fw' + viewType[0].toUpperCase() + viewType.substring(1);
                                         }
                                         app.model[viewType].get({ id: component.viewId }, (error, item) => getNextComponent(item ? item.title : '<empty>'));
-                                    } else if (['all events', 'all jobs', 'last news', 'last events', 'all events', 'hot events', 'last jobs', 'jobs carousel', 'subscribe', 'all staffs', 'contact'].indexOf(viewType) != -1) {
+                                    } else if (viewType == 'all companies') {
+                                        app.model.dmLoaiDoanhNghiep.get({ id: component.viewId }, (error, item) => getNextComponent(item ? item.ten : '<empty>'));
+                                    }  else if (['all events', 'all jobs', 'last news', 'last events', 'all events', 'hot events', 'last jobs', 'jobs carousel', 'subscribe', 'all staffs', 'contact'].indexOf(viewType) != -1) {
                                         getNextComponent(viewType);
                                     } else {
                                         getNextComponent('<empty>');

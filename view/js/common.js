@@ -14,6 +14,7 @@ const T = {
         'all news',
         'all events',
         'all divisions',
+        'all companies',
         'carousel',
         'last events',
         'last news',
@@ -78,6 +79,11 @@ const T = {
         link.download = name;
         link.href = url;
         link.click();
+    },
+
+    getCookiePage: (cookieName, key) => {
+        const pageData = T.storage(cookieName);
+        return pageData && pageData[key] ? pageData[key] : '';
     },
 
     cookie: (cname, cvalue, exdays) => {

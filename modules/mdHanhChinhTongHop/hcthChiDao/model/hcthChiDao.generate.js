@@ -1,6 +1,6 @@
-// Table name: HCTH_CHI_DAO { id, chiDao, loai, congVan, canBo }
+// Table name: HCTH_CHI_DAO { id, chiDao, loai, congVan, canBo, thoiGian }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'chiDao': 'CHI_DAO', 'loai': 'LOAI', 'congVan': 'CONG_VAN', 'canBo': 'CAN_BO' };
+const obj2Db = { 'id': 'ID', 'chiDao': 'CHI_DAO', 'loai': 'LOAI', 'congVan': 'CONG_VAN', 'canBo': 'CAN_BO', 'thoiGian': 'THOI_GIAN' };
 
 module.exports = app => {
     app.model.hcthChiDao = {
@@ -129,6 +129,11 @@ module.exports = app => {
             const parameter = condition.parameter ? condition.parameter : {};
             const sql = 'SELECT COUNT(*) FROM HCTH_CHI_DAO' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.database.oracle.connection.main.execute(sql, parameter, (error, result) => done(error, result));
+        },
+
+        getCongVanChiDao: (idcongvan, type, done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_chi_dao_get_cong_van_chi_dao(:idcongvan, :type); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, idcongvan, type }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
     };
 };
