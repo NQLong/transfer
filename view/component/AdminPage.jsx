@@ -259,23 +259,23 @@ export class FormCheckbox extends React.Component {
         }
     }
 
-    onCheck = () => this.props.disabled || this.props.readOnly || this.setState({ checked: !this.state.checked }, () => this.props.onChange && this.props.onChange(this.state.checked));
+    onCheck = () => this.props.readOnly || this.setState({ checked: !this.state.checked }, () => this.props.onChange && this.props.onChange(this.state.checked));
 
     render() {
-        let { className = '', label, style, isSwitch = false, trueClassName = 'text-primary', falseClassName = 'text', inline = true, disabled = false } = this.props;
+        let { className = '', label, style, isSwitch = false, trueClassName = 'text-primary', falseClassName = 'text-secondary', inline = true } = this.props;
         if (style == null) style = {};
         return isSwitch ? (
             <div className={className} style={{ ...style, display: inline ? 'inline-flex' : '' }}>
                 <label style={{ cursor: 'pointer' }} onClick={this.onCheck}>{label}:&nbsp;</label>
                 <div className='toggle'>
                     <label style={{ marginBottom: 0 }}>
-                        <input type='checkbox' disabled={disabled} checked={this.state.checked} onChange={this.onCheck} /><span className='button-indecator' />
+                        <input type='checkbox' disabled={this.props.readOnly} checked={this.state.checked} onChange={this.onCheck} /><span className='button-indecator' />
                     </label>
                 </div>
             </div>) : (
             <div className={'animated-checkbox ' + className} style={style}>
                 <label>
-                    <input type='checkbox' disabled={disabled} checked={this.state.checked} onChange={this.onCheck} />
+                    <input type='checkbox' disabled={this.props.readOnly} checked={this.state.checked} onChange={this.onCheck} />
                     <span className={'label-text ' + (this.props.readOnly ? 'text-secondary' : (this.state.checked ? trueClassName : falseClassName))}>{label}</span>
                 </label>
             </div>
