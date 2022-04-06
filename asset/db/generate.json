@@ -6548,13 +6548,6 @@
                     "nullable": true,
                     "size": 1000
                 },
-                "DON_VI_NHAN": {
-                    "value": "donViNhan",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 100
-                },
                 "CAN_BO_NHAN": {
                     "value": "canBoNhan",
                     "dataType": "NVARCHAR2",
@@ -11857,6 +11850,91 @@
             },
             "primaryKeys": [
                 "EMAIL"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "DT_DS_MON_MO": {
+            "active": true,
+            "moduleName": "dtDsMonMo",
+            "modelName": "dtDsMonMo",
+            "columns": {
+                "HOC_KY": {
+                    "value": "hocKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "NAM_HOC": {
+                    "value": "namHoc",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "KHOA": {
+                    "value": "khoa",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "MON_HOC": {
+                    "value": "monHoc",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "NGAY_NOP": {
+                    "value": "ngayNop",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                }
+            },
+            "primaryKeys": [],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "HCTH_DON_VI_NHAN_CONG_VAN": {
+            "active": true,
+            "moduleName": "hcthDonViNhanCongVan",
+            "modelName": "hcthDonViNhanCongVan",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_105690\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "DON_VI_NHAN": {
+                    "value": "donViNhan",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "10,0"
+                },
+                "CONG_VAN": {
+                    "value": "congVan",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "10,0"
+                },
+                "LOAI": {
+                    "value": "loai",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 5
+                }
+            },
+            "primaryKeys": [
+                "ID"
             ],
             "foreignKeys": [],
             "type": "table"
