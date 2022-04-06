@@ -2,9 +2,9 @@
 
 module.exports = app => {
     // app.model.canBo.foo = () => { };
-    app.model.canBo.download = (listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe, done) => {
-        app.dbConnection.execute('BEGIN :ret:=tccb_can_bo_download_excel(:listDonVi, :gender, :listNgach, :listHocVi, :listChucDanh, :isBienChe); END;',
-            { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
+    app.model.canBo.download = (filter, done) => {
+        app.dbConnection.execute('BEGIN :ret:=tccb_can_bo_download_excel(:filter); END;',
+            { ret: { dir: app.oracleDB.BIND_OUT, type: app.oracleDB.CURSOR }, filter }, (error, result) => app.dbConnection.fetchRowsFromCursor(error, result, done));
     },
     app.model.canBo.getShccCanBo = (data, done) => {
         const deltaTime = 86400 * 1000; ///1 day

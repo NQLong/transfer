@@ -41,8 +41,9 @@ module.exports = app => {
         let pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe } = req.query.filter && req.query.filter != '%%%%%%%%%%%%' ? req.query.filter : { listDonVi: null, gender: null, listNgach: null, listHocVi: null, listChucDanh: null, isBienChe: null };
-        app.model.canBo.searchPage(pageNumber, pageSize, listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe, searchTerm, (error, page) => {
+        const filter = JSON.stringify(req.query.filter || {});
+
+        app.model.canBo.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -2223,15 +2224,8 @@ module.exports = app => {
     app.uploadHooks.add('staffData', (req, fields, files, params, done) =>
         app.permission.has(req, () => staffImportData(req, fields, files, params, done), done, 'staff:write'));
 
-    app.get('/api/staff/download-excel/:listDonVi/:gender/:listNgach/:listHocVi/:listChucDanh/:isBienChe/', checkGetStaffPermission, (req, res) => {
-        let { listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe }  = req.params ? req.params : { listDonVi: null, gender: null, listNgach: null, listHocVi: null, listChucDanh: null, isBienChe: null };
-        if (listDonVi == 'null') listDonVi = null;
-        if (gender == 'null') gender = null;
-        if (listNgach == 'null') listNgach = null;
-        if (listHocVi == 'null') listHocVi = null;
-        if (listChucDanh == 'null') listChucDanh = null;
-        if (isBienChe == 'null') isBienChe = null;
-        app.model.canBo.download(listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe, (err, result) => {
+    app.get('/api/staff/download-excel/:filter', checkGetStaffPermission, (req, res) => {
+        app.model.canBo.download(req.params.filter, (err, result) => {
             if (err || !result) {
                 res.send({ err });
             } else {
