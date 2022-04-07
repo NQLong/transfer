@@ -311,6 +311,33 @@ module.exports = app => {
         },
     };
 
+    // Assign roles Hook ------------------------------------------------------------------------------------------------------------------------------
+    const assignListContainer = {}; // Ex: { quanLyDonVi: [{ id: 'dnDoanhNghiep:manage', text: 'Quản lý doanh nghiệp' }] }
+    const assignRolePermissionHookContainer = {};
+    app.assignRoleHooks = {
+        addRoles: (name, ...roles) => {
+            if (assignListContainer[name]) {
+                const currentId = assignListContainer[name].map(role => role.id);
+                const filteredRoles = roles.filter(role => !currentId.includes(role.id));
+                assignListContainer[name].push(...filteredRoles);
+            } else {
+                assignListContainer[name] = roles;
+            }
+        },
+        get: (name) => {
+            if (assignListContainer[name]) return [...assignListContainer[name]];
+            return [];
+        },
+        addHook: (name, hook) => assignRolePermissionHookContainer[name] = hook, // Hook is Promise object | parameters: req, roles
+        check: async (req, roles, sucess, fail) => {
+            const hooks = Object.values(assignRolePermissionHookContainer);
+            let returnData = null;
+            for (const hook of hooks) {
+
+            }
+        }
+    };
+
     // Hook readyHooks ------------------------------------------------------------------------------------------------------------------------------
     app.readyHooks.add('permissionInit', {
         ready: () => app.database.oracle.connected && app.model.fwRole != null,
