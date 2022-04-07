@@ -1,5 +1,5 @@
 import T from 'view/js/common';
-import { getStaffEdit } from '../tccbCanBo/redux';
+import { getStaff, getStaffEdit } from '../tccbCanBo/redux';
 
 // Reducer ------------------------------------------------------------------------------------------------------------
 const QtChucVuGetAll = 'QtChucVu:GetAll';
@@ -362,3 +362,11 @@ export function downloadWord(stt, done) {
         }, () => T.notify('Tải file word bị lỗi', 'danger'));
     };
 }
+
+export const SelectApdater_DaiDienKy = {
+    ajax: true,
+    url: '/api/get-dai-dien-ky',
+    data: () => {},
+    processResults: response => ({results: response && response.items ? response.items.map(item => ({ id: item.shcc, text: `${item.shcc}: ${(item.hoCanBo + ' ' + item.tenCanBo).normalizedName()}`})) : []}), 
+    fetchOne: (shcc, done) => (getStaff(shcc, ({ item }) => done && done({ id: item.shcc, text: `${item.shcc}: ${(item.ho + ' ' + item.ten).normalizedName()}` })))(),
+};
