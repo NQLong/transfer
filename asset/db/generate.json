@@ -11891,6 +11891,9 @@
             "active": true,
             "moduleName": "dmKhoiKienThuc",
             "modelName": "dmKhoiKienThuc",
+            "methods": {
+                "DM_KHOI_KIEN_THUC_SEARCH_PAGE": "searchPage"
+            },
             "columns": {
                 "TEN": {
                     "value": "ten",
@@ -12047,6 +12050,9 @@
             "active": true,
             "moduleName": "fwAssignRole",
             "modelName": "fwAssignRole",
+            "methods": {
+                "FW_ASSIGN_ROLE_GET_CURRENT_ROLES": "getCurrentRoles"
+            },
             "columns": {
                 "ID": {
                     "value": "id",
@@ -12136,70 +12142,6 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 5
-                }
-            },
-            "primaryKeys": [
-                "ID"
-            ],
-            "foreignKeys": [],
-            "type": "table"
-        },
-        "FW_ASSIGN_ROLE": {
-            "active": true,
-            "moduleName": "fwAssignRole",
-            "modelName": "fwAssignRole",
-            "methods": {
-                "FW_ASSIGN_ROLE_GET_CURRENT_ROLES": "getCurrentRoles"
-            },
-            "columns": {
-                "ID": {
-                    "value": "id",
-                    "dataType": "NUMBER",
-                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_106283\".nextval",
-                    "nullable": false,
-                    "size": "22,0"
-                },
-                "NGUOI_GAN": {
-                    "value": "nguoiGan",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 10
-                },
-                "NGUOI_DUOC_GAN": {
-                    "value": "nguoiDuocGan",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 10
-                },
-                "NGAY_BAT_DAU": {
-                    "value": "ngayBatDau",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "22,0"
-                },
-                "NGAY_KET_THUC": {
-                    "value": "ngayKetThuc",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "22,0"
-                },
-                "TEN_ROLE": {
-                    "value": "tenRole",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 200
-                },
-                "NHOM_ROLE": {
-                    "value": "nhomRole",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 200
                 }
             },
             "primaryKeys": [
