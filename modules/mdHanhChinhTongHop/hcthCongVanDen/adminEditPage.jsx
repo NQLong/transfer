@@ -70,7 +70,7 @@ class StaffEditPage extends AdminPage {
         return renderComment({
             getDataSource: () => chiDao,
             emptyComment: 'Chưa có chỉ đạo',
-            renderAvatar: (item) => <img src={item.image || '/img/avatar.png'} style={{ width: '48px', height: 'auto', paddingTop: '5px', borderRadius: '50%' }} />,
+            renderAvatar: (item) => <img src={item.image || '/img/avatar.png'} style={{ width: '48px', height: '48px', paddingTop: '5px', borderRadius: '50%' }} />,
             renderName: (item) => <>{item.chucVu} - <span style={{ color: 'blue' }}>{item.ho?.normalizedName()} {item.ten?.normalizedName()}</span></>,
             renderTime: (item) => T.dateToText(item.thoiGian, 'dd/mm/yyyy HH:MM'),
             renderContent: (item) => item.chiDao
