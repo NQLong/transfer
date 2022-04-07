@@ -20,8 +20,8 @@ class EditModal extends AdminModal {
     onShow = (item, multiple = true) => {
         this.multiple = multiple;
 
-        let { id, maCanBo, lyDoHinhThuc, diemThiDua, noiDung, soQuyetDinh, ngayRaQuyetDinh} = item ? item : {
-            id: '', maCanBo: '', lyDoHinhThuc: '', diemThiDua: '', noiDung: '', soQuyetDinh: '', ngayRaQuyetDinh: ''
+        let { id, maCanBo, lyDoHinhThuc, capQuyetDinh, diemThiDua, noiDung, soQuyetDinh, ngayRaQuyetDinh} = item ? item : {
+            id: '', maCanBo: '', lyDoHinhThuc: '', capQuyetDinh: '', diemThiDua: '', noiDung: '', soQuyetDinh: '', ngayRaQuyetDinh: ''
         };
 
         this.setState({
@@ -29,6 +29,7 @@ class EditModal extends AdminModal {
         }, () => {
             this.maCanBo.value(maCanBo);
             this.hinhThucKyLuat.value(lyDoHinhThuc);
+            this.capQuyetDinh.value(capQuyetDinh || '');
             this.diemThiDua.value(diemThiDua || '');
             this.noiDung.value(noiDung || '');
             this.soQuyetDinh.value(soQuyetDinh || '');
@@ -59,6 +60,7 @@ class EditModal extends AdminModal {
                 const changes = {
                     shcc: ma,
                     lyDoHinhThuc: this.hinhThucKyLuat.value(),
+                    capQuyetDinh: this.capQuyetDinh.value(),
                     diemThiDua: this.diemThiDua.value(),
                     noiDung: this.noiDung.value(),
                     soQuyetDinh: this.soQuyetDinh.value(),
@@ -129,7 +131,6 @@ class QtKyLuat extends AdminPage {
         this.modal.show();
     }
 
-
     changeAdvancedSearch = (isInitial = false, isReset = false) => {
         let { pageNumber, pageSize, pageCondition } = this.props && this.props.qtKyLuat && this.props.qtKyLuat.page ? this.props.qtKyLuat.page : { pageNumber: 1, pageSize: 50, pageCondition: {} };
 
@@ -145,13 +146,16 @@ class QtKyLuat extends AdminPage {
             this.getPage(pageNumber, pageSize, pageCondition, (page) => {
                 if (isInitial) {
                     const filter = page.filter || {};
+                    const filterCookie = T.getCookiePage('pageQtKyLuat', 'F');
+                    let { listDv, fromYear, toYear, listShcc, listHinhThucKyLuat } = filter;
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
-                    this.fromYear.value(filter.fromYear || '');
-                    this.toYear.value(filter.toYear || '');
-                    this.maDonVi.value(filter.listDv);
-                    this.mulCanBo.value(filter.listShcc);
-                    this.hinhThucKyLuat.value(filter.listHinhThucKyLuat);
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.listShcc || filter.listDv || filter.listHinhThucKyLuat)) this.showAdvanceSearch();
+                    
+                    this.fromYear.value(fromYear || filterCookie.fromYear || '');
+                    this.toYear.value(toYear || filterCookie.toYear || '');
+                    this.maDonVi.value(listDv || filterCookie.listDv);
+                    this.mulCanBo.value(listShcc || filterCookie.listShcc);
+                    this.hinhThucKyLuat.value(listHinhThucKyLuat || filterCookie.listHinhThucKyLuat || '');
+                    if (!$.isEmptyObject(this.fromYear.value() || this.toYear.value() || this.listShcc.value() || this.listDv.value() || this.listHinhThucKyLuat.value())) this.showAdvanceSearch();
                 } else if (isReset) {
                     this.fromYear.value('');
                     this.toYear.value('');
@@ -226,6 +230,10 @@ class QtKyLuat extends AdminPage {
                         {!this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Nội dung kỷ luật</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày ra quyết định</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>}
+                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nội dung kỷ luật</th>}
+                        {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Hình thức kỷ luật</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cấp quyết định</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Điểm thi đua</th>}
                         {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số lần bị kỷ luật</th>}
                         {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách hình thức kỷ luật</th>}
@@ -253,6 +261,10 @@ class QtKyLuat extends AdminPage {
                         {!this.checked && <TableCell type='text' contentClassName='multiple-lines-5' content={(item.noiDung || '')} />}
                         {!this.checked && <TableCell type='text' content={(<b> {item.soQuyetDinh || ''} </b>)} />}
                         {!this.checked && <TableCell type='date' style={{color: 'blue'}} dateFormat='dd/mm/yyyy' content={item.ngayRaQuyetDinh} />}
+                        {!this.checked && <TableCell type='text' content={(<b> {item.soQuyetDinh || ''} </b>)} />}
+                        {!this.checked && <TableCell type='text' content={(item.noiDung || '')} />}
+                        {!this.checked && <TableCell type='text' style={{ color: 'red' }} content={(<span><b>{item.tenKyLuat || ''}</b></span>)} />}
+                        {!this.checked && <TableCell type='text' content={(item.capQuyetDinh || '')} />}
                         {!this.checked && <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemThiDua} />}
                         {this.checked && <TableCell type='text' style={{ textAlign: 'left' }} content={item.soKyLuat} />}
                         {this.checked && <TableCell type='text' content={this.list(item.danhSachKyLuat, item.danhSachNgayRaQd, item.soKyLuat)} />}

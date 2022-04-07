@@ -101,7 +101,7 @@ export class TableHeader extends React.Component {
                         <span style={{ flex: 1 }}>
                             {children}
                         </span>
-                        <i className={sortType.className} ariaHidden='true' onClick={(e) => this.onSortChange(e, onSort)} />
+                        <i className={sortType.className} onClick={(e) => this.onSortChange(e, onSort)} />
                     </div>
                         : children
                 }

@@ -23,19 +23,6 @@ module.exports = app => {
                 parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
             };
         }
-        if (req.query.kichHoat) {
-            if (req.query.condition) {
-                condition.statement += ' AND kichHoat = :kichHoat';
-                condition.parameter.kichHoat = req.query.kichHoat;
-            } else {
-                condition = {
-                    statement: 'kichHoat = :kichHoat',
-                    parameter: {
-                        kichHoat: req.query.kichHoat
-                    },
-                };
-            }
-        }
         app.model.dmKyLuat.getPage(pageNumber, pageSize, condition, (error, page) => res.send({ error, page }));
     });
 

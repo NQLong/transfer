@@ -9865,6 +9865,7 @@
             "moduleName": "tccbCanBo",
             "methods": {
                 "TCCB_CAN_BO_SEARCH_PAGE": "searchPage",
+                "TCCB_CAN_BO_DOWNLOAD_EXCEL": "download",
                 "tccb_dashboard_total_gender": "tccbDasboardTotalGender",
                 "TCCB_DASHBOARD_GET_NUMBER_STAFF_BY_DON_VI": "tccbDashboardStaffByDV",
                 "TCCB_DASHBOARD_GET_STAFF_DANG_NUOC_NGOAI_BY_MUC_DICH": "tccbDashboardStaffCurrentlyForeign",
@@ -11859,20 +11860,6 @@
             "moduleName": "dtDsMonMo",
             "modelName": "dtDsMonMo",
             "columns": {
-                "HOC_KY": {
-                    "value": "hocKy",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "1,0"
-                },
-                "NAM_HOC": {
-                    "value": "namHoc",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 20
-                },
                 "KHOA": {
                     "value": "khoa",
                     "dataType": "NUMBER",
@@ -11882,17 +11869,17 @@
                 },
                 "MON_HOC": {
                     "value": "monHoc",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "ID": {
+                    "value": "id",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
                     "size": "22,0"
-                },
-                "NGAY_NOP": {
-                    "value": "ngayNop",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "20,0"
                 }
             },
             "primaryKeys": [],
@@ -11931,6 +11918,67 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 5
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "DT_DANG_KY_MO_MON": {
+            "active": true,
+            "moduleName": "dtDangKyMoMon",
+            "modelName": "dtDangKyMoMon",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_105975\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "KHOA": {
+                    "value": "khoa",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "THOI_GIAN": {
+                    "value": "thoiGian",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "HOC_KY": {
+                    "value": "hocKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "NAM_HOC": {
+                    "value": "namHoc",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "GHI_CHU": {
+                    "value": "ghiChu",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 500
+                },
+                "IS_DUYET": {
+                    "value": "isDuyet",
+                    "dataType": "NUMBER",
+                    "dataDefault": "0",
+                    "nullable": true,
+                    "size": "1,0"
                 }
             },
             "primaryKeys": [
