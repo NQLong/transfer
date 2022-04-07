@@ -532,3 +532,6 @@
 .select2-container--classic.select2-container--open .select2-dropdown {
 	border-color: $primary-color;
 }
+.select2-container li:only-child, .select2-container input:placeholder-shown {
+	width: 100% !important;
+ }

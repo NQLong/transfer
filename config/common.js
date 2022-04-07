@@ -194,4 +194,21 @@ module.exports = (app) => {
         modelPaths.forEach(path => require(path)(app));
         if (loadController) controllerPaths.forEach(path => require(path)(app));
     };
+
+    //Utils-----------------------------------------------------------------------------------------------------------------------
+    app.stringify = (value, defaultValue = '') => {
+        try {
+            return JSON.stringify(value);
+        } catch (exception) {
+            return defaultValue;
+        }
+    };
+
+    app.parse = (value, defaultValue = {}) => {
+        try {
+            return JSON.parse(value);
+        } catch (exception) {
+            return defaultValue;
+        }
+    };
 };
