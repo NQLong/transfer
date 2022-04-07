@@ -160,12 +160,11 @@ module.exports = app => {
                         { cell: 'E1', value: 'Tên', bold: true, border: '1234' },
                         { cell: 'F1', value: 'Chức vụ', bold: true, border: '1234' },
                         { cell: 'G1', value: 'Đơn vị', bold: true, border: '1234' },
-                        { cell: 'H1', value: 'Số quyết định', bold: true, border: '1234' },
-                        { cell: 'I1', value: 'Ngày ra quyết định', bold: true, border: '1234' },
-                        { cell: 'J1', value: 'Hình thức kỷ luật', bold: true, border: '1234' },
-                        { cell: 'K1', value: 'Cấp quyết định', bold: true, border: '1234' },
-                        { cell: 'L1', value: 'Nội dung', bold: true, border: '1234' },
-                        { cell: 'M1', value: 'Điểm thi đua', bold: true, border: '1234' },
+                        { cell: 'H1', value: 'Hình thức kỷ luật', bold: true, border: '1234' },
+                        { cell: 'I1', value: 'Nội dung', bold: true, border: '1234' },
+                        { cell: 'J1', value: 'Số quyết định', bold: true, border: '1234' },
+                        { cell: 'K1', value: 'Ngày ra quyết định', bold: true, border: '1234' },
+                        { cell: 'L1', value: 'Điểm thi đua', bold: true, border: '1234' },
                     ];
                     result.rows.forEach((item, index) => {
                         cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
@@ -175,12 +174,11 @@ module.exports = app => {
                         cells.push({ cell: 'E' + (index + 2), border: '1234', value: item.tenCanBo });
                         cells.push({ cell: 'F' + (index + 2), border: '1234', value: item.tenChucVu });
                         cells.push({ cell: 'G' + (index + 2), border: '1234', value: item.tenDonVi });
-                        cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.soQuyetDinh });
-                        cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.ngayRaQuyetDinh ? app.date.dateTimeFormat(new Date(item.ngayRaQuyetDinh), 'dd/mm/yyyy') : ''  });
-                        cells.push({ cell: 'J' + (index + 2), border: '1234', value: item.tenKyLuat });
-                        cells.push({ cell: 'K' + (index + 2), border: '1234', value: item.capQuyetDinh });
-                        cells.push({ cell: 'L' + (index + 2), alignment: 'center', border: '1234', value: item.noiDung });
-                        cells.push({ cell: 'M' + (index + 2), border: '1234', value: item.diemThiDua });
+                        cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.tenKyLuat });
+                        cells.push({ cell: 'I' + (index + 2), alignment: 'center', border: '1234', value: item.noiDung });
+                        cells.push({ cell: 'J' + (index + 2), border: '1234', value: item.soQuyetDinh });
+                        cells.push({ cell: 'K' + (index + 2), border: '1234', value: item.ngayRaQuyetDinh ? app.date.dateTimeFormat(new Date(item.ngayRaQuyetDinh), 'dd/mm/yyyy') : ''  });
+                        cells.push({ cell: 'L' + (index + 2), border: '1234', value: item.diemThiDua });
                     });
                     resolve(cells);
                 }).then((cells) => {

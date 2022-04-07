@@ -74,7 +74,7 @@ class EditModal extends AdminModal {
                 <FormDatePicker className='col-md-4' type='date-mask'  ref={e => this.ngayRaQuyetDinh = e} label='Ngày ra quyết định' readOnly={readOnly} required />
                 <FormSelect className='col-md-4' ref={e => this.hinhThucKyLuat = e} label='Hình thức kỷ luật' data={SelectAdapter_DmKyLuatV2} readOnly={readOnly} required />
 
-                <FormRichTextBox className='col-md-12' ref={e => this.noiDung = e} rows={10} readOnly={readOnly} label='Nội dung kỷ luật' placeholder='Nhập nội dung kỷ luật (tối đa 1000 ký tự)' maxLength={1000} />
+                <FormRichTextBox className='col-md-12' ref={e => this.noiDung = e} rows={10} readOnly={readOnly} label='Nội dung kỷ luật' placeholder='Nhập nội dung kỷ luật (tối đa 1000 ký tự)' />
 
                 <FormTextBox className='col-md-4' ref={e => this.diemThiDua = e} type='number' label='Điểm thi đua' readOnly={readOnly} />
             </div>
@@ -120,11 +120,13 @@ class QtKyLuatGroupPage extends AdminPage {
             this.getPage(pageNumber, pageSize, pageCondition, (page) => {
                 if (isInitial) {
                     const filter = page.filter || {};
+                    const filterCookie = T.getCookiePage('groupPageMaQtKyLuat', 'F');
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
-                    this.fromYear.value(filter.fromYear || '');
-                    this.toYear.value(filter.toYear || '');
-                    this.hinhThucKyLuat.value(filter.listHinhThucKyLuat);
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.listHinhThucKyLuat)) this.showAdvanceSearch();
+
+                    this.fromYear.value(filter.fromYear || filterCookie.fromYear || '');
+                    this.toYear.value(filter.toYear || filterCookie.toYear || '');
+                    this.hinhThucKyLuat.value(filter.listHinhThucKyLuat || filterCookie.listHinhThucKyLuat || '');
+                    if (this.fromYear.value() || this.toYear.value() || this.listHinhThucKyLuat.value()) this.showAdvanceSearch();
                 } else if (isReset) {
                     this.fromYear.value('');
                     this.toYear.value('');
