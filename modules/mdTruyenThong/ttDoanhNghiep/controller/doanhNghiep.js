@@ -297,4 +297,30 @@ module.exports = app => {
             res.send({ error, items: result && result.rows || [] });
         });
     });
+
+    // Phân quyền cho các đơn vị ------------------------------------------------------------------------------------------------------------------------
+    app.assignRoleHooks.addRoles('quanLyDonVi', { id: 'dnDoanhNghiep:manage', text: 'Quản lý doanh nghiệp' });
+    app.assignRoleHooks.addHook('quanLyDonVi', (req, roles) => new Promise(resolve => {
+        if (req.session.user && req.session.user.permissions && req.session.user.permissions.includes('manager:write')) {
+            const assignRolesList = app.assignRoleHooks.get('quanLyDonVi').map(item => item.id);
+            resolve(roles && roles.length && assignRolesList.contains(roles));
+        }
+    }));
+
+    app.permissionHooks.add('staff', 'checkRoleQuanLyDoanhNghiep', (user, staff) => new Promise(resolve => {
+        if (staff.donViQuanLy && staff.donViQuanLy.length) {
+            app.permissionHooks.pushUserPermission(user, 'dnDoanhNghiep:manage');
+        }
+        resolve();
+    }));
+
+    app.permissionHooks.add('assignRole', 'checkRoleQuanLyDoanhNghiep', (user, assignRoles) => new Promise(resolve => {
+        const inScopeRoles = assignRoles.filter(role => role.nhomRole == 'quanLyDonVi');
+        inScopeRoles.forEach(role => {
+            if (role.tenRole == 'dnDoanhNghiep:manage') {
+                app.permissionHooks.pushUserPermission(user, 'dnDoanhNghiep:manage');
+            }
+        });
+        resolve();
+    }));
 };

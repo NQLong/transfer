@@ -138,7 +138,7 @@ module.exports = app => {
     };
 
     // Update user's session ------------------------------------------------------------------------------------------------------------------------
-    app.initManager = (user, ...listChucVuTruong) => {
+    const initManager = (user, listChucVuTruong = ['013', '005', '003', '016', '009', '007']) => {
         if (!(user && user.staff && user.staff.listChucVu && user.staff.listChucVu.length)) {
             return [];
         } else {
@@ -189,6 +189,7 @@ module.exports = app => {
                             user.firstName = item.ten;
                             user.lastName = item.ho;
                             user.staff = {
+                                shcc: item.shcc,
                                 listChucVu: [],
                                 maDonVi: item.maDonVi,
                             };
@@ -202,25 +203,51 @@ module.exports = app => {
                             app.permissionHooks.pushUserPermission(user, 'staff:login'); // Add staff permission: staff:login
                             app.model.qtChucVu.getAll(condition, 'maChucVu,maDonVi', null, (e, listChucVu) => {
                                 user.staff.listChucVu = listChucVu || [];
-                                app.permissionHooks.run('staff', user, user.staff).then(() => {
-                                    resolve();
-                                });
+                                resolve();
                             });
                         }
                     });
                 }).then(() => new Promise(resolve => {
                     //Check cán bộ đặc biệt
                     if (user.isStaff) {
+                        // Cán bộ quản lý
+                        user.staff.donViQuanLy = initManager(user);
+                        user.staff.donViQuanLy.length && app.permissionHooks.pushUserPermission(user, 'manager:read', 'manager:write', 'fwAssignRole:write', 'fwAssignRole:read');
+
                         if (user.staff.maDonVi == 68) {
                             app.permissionHooks.pushUserPermission(user, 'rectors:login');
                             if (user.staff.listChucVu.some(item => item.maChucVu == '001')) {
                                 app.permissionHooks.pushUserPermission(user, 'president:login');
-                                resolve();
                             } else {
                                 app.permissionHooks.pushUserPermission(user, 'vice-president:login');
-                                resolve();
                             }
-                        } else resolve();
+                        }
+                        app.permissionHooks.run('staff', user, user.staff).then(() => {
+                            resolve();
+                        });
+                    } else resolve();
+                })).then(() => new Promise(resolve => {
+                    // AssignRole hooks
+                    if (user.isStaff) {
+                        app.model.fwAssignRole.getAll({ nguoiDuocGan: user.shcc }, (error, roles) => {
+                            if (!error || roles != []) {
+                                const checkExpire = role => !role.ngayKetThuc || new Date(role.ngayKetThuc).getTime() > new Date().getTime();
+                                // Xóa các role đã hết hạn
+                                const validRoles = roles.filter(checkExpire);
+                                const invalidRoles = roles.filter(role => !checkExpire(role));
+                                if (invalidRoles.length) {
+                                    app.model.fwAssignRole.delete({
+                                        statement: 'id IN (:roles)',
+                                        parameter: { roles: invalidRoles.map(role => role.id) }
+                                    }, () => { });
+                                }
+                                if (validRoles.length) {
+                                    app.permissionHooks.run('assignRole', user, validRoles).then(() => {
+                                        resolve();
+                                    });
+                                } else resolve();
+                            } else resolve();
+                        });
                     } else resolve();
                 })).then(() => new Promise(resolve => {
                     if (!user.isStaff && user.studentId) {
@@ -271,7 +298,7 @@ module.exports = app => {
 
 
     // Permission Hook ------------------------------------------------------------------------------------------------------------------------------
-    const permissionHookContainer = { student: {}, staff: {} };
+    const permissionHookContainer = { student: {}, staff: {}, assignRole: {} };
     app.permissionHooks = {
         add: (type, name, hook) => {
             if (permissionHookContainer[type]) {
@@ -314,6 +341,7 @@ module.exports = app => {
     // Assign roles Hook ------------------------------------------------------------------------------------------------------------------------------
     const assignListContainer = {}; // Ex: { quanLyDonVi: [{ id: 'dnDoanhNghiep:manage', text: 'Quản lý doanh nghiệp' }] }
     const assignRolePermissionHookContainer = {};
+    // Hook: Trả về true hoặc false ==> hook trúng, trả về undefined|null => không hook
     app.assignRoleHooks = {
         addRoles: (name, ...roles) => {
             if (assignListContainer[name]) {
@@ -329,12 +357,16 @@ module.exports = app => {
             return [];
         },
         addHook: (name, hook) => assignRolePermissionHookContainer[name] = hook, // Hook is Promise object | parameters: req, roles
-        check: async (req, roles, sucess, fail) => {
+        check: async (req, roles) => {
             const hooks = Object.values(assignRolePermissionHookContainer);
-            let returnData = null;
+            let checkFlag = null;
             for (const hook of hooks) {
-
+                checkFlag = await hook(req, roles);
+                if (typeof checkFlag == 'boolean') break; // Hook trúng => Break luôn
             }
+
+            if (checkFlag) return true;
+            else throw 'Permission denied!';
         }
     };
 

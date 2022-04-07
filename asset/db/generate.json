@@ -12071,6 +12071,9 @@
             "active": true,
             "moduleName": "fwAssignRole",
             "modelName": "fwAssignRole",
+            "methods": {
+                "FW_ASSIGN_ROLE_GET_CURRENT_ROLES": "getCurrentRoles"
+            },
             "columns": {
                 "ID": {
                     "value": "id",
