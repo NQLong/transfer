@@ -250,7 +250,7 @@ class QtKyLuatGroupPage extends AdminPage {
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
             onExport: (e) => {
                 e.preventDefault();
-                const filter = JSON.stringify(this.state.filter || {});
+                const filter = T.stringify(this.state.filter);
 
                 T.download(T.url(`/api/qua-trinh/ky-luat/download-excel/${filter}`), 'kyluat.xlsx');
             }
