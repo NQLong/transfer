@@ -13,6 +13,21 @@ module.exports = app => {
         }
     };
 
+    const checkOrPermissions = (req, res, next, permissions) => {
+        if (req.session.user) {
+            const user = req.session.user;
+            if (user.permissions && user.permissions.exists(permissions)) {
+                next();
+            } else if (permissions.length == 0) {
+                next();
+            } else {
+                responseError(req, res);
+            }
+        } else {
+            responseError(req, res);
+        }
+    };
+
     const responseError = (req, res) => {
         if (req.method.toLowerCase() === 'get') { // is get method
             if (req.originalUrl.startsWith('/api')) {
@@ -87,7 +102,7 @@ module.exports = app => {
         },
 
         check: (...permissions) => (req, res, next) => {
-            if (app.isDebug && (req.session.user == null || req.session.user == undefined)) {
+            if (app.isDebug && req.session.user == null) {
                 const personId = req.cookies.personId || '003379';
                 const condition = {
                     statement: 'shcc=:personId OR studentId=:personId OR email=:personId',
@@ -104,6 +119,27 @@ module.exports = app => {
                 checkPermissions(req, res, next, permissions);
             }
         },
+
+        orCheck: (...permissions) => (req, res, next) => {
+            if (app.isDebug && req.session.user == null) {
+                const personId = req.cookies.personId || '003379';
+                const condition = {
+                    statement: 'shcc=:personId OR studentId=:personId OR email=:personId',
+                    parameter: { personId }
+                };
+                app.model.fwUser.get(condition, (error, user) => {
+                    if (error || user == null) {
+                        res.send({ error: 'System has errors!' });
+                    } else {
+                        app.updateSessionUser(req, user, () => checkOrPermissions(req, res, next, permissions));
+                    }
+                });
+            } else {
+                checkOrPermissions(req, res, next, permissions);
+            }
+        },
+
+
         has: (req, success, fail, ...permissions) => {
             if (typeof fail == 'string') {
                 permissions.unshift(fail);
