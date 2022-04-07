@@ -1,57 +1,64 @@
 module.exports = app => {
     const menu = {
-        parentMenu: app.parentMenu.category,
+        parentMenu: app.parentMenu.daoTao,
         menus: {
-            4094: { title: 'Môn học', subTitle: 'Đào tạo', link: '/user/danh-muc/dao-tao/mon-hoc' },
+            9007: { title: 'Danh sách Môn học', subTitle: 'Của các Khoa/Bộ môn', link: '/user/pdt/mon-hoc', groupIndex: 2, backgroundColor: '#9DE7BE', icon: 'fa-leanpub', color: '#000' },
         },
     };
     app.permission.add(
         { name: 'dmMonHoc:read', menu },
+        { name: 'manager:read', menu },
         { name: 'dmMonHoc:write' },
         { name: 'dmMonHoc:delete' },
         { name: 'dmMonHoc:upload' },
     );
-    app.get('/user/danh-muc/dao-tao/mon-hoc', app.permission.check('dmMonHoc:read'), app.templates.admin);
-    app.get('/user/danh-muc/dao-tao/mon-hoc/upload', app.permission.check('dmMonHoc:write'), app.templates.admin);
+    app.get('/user/pdt/mon-hoc', app.permission.orCheck('dmMonHoc:read', 'manager:read'), app.templates.admin);
+    app.get('/user/pdt/mon-hoc/upload', app.permission.orCheck('dmMonHoc:read', 'manager:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/danh-muc/dao-tao/mon-hoc/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
-        const pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize);
-        let condition = { statement: null };
-        const statement = ['ma', 'ten', 'tenTiengAnh'].map(i => `lower(${i}) LIKE :searchText`).join(' OR ');
-        if (req.query.condition) {
-            condition = {
-                statement,
-                parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
-            };
+    app.get('/api/pdt/mon-hoc/page/:pageNumber/:pageSize', app.permission.orCheck('dmMonHoc:read', 'manager:read'), (req, res) => {
+        let pageNumber = parseInt(req.params.pageNumber),
+            pageSize = parseInt(req.params.pageSize),
+            donVi = req.query.donVi || 'all',
+            searchTerm = typeof req.query.searchTerm === 'string' ? `%${req.query.searchTerm.toLowerCase()}%` : '',
+            statement = 'lower(ten) LIKE :searchTerm',
+            parameter = { searchTerm };
+        if (donVi != 'all') {
+            statement = 'boMon = :donVi AND lower(ten) LIKE :searchTerm';
+            parameter.donVi = parseInt(donVi);
         }
-        app.model.dmMonHoc.getPage(pageNumber, pageSize, condition, '*', 'boMon', (error, page) => res.send({ error, page }));
+        let condition = { statement, parameter };
+        app.model.dmMonHoc.getPage(pageNumber, pageSize, condition, '*', 'boMon', (error, page) => {
+            page.pageCondition = {
+                searchTerm, donVi
+            };
+            res.send({ error, page });
+        });
     });
 
-    app.get('/api/danh-muc/dao-tao/mon-hoc/all', app.permission.check('user:login'), (req, res) => {
+    app.get('/api/pdt/mon-hoc/all', app.permission.orCheck('dmMonHoc:read', 'manager:read'), (req, res) => {
         const condition = req.query.condition || {};
         Object.keys(condition).forEach(key => { condition[key] === '' ? condition[key] = null : ''; });
         app.model.dmMonHoc.getAll(condition, '*', 'ten ASC', (error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/danh-muc/dao-tao/mon-hoc/item/:ma', app.permission.check('user:login'), (req, res) => {
+    app.get('/api/pdt/mon-hoc/item/:ma', app.permission.orCheck('dmMonHoc:read', 'manager:read'), (req, res) => {
         app.model.dmMonHoc.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
     });
 
-    app.post('/api/danh-muc/dao-tao/mon-hoc', app.permission.check('dmMonHoc:write'), (req, res) => {
+    app.post('/api/pdt/mon-hoc', app.permission.check('dmMonHoc:write'), (req, res) => {
         app.model.dmMonHoc.create(req.body.item, (error, item) => res.send({ error, item }));
     });
 
-    app.put('/api/danh-muc/dao-tao/mon-hoc', app.permission.check('dmMonHoc:write'), (req, res) => {
-        app.model.dmMonHoc.update({ ma: req.body.ma }, req.body.changes, (error, items) => res.send({ error, items }));
+    app.put('/api/pdt/mon-hoc', app.permission.check('dmMonHoc:write'), (req, res) => {
+        app.model.dmMonHoc.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
-    app.delete('/api/danh-muc/dao-tao/mon-hoc', app.permission.check('dmMonHoc:delete'), (req, res) => {
+    app.delete('/api/pdt/mon-hoc', app.permission.check('dmMonHoc:delete'), (req, res) => {
         app.model.dmMonHoc.delete({ ma: req.body.ma }, errors => res.send({ errors }));
     });
 
-    app.post('/api/danh-muc/dao-tao/mon-hoc/multiple', app.permission.check('dmMonHoc:write'), (req, res) => {
+    app.post('/api/pdt/mon-hoc/multiple', app.permission.check('dmMonHoc:write'), (req, res) => {
         const dmMonHoc = req.body.dmMonHoc, errorList = [];
         for (let i = 0; i <= dmMonHoc.length; i++) {
             if (i == dmMonHoc.length) {
@@ -122,7 +129,7 @@ module.exports = app => {
     });
 
     // Download Template ---------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/danh-muc/dao-tao/mon-hoc/download-template', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/pdt/mon-hoc/download-template', app.permission.check('staff:login'), (req, res) => {
         const workBook = app.excel.create();
         const ws = workBook.addWorksheet('Danh_muc_mon_hoc_Template');
         const defaultColumns = [

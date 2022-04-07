@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { getDtThoiKhoaBieuPage, createDtThoiKhoaBieu, updateDtThoiKhoaBieu, deleteDtThoiKhoaBieu } from './redux';
 import { Link } from 'react-router-dom';
 import { getDmDonViAll, SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
-import { getDmMonHocAll, SelectAdapter_DmMonHoc } from 'modules/mdDanhMuc/dmMonHoc/redux';
+import { getDmMonHocAll, SelectAdapter_DmMonHoc } from '../dmMonHoc/redux';
 import { getDmPhongAll, SelectAdapter_DmPhong } from 'modules/mdDanhMuc/dmPhong/redux';
 import { AdminPage, AdminModal, renderTable, TableCell, FormTextBox, FormSelect, FormDatePicker } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';

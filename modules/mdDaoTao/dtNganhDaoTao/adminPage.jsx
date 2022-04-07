@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getDmSvNganhDaoTaoPage, deleteDmSvNganhDaoTao, createDmSvNganhDaoTao, updateDmSvNganhDaoTao } from './redux';
+import { getDtNganhDaoTaoPage, deleteDtNganhDaoTao, createDtNganhDaoTao, updateDtNganhDaoTao } from './redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormCheckbox, FormTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
@@ -57,11 +57,13 @@ class EditModal extends AdminModal {
   }
 }
 
-class DmSvNganhDaoTaoPage extends AdminPage {
+class DtNganhDaoTaoPage extends AdminPage {
   componentDidMount() {
-    T.onSearch = (searchText) => this.props.getDmSvNganhDaoTaoPage(undefined, undefined, searchText || '');
-    T.showSearchBox();
-    this.props.getDmSvNganhDaoTaoPage();
+    T.ready('/user/pdt', () => {
+      T.onSearch = (searchText) => this.props.getDtNganhDaoTaoPage(undefined, undefined, searchText || '');
+      T.showSearchBox();
+      this.props.getDtNganhDaoTaoPage();
+    });
   }
 
   showModal = (e) => {
@@ -71,7 +73,7 @@ class DmSvNganhDaoTaoPage extends AdminPage {
 
   delete = (e, item) => {
     T.confirm('Xóa ngành đào tạo', `Bạn có chắc bạn muốn xóa ngành đào tạo ${item.tenNganh ? `<b>${item.tenNganh}</b>` : 'này'}?`, 'warning', true, isConfirm => {
-      isConfirm && this.props.deleteDmSvNganhDaoTao(item.maNganh, error => {
+      isConfirm && this.props.deleteDtNganhDaoTao(item.maNganh, error => {
         if (error) T.notify(error.message ? error.message : `Xoá ngành đào tạo ${item.tenNganh} bị lỗi!`, 'danger');
         else T.alert(`Xoá ngành đào tạo ${item.tenNganh} thành công!`, 'success', false, 800);
       });
@@ -81,10 +83,10 @@ class DmSvNganhDaoTaoPage extends AdminPage {
 
   render() {
     const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-      permission = this.getUserPermission('dmSvNganhDaoTao', ['read', 'write', 'delete']);
+      permission = this.getUserPermission('dtNganhDaoTao', ['read', 'write', 'delete']);
 
-    const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmSvNganhDaoTao && this.props.dmSvNganhDaoTao.page ?
-      this.props.dmSvNganhDaoTao.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null };
+    const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dtNganhDaoTao && this.props.dtNganhDaoTao.page ?
+      this.props.dtNganhDaoTao.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null };
     const table = !(list && list.length > 0) ? 'Không có dữ liệu ngành đào tạo' :
       renderTable({
         getDataSource: () => list, stickyHead: false,
@@ -102,7 +104,7 @@ class DmSvNganhDaoTaoPage extends AdminPage {
             <TableCell type='link' content={item.maNganh} onClick={() => this.modal.show(item)} />
             <TableCell type='text' content={item.tenNganh} />
             <TableCell type='checkbox' content={item.kichHoat} permission={permission}
-              onChanged={value => this.props.updateDmSvNganhDaoTao(item.maNganh, { kichHoat: Number(value) })} />
+              onChanged={value => this.props.updateDtNganhDaoTao(item.maNganh, { kichHoat: Number(value) })} />
             <TableCell type='buttons' content={item} permission={permission}
               onEdit={() => this.modal.show(item)} onDelete={this.delete} />
           </tr>
@@ -111,25 +113,25 @@ class DmSvNganhDaoTaoPage extends AdminPage {
 
 
     return this.renderPage({
-      icon: 'fa fa-list-alt',
-      title: 'Ngành đào tạo (sinh viên)',
+      icon: 'fa fa-cube',
+      title: 'Danh sách Ngành đào tạo',
       breadcrumb: [
-        <Link key={0} to='/user/category'>Danh mục</Link>,
-        'Ngành đào tạo (sinh viên)'
+        <Link key={0} to='/user/pdt'>Đào tạo</Link>,
+        'Danh sách Ngành đào tạo'
       ],
       content: <>
         <div className='tile'>{table}</div>
         <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-          getPage={this.props.getDmSvNganhDaoTaoPage} />
+          getPage={this.props.getDtNganhDaoTaoPage} />
         <EditModal ref={e => this.modal = e} permission={permission}
-          create={this.props.createDmSvNganhDaoTao} update={this.props.updateDmSvNganhDaoTao} permissions={currentPermissions} />
+          create={this.props.createDtNganhDaoTao} update={this.props.updateDtNganhDaoTao} permissions={currentPermissions} />
       </>,
-      backRoute: '/user/category',
+      backRoute: '/user/pdt',
       onCreate: permission && permission.write ? (e) => this.showModal(e) : null
     });
   }
 }
 
-const mapStateToProps = state => ({ system: state.system, dmSvNganhDaoTao: state.danhMuc.dmSvNganhDaoTao });
-const mapActionsToProps = { getDmSvNganhDaoTaoPage, deleteDmSvNganhDaoTao, createDmSvNganhDaoTao, updateDmSvNganhDaoTao };
-export default connect(mapStateToProps, mapActionsToProps)(DmSvNganhDaoTaoPage);
+const mapStateToProps = state => ({ system: state.system, dtNganhDaoTao: state.daoTao.dtNganhDaoTao });
+const mapActionsToProps = { getDtNganhDaoTaoPage, deleteDtNganhDaoTao, createDtNganhDaoTao, updateDtNganhDaoTao };
+export default connect(mapStateToProps, mapActionsToProps)(DtNganhDaoTaoPage);

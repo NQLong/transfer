@@ -1,12 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getDmSvNganhToHopPage, deleteDmSvNganhToHop, createDmSvNganhToHop, updateDmSvNganhToHop } from './redux';
+import { getDtNganhToHopPage, deleteDtNganhToHop, createDtNganhToHop, updateDtNganhToHop } from './redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormCheckbox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
-import { SelectAdapter_DmSvNganhDaoTao } from '../dmSvNganhDaoTao/redux';
-import { SelectAdapter_DmSvToHopTs } from '../dmSvToHopTs/redux';
-
+import { SelectAdapter_DtNganhDaoTao } from '../dtNganhDaoTao/redux';
+import { SelectAdapter_DmSvToHopTs } from 'modules/mdDanhMuc/dmSvToHopTs/redux';
 class EditModal extends AdminModal {
 
   onShow = (item) => {
@@ -44,7 +43,7 @@ class EditModal extends AdminModal {
       title: this.state.id ? 'Tạo mới' : 'Cập nhật',
       size: 'large',
       body: <div className='row'>
-        <FormSelect className='col-12' ref={e => this.maNganh = e} label='Ngành' readOnly={this.state.id ? true : readOnly} data={SelectAdapter_DmSvNganhDaoTao} required />
+        <FormSelect className='col-12' ref={e => this.maNganh = e} label='Ngành' readOnly={this.state.id ? true : readOnly} data={SelectAdapter_DtNganhDaoTao} required />
         <FormSelect className='col-12' ref={e => this.maToHop = e} label='Tổ hợp' readOnly={readOnly} data={SelectAdapter_DmSvToHopTs} required />
         <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex' }}
           onChange={value => this.changeKichHoat(value ? 1 : 0)} />
@@ -54,11 +53,13 @@ class EditModal extends AdminModal {
   }
 }
 
-class DmSvNganhToHopPage extends AdminPage {
+class DtNganhToHopPage extends AdminPage {
   componentDidMount() {
-    T.onSearch = (searchText) => this.props.getDmSvNganhToHopPage(undefined, undefined, searchText || '');
-    T.showSearchBox();
-    this.props.getDmSvNganhToHopPage();
+    T.ready('/user/pdt', () => {
+      T.onSearch = (searchText) => this.props.getDtNganhToHopPage(undefined, undefined, searchText || '');
+      T.showSearchBox();
+      this.props.getDtNganhToHopPage();
+    });
   }
 
   showModal = (e) => {
@@ -68,7 +69,7 @@ class DmSvNganhToHopPage extends AdminPage {
 
   delete = (e, item) => {
     T.confirm('Xóa tổ hợp thi', `Bạn có chắc bạn muốn xóa tổ hợp thi ${item.tenNganh ? `<b>${item.tenNganh}</b>` : 'này'}?`, 'warning', true, isConfirm => {
-      isConfirm && this.props.deleteDmSvNganhToHop(item.maNganh, error => {
+      isConfirm && this.props.deleteDtNganhToHop(item.maNganh, error => {
         if (error) T.notify(error.message ? error.message : `Xoá tổ hợp thi ${item.tenNganh} bị lỗi!`, 'danger');
         else T.alert(`Xoá tổ hợp thi ${item.tenNganh} thành công!`, 'success', false, 800);
       });
@@ -78,10 +79,10 @@ class DmSvNganhToHopPage extends AdminPage {
 
   render() {
     const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-      permission = this.getUserPermission('dmSvNganhToHop', ['read', 'write', 'delete']);
+      permission = this.getUserPermission('dtNganhToHop', ['read', 'write', 'delete']);
 
-    const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmSvNganhToHop && this.props.dmSvNganhToHop.page ?
-      this.props.dmSvNganhToHop.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, pageCondition: {}, totalItem: 0, list: null };
+    const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dtNganhToHop && this.props.dtNganhToHop.page ?
+      this.props.dtNganhToHop.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, pageCondition: {}, totalItem: 0, list: null };
     const table = !(list && list.length > 0) ? 'Không có dữ liệu tổ hợp thi' :
       renderTable({
         getDataSource: () => list, stickyHead: false,
@@ -103,7 +104,7 @@ class DmSvNganhToHopPage extends AdminPage {
             <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.maToHop} />
             <TableCell styl e={{ whiteSpace: 'nowrap' }} content={`${item.tenMon1 ? item.tenMon1 + ' -' : ''} ${item.tenMon2 ? item.tenMon2 + ' -' : ''} ${item.tenMon3 || ''}`} />
             <TableCell type='checkbox' content={item.kichHoat} permission={permission}
-              onChanged={value => this.props.updateDmSvNganhToHop(item.id, { kichHoat: Number(value) })} />
+              onChanged={value => this.props.updateDtNganhToHop(item.id, { kichHoat: Number(value) })} />
             <TableCell type='buttons' content={item} permission={permission}
               onEdit={() => this.modal.show(item)} onDelete={this.delete} />
           </tr>
@@ -112,7 +113,7 @@ class DmSvNganhToHopPage extends AdminPage {
 
 
     return this.renderPage({
-      icon: 'fa fa-list-alt',
+      icon: 'fa fa-cubes',
       title: 'Ngành theo tổ hợp thi',
       breadcrumb: [
         <Link key={0} to='/user/category'>Danh mục</Link>,
@@ -121,16 +122,16 @@ class DmSvNganhToHopPage extends AdminPage {
       content: <>
         <div className='tile'>{table}</div>
         <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-          getPage={this.props.getDmSvNganhToHopPage} />
+          getPage={this.props.getDtNganhToHopPage} />
         <EditModal ref={e => this.modal = e} permission={permission}
-          create={this.props.createDmSvNganhToHop} update={this.props.updateDmSvNganhToHop} permissions={currentPermissions} />
+          create={this.props.createDtNganhToHop} update={this.props.updateDtNganhToHop} permissions={currentPermissions} />
       </>,
-      backRoute: '/user/category',
+      backRoute: '/user/pdt',
       onCreate: permission && permission.write ? (e) => this.showModal(e) : null
     });
   }
 }
 
-const mapStateToProps = state => ({ system: state.system, dmSvNganhToHop: state.danhMuc.dmSvNganhToHop });
-const mapActionsToProps = { getDmSvNganhToHopPage, deleteDmSvNganhToHop, createDmSvNganhToHop, updateDmSvNganhToHop };
-export default connect(mapStateToProps, mapActionsToProps)(DmSvNganhToHopPage);
+const mapStateToProps = state => ({ system: state.system, dtNganhToHop: state.danhMuc.dtNganhToHop });
+const mapActionsToProps = { getDtNganhToHopPage, deleteDtNganhToHop, createDtNganhToHop, updateDtNganhToHop };
+export default connect(mapStateToProps, mapActionsToProps)(DtNganhToHopPage);

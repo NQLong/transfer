@@ -1,14 +1,14 @@
 import T from 'view/js/common';
 
 // Reducer ------------------------------------------------------------------------------------------------------------
-const DmSvNganhToHopGetPage = 'DmSvNganhToHop:GetPage';
-const DmSvNganhToHopUpdate = 'DmSvNganhToHop:Update';
+const DtNganhDaoTaoGetPage = 'DtNganhDaoTao:GetPage';
+const DtNganhDaoTaoUpdate = 'DtNganhDaoTao:Update';
 
-export default function DmSvNganhToHopReducer(state = null, data) {
+export default function DtNganhDaoTaoReducer(state = null, data) {
   switch (data.type) {
-    case DmSvNganhToHopGetPage:
+    case DtNganhDaoTaoGetPage:
       return Object.assign({}, state, { page: data.page });
-    case DmSvNganhToHopUpdate:
+    case DtNganhDaoTaoUpdate:
       if (state) {
         let updatedItems = Object.assign({}, state.items),
           updatedPage = Object.assign({}, state.page),
@@ -39,27 +39,26 @@ export default function DmSvNganhToHopReducer(state = null, data) {
 }
 
 // Actions ------------------------------------------------------------------------------------------------------------
-T.initPage('pageDmSvNganhToHop');
-export function getDmSvNganhToHopPage(pageNumber, pageSize, pageCondition, done) {
-  const page = T.updatePage('pageDmSvNganhToHop', pageNumber, pageSize, pageCondition);
+T.initPage('pageDtNganhDaoTao');
+export function getDtNganhDaoTaoPage(pageNumber, pageSize, done) {
+  const page = T.updatePage('pageDtNganhDaoTao', pageNumber, pageSize);
   return dispatch => {
-    const url = `/api/danh-muc/dao-tao/nganh-theo-to-hop-thi/page/${page.pageNumber}/${page.pageSize}`;
-    T.get(url, { condition: page.pageCondition }, data => {
+    const url = `/api/pdt/nganh-dao-tao/page/${page.pageNumber}/${page.pageSize}`;
+    T.get(url, data => {
       if (data.error) {
         T.notify('Lấy danh sách ngành bị lỗi!', 'danger');
         console.error(`GET: ${url}.`, data.error);
       } else {
-        if (page.pageCondition) data.page.pageCondition = page.pageCondition;
-        if (done) done(data.page);
-        dispatch({ type: DmSvNganhToHopGetPage, page: data.page });
+        if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
+        dispatch({ type: DtNganhDaoTaoGetPage, page: data.page });
       }
     }, () => T.notify('Lấy danh sách ngành bị lỗi!', 'danger'));
   };
 }
 
-export function getDmSvNganhToHop(id, done) {
+export function getDtNganhDaoTao(maNganh, done) {
   return () => {
-    const url = `/api/danh-muc/dao-tao/nganh-theo-to-hop-thi/item/${id}`;
+    const url = `/api/pdt/nganh-dao-tao/item/${maNganh}`;
     T.get(url, data => {
       if (data.error) {
         T.notify('Lấy thông tin ngành bị lỗi!', 'danger');
@@ -71,9 +70,9 @@ export function getDmSvNganhToHop(id, done) {
   };
 }
 
-export function createDmSvNganhToHop(item, done) {
+export function createDtNganhDaoTao(item, done) {
   return dispatch => {
-    const url = '/api/danh-muc/dao-tao/nganh-theo-to-hop-thi';
+    const url = '/api/pdt/nganh-dao-tao';
     T.post(url, { data: item }, data => {
       if (data.error) {
         T.notify(data.error.message || 'Tạo ngành bị lỗi', 'danger');
@@ -81,53 +80,54 @@ export function createDmSvNganhToHop(item, done) {
         if (done) done(data.error);
       } else {
         T.notify('Tạo mới thông tin ngành thành công!', 'success');
-        dispatch(getDmSvNganhToHopPage());
+        dispatch(getDtNganhDaoTaoPage());
         if (done) done(data);
       }
     }, () => T.notify('Tạo ngành bị lỗi!', 'danger'));
   };
 }
 
-export function deleteDmSvNganhToHop(id) {
+export function deleteDtNganhDaoTao(maNganh) {
   return dispatch => {
-    const url = '/api/danh-muc/dao-tao/nganh-theo-to-hop-thi';
-    T.delete(url, { id: id }, data => {
+    const url = '/api/pdt/nganh-dao-tao';
+    T.delete(url, { maNganh: maNganh }, data => {
       if (data.error) {
         T.notify('Xóa danh mục ngành bị lỗi!', 'danger');
         console.error(`DELETE: ${url}.`, data.error);
       } else {
         T.alert('Danh mục đã xóa thành công!', 'success', false, 800);
-        dispatch(getDmSvNganhToHopPage());
+        dispatch(getDtNganhDaoTaoPage());
       }
     }, () => T.notify('Xóa ngành bị lỗi!', 'danger'));
   };
 }
 
-export function updateDmSvNganhToHop(id, changes, done) {
+export function updateDtNganhDaoTao(maNganh, changes, done) {
   return dispatch => {
-    const url = '/api/danh-muc/dao-tao/nganh-theo-to-hop-thi';
-    T.put(url, { id, changes }, data => {
+    const url = '/api/pdt/nganh-dao-tao';
+    T.put(url, { maNganh, changes }, data => {
       if (data.error || changes == null) {
         T.notify(data.error.message || 'Cập nhật thông tin ngành bị lỗi', 'danger');
         console.error(`PUT: ${url}.`, data.error);
         done && done(data.error);
       } else {
         T.notify('Cập nhật thông tin ngành thành công!', 'success');
-        dispatch(getDmSvNganhToHopPage());
+        dispatch(getDtNganhDaoTaoPage());
         if (done) done();
       }
     }, () => T.notify('Cập nhật thông tin ngành bị lỗi!', 'danger'));
   };
 }
 
-export function changeDmSvNganhToHop(item) {
-  return { type: DmSvNganhToHopUpdate, item };
+export function changeDtNganhDaoTao(item) {
+  return { type: DtNganhDaoTaoUpdate, item };
 }
 
-// export const SelectAdapter_DmSvNganhToHop = {
-//   ajax: true,
-//   url: '/api/danh-muc/dao-tao/nganh-theo-to-hop-thi/page/1/20',
-//   data: params => ({ condition: params.term }),
-//   processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.id, text: item. })) : [] }),
-//   fetchOne: (maNganh, done) => (getDmSvNganhToHop(maNganh, item => done && done({ id: item.maNganh, text: item.tenNganh })))(),
-// };
+export const SelectAdapter_DtNganhDaoTao = {
+  ajax: true,
+  url: '/api/pdt/nganh-dao-tao/page/1/20',
+  data: params => ({ condition: params.term }),
+  processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.maNganh, text: item.tenNganh })) : [] }),
+  fetchOne: (maNganh, done) => (getDtNganhDaoTao(maNganh, item => done && done({ id: item.maNganh, text: item.tenNganh })))(),
+
+};

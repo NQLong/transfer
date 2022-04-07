@@ -1,4 +1,4 @@
 // eslint-disable-next-line no-unused-vars
 module.exports = app => {
-    // app.model.dmSvNganhToHop.foo = () => { };
+    // app.model.dtNganhToHop.foo = () => { };
 };

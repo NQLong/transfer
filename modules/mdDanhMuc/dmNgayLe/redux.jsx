@@ -126,7 +126,7 @@ export function deleteDmNgayLe(id) {
 export function updateDmNgayLe(id, changes, done) {
     return dispatch => {
         const url = '/api/danh-muc/ngay-le';
-        T.put(url, {  id, changes }, data => {
+        T.put(url, { id, changes }, data => {
             if (data.error) {
                 T.notify('Cập nhật ngày lễ bị lỗi!', 'danger');
                 console.error(`PUT ${url}. ${data.error}`);
@@ -134,6 +134,7 @@ export function updateDmNgayLe(id, changes, done) {
             } else {
                 T.notify('Cập nhật thông tin ngày lễ thành công!', 'success');
                 dispatch(getDmNgayLePage());
+                done && done();
             }
         }, () => T.notify('Cập nhật thông tin ngày lễ bị lỗi!', 'danger'));
     };

@@ -2,25 +2,18 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getDmMonHocPage, createDmMonHoc, updateDmMonHoc, deleteDmMonHoc } from './redux';
 import { Link } from 'react-router-dom';
-import { getDmDonViAll } from 'modules/mdDanhMuc/dmDonVi/redux';
+import { getDmDonViAll, SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { AdminPage, AdminModal, renderTable, TableCell, FormTextBox, FormCheckbox, FormSelect, FormRichTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
-import { SelectAdapter_DmSvLoaiHinhDaoTao } from '../dmSvLoaiHinhDaoTao/redux';
+import { SelectAdapter_DmSvLoaiHinhDaoTao } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
 
 class EditModal extends AdminModal {
     state = { active: true, ma: '' };
-    DonViTable = [];
 
     componentDidMount() {
         $(document).ready(() => this.onShown(() => {
             !this.ma.value() ? this.ma.focus() : this.ten.focus();
         }));
-        this.props.getDataSelect(items => {
-            if (items) {
-                this.DonViTable = [];
-                items.forEach(item => this.DonViTable.push({ 'id': item.ma, 'text': item.ten }));
-            }
-        });
     }
 
     onShow = (item) => {
@@ -94,7 +87,7 @@ class EditModal extends AdminModal {
     }
 
     render = () => {
-        const readOnly = this.props.readOnly;
+        const readOnly = !this.props.permission.write;
         return this.renderModal({
             title: this.state.ma ? 'Cập nhật môn học' : 'Tạo mới môn học',
             size: 'elarge',
@@ -111,7 +104,7 @@ class EditModal extends AdminModal {
                 <FormTextBox type='number' className='col-2' ref={e => this.soTietDa = e} label='Số tiết DA' readOnly={readOnly} placeholder='Số tiết DA' required />
                 <FormTextBox type='number' className='col-2' ref={e => this.soTietLa = e} label='Số tiết LA' readOnly={readOnly} placeholder='Số tiết LA' required />
                 <FormTextBox type='text' className='col-12' ref={e => this.tinhChatPhong = e} label='Tính chất phòng' readOnly={readOnly} placeholder='Tính chất phòng' />
-                <FormSelect className='col-12' ref={e => this.boMon = e} data={this.DonViTable} label='Khoa/Bộ Môn' required />
+                <FormSelect className='col-12' ref={e => this.boMon = e} data={SelectAdapter_DmDonViFaculty_V2} label='Khoa/Bộ Môn' required />
                 <FormSelect type='text' className='col-6' ref={e => this.loaiHinh = e} label='Loại hình' readOnly={readOnly} data={SelectAdapter_DmSvLoaiHinhDaoTao} placeholder='Loại hình' />
                 <FormTextBox type='text' className='col-6' ref={e => this.chuyenNganh = e} label='Chuyên ngành' readOnly={readOnly} placeholder='Chuyên ngành' />
                 <FormTextBox type='text' className='col-12' ref={e => this.ghiChu = e} label='Ghi chú' readOnly={readOnly} placeholder='Ghi chú' />
@@ -126,7 +119,7 @@ class EditModal extends AdminModal {
 
 class DmMonHocPage extends AdminPage {
     donViMapper = {};
-
+    state = { donVi: '' }
     componentDidMount() {
         this.props.getDmDonViAll(items => {
             if (items) {
@@ -134,10 +127,19 @@ class DmMonHocPage extends AdminPage {
                 items.forEach(item => this.donViMapper[item.ma] = item.ten);
             }
         });
-        T.ready('/user/category', () => {
-            T.onSearch = (searchText) => this.props.getDmMonHocPage(undefined, undefined, searchText || '');
-            T.showSearchBox();
-            this.props.getDmMonHocPage();
+        T.ready('/user/pdt', () => {
+            let permission = this.getUserPermission('dmMonHoc');
+            this.setState({ donVi: permission.read ? 'all' : this.props.system.user.staff.maDonVi }, () => {
+                T.onSearch = (searchText) => this.props.getDmMonHocPage(undefined, undefined, {
+                    searchTerm: searchText || '',
+                    donVi: this.state.donVi
+                });
+                T.showSearchBox();
+                this.props.getDmMonHocPage(undefined, undefined, {
+                    searchTerm: '',
+                    donVi: this.state.donVi
+                });
+            });
         });
     }
 
@@ -153,11 +155,19 @@ class DmMonHocPage extends AdminPage {
     }
 
     render() {
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permission = this.getUserPermission('dmMonHoc', ['read', 'write', 'delete']);
+        const permissionMonHoc = this.getUserPermission('dmMonHoc'),
+            permissionManager = this.getUserPermission('manager');
+        let permission = {
+            read: permissionMonHoc.read || permissionManager.read,
+            write: permissionManager.write,
+            delete: permissionManager.write
+        };
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmMonHoc && this.props.dmMonHoc.page ?
-            this.props.dmMonHoc.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: [] };
-
+            this.props.dmMonHoc.page : {
+                pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {
+                    searchTerm: '', donVi: this.state.donVi
+                }, list: []
+            };
         let table = renderTable({
             emptyTable: 'Không có dữ liệu môn học',
             getDataSource: () => list, stickyHead: false,
@@ -199,7 +209,7 @@ class DmMonHocPage extends AdminPage {
                     <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietDa} />
                     <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietLa} />
                     <TableCell type='text' content={this.donViMapper && this.donViMapper[item.boMon] ? this.donViMapper[item.boMon] : ''} />
-                    <TableCell contentClassName='multiple-lines-4' content={item.tenCtdt?.split(',').map(ctdt => <div key={index}>{ctdt} <br /></div>)} />
+                    <TableCell contentClassName='multiple-lines-4' content={item.tenCtdt?.split(',').map((ctdt, index) => <div key={index}>{ctdt} <br /></div>)} />
                     <TableCell type='checkbox' content={item.kichHoat} permission={permission}
                         onChanged={value => this.props.updateDmMonHoc(item.ma, { kichHoat: value ? 1 : 0, })} />
                     <TableCell type='buttons' content={item} permission={permission}
@@ -208,25 +218,29 @@ class DmMonHocPage extends AdminPage {
         });
 
         return this.renderPage({
-            icon: 'fa fa-list-alt',
-            title: 'Danh mục Môn Học',
+            icon: 'fa fa-leanpub',
+            title: 'Danh sách Môn Học',
             breadcrumb: [
-                <Link key={0} to='/user/category'>Danh mục</Link>,
-                'Danh mục Môn Học'
+                <Link key={0} to='/user/pdt'>Đào tạo</Link>,
+                'Danh sách Môn Học'
             ],
+            header: permissionMonHoc.read && <FormSelect style={{ width: '300px', marginBottom: '0' }} placeholder='Danh sách khoa/bộ môn' ref={e => this.donVi = e} onChange={value => this.props.getDmMonHocPage(undefined, undefined, {
+                searchTerm: '',
+                donVi: value ? value.id : 'all'
+            })} data={SelectAdapter_DmDonViFaculty_V2} allowClear={true} />,
             content: <>
                 <div className='tile'>{table}</div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getDmMonHocPage} />
-                <EditModal ref={e => this.modal = e} permission={permission} getDataSelect={this.props.getDmDonViAll}
-                    create={this.props.createDmMonHoc} update={this.props.updateDmMonHoc} permissions={currentPermissions} />
+                <EditModal ref={e => this.modal = e} permission={permission}
+                    create={this.props.createDmMonHoc} update={this.props.updateDmMonHoc} />
             </>,
-            backRoute: '/user/category',
+            backRoute: '/user/pdt',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
         });
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, dmMonHoc: state.danhMuc.dmMonHoc, dmDonVi: state.danhMuc.dmDonVi });
+const mapStateToProps = state => ({ system: state.system, dmMonHoc: state.daoTao.dmMonHoc });
 const mapActionsToProps = { getDmDonViAll, getDmMonHocPage, createDmMonHoc, updateDmMonHoc, deleteDmMonHoc };
 export default connect(mapStateToProps, mapActionsToProps)(DmMonHocPage);
