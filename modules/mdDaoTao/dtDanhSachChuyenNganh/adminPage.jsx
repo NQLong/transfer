@@ -12,7 +12,7 @@ class EditModal extends AdminModal {
     this.setState({ id });
     this.ten.value(ten);
     this.namHoc.value(namHoc);
-    this.khoa.value(khoa || this.props.khoa);
+    this.khoa.value(khoa || (this.props.khoa != 'all' ? this.props.khoa : ''));
   }
   onSubmit = (e) => {
     e.preventDefault();
@@ -44,7 +44,7 @@ class EditModal extends AdminModal {
         <FormTextBox ref={e => this.ten = e} className='col-12' required label='Tên chuyên ngành' readOnly={readOnly} />
         <FormTextBox type='year' ref={e => this.namHoc = e} className=
           'col-12' required label='Năm' readOnly={readOnly} />
-        <FormSelect ref={e => this.khoa = e} className='col-12' required label='Khoa/Bộ môn' data={SelectAdapter_DmDonViFaculty_V2} readOnly />
+        <FormSelect ref={e => this.khoa = e} className='col-12' required label='Khoa/Bộ môn' data={SelectAdapter_DmDonViFaculty_V2} readOnly={readOnly || this.props.khoa != 'all'} />
       </div>
     });
   }

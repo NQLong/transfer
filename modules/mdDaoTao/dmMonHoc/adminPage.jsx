@@ -32,7 +32,7 @@ class EditModal extends AdminModal {
         this.soTietLa.value(soTietLa);
         this.tinhChatPhong.value(tinhChatPhong || '');
         this.tenTiengAnh.value(tenTiengAnh || '');
-        this.boMon.value(boMon);
+        this.boMon.value(boMon || (this.props.khoa != 'all' ? this.props.khoa : ''));
         this.loaiHinh.value(loaiHinh || '');
         this.chuyenNganh.value(chuyenNganh || '');
         this.ghiChu.value(ghiChu || '');
@@ -92,9 +92,9 @@ class EditModal extends AdminModal {
             title: this.state.ma ? 'Cập nhật môn học' : 'Tạo mới môn học',
             size: 'elarge',
             body: <div className='row'>
-                <FormTextBox type='text' className='col-12' ref={e => this.ma = e} label='Mã môn học' readOnly={this.state.ma ? true : readOnly} placeholder='Mã môn học' required />
-                <FormTextBox type='text' className='col-12' ref={e => this.ten = e} label='Tên môn học' readOnly={readOnly} placeholder='Tên môn học' required />
-                <FormTextBox type='text' className='col-12' ref={e => this.tenTiengAnh = e} label='Tên tiếng Anh' readOnly={readOnly} placeholder='Tên tiếng Anh' />
+                <FormTextBox className='col-12' ref={e => this.ma = e} label='Mã môn học' readOnly={this.state.ma ? true : readOnly} placeholder='Mã môn học' required />
+                <FormTextBox className='col-12' ref={e => this.ten = e} label='Tên môn học' readOnly={readOnly} placeholder='Tên môn học' required />
+                <FormTextBox className='col-12' ref={e => this.tenTiengAnh = e} label='Tên tiếng Anh' readOnly={readOnly} placeholder='Tên tiếng Anh' />
                 <FormTextBox type='number' className='col-6' ref={e => this.soTinChi = e} label='Số tín chỉ' readOnly={readOnly} placeholder='Số tín chỉ' required />
                 <FormTextBox type='number' className='col-6' ref={e => this.tongSoTiet = e} label='Tổng số tiết' readOnly={readOnly} placeholder='Tổng số tiết' required />
                 <FormTextBox type='number' className='col-2' ref={e => this.soTietLt = e} label='Số tiết LT' readOnly={readOnly} placeholder='Số tiết LT' required />
@@ -103,11 +103,11 @@ class EditModal extends AdminModal {
                 <FormTextBox type='number' className='col-2' ref={e => this.soTietTl = e} label='Số tiết TL' readOnly={readOnly} placeholder='Số tiết TL' required />
                 <FormTextBox type='number' className='col-2' ref={e => this.soTietDa = e} label='Số tiết DA' readOnly={readOnly} placeholder='Số tiết DA' required />
                 <FormTextBox type='number' className='col-2' ref={e => this.soTietLa = e} label='Số tiết LA' readOnly={readOnly} placeholder='Số tiết LA' required />
-                <FormTextBox type='text' className='col-12' ref={e => this.tinhChatPhong = e} label='Tính chất phòng' readOnly={readOnly} placeholder='Tính chất phòng' />
-                <FormSelect className='col-12' ref={e => this.boMon = e} data={SelectAdapter_DmDonViFaculty_V2} label='Khoa/Bộ Môn' required />
-                <FormSelect type='text' className='col-6' ref={e => this.loaiHinh = e} label='Loại hình' readOnly={readOnly} data={SelectAdapter_DmSvLoaiHinhDaoTao} placeholder='Loại hình' />
-                <FormTextBox type='text' className='col-6' ref={e => this.chuyenNganh = e} label='Chuyên ngành' readOnly={readOnly} placeholder='Chuyên ngành' />
-                <FormTextBox type='text' className='col-12' ref={e => this.ghiChu = e} label='Ghi chú' readOnly={readOnly} placeholder='Ghi chú' />
+                <FormTextBox className='col-12' ref={e => this.tinhChatPhong = e} label='Tính chất phòng' readOnly={readOnly} placeholder='Tính chất phòng' />
+                <FormSelect className='col-12' ref={e => this.boMon = e} data={SelectAdapter_DmDonViFaculty_V2} label='Khoa/Bộ Môn' readOnly={readOnly || this.props.khoa != 'all'} required />
+                <FormSelect className='col-6' ref={e => this.loaiHinh = e} label='Loại hình' readOnly={readOnly} data={SelectAdapter_DmSvLoaiHinhDaoTao} placeholder='Loại hình' />
+                <FormTextBox className='col-6' ref={e => this.chuyenNganh = e} label='Chuyên ngành' readOnly={readOnly} placeholder='Chuyên ngành' />
+                <FormTextBox className='col-12' ref={e => this.ghiChu = e} label='Ghi chú' readOnly={readOnly} placeholder='Ghi chú' />
                 <FormRichTextBox rows='5' className='col-6' ref={e => this.maCtdt = e} label='Mã CTĐT' readOnly={readOnly} placeholder='Mã CTĐT' />
                 <FormRichTextBox rows='5' className='col-6' ref={e => this.tenCtdt = e} label='Tên CTĐT' readOnly={readOnly} placeholder='Tên CTĐT' />
                 <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
@@ -197,9 +197,9 @@ class DmMonHocPage extends AdminPage {
                 </>),
             renderRow: (item, index) => (
                 <tr key={index}>
-                    <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
+                    <TableCell style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                     <TableCell type='link' content={item.ma} onClick={() => this.modal.show(item)} />
-                    <TableCell type='text' contentClassName='multiple-lines-3' content={item.ten} />
+                    <TableCell contentClassName='multiple-lines-3' content={item.ten} />
                     <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTinChi} />
                     <TableCell type='number' style={{ textAlign: 'center' }} content={item.tongSoTiet} />
                     <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietLt} />
@@ -208,7 +208,7 @@ class DmMonHocPage extends AdminPage {
                     <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietTl} />
                     <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietDa} />
                     <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietLa} />
-                    <TableCell type='text' content={this.donViMapper && this.donViMapper[item.boMon] ? this.donViMapper[item.boMon] : ''} />
+                    <TableCell content={this.donViMapper && this.donViMapper[item.boMon] ? this.donViMapper[item.boMon] : ''} />
                     <TableCell contentClassName='multiple-lines-4' content={item.tenCtdt?.split(',').map((ctdt, index) => <div key={index}>{ctdt} <br /></div>)} />
                     <TableCell type='checkbox' content={item.kichHoat} permission={permission}
                         onChanged={value => this.props.updateDmMonHoc(item.ma, { kichHoat: value ? 1 : 0, })} />
@@ -233,7 +233,7 @@ class DmMonHocPage extends AdminPage {
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getDmMonHocPage} />
                 <EditModal ref={e => this.modal = e} permission={permission} readOnly={!permission.write}
-                    create={this.props.createDmMonHoc} update={this.props.updateDmMonHoc} />
+                    create={this.props.createDmMonHoc} update={this.props.updateDmMonHoc} khoa={this.state.donVi} />
             </>,
             backRoute: '/user/pdt',
             onCreate: permission.write ? (e) => this.showModal(e) : null,
