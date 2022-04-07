@@ -16,8 +16,8 @@ class EditModal extends AdminModal {
 
     onShow = (item) => {
 
-        let { id, lyDoHinhThuc, capQuyetDinh, diemThiDua, noiDung, soQuyetDinh, ngayRaQuyetDinh} = item && item.item ? item.item : {
-            id: '', lyDoHinhThuc: '', capQuyetDinh: '', diemThiDua: '', noiDung: '', soQuyetDinh: '', ngayRaQuyetDinh: ''
+        let { id, lyDoHinhThuc, diemThiDua, noiDung, soQuyetDinh, ngayRaQuyetDinh} = item && item.item ? item.item : {
+            id: '', lyDoHinhThuc: '', diemThiDua: '', noiDung: '', soQuyetDinh: '', ngayRaQuyetDinh: ''
         };
 
         this.setState({
@@ -25,7 +25,6 @@ class EditModal extends AdminModal {
             maCanBo: item.maCanBo
         }, () => {
             this.hinhThucKyLuat.value(lyDoHinhThuc);
-            this.capQuyetDinh.value(capQuyetDinh || '');
             this.diemThiDua.value(diemThiDua || '');
             this.noiDung.value(noiDung || '');
             this.soQuyetDinh.value(soQuyetDinh || '');
@@ -38,7 +37,6 @@ class EditModal extends AdminModal {
         const changes = {
             shcc: this.state.maCanBo,
             lyDoHinhThuc: this.hinhThucKyLuat.value(),
-            capQuyetDinh: this.capQuyetDinh.value(),
             diemThiDua: this.diemThiDua.value(),
             noiDung: this.noiDung.value(),
             soQuyetDinh: this.soQuyetDinh.value(),
@@ -81,7 +79,7 @@ class QtKyLuatUserPage extends AdminPage {
     componentDidMount() {
         T.ready('/user', () => {
             const { shcc } = this.props.system && this.props.system.user ? this.props.system.user : { shcc: '' };
-            this.setState({ filter: { listShcc: shcc, listDv: '', fromYear: null, toYear: null } });
+            this.setState({ filter: { listShcc: shcc, listDv: '', fromYear: null, toYear: null, listHinhThucKyLuat: '' } });
             this.getPage();
         });
     }
@@ -137,13 +135,9 @@ class QtKyLuatUserPage extends AdminPage {
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='text' style={{ color: 'red' }} content={(<span><b>{item.tenKyLuat || ''}</b></span>)} />
-                        <TableCell type='text' contentClassName='multiple-lines-5' content={(item.noiDung || '')} />
+                        <TableCell type='text' content={(item.noiDung || '')} />
                         <TableCell type='text' content={(<b> {item.soQuyetDinh || ''} </b>)} />
                         <TableCell type='date' style={{color: 'blue'}} dateFormat='dd/mm/yyyy' content={item.ngayRaQuyetDinh} />
-                        <TableCell type='text' content={(<b> {item.soQuyetDinh || ''} </b>)} />
-                        <TableCell type='text' content={(item.noiDung || '')} />
-                        <TableCell type='text' style={{ color: 'red' }} content={(<span><b>{item.tenKyLuat || ''}</b></span>)} />
-                        <TableCell type='text' content={(item.capQuyetDinh || '')} />
                         <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemThiDua} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show({ item, maCanBo: shcc })} onDelete={this.delete} >

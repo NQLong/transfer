@@ -20,8 +20,8 @@ class EditModal extends AdminModal {
     };
 
     onShow = (item) => {
-        let { id, maCanBo, lyDoHinhThuc, capQuyetDinh, diemThiDua, noiDung, soQuyetDinh, ngayRaQuyetDinh} = item ? item : {
-            id: '', maCanBo: '', lyDoHinhThuc: '', capQuyetDinh: '', diemThiDua: '', noiDung: '', soQuyetDinh: '', ngayRaQuyetDinh: ''
+        let { id, maCanBo, lyDoHinhThuc, diemThiDua, noiDung, soQuyetDinh, ngayRaQuyetDinh} = item ? item : {
+            id: '', maCanBo: '', lyDoHinhThuc: '', diemThiDua: '', noiDung: '', soQuyetDinh: '', ngayRaQuyetDinh: ''
         };
 
         this.setState({
@@ -29,7 +29,6 @@ class EditModal extends AdminModal {
         }, () => {
             this.maCanBo.value(maCanBo ? maCanBo : this.props.maCanBo);
             this.hinhThucKyLuat.value(lyDoHinhThuc);
-            this.capQuyetDinh.value(capQuyetDinh || '');
             this.diemThiDua.value(diemThiDua || '');
             this.noiDung.value(noiDung || '');
             this.soQuyetDinh.value(soQuyetDinh || '');
@@ -42,7 +41,6 @@ class EditModal extends AdminModal {
         const changes = {
             shcc: this.maCanBo.value(),
             lyDoHinhThuc: this.hinhThucKyLuat.value(),
-            capQuyetDinh: this.capQuyetDinh.value(),
             diemThiDua: this.diemThiDua.value(),
             noiDung: this.noiDung.value(),
             soQuyetDinh: this.soQuyetDinh.value(),
@@ -174,10 +172,6 @@ class QtKyLuatGroupPage extends AdminPage {
                         <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Nội dung kỷ luật</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày ra quyết định</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nội dung kỷ luật</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Hình thức kỷ luật</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cấp quyết định</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Điểm thi đua</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
                     </tr>
@@ -200,13 +194,9 @@ class QtKyLuatGroupPage extends AdminPage {
                             </>
                         )} />
                         <TableCell type='text' style={{ color: 'red' }} content={(<span><b>{item.tenKyLuat || ''}</b></span>)} />
-                        <TableCell type='text' contentClassName='multiple-lines-5' content={(item.noiDung || '')} />
+                        <TableCell type='text' content={(item.noiDung || '')} />
                         <TableCell type='text' content={(<b> {item.soQuyetDinh || ''} </b>)} />
                         <TableCell type='date' style={{color: 'blue'}} dateFormat='dd/mm/yyyy' content={item.ngayRaQuyetDinh} />
-                        <TableCell type='text' content={(<b> {item.soQuyetDinh || ''} </b>)} />
-                        <TableCell type='text' content={(item.noiDung || '')} />
-                        <TableCell type='text' style={{ color: 'red' }} content={(<span><b>{item.tenKyLuat || ''}</b></span>)} />
-                        <TableCell type='text' content={(item.capQuyetDinh || '')} />
                         <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemThiDua} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={this.delete} >

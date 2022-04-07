@@ -20,8 +20,8 @@ class EditModal extends AdminModal {
     onShow = (item, multiple = true) => {
         this.multiple = multiple;
 
-        let { id, maCanBo, lyDoHinhThuc, capQuyetDinh, diemThiDua, noiDung, soQuyetDinh, ngayRaQuyetDinh} = item ? item : {
-            id: '', maCanBo: '', lyDoHinhThuc: '', capQuyetDinh: '', diemThiDua: '', noiDung: '', soQuyetDinh: '', ngayRaQuyetDinh: ''
+        let { id, maCanBo, lyDoHinhThuc, diemThiDua, noiDung, soQuyetDinh, ngayRaQuyetDinh} = item ? item : {
+            id: '', maCanBo: '', lyDoHinhThuc: '', diemThiDua: '', noiDung: '', soQuyetDinh: '', ngayRaQuyetDinh: ''
         };
 
         this.setState({
@@ -29,7 +29,6 @@ class EditModal extends AdminModal {
         }, () => {
             this.maCanBo.value(maCanBo);
             this.hinhThucKyLuat.value(lyDoHinhThuc);
-            this.capQuyetDinh.value(capQuyetDinh || '');
             this.diemThiDua.value(diemThiDua || '');
             this.noiDung.value(noiDung || '');
             this.soQuyetDinh.value(soQuyetDinh || '');
@@ -60,7 +59,6 @@ class EditModal extends AdminModal {
                 const changes = {
                     shcc: ma,
                     lyDoHinhThuc: this.hinhThucKyLuat.value(),
-                    capQuyetDinh: this.capQuyetDinh.value(),
                     diemThiDua: this.diemThiDua.value(),
                     noiDung: this.noiDung.value(),
                     soQuyetDinh: this.soQuyetDinh.value(),
