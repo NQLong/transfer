@@ -1,6 +1,7 @@
 import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
 import React from 'react';
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { AdminModal, AdminPage, FormSelect, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import { getDtDanhSachChuyenNganhPage, updateDtDanhSachChuyenNganh, createDtDanhSachChuyenNganh, deleteDtDanhSachChuyenNganh } from './redux';
@@ -109,7 +110,12 @@ class DtDanhSachChuyenNganhPage extends AdminPage {
     });
     return this.renderPage({
       title: 'Danh sách chuyên ngành',
+      subTitle: 'Của các Khoa/Bộ môn',
       icon: 'fa fa-sitemap',
+      breadcrumb: [
+        <Link key={0} to='/user/pdt'>Đào tạo</Link>,
+        'Danh sách chuyên ngành'
+      ],
       content: <>
         {permissionDaoTao.read &&
           <div className='tile'>

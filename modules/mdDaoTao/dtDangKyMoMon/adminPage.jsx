@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { AdminPage, renderTable, TableCell } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import { getDtDangKyMoMonPage } from './redux';
@@ -54,6 +55,10 @@ class DtDangKyMoMonPage extends AdminPage {
     return this.renderPage({
       title: 'Danh sách các đợt khoa, bộ môn đăng ký mở môn trong học kỳ',
       icon: 'fa fa-paper-plane-o',
+      breadcrumb: [
+        <Link key={0} to='/user/pdt'>Đào tạo</Link>,
+        'Danh sách đợt mở môn học'
+      ],
       content: <>
         <div className='tile'>{table}</div>
         <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}

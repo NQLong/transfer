@@ -170,7 +170,7 @@ class DmMonHocPage extends AdminPage {
             };
         let table = renderTable({
             emptyTable: 'Chưa có dữ liệu môn học',
-            getDataSource: () => list, stickyHead: true,
+            getDataSource: () => list, stickyHead: false,
             renderHead: () => (
                 <>
                     <tr>
