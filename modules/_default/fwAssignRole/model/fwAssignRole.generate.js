@@ -130,5 +130,10 @@ module.exports = app => {
             const sql = 'SELECT COUNT(*) FROM FW_ASSIGN_ROLE' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.database.oracle.connection.main.execute(sql, parameter, (error, result) => done(error, result));
         },
+
+        getCurrentRoles: (nguoiduocgan, nhomrole, done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=fw_assign_role_get_current_roles(:nguoiduocgan, :nhomrole); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, nguoiduocgan, nhomrole }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
+        },
     };
 };
