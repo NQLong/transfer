@@ -168,12 +168,12 @@ class QtKyLuatGroupPage extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br/>Đơn vị công tác</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Hình thức kỷ luật</th>
-                        <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Nội dung kỷ luật</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Hình thức kỷ luật</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Nội dung kỷ luật</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Số quyết định</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày ra quyết định</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Điểm thi đua</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
@@ -194,7 +194,7 @@ class QtKyLuatGroupPage extends AdminPage {
                             </>
                         )} />
                         <TableCell type='text' style={{ color: 'red' }} content={(<span><b>{item.tenKyLuat || ''}</b></span>)} />
-                        <TableCell type='text' content={(item.noiDung || '')} />
+                        <TableCell type='text' contentClassName='multiple-lines-5' content={(item.noiDung || '')} />
                         <TableCell type='text' content={(<b> {item.soQuyetDinh || ''} </b>)} />
                         <TableCell type='date' style={{color: 'blue'}} dateFormat='dd/mm/yyyy' content={item.ngayRaQuyetDinh} />
                         <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemThiDua} />
