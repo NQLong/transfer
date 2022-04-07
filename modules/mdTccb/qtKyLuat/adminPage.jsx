@@ -133,9 +133,18 @@ class QtKyLuat extends AdminPage {
         let { pageNumber, pageSize, pageCondition } = this.props && this.props.qtKyLuat && this.props.qtKyLuat.page ? this.props.qtKyLuat.page : { pageNumber: 1, pageSize: 50, pageCondition: {} };
 
         if (pageCondition && (typeof pageCondition == 'string')) T.setTextSearchBox(pageCondition);
-
-        const fromYear = this.fromYear.value() == '' ? null : this.fromYear.value().getTime();
-        const toYear = this.toYear.value() == '' ? null : this.toYear.value().getTime() + 43200000;
+        let fromYear = null;
+        if (this.fromYear.value()) {
+            fromYear = this.fromYear.value();
+            fromYear.setHours(0, 0, 0, 0);
+            fromYear = fromYear.getTime();
+        }
+        let toYear = null;
+        if (this.toYear.value()) {
+            toYear = this.toYear.value();
+            toYear.setHours(23, 59, 59, 999);
+            toYear = toYear.getTime();
+        }
         const listDv = this.maDonVi.value().toString() || '';
         const listShcc = this.mulCanBo.value().toString() || '';
         const listHinhThucKyLuat = this.hinhThucKyLuat.value().toString() || '';
