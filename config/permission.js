@@ -102,7 +102,7 @@ module.exports = app => {
         },
 
         check: (...permissions) => (req, res, next) => {
-            if (app.isDebug && (req.session.user == null || req.session.user == undefined)) {
+            if (app.isDebug && req.session.user == null) {
                 const personId = req.cookies.personId || '003379';
                 const condition = {
                     statement: 'shcc=:personId OR studentId=:personId OR email=:personId',
@@ -121,10 +121,10 @@ module.exports = app => {
         },
 
         orCheck: (...permissions) => (req, res, next) => {
-            if (app.isDebug && (req.session.user == null || req.session.user == undefined)) {
-                const personId = req.cookies.personId || '404';
+            if (app.isDebug && req.session.user == null) {
+                const personId = req.cookies.personId || '003379';
                 const condition = {
-                    statement: 'shcc=:personId OR mssv=:personId',
+                    statement: 'shcc=:personId OR studentId=:personId OR email=:personId',
                     parameter: { personId }
                 };
                 app.model.fwUser.get(condition, (error, user) => {
