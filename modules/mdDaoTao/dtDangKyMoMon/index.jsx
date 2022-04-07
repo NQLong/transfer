@@ -11,7 +11,7 @@ export default {
   },
   routes: [
     {
-      path: '/user/pdt/dang-ky-mo-mon/:id',
+      path: '/user/pdt/dang-ky-mo-mon/:khoa/:id',
       component: Loadable({ loading: Loading, loader: () => import('./adminEditPage') })
     },
     {

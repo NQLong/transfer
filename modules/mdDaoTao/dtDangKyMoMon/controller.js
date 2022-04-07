@@ -14,7 +14,7 @@ module.exports = app => {
   );
 
   app.get('/user/pdt/dang-ky-mo-mon', app.permission.orCheck('dtDangKyMoMon:read', 'dtDangKyMoMon:readAll', 'manager:read'), app.templates.admin);
-  app.get('/user/pdt/dang-ky-mo-mon/:id', app.permission.orCheck('dtDangKyMoMon:read', 'dtDangKyMoMon:readAll', 'manager:read'), app.templates.admin);
+  app.get('/user/pdt/dang-ky-mo-mon/:khoa/:id', app.permission.orCheck('dtDangKyMoMon:read', 'dtDangKyMoMon:readAll', 'manager:read'), app.templates.admin);
 
   //APIs-----------------------------------------------------------------------------------------------------------------------------------------------------
   const checkDaoTaoPermission = (req, res, next) => app.isDebug ? next() : app.permission.orCheck('dtDangKyMoMon:read', 'dtDangKyMoMon:readAll', 'manager:read')(req, res, next);

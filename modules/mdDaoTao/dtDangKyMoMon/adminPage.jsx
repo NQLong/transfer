@@ -17,9 +17,11 @@ class DtDangKyMoMonPage extends AdminPage {
   render() {
     let permissionDaoTao = this.getUserPermission('dtDangKyMoMon'),
       permissionManager = this.getUserPermission('manager');
-    console.log(permissionDaoTao);
-    const permissionWrite = permissionDaoTao.write || permissionManager.write;
-
+    let permission = {
+      read: permissionDaoTao.read || permissionManager.read,
+      write: permissionManager.write,
+      delete: permissionManager.write
+    };
     const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dtDangKyMoMon && this.props.dtDangKyMoMon.page ?
       this.props.dtDangKyMoMon.page : { pageNumber: 1, pageSize: 200, pageTotal: 1, totalItem: 0, list: [] };
 
@@ -46,18 +48,19 @@ class DtDangKyMoMonPage extends AdminPage {
           <TableCell style={{ textAlign: 'center' }} content={item.namHoc} />
           <TableCell type='date' style={{ textAlign: 'center' }} content={item.thoiGian} />
           <TableCell contentClassName='multiple-lines-4' content={item.ghiChu} />
-          <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permissionDaoTao || permissionManager} onEdit={`/user/pdt/dang-ky-mo-mon/${item.id}`} />
+          <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onEdit={() => this.props.history.push(`/user/pdt/dang-ky-mo-mon/${item.maKhoaBoMon}/${item.id}`)} />
         </tr>)
     });
     return this.renderPage({
-      title: 'Danh sách đợt dăng ký mở môn',
+      title: 'Danh sách các đợt khoa, bộ môn đăng ký mở môn trong học kỳ',
+      icon: 'fa fa-paper-plane-o',
       content: <>
         <div className='tile'>{table}</div>
         <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
           getPage={this.props.getDtDangKyMoMonPage} />
       </>,
       backRoute: '/user/pdt',
-      onCreate: permissionWrite ? (e) => e.preventDefault() || this.props.history.push('/user/pdt/dang-ky-mo-mon/new') : null
+      onCreate: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/pdt/dang-ky-mo-mon/new') : null
     });
   }
 }

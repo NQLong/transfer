@@ -5,6 +5,7 @@ const DmMonHocGetAll = 'DmMonHoc:GetAll';
 const DmMonHocGetPage = 'DmMonHoc:GetPage';
 const DmMonHocUpdate = 'DmMonHoc:Update';
 const DmMonHocDelete = 'DmMonHoc:Delete';
+const DmMonHocCreate = 'DmMonHoc:Create';
 
 export default function dmMonHocReducer(state = null, data) {
     switch (data.type) {
@@ -49,6 +50,17 @@ export default function dmMonHocReducer(state = null, data) {
                             break;
                         }
                     }
+                }
+                return Object.assign({}, state, { page: updatedPage });
+            } else {
+                return null;
+            }
+        case DmMonHocCreate:
+            if (state) {
+                let updatedPage = Object.assign({}, state.page),
+                    createdItem = data.item;
+                if (updatedPage) {
+                    updatedPage.list.unshift(createdItem);
                 }
                 return Object.assign({}, state, { page: updatedPage });
             } else {
@@ -104,7 +116,7 @@ export function createDmMonHoc(item, done) {
                 console.error(`POST ${url}. ${data.error}`);
             } else {
                 T.notify('Tạo môn học thành công!', 'success');
-                dispatch({ type: DmMonHocUpdate, item: data.item });
+                dispatch({ type: DmMonHocCreate, item: data.item });
                 if (done) done(data.item);
             }
         });
@@ -135,7 +147,7 @@ export function deleteDmMonHoc(ma) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('Môn học đã xóa thành công!', 'success', false, 800);
-                dispatch({ type: DmMonHocUpdate, item: { ma } });
+                dispatch({ type: DmMonHocDelete, item: { ma } });
             }
         }, () => T.notify('Xóa môn học bị lỗi!', 'danger'));
     };

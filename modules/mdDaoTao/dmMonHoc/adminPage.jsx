@@ -155,10 +155,10 @@ class DmMonHocPage extends AdminPage {
     }
 
     render() {
-        const permissionMonHoc = this.getUserPermission('dmMonHoc'),
+        const permissionDaoTao = this.getUserPermission('dmMonHoc'),
             permissionManager = this.getUserPermission('manager');
         let permission = {
-            read: permissionMonHoc.read || permissionManager.read,
+            read: permissionDaoTao.read || permissionManager.read,
             write: permissionManager.write,
             delete: permissionManager.write
         };
@@ -169,19 +169,19 @@ class DmMonHocPage extends AdminPage {
                 }, list: []
             };
         let table = renderTable({
-            emptyTable: 'Không có dữ liệu môn học',
-            getDataSource: () => list, stickyHead: false,
+            emptyTable: 'Chưa có dữ liệu môn học',
+            getDataSource: () => list, stickyHead: true,
             renderHead: () => (
                 <>
                     <tr>
                         <th rowSpan='2' style={{ width: 'auto', textAlign: 'right', verticalAlign: 'middle' }}>#</th>
                         <th rowSpan='2' style={{ width: 'auto', verticalAlign: 'middle' }}>Mã</th>
-                        <th rowSpan='2' style={{ width: '50%', verticalAlign: 'middle' }}>Tên môn học</th>
+                        <th rowSpan='2' style={{ width: 'auto', verticalAlign: 'middle' }}>Tên môn học</th>
                         <th rowSpan='2' style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center', verticalAlign: 'middle' }}>Số tín chỉ</th>
                         <th rowSpan='2' style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center', verticalAlign: 'middle' }}>Tổng số tiết</th>
                         <th colSpan='6' rowSpan='1' style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Số tiết
                         </th>
-                        <th rowSpan='2' style={{ width: '50%', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Khoa/Bộ môn</th>
+                        <th rowSpan='2' style={{ width: '100%', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Khoa/Bộ môn</th>
                         <th rowSpan='2' style={{ width: 'auto', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Danh sách CTĐT</th>
                         <th rowSpan='2' style={{ width: 'auto', verticalAlign: 'middle' }} nowrap='true'>Kích hoạt</th>
                         <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Thao tác</th>
@@ -199,7 +199,7 @@ class DmMonHocPage extends AdminPage {
                 <tr key={index}>
                     <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                     <TableCell type='link' content={item.ma} onClick={() => this.modal.show(item)} />
-                    <TableCell type='text' content={item.ten} />
+                    <TableCell type='text' contentClassName='multiple-lines-3' content={item.ten} />
                     <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTinChi} />
                     <TableCell type='number' style={{ textAlign: 'center' }} content={item.tongSoTiet} />
                     <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietLt} />
@@ -224,7 +224,7 @@ class DmMonHocPage extends AdminPage {
                 <Link key={0} to='/user/pdt'>Đào tạo</Link>,
                 'Danh sách Môn Học'
             ],
-            header: permissionMonHoc.read && <FormSelect style={{ width: '300px', marginBottom: '0' }} placeholder='Danh sách khoa/bộ môn' ref={e => this.donVi = e} onChange={value => this.props.getDmMonHocPage(undefined, undefined, {
+            header: permissionDaoTao.read && <FormSelect style={{ width: '300px', marginBottom: '0' }} placeholder='Danh sách khoa/bộ môn' ref={e => this.donVi = e} onChange={value => this.props.getDmMonHocPage(undefined, undefined, {
                 searchTerm: '',
                 donVi: value ? value.id : 'all'
             })} data={SelectAdapter_DmDonViFaculty_V2} allowClear={true} />,

@@ -7,11 +7,11 @@ class DtDsMonMoEditPage extends AdminPage {
   state = { isCreate: false }
 
   componentDidMount() {
-    const route = T.routeMatcher('/user/pdt/dang-ky-mo-mon/:id').parse(window.location.pathname),
+    const route = T.routeMatcher('/user/pdt/dang-ky-mo-mon/:khoa/:id').parse(window.location.pathname),
       staff = this.props.system.user.staff;
     this.setState({
       staff,
-      donVi: staff.maDonVi,
+      donVi: Number(route.khoa),
       id: route.id == 'new' ? null : route.id,
       isCreate: (route.id == 'new')
     }, () => {
@@ -68,7 +68,8 @@ class DtDsMonMoEditPage extends AdminPage {
   })
   render() {
     return this.renderPage({
-      title: <>Mở môn học: <small>{this.state.isCreate ? 'Đợt đăng ký mới' : 'Chỉnh sửa đợt đã đăng ký'}</small></>,
+      title: <>Mở môn học: <i>{this.state.isCreate ? 'Đợt đăng ký mới' : 'Chỉnh sửa đợt đã đăng ký'}</i></>,
+      icon: 'fa fa-paper-plane-o',
       breadcrumb: [
         <Link key={0} to='/user/pdt'>Phòng đào tạo</Link>,
         <Link key={1} to='/user/pdt/dang-ky-mo-mon'>Danh sách các đợt</Link>,
@@ -77,11 +78,11 @@ class DtDsMonMoEditPage extends AdminPage {
       content: <>
         <div className='tile' style={{ height: '40vh' }}>
           <div className='tile-title'>Danh sách môn mở:</div>
-          <div>{this.renderMonHocTable(this.state.dataMonMo || [])}</div>
+          <div>{this.renderMonHocTable([])}</div>
         </div>
         <div className='tile'>
           <div className='tile-title'>Danh sách môn không mở:</div>
-          <div>{this.renderMonHocTable(this.state.dataMonKhongMo || [])}</div>
+          <div>{this.renderMonHocTable([])}</div>
         </div>
       </>,
       backRoute: '/user/pdt/dang-ky-mo-mon'

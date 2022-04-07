@@ -25,16 +25,21 @@ module.exports = app => {
   app.get('/api/pdt/danh-sach-chuyen-nganh/page/:pageNumber/:pageSize', checkDaoTaoPermission, (req, res) => {
     let pageNumber = parseInt(req.params.pageNumber),
       pageSize = parseInt(req.params.pageSize),
-      donVi = req.query.donVi || 'all', statement = 'lower(ten) LIKE :searchTerm',
-      parameter = {
-        searchTerm: typeof req.query.condition === 'string' ? `%${req.query.condition.toLowerCase()}%` : '',
-      };
+      donVi = req.query.donVi || 'all',
+      namHoc = req.query.namHoc ? parseInt(req.query.namHoc) : null,
+      searchTerm = typeof req.query.searchTerm === 'string' ? `%${req.query.searchTerm.toLowerCase()}%` : '',
+      statement = 'lower(ten) LIKE :searchTerm',
+      parameter = { searchTerm };
     if (donVi != 'all') {
-      statement = 'khoa = :donVi AND lower(ten) LIKE :searchTerm';
       parameter.donVi = parseInt(donVi);
+      parameter.namHoc = namHoc;
+      statement = 'khoa = :donVi AND (:namHoc IS NULL OR (namHoc = :namHoc)) AND lower(ten) LIKE :searchTerm';
     }
     let condition = { statement, parameter };
     app.model.dtDanhSachChuyenNganh.getPage(pageNumber, pageSize, condition, '*', 'khoa', (error, page) => {
+      page.pageCondition = {
+        searchTerm, donVi, nam: namHoc
+      };
       res.send({ error, page });
     });
   });

@@ -116,7 +116,7 @@ class DtNganhToHopPage extends AdminPage {
       icon: 'fa fa-cubes',
       title: 'Ngành theo tổ hợp thi',
       breadcrumb: [
-        <Link key={0} to='/user/category'>Danh mục</Link>,
+        <Link key={0} to='/user/category'>Đào tạo</Link>,
         'Ngành theo tổ hợp thi'
       ],
       content: <>
