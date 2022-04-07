@@ -43,7 +43,7 @@ class EditModal extends AdminModal {
   changeKichHoat = value => this.kichHoat.value(value);
 
   render = () => {
-    const readOnly = !this.props.permission.write;
+    const readOnly = this.props.readOnly;
     return this.renderModal({
       title: this.state.item ? 'Tạo mới' : 'Cập nhật khối kiến thức',
       size: 'large',
@@ -80,8 +80,7 @@ class DmKhoiKienThucPage extends AdminPage {
   }
 
   render() {
-    const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-      permission = this.getUserPermission('dmKhoiKienThuc', ['read', 'write', 'delete']);
+    const permission = this.getUserPermission('dmKhoiKienThuc', ['read', 'write', 'delete']);
 
     const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmKhoiKienThuc && this.props.dmKhoiKienThuc.page ?
       this.props.dmKhoiKienThuc.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null };
@@ -120,8 +119,8 @@ class DmKhoiKienThucPage extends AdminPage {
         <div className='tile'>{table}</div>
         <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
           getPage={this.props.getDmKhoiKienThucPage} />
-        <EditModal ref={e => this.modal = e} permission={permission}
-          create={this.props.createDmKhoiKienThuc} update={this.props.updateDmKhoiKienThuc} permissions={currentPermissions} />
+        <EditModal ref={e => this.modal = e} permission={permission} readOnly={!permission.write}
+          create={this.props.createDmKhoiKienThuc} update={this.props.updateDmKhoiKienThuc} />
       </>,
       backRoute: '/user/pdt',
       onCreate: permission && permission.write ? (e) => this.showModal(e) : null

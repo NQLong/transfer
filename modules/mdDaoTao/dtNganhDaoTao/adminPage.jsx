@@ -44,7 +44,7 @@ class EditModal extends AdminModal {
   render = () => {
     const readOnly = this.props.readOnly;
     return this.renderModal({
-      title: this.state.maNganh ? 'Tạo mới ngành đào tạo' : 'Cập nhật ngành đào tạo',
+      title: this.state.maNganh ? 'Cập nhât ngành đào tạo' : 'Tạo mới ngành đào tạo',
       size: 'large',
       body: <div className='row'>
         <FormTextBox type='text' className='col-12' ref={e => this.maNganh = e} label='Mã' readOnly={this.state.maNganh ? true : readOnly} placeholder='Mã' required />
@@ -82,8 +82,7 @@ class DtNganhDaoTaoPage extends AdminPage {
   }
 
   render() {
-    const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-      permission = this.getUserPermission('dtNganhDaoTao', ['read', 'write', 'delete']);
+    const permission = this.getUserPermission('dtNganhDaoTao', ['read', 'write', 'delete']);
 
     const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dtNganhDaoTao && this.props.dtNganhDaoTao.page ?
       this.props.dtNganhDaoTao.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null };
@@ -123,8 +122,8 @@ class DtNganhDaoTaoPage extends AdminPage {
         <div className='tile'>{table}</div>
         <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
           getPage={this.props.getDtNganhDaoTaoPage} />
-        <EditModal ref={e => this.modal = e} permission={permission}
-          create={this.props.createDtNganhDaoTao} update={this.props.updateDtNganhDaoTao} permissions={currentPermissions} />
+        <EditModal ref={e => this.modal = e} permission={permission} readOnly={!permission.write}
+          create={this.props.createDtNganhDaoTao} update={this.props.updateDtNganhDaoTao} />
       </>,
       backRoute: '/user/pdt',
       onCreate: permission && permission.write ? (e) => this.showModal(e) : null

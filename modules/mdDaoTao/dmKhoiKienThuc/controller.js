@@ -9,14 +9,15 @@ module.exports = app => {
   };
   app.permission.add(
     { name: 'dmKhoiKienThuc:read', menu },
+    { name: 'manager:read', menu },
     { name: 'dmKhoiKienThuc:write' },
     { name: 'dmKhoiKienThuc:delete' },
   );
 
-  app.get('/user/pdt/khoi-kien-thuc', app.permission.check('dmKhoiKienThuc:read'), app.templates.admin);
+  app.get('/user/pdt/khoi-kien-thuc', app.permission.orCheck('dmKhoiKienThuc:read', 'manager:read'), app.templates.admin);
 
   //APIs----------------------------------------------------------------------------------------------------------------------------------
-  app.get('/api/pdt/khoi-kien-thuc/page/:pageNumber/:pageSize', app.permission.check('dmKhoiKienThuc:read'), (req, res) => {
+  app.get('/api/pdt/khoi-kien-thuc/page/:pageNumber/:pageSize', app.permission.orCheck('dmKhoiKienThuc:read', 'manager:read'), (req, res) => {
     let pageNumber = parseInt(req.params.pageNumber),
       pageSize = parseInt(req.params.pageSize),
       searchTerm = typeof req.query.condition == 'string' ? req.query.condition : '';
@@ -38,7 +39,7 @@ module.exports = app => {
     app.model.dmKhoiKienThuc.getAll((error, items) => res.send({ error, items }));
   });
 
-  app.get('/api/pdt/khoi-kien-thuc/item/:ma', app.permission.check('dmKhoiKienThuc:read'), (req, res) => {
+  app.get('/api/pdt/khoi-kien-thuc/item/:ma', app.permission.orCheck('dmKhoiKienThuc:read', 'manager:read'), (req, res) => {
     app.model.dmKhoiKienThuc.get({ ma: req.params.ma }, (error, item) => {
       res.send({ error, item });
     });

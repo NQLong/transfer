@@ -16,16 +16,16 @@ module.exports = app => {
     { name: 'dtNganhDaoTao:write' },
     { name: 'dtNganhDaoTao:delete' },
   );
-  app.get('/user/pdt/nganh-dao-tao', app.permission.check('dtNganhDaoTao:read'), app.templates.admin);
+  app.get('/user/pdt/nganh-dao-tao', app.permission.orCheck('dtNganhDaoTao:read', 'manager:read'), app.templates.admin);
 
   // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-  app.get('/api/pdt/nganh-dao-tao/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
+  app.get('/api/pdt/nganh-dao-tao/page/:pageNumber/:pageSize', app.permission.orCheck('dtNganhDaoTao:read', 'manager:read'), (req, res) => {
     const pageNumber = parseInt(req.params.pageNumber),
       pageSize = parseInt(req.params.pageSize);
     app.model.dtNganhDaoTao.getPage(pageNumber, pageSize, {}, (error, page) => res.send({ error, page }));
   });
 
-  app.get('/api/pdt/nganh-dao-tao/item/:maNganh', app.permission.check('user:login'), (req, res) => {
+  app.get('/api/pdt/nganh-dao-tao/item/:maNganh', app.permission.orCheck('dtNganhDaoTao:read', 'manager:read'), (req, res) => {
     app.model.dtNganhDaoTao.get({ maNganh: req.params.maNganh }, (error, item) => res.send({ error, item }));
   });
 

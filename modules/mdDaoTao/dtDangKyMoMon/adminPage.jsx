@@ -49,7 +49,9 @@ class DtDangKyMoMonPage extends AdminPage {
           <TableCell style={{ textAlign: 'center' }} content={item.namHoc} />
           <TableCell type='date' style={{ textAlign: 'center' }} content={item.thoiGian} />
           <TableCell contentClassName='multiple-lines-4' content={item.ghiChu} />
-          <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onEdit={() => this.props.history.push(`/user/pdt/dang-ky-mo-mon/${item.maKhoaBoMon}/${item.id}`)} />
+          <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
+          // onEdit={() => this.props.history.push(`/user/pdt/dang-ky-mo-mon/${item.maKhoaBoMon}/${item.id}`)} //TODO: Đăng ký mở môn theo CTDT
+          />
         </tr>)
     });
     return this.renderPage({
@@ -65,7 +67,8 @@ class DtDangKyMoMonPage extends AdminPage {
           getPage={this.props.getDtDangKyMoMonPage} />
       </>,
       backRoute: '/user/pdt',
-      onCreate: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/pdt/dang-ky-mo-mon/new') : null
+      onCreate: null,  //TODO: Đăng ký mở môn theo CTDT
+      // permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/pdt/dang-ky-mo-mon/new') : null
     });
   }
 }

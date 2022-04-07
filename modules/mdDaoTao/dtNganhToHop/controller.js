@@ -12,13 +12,14 @@ module.exports = app => {
   };
   app.permission.add(
     { name: 'dtNganhToHop:read', menu },
+    { name: 'manager:read', menu },
     { name: 'dtNganhToHop:write' },
     { name: 'dtNganhToHop:delete' },
   );
-  app.get('/user/pdt/nganh-theo-to-hop-thi', app.permission.check('dtNganhToHop:read'), app.templates.admin);
+  app.get('/user/pdt/nganh-theo-to-hop-thi', app.permission.orCheck('dtNganhToHop:read', 'manager:read'), app.templates.admin);
 
   // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-  app.get('/api/pdt/nganh-theo-to-hop-thi/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
+  app.get('/api/pdt/nganh-theo-to-hop-thi/page/:pageNumber/:pageSize', app.permission.orCheck('dtNganhToHop:read', 'manager:read'), (req, res) => {
     const pageNumber = parseInt(req.params.pageNumber),
       pageSize = parseInt(req.params.pageSize),
       searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -33,7 +34,7 @@ module.exports = app => {
     });
   });
 
-  app.get('/api/pdt/nganh-theo-to-hop-thi/item/:id', app.permission.check('user:login'), (req, res) => {
+  app.get('/api/pdt/nganh-theo-to-hop-thi/item/:id', app.permission.orCheck('dtNganhToHop:read', 'manager:read'), (req, res) => {
     app.model.dtNganhToHop.get({ id: req.params.id }, (error, item) => res.send({ error, item }));
   });
 

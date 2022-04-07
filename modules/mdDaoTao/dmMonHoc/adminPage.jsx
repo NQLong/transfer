@@ -87,7 +87,7 @@ class EditModal extends AdminModal {
     }
 
     render = () => {
-        const readOnly = !this.props.permission.write;
+        const readOnly = this.props.readOnly;
         return this.renderModal({
             title: this.state.ma ? 'Cập nhật môn học' : 'Tạo mới môn học',
             size: 'elarge',
@@ -232,11 +232,11 @@ class DmMonHocPage extends AdminPage {
                 <div className='tile'>{table}</div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getDmMonHocPage} />
-                <EditModal ref={e => this.modal = e} permission={permission}
+                <EditModal ref={e => this.modal = e} permission={permission} readOnly={!permission.write}
                     create={this.props.createDmMonHoc} update={this.props.updateDmMonHoc} />
             </>,
             backRoute: '/user/pdt',
-            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+            onCreate: permission.write ? (e) => this.showModal(e) : null,
         });
     }
 }

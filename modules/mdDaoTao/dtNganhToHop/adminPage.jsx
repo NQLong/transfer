@@ -40,7 +40,7 @@ class EditModal extends AdminModal {
   render = () => {
     const readOnly = this.props.readOnly;
     return this.renderModal({
-      title: this.state.id ? 'Tạo mới' : 'Cập nhật',
+      title: this.state.id ? 'Chỉnh sửa/Xem' : 'Tạo mới',
       size: 'large',
       body: <div className='row'>
         <FormSelect className='col-12' ref={e => this.maNganh = e} label='Ngành' readOnly={this.state.id ? true : readOnly} data={SelectAdapter_DtNganhDaoTao} required />
@@ -78,8 +78,7 @@ class DtNganhToHopPage extends AdminPage {
   }
 
   render() {
-    const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-      permission = this.getUserPermission('dtNganhToHop', ['read', 'write', 'delete']);
+    let permission = this.getUserPermission('dtNganhToHop', ['read', 'write', 'delete']);
 
     const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dtNganhToHop && this.props.dtNganhToHop.page ?
       this.props.dtNganhToHop.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, pageCondition: {}, totalItem: 0, list: null };
@@ -123,8 +122,8 @@ class DtNganhToHopPage extends AdminPage {
         <div className='tile'>{table}</div>
         <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
           getPage={this.props.getDtNganhToHopPage} />
-        <EditModal ref={e => this.modal = e} permission={permission}
-          create={this.props.createDtNganhToHop} update={this.props.updateDtNganhToHop} permissions={currentPermissions} />
+        <EditModal ref={e => this.modal = e} permission={permission} readOnly={!permission.write}
+          create={this.props.createDtNganhToHop} update={this.props.updateDtNganhToHop} />
       </>,
       backRoute: '/user/pdt',
       onCreate: permission && permission.write ? (e) => this.showModal(e) : null

@@ -255,7 +255,9 @@ class DtThoiKhoaBieuPage extends AdminPage {
                     <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietLa} />
                     <TableCell style={{}} content={item.tenKhoaBoMon} />
                     <TableCell type='buttons' content={item} permission={permission}
-                        onEdit={() => this.modal.show(item)} onDelete={this.delete} />
+                    // onEdit={() => this.modal.show(item)} //TODO: Sắp xếp thời khóa biểu cho phòng đào tạo
+                    // onDelete={this.delete}
+                    />
                 </tr>)
         });
 
@@ -274,7 +276,8 @@ class DtThoiKhoaBieuPage extends AdminPage {
                     create={this.props.createDtThoiKhoaBieu} update={this.props.updateDtThoiKhoaBieu} permissions={currentPermissions} />
             </>,
             backRoute: '/user/pdt',
-            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+            onCreate: null, //TODO: Sắp xếp thời khóa biểu cho phòng đào tạo
+            // permission && permission.write ? (e) => this.showModal(e) : null,
         });
     }
 }
