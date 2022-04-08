@@ -298,36 +298,40 @@ module.exports = app => {
                     }
                     const pendingMaThanhTich = new Promise(resolve => { //find ma thanh tich
                         let ansMaThanhTich = null;
-                        let bestScore = -1;
-                        for (let idx = 0; idx < danhSachThanhTich.length; idx++) {
-                            let arr = danhSachThanhTich[idx].split(':');
-                            let ma = arr[0], ten = arr[1];
-                            if (ma == maThanhTich) {
-                                ansMaThanhTich = idx;
-                                break;
-                            }
-                            let score = bestChoice(thanhTich.toLowerCase(), ten.toLowerCase());
-                            if (score > bestScore) {
-                                bestScore = score;
-                                ansMaThanhTich = idx;
+                        if (thanhTich != '') {
+                            let bestScore = -1;
+                            for (let idx = 0; idx < danhSachThanhTich.length; idx++) {
+                                let arr = danhSachThanhTich[idx].split(':');
+                                let ma = arr[0], ten = arr[1];
+                                if (ma == maThanhTich) {
+                                    ansMaThanhTich = idx;
+                                    break;
+                                }
+                                let score = bestChoice(thanhTich.toLowerCase(), ten.toLowerCase());
+                                if (score > bestScore) {
+                                    bestScore = score;
+                                    ansMaThanhTich = idx;
+                                }
                             }
                         }
                         resolve(ansMaThanhTich);
                     });
                     const pendingMaChuThich = new Promise(resolve => { ///find ma thanh tich chú thích
                         let ansMaChuThich = null;
-                        let bestScore = -1;
-                        for (let idx = 0; idx < danhSachChuThich.length; idx++) {
-                            let arr = danhSachChuThich[idx].split(':');
-                            let ma = arr[0], ten = arr[1];
-                            if (ma == maChuThich) {
-                                ansMaChuThich = idx;
-                                break;
-                            }
-                            let score = bestChoice(chuThich.toLowerCase(), ten.toLowerCase());
-                            if (score > bestScore) {
-                                bestScore = score;
-                                ansMaChuThich = idx;
+                        if (chuThich != '') {
+                            let bestScore = -1;
+                            for (let idx = 0; idx < danhSachChuThich.length; idx++) {
+                                let arr = danhSachChuThich[idx].split(':');
+                                let ma = arr[0], ten = arr[1];
+                                if (ma == maChuThich) {
+                                    ansMaChuThich = idx;
+                                    break;
+                                }
+                                let score = bestChoice(chuThich.toLowerCase(), ten.toLowerCase());
+                                if (score > bestScore) {
+                                    bestScore = score;
+                                    ansMaChuThich = idx;
+                                }
                             }
                         }
                         resolve(ansMaChuThich);
@@ -350,74 +354,79 @@ module.exports = app => {
                         if (ansMaLoaiDoiTuong == '-1') {
                             done({ error: `Sai định dạng cột loại đối tượng ở dòng ${index}` });
                             return;
-                        } else {
-                            if (loaiDoiTuong == '01') {
-                                items.push({ soQuyetDinh, diemThiDua, ma: '-1', namDatDuoc,
-                                    loaiDoiTuong, thanhTich: ansMaThanhTich ? danhSachThanhTich[ansMaThanhTich].split(':')[0] : '', chuThich: ansMaChuThich ? danhSachChuThich[ansMaChuThich].split(':')[0] : '',
-                                    hoCanBo, tenCanBo, maCanBo, tenBoMon, tenDonViBoMon, tenDonViCanBo, tenDonVi,
-                                    tenLoaiDoiTuong: danhSachLoaiDoiTuong[ansMaLoaiDoiTuong].split(':')[1],
-                                    tenThanhTich: ansMaThanhTich ? danhSachThanhTich[ansMaThanhTich].split(':')[1] : '',
-                                });
-                                solve(index + 1);
-                            }
-                            if (loaiDoiTuong == '02') {
-                                app.model.canBo.get({ shcc }, (error, item) => {
-                                    if (error || item == null) {
-                                        done({ error: `Sai định dạng cột cán bộ ở dòng ${index}` });
-                                        return;
-                                    } else {
-                                        hoCanBo = item.ho;
-                                        tenCanBo = item.ten;
-                                        maCanBo = shcc;
-                                        app.model.dmDonVi.get({ ma: item.maDonVi }, (error, itemDonVi) => {
-                                            if (itemDonVi) tenDonViCanBo = itemDonVi.ten;
-                                            items.push({ soQuyetDinh, diemThiDua, ma: shcc, namDatDuoc,
-                                                loaiDoiTuong, thanhTich: ansMaThanhTich ? danhSachThanhTich[ansMaThanhTich].split(':')[0] : '', chuThich: ansMaChuThich ? danhSachChuThich[ansMaChuThich].split(':')[0] : '',
-                                                hoCanBo, tenCanBo, maCanBo, tenBoMon, tenDonViBoMon, tenDonViCanBo, tenDonVi,
-                                                tenLoaiDoiTuong: danhSachLoaiDoiTuong[ansMaLoaiDoiTuong].split(':')[1],
-                                                tenThanhTich: ansMaThanhTich ? danhSachThanhTich[ansMaThanhTich].split(':')[1] : '',
-                                                tenChuThich: ansMaChuThich ? danhSachChuThich[ansMaChuThich].split(':')[1] : '',
-                                            });
-                                            solve(index + 1);
-                                        });
-                                    }
-                                });
-                            }
-                            if (loaiDoiTuong == '03') {
-                                app.model.dmDonVi.get({ ma: maDonVi }, (error, item) => {
-                                    if (error || item == null) {
-                                        done({ error: `Sai định dạng cột đơn vị ở dòng ${index}` });
-                                        return;
-                                    } else {
-                                        tenDonVi = item.ten;
-                                        items.push({ soQuyetDinh, diemThiDua, ma: maDonVi, namDatDuoc,
-                                            loaiDoiTuong, thanhTich: ansMaThanhTich ? danhSachThanhTich[ansMaThanhTich].split(':')[0] : '', chuThich: ansMaChuThich ? danhSachChuThich[ansMaChuThich].split(':')[0] : '',
+                        }
+                        if (ansMaThanhTich == null) {
+                            done({ error: `Dữ liệu cột thành tích bị trống ở dòng ${index}`});
+                            return;
+                        }
+                        if (loaiDoiTuong == '01') {
+                            items.push({ soQuyetDinh, diemThiDua, ma: '-1', namDatDuoc,
+                                loaiDoiTuong, thanhTich: danhSachThanhTich[ansMaThanhTich].split(':')[0], chuThich: ansMaChuThich ? danhSachChuThich[ansMaChuThich].split(':')[0] : '',
+                                hoCanBo, tenCanBo, maCanBo, tenBoMon, tenDonViBoMon, tenDonViCanBo, tenDonVi,
+                                tenLoaiDoiTuong: danhSachLoaiDoiTuong[ansMaLoaiDoiTuong].split(':')[1],
+                                tenThanhTich: danhSachThanhTich[ansMaThanhTich].split(':')[1],
+                                tenChuThich: ansMaChuThich ? danhSachChuThich[ansMaChuThich].split(':')[1] : '',
+                            });
+                            solve(index + 1);
+                        }
+                        if (loaiDoiTuong == '02') {
+                            app.model.canBo.get({ shcc }, (error, item) => {
+                                if (error || item == null) {
+                                    done({ error: `Sai định dạng cột cán bộ ở dòng ${index}` });
+                                    return;
+                                } else {
+                                    hoCanBo = item.ho;
+                                    tenCanBo = item.ten;
+                                    maCanBo = shcc;
+                                    app.model.dmDonVi.get({ ma: item.maDonVi }, (error, itemDonVi) => {
+                                        if (itemDonVi) tenDonViCanBo = itemDonVi.ten;
+                                        items.push({ soQuyetDinh, diemThiDua, ma: shcc, namDatDuoc,
+                                            loaiDoiTuong, thanhTich: danhSachThanhTich[ansMaThanhTich].split(':')[0], chuThich: ansMaChuThich ? danhSachChuThich[ansMaChuThich].split(':')[0] : '',
                                             hoCanBo, tenCanBo, maCanBo, tenBoMon, tenDonViBoMon, tenDonViCanBo, tenDonVi,
                                             tenLoaiDoiTuong: danhSachLoaiDoiTuong[ansMaLoaiDoiTuong].split(':')[1],
-                                            tenThanhTich: ansMaThanhTich ? danhSachThanhTich[ansMaThanhTich].split(':')[1] : '',
+                                            tenThanhTich: danhSachThanhTich[ansMaThanhTich].split(':')[1],
                                             tenChuThich: ansMaChuThich ? danhSachChuThich[ansMaChuThich].split(':')[1] : '',
                                         });
                                         solve(index + 1);
-                                    }
-                                });
-                            }
-                            if (loaiDoiTuong == '04') {
-                                app.model.dmBoMon.get({ ma: maBoMon}, (error, item) => {
-                                    if (error || item == null) {
-                                        done({ error: `Sai định dạng cột bộ môn ở dòng ${index}` });
-                                        return;
-                                    } else {
-                                        tenBoMon = item.ten;
-                                        items.push({ soQuyetDinh, diemThiDua, ma: maBoMon, namDatDuoc,
-                                            loaiDoiTuong, thanhTich: ansMaThanhTich ? danhSachThanhTich[ansMaThanhTich].split(':')[0] : '', chuThich: ansMaChuThich ? danhSachChuThich[ansMaChuThich].split(':')[0] : '',
-                                            hoCanBo, tenCanBo, maCanBo, tenBoMon, tenDonViBoMon, tenDonViCanBo, tenDonVi,
-                                            tenLoaiDoiTuong: danhSachLoaiDoiTuong[ansMaLoaiDoiTuong].split(':')[1],
-                                            tenThanhTich: ansMaThanhTich ? danhSachThanhTich[ansMaThanhTich].split(':')[1] : '',
-                                        });
-                                        solve(index + 1);
-                                    }
-                                });
-                            }
+                                    });
+                                }
+                            });
+                        }
+                        if (loaiDoiTuong == '03') {
+                            app.model.dmDonVi.get({ ma: maDonVi }, (error, item) => {
+                                if (error || item == null) {
+                                    done({ error: `Sai định dạng cột đơn vị ở dòng ${index}` });
+                                    return;
+                                } else {
+                                    tenDonVi = item.ten;
+                                    items.push({ soQuyetDinh, diemThiDua, ma: maDonVi, namDatDuoc,
+                                        loaiDoiTuong, thanhTich: danhSachThanhTich[ansMaThanhTich].split(':')[0], chuThich: ansMaChuThich ? danhSachChuThich[ansMaChuThich].split(':')[0] : '',
+                                        hoCanBo, tenCanBo, maCanBo, tenBoMon, tenDonViBoMon, tenDonViCanBo, tenDonVi,
+                                        tenLoaiDoiTuong: danhSachLoaiDoiTuong[ansMaLoaiDoiTuong].split(':')[1],
+                                        tenThanhTich: danhSachThanhTich[ansMaThanhTich].split(':')[1],
+                                        tenChuThich: ansMaChuThich ? danhSachChuThich[ansMaChuThich].split(':')[1] : '',
+                                    });
+                                    solve(index + 1);
+                                }
+                            });
+                        }
+                        if (loaiDoiTuong == '04') {
+                            app.model.dmBoMon.get({ ma: maBoMon}, (error, item) => {
+                                if (error || item == null) {
+                                    done({ error: `Sai định dạng cột bộ môn ở dòng ${index}` });
+                                    return;
+                                } else {
+                                    tenBoMon = item.ten;
+                                    items.push({ soQuyetDinh, diemThiDua, ma: maBoMon, namDatDuoc,
+                                        loaiDoiTuong, thanhTich: danhSachThanhTich[ansMaThanhTich].split(':')[0], chuThich: ansMaChuThich ? danhSachChuThich[ansMaChuThich].split(':')[0] : '',
+                                        hoCanBo, tenCanBo, maCanBo, tenBoMon, tenDonViBoMon, tenDonViCanBo, tenDonVi,
+                                        tenLoaiDoiTuong: danhSachLoaiDoiTuong[ansMaLoaiDoiTuong].split(':')[1],
+                                        tenThanhTich: danhSachThanhTich[ansMaThanhTich].split(':')[1],
+                                        tenChuThich: ansMaChuThich ? danhSachChuThich[ansMaChuThich].split(':')[1] : '',
+                                    });
+                                    solve(index + 1);
+                                }
+                            });
                         }
                     }).catch(error => done({ error }));
                 };

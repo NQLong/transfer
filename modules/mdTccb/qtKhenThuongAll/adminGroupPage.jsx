@@ -120,6 +120,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
     ma = ''; loaiDoiTuong = '-1';
     componentDidMount() {
         T.ready('/user/tccb', () => {
+            T.clearSearchBox();
             const route = T.routeMatcher('/user/tccb/qua-trinh/khen-thuong-all/groupDt/:loaiDoiTuong/:ma'),
                 params = route.parse(window.location.pathname);
             this.loaiDoiTuong = params.loaiDoiTuong;
