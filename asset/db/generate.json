@@ -11301,13 +11301,6 @@
                     "nullable": false,
                     "size": 28
                 },
-                "CAN_BO_NHAN": {
-                    "value": "canBoNhan",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": false,
-                    "size": 28
-                },
                 "MA_NHIEM_VU": {
                     "value": "maNhiemVu",
                     "dataType": "NUMBER",
@@ -11578,10 +11571,10 @@
                 },
                 "MA_HOC_PHAN": {
                     "value": "maHocPhan",
-                    "dataType": "VARCHAR2",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": false,
-                    "size": 100
+                    "size": 200
                 },
                 "NHOM": {
                     "value": "nhom",
@@ -11592,10 +11585,10 @@
                 },
                 "MA_HOC_KY": {
                     "value": "maHocKy",
-                    "dataType": "VARCHAR2",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": false,
-                    "size": 100
+                    "size": 200
                 },
                 "THU": {
                     "value": "thu",
@@ -11606,24 +11599,24 @@
                 },
                 "PHONG": {
                     "value": "phong",
-                    "dataType": "VARCHAR2",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 100
+                    "size": 200
                 },
                 "NGAY_BAT_DAU": {
                     "value": "ngayBatDau",
-                    "dataType": "VARCHAR2",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 100
+                    "size": 200
                 },
                 "CBGD": {
                     "value": "cbgd",
-                    "dataType": "VARCHAR2",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 100
+                    "size": 200
                 }
             },
             "primaryKeys": [
