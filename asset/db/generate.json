@@ -10887,21 +10887,14 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 20
+                    "size": 100
                 },
                 "TEN_DAY_DU": {
                     "value": "tenDayDu",
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 100
-                },
-                "MO_TA": {
-                    "value": "moTa",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 2000
+                    "size": 500
                 },
                 "KICH_HOAT": {
                     "value": "kichHoat",
@@ -10915,21 +10908,21 @@
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "20,0"
+                    "size": "5,0"
                 },
                 "THE_MANH": {
                     "value": "theManh",
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 100
+                    "size": 1000
                 },
                 "DIA_CHI": {
                     "value": "diaChi",
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 200
+                    "size": 500
                 },
                 "EMAIL": {
                     "value": "email",
@@ -10943,7 +10936,7 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 15
+                    "size": 50
                 },
                 "IMAGE": {
                     "value": "image",
@@ -10964,7 +10957,7 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 20
+                    "size": 100
                 },
                 "WEBSITE": {
                     "value": "website",
@@ -10973,33 +10966,40 @@
                     "nullable": true,
                     "size": 100
                 },
-                "MO_TA_HOP_TAC": {
-                    "value": "moTaHopTac",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 500
-                },
-                "KET_QUA_HOP_TAC": {
-                    "value": "ketQuaHopTac",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 200
-                },
-                "GHI_CHU": {
-                    "value": "ghiChu",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 500
-                },
                 "DON_VI_PHU_TRACH": {
                     "value": "donViPhuTrach",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
                     "size": "22,0"
+                },
+                "MO_TA": {
+                    "value": "moTa",
+                    "dataType": "CLOB",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 4000
+                },
+                "MO_TA_HOP_TAC": {
+                    "value": "moTaHopTac",
+                    "dataType": "CLOB",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 4000
+                },
+                "KET_QUA_HOP_TAC": {
+                    "value": "ketQuaHopTac",
+                    "dataType": "CLOB",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 4000
+                },
+                "GHI_CHU": {
+                    "value": "ghiChu",
+                    "dataType": "CLOB",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 4000
                 }
             },
             "primaryKeys": [
