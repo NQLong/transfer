@@ -126,33 +126,47 @@ class QtKhenThuongAllGroupPage extends AdminPage {
             this.ma = params.ma;
             this.setState({ filter: { loaiDoiTuong: this.loaiDoiTuong, listShcc: this.loaiDoiTuong == '02' ? this.ma : '', listDv: ''} });
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
+            
             T.showSearchBox(() => {
-                this.fromYear.value('');
-                this.toYear.value('');
+                let filterCookie = T.getCookiePage('groupPageMaQtKhenThuongAll', 'F'), {
+                    fromYear = null, toYear = null, listThanhTich = ''
+                } = filterCookie;
+                fromYear && this.fromYear.value(fromYear);
+                toYear && this.toYear.value(toYear);
+                this.listThanhTich.value(listThanhTich);
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
             this.getPage();
         });
     }
 
-    changeAdvancedSearch = (isInitial = false) => {
-        let { pageNumber, pageSize } = this.props && this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.pageMa ? this.props.qtKhenThuongAll.pageMa : { pageNumber: 1, pageSize: 50 };
+    changeAdvancedSearch = (isInitial = false, isReset = false) => {
+        let { pageNumber, pageSize, pageCondition } = this.props && this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.pageMa ? this.props.qtKhenThuongAll.pageMa : { pageNumber: 1, pageSize: 50, pageCondition: {}};
+
+        if (pageCondition && (typeof pageCondition == 'string')) T.setTextSearchBox(pageCondition);
+
         const fromYear = this.fromYear.value() == '' ? null : Number(this.fromYear.value());
         const toYear = this.toYear.value() == '' ? null : Number(this.toYear.value());
         const loaiDoiTuong = this.state.filter.loaiDoiTuong;
         const listShcc = this.state.filter.listShcc;
         const listDv = this.state.filter.listDv;
         const listThanhTich = this.listThanhTich.value().toString() || '';
-        const pageFilter = isInitial ? null : { fromYear, toYear, loaiDoiTuong, listDv, listShcc, listThanhTich };
+        const pageFilter = (isInitial || isReset) ? { listShcc, listDv, loaiDoiTuong } : { fromYear, toYear, loaiDoiTuong, listDv, listShcc, listThanhTich };
         this.setState({ filter: pageFilter }, () => {
-            this.getPage(pageNumber, pageSize, '', (page) => {
+            this.getPage(pageNumber, pageSize, pageCondition, (page) => {
                 if (isInitial) {
-                    const filter = page.filter || {};
+                    const filter = page.filter || { listShcc, listDv, loaiDoiTuong };
+                    const filterCookie = T.getCookiePage('groupPageMaQtKhenThuongAll', 'F');
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
-                    this.fromYear.value(filter.fromYear || '');
-                    this.toYear.value(filter.toYear || '');
-                    this.listThanhTich.value(filter.listThanhTich);
-                    if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.listThanhTich )) this.showAdvanceSearch();
+
+                    this.fromYear.value(filter.fromYear || filterCookie.fromYear || '');
+                    this.toYear.value(filter.toYear || filterCookie.toYear || '');
+                    this.listThanhTich.value(filter.listThanhTich || filterCookie.listThanhTich || '');
+                    if (this.fromYear.value() || this.toYear.value() || this.listThanhTich.value()) this.showAdvanceSearch();
+                } else if (isReset) {
+                    this.fromYear.value('');
+                    this.toYear.value('');
+                    this.listThanhTich.value('');
                 }
             });
         });
@@ -244,9 +258,9 @@ class QtKhenThuongAllGroupPage extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    <FormTextBox className='col-md-4' ref={e => this.fromYear = e} label='Năm đạt được (yyyy)' type='year' />
-                    <FormTextBox className='col-md-4' ref={e => this.toYear = e} label='Năm đạt được (yyyy)' type='year' />
-                    <FormSelect className='col-12 col-md-6' multiple ref={e => this.listThanhTich = e} label='Thành tích' data={SelectAdapter_DmKhenThuongKyHieuV2} allowClear minimumResultsForSearch={-1} />
+                    <FormTextBox className='col-md-2' ref={e => this.fromYear = e} label='Năm đạt được (yyyy)' type='year' />
+                    <FormTextBox className='col-md-2' ref={e => this.toYear = e} label='Năm đạt được (yyyy)' type='year' />
+                    <FormSelect className='col-12 col-md-8' multiple ref={e => this.listThanhTich = e} label='Thành tích' data={SelectAdapter_DmKhenThuongKyHieuV2} allowClear minimumResultsForSearch={-1} />
                     <div className='form-group col-12' style={{ justifyContent: 'end', display: 'flex' }}>
                         <button className='btn btn-danger' style={{ marginRight: '10px' }} type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch(null, true)}>
                             <i className='fa fa-fw fa-lg fa-times' />Xóa bộ lọc
@@ -279,7 +293,7 @@ class QtKhenThuongAllGroupPage extends AdminPage {
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
             onExport: (e) => {
                 e.preventDefault();
-                const filter = JSON.stringify(this.state.filter || {});
+                const filter = T.stringify(this.state.filter);
 
                 T.download(T.url(`/api/qua-trinh/khen-thuong-all/download-excel/${filter}`), 'khenthuong.xlsx');
             }

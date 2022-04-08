@@ -57,6 +57,7 @@ class EditModal extends AdminModal {
 
         const changes = {
             tenThanhTich: this.thanhTich.data().text,
+            tenChuThich: this.chuThich.data().text,
             loaiDoiTuong: this.loaiDoiTuong.value(),
             ma: ma,
             namDatDuoc: this.namDatDuoc.value(),
@@ -120,14 +121,16 @@ class QtKhenThuongAllImportPage extends AdminPage {
     }
 
     onSuccess = (response) => {
-        this.setState({
-            qtKhenThuongAll: response.items,
-            message: `${response.items.length} hàng được tải lên thành công`,
-            isDisplay: false,
-            displayState: 'data'
-        }, () => T.notify(this.state.message, 'success'));
+        if (response.error) T.notify(response.error, 'danger');
+        else if (response.items) {
+            this.setState({
+                qtKhenThuongAll: response.items,
+                message: `${response.items.length} hàng được tải lên thành công`,
+                isDisplay: false,
+                displayState: 'data'
+            }, () => T.notify(this.state.message, 'success'));
+        }
     };
-
     showEdit = (e, index, item) => {
         e.preventDefault();
         this.modal.show({index, item});
@@ -192,6 +195,7 @@ class QtKhenThuongAllImportPage extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tập thể</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm đạt được</th>
                         <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Thành tích</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chú thích</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>
                         <th style={{ width: 'auto', textAlign: 'right', whiteSpace: 'nowrap' }}>Điểm thi đua</th>
                          <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
@@ -217,6 +221,7 @@ class QtKhenThuongAllImportPage extends AdminPage {
                         )} />
                         <TableCell type='text' style={{ textAlign: 'center' }} content={(item.namDatDuoc)} />
                         <TableCell type='text' content={(item.tenThanhTich)} />
+                        <TableCell type='text' content={(item.tenChuThich)} />
                         <TableCell type='text' style={{ textAlign: 'center' }} content={(item.soQuyetDinh || '')} />
                         <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemThiDua} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onEdit={() => this.modal.show({ index, item })} onDelete={(e) => this.delete(e, index)} />
@@ -233,7 +238,7 @@ class QtKhenThuongAllImportPage extends AdminPage {
                     <FileBox postUrl='/user/upload' uploadType='KhenThuongAllDataFile' userData={'KhenThuongAllDataFile'} 
                             accept='.csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'
                             style={{ width: '80%', margin: '0 auto' }}
-                            ajax={true} success={this.onSuccess} error={this.onError} />
+                            ajax={true} success={this.onSuccess} />
                         <button className='btn btn-warning' type='button' onClick={e => e.preventDefault() || T.download('/api/qua-trinh/khen-thuong-all/download-template')}>
                             <i className='fa fa-fw fa-lg fa-arrow-circle-down' />Tải file mẫu tại đây
                         </button>

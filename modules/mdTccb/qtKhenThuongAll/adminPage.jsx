@@ -147,9 +147,9 @@ class QtKhenThuongAll extends AdminPage {
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
                 let filterCookie = T.getCookiePage('pageQtKhenThuongAll', 'F'),
-                    { fromYear = '', toYear = '', loaiDoiTuong = '-1', listDv = '', listShcc = '', listThanhTich = '' } = filterCookie;
-                this.fromYear.value(fromYear);
-                this.toYear.value(toYear);
+                    { fromYear = null, toYear = null, loaiDoiTuong = '-1', listDv = '', listShcc = '', listThanhTich = '' } = filterCookie;
+                fromYear && this.fromYear.value(fromYear);
+                toYear && this.toYear.value(toYear);
                 this.loaiDoiTuong.value(loaiDoiTuong);
                 this.maDonVi?.value(listDv);
                 this.mulCanBo?.value(listShcc);
@@ -179,20 +179,21 @@ class QtKhenThuongAll extends AdminPage {
         const listDv = loaiDoiTuong == '02' ? (this.maDonVi?.value().toString() || '') : '';
         const listShcc = loaiDoiTuong == '02' ? (this.mulCanBo?.value().toString() || '') : '';
         const listThanhTich = this.listThanhTich.value().toString() || '';
-        const pageFilter = isInitial ? null : (isReset ? { loaiDoiTuong: '-1' } : { fromYear, toYear, loaiDoiTuong, listDv, listShcc, listThanhTich });
+        const pageFilter = (isInitial || isReset) ? { loaiDoiTuong: '-1' } : { fromYear, toYear, loaiDoiTuong, listDv, listShcc, listThanhTich };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, pageCondition, (page) => {
                 if (isInitial) {
-                    const filter = page.filter || {};
-                    this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter }, () => {
-                        this.fromYear.value(filter.fromYear || '');
-                        this.toYear.value(filter.toYear || '');
-                        this.loaiDoiTuong.value(filter.loaiDoiTuong || '-1');
-                        this.maDonVi?.value(filter.listDv);
-                        this.mulCanBo?.value(filter.listShcc);
-                        this.listThanhTich.value(filter.listThanhTich);
-                        if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.loaiDoiTuong || filter.listDv || filter.listShcc || filter.listThanhTich)) this.showAdvanceSearch();
-                    });
+                    const filter = page.filter || { loaiDoiTuong: '-1' };
+                    const filterCookie = T.getCookiePage('pageQtKhenThuongAll', 'F');
+                    this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
+
+                    this.fromYear.value(filter.fromYear || filterCookie.fromYear || '');
+                    this.toYear.value(filter.toYear || filterCookie.toYear || '');
+                    this.maDonVi?.value(filter.listDv || filterCookie.listDv);
+                    this.mulCanBo?.value(filter.listShcc || filterCookie.listShcc);
+                    this.listThanhTich.value(filter.listThanhTich || filterCookie.listThanhTich || '');
+                    this.loaiDoiTuong.value(filter.loaiDoiTuong || filterCookie.loaiDoiTuong || '');
+                    if (this.fromYear.value() || this.toYear.value() || this.mulCanBo?.value() || this.maDonVi?.value() || this.listThanhTich.value() || this.loaiDoiTuong.value()) this.showAdvanceSearch();
                 } else if (isReset) {
                     this.fromYear.value('');
                     this.toYear.value('');
@@ -325,14 +326,14 @@ class QtKhenThuongAll extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    <FormTextBox className='col-md-4' ref={e => this.fromYear = e} label='Từ năm đạt được (yyyy)' type='year' />
-                    <FormTextBox className='col-md-4' ref={e => this.toYear = e} label='Đến năm đạt được (yyyy)' type='year' />
+                    <FormTextBox className='col-md-2' ref={e => this.fromYear = e} label='Từ năm đạt được (yyyy)' type='year' />
+                    <FormTextBox className='col-md-2' ref={e => this.toYear = e} label='Đến năm đạt được (yyyy)' type='year' />
+                    <FormSelect className='col-12 col-md-8' multiple ref={e => this.listThanhTich = e} label='Thành tích' data={SelectAdapter_DmKhenThuongKyHieuV2} allowClear minimumResultsForSearch={-1} />
                     {(this.loaiDoiTuong && this.loaiDoiTuong.value() == '02') &&
                     <>
                         <FormSelect className='col-12 col-md-6' multiple ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} allowClear minimumResultsForSearch={-1} />
                         <FormSelect className='col-12 col-md-6' multiple ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} allowClear minimumResultsForSearch={-1} />
                     </>}
-                    <FormSelect className='col-12 col-md-6' multiple ref={e => this.listThanhTich = e} label='Thành tích' data={SelectAdapter_DmKhenThuongKyHieuV2} allowClear minimumResultsForSearch={-1} />
                     <div className='form-group col-12' style={{ justifyContent: 'end', display: 'flex' }}>
                         <button className='btn btn-danger' style={{ marginRight: '10px' }} type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch(null, true)}>
                             <i className='fa fa-fw fa-lg fa-times' />Xóa bộ lọc
@@ -363,7 +364,7 @@ class QtKhenThuongAll extends AdminPage {
             onImport: !this.checked ? (e) => e.preventDefault() || this.props.history.push('/user/tccb/qua-trinh/khen-thuong-all/upload') : null,
             onExport: !this.checked ? (e) => {
                 e.preventDefault();
-                const filter = JSON.stringify(this.state.filter || {});
+                const filter = T.stringify(this.state.filter);
 
                 T.download(T.url(`/api/qua-trinh/khen-thuong-all/download-excel/${filter}`), 'khenthuong.xlsx');
             } : null

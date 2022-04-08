@@ -111,7 +111,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const filter = JSON.stringify(req.query.filter || {});
+        const filter = app.stringify(req.query.filter);
         app.model.qtKhenThuongAll.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -128,7 +128,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const filter = JSON.stringify(req.query.filter || {});
+        const filter = app.stringify(req.query.filter);
         app.model.qtKhenThuongAll.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -144,7 +144,7 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const filter = JSON.stringify(req.query.filter || {});
+        const filter = app.stringify(req.query.filter);
         app.model.qtKhenThuongAll.groupPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
@@ -267,26 +267,23 @@ module.exports = app => {
             }
         }).then(() => {
             const pendingLoaiDoiTuong = new Promise(resolve => app.model.dmKhenThuongLoaiDoiTuong.getAll((error, items) => resolve((items || []).map(item => item.ma + ':' + item.ten))));
-            const pendingCanBo = new Promise(resolve => app.model.canBo.getAll((error, items) => resolve((items || []).map(item => item.shcc.toString()))));
-            const pendingBoMon = new Promise(resolve => app.model.dmBoMon.getAll((error, items) => resolve((items || []).map(item => item.ma.toString()))));
-            const pendingDonVi = new Promise(resolve => app.model.dmDonVi.getAll((error, items) => resolve((items || []).map(item => item.ma.toString()))));
             const pendingThanhTich = new Promise(resolve => app.model.dmKhenThuongKyHieu.getAll((error, items) => resolve((items || []).map(item => item.ma + ':' + item.ten))));
             const pendingChuThich = new Promise(resolve => app.model.dmKhenThuongChuThich.getAll((error, items) => resolve((items || []).map(item => item.ma + ':' + item.ten))));
-            Promise.all([pendingLoaiDoiTuong, pendingCanBo, pendingBoMon, pendingDonVi, pendingThanhTich, pendingChuThich])
-            .then(([danhSachLoaiDoiTuong, danhSachCanBo, danhSachBoMon, danhSachDonVi, danhSachThanhTich, danhSachChuThich]) => {
+            Promise.all([pendingLoaiDoiTuong, pendingThanhTich, pendingChuThich])
+            .then(([danhSachLoaiDoiTuong, danhSachThanhTich, danhSachChuThich]) => {
                 let items = [];
                 const solve = (index = 2) => {
                     let soQuyetDinh = (worksheet.getCell('A' + index).value || '').toString().trim();
                     let loaiDoiTuong = (worksheet.getCell('B' + index).value || '').toString().trim();
-                    let canBo = (worksheet.getCell('C' + index).value || '').toString().trim();
+                    let shcc = (worksheet.getCell('C' + index).value || '').toString().trim();
                     let donVi = (worksheet.getCell('D' + index).value || '').toString().trim();
                     let boMon = (worksheet.getCell('E' + index).value || '').toString().trim();
                     let namDatDuoc = (worksheet.getCell('F' + index).value || '').toString().trim();
                     let thanhTich = (worksheet.getCell('G' + index).value || '').toString().trim();
                     let chuThich = (worksheet.getCell('H' + index).value || '').toString().trim();
                     let diemThiDua = (worksheet.getCell('I' + index).value || '').toString().trim();
+
                     loaiDoiTuong = getKey(loaiDoiTuong);
-                    let shcc = getKey(canBo);
                     let maDonVi = getKey(donVi);
                     let maBoMon = getKey(boMon);
                     let maThanhTich = getKey(thanhTich);
@@ -295,49 +292,12 @@ module.exports = app => {
                         done({ items });
                         return;
                     }
-                    let ansMaLoaiDoiTuong = '-1';
-                    {
-                        for (let idx = 0; idx < danhSachLoaiDoiTuong.length; idx++) {
-                            let arr = danhSachLoaiDoiTuong[idx].split(':');
-                            let ma = arr[0];
-                            if (ma == loaiDoiTuong) {
-                                ansMaLoaiDoiTuong = idx;
-                                break;
-                            }
-                        }
-                    }
-                    if (ansMaLoaiDoiTuong == '-1') {
-                        done({ error: 'Sai định dạng cột loại đối tượng' });
-                        solve(index + 1);
-                    }
-                    let ma = '-1';
-                    if (loaiDoiTuong == '02') {
-                        if (!danhSachCanBo.includes(shcc)) {
-                            done({ error: 'Sai định dạng cột cán bộ' });
-                            solve(index + 1);
-                        }
-                        ma = shcc;
-                    }
-                    if (loaiDoiTuong == '03') {
-                        if (!danhSachDonVi.includes(maDonVi)) {
-                            done({ error: 'Sai định dạng cột đơn vị' });
-                            solve(index + 1);
-                        }
-                        ma = maDonVi;
-                    }
-                    if (loaiDoiTuong == '04') {
-                        if (!danhSachBoMon.includes(maBoMon)) {
-                            done({ error: 'Sai định dạng cột bộ môn' });
-                            solve(index + 1);
-                        }
-                        ma = maBoMon;
-                    }
                     if (namDatDuoc.length != 4) {
-                        done({ error: 'Sai định dạng cột năm đạt được' });
-                        solve(index + 1);
+                        done({ error: `Sai định dạng cột năm đạt được ở dòng ${index}` });
+                        return;
                     }
-                    let ansMaThanhTich = null;
-                    { ///find ma thanh tich
+                    const pendingMaThanhTich = new Promise(resolve => { //find ma thanh tich
+                        let ansMaThanhTich = null;
                         let bestScore = -1;
                         for (let idx = 0; idx < danhSachThanhTich.length; idx++) {
                             let arr = danhSachThanhTich[idx].split(':');
@@ -352,9 +312,10 @@ module.exports = app => {
                                 ansMaThanhTich = idx;
                             }
                         }
-                    }
-                    let ansMaChuThich = null;
-                    { ///find ma thanh tich chú thích
+                        resolve(ansMaThanhTich);
+                    });
+                    const pendingMaChuThich = new Promise(resolve => { ///find ma thanh tich chú thích
+                        let ansMaChuThich = null;
                         let bestScore = -1;
                         for (let idx = 0; idx < danhSachChuThich.length; idx++) {
                             let arr = danhSachChuThich[idx].split(':');
@@ -369,55 +330,96 @@ module.exports = app => {
                                 ansMaChuThich = idx;
                             }
                         }
-                    }
-                    let hoCanBo = '', tenCanBo = '', maCanBo = '', tenBoMon = '', tenDonViBoMon = '', tenDonViCanBo = '', tenDonVi = '';
-                    if (loaiDoiTuong == '01') {
-                        items.push({ soQuyetDinh, diemThiDua, ma, namDatDuoc,
-                            loaiDoiTuong, thanhTich: ansMaThanhTich ? danhSachThanhTich[ansMaThanhTich].split(':')[0] : '', chuThich: ansMaChuThich ? danhSachChuThich[ansMaChuThich].split(':')[0] : '',
-                            hoCanBo, tenCanBo, maCanBo, tenBoMon, tenDonViBoMon, tenDonViCanBo, tenDonVi,
-                            tenLoaiDoiTuong: danhSachLoaiDoiTuong[ansMaLoaiDoiTuong].split(':')[1],
-                            tenThanhTich: ansMaThanhTich ? danhSachThanhTich[ansMaThanhTich].split(':')[1] : '',
-                        });
-                        solve(index + 1);
-                    } else if (loaiDoiTuong == '02') {
-                        app.model.canBo.get({ shcc }, (error, item) => {
-                            hoCanBo = item.ho;
-                            tenCanBo = item.ten;
-                            maCanBo = shcc;
-                            app.model.dmDonVi.get({ ma: item.maDonVi }, (error, itemDonVi) => {
-                                if (itemDonVi) tenDonViCanBo = itemDonVi.ten;
-                                items.push({ soQuyetDinh, diemThiDua, ma, namDatDuoc,
+                        resolve(ansMaChuThich);
+                    });
+                    const pendingMaLoaiDoiTuong = new Promise(resolve => { ///find mã loại đối tượng
+                        let ansMaLoaiDoiTuong = '-1';
+                        for (let idx = 0; idx < danhSachLoaiDoiTuong.length; idx++) {
+                            let arr = danhSachLoaiDoiTuong[idx].split(':');
+                            let ma = arr[0];
+                            if (ma == loaiDoiTuong) {
+                                ansMaLoaiDoiTuong = idx;
+                                break;
+                            }
+                        }
+                        resolve(ansMaLoaiDoiTuong);
+                    });
+                    Promise.all([pendingMaThanhTich, pendingMaChuThich, pendingMaLoaiDoiTuong])
+                    .then(([ansMaThanhTich, ansMaChuThich, ansMaLoaiDoiTuong]) => {
+                        let hoCanBo = '', tenCanBo = '', maCanBo = '', tenBoMon = '', tenDonViBoMon = '', tenDonViCanBo = '', tenDonVi = '';
+                        if (ansMaLoaiDoiTuong == '-1') {
+                            done({ error: `Sai định dạng cột loại đối tượng ở dòng ${index}` });
+                            return;
+                        } else {
+                            if (loaiDoiTuong == '01') {
+                                items.push({ soQuyetDinh, diemThiDua, ma: '-1', namDatDuoc,
                                     loaiDoiTuong, thanhTich: ansMaThanhTich ? danhSachThanhTich[ansMaThanhTich].split(':')[0] : '', chuThich: ansMaChuThich ? danhSachChuThich[ansMaChuThich].split(':')[0] : '',
                                     hoCanBo, tenCanBo, maCanBo, tenBoMon, tenDonViBoMon, tenDonViCanBo, tenDonVi,
                                     tenLoaiDoiTuong: danhSachLoaiDoiTuong[ansMaLoaiDoiTuong].split(':')[1],
                                     tenThanhTich: ansMaThanhTich ? danhSachThanhTich[ansMaThanhTich].split(':')[1] : '',
                                 });
                                 solve(index + 1);
-                            });
-                        });
-                    } else if (loaiDoiTuong == '03') {
-                        app.model.dmDonVi.get({ ma: maDonVi }, (error, item) => {
-                            tenDonVi = item.ten;
-                            items.push({ soQuyetDinh, diemThiDua, ma, namDatDuoc,
-                                loaiDoiTuong, thanhTich: ansMaThanhTich ? danhSachThanhTich[ansMaThanhTich].split(':')[0] : '', chuThich: ansMaChuThich ? danhSachChuThich[ansMaChuThich].split(':')[0] : '',
-                                hoCanBo, tenCanBo, maCanBo, tenBoMon, tenDonViBoMon, tenDonViCanBo, tenDonVi,
-                                tenLoaiDoiTuong: danhSachLoaiDoiTuong[ansMaLoaiDoiTuong].split(':')[1],
-                                tenThanhTich: ansMaThanhTich ? danhSachThanhTich[ansMaThanhTich].split(':')[1] : '',
-                            });
-                            solve(index + 1);
-                        });
-                    } else {
-                        app.model.dmBoMon.get({ ma: maBoMon}, (error, item) => {
-                            tenBoMon = item.ten;
-                            items.push({ soQuyetDinh, diemThiDua, ma, namDatDuoc,
-                                loaiDoiTuong, thanhTich: ansMaThanhTich ? danhSachThanhTich[ansMaThanhTich].split(':')[0] : '', chuThich: ansMaChuThich ? danhSachChuThich[ansMaChuThich].split(':')[0] : '',
-                                hoCanBo, tenCanBo, maCanBo, tenBoMon, tenDonViBoMon, tenDonViCanBo, tenDonVi,
-                                tenLoaiDoiTuong: danhSachLoaiDoiTuong[ansMaLoaiDoiTuong].split(':')[1],
-                                tenThanhTich: ansMaThanhTich ? danhSachThanhTich[ansMaThanhTich].split(':')[1] : '',
-                            });
-                            solve(index + 1);
-                        });
-                    }
+                            }
+                            if (loaiDoiTuong == '02') {
+                                app.model.canBo.get({ shcc }, (error, item) => {
+                                    if (error || item == null) {
+                                        done({ error: `Sai định dạng cột cán bộ ở dòng ${index}` });
+                                        return;
+                                    } else {
+                                        hoCanBo = item.ho;
+                                        tenCanBo = item.ten;
+                                        maCanBo = shcc;
+                                        app.model.dmDonVi.get({ ma: item.maDonVi }, (error, itemDonVi) => {
+                                            if (itemDonVi) tenDonViCanBo = itemDonVi.ten;
+                                            items.push({ soQuyetDinh, diemThiDua, ma: shcc, namDatDuoc,
+                                                loaiDoiTuong, thanhTich: ansMaThanhTich ? danhSachThanhTich[ansMaThanhTich].split(':')[0] : '', chuThich: ansMaChuThich ? danhSachChuThich[ansMaChuThich].split(':')[0] : '',
+                                                hoCanBo, tenCanBo, maCanBo, tenBoMon, tenDonViBoMon, tenDonViCanBo, tenDonVi,
+                                                tenLoaiDoiTuong: danhSachLoaiDoiTuong[ansMaLoaiDoiTuong].split(':')[1],
+                                                tenThanhTich: ansMaThanhTich ? danhSachThanhTich[ansMaThanhTich].split(':')[1] : '',
+                                                tenChuThich: ansMaChuThich ? danhSachChuThich[ansMaChuThich].split(':')[1] : '',
+                                            });
+                                            solve(index + 1);
+                                        });
+                                    }
+                                });
+                            }
+                            if (loaiDoiTuong == '03') {
+                                app.model.dmDonVi.get({ ma: maDonVi }, (error, item) => {
+                                    if (error || item == null) {
+                                        done({ error: `Sai định dạng cột đơn vị ở dòng ${index}` });
+                                        return;
+                                    } else {
+                                        tenDonVi = item.ten;
+                                        items.push({ soQuyetDinh, diemThiDua, ma: maDonVi, namDatDuoc,
+                                            loaiDoiTuong, thanhTich: ansMaThanhTich ? danhSachThanhTich[ansMaThanhTich].split(':')[0] : '', chuThich: ansMaChuThich ? danhSachChuThich[ansMaChuThich].split(':')[0] : '',
+                                            hoCanBo, tenCanBo, maCanBo, tenBoMon, tenDonViBoMon, tenDonViCanBo, tenDonVi,
+                                            tenLoaiDoiTuong: danhSachLoaiDoiTuong[ansMaLoaiDoiTuong].split(':')[1],
+                                            tenThanhTich: ansMaThanhTich ? danhSachThanhTich[ansMaThanhTich].split(':')[1] : '',
+                                            tenChuThich: ansMaChuThich ? danhSachChuThich[ansMaChuThich].split(':')[1] : '',
+                                        });
+                                        solve(index + 1);
+                                    }
+                                });
+                            }
+                            if (loaiDoiTuong == '04') {
+                                app.model.dmBoMon.get({ ma: maBoMon}, (error, item) => {
+                                    if (error || item == null) {
+                                        done({ error: `Sai định dạng cột bộ môn ở dòng ${index}` });
+                                        return;
+                                    } else {
+                                        tenBoMon = item.ten;
+                                        items.push({ soQuyetDinh, diemThiDua, ma: maBoMon, namDatDuoc,
+                                            loaiDoiTuong, thanhTich: ansMaThanhTich ? danhSachThanhTich[ansMaThanhTich].split(':')[0] : '', chuThich: ansMaChuThich ? danhSachChuThich[ansMaChuThich].split(':')[0] : '',
+                                            hoCanBo, tenCanBo, maCanBo, tenBoMon, tenDonViBoMon, tenDonViCanBo, tenDonVi,
+                                            tenLoaiDoiTuong: danhSachLoaiDoiTuong[ansMaLoaiDoiTuong].split(':')[1],
+                                            tenThanhTich: ansMaThanhTich ? danhSachThanhTich[ansMaThanhTich].split(':')[1] : '',
+                                        });
+                                        solve(index + 1);
+                                    }
+                                });
+                            }
+                        }
+                    }).catch(error => done({ error }));
                 };
                 solve();
             });
@@ -433,9 +435,9 @@ module.exports = app => {
         const defaultColumns = [
             { header: 'SỐ QUYẾT ĐỊNH', key: 'soQuyetDinh', width: 15 },
             { header: 'LOẠI ĐỐI TƯỢNG', key: 'loaiDoiTuong', width: 20 },
-            { header: 'CÁN BỘ', key: 'canBo', width: 60 },
-            { header: 'ĐƠN VỊ', key: 'donVi', width: 50 },
-            { header: 'BỘ MÔN', key: 'boMon', width: 50 },
+            { header: 'CÁN BỘ', key: 'canBo', width: 15 },
+            { header: 'ĐƠN VỊ', key: 'donVi', width: 40 },
+            { header: 'BỘ MÔN', key: 'boMon', width: 60 },
             { header: 'NĂM ĐẠT ĐƯỢC', key: 'namDatDuoc', width: 15 },
             { header: 'THÀNH TÍCH', key: 'thanhTich', width: 30 },
             { header: 'CHÚ THÍCH', key: 'chuThich', width: 30 },
@@ -444,28 +446,6 @@ module.exports = app => {
         ws.columns = defaultColumns;
         ws.getRow(1).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', horizontal: 'center' };
         const pendingLoaiDoiTuong = new Promise(resolve => app.model.dmKhenThuongLoaiDoiTuong.getAll({}, '*', 'ma', (error, items) => resolve((items || []).map(item => item.ma + ': ' + item.ten))));
-        const pendingCanBo = new Promise(resolve => {
-            const condition = {
-                statement: 'ngayNghi IS NULL',
-                parameter: {},
-            };
-            app.model.canBo.getAll(condition, '*', 'ho,ten', (error, items) => {
-                let data = [];
-                const traverse = (idx = 0) => {
-                    if (idx == items.length) {
-                        resolve(data);
-                        return;
-                    }
-                    app.model.dmDonVi.get({ ma: items[idx].maDonVi }, (error, itemDonVi) => {
-                        let tenDonVi = '';
-                        if (itemDonVi) tenDonVi = 'Khoa ' + itemDonVi.ten;
-                        data.push(items[idx].shcc + ': ' + items[idx].ho + ' ' + items[idx].ten + ' - ' + tenDonVi);
-                        traverse(idx + 1);
-                    });
-                };
-                traverse();
-            });
-        });
         const pendingBoMon = new Promise(resolve => app.model.dmBoMon.getAll({}, '*', 'ma', (error, items) => {
             let data = [];
             const traverse = (idx = 0) => {
@@ -483,18 +463,16 @@ module.exports = app => {
         const pendingDonVi = new Promise(resolve => app.model.dmDonVi.getAll({}, '*', 'ma', (error, items) => resolve((items || []).map(item => item.ma + ': ' + item.ten))));
         const pendingThanhTich = new Promise(resolve => app.model.dmKhenThuongKyHieu.getAll((error, items) => resolve((items || []).map(item => item.ma + ': ' + item.ten))));
         const pendingChuThich = new Promise(resolve => app.model.dmKhenThuongChuThich.getAll((error, items) => resolve((items || []).map(item => item.ma + ': ' + item.ten))));
-        Promise.all([pendingLoaiDoiTuong, pendingCanBo, pendingBoMon, pendingDonVi, pendingThanhTich, pendingChuThich])
-        .then(([danhSachLoaiDoiTuong, danhSachCanBo, danhSachBoMon, danhSachDonVi, danhSachThanhTich, danhSachChuThich]) => {
+        Promise.all([pendingLoaiDoiTuong, pendingBoMon, pendingDonVi, pendingThanhTich, pendingChuThich])
+        .then(([danhSachLoaiDoiTuong, danhSachBoMon, danhSachDonVi, danhSachThanhTich, danhSachChuThich]) => {
             const rows = ws.getRows(2, 1000);
             const { dataRange: loaiDoiTuongRange } = workBook.createRefSheet('KHEN_THUONG_LOAI_DOI_TUONG', danhSachLoaiDoiTuong);
-            const { dataRange: canBoRange } = workBook.createRefSheet('CAN_BO', danhSachCanBo);
             const { dataRange: donViRange } = workBook.createRefSheet('DON_VI', danhSachDonVi);
             const { dataRange: boMonRange } = workBook.createRefSheet('BO_MON', danhSachBoMon);
             const { dataRange: thanhTichRange } = workBook.createRefSheet('KHEN_THUONG_THANH_TICH', danhSachThanhTich);
             const { dataRange: chuThichRange } = workBook.createRefSheet('KHEN_THUONG_CHU_THICH', danhSachChuThich);
             rows.forEach((row) => {
                 row.getCell('loaiDoiTuong').dataValidation = { type: 'list', allowBlank: true, formulae: [loaiDoiTuongRange] };
-                row.getCell('canBo').dataValidation = { type: 'list', allowBlank: true, formulae: [canBoRange] };
                 row.getCell('donVi').dataValidation = { type: 'list', allowBlank: true, formulae: [donViRange] };
                 row.getCell('boMon').dataValidation = { type: 'list', allowBlank: true, formulae: [boMonRange] };
                 row.getCell('thanhTich').dataValidation = { type: 'list', allowBlank: true, formulae: [thanhTichRange] };
