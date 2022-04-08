@@ -130,9 +130,8 @@ class EditModal extends AdminModal {
 
 class QtKhenThuongAll extends AdminPage {
     checked = parseInt(T.cookie('hienThiTheoDoiTuong')) == 1;
-    state = { filter: {} };
+    state = { filter: { loaiDoiTuong: '-1' }};
     stateTable = [{ 'id': '-1', 'text': 'Tất cả' }];
-    searchText = '';
 
     componentDidMount() {
         T.ready('/user/tccb', () => {
@@ -147,17 +146,19 @@ class QtKhenThuongAll extends AdminPage {
             });
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
-                this.fromYear.value('');
-                this.toYear.value('');
-                this.loaiDoiTuong.value('');
-                this.maDonVi?.value('');
-                this.mulCanBo?.value('');
+                let filterCookie = T.getCookiePage('pageQtKhenThuongAll', 'F'),
+                    { fromYear = null, toYear = null, loaiDoiTuong = '-1', listDv = '', listShcc = '', listThanhTich = '' } = filterCookie;
+                fromYear && this.fromYear.value(fromYear);
+                toYear && this.toYear.value(toYear);
+                this.loaiDoiTuong.value(loaiDoiTuong);
+                this.maDonVi?.value(listDv);
+                this.mulCanBo?.value(listShcc);
+                this.listThanhTich.value(listThanhTich);
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
             if (this.checked) {
                 this.hienThiTheoDoiTuong.value(true);
             }
-            this.getPage();
             this.changeAdvancedSearch(true);
         });
     }
@@ -167,26 +168,39 @@ class QtKhenThuongAll extends AdminPage {
         this.modal.show();
     }
 
-    changeAdvancedSearch = (isInitial = false) => {
-        let { pageNumber, pageSize } = this.props && this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.page ? this.props.qtKhenThuongAll.page : { pageNumber: 1, pageSize: 50 };
+    changeAdvancedSearch = (isInitial = false, isReset = false) => {
+        let { pageNumber, pageSize, pageCondition } = this.props && this.props.qtKhenThuongAll && this.props.qtKhenThuongAll.page ? this.props.qtKhenThuongAll.page : { pageNumber: 1, pageSize: 50, pageCondition: {}};
+
+        if (pageCondition && (typeof pageCondition == 'string')) T.setTextSearchBox(pageCondition);
+
         const fromYear = this.fromYear.value() == '' ? null : Number(this.fromYear.value());
         const toYear = this.toYear.value() == '' ? null : Number(this.toYear.value());
         const loaiDoiTuong = this.loaiDoiTuong.value() || '-1';
         const listDv = loaiDoiTuong == '02' ? (this.maDonVi?.value().toString() || '') : '';
         const listShcc = loaiDoiTuong == '02' ? (this.mulCanBo?.value().toString() || '') : '';
-        const pageFilter = isInitial ? null : { fromYear, toYear, loaiDoiTuong, listDv, listShcc };
+        const listThanhTich = this.listThanhTich.value().toString() || '';
+        const pageFilter = (isInitial || isReset) ? { loaiDoiTuong: '-1' } : { fromYear, toYear, loaiDoiTuong, listDv, listShcc, listThanhTich };
         this.setState({ filter: pageFilter }, () => {
-            this.getPage(pageNumber, pageSize, '', (page) => {
+            this.getPage(pageNumber, pageSize, pageCondition, (page) => {
                 if (isInitial) {
-                    const filter = page.filter || {};
-                    this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter }, () => {
-                        this.fromYear.value(filter.fromYear || '');
-                        this.toYear.value(filter.toYear || '');
-                        this.loaiDoiTuong.value(filter.loaiDoiTuong || '-1');
-                        this.maDonVi?.value(filter.listDv);
-                        this.mulCanBo?.value(filter.listShcc);
-                        if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.loaiDoiTuong || filter.listDv || filter.listShcc)) this.showAdvanceSearch();
-                    });
+                    const filter = page.filter || { loaiDoiTuong: '-1' };
+                    const filterCookie = T.getCookiePage('pageQtKhenThuongAll', 'F');
+                    this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
+
+                    this.fromYear.value(filter.fromYear || filterCookie.fromYear || '');
+                    this.toYear.value(filter.toYear || filterCookie.toYear || '');
+                    this.maDonVi?.value(filter.listDv || filterCookie.listDv);
+                    this.mulCanBo?.value(filter.listShcc || filterCookie.listShcc);
+                    this.listThanhTich.value(filter.listThanhTich || filterCookie.listThanhTich || '');
+                    this.loaiDoiTuong.value(filter.loaiDoiTuong || filterCookie.loaiDoiTuong || '');
+                    if (this.fromYear.value() || this.toYear.value() || this.mulCanBo?.value() || this.maDonVi?.value() || this.listThanhTich.value() || this.loaiDoiTuong.value()) this.showAdvanceSearch();
+                } else if (isReset) {
+                    this.fromYear.value('');
+                    this.toYear.value('');
+                    this.loaiDoiTuong.value('-1');
+                    this.maDonVi?.value('');
+                    this.mulCanBo?.value('');
+                    this.listThanhTich.value('');
                 }
             });
         });
@@ -250,53 +264,44 @@ class QtKhenThuongAll extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Đối tượng</th>
-                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>}
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Loại đối tượng</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cá nhân</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tập thể</th>
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm đạt được</th>}
                         {!this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Thành tích</th>}
+                        {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>}
                         {!this.checked && <th style={{ width: 'auto', textAlign: 'right', whiteSpace: 'nowrap' }}>Điểm thi đua</th>}
 
                         {this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số thành tích đạt được</th>}
                         {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách thành tích</th>}
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Loại đối tượng</th>
                         <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
+                        <TableCell type='text' content={item.tenLoaiDoiTuong} />
                         <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
-                            item.maLoaiDoiTuong == '01' ?
+                            item.maLoaiDoiTuong == '02' ?
                                 <>
-                                    <span>
-                                        {'Trường Đại học Khoa học Xã hội và Nhân Văn, TP. HCM'}
-                                    </span>
+                                    <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
+                                    {item.maCanBo}
                                 </>
-                                :
-                                item.maLoaiDoiTuong == '02' ?
-                                    <>
-                                        <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
-                                        {item.maCanBo}
-                                    </>
-                                    : item.maLoaiDoiTuong == '03' ?
-                                        <>
-                                            <span>
-                                                {item.tenDonVi}
-                                            </span>
-                                        </>
-                                        : <>
-                                            <span>{item.tenBoMon}</span> <br />
-                                            {item.tenDonViBoMon}
-                                        </>
+                                : item.maLoaiDoiTuong == '04' ? item.tenBoMon : ''
 
                         )} />
-                        {!this.checked && <TableCell type='text' style={{ textAlign: 'center' }} content={(item.soQuyetDinh || '')} />}
+                        <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
+                            item.maLoaiDoiTuong == '01' ? 'Trường Đại học Khoa học Xã hội và Nhân Văn, TP. HCM'
+                                : item.maLoaiDoiTuong == '02' ? item.tenDonViCanBo
+                                    : item.maLoaiDoiTuong == '03' ? item.tenDonVi
+                                        : item.tenDonViBoMon
+                        )} />
                         {!this.checked && <TableCell type='text' style={{ textAlign: 'center' }} content={(item.namDatDuoc)} />}
                         {!this.checked && <TableCell type='text' content={(item.tenThanhTich)} />}
+                        {!this.checked && <TableCell type='text' style={{ textAlign: 'center' }} content={(item.soQuyetDinh || '')} />}
                         {!this.checked && <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemThiDua} />}
                         {this.checked && <TableCell type='text' style={{ textAlign: 'left' }} content={item.soKhenThuong} />}
                         {this.checked && <TableCell type='text' content={this.list(item.danhSachKhenThuong, item.soKhenThuong, item.danhSachNamDatDuoc)} />}
-                        <TableCell type='text' content={item.tenLoaiDoiTuong} />
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onEdit={() => this.modal.show(item, false)} onDelete={this.delete} />
                         }
@@ -312,7 +317,6 @@ class QtKhenThuongAll extends AdminPage {
                 )
             });
         }
-
         return this.renderPage({
             icon: 'fa fa-gift',
             title: ' Quá trình khen thưởng',
@@ -322,19 +326,34 @@ class QtKhenThuongAll extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    <FormTextBox className='col-md-4' ref={e => this.fromYear = e} label='Từ năm đạt được (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
-                    <FormTextBox className='col-md-4' ref={e => this.toYear = e} label='Đến năm đạt được (yyyy)' type='year' onChange={() => this.changeAdvancedSearch()} />
+                    <FormTextBox className='col-md-2' ref={e => this.fromYear = e} label='Từ năm đạt được (yyyy)' type='year' />
+                    <FormTextBox className='col-md-2' ref={e => this.toYear = e} label='Đến năm đạt được (yyyy)' type='year' />
+                    <FormSelect className='col-12 col-md-8' multiple ref={e => this.listThanhTich = e} label='Thành tích' data={SelectAdapter_DmKhenThuongKyHieuV2} allowClear minimumResultsForSearch={-1} />
                     {(this.loaiDoiTuong && this.loaiDoiTuong.value() == '02') &&
                     <>
-                        <FormSelect className='col-12 col-md-6' multiple ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear minimumResultsForSearch={-1} />
-                        <FormSelect className='col-12 col-md-6' multiple ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear minimumResultsForSearch={-1} />
+                        <FormSelect className='col-12 col-md-6' multiple ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} allowClear minimumResultsForSearch={-1} />
+                        <FormSelect className='col-12 col-md-6' multiple ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} allowClear minimumResultsForSearch={-1} />
                     </>}
+                    <div className='form-group col-12' style={{ justifyContent: 'end', display: 'flex' }}>
+                        <button className='btn btn-danger' style={{ marginRight: '10px' }} type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch(null, true)}>
+                            <i className='fa fa-fw fa-lg fa-times' />Xóa bộ lọc
+                        </button>
+                        <button className='btn btn-info' type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch()}>
+                            <i className='fa fa-fw fa-lg fa-search-plus' />Tìm kiếm
+                        </button>
+                    </div>
                 </div>
             </>,
             content: <>
+                {!this.checked && <div className='tile'>
+                    <h3 className='tile-title'>
+                        Thống kê
+                    </h3>
+                    <b>{'Số lượng: ' + totalItem.toString()}</b>
+                </div>}
                 <div className='tile'>
                     <FormSelect className='col-md-3' ref={e => this.loaiDoiTuong = e} label='Chọn loại đối tượng' data={this.stateTable} onChange={() => this.changeAdvancedSearch()} />
-                    <FormCheckbox label='Hiển thị theo đối tượng' style={{ position: 'absolute', right: '70px', top: '50px' }} ref={e => this.hienThiTheoDoiTuong = e} onChange={this.groupPage} />
+                    <FormCheckbox label='Hiển thị theo đối tượng' style={{ position: 'absolute', right: '70px', top: '70px' }} ref={e => this.hienThiTheoDoiTuong = e} onChange={this.groupPage} />
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.getPage} />
@@ -342,11 +361,12 @@ class QtKhenThuongAll extends AdminPage {
             </>,
             backRoute: '/user/tccb',
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
+            onImport: !this.checked ? (e) => e.preventDefault() || this.props.history.push('/user/tccb/qua-trinh/khen-thuong-all/upload') : null,
             onExport: !this.checked ? (e) => {
                 e.preventDefault();
-                const { fromYear, toYear, loaiDoiTuong, listDv, listShcc } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, loaiDoiTuong: '-1', listDv: null, listShcc: null };
+                const filter = T.stringify(this.state.filter);
 
-                T.download(T.url(`/api/qua-trinh/khen-thuong-all/download-excel/${listShcc ? listShcc : null}/${listDv ? listDv : null}/${fromYear ? fromYear : null}/${toYear ? toYear : null}/${loaiDoiTuong ? loaiDoiTuong : '-1'}`), 'khenthuong.xlsx');
+                T.download(T.url(`/api/qua-trinh/khen-thuong-all/download-excel/${filter}`), 'khenthuong.xlsx');
             } : null
         });
     }
