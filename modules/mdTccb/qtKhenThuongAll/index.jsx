@@ -14,6 +14,10 @@ export default {
             component: Loadable({ loading: Loading, loader: () => import('./adminGroupPage') })
         },
         {
+            path: '/user/tccb/qua-trinh/khen-thuong-all/upload',
+            component: Loadable({ loading: Loading, loader: () => import('./adminImportPage') })
+        },
+        {
             path: '/user/tccb/qua-trinh/khen-thuong-all',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
