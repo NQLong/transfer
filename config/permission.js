@@ -401,10 +401,22 @@ module.exports = app => {
                     assignListContainer[name] = roles;
                }
           },
-          get: (name) => {
-               if (assignListContainer[name]) return [...assignListContainer[name]];
-               return [];
-          },
+          get: (name) => new Promise(resolve => {
+               let listPermission = [], nhomRole = name.split(',');
+               nhomRole.forEach((nhomRole, index, array) => {
+                    if (assignListContainer[nhomRole]) listPermission.push(...assignListContainer[nhomRole]);
+                    if (index == array.length - 1) {
+                         resolve(listPermission);
+                    }
+               });
+          }),
+
+          getNhomRole: (permission) => new Promise(resolve => {
+               Object.keys(assignListContainer).forEach(nhomRole => {
+                    assignListContainer[nhomRole].find(item => item.id == permission) && resolve(nhomRole);
+               });
+          }),
+
           addHook: (name, hook) => assignRolePermissionHookContainer[name] = hook, // Hook is Promise object | parameters: req, roles
           check: async (req, roles) => {
                const hooks = Object.values(assignRolePermissionHookContainer);
@@ -414,7 +426,7 @@ module.exports = app => {
                     if (typeof checkFlag == 'boolean') break; // Hook trúng => Break luôn
                }
 
-               if (checkFlag) return true;
+               if (checkFlag != null) return checkFlag;
                else throw 'Permission denied!';
           }
      };
