@@ -53,7 +53,7 @@ class CanBoTheoDonVi extends AdminPage {
             <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Họ và tên</th>
             <th style={{ width: '70%', whiteSpace: 'nowrap' }}>Email</th>
             <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Số điện thoại</th>
-            {/* Gán quyền xử lý công việc */}
+            <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
         </tr>
     );
 
@@ -75,14 +75,21 @@ class CanBoTheoDonVi extends AdminPage {
         </>
     );
 
-    normalRows = (item, index) => <tr key={index}>
-        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
-        <TableCell type='link' style={{ whiteSpace: 'nowrap' }} content={
-            (item.ho + ' ' + item.ten)
-        } url={`tccb/staff/${item.shcc}`} />
-        <TableCell type='text' style={{ whiteSpace: 'nowrap', fontStyle: 'italic' }} content={item.email} />
-        <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.dienThoaiCaNhan} />
-    </tr>
+    normalRows = (item, index) => {
+        item.lastName = item.ho;
+        item.firstName = item.ten;
+        return <tr key={index}>
+            <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
+            <TableCell type='link' style={{ whiteSpace: 'nowrap' }} content={
+                (item.ho + ' ' + item.ten)
+            } url={`tccb/staff/${item.shcc}`} />
+            <TableCell type='text' style={{ whiteSpace: 'nowrap', fontStyle: 'italic' }} content={item.email} />
+            <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.dienThoaiCaNhan} />
+            <TableCell type='buttons'>
+                <a href='#' className='btn btn-sm btn-success' onClick={(e) => e.preventDefault() || this.assignRolesModal && this.assignRolesModal.show(item)} > <i className='fa fa-lg fa-plus' />&nbsp;Gán quyền</a>
+            </TableCell>
+        </tr>;
+    }
 
     tccbRows = (item, index) => {
         item.lastName = item.ho;
