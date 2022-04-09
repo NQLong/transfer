@@ -224,6 +224,7 @@ module.exports = app => {
                             user.shcc = item.shcc;
                             user.firstName = item.ten;
                             user.lastName = item.ho;
+                            user.maDonVi = item.maDonVi;
                             user.staff = {
                                 shcc: item.shcc,
                                 listChucVu: [],

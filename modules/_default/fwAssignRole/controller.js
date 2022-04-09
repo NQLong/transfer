@@ -6,7 +6,7 @@ module.exports = app => {
     );
 
     app.get('/api/assign-role/:nguoiDuocGan', app.permission.check('fwAssignRole:read'), (req, res) => {
-        app.model.fwAssignRole.getCurrentRoles(req.params.nguoiDuocGan, req.params.nhomRole, (error, result) => {
+        app.model.fwAssignRole.getCurrentRoles(req.params.nguoiDuocGan, req.query.nhomRole, (error, result) => {
             if (error) {
                 res.send({ error });
             } else {
@@ -21,7 +21,7 @@ module.exports = app => {
     });
 
     app.post('/api/assign-role', app.permission.check('fwAssignRole:write'), (req, res) => {
-        let { item } = req.body.assignRole;
+        let item = req.body.assignRole;
         const roles = [item.tenRole];
         app.assignRoleHooks.check(req, roles).then(() => { // Được thông qua
             if (item.tenRole && typeof item.tenRole == 'object') item.tenRole = item.tenRole.toString();

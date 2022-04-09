@@ -906,7 +906,7 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 3
+                    "size": 4
                 }
             },
             "primaryKeys": [
@@ -6575,6 +6575,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 255
+                },
+                "TRANG_THAI": {
+                    "value": "trangThai",
+                    "dataType": "NUMBER",
+                    "dataDefault": "4",
+                    "nullable": true,
+                    "size": "4,0"
                 }
             },
             "primaryKeys": [
@@ -6598,8 +6605,8 @@
                     "nullable": false,
                     "size": "22,0"
                 },
-                "NOI_DUNG": {
-                    "value": "noiDung",
+                "TRICH_YEU": {
+                    "value": "trichYeu",
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
@@ -6654,12 +6661,12 @@
                     "nullable": true,
                     "size": "1,0"
                 },
-                "LINK_CONG_VAN": {
-                    "value": "linkCongVan",
-                    "dataType": "NVARCHAR2",
+                "TRANG_THAI": {
+                    "value": "trangThai",
+                    "dataType": "VARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 1000
+                    "size": 5
                 }
             },
             "primaryKeys": [
@@ -11301,8 +11308,8 @@
                     "nullable": false,
                     "size": 28
                 },
-                "MA_NHIEM_VU": {
-                    "value": "maNhiemVu",
+                "KEY": {
+                    "value": "key",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": false,
@@ -12168,6 +12175,135 @@
                     "dataDefault": "1",
                     "nullable": true,
                     "size": "1,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "DT_CHUONG_TRINH_DAO_TAO": {
+            "active": true,
+            "moduleName": "dtChuongTrinhDaoTao",
+            "modelName": "dtChuongTrinhDaoTao",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_106920\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "MA_MON_HOC": {
+                    "value": "maMonHoc",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 20
+                },
+                "LOAI_MON_HOC": {
+                    "value": "loaiMonHoc",
+                    "dataType": "NUMBER",
+                    "dataDefault": "0",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "TIN_CHI_LY_THUYET": {
+                    "value": "tinChiLyThuyet",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "TIN_CHI_THUC_HANH": {
+                    "value": "tinChiThucHanh",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "PHONG_THI_NGHIEM": {
+                    "value": "phongThiNghiem",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 200
+                },
+                "GHI_CHU": {
+                    "value": "ghiChu",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 2000
+                },
+                "KICH_HOAT": {
+                    "value": "kichHoat",
+                    "dataType": "NUMBER",
+                    "dataDefault": "1",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "MA_KHOI_KIEN_THUC": {
+                    "value": "maKhoiKienThuc",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "22,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "HCTH_HISTORY": {
+            "active": true,
+            "moduleName": "hcthHistory",
+            "modelName": "hcthHistory",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_106880\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "TYPE": {
+                    "value": "type",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                },
+                "TARGET": {
+                    "value": "target",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "NOTE": {
+                    "value": "note",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 255
+                },
+                "SHCC": {
+                    "value": "shcc",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                },
+                "ACTION": {
+                    "value": "action",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 31
                 }
             },
             "primaryKeys": [

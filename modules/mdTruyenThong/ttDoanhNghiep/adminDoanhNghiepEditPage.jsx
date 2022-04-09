@@ -11,11 +11,11 @@ import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_DmLoaiDoanhNghiep } from 'modules/mdDanhMuc/dmLoaiDoanhNghiep/redux';
 import { LoaiDoanhNghiepEditModal } from 'modules/mdDanhMuc/dmLoaiDoanhNghiep/adminPage';
 import { createDmLoaiDoanhNghiep } from 'modules/mdDanhMuc/dmLoaiDoanhNghiep/redux';
+
 class DnDoanhNghiepEditPage extends AdminPage {
     state = { id: null, kichHoat: true, doiTac: false, searching: false, listLinhVuc: null, listLoaiDoanhNghiep: null }
     isNew = false;
     componentDidMount() {
-
         T.ready('/user/truyen-thong', () => {
             const route = T.routeMatcher('/user/truyen-thong/doanh-nghiep/edit/:doanhNghiepId'),
                 doanhNghiepId = route.parse(window.location.pathname).doanhNghiepId;
@@ -28,6 +28,8 @@ class DnDoanhNghiepEditPage extends AdminPage {
     }
 
     getData = (data = {}) => {
+        const permission = this.getUserPermission('dnDoanhNghiep', ['write', 'manage']);
+        const user = this.props.system.user;
         let {
             id = null, tenDayDu = '', tenVietTat = '', namThanhLap = '', phone = '', email = '', website = '', capDo = 1,
             diaChi = '', theManh = '', moTa = '', moTaHopTac = '', ketQuaHopTac = '', ghiChu = '', kichHoat = false, doiTac = false, image = '/img/avatar.jpg',
@@ -41,7 +43,11 @@ class DnDoanhNghiepEditPage extends AdminPage {
         ketQuaHopTac = T.language.parse(ketQuaHopTac || '', true);
         ghiChu = T.language.parse(ghiChu || '', true);
 
-        this.donViPhuTrach.value(donViPhuTrach);
+        if (!permission.write) {
+            this.donViPhuTrach.value(user.maDonVi);
+        } else {
+            this.donViPhuTrach.value(donViPhuTrach);
+        }
         this.dnDoanhNghiepViTitle.value(tenDayDu.vi);
         this.dnDoanhNghiepEnTitle.value(tenDayDu.en);
 
@@ -184,10 +190,10 @@ class DnDoanhNghiepEditPage extends AdminPage {
     }
 
     render() {
-        const permission = this.getUserPermission('dnDoanhNghiep', ['write']),
+        const permission = this.getUserPermission('dnDoanhNghiep', ['write', 'manage']),
             dmLinhVucKinhDoanhPermission = this.getUserPermission('dmLinhVucKinhDoanh', ['write']),
-            dmLoaiDoanhNghiepPermission = this.getUserPermission('dmLoaiDoanhNghiep', ['write']),
-            readOnly = !permission.write;
+            dmLoaiDoanhNghiepPermission = this.getUserPermission('dmLoaiDoanhNghiep', ['write']);
+        const readOnly = !(permission.write || permission.manage);
         const doanhNghiep = this.props.doanhNghiep && this.props.doanhNghiep.item ? this.props.doanhNghiep.item : {};
 
         return this.renderPage({
@@ -203,8 +209,7 @@ class DnDoanhNghiepEditPage extends AdminPage {
                         <div className='tile-body row'>
                             <div className='col-md-8'>
                                 <div className='row'>
-                                    <FormSelect ref={e => this.donViPhuTrach = e} className='form-group col-md-12' label='Đơn vị phụ trách' data={SelectAdapter_DmDonVi} readOnly={readOnly} required />
-
+                                    <FormSelect ref={e => this.donViPhuTrach = e} className='form-group col-md-12' label='Đơn vị phụ trách' data={SelectAdapter_DmDonVi} readOnly={!permission.write} required />
                                 </div>
                                 <FormTabs ref={e => this.tabs = e} tabs={[
                                     {
@@ -331,15 +336,11 @@ class DnDoanhNghiepEditPage extends AdminPage {
                             ]} onChange={this.changeTab} />
                         </div>
                     </div>
-                    <EditModal ref={e => this.modal = e}
-                        permissions={dmLinhVucKinhDoanhPermission}
-                        create={this.onCreateLinhVucKinhDoanh}
-                    />
-                    <LoaiDoanhNghiepEditModal ref={e => this.modalLoaiDN = e}
-                        create={this.onCreateDmLoaiDoanhNghiep} permissions={dmLoaiDoanhNghiepPermission} />
+                    <EditModal ref={e => this.modal = e} permissions={dmLinhVucKinhDoanhPermission} create={this.onCreateLinhVucKinhDoanh} />
+                    <LoaiDoanhNghiepEditModal ref={e => this.modalLoaiDN = e} create={this.onCreateDmLoaiDoanhNghiep} permissions={dmLoaiDoanhNghiepPermission} />
                 </>,
             backRoute: '/user/truyen-thong/doanh-nghiep',
-            onSave: permission.write ? this.save : null
+            onSave: permission.write || permission.manage ? this.save : null
         });
     }
 }

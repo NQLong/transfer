@@ -1,6 +1,6 @@
-// Table name: HCTH_CONG_VAN_DI { id, noiDung, ngayGui, ngayKy, donViGui, donViNhan, canBoNhan, isDonVi, isCanBo, linkCongVan }
+// Table name: HCTH_CONG_VAN_DI { id, trichYeu, ngayGui, ngayKy, donViGui, donViNhan, canBoNhan, isDonVi, isCanBo, trangThai }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'noiDung': 'NOI_DUNG', 'ngayGui': 'NGAY_GUI', 'ngayKy': 'NGAY_KY', 'donViGui': 'DON_VI_GUI', 'donViNhan': 'DON_VI_NHAN', 'canBoNhan': 'CAN_BO_NHAN', 'isDonVi': 'IS_DON_VI', 'isCanBo': 'IS_CAN_BO', 'linkCongVan': 'LINK_CONG_VAN' };
+const obj2Db = { 'id': 'ID', 'trichYeu': 'TRICH_YEU', 'ngayGui': 'NGAY_GUI', 'ngayKy': 'NGAY_KY', 'donViGui': 'DON_VI_GUI', 'donViNhan': 'DON_VI_NHAN', 'canBoNhan': 'CAN_BO_NHAN', 'isDonVi': 'IS_DON_VI', 'isCanBo': 'IS_CAN_BO', 'trangThai': 'TRANG_THAI' };
 
 module.exports = app => {
     app.model.hcthCongVanDi = {

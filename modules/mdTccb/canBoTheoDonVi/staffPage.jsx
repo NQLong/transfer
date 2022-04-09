@@ -5,6 +5,7 @@ import { AdminPage, TableCell, renderTable, FormSelect } from 'view/component/Ad
 import { getNhanSuDonVi } from './redux';
 import { getDmDonVi, SelectAdapter_DmDonViFilter } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { getDmChucVu } from 'modules/mdDanhMuc/dmChucVu/redux';
+import AssignRoleModal from 'modules/_default/fwAssignRole/AssignRoleModal';
 
 const CRUD = {
     'C': 'Tạo',
@@ -12,6 +13,7 @@ const CRUD = {
     'U': 'Cập nhật',
     'D': 'Xóa'
 };
+
 class CanBoTheoDonVi extends AdminPage {
     state = { tenDonVi: '', listStaffAll: [], listNhanSu: [], listDonViQuanLy: [], shcc: null };
 
@@ -62,8 +64,8 @@ class CanBoTheoDonVi extends AdminPage {
                 <th rowSpan={2} style={{ width: '30%', whiteSpace: 'nowrap' }}>Họ và tên</th>
                 <th rowSpan={2} style={{ width: '70%', whiteSpace: 'nowrap' }}>Email</th>
                 <th rowSpan={2} style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Số điện thoại</th>
-                <th rowSpan={1} colSpan={3} style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác hệ thống Tổ chức cán bộ</th>
-                {/* Gán quyền xử lý công việc */}
+                <th colSpan={3} style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác hệ thống Tổ chức cán bộ</th>
+                <th rowSpan={2} style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
             </tr>
             <tr>
                 <th rowSpan={1} style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
@@ -82,48 +84,52 @@ class CanBoTheoDonVi extends AdminPage {
         <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.dienThoaiCaNhan} />
     </tr>
 
-    tccbRows = (item, index) => <tr key={index}>
-        <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
-        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
-            <>
-                <a href={`tccb/staff/${item.shcc}`}>{item.ho + ' ' + item.ten}<br /></a>
-                {item.ngach + ': ' + item.tenNgach}
-            </>
-        } />
-        <TableCell type='text' style={{ whiteSpace: 'nowrap', fontStyle: 'italic' }} content={item.email} />
-        <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.dienThoaiCaNhan} />
-        <TableCell type='text' style={this.defaultCRUDRowStyle(item.tccbLog)} content={CRUD[item.tccbLog?.thaoTac] || ''} />
-        <TableCell type='text' style={this.defaultCRUDRowStyle(item.tccbLog)} content={item.tccbLog?.quaTrinh || ''} />
-        <TableCell type='date' dateFormat='HH:MM:ss dd/mm/yy'
-            style={this.defaultCRUDRowStyle(item.tccbLog)} content={item.tccbLog?.ngay || null} />
-    </tr>
+    tccbRows = (item, index) => {
+        item.lastName = item.ho;
+        item.firstName = item.ten;
+        return <tr key={index}>
+            <TableCell type='text' style={{ textAlign: 'right' }} content={index + 1} />
+            <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
+                <>
+                    <a href={`tccb/staff/${item.shcc}`}>{item.ho + ' ' + item.ten}<br /></a>
+                    {item.ngach + ': ' + item.tenNgach}
+                </>
+            } />
+            <TableCell type='text' style={{ whiteSpace: 'nowrap', fontStyle: 'italic' }} content={item.email} />
+            <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.dienThoaiCaNhan} />
+            <TableCell type='text' style={this.defaultCRUDRowStyle(item.tccbLog)} content={CRUD[item.tccbLog?.thaoTac] || ''} />
+            <TableCell type='text' style={this.defaultCRUDRowStyle(item.tccbLog)} content={item.tccbLog?.quaTrinh || ''} />
+            <TableCell type='date' dateFormat='HH:MM:ss dd/mm/yy' style={this.defaultCRUDRowStyle(item.tccbLog)} content={item.tccbLog?.ngay || null} />
+            <TableCell type='buttons'>
+                <a href='#' className='btn btn-sm btn-success' onClick={(e) => e.preventDefault() || this.assignRolesModal && this.assignRolesModal.show(item)} > <i className='fa fa-lg fa-plus' />&nbsp;Gán quyền</a>
+            </TableCell>
+        </tr>;
+    }
 
     render() {
+        const assignRolePermissions = this.getUserPermission('fwAssignRole', ['read', 'write']);
+        const nguoiGan = this.props.system && this.props.system.user ? this.props.system.user : {};
         let table = renderTable({
             emptyTable: 'Đơn vị chưa có cán bộ',
-            getDataSource: () => this.state.listNhanSu
-            , stickyHead: false,
+            getDataSource: () => this.state.listNhanSu,
+            stickyHead: false,
             renderHead: () => this.state.maDonVi ? (this.state.maDonVi == '30' ? this.tccbHeader() : this.normalHeader()) : this.normalHeader(),
             renderRow: (item, index) =>
                 this.state.maDonVi ? ((this.state.maDonVi == '30') ? this.tccbRows(item, index) : this.normalRows(item, index)) : this.normalRows(item, index)
         });
         return this.renderPage({
             icon: 'fa fa-user-circle-o',
-            header: <FormSelect style={{ width: '300px', marginBottom: '0' }} placeholder='Danh sách đơn vị quản lý' ref={e => this.donVi = e} onChange={value => this.getData(this.state.listDonVi, value.id)} data={SelectAdapter_DmDonViFilter(this.state.listDonViQuanLy)
-            } minimumResultsForSearch={-1}
-            // disabled={this.state.listDonViQuanLy.length == 1}
-            />,
+            header: <FormSelect style={{ width: '300px', marginBottom: '0' }} placeholder='Danh sách đơn vị quản lý' ref={e => this.donVi = e} onChange={value => this.getData(this.state.listDonVi, value.id)} data={SelectAdapter_DmDonViFilter(this.state.listDonViQuanLy)} minimumResultsForSearch={-1} />,
             title: 'Danh sách nhân sự thuộc đơn vị quản lý',
             breadcrumb: [
                 <Link key={0} to='/user'>Trang cá nhân</Link>,
                 'Danh sách nhân sự'
             ],
             content: <>
-                <div className='tile'>
-                    {table}
-                </div>
+                <div className='tile'>{table}</div>
+                {assignRolePermissions.read && <AssignRoleModal ref={e => this.assignRolesModal = e} nhomRole='quanLyDonVi' nguoiGan={nguoiGan} />}
             </>,
-            backRoute: '/user',
+            backRoute: '/user'
         });
     }
 }
