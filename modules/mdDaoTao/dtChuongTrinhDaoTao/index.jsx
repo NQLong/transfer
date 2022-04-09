@@ -15,7 +15,11 @@ export default {
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
         {
-            path: '/user/pdt/chuong-trinh-dao-tao/:ma',
+            path: '/user/pdt/chuong-trinh-dao-tao/:maDonVi/:namDaoTao',
+            component: Loadable({ loading: Loading, loader: () => import('./adminDetails') })
+        },
+        {
+            path: '/user/pdt/chuong-trinh-dao-tao/new',
             component: Loadable({ loading: Loading, loader: () => import('./adminDetails') })
         },
     ],

@@ -1,106 +1,225 @@
+import { SelectAdapter_DmMonHoc, SelectAdapter_DmMonHocFaculty, getDmMonHoc } from 'modules/mdDaoTao/dmMonHoc/redux';
 import React from 'react';
 import { connect } from 'react-redux';
-import { FormDatePicker, FormSelect, FormTextBox } from 'view/component/AdminPage';
-import { SelectAdapter_FwCanBo } from '../tccbCanBo/redux';
-import { getTruongPhongTccb, suggestSoHopDong, getDaiDienKyHopDong } from './redux';
-export class ComponentKienThuc extends React.Component {
+import { AdminPage, FormSelect, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
+import { createDtChuongTrinhDaoTao, updateDtChuongTrinhDaoTao } from './redux';
+export class ComponentKienThuc extends AdminPage {
+    rows = {};
+    state = { datas: {} };
 
-    componentDidMount() {
-        const { address, schoolName, mobile } = this.props.system ? this.props.system : { address: '', schoolName: '', mobile: '' };
-        this.address.value(JSON.parse(address).vi);
-        this.schoolName.value(JSON.parse(schoolName).vi);
-        this.mobile.value(mobile);
-        this.props.getTruongPhongTccb(data => {
-            if (!data.error) {
-                data.truongPhongTCCB && data.truongPhongTCCB.shcc && this.setState({ truongPhongTCCB: data.truongPhongTCCB.shcc });
+    // componentDidMount() {
+    //     this.addRow(0);
+    // }
+
+    addRow = (idx, item) => {
+        const permission = this.getUserPermission('dtChuongTrinhDaoTao', ['write']);
+        const id = item ? item.id : -1;
+        const editFlag = permission.write ? (id > 0 ? false : true) : false;
+        console.log(item, editFlag);
+        this.rows[idx] = {
+            maMonHoc: null,
+            loaiMonHoc: null,
+            tongSoTc: null,
+            tinChiLyThuyet: null,
+            tinChiThucHanh: null,
+            soTiet: null,
+            phongTn: null,
+        };
+        this.setEditState(idx, editFlag, id, () => {
+            this.rows[idx].loaiMonHoc.value(item ? item.loaiMonHoc : 0);
+            this.rows[idx].tinChiLyThuyet.value(item ? item.tinChiLyThuyet : 0);
+            this.rows[idx].tinChiThucHanh.value(item ? item.tinChiThucHanh : 0);
+            if (item) {
+                SelectAdapter_DmMonHoc.fetchOneItem(item.maMonHoc, ({ item }) => {
+                    const { soTinChi, tongSoTiet } = item;
+                    // this.setEditState(idx, true, this.state.datas[idx].id);
+                    this.rows[idx].tongSoTc.value(soTinChi);
+                    this.rows[idx].soTiet.value(tongSoTiet);
+                });
+                this.rows[idx].maMonHoc.value(item.maMonHoc);
             }
         });
-        this.props.suggestSoHopDong(data => {
-            data.soHopDongSuggested && this.setState({ suggestSoHopDong: data.soHopDongSuggested });
+    }
+
+    setEditState = (idx, editFlag, id, done) => {
+        this.setState({
+            datas: {
+                ...this.state.datas,
+                [idx]: {
+                    edit: editFlag,
+                    id: id,
+                }
+            }
+        }, () => {
+            done && done();
         });
     }
 
-    handleDaiDien = (shcc) => {
-        let shccDaiDien = typeof (shcc) === 'object' ? shcc.id : shcc;
-        this.props.getDaiDienKyHopDong(shccDaiDien, daiDien => {
-            this.daiDien.value(daiDien.item.shcc);
-            this.nguoiKyChucVu.value(daiDien.item.chucVu);
-            this.hoTenDaiDien.value(((daiDien.item.phai == '01' ? 'Ông: ' : 'Bà: ') + daiDien.item.ho + ' ' + daiDien.item.ten).normalizedName());
-            this.nguoiKyQuocTich.value(daiDien.item.quocGia ? daiDien.item.quocGia : 'VN');
-            this.nguoiKyDonVi.value(daiDien.item.maDonVi);
-        });
+    editRow = (idx) => {
+        const permission = this.getUserPermission('dtChuongTrinhDaoTao', ['write']);
+        if (permission.write) {
+            const curEdit = this.state.datas[idx].edit;
+            const id = this.state.datas[idx].id;
+            this.setEditState(idx, !curEdit, id, () => {
+                this.rows[idx].maMonHoc.value(this.rows[idx].maMonHoc.value());
+                this.rows[idx].loaiMonHoc.value(this.rows[idx].loaiMonHoc.value());
+            });
+        }
     }
 
-    validate = (selector) => {
-        const data = selector.value();
-        const isRequired = selector.props.required;
-        if (data || data === 0) return data;
-        if (isRequired) throw selector;
-        return '';
+    removeRow = (idx) => {
+        delete this.rows[idx];
+    }
+
+    setMonHoc = (idx, id) => {
+        if (this.rows[idx - 1] && this.state.datas[idx - 1]?.edit) {
+            this.editRow(idx - 1);
+        }
+        SelectAdapter_DmMonHoc.fetchOneItem(id, ({ item }) => {
+            const { soTinChi, tongSoTiet } = item;
+            // this.setEditState(idx, true, this.state.datas[idx].id);
+            this.rows[idx].tongSoTc.value(soTinChi);
+            this.rows[idx].soTiet.value(tongSoTiet);
+            this.addRow(idx + 1);
+        });
+
+    }
+
+    selectMh = (idx) => {
+        return (<FormSelect ref={e => this.rows[idx].maMonHoc = e} data={SelectAdapter_DmMonHocFaculty(33)} className='col-12' style={{ marginBottom: 0 }} readOnly={!this.state.datas[idx].edit} onChange={value => this.setMonHoc(idx, value.id)} />);
     };
+    insertLoaiMh = (idx) => {
+        return (<FormSelect ref={e => this.rows[idx].loaiMonHoc = e} data={[{ id: 0, text: 'Bắt buộc' }, { id: 1, text: 'Tự chọn' }]} className='col-12' style={{ marginBottom: 0 }} readOnly={!this.state.datas[idx].edit} />);
+    };
+    insertTongSoTc = (idx) => {
+        return (<FormTextBox type="number" ref={e => this.rows[idx].tongSoTc = e} className='col-12' readOnly={true} style={{ marginBottom: 0 }} />);
+    };
+    insertTinChiLt = (idx) => {
+        return (<FormTextBox type="number" ref={e => this.rows[idx].tinChiLyThuyet = e} className='col-12' readOnly={!this.state.datas[idx].edit} max={999} style={{ marginBottom: 0 }} />);
+    };
+    insertTinChiTh = (idx) => {
+        return (<FormTextBox type="number" ref={e => this.rows[idx].tinChiThucHanh = e} className='col-12' readOnly={!this.state.datas[idx].edit} style={{ marginBottom: 0 }} />);
+    };
+    insertSoTiet = (idx) => {
+        return (<FormTextBox type="number" ref={e => this.rows[idx].soTiet = e} className='col-12' readOnly={true} style={{ marginBottom: 0 }} />);
+    };
+    insertPhongTn = (idx) => {
+        return (<FormTextBox type="text" ref={e => this.rows[idx].phongTn = e} className='col-12' readOnly={!this.state.datas[idx].edit} style={{ marginBottom: 0 }} />);
+    };
+
+
+
+    convertObjToArr = () => {
+        const keys = Object.keys(this.state.datas);
+        const tmp = [];
+        keys.forEach(key => {
+            tmp.push(this.state.datas[key]);
+        });
+        return tmp;
+    }
 
     getValue = () => {
         try {
-            const data = {
-                soHopDong: this.validate(this.soHopDong),
-                ngayKyHopDong: this.validate(this.ngayKy).getTime(),
-                nguoiKy: this.validate(this.daiDien)
-            };
+            const keys = Object.keys(this.rows);
+            const data = [];
+            keys.forEach((key) => {
+                const item = {
+                    id: this.state.datas[key].id,
+                    maMonHoc: this.rows[key].maMonHoc?.value(),
+                    loaiMonHoc: this.rows[key].loaiMonHoc?.value(),
+                    tinChiLyThuyet: this.rows[key].tinChiLyThuyet?.value(),
+                    tinChiThucHanh: this.rows[key].tinChiThucHanh?.value(),
+                    phongTn: this.rows[key].phongTn?.value(),
+                    maKhoiKienThuc: '1',
+                };
+                if (item.maMonHoc) {
+                    data.push(item);
+                }
+            });
             return data;
-        } catch (selector) {
-            selector.focus();
-            T.notify('<b>' + (selector.props.label || 'Dữ liệu') + '</b> bị trống!', 'danger');
+        } catch (e) {
             return false;
         }
     }
 
-    setVal = (data = null) => {
-        if (data) {
-            this.soHopDong.value(data.soHopDong);
-            this.ngayKy.value(data.ngayKyHopDong);
-            this.handleDaiDien(data.nguoiKy);
-        } else {
-            let curYear = new Date().getFullYear(), curDate = new Date().getTime();
-            this.soHopDong.value(this.state.suggestSoHopDong + '/' + curYear + '/HĐLĐ-XHNV-TCCB');
-            this.ngayKy.value(curDate);
-            this.props.getTruongPhongTccb(data => {
-                if (data.error) T.notify('Lỗi khi lấy thông tin người đại diện trường', 'danger');
-                else this.handleDaiDien(data.truongPhongTCCB.shcc);
-            });
-        }
+    setVal = (items = []) => {
+        items.forEach((item, idx) => {
+            // const { id, loaiMonHoc, maMonHoc, phongThiNghiem, tinChiLyThuyet, tinChiThucHanh } =
+            //     item ? item : { id: '', loaiMonHoc: 0, maMonHoc: '', phongThiNghiem: null, tinChiLyThuyet: null, tinChiThucHanh: null };
+
+            this.addRow(idx, item);
+        });
+        this.addRow(items.length);
+
 
     }
 
-    render() {
-        const currentPermission = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [];
-        let readOnly = !currentPermission.includes('qtHopDongLaoDong:write');
-        return (<>
-            <div className="tile">
-                <div className="tile-body row">
-                    <FormTextBox ref={e => this.soHopDong = e} label='Số hợp đồng' className='col-md-4' required maxLength={100} readOnly={readOnly} />
-                    <FormDatePicker ref={e => this.ngayKy = e} type='date-mask' className='col-md-4' label='Ngày ký' required readOnly={readOnly} />
-                    <FormSelect ref={e => this.daiDien = e} data={SelectAdapter_FwCanBo} className='col-md-4' label='Đại diện ký' onChange={this.handleDaiDien} required />
-                </div>
-            </div>
-            <div className="tile">
-                <h3 className="tile-title">Thông tin phía trường</h3>
-                <div className="tile-body row">
-                    <FormTextBox ref={e => this.hoTenDaiDien = e} label='Đại diện ký' className='col-6' readOnly={true} />
-                    {/* <FormSelect ref={e => this.nguoiKyQuocTich = e} data={SelectAdapter_DmQuocGia} label='Quốc tịch' className='col-6' readOnly={true} /> */}
-                    {/* <FormSelect ref={e => this.nguoiKyChucVu = e} data={SelectAdapter_DmChucVuV1} label='Chức vụ' className='col-6' readOnly={true} /> */}
-                    {/* <FormSelect ref={e => this.nguoiKyDonVi = e} data={SelectAdapter_DmDonVi} label='Đơn vị' className='col-6' readOnly={true} /> */}
 
-                    <FormTextBox ref={e => this.schoolName = e} label='Đại diện cho' className='col-12' readOnly={true} />
-                    <FormTextBox ref={e => this.mobile = e} label='Điện thoại' className='col-12' readOnly={true} />
-                    <FormTextBox ref={e => this.address = e} label='Địa chỉ' className='col-12' readOnly={true} />
+    render() {
+        const permission = this.getUserPermission('dtChuongTrinhDaoTao', ['read', 'readAll', 'write', 'delete']);
+        const title = this.props.title;
+
+        const table = renderTable({
+            getDataSource: () => this.convertObjToArr(),
+            stickyHead: false,
+            emptyTable: 'Không có dữ liệu',
+            renderHead: () => (
+                <>
+                    <tr>
+                        <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>#</th>
+                        <th rowSpan='2' style={{ width: '40%', verticalAlign: 'middle', textAlign: 'center' }} nowrap='true'>Tên Môn Học</th>
+                        <th rowSpan='2' style={{ width: '15%', verticalAlign: 'middle', textAlign: 'center' }} nowrap='true'>Loại MH</th>
+                        <th colSpan='3' rowSpan='1' style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tín chỉ
+                        </th>
+                        <th rowSpan='2' style={{ width: 'auto', verticalAlign: 'middle', textAlign: 'center' }} nowrap='true'>Số tiết</th>
+                        <th rowSpan='2' style={{ width: '20%', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Phòng TN</th>
+                        <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Thao tác</th>
+                    </tr>
+                    <tr>
+                        <th style={{ width: '5%', whiteSpace: 'nowrap', textAlign: 'center' }}>TC</th>
+                        <th style={{ width: '10%', whiteSpace: 'nowrap', textAlign: 'center' }}>LT</th>
+                        <th style={{ width: '10%', whiteSpace: 'nowrap', textAlign: 'center' }}>TH/TN</th>
+                    </tr>
+
+                </>),
+            renderRow: (item, index) => (
+                <tr key={index}>
+                    <TableCell type='text' style={{ textAlign: 'center' }} content={item.id > 0 ? item.id : null} />
+                    <TableCell content={this.selectMh(index)} />
+                    <TableCell content={this.insertLoaiMh(index)} />
+                    <TableCell type='number' style={{ textAlign: 'center' }} content={this.insertTongSoTc(index)} />
+                    <TableCell type='number' style={{ textAlign: 'center' }} content={this.insertTinChiLt(index)} />
+                    <TableCell type='number' style={{ textAlign: 'center' }} content={this.insertTinChiTh(index)} />
+                    <TableCell type='number' content={this.insertSoTiet(index)} />
+                    <TableCell type='number' content={this.insertPhongTn(index)} />
+                    <td rowSpan={1} colSpan={1}>
+                        <div className='btn-group'>
+                            {
+                                permission.write ?
+                                    <a className='btn btn-primary' href='#' title={!item.edit ? 'Chỉnh sửa' : 'Xong'} onClick={() => this.editRow(index)}><i className={'fa fa-lg ' + (!item.edit ? 'fa-edit' : 'fa-check')} /></a> : null
+                            }
+
+                        </div>
+                    </td>
+                </tr>
+            ),
+        });
+
+        return (<>
+            <div className='tile'>
+                <div>
+                    <h4>{title}</h4>
+                    <p>{this.props.subTitle}</p>
                 </div>
+                {table}
+
             </div>
-        </>);
+        </>
+        );
+
     }
 }
 
-const mapStateToProps = state => ({ staff: state.tccb.qtHopDongLaoDong, system: state.system });
-const mapActionsToProps = {
-    getTruongPhongTccb, suggestSoHopDong, getDaiDienKyHopDong
-};
+const mapStateToProps = state => ({ system: state.system, dtChuongTrinhDaoTao: state.daoTao.dtChuongTrinhDaoTao });
+const mapActionsToProps = { getDmMonHoc, createDtChuongTrinhDaoTao, updateDtChuongTrinhDaoTao };
 export default connect(mapStateToProps, mapActionsToProps, null, { forwardRef: true })(ComponentKienThuc);

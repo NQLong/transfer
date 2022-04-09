@@ -1,23 +1,27 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getDtChuongTrinhDaoTaoPage, createDtChuongTrinhDaoTao, updateDtChuongTrinhDaoTao, deleteDtChuongTrinhDaoTao } from './redux';
+import { getDtChuongTrinhDaoTaoPage } from './redux';
+import { getDmDonViAll } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, renderTable, TableCell } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 
 
 class DtChuongTrinhDaoTaoPage extends AdminPage {
+    donViMapper = {};
     componentDidMount() {
+        this.props.getDmDonViAll(items => {
+            if (items) {
+                this.donViMapper = {};
+                items.forEach(item => this.donViMapper[item.ma] = item.ten);
+            }
+        });
         T.ready('/user/pdt', () => {
             T.onSearch = (searchText) => this.props.getDtChuongTrinhDaoTaoPage(undefined, undefined, searchText || '');
             T.showSearchBox();
-            this.props.getDtChuongTrinhDaoTaoPage();
-        });
-    }
+            this.props.getDtChuongTrinhDaoTaoPage(undefined, undefined, { searchTerm: '' });
 
-    showModal = (e) => {
-        e.preventDefault();
-        this.modal.show();
+        });
     }
 
     changeActive = item => this.props.updateDtChuongTrinhDaoTao(item.id, { kichHoat: item.kichHoat == '1' ? '0' : '1' });
@@ -35,49 +39,23 @@ class DtChuongTrinhDaoTaoPage extends AdminPage {
 
         let table = renderTable({
             emptyTable: 'Không có dữ liệu chương trình đào tạo',
-            getDataSource: () => list, stickyHead: false,
+            getDataSource: () => list,
             renderHead: () => (
-                <>
-                    <tr>
-                        <th rowSpan='2' style={{ width: 'auto', textAlign: 'right', verticalAlign: 'middle' }}>#</th>
-                        <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Mã học kỳ</th>
-                        <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }}>Nhóm</th>
-                        <th rowSpan='2' style={{ width: '50%', verticalAlign: 'middle' }}>Tên chương trình đào tạo</th>
-                        <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Số tín chỉ</th>
-                        <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Tổng số tiết</th>
-                        <th colSpan='6' rowSpan='1' style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Số tiết
-                        </th>
-                        <th rowSpan='2' style={{ width: '50%', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Khoa/Bộ môn</th>
-                        <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Thao tác</th>
-                    </tr>
-                    <tr>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>LT</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>TH</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>TT</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>TL</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>ĐA</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>LA</th>
-                    </tr>
-                </>),
-            renderRow: (
-                item, index) => (
+                <tr>
+                    <th style={{ width: 'auto', textAlign: 'right', verticalAlign: 'middle' }}>#</th>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Năm đào tạo</th>
+                    <th style={{ width: '100%', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Khoa/Bộ môn</th>
+                    <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Thao tác</th>
+                </tr>
+            ),
+            renderRow: (item, index) => (
                 <tr key={index}>
                     <TableCell style={{ width: 'auto', textAlign: 'right' }} content={index + 1} />
-                    <TableCell style={{ width: 'auto', textAlign: 'center' }} content={item.maHocKy} />
-                    <TableCell style={{ width: 'auto', textAlign: 'center' }} content={'0' + item.nhom} />
-                    <TableCell type='link' content={item.tenMonHoc} onClick={() => this.modal.show(item)} />
-                    <TableCell style={{ width: 'auto', textAlign: 'center' }} content={item.soTinChi} />
-                    <TableCell style={{ width: 'auto', textAlign: 'center' }} content={item.tongSoTiet} />
-                    <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietLt} />
-                    <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietTh} />
-                    <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietTt} />
-                    <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietTl} />
-                    <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietDa} />
-                    <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietLa} />
-                    <TableCell style={{}} content={item.tenKhoaBoMon} />
-                    <TableCell type='buttons' content={item} permission={permission}
-                    />
-                </tr>)
+                    <TableCell style={{ width: 'auto', textAlign: 'center' }} content={item.namDaoTao} />
+                    <TableCell content={this.donViMapper && this.donViMapper[item.maBoMon] ? this.donViMapper[item.maBoMon] : ''} />
+                    <TableCell type='buttons' content={item} permission={permission}  onEdit={ permission.write ? (e) => e.preventDefault() || this.props.history.push(`/user/pdt/chuong-trinh-dao-tao/${item.maBoMon}/${item.namDaoTao}`) : null}/>
+                </tr>
+            )
         });
 
         return this.renderPage({
@@ -99,5 +77,5 @@ class DtChuongTrinhDaoTaoPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, dtChuongTrinhDaoTao: state.daoTao.dtChuongTrinhDaoTao });
-const mapActionsToProps = {  getDtChuongTrinhDaoTaoPage, createDtChuongTrinhDaoTao, updateDtChuongTrinhDaoTao, deleteDtChuongTrinhDaoTao };
+const mapActionsToProps = { getDtChuongTrinhDaoTaoPage, getDmDonViAll };
 export default connect(mapStateToProps, mapActionsToProps)(DtChuongTrinhDaoTaoPage);

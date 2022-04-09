@@ -16,25 +16,28 @@ module.exports = app => {
     app.get('/user/pdt/mon-hoc/upload', app.permission.orCheck('dmMonHoc:read', 'manager:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/pdt/mon-hoc/page/:pageNumber/:pageSize', app.permission.orCheck('dmMonHoc:read', 'manager:read'), (req, res) => {
+    app.get('/api/pdt/mon-hoc/page/:pageNumber/:pageSize', app.permission.orCheck('dmMonHoc:read', 'dmMonHoc:manage'), (req, res) => {
         let pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize),
-            donVi = req.query.donVi || 'all',
-            searchTerm = typeof req.query.searchTerm === 'string' ? `%${req.query.searchTerm.toLowerCase()}%` : '',
-            statement = 'lower(ten) LIKE :searchTerm',
-            parameter = { searchTerm };
-        if (donVi != 'all') {
-            statement = 'boMon = :donVi AND lower(ten) LIKE :searchTerm';
-            parameter.donVi = parseInt(donVi);
+             pageSize = parseInt(req.params.pageSize),
+             donViFilter = req.query.donViFilter,
+             donVi = req.session.user.staff ? req.session.user.staff.maDonVi : null,
+             searchTerm = typeof req.query.searchTerm === 'string' ? `%${req.query.searchTerm.toLowerCase()}%` : '',
+             statement = 'lower(ten) LIKE :searchTerm',
+             parameter = { searchTerm };
+        if (req.session.user.permissions.exists(['dmMonHoc:read']) && donViFilter) donVi = donViFilter;
+        if (donVi) {
+             statement = 'boMon = :donVi AND lower(ten) LIKE :searchTerm';
+             parameter.donVi = parseInt(donVi);
         }
         let condition = { statement, parameter };
         app.model.dmMonHoc.getPage(pageNumber, pageSize, condition, '*', 'boMon', (error, page) => {
-            page.pageCondition = {
-                searchTerm, donVi
-            };
-            res.send({ error, page });
+             page.pageCondition = {
+                  searchTerm,
+                  donViFilter: donViFilter
+             };
+             res.send({ error, page });
         });
-    });
+   });
 
     app.get('/api/pdt/mon-hoc/all', app.permission.orCheck('dmMonHoc:read', 'manager:read'), (req, res) => {
         const condition = req.query.condition || {};

@@ -3,11 +3,13 @@ import T from 'view/js/common';
 // Reducer ------------------------------------------------------------------------------------------------------------
 const DtChuongTrinhDaoTaoGetAll = 'DtChuongTrinhDaoTao:GetAll';
 const DtChuongTrinhDaoTaoGetPage = 'DtChuongTrinhDaoTao:GetPage';
+const DtChuongTrinhDaoTaoGetByBoMon = 'DtChuongTrinhDaoTao:GetByBoMon';
 const DtChuongTrinhDaoTaoUpdate = 'DtChuongTrinhDaoTao:Update';
 
 export default function dtChuongTrinhDaoTaoReducer(state = null, data) {
     switch (data.type) {
         case DtChuongTrinhDaoTaoGetAll:
+        case DtChuongTrinhDaoTaoGetByBoMon:
             return Object.assign({}, state, { items: data.items });
         case DtChuongTrinhDaoTaoGetPage:
             return Object.assign({}, state, { page: data.page });
@@ -66,7 +68,7 @@ export function getDtChuongTrinhDaoTaoPage(pageNumber, pageSize, pageCondition, 
     const page = T.updatePage('pageDtChuongTrinhDaoTao', pageNumber, pageSize, pageCondition);
     return dispatch => {
         const url = `/api/pdt/chuong-trinh-dao-tao/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: pageCondition }, data => {
+        T.get(url, {  searchTerm: pageCondition?.searchTerm }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách chương trình đào tạo bị lỗi!', 'danger');
                 console.error(`GET ${url}. ${data.error}`);
@@ -75,6 +77,36 @@ export function getDtChuongTrinhDaoTaoPage(pageNumber, pageSize, pageCondition, 
                 dispatch({ type: DtChuongTrinhDaoTaoGetPage, page: data.page });
             }
         });
+    };
+}
+
+export function getDtChuongTrinhDaoTaoByBoMon(maDonVi, namDaoTao, done) {
+    return dispatch => {
+        const url = `/api/pdt/chuong-trinh-dao-tao/${maDonVi}/${namDaoTao}`;
+        T.get(url, { condition: {maDonVi, namDaoTao} }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách chương trình đào tạo bị lỗi!', 'danger');
+                console.error(`GET ${url}. ${data.error}`);
+            } else {
+                if (done) done(data.items);
+                dispatch({ type: DtChuongTrinhDaoTaoGetByBoMon, items: data.items ? data.items : [] });
+            }
+        });
+    };
+}
+
+
+export function createMultiDtChuongTrinhDaoTao(data, done) {
+    return () => {
+        const url = '/api/pdt/chuong-trinh-dao-tao/multiple';
+        T.post(url, { data }, data => {
+            if (data.error) {
+                T.notify('Upload thông tin chương trình đào tạo có lỗi!', 'danger');
+            } else {
+                T.notify(`Cập nhật ${data && data.items ? data.items.length + ' ' : ''} chương trình đào tạothành công!`, 'success');
+            }
+            done && done();
+        }, () => T.notify('Upload thông tin chương trình đào tạo có lỗi!', 'danger'));
     };
 }
 
