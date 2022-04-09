@@ -148,7 +148,7 @@ class QtKyLuat extends AdminPage {
         const listDv = this.maDonVi.value().toString() || '';
         const listShcc = this.mulCanBo.value().toString() || '';
         const listHinhThucKyLuat = this.hinhThucKyLuat.value().toString() || '';
-        const pageFilter = isInitial ? null : (isReset ? {} : { listDv, fromYear, toYear, listShcc, listHinhThucKyLuat });
+        const pageFilter = (isInitial || isReset) ? {} : { listDv, fromYear, toYear, listShcc, listHinhThucKyLuat };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, pageCondition, (page) => {
                 if (isInitial) {

@@ -99,8 +99,9 @@ export function createDmKhenThuongChuThich(item, done) {
                 T.notify('Tạo dữ liệu bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`POST: ${url}.`, data.error);
             } else {
-                dispatch(getDmKhenThuongChuThichPage());
+                T.notify('Tạo mới dữ liệu thành công!', 'success');
                 if (done) done(data);
+                dispatch(getDmKhenThuongChuThichPage());
             }
         }, error => T.notify('Tạo dữ liệu bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));
     };
@@ -113,6 +114,7 @@ export function deleteDmKhenThuongChuThich(ma) {
             if (data.error) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
+                T.notify('Xóa dữ liệu thành công!', 'success');
                 dispatch(getDmKhenThuongChuThichPage());
             }
         }, error => T.notify('Xóa dữ liệu bị lỗi' + (error.error.message && (':<br>' + error.message)), 'danger'));

@@ -1686,27 +1686,29 @@ BEGIN
                      )
              )
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize
-        ORDER BY CASE
-                     WHEN sortType = 'DESC' THEN CASE
-                                                     when sortBy = 'NGAY_NHAN'
-                                                         then CASE when "ngayNhan" is NULL THEN 0 ELSE "ngayNhan" end
-                                                     when sortBy = 'NGAY_HET_HAN'
-                                                         then CASE when "ngayHetHan" is NULL THEN 0 ELSE "ngayHetHan" end
-                                                     when sortBy = 'TINH_TRANG'
-                                                         then "hasChiDao"
-                                                     ELSE 0 END
-                     ELSE 0 END DESC,
-                 CASE
-                     WHEN sortType = 'ASC' THEN CASE
-                                                    when sortBy = 'NGAY_NHAN'
-                                                        then CASE when "ngayNhan" is NULL THEN 0 ELSE "ngayNhan" end
-                                                    when sortBy = 'NGAY_HET_HAN'
-                                                        then CASE when "ngayHetHan" is NULL THEN 0 ELSE "ngayHetHan" end
-                                                    when sortBy = 'TINH_TRANG'
-                                                        then "hasChiDao"
-                                                    ELSE 0 END
-                     ELSE 0 END,
-                 "id" DESC;
+        ORDER BY R
+--                  CASE
+--                      WHEN sortType = 'DESC' THEN CASE
+--                                                      when sortBy = 'NGAY_NHAN'
+--                                                          then CASE when "ngayNhan" is NULL THEN 0 ELSE "ngayNhan" end
+--                                                      when sortBy = 'NGAY_HET_HAN'
+--                                                          then CASE when "ngayHetHan" is NULL THEN 0 ELSE "ngayHetHan" end
+--                                                      when sortBy = 'TINH_TRANG'
+--                                                          then "hasChiDao"
+--                                                      ELSE 0 END
+--                      ELSE 0 END DESC,
+--                  CASE
+--                      WHEN sortType = 'ASC' THEN CASE
+--                                                     when sortBy = 'NGAY_NHAN'
+--                                                         then CASE when "ngayNhan" is NULL THEN 0 ELSE "ngayNhan" end
+--                                                     when sortBy = 'NGAY_HET_HAN'
+--                                                         then CASE when "ngayHetHan" is NULL THEN 0 ELSE "ngayHetHan" end
+--                                                     when sortBy = 'TINH_TRANG'
+--                                                         then "hasChiDao"
+--                                                     ELSE 0 END
+--                      ELSE 0 END,
+--                  "id" DESC
+    ;
     RETURN my_cursor;
 END;
 /
@@ -1844,11 +1846,9 @@ SELECT
     ph.ID               as  "id",
     ph.NOI_DUNG         as  "noiDung",
     ph.CAN_BO_GUI       as  "canBoGui",
-    ph.CAN_BO_NHAN      as  "canBoNhan",
     ph.NGAY_TAO         as  "ngayTao",
     cb.HO               as  "ho",
     cb.TEN              as  "ten",
-
     CASE
         WHEN cb.HO IS NULL THEN cb.TEN
         WHEN cb.TEN IS NULL THEN cb.HO
@@ -1947,6 +1947,7 @@ OPEN my_cursor FOR
 SELECT *
 FROM (
         SELECT hcthgnv.ID AS "id",
+            hcthgnv.NGUOI_TAO AS "nguoiTao",
             hcthgnv.NGAY_HET_HAN AS "ngayHetHan",
             hcthgnv.DON_VI_NHAN AS "maDonViNhan",
             hcthgnv.CAN_BO_NHAN AS "maCanBoNhan",
@@ -1991,6 +1992,19 @@ FROM (
                 LEFT JOIN DM_CHUC_VU DMCV ON DMCV.MA = qtcv.MA_CHUC_VU
                 WHERE INSTR(CONCAT(hcthgnv.CAN_BO_NHAN,','), CONCAT( cbn.shcc, ',')) != 0
             ) ELSE NULL END AS "danhSachCanBoNhan",
+
+            CASE when hcthgnv.NGUOI_TAO is not null then
+            (
+                SELECT (
+                        CASE
+                            WHEN cbn.HO IS NULL THEN cbn.TEN
+                            WHEN cbn.TEN IS NULL THEN cbn.HO
+                            ELSE CONCAT(CONCAT(cbn.HO, ' '), cbn.TEN)
+                        END
+                )
+                FROM TCHC_CAN_BO cbn
+                WHERE hcthgnv.NGUOI_TAO = cbn.shcc
+            ) ELSE NULL END AS "tenNguoiTao",
 
             ROW_NUMBER() OVER (
                 ORDER BY hcthgnv.ID DESC

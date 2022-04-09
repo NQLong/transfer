@@ -104,7 +104,7 @@ class QtKyLuatGroupPage extends AdminPage {
     }
 
     changeAdvancedSearch = (isInitial = false, isReset = false) => {
-        let { pageNumber, pageSize, pageCondition } = this.props && this.props.qtKyLuat && this.props.qtKyLuat.page ? this.props.qtKyLuat.page : { pageNumber: 1, pageSize: 50, pageCondition: {} };
+        let { pageNumber, pageSize, pageCondition } = this.props && this.props.qtKyLuat && this.props.qtKyLuat.pageMa ? this.props.qtKyLuat.pageMa : { pageNumber: 1, pageSize: 50, pageCondition: {} };
 
         if (pageCondition && (typeof pageCondition == 'string')) T.setTextSearchBox(pageCondition);
 
@@ -123,11 +123,11 @@ class QtKyLuatGroupPage extends AdminPage {
         const listDv = this.state.filter.listDv;
         const listShcc = this.state.filter.listShcc;
         const listHinhThucKyLuat = this.hinhThucKyLuat.value().toString() || '';
-        const pageFilter = isInitial ? null : (isReset ? { listShcc, listDv } : { listDv, fromYear, toYear, listShcc, listHinhThucKyLuat });
+        const pageFilter = (isInitial || isReset) ? { listShcc, listDv } : { listDv, fromYear, toYear, listShcc, listHinhThucKyLuat };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, pageCondition, (page) => {
                 if (isInitial) {
-                    const filter = page.filter || {};
+                    const filter = page.filter || { listShcc, listDv };
                     const filterCookie = T.getCookiePage('groupPageMaQtKyLuat', 'F');
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
 
