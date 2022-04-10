@@ -17,7 +17,7 @@ module.exports = app => {
   );
 
   app.get('/user/pdt/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:readAll', 'manager:read'), app.templates.admin);
-  app.get('/user/pdt/chuong-trinh-dao-tao/:maDonVi/:namDaoTao', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:readAll', 'manager:read'), app.templates.admin);
+  app.get('/user/pdt/chuong-trinh-dao-tao/:ma', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:readAll', 'manager:read'), app.templates.admin);
   app.get('/user/pdt/chuong-trinh-dao-tao/new', app.permission.orCheck('dtChuongTrinhDaoTao:write', 'manager:write'), app.templates.admin);
 
 
@@ -25,28 +25,26 @@ module.exports = app => {
   app.get('/api/pdt/chuong-trinh-dao-tao/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
     let pageNumber = parseInt(req.params.pageNumber),
       pageSize = parseInt(req.params.pageSize),
-      donVi = req.session.user ? req.session.user.maDonVi : null,
-      searchTerm = typeof req.query.searchTerm === 'string' ? `%${req.query.searchTerm.toLowerCase()}%` : '',
-      statement = 'lower(namDaoTao) LIKE :searchTerm',
-      parameter = { searchTerm };
-    if (req.session.user.permissions.exists(['manager:read'])) donVi = null;
-    if (donVi) {
-      statement = 'maBoMon = :donVi AND lower(namDaoTao) LIKE :searchTerm';
-      parameter.donVi = parseInt(donVi);
-    }
-    let condition = { statement, parameter };
-    app.model.dtChuongTrinhDaoTao.getDistinct(pageNumber, pageSize, condition, 'maBoMon, namDaoTao', 'maBoMon', (error, page) => {
-      page.pageCondition = {
-        searchTerm
-      };
-      res.send({ error, page });
+      searchTerm = typeof req.query.condition == 'string' ? req.query.condition : '';
+    app.model.dtKhungDaoTao.searchPage(pageNumber, pageSize, searchTerm, (error, result) => {
+      if (error) res.send({ error });
+      else {
+        const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = result;
+        res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, list } });
+      }
     });
   });
 
-  app.get('/api/pdt/chuong-trinh-dao-tao/:maDonVi/:namDaoTao', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:readAll', 'manager:read'), (req, res) => {
+  app.get('/api/pdt/chuong-trinh-dao-tao/:ma', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:readAll', 'manager:read'), (req, res) => {
     const condition = req.query.condition || {};
     Object.keys(condition).forEach(key => { condition[key] === '' ? condition[key] = null : ''; });
     app.model.dtChuongTrinhDaoTao.getAll(condition, '*', 'id ASC', (error, items) => res.send({ error, items }));
+  });
+
+  app.get('/api/pdt/khung-dao-tao/:ma', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:readAll', 'manager:read'), (req, res) => {
+    const condition = req.query.condition || {};
+    Object.keys(condition).forEach(key => { condition[key] === '' ? condition[key] = null : ''; });
+    app.model.dtKhungDaoTao.get(condition, '*', 'id ASC', (error, items) => res.send({ error, items }));
   });
 
   app.post('/api/pdt/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:write', 'manager:write'), (req, res) => {
@@ -55,13 +53,14 @@ module.exports = app => {
 
   app.post('/api/pdt/chuong-trinh-dao-tao/multiple', app.permission.orCheck('dtChuongTrinhDaoTao:write', 'manager:write'), (req, res) => {
     const { data } = req.body;
-    const { items, namDaoTao, maBoMon } = data;
+    const { items, namDaoTao, maKhoa, id: idKhungDt } = data;
     const dataImported = [];
-    const handleCreate = index => {
+
+    const handleCreate = (index, idKhungDt) => {
       if (index >= items.length) res.send({ items: dataImported });
       else
         app.model.dtChuongTrinhDaoTao.get({ id: items[index].id }, (error, item) => {
-          const currentData = { ...items[index], ...{ namDaoTao, maBoMon } };
+          const currentData = { ...items[index], ...{ maKhungDaoTao: idKhungDt } };
           delete currentData['id'];
           if (error) res.send({ error });
           else if (item) {
@@ -71,7 +70,7 @@ module.exports = app => {
                 dataImported.push(item);
               }
             });
-            handleCreate(index + 1);
+            handleCreate(index + 1, idKhungDt);
           }
           else {
             app.model.dtChuongTrinhDaoTao.create(currentData, (error, item) => {
@@ -84,7 +83,41 @@ module.exports = app => {
           }
         });
     };
-    handleCreate(0);
+    if (idKhungDt > 0) {
+      app.model.dtKhungDaoTao.get({ id: idKhungDt }, (error, item) => {
+        if (error) res.send({ error });
+        else if (item) {
+          const { id: idKhungDt, namDaoTao: dbNamDaoTao, maKhoa: dbMaKhoa } = item;
+          const changes = {};
+          if (namDaoTao != dbNamDaoTao) {
+            changes[namDaoTao] = namDaoTao;
+          }
+          if (maKhoa != dbMaKhoa) {
+            changes[maKhoa] = maKhoa;
+          }
+          app.model.dtKhungDaoTao.update({ id: idKhungDt }, changes, () => {});
+          handleCreate(0, idKhungDt);
+        }
+        else {
+          app.model.dtKhungDaoTao.create({ namDaoTao, maKhoa }, (error, item) => {
+            if (error) res.send({ error });
+            else {
+              const { id: idKhungDt } = item;
+              handleCreate(0, idKhungDt);
+            }
+          });
+        }
+      });
+    } else {
+      app.model.dtKhungDaoTao.create({ namDaoTao, maKhoa }, (error, item) => {
+        if (error) res.send({ error });
+        else {
+          const { id: idKhungDt } = item;
+          handleCreate(0, idKhungDt);
+        }
+      });
+    }
+
   });
 
   app.put('/api/pdt/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:write', 'manager:write'), (req, res) => {

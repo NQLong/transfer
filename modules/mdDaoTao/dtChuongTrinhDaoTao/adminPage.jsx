@@ -8,14 +8,8 @@ import Pagination from 'view/component/Pagination';
 
 
 class DtChuongTrinhDaoTaoPage extends AdminPage {
-    donViMapper = {};
     componentDidMount() {
-        this.props.getDmDonViAll(items => {
-            if (items) {
-                this.donViMapper = {};
-                items.forEach(item => this.donViMapper[item.ma] = item.ten);
-            }
-        });
+
         T.ready('/user/pdt', () => {
             T.onSearch = (searchText) => this.props.getDtChuongTrinhDaoTaoPage(undefined, undefined, searchText || '');
             T.showSearchBox();
@@ -52,8 +46,8 @@ class DtChuongTrinhDaoTaoPage extends AdminPage {
                 <tr key={index}>
                     <TableCell style={{ width: 'auto', textAlign: 'right' }} content={index + 1} />
                     <TableCell style={{ width: 'auto', textAlign: 'center' }} content={item.namDaoTao} />
-                    <TableCell content={this.donViMapper && this.donViMapper[item.maBoMon] ? this.donViMapper[item.maBoMon] : ''} />
-                    <TableCell type='buttons' content={item} permission={permission}  onEdit={ permission.write ? (e) => e.preventDefault() || this.props.history.push(`/user/pdt/chuong-trinh-dao-tao/${item.maBoMon}/${item.namDaoTao}`) : null}/>
+                    <TableCell content={item.ten} />
+                    <TableCell type='buttons' content={item} permission={permission}  onEdit={ permission.write ? (e) => e.preventDefault() || this.props.history.push(`/user/pdt/chuong-trinh-dao-tao/${item.id}`) : null}/>
                 </tr>
             )
         });

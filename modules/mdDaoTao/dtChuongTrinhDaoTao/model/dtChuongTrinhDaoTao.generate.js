@@ -1,6 +1,6 @@
-// Table name: DT_CHUONG_TRINH_DAO_TAO { id, maMonHoc, loaiMonHoc, tinChiLyThuyet, tinChiThucHanh, phongThiNghiem, ghiChu, kichHoat, maKhoiKienThuc, maBoMon, namDaoTao }
+// Table name: DT_CHUONG_TRINH_DAO_TAO { id, maMonHoc, loaiMonHoc, tinChiLyThuyet, tinChiThucHanh, phongThiNghiem, ghiChu, kichHoat, maKhoiKienThuc, maKhungDaoTao }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'maMonHoc': 'MA_MON_HOC', 'loaiMonHoc': 'LOAI_MON_HOC', 'tinChiLyThuyet': 'TIN_CHI_LY_THUYET', 'tinChiThucHanh': 'TIN_CHI_THUC_HANH', 'phongThiNghiem': 'PHONG_THI_NGHIEM', 'ghiChu': 'GHI_CHU', 'kichHoat': 'KICH_HOAT', 'maKhoiKienThuc': 'MA_KHOI_KIEN_THUC', 'maBoMon': 'MA_BO_MON', 'namDaoTao': 'NAM_DAO_TAO' };
+const obj2Db = { 'id': 'ID', 'maMonHoc': 'MA_MON_HOC', 'loaiMonHoc': 'LOAI_MON_HOC', 'tinChiLyThuyet': 'TIN_CHI_LY_THUYET', 'tinChiThucHanh': 'TIN_CHI_THUC_HANH', 'phongThiNghiem': 'PHONG_THI_NGHIEM', 'ghiChu': 'GHI_CHU', 'kichHoat': 'KICH_HOAT', 'maKhoiKienThuc': 'MA_KHOI_KIEN_THUC', 'maKhungDaoTao': 'MA_KHUNG_DAO_TAO' };
 
 module.exports = app => {
     app.model.dtChuongTrinhDaoTao = {
@@ -84,35 +84,6 @@ module.exports = app => {
                 result.pageNumber = Math.max(1, Math.min(pageNumber, result.pageTotal));
                 leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
                 const sql = 'SELECT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT DT_CHUONG_TRINH_DAO_TAO.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM DT_CHUONG_TRINH_DAO_TAO' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
-                app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
-                    result.list = resultSet && resultSet.rows ? resultSet.rows : [];
-                    done(error, result);
-                });
-            });
-        },
-
-        getDistinct: (pageNumber, pageSize, condition, selectedColumns, orderBy, done) => {
-            if (typeof condition == 'function') {
-                done = condition;
-                condition = {};
-                selectedColumns = '*';
-            } else if (selectedColumns && typeof selectedColumns == 'function') {
-                done = selectedColumns;
-                selectedColumns = '*';
-            }
-
-            if (orderBy) Object.keys(obj2Db).sort((a, b) => b.length - a.length).forEach(key => orderBy = orderBy.replaceAll(key, obj2Db[key]));
-            condition = app.database.oracle.buildCondition(obj2Db, condition, ' AND ');
-            let leftIndex = (pageNumber <= 1 ? 0 : pageNumber - 1) * pageSize,
-                parameter = condition.parameter ? condition.parameter : {};
-            const sql_count = 'SELECT COUNT(*) FROM (SELECT DISTINCT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM DT_CHUONG_TRINH_DAO_TAO' + (condition.statement ? ' WHERE ' + condition.statement + ')' : '');
-            app.database.oracle.connection.main.execute(sql_count, parameter, (err, res) => {
-                let result = {};
-                let totalItem = res && res.rows && res.rows[0] ? res.rows[0]['COUNT(*)'] : 0;
-                result = { totalItem, pageSize, pageTotal: Math.ceil(totalItem / pageSize) };
-                result.pageNumber = Math.max(1, Math.min(pageNumber, result.pageTotal));
-                leftIndex = Math.max(0, result.pageNumber - 1) * pageSize;
-                const sql = 'SELECT DISTINCT ' + app.database.oracle.parseSelectedColumns(obj2Db, selectedColumns) + ' FROM (SELECT DT_CHUONG_TRINH_DAO_TAO.*, ROW_NUMBER() OVER (ORDER BY ' + (orderBy ? orderBy : keys) + ') R FROM DT_CHUONG_TRINH_DAO_TAO' + (condition.statement ? ' WHERE ' + condition.statement : '') + ') WHERE R BETWEEN ' + (leftIndex + 1) + ' and ' + (leftIndex + pageSize);
                 app.database.oracle.connection.main.execute(sql, parameter, (error, resultSet) => {
                     result.list = resultSet && resultSet.rows ? resultSet.rows : [];
                     done(error, result);

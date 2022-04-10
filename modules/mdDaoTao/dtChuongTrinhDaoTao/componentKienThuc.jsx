@@ -2,9 +2,11 @@ import { SelectAdapter_DmMonHoc, SelectAdapter_DmMonHocFaculty, getDmMonHoc } fr
 import React from 'react';
 import { connect } from 'react-redux';
 import { AdminPage, FormSelect, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
-import { createDtChuongTrinhDaoTao, updateDtChuongTrinhDaoTao } from './redux';
+import { deleteDtChuongTrinhDaoTao } from './redux';
 export class ComponentKienThuc extends AdminPage {
+    maKhoa = null;
     rows = {};
+
     state = { datas: {} };
 
     // componentDidMount() {
@@ -15,7 +17,7 @@ export class ComponentKienThuc extends AdminPage {
         const permission = this.getUserPermission('dtChuongTrinhDaoTao', ['write']);
         const id = item ? item.id : -1;
         const editFlag = permission.write ? (id > 0 ? false : true) : false;
-        console.log(item, editFlag);
+        const isDeleted = false;
         this.rows[idx] = {
             maMonHoc: null,
             loaiMonHoc: null,
@@ -25,7 +27,7 @@ export class ComponentKienThuc extends AdminPage {
             soTiet: null,
             phongTn: null,
         };
-        this.setEditState(idx, editFlag, id, () => {
+        this.setEditState(idx, editFlag, id, isDeleted, () => {
             this.rows[idx].loaiMonHoc.value(item ? item.loaiMonHoc : 0);
             this.rows[idx].tinChiLyThuyet.value(item ? item.tinChiLyThuyet : 0);
             this.rows[idx].tinChiThucHanh.value(item ? item.tinChiThucHanh : 0);
@@ -41,13 +43,14 @@ export class ComponentKienThuc extends AdminPage {
         });
     }
 
-    setEditState = (idx, editFlag, id, done) => {
+    setEditState = (idx, editFlag, id, isDeleted, done) => {
         this.setState({
             datas: {
                 ...this.state.datas,
                 [idx]: {
                     edit: editFlag,
                     id: id,
+                    isDeleted: isDeleted,
                 }
             }
         }, () => {
@@ -55,21 +58,41 @@ export class ComponentKienThuc extends AdminPage {
         });
     }
 
-    editRow = (idx) => {
+    editRow = (e, idx) => {
+        if (!this.rows[idx].maMonHoc.value()) {
+            return;
+        }
         const permission = this.getUserPermission('dtChuongTrinhDaoTao', ['write']);
         if (permission.write) {
             const curEdit = this.state.datas[idx].edit;
             const id = this.state.datas[idx].id;
-            this.setEditState(idx, !curEdit, id, () => {
+            const isDeleted = this.state.datas[idx].isDeleted;
+            this.setEditState(idx, !curEdit, id, isDeleted, () => {
                 this.rows[idx].maMonHoc.value(this.rows[idx].maMonHoc.value());
                 this.rows[idx].loaiMonHoc.value(this.rows[idx].loaiMonHoc.value());
             });
         }
     }
 
-    removeRow = (idx) => {
-        delete this.rows[idx];
+    removeRow = (e, idx) => {
+        const id = this.state.datas[idx].id;
+        if (id > 0) {
+            T.confirm('Xóa môn học', 'Bạn có chắc bạn muốn xóa môn học này?', 'warning', true, isConfirm => {
+                isConfirm && this.props.deleteDtChuongTrinhDaoTao(id, error => {
+                    if (error) {
+                        T.notify(error.message ? error.message : 'Xóa môn học bị lỗi!', 'danger');
+                    }
+                    else {
+                        T.alert('Xóa môn học thành công!', 'success', false, 800);
+                        this.setEditState(idx, false, id, true);
+                    }
+                });
+            });
+        } else {
+            this.setEditState(idx, false, id, true);
+        }
     }
+
 
     setMonHoc = (idx, id) => {
         if (this.rows[idx - 1] && this.state.datas[idx - 1]?.edit) {
@@ -86,25 +109,25 @@ export class ComponentKienThuc extends AdminPage {
     }
 
     selectMh = (idx) => {
-        return (<FormSelect ref={e => this.rows[idx].maMonHoc = e} data={SelectAdapter_DmMonHocFaculty(33)} className='col-12' style={{ marginBottom: 0 }} readOnly={!this.state.datas[idx].edit} onChange={value => this.setMonHoc(idx, value.id)} />);
+        return (<FormSelect ref={e => this.rows[idx].maMonHoc = e} data={SelectAdapter_DmMonHocFaculty(this.props.khoiKienThucId == 1 ? 33 : this.maKhoa)} className='col-12' style={{ marginBottom: 0, textDecoration: `${this.state.datas[idx]?.isDeleted ? 'line-through' : null}` }} readOnly={!this.state.datas[idx].edit} onChange={value => this.setMonHoc(idx, value.id)} />);
     };
     insertLoaiMh = (idx) => {
-        return (<FormSelect ref={e => this.rows[idx].loaiMonHoc = e} data={[{ id: 0, text: 'Bắt buộc' }, { id: 1, text: 'Tự chọn' }]} className='col-12' style={{ marginBottom: 0 }} readOnly={!this.state.datas[idx].edit} />);
+        return (<FormSelect ref={e => this.rows[idx].loaiMonHoc = e} data={[{ id: 0, text: 'Bắt buộc' }, { id: 1, text: 'Tự chọn' }]} className='col-12' style={{ marginBottom: 0, textDecoration: `${this.state.datas[idx]?.isDeleted ? 'line-through' : null}` }} readOnly={!this.state.datas[idx].edit} />);
     };
     insertTongSoTc = (idx) => {
-        return (<FormTextBox type="number" ref={e => this.rows[idx].tongSoTc = e} className='col-12' readOnly={true} style={{ marginBottom: 0 }} />);
+        return (<FormTextBox type="number" ref={e => this.rows[idx].tongSoTc = e} className='col-12' readOnly={true} style={{ marginBottom: 0, textDecoration: `${this.state.datas[idx].isDeleted ? 'line-through' : null}` }} />);
     };
     insertTinChiLt = (idx) => {
-        return (<FormTextBox type="number" ref={e => this.rows[idx].tinChiLyThuyet = e} className='col-12' readOnly={!this.state.datas[idx].edit} max={999} style={{ marginBottom: 0 }} />);
+        return (<FormTextBox type="number" ref={e => this.rows[idx].tinChiLyThuyet = e} className='col-12' readOnly={!this.state.datas[idx].edit} max={999} style={{ marginBottom: 0, textDecoration: `${this.state.datas[idx]?.isDeleted ? 'line-through' : null}` }} />);
     };
     insertTinChiTh = (idx) => {
-        return (<FormTextBox type="number" ref={e => this.rows[idx].tinChiThucHanh = e} className='col-12' readOnly={!this.state.datas[idx].edit} style={{ marginBottom: 0 }} />);
+        return (<FormTextBox type="number" ref={e => this.rows[idx].tinChiThucHanh = e} className='col-12' readOnly={!this.state.datas[idx].edit} style={{ marginBottom: 0, textDecoration: `${this.state.datas[idx]?.isDeleted ? 'line-through' : null}` }} />);
     };
     insertSoTiet = (idx) => {
-        return (<FormTextBox type="number" ref={e => this.rows[idx].soTiet = e} className='col-12' readOnly={true} style={{ marginBottom: 0 }} />);
+        return (<FormTextBox type="number" ref={e => this.rows[idx].soTiet = e} className='col-12' readOnly={true} style={{ marginBottom: 0, textDecoration: `${this.state.datas[idx]?.isDeleted ? 'line-through' : null}` }} />);
     };
     insertPhongTn = (idx) => {
-        return (<FormTextBox type="text" ref={e => this.rows[idx].phongTn = e} className='col-12' readOnly={!this.state.datas[idx].edit} style={{ marginBottom: 0 }} />);
+        return (<FormTextBox type="text" ref={e => this.rows[idx].phongTn = e} className='col-12' readOnly={!this.state.datas[idx].edit} style={{ marginBottom: 0, textDecoration: `${this.state.datas[idx]?.isDeleted ? 'line-through' : null}` }} />);
     };
 
 
@@ -130,9 +153,9 @@ export class ComponentKienThuc extends AdminPage {
                     tinChiLyThuyet: this.rows[key].tinChiLyThuyet?.value(),
                     tinChiThucHanh: this.rows[key].tinChiThucHanh?.value(),
                     phongTn: this.rows[key].phongTn?.value(),
-                    maKhoiKienThuc: '1',
+                    maKhoiKienThuc: this.props.khoiKienThucId,
                 };
-                if (item.maMonHoc) {
+                if (item.maMonHoc && !this.state.datas[key].isDeleted) {
                     data.push(item);
                 }
             });
@@ -142,14 +165,19 @@ export class ComponentKienThuc extends AdminPage {
         }
     }
 
-    setVal = (items = []) => {
-        items.forEach((item, idx) => {
+    setVal = (items = [], maKhoa) => {
+        this.maKhoa = maKhoa;
+        let length = 0;
+        items.forEach((item) => {
+            console.log(item);
             // const { id, loaiMonHoc, maMonHoc, phongThiNghiem, tinChiLyThuyet, tinChiThucHanh } =
             //     item ? item : { id: '', loaiMonHoc: 0, maMonHoc: '', phongThiNghiem: null, tinChiLyThuyet: null, tinChiThucHanh: null };
-
-            this.addRow(idx, item);
+            if (item.maKhoiKienThuc.toString() === this.props.khoiKienThucId.toString()) {
+                this.addRow(length, item);
+                length++;
+            }
         });
-        this.addRow(items.length);
+        this.addRow(length);
 
 
     }
@@ -172,19 +200,19 @@ export class ComponentKienThuc extends AdminPage {
                         <th colSpan='3' rowSpan='1' style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tín chỉ
                         </th>
                         <th rowSpan='2' style={{ width: 'auto', verticalAlign: 'middle', textAlign: 'center' }} nowrap='true'>Số tiết</th>
-                        <th rowSpan='2' style={{ width: '20%', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Phòng TN</th>
+                        <th rowSpan='2' style={{ width: '10%', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Phòng TN</th>
                         <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Thao tác</th>
                     </tr>
                     <tr>
                         <th style={{ width: '5%', whiteSpace: 'nowrap', textAlign: 'center' }}>TC</th>
-                        <th style={{ width: '10%', whiteSpace: 'nowrap', textAlign: 'center' }}>LT</th>
-                        <th style={{ width: '10%', whiteSpace: 'nowrap', textAlign: 'center' }}>TH/TN</th>
+                        <th style={{ width: '15%', whiteSpace: 'nowrap', textAlign: 'center' }}>LT</th>
+                        <th style={{ width: '15%', whiteSpace: 'nowrap', textAlign: 'center' }}>TH/TN</th>
                     </tr>
 
                 </>),
             renderRow: (item, index) => (
                 <tr key={index}>
-                    <TableCell type='text' style={{ textAlign: 'center' }} content={item.id > 0 ? item.id : null} />
+                    <TableCell type='text' style={{ textAlign: 'center', textDecoration: `${item.isDeleted ? 'line-through' : null}` }} content={item.id > 0 ? item.id : null} />
                     <TableCell content={this.selectMh(index)} />
                     <TableCell content={this.insertLoaiMh(index)} />
                     <TableCell type='number' style={{ textAlign: 'center' }} content={this.insertTongSoTc(index)} />
@@ -192,11 +220,16 @@ export class ComponentKienThuc extends AdminPage {
                     <TableCell type='number' style={{ textAlign: 'center' }} content={this.insertTinChiTh(index)} />
                     <TableCell type='number' content={this.insertSoTiet(index)} />
                     <TableCell type='number' content={this.insertPhongTn(index)} />
-                    <td rowSpan={1} colSpan={1}>
+                    <td rowSpan={1} colSpan={1} style={{ textAlign: 'center' }}>
                         <div className='btn-group'>
                             {
-                                permission.write ?
-                                    <a className='btn btn-primary' href='#' title={!item.edit ? 'Chỉnh sửa' : 'Xong'} onClick={() => this.editRow(index)}><i className={'fa fa-lg ' + (!item.edit ? 'fa-edit' : 'fa-check')} /></a> : null
+                                permission.write && !item.isDeleted ?
+                                    <>
+                                        <a className='btn btn-primary' href='#' title={!item.edit ? 'Chỉnh sửa' : 'Xong'} onClick={(e) => this.editRow(e, index)}><i className={'fa fa-lg ' + (!item.edit ? 'fa-edit' : 'fa-check')} /></a>
+                                        {!item.edit && <a className='btn btn-danger' href='#' title='Xóa' onClick={(e) => this.removeRow(e, index)}><i className='fa fa-lg fa-trash' /></a>}
+                                    </>
+                                    : null
+
                             }
 
                         </div>
@@ -221,5 +254,5 @@ export class ComponentKienThuc extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, dtChuongTrinhDaoTao: state.daoTao.dtChuongTrinhDaoTao });
-const mapActionsToProps = { getDmMonHoc, createDtChuongTrinhDaoTao, updateDtChuongTrinhDaoTao };
+const mapActionsToProps = { getDmMonHoc, deleteDtChuongTrinhDaoTao };
 export default connect(mapStateToProps, mapActionsToProps, null, { forwardRef: true })(ComponentKienThuc);
