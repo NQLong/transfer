@@ -22,7 +22,7 @@ import { SelectAdapter_DmDonViGuiCongVan } from 'modules/mdDanhMuc/dmDonViGuiCv/
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import Pagination from 'view/component/Pagination';
-import { trangThaiSwitcher, getTrangThaiText } from './adminEditPage';
+import { trangThaiSwitcher, getTrangThaiText } from './staffEditPage';
 // console.log(require('./utils'))
 const timeList = [
     { id: 1, text: 'Theo ngày công văn' },

@@ -1,7 +1,6 @@
 
 module.exports = (app) => {
     const { trangThaiSwitcher, action, CONG_VAN_TYPE, MA_CHUC_VU_HIEU_TRUONG, MA_BAN_GIAM_HIEU } = require('./constant');
-    const { createHistory } = require('../hcthHistory/utils');
 
 
     const menu = {
@@ -396,7 +395,7 @@ module.exports = (app) => {
             }
             else {
                 const newCongVan = await updateCongvanDen(id, { trangThai });
-                await createHistory(app, {
+                await app.model.hcthHistory.createHistory(app, {
                     key: id, loai: CONG_VAN_TYPE, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc,
                     hanhDong: statusToAction(congVan.trangThai, trangThai),
                 });
