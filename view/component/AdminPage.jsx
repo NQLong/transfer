@@ -200,6 +200,39 @@ export function renderComment({
         return <b>{emptyComment}</b>;
 }
 
+
+export const renderTimeline = ({
+    className = '', style = {},
+    handleItem = () => ({}), getDataSource = () => null, loadingText = 'Đang tải ...', emptyTimeline = 'Chưa có dữ liệu'
+}) => {
+    const list = getDataSource();
+    if (list == null)
+        return (
+            <div className='overlay' style={{ minHeight: '120px' }}>
+                <div className='m-loader mr-4'>
+                    <svg className='m-circular' viewBox='25 25 50 50'>
+                        <circle className='path' cx='50' cy='50' r='20' fill='none' strokeWidth='4' strokeMiterlimit='10' />
+                    </svg>
+                </div>
+                <h3 className='l-text'>{loadingText}</h3>
+            </div>);
+    else if (list && list.length > 0) {
+        return (
+            <div className={'history-container ' + className} style={style}>
+                    <ul className='sessions'>
+                        {list.map((item, index) => {
+                            const { component = null, style = {}, className = '' } = handleItem(item);
+                            return <li key={index} style={style} className={className}>{component}</li>;
+                        })}
+                    </ul>
+            </div>
+        );
+    }
+    else {
+        return <b>{emptyTimeline}</b>;
+    }
+};
+
 // Form components ----------------------------------------------------------------------------------------------------
 export class FormTabs extends React.Component {
     randomKey = T.randomPassword(8)
@@ -229,6 +262,7 @@ export class FormTabs extends React.Component {
         e && e.preventDefault();
         $(`a[href='#${(this.props.id || 'tab')}_${index}${this.randomKey}']`).click();
     }
+
     render() {
         const { tabClassName = '', contentClassName = '', tabs = [] } = this.props,
             id = this.props.id || 'tab',
@@ -427,7 +461,7 @@ export class FormTextBox extends React.Component {
                 className: 'form-control',
                 placeholder: placeholder || label,
                 value: this.state.value,
-                onChange: e => this.setState({ value: e.target.value }) || (onChange && onChange(e))
+                onChange: e => this.setState({ value: e.target.value }, () => (onChange && onChange(e)))
             };
             if (type == 'password') properties.autoComplete = 'new-password';
             if (type == 'phone') {
@@ -634,10 +668,10 @@ export class FormSelect extends React.Component {
     };
 
     render = () => {
-        const { className = '', style = {}, labelStyle = {}, label = '', multiple = false, readOnly = false, required = false } = this.props;
+        const { className = '', style = {}, labelStyle = {}, label = '', multiple = false, readOnly = false, required = false, readOnlyEmptyText = '' } = this.props;
         return (
             <div className={'form-group admin-form-select ' + className} style={style}>
-                {label ? <label style={labelStyle} onClick={this.focus}>{label}{!readOnly && required ? <span style={{ color: 'red' }}> *</span> : ''}{readOnly ? ':' : ''}</label> : null} {readOnly ? <b>{this.state.valueText}</b> : ''}
+                {label ? <label style={labelStyle} onClick={this.focus}>{label}{!readOnly && required ? <span style={{ color: 'red' }}> *</span> : ''}{readOnly ? ':' : ''}</label> : null} {readOnly ? <b>{this.state.valueText == null ? readOnlyEmptyText : this.state.valueText}</b> : ''}
                 <div style={{ width: '100%', display: readOnly ? 'none' : 'inline-flex' }}>
                     <select ref={e => this.input = e} multiple={multiple} disabled={readOnly} />
                 </div>

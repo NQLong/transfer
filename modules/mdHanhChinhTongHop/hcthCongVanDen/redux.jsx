@@ -1,10 +1,14 @@
 import T from 'view/js/common';
 
 // Reducer ------------------------------------------------------------------------------------------------------------
-const HcthCongVanDenGetAll = 'HcthCongVanDen:GetAll';
-const HcthCongVanDenGetPage = 'HcthCongVanDen:GetPage';
-const HcthCongVanDenSearchPage = 'HcthCongVanDen:SearchPage';
-const HcthCongVanDenGet = 'HcthCongVanDen:Get';
+const
+    HcthCongVanDenGetAll = 'HcthCongVanDen:GetAll',
+    HcthCongVanDenGetPage = 'HcthCongVanDen:GetPage',
+    HcthCongVanDenSearchPage = 'HcthCongVanDen:SearchPage',
+    HcthCongVanDenGet = 'HcthCongVanDen:Get',
+    HcthCongVanDenGetPhanHoi = 'HcthCongVanDen:GetPhanHoi',
+    HcthCongVanDenGetHistory = 'HcthCongVanDen:GetHistory';
+
 // const HcthCongVanDenUpdate = 'HcthCongVanDen:Update';
 
 export default function HcthCongVanDenReducer(state = null, data) {
@@ -16,6 +20,10 @@ export default function HcthCongVanDenReducer(state = null, data) {
         case HcthCongVanDenGetPage:
         case HcthCongVanDenSearchPage:
             return Object.assign({}, state, { page: data.page });
+        case HcthCongVanDenGetPhanHoi:
+            return Object.assign({}, state, { item: { ...(state.item || {}), phanHoi: data.phanHoi } });
+        case HcthCongVanDenGetHistory:
+            return Object.assign({}, state, { item: { ...(state.item || {}), history: data.history } });
         default:
             return state;
     }
@@ -89,7 +97,7 @@ export function updateHcthCongVanDen(id, changes, done) {
                 dispatch(getHcthCongVanDenSearchPage());
                 done && done();
             }
-        }, () => T.notify('Cập nhật công văn đến học bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật công văn đến bị lỗi!', 'danger'));
     };
 }
 
@@ -104,7 +112,7 @@ export function deleteHcthCongVanDen(id) {
                 T.notify('Xóa công văn đến thành công!', 'success');
                 dispatch(getHcthCongVanDenSearchPage());
             }
-        }, () => T.notify('Xóa công văn đến học bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa công văn đến bị lỗi!', 'danger'));
     };
 }
 
@@ -163,7 +171,7 @@ export function getCongVanDen(id, done) {
 
 
 export function createChiDao(data, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/hcth/cong-van-den/chi-dao';
         T.post(url, { data }, res => {
             if (res.error) {
@@ -171,10 +179,69 @@ export function createChiDao(data, done) {
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
                 T.notify('Thêm chỉ đạo thành công!', 'success');
-                dispatch(getHcthCongVanDenSearchPage());
                 done && done(data);
             }
         }, () => T.notify('Thêm chỉ đạo bị lỗi', 'danger'));
     };
 }
 
+export function createPhanHoi(data, done) {
+    return () => {
+        const url = '/api/hcth/cong-van-den/phan-hoi';
+        T.post(url, { data }, res => {
+            if (res.error) {
+                T.notify('Thêm phản hồi bị lỗi', 'danger');
+                console.error('POST: ' + url + '. ' + res.error);
+            } else {
+                T.notify('Thêm phản hồi thành công!', 'success');
+                done && done(data);
+            }
+        }, () => T.notify('Thêm phản hồi bị lỗi', 'danger'));
+    };
+}
+
+export function updateStatus(data, done) {
+    return () => {
+        const url = '/api/hcth/cong-van-den/status';
+        T.put(url, { data }, res => {
+            if (res.error) {
+                T.notify('Cập nhật công văn đến bị lỗi', 'danger');
+                console.error('POST: ' + url + '. ' + res.error);
+            } else {
+                T.notify('Cập nhật công văn đến thành công!', 'success');
+                done && done(data);
+            }
+        }, () => T.notify('Cập nhật công văn đến bị lỗi', 'danger'));
+    };
+}
+
+export function getPhanHoi(id, done) {
+    return dispatch => {
+        const url = `/api/hcth/cong-van-den/phan-hoi/${id}`;
+        T.get(url, res => {
+            if (res.error) {
+                T.notify('Lấy danh sách phản hồi lỗi', 'danger');
+                console.error('POST: ' + url + '. ' + res.error);
+            } else {
+                dispatch({type: HcthCongVanDenGetPhanHoi, phanHoi: res.items});
+                done && done(res.items);
+            }
+        }, () => T.notify('Lấy danh sách phản hồi lỗi', 'danger'));
+    };
+}
+
+export function getHistory(id, done) {
+    return dispatch => {
+        const url = `/api/hcth/cong-van-den/lich-su/${id}`;
+        T.get(url, res => {
+            if (res.error) {
+                T.notify('Lấy lịch sử công văn lỗi', 'danger');
+                console.error('POST: ' + url + '. ' + res.error);
+            } else {
+                console.log(res.items);
+                dispatch({type: HcthCongVanDenGetHistory, history: res.items});
+                done && done(res.items);
+            }
+        }, () => T.notify('Lấy lịch sử công văn lỗi', 'danger'));
+    };
+}
