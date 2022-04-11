@@ -322,6 +322,33 @@ const T = {
             T.notify(`Lỗi parse: ${exception}, đặt theo giá trị mặc định: ${defaultValue}`, 'danger');
             return defaultValue;
         }
+    },
+
+    // TIME Operation ----------------------------------
+    monthDiff: (d1, d2) => { //Difference in Months between two dates
+        var months;
+        months = (d2.getFullYear() - d1.getFullYear()) * 12;
+        months -= d1.getMonth();
+        months += d2.getMonth();
+        return months <= 0 ? 0 : months;
+    },
+
+    numberNgayNghi: (start, end) => { //Số ngày nghỉ trong khoảng [start, end]
+        let result = 0;
+        while (end >= start && result <= 30) {
+            let positionDay = start.getDay();
+            if (positionDay == 0 || positionDay == 6) {
+                 //thứ bảy, chủ nhật
+                 //TODO: thêm ngày lễ
+            } else {
+                result += 1;
+            }
+            start = start.nextDate();
+        }
+        if (result > 30) { //Case: Quá nhiều ngày phép
+            return -1; 
+        }
+        return result;
     }
 }
 
