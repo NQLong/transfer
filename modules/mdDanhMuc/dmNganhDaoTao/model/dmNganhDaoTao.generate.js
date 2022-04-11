@@ -1,6 +1,6 @@
-// Table name: DM_NGANH_DAO_TAO { ma, ten, moTa, kichHoat, maDonVi }
+// Table name: DM_NGANH_DAO_TAO { kichHoat, ma, ten, ghiChu }
 const keys = ['MA'];
-const obj2Db = { 'ma': 'MA', 'ten': 'TEN', 'moTa': 'MO_TA', 'kichHoat': 'KICH_HOAT', 'maDonVi': 'MA_DON_VI' };
+const obj2Db = { 'kichHoat': 'KICH_HOAT', 'ma': 'MA', 'ten': 'TEN', 'ghiChu': 'GHI_CHU' };
 
 module.exports = app => {
     app.model.dmNganhDaoTao = {
