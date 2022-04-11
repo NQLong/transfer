@@ -160,9 +160,10 @@ class DmMonHocPage extends AdminPage {
           const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmMonHoc && this.props.dmMonHoc.page ?
                this.props.dmMonHoc.page : {
                     pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {
-                         searchTerm: '', donViFilter: this.state.donVi
+                         searchTerm: '', donViFilter: this.state.donViFilter
                     }, list: []
                };
+
           let table = renderTable({
                emptyTable: 'Chưa có dữ liệu môn học',
                getDataSource: () => list, stickyHead: false,

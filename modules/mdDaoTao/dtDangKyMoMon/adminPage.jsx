@@ -1,7 +1,8 @@
+import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, renderTable, TableCell } from 'view/component/AdminPage';
+import { AdminPage, FormSelect, renderTable, TableCell } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import { getDtDangKyMoMonPage } from './redux';
 class DtDangKyMoMonPage extends AdminPage {
@@ -28,7 +29,7 @@ class DtDangKyMoMonPage extends AdminPage {
           };
           const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dtDangKyMoMon && this.props.dtDangKyMoMon.page ?
                this.props.dtDangKyMoMon.page : {
-                    pageNumber: 1, pageSize: 200, pageTotal: 1, pageCondition: {
+                    pageNumber: 1, pageSize: 50, pageTotal: 1, pageCondition: {
                          searchTerm: '', donViFilter: this.state.donViFilter
                     }, totalItem: 0, list: []
                };
@@ -62,12 +63,20 @@ class DtDangKyMoMonPage extends AdminPage {
                     </tr>)
           });
           return this.renderPage({
-               title: 'Danh sách các đợt khoa, bộ môn đăng ký mở môn trong học kỳ',
+               title: 'Danh sách các đợt mở môn học trong học kỳ',
                icon: 'fa fa-paper-plane-o',
                breadcrumb: [
                     <Link key={0} to='/user/pdt'>Đào tạo</Link>,
                     'Danh sách đợt mở môn học'
                ],
+               header: permissionDaoTao.read && <FormSelect style={{ width: '300px', marginBottom: '0' }} placeholder='Danh sách khoa/bộ môn' ref={e => this.donVi = e} onChange={value => {
+                    T.clearSearchBox();
+                    this.setState({ donViFilter: value ? value.id : '' });
+                    this.props.getDtDangKyMoMonPage(undefined, undefined, {
+                         searchTerm: '',
+                         donViFilter: value && value.id
+                    });
+               }} data={SelectAdapter_DmDonViFaculty_V2} allowClear={true} />,
                content: <>
                     <div className='tile'>{table}</div>
                     <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
