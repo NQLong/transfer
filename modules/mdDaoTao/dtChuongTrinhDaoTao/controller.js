@@ -58,24 +58,29 @@ module.exports = app => {
     });
 
     app.post('/api/dao-tao/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:write', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
-        let dataKhung = req.body.item.data, dataMon = req.body.item.items;
-        app.model.dtKhungDaoTao.create(dataKhung, (error, item) => {
-            if (!error) {
-                const create = (index = 0) => {
-                    if (index == dataMon.length) {
-                        res.send({ error, item });
-                    } else {
-                        dataMon[index].maKhungDaoTao = item.id;
-                        delete dataMon[index].id;
-                        app.model.dtChuongTrinhDaoTao.create(dataMon[index], (error, item1) => {
-                            if (error || !item1) res.send({ error });
-                            else create(index + 1);
-                        });
-                    }
-                };
-                create();
-            } else res.send({ error });
+        let dataKhung = req.body.item.data, dataMon = req.body.item.items || [];
+        app.model.dtKhungDaoTao.get({ namDaoTao: dataKhung.namDaoTao, maNganh: dataKhung.maNganh }, (error, createdCTDT) => {
+            if (!error && !createdCTDT) {
+                app.model.dtKhungDaoTao.create(dataKhung, (error, item) => {
+                    if (!error) {
+                        const create = (index = 0) => {
+                            if (index == dataMon.length) {
+                                res.send({ error, item, warning: (!dataMon || !dataMon.length) ? 'Chưa có môn học nào được chọn' : null });
+                            } else {
+                                dataMon[index].maKhungDaoTao = item.id;
+                                delete dataMon[index].id;
+                                app.model.dtChuongTrinhDaoTao.create(dataMon[index], (error, item1) => {
+                                    if (error || !item1) res.send({ error });
+                                    else create(index + 1);
+                                });
+                            }
+                        };
+                        create();
+                    } else res.send({ error });
+                });
+            } else res.send({ error: `Mã ngành ${dataKhung.maNganh} năm ${dataKhung.namDaoTao} đã tồn tại!` });
         });
+
     });
 
     app.post('/api/dao-tao/chuong-trinh-dao-tao/multiple', app.permission.orCheck('dtChuongTrinhDaoTao:write', 'manager:write'), (req, res) => {
@@ -148,7 +153,6 @@ module.exports = app => {
 
     app.put('/api/dao-tao/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:write', 'manager:write'), async (req, res) => {
         let id = req.body.id, changes = req.body.changes;
-        // console.log(changes);
         const updateCTDT = (listMonHoc) => new Promise((resolve, reject) => {
             app.model.dtChuongTrinhDaoTao.delete({ maKhungDaoTao: id }, (error) => {
                 if (error) reject(error);
@@ -184,6 +188,18 @@ module.exports = app => {
 
     app.delete('/api/dao-tao/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:delete', 'manager:write'), (req, res) => {
         app.model.dtChuongTrinhDaoTao.delete({ id: req.body.id }, errors => res.send({ errors }));
+    });
+
+    app.delete('/api/dao-tao/chuong-trinh-dao-tao/multiple', app.permission.orCheck('dtChuongTrinhDaoTao:delete', 'manager:write'), (req, res) => {
+        const { data } = req.body;
+        const { items } = data;
+        const handleDelete = (index) => {
+            if (index >= items.length) res.send();
+            app.model.dtChuongTrinhDaoTao.delete({ id: items[index].id }, (errors) => {
+                if (errors) res.send({ errors });
+            });
+        };
+        handleDelete(0);
     });
 
     //Phân quyền ------------------------------------------------------------------------------------------

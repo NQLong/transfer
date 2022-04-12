@@ -80,21 +80,30 @@ export class ComponentKienThuc extends AdminPage {
     removeRow = (e, idx) => {
         e.preventDefault();
         const id = this.state.datas[idx].id;
-        if (id > 0) {
-            T.confirm('Xóa môn học', 'Bạn có chắc bạn muốn xóa môn học này?', 'warning', true, isConfirm => {
-                isConfirm && this.props.deleteDtChuongTrinhDaoTao(id, error => {
-                    if (error) {
-                        T.notify(error.message ? error.message : 'Xóa môn học bị lỗi!', 'danger');
-                    }
-                    else {
-                        T.alert('Xóa môn học thành công!', 'success', false, 800);
-                        this.setEditState(idx, false, id, true);
-                    }
-                });
-            });
-        } else {
-            this.setEditState(idx, false, id, true);
-        }
+        // if (id > 0) {
+        T.confirm('Xóa môn học', 'Bạn có chắc bạn muốn xóa môn học này?', 'warning', true, isConfirm => {
+            if (isConfirm) {
+                T.alert('Xóa môn học thành công!', 'success', false, 800);
+                this.setEditState(idx, false, id, true);
+            }
+            // this.props.deleteDtChuongTrinhDaoTao(id, error => {
+            // if (error) {
+            // T.notify(error.message ? error.message : 'Xóa môn học bị lỗi!', 'danger');
+            // }
+            // else {
+
+            // }
+            // });
+        });
+        // } else {
+        // this.setEditState(idx, false, id, true);
+        // }
+    }
+
+    undoRow = (e, idx) => {
+        e.preventDefault();
+        const id = this.state.datas[idx].id;
+        this.setEditState(idx, false, id, false);
     }
 
 
@@ -151,10 +160,12 @@ export class ComponentKienThuc extends AdminPage {
     getValue = () => {
         try {
             const keys = Object.keys(this.rows);
-            const data = [];
+            const updateDatas = [];
+            const deleteDatas = [];
             keys.forEach((key) => {
+                const id = this.state.datas[key].id;
                 const item = {
-                    id: this.state.datas[key].id,
+                    id: id,
                     maMonHoc: this.rows[key].maMonHoc?.value(),
                     loaiMonHoc: this.rows[key].loaiMonHoc?.value(),
                     tinChiLyThuyet: this.rows[key].tinChiLyThuyet?.value(),
@@ -162,11 +173,15 @@ export class ComponentKienThuc extends AdminPage {
                     phongTn: this.rows[key].phongTn?.value(),
                     maKhoiKienThuc: this.props.khoiKienThucId,
                 };
-                if (item.maMonHoc && !this.state.datas[key].isDeleted) {
-                    data.push(item);
+                if (item.maMonHoc) {
+                    if (id > 0 && this.state.datas[key].isDeleted) {
+                        deleteDatas.push(item);
+                    } else if (!this.state.datas[key].isDeleted) {
+                        updateDatas.push(item);
+                    }
                 }
             });
-            return data;
+            return { updateDatas, deleteDatas };
         } catch (e) {
             return false;
         }
@@ -237,7 +252,7 @@ export class ComponentKienThuc extends AdminPage {
                                             <a className='btn btn-primary' href='#' title={!item.edit ? 'Chỉnh sửa' : 'Xong'} onClick={(e) => this.editRow(e, index)}><i className={'fa fa-lg ' + (!item.edit ? 'fa-edit' : 'fa-check')} /></a>
                                             {!item.edit && <a className='btn btn-danger' href='#' title='Xóa' onClick={(e) => this.removeRow(e, index)}><i className='fa fa-lg fa-trash' /></a>}
                                         </>
-                                        : null
+                                        : !item.edit && <a className='btn btn-danger' href='#' title='Xóa' onClick={(e) => this.undoRow(e, index)}><i className='fa fa-lg fa-undo' /></a>
 
                                 }
 

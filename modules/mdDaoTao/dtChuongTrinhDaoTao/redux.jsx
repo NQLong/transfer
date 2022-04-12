@@ -124,16 +124,29 @@ export function createMultiDtChuongTrinhDaoTao(data, done) {
     };
 }
 
+export function deleteMultiDtChuongTrinhDaoTao(data, done) {
+    return () => {
+        const url = '/api/dao-tao/chuong-trinh-dao-tao/multiple';
+        T.delete(url, { data }, data => {
+            if (data.error) {
+                T.notify('Xóa chương trình đào tạo bị lỗi!', 'danger');
+            }
+            done && done();
+        });
+    };
+}
+
+
 export function createDtChuongTrinhDaoTao(item, done) {
     return dispatch => {
         const url = '/api/dao-tao/chuong-trinh-dao-tao';
         T.post(url, { item }, data => {
             if (data.error) {
-                T.notify('Tạo chương trình đào tạo bị lỗi!', 'danger');
+                T.notify(`Tạo mới bị lỗi: ${data.error}`, 'danger');
                 console.error(`POST ${url}. ${data.error}`);
             } else {
                 T.notify('Tạo chương trình đào tạo thành công!', 'success');
-                if (done) done();
+                if (done) done(data.item);
                 dispatch(getDtChuongTrinhDaoTaoPage());
             }
         });
@@ -167,6 +180,7 @@ export function updateDtChuongTrinhDaoTao(id, changes, done) {
             } else {
                 T.notify('Cập nhật thông tin chương trình đào tạo thành công!', 'success');
                 dispatch(getDtChuongTrinhDaoTaoPage());
+                done && done(data.item);
             }
         }, () => T.notify('Cập nhật thông tin chương trình đào tạo bị lỗi!', 'danger'));
     };
