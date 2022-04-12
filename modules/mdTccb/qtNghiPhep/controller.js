@@ -162,7 +162,7 @@ module.exports = app => {
         })
     );
 
-    function calcSoNgayPhepConLai(shcc, ngayBatDauCongTac, current, danhSachNgayLe, done) {
+    const calcSoNgayPhepConLai = (shcc, ngayBatDauCongTac, current, danhSachNgayLe, done) => {
         new Promise(resolve => {
             let result = 12 + current;
             if (ngayBatDauCongTac) { //+ thâm niên
@@ -193,77 +193,65 @@ module.exports = app => {
         }).then(data => {
             done && done(data);
         });
-    }
+    };
+
     app.get('/api/qua-trinh/nghi-phep/download-excel/:filter', app.permission.check('qtNghiPhep:read'), (req, res) => {
         app.model.qtNghiPhep.downloadExcel(req.params.filter, (error, result) => {
             if (error || !result) {
                 res.send({ error });
             } else {
                 app.model.dmNgayLe.getAll({}, (error, items) => {
+                    const danhSachNgayLe = (items || []).map(item => item.ngay);
+                    const workbook = app.excel.create(), worksheet = workbook.addWorksheet('nghiphep');
                     new Promise(resolve => {
-                        let danhSachNgay = [];
+                        let cells = [
+                            { cell: 'A1', value: '#', bold: true, border: '1234' },
+                            { cell: 'B1', value: 'Học vị', bold: true, border: '1234' },
+                            { cell: 'C1', value: 'Mã thẻ cán bộ', bold: true, border: '1234' },
+                            { cell: 'D1', value: 'Họ', bold: true, border: '1234' },
+                            { cell: 'E1', value: 'Tên', bold: true, border: '1234' },
+                            { cell: 'F1', value: 'Chức vụ', bold: true, border: '1234' },
+                            { cell: 'G1', value: 'Đơn vị', bold: true, border: '1234' },
+                            { cell: 'H1', value: 'Lý do nghỉ', bold: true, border: '1234' },
+                            { cell: 'I1', value: 'Nơi đến', bold: true, border: '1234' },
+                            { cell: 'J1', value: 'Bắt đầu', bold: true, border: '1234' },
+                            { cell: 'K1', value: 'Kết thúc',   bold: true, border: '1234' },
+                            { cell: 'L1', value: 'Tổng ngày được nghỉ',   bold: true, border: '1234' },
+                            { cell: 'M1', value: 'Số ngày xin nghỉ',   bold: true, border: '1234' },
+                            { cell: 'N1', value: 'Số ngày tính phép',   bold: true, border: '1234' },
+                            { cell: 'O1', value: 'Thâm niên',   bold: true, border: '1234' },
+                        ];
                         const solve = (index = 0) => {
-                            if (index == items.length) {
-                                resolve(danhSachNgay);
+                            if (index == result.rows.length) {
+                                resolve(cells);
                                 return;
                             }
-                            danhSachNgay.push(items[index].ngay);
-                            solve(index + 1);
+                            let item = result.rows[index];
+                            calcSoNgayPhepConLai(item.shcc, item.ngayBatDauCongTac, item.ngayNghiPhep, danhSachNgayLe, soNgayPhepConLai => {
+                                cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
+                                cells.push({ cell: 'B' + (index + 2), border: '1234', value: item.tenHocVi });
+                                cells.push({ cell: 'C' + (index + 2), border: '1234', value: item.shcc });
+                                cells.push({ cell: 'D' + (index + 2), border: '1234', value: item.hoCanBo });
+                                cells.push({ cell: 'E' + (index + 2), border: '1234', value: item.tenCanBo });
+                                cells.push({ cell: 'F' + (index + 2), border: '1234', value: item.tenChucVu });
+                                cells.push({ cell: 'G' + (index + 2), border: '1234', value: item.tenDonVi });
+                                cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.lyDo == '99' ? item.lyDoKhac : item.tenNghiPhep });
+                                cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.noiDen });
+                                cells.push({ cell: 'J' + (index + 2), border: '1234', value: item.batDau ? app.date.dateTimeFormat(new Date(item.batDau), item.batDauType) : '' });
+                                cells.push({ cell: 'K' + (index + 2), border: '1234', value: item.ketThuc ? app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType) : '' });
+                                cells.push({ cell: 'L' + (index + 2), border: '1234', value: soNgayPhepConLai });
+                                cells.push({ cell: 'M' + (index + 2), border: '1234', value: app.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), danhSachNgayLe) });
+                                cells.push({ cell: 'N' + (index + 2), border: '1234', value: Math.max(app.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), danhSachNgayLe) - item.ngayNghiPhep, 0) });
+                                cells.push({ cell: 'O' + (index + 2), border: '1234', value: parseInt(app.monthDiff(new Date(item.ngayBatDauCongTac), new Date()) / 12 / 5) + 'tn' });
+                                solve(index + 1);
+                            });
                         };
                         solve();
-                    }).then((danhSachNgayLe) => {
-                        const workbook = app.excel.create(),
-                        worksheet = workbook.addWorksheet('nghiphep');
-                        new Promise(resolve => {
-                            let cells = [
-                                { cell: 'A1', value: '#', bold: true, border: '1234' },
-                                { cell: 'B1', value: 'Học vị', bold: true, border: '1234' },
-                                { cell: 'C1', value: 'Mã thẻ cán bộ', bold: true, border: '1234' },
-                                { cell: 'D1', value: 'Họ', bold: true, border: '1234' },
-                                { cell: 'E1', value: 'Tên', bold: true, border: '1234' },
-                                { cell: 'F1', value: 'Chức vụ', bold: true, border: '1234' },
-                                { cell: 'G1', value: 'Đơn vị', bold: true, border: '1234' },
-                                { cell: 'H1', value: 'Lý do nghỉ', bold: true, border: '1234' },
-                                { cell: 'I1', value: 'Nơi đến', bold: true, border: '1234' },
-                                { cell: 'J1', value: 'Bắt đầu', bold: true, border: '1234' },
-                                { cell: 'K1', value: 'Kết thúc',   bold: true, border: '1234' },
-                                { cell: 'L1', value: 'Tổng ngày được nghỉ',   bold: true, border: '1234' },
-                                { cell: 'M1', value: 'Số ngày xin nghỉ',   bold: true, border: '1234' },
-                                { cell: 'N1', value: 'Số ngày tính phép',   bold: true, border: '1234' },
-                                { cell: 'O1', value: 'Thâm niên',   bold: true, border: '1234' },
-                            ];
-                            const solve = (index = 0) => {
-                                if (index == result.rows.length) {
-                                    resolve(cells);
-                                    return;
-                                }
-                                let item = result.rows[index];
-                                calcSoNgayPhepConLai(item.shcc, item.ngayBatDauCongTac, item.ngayNghiPhep, danhSachNgayLe, soNgayPhepConLai => {
-                                    cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
-                                    cells.push({ cell: 'B' + (index + 2), border: '1234', value: item.tenHocVi });
-                                    cells.push({ cell: 'C' + (index + 2), border: '1234', value: item.shcc });
-                                    cells.push({ cell: 'D' + (index + 2), border: '1234', value: item.hoCanBo });
-                                    cells.push({ cell: 'E' + (index + 2), border: '1234', value: item.tenCanBo });
-                                    cells.push({ cell: 'F' + (index + 2), border: '1234', value: item.tenChucVu });
-                                    cells.push({ cell: 'G' + (index + 2), border: '1234', value: item.tenDonVi });
-                                    cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.lyDo == '99' ? item.lyDoKhac : item.tenNghiPhep });
-                                    cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.noiDen });
-                                    cells.push({ cell: 'J' + (index + 2), border: '1234', value: item.batDau ? app.date.dateTimeFormat(new Date(item.batDau), item.batDauType) : '' });
-                                    cells.push({ cell: 'K' + (index + 2), border: '1234', value: item.ketThuc ? app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType) : '' });
-                                    cells.push({ cell: 'L' + (index + 2), border: '1234', value: soNgayPhepConLai });
-                                    cells.push({ cell: 'M' + (index + 2), border: '1234', value: app.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), danhSachNgayLe) });
-                                    cells.push({ cell: 'N' + (index + 2), border: '1234', value: Math.max(app.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), danhSachNgayLe) - item.ngayNghiPhep, 0) });
-                                    cells.push({ cell: 'O' + (index + 2), border: '1234', value: parseInt(app.monthDiff(new Date(item.ngayBatDauCongTac), new Date()) / 12 / 5) + 'tn' });
-                                    solve(index + 1);
-                                });
-                            };
-                            solve();
-                        }).then((cells) => {
-                            app.excel.write(worksheet, cells);
-                            app.excel.attachment(workbook, res, 'nghiphep.xlsx');
-                        }).catch((error) => {
-                            res.send({ error });
-                        });
+                    }).then((cells) => {
+                        app.excel.write(worksheet, cells);
+                        app.excel.attachment(workbook, res, 'nghiphep.xlsx');
+                    }).catch((error) => {
+                        res.send({ error });
                     });
                 });
             }
