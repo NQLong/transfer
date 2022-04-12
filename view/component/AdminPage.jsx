@@ -219,12 +219,12 @@ export const renderTimeline = ({
     else if (list && list.length > 0) {
         return (
             <div className={'history-container ' + className} style={style}>
-                    <ul className='sessions'>
-                        {list.map((item, index) => {
-                            const { component = null, style = {}, className = '' } = handleItem(item);
-                            return <li key={index} style={style} className={className}>{component}</li>;
-                        })}
-                    </ul>
+                <ul className='sessions'>
+                    {list.map((item, index) => {
+                        const { component = null, style = {}, className = '' } = handleItem(item);
+                        return <li key={index} style={style} className={className}>{component}</li>;
+                    })}
+                </ul>
             </div>
         );
     }
@@ -956,9 +956,9 @@ export class AdminPage extends React.Component {
 
     showAdvanceSearch = () => $(this.advanceSearchBox).addClass('show');
 
-    renderPage = ({ icon, title, subTitle, header, breadcrumb, advanceSearch, content, backRoute, onCreate, onSave, onExport, onImport }) => {
+    renderPage = ({ icon, title, subTitle, header, breadcrumb, advanceSearch, content, backRoute, onCreate, onSave, onExport, onImport, buttons = null }) => {
 
-        let right = 10, createButton, saveButton, exportButton, importButton;
+        let right = 10, createButton, saveButton, exportButton, importButton, customButtons;
         if (onCreate) {
             createButton = <CirclePageButton type='create' onClick={onCreate} style={{ right }} />;
             right += 60;
@@ -974,6 +974,18 @@ export class AdminPage extends React.Component {
         if (onImport) {
             importButton = <CirclePageButton type='import' onClick={onImport} style={{ right }} />;
             right += 60;
+        }
+        if (buttons) {
+            if (buttons.length) {
+                customButtons = buttons.map(item => {
+                    right += 60;
+                    return <CirclePageButton type='custom' customClassName={item.className} customIcon={item.icon} onClick={item.onClick} style={{ right: right - 60 }} />
+                })
+            }
+            else {
+                customButtons = <CirclePageButton type='custom' customClassName={buttons.className} customIcon={buttons.icon} onClick={buttons.onClick} style={{ right: right }} />
+                right += 60;
+            }
         }
 
         return (
@@ -995,7 +1007,7 @@ export class AdminPage extends React.Component {
                 </div>
                 {content}
                 {backRoute ? <CirclePageButton type='back' to={backRoute} /> : null}
-                {importButton} {exportButton} {saveButton} {createButton}
+                {importButton} {exportButton} {saveButton} {createButton} {customButtons}
             </main>);
     }
 

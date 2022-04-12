@@ -10,7 +10,7 @@ import { EditModal } from 'modules/mdDanhMuc/dmDonViGuiCv/adminPage';
 import { createDmDonViGuiCv } from 'modules/mdDanhMuc/dmDonViGuiCv/redux';
 import { SelectAdapter_DmChucVuV2 } from 'modules/mdDanhMuc/dmChucVu/redux';
 
-const { action } = require('./constant.js');
+const { action, MA_BAN_GIAM_HIEU } = require('./constant.js');
 
 const MA_CHUC_VU_HIEU_TRUONG = '001';
 
@@ -136,7 +136,6 @@ class StaffEditPage extends AdminPage {
         user: {},
         shcc: null,
         chucVu: null,
-        changed: false
     }
 
 
@@ -155,8 +154,9 @@ class StaffEditPage extends AdminPage {
             // fetch chuc vu
             if (staff && staff.listChucVu?.length > 0)
                 SelectAdapter_DmChucVuV2.fetchOne(staff.listChucVu[0].maChucVu, (item) => this.setState({ chucVu: item.text }));
+
             //fetch list banGiamHieu to render quyen chi dao
-            this.props.getStaffPage(1, 100, '', { listDonVi: '68' }, (page) => {
+            this.props.getStaffPage(1, 100, '', { listDonVi: MA_BAN_GIAM_HIEU }, (page) => {
                 this.setState({ banGiamHieu: page.list }, () => this.setQuyenChiDao());
             });
         });
@@ -194,9 +194,25 @@ class StaffEditPage extends AdminPage {
                 canChiDao && (<>
                     <FormRichTextBox type='text' className='col-md-12' ref={e => this.chiDao = e} label='Thêm chỉ đạo' readOnly={readOnly && !canChiDao} />
                     <div className='col-md-12' style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', gap: '10px' }}>
-                        <button type='submit' className='btn btn-primary' onClick={this.onCreateChiDao}>
-                            Gửi
-                        </button>
+                        {
+                            this.canPublish() && <>
+                                <button type='submit' className='btn btn-danger' onClick={(e) => this.onReturn(e, trangThaiSwitcher.TRA_LAI_HCTH.id)}>
+                                    Trả lại
+                                </button>
+                                <button type='submit' className='btn btn-success' onClick={this.onPublish}>
+                                    Duyệt
+                                </button>
+                            </>
+                        }
+                        {this.canApprove() && <>
+                            <button type='submit' className='btn btn-danger' onClick={(e) => this.onReturn(e, trangThaiSwitcher.TRA_LAI_BGH.id)}>
+                                Trả lại
+                            </button>
+                            <button type='submit' className='btn btn-success' onClick={this.onAprrove}>
+                                Duyệt
+                            </button>
+                        </>
+                        }
                     </div>
                 </>)
             }
@@ -235,7 +251,6 @@ class StaffEditPage extends AdminPage {
         else this.setData();
     }
 
-    setChange = () => this.setState({ changed: true })
 
     setData = (data = null) => {
         let { ngayCongVan, ngayNhan, ngayHetHan, soCongVan, donViGui, donViNhan, canBoNhan, trichYeu, listFile = [], quyenChiDao, danhSachChiDao = [], trangThai = 0, history = [] } = data ? data :
@@ -267,13 +282,15 @@ class StaffEditPage extends AdminPage {
 
 
     changeQuyenChiDao = (shcc, value) => {
-        const quyenChiDao = [...(this.state.quyenChiDao || [])];
+        const permissions = this.props.system?.user?.permissions || [];
+        let newQuyenChiDao = [...(this.state.quyenChiDao || [])];
+
         if (value) {
-            quyenChiDao.push(shcc);
-            this.setState({ quyenChiDao, changed: true });
+            newQuyenChiDao.push(shcc);
         } else {
-            this.setState({ quyenChiDao: quyenChiDao.filter((item) => item !== shcc), changed: true });
+            newQuyenChiDao = newQuyenChiDao.filter((item) => item !== shcc);
         }
+        this.setState({ quyenChiDao: newQuyenChiDao }, () => this.state.id && permissions.includes('president:login') && this.save());
     }
 
     onSuccess = (response) => {
@@ -308,7 +325,7 @@ class StaffEditPage extends AdminPage {
         e.preventDefault();
         let listFile = [...this.state.listFile];
         listFile[index].viTri = this.listFileRefs[index].value() || '';
-        this.setState({ listFile, changed: true });
+        this.setState({ listFile });
     }
 
     tableListFile = (data, id, permission) => renderTable({
@@ -357,7 +374,7 @@ class StaffEditPage extends AdminPage {
             ngayHetHan: Number(this.ngayHetHan.value()),
             soCongVan: this.soCongVan.value(),
             donViGui: this.donViGui.value(),
-            donViNhan: this.donViNhan.value().toString() || null,
+            donViNhan: this.donViNhan.value()?.toString() || null,
             canBoNhan: this.canBoNhan.value().toString() || null,
             quyenChiDao: this.state.quyenChiDao.toString() || null,
             trichYeu: this.trichYeu.value(),
@@ -385,7 +402,6 @@ class StaffEditPage extends AdminPage {
             this.ngayNhan.focus();
         }
         else {
-            // this.setState({ changed: false });
             if (this.state.id) {
                 this.props.updateHcthCongVanDen(this.state.id, changes, this.getData);
             } else {
@@ -438,7 +454,7 @@ class StaffEditPage extends AdminPage {
         e.preventDefault();
         const newState = [trangThaiSwitcher.MOI.id, trangThaiSwitcher.TRA_LAI_BGH.id].includes(this.state.trangThai) ? trangThaiSwitcher.CHO_DUYET.id : trangThaiSwitcher.CHO_PHAN_PHOI.id;
         T.confirm('Hoàn thiện công văn', 'Bạn có chắc bạn đã hoàn thiện công văn này công văn này?', true,
-            isConfirm => isConfirm && this.onChangeStatus(newState));
+            isConfirm => isConfirm && this.save() this.onChangeStatus(newState));
 
     }
 
@@ -461,8 +477,8 @@ class StaffEditPage extends AdminPage {
             isConfirm => isConfirm && this.onChangeStatus(trangThaiSwitcher.DA_PHAN_PHOI.id));
     }
 
-    onChangeStatus = (status) => {
-        this.props.updateStatus({ id: this.state.id, trangThai: status }, () => this.setState({ trangThai: status }, () => this.props.getHistory(this.state.id)));
+    onChangeStatus = (status, done) => {
+        this.props.updateStatus({ id: this.state.id, trangThai: status }, () => this.setState({ trangThai: status }, () => this.props.getHistory(this.state.id, () => done && done())));
     }
 
     sortByChucVuChinh = (a, b) => a.maChucVuChinh == MA_CHUC_VU_HIEU_TRUONG ? -1 : b.maChucVuChinh == MA_CHUC_VU_HIEU_TRUONG ? 1 : 0;
@@ -501,6 +517,8 @@ class StaffEditPage extends AdminPage {
         return this.state.id && (this.getUserPermission('president', ['login']).login || quyenChiDao.split(',').includes(this.state.shcc)) && this.state.trangThai == trangThaiSwitcher.CHO_DUYET.id;
     }
 
+    canFinish = () => this.state.id && [trangThaiSwitcher.MOI.id, trangThaiSwitcher.TRA_LAI_BGH.id, trangThaiSwitcher.TRA_LAI_HCTH.id].includes(this.state.trangThai)
+
     render() {
         const permission = this.getUserPermission('hcthCongVanDen', ['read', 'write', 'delete']),
             dmDonViGuiCvPermission = this.getUserPermission('dmDonViGuiCv', ['read', 'write', 'delete']),
@@ -523,9 +541,8 @@ class StaffEditPage extends AdminPage {
                 <div className='tile'>
                     <h3 className='tile-title'>{!this.state.id ? 'Tạo mới công văn đến' : 'Cập nhật công văn đến'}</h3>
                     <div className='tile-body row'>
-                        <FormTextBox onChange={this.setChange} type='text' className='col-md-2' ref={e => this.soDen = e} label='Số đến' readOnlyEmptyText='Chưa có' readOnly={readOnly} />
-                        <FormTextBox onChange={this.setChange} type='text' className='col-md-2' ref={e => this.soCongVan = e} label='Mã số CV' readOnlyEmptyText='Chưa có' readOnly={readOnly} />
-                        <FormSelect onChange={this.setChange} className='col-md-8' ref={e => this.donViGui = e} label={(<>
+                        <FormTextBox type='text' className='col-md-4' ref={e => this.soCongVan = e} label='Mã số CV' readOnlyEmptyText='Chưa có' readOnly={readOnly} />
+                        <FormSelect className='col-md-8' ref={e => this.donViGui = e} label={(<>
                             Đơn vị gửi công văn
                             {!readOnly && <>
                                 (
@@ -534,19 +551,19 @@ class StaffEditPage extends AdminPage {
                             </>
                             }
                         </>)} data={SelectAdapter_DmDonViGuiCongVan} placeholder='Đơn vị gửi công văn' readOnly={readOnly} required />
-                        <FormDatePicker onChange={this.setChange} type='date-mask' className='col-md-4' ref={e => this.ngayCongVan = e} label='Ngày CV' readOnlyEmptyText='Chưa có ngày công văn' readOnly={readOnly} required />
-                        <FormDatePicker onChange={this.setChange} type='date-mask' className='col-md-4' ref={e => this.ngayNhan = e} label='Ngày nhận' readOnlyEmptyText='Chưa có ngày nhận' readOnly={readOnly} required />
-                        <FormDatePicker onChange={this.setChange} type='date-mask' className='col-md-4' ref={e => this.ngayHetHan = e} readOnlyEmptyText='Chưa có ngày hết hạn' label='Ngày hết hạn' readOnly={readOnly} />
-                        <FormRichTextBox onChange={this.setChange} type='text' className='col-md-12' ref={e => this.trichYeu = e} label='Trích yếu' readOnly={readOnly} required />
+                        <FormDatePicker type='date-mask' className='col-md-4' ref={e => this.ngayCongVan = e} label='Ngày CV' readOnlyEmptyText='Chưa có ngày công văn' readOnly={readOnly} required />
+                        <FormDatePicker type='date-mask' className='col-md-4' ref={e => this.ngayNhan = e} label='Ngày nhận' readOnlyEmptyText='Chưa có ngày nhận' readOnly={readOnly} required />
+                        <FormDatePicker type='date-mask' className='col-md-4' ref={e => this.ngayHetHan = e} readOnlyEmptyText='Chưa có ngày hết hạn' label='Ngày hết hạn' readOnly={readOnly} />
+                        <FormRichTextBox type='text' className='col-md-12' ref={e => this.trichYeu = e} label='Trích yếu' readOnly={readOnly} required />
                         {this.state.id && <span className='form-group col-md-12'>Tình trạng: <b style={{ color: criticalStatus.includes(this.state.trangThai) ? 'red' : 'blue' }}>{getTrangThaiText(this.state.trangThai)}</b></span>}
-                        <FormSelect onChange={this.setChange} multiple={true} className='col-md-12' ref={e => this.donViNhan = e} label='Đơn vị nhận công văn' data={SelectAdapter_DmDonVi} readOnly={readOnly} readOnlyEmptyText='Chưa có đơn vị nhận' />
-                        <FormSelect onChange={this.setChange} multiple={true} className='col-md-12' ref={e => this.canBoNhan = e} label='Cán bộ nhận công văn' data={SelectAdapter_FwCanBo} readOnly={readOnly} />
+                        <FormSelect Fmultiple={true} className='col-md-12' ref={e => this.donViNhan = e} label='Đơn vị nhận công văn' data={SelectAdapter_DmDonVi} readOnly={readOnly} readOnlyEmptyText='Chưa có đơn vị nhận' />
+                        <FormSelect multiple={true} className='col-md-12' ref={e => this.canBoNhan = e} label='Cán bộ nhận công văn' data={SelectAdapter_FwCanBo} readOnly={readOnly} />
                         <span className='col-md-12 form-group'>Cán bộ chỉ đạo :</span>
                         {
                             this.renderQuyenChiDao(this.state.quyenChiDao || [], { write: hcthStaffPermission.login || presidentPermission.login })
                         }
 
-                        <div className='col-md-12'
+                        {/* <div className='col-md-12'
                             style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}
                         >
                             {
@@ -556,41 +573,15 @@ class StaffEditPage extends AdminPage {
                                     </button>
                                 </>)
                             }
-                            {
-                                this.state.id && (!readOnly || presidentPermission.login) && !hcthStaffPermission.login && (<>
-                                    <button type='submit' className='btn btn-primary' onClick={this.save}>
-                                        Lưu
-                                    </button>
-                                </>)
-                            }
-                        </div>
+                        </div> */}
 
                     </div>
                 </div>
                 <div className='tile'>
                     <div className='form-group'>
-                        <div className='form-group' style={{ display: 'flex', flexDirection: 'row', gap: '10px', alignItems: 'center' }}>
-                            <h3 className='tile-title' style={{ flex: 1 }}>Chỉ đạo</h3>
-                            {
-                                this.canPublish() && <>
-                                    <button type='submit' className='btn btn-success' onClick={this.onPublish}>
-                                        Duyệt
-                                    </button>
-                                    <button type='submit' className='btn btn-danger' onClick={(e) => this.onReturn(e, trangThaiSwitcher.TRA_LAI_HCTH.id)}>
-                                        Trả lại
-                                    </button>
-                                </>
-                            }
-                            {this.canApprove() && <>
-                                <button type='submit' className='btn btn-success' onClick={this.onAprrove}>
-                                    Duyệt
-                                </button>
-                                <button type='submit' className='btn btn-danger' onClick={(e) => this.onReturn(e, trangThaiSwitcher.TRA_LAI_BGH.id)}>
-                                    Trả lại
-                                </button>
-                            </>
-                            }
-                        </div>
+                        {/* <div className='form-group' style={{ display: 'flex', flexDirection: 'row', gap: '10px', alignItems: 'center' }}> */}
+                        <h3 className='tile-title' style={{ flex: 1 }}>Chỉ đạo</h3>
+
                         {this.renderChiDao(readOnly)}
                     </div>
                 </div>
@@ -616,7 +607,8 @@ class StaffEditPage extends AdminPage {
                 />
             </>,
             backRoute: '/user/hcth/cong-van-den',
-            onSave: (permission && permission.write) && (!this.state.id || hcthStaffPermission.login) ? this.save : null
+            onSave: (permission && permission.write) && (!this.state.id || hcthStaffPermission.login) ? this.save : null,
+            buttons: this.canFinish() && hcthStaffPermission.login && [{ className: 'btn-success', icon: 'fa-check', onClick: this.onFinish }],
         });
     }
 }
