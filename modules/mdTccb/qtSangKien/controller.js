@@ -54,16 +54,20 @@ module.exports = app => {
     
     app.post('/api/tccb/qua-trinh/sang-kien/multiple', app.permission.check('qtSangKien:write'), (req, res) => {
         const qtSangKien = req.body.qtSangKien, errorList = [];
-        for (let i = 0; i <= qtSangKien.length; i++) {
-            if (i == qtSangKien.length) {
-                res.send({ error: errorList });
-            } else {
-                const item = qtSangKien[i];
-                app.model.qtSangKien.create(item, (error) => {
-                    if (error) errorList.push(error);
+
+        let promises = qtSangKien ? qtSangKien.map(item => {
+            return new Promise((resolve, reject) => {
+                app.model.qtSangKien.create(item, (error, item) => {
+                    if (error) reject(error);
+                    else resolve(item);
                 });
-            }
-        }
+            });
+        }) : [];
+
+        Promise.all(promises).catch(error => {
+            errorList.push(error);
+        });
+        res.send({ errorList });
     });
 
     // End TCCB APIs ---------------------------------------------------------------------------------------------------------------------------

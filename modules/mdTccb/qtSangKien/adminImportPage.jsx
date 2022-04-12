@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import FileBox from 'view/component/FileBox';
-import { AdminModal, AdminPage, FormSelect, FormTextBox, renderTable, TableCell, FormRichTextBox } from 'view/component/AdminPage';
+import { AdminModal, AdminPage, FormSelect, FormTextBox, renderTable, TableCell, FormRichTextBox, CirclePageButton } from 'view/component/AdminPage';
 import { SelectAdapter_FwCanBo } from '../../mdTccb/tccbCanBo/redux';
 import { createMultiQtSangKien } from './redux';
 
@@ -198,12 +198,13 @@ class QtSangKienImportPage extends AdminPage {
                 </div>
                 <div className='tile' style={{ display: displayState == 'import' ? 'none' : 'block' }}>
                     {table}
-                    <button className='btn btn-warning' type='button' onClick={e => e.preventDefault() || this.cancelUpload()}>Hủy upload</button>
                 </div>
                 <EditModal ref={e => this.modal = e} permission={permission}
                          update={this.update}
                     permissions={permission}
                 />
+                <CirclePageButton style ={{ display: displayState == 'import' ? 'none' : 'block',  marginRight: '65px' }}
+                 onClick={e => e.preventDefault() || this.cancelUpload()} className='btn-warning' type='custom' customIcon='fa fa-lg fa-refresh' tooltip='Hủy tải lên' />
             </>,
             backRoute: '/user/tccb',
             onSave: displayState == 'data' ? (e) => this.save(e) : null,
