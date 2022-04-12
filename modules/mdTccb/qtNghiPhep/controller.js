@@ -166,7 +166,7 @@ module.exports = app => {
         new Promise(resolve => {
             let result = 12 + current;
             if (ngayBatDauCongTac) { //+ thâm niên
-                let thamnien = parseInt(app.monthDiff(new Date(ngayBatDauCongTac), new Date()) / 12 / 5);
+                let thamnien = parseInt(app.date.monthDiff(new Date(ngayBatDauCongTac), new Date()) / 12 / 5);
                 result += thamnien;
             }
             let currentYear = new Date().getFullYear();
@@ -182,7 +182,7 @@ module.exports = app => {
                     let year = new Date(items[idx].batDau).getFullYear();
                     if (year == currentYear) {
                         app.model.dmNghiPhep.get({ ma: items[idx].lyDo }, (error, itemNghiPhep ) => {
-                            let value = Math.max(app.numberNgayNghi(new Date(items[idx].batDau), new Date(items[idx].ketThuc), danhSachNgayLe) - itemNghiPhep.soNgayPhep, 0);
+                            let value = Math.max(app.date.numberNgayNghi(new Date(items[idx].batDau), new Date(items[idx].ketThuc), danhSachNgayLe) - itemNghiPhep.soNgayPhep, 0);
                             result -= value;
                             solve(idx + 1);
                         });
@@ -240,9 +240,9 @@ module.exports = app => {
                                 cells.push({ cell: 'J' + (index + 2), border: '1234', value: item.batDau ? app.date.dateTimeFormat(new Date(item.batDau), item.batDauType) : '' });
                                 cells.push({ cell: 'K' + (index + 2), border: '1234', value: item.ketThuc ? app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType) : '' });
                                 cells.push({ cell: 'L' + (index + 2), border: '1234', value: soNgayPhepConLai });
-                                cells.push({ cell: 'M' + (index + 2), border: '1234', value: app.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), danhSachNgayLe) });
-                                cells.push({ cell: 'N' + (index + 2), border: '1234', value: Math.max(app.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), danhSachNgayLe) - item.ngayNghiPhep, 0) });
-                                cells.push({ cell: 'O' + (index + 2), border: '1234', value: parseInt(app.monthDiff(new Date(item.ngayBatDauCongTac), new Date()) / 12 / 5) + 'tn' });
+                                cells.push({ cell: 'M' + (index + 2), border: '1234', value: app.date.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), danhSachNgayLe) });
+                                cells.push({ cell: 'N' + (index + 2), border: '1234', value: Math.max(app.date.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), danhSachNgayLe) - item.ngayNghiPhep, 0) });
+                                cells.push({ cell: 'O' + (index + 2), border: '1234', value: parseInt(app.date.monthDiff(new Date(item.ngayBatDauCongTac), new Date()) / 12 / 5) + 'tn' });
                                 solve(index + 1);
                             });
                         };

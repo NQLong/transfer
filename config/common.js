@@ -212,38 +212,4 @@ module.exports = (app) => {
         }
     };
 
-    // TIME Operation ----------------------------------
-    app.monthDiff = (d1, d2) => { //Difference in Months between two dates
-        let months;
-        months = (d2.getFullYear() - d1.getFullYear()) * 12;
-        months -= d1.getMonth();
-        months += d2.getMonth();
-        return months <= 0 ? 0 : months;
-    };
-
-    app.numberNgayNghi = (start, end, danhSachNgayLe = []) => { //Số ngày nghỉ trong khoảng [start, end]
-        let result = 0;
-        while (end >= start && result <= 30) {
-            let positionDay = start.getDay();
-            if (positionDay == 0 || positionDay == 6) {
-                //thứ bảy, chủ nhật
-                //TODO: thêm ngày lễ
-            } else {
-                let isNgayLe = false;
-                for (let idx = 0; idx < danhSachNgayLe.length; idx++) {
-                    let ngayLeDate = new Date(danhSachNgayLe[idx]);
-                    if (ngayLeDate.getFullYear() == start.getFullYear() && ngayLeDate.getMonth() == start.getMonth() && ngayLeDate.getDate() == start.getDate()) {
-                        isNgayLe = true;
-                        break;
-                    }
-                }
-                result += isNgayLe ? 0 : 1;
-            }
-            start.setDate(start.getDate() + 1);
-        }
-        if (result > 30) { //Case: Quá nhiều ngày nghỉ
-            return -1; 
-        }
-        return result;
-    };
 };
