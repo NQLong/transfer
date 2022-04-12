@@ -7010,7 +7010,8 @@
                 "QT_CHUC_VU_SEARCH_PAGE": "searchPage",
                 "QT_CHUC_VU_GROUP_PAGE": "groupPage",
                 "QT_CHUC_VU_GET_BY_SHCC": "getByShcc",
-                "QT_CHUC_VU_DOWNLOAD_EXCEL": "download"
+                "QT_CHUC_VU_DOWNLOAD_EXCEL": "download",
+                "GET_NGUOI_DAI_DIEN_KY_HOP_DONG": "getDaiDienKy"
             },
             "moduleName": "qtChucVu",
             "modelName": "qtChucVu",
