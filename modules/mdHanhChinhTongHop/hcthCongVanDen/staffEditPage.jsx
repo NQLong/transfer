@@ -523,8 +523,8 @@ class StaffEditPage extends AdminPage {
                 <div className='tile'>
                     <h3 className='tile-title'>{!this.state.id ? 'Tạo mới công văn đến' : 'Cập nhật công văn đến'}</h3>
                     <div className='tile-body row'>
-                        <FormTextBox onChange={this.setChange} type='text' className='col-md-2' ref={e => this.soDen = e} label='Số đến' readOnlyEmptyText='Chưa có' readOnly={readOnly} />
-                        <FormTextBox onChange={this.setChange} type='text' className='col-md-2' ref={e => this.soCongVan = e} label='Mã số CV' readOnlyEmptyText='Chưa có' readOnly={readOnly} />
+                        {/* <FormTextBox onChange={this.setChange} type='text' className='col-md-2' ref={e => this.soDen = e} label='Số đến' readOnlyEmptyText='Chưa có' readOnly={readOnly} /> */}
+                        <FormTextBox onChange={this.setChange} type='text' className='col-md-4' ref={e => this.soCongVan = e} label='Mã số CV' readOnlyEmptyText='Chưa có' readOnly={readOnly} />
                         <FormSelect onChange={this.setChange} className='col-md-8' ref={e => this.donViGui = e} label={(<>
                             Đơn vị gửi công văn
                             {!readOnly && <>
