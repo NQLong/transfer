@@ -42,6 +42,7 @@ module.exports = (app) => {
 
     app.post('/api/hcth/cong-van-den', app.permission.check('hcthCongVanDen:write'), (req, res) => {
         const { fileList, chiDao, quyenChiDao, donViNhan, ...data } = req.body.data;
+        
         const dsCanBoChiDao = quyenChiDao.split(',');
         app.model.qtChucVu.get({ maChucVu: MA_CHUC_VU_HIEU_TRUONG }, (error, hieuTruong) => {
             if (error)
@@ -139,7 +140,7 @@ module.exports = (app) => {
                 res.send({ errors, item });
             else
                 createChiDaoFromList(chiDao, req.body.id, () => {
-                    app.model.hcthDonViNhanCongVan.delete({ congVan: req.body.id }, () => createDonViNhanFromList(donViNhan?.split(',') || [], req.body.id, () => {
+                    app.model.hcthDonViNhanCongVan.delete({ congVan: req.body.id }, () => createDonViNhanFromList(donViNhan, req.body.id, () => {
                         updateListFile(fileList, req.body.id, () => app.model.hcthHistory.create({ key: req.body.id, loai: CONG_VAN_TYPE, hanhDong: action.UPDATE, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc }, (error) => {
                             res.send({ error, item });
                         }));
