@@ -2,22 +2,22 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.tccb,
         menus: {
-            3002: { title: 'Danh sách cán bộ', link: '/user/tccb/staff', icon: 'fa-users', backgroundColor: '#8bc34a', groupIndex: 0 },
-        },
+            3002: { title: 'Danh sách cán bộ', link: '/user/tccb/staff', icon: 'fa-users', backgroundColor: '#8bc34a', groupIndex: 0 }
+        }
     };
 
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1001: { title: 'Hồ sơ cán bộ', link: '/user/profile', icon: 'fa-address-card-o', color: '#000000', backgroundColor: '#fbe904', groupIndex: 0 },
-        },
+            1001: { title: 'Hồ sơ cán bộ', link: '/user/profile', icon: 'fa-address-card-o', color: '#000000', backgroundColor: '#fbe904', groupIndex: 0 }
+        }
     };
 
     app.permission.add(
         { name: 'staff:login', menu: menuStaff },
         { name: 'staff:read', menu },
         { name: 'staff:write' },
-        { name: 'staff:delete' },
+        { name: 'staff:delete' }
     );
 
     app.get('/user/profile', app.permission.check('staff:login'), app.templates.admin);
@@ -34,6 +34,25 @@ module.exports = app => {
         });
     });
 
+    //Hook staff-------------------------------------------------------------------------------------------------
+    app.permissionHooks.add('staff', 'checkKhoaBoMon', (user, staff) => new Promise(resolve => {
+        if (staff.maDonVi) {
+            let permissionLoaiDonVi = {
+                1: 'faculty:login',
+                2: 'department:login',
+                3: 'center:login',
+                4: 'union:login'
+            };
+            app.model.dmDonVi.get({ ma: staff.maDonVi }, (error, item) => {
+                if (!error && item && item.maPl) {
+                    app.permissionHooks.pushUserPermission(user, permissionLoaiDonVi[item.maPl]);
+                    resolve();
+                } else resolve();
+            });
+        } else {
+            resolve();
+        }
+    }));
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
 
@@ -100,8 +119,7 @@ module.exports = app => {
     // });
 
     app.get('/api/staff/all', app.permission.check('staff:login'), (req, res) => {
-        app.model.canBo.getAll({
-        }, (error, items) => {
+        app.model.canBo.getAll({}, (error, items) => {
             res.send({ error, items });
         });
     });
@@ -766,7 +784,7 @@ module.exports = app => {
                                                         tenCongNghe: ungDung.tenCongNghe,
                                                         hinhThuc: ungDung.hinhThuc,
                                                         namChuyenGia: ungDung.namChuyenGia,
-                                                        sanPham: ungDung.sanPham,
+                                                        sanPham: ungDung.sanPham
                                                     };
                                                     app.model.qtUngDungThuongMai.create(newUngDung, () => {
                                                         handleUngDungThuongMai(index + 1);
@@ -828,8 +846,7 @@ module.exports = app => {
             app.model.quanHeCanBo.getQhByShcc(canBo.shcc, (error, items) => {
                 if (error) {
                     res.send({ error: 'Lỗi khi lấy thông tin quan hệ cán bộ !' });
-                }
-                else if (items == null) {
+                } else if (items == null) {
                     result = app.clone(result, { items: null });
                 } else {
                     result = app.clone(result, { items: items.rows });
@@ -840,8 +857,7 @@ module.exports = app => {
             app.model.dmDonVi.get({ ma: canBo.maDonVi, kichHoat: 1 }, (error, item) => {
                 if (error) {
                     res.send({ error: 'Lỗi khi lấy thông tin đơn vị cán bộ !' });
-                }
-                else if (item == null) {
+                } else if (item == null) {
                     result = app.clone(result, { tenDonVi: '' });
                 } else {
                     result = app.clone(result, { tenDonVi: item.ten });
@@ -852,8 +868,7 @@ module.exports = app => {
             app.model.tccbToChucKhac.getAll({ shcc: canBo.shcc }, (error, toChucKhac) => {
                 if (error) {
                     res.send({ error: 'Lỗi khi lấy thông tin tổ chức chính trị - xã hội, nghề nghiệp cán bộ !' });
-                }
-                else if (toChucKhac == null) {
+                } else if (toChucKhac == null) {
                     result = app.clone(result, { toChucKhac: null });
                 } else {
                     result = app.clone(result, { toChucKhac });
@@ -864,8 +879,7 @@ module.exports = app => {
             app.model.qtDaoTao.getCurrentOfStaff(canBo.shcc, curTime, (error, daoTaoCurrent) => {
                 if (error) {
                     res.send({ error: 'Lỗi khi lấy thông tin đào tạo hiện tại!' });
-                }
-                else if (daoTaoCurrent == null || daoTaoCurrent.length == 0) {
+                } else if (daoTaoCurrent == null || daoTaoCurrent.length == 0) {
                     result = app.clone(result, { daoTaoCurrent: [] });
                 } else {
                     result = app.clone(result, { daoTaoCurrent: daoTaoCurrent.rows });
@@ -876,8 +890,7 @@ module.exports = app => {
             app.model.qtDaoTao.getTDCT(canBo.shcc, (error, llct) => {
                 if (error) {
                     res.send({ error: 'Lỗi khi lấy thông tin trình độ lí luận chính trị cán bộ !' });
-                }
-                else if (llct == null || llct.rows.length == 0) {
+                } else if (llct == null || llct.rows.length == 0) {
                     result = app.clone(result, { llct: null });
                 } else {
                     result = app.clone(result, { llct: llct.rows[0] });
@@ -888,8 +901,7 @@ module.exports = app => {
             app.model.qtDaoTao.getQLNN(canBo.shcc, (error, qlnn) => {
                 if (error) {
                     res.send({ error: 'Lỗi khi lấy thông tin trình độ quản lý nhà nước cán bộ !' });
-                }
-                else if (qlnn == null || qlnn.length == 0) {
+                } else if (qlnn == null || qlnn.length == 0) {
                     result = app.clone(result, { qlnn: null });
                 } else {
                     result = app.clone(result, { qlnn: qlnn.rows[0] });
@@ -900,8 +912,7 @@ module.exports = app => {
             app.model.qtDaoTao.getHV(canBo.shcc, (error, hocViCB) => {
                 if (error) {
                     res.send({ error: 'Lỗi khi lấy thông tin trình độ học vấn, đào tạo !' });
-                }
-                else if (hocViCB == null || hocViCB.length == 0) {
+                } else if (hocViCB == null || hocViCB.length == 0) {
                     result = app.clone(result, { hocViCB: null });
                 } else {
                     result = app.clone(result, { hocViCB: hocViCB.rows });
@@ -912,8 +923,7 @@ module.exports = app => {
             app.model.qtDaoTao.getCC(canBo.shcc, (error, chungChi) => {
                 if (error) {
                     res.send({ error: 'Lỗi khi lấy thông tin trình độ cử nhân !' });
-                }
-                else if (chungChi == null || chungChi.length == 0) {
+                } else if (chungChi == null || chungChi.length == 0) {
                     result = app.clone(result, { chungChi: null });
                 } else {
                     result = app.clone(result, { chungChi: chungChi.rows });
@@ -924,8 +934,7 @@ module.exports = app => {
             app.model.qtDaoTao.getTH(canBo.shcc, (error, tinHoc) => {
                 if (error) {
                     res.send({ error: 'Lỗi khi lấy thông tin trình độ tin học cán bộ !' });
-                }
-                else if (tinHoc == null || tinHoc.length == 0) {
+                } else if (tinHoc == null || tinHoc.length == 0) {
                     result = app.clone(result, { tinHoc: null });
                 } else {
                     result = app.clone(result, { tinHoc: tinHoc.rows[0] });
@@ -936,8 +945,7 @@ module.exports = app => {
             app.model.trinhDoNgoaiNgu.getTrinhDoNNByShcc(canBo.shcc, (error, trinhDoNN) => {
                 if (error) {
                     res.send({ error: 'Lỗi khi lấy thông tin trình độ ngoại ngữ cán bộ !' });
-                }
-                else if (trinhDoNN == null) {
+                } else if (trinhDoNN == null) {
                     result = app.clone(result, { trinhDoNN: null });
                 } else {
                     result = app.clone(result, { trinhDoNN: trinhDoNN.rows[0] });
@@ -949,8 +957,7 @@ module.exports = app => {
             app.model.qtChucVu.getByShcc(canBo.shcc, (error, chucVu) => {
                 if (error) {
                     res.send({ error: 'Lỗi khi lấy thông tin quá trình chức vụ !' });
-                }
-                else if (chucVu == null) {
+                } else if (chucVu == null) {
                     result = app.clone(result, { chucVu: [] });
                 } else {
                     chucVu.rows.forEach(i => {
@@ -966,8 +973,7 @@ module.exports = app => {
                     res.send({ error: 'Lỗi khi lấy thông tin hợp đồng lao động !' });
                 } else if (!hopDongLD) {
                     result = app.clone(result, { hopDongCanBo: 'VC' });
-                }
-                else {
+                } else {
                     result = app.clone(result, { hopDongCanBo: 'LĐ', hopDongCanBoNgay: hopDongLD.ngayKyHopDong, loaiHopDongCanBo: hopDongLD.loaiHopDong });
                 }
                 resolve();
@@ -1298,7 +1304,7 @@ module.exports = app => {
                                         data.htct.push({
                                             noiDung: item.noiDung ? item.noiDung : '',
                                             batDau: item.batDau ? app.date.dateTimeFormat(new Date(item.batDau), item.batDauType ? item.batDauType : 'dd/mm/yyyy') : '',
-                                            ketThuc: item.ketThuc ? item.ketThuc == -1 ? 'đến nay' : app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : '',
+                                            ketThuc: item.ketThuc ? item.ketThuc == -1 ? 'đến nay' : app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType ? item.ketThucType : 'dd/mm/yyyy') : ''
                                         });
                                         handleHtct(index + 1);
                                     }
@@ -1423,7 +1429,7 @@ module.exports = app => {
                             namHocVi: canBo.namHocVi ? new Date(canBo.namHocVi).getFullYear() : '',
                             namChucDanh: canBo.namChucDanh ? new Date(canBo.namChucDanh).getFullYear() : '',
                             emailTruong: canBo.email ? canBo.email : '',
-                            emailCaNhan: canBo.emailCaNhan ? canBo.emailCaNhan : '',
+                            emailCaNhan: canBo.emailCaNhan ? canBo.emailCaNhan : ''
                         };
                         let firstMst, lastMst;
                         if (canBo.shcc.includes('.')) {
@@ -1437,8 +1443,7 @@ module.exports = app => {
                             data.m1 = '';
                             data.m2 = '';
                             data.m3 = firstMst;
-                        }
-                        else if (firstMst.length == 2) {
+                        } else if (firstMst.length == 2) {
                             data.m1 = '';
                             data.m2 = firstMst[0];
                             data.m3 = firstMst[1];
@@ -1458,8 +1463,7 @@ module.exports = app => {
                         app.docx.generateFile(source, data, (error, data) => {
                             if (error) {
                                 res.send({ error });
-                            }
-                            else
+                            } else
                                 res.send({ data });
                         });
                     });
@@ -1519,7 +1523,7 @@ module.exports = app => {
                                     soTruong: worksheet.getCell('AP' + index).value,
                                     sucKhoe: worksheet.getCell('AQ' + index).value,
                                     canNang: worksheet.getCell('AR' + index).value ? worksheet.getCell('AR' + index).value.toString().replaceAll('kg', '') : null,
-                                    // chieuCao: worksheet.getCell('AS' + index).value, 
+                                    // chieuCao: worksheet.getCell('AS' + index).value,
                                     nhomMau: worksheet.getCell('AT' + index).value,
                                     ngayVaoDoan: worksheet.getCell('AU' + index).value ? new Date(worksheet.getCell('AU' + index).value).getTime() : null,
                                     noiVaoDang: worksheet.getCell('AV' + index).value,
@@ -1533,7 +1537,7 @@ module.exports = app => {
                                     giaDinhChinhSach: worksheet.getCell('BD' + index).value,
                                     danhHieu: worksheet.getCell('BE' + index).value,
                                     tuNhanXetUuDiem: worksheet.getCell('FG' + index).value,
-                                    loiCamDoan: worksheet.getCell('FI' + index).value,
+                                    loiCamDoan: worksheet.getCell('FI' + index).value
                                 };
                                 let chieuCao = worksheet.getCell('AS' + index).value ? worksheet.getCell('AS' + index).value.toString() : null;
                                 if (chieuCao && chieuCao.includes('cm')) {
@@ -2072,7 +2076,7 @@ module.exports = app => {
                                                 tenGiaiThuong: tenGiaiThuong,
                                                 noiDung: noiDung,
                                                 noiCap: noiCap,
-                                                namCap: namCap,
+                                                namCap: namCap
                                             });
                                         }
                                         handleGiaiThuong(qtIndex + 1);
@@ -2120,7 +2124,7 @@ module.exports = app => {
                                                 tenCongNghe: tenCongNghe,
                                                 hinhThuc: hinhThuc,
                                                 namChuyenGia: namChuyenGia,
-                                                sanPham: sanPham,
+                                                sanPham: sanPham
                                             });
                                         }
                                         handleUngDungThuongMai(qtIndex + 1);
@@ -2245,7 +2249,7 @@ module.exports = app => {
                         { cell: 'I1', value: 'CHỨC VỤ', bold: true, border: '1234' },
                         { cell: 'J1', value: 'BỔ NHIỆM NGÀY', bold: true, border: '1234' },
                         { cell: 'K1', value: 'ĐƠN VỊ CÔNG TÁC', bold: true, border: '1234' },
-                        { cell: 'L1', value: 'CHỨC DANH NGHỀ NGHIỆP', bold: true, border: '1234' },
+                        { cell: 'L1', value: 'CHỨC DANH NGHỀ NGHIỆP', bold: true, border: '1234' }
                     ];
                     result.rows.forEach((item, index) => {
                         cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });

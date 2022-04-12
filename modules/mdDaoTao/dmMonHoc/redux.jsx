@@ -92,11 +92,12 @@ export function getDmMonHocAll(condition, done) {
 }
 
 T.initPage('pageDmMonHoc');
+
 export function getDmMonHocPage(pageNumber, pageSize, pageCondition) {
     const page = T.updatePage('pageDmMonHoc', pageNumber, pageSize, pageCondition);
     return dispatch => {
         const url = `/api/pdt/mon-hoc/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { searchTerm: pageCondition?.searchTerm, donVi: pageCondition?.donVi }, data => {
+        T.get(url, { searchTerm: pageCondition?.searchTerm, donViFilter: pageCondition?.donViFilter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách môn học bị lỗi!', 'danger');
                 console.error(`GET ${url}. ${data.error}`);
@@ -177,8 +178,19 @@ export function changeDmMonHoc(item) {
 export const SelectAdapter_DmMonHoc = {
     ajax: true,
     url: '/api/pdt/mon-hoc/page/1/20',
-    data: params => ({ condition: params.term }),
+    data: params => ({ searchTerm: params.term || '' }),
     processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: `${item.ma}: ${item.ten}` })) : [] }),
-    fetchOne: (ma, done) => (getDmMonHoc(ma, item => done && done({ id: item.ma, text: `${item.ma}: ${item.ten}` })))(),
+    fetchOne: (ma, done) => (getDmMonHoc(ma, item => done && done({ id: item.ma, text: `${item.ma}: ${item.ten}` })))()
 
+};
+
+export const SelectAdapter_DmMonHocFaculty = (donVi) => {
+    return {
+        ajax: true,
+        url: '/api/pdt/mon-hoc/page/1/20',
+        data: params => ({ searchTerm: params.term || '', donViFilter: donVi }),
+        processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: `${item.ma}: ${item.ten}` })) : [] }),
+        fetchOne: (ma, done) => (getDmMonHoc(ma, item => done && done({ id: item.ma, text: `${item.ma}: ${item.ten}` })))()
+
+    };
 };

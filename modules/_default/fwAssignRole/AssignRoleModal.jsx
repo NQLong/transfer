@@ -16,10 +16,11 @@ class AssignRoleModal extends AdminModal {
             this.setState({ disableButton: true });
             const newData = {
                 nguoiGan: this.props.nguoiGan.shcc,
+                emailNguoiDuocGan: this.state.nguoiDuocGan.email,
                 nguoiDuocGan: this.state.nguoiDuocGan.shcc,
                 tenRole: getValue(this.select),
                 ngayBatDau: this.state.ngayBatDau,
-                nhomRole: this.props.nhomRole,
+                nhomRole: this.state.rolesList.find(item => item.id == getValue(this.select)).nhomRole
             };
             if (this.ngayKetThuc.value()) newData.ngayKetThuc = this.ngayKetThuc.value().getTime();
             if (newData.tenRole == '') {
@@ -44,7 +45,6 @@ class AssignRoleModal extends AdminModal {
 
     onShow = (nguoiDuocGan) => {
         getAssignRole(nguoiDuocGan.shcc, this.props.nhomRole, items => {
-            console.log(items);
             let list = items.map(item => item.tenRole);
             let diff = this.state.rolesList.filter(role => !list.includes(role.id));
             this.setState({ items, updateRolesList: diff, nguoiDuocGan, disableButton: false, tenCanBo: nguoiDuocGan.lastName + ' ' + nguoiDuocGan.firstName }, () => {
@@ -55,8 +55,9 @@ class AssignRoleModal extends AdminModal {
 
     delete = (e, item) => {
         e.preventDefault();
-        T.confirm('Xóa thông tin gán quyền', 'Bạn có chắc bạn muốn xóa thông tin gán quyền này?', true, isConfirm =>
-            isConfirm && this.props.deleteAssignRole(item, () => this.onShow(this.state.nguoiDuocGan)));
+        T.confirm('Xóa thông tin gán quyền', 'Bạn có chắc bạn muốn xóa thông tin gán quyền này?', true, isConfirm => {
+            isConfirm && this.props.deleteAssignRole(item, () => this.onShow(this.state.nguoiDuocGan));
+        });
     };
 
     render = () => {
@@ -81,7 +82,7 @@ class AssignRoleModal extends AdminModal {
                     <TableCell content={tenRole ? tenRole.text : ''} />
                     <TableCell type='date' content={item.ngayKetThuc} dateFormat='dd/mm/yyyy' />
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={item.tenNguoiGan + ' ' + item.nguoiGan} />
-                    <TableCell type='buttons' permission={{ delete: writable }} onDelete={this.delete} content={item} />
+                    <TableCell type='buttons' style={{ textAlign: 'center' }} permission={{ delete: writable }} onDelete={this.delete} content={item} />
                 </tr>;
             }
         });
