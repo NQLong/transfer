@@ -1,6 +1,6 @@
-// Table name: DT_NGANH_TO_HOP { id, maNganh, maToHop, ma, kichHoat }
+// Table name: DT_NGANH_TO_HOP { id, maToHop, ma, kichHoat }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'maNganh': 'MA_NGANH', 'maToHop': 'MA_TO_HOP', 'ma': 'MA', 'kichHoat': 'KICH_HOAT' };
+const obj2Db = { 'id': 'ID', 'maToHop': 'MA_TO_HOP', 'ma': 'MA', 'kichHoat': 'KICH_HOAT' };
 
 module.exports = app => {
     app.model.dtNganhToHop = {

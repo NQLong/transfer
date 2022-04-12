@@ -383,57 +383,171 @@ module.exports = app => {
                          const permission = arguments[i];
                          if (!user.permissions.includes(permission)) user.permissions.push(permission);
                     }
-               }
-          },
-     };
-
-     // Assign roles Hook ------------------------------------------------------------------------------------------------------------------------------
-     const assignListContainer = {}; // Ex: { quanLyDonVi: [{ id: 'dnDoanhNghiep:manage', text: 'Quản lý doanh nghiệp' }] }
-     const assignRolePermissionHookContainer = {};
-     // Hook: Trả về true hoặc false ==> hook trúng, trả về undefined|null => không hook
-     app.assignRoleHooks = {
-          addRoles: (name, ...roles) => {
-               if (assignListContainer[name]) {
-                    const currentId = assignListContainer[name].map(role => role.id);
-                    const filteredRoles = roles.filter(role => !currentId.includes(role.id));
-                    assignListContainer[name].push(...filteredRoles);
-               } else {
-                    assignListContainer[name] = roles;
-               }
-          },
-          get: (name) => new Promise(resolve => {
-               let listPermission = [], nhomRole = name.split(',');
-               nhomRole.forEach((nhomRole, index, array) => {
-                    if (assignListContainer[nhomRole]) listPermission.push(...assignListContainer[nhomRole]);
-                    if (index == array.length - 1) {
-                         resolve(listPermission);
-                    }
-               });
-          }),
-
-          getNhomRole: (permission) => new Promise(resolve => {
-               Object.keys(assignListContainer).forEach(nhomRole => {
-                    assignListContainer[nhomRole].find(item => item.id == permission) && resolve(nhomRole);
-               });
-          }),
-
-          addHook: (name, hook) => assignRolePermissionHookContainer[name] = hook, // Hook is Promise object | parameters: req, roles
-          check: async (req, roles) => {
-               const hooks = Object.values(assignRolePermissionHookContainer);
-               let checkFlag = null;
-               for (const hook of hooks) {
-                    checkFlag = await hook(req, roles);
-                    if (typeof checkFlag == 'boolean') break; // Hook trúng => Break luôn
+                    (role.permission ? role.permission.split(',') : []).forEach(permission => app.permissionHooks.pushUserPermission(user, permission.trim()));
                }
 
-               if (checkFlag != null) return checkFlag;
-               else throw 'Permission denied!';
-          }
-     };
+               // Add login permission => user.active == 1 => user:login
+               if (user.active == 1) app.permissionHooks.pushUserPermission(user, 'user:login');
+               new Promise(resolve => {
+                    //Check if user if a staff
+                    user.isStaff && app.permissionHooks.pushUserPermission(user, 'staff:login');
+                    app.model.canBo.get({ email: user.email }, (e, item) => {
+                         if (e || item == null) {
+                              user.isStaff = 0;
+                              app.permissionHooks.remove(user, 'staff:login');
+                              resolve();
+                         } else {
+                              user.isStaff = 1;
+                              item.phai == '02' && app.permissionHooks.pushUserPermission(user, 'staff:female');
+                              user.shcc = item.shcc;
+                              user.firstName = item.ten;
+                              user.lastName = item.ho;
+                              user.maDonVi = item.maDonVi;
+                              user.staff = {
+                                   shcc: item.shcc,
+                                   listChucVu: [],
+                                   maDonVi: item.maDonVi,
+                              };
+                              const condition = {
+                                   statement: 'shcc = :shcc AND (ngayRaQd < :today) AND (ngayRaQdThoiChucVu < :today)',
+                                   parameter: {
+                                        shcc: item.shcc,
+                                        today: new Date().getTime()
+                                   }
+                              };
+                              app.permissionHooks.pushUserPermission(user, 'staff:login'); // Add staff permission: staff:login
+                              app.model.qtChucVu.getAll(condition, 'maChucVu,maDonVi', null, (e, listChucVu) => {
+                                   user.staff.listChucVu = listChucVu || [];
+                                   resolve();
+                              });
+                         }
+                    });
+               }).then(() => new Promise(resolve => {
+                    //Check cán bộ đặc biệt
+                    if (user.isStaff) {
+                         // Cán bộ quản lý
+                         user.staff.donViQuanLy = initManager(user);
+                         user.staff.donViQuanLy.length && app.permissionHooks.pushUserPermission(user, 'manager:read', 'manager:write', 'fwAssignRole:write', 'fwAssignRole:read');
 
-     // Hook readyHooks ------------------------------------------------------------------------------------------------------------------------------
-     app.readyHooks.add('permissionInit', {
-          ready: () => app.database.oracle.connected && app.model.fwRole != null,
-          run: () => app.isDebug && app.permission.getTreeMenuText(),
-     });
-};
+                         if (user.staff.maDonVi == 68) {
+                              app.permissionHooks.pushUserPermission(user, 'rectors:login');
+                              if (user.staff.listChucVu.some(item => item.maChucVu == '001')) {
+                                   app.permissionHooks.pushUserPermission(user, 'president:login');
+                              } else {
+                                   app.permissionHooks.pushUserPermission(user, 'vice-president:login');
+                              }
+                         }
+                         app.permissionHooks.run('staff', user, user.staff).then(() => {
+                              resolve();
+                         });
+                    } else resolve();
+               })).then(() => new Promise(resolve => {
+                    // AssignRole hooks
+                    if (user.isStaff) {
+                         app.model.fwAssignRole.getAll({ nguoiDuocGan: user.shcc }, (error, roles) => {
+                              if (!error || roles != []) {
+                                   const checkExpire = role => !role.ngayKetThuc || new Date(role.ngayKetThuc).getTime() > new Date().getTime();
+                                   // Xóa các role đã hết hạn
+                                   const validRoles = roles.filter(checkExpire);
+                                   const invalidRoles = roles.filter(role => !checkExpire(role));
+                                   if (invalidRoles.length) {
+                                        app.model.fwAssignRole.delete({
+                                             statement: 'id IN (:roles)',
+                                             parameter: { roles: invalidRoles.map(role => role.id) }
+                                        }, () => { });
+                                   }
+                                   if (validRoles.length) {
+                                        app.permissionHooks.run('assignRole', user, validRoles).then(() => {
+                                             resolve();
+                                        });
+                                   } else resolve();
+                              } else resolve();
+                         });
+                    } else resolve();
+               })).then(() => new Promise(resolve => {
+                    if (!user.isStaff && user.studentId) {
+                         app.model.fwStudents.get({ mssv: user.studentId }, (error, student) => {
+                              if (student) {
+                                   app.permissionHooks.pushUserPermission(user, 'student:login');
+                                   user.isStudent = 1;
+                                   user.active = 1;
+                                   user.data = student;
+                                   resolve();
+                              } else resolve();
+                         });
+                    } else resolve();
+               })).then(() => {
+                    user.menu = app.permission.tree();
+                    Object.keys(user.menu).forEach(parentMenuIndex => {
+                         let flag = true;
+                         const menuItem = user.menu[parentMenuIndex];
+                         if (menuItem.parentMenu && menuItem.parentMenu.permissions) {
+                              if (hasPermission(user.permissions, menuItem.parentMenu.permissions)) {
+                                   delete menuItem.parentMenu.permissions;
+                              } else {
+                                   delete user.menu[parentMenuIndex];
+                                   flag = false;
+                              }
+                         }
+
+                         flag && Object.keys(menuItem.menus).forEach(menuIndex => {
+                              const menu = menuItem.menus[menuIndex];
+                              if (hasPermission(user.permissions, menu.permissions)) {
+                                   delete menu.permissions;
+                              } else {
+                                   delete menuItem.menus[menuIndex];
+                                   if (Object.keys(menuItem.menus).length == 0) delete user.menu[parentMenuIndex];
+                              }
+                         });
+                    });
+
+                    // Assign roles Hook ------------------------------------------------------------------------------------------------------------------------------
+                    const assignListContainer = {}; // Ex: { quanLyDonVi: [{ id: 'dnDoanhNghiep:manage', text: 'Quản lý doanh nghiệp' }] }
+                    const assignRolePermissionHookContainer = {};
+                    // Hook: Trả về true hoặc false ==> hook trúng, trả về undefined|null => không hook
+                    app.assignRoleHooks = {
+                         addRoles: (name, ...roles) => {
+                              if (assignListContainer[name]) {
+                                   const currentId = assignListContainer[name].map(role => role.id);
+                                   const filteredRoles = roles.filter(role => !currentId.includes(role.id));
+                                   assignListContainer[name].push(...filteredRoles);
+                              } else {
+                                   assignListContainer[name] = roles;
+                              }
+                         },
+                         get: (name) => new Promise(resolve => {
+                              let listPermission = [], nhomRole = name.split(',');
+                              nhomRole.forEach((nhomRole, index, array) => {
+                                   if (assignListContainer[nhomRole]) listPermission.push(...assignListContainer[nhomRole]);
+                                   if (index == array.length - 1) {
+                                        resolve(listPermission);
+                                   }
+                              });
+                         }),
+
+                         getNhomRole: (permission) => new Promise(resolve => {
+                              Object.keys(assignListContainer).forEach(nhomRole => {
+                                   assignListContainer[nhomRole].find(item => item.id == permission) && resolve(nhomRole);
+                              });
+                         }),
+
+                         addHook: (name, hook) => assignRolePermissionHookContainer[name] = hook, // Hook is Promise object | parameters: req, roles
+                         check: async (req, roles) => {
+                              const hooks = Object.values(assignRolePermissionHookContainer);
+                              let checkFlag = null;
+                              for (const hook of hooks) {
+                                   checkFlag = await hook(req, roles);
+                                   if (typeof checkFlag == 'boolean') break; // Hook trúng => Break luôn
+                              }
+
+                              if (checkFlag != null) return checkFlag;
+                              else throw 'Permission denied!';
+                         }
+                    };
+
+                    // Hook readyHooks ------------------------------------------------------------------------------------------------------------------------------
+                    app.readyHooks.add('permissionInit', {
+                         ready: () => app.database.oracle.connected && app.model.fwRole != null,
+                         run: () => app.isDebug && app.permission.getTreeMenuText(),
+                    });
+               };
