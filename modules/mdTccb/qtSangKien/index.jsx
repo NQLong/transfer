@@ -21,5 +21,9 @@ export default {
             path: '/user/sang-kien',
             component: Loadable({ loading: Loading, loader: () => import('./staffPage') })
         },
+        {
+            path: '/user/tccb/qua-trinh/sang-kien/upload',
+            component: Loadable({ loading: Loading, loader: () => import('./adminImportPage') })
+        },
     ],
 };

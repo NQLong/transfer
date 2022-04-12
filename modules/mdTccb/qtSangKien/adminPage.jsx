@@ -94,12 +94,12 @@ class QtSangKien extends AdminPage {
         this.modal.show();
     }
 
-    changeAdvancedSearch = (isInitial = false) => {
+    changeAdvancedSearch = (isInitial = false, isReset = false) => {
         let { pageNumber, pageSize } = this.props && this.props.qtSangKien && this.props.qtSangKien.page ? this.props.qtSangKien.page : { pageNumber: 1, pageSize: 50 };
         const listDonVi = this.maDonVi?.value().toString() || '';
         const listShcc = this.mulCanBo?.value().toString() || '';
         const pageFilter = isInitial ? null : { listDonVi, listShcc };
-        this.setState({ filter: pageFilter }, () => {
+        this.setState({ filter: isReset ? {} : pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
                     const filter = page.filter || {};
@@ -152,7 +152,7 @@ class QtSangKien extends AdminPage {
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br />Đơn vị công tác</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Mã số</th>
-                    <th style={{ width: '70%', whiteSpace: 'nowrap' }}>Tên sáng kiến</th>
+                    <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Tên sáng kiến</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                 </tr>
@@ -169,7 +169,7 @@ class QtSangKien extends AdminPage {
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenHocVi || ''} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucDanhNgheNghiep || ''} />
                     <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                        <>
+                        <>  
                             <span> {item.tenChucVu || ''}<br /> </span>
                             {(item.tenDonVi || '').normalizedName()}
                         </>
@@ -195,8 +195,21 @@ class QtSangKien extends AdminPage {
             ],
             advanceSearch: <>
                 <div className='row'>
-                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
-                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi} allowClear={true} minimumResultsForSearch={-1} />
+                    <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} allowClear={true} minimumResultsForSearch={-1} />
+                    <div className='col-12'>
+                        <div className='row justify-content-between'>
+                            <div className='col-md-6'>Tìm thấy: <b>{totalItem}</b> kết quả</div>
+                            <div className='form-group col-md-6' style={{ textAlign:'right' }}>
+                                <button className='btn btn-danger' style={{ marginRight: '10px' }} type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch(null, true)}>
+                                    <i className='fa fa-fw fa-lg fa-times' />Xóa bộ lọc
+                                </button>
+                                <button className='btn btn-info' type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch()}>
+                                    <i className='fa fa-fw fa-lg fa-search-plus' />Tìm kiếm
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </>,
             content: <>
@@ -216,7 +229,8 @@ class QtSangKien extends AdminPage {
                 e.preventDefault();
                 const filter = T.stringify(this.state.filter);
                 T.download(T.url(`/api/qua-trinh/sang-kien/download-excel/${filter}`), 'sangkien.xlsx');
-            }
+            },
+            onImport: !this.checked ? (e) => e.preventDefault() || this.props.history.push('/user/tccb/qua-trinh/sang-kien/upload') : null,
         });
     }
 }

@@ -20,6 +20,7 @@ module.exports = app => {
     );
     app.get('/user/tccb/qua-trinh/sang-kien', app.permission.check('qtSangKien:read'), app.templates.admin);
     app.get('/user/sang-kien', app.permission.check('staff:login'), app.templates.admin);
+    app.get('/user/tccb/qua-trinh/sang-kien/upload', app.permission.check('qtSangKien:write'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
 
@@ -50,6 +51,20 @@ module.exports = app => {
 
     app.delete('/api/tccb/qua-trinh/sang-kien', app.permission.check('qtSangKien:write'), (req, res) =>
         app.model.qtSangKien.delete({ id: req.body.id }, (error) => res.send(error)));
+    
+    app.post('/api/tccb/qua-trinh/sang-kien/multiple', app.permission.check('qtSangKien:write'), (req, res) => {
+        const qtSangKien = req.body.qtSangKien, errorList = [];
+        for (let i = 0; i <= qtSangKien.length; i++) {
+            if (i == qtSangKien.length) {
+                res.send({ error: errorList });
+            } else {
+                const item = qtSangKien[i];
+                app.model.qtSangKien.create(item, (error) => {
+                    if (error) errorList.push(error);
+                });
+            }
+        }
+    });
 
     // End TCCB APIs ---------------------------------------------------------------------------------------------------------------------------
 
@@ -162,6 +177,69 @@ module.exports = app => {
             }
         });
     });
+
+    app.get('/api/qua-trinh/sang-kien/download-template', app.permission.check('qtSangKien:write'), (req, res) => {
+        const workBook = app.excel.create();
+        const ws = workBook.addWorksheet('Khen_thuong_Template');
+        new Promise(resolve => {
+            const defaultColumns = [
+                { header: 'SỐ QUYẾT ĐỊNH', key: 'soQuyetDinh', width: 15 },
+                { header: 'CÁN BỘ', key: 'shcc', width: 15 },
+                { header: 'MÃ SỐ SÁNG KIẾN', key: 'maSo', width: 15 },
+                { header: 'TÊN SÁNG KIẾN', key: 'tenSangKien', width: 30 },
+            ];
+            ws.columns = defaultColumns;
+            resolve();
+        }).then(() => {
+            app.excel.attachment(workBook, res, 'Sang_Kien_Template.xlsx');
+        }).catch((error) => {
+            res.send({ error });
+        });
+    });
+    
+    const sangKienImportData = (fields, files, done) => {
+        let worksheet = null;
+        new Promise((resolve, reject) => {
+            if (fields.userData && fields.userData[0] && fields.userData[0] == 'SangKienDataFile' && files.SangKienDataFile && files.SangKienDataFile.length) {
+                const srcPath = files.SangKienDataFile[0].path;
+                const workbook = app.excel.create();
+                workbook.xlsx.readFile(srcPath).then(() => {
+                    app.deleteFile(srcPath);
+                    worksheet = workbook.getWorksheet(1);
+                    worksheet ? resolve() : reject('File dữ liệu không hợp lệ!');
+                });
+            }
+        }).then(() => {
+            let items = [];
+            const getData = (index = 2) => {
+                let soQuyetDinh = (worksheet.getCell('A' + index).value || '').toString().trim();
+                let shcc = (worksheet.getCell('B' + index).value || '').toString().trim();
+                let maSo = (worksheet.getCell('C' + index).value || '').toString().trim();
+                let tenSangKien = (worksheet.getCell('D' + index).value || '').toString().trim();
+                
+                if (soQuyetDinh.length == 0) {
+                    done({ items });
+                    return;
+                }
+                app.model.canBo.get({ shcc }, (error, item) => {
+                    if (error || !item) {
+                        done({ error: `Sai định dạng mã số cán bộ ở dòng ${index}` });
+                        getData(index + 1);
+                    }
+                    let hoCanBo = item.ho;
+                    let tenCanBo = item.ten;
+                    items.push({
+                        soQuyetDinh, maSo, tenSangKien, tenCanBo, hoCanBo, shcc
+                    });
+                    getData(index + 1);
+                });
+            };
+            getData();
+        }).catch(error => done({ error }));
+    };
+
+    app.uploadHooks.add('SangKienDataFile', (req, fields, files, params, done) =>
+        app.permission.has(req, () => sangKienImportData(fields, files, done), done, 'qtSangKien:write'));
 };
 
 // End Other APIs --------------------------------------------------------------------------------------------------------------
