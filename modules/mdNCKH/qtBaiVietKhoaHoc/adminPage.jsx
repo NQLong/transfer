@@ -242,8 +242,7 @@ class QtBaiVietKhoaHoc extends AdminPage {
         e.preventDefault();
     }
     render() {
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permission = this.getUserPermission('qtBaiVietKhoaHoc', ['read', 'write', 'delete']);
+        const permission = this.getUserPermission('qtBaiVietKhoaHoc', ['read', 'write', 'delete', 'readOnly']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ? (
             this.props.qtBaiVietKhoaHoc && this.props.qtBaiVietKhoaHoc.pageGr ?
                 this.props.qtBaiVietKhoaHoc.pageGr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
@@ -258,7 +257,7 @@ class QtBaiVietKhoaHoc extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br/>Đơn vị công tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br />Đơn vị công tác</th>
                         {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tác giả</th>}
                         {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Bài viết</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tạp chí</th>}
@@ -343,13 +342,13 @@ class QtBaiVietKhoaHoc extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
-                <EditModal ref={e => this.modal = e} permission={permission}
-                    permissions={currentPermissions} getStaffAll={this.props.getStaffAll}
+                <EditModal ref={e => this.modal = e} readOnly={!permission.write}
+                    getStaffAll={this.props.getStaffAll}
                     create={this.props.createQtBaiVietKhoaHocStaff} update={this.props.updateQtBaiVietKhoaHocStaff}
                 />
             </>,
             backRoute: '/user/' + this.menu,
-            onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
+            onCreate: (permission && permission.write && !this.checked) ? (e) => this.showModal(e) : null,
             onExport: !this.checked ? (e) => {
                 e.preventDefault();
                 const { fromYear, toYear, listShcc, listDv, xuatBanRange } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, xuatBanRange: null };

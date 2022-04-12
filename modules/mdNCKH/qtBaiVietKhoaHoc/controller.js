@@ -21,12 +21,12 @@ module.exports = app => {
     app.permission.add(
         { name: 'staff:login', menu: menuStaff },
         { name: 'qtBaiVietKhoaHoc:read', menu },
-        { name: 'qtBaiVietKhoaHoc:read', menu: menuTCCB },
+        { name: 'qtBaiVietKhoaHoc:readOnly', menu: menuTCCB },
         { name: 'qtBaiVietKhoaHoc:write' },
         { name: 'qtBaiVietKhoaHoc:delete' },
     );
-    app.get('/user/:khcn/qua-trinh/bai-viet-khoa-hoc', app.permission.check('qtBaiVietKhoaHoc:read'), app.templates.admin);
-    app.get('/user/:khcn/qua-trinh/bai-viet-khoa-hoc/group/:shcc', app.permission.check('qtBaiVietKhoaHoc:read'), app.templates.admin);
+    app.get('/user/:khcn/qua-trinh/bai-viet-khoa-hoc', app.permission.orCheck('qtBaiVietKhoaHoc:read', 'qtBaiVietKhoaHoc:readOnly'), app.templates.admin);
+    app.get('/user/:khcn/qua-trinh/bai-viet-khoa-hoc/group/:shcc', app.permission.orCheck('qtBaiVietKhoaHoc:read', 'qtBaiVietKhoaHoc:readOnly'), app.templates.admin);
     app.get('/user/bai-viet-khoa-hoc', app.permission.check('staff:login'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
@@ -93,7 +93,7 @@ module.exports = app => {
     });
     ///END USER ACTIONS
 
-    app.get('/api/khcn/qua-trinh/bai-viet-khoa-hoc/page/:pageNumber/:pageSize', app.permission.check('qtBaiVietKhoaHoc:read'), (req, res) => {
+    app.get('/api/khcn/qua-trinh/bai-viet-khoa-hoc/page/:pageNumber/:pageSize', app.permission.orCheck('qtBaiVietKhoaHoc:read', 'qtBaiVietKhoaHoc:readOnly'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -109,7 +109,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/khcn/qua-trinh/bai-viet-khoa-hoc/group/page/:pageNumber/:pageSize', app.permission.check('qtBaiVietKhoaHoc:read'), (req, res) => {
+    app.get('/api/khcn/qua-trinh/bai-viet-khoa-hoc/group/page/:pageNumber/:pageSize', app.permission.orCheck('qtBaiVietKhoaHoc:read', 'qtBaiVietKhoaHoc:readOnly'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -125,13 +125,13 @@ module.exports = app => {
         });
     });
 
-    app.post('/api/qua-trinh/bai-viet-khoa-hoc', app.permission.check('staff:write'), (req, res) =>
+    app.post('/api/qua-trinh/bai-viet-khoa-hoc', app.permission.check('qtBaiVietKhoaHoc:write'), (req, res) =>
         app.model.qtBaiVietKhoaHoc.create(req.body.data, (error, item) => res.send({ error, item })));
 
-    app.put('/api/qua-trinh/bai-viet-khoa-hoc', app.permission.check('staff:write'), (req, res) =>
+    app.put('/api/qua-trinh/bai-viet-khoa-hoc', app.permission.check('qtBaiVietKhoaHoc:write'), (req, res) =>
         app.model.qtBaiVietKhoaHoc.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })));
 
-    app.delete('/api/qua-trinh/bai-viet-khoa-hoc', app.permission.check('staff:write'), (req, res) =>
+    app.delete('/api/qua-trinh/bai-viet-khoa-hoc', app.permission.check('qtBaiVietKhoaHoc:write'), (req, res) =>
         app.model.qtBaiVietKhoaHoc.delete({ id: req.body.id }, (error) => res.send(error)));
 
     app.get('/api/qua-trinh/bai-viet-khoa-hoc/download-excel/:listShcc/:listDv/:fromYear/:toYear/:xuatBanRange', app.permission.check('qtBaiVietKhoaHoc:read'), (req, res) => {
