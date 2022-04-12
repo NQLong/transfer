@@ -59,9 +59,6 @@ class HcthCongVanDenStaffPage extends AdminPage {
                 this.toTime?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
-            const donViQuanLy = this.props.system?.user?.staff?.donViQuanLy || [];
-            if (donViQuanLy.length == 0 && !this.getUserPermission('rectors', ['login']).login)
-                this.changeAdvancedSearch(true);
         });
     }
 
@@ -124,7 +121,6 @@ class HcthCongVanDenStaffPage extends AdminPage {
             donViQuanLy = staff && staff.donViQuanLy ? staff.donViQuanLy : [],
             permission = this.getUserPermission('hcthCongVanDen', ['read', 'write', 'delete']);
 
-        const singlePage = !currentPermissions.includes('rectors:login') && donViQuanLy.length == 0;
 
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.hcthCongVanDen && this.props.hcthCongVanDen.page ? this.props.hcthCongVanDen.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = renderTable({
@@ -194,6 +190,27 @@ class HcthCongVanDenStaffPage extends AdminPage {
                     </tr>);
             }
         });
+
+        let tabList = {
+            all: {
+                title: 'Tất cả',
+                component: table
+            },
+            donVi: {
+                title: 'Đơn vị quản lý',
+                component: table
+            },
+            self: {
+                title: 'Cá nhân',
+                component: table
+            }
+        };
+
+        const tabs = !(user.isStaff || user.isStudent) ? [tabList.all]:
+        donViQuanLy.length || currentPermissions.includes('president:login') ? [tabList.all, tabList.donVi, tabList.self] 
+        : currentPermissions.includes('rectors:login') || (currentPermissions.includes('hcth:login') ) ? [tabList.all, tabList.self] 
+        : [tabList.self];
+
         return this.renderPage({
             icon: 'fa fa-caret-square-o-left',
             title: 'Công văn đến',
@@ -218,20 +235,7 @@ class HcthCongVanDenStaffPage extends AdminPage {
                 </div>
             </>,
             content: <div className='tile'>
-                {singlePage ? table : <FormTabs ref={e => this.tabs = e} tabs={[
-                    {
-                        title: 'Tất cả',
-                        component: table
-                    },
-                    {
-                        title: 'Đơn vị quản lý',
-                        component: table
-                    },
-                    {
-                        title: 'Cá nhân',
-                        component: table
-                    }
-                ]} id={TAB_ID} onChange={() => this.changeAdvancedSearch()} />}
+                <FormTabs ref={e => this.tabs = e} tabs={tabs} id={TAB_ID} onChange={() => this.changeAdvancedSearch()} />
                 < Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
             </div>,

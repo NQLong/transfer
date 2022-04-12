@@ -1,6 +1,6 @@
 
 module.exports = (app) => {
-    const { trangThaiSwitcher, action, CONG_VAN_TYPE, MA_CHUC_VU_HIEU_TRUONG, MA_BAN_GIAM_HIEU } = require('./constant');
+    const { trangThaiSwitcher, action, CONG_VAN_TYPE, MA_CHUC_VU_HIEU_TRUONG, MA_BAN_GIAM_HIEU, MA_HCTH } = require('./constant');
 
 
     const menu = {
@@ -9,7 +9,8 @@ module.exports = (app) => {
             501: { title: 'Công văn đến', link: '/user/hcth/cong-van-den', icon: 'fa-caret-square-o-left', backgroundColor: '#00aa00' },
         },
     };
-    app.permission.add({ name: 'hcthCongVanDen:read', menu });
+    app.permission.add({ name: 'hcthCongVanDen:read' });
+    app.permission.add({ name: 'staff:login', menu });
     app.permission.add({ name: 'hcthCongVanDen:write' });
     app.permission.add({ name: 'hcthCongVanDen:delete' });
     app.permission.add({ name: 'hcth:login' });
@@ -200,24 +201,31 @@ module.exports = (app) => {
                 pageNumber = parseInt(req.params.pageNumber),
                 pageSize = parseInt(req.params.pageSize),
                 searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-            let { donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, timeType, fromTime, toTime, congVanYear, sortBy, sortType, tab } = (req.query.filter && req.query.filter != '%%%%%%') ? req.query.filter :
+            let { donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, timeType, fromTime, toTime, congVanYear, sortBy, sortType, tab, status = '' } = (req.query.filter && req.query.filter != '%%%%%%') ? req.query.filter :
                 { donViGuiCongVan: null, donViNhanCongVan: null, canBoNhanCongVan: null, timeType: null, fromTime: null, toTime: null, congVanYear: null },
                 donViCanBo = '', canBo = '', tabValue = parseInt(tab);
 
-            const rectorsPermission = getUserPermission(req, 'rectors', ['login']);
+            // const rectorsPermission = getUserPermission(req, 'rectors', ['login']);
             const hcthPermission = getUserPermission(req, 'hcth', ['login']);
+            const user = req.session.user;
+            const permissions = user.permissions;
+            donViCanBo = (req.session?.user?.staff?.donViQuanLy || []);
+            donViCanBo = donViCanBo.map(item => item.maDonVi).toString() || (permissions.includes('president:login') && MA_BAN_GIAM_HIEU) || '';
+            canBo = req.session?.user?.shcc || '';
 
-
-            if (!rectorsPermission.login && !hcthPermission.login) {
-                donViCanBo = (req.session?.user?.staff?.donViQuanLy || []);
-                donViCanBo = donViCanBo.map(item => item.maDonVi).toString();
-                canBo = req.session?.user?.shcc || '';
-                if (tabValue == 1) canBo = '';
-                else if (tabValue == 2) donViCanBo = '';
-            } else if (rectorsPermission.login) {
-                if (tabValue == 1) donViCanBo = MA_BAN_GIAM_HIEU;
-                else if (tabValue == 2) canBo = req.session?.user?.shcc || '';
+            if (tabValue == 0) {
+                if (permissions.includes('rectors:login') || permissions.includes('hcth:login') || (!user.isStaff && !user.isStudent)) {
+                    donViCanBo = '';
+                    canBo = '';
+                }
             }
+            else if (tabValue == 1) {
+                if (donViCanBo.length) {
+                    canBo = '';
+                } else
+                    donViCanBo = '';
+            } else donViCanBo = '';
+
 
 
             if (congVanYear && Number(congVanYear) > 1900) {
@@ -226,7 +234,7 @@ module.exports = (app) => {
                 toTime = new Date(`${Number(congVanYear) + 1}-01-01`).getTime();
             }
 
-            app.model.hcthCongVanDen.searchPage(pageNumber, pageSize, donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, timeType, fromTime, toTime, obj2Db[sortBy] || '', sortType, canBo, donViCanBo, hcthPermission.login ? 1 : 0, searchTerm, (error, page) => {
+            app.model.hcthCongVanDen.searchPage(pageNumber, pageSize, donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, timeType, fromTime, toTime, obj2Db[sortBy] || '', sortType, canBo, donViCanBo, hcthPermission.login ? 1 : 0, status, searchTerm, (error, page) => {
                 if (error || page == null) {
 
                     res.send({ error });
@@ -417,4 +425,13 @@ module.exports = (app) => {
             res.send({ error });
         }
     });
+
+    app.assignRoleHooks.addRoles('quanLyHcth', { id: 'hcth:manage', text: 'Công văn: Quản lý phòng hành chính tổng hợp' });
+    app.permissionHooks.add('staff', 'checkQuanLyHcth', (user, staff) => new Promise(resolve => {
+        if (staff.donViQuanLy && staff.donViQuanLy.find(item => item.maDonVi == MA_HCTH)) {
+            app.permissionHooks.pushUserPermission(user, 'hcth:manage');
+        }
+        resolve();
+    }));
+
 };

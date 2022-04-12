@@ -20,5 +20,6 @@ module.exports = {
     CONG_VAN_TYPE: 'DEN',
     MA_CHUC_VU_HIEU_TRUONG: '001',
     MA_BAN_GIAM_HIEU: '68',
+    MA_HCTH: '29',
 
 };
