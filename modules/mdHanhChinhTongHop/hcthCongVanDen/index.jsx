@@ -12,11 +12,11 @@ export default {
     routes: [
         {
             path: '/user/hcth/cong-van-den',
-            component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
+            component: Loadable({ loading: Loading, loader: () => import('./staffPage') })
         },
         {
             path: '/user/hcth/cong-van-den/:id',
-            component: Loadable({ loading: Loading, loader: () => import('./adminEditPage') })
+            component: Loadable({ loading: Loading, loader: () => import('./staffEditPage') })
         },
     ]
 };
