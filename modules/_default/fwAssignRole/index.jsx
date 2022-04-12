@@ -4,5 +4,5 @@ import React from 'react';
 
 export default {
     redux: {},
-    routes: [],
+    routes: []
 };

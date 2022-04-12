@@ -17,7 +17,6 @@ module.exports = app => {
 
     app.get('/api/assign-role/list/:nhomRole', app.permission.check('fwAssignRole:read'), (req, res) => {
         app.assignRoleHooks.get(req.params.nhomRole).then((items) => {
-            items.nhomRole = req.params.nhomRole;
             res.send({ items });
         });
     });

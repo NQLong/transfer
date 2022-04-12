@@ -105,8 +105,7 @@ module.exports = app => {
             if (user.maDonVi) {
                 updateCondition.donViPhuTrach = user.maDonVi;
                 delete changes.donViPhuTrach;
-            }
-            else return res.send({ error: 'Permission denied!' });
+            } else return res.send({ error: 'Permission denied!' });
         }
         const updateLoaiDoanhNghiep = (listLoaiDoanhNghiep) => new Promise((resolve, reject) => {
             app.model.dnLoaiDoanhNghiep.delete({ doanhNghiep: id }, (error) => {

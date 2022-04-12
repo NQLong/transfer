@@ -70,7 +70,7 @@ module.exports = app => {
                         if (menuTree[index] == null) {
                             menuTree[index] = {
                                 parentMenu: app.clone(permission.menu.parentMenu),
-                                menus: {},
+                                menus: {}
                             };
                         }
                         if (permission.menu.menus == null) {

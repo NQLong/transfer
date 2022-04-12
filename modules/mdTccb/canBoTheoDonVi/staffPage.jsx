@@ -86,8 +86,8 @@ class CanBoTheoDonVi extends AdminPage {
             <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.dienThoaiCaNhan} />
             <TableCell type='buttons'>
                 <a href='#' className='btn btn-sm btn-success' onClick={(e) => e.preventDefault() || this.assignRolesModal && this.assignRolesModal.show(item)} > <i className='fa fa-lg fa-plus' />&nbsp;Gán quyền</a>
-            </TableCell>
-        </tr>;
+            </TableCell >
+        </tr >;
     }
 
     tccbRows = (item, index) => {
@@ -102,7 +102,7 @@ class CanBoTheoDonVi extends AdminPage {
             <TableCell type='text' style={this.defaultCRUDRowStyle(item.tccbLog)} content={item.tccbLog?.quaTrinh || ''} />
             <TableCell type='date' dateFormat='HH:MM:ss dd/mm/yy' style={this.defaultCRUDRowStyle(item.tccbLog)} content={item.tccbLog?.ngay || null} />
             <TableCell type='buttons'>
-                <a href='#' className='btn btn-sm btn-success' onClick={(e) => e.preventDefault() || this.assignRolesModal && this.assignRolesModal.show(item)} > <i className='fa fa-lg fa-plus' />&nbsp;Gán quyền</a>
+                <a href='#' className='btn btn-sm btn-success' onClick={(e) => e.preventDefault() || this.assignRolesModal && this.assignRolesModal.show(item)}> <i className='fa fa-lg fa-plus' />&nbsp;Gán quyền</a>
             </TableCell>
         </tr>;
     }

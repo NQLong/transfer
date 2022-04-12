@@ -46,7 +46,6 @@ class AssignRoleModal extends AdminModal {
     onShow = (nguoiDuocGan) => {
         getAssignRole(nguoiDuocGan.shcc, this.props.nhomRole, items => {
             let list = items.map(item => item.tenRole);
-            console.log(this.state.rolesList);
             let diff = this.state.rolesList.filter(role => !list.includes(role.id));
             this.setState({ items, updateRolesList: diff, nguoiDuocGan, disableButton: false, tenCanBo: nguoiDuocGan.lastName + ' ' + nguoiDuocGan.firstName }, () => {
                 this.select.value(null);
