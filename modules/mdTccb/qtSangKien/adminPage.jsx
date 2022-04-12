@@ -212,6 +212,11 @@ class QtSangKien extends AdminPage {
             </>,
             backRoute: '/user/tccb',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+            onExport: (e) => {
+                e.preventDefault();
+                const { listDonVi, listShcc } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { listShcc: null, listDonVi: null };
+                T.download(T.url(`/api/qua-trinh/sang-kien/download-excel/${listShcc ? listShcc : null}/${listDonVi ? listDonVi : null}`), 'sangkien.xlsx');
+            }
         });
     }
 }
