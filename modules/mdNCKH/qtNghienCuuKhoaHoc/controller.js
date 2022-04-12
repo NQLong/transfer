@@ -22,15 +22,15 @@ module.exports = app => {
 
     app.permission.add(
         { name: 'staff:login', menu: menuStaff },
-        { name: 'qtNghienCuuKhoaHoc:read', menu: menuTCCB },
+        { name: 'qtNghienCuuKhoaHoc:readOnly', menu: menuTCCB },
         { name: 'qtNghienCuuKhoaHoc:read', menu },
         { name: 'qtNghienCuuKhoaHoc:write' },
         { name: 'qtNghienCuuKhoaHoc:delete' },
     );
 
-    app.get('/user/:khcn/qua-trinh/nghien-cuu-khoa-hoc/:id', app.permission.check('qtNghienCuuKhoaHoc:read'), app.templates.admin);
-    app.get('/user/:khcn/qua-trinh/nghien-cuu-khoa-hoc', app.permission.check('qtNghienCuuKhoaHoc:read'), app.templates.admin);
-    app.get('/user/:khcn/qua-trinh/nghien-cuu-khoa-hoc/group/:shcc', app.permission.check('qtNghienCuuKhoaHoc:read'), app.templates.admin);
+    app.get('/user/:khcn/qua-trinh/nghien-cuu-khoa-hoc/:id', app.permission.orCheck('qtNghienCuuKhoaHoc:read', 'qtNghienCuuKhoaHoc:readOnly'), app.templates.admin);
+    app.get('/user/:khcn/qua-trinh/nghien-cuu-khoa-hoc', app.permission.orCheck('qtNghienCuuKhoaHoc:read', 'qtNghienCuuKhoaHoc:readOnly'), app.templates.admin);
+    app.get('/user/:khcn/qua-trinh/nghien-cuu-khoa-hoc/group/:shcc', app.permission.orCheck('qtNghienCuuKhoaHoc:read', 'qtNghienCuuKhoaHoc:readOnly'), app.templates.admin);
 
     app.get('/user/nghien-cuu-khoa-hoc', app.permission.check('staff:login'), app.templates.admin);
     app.get('/user/nghien-cuu-khoa-hoc/:id/:ownerShcc', app.permission.check('staff:login'), app.templates.admin);
@@ -47,7 +47,7 @@ module.exports = app => {
     // const checkReadPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/khcn/qua-trinh/nghien-cuu-khoa-hoc/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/khcn/qua-trinh/nghien-cuu-khoa-hoc/page/:pageNumber/:pageSize', app.permission.orCheck('qtNghienCuuKhoaHoc:read', 'qtNghienCuuKhoaHoc:readOnly'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -63,7 +63,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/khcn/qua-trinh/nghien-cuu-khoa-hoc/group/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/khcn/qua-trinh/nghien-cuu-khoa-hoc/group/page/:pageNumber/:pageSize', app.permission.orCheck('qtNghienCuuKhoaHoc:read', 'qtNghienCuuKhoaHoc:readOnly'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -79,7 +79,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/khcn/qua-trinh/nghien-cuu-khoa-hoc/all', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/khcn/qua-trinh/nghien-cuu-khoa-hoc/all', app.permission.orCheck('qtNghienCuuKhoaHoc:read', 'qtNghienCuuKhoaHoc:readOnly'), (req, res) => {
         let condition = { statement: null };
         if (req.query.shcc) {
             condition = {
@@ -99,7 +99,7 @@ module.exports = app => {
     app.delete('/api/qua-trinh/nckh', app.permission.check('qtNghienCuuKhoaHoc:write'), (req, res) =>
         app.model.qtNghienCuuKhoaHoc.delete({ id: req.body.id }, (error) => res.send(error)));
 
-    app.get('/api/qua-trinh/nckh/download-excel/:maDonVi/:fromYear/:toYear/:loaiHocVi/:maSoCanBo/:timeType', app.permission.check('qtNghienCuuKhoaHoc:read'), (req, res) => {
+    app.get('/api/qua-trinh/nckh/download-excel/:maDonVi/:fromYear/:toYear/:loaiHocVi/:maSoCanBo/:timeType', app.permission.orCheck('qtNghienCuuKhoaHoc:read', 'qtNghienCuuKhoaHoc:readOnly'), (req, res) => {
         let { maDonVi, fromYear, toYear, loaiHocVi, maSoCanBo, timeType } = req.params ? req.params : { maDonVi: '', fromYear: null, toYear: null, loaiHocVi: '', maSoCanBo: '', timeType: 0 };
         if (maDonVi == 'null') maDonVi = null;
         if (fromYear == 'null') fromYear = null;

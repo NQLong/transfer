@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormRichTextBox, FormDatePicker } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, AdminModal, FormSelect, FormTextBox, FormRichTextBox, FormDatePicker, FormCheckbox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 import {
     getQtNghienCuuKhoaHocGroupPageMa, createQtNckhStaffGroup, updateQtNckhStaffGroup, deleteQtNckhStaffGroup
@@ -33,105 +33,174 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        let { id, shcc, batDauType, ketThucType, batDau, ketThuc, tenDeTai, maSoCapQuanLy, kinhPhi, vaiTro, ngayNghiemThu, ketQua, ngayNghiemThuType, thoiGian }
+        let { id, shcc, batDauType, ketThucType, batDau, ketThuc,
+            tenDeTai, maSoCapQuanLy, kinhPhi, vaiTro, ngayNghiemThu, ketQua, ngayNghiemThuType }
             = item ? item :
                 {
-                    id: null, shcc: '', batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', batDau: null, ketThuc: null, tenDeTai: '',
-                    maSoCapQuanLy: '', kinhPhi: '', vaiTro: '', ngayNghiemThu: null, ketQua: '', ngayNghiemThuType: 'dd/mm/yyyy', thoiGian: null
+                    id: null, shcc: null, batDauType: 'dd/mm/yyyy', ketThucType: 'dd/mm/yyyy', batDau: null, ketThuc: null, tenDeTai: '',
+                    maSoCapQuanLy: '', kinhPhi: '', vaiTro: '', ngayNghiemThu: null, ketQua: '', ngayNghiemThuType: 'dd/mm/yyyy', fileMinhChung: '[]'
                 };
         this.setState({
+            shcc: shcc,
             batDauType: batDauType ? batDauType : 'dd/mm/yyyy',
-            ketThucType: ketThuc ? ketThucType : 'dd/mm/yyyy',
+            ketThucType: ketThucType ? ketThucType : 'dd/mm/yyyy',
             ngayNghiemThuType: ngayNghiemThuType ? ngayNghiemThuType : 'dd/mm/yyyy',
-            id, batDau, ketThuc, ngayNghiemThu
-        });
-        setTimeout(() => {
+            id, batDau, ketThuc, ngayNghiemThu,
+            denNay: ketThuc == -1 ? 1 : 0,
+            nghiemThu: (ngayNghiemThu == -1 || ketThuc == -1) ? 1 : 0,
+        }, () => {
             this.maCanBo.value(shcc ? shcc : this.props.shcc);
-            this.batDauType.setText({ text: batDauType ? batDauType : 'dd/mm/yyyy' });
-            this.ketThucType.setText({ text: ketThucType ? ketThucType : 'dd/mm/yyyy' });
-            this.ngayNghiemThuType.setText({ text: ngayNghiemThuType ? ngayNghiemThuType : 'dd/mm/yyyy' });
-            this.batDau.setVal(batDau ? batDau : '');
-            this.ketThuc.setVal(ketThuc ? ketThuc : '');
             this.tenDeTai.value(tenDeTai);
-            this.maSoCapQuanLy.value(maSoCapQuanLy ? maSoCapQuanLy : '');
+            this.maSo.value(maSoCapQuanLy);
+            this.batDauType.setText({ text: batDauType ? batDauType : 'dd/mm/yyyy' });
+            if (ngayNghiemThu != -1) {
+                this.nghiemThuCheck.value(0);
+                $('#done').show();
+                this.ngayNghiemThu?.setVal(ngayNghiemThu ? ngayNghiemThu : '');
+                this.ngayNghiemThuType?.setText({ text: ngayNghiemThuType ? ngayNghiemThuType : 'dd/mm/yyyy' });
+            } else {
+                this.nghiemThuCheck.value(1);
+                $('#done').hide();
+
+            }
+            if (ketThuc != -1) {
+                this.denNayCheck.value(0);
+
+                $('#end').show();
+
+                this.ketThucType?.setText({ text: ketThucType ? ketThucType : 'dd/mm/yyyy' });
+                this.ketThuc?.setVal(ketThuc ? ketThuc : '');
+            } else {
+                this.denNayCheck.value(1);
+                $('#end').hide();
+                this.nghiemThuCheck.value(1);
+                $('#done').hide();
+            }
+            this.batDau.setVal(batDau ? batDau : '');
             this.kinhPhi.value(kinhPhi ? kinhPhi : '');
-            this.thoiGian.value(thoiGian);
             this.vaiTro.value(vaiTro ? vaiTro : '');
-            this.ngayNghiemThu.setVal(ngayNghiemThu ? ngayNghiemThu : '');
-            this.ketQua.value(ketQua ? ketQua : '');
-        }, 500);
+            !this.state.nghiemThu && this.ketQua.value(ketQua ? ketQua : '');
+            this.tenDeTai.focus();
+        });
     }
 
     onSubmit = () => {
         const changes = {
             shcc: this.maCanBo.value(),
             batDau: this.batDau.getVal(),
-            ketThuc: this.ketThuc.getVal(),
+            ketThuc: !this.state.denNay ? this.ketThuc.getVal() : -1,
             batDauType: this.state.batDauType,
-            ketThucType: this.state.ketThucType,
+            ketThucType: !this.state.denNay ? this.state.ketThucType : '',
             tenDeTai: this.tenDeTai.value(),
             maSoCapQuanLy: this.maSoCapQuanLy.value(),
             kinhPhi: this.kinhPhi.value(),
-            thoiGian: this.thoiGian.value(),
             vaiTro: this.vaiTro.value(),
             ketQua: this.ketQua.value(),
-            ngayNghiemThu: this.ngayNghiemThu.getVal(),
-            ngayNghiemThuType: this.state.ngayNghiemThuType,
+            ngayNghiemThu: !this.state.denNay ? this.ngayNghiemThu.getVal() : null,
+            ngayNghiemThuType: !this.state.denNay ? this.state.ngayNghiemThuType : '',
         };
-        if (!changes.tenDeTai) {
-            T.notify('Tên đề tài bị trống!', 'danger');
+        if (!this.tenDeTai.value()) {
+            T.notify('Tên đề tài, dự án trống', 'danger');
             this.tenDeTai.focus();
-        } else if (!changes.maSoCapQuanLy) {
-            T.notify('Mã số và cấp quản lý bị trống!', 'danger');
+        } else if (!this.maSoCapQuanLy.value()) {
+            T.notify('Mã số cấp quản lý trống', 'danger');
             this.maSoCapQuanLy.focus();
-        }
-        else if (!changes.batDau) {
-            T.notify('Thời gian bắt đầu bị trống!', 'danger');
+        } else if (!this.batDau.getVal()) {
+            T.notify('Ngày bắt đầu trống', 'danger');
             this.batDau.focus();
-        }
-        else if (!changes.vaiTro) {
+        } else if (!this.vaiTro.value()) {
             T.notify('Vai trò bị trống!', 'danger');
             this.vaiTro.focus();
+        } else if (!this.state.denNay && !this.ketThuc.getVal()) {
+            T.notify('Ngày kết thúc trống', 'danger');
+            this.ketThuc.focus();
+        } else if (!this.state.denNay && !this.ngayNghiemThu.getVal()) {
+            T.notify('Ngày nghiệm thu trống', 'danger');
+            this.ngayNghiemThu.focus();
+        } else if (!this.state.denNay && (this.batDau.getVal() && this.ketThuc.getVal()) && this.batDau.getVal() >= this.ketThuc.getVal()) {
+            T.notify('Ngày bắt đầu phải nhỏ hơn kết thúc', 'danger');
+            this.batDau.focus();
+        } else if (!this.state.denNay && (this.batDau.getVal() && this.ngayNghiemThu.getVal()) && this.batDau.getVal() >= this.ngayNghiemThu.getVal()) {
+            T.notify('Ngày bắt đầu phải nhỏ hơn nghiệm thu', 'danger');
+            this.batDau.focus();
+        } else if (!this.state.denNay && (this.ketThuc.getVal() && this.ngayNghiemThu.getVal()) && this.ketThuc.getVal() > this.ngayNghiemThu.getVal()) {
+            T.notify('Ngày kết thúc lớn hơn ngày nghiệm thu', 'danger');
+            this.ketThuc.focus();
         }
         else this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
 
     }
 
+    handleKetThuc = (value) => {
+        if (value) {
+            $('#end').hide();
+            this.handleNghiemThu(1);
+            this.ketThucType?.setText({ text: '' });
+        }
+        else {
+            $('#end').show();
+            this.ketThucType?.setText({ text: this.state.ketThucType ? this.state.ketThucType : 'dd/mm/yyyy' });
+            this.ketThuc.setVal(null);
+        }
+        this.setState({ denNay: value });
+    }
+
+    handleNghiemThu = (value) => {
+        if (value) {
+            this.ngayNghiemThuType?.setText({ text: '' });
+            $('#done').hide();
+            this.nghiemThuCheck.value(1);
+        }
+        else {
+            $('#done').show();
+            this.ngayNghiemThuType?.setText({ text: this.state.ngayNghiemThuType ? this.state.ngayNghiemThuType : 'dd/mm/yyyy' });
+            this.ngayNghiemThu.setVal(null);
+        }
+        this.setState({ nghiemThu: value });
+    }
+
     render = () => {
+        const readOnly = this.props.readOnly;
         return this.renderModal({
             title: 'Thông tin nghiên cứu khoa học',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12' ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={true} required />
-                <FormRichTextBox className='col-12' ref={e => this.tenDeTai = e} label={'Tên đề tài'} type='text' required />
-                <FormRichTextBox className='col-md-12' ref={e => this.maSoCapQuanLy = e} label={'Mã số và cấp quản lý'} type='text' required />
-                <FormTextBox className='col-md-6' ref={e => this.thoiGian = e} label={'Thời gian thực hiện (tháng)'} type='number' />
-                <FormTextBox className='col-md-6' ref={e => this.kinhPhi = e} label={'Kinh phí'} type='text' />
-                <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
+                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={true} required />
+                <FormRichTextBox className='col-12' ref={e => this.tenDeTai = e} label='Tên đề tài' readOnly={readOnly} required />
+                <FormTextBox className='col-md-6' ref={e => this.maSo = e} label='Mã số và cấp quản lý' readOnly={readOnly} required />
+                <FormTextBox className='col-md-6' ref={e => this.kinhPhi = e} label={'Kinh phí'} type='text' placeholder='Nhập kinh phí (triệu đồng)' readOnly={readOnly}/>
+
+                <div className='form-group col-md-4'>Các mốc thời gian: </div>
+                <FormCheckbox ref={e => this.denNayCheck = e} label='Chưa kết thúc' onChange={this.handleKetThuc} className='form-group col-md-4' readOnly={readOnly} />
+                <FormCheckbox ref={e => this.nghiemThuCheck = e} label='Chưa nghiệm thu' onChange={this.handleNghiemThu} className='form-group col-md-4' readOnly={readOnly} />
+                <div className='form-group col-md-4'><DateInput ref={e => this.batDau = e} placeholder='Thời gian bắt đầu'
                     label={
-                        <div style={{ display: 'flex' }}>Thời gian bắt đầu (định dạng:&nbsp; <Dropdown ref={e => this.batDauType = e}
+                        <div style={{ display: 'flex' }}>Thời gian bắt đầu &nbsp; <Dropdown ref={e => this.batDauType = e}
                             items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
-                            onSelected={item => this.setState({ batDauType: item })} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
+                            onSelected={item => { this.setState({ batDauType: item }); this.batDau.clear(); this.batDau.focus(); }} readOnly={readOnly} />&nbsp;<span style={{ color: 'red' }}> *</span></div>
                     }
-                    type={this.state.batDauType ? typeMapper[this.state.batDauType] : null} /></div>
-                <div className='form-group col-md-6'><DateInput ref={e => this.ketThuc = e} placeholder='Thời gian kết thúc'
+                    type={this.state.batDauType ? typeMapper[this.state.batDauType] : null} readOnly={readOnly} /></div>
+                <div className='form-group col-md-4' id='end'><DateInput ref={e => this.ketThuc = e} placeholder='Thời gian kết thúc'
                     label={
-                        <div style={{ display: 'flex' }}>Thời gian kết thúc (định dạng:&nbsp; <Dropdown ref={e => this.ketThucType = e}
+                        <div style={{ display: 'flex' }}>Thời gian kết thúc &nbsp; <Dropdown ref={e => this.ketThucType = e}
                             items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
-                            onSelected={item => this.setState({ ketThucType: item })} />)</div>
+                            onSelected={item => { this.setState({ ketThucType: item }); this.ketThuc.clear(); this.ketThuc.focus(); }} readOnly={readOnly} />&nbsp;<span style={{ color: 'red' }}> *</span></div>
                     }
-                    type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} /></div>
+                    type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} readOnly={readOnly} /></div>
+                <div className='form-group col-md-4' style={{ display: this.state.denNay ? 'block' : 'none' }} />
+                <div className='form-group col-md-4' id='done'><DateInput ref={e => this.ngayNghiemThu = e} placeholder='Thời gian nghiệm thu'
+                    label={
+                        <div style={{ display: 'flex' }}>Thời gian nghiệm thu &nbsp; <Dropdown ref={e => this.ngayNghiemThuType = e}
+                            items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
+                            onSelected={item => { this.setState({ ngayNghiemThuType: item }); this.ngayNghiemThu.clear(); this.ngayNghiemThu.focus(); }} readOnly={readOnly} />&nbsp;<span style={{ color: 'red' }}> *</span></div>
+                    }
+                    type={this.state.ngayNghiemThuType ? typeMapper[this.state.ngayNghiemThuType] : null} readOnly={readOnly} /></div>
+                <div className='form-group col-md-4' style={{ display: this.state.nghiemThu ? 'block' : 'none' }} />
+
                 <FormSelect className='col-md-4' ref={e => this.vaiTro = e} label={'Vai trò'} data={[
                     { id: 'CN', text: 'Chủ nhiệm' }, { id: 'TG', text: 'Tham gia' }
-                ]} type='text' required />
-                <div className='form-group col-md-6'><DateInput ref={e => this.ngayNghiemThu = e} placeholder='Thời gian kết thúc'
-                    label={
-                        <div style={{ display: 'flex' }}>Thời gian nghiệm thu (định dạng:&nbsp; <Dropdown ref={e => this.ngayNghiemThuType = e}
-                            items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
-                            onSelected={item => this.setState({ ngayNghiemThuType: item })} />)</div>
-                    }
-                    type={this.state.ngayNghiemThuType ? typeMapper[this.state.ngayNghiemThuType] : null} /></div>
-                <FormTextBox className='col-md-12' ref={e => this.ketQua = e} label={'Kết quả'} type='text' />
+                ]} type='text' required readOnly={readOnly} />
+                {!this.state.nghiemThu && <FormTextBox className='col-md-4' ref={e => this.ketQua = e} label={'Kết quả'} type='text' readOnly={readOnly} />}
 
             </div>,
         });
@@ -211,8 +280,7 @@ class QtNghienCuuKhoaHocGroupPage extends AdminPage {
     }
 
     render() {
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permission = this.getUserPermission('qtNghienCuuKhoaHoc', ['read', 'write', 'delete']);
+        const permission = this.getUserPermission('qtNghienCuuKhoaHoc', ['read', 'write', 'delete', 'readOnly']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtNghienCuuKhoaHoc && this.props.qtNghienCuuKhoaHoc.pageMa ? this.props.qtNghienCuuKhoaHoc.pageMa : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
@@ -221,10 +289,6 @@ class QtNghienCuuKhoaHocGroupPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br/>Đơn vị công tác</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Đề tài</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Mã số và cấp quản lý</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian thực hiện</th>
@@ -232,26 +296,16 @@ class QtNghienCuuKhoaHocGroupPage extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Vai trò</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Nghiệm thu</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Kết quả</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br/>Đơn vị công tác</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                        <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
-                                {item.shcc}
-                            </>
-                        )} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenHocVi || ''} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucDanhNgheNghiep || ''} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
-                            <>
-                                <span> {item.tenChucVu || ''}<br /> </span>
-                                {(item.tenDonVi || '').normalizedName()}
-                            </>
-                        )} />
                         <TableCell type='text' content={<>
                             <div><br />{item.tenDeTai || ''}</div> <br />
                         </>
@@ -272,6 +326,20 @@ class QtNghienCuuKhoaHocGroupPage extends AdminPage {
                                 <span style={{ color: 'red' }}>{item.ngayNghiemThu == -1 ? 'Chưa nghiệm thu' : T.dateToText(item.ngayNghiemThu, item.ngayNghiemThuType ? item.ngayNghiemThuType : 'dd/mm/yyyy')}</span>
                                 : ''} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.ketQua} />
+                        <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
+                            <>
+                                <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
+                                {item.shcc}
+                            </>
+                        )} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenHocVi || ''} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucDanhNgheNghiep || ''} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
+                            <>
+                                <span> {item.tenChucVu || ''}<br /> </span>
+                                {(item.tenDonVi || '').normalizedName()}
+                            </>
+                        )} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={this.delete} >
                         </TableCell>
@@ -301,8 +369,8 @@ class QtNghienCuuKhoaHocGroupPage extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getQtNghienCuuKhoaHocGroupPageMa} />
-                <EditModal ref={e => this.modal = e} permission={permission}
-                    permissions={currentPermissions} shcc={this.state.shcc}
+                <EditModal ref={e => this.modal = e} readOnly={!permission.write}
+                    shcc={this.state.shcc}
                     create={this.props.createQtNckhStaffGroup}
                     update={this.props.updateQtNckhStaffGroup}
                 />

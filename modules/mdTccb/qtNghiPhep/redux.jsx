@@ -247,10 +247,10 @@ export function createQtNghiPhepGroupPageMa(data, done) {
     };
 }
 
-export function getQtNghiPhepAll(done) {
+export function getQtNghiPhepAll(shcc, done) {
     return dispatch => {
         const url = '/api/tccb/qua-trinh/nghi-phep/all';
-        T.get(url, data => {
+        T.get(url, { shcc }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách nghỉ phép bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
@@ -261,6 +261,22 @@ export function getQtNghiPhepAll(done) {
         }, () => T.notify('Lấy danh sách nghỉ phép bị lỗi!', 'danger'));
     };
 }
+
+export function getQtNghiPhepAllUser(shcc, done) {
+    return dispatch => {
+        const url = '/api/user/qua-trinh/nghi-phep/all';
+        T.get(url, { shcc }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách nghỉ phép bị lỗi!', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (done) done(data.items);
+                dispatch({ type: QtNghiPhepGetAll, items: data.items ? data.items : {} });
+            }
+        }, () => T.notify('Lấy danh sách nghỉ phép bị lỗi!', 'danger'));
+    };
+}
+
 
 export function getQtNghiPhep(id, done) {
     return () => {

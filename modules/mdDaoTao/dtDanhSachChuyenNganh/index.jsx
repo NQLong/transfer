@@ -4,14 +4,14 @@ import Loading from 'view/component/Loading';
 import dtDanhSachChuyenNganh from './redux';
 
 export default {
-  redux: {
-    parent: 'daoTao',
-    reducers: { dtDanhSachChuyenNganh }
-  },
-  routes: [
-    {
-      path: '/user/pdt/danh-sach-chuyen-nganh',
-      component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
+    redux: {
+        parent: 'daoTao',
+        reducers: { dtDanhSachChuyenNganh }
     },
-  ],
+    routes: [
+        {
+            path: '/user/dao-tao/danh-sach-chuyen-nganh',
+            component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
+        },
+    ],
 };

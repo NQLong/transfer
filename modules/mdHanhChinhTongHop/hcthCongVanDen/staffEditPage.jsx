@@ -569,7 +569,7 @@ class StaffEditPage extends AdminPage {
     render() {
         const permission = this.getUserPermission('hcthCongVanDen', ['read', 'write', 'delete']),
             dmDonViGuiCvPermission = this.getUserPermission('dmDonViGuiCv', ['read', 'write', 'delete']),
-            readOnly = !permission.write || [trangThaiSwitcher.CHO_DUYET.id, trangThaiSwitcher.CHO_PHAN_PHOI.id, trangThaiSwitcher.CHO_PHAN_PHOI.id].includes(this.state.trangThai),
+            readOnly = !permission.write || [trangThaiSwitcher.CHO_DUYET.id, trangThaiSwitcher.CHO_PHAN_PHOI.id, trangThaiSwitcher.DA_PHAN_PHOI.id].includes(this.state.trangThai),
             isNew = !this.state.id,
             presidentPermission = this.getUserPermission('president', ['login']),
             hcthStaffPermission = this.getUserPermission('hcth', ['login', 'manage']),

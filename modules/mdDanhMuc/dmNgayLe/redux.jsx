@@ -86,8 +86,11 @@ export function createDmNgayLe(item, done) {
                 T.notify('Tạo ngày lễ bị lỗi!', 'danger');
                 console.error(`POST ${url}. ${data.error}`);
             } else {
-                if (done) done(data.items);
-                dispatch(getDmNgayLePage());
+                if (done) {
+                    T.notify('Tạo ngày lễ thành công', 'success');
+                    done(data.items);
+                    dispatch(getDmNgayLePage());
+                }
             }
         });
     };
@@ -132,9 +135,11 @@ export function updateDmNgayLe(id, changes, done) {
                 console.error(`PUT ${url}. ${data.error}`);
                 done && done(data.error);
             } else {
-                T.notify('Cập nhật thông tin ngày lễ thành công!', 'success');
-                dispatch(getDmNgayLePage());
-                done && done();
+                if (done) {
+                    T.notify('Cập nhật thông tin ngày lễ thành công!', 'success');
+                    dispatch(getDmNgayLePage());
+                    done();
+                }
             }
         }, () => T.notify('Cập nhật thông tin ngày lễ bị lỗi!', 'danger'));
     };

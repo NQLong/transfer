@@ -21,13 +21,13 @@ module.exports = app => {
 
     app.permission.add(
         { name: 'staff:login', menu: menuStaff },
-        { name: 'qtBangPhatMinh:read', menu: menuTCCB },
+        { name: 'qtBangPhatMinh:readOnly', menu: menuTCCB },
         { name: 'qtBangPhatMinh:read', menu },
         { name: 'qtBangPhatMinh:write' },
         { name: 'qtBangPhatMinh:delete' },
     );
-    app.get('/user/:khcn/qua-trinh/bang-phat-minh', app.permission.check('qtBangPhatMinh:read'), app.templates.admin);
-    app.get('/user/:khcn/qua-trinh/bang-phat-minh/group/:shcc', app.permission.check('qtBangPhatMinh:read'), app.templates.admin);
+    app.get('/user/:khcn/qua-trinh/bang-phat-minh', app.permission.orCheck('qtBangPhatMinh:read', 'qtBangPhatMinh:readOnly'), app.templates.admin);
+    app.get('/user/:khcn/qua-trinh/bang-phat-minh/group/:shcc', app.permission.orCheck('qtBangPhatMinh:read', 'qtBangPhatMinh:readOnly'), app.templates.admin);
     app.get('/user/bang-phat-minh', app.permission.check('staff:login'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
@@ -95,7 +95,7 @@ module.exports = app => {
     });
     ///END USER ACTIONS
     
-    app.get('/api/khcn/qua-trinh/bang-phat-minh/page/:pageNumber/:pageSize', app.permission.check('qtBangPhatMinh:read'), (req, res) => {
+    app.get('/api/khcn/qua-trinh/bang-phat-minh/page/:pageNumber/:pageSize', app.permission.orCheck('qtBangPhatMinh:read', 'qtBangPhatMinh:readOnly'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -111,7 +111,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/khcn/qua-trinh/bang-phat-minh/group/page/:pageNumber/:pageSize', app.permission.check('qtBangPhatMinh:read'), (req, res) => {
+    app.get('/api/khcn/qua-trinh/bang-phat-minh/group/page/:pageNumber/:pageSize', app.permission.orCheck('qtBangPhatMinh:read', 'qtBangPhatMinh:readOnly'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';

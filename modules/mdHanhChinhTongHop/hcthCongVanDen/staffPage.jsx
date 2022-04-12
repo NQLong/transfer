@@ -132,7 +132,7 @@ class HcthCongVanDenStaffPage extends AdminPage {
         let table = renderTable({
             style: { marginTop: '5px' },
             getDataSource: () => list,
-            emptyTable: 'Không dữ liệu công văn đến',
+            emptyTable: 'Không có dữ liệu công văn đến',
             stickyHead: false,
             renderHead: () => (
                 <tr>

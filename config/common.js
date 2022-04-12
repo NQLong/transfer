@@ -107,7 +107,7 @@ module.exports = (app) => {
             subMenusRender: false
         },
         daoTao: {
-            index: 7000, title: 'Đào tạo', link: '/user/pdt', icon: 'fa-diamond',
+            index: 7000, title: 'Đào tạo', link: '/user/dao-tao', icon: 'fa-diamond',
             subMenusRender: false, groups: ['NGÀNH ĐÀO TẠO', 'CÔNG TÁC ĐÀO TẠO', 'MÔN HỌC']
         },
         category: {

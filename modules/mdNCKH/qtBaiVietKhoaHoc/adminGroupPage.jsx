@@ -172,8 +172,7 @@ class QtBaiVietKhoaHocGroupPage extends AdminPage {
     }
 
     render() {
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permission = this.getUserPermission('qtBaiVietKhoaHoc', ['read', 'write', 'delete']);
+        const permission = this.getUserPermission('qtBaiVietKhoaHoc', ['read', 'write', 'delete', 'readOnly']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtBaiVietKhoaHoc && this.props.qtBaiVietKhoaHoc.pageMa ? this.props.qtBaiVietKhoaHoc.pageMa : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
@@ -183,8 +182,8 @@ class QtBaiVietKhoaHocGroupPage extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tác giả</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Bài viết</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tạp chí</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Bài viết</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tạp chí</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số hiệu ISSN</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Xuất bản</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
@@ -201,8 +200,8 @@ class QtBaiVietKhoaHocGroupPage extends AdminPage {
                         )}
                         /> */}
                         <TableCell type='link' onClick={() => this.modal.show(item)} content={(item.tenTacGia || '')} />
-                        <TableCell type='text' content={(<b>{item.tenBaiViet}</b>)} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(<i>{item.tenTapChi}</i>)} />
+                        <TableCell type='text' contentClassName='multiple-lines-5' content={(<b>{item.tenBaiViet}</b>)} />
+                        <TableCell type='text' content={(<i>{item.tenTapChi}</i>)} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.soHieuIssn} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
@@ -246,8 +245,8 @@ class QtBaiVietKhoaHocGroupPage extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
-                <EditModal ref={e => this.modal = e} permission={permission}
-                    permissions={currentPermissions} shcc={this.shcc} hoten={this.hoten}
+                <EditModal ref={e => this.modal = e} readOnly={!permission.write}
+                    shcc={this.shcc} hoten={this.hoten}
                     update={this.props.updateQtBaiVietKhoaHocGroupPageMa} create={this.props.createQtBaiVietKhoaHocGroupPageMa}
                 />
             </>,

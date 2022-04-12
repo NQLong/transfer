@@ -150,5 +150,10 @@ module.exports = app => {
             app.database.oracle.connection.main.execute('BEGIN :ret:=qt_chuc_vu_download_excel(:listShcc, :listDv, :fromyear, :toyear, :timetype, :listCv, :gioitinh); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, listShcc, listDv, fromyear, toyear, timetype, listCv, gioitinh }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
+
+        getDaiDienKy: (done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=get_nguoi_dai_dien_ky_hop_dong(); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
+        },
     };
 };
