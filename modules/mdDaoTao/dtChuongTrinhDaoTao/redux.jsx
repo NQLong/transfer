@@ -50,7 +50,7 @@ export function getDtChuongTrinhDaoTaoAll(condition, done) {
           condition = {};
      }
      return dispatch => {
-          const url = '/api/dao-tao/chuong-trinh-dao-tao/all';
+          const url = '/api/pdt/chuong-trinh-dao-tao/all';
           T.get(url, { condition }, data => {
                if (data.error) {
                     T.notify('Lấy danh sách chương trình đào tạo bị lỗi', 'danger');
@@ -67,7 +67,7 @@ T.initPage('pageDtChuongTrinhDaoTao');
 export function getDtChuongTrinhDaoTaoPage(pageNumber, pageSize, pageCondition, done) {
      const page = T.updatePage('pageDtChuongTrinhDaoTao', pageNumber, pageSize, pageCondition);
      return dispatch => {
-          const url = `/api/dao-tao/chuong-trinh-dao-tao/page/${page.pageNumber}/${page.pageSize}`;
+          const url = `/api/pdt/chuong-trinh-dao-tao/page/${page.pageNumber}/${page.pageSize}`;
           T.get(url, { searchTerm: pageCondition?.searchTerm }, data => {
                if (data.error) {
                     T.notify('Lấy danh sách chương trình đào tạo bị lỗi!', 'danger');
@@ -82,7 +82,7 @@ export function getDtChuongTrinhDaoTaoPage(pageNumber, pageSize, pageCondition, 
 
 export function getDtChuongTrinhDaoTao(maKhungDaoTao, done) {
      return dispatch => {
-          const url = `/api/dao-tao/chuong-trinh-dao-tao/${maKhungDaoTao}`;
+          const url = `/api/pdt/chuong-trinh-dao-tao/${maKhungDaoTao}`;
           T.get(url, { condition: { maKhungDaoTao } }, data => {
                if (data.error) {
                     T.notify('Lấy danh sách chương trình đào tạo bị lỗi!', 'danger');
@@ -97,7 +97,7 @@ export function getDtChuongTrinhDaoTao(maKhungDaoTao, done) {
 
 export function getDtKhungDaoTao(id, done) {
      return () => {
-          const url = `/api/dao-tao/khung-dao-tao/${id}`;
+          const url = `/api/pdt/khung-dao-tao/${id}`;
           T.get(url, { condition: { id } }, data => {
                if (data.error) {
                     T.notify('Lấy danh sách khung đào tạo bị lỗi!', 'danger');
@@ -112,7 +112,7 @@ export function getDtKhungDaoTao(id, done) {
 
 export function createMultiDtChuongTrinhDaoTao(data, done) {
      return () => {
-          const url = '/api/dao-tao/chuong-trinh-dao-tao/multiple';
+          const url = '/api/pdt/chuong-trinh-dao-tao/multiple';
           T.post(url, { data }, data => {
                if (data.error) {
                     T.notify('Upload thông tin chương trình đào tạo có lỗi!', 'danger');
@@ -126,7 +126,7 @@ export function createMultiDtChuongTrinhDaoTao(data, done) {
 
 export function createDtChuongTrinhDaoTao(item, done) {
      return dispatch => {
-          const url = '/api/dao-tao/chuong-trinh-dao-tao';
+          const url = '/api/pdt/chuong-trinh-dao-tao';
           T.post(url, { item }, data => {
                if (data.error) {
                     T.notify('Tạo chương trình đào tạo bị lỗi!', 'danger');
@@ -142,7 +142,7 @@ export function createDtChuongTrinhDaoTao(item, done) {
 
 export function deleteDtChuongTrinhDaoTao(id, done) {
      return () => {
-          const url = '/api/dao-tao/chuong-trinh-dao-tao';
+          const url = '/api/pdt/chuong-trinh-dao-tao';
           console.log(id);
           T.delete(url, { id }, data => {
                if (data.error) {
@@ -159,7 +159,7 @@ export function deleteDtChuongTrinhDaoTao(id, done) {
 
 export function updateDtChuongTrinhDaoTao(id, changes, done) {
      return dispatch => {
-          const url = '/api/dao-tao/chuong-trinh-dao-tao';
+          const url = '/api/pdt/chuong-trinh-dao-tao';
           T.put(url, { id, changes }, data => {
                if (data.error) {
                     T.notify('Cập nhật chương trình đào tạo bị lỗi!', 'danger');

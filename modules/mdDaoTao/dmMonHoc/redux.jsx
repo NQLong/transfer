@@ -176,7 +176,7 @@ export function changeDmMonHoc(item) {
 
 export const SelectAdapter_DmMonHoc = {
      ajax: true,
-     url: '/api/dao-tao/mon-hoc/page/1/20',
+     url: '/api/pdt/mon-hoc/page/1/20',
      data: params => ({ searchTerm: params.term || '' }),
      processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: `${item.ma}: ${item.ten}` })) : [] }),
      fetchOne: (ma, done) => (getDmMonHoc(ma, item => done && done({ id: item.ma, text: `${item.ma}: ${item.ten}` })))(),
@@ -186,7 +186,7 @@ export const SelectAdapter_DmMonHoc = {
 export const SelectAdapter_DmMonHocFaculty = (donVi) => {
      return {
           ajax: true,
-          url: '/api/dao-tao/mon-hoc/page/1/20',
+          url: '/api/pdt/mon-hoc/page/1/20',
           data: params => ({ searchTerm: params.term || '', donViFilter: donVi }),
           processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: `${item.ma}: ${item.ten}` })) : [] }),
           fetchOne: (ma, done) => (getDmMonHoc(ma, item => done && done({ id: item.ma, text: `${item.ma}: ${item.ten}` })))(),

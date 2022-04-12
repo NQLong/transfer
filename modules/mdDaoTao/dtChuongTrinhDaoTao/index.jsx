@@ -11,15 +11,15 @@ export default {
      },
      routes: [
           {
-               path: '/user/dao-tao/chuong-trinh-dao-tao',
+               path: '/user/pdt/chuong-trinh-dao-tao',
                component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
           },
           {
-               path: '/user/dao-tao/chuong-trinh-dao-tao/:ma',
+               path: '/user/pdt/chuong-trinh-dao-tao/:ma',
                component: Loadable({ loading: Loading, loader: () => import('./adminDetails') })
           },
           {
-               path: '/user/dao-tao/chuong-trinh-dao-tao/new',
+               path: '/user/pdt/chuong-trinh-dao-tao/new',
                component: Loadable({ loading: Loading, loader: () => import('./adminDetails') })
           },
      ],

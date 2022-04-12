@@ -4,7 +4,7 @@ module.exports = app => {
           menus: {
                7006: {
                     title: 'Chương trình đào tạo', groupIndex: 1,
-                    link: '/user/dao-tao/chuong-trinh-dao-tao', icon: 'fa-university', backgroundColor: '#8ca474'
+                    link: '/user/pdt/chuong-trinh-dao-tao', icon: 'fa-university', backgroundColor: '#8ca474'
                },
           },
      };
@@ -16,13 +16,13 @@ module.exports = app => {
           { name: 'dtChuongTrinhDaoTao:delete' },
      );
 
-     app.get('/user/dao-tao/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:readAll', 'manager:read'), app.templates.admin);
-     app.get('/user/dao-tao/chuong-trinh-dao-tao/:ma', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:readAll', 'manager:read'), app.templates.admin);
-     app.get('/user/dao-tao/chuong-trinh-dao-tao/new', app.permission.orCheck('dtChuongTrinhDaoTao:write', 'manager:write'), app.templates.admin);
+     app.get('/user/pdt/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:readAll', 'manager:read'), app.templates.admin);
+     app.get('/user/pdt/chuong-trinh-dao-tao/:ma', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:readAll', 'manager:read'), app.templates.admin);
+     app.get('/user/pdt/chuong-trinh-dao-tao/new', app.permission.orCheck('dtChuongTrinhDaoTao:write', 'manager:write'), app.templates.admin);
 
 
      // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-     app.get('/api/dao-tao/chuong-trinh-dao-tao/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
+     app.get('/api/pdt/chuong-trinh-dao-tao/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
           let pageNumber = parseInt(req.params.pageNumber),
                pageSize = parseInt(req.params.pageSize),
                searchTerm = typeof req.query.condition == 'string' ? req.query.condition : '';
@@ -35,23 +35,23 @@ module.exports = app => {
           });
      });
 
-     app.get('/api/dao-tao/chuong-trinh-dao-tao/:ma', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:readAll', 'manager:read'), (req, res) => {
+     app.get('/api/pdt/chuong-trinh-dao-tao/:ma', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:readAll', 'manager:read'), (req, res) => {
           const condition = req.query.condition || {};
           Object.keys(condition).forEach(key => { condition[key] === '' ? condition[key] = null : ''; });
           app.model.dtChuongTrinhDaoTao.getAll(condition, '*', 'id ASC', (error, items) => res.send({ error, items }));
      });
 
-     app.get('/api/dao-tao/khung-dao-tao/:ma', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:readAll', 'manager:read'), (req, res) => {
+     app.get('/api/pdt/khung-dao-tao/:ma', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:readAll', 'manager:read'), (req, res) => {
           const condition = req.query.condition || {};
           Object.keys(condition).forEach(key => { condition[key] === '' ? condition[key] = null : ''; });
           app.model.dtKhungDaoTao.get(condition, '*', 'id ASC', (error, items) => res.send({ error, items }));
      });
 
-     app.post('/api/dao-tao/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:write', 'manager:write'), (req, res) => {
+     app.post('/api/pdt/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:write', 'manager:write'), (req, res) => {
           app.model.dtChuongTrinhDaoTao.create(req.body.data, (error, item) => res.send({ error, item }));
      });
 
-     app.post('/api/dao-tao/chuong-trinh-dao-tao/multiple', app.permission.orCheck('dtChuongTrinhDaoTao:write', 'manager:write'), (req, res) => {
+     app.post('/api/pdt/chuong-trinh-dao-tao/multiple', app.permission.orCheck('dtChuongTrinhDaoTao:write', 'manager:write'), (req, res) => {
           const { data } = req.body;
           const { items, namDaoTao, maKhoa, id: idKhungDt } = data;
           const dataImported = [];
@@ -120,11 +120,11 @@ module.exports = app => {
 
      });
 
-     app.put('/api/dao-tao/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:write', 'manager:write'), (req, res) => {
+     app.put('/api/pdt/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:write', 'manager:write'), (req, res) => {
           app.model.dtChuongTrinhDaoTao.update({ id: req.body.id }, req.body.changes, (error, items) => res.send({ error, items }));
      });
 
-     app.delete('/api/dao-tao/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:delete', 'manager:write'), (req, res) => {
+     app.delete('/api/pdt/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:delete', 'manager:write'), (req, res) => {
           app.model.dtChuongTrinhDaoTao.delete({ id: req.body.id }, errors => res.send({ errors }));
      });
 };
