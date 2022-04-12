@@ -130,5 +130,10 @@ module.exports = app => {
             const sql = 'SELECT COUNT(*) FROM HCTH_PHAN_HOI' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.database.oracle.connection.main.execute(sql, parameter, (error, result) => done(error, result));
         },
+
+        getAllFrom: (target, type, done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_phan_hoi_get_all_from(:target, :type); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, target, type }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
+        },
     };
 };

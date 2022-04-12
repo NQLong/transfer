@@ -12,11 +12,11 @@ module.exports = app => {
         { name: 'dtDangKyMoMon:delete' },
     );
 
-    app.get('/user/dao-tao/dang-ky-mo-mon', app.permission.orCheck('dtDangKyMoMon:read', 'dtDangKyMoMon:readAll', 'manager:read'), app.templates.admin);
-    app.get('/user/dao-tao/dang-ky-mo-mon/:id', app.permission.orCheck('dtDangKyMoMon:read', 'dtDangKyMoMon:readAll', 'manager:read'), app.templates.admin);
+    app.get('/user/dao-tao/dang-ky-mo-mon', app.permission.orCheck('dtDangKyMoMon:read', 'dtDangKyMoMon:manage'), app.templates.admin);
+    app.get('/user/dao-tao/dang-ky-mo-mon/:id', app.permission.orCheck('dtDangKyMoMon:read', 'dtDangKyMoMon:manage'), app.templates.admin);
 
     //APIs-----------------------------------------------------------------------------------------------------------------------------------------------------
-    const checkDaoTaoPermission = (req, res, next) => app.isDebug ? next() : app.permission.orCheck('dtDangKyMoMon:read', 'dtDangKyMoMon:readAll', 'manager:read')(req, res, next);
+    const checkDaoTaoPermission = (req, res, next) => app.isDebug ? next() : app.permission.orCheck('dtDangKyMoMon:read', 'dtDangKyMoMon:manage')(req, res, next);
 
     app.get('/api/dao-tao/dang-ky-mo-mon/page/:pageNumber/:pageSize', checkDaoTaoPermission, (req, res) => {
         let pageNumber = parseInt(req.params.pageNumber),

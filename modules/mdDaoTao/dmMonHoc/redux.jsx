@@ -45,7 +45,6 @@ export default function dmMonHocReducer(state = null, data) {
                 if (updatedPage) {
                     for (let i = 0, n = updatedPage.list.length; i < n; i++) {
                         if (updatedPage.list[i].ma == deletedItem.ma) {
-                            console.log(deletedItem);
                             updatedPage.list.splice(i, 1, deletedItem);
                             break;
                         }
@@ -92,6 +91,7 @@ export function getDmMonHocAll(condition, done) {
 }
 
 T.initPage('pageDmMonHoc');
+
 export function getDmMonHocPage(pageNumber, pageSize, pageCondition) {
     const page = T.updatePage('pageDmMonHoc', pageNumber, pageSize, pageCondition);
     return dispatch => {

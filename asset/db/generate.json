@@ -6588,7 +6588,8 @@
             "moduleName": "hcthCongVanDi",
             "modelName": "hcthCongVanDi",
             "methods": {
-                "HCTH_CONG_VAN_DI_SEARCH_PAGE": "searchPage"
+                "HCTH_CONG_VAN_DI_SEARCH_PAGE": "searchPage",
+                "HCTH_CONG_VAN_DI_UPDATE_SO_CONG_VAN": "updateSoCongVanDi"
             },
             "columns": {
                 "ID": {
@@ -8397,10 +8398,10 @@
                 },
                 "ACTION": {
                     "value": "action",
-                    "dataType": "NUMBER",
-                    "dataDefault": "0",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
                     "nullable": true,
-                    "size": "2,0"
+                    "size": 32
                 }
             },
             "primaryKeys": [
@@ -9195,13 +9196,47 @@
             "foreignKeys": [],
             "type": "table"
         },
+        "DM_NGHI_PHEP": {
+            "active": true,
+            "moduleName": "dmNghiPhep",
+            "modelName": "dmNghiPhep",
+            "columns": {
+                "MA": {
+                    "value": "ma",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 2
+                },
+                "TEN": {
+                    "value": "ten",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
+                },
+                "SO_NGAY_PHEP": {
+                    "value": "soNgayPhep",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                }
+            },
+            "primaryKeys": [
+                "MA"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
         "QT_NGHI_PHEP": {
             "active": true,
             "moduleName": "qtNghiPhep",
             "modelName": "qtNghiPhep",
             "methods": {
                 "QT_NGHI_PHEP_SEARCH_PAGE": "searchPage",
-                "QT_NGHI_PHEP_GROUP_PAGE": "groupPage"
+                "QT_NGHI_PHEP_GROUP_PAGE": "groupPage",
+                "QT_NGHI_PHEP_DOWNLOAD_EXCEL": "downloadExcel"
             },
             "columns": {
                 "SHCC": {
@@ -9839,6 +9874,46 @@
             "foreignKeys": [
                 "MSSV"
             ],
+            "type": "table"
+        },
+        "DM_LOAI_CONG_VAN": {
+            "active": true,
+            "moduleName": "dmLoaiCongVan",
+            "modelName": "dmLoaiCongVan",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_107757\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "TEN": {
+                    "value": "ten",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 100
+                },
+                "TEN_VIET_TAT": {
+                    "value": "tenVietTat",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 100
+                },
+                "KICH_HOAT": {
+                    "value": "kichHoat",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "10,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
             "type": "table"
         },
         "TCCB_TO_CHUC_KHAC": {
@@ -11300,6 +11375,9 @@
             "active": true,
             "moduleName": "hcthPhanHoi",
             "modelName": "hcthPhanHoi",
+            "methods": {
+                "HCTH_PHAN_HOI_GET_ALL_FROM": "getAllFrom"
+            },
             "columns": {
                 "ID": {
                     "value": "id",
@@ -12283,6 +12361,9 @@
             "active": true,
             "moduleName": "hcthHistory",
             "modelName": "hcthHistory",
+            "methods": {
+                "HCTH_HISTORY_GET_ALL_FROM": "getAllFrom"
+            },
             "columns": {
                 "ID": {
                     "value": "id",
@@ -12340,86 +12421,10 @@
             "foreignKeys": [],
             "type": "table"
         },
-        "DM_LOAI_CONG_VAN": {
-            "active": true,
-            "moduleName": "dmLoaiCongVan",
-            "modelName": "dmLoaiCongVan",
-            "columns": {
-                "ID": {
-                    "value": "id",
-                    "dataType": "NUMBER",
-                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_107757\".nextval",
-                    "nullable": false,
-                    "size": "22,0"
-                },
-                "TEN": {
-                    "value": "ten",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": false,
-                    "size": 100
-                },
-                "TEN_VIET_TAT": {
-                    "value": "tenVietTat",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": false,
-                    "size": 100
-                },
-                "KICH_HOAT": {
-                    "value": "kichHoat",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "10,0"
-                }
-            },
-            "primaryKeys": [
-                "ID"
-            ],
-            "foreignKeys": [],
-            "type": "table"
-        },
-        "DM_NGHI_PHEP": {
-            "active": true,
-            "moduleName": "dmNghiPhep",
-            "modelName": "dmNghiPhep",
-            "columns": {
-                "MA": {
-                    "value": "ma",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": false,
-                    "size": 2
-                },
-                "TEN": {
-                    "value": "ten",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 100
-                },
-                "SO_NGAY_PHEP": {
-                    "value": "soNgayPhep",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "22,0"
-                }
-            },
-            "primaryKeys": [
-                "MA"
-            ],
-            "foreignKeys": [],
-            "type": "table"
-        },
         "DT_KHUNG_DAO_TAO": {
             "active": true,
             "moduleName": "dtKhungDaoTao",
             "modelName": "dtKhungDaoTao",
-            "methods": {
-                "DT_KHUNG_DAO_TAO_SEARCH_PAGE": "searchPage"
-            },
             "columns": {
                 "ID": {
                     "value": "id",
