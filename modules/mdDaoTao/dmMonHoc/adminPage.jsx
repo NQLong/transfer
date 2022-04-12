@@ -17,10 +17,8 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        let {
-            ma, ten, soTinChi, tongSoTiet, soTietLt, soTietTh, soTietTt, soTietTl, soTietDa, soTietLa, tinhChatPhong, tenTiengAnh,
-            boMon, loaiHinh, chuyenNganh, ghiChu, maCtdt, tenCtdt, kichHoat
-        } = item ? item : { ma: '', ten: '', soTinChi: 0, tongSoTiet: 0, soTietLt: 0, soTietTh: 0, soTietTt: 0, soTietTl: 0, soTietDa: 0, soTietLa: 0, tinhChatPhong: '', tenTiengAnh: '', boMon: 0, loaiHinh: '', chuyenNganh: '', ghiChu: '', maCtdt: '', tenCtdt: '', kichHoat: 1 };
+        let { ma, ten, soTinChi, tongSoTiet, soTietLt, soTietTh, soTietTt, soTietTl, soTietDa, soTietLa, tinhChatPhong, tenTiengAnh,
+            boMon, loaiHinh, chuyenNganh, ghiChu, maCtdt, tenCtdt, kichHoat } = item ? item : { ma: '', ten: '', soTinChi: 0, tongSoTiet: 0, soTietLt: 0, soTietTh: 0, soTietTt: 0, soTietTl: 0, soTietDa: 0, soTietLa: 0, tinhChatPhong: '', tenTiengAnh: '', boMon: 0, loaiHinh: '', chuyenNganh: '', ghiChu: '', maCtdt: '', tenCtdt: '', kichHoat: 1 };
 
         this.ma.value(ma);
         this.ten.value(ten);
@@ -69,7 +67,7 @@ class EditModal extends AdminModal {
                 ghiChu: this.ghiChu.value(),
                 maCtdt: this.maCtdt.value(),
                 tenCtdt: this.tenCtdt.value(),
-                kichHoat: this.state.active ? '1' : '0'
+                kichHoat: this.state.active ? '1' : '0',
             };
         if (changes.ma == '') {
             T.notify('Mã môn học bị trống!', 'danger');
@@ -129,11 +127,11 @@ class DmMonHocPage extends AdminPage {
                 items.forEach(item => this.donViMapper[item.ma] = item.ten);
             }
         });
-        T.ready('/user/pdt', () => {
+        T.ready('/user/dao-tao', () => {
             T.clearSearchBox();
             this.setState({ donViFilter: this.props.system.user.staff?.maDonVi });
             T.onSearch = (searchText) => this.props.getDmMonHocPage(undefined, undefined, {
-                searchTerm: searchText || ''
+                searchTerm: searchText || '',
             });
             T.showSearchBox();
             this.props.getDmMonHocPage(undefined, undefined, {
@@ -162,9 +160,10 @@ class DmMonHocPage extends AdminPage {
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmMonHoc && this.props.dmMonHoc.page ?
             this.props.dmMonHoc.page : {
                 pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {
-                    searchTerm: '', donViFilter: this.state.donVi
+                    searchTerm: '', donViFilter: this.state.donViFilter
                 }, list: []
             };
+
         let table = renderTable({
             emptyTable: 'Chưa có dữ liệu môn học',
             getDataSource: () => list, stickyHead: false,
@@ -207,16 +206,19 @@ class DmMonHocPage extends AdminPage {
                     <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietLa} />
                     <TableCell content={this.donViMapper && this.donViMapper[item.boMon] ? this.donViMapper[item.boMon] : ''} />
                     <TableCell contentClassName='multiple-lines-4' content={item.tenCtdt?.split(',').map((ctdt, index) => <div key={index}>{ctdt} <br /></div>)} />
-                    <TableCell type='checkbox' content={item.kichHoat} permission={permission} onChanged={value => this.props.updateDmMonHoc(item.ma, { kichHoat: value ? 1 : 0 })} />
-                    <TableCell type='buttons' content={item} permission={permission} onEdit={() => this.modal.show(item)} onDelete={this.delete} />
-                </tr>)
+                    < TableCell type='checkbox' content={item.kichHoat} permission={permission}
+                        onChanged={value => this.props.updateDmMonHoc(item.ma, { kichHoat: value ? 1 : 0, })
+                        } />
+                    < TableCell type='buttons' content={item} permission={permission}
+                        onEdit={() => this.modal.show(item)} onDelete={this.delete} />
+                </tr >)
         });
 
         return this.renderPage({
             icon: 'fa fa-leanpub',
             title: 'Danh sách Môn Học',
             breadcrumb: [
-                <Link key={0} to='/user/pdt'>Đào tạo</Link>,
+                <Link key={0} to='/user/dao-tao'>Đào tạo</Link>,
                 'Danh sách Môn Học'
             ],
             header: permissionDaoTao.read && <FormSelect style={{ width: '300px', marginBottom: '0' }} placeholder='Danh sách khoa/bộ môn' ref={e => this.donVi = e} onChange={value => {
@@ -229,11 +231,13 @@ class DmMonHocPage extends AdminPage {
             }} data={SelectAdapter_DmDonViFaculty_V2} allowClear={true} />,
             content: <>
                 <div className='tile'>{table}</div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.props.getDmMonHocPage} />
-                <EditModal ref={e => this.modal = e} permission={permission} readOnly={!permission.write} create={this.props.createDmMonHoc} update={this.props.updateDmMonHoc} khoa={this.state.donViFilter} />
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
+                    getPage={this.props.getDmMonHocPage} />
+                <EditModal ref={e => this.modal = e} permission={permission} readOnly={!permission.write}
+                    create={this.props.createDmMonHoc} update={this.props.updateDmMonHoc} khoa={this.state.donViFilter} />
             </>,
-            backRoute: '/user/pdt',
-            onCreate: permission.write ? (e) => this.showModal(e) : null
+            backRoute: '/user/dao-tao',
+            onCreate: permission.write ? (e) => this.showModal(e) : null,
         });
     }
 }

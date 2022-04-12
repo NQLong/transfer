@@ -43,7 +43,7 @@ export class TableCell extends React.Component { // type = number | date | link 
                     </label>
                 </td>);
         } else if (type == 'buttons') {
-            const { onSwap, onEdit, onDelete, children } = this.props;
+            const { onSwap, onEdit, onDelete, onClone, children } = this.props;
             return (
                 <td className={className} style={{ ...style }} rowSpan={rowSpan} colSpan={colSpan}>
                     <div className='btn-group'>
@@ -54,6 +54,8 @@ export class TableCell extends React.Component { // type = number | date | link 
                             <a className='btn btn-warning' href='#' onClick={e => e.preventDefault() || onSwap(e, content, false)}><i className='fa fa-lg fa-arrow-down' /></a> : null}
                         {onEdit && typeof onEdit == 'function' ?
                             <a className='btn btn-primary' href='#' title={permission.write ? 'Chỉnh sửa' : 'Xem'} onClick={e => e.preventDefault() || onEdit(e, content)}><i className={'fa fa-lg ' + (permission.write ? 'fa-edit' : 'fa-eye')} /></a> : null}
+                        {permission.write && onClone && typeof onClone == 'function' ?
+                            <a className='btn btn-info' href='#' title={'Sao chép'} onClick={e => e.preventDefault() || onClone(e, content)}><i className='fa fa-lg fa-clone' /></a> : null}
                         {onEdit && typeof onEdit == 'string' ?
                             <Link to={onEdit} className='btn btn-primary'><i className='fa fa-lg fa-edit' /></Link> : null}
                         {permission.delete && onDelete ?
@@ -947,7 +949,7 @@ export class AdminPage extends React.Component {
                 <div className='app-title'>
                     <div>
                         <h1><i className={icon} /> {title}</h1>
-                        <p>{subTitle}</p>
+                        <div>{subTitle}</div>
                     </div>
                     <ul className='app-breadcrumb breadcrumb' style={{ alignItems: 'center' }}>
                         <div style={{ display: 'flex', marginRight: '15px' }} >{header}</div>

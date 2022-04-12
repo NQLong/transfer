@@ -4,14 +4,14 @@ import Loading from 'view/component/Loading';
 import dtNganhDaoTao from './redux';
 
 export default {
-  redux: {
-    parent: 'daoTao',
-    reducers: { dtNganhDaoTao }
-  },
-  routes: [
-    {
-      path: '/user/pdt/nganh-dao-tao',
-      component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
+    redux: {
+        parent: 'daoTao',
+        reducers: { dtNganhDaoTao }
     },
-  ],
+    routes: [
+        {
+            path: '/user/dao-tao/nganh-dao-tao',
+            component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
+        },
+    ],
 };

@@ -7,7 +7,7 @@ import { getDmDonViAll } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { FormTextBox, renderTable, AdminModal, TableCell, AdminPage, FormSelect, FormCheckbox, } from 'view/component/AdminPage';
 
 class EditModal extends AdminModal {
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.state = { index: -1 };
     }
@@ -26,7 +26,6 @@ class EditModal extends AdminModal {
     }
 
     onShow = (index, item) => {
-        console.log(index, item);
         let { ma, ten, soTinChi, tongSoTiet, soTietLt, soTietTh, soTietTt, soTietTl, soTietDa, soTietLa, tinhChatPhong, tenTiengAnh,
             boMon, loaiHinh, chuyenNganh, ghiChu, maCtdt, tenCtdt, kichHoat } = item ? item : { ma: '', ten: '', soTinChi: 0, tongSoTiet: 0, soTietLt: 0, soTietTh: 0, soTietTt: 0, soTietTl: 0, soTietDa: 0, soTietLa: 0, tinhChatPhong: '', tenTiengAnh: '', boMon: 0, loaiHinh: '', chuyenNganh: '', ghiChu: '', maCtdt: '', tenCtdt: '', kichHoat: 1 };
 
@@ -134,7 +133,7 @@ class DmMonHocImportPage extends AdminPage {
                 this.donViMapper = {};
                 items.forEach(item => {
                     this.donViMapper[item.ma] = item.ten;
-                    this.donViTenMa[item.ten.replace('Khoa ','')] = item.ma;
+                    this.donViTenMa[item.ten.replace('Khoa ', '')] = item.ma;
                 });
             }
         });

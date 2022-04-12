@@ -11,7 +11,7 @@ export default {
     },
     routes: [
         {
-            path: '/user/pdt/thoi-khoa-bieu',
+            path: '/user/dao-tao/thoi-khoa-bieu',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
     ],

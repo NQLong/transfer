@@ -11,11 +11,11 @@ export default {
     },
     routes: [
         // {
-        //     path: '/user/pdt/mon-hoc/upload',
+        //     path: '/user/dao-tao/mon-hoc/upload',
         //     component: Loadable({ loading: Loading, loader: () => import('./adminImportPage') })
         // },
         {
-            path: '/user/pdt/mon-hoc',
+            path: '/user/dao-tao/mon-hoc',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
     ],

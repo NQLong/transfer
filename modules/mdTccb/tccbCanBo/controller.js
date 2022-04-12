@@ -942,13 +942,14 @@ module.exports = app => {
                 resolve();
             });
         })).then(() => new Promise(resolve => {
-            app.model.trinhDoNgoaiNgu.getTrinhDoNNByShcc(canBo.shcc, (error, trinhDoNN) => {
+            app.model.trinhDoNgoaiNgu.getAll({ shcc: canBo.shcc }, (error, trinhDoNN) => {
                 if (error) {
                     res.send({ error: 'Lỗi khi lấy thông tin trình độ ngoại ngữ cán bộ !' });
-                } else if (trinhDoNN == null) {
+                }
+                else if (trinhDoNN == null) {
                     result = app.clone(result, { trinhDoNN: null });
                 } else {
-                    result = app.clone(result, { trinhDoNN: trinhDoNN.rows[0] });
+                    result = app.clone(result, { trinhDoNN: trinhDoNN });
                 }
                 resolve();
             });
