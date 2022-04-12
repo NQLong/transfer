@@ -402,17 +402,15 @@ module.exports = app => {
             }
         },
         get: (name) => {
-            let listPermission = [], nhomRoles = name.split(',');
-            const getList = (index = 0) => {
-                let nhomRole = nhomRoles[index];
-                if (assignListContainer[nhomRole]) {
-                    assignListContainer[nhomRole].map(item => item.nhomRole = nhomRole);
-                    listPermission.push(...assignListContainer[nhomRole]);
+            if (typeof name == 'string') name = [name];
+            let listPermission = [];
+            name.forEach(roleName => {
+                if (assignListContainer[roleName]) {
+                    listPermission.push(...assignListContainer[roleName].map(item => app.clone(item, { nhomRole: roleName })));
                 }
-                if (index == nhomRoles.length - 1) return listPermission;
-                else return getList(index + 1);
-            };
-            return getList();
+            });
+
+            return listPermission;
         },
 
         addHook: (name, hook) => assignRolePermissionHookContainer[name] = hook, // Hook is Promise object | parameters: req, roles
