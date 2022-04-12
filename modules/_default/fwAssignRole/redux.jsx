@@ -1,8 +1,9 @@
 import T from 'view/js/common';
+
 // Actions ------------------------------------------------------------------------------------------------------------
 export function getRolesList(nhomRole, done) {
-    const url = `/api/assign-role/list/${nhomRole}`;
-    T.get(url, data => {
+    const url = '/api/list-assign-role';
+    T.get(url, { nhomRole }, data => {
         if (data.error) {
             T.notify('Lấy danh sách quyền bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
             console.error(`GET: ${url}.`, data.error);
@@ -25,7 +26,7 @@ export function getAssignRole(nguoiDuocGan, nhomRole, done) {
 }
 
 export function createAssignRole(assignRole, done) {
-    const url = '/api/assign-role';
+    const url = `/api/assign-role?nhomRole=${assignRole.nhomRole}`;
     T.post(url, { assignRole }, data => {
         if (data.error) {
             T.notify('Tạo gán quyền bị lỗi!', 'danger');
@@ -38,7 +39,7 @@ export function createAssignRole(assignRole, done) {
 }
 
 export function updateAssignRole(id, item, done) {
-    const url = '/api/assign-role';
+    const url = `/api/assign-role?nhomRole=${item.nhomRole}`;
     T.put(url, { id, item }, data => {
         if (data.error || item == null) {
             T.notify('Cập nhật thông tin gán quyền bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -52,8 +53,9 @@ export function updateAssignRole(id, item, done) {
 }
 
 export function deleteAssignRole(item, done) {
-    const url = '/api/assign-role';
-    T.delete(url, { item }, data => {
+    return () => {
+        const url = `/api/assign-role?nhomRole=${item.nhomRole}`;
+        T.delete(url, { item }, data => {
             if (data.error) {
                 T.notify('Xóa thông tin gán quyền bị lỗi' + (data.error.message && ('<br>' + data.error.message)), 'danger');
                 console.error(`DELETE: ${url}`);
@@ -63,5 +65,7 @@ export function deleteAssignRole(item, done) {
                 done && done(data);
             }
         }, error => T.notify('Xóa thông tin gán quyền bị lỗi' + (error.message && ('<br>' + error.message)), 'danger')
-    );
+        );
+    };
+
 }

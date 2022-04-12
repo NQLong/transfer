@@ -376,7 +376,7 @@ module.exports = (app) => {
             case trangThaiSwitcher.TRA_LAI_BGH.id:
                 return action.RETURN;
             case trangThaiSwitcher.DA_PHAN_PHOI.id:
-                return action.PUBLISH
+                return action.PUBLISH;
             default:
                 return '';
         }
@@ -392,7 +392,7 @@ module.exports = (app) => {
             }
             else {
                 const newCongVan = await updateCongvanDen(id, { trangThai });
-                const history = await app.model.hcthHistory.createHistory({
+                await app.model.hcthHistory.createHistory({
                     key: id, loai: CONG_VAN_TYPE, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc,
                     hanhDong: statusToAction(congVan.trangThai, trangThai),
                 });
