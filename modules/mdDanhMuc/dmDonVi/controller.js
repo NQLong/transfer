@@ -72,13 +72,20 @@ module.exports = app => {
     });
     app.get('/api/danh-muc/don-vi/faculty', app.permission.check('user:login'), (req, res) => {
         let condition = {
-            statement: 'maPl = :maPl AND kichHoat = :kichHoat',
+            statement: '( (maPl = :maPl OR ma = 33 OR ma = 32) AND kichHoat = 1 )',
             parameter: {
-                maPl: 1,
-                kichHoat: 1
+                maPl: 1
             },
         };
-        app.model.dmDonVi.getAll(condition, (error, items) => res.send({ error, items }));
+        if (req.query.condition) {
+            condition = {
+                statement: '( ((maPl = 1 OR ma = 33 OR ma = 32) AND kichHoat = 1) AND (lower(ten) LIKE :searchTerm)',
+                parameter: {
+                    searchText: `%${req.query.condition.toLowerCase()}%`
+                },
+            };
+        }
+        app.model.dmDonVi.getAll(condition, 'ma,ten', 'ma', (error, items) => res.send({ error, items }));
     });
     app.get('/dm-don-vi/:idLoaiDonVi', (req, res) => {
         const condition = { maPl: req.params.idLoaiDonVi, kichHoat: 1 };
