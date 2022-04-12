@@ -409,7 +409,6 @@ module.exports = app => {
                     listPermission.push(...assignListContainer[roleName].map(item => app.clone(item, { nhomRole: roleName })));
                 }
             });
-
             return listPermission;
         },
 

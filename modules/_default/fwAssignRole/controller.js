@@ -15,8 +15,8 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/assign-role/list/:nhomRole', app.permission.check('fwAssignRole:read'), (req, res) => {
-        const items = app.assignRoleHooks.get(req.params.nhomRole);
+    app.get('/api/list-assign-role', app.permission.check('fwAssignRole:read'), (req, res) => {
+        const items = app.assignRoleHooks.get(req.query.nhomRole);
         res.send({ items });
     });
 

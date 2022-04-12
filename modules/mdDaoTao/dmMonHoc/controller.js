@@ -166,10 +166,8 @@ module.exports = app => {
 
     app.assignRoleHooks.addHook('daoTao', (req, roles) => new Promise((resolve) => {
         if (req.session.user && req.session.user.permissions && req.session.user.permissions.includes('manager:write') && req.session.user.permissions.includes('faculty:login')) {
-            app.assignRoleHooks.get('daoTao').then(items => {
-                const assignRolesList = items.map(item => item.id);
-                resolve(roles && roles.length && assignRolesList.contains(roles));
-            });
+            const assignRolesList = app.assignRoleHooks.get('daoTao').map(item => item.id);
+            resolve(roles && roles.length && assignRolesList.contains(roles));
         }
     }));
 

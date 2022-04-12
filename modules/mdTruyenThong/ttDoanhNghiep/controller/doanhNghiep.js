@@ -323,12 +323,11 @@ module.exports = app => {
 
     // Phân quyền cho các đơn vị ------------------------------------------------------------------------------------------------------------------------
     app.assignRoleHooks.addRoles('ttDoanhNghiep', { id: 'dnDoanhNghiep:manage', text: 'Doanh nghiệp: Quản lý doanh nghiệp' });
+
     app.assignRoleHooks.addHook('ttDoanhNghiep', (req, roles) => new Promise(resolve => {
         if (req.session.user && req.session.user.permissions && req.session.user.permissions.includes('manager:write')) {
-            app.assignRoleHooks.get('ttDoanhNghiep').then(items => {
-                const assignRolesList = items.map(item => item.id);
-                resolve(roles && roles.length && assignRolesList.contains(roles));
-            });
+            const assignRolesList = app.assignRoleHooks.get('ttDoanhNghiep').map(item => item.id);
+            resolve(roles && roles.length && assignRolesList.contains(roles));
         }
     }));
 
