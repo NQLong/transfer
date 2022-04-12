@@ -44,6 +44,7 @@ export default function dtDangKyMoMonReducer(state = null, data) {
 
 export const PageName = 'pageDtDangKyMoMon';
 T.initPage(PageName);
+
 export function getDtDangKyMoMonPage(pageNumber, pageSize, pageCondition, done) {
     const page = T.updatePage(PageName, pageNumber, pageSize, pageCondition);
     return dispatch => {

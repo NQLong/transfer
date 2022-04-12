@@ -110,8 +110,7 @@ class EditModal extends AdminModal {
                 <FormTextBox className='col-12' ref={e => this.ghiChu = e} label='Ghi chú' readOnly={readOnly} placeholder='Ghi chú' />
                 <FormRichTextBox rows='5' className='col-6' ref={e => this.maCtdt = e} label='Mã CTĐT' readOnly={readOnly} placeholder='Mã CTĐT' />
                 <FormRichTextBox rows='5' className='col-6' ref={e => this.tenCtdt = e} label='Tên CTĐT' readOnly={readOnly} placeholder='Tên CTĐT' />
-                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
-                    onChange={value => this.changeKichHoat(value ? 1 : 0)} />
+                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }} onChange={value => this.changeKichHoat(value ? 1 : 0)} />
             </div>
         });
     }
@@ -119,7 +118,7 @@ class EditModal extends AdminModal {
 
 class DmMonHocPage extends AdminPage {
     donViMapper = {};
-    state = { donViFilter: '' };
+    state = { donViFilter: '' }
 
     componentDidMount() {
         this.props.getDmDonViAll(items => {
@@ -207,11 +206,12 @@ class DmMonHocPage extends AdminPage {
                     <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietLa} />
                     <TableCell content={this.donViMapper && this.donViMapper[item.boMon] ? this.donViMapper[item.boMon] : ''} />
                     <TableCell contentClassName='multiple-lines-4' content={item.tenCtdt?.split(',').map((ctdt, index) => <div key={index}>{ctdt} <br /></div>)} />
-                    <TableCell type='checkbox' content={item.kichHoat} permission={permission}
-                        onChanged={value => this.props.updateDmMonHoc(item.ma, { kichHoat: value ? 1 : 0, })} />
-                    <TableCell type='buttons' content={item} permission={permission}
+                    < TableCell type='checkbox' content={item.kichHoat} permission={permission}
+                        onChanged={value => this.props.updateDmMonHoc(item.ma, { kichHoat: value ? 1 : 0, })
+                        } />
+                    < TableCell type='buttons' content={item} permission={permission}
                         onEdit={() => this.modal.show(item)} onDelete={this.delete} />
-                </tr>)
+                </tr >)
         });
 
         return this.renderPage({
