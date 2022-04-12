@@ -22,8 +22,6 @@ class DtChuongTrinhDaoTaoPage extends AdminPage {
         });
     }
 
-    changeActive = item => this.props.updateDtChuongTrinhDaoTao(item.id, { kichHoat: item.kichHoat == '1' ? '0' : '1' });
-
     delete = (e, item) => {
         e.preventDefault();
         T.confirm('Xóa chương trình đào tạo', 'Bạn có chắc bạn muốn xóa chương trình đào tạo này?', true, isConfirm =>
@@ -48,18 +46,28 @@ class DtChuongTrinhDaoTaoPage extends AdminPage {
             getDataSource: () => list,
             renderHead: () => (
                 <tr>
-                    <th style={{ width: 'auto', textAlign: 'right', verticalAlign: 'middle' }}>#</th>
-                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Năm đào tạo</th>
+                    <th style={{ width: 'auto', textAlign: 'right', verticalAlign: 'middle' }}>STT</th>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Năm ĐT</th>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Mã ngành</th>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Tên ngành</th>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Trình độ</th>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Loại hình</th>
+                    <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thời gian</th>
                     <th style={{ width: '100%', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Khoa/Bộ môn</th>
                     <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Thao tác</th>
                 </tr>
             ),
             renderRow: (item, index) => (
                 <tr key={index}>
-                    <TableCell style={{ width: 'auto', textAlign: 'right' }} content={index + 1} />
-                    <TableCell style={{ width: 'auto', textAlign: 'center' }} content={item.namDaoTao} />
-                    <TableCell content={item.ten} />
-                    <TableCell type='buttons' content={item} permission={permission} onEdit={permission.write ? (e) => e.preventDefault() || this.props.history.push(`/user/dao-tao/chuong-trinh-dao-tao/${item.id}`) : null} />
+                    <TableCell style={{ textAlign: 'right' }} content={index + 1} />
+                    <TableCell style={{ textAlign: 'center' }} content={item.namDaoTao} />
+                    <TableCell style={{ textAlign: 'center' }} content={item.maNganh} />
+                    <TableCell content={item.tenNganh} />
+                    <TableCell style={{ textAlign: 'center' }} content={item.trinhDoDaoTao} />
+                    <TableCell style={{ whiteSpace: 'nowrap' }} content={item.loaiHinhDaoTao} />
+                    <TableCell style={{ textAlign: 'center' }} content={item.thoiGianDaoTao + ' năm'} />
+                    <TableCell content={item.tenKhoaBoMon} />
+                    <TableCell style={{ textAlign: 'center' }} type='buttons' content={item} permission={permission} onEdit={permission.write ? (e) => e.preventDefault() || this.props.history.push(`/user/dao-tao/chuong-trinh-dao-tao/${item.id}`) : null} />
                 </tr>
             )
         });
