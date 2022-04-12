@@ -333,7 +333,7 @@ const T = {
         return months <= 0 ? 0 : months;
     },
 
-    numberNgayNghi: (start, end) => { //Số ngày nghỉ trong khoảng [start, end]
+    numberNgayNghi: (start, end, danhSachNgayLe = []) => { //Số ngày nghỉ trong khoảng [start, end]
         let result = 0;
         while (end >= start && result <= 30) {
             let positionDay = start.getDay();
@@ -341,11 +341,19 @@ const T = {
                  //thứ bảy, chủ nhật
                  //TODO: thêm ngày lễ
             } else {
-                result += 1;
+                let isNgayLe = false;
+                for (let idx = 0; idx < danhSachNgayLe.length; idx++) {
+                    let ngayLeDate = new Date(danhSachNgayLe[idx]);
+                    if (ngayLeDate.getFullYear() == start.getFullYear() && ngayLeDate.getMonth() == start.getMonth() && ngayLeDate.getDate() == start.getDate()) {
+                        isNgayLe = true;
+                        break;
+                    }
+                }
+                result += isNgayLe ? 0 : 1;
             }
             start = start.nextDate();
         }
-        if (result > 30) { //Case: Quá nhiều ngày phép
+        if (result > 30) { //Case: Quá nhiều ngày nghỉ
             return -1; 
         }
         return result;

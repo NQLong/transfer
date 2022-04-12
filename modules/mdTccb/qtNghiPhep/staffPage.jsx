@@ -11,6 +11,7 @@ import {
 } from './redux';
 import { SelectAdapter_DmNghiPhepV2 } from 'modules/mdDanhMuc/dmNghiPhep/redux';
 import { getDmNghiPhep } from 'modules/mdDanhMuc/dmNghiPhep/redux';
+import { getDmNgayLeAll } from 'modules/mdDanhMuc/dmNgayLe/redux';
 
 const EnumDateType = Object.freeze({
     0: { text: '' },
@@ -52,7 +53,7 @@ class EditModal extends AdminModal {
                     let year = new Date(items[idx].batDau).getFullYear();
                     if (year == currentYear) {
                         this.props.getNghiPhep(items[idx].lyDo, itemNghiPhep => {
-                            let value = Math.max(T.numberNgayNghi(new Date(items[idx].batDau), new Date(items[idx].ketThuc)) - itemNghiPhep.soNgayPhep, 0);
+                            let value = Math.max(T.numberNgayNghi(new Date(items[idx].batDau), new Date(items[idx].ketThuc), this.props.danhSachNgayLe) - itemNghiPhep.soNgayPhep, 0);
                             result -= value;
                             solve(idx + 1);
                         });
@@ -71,12 +72,12 @@ class EditModal extends AdminModal {
         if (!shcc) {
             shcc = item.shcc;
         }
-        this.calcSoNgayPhepConLai(shcc, ngayBatDauCongTac, batDau && ketThuc ? Math.max(T.numberNgayNghi(new Date(batDau), new Date(ketThuc)) - ngayNghiPhep, 0) : 0, soNgayNghiPhepConLai => {
+        this.calcSoNgayPhepConLai(shcc, ngayBatDauCongTac, batDau && ketThuc ? Math.max(T.numberNgayNghi(new Date(batDau), new Date(ketThuc), this.props.danhSachNgayLe) - ngayNghiPhep, 0) : 0, soNgayNghiPhepConLai => {
             this.setState({ soNgayNghiPhepConLai });
         });
         this.setState({
-            soNgayXinNghi: batDau && ketThuc ? T.numberNgayNghi(new Date(batDau), new Date(ketThuc)) : 0,
-            soNgayPhep: batDau && ketThuc ? Math.max(T.numberNgayNghi(new Date(batDau), new Date(ketThuc)) - ngayNghiPhep, 0) : 0,
+            soNgayXinNghi: batDau && ketThuc ? T.numberNgayNghi(new Date(batDau), new Date(ketThuc), this.props.danhSachNgayLe) : 0,
+            soNgayPhep: batDau && ketThuc ? Math.max(T.numberNgayNghi(new Date(batDau), new Date(ketThuc), this.props.danhSachNgayLe) - ngayNghiPhep, 0) : 0,
             id, batDauType: batDauType ? batDauType : 'dd/mm/yyyy',
             ketThucType: ketThucType ? ketThucType : 'dd/mm/yyyy',
             batDau, ketThuc, lyDoKhac: lyDo == '99' ? true : false,
@@ -135,8 +136,8 @@ class EditModal extends AdminModal {
             let { batDau, ketThuc, ngayPhepLyDo } = this.state;
             if (batDau && ketThuc) {
                 this.setState({
-                    soNgayXinNghi: T.numberNgayNghi(new Date(batDau), new Date(ketThuc)),
-                    soNgayPhep: Math.max(T.numberNgayNghi(new Date(batDau), new Date(ketThuc)) - ngayPhepLyDo, 0),
+                    soNgayXinNghi: T.numberNgayNghi(new Date(batDau), new Date(ketThuc), this.props.danhSachNgayLe),
+                    soNgayPhep: Math.max(T.numberNgayNghi(new Date(batDau), new Date(ketThuc), this.props.danhSachNgayLe) - ngayPhepLyDo, 0),
                 });
             }
         });
@@ -146,8 +147,8 @@ class EditModal extends AdminModal {
             let { batDau, ketThuc, ngayPhepLyDo } = this.state;
             if (batDau && ketThuc) {
                 this.setState({
-                    soNgayXinNghi: T.numberNgayNghi(new Date(batDau), new Date(ketThuc)),
-                    soNgayPhep: Math.max(T.numberNgayNghi(new Date(batDau), new Date(ketThuc)) - ngayPhepLyDo, 0),
+                    soNgayXinNghi: T.numberNgayNghi(new Date(batDau), new Date(ketThuc), this.props.danhSachNgayLe),
+                    soNgayPhep: Math.max(T.numberNgayNghi(new Date(batDau), new Date(ketThuc), this.props.danhSachNgayLe) - ngayPhepLyDo, 0),
                 });
             }
         });
@@ -159,7 +160,7 @@ class EditModal extends AdminModal {
                 let { batDau, ketThuc, ngayPhepLyDo } = this.state;
                 if (batDau && ketThuc) {
                     this.setState({
-                        soNgayPhep: Math.max(T.numberNgayNghi(new Date(batDau), new Date(ketThuc)) - ngayPhepLyDo, 0),
+                        soNgayPhep: Math.max(T.numberNgayNghi(new Date(batDau), new Date(ketThuc), this.props.danhSachNgayLe) - ngayPhepLyDo, 0),
                     });
                 }
                 
@@ -170,7 +171,7 @@ class EditModal extends AdminModal {
                 let { batDau, ketThuc, ngayPhepLyDo } = this.state;
                 if (batDau && ketThuc) {
                     this.setState({
-                        soNgayPhep: Math.max(T.numberNgayNghi(new Date(batDau), new Date(ketThuc)) - ngayPhepLyDo, 0),
+                        soNgayPhep: Math.max(T.numberNgayNghi(new Date(batDau), new Date(ketThuc), this.props.danhSachNgayLe) - ngayPhepLyDo, 0),
                     });
                 }
             });
@@ -186,7 +187,7 @@ class EditModal extends AdminModal {
                 <span className='form-group col-md-12' style={{ color: 'blue'}}>Năm {currentYear}, cán bộ còn <b>{this.state.soNgayNghiPhepConLai}</b> ngày nghỉ phép<br/></span>
                 <FormSelect className='col-md-6' ref={e => this.lyDo = e} readOnly={readOnly} data={SelectAdapter_DmNghiPhepV2} label='Lý do nghỉ' onChange={this.handleLyDo} required />
                 <div className='col-md-12' id='lyDoKhac'><FormRichTextBox type='text' ref={e => this.lyDoKhac = e} rows={2} label='Nhập lý do khác' placeholder='Nhập lý do xin nghỉ phép (tối đa 200 ký tự)' readOnly={readOnly} /> </div>
-                <FormTextBox className='col-md-12' ref={e => this.noiDen = e} label='Nơi đến' />
+                <FormTextBox className='col-md-12' ref={e => this.noiDen = e} label='Nơi đến' readOnly={readOnly} />
             
                 <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} onChange={this.handleBatDau} placeholder='Thời gian bắt đầu'
                     label={
@@ -201,7 +202,7 @@ class EditModal extends AdminModal {
                             items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
                             onSelected={item => this.setState({ ketThucType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
                     }
-                    type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} /></div>
+                    type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} readOnly={readOnly} /></div>
                 <span className='form-group col-md-6' style={{ color: 'blue'}}>Tổng số ngày xin nghỉ là <b>{this.state.soNgayXinNghi}</b> ngày</span>
                 <span className='form-group col-md-6' style={{ color: 'blue'}}>Tổng số ngày phép là <b>{this.state.soNgayPhep}</b> ngày<br/></span>
                 <FormRichTextBox className='col-md-12' ref={e => this.ghiChu = e} rows={2} readOnly={readOnly} label='Ghi chú' placeholder='Ghi chú (tối đa 200 ký tự)' />
@@ -214,6 +215,13 @@ class QtNghiPhepUserPage extends AdminPage {
     state = { filter: {} };
     componentDidMount() {
         T.ready('/user', () => {
+            this.props.getDmNgayLeAll({}, items => {
+                let danhSachNgay = [];
+                for (let idx = 0; idx < items.length; idx++) {
+                    danhSachNgay.push(items[idx].ngay);
+                }
+                this.setState({ danhSachNgayLe: danhSachNgay });
+            });
             const { shcc } = this.props.system && this.props.system.user ? this.props.system.user : { shcc: '' };
             this.setState({ filter: { listShcc: shcc, listDv: '', fromYear: null, toYear: null, tinhTrang: null, lyDo: '' } });
             this.getPage();
@@ -252,9 +260,9 @@ class QtNghiPhepUserPage extends AdminPage {
     render() {
         let permission = this.getUserPermission('staff', ['login']);
         if (permission.login == true) {
-            permission = {
-                write: true,
-                delete: true
+            permission = { //TODO: Sẽ thêm vào phần gửi yêu cầu tới tổ chức cán bộ duyệt
+                write: false,
+                delete: false
             };
         }
         const { isStaff, shcc } = this.props.system && this.props.system.user ? this.props.system.user : { isStaff: false, shcc: '' };
@@ -326,7 +334,7 @@ class QtNghiPhepUserPage extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
-                <EditModal ref={e => this.modal = e} shcc={this.shcc} readOnly={!permission.write}
+                <EditModal ref={e => this.modal = e} shcc={this.shcc} readOnly={!permission.write} danhSachNgayLe={this.state.danhSachNgayLe}
                     create={this.props.createQtNghiPhepUserPage} update={this.props.updateQtNghiPhepUserPage} getAll={this.props.getQtNghiPhepAllUser} getNghiPhep={this.props.getDmNghiPhep}
                 />
             </>,
@@ -339,6 +347,6 @@ class QtNghiPhepUserPage extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtNghiPhep: state.tccb.qtNghiPhep });
 const mapActionsToProps = {
     getQtNghiPhepUserPage, deleteQtNghiPhepUserPage,
-    updateQtNghiPhepUserPage, createQtNghiPhepUserPage, getQtNghiPhepAllUser, getDmNghiPhep
+    updateQtNghiPhepUserPage, createQtNghiPhepUserPage, getQtNghiPhepAllUser, getDmNghiPhep, getDmNgayLeAll
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtNghiPhepUserPage);
