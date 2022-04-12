@@ -143,7 +143,6 @@ export function createDtChuongTrinhDaoTao(item, done) {
 export function deleteDtChuongTrinhDaoTao(id, done) {
     return () => {
         const url = '/api/dao-tao/chuong-trinh-dao-tao';
-        console.log(id);
         T.delete(url, { id }, data => {
             if (data.error) {
                 T.notify('Xóa chương trình đào tạo bị lỗi!', 'danger');

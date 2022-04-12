@@ -45,20 +45,37 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/dao-tao/chuong-trinh-dao-tao/:ma', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:readAll', 'manager:read'), (req, res) => {
+    app.get('/api/dao-tao/chuong-trinh-dao-tao/:ma', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
         const condition = req.query.condition || {};
         Object.keys(condition).forEach(key => { condition[key] === '' ? condition[key] = null : ''; });
         app.model.dtChuongTrinhDaoTao.getAll(condition, '*', 'id ASC', (error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/dao-tao/khung-dao-tao/:ma', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:readAll', 'manager:read'), (req, res) => {
+    app.get('/api/dao-tao/khung-dao-tao/:ma', app.permission.orCheck('dtChuongTrinhDaoTao:read', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
         const condition = req.query.condition || {};
         Object.keys(condition).forEach(key => { condition[key] === '' ? condition[key] = null : ''; });
         app.model.dtKhungDaoTao.get(condition, '*', 'id ASC', (error, items) => res.send({ error, items }));
     });
 
-    app.post('/api/dao-tao/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:write', 'manager:write'), (req, res) => {
-        app.model.dtChuongTrinhDaoTao.create(req.body.data, (error, item) => res.send({ error, item }));
+    app.post('/api/dao-tao/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:write', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
+        let dataKhung = req.body.item.data, dataMon = req.body.item.items;
+        app.model.dtKhungDaoTao.create(dataKhung, (error, item) => {
+            if (!error) {
+                const create = (index = 0) => {
+                    if (index == dataMon.length) {
+                        res.send({ error, item });
+                    } else {
+                        dataMon[index].maKhungDaoTao = item.id;
+                        delete dataMon[index].id;
+                        app.model.dtChuongTrinhDaoTao.create(dataMon[index], (error, item1) => {
+                            if (error || !item1) res.send({ error });
+                            else create(index + 1);
+                        });
+                    }
+                };
+                create();
+            } else res.send({ error });
+        });
     });
 
     app.post('/api/dao-tao/chuong-trinh-dao-tao/multiple', app.permission.orCheck('dtChuongTrinhDaoTao:write', 'manager:write'), (req, res) => {
@@ -68,30 +85,29 @@ module.exports = app => {
 
         const handleCreate = (index, idKhungDt) => {
             if (index >= items.length) res.send({ items: dataImported });
-            else
-                app.model.dtChuongTrinhDaoTao.get({ id: items[index].id }, (error, item) => {
-                    const currentData = { ...items[index], ...{ maKhungDaoTao: idKhungDt } };
-                    delete currentData['id'];
-                    if (error) res.send({ error });
-                    else if (item) {
-                        app.model.dtChuongTrinhDaoTao.update({ id: items[index].id }, currentData, (error, item) => {
-                            if (error) res.send({ error });
-                            else {
-                                dataImported.push(item);
-                            }
-                        });
-                        handleCreate(index + 1, idKhungDt);
-                    }
-                    else {
-                        app.model.dtChuongTrinhDaoTao.create(currentData, (error, item) => {
-                            if (error) res.send({ error });
-                            else {
-                                dataImported.push(item);
-                                handleCreate(index + 1);
-                            }
-                        });
-                    }
-                });
+            else app.model.dtChuongTrinhDaoTao.get({ id: items[index].id }, (error, item) => {
+                const currentData = { ...items[index], ...{ maKhungDaoTao: idKhungDt } };
+                delete currentData['id'];
+                if (error) res.send({ error });
+                else if (item) {
+                    app.model.dtChuongTrinhDaoTao.update({ id: items[index].id }, currentData, (error, item) => {
+                        if (error) res.send({ error });
+                        else {
+                            dataImported.push(item);
+                        }
+                    });
+                    handleCreate(index + 1, idKhungDt);
+                }
+                else {
+                    app.model.dtChuongTrinhDaoTao.create(currentData, (error, item) => {
+                        if (error) res.send({ error });
+                        else {
+                            dataImported.push(item);
+                            handleCreate(index + 1);
+                        }
+                    });
+                }
+            });
         };
         if (idKhungDt > 0) {
             app.model.dtKhungDaoTao.get({ id: idKhungDt }, (error, item) => {
@@ -130,8 +146,40 @@ module.exports = app => {
 
     });
 
-    app.put('/api/dao-tao/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:write', 'manager:write'), (req, res) => {
-        app.model.dtChuongTrinhDaoTao.update({ id: req.body.id }, req.body.changes, (error, items) => res.send({ error, items }));
+    app.put('/api/dao-tao/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:write', 'manager:write'), async (req, res) => {
+        let id = req.body.id, changes = req.body.changes;
+        // console.log(changes);
+        const updateCTDT = (listMonHoc) => new Promise((resolve, reject) => {
+            app.model.dtChuongTrinhDaoTao.delete({ maKhungDaoTao: id }, (error) => {
+                if (error) reject(error);
+                else {
+                    const newCTDT = [];
+                    const update = (index = 0) => {
+                        if (index == listMonHoc.length) {
+                            resolve(newCTDT);
+                        } else {
+                            let monHoc = listMonHoc[index];
+                            monHoc.maKhungDaoTao = parseInt(id);
+                            delete monHoc.id;
+                            app.model.dtChuongTrinhDaoTao.create(monHoc, (error, item) => {
+                                if (error || !item) reject(error);
+                                else {
+                                    newCTDT.push(item);
+                                    update(index + 1);
+                                }
+                            });
+                        }
+                    };
+                    update();
+                }
+            });
+        });
+        try {
+            let listMonHocCTDT = changes.items && changes.items.length ? await updateCTDT(changes.items) : [];
+            app.model.dtKhungDaoTao.update({ id }, changes.data, (error, item) => res.send({ error, item: app.clone(item, { listMonHocCTDT }) }));
+        } catch (error) {
+            res.send({ error });
+        }
     });
 
     app.delete('/api/dao-tao/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:delete', 'manager:write'), (req, res) => {

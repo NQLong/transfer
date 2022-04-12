@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { createMultiDtChuongTrinhDaoTao, getDtChuongTrinhDaoTao, getDtKhungDaoTao } from './redux';
+import { createMultiDtChuongTrinhDaoTao, createDtChuongTrinhDaoTao, updateDtChuongTrinhDaoTao, getDtChuongTrinhDaoTao, getDtKhungDaoTao } from './redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, FormRichTextBox, FormSelect, FormTabs, FormTextBox } from 'view/component/AdminPage';
 import ComponentKienThuc from './componentKienThuc';
@@ -20,6 +20,21 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                 this.props.getDtKhungDaoTao(this.ma, (data) => {
                     this.khoa.value(data.maKhoa);
                     this.namDaoTao.value(data.namDaoTao);
+                    this.maNganh.value(data.maNganh);
+                    this.tenNganhVi.value(T.parse(data.tenNganh).vi || '');
+                    this.tenNganhEn.value(T.parse(data.tenNganh).en || '');
+                    this.trinhDoDaoTao.value(data.trinhDoDaoTao);
+                    this.loaiHinhDaoTao.value(data.loaiHinhDaoTao);
+                    this.thoiGianDaoTao.value(data.thoiGianDaoTao || '');
+                    this.tenVanBangVi.value(T.parse(data.tenVanBang).vi || '');
+                    this.tenVanBangEn.value(T.parse(data.tenVanBang).en || '');
+                    this.mucTieuChung.value(data.mucTieuChung);
+
+                    let mucTieuCuThe = T.parse(data.mucTieuCuThe || '{}');
+                    this.mucTieuCuThe1.value(mucTieuCuThe[1] || '');
+                    this.mucTieuCuThe2.value(mucTieuCuThe[2] || '');
+                    this.mucTieuCuThe3.value(mucTieuCuThe[3] || '');
+                    this.mucTieuCuThe4.value(mucTieuCuThe[4] || '');
                     this.props.getDtChuongTrinhDaoTao(this.ma, (ctdt) => {
                         //TODO: Group SQL
                         [this.kienThucDaiCuong, this.kienThucCoSoNganh, this.kienThucChuyenNganh, this.kienThucBoTro, this.kienThucLVTN].forEach(e => e.setVal(ctdt, data.maKhoa));
@@ -30,7 +45,6 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                 this.khoa.value(maKhoa);
                 [this.kienThucDaiCuong, this.kienThucCoSoNganh, this.kienThucChuyenNganh, this.kienThucBoTro, this.kienThucLVTN].forEach(e => e.setVal([], maKhoa));
             }
-
         });
     }
 
@@ -57,12 +71,17 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                 tenVanBangEn: this.validation(this.tenVanBangEn),
                 tenVanBang: T.stringify({ vi: this.tenVanBangVi.value(), en: this.tenVanBangEn.value() }),
                 maKhoa: this.validation(this.khoa),
-                mucTieuChung: this.validation(this.mucTieuChung)
+                mucTieuChung: this.validation(this.mucTieuChung),
+                mucTieu1: this.validation(this.mucTieuCuThe1),
+                mucTieu2: this.validation(this.mucTieuCuThe2),
+                mucTieu3: this.validation(this.mucTieuCuThe3),
+                mucTieu4: this.validation(this.mucTieuCuThe4),
+                mucTieuCuThe: T.stringify({ 1: this.mucTieuCuThe1.value(), 2: this.mucTieuCuThe2.value(), 3: this.mucTieuCuThe3.value(), 4: this.mucTieuCuThe4.value() })
             };
             return data;
         } catch (selector) {
             selector.focus();
-            T.notify('<b>' + (selector.props.label || selector.props.placeholder || 'Dữ liệu') + '</b> bị trống!', 'danger');
+            T.notify('<b>' + (selector.props.placeholder || selector.props.label || 'Dữ liệu') + '</b> bị trống!', 'danger');
             return false;
         }
     }
@@ -77,10 +96,14 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
             const kienThucLVTN = this.kienThucLVTN.getValue() || [];
             const items = [...kienThucDaiCuong, ...kienThucCoSoNganh, ...kienThucChuyenNganh, ...kienThucBoTro, ...kienThucLVTN];
             const datas = { items: items, ...{ id: this.ma, data } };
-            console.log(datas);
-            this.props.createMultiDtChuongTrinhDaoTao(datas, () => {
-                // location.reload();
-            });
+            try {
+                this.ma == 'new' ? this.props.createDtChuongTrinhDaoTao(datas) : this.props.updateDtChuongTrinhDaoTao(this.ma, datas);
+            } catch (error) {
+                return;
+            }
+            // this.props.createMultiDtChuongTrinhDaoTao(datas, () => {
+            //     // location.reload();
+            // });
         }
     }
     render() {
@@ -139,7 +162,7 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                                     }
                                 ]} />
                             </div>
-                            <FormSelect ref={e => this.khoa = e} data={SelectAdapter_DmDonViFaculty_V2} label='Nơi đào tạo' className='col-12' readOnly={true} />
+                            <FormSelect ref={e => this.khoa = e} data={SelectAdapter_DmDonViFaculty_V2} label='Nơi đào tạo' className='col-12' readOnly={this.props.system.user.staff?.maDonVi || false} />
                         </div>
                     </div>
                 </div>
@@ -154,10 +177,10 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                             <p className='form-group col-12'>Sinh viên tốt nghiệp ngành {this.state.tenNganhVi || ''} có các kiến thức, kỹ năng và năng lực nghề nghiệp như sau:</p>
 
                             {/*TODO: DT_MUC_TIEU_DAO_DAO*/}
-                            <FormRichTextBox ref={e => this.mucTieuCuThe1 = e} label={<b><i>1. Kiến thức và lập luận ngành</i></b>} placeholder='Về kiến thức và lập luận ngành' className='form-group col-12' required />
-                            <FormRichTextBox ref={e => this.mucTieuCuThe2 = e} label={<b><i>2. Kỹ năng, phẩm chất cá nhân và nghề nghiệp</i></b>} placeholder='Về kỹ năng, phẩm chất cá nhân và nghề nghiệp' className='form-group col-12' required />
-                            <FormRichTextBox ref={e => this.mucTieuCuThe3 = e} label={<b><i>3. Kỹ năng làm việc nhóm và giao tiếp</i></b>} placeholder='Về kỹ năng làm việc nhóm và giao tiếp' className='form-group col-12' required />
-                            <FormRichTextBox ref={e => this.mucTieuCuThe4 = e} label={<b><i>4. Năng lực thực hành nghề nghiệp</i></b>} placeholder='Về năng lực thực hành nghề nghiệp' className='form-group col-12' required />
+                            <FormRichTextBox ref={e => this.mucTieuCuThe1 = e} label={<b><i>1. Kiến thức và lập luận ngành</i></b>} placeholder='Kiến thức và lập luận ngành' className='form-group col-12' required />
+                            <FormRichTextBox ref={e => this.mucTieuCuThe2 = e} label={<b><i>2. Kỹ năng, phẩm chất cá nhân và nghề nghiệp</i></b>} placeholder='Kỹ năng, phẩm chất cá nhân và nghề nghiệp' className='form-group col-12' required />
+                            <FormRichTextBox ref={e => this.mucTieuCuThe3 = e} label={<b><i>3. Kỹ năng làm việc nhóm và giao tiếp</i></b>} placeholder='Kỹ năng làm việc nhóm và giao tiếp' className='form-group col-12' required />
+                            <FormRichTextBox ref={e => this.mucTieuCuThe4 = e} label={<b><i>4. Năng lực thực hành nghề nghiệp</i></b>} placeholder='Năng lực thực hành nghề nghiệp' className='form-group col-12' required />
                         </div>
                     </div>
                 </div>
@@ -176,5 +199,5 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, dtChuongTrinhDaoTao: state.daoTao.dtChuongTrinhDaoTao });
-const mapActionsToProps = { createMultiDtChuongTrinhDaoTao, getDtChuongTrinhDaoTao, getDtKhungDaoTao };
+const mapActionsToProps = { createMultiDtChuongTrinhDaoTao, getDtChuongTrinhDaoTao, getDtKhungDaoTao, createDtChuongTrinhDaoTao, updateDtChuongTrinhDaoTao, };
 export default connect(mapStateToProps, mapActionsToProps)(DtChuongTrinhDaoTaoDetails);
