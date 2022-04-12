@@ -11625,10 +11625,10 @@
                 },
                 "NGAY": {
                     "value": "ngay",
-                    "dataType": "NVARCHAR2",
+                    "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": false,
-                    "size": 200
+                    "size": "20,0"
                 },
                 "MO_TA": {
                     "value": "moTa",
@@ -12382,6 +12382,9 @@
             "active": true,
             "moduleName": "dtKhungDaoTao",
             "modelName": "dtKhungDaoTao",
+            "methods": {
+                "DT_KHUNG_DAO_TAO_SEARCH_PAGE": "searchPage"
+            },
             "columns": {
                 "ID": {
                     "value": "id",

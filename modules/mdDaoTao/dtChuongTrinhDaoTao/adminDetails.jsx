@@ -77,8 +77,9 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
             const kienThucLVTN = this.kienThucLVTN.getValue() || [];
             const items = [...kienThucDaiCuong, ...kienThucCoSoNganh, ...kienThucChuyenNganh, ...kienThucBoTro, ...kienThucLVTN];
             const datas = { items: items, ...{ id: this.ma, data } };
+            console.log(datas);
             this.props.createMultiDtChuongTrinhDaoTao(datas, () => {
-                location.reload();
+                // location.reload();
             });
         }
     }
