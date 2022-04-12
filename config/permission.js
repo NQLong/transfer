@@ -70,7 +70,7 @@ module.exports = app => {
                         if (menuTree[index] == null) {
                             menuTree[index] = {
                                 parentMenu: app.clone(permission.menu.parentMenu),
-                                menus: {},
+                                menus: {}
                             };
                         }
                         if (permission.menu.menus == null) {
@@ -224,7 +224,6 @@ module.exports = app => {
                             user.shcc = item.shcc;
                             user.firstName = item.ten;
                             user.lastName = item.ho;
-                            user.maDonVi = item.maDonVi;
                             user.staff = {
                                 shcc: item.shcc,
                                 listChucVu: [],
@@ -238,10 +237,23 @@ module.exports = app => {
                                 }
                             };
                             app.permissionHooks.pushUserPermission(user, 'staff:login'); // Add staff permission: staff:login
+
                             app.model.qtChucVu.getAll(condition, 'maChucVu,maDonVi', null, (e, listChucVu) => {
                                 user.staff.listChucVu = listChucVu || [];
-                                resolve();
+                                let permissionLoaiDonVi = {
+                                    1: 'faculty:login',
+                                    2: 'department:login',
+                                    3: 'center:login',
+                                    4: 'union:login'
+                                };
+                                user.staff.maDonVi ? app.model.dmDonVi.get({ ma: user.staff.maDonVi }, (error, donVi) => {
+                                    if (!error && donVi && donVi.maPl) {
+                                        app.permissionHooks.pushUserPermission(user, permissionLoaiDonVi[donVi.maPl]);
+                                        resolve();
+                                    } else resolve();
+                                }) : resolve();
                             });
+
                         }
                     });
                 }).then(() => new Promise(resolve => {
@@ -390,9 +402,16 @@ module.exports = app => {
             }
         },
         get: (name) => {
-            if (assignListContainer[name]) return [...assignListContainer[name]];
-            return [];
+            if (typeof name == 'string') name = [name];
+            let listPermission = [];
+            name.forEach(roleName => {
+                if (assignListContainer[roleName]) {
+                    listPermission.push(...assignListContainer[roleName].map(item => app.clone(item, { nhomRole: roleName })));
+                }
+            });
+            return listPermission;
         },
+
         addHook: (name, hook) => assignRolePermissionHookContainer[name] = hook, // Hook is Promise object | parameters: req, roles
         check: async (req, roles) => {
             const hooks = Object.values(assignRolePermissionHookContainer);

@@ -2,35 +2,38 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.daoTao,
         menus: {
-            9007: { title: 'Danh sách Môn học', subTitle: 'Của các Khoa/Bộ môn', link: '/user/pdt/mon-hoc', groupIndex: 2, backgroundColor: '#9DE7BE', icon: 'fa-leanpub', color: '#000' },
-        },
+            9007: { title: 'Danh sách Môn học', subTitle: 'Của các Khoa/Bộ môn', link: '/user/pdt/mon-hoc', groupIndex: 2, backgroundColor: '#9DE7BE', icon: 'fa-leanpub', color: '#000' }
+        }
     };
     app.permission.add(
         { name: 'dmMonHoc:read', menu },
-        { name: 'manager:read', menu },
+        { name: 'dmMonHoc:manage', menu },
         { name: 'dmMonHoc:write' },
         { name: 'dmMonHoc:delete' },
-        { name: 'dmMonHoc:upload' },
+        { name: 'dmMonHoc:upload' }
     );
     app.get('/user/pdt/mon-hoc', app.permission.orCheck('dmMonHoc:read', 'manager:read'), app.templates.admin);
     app.get('/user/pdt/mon-hoc/upload', app.permission.orCheck('dmMonHoc:read', 'manager:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/pdt/mon-hoc/page/:pageNumber/:pageSize', app.permission.orCheck('dmMonHoc:read', 'manager:read'), (req, res) => {
+    app.get('/api/pdt/mon-hoc/page/:pageNumber/:pageSize', app.permission.orCheck('dmMonHoc:read', 'dmMonHoc:manage'), (req, res) => {
         let pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
-            donVi = req.query.donVi || 'all',
+            donViFilter = req.query.donViFilter,
+            donVi = req.session.user.staff ? req.session.user.staff.maDonVi : null,
             searchTerm = typeof req.query.searchTerm === 'string' ? `%${req.query.searchTerm.toLowerCase()}%` : '',
             statement = 'lower(ten) LIKE :searchTerm',
             parameter = { searchTerm };
-        if (donVi != 'all') {
+        if (req.session.user.permissions.exists(['dmMonHoc:read']) && donViFilter) donVi = donViFilter;
+        if (donVi) {
             statement = 'boMon = :donVi AND lower(ten) LIKE :searchTerm';
             parameter.donVi = parseInt(donVi);
         }
         let condition = { statement, parameter };
         app.model.dmMonHoc.getPage(pageNumber, pageSize, condition, '*', 'boMon', (error, page) => {
             page.pageCondition = {
-                searchTerm, donVi
+                searchTerm,
+                donViFilter: donViFilter
             };
             res.send({ error, page });
         });
@@ -67,7 +70,7 @@ module.exports = app => {
                 if (dmMonHoc[i].kichHoat === 'true' | dmMonHoc[i].kichHoat === 'false')
                     dmMonHoc[i].kichHoat === 'true' ? dmMonHoc[i].kichHoat = 1 : dmMonHoc[i].kichHoat = 0;
                 const current = dmMonHoc[i];
-                app.model.dmMonHoc.create(current, (error,) => {
+                app.model.dmMonHoc.create(current, (error) => {
                     if (error) errorList.push(error);
                 });
             }
@@ -151,11 +154,38 @@ module.exports = app => {
             { header: 'Ghi Chú', key: 'ghiChu', width: 20 },
             { header: 'Danh Sách Mã CTĐT', key: 'maCtdt', width: 20 },
             { header: 'Danh Sách Tên CTĐT', key: 'tenCtdt', width: 40 },
-            { header: 'Kích hoạt', key: 'kichHoat', width: 15 },
+            { header: 'Kích hoạt', key: 'kichHoat', width: 15 }
         ];
         ws.columns = defaultColumns;
         ws.getRow(1).alignment = { ...ws.getRow(1).alignment, vertical: 'middle', horizontal: 'center' };
         app.excel.attachment(workBook, res, 'Danh_muc_mon_hoc_Template.xlsx');
     });
 
+    //Phân quyền cho đơn vị ------------------------------------------------------------------------------
+    app.assignRoleHooks.addRoles('daoTao', { id: 'dmMonHoc:manage', text: 'Đào tạo: Quản lý môn học' });
+
+    app.assignRoleHooks.addHook('daoTao', async (req, roles) => {
+        const userPermissions = req.session.user ? req.session.user.permissions : [];
+        if (req.query.nhomRole && req.query.nhomRole == 'daoTao' && userPermissions.includes('manager:write')) {
+            const assignRolesList = app.assignRoleHooks.get('daoTao').map(item => item.id);
+            return roles && roles.length && assignRolesList.contains(roles);
+        }
+    });
+
+    app.permissionHooks.add('staff', 'checkRoleDTQuanLyMonHoc', (user, staff) => new Promise(resolve => {
+        if (staff.donViQuanLy && staff.donViQuanLy.length && user.permissions.includes('faculty:login')) {
+            app.permissionHooks.pushUserPermission(user, 'dmMonHoc:manage');
+        }
+        resolve();
+    }));
+
+    app.permissionHooks.add('assignRole', 'checkRoleDTQuanLyMonHoc', (user, assignRoles) => new Promise(resolve => {
+        const inScopeRoles = assignRoles.filter(role => role.nhomRole == 'daoTao');
+        inScopeRoles.forEach(role => {
+            if (role.tenRole == 'dmMonHoc:manage') {
+                app.permissionHooks.pushUserPermission(user, 'dmMonHoc:manage');
+            }
+        });
+        resolve();
+    }));
 };

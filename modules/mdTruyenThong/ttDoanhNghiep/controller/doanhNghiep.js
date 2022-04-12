@@ -105,8 +105,7 @@ module.exports = app => {
             if (user.maDonVi) {
                 updateCondition.donViPhuTrach = user.maDonVi;
                 delete changes.donViPhuTrach;
-            }
-            else return res.send({ error: 'Permission denied!' });
+            } else return res.send({ error: 'Permission denied!' });
         }
         const updateLoaiDoanhNghiep = (listLoaiDoanhNghiep) => new Promise((resolve, reject) => {
             app.model.dnLoaiDoanhNghiep.delete({ doanhNghiep: id }, (error) => {
@@ -323,13 +322,24 @@ module.exports = app => {
     });
 
     // Phân quyền cho các đơn vị ------------------------------------------------------------------------------------------------------------------------
-    app.assignRoleHooks.addRoles('quanLyDonVi', { id: 'dnDoanhNghiep:manage', text: 'Quản lý doanh nghiệp' });
-    app.assignRoleHooks.addHook('quanLyDonVi', (req, roles) => new Promise(resolve => {
-        if (req.session.user && req.session.user.permissions && req.session.user.permissions.includes('manager:write')) {
-            const assignRolesList = app.assignRoleHooks.get('quanLyDonVi').map(item => item.id);
-            resolve(roles && roles.length && assignRolesList.contains(roles));
+    app.assignRoleHooks.addRoles('ttDoanhNghiep', { id: 'dnDoanhNghiep:manage', text: 'Doanh nghiệp: Quản lý doanh nghiệp' });
+
+    // app.assignRoleHooks.addHook('ttDoanhNghiep', (req, roles) => new Promise(resolve => {
+    //     const userPermissions = req.session.user ? req.session.user.permissions : [];
+    //     if (req.query.nhomRole && req.query.nhomRole == 'ttDoanhNghiep' && userPermissions.includes('manager:write')) {
+    //         const assignRolesList = app.assignRoleHooks.get('ttDoanhNghiep').map(item => item.id);
+    //         console.log(roles && roles.length && assignRolesList.contains(roles));
+    //         resolve(roles && roles.length && assignRolesList.contains(roles));
+    //     } else resolve(null);
+    // }));
+
+    app.assignRoleHooks.addHook('ttDoanhNghiep', async (req, roles) => {
+        const userPermissions = req.session.user ? req.session.user.permissions : [];
+        if (req.query.nhomRole && req.query.nhomRole == 'ttDoanhNghiep' && userPermissions.includes('manager:write')) {
+            const assignRolesList = app.assignRoleHooks.get('ttDoanhNghiep').map(item => item.id);
+            return roles && roles.length && assignRolesList.contains(roles);
         }
-    }));
+    });
 
     app.permissionHooks.add('staff', 'checkRoleQuanLyDoanhNghiep', (user, staff) => new Promise(resolve => {
         if (staff.donViQuanLy && staff.donViQuanLy.length) {
@@ -339,7 +349,7 @@ module.exports = app => {
     }));
 
     app.permissionHooks.add('assignRole', 'checkRoleQuanLyDoanhNghiep', (user, assignRoles) => new Promise(resolve => {
-        const inScopeRoles = assignRoles.filter(role => role.nhomRole == 'quanLyDonVi');
+        const inScopeRoles = assignRoles.filter(role => role.nhomRole == 'ttDoanhNghiep');
         inScopeRoles.forEach(role => {
             if (role.tenRole == 'dnDoanhNghiep:manage') {
                 app.permissionHooks.pushUserPermission(user, 'dnDoanhNghiep:manage');

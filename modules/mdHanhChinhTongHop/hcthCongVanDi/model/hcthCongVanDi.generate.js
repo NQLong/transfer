@@ -134,6 +134,6 @@ module.exports = app => {
         searchPage: (pagenumber, pagesize, macanbo, donvigui, donvi, loaicongvan, searchterm, done) => {
             app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_di_search_page(:pagenumber, :pagesize, :macanbo, :donvigui, :donvi, :loaicongvan, :searchterm, :totalitem, :pagetotal); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, macanbo, donvigui, donvi, loaicongvan, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
-        },
+        }
     };
 };
