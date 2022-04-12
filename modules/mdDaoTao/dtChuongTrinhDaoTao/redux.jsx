@@ -124,6 +124,19 @@ export function createMultiDtChuongTrinhDaoTao(data, done) {
     };
 }
 
+export function deleteMultiDtChuongTrinhDaoTao(data, done) {
+    return () => {
+        const url = '/api/dao-tao/chuong-trinh-dao-tao/multiple';
+        T.delete(url, { data }, data => {
+            if (data.error) {
+                T.notify('Xóa chương trình đào tạo bị lỗi!', 'danger');
+            }
+            done && done();
+        });
+    };
+}
+
+
 export function createDtChuongTrinhDaoTao(item, done) {
     return dispatch => {
         const url = '/api/dao-tao/chuong-trinh-dao-tao';

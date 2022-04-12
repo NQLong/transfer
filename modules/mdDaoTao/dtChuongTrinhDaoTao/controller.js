@@ -138,6 +138,18 @@ module.exports = app => {
         app.model.dtChuongTrinhDaoTao.delete({ id: req.body.id }, errors => res.send({ errors }));
     });
 
+    app.delete('/api/dao-tao/chuong-trinh-dao-tao/multiple', app.permission.orCheck('dtChuongTrinhDaoTao:delete', 'manager:write'), (req, res) => {
+        const { data } = req.body;
+        const { items } = data;
+        const handleDelete = (index) => {
+            if (index >= items.length) res.send();
+            app.model.dtChuongTrinhDaoTao.delete({ id: items[index].id }, (errors) => {
+                if (errors) res.send({ errors });
+            });
+        };
+        handleDelete(0);
+    });
+
     //Phân quyền ------------------------------------------------------------------------------------------
     app.assignRoleHooks.addRoles('daoTao', { id: 'dtChuongTrinhDaoTao:manage', text: 'Đào tạo: Quản lý Chương trình đào tạo' });
 

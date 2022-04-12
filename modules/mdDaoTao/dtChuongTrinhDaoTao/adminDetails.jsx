@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { createMultiDtChuongTrinhDaoTao, getDtChuongTrinhDaoTao, getDtKhungDaoTao } from './redux';
+import { createMultiDtChuongTrinhDaoTao, deleteMultiDtChuongTrinhDaoTao, getDtChuongTrinhDaoTao, getDtKhungDaoTao } from './redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, FormRichTextBox, FormSelect, FormTabs, FormTextBox } from 'view/component/AdminPage';
 import ComponentKienThuc from './componentKienThuc';
@@ -70,17 +70,32 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
     save = () => {
         let data = this.getValue();
         if (data) {
-            const kienThucDaiCuong = this.kienThucDaiCuong.getValue() || [];
-            const kienThucCoSoNganh = this.kienThucCoSoNganh.getValue() || [];
-            const kienThucChuyenNganh = this.kienThucChuyenNganh.getValue() || [];
-            const kienThucBoTro = this.kienThucBoTro.getValue() || [];
-            const kienThucLVTN = this.kienThucLVTN.getValue() || [];
-            const items = [...kienThucDaiCuong, ...kienThucCoSoNganh, ...kienThucChuyenNganh, ...kienThucBoTro, ...kienThucLVTN];
-            const datas = { items: items, ...{ id: this.ma, data } };
-            console.log(datas);
-            this.props.createMultiDtChuongTrinhDaoTao(datas, () => {
-                // location.reload();
+            const kienThucDaiCuong = this.kienThucDaiCuong.getValue() || { updateDatas: [], deleteDatas: [] };
+            const kienThucCoSoNganh = this.kienThucCoSoNganh.getValue() || { updateDatas: [], deleteDatas: [] };
+            const kienThucChuyenNganh = this.kienThucChuyenNganh.getValue() || { updateDatas: [], deleteDatas: [] };
+            const kienThucBoTro = this.kienThucBoTro.getValue() || { updateDatas: [], deleteDatas: [] };
+            const kienThucLVTN = this.kienThucLVTN.getValue() || { updateDatas: [], deleteDatas: [] };
+            const updateItems = [
+                ...kienThucDaiCuong.updateDatas,
+                ...kienThucCoSoNganh.updateDatas,
+                ...kienThucChuyenNganh.updateDatas,
+                ...kienThucBoTro.updateDatas,
+                ...kienThucLVTN.updateDatas
+            ];
+            const deleteItems = [
+                ...kienThucDaiCuong.deleteDatas,
+                ...kienThucCoSoNganh.deleteDatas,
+                ...kienThucChuyenNganh.deleteDatas,
+                ...kienThucBoTro.deleteDatas,
+                ...kienThucLVTN.deleteDatas
+            ];
+            const updateDatas = { items: updateItems, ...{ id: this.ma, data } };
+            const deleteDatas = { items: deleteItems };
+
+            this.props.createMultiDtChuongTrinhDaoTao(updateDatas, () => {
+                location.reload();
             });
+            this.props.deleteMultiDtChuongTrinhDaoTao(deleteDatas, ()=> {}  );
         }
     }
     render() {
@@ -176,5 +191,5 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, dtChuongTrinhDaoTao: state.daoTao.dtChuongTrinhDaoTao });
-const mapActionsToProps = { createMultiDtChuongTrinhDaoTao, getDtChuongTrinhDaoTao, getDtKhungDaoTao };
+const mapActionsToProps = { createMultiDtChuongTrinhDaoTao,deleteMultiDtChuongTrinhDaoTao, getDtChuongTrinhDaoTao, getDtKhungDaoTao };
 export default connect(mapStateToProps, mapActionsToProps)(DtChuongTrinhDaoTaoDetails);
