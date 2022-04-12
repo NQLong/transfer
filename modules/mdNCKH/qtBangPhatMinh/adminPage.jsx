@@ -88,7 +88,7 @@ class EditModal extends AdminModal {
             title: this.state.id ? 'Cập nhật quá trình bằng phát minh' : 'Tạo mới quá trình bằng phát minh',
             size: 'large',
             body: <div className='row'>
-                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={this.state.id ? true : false} required />
+                <FormSelect className='col-md-12' multiple={this.multiple} ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} readOnly={readOnly} required />
                 <FormTextBox className='col-md-12' ref={e => this.tenBang = e} label='Tên bằng phát minh' readOnly={readOnly}/>
                 <FormTextBox className='col-md-6' ref={e => this.soHieu = e} label='Số hiệu bằng phát minh' readOnly={readOnly}/>
                 <FormDatePicker className='col-md-6' type='year-mask' ref={e => this.namCap = e} label='Năm cấp bằng phát minh' placeholder='Năm cấp' readOnly={readOnly}/>
@@ -180,8 +180,7 @@ class QtBangPhatMinh extends AdminPage {
     }
 
     render() {
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permission = this.getUserPermission('qtBangPhatMinh', ['read', 'write', 'delete']);
+        const permission = this.getUserPermission('qtBangPhatMinh', ['read', 'write', 'delete', 'readOnly']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.checked ? (
             this.props.qtBangPhatMinh && this.props.qtBangPhatMinh.pageGr ?
                 this.props.qtBangPhatMinh.pageGr : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list })
@@ -193,10 +192,6 @@ class QtBangPhatMinh extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br/>Đơn vị công tác</th>
                         {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tên bằng</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số hiệu</th>}
                         {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Năm cấp</th>}
@@ -204,12 +199,24 @@ class QtBangPhatMinh extends AdminPage {
                         {this.checked && <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Danh sách tên bằng</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Nơi cấp</th>}
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tác giả</th>}
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br/>Đơn vị công tác</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
+                        {!this.checked && <TableCell type='text' content={(item.tenBang || '')} />}
+                        {!this.checked && <TableCell type='text' content={(item.soHieu || '')} />}
+                        {!this.checked && <TableCell type='text' content={(<span style={{ color: 'blue' }}>{item.namCap}</span>)} />}
+                        {!this.checked && <TableCell type='text' content={(item.noiCap)} />}
+                        {!this.checked && <TableCell type='text' content={(item.tacGia)}/>}
+                        
+                        {this.checked && <TableCell type='text' content={item.soBang} />}
+                        {this.checked && <TableCell type='text' content={this.list(item.danhSachTenBang, item.soBang, item.soBang)} />}
                         <TableCell type='link' onClick={() => this.modal.show(item, false)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
@@ -224,14 +231,6 @@ class QtBangPhatMinh extends AdminPage {
                                 {(item.tenDonVi || '').normalizedName()}
                             </>
                         )} />
-                        {!this.checked && <TableCell type='text' content={(item.tenBang || '')} />}
-                        {!this.checked && <TableCell type='text' content={(item.soHieu || '')} />}
-                        {!this.checked && <TableCell type='text' content={(<span style={{ color: 'blue' }}>{item.namCap}</span>)} />}
-                        {!this.checked && <TableCell type='text' content={(item.noiCap)} />}
-                        {!this.checked && <TableCell type='text' content={(item.tacGia)}/>}
-                        
-                        {this.checked && <TableCell type='text' content={item.soBang} />}
-                        {this.checked && <TableCell type='text' content={this.list(item.danhSachTenBang, item.soBang, item.soBang)} />}
                         {
                             !this.checked && <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                                 onEdit={() => this.modal.show(item, false)} onDelete={this.delete} >
@@ -271,9 +270,8 @@ class QtBangPhatMinh extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
-                <EditModal ref={e => this.modal = e} permission={permission}
+                <EditModal ref={e => this.modal = e} readOnly={!permission.write}
                     create={this.props.createQtBangPhatMinhStaff} update={this.props.updateQtBangPhatMinhStaff}
-                    permissions={currentPermissions}
                 />
             </>,
             backRoute: '/user/' + this.menu,

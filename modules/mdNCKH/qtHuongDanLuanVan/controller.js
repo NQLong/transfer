@@ -23,15 +23,15 @@ module.exports = app => {
     app.permission.add(
         { name: 'staff:login', menu: menuStaff },
         { name: 'qtHuongDanLuanVan:read', menu },
-        { name: 'qtHuongDanLuanVan:read', menu: menuTCCB },
+        { name: 'qtHuongDanLuanVan:readOnly', menu: menuTCCB },
         { name: 'qtHuongDanLuanVan:write' },
         { name: 'qtHuongDanLuanVan:delete' },
     );
-    app.get('/user/:khcn/qua-trinh/hdlv', app.permission.check('qtHuongDanLuanVan:read'), app.templates.admin);
-    app.get('/user/:khcn/qua-trinh/hdlv/group/:shcc', app.permission.check('qtHuongDanLuanVan:read'), app.templates.admin);
+    app.get('/user/:khcn/qua-trinh/hdlv', app.permission.orCheck('qtHuongDanLuanVan:read', 'qtHuongDanLuanVan:readOnly'), app.templates.admin);
+    app.get('/user/:khcn/qua-trinh/hdlv/group/:shcc', app.permission.orCheck('qtHuongDanLuanVan:read', 'qtHuongDanLuanVan:readOnly'), app.templates.admin);
     app.get('/user/huong-dan-luan-van', app.permission.check('staff:login'), app.templates.admin);
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
+    // const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
     app.get('/api/user/qua-trinh/hdlv/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
@@ -48,7 +48,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/qua-trinh/hdlv/page/:pageNumber/:pageSize', app.permission.check('qtHuongDanLuanVan:read'), (req, res) => {
+    app.get('/api/qua-trinh/hdlv/page/:pageNumber/:pageSize', app.permission.orCheck('qtHuongDanLuanVan:read', 'qtHuongDanLuanVan:readOnly'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -64,7 +64,7 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/qua-trinh/hdlv/group/page/:pageNumber/:pageSize', app.permission.check('qtHuongDanLuanVan:read'), (req, res) => {
+    app.get('/api/qua-trinh/hdlv/group/page/:pageNumber/:pageSize', app.permission.orCheck('qtHuongDanLuanVan:read', 'qtHuongDanLuanVan:readOnly'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -81,17 +81,17 @@ module.exports = app => {
     });
 
 
-    app.get('/api/qua-trinh/hdlv/all', checkGetStaffPermission, (req, res) => {
+    app.get('/api/qua-trinh/hdlv/all', app.permission.orCheck('qtHuongDanLuanVan:read', 'qtHuongDanLuanVan:readOnly'), (req, res) => {
         app.model.qtHuongDanLuanVan.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.post('/api/qua-trinh/hdlv', app.permission.check('staff:write'), (req, res) =>
+    app.post('/api/qua-trinh/hdlv', app.permission.check('qtHuongDanLuanVan:write'), (req, res) =>
         app.model.qtHuongDanLuanVan.create(req.body.data, (error, item) => res.send({ error, item })));
 
-    app.put('/api/qua-trinh/hdlv', app.permission.check('staff:write'), (req, res) =>
+    app.put('/api/qua-trinh/hdlv', app.permission.check('qtHuongDanLuanVan:write'), (req, res) =>
         app.model.qtHuongDanLuanVan.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })));
 
-    app.delete('/api/qua-trinh/hdlv', app.permission.check('staff:write'), (req, res) =>
+    app.delete('/api/qua-trinh/hdlv', app.permission.check('qtHuongDanLuanVan:write'), (req, res) =>
         app.model.qtHuongDanLuanVan.delete({ id: req.body.id }, (error) => res.send(error)));
 
     app.post('/api/user/qua-trinh/hdlv', app.permission.check('staff:login'), (req, res) => {

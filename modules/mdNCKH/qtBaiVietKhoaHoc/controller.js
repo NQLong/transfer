@@ -134,7 +134,7 @@ module.exports = app => {
     app.delete('/api/qua-trinh/bai-viet-khoa-hoc', app.permission.check('qtBaiVietKhoaHoc:write'), (req, res) =>
         app.model.qtBaiVietKhoaHoc.delete({ id: req.body.id }, (error) => res.send(error)));
 
-    app.get('/api/qua-trinh/bai-viet-khoa-hoc/download-excel/:listShcc/:listDv/:fromYear/:toYear/:xuatBanRange', app.permission.check('qtBaiVietKhoaHoc:read'), (req, res) => {
+    app.get('/api/qua-trinh/bai-viet-khoa-hoc/download-excel/:listShcc/:listDv/:fromYear/:toYear/:xuatBanRange', app.permission.orCheck('qtBaiVietKhoaHoc:read', 'qtBaiVietKhoaHoc:readOnly'), (req, res) => {
         let { listShcc, listDv, fromYear, toYear, xuatBanRange } = req.params ? req.params : { listShcc: null, listDv: null, toYear: null, xuatBanRange: null };
         if (listShcc == 'null') listShcc = null;
         if (listDv == 'null') listDv = null;
