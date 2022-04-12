@@ -1,6 +1,6 @@
-// Table name: HCTH_CONG_VAN_DI { id, trichYeu, ngayGui, ngayKy, donViGui, donViNhan, canBoNhan, noiBo, trangThai, loai, tenVietTatDonViGui, soDi }
+// Table name: HCTH_CONG_VAN_DI { id, trichYeu, ngayGui, ngayKy, donViGui, donViNhan, canBoNhan, noiBo, trangThai, loaiCongVan, tenVietTatDonViGui, soDi, donViNhanNgoai }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'trichYeu': 'TRICH_YEU', 'ngayGui': 'NGAY_GUI', 'ngayKy': 'NGAY_KY', 'donViGui': 'DON_VI_GUI', 'donViNhan': 'DON_VI_NHAN', 'canBoNhan': 'CAN_BO_NHAN', 'noiBo': 'NOI_BO', 'trangThai': 'TRANG_THAI', 'loai': 'LOAI', 'tenVietTatDonViGui': 'TEN_VIET_TAT_DON_VI_GUI', 'soDi': 'SO_DI' };
+const obj2Db = { 'id': 'ID', 'trichYeu': 'TRICH_YEU', 'ngayGui': 'NGAY_GUI', 'ngayKy': 'NGAY_KY', 'donViGui': 'DON_VI_GUI', 'donViNhan': 'DON_VI_NHAN', 'canBoNhan': 'CAN_BO_NHAN', 'noiBo': 'NOI_BO', 'trangThai': 'TRANG_THAI', 'loaiCongVan': 'LOAI_CONG_VAN', 'tenVietTatDonViGui': 'TEN_VIET_TAT_DON_VI_GUI', 'soDi': 'SO_DI', 'donViNhanNgoai': 'DON_VI_NHAN_NGOAI' };
 
 module.exports = app => {
     app.model.hcthCongVanDi = {
@@ -131,9 +131,9 @@ module.exports = app => {
             app.database.oracle.connection.main.execute(sql, parameter, (error, result) => done(error, result));
         },
 
-        searchPage: (pagenumber, pagesize, macanbo, donvigui, donvi, loaicongvan, searchterm, done) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_di_search_page(:pagenumber, :pagesize, :macanbo, :donvigui, :donvi, :loaicongvan, :searchterm, :totalitem, :pagetotal); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, macanbo, donvigui, donvi, loaicongvan, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
-        }
+        searchPage: (pagenumber, pagesize, macanbo, donvigui, donvi, loaicongvan, donvinhanngoai, donvixem, canboxem, searchterm, done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_di_search_page(:pagenumber, :pagesize, :macanbo, :donvigui, :donvi, :loaicongvan, :donvinhanngoai, :donvixem, :canboxem, :searchterm, :totalitem, :pagetotal); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, macanbo, donvigui, donvi, loaicongvan, donvinhanngoai, donvixem, canboxem, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
+        },
     };
 };
