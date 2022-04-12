@@ -118,23 +118,13 @@ module.exports = app => {
     // End User APIs ---------------------------------------------------------------------------------------------------------------- 
 
     // Other APIs -------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/qua-trinh/sang-kien/download-excel/:listShcc/:listDonVi', app.permission.check('qtSangKien:read'), (req, res) => {
-        console.log('lol------------');
-        let { listShcc, listDonVi } = req.params ? req.params : { listShcc: null, listDonVi: null };
-        if (listShcc == 'null') listShcc = null;
-        if (listDonVi == 'null') listDonVi = null;
+    app.get('/api/qua-trinh/sang-kien/download-excel/:filter', app.permission.check('qtSangKien:read'), (req, res) => {
         const searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        let filter = { listShcc, listDonVi };
-        try {
-            filter = JSON.stringify(filter || {});
-        } catch(error) {
-            res.send({ error });
-        }
+        const filter = req.params.filter;
         app.model.qtSangKien.downloadExcel(filter, searchTerm, (err, result) => {
             if (err) {
                 res.send({ err });
             } else {
-                console.log(result);
                 const workbook = app.excel.create(),
                 worksheet = workbook.addWorksheet('sangkien');
                 new Promise(resolve => {

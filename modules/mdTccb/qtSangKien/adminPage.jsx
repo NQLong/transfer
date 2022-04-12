@@ -214,8 +214,8 @@ class QtSangKien extends AdminPage {
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
             onExport: (e) => {
                 e.preventDefault();
-                const { listDonVi, listShcc } = (this.state.filter && this.state.filter != '%%%%%%%%') ? this.state.filter : { listShcc: null, listDonVi: null };
-                T.download(T.url(`/api/qua-trinh/sang-kien/download-excel/${listShcc ? listShcc : null}/${listDonVi ? listDonVi : null}`), 'sangkien.xlsx');
+                const filter = T.stringify(this.state.filter);
+                T.download(T.url(`/api/qua-trinh/sang-kien/download-excel/${filter}`), 'sangkien.xlsx');
             }
         });
     }
