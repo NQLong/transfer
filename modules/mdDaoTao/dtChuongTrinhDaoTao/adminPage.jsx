@@ -67,7 +67,9 @@ class DtChuongTrinhDaoTaoPage extends AdminPage {
                     <TableCell style={{ whiteSpace: 'nowrap' }} content={item.loaiHinhDaoTao} />
                     <TableCell style={{ textAlign: 'center' }} content={item.thoiGianDaoTao + ' năm'} />
                     <TableCell content={item.tenKhoaBoMon} />
-                    <TableCell style={{ textAlign: 'center' }} type='buttons' content={item} permission={permission} onEdit={permission.write ? (e) => e.preventDefault() || this.props.history.push(`/user/dao-tao/chuong-trinh-dao-tao/${item.id}`) : null} />
+                    <TableCell style={{ textAlign: 'center' }} type='buttons' content={item} permission={permission} 
+                        onEdit={permission.write ? (e) => e.preventDefault() || this.props.history.push(`/user/dao-tao/chuong-trinh-dao-tao/${item.id}`) : null} 
+                        onClone={(e) => e.preventDefault() || this.props.history.push(`/user/dao-tao/chuong-trinh-dao-tao/new?id=${item.id}`)}/>
                 </tr>
             )
         });
