@@ -211,5 +211,4 @@ module.exports = (app) => {
             return defaultValue;
         }
     };
-
 };
