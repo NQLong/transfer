@@ -6,7 +6,7 @@ module.exports = app => {
                     title: 'Ngành đào tạo theo tổ hợp môn thi',
                     groupIndex: 0,
                     icon: 'fa-cubes', backgroundColor: '#738986',
-                    link: '/user/pdt/nganh-theo-to-hop-thi'
+                    link: '/user/dao-tao/nganh-theo-to-hop-thi'
                },
           },
      };
@@ -16,10 +16,10 @@ module.exports = app => {
           { name: 'dtNganhToHop:write' },
           { name: 'dtNganhToHop:delete' },
      );
-     app.get('/user/pdt/nganh-theo-to-hop-thi', app.permission.orCheck('dtNganhToHop:read', 'manager:read'), app.templates.admin);
+     app.get('/user/dao-tao/nganh-theo-to-hop-thi', app.permission.orCheck('dtNganhToHop:read', 'manager:read'), app.templates.admin);
 
      // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-     app.get('/api/pdt/nganh-theo-to-hop-thi/page/:pageNumber/:pageSize', app.permission.orCheck('dtNganhToHop:read', 'manager:read'), (req, res) => {
+     app.get('/api/dao-tao/nganh-theo-to-hop-thi/page/:pageNumber/:pageSize', app.permission.orCheck('dtNganhToHop:read', 'manager:read'), (req, res) => {
           const pageNumber = parseInt(req.params.pageNumber),
                pageSize = parseInt(req.params.pageSize),
                searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
@@ -34,21 +34,20 @@ module.exports = app => {
           });
      });
 
-     app.get('/api/pdt/nganh-theo-to-hop-thi/item/:id', app.permission.orCheck('dtNganhToHop:read', 'manager:read'), (req, res) => {
+     app.get('/api/dao-tao/nganh-theo-to-hop-thi/item/:id', app.permission.orCheck('dtNganhToHop:read', 'manager:read'), (req, res) => {
           app.model.dtNganhToHop.get({ id: req.params.id }, (error, item) => res.send({ error, item }));
      });
 
-     app.post('/api/pdt/nganh-theo-to-hop-thi', app.permission.check('dtNganhToHop:write'), (req, res) => {
+     app.post('/api/dao-tao/nganh-theo-to-hop-thi', app.permission.check('dtNganhToHop:write'), (req, res) => {
           app.model.dtNganhToHop.create(req.body.data, (error, item) => res.send({ error, item }));
      });
 
-     app.put('/api/pdt/nganh-theo-to-hop-thi', app.permission.check('dtNganhToHop:write'), (req, res) => {
+     app.put('/api/dao-tao/nganh-theo-to-hop-thi', app.permission.check('dtNganhToHop:write'), (req, res) => {
           const changes = req.body.changes || {};
-          console.log(req.body);
-          app.model.dtNganhToHop.update({ id: parseInt(req.body.id) }, changes, (error, item) => res.send({ error, item }));
+          app.model.dtNganhToHop.update({ id: req.body.id }, changes, (error, item) => res.send({ error, item }));
      });
 
-     app.delete('/api/pdt/nganh-theo-to-hop-thi', app.permission.check('dtNganhToHop:delete'), (req, res) => {
+     app.delete('/api/dao-tao/nganh-theo-to-hop-thi', app.permission.check('dtNganhToHop:delete'), (req, res) => {
           app.model.dtNganhToHop.delete({ id: req.body.id }, errors => res.send({ errors }));
      });
 };

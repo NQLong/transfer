@@ -8,7 +8,7 @@ import { getDtDangKyMoMonPage } from './redux';
 class DtDangKyMoMonPage extends AdminPage {
      state = { donViFilter: '' }
      componentDidMount() {
-          T.ready('/user/pdt', () => {
+          T.ready('/user/dao-tao', () => {
                T.clearSearchBox();
                this.setState({ donViFilter: this.props.system.user.staff?.maDonVi });
                T.onSearch = (searchText) => this.props.getDmMonHocPage(undefined, undefined, {
@@ -58,7 +58,7 @@ class DtDangKyMoMonPage extends AdminPage {
                          <TableCell type='date' style={{ textAlign: 'center' }} content={item.thoiGian} />
                          <TableCell contentClassName='multiple-lines-4' content={item.ghiChu} />
                          <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                              onEdit={() => this.props.history.push(`/user/pdt/dang-ky-mo-mon/${item.maKhoaBoMon}/${item.id}`)} //TODO: Đăng ký mở môn theo CTDT
+                              onEdit={() => this.props.history.push(`/user/dao-tao/dang-ky-mo-mon/${item.maKhoaBoMon}/${item.id}`)} //TODO: Đăng ký mở môn theo CTDT
                          />
                     </tr>)
           });
@@ -66,7 +66,7 @@ class DtDangKyMoMonPage extends AdminPage {
                title: 'Danh sách các đợt mở môn học trong học kỳ',
                icon: 'fa fa-paper-plane-o',
                breadcrumb: [
-                    <Link key={0} to='/user/pdt'>Đào tạo</Link>,
+                    <Link key={0} to='/user/dao-tao'>Đào tạo</Link>,
                     'Danh sách đợt mở môn học'
                ],
                header: permissionDaoTao.read && <FormSelect style={{ width: '300px', marginBottom: '0' }} placeholder='Danh sách khoa/bộ môn' ref={e => this.donVi = e} onChange={value => {
@@ -82,8 +82,8 @@ class DtDangKyMoMonPage extends AdminPage {
                     <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                          getPage={this.props.getDtDangKyMoMonPage} />
                </>,
-               backRoute: '/user/pdt',
-               onCreate: permissionDaoTao.manage ? ((e) => e.preventDefault() || this.props.history.push(`/user/pdt/dang-ky-mo-mon/${this.state.donViFilter}/new`)) : null,
+               backRoute: '/user/dao-tao',
+               onCreate: permission.write ? ((e) => e.preventDefault() || this.props.history.push(`/user/dao-tao/dang-ky-mo-mon/${this.state.donViFilter}/new`)) : null,
                //TODO: Đăng ký mở môn theo CTDT
 
           });

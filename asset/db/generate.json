@@ -12396,6 +12396,55 @@
                     "dataDefault": "",
                     "nullable": false,
                     "size": "22,0"
+                },
+                "MA_NGANH": {
+                    "value": "maNganh",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "TEN_NGANH": {
+                    "value": "tenNganh",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 1000
+                },
+                "TRINH_DO_DAO_TAO": {
+                    "value": "trinhDoDaoTao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 5
+                },
+                "LOAI_HINH_DAO_TAO": {
+                    "value": "loaiHinhDaoTao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 5
+                },
+                "THOI_GIAN_DAO_TAO": {
+                    "value": "thoiGianDaoTao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 5
+                },
+                "TEN_VAN_BANG": {
+                    "value": "tenVanBang",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 1000
+                },
+                "MUC_TIEU_CHUNG": {
+                    "value": "mucTieuChung",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 2000
                 }
             },
             "primaryKeys": [

@@ -1,31 +1,35 @@
+import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AdminPage, FormTabs, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
+import { AdminPage, FormSelect, FormTabs, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
+import { ComponentKienThuc } from '../dtChuongTrinhDaoTao/componentKienThuc';
 import { getDsMonMo } from '../dtDsMonMo/redux';
 class DtDsMonMoEditPage extends AdminPage {
-     state = { isCreate: false }
+     state = { isCreate: false, isDaoTao: false }
 
      componentDidMount() {
-          const route = T.routeMatcher('/user/pdt/dang-ky-mo-mon/:khoa/:id').parse(window.location.pathname),
-               staff = this.props.system.user.staff;
-          if (staff) {
-               let donVi = staff.maDonVi;
-               if (Number(route.khoa) != donVi) {
-                    this.props.history.push('/user/pdt/dang-ky-mo-mon');
-                    T.notify('Bạn không có quyền truy cập dữ liệu này!', 'danger');
+          T.ready('/user/dao-tao', () => {
+               const route = T.routeMatcher('/user/dao-tao/dang-ky-mo-mon/:khoa/:id').parse(window.location.pathname),
+                    staff = this.props.system.user.staff,
+                    permissionDaoTao = this.getUserPermission('dtDangKyMoMon');
+               this.donViDangKy.value(Number(route.khoa));
+               if (staff) {
+                    let donVi = staff.maDonVi;
+                    if (Number(route.khoa) != donVi && !permissionDaoTao.write) {
+                         this.props.history.push('/user/dao-tao/dang-ky-mo-mon');
+                         T.notify('Bạn không có quyền truy cập dữ liệu này!', 'danger');
+                    }
                }
-          }
-          this.setState({
-               staff,
-               donVi: Number(route.khoa),
-               id: route.id == 'new' ? null : route.id,
-               isCreate: (route.id == 'new')
-          }, () => {
-               this.props.getDsMonMo(this.state.id, this.state.donVi, (data) => this.setState({
-                    dataMonMo: data.filter(item => item.isOpen == 1),
-                    dataMonKhongMo: data.filter(item => item.isOpen == null)
-               }));
+               this.setState({
+                    staff,
+                    donVi: Number(route.khoa),
+                    id: route.id == 'new' ? null : route.id,
+                    isCreate: (route.id == 'new'),
+                    isDaoTao: permissionDaoTao.write
+               }, () => {
+                    this.listDaiCuong.setVal([], this.state.donVi);
+               });
           });
      }
 
@@ -75,11 +79,13 @@ class DtDsMonMoEditPage extends AdminPage {
      })
      render() {
           return this.renderPage({
-               title: <>Mở môn học: <i>{this.state.isCreate ? 'Đợt đăng ký mới' : 'Chỉnh sửa đợt đã đăng ký'}</i></>,
+               title: <>Mở môn học: <i>{this.state.isCreate ? 'Đợt đăng ký mới' : 'Cập nhật đợt đã đăng ký'}</i></>,
                icon: 'fa fa-paper-plane-o',
+               header: <FormSelect ref={e => this.hocKy = e} data={['HK1', 'HK2', 'HK3']} style={{ width: '100px', marginBottom: '0' }} placeholder='Học kỳ' />,
+               subTitle: <FormSelect ref={e => this.donViDangKy = e} data={SelectAdapter_DmDonViFaculty_V2} readOnly />,
                breadcrumb: [
-                    <Link key={0} to='/user/pdt'>Phòng đào tạo</Link>,
-                    <Link key={1} to='/user/pdt/dang-ky-mo-mon'>Danh sách các đợt</Link>,
+                    <Link key={0} to='/user/dao-tao'>Đào tạo</Link>,
+                    <Link key={1} to='/user/dao-tao/dang-ky-mo-mon'>Danh sách các đợt</Link>,
                     this.state.isCreate ? 'Đợt đăng ký mới' : 'Chỉnh sửa đợt đã đăng ký'
                ],
                content: <>
@@ -88,15 +94,12 @@ class DtDsMonMoEditPage extends AdminPage {
                               {
                                    title: 'Năm 1',
                                    component:
-                                        <div className='tile'>
-                                             <FormTextBox placeholder='Tên doanh nghiệp' ref={e => this.dnDoanhNghiepViTitle = e} required />
-                                        </div>
+                                        <ComponentKienThuc title={'Danh sách các môn đại cương'} ref={e => this.listDaiCuong = e} prefixPermission='dtDangKyMoMon' />
                               },
                               {
                                    title: 'Năm 2',
                                    component:
                                         <div className='tile'>
-                                             <FormTextBox placeholder='Tên doanh nghiệp' ref={e => this.dnDoanhNghiepViTitle = e} required />
                                         </div>
                               },
                               {
@@ -115,16 +118,8 @@ class DtDsMonMoEditPage extends AdminPage {
                               },
                          ]}
                     />
-                    <div className='tile' style={{ height: '40vh' }}>
-                         <div className='tile-title'>Danh sách môn mở:</div>
-                         <div>{this.renderMonHocTable([])}</div>
-                    </div>
-                    <div className='tile'>
-                         <div className='tile-title'>Danh sách môn không mở:</div>
-                         <div>{this.renderMonHocTable([])}</div>
-                    </div>
                </>,
-               backRoute: '/user/pdt/dang-ky-mo-mon'
+               backRoute: '/user/dao-tao/dang-ky-mo-mon'
           });
      }
 }

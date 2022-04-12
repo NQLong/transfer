@@ -5,14 +5,14 @@ import Loading from 'view/component/Loading';
 import dtThoiKhoaBieu from './redux';
 
 export default {
-    redux: {
-        parent: 'daoTao',
-        reducers: { dtThoiKhoaBieu }
-    },
-    routes: [
-        {
-            path: '/user/pdt/thoi-khoa-bieu',
-            component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
-        },
-    ],
+     redux: {
+          parent: 'daoTao',
+          reducers: { dtThoiKhoaBieu }
+     },
+     routes: [
+          {
+               path: '/user/dao-tao/thoi-khoa-bieu',
+               component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
+          },
+     ],
 };

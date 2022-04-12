@@ -127,7 +127,7 @@ class DmMonHocPage extends AdminPage {
                     items.forEach(item => this.donViMapper[item.ma] = item.ten);
                }
           });
-          T.ready('/user/pdt', () => {
+          T.ready('/user/dao-tao', () => {
                T.clearSearchBox();
                this.setState({ donViFilter: this.props.system.user.staff?.maDonVi });
                T.onSearch = (searchText) => this.props.getDmMonHocPage(undefined, undefined, {
@@ -217,7 +217,7 @@ class DmMonHocPage extends AdminPage {
                icon: 'fa fa-leanpub',
                title: 'Danh sách Môn Học',
                breadcrumb: [
-                    <Link key={0} to='/user/pdt'>Đào tạo</Link>,
+                    <Link key={0} to='/user/dao-tao'>Đào tạo</Link>,
                     'Danh sách Môn Học'
                ],
                header: permissionDaoTao.read && <FormSelect style={{ width: '300px', marginBottom: '0' }} placeholder='Danh sách khoa/bộ môn' ref={e => this.donVi = e} onChange={value => {
@@ -235,7 +235,7 @@ class DmMonHocPage extends AdminPage {
                     <EditModal ref={e => this.modal = e} permission={permission} readOnly={!permission.write}
                          create={this.props.createDmMonHoc} update={this.props.updateDmMonHoc} khoa={this.state.donViFilter} />
                </>,
-               backRoute: '/user/pdt',
+               backRoute: '/user/dao-tao',
                onCreate: permission.write ? (e) => this.showModal(e) : null,
           });
      }

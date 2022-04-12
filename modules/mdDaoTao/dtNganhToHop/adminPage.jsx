@@ -55,7 +55,7 @@ class EditModal extends AdminModal {
 
 class DtNganhToHopPage extends AdminPage {
      componentDidMount() {
-          T.ready('/user/pdt', () => {
+          T.ready('/user/dao-tao', () => {
                T.onSearch = (searchText) => this.props.getDtNganhToHopPage(undefined, undefined, searchText || '');
                T.showSearchBox();
                this.props.getDtNganhToHopPage();
@@ -125,7 +125,7 @@ class DtNganhToHopPage extends AdminPage {
                     <EditModal ref={e => this.modal = e} permission={permission} readOnly={!permission.write}
                          create={this.props.createDtNganhToHop} update={this.props.updateDtNganhToHop} />
                </>,
-               backRoute: '/user/pdt',
+               backRoute: '/user/dao-tao',
                onCreate: permission && permission.write ? (e) => this.showModal(e) : null
           });
      }
