@@ -148,7 +148,7 @@ export function renderTable({
 
 export function renderComment({
     renderAvatar = () => null, renderName = () => null, renderContent = () => null, renderTime = () => null, getDataSource = () => null, loadingText = 'Đang tải ...',
-    emptyComment = 'Chưa có phản hồi'
+    emptyComment = 'Chưa có phản hồi', getItemStyle = () => {}
 }) {
     const list = getDataSource();
     if (list == null) {
@@ -183,7 +183,7 @@ export function renderComment({
                         return (
                             <div key={index} style={flexRow}>
                                 <div >{renderAvatar(item)}</div>
-                                <div style={contentStyle}>
+                                <div style={{...contentStyle, ...getItemStyle(item)}}>
                                     <div style={{ borderBottom: '1px solid #000000 ', paddingLeft: '5px', ...flexRow }}>
                                         <b style={{ flex: 1 }}>{renderName(item)}</b>
                                         <span>{renderTime(item)}</span>
@@ -264,7 +264,7 @@ export class FormTabs extends React.Component {
     }
 
     render() {
-        const { tabClassName = '', contentClassName = '', tabs = [] } = this.props,
+        const { style={}, tabClassName = '', contentClassName = '', tabs = [] } = this.props,
             id = this.props.id || 'tab',
             tabLinks = [], tabPanes = [];
         tabs.forEach((item, index) => {
@@ -274,10 +274,10 @@ export class FormTabs extends React.Component {
             tabPanes.push(<div key={index} className={'tab-pane fade' + className} id={tabId}>{item.component}</div>);
         });
 
-        return <>
+        return <div style={style}>
             <ul ref={e => this.tabs = e} className={'nav nav-tabs ' + tabClassName}>{tabLinks}</ul>
             <div className={'tab-content ' + contentClassName}>{tabPanes}</div>
-        </>;
+        </div>;
     }
 }
 
@@ -977,13 +977,13 @@ export class AdminPage extends React.Component {
         }
         if (buttons) {
             if (buttons.length) {
-                customButtons = buttons.map(item => {
+                customButtons = buttons.map((item, index) => {
                     right += 60;
-                    return <CirclePageButton type='custom' customClassName={item.className} customIcon={item.icon} onClick={item.onClick} style={{ right: right - 60 }} />
-                })
+                    return <CirclePageButton key={index} type='custom' customClassName={item.className} customIcon={item.icon} onClick={item.onClick} style={{ right: right - 60 }} />;
+                });
             }
             else {
-                customButtons = <CirclePageButton type='custom' customClassName={buttons.className} customIcon={buttons.icon} onClick={buttons.onClick} style={{ right: right }} />
+                customButtons = <CirclePageButton type='custom' customClassName={buttons.className} customIcon={buttons.icon} onClick={buttons.onClick} style={{ right: right }} />;
                 right += 60;
             }
         }

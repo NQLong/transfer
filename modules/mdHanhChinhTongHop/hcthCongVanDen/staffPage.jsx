@@ -22,8 +22,10 @@ import { SelectAdapter_DmDonViGuiCongVan } from 'modules/mdDanhMuc/dmDonViGuiCv/
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import Pagination from 'view/component/Pagination';
-import { trangThaiSwitcher, getTrangThaiText } from './staffEditPage';
-// console.log(require('./utils'))
+import { getTrangThaiText } from './staffEditPage';
+
+const { trangThaiSwitcher } = require('./constant');
+
 const timeList = [
     { id: 1, text: 'Theo ngày công văn' },
     { id: 2, text: 'Theo ngày nhận' },
@@ -73,7 +75,7 @@ class HcthCongVanDenStaffPage extends AdminPage {
             toTime = this.toTime?.value() ? Number(this.toTime.value()) : null,
             congVanYear = this.congVanYear?.value() || null,
             status = this.status?.value() || null,
-            tab = parseInt(T.cookie(TAB_ID))
+            tab = this.tabs?.selectedTabIndex()
             ;
 
         const pageFilter = isInitial ? {} : { donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, timeType, fromTime, toTime, congVanYear, tab, status };
@@ -198,15 +200,15 @@ class HcthCongVanDenStaffPage extends AdminPage {
         let tabList = {
             all: {
                 title: 'Tất cả',
-                component: table
+                // component: table
             },
             donVi: {
                 title: 'Đơn vị quản lý',
-                component: table
+                // component: table
             },
             self: {
                 title: 'Cá nhân',
-                component: table
+                // component: table
             }
         };
 
@@ -224,7 +226,7 @@ class HcthCongVanDenStaffPage extends AdminPage {
             ],
             header: <>
                 <FormSelect style={{ width: '150px', marginBottom: '0' }} allowClear={true} ref={e => this.congVanYear = e} placeholder='Năm' onChange={() => this.changeAdvancedSearch()} data={yearSelector} />
-                <FormSelect style={{ width: '150px', marginBottom: '0', marginLeft: '5px' }} allowClear={true} ref={e => this.status = e} placeholder='Tình trạng' onChange={() => this.changeAdvancedSearch()} data={statusSelector} />
+                {(currentPermissions.includes('rectors:login') || currentPermissions.includes('hcth:login')) && <FormSelect style={{ width: '150px', marginBottom: '0', marginLeft: '5px' }} allowClear={true} ref={e => this.status = e} placeholder='Tình trạng' onChange={() => this.changeAdvancedSearch()} data={statusSelector} />}
             </>
             ,
             advanceSearch: <>
@@ -243,7 +245,8 @@ class HcthCongVanDenStaffPage extends AdminPage {
                 </div>
             </>,
             content: <div className='tile'>
-                <FormTabs ref={e => this.tabs = e} tabs={tabs} id={TAB_ID} onChange={() => this.changeAdvancedSearch()} />
+                <FormTabs style={tabs.length == 1 ? { display: 'none' } : {}} ref={e => this.tabs = e} tabs={tabs} id={TAB_ID} onChange={() => this.changeAdvancedSearch()} />
+                {table}
                 < Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
             </div>,

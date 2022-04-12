@@ -7,7 +7,8 @@ const
     HcthCongVanDenSearchPage = 'HcthCongVanDen:SearchPage',
     HcthCongVanDenGet = 'HcthCongVanDen:Get',
     HcthCongVanDenGetPhanHoi = 'HcthCongVanDen:GetPhanHoi',
-    HcthCongVanDenGetHistory = 'HcthCongVanDen:GetHistory';
+    HcthCongVanDenGetHistory = 'HcthCongVanDen:GetHistory',
+    HcthCongVanDenGetChiDao = 'HcthCongVanDen:GetChiDao';
 
 // const HcthCongVanDenUpdate = 'HcthCongVanDen:Update';
 
@@ -24,6 +25,8 @@ export default function HcthCongVanDenReducer(state = null, data) {
             return Object.assign({}, state, { item: { ...(state.item || {}), phanHoi: data.phanHoi } });
         case HcthCongVanDenGetHistory:
             return Object.assign({}, state, { item: { ...(state.item || {}), history: data.history } });
+        case HcthCongVanDenGetChiDao:
+            return Object.assign({}, state, { item: { ...(state.item || {}), danhSachChiDao: data.chiDao } });
         default:
             return state;
     }
@@ -238,10 +241,24 @@ export function getHistory(id, done) {
                 T.notify('Lấy lịch sử công văn lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
-                console.log(res.items);
                 dispatch({type: HcthCongVanDenGetHistory, history: res.items});
                 done && done(res.items);
             }
         }, () => T.notify('Lấy lịch sử công văn lỗi', 'danger'));
+    };
+}
+
+export function getChiDao(id, done) {
+    return dispatch => {
+        const url = `/api/hcth/cong-van-den/chi-dao/${id}`;
+        T.get(url, res => {
+            if (res.error) {
+                T.notify('Lấy công văn chỉ đạo lỗi', 'danger');
+                console.error('POST: ' + url + '. ' + res.error);
+            } else {
+                dispatch({type: HcthCongVanDenGetChiDao, chiDao: res.items});
+                done && done(res.items);
+            }
+        }, () => T.notify('Lấy công văn chỉ đạo lỗi', 'danger'));
     };
 }

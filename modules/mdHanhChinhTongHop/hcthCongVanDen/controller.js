@@ -2,7 +2,6 @@
 module.exports = (app) => {
     const { trangThaiSwitcher, action, CONG_VAN_TYPE, MA_CHUC_VU_HIEU_TRUONG, MA_BAN_GIAM_HIEU, MA_HCTH } = require('./constant');
 
-
     const menu = {
         parentMenu: app.parentMenu.hcth,
         menus: {
@@ -70,16 +69,11 @@ module.exports = (app) => {
                                                 if (error)
                                                     throw error;
                                                 else {
-                                                    app.model.hcthHistory.create({ loai: CONG_VAN_TYPE, key: id, hanhDong: action.CREATE, shcc: req.session?.user?.shcc }, (error) => {
+                                                    app.model.hcthHistory.create({ key: id, loai: CONG_VAN_TYPE, hanhDong: action.CREATE, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc }, (error) => {
                                                         if (error)
                                                             throw error;
                                                         else
-                                                            app.model.hcthHistory.create({ key: id, type: CONG_VAN_TYPE, action: action.CREATE, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc }, (error) => {
-                                                                if (error)
-                                                                    throw error;
-                                                                else
-                                                                    res.send({ error, item });
-                                                            });
+                                                            res.send({ error, item });
                                                     });
                                                 }
                                             });
@@ -146,7 +140,9 @@ module.exports = (app) => {
             else
                 createChiDaoFromList(chiDao, req.body.id, () => {
                     app.model.hcthDonViNhanCongVan.delete({ congVan: req.body.id }, () => createDonViNhanFromList(donViNhan?.split(',') || [], req.body.id, () => {
-                        updateListFile(fileList, req.body.id, ({ error }) => res.send({ error, item }));
+                        updateListFile(fileList, req.body.id, () => app.model.hcthHistory.create({ key: req.body.id, loai: CONG_VAN_TYPE, hanhDong: action.UPDATE, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc }, (error) => {
+                            res.send({ error, item });
+                        }));
                     })
                     );
                 });
@@ -185,13 +181,6 @@ module.exports = (app) => {
         deleteCongVan(req.body.id, ({ error }) => res.send({ error }));
     });
 
-    const getCurrentPermissions = (req) => (req.session && req.session.user && req.session.user.permissions) || [];
-
-    const getUserPermission = (req, prefix, listPermissions = ['read', 'write', 'delete']) => {
-        const permission = {}, currentPermissions = getCurrentPermissions(req);
-        listPermissions.forEach(item => permission[item] = currentPermissions.includes(`${prefix}:${item}`));
-        return permission;
-    };
 
 
     app.get('/api/hcth/cong-van-den/search/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
@@ -205,8 +194,6 @@ module.exports = (app) => {
                 { donViGuiCongVan: null, donViNhanCongVan: null, canBoNhanCongVan: null, timeType: null, fromTime: null, toTime: null, congVanYear: null },
                 donViCanBo = '', canBo = '', tabValue = parseInt(tab);
 
-            // const rectorsPermission = getUserPermission(req, 'rectors', ['login']);
-            const hcthPermission = getUserPermission(req, 'hcth', ['login']);
             const user = req.session.user;
             const permissions = user.permissions;
             donViCanBo = (req.session?.user?.staff?.donViQuanLy || []);
@@ -234,7 +221,7 @@ module.exports = (app) => {
                 toTime = new Date(`${Number(congVanYear) + 1}-01-01`).getTime();
             }
 
-            app.model.hcthCongVanDen.searchPage(pageNumber, pageSize, donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, timeType, fromTime, toTime, obj2Db[sortBy] || '', sortType, canBo, donViCanBo, hcthPermission.login ? 1 : 0, status, searchTerm, (error, page) => {
+            app.model.hcthCongVanDen.searchPage(pageNumber, pageSize, donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, timeType, fromTime, toTime, obj2Db[sortBy] || '', sortType, canBo, donViCanBo, permissions.includes('rectors:login') ? 1 : permissions.includes('hcth:login') ? 0 : 2, status, searchTerm, (error, page) => {
                 if (error || page == null) {
 
                     res.send({ error });
@@ -388,6 +375,8 @@ module.exports = (app) => {
             case trangThaiSwitcher.TRA_LAI_HCTH.id:
             case trangThaiSwitcher.TRA_LAI_BGH.id:
                 return action.RETURN;
+            case trangThaiSwitcher.DA_PHAN_PHOI.id:
+                return action.PUBLISH
             default:
                 return '';
         }
@@ -403,7 +392,7 @@ module.exports = (app) => {
             }
             else {
                 const newCongVan = await updateCongvanDen(id, { trangThai });
-                await app.model.hcthHistory.createHistory(app, {
+                const history = await app.model.hcthHistory.createHistory({
                     key: id, loai: CONG_VAN_TYPE, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc,
                     hanhDong: statusToAction(congVan.trangThai, trangThai),
                 });
@@ -424,6 +413,10 @@ module.exports = (app) => {
         catch (error) {
             res.send({ error });
         }
+    });
+
+    app.get('/api/hcth/cong-van-den/chi-dao/:id', app.permission.check('staff:login'), async (req, res) => {
+        app.model.hcthChiDao.getCongVanChiDao(parseInt(req.params.id), CONG_VAN_TYPE, (error, items) => res.send({ error, items: items?.rows || [] }));
     });
 
     app.assignRoleHooks.addRoles('quanLyHcth', { id: 'hcth:manage', text: 'Công văn: Quản lý phòng hành chính tổng hợp' });
