@@ -26,7 +26,7 @@ export function getAssignRole(nguoiDuocGan, nhomRole, done) {
 }
 
 export function createAssignRole(assignRole, done) {
-    const url = '/api/assign-role';
+    const url = `/api/assign-role?nhomRole=${assignRole.nhomRole}`;
     T.post(url, { assignRole }, data => {
         if (data.error) {
             T.notify('Tạo gán quyền bị lỗi!', 'danger');
@@ -39,7 +39,7 @@ export function createAssignRole(assignRole, done) {
 }
 
 export function updateAssignRole(id, item, done) {
-    const url = '/api/assign-role';
+    const url = `/api/assign-role?nhomRole=${item.nhomRole}`;
     T.put(url, { id, item }, data => {
         if (data.error || item == null) {
             T.notify('Cập nhật thông tin gán quyền bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
@@ -54,7 +54,7 @@ export function updateAssignRole(id, item, done) {
 
 export function deleteAssignRole(item, done) {
     return () => {
-        const url = '/api/assign-role';
+        const url = `/api/assign-role?nhomRole=${item.nhomRole}`;
         T.delete(url, { item }, data => {
             if (data.error) {
                 T.notify('Xóa thông tin gán quyền bị lỗi' + (data.error.message && ('<br>' + data.error.message)), 'danger');

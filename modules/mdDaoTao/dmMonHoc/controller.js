@@ -164,12 +164,13 @@ module.exports = app => {
     //Phân quyền cho đơn vị ------------------------------------------------------------------------------
     app.assignRoleHooks.addRoles('daoTao', { id: 'dmMonHoc:manage', text: 'Đào tạo: Quản lý môn học' });
 
-    app.assignRoleHooks.addHook('daoTao', (req, roles) => new Promise((resolve) => {
-        if (req.session.user && req.session.user.permissions && req.session.user.permissions.includes('manager:write') && req.session.user.permissions.includes('faculty:login')) {
+    app.assignRoleHooks.addHook('daoTao', async (req, roles) => {
+        const userPermissions = req.session.user ? req.session.user.permissions : [];
+        if (req.query.nhomRole && req.query.nhomRole == 'daoTao' && userPermissions.includes('manager:write')) {
             const assignRolesList = app.assignRoleHooks.get('daoTao').map(item => item.id);
-            resolve(roles && roles.length && assignRolesList.contains(roles));
+            return roles && roles.length && assignRolesList.contains(roles);
         }
-    }));
+    });
 
     app.permissionHooks.add('staff', 'checkRoleDTQuanLyMonHoc', (user, staff) => new Promise(resolve => {
         if (staff.donViQuanLy && staff.donViQuanLy.length && user.permissions.includes('faculty:login')) {
