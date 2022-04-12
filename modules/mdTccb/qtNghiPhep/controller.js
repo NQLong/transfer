@@ -196,11 +196,27 @@ module.exports = app => {
     };
 
     app.get('/api/qua-trinh/nghi-phep/download-excel/:filter', app.permission.check('qtNghiPhep:read'), (req, res) => {
+        let objFilter = app.parse(req.params.filter);
+        let batDau = objFilter && objFilter.batDau ? objFilter.batDau : null;
+        if (batDau) {
+            let batDauDate = new Date(batDau);
+            batDauDate.setHours(0, 0, 0, 0);
+            batDau = batDauDate.getTime();
+        }
         app.model.qtNghiPhep.downloadExcel(req.params.filter, (error, result) => {
             if (error || !result) {
                 res.send({ error });
             } else {
-                app.model.dmNgayLe.getAll({}, (error, items) => {
+                let condition = {};
+                if (batDau) {
+                    condition = {
+                        statement: 'ngay >= :ngay',
+                        parameter: {
+                            ngay: batDau,
+                        }
+                    };
+                }
+                app.model.dmNgayLe.getAll(condition, (error, items) => {
                     const danhSachNgayLe = (items || []).map(item => item.ngay);
                     const workbook = app.excel.create(), worksheet = workbook.addWorksheet('nghiphep');
                     new Promise(resolve => {
