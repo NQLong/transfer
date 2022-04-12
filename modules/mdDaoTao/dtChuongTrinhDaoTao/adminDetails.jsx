@@ -12,39 +12,50 @@ import { SelectAdapter_DmSvLoaiHinhDaoTao } from 'modules/mdDanhMuc/dmSvLoaiHinh
 
 class DtChuongTrinhDaoTaoDetails extends AdminPage {
     state = {}
+
     componentDidMount() {
         T.ready('/user/dao-tao', () => {
             const route = T.routeMatcher('/user/dao-tao/chuong-trinh-dao-tao/:ma');
             this.ma = route.parse(window.location.pathname)?.ma;
+            const query = new URLSearchParams(this.props.location.search);
+            const id = query.get('id');
             if (this.ma !== 'new') {
-                this.props.getDtKhungDaoTao(this.ma, (data) => {
-                    this.khoa.value(data.maKhoa);
-                    this.namDaoTao.value(data.namDaoTao);
-                    this.maNganh.value(data.maNganh);
-                    this.tenNganhVi.value(T.parse(data.tenNganh).vi || '');
-                    this.tenNganhEn.value(T.parse(data.tenNganh).en || '');
-                    this.trinhDoDaoTao.value(data.trinhDoDaoTao);
-                    this.loaiHinhDaoTao.value(data.loaiHinhDaoTao);
-                    this.thoiGianDaoTao.value(data.thoiGianDaoTao || '');
-                    this.tenVanBangVi.value(T.parse(data.tenVanBang).vi || '');
-                    this.tenVanBangEn.value(T.parse(data.tenVanBang).en || '');
-                    this.mucTieuChung.value(data.mucTieuChung);
-
-                    let mucTieuCuThe = T.parse(data.mucTieuCuThe || '{}');
-                    this.mucTieuCuThe1.value(mucTieuCuThe[1] || '');
-                    this.mucTieuCuThe2.value(mucTieuCuThe[2] || '');
-                    this.mucTieuCuThe3.value(mucTieuCuThe[3] || '');
-                    this.mucTieuCuThe4.value(mucTieuCuThe[4] || '');
-                    this.props.getDtChuongTrinhDaoTao(this.ma, (ctdt) => {
-                        //TODO: Group SQL
-                        [this.kienThucDaiCuong, this.kienThucCoSoNganh, this.kienThucChuyenNganh, this.kienThucBoTro, this.kienThucLVTN].forEach(e => e.setVal(ctdt, data.maKhoa));
-                    });
-                });
+                this.getData(this.ma);
             } else {
+                if (id > 0) {
+                    this.getData(id, true);
+                    return;
+                }
                 const maKhoa = this.props.system.user.staff ? this.props.system.user.staff.maDonVi : '';
                 this.khoa.value(maKhoa);
                 [this.kienThucDaiCuong, this.kienThucCoSoNganh, this.kienThucChuyenNganh, this.kienThucBoTro, this.kienThucLVTN].forEach(e => e.setVal([], maKhoa));
             }
+        });
+    }
+
+    getData = (id, isClone = false) => {
+        this.props.getDtKhungDaoTao(id, (data) => {
+            this.khoa.value(data.maKhoa);
+            this.namDaoTao.value(!isClone ? data.namDaoTao : parseInt(data.namDaoTao) + 1);
+            this.maNganh.value(data.maNganh);
+            this.tenNganhVi.value(T.parse(data.tenNganh).vi || '');
+            this.tenNganhEn.value(T.parse(data.tenNganh).en || '');
+            this.trinhDoDaoTao.value(data.trinhDoDaoTao);
+            this.loaiHinhDaoTao.value(data.loaiHinhDaoTao);
+            this.thoiGianDaoTao.value(data.thoiGianDaoTao || '');
+            this.tenVanBangVi.value(T.parse(data.tenVanBang).vi || '');
+            this.tenVanBangEn.value(T.parse(data.tenVanBang).en || '');
+            this.mucTieuChung.value(data.mucTieuChung);
+
+            let mucTieuCuThe = T.parse(data.mucTieuCuThe || '{}');
+            this.mucTieuCuThe1.value(mucTieuCuThe[1] || '');
+            this.mucTieuCuThe2.value(mucTieuCuThe[2] || '');
+            this.mucTieuCuThe3.value(mucTieuCuThe[3] || '');
+            this.mucTieuCuThe4.value(mucTieuCuThe[4] || '');
+            this.props.getDtChuongTrinhDaoTao(id, (ctdt) => {
+                //TODO: Group SQL
+                [this.kienThucDaiCuong, this.kienThucCoSoNganh, this.kienThucChuyenNganh, this.kienThucBoTro, this.kienThucLVTN].forEach(e => e.setVal(ctdt, data.maKhoa));
+            });
         });
     }
 
@@ -101,15 +112,15 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                 ...kienThucBoTro.updateDatas,
                 ...kienThucLVTN.updateDatas
             ];
-            const deleteItems = [
-                ...kienThucDaiCuong.deleteDatas,
-                ...kienThucCoSoNganh.deleteDatas,
-                ...kienThucChuyenNganh.deleteDatas,
-                ...kienThucBoTro.deleteDatas,
-                ...kienThucLVTN.deleteDatas
-            ];
+            // const deleteItems = [
+            //     ...kienThucDaiCuong.deleteDatas,
+            //     ...kienThucCoSoNganh.deleteDatas,
+            //     ...kienThucChuyenNganh.deleteDatas,
+            //     ...kienThucBoTro.deleteDatas,
+            //     ...kienThucLVTN.deleteDatas
+            // ];
             const updateDatas = { items: updateItems, ...{ id: this.ma, data } };
-            const deleteDatas = { items: deleteItems };
+            // const deleteDatas = { items: deleteItems };
 
             this.ma == 'new' ? this.props.createDtChuongTrinhDaoTao(updateDatas, (item) => {
                 location.replace('/new', `/${item.id}`);
@@ -117,7 +128,7 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
             }) : this.props.updateDtChuongTrinhDaoTao(this.ma, updateDatas, () => {
                 location.reload();
             });
-            this.props.deleteMultiDtChuongTrinhDaoTao(deleteDatas, () => { });
+            // this.props.deleteMultiDtChuongTrinhDaoTao(deleteDatas, () => { });
         }
     }
     render() {
