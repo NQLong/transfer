@@ -24,7 +24,7 @@ module.exports = app => {
             maDonVi = maDonVi.toString().trim();
         }
         let condition = {
-            statement: 'lower(ho) like lower(:ho) and lower(ten) like lower(:ten)',
+            statement: 'lower(ho) like lower(:ho) and lower(ten) like lower(:ten) and ngayNghi IS NULL',
             parameter: {
                 ho: `%${ho}%`,
                 ten: `%${ten}%`,
