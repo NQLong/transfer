@@ -27,7 +27,11 @@ class DtChuongTrinhDaoTaoPage extends AdminPage {
      }
 
      render() {
-          const permission = this.getUserPermission('dtChuongTrinhDaoTao', ['read', 'write', 'delete']);
+          const permissionDaoTao = this.getUserPermission('dtChuongTrinhDaoTao', ['read', 'write', 'delete', 'manage']);
+          let permission = {
+               write: permissionDaoTao.write || permissionDaoTao.manage,
+               delete: permissionDaoTao.delete || permissionDaoTao.manage
+          };
           const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dtChuongTrinhDaoTao && this.props.dtChuongTrinhDaoTao.page ?
                this.props.dtChuongTrinhDaoTao.page : { pageNumber: 1, pageSize: 200, pageTotal: 1, totalItem: 0, list: [] };
 

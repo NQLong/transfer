@@ -22,13 +22,13 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                          this.namDaoTao.value(data.namDaoTao);
                          this.props.getDtChuongTrinhDaoTao(this.ma, (ctdt) => {
                               //TODO: Group SQL
-                              [this.kienThucDaiCuong, this.kienThucCoSoNganh, this.kienThucChuyeNganh, this.kienThucBoTro, this.kienThucLVTN].forEach(e => e.setVal(ctdt, data.maKhoa));
+                              [this.kienThucDaiCuong, this.kienThucCoSoNganh, this.kienThucChuyenNganh, this.kienThucBoTro, this.kienThucLVTN].forEach(e => e.setVal(ctdt, data.maKhoa));
                          });
                     });
                } else {
-                    const maKhoa = this.props.system?.user?.maDonVi;
+                    const maKhoa = this.props.system?.user?.staff.maDonVi;
                     this.khoa.value(maKhoa);
-                    [this.kienThucDaiCuong, this.kienThucCoSoNganh, this.kienThucChuyeNganh, this.kienThucBoTro, this.kienThucLVTN].forEach(e => e.setVal(null, maKhoa));
+                    [this.kienThucDaiCuong, this.kienThucCoSoNganh, this.kienThucChuyenNganh, this.kienThucBoTro, this.kienThucLVTN].forEach(e => e.setVal([], maKhoa));
                }
 
           });
@@ -72,10 +72,10 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
           if (data) {
                const kienThucDaiCuong = this.kienThucDaiCuong.getValue() || [];
                const kienThucCoSoNganh = this.kienThucCoSoNganh.getValue() || [];
-               const kienThucChuyeNganh = this.kienThucChuyeNganh.getValue() || [];
+               const kienThucChuyenNganh = this.kienThucChuyenNganh.getValue() || [];
                const kienThucBoTro = this.kienThucBoTro.getValue() || [];
                const kienThucLVTN = this.kienThucLVTN.getValue() || [];
-               const items = [...kienThucDaiCuong, ...kienThucCoSoNganh, ...kienThucChuyeNganh, ...kienThucBoTro, ...kienThucLVTN];
+               const items = [...kienThucDaiCuong, ...kienThucCoSoNganh, ...kienThucChuyenNganh, ...kienThucBoTro, ...kienThucLVTN];
                const datas = { items: items, ...{ id: this.ma, data } };
                this.props.createMultiDtChuongTrinhDaoTao(datas, () => {
                     location.reload();
@@ -84,7 +84,7 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
      }
      render() {
           const isData = this.props.dtChuongTrinhDaoTao ? this.props.dtChuongTrinhDaoTao : null;
-          const permission = this.getUserPermission('dtChuongTrinhDaoTao', ['read', 'readAll', 'write', 'delete']);
+          const permission = this.getUserPermission('dtChuongTrinhDaoTao', ['read', 'write', 'delete', 'manage']);
           const readOnly = !permission.write;
 
           return this.renderPage({
@@ -161,13 +161,13 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
 
                     <ComponentKienThuc title={'Kiến thức giáo dục đại cương'} khoiKienThucId={1} ref={e => this.kienThucDaiCuong = e} />
                     <ComponentKienThuc title={'Kiến thức cơ sở ngành'} khoiKienThucId={9} ref={e => this.kienThucCoSoNganh = e} />
-                    <ComponentKienThuc title={'Kiến thức chuyên ngành'} khoiKienThucId={10} ref={e => this.kienThucChuyeNganh = e} />
+                    <ComponentKienThuc title={'Kiến thức chuyên ngành'} khoiKienThucId={10} ref={e => this.kienThucChuyenNganh = e} />
                     <ComponentKienThuc title={'Kiến thức bổ trợ'} khoiKienThucId={33} ref={e => this.kienThucBoTro = e} />
                     <ComponentKienThuc title={'Thực tập, khóa luận/luận văn tốt nghiệp'} khoiKienThucId={11} ref={e => this.kienThucLVTN = e} />
 
                </>,
                backRoute: '/user/dao-tao/chuong-trinh-dao-tao',
-               onSave: permission.write ? this.save : null,
+               onSave: permission.write || permission.manage ? this.save : null,
           });
      }
 }

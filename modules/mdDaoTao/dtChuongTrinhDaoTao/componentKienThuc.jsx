@@ -34,7 +34,7 @@ export class ComponentKienThuc extends AdminPage {
                if (item) {
                     SelectAdapter_DmMonHoc.fetchOneItem(item.maMonHoc, ({ item }) => {
                          const { soTinChi, tongSoTiet } = item;
-                         // this.setEditState(idx, true, this.state.datas[idx].id);
+                         // this.setEditState(idx`x, true, this.state.datas[idx].id);
                          this.rows[idx].tongSoTc.value(soTinChi);
                          this.rows[idx].soTiet.value(tongSoTiet);
                     });
@@ -109,7 +109,6 @@ export class ComponentKienThuc extends AdminPage {
      }
 
      selectMh = (idx) => {
-          console.log(idx);
           return (
                <FormSelect ref={e => this.rows[idx].maMonHoc = e} data={SelectAdapter_DmMonHocFaculty(this.props.khoiKienThucId == 1 ? 33 : this.maKhoa)} className='col-12' style={{ marginBottom: 0, textDecoration: `${this.state.datas[idx]?.isDeleted ? 'line-through' : null}` }} readOnly={!this.state.datas[idx].edit} onChange={value => this.setMonHoc(idx, value.id)} />
           );
@@ -186,7 +185,7 @@ export class ComponentKienThuc extends AdminPage {
 
 
      render() {
-          const permission = this.getUserPermission(this.props.prefixPermission || 'dtChuongTrinhDaoTao', ['read', 'readAll', 'write', 'delete']);
+          const permission = this.getUserPermission(this.props.prefixPermission || 'dtChuongTrinhDaoTao', ['read', 'manage', 'write', 'delete']);
           const title = this.props.title;
 
           const table = renderTable({
@@ -214,7 +213,7 @@ export class ComponentKienThuc extends AdminPage {
                     </>),
                renderRow: (item, index) => (
                     <tr key={index}>
-                         <TableCell type='text' style={{ textAlign: 'center', textDecoration: `${item.isDeleted ? 'line-through' : null}` }} content={item.id > 0 ? item.id : null} />
+                         <TableCell type='text' style={{ textAlign: 'center', textDecoration: `${item.isDeleted ? 'line-through' : null}` }} content={item.id > 0 ? index + 1 : null} />
                          <TableCell content={this.selectMh(index)} />
                          <TableCell content={this.insertLoaiMh(index)} />
                          <TableCell type='number' style={{ textAlign: 'center' }} content={this.insertTongSoTc(index)} />
