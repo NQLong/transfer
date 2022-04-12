@@ -12,6 +12,7 @@ import {
 import { SelectAdapter_DmNghiPhepV2 } from 'modules/mdDanhMuc/dmNghiPhep/redux';
 import { getDmNghiPhep } from 'modules/mdDanhMuc/dmNghiPhep/redux';
 import { getDmNgayLeAll } from 'modules/mdDanhMuc/dmNgayLe/redux';
+import { getStaff } from 'modules/mdTccb/tccbCanBo/redux';
 
 const EnumDateType = Object.freeze({
     0: { text: '' },
@@ -71,6 +72,7 @@ class EditModal extends AdminModal {
         };
         if (!shcc) {
             shcc = item.shcc;
+            ngayBatDauCongTac = this.props.ngayBatDauCongTac;
         }
         this.calcSoNgayPhepConLai(shcc, ngayBatDauCongTac, batDau && ketThuc ? Math.max(T.numberNgayNghi(new Date(batDau), new Date(ketThuc), this.props.danhSachNgayLe) - ngayNghiPhep, 0) : 0, soNgayNghiPhepConLai => {
             this.setState({ soNgayNghiPhepConLai });
@@ -212,18 +214,23 @@ class EditModal extends AdminModal {
 }
 
 class QtNghiPhepUserPage extends AdminPage {
-    state = { filter: {} };
+    state = { filter: {}, danhSachNgayLe: [], ngayBatDauCongTac: null };
     componentDidMount() {
         T.ready('/user', () => {
-            this.props.getDmNgayLeAll({}, items => {
-                let danhSachNgay = [];
-                for (let idx = 0; idx < items.length; idx++) {
-                    danhSachNgay.push(items[idx].ngay);
-                }
-                this.setState({ danhSachNgayLe: danhSachNgay });
-            });
             const { shcc } = this.props.system && this.props.system.user ? this.props.system.user : { shcc: '' };
-            this.setState({ filter: { listShcc: shcc, listDv: '', fromYear: null, toYear: null, tinhTrang: null, lyDo: '' } });
+            this.setState({ filter: { listShcc: shcc, listDv: '', fromYear: null, toYear: null, tinhTrang: null, lyDo: '' } }, () => {
+                this.props.getDmNgayLeAll({}, items => {
+                    this.props.getStaff(shcc, item => {
+                        let danhSachNgay = (items || []).map(item => item.ngay);
+                        let ngay = 0;
+                        if (item && item.item) ngay = item.item.ngayBatDauCongTac;
+                        this.setState({ 
+                            danhSachNgayLe: danhSachNgay,
+                            ngayBatDauCongTac: ngay
+                        });
+                    });
+                });
+            });
             this.getPage();
         });
     }
@@ -298,8 +305,8 @@ class QtNghiPhepUserPage extends AdminPage {
                         />
                         <TableCell type='text' content={item.lyDo == '99' ? item.lyDoKhac : <b>{item.tenNghiPhep}</b>} />
                         <TableCell type='text' content={item.noiDen} />
-                        <TableCell type='number' content={T.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc))} />
-                        <TableCell type='number' content={Math.max(T.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc)) - item.ngayNghiPhep, 0)} />
+                        <TableCell type='number' content={T.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), this.state.danhSachNgayLe)} />
+                        <TableCell type='number' content={Math.max(T.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), this.state.danhSachNgayLe) - item.ngayNghiPhep, 0)} />
                         <TableCell type='text' content={parseInt(T.monthDiff(new Date(item.ngayBatDauCongTac), new Date()) / 12 / 5) + 'tn'} />
                         <TableCell type='text' content={(
                             <>
@@ -334,7 +341,7 @@ class QtNghiPhepUserPage extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
-                <EditModal ref={e => this.modal = e} shcc={this.shcc} readOnly={!permission.write} danhSachNgayLe={this.state.danhSachNgayLe}
+                <EditModal ref={e => this.modal = e} shcc={this.shcc} readOnly={!permission.write} danhSachNgayLe={this.state.danhSachNgayLe} ngayBatDauCongTac={this.state.ngayBatDauCongTac}
                     create={this.props.createQtNghiPhepUserPage} update={this.props.updateQtNghiPhepUserPage} getAll={this.props.getQtNghiPhepAllUser} getNghiPhep={this.props.getDmNghiPhep}
                 />
             </>,
@@ -347,6 +354,6 @@ class QtNghiPhepUserPage extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtNghiPhep: state.tccb.qtNghiPhep });
 const mapActionsToProps = {
     getQtNghiPhepUserPage, deleteQtNghiPhepUserPage,
-    updateQtNghiPhepUserPage, createQtNghiPhepUserPage, getQtNghiPhepAllUser, getDmNghiPhep, getDmNgayLeAll
+    updateQtNghiPhepUserPage, createQtNghiPhepUserPage, getQtNghiPhepAllUser, getDmNghiPhep, getDmNgayLeAll, getStaff
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtNghiPhepUserPage);

@@ -13,6 +13,7 @@ import {
 import { SelectAdapter_DmNghiPhepV2 } from 'modules/mdDanhMuc/dmNghiPhep/redux';
 import { getDmNghiPhep } from 'modules/mdDanhMuc/dmNghiPhep/redux';
 import { getDmNgayLeAll } from 'modules/mdDanhMuc/dmNgayLe/redux';
+import { getStaff } from 'modules/mdTccb/tccbCanBo/redux';
 
 const EnumDateType = Object.freeze({
     0: { text: '' },
@@ -71,7 +72,10 @@ class EditModal extends AdminModal {
         let { id, shcc, lyDo, batDau, batDauType, ketThuc, ketThucType, noiDen, ghiChu, lyDoKhac, ngayNghiPhep, ngayBatDauCongTac } = item ? item : {
             id: '', shcc: '', lyDo: '', batDau: null, batDauType: '', ketThuc: null, ketThucType: '', noiDen: '', ghiChu: '', lyDoKhac: '', ngayNghiPhep: 0, ngayBatDauCongTac: null
         };
-        if (!shcc) shcc = this.props.shcc;
+        if (!shcc) {
+            shcc = this.props.shcc;
+            ngayBatDauCongTac = this.props.ngayBatDauCongTac;
+        }
         this.calcSoNgayPhepConLai(shcc, ngayBatDauCongTac, batDau && ketThuc ? Math.max(T.numberNgayNghi(new Date(batDau), new Date(ketThuc), this.props.danhSachNgayLe) - ngayNghiPhep, 0) : 0, soNgayNghiPhepConLai => {
             this.setState({ soNgayNghiPhepConLai });
         });
@@ -224,22 +228,27 @@ class EditModal extends AdminModal {
 }
 
 class QtNghiPhepGroupPage extends AdminPage {
-    state = { filter: {} };
+    state = { filter: {}, danhSachNgayLe: [], ngayBatDauCongTac: 0};
 
     componentDidMount() {
         T.ready('/user/tccb', () => {
-            this.props.getDmNgayLeAll({}, items => {
-                let danhSachNgay = [];
-                for (let idx = 0; idx < items.length; idx++) {
-                    danhSachNgay.push(items[idx].ngay);
-                }
-                this.setState({ danhSachNgayLe: danhSachNgay });
-            });
             T.clearSearchBox();
             const route = T.routeMatcher('/user/tccb/qua-trinh/nghi-phep/group/:shcc'),
                 params = route.parse(window.location.pathname);
             this.shcc = params.shcc;
-            this.setState({ filter: { listShcc: params.shcc, listDv: '' } });
+            this.setState({ filter: { listShcc: params.shcc, listDv: '' } }, () => {
+                this.props.getDmNgayLeAll({}, items => {
+                    this.props.getStaff(params.shcc, item => {
+                        let danhSachNgay = (items || []).map(item => item.ngay);
+                        let ngay = 0;
+                        if (item && item.item) ngay = item.item.ngayBatDauCongTac;
+                        this.setState({ 
+                            danhSachNgayLe: danhSachNgay,
+                            ngayBatDauCongTac: ngay
+                        });
+                    });
+                });
+            });
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
 
             T.showSearchBox(() => {
@@ -250,7 +259,7 @@ class QtNghiPhepGroupPage extends AdminPage {
                 this.toYear.value(toYear);
                 this.tinhTrang.value(tinhTrang);
                 this.lyDo.value(lyDo);
-                setTimeout(() => this.changeAdvancedSearch(), 50);
+                setTimeout(() => this.changeAdvancedSearch(), 500);
             });
             this.getPage();
         });
@@ -370,8 +379,8 @@ class QtNghiPhepGroupPage extends AdminPage {
                         />
                         <TableCell type='text' content={item.lyDo == '99' ? item.lyDoKhac : <b>{item.tenNghiPhep}</b>} />
                         <TableCell type='text' content={item.noiDen} />
-                        <TableCell type='number' content={T.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc))} />
-                        <TableCell type='number' content={Math.max(T.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc)) - item.ngayNghiPhep, 0)} />
+                        <TableCell type='number' content={T.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), this.state.danhSachNgayLe)} />
+                        <TableCell type='number' content={Math.max(T.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), this.state.danhSachNgayLe) - item.ngayNghiPhep, 0)} />
                         <TableCell type='text' content={parseInt(T.monthDiff(new Date(item.ngayBatDauCongTac), new Date()) / 12 / 5) + 'tn'} />
                         <TableCell type='text' content={(
                             <>
@@ -426,7 +435,7 @@ class QtNghiPhepGroupPage extends AdminPage {
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e}
-                    shcc={this.shcc} danhSachNgayLe={this.state.danhSachNgayLe} readOnly={!permission.write}
+                    shcc={this.shcc} danhSachNgayLe={this.state.danhSachNgayLe} readOnly={!permission.write} ngayBatDauCongTac={this.state.ngayBatDauCongTac}
                     create={this.props.createQtNghiPhepGroupPageMa} update={this.props.updateQtNghiPhepGroupPageMa} getAll={this.props.getQtNghiPhepAll} getNghiPhep={this.props.getDmNghiPhep}
                 />
             </>,
@@ -439,6 +448,6 @@ class QtNghiPhepGroupPage extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtNghiPhep: state.tccb.qtNghiPhep });
 const mapActionsToProps = {
     getQtNghiPhepGroupPageMa, deleteQtNghiPhepGroupPageMa,
-    updateQtNghiPhepGroupPageMa, createQtNghiPhepGroupPageMa, getQtNghiPhepAll, getDmNghiPhep, getDmNgayLeAll
+    updateQtNghiPhepGroupPageMa, createQtNghiPhepGroupPageMa, getQtNghiPhepAll, getDmNghiPhep, getDmNgayLeAll, getStaff
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtNghiPhepGroupPage);
