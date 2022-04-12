@@ -40,6 +40,7 @@ export default function DmSvLoaiHinhDaoTaoReducer(state = null, data) {
 
 // Actions ------------------------------------------------------------------------------------------------------------
 T.initPage('pageDmSvLoaiHinhDaoTao');
+
 export function getDmSvLoaiHinhDaoTaoPage(pageNumber, pageSize, done) {
     const page = T.updatePage('pageDmSvLoaiHinhDaoTao', pageNumber, pageSize);
     return dispatch => {
@@ -128,5 +129,5 @@ export const SelectAdapter_DmSvLoaiHinhDaoTao = {
     url: '/api/danh-muc/dao-tao/loai-hinh-dao-tao/page/1/20',
     data: params => ({ condition: params.term }),
     processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.ten })) : [] }),
-    fetchOne: (ma, done) => (getDmSvLoaiHinhDaoTao(ma, item => done && done({ id: item.ma, text: item.ten })))(),
+    fetchOne: (ma, done) => (getDmSvLoaiHinhDaoTao(ma, item => done && done({ id: item.ma, text: item.ten })))()
 };

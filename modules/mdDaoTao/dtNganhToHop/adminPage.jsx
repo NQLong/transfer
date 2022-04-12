@@ -7,7 +7,7 @@ import Pagination from 'view/component/Pagination';
 import { SelectAdapter_DtNganhDaoTao } from '../dtNganhDaoTao/redux';
 import { SelectAdapter_DmSvToHopTs } from 'modules/mdDanhMuc/dmSvToHopTs/redux';
 import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
-import T from 'view/js/common';
+
 class EditModal extends AdminModal {
 
     onShow = (item) => {
@@ -42,21 +42,21 @@ class EditModal extends AdminModal {
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
-            title: this.state.id ? 'Chỉnh sửa' : 'Tạo mới',
-            size: 'large',
-            body: <div className='row'>
-                <FormSelect className='col-12' ref={e => this.maNganh = e} label='Ngành' readOnly={this.state.id ? true : readOnly} data={SelectAdapter_DtNganhDaoTao} required />
-                <FormSelect className='col-12' ref={e => this.maToHop = e} label='Tổ hợp' readOnly={readOnly} data={SelectAdapter_DmSvToHopTs} required />
-                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex' }}
-                    onChange={value => this.changeKichHoat(value ? 1 : 0)} />
-            </div>
-        }
+                title: this.state.id ? 'Chỉnh sửa' : 'Tạo mới',
+                size: 'large',
+                body: <div className='row'>
+                    <FormSelect className='col-12' ref={e => this.maNganh = e} label='Ngành' readOnly={this.state.id ? true : readOnly} data={SelectAdapter_DtNganhDaoTao} required />
+                    <FormSelect className='col-12' ref={e => this.maToHop = e} label='Tổ hợp' readOnly={readOnly} data={SelectAdapter_DmSvToHopTs} required />
+                    <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex' }} onChange={value => this.changeKichHoat(value ? 1 : 0)} />
+                </div>
+            }
         );
     }
 }
 
 class DtNganhToHopPage extends AdminPage {
     state = { donViFilter: '' }
+
     componentDidMount() {
         T.ready('/user/dao-tao', () => {
             T.onSearch = (searchText) => this.props.getDtNganhToHopPage(undefined, undefined, { searchTerm: searchText || '' });
@@ -110,12 +110,10 @@ class DtNganhToHopPage extends AdminPage {
                         <TableCell type='link' content={item.tenNganh} onClick={() => this.modal.show(item)} />
                         <TableCell style={{ whiteSpace: 'nowrap', textAlign: 'center' }} content={item.maToHop} />
                         <TableCell style={{ whiteSpace: 'nowrap' }} content={`${item.tenMon1 ? item.tenMon1 + ' -' : ''} ${item.tenMon2 ? item.tenMon2 + ' -' : ''} ${item.tenMon3 || ''}`} />
-                        <TableCell type='checkbox' content={item.kichHoat} permission={permission}
-                            onChanged={value => this.props.updateDtNganhToHop(item.id, { kichHoat: Number(value) })} />
-                        <TableCell type='buttons' content={item} permission={permission}
-                            onEdit={() => this.modal.show(item)} onDelete={this.delete} />
+                        <TableCell type='checkbox' content={item.kichHoat} permission={permission} onChanged={value => this.props.updateDtNganhToHop(item.id, { kichHoat: Number(value) })} />
+                        <TableCell type='buttons' content={item} permission={permission} onEdit={() => this.modal.show(item)} onDelete={this.delete} />
                     </tr>
-                ),
+                )
             });
 
 
@@ -133,10 +131,8 @@ class DtNganhToHopPage extends AdminPage {
             }} allowClear />,
             content: <>
                 <div className='tile'>{table}</div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                    getPage={this.props.getDtNganhToHopPage} />
-                <EditModal ref={e => this.modal = e} permission={permission} readOnly={!permission.write}
-                    create={this.props.createDtNganhToHop} update={this.props.updateDtNganhToHop} />
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.props.getDtNganhToHopPage} />
+                <EditModal ref={e => this.modal = e} permission={permission} readOnly={!permission.write} create={this.props.createDtNganhToHop} update={this.props.updateDtNganhToHop} />
             </>,
             backRoute: '/user/dao-tao',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null

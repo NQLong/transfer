@@ -26,13 +26,12 @@ class EditModal extends AdminModal {
         const changes = {
             ma: this.ma.value(),
             ten: this.ten.value(),
-            khoiCha: this.khoiCha.value(),
+            khoiCha: this.khoiCha.value()
         };
         if (changes.ma == '') {
             T.notify('mã không được bị trống!', 'danger');
             this.ma.focus();
-        }
-        else if (changes.ten == '') {
+        } else if (changes.ten == '') {
             T.notify('Tên không được bị trống!', 'danger');
             this.ten.focus();
         } else {
@@ -45,14 +44,14 @@ class EditModal extends AdminModal {
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
-            title: this.state.item ? 'Tạo mới' : 'Cập nhật khối kiến thức',
-            size: 'large',
-            body: <div className='row'>
-                <FormTextBox type='text' className='col-12' ref={e => this.ma = e} label='Mã' readOnly={this.state.item} required />
-                <FormTextBox type='text' className='col-12' ref={e => this.ten = e} label='Tên' readOnly={readOnly} required />
-                <FormSelect data={SelectAdapter_DmKhoiKienThucAll} className='col-12' ref={e => this.khoiCha = e} label='Khối cha' readOnly={readOnly} placeholder='Khối cha' />
-            </div>
-        }
+                title: this.state.item ? 'Tạo mới' : 'Cập nhật khối kiến thức',
+                size: 'large',
+                body: <div className='row'>
+                    <FormTextBox type='text' className='col-12' ref={e => this.ma = e} label='Mã' readOnly={this.state.item} required />
+                    <FormTextBox type='text' className='col-12' ref={e => this.ten = e} label='Tên' readOnly={readOnly} required />
+                    <FormSelect data={SelectAdapter_DmKhoiKienThucAll} className='col-12' ref={e => this.khoiCha = e} label='Khối cha' readOnly={readOnly} placeholder='Khối cha' />
+                </div>
+            }
         );
     }
 }
@@ -102,10 +101,9 @@ class DmKhoiKienThucPage extends AdminPage {
                     <TableCell type='link' style={{ textAlign: 'center' }} content={item.ma} onClick={() => this.modal.show(item)} />
                     <TableCell content={item.ten} />
                     <TableCell content={item.tenKhoiCha || ''} />
-                    <TableCell type='buttons' content={item} permission={permission}
-                        onEdit={() => this.modal.show(item)} onDelete={this.delete} />
+                    <TableCell type='buttons' content={item} permission={permission} onEdit={() => this.modal.show(item)} onDelete={this.delete} />
                 </tr>
-            ),
+            )
         });
 
         return this.renderPage({
@@ -117,10 +115,8 @@ class DmKhoiKienThucPage extends AdminPage {
             ],
             content: <>
                 <div className='tile'>{table}</div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                    getPage={this.props.getDmKhoiKienThucPage} />
-                <EditModal ref={e => this.modal = e} permission={permission} readOnly={!permission.write}
-                    create={this.props.createDmKhoiKienThuc} update={this.props.updateDmKhoiKienThuc} />
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.props.getDmKhoiKienThucPage} />
+                <EditModal ref={e => this.modal = e} permission={permission} readOnly={!permission.write} create={this.props.createDmKhoiKienThuc} update={this.props.updateDmKhoiKienThuc} />
             </>,
             backRoute: '/user/dao-tao',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null

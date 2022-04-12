@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { AdminPage, FormSelect, FormTabs, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
 import { ComponentKienThuc } from '../dtChuongTrinhDaoTao/componentKienThuc';
 import { getDsMonMo } from '../dtDsMonMo/redux';
+
 class DtDsMonMoEditPage extends AdminPage {
     state = { isCreate: false, isDaoTao: false }
 
@@ -70,6 +71,7 @@ class DtDsMonMoEditPage extends AdminPage {
             </tr>
         )
     })
+
     render() {
         return this.renderPage({
             title: <>Mở môn học: <i>{this.state.isCreate ? 'Đợt đăng ký mới' : 'Cập nhật đợt đã đăng ký'}</i></>,
@@ -82,40 +84,38 @@ class DtDsMonMoEditPage extends AdminPage {
                 this.state.isCreate ? 'Đợt đăng ký mới' : 'Chỉnh sửa đợt đã đăng ký'
             ],
             content: <>
-                <FormTabs ref={e => this.tabs = e}
-                    tabs={[
-                        {
-                            title: 'Năm 1',
-                            component:
-                                <ComponentKienThuc title={'Danh sách các môn đại cương'} ref={e => this.listDaiCuong = e} prefixPermission='dtDangKyMoMon' />
-                        },
-                        {
-                            title: 'Năm 2',
-                            component:
-                                <div className='tile'>
-                                </div>
-                        },
-                        {
-                            title: 'Năm 3',
-                            component:
-                                <div className='tile'>
-                                    <FormTextBox placeholder='Tên doanh nghiệp' ref={e => this.dnDoanhNghiepViTitle = e} required />
-                                </div>
-                        },
-                        {
-                            title: 'Năm 4',
-                            component:
-                                <div className='tile'>
-                                    <FormTextBox placeholder='Tên doanh nghiệp' ref={e => this.dnDoanhNghiepViTitle = e} required />
-                                </div>
-                        },
-                    ]}
-                />
+                <FormTabs ref={e => this.tabs = e} tabs={[
+                    {
+                        title: 'Năm 1',
+                        component:
+                            <ComponentKienThuc title={'Danh sách các môn đại cương'} ref={e => this.listDaiCuong = e} prefixPermission='dtDangKyMoMon' />
+                    },
+                    {
+                        title: 'Năm 2',
+                        component:
+                            <div className='tile'></div>
+                    },
+                    {
+                        title: 'Năm 3',
+                        component:
+                            <div className='tile'>
+                                <FormTextBox placeholder='Tên doanh nghiệp' ref={e => this.dnDoanhNghiepViTitle = e} required />
+                            </div>
+                    },
+                    {
+                        title: 'Năm 4',
+                        component:
+                            <div className='tile'>
+                                <FormTextBox placeholder='Tên doanh nghiệp' ref={e => this.dnDoanhNghiepViTitle = e} required />
+                            </div>
+                    }
+                ]} />
             </>,
             backRoute: '/user/dao-tao/dang-ky-mo-mon'
         });
     }
 }
+
 const mapStateToProps = state => ({ system: state.system, dtDsMonMo: state.daoTao.dtDsMonMo });
 const mapActionsToProps = {
     getDsMonMo

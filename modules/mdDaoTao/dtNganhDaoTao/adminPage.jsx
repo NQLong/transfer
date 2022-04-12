@@ -45,15 +45,14 @@ class EditModal extends AdminModal {
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
-            title: this.state.maNganh ? 'Cập nhât ngành đào tạo' : 'Tạo mới ngành đào tạo',
-            size: 'large',
-            body: <div className='row'>
-                <FormTextBox type='text' className='col-12' ref={e => this.maNganh = e} label='Mã' readOnly={this.state.maNganh ? true : readOnly} placeholder='Mã' required />
-                <FormTextBox type='text' className='col-12' ref={e => this.tenNganh = e} label='Tên ngành' readOnly={readOnly} placeholder='Tên' required />
-                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex' }}
-                    onChange={value => this.changeKichHoat(value ? 1 : 0)} />
-            </div>
-        }
+                title: this.state.maNganh ? 'Cập nhât ngành đào tạo' : 'Tạo mới ngành đào tạo',
+                size: 'large',
+                body: <div className='row'>
+                    <FormTextBox type='text' className='col-12' ref={e => this.maNganh = e} label='Mã' readOnly={this.state.maNganh ? true : readOnly} placeholder='Mã' required />
+                    <FormTextBox type='text' className='col-12' ref={e => this.tenNganh = e} label='Tên ngành' readOnly={readOnly} placeholder='Tên' required />
+                    <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex' }} onChange={value => this.changeKichHoat(value ? 1 : 0)} />
+                </div>
+            }
         );
     }
 }
@@ -107,12 +106,10 @@ class DtNganhDaoTaoPage extends AdminPage {
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='link' content={item.maNganh} onClick={() => this.modal.show(item)} />
                         <TableCell type='text' content={item.tenNganh} />
-                        <TableCell type='checkbox' content={item.kichHoat} permission={permission}
-                            onChanged={value => this.props.updateDtNganhDaoTao(item.maNganh, { kichHoat: Number(value) })} />
-                        <TableCell type='buttons' content={item} permission={permission}
-                            onEdit={() => this.modal.show(item)} onDelete={this.delete} />
+                        <TableCell type='checkbox' content={item.kichHoat} permission={permission} onChanged={value => this.props.updateDtNganhDaoTao(item.maNganh, { kichHoat: Number(value) })} />
+                        <TableCell type='buttons' content={item} permission={permission} onEdit={() => this.modal.show(item)} onDelete={this.delete} />
                     </tr>
-                ),
+                )
             });
 
 
@@ -130,10 +127,8 @@ class DtNganhDaoTaoPage extends AdminPage {
             ],
             content: <>
                 <div className='tile'>{table}</div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                    getPage={this.props.getDtNganhDaoTaoPage} />
-                <EditModal ref={e => this.modal = e} permission={permission} readOnly={!permission.write}
-                    create={this.props.createDtNganhDaoTao} update={this.props.updateDtNganhDaoTao} />
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.props.getDtNganhDaoTaoPage} />
+                <EditModal ref={e => this.modal = e} permission={permission} readOnly={!permission.write} create={this.props.createDtNganhDaoTao} update={this.props.updateDtNganhDaoTao} />
             </>,
             backRoute: '/user/dao-tao',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null

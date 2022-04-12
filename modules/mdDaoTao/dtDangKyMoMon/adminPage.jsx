@@ -8,16 +8,17 @@ import { getDtDangKyMoMonPage } from './redux';
 
 class DtDangKyMoMonPage extends AdminPage {
     state = { donViFilter: '' }
+
     componentDidMount() {
         T.ready('/user/dao-tao', () => {
             T.clearSearchBox();
             this.setState({ donViFilter: this.props.system.user.staff?.maDonVi });
             T.onSearch = (searchText) => this.props.getDmMonHocPage(undefined, undefined, {
-                searchTerm: searchText || '',
+                searchTerm: searchText || ''
             });
             T.showSearchBox();
             this.props.getDtDangKyMoMonPage(undefined, undefined, {
-                searchTerm: '',
+                searchTerm: ''
             });
         });
     }
@@ -58,9 +59,8 @@ class DtDangKyMoMonPage extends AdminPage {
                     <TableCell style={{ textAlign: 'center' }} content={item.namHoc} />
                     <TableCell type='date' style={{ textAlign: 'center' }} content={item.thoiGian} />
                     <TableCell contentClassName='multiple-lines-4' content={item.ghiChu} />
-                    <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                        onEdit={() => this.props.history.push(`/user/dao-tao/dang-ky-mo-mon/${item.id}`)} //TODO: Đăng ký mở môn theo CTDT
-                    />
+                    {/*//TODO: Đăng ký mở môn theo CTDT*/}
+                    <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onEdit={() => this.props.history.push(`/user/dao-tao/dang-ky-mo-mon/${item.id}`)} />
                 </tr>)
         });
         return this.renderPage({
@@ -80,11 +80,10 @@ class DtDangKyMoMonPage extends AdminPage {
             }} data={SelectAdapter_DmDonViFaculty_V2} allowClear={true} />,
             content: <>
                 <div className='tile'>{table}</div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                    getPage={this.props.getDtDangKyMoMonPage} />
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.props.getDtDangKyMoMonPage} />
             </>,
             backRoute: '/user/dao-tao',
-            onCreate: permission.write ? ((e) => e.preventDefault() || this.props.history.push('/user/dao-tao/dang-ky-mo-mon/new')) : null,
+            onCreate: permission.write ? ((e) => e.preventDefault() || this.props.history.push('/user/dao-tao/dang-ky-mo-mon/new')) : null
             //TODO: Đăng ký mở môn theo CTDT
 
         });

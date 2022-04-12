@@ -40,6 +40,7 @@ export default function DmSvBacDaoTaoReducer(state = null, data) {
 
 // Actions ------------------------------------------------------------------------------------------------------------
 T.initPage('pageDmSvBacDaoTao');
+
 export function getDmSvBacDaoTaoPage(pageNumber, pageSize, pageCondition, done) {
     const page = T.updatePage('pageDmSvBacDaoTao', pageNumber, pageSize, pageCondition);
     return dispatch => {
@@ -130,5 +131,5 @@ export const SelectAdapter_DmSvBacDaoTao = {
     url: '/api/danh-muc/dao-tao/bac-dao-tao/page/1/20',
     data: params => ({ condition: params.term }),
     processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.maBac, text: item.tenBac })) : [] }),
-    fetchOne: (maBac, done) => (getDmSvBacDaoTao(maBac, item => done && done({ id: item.maBac, text: item.tenBac })))(),
+    fetchOne: (maBac, done) => (getDmSvBacDaoTao(maBac, item => done && done({ id: item.maBac, text: item.tenBac })))()
 };

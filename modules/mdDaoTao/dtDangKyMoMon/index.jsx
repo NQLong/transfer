@@ -17,6 +17,6 @@ export default {
         {
             path: '/user/dao-tao/dang-ky-mo-mon',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
-        },
-    ],
+        }
+    ]
 };

@@ -5,13 +5,13 @@ module.exports = app => {
             7001: {
                 title: 'Thời khóa biểu', groupIndex: 1,
                 link: '/user/dao-tao/thoi-khoa-bieu', icon: 'fa-calendar', backgroundColor: '#1ca474'
-            },
-        },
+            }
+        }
     };
     app.permission.add(
         { name: 'dtThoiKhoaBieu:read', menu },
         { name: 'dtThoiKhoaBieu:write' },
-        { name: 'dtThoiKhoaBieu:delete' },
+        { name: 'dtThoiKhoaBieu:delete' }
     );
 
     app.get('/user/dao-tao/thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:read'), app.templates.admin);

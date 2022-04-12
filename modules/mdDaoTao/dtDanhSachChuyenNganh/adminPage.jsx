@@ -19,7 +19,7 @@ class EditModal extends AdminModal {
         const changes = {
             ten: this.ten.value(),
             namHoc: this.namHoc.value(),
-            khoa: this.khoa.value(),
+            khoa: this.khoa.value()
         };
         if (!changes.ten) {
             T.notify('Tên không được trống!', 'danger');
@@ -42,15 +42,16 @@ class EditModal extends AdminModal {
             size: 'large',
             body: <div className='row'>
                 <FormTextBox ref={e => this.ten = e} className='col-12' required label='Tên chuyên ngành' readOnly={readOnly} />
-                <FormTextBox type='year' ref={e => this.namHoc = e} className=
-                    'col-12' required label='Năm' readOnly={readOnly} />
+                <FormTextBox type='year' ref={e => this.namHoc = e} className='col-12' required label='Năm' readOnly={readOnly} />
                 <FormSelect ref={e => this.khoa = e} className='col-12' required label='Khoa/Bộ môn' data={SelectAdapter_DmDonViFaculty_V2} readOnly={readOnly || this.props.khoa != 'all'} />
             </div>
         });
     }
 }
+
 class DtDanhSachChuyenNganhPage extends AdminPage {
     state = { donVi: '', nam: '' }
+
     componentDidMount() {
         T.ready('/user/dao-tao', () => {
             let permission = this.getUserPermission('dtDanhSachChuyenNganh', ['read']);
@@ -119,32 +120,30 @@ class DtDanhSachChuyenNganhPage extends AdminPage {
             ],
             content: <>
                 {permissionDaoTao.read &&
-                    <div className='tile'>
-                        <div className='tile-title'><h3>Tra cứu</h3></div>
-                        <div className='row'>
-                            <FormSelect className='col-8' label='Chọn khoa, bộ môn' placeholder='Danh sách Khoa, bộ môn' ref={e => this.donVi = e} onChange={value => this.setState({ donVi: value ? value.id : 'all' })} data={SelectAdapter_DmDonViFaculty_V2} allowClear={true} />
-                            <FormTextBox type='year' className='col-4' label='Nhập năm' ref={e => this.nam = e} onChange={value => this.setState({ nam: value })} />
-                            <div className='form-group col-12' style={{ justifyContent: 'end', display: 'flex' }}>
-                                <button className='btn btn-danger' style={{ marginRight: '10px' }} type='button' onClick={e => {
-                                    e.preventDefault();
-                                    this.donVi.value('');
-                                    this.nam.value('');
-                                    this.getData('all');
-                                    T.notify('Đã xóa bộ lọc', 'info');
-                                }}>
-                                    <i className='fa fa-fw fa-lg fa-times' />Xóa bộ lọc
-                                </button>
-                                <button className='btn btn-info' type='button' onClick={e => e.preventDefault() || this.getData(this.state.donVi, this.state.nam)}>
-                                    <i className='fa fa-fw fa-lg fa-search-plus' />Tìm kiếm
-                                </button>
-                            </div>
+                <div className='tile'>
+                    <div className='tile-title'><h3>Tra cứu</h3></div>
+                    <div className='row'>
+                        <FormSelect className='col-8' label='Chọn khoa, bộ môn' placeholder='Danh sách Khoa, bộ môn' ref={e => this.donVi = e} onChange={value => this.setState({ donVi: value ? value.id : 'all' })} data={SelectAdapter_DmDonViFaculty_V2} allowClear={true} />
+                        <FormTextBox type='year' className='col-4' label='Nhập năm' ref={e => this.nam = e} onChange={value => this.setState({ nam: value })} />
+                        <div className='form-group col-12' style={{ justifyContent: 'end', display: 'flex' }}>
+                            <button className='btn btn-danger' style={{ marginRight: '10px' }} type='button' onClick={e => {
+                                e.preventDefault();
+                                this.donVi.value('');
+                                this.nam.value('');
+                                this.getData('all');
+                                T.notify('Đã xóa bộ lọc', 'info');
+                            }}>
+                                <i className='fa fa-fw fa-lg fa-times' />Xóa bộ lọc
+                            </button>
+                            <button className='btn btn-info' type='button' onClick={e => e.preventDefault() || this.getData(this.state.donVi, this.state.nam)}>
+                                <i className='fa fa-fw fa-lg fa-search-plus' />Tìm kiếm
+                            </button>
                         </div>
-                    </div>}
+                    </div>
+                </div>}
                 <div className='tile'>{table}</div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                    getPage={this.props.getDtDanhSachChuyenNganhPage} />
-                <EditModal ref={e => this.modal = e} readOnly={!permission.write} update={this.props.updateDtDanhSachChuyenNganh}
-                    create={this.props.createDtDanhSachChuyenNganh} khoa={this.state.donVi} />
+                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }} getPage={this.props.getDtDanhSachChuyenNganhPage} />
+                <EditModal ref={e => this.modal = e} readOnly={!permission.write} update={this.props.updateDtDanhSachChuyenNganh} create={this.props.createDtDanhSachChuyenNganh} khoa={this.state.donVi} />
             </>,
             backRoute: '/user/dao-tao',
             onCreate: permission.write ? (e) => e.preventDefault() || this.modal.show() : null
