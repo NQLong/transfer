@@ -322,10 +322,10 @@ module.exports = app => {
     });
 
     // Phân quyền cho các đơn vị ------------------------------------------------------------------------------------------------------------------------
-    app.assignRoleHooks.addRoles('doanhNghiep', { id: 'dnDoanhNghiep:manage', text: 'Doanh nghiệp: Quản lý doanh nghiệp' });
-    app.assignRoleHooks.addHook('doanhNghiep', (req, roles) => new Promise(resolve => {
+    app.assignRoleHooks.addRoles('ttDoanhNghiep', { id: 'dnDoanhNghiep:manage', text: 'Doanh nghiệp: Quản lý doanh nghiệp' });
+    app.assignRoleHooks.addHook('ttDoanhNghiep', (req, roles) => new Promise(resolve => {
         if (req.session.user && req.session.user.permissions && req.session.user.permissions.includes('manager:write')) {
-            app.assignRoleHooks.get('doanhNghiep').then(items => {
+            app.assignRoleHooks.get('ttDoanhNghiep').then(items => {
                 const assignRolesList = items.map(item => item.id);
                 resolve(roles && roles.length && assignRolesList.contains(roles));
             });
@@ -340,7 +340,7 @@ module.exports = app => {
     }));
 
     app.permissionHooks.add('assignRole', 'checkRoleQuanLyDoanhNghiep', (user, assignRoles) => new Promise(resolve => {
-        const inScopeRoles = assignRoles.filter(role => role.nhomRole == 'doanhNghiep');
+        const inScopeRoles = assignRoles.filter(role => role.nhomRole == 'ttDoanhNghiep');
         inScopeRoles.forEach(role => {
             if (role.tenRole == 'dnDoanhNghiep:manage') {
                 app.permissionHooks.pushUserPermission(user, 'dnDoanhNghiep:manage');

@@ -110,7 +110,7 @@ class CanBoTheoDonVi extends AdminPage {
     render() {
         const assignRolePermissions = this.getUserPermission('fwAssignRole', ['read', 'write']),
             daoTaoPermission = this.getCurrentPermissions().includes('faculty:login');
-        let nhomRoles = ['doanhNghiep'];
+        let nhomRoles = ['ttDoanhNghiep'];
         daoTaoPermission && nhomRoles.push('daoTao');
 
         const nguoiGan = this.props.system && this.props.system.user ? this.props.system.user : {};

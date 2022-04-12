@@ -16,9 +16,12 @@ module.exports = app => {
     });
 
     app.get('/api/assign-role/list/:nhomRole', app.permission.check('fwAssignRole:read'), (req, res) => {
-        app.assignRoleHooks.get(req.params.nhomRole).then((items) => {
-            res.send({ items });
-        });
+        // app.assignRoleHooks.get(req.params.nhomRole).then((items) => {
+        //     res.send({ items });
+        // });
+        const items = app.assignRoleHooks.get(req.params.nhomRole);
+        res.send({ items });
+
     });
 
     app.post('/api/assign-role', app.permission.check('fwAssignRole:write'), (req, res) => {

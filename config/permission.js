@@ -401,7 +401,7 @@ module.exports = app => {
                 assignListContainer[name] = roles;
             }
         },
-        get: (name) => new Promise(resolve => {
+        get: (name) => {
             let listPermission = [], nhomRoles = name.split(',');
             const getList = (index = 0) => {
                 let nhomRole = nhomRoles[index];
@@ -409,11 +409,11 @@ module.exports = app => {
                     assignListContainer[nhomRole].map(item => item.nhomRole = nhomRole);
                     listPermission.push(...assignListContainer[nhomRole]);
                 }
-                if (index == nhomRoles.length - 1) resolve(listPermission);
-                else getList(index + 1);
+                if (index == nhomRoles.length - 1) return listPermission;
+                else return getList(index + 1);
             };
-            getList();
-        }),
+            return getList();
+        },
 
         addHook: (name, hook) => assignRolePermissionHookContainer[name] = hook, // Hook is Promise object | parameters: req, roles
         check: async (req, roles) => {
