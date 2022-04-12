@@ -34,26 +34,54 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
           });
      }
 
+     validation = (selector) => {
+          const data = selector.value();
+          const isRequired = selector.props.required;
+          if (data || data === 0) return data;
+          if (isRequired) throw selector;
+          return '';
+     };
+
+     getValue = () => {
+          try {
+               let data = {
+                    maNganh: this.validation(this.maNganh),
+                    tenNganhVi: this.validation(this.tenNganhVi),
+                    tenNganhEn: this.validation(this.tenNganhEn),
+                    tenNganh: T.stringify({ vi: this.tenNganhVi.value(), en: this.tenNganhEn.value() }),
+                    namDaoTao: this.validation(this.namDaoTao),
+                    trinhDoDaoTao: this.validation(this.trinhDoDaoTao),
+                    loaiHinhDaoTao: this.validation(this.loaiHinhDaoTao),
+                    thoiGianDaoTao: this.validation(this.thoiGianDaoTao),
+                    tenVanBangVi: this.validation(this.tenVanBangVi),
+                    tenVanBangEn: this.validation(this.tenVanBangEn),
+                    tenVanBang: T.stringify({ vi: this.tenVanBangVi.value(), en: this.tenVanBangEn.value() }),
+                    maKhoa: this.validation(this.khoa),
+                    mucTieuChung: this.validation(this.mucTieuChung)
+               };
+               return data;
+          } catch (selector) {
+               selector.focus();
+               T.notify('<b>' + (selector.props.label || selector.props.placeholder || 'Dữ liệu') + '</b> bị trống!', 'danger');
+               return false;
+          }
+     }
+
      save = () => {
-          const kienThucDaiCuong = this.kienThucDaiCuong.getValue() || [];
-          const kienThucCoSoNganh = this.kienThucCoSoNganh.getValue() || [];
-          const kienThucChuyeNganh = this.kienThucChuyeNganh.getValue() || [];
-          const kienThucBoTro = this.kienThucBoTro.getValue() || [];
-          const kienThucLVTN = this.kienThucLVTN.getValue() || [];
-          const namDaoTao = this.namDaoTao.value();
-          const maKhoa = this.khoa.value();
-          if (!namDaoTao) {
-               T.notify('Năm đào tạo bị trống!', 'danger');
-               this.namDaoTao.focus();
-          } else {
+          let data = this.getValue();
+          if (data) {
+               const kienThucDaiCuong = this.kienThucDaiCuong.getValue() || [];
+               const kienThucCoSoNganh = this.kienThucCoSoNganh.getValue() || [];
+               const kienThucChuyeNganh = this.kienThucChuyeNganh.getValue() || [];
+               const kienThucBoTro = this.kienThucBoTro.getValue() || [];
+               const kienThucLVTN = this.kienThucLVTN.getValue() || [];
                const items = [...kienThucDaiCuong, ...kienThucCoSoNganh, ...kienThucChuyeNganh, ...kienThucBoTro, ...kienThucLVTN];
-               const data = { items: items, ...{ id: this.ma, namDaoTao, maKhoa } };
-               this.props.createMultiDtChuongTrinhDaoTao(data, () => {
+               const datas = { items: items, ...{ id: this.ma, data } };
+               this.props.createMultiDtChuongTrinhDaoTao(datas, () => {
                     location.reload();
                });
           }
      }
-
      render() {
           const isData = this.props.dtChuongTrinhDaoTao ? this.props.dtChuongTrinhDaoTao : null;
           const permission = this.getUserPermission('dtChuongTrinhDaoTao', ['read', 'readAll', 'write', 'delete']);
@@ -62,9 +90,11 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
           return this.renderPage({
                icon: 'fa fa-university',
                title: isData ? 'Chỉnh sửa chương trình đào tạo' : 'Tạo mới chương trình đào tạo',
+               subTitle: <span style={{ color: 'red' }}>Lưu ý: Các mục đánh dấu * là bắt buộc</span>,
                breadcrumb: [
                     <Link key={0} to='/user/dao-tao'>Đào tạo</Link>,
-                    'Chương trình đào tạo'
+                    <Link key={1} to='/user/chuong-trinh-dao-tao'>Chương trình đào tạo</Link>,
+                    isData ? 'Chỉnh sửa' : 'Tạo mới',
                ],
                content: <>
                     <div className='tile'>
@@ -80,11 +110,11 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                                              <FormTabs tabs={[
                                                   {
                                                        title: <>Tên ngành tiếng Việt  <span style={{ color: 'red' }}>*</span></>,
-                                                       component: <FormTextBox ref={e => this.tenNganhVi = e} placeholder='Tên tiếng Việt' />
+                                                       component: <FormTextBox ref={e => this.tenNganhVi = e} placeholder='Tên ngành (tiếng Việt)' required />
                                                   },
                                                   {
                                                        title: <>Tên ngành tiếng Anh  <span style={{ color: 'red' }}>*</span></>,
-                                                       component: <FormTextBox ref={e => this.tenNganhEn = e} placeholder='Tên tiếng Anh' />
+                                                       component: <FormTextBox ref={e => this.tenNganhEn = e} placeholder='Tên ngành (tiếng Anh)' required />
                                                   }
                                              ]} />
                                         </div>
@@ -98,11 +128,11 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                                         <FormTabs tabs={[
                                              {
                                                   title: <>Tiếng Việt  <span style={{ color: 'red' }}>*</span></>,
-                                                  component: <FormTextBox ref={e => this.tenVanBangVi = e} placeholder='Tên tiếng Việt' />
+                                                  component: <FormTextBox ref={e => this.tenVanBangVi = e} placeholder='Tên văn bằng (tiếng Việt)' />
                                              },
                                              {
                                                   title: <>Tiếng Anh  <span style={{ color: 'red' }}>*</span></>,
-                                                  component: <FormTextBox ref={e => this.tenVanBangEn = e} placeholder='Tên tiếng Anh' />
+                                                  component: <FormTextBox ref={e => this.tenVanBangEn = e} placeholder='Tên văn bằng (tiếng Anh)' />
                                              }
                                         ]} />
                                    </div>
@@ -115,16 +145,16 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                          <h3 className='tile-title'>2. Mục tiêu đào tạo</h3>
                          <div className='tile-body'>
                               <div className='row'>
-                                   <h4 className='form-group col-12'>2.1. Mục tiêu chung</h4>
-                                   <FormRichTextBox ref={e => this.mucTieuChung = e} placeholder='Xác định mục tiêu của CTĐT về: năng lực kiến thức, năng lực thực hành nghề nghiệp của người tốt nghiệp, …' className='form-group col-12' rows={5} />
+                                   <h4 className='form-group col-12'>2.1. Mục tiêu chung <span style={{ color: 'red' }}>*</span></h4>
+                                   <FormRichTextBox ref={e => this.mucTieuChung = e} placeholder='Mục tiêu chung' className='form-group col-12' rows={5} required />
                                    <h4 className='form-group col-12'>2.1. Mục tiêu cụ thể</h4>
                                    <p className='form-group col-12'>Sinh viên tốt nghiệp ngành {this.state.tenNganhVi || ''} có các kiến thức, kỹ năng và năng lực nghề nghiệp như sau:</p>
 
                                    {/*TODO: DT_MUC_TIEU_DAO_DAO*/}
-                                   <FormRichTextBox ref={e => this.mucTieuCuThe1 = e} label={<b><i>1. Kiến thức và lập luận ngành</i></b>} placeholder='Về kiến thức và lập luận ngành' className='form-group col-12' />
-                                   <FormRichTextBox ref={e => this.mucTieuCuThe2 = e} label={<b><i>2. Kỹ năng, phẩm chất cá nhân và nghề nghiệp</i></b>} placeholder='Về kỹ năng, phẩm chất cá nhân và nghề nghiệp' className='form-group col-12' />
-                                   <FormRichTextBox ref={e => this.mucTieuCuThe3 = e} label={<b><i>3. Kỹ năng làm việc nhóm và giao tiếp</i></b>} placeholder='Về kỹ năng làm việc nhóm và giao tiếp' className='form-group col-12' />
-                                   <FormRichTextBox ref={e => this.mucTieuCuThe4 = e} label={<b><i>4. Năng lực thực hành nghề nghiệp</i></b>} placeholder='Về năng lực thực hành nghề nghiệp' className='form-group col-12' />
+                                   <FormRichTextBox ref={e => this.mucTieuCuThe1 = e} label={<b><i>1. Kiến thức và lập luận ngành</i></b>} placeholder='Về kiến thức và lập luận ngành' className='form-group col-12' required />
+                                   <FormRichTextBox ref={e => this.mucTieuCuThe2 = e} label={<b><i>2. Kỹ năng, phẩm chất cá nhân và nghề nghiệp</i></b>} placeholder='Về kỹ năng, phẩm chất cá nhân và nghề nghiệp' className='form-group col-12' required />
+                                   <FormRichTextBox ref={e => this.mucTieuCuThe3 = e} label={<b><i>3. Kỹ năng làm việc nhóm và giao tiếp</i></b>} placeholder='Về kỹ năng làm việc nhóm và giao tiếp' className='form-group col-12' required />
+                                   <FormRichTextBox ref={e => this.mucTieuCuThe4 = e} label={<b><i>4. Năng lực thực hành nghề nghiệp</i></b>} placeholder='Về năng lực thực hành nghề nghiệp' className='form-group col-12' required />
                               </div>
                          </div>
                     </div>

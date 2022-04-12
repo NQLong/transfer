@@ -10,7 +10,7 @@ import Pagination from 'view/component/Pagination';
 class DtChuongTrinhDaoTaoPage extends AdminPage {
      componentDidMount() {
 
-          T.ready('/user/pdt', () => {
+          T.ready('/user/dao-tao', () => {
                T.onSearch = (searchText) => this.props.getDtChuongTrinhDaoTaoPage(undefined, undefined, searchText || '');
                T.showSearchBox();
                this.props.getDtChuongTrinhDaoTaoPage(undefined, undefined, { searchTerm: '' });
@@ -47,7 +47,7 @@ class DtChuongTrinhDaoTaoPage extends AdminPage {
                          <TableCell style={{ width: 'auto', textAlign: 'right' }} content={index + 1} />
                          <TableCell style={{ width: 'auto', textAlign: 'center' }} content={item.namDaoTao} />
                          <TableCell content={item.ten} />
-                         <TableCell type='buttons' content={item} permission={permission} onEdit={permission.write ? (e) => e.preventDefault() || this.props.history.push(`/user/pdt/chuong-trinh-dao-tao/${item.id}`) : null} />
+                         <TableCell type='buttons' content={item} permission={permission} onEdit={permission.write ? (e) => e.preventDefault() || this.props.history.push(`/user/dao-tao/chuong-trinh-dao-tao/${item.id}`) : null} />
                     </tr>
                )
           });
@@ -56,7 +56,7 @@ class DtChuongTrinhDaoTaoPage extends AdminPage {
                icon: 'fa fa-university',
                title: 'Chương trình đào tạo',
                breadcrumb: [
-                    <Link key={0} to='/user/pdt'>Đào tạo</Link>,
+                    <Link key={0} to='/user/dao-tao'>Đào tạo</Link>,
                     'Chương trình đào tạo'
                ],
                content: <>
@@ -64,8 +64,8 @@ class DtChuongTrinhDaoTaoPage extends AdminPage {
                     <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                          getPage={this.props.getDtChuongTrinhDaoTaoPage} />
                </>,
-               backRoute: '/user/pdt',
-               onCreate: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/pdt/chuong-trinh-dao-tao/new') : null
+               backRoute: '/user/dao-tao',
+               onCreate: permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/dao-tao/chuong-trinh-dao-tao/new') : null
           });
      }
 }

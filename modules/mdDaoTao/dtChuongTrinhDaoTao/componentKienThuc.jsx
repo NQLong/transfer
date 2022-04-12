@@ -15,7 +15,7 @@ export class ComponentKienThuc extends AdminPage {
 
      addRow = (idx, item) => {
           const permission = this.getUserPermission(this.props.prefixPermission || 'dtChuongTrinhDaoTao', ['write', 'manage']);
-          const id = item ? item.id : 0;
+          const id = item ? item.id : -1;
           const editFlag = (permission.write || permission.manage) ? (id > 0 ? false : true) : false;
           const isDeleted = false;
           this.rows[idx] = {

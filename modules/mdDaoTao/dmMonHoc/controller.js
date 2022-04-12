@@ -16,7 +16,7 @@ module.exports = app => {
      app.get('/user/dao-tao/mon-hoc/upload', app.permission.orCheck('dmMonHoc:read', 'manager:read'), app.templates.admin);
 
      // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-     app.get('/api/pdt/mon-hoc/page/:pageNumber/:pageSize', app.permission.orCheck('dmMonHoc:read', 'dmMonHoc:manage'), (req, res) => {
+     app.get('/api/dao-tao/mon-hoc/page/:pageNumber/:pageSize', app.permission.orCheck('dmMonHoc:read', 'dmMonHoc:manage'), (req, res) => {
           let pageNumber = parseInt(req.params.pageNumber),
                pageSize = parseInt(req.params.pageSize),
                donViFilter = req.query.donViFilter,
