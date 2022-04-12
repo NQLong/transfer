@@ -4,8 +4,9 @@ import { SelectAdapter_DmQuocGia } from 'modules/mdDanhMuc/dmQuocGia/redux';
 import React from 'react';
 import { connect } from 'react-redux';
 import { FormDatePicker, FormSelect, FormTextBox } from 'view/component/AdminPage';
-import { SelectAdapter_FwCanBo } from '../tccbCanBo/redux';
+import { SelectApdater_DaiDienKy } from 'modules/mdTccb/qtChucVu/redux';
 import { getTruongPhongTccb, suggestSoHopDong, getDaiDienKyHopDong } from './redux';
+
 export class ComponentPhiaTruong extends React.Component {
     componentDidMount() {
         const { address, schoolName, mobile } = this.props.system ? this.props.system : { address: '', schoolName: '', mobile: '' };
@@ -81,7 +82,7 @@ export class ComponentPhiaTruong extends React.Component {
                 <div className="tile-body row">
                     <FormTextBox ref={e => this.soHopDong = e} label='Số hợp đồng' className='col-md-4' required maxLength={100} readOnly={readOnly} />
                     <FormDatePicker ref={e => this.ngayKy = e} type='date-mask' className='col-md-4' label='Ngày ký' required readOnly={readOnly} />
-                    <FormSelect ref={e => this.daiDien = e} data={SelectAdapter_FwCanBo} className='col-md-4' label='Đại diện ký' onChange={this.handleDaiDien} required />
+                    <FormSelect ref={e => this.daiDien = e} data={SelectApdater_DaiDienKy} className='col-md-4' label='Đại diện ký' onChange={this.handleDaiDien} required />
                 </div>
             </div>
             <div className="tile">

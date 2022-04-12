@@ -83,8 +83,8 @@ export class ComponentDiaDiem extends React.Component {
                     <label>{label || 'Địa chỉ'}:</label>
                     <div className='row'>
                         <FormSelect ref={e => this.dmTinhThanhPho = e} data={ajaxSelectTinhThanhPho} onChange={value => this.changeTinhThanhPho(value)} readOnly={readOnly} className='col-4' label={readOnly ? 'Thành phố, tỉnh' : null} placeholder='Thành phố, tỉnh' />
-                        <FormSelect ref={e => this.dmQuanHuyen = e} data={maTinhThanhPho ? ajaxSelectQuanHuyen(maTinhThanhPho) : []} onChange={value => this.changeQuanHuyen(value.id)} readOnly={readOnly} className='col-4' label={readOnly ? 'Quận, huyện' : null} placeholder='Quận, huyện' />
-                        <FormSelect ref={e => this.dmPhuongXa = e} data={maQuanHuyen ? ajaxSelectPhuongXa(maQuanHuyen) : []} onChange={value => this.changePhuongXa(value.id)} readOnly={readOnly} className='col-4' label={readOnly ? 'Phường, xã' : null} placeholder='Phường, xã' />
+                        <FormSelect ref={e => this.dmQuanHuyen = e} data={maTinhThanhPho ? ajaxSelectQuanHuyen(maTinhThanhPho) : []} onChange={value => this.changeQuanHuyen(value)} readOnly={readOnly} className='col-4' label={readOnly ? 'Quận, huyện' : null} placeholder='Quận, huyện' />
+                        <FormSelect ref={e => this.dmPhuongXa = e} data={maQuanHuyen ? ajaxSelectPhuongXa(maQuanHuyen) : []} onChange={value => this.changePhuongXa(value)} readOnly={readOnly} className='col-4' label={readOnly ? 'Phường, xã' : null} placeholder='Phường, xã' />
                         <FormTextBox ref={e => this.soNhaDuong = e} type='text' style={{ display: requiredSoNhaDuong ? 'block' : 'none' }} label={readOnly ? 'Số nhà, đường' : null} placeholder='Số nhà, đường' readOnly={readOnly} className='col-6' />
                     </div>
                 </span>

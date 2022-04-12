@@ -7,7 +7,7 @@ import { AdminPage, AdminModal, renderTable, TableCell, FormCheckbox, FormRichTe
 import Pagination from 'view/component/Pagination';
 
 class EditModal extends AdminModal {
-    state = { active: true, id: '' };
+    state = { id: '', visibleKetThuc: false, isCreate: false };
 
     componentDidMount() {
     }
@@ -18,41 +18,79 @@ class EditModal extends AdminModal {
         this.ngay.value(ngay);
         this.moTa.value(moTa);
         this.kichHoat.value(kichHoat);
-        this.setState({ active: kichHoat == 1, id: id });
-
+        this.setState({ id: id, isCreate: id ? false : true, visibleKetThuc: false });
+        $('#ketThuc').hide();
     };
 
     changeKichHoat = value => this.kichHoat.value(value ? 1 : 0) || this.kichHoat.value(value);
 
     onSubmit = (e) => {
         e.preventDefault();
-        const
-            changes = {
-                ngay: this.ngay.value(),
-                moTa: this.moTa.value(),
-                kichHoat: this.state.active ? '1' : '0',
-            };
-        if (changes.ngay == '') {
+        const changes = {
+            ngay: this.ngay.value(),
+            moTa: this.moTa.value(),
+            kichHoat: Number(this.kichHoat.value()),
+            ketThuc: this.state.visibleKetThuc ? this.ketThuc.value() : null,
+        };
+        const doSave = () => {
+            let start = this.ngay.value();
+            const end = (this.state.visibleKetThuc == false) ? this.ngay.value() : this.ketThuc.value();
+            while (start <= end) {
+                const data = {
+                    ngay: start.getTime(),
+                    moTa: this.moTa.value(),
+                    kichHoat: Number(this.kichHoat.value()),
+                }; 
+                let hide = (start.getDate() == end.getDate() && start.getMonth() == end.getMonth() && start.getFullYear() == end.getFullYear()) ? this.hide : null;
+                this.state.id ? this.props.update(this.state.id, data, hide) : this.props.create(data, hide);
+                start = start.nextDate();    
+            }
+        };
+        if (!changes.ngay) {
             T.notify('Ngày lễ bị trống!', 'danger');
             this.ngay.focus();
         } else if (changes.moTa == '') {
             T.notify('Mô tả bị trống!', 'danger');
             this.moTa.focus();
+        } else if ((this.state.visibleKetThuc == true) && !changes.ketThuc) {
+            T.notify('Ngày kết thúc bị trống!', 'danger');
+            this.ketThuc.focus();
+        } else if ((this.state.visibleKetThuc == true) && this.ngay.value() > this.ketThuc.value()) {
+            T.notify('Ngày bắt đầu lớn hơn ngày kết thúc!', 'danger');
+            this.ngay.focus();
+        } else if ((this.state.visibleKetThuc == true) && T.monthDiff(this.ngay.value(), this.ketThuc.value()) >= 6) { //>= 6 tháng
+            T.confirm('Chênh lệch giữa ngày bắt đầu và kết thúc là rất lớn', 'Bạn có chắc bạn muốn tiếp tục thực hiện?', 'warning', true, isConfirm => {
+                if (isConfirm) {
+                    doSave();
+                }
+            });
         } else {
-            this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
+            doSave();
         }
     }
 
+    changeKetThuc = (value) => {
+        if (value) {
+            this.setState({ visibleKetThuc: true }, () => {
+                $('#ketThuc').show();
+            });
+        } else {
+            this.setState({ visibleKetThuc: false }, () => {
+                $('#ketThuc').hide();
+            });
+        }
+    }
     render = () => {
         const readOnly = this.props.readOnly;
         return this.renderModal({
             title: this.state.ma ? 'Cập nhật ngày lễ' : 'Tạo mới ngày lễ',
-            size: 'medium',
+            size: 'large',
             body: <div className='row'>
-                <FormDatePicker type='text' className='col-8' ref={e => this.ngay = e} label='Ngày' readOnly={this.state.ma ? true : readOnly} placeholder='Ngày' required />
+                <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngay = e} label={this.state.visibleKetThuc ? 'Ngày bắt đầu lễ' : 'Ngày lễ'} readOnly={this.state.ma ? true : readOnly} placeholder={this.state.visibleKetThuc ? 'Ngày bắt đầu lễ' : 'Ngày lễ'} required />
+                {this.state.isCreate && <FormCheckbox className='col-md-6' label='Bấm vào đây nếu nhập nhiều ngày' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }} onChange={this.changeKetThuc} />}
+                <div className='col-md-6' id='ketThuc'> <FormDatePicker type='date-mask' ref={e => this.ketThuc = e} label={'Ngày kết thúc lễ'} readOnly={this.state.ma ? true : readOnly} placeholder='Ngày kết thúc lễ' required /> </div>
                 <FormRichTextBox rows='3' className='col-12' ref={e => this.moTa = e} label='Mô tả' readOnly={readOnly} placeholder='Mô tả' required/>
-                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
-                    onChange={value => this.changeKichHoat(value ? 1 : 0)} />
+                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }} onChange={value => this.changeKichHoat(value ? 1 : 0)} />
             </div>
         });
     }

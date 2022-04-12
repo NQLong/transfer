@@ -7010,7 +7010,8 @@
                 "QT_CHUC_VU_SEARCH_PAGE": "searchPage",
                 "QT_CHUC_VU_GROUP_PAGE": "groupPage",
                 "QT_CHUC_VU_GET_BY_SHCC": "getByShcc",
-                "QT_CHUC_VU_DOWNLOAD_EXCEL": "download"
+                "QT_CHUC_VU_DOWNLOAD_EXCEL": "download",
+                "GET_NGUOI_DAI_DIEN_KY_HOP_DONG": "getDaiDienKy"
             },
             "moduleName": "qtChucVu",
             "modelName": "qtChucVu",
@@ -7457,6 +7458,34 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 2
+                },
+                "SO_QD_TIEP_NHAN": {
+                    "value": "soQdTiepNhan",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "NGAY_QD_TIEP_NHAN": {
+                    "value": "ngayQdTiepNhan",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "NOI_DUNG_TIEP_NHAN": {
+                    "value": "noiDungTiepNhan",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 1000
+                },
+                "NGAY_VE_NUOC": {
+                    "value": "ngayVeNuoc",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
                 }
             },
             "primaryKeys": [
@@ -8367,6 +8396,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "20,0"
+                },
+                "ACTION": {
+                    "value": "action",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 32
                 }
             },
             "primaryKeys": [
@@ -12474,6 +12510,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "20,0"
+                },
+                "MUC_TIEU_CU_THE": {
+                    "value": "mucTieuCuThe",
+                    "dataType": "CLOB",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 4000
                 }
             },
             "primaryKeys": [

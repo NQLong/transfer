@@ -48,7 +48,7 @@ export function getDtThoiKhoaBieuAll(condition, done) {
         condition = {};
     }
     return dispatch => {
-        const url = '/api/pdt/thoi-khoa-bieu/all';
+        const url = '/api/dao-tao/thoi-khoa-bieu/all';
         T.get(url, { condition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách thời khoá biểu bị lỗi', 'danger');
@@ -65,7 +65,7 @@ T.initPage('pageDtThoiKhoaBieu');
 export function getDtThoiKhoaBieuPage(pageNumber, pageSize, pageCondition, done) {
     const page = T.updatePage('pageDtThoiKhoaBieu', pageNumber, pageSize, pageCondition);
     return dispatch => {
-        const url = `/api/pdt/thoi-khoa-bieu/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/dao-tao/thoi-khoa-bieu/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: pageCondition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách thời khoá biểu bị lỗi!', 'danger');
@@ -80,7 +80,7 @@ export function getDtThoiKhoaBieuPage(pageNumber, pageSize, pageCondition, done)
 
 export function createDtThoiKhoaBieu(item, done) {
     return dispatch => {
-        const url = '/api/pdt/thoi-khoa-bieu';
+        const url = '/api/dao-tao/thoi-khoa-bieu';
         T.post(url, { item }, data => {
             if (data.error) {
                 T.notify('Tạo thời khoá biểu bị lỗi!', 'danger');
@@ -96,7 +96,7 @@ export function createDtThoiKhoaBieu(item, done) {
 
 export function deleteDtThoiKhoaBieu(id) {
     return dispatch => {
-        const url = '/api/pdt/thoi-khoa-bieu';
+        const url = '/api/dao-tao/thoi-khoa-bieu';
         T.delete(url, { id }, data => {
             if (data.error) {
                 T.notify('Xóa thời khoá biểu bị lỗi!', 'danger');
@@ -111,7 +111,7 @@ export function deleteDtThoiKhoaBieu(id) {
 
 export function updateDtThoiKhoaBieu(id, changes, done) {
     return dispatch => {
-        const url = '/api/pdt/thoi-khoa-bieu';
+        const url = '/api/dao-tao/thoi-khoa-bieu';
         T.put(url, { id, changes }, data => {
             if (data.error) {
                 T.notify('Cập nhật thời khoá biểu bị lỗi!', 'danger');

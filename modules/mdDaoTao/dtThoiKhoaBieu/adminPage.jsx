@@ -186,7 +186,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                 items.forEach(item => this.monHocMapper[item.ma] = item);
             }
         });
-        T.ready('/user/pdt', () => {
+        T.ready('/user/dao-tao', () => {
             T.onSearch = (searchText) => this.props.getDtThoiKhoaBieuPage(undefined, undefined, searchText || '');
             T.showSearchBox();
             this.props.getDtThoiKhoaBieuPage();
@@ -265,7 +265,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
             icon: 'fa fa-calendar',
             title: 'Thời khoá biểu',
             breadcrumb: [
-                <Link key={0} to='/user/pdt'>Đào tạo</Link>,
+                <Link key={0} to='/user/dao-tao'>Đào tạo</Link>,
                 'Thời khoá niểu'
             ],
             content: <>
@@ -275,7 +275,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                 <EditModal ref={e => this.modal = e} permission={permission} getDonViSelect={this.props.getDmDonViAll} getMonHocSelect={this.props.getDmMonHocAll} getPhongSelect={this.props.getDmPhongAll}
                     create={this.props.createDtThoiKhoaBieu} update={this.props.updateDtThoiKhoaBieu} permissions={currentPermissions} />
             </>,
-            backRoute: '/user/pdt',
+            backRoute: '/user/dao-tao',
             onCreate: null, //TODO: Sắp xếp thời khóa biểu cho phòng đào tạo
             // permission && permission.write ? (e) => this.showModal(e) : null,
         });

@@ -44,7 +44,7 @@ T.initPage('pageDmKhoiKienThuc');
 export function getDmKhoiKienThucPage(pageNumber, pageSize, pageCondition, done) {
     const page = T.updatePage('pageDmKhoiKienThuc', pageNumber, pageSize, pageCondition);
     return dispatch => {
-        const url = `/api/pdt/khoi-kien-thuc/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/dao-tao/khoi-kien-thuc/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: pageCondition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách khối kiến thức bị lỗi!', 'danger');
@@ -60,7 +60,7 @@ export function getDmKhoiKienThucPage(pageNumber, pageSize, pageCondition, done)
 
 export function getDmKhoiKienThuc(ma, done) {
     return () => {
-        const url = `/api/pdt/khoi-kien-thuc/item/${ma}`;
+        const url = `/api/dao-tao/khoi-kien-thuc/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy thông tin khối kiến thức bị lỗi!', 'danger');
@@ -74,7 +74,7 @@ export function getDmKhoiKienThuc(ma, done) {
 
 export function createDmKhoiKienThuc(item, done) {
     return dispatch => {
-        const url = '/api/pdt/khoi-kien-thuc';
+        const url = '/api/dao-tao/khoi-kien-thuc';
         T.post(url, { data: item }, data => {
             if (data.error) {
                 T.notify(data.error.message || 'Tạo khối kiến thức bị lỗi', 'danger');
@@ -91,7 +91,7 @@ export function createDmKhoiKienThuc(item, done) {
 
 export function deleteDmKhoiKienThuc(ma) {
     return dispatch => {
-        const url = '/api/pdt/khoi-kien-thuc';
+        const url = '/api/dao-tao/khoi-kien-thuc';
         T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa danh mục khối kiến thức bị lỗi!', 'danger');
@@ -106,7 +106,7 @@ export function deleteDmKhoiKienThuc(ma) {
 
 export function updateDmKhoiKienThuc(id, changes, done) {
     return dispatch => {
-        const url = '/api/pdt/khoi-kien-thuc';
+        const url = '/api/dao-tao/khoi-kien-thuc';
         T.put(url, { id, changes }, data => {
             if (data.error || changes == null) {
                 T.notify(data.error.message || 'Cập nhật thông tin khối kiến thức bị lỗi', 'danger');
@@ -123,7 +123,7 @@ export function updateDmKhoiKienThuc(id, changes, done) {
 
 export const SelectAdapter_DmKhoiKienThucAll = {
     ajax: true,
-    url: '/api/pdt/khoi-kien-thuc/all',
+    url: '/api/dao-tao/khoi-kien-thuc/all',
     data: params => ({ condition: params.term }),
     processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.ma, text: item.ten })) : [] }),
     fetchOne: (ma, done) => (getDmKhoiKienThuc(ma, item => done && done({ id: item.ma, text: item.ten })))()

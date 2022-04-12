@@ -86,7 +86,7 @@ class ComponentNN extends AdminPage {
                     </tr>),
                 renderRow: (item, index) => (
                     <tr key={index}>
-                        <TableCell type='link' content={item.tenLoaiNgonNgu} onClick={e => this.showModal(e, item)} />
+                        <TableCell type='link' content={this.mapperNgonNgu[item.loaiNgonNgu]} onClick={e => this.showModal(e, item)} />
                         <TableCell type='text' content={item.trinhDo} />
                         <TableCell type='buttons' content={item} permission={permission} onEdit={e => this.showModal(e, item)} onDelete={this.deleteTrinhDoNN}></TableCell>
                     </tr>)
