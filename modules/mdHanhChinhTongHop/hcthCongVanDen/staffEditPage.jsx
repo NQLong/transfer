@@ -377,7 +377,7 @@ class StaffEditPage extends AdminPage {
             ngayHetHan: Number(this.ngayHetHan.value()),
             soCongVan: this.soCongVan.value(),
             donViGui: this.donViGui.value(),
-            donViNhan: this.donViNhan.value()?.toString() || null,
+            donViNhan: this.donViNhan.value() || [],
             canBoNhan: this.canBoNhan.value().toString() || null,
             quyenChiDao: this.state.quyenChiDao.toString() || null,
             trichYeu: this.trichYeu.value(),
