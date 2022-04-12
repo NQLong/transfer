@@ -1,0 +1,51 @@
+module.exports = app => {
+  const menu = {
+    parentMenu: app.parentMenu.daoTao,
+    menus: {
+      7003: {
+        title: 'Danh sách Ngành đào tạo', groupIndex: 0,
+        icon: 'fa-cube', backgroundColor: '#b36154',
+        link: '/user/pdt/nganh-dao-tao'
+      },
+    },
+  };
+
+  app.permission.add(
+    { name: 'dtNganhDaoTao:read', menu },
+    { name: 'manager:read', menu },
+    { name: 'dtNganhDaoTao:write' },
+    { name: 'dtNganhDaoTao:delete' },
+  );
+  app.get('/user/pdt/nganh-dao-tao', app.permission.orCheck('dtNganhDaoTao:read', 'manager:read'), app.templates.admin);
+
+  // APIs -----------------------------------------------------------------------------------------------------------------------------------------
+  app.get('/api/pdt/nganh-dao-tao/page/:pageNumber/:pageSize', app.permission.orCheck('dtNganhDaoTao:read', 'manager:read'), (req, res) => {
+    const pageNumber = parseInt(req.params.pageNumber),
+      pageSize = parseInt(req.params.pageSize);
+    app.model.dtNganhDaoTao.getPage(pageNumber, pageSize, {}, (error, page) => res.send({ error, page }));
+  });
+
+  app.get('/api/pdt/nganh-dao-tao/item/:maNganh', app.permission.orCheck('dtNganhDaoTao:read', 'manager:read'), (req, res) => {
+    app.model.dtNganhDaoTao.get({ maNganh: req.params.maNganh }, (error, item) => res.send({ error, item }));
+  });
+
+  app.post('/api/pdt/nganh-dao-tao', app.permission.check('dtNganhDaoTao:write'), (req, res) => {
+    let data = req.body.data;
+    app.model.dtNganhDaoTao.get({ maNganh: data.maNganh }, (error, item) => {
+      if (!error && item) {
+        res.send({ error: 'Mã đã tồn tại' });
+      } else {
+        app.model.dtNganhDaoTao.create(req.body.data, (error, item) => res.send({ error, item }));
+      }
+    });
+  });
+
+  app.put('/api/pdt/nganh-dao-tao', app.permission.check('dtNganhDaoTao:write'), (req, res) => {
+    const changes = req.body.changes || {};
+    app.model.dtNganhDaoTao.update({ maNganh: req.body.maNganh }, changes, (error, item) => res.send({ error, item }));
+  });
+
+  app.delete('/api/pdt/nganh-dao-tao', app.permission.check('dtNganhDaoTao:delete'), (req, res) => {
+    app.model.dtNganhDaoTao.delete({ maNganh: req.body.maNganh }, errors => res.send({ errors }));
+  });
+};

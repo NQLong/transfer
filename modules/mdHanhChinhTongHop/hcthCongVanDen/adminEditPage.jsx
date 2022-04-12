@@ -42,7 +42,7 @@ class StaffEditPage extends AdminPage {
         chiDao: [],
         user: {},
         shcc: null,
-        chucVu: null,
+        chucVu: null
     }
 
 
@@ -81,13 +81,11 @@ class StaffEditPage extends AdminPage {
         return (this.state.banGiamHieu && this.state.banGiamHieu.length > 0 && this.state.banGiamHieu.sort(this.sortByChucVuChinh).map((item, index) => {
             if (item.maChucVuChinh == MA_CHUC_VU_HIEU_TRUONG || (!permission.write && list.includes(item.shcc))) {
                 return <span key={index} className='col-md-3 form-group'><b>{item.chucVuChinh}</b> - <b style={{ color: 'blue' }}>{item.ho?.normalizedName()} {item.ten?.normalizedName()}</b></span>;
-            }
-            else if (permission.write)
-                return <FormCheckbox
-                    key={index} isSwitch ref={e => this.quyenChiDaoRef[item.shcc] = e} onChange={(value) => this.changeQuyenChiDao(item.shcc, value)} label={
-                        list.includes(item.shcc) ?
-                            <><b>{item.chucVuChinh}</b> - <b style={{ color: 'blue' }}>{item.ho?.normalizedName()} {item.ten?.normalizedName()}</b></> :
-                            `${item.chucVuChinh} - ${item.ho ? item.ho.normalizedName() + ' ' : ''}${item.ten?.normalizedName()}`} className='col-md-3 form-group' />;
+            } else if (permission.write)
+                return <FormCheckbox key={index} isSwitch ref={e => this.quyenChiDaoRef[item.shcc] = e} onChange={(value) => this.changeQuyenChiDao(item.shcc, value)} label={
+                    list.includes(item.shcc) ?
+                        <><b>{item.chucVuChinh}</b> - <b style={{ color: 'blue' }}>{item.ho?.normalizedName()} {item.ten?.normalizedName()}</b></> :
+                        `${item.chucVuChinh} - ${item.ho ? item.ho.normalizedName() + ' ' : ''}${item.ten?.normalizedName()}`} className='col-md-3 form-group' />;
             else return null;
         }));
     }
@@ -105,8 +103,7 @@ class StaffEditPage extends AdminPage {
     getData = () => {
         if (this.state.id) {
             this.props.getCongVanDen(Number(this.state.id), (item) => this.setData(item));
-        }
-        else this.setData();
+        } else this.setData();
     }
 
     setData = (data = null) => {
@@ -176,10 +173,11 @@ class StaffEditPage extends AdminPage {
     }
 
     onViTriChange = (e, index) => {
-        e.preventDefault();
+        console.log(e);
         let listFile = [...this.state.listFile];
         listFile[index].viTri = this.listFileRefs[index].value() || '';
-        this.setState({ listFile });
+        console.log(listFile);
+        setTimeout(() => this.setState({ listFile }), 500);
     }
 
     tableListFile = (data, id, permission) => renderTable({
@@ -233,7 +231,7 @@ class StaffEditPage extends AdminPage {
             quyenChiDao: this.state.quyenChiDao.toString() || null,
             trichYeu: this.trichYeu.value(),
             chiDao: this.state.newChiDao,
-            fileList: this.state.listFile || [],
+            fileList: this.state.listFile || []
         };
         if (!changes.ngayCongVan) {
             T.notify('Ngày công văn bị trống', 'danger');
@@ -253,8 +251,7 @@ class StaffEditPage extends AdminPage {
         } else if (changes.ngayHetHan && changes.ngayHetHan < changes.ngayCongVan) {
             T.notify('Ngày công văn hết hạn trước ngày công văn', 'danger');
             this.ngayNhan.focus();
-        }
-        else {
+        } else {
             if (this.state.id) {
                 this.props.updateHcthCongVanDen(this.state.id, changes, this.getData);
             } else {
@@ -282,12 +279,11 @@ class StaffEditPage extends AdminPage {
                 canBo: shcc,
                 chiDao: this.chiDao.value(),
                 thoiGian: new Date().getTime(),
-                congVan: this.state.id,
+                congVan: this.state.id
             };
             if (this.state.id) {
                 this.props.createChiDao(newChiDao, () => this.getData());
-            }
-            else
+            } else
                 this.setState({
                     'newChiDao': [...this.state.newChiDao, newChiDao],
                     chiDao: [...this.state.chiDao, {
@@ -295,7 +291,7 @@ class StaffEditPage extends AdminPage {
                         chucVu: this.state.chucVu,
                         ho: this.state.user.lastName,
                         ten: this.state.user.firstName,
-                        image: this.state.image,
+                        image: this.state.image
                     }]
                 }, () => this.chiDao?.value(''));
         }
@@ -333,8 +329,7 @@ class StaffEditPage extends AdminPage {
                             {!readOnly && <>
                                 (
                                 <Link to='#' onClick={() => this.modal.show(null)}>Nhấn vào đây để thêm</Link>
-                                )
-                            </>
+                                ) </>
                             }
                         </>)} data={SelectAdapter_DmDonViGuiCongVan} placeholder='Đơn vị gửi công văn' readOnly={readOnly} required />
                         <FormDatePicker type='date-mask' className='col-md-4' ref={e => this.ngayCongVan = e} label='Ngày CV' readOnlyEmptyText='Chưa có ngày công văn' readOnly={readOnly} required />
@@ -393,10 +388,7 @@ class StaffEditPage extends AdminPage {
                         </div>
                     </div>
                 </div>
-                <EditModal ref={e => this.modal = e}
-                    permissions={dmDonViGuiCvPermission}
-                    create={this.onCreateDonviGui}
-                />
+                <EditModal ref={e => this.modal = e} permissions={dmDonViGuiCvPermission} create={this.onCreateDonviGui} />
             </>,
             backRoute: '/user/hcth/cong-van-den',
             onSave: (permission && permission.write) && (!this.state.id || hcthStaffPermission.login) ? this.save : null

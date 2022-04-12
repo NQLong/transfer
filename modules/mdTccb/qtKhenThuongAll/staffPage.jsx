@@ -82,7 +82,7 @@ class QtKhenThuongAllUserPage extends AdminPage {
     componentDidMount() {
         T.ready('/user', () => {
             const { shcc } = this.props.system && this.props.system.user ? this.props.system.user : { shcc: '' };
-            this.setState({ filter: { listDv: '', listShcc: shcc, loaiDoiTuong: '02', fromYear: null, toYear: null } });
+            this.setState({ filter: { listDv: '', listShcc: shcc, loaiDoiTuong: '02', fromYear: null, toYear: null, listThanhTich: '' } });
             this.getPage();
         });
     }
@@ -126,19 +126,19 @@ class QtKhenThuongAllUserPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>
-                        <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Thành tích</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm đạt được</th>
+                        <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Thành tích</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>
                         <th style={{ width: 'auto', textAlign: 'right', whiteSpace: 'nowrap' }}>Điểm thi đua</th>
-                        <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
+                        <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                        <TableCell type='text' style={{ textAlign: 'center' }} content={(item.soQuyetDinh || '')} />
                         <TableCell type='text' style={{ textAlign: 'center' }} content={(item.namDatDuoc)} />
                         <TableCell type='text' content={(item.tenThanhTich)} />
+                        <TableCell type='text' style={{ textAlign: 'center' }} content={(item.soQuyetDinh || '')} />
                         <TableCell type='text' style={{ textAlign: 'right' }} content={item.diemThiDua} />
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show({ item, ma: shcc })} onDelete={this.delete} />
@@ -156,7 +156,15 @@ class QtKhenThuongAllUserPage extends AdminPage {
                 'Khen thưởng'
             ],
             content: <>
-                <div className='tile'>{table}</div>
+                <div className='tile'>
+                    <h3 className='tile-title'>
+                        Thống kê
+                    </h3>
+                    <b>{'Số lượng: ' + totalItem.toString()}</b>
+                </div>
+                <div className='tile'>
+                    {table}
+                </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
                 <EditModal ref={e => this.modal = e}

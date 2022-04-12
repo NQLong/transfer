@@ -70,22 +70,6 @@ export function getDnDoanhNghiepPage(pageNumber, pageSize, pageCondition, done) 
     };
 }
 
-
-export function getDnDoanhNghiepAll(condition, done) {
-    return dispatch => {
-        const url = '/api/doi-ngoai/doanh-nghiep/all';
-        T.get(url, { condition }, data => {
-            if (data.error) {
-                T.notify('Lấy danh sách doanh nghiệp bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
-                console.error(`GET: ${url}.`, data.error);
-            } else {
-                done && done(data.items);
-                dispatch({ type: DnDoanhNghiepGetAll, items: data.items ? data.items : [] });
-            }
-        }, error => T.notify('Lấy danh sách doanh nghiệp bị lỗi' + (error.error.message && (':<br>' + error.error.message)), 'danger'));
-    };
-}
-
 export function getDnDoanhNghiep(id, done) {
     return dispatch => {
         const url = `/api/doi-ngoai/doanh-nghiep/item/${id}`;
@@ -234,13 +218,13 @@ export function getOneDnDoanhNghiep(id, done) {
     };
 }
 
-export const SelectAdapter_DnDoanhNghiep = {
-    ajax: true,
-    url: '/api/doi-ngoai/doanh-nghiep/page/1/20',
-    data: params => ({ condition: { searchText: params.term ? params.term : '' } }),
-    processResults: response => {
-        const results = response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.id, text: T.language.parse(item.tenDayDu || '', true).vi })) : [];
-        return { results };
-    },
-    fetchOne: (id, done) => (getOneDnDoanhNghiep(id, (item) => done && done({ id: item.id, text: T.language.parse(item.tenDayDu || '', true).vi })))()
-};
+// export const SelectAdapter_DnDoanhNghiep = {
+//     ajax: true,
+//     url: '/api/doi-ngoai/doanh-nghiep/page/1/20',
+//     data: params => ({ condition: { searchText: params.term ? params.term : '' } }),
+//     processResults: response => {
+//         const results = response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.id, text: T.language.parse(item.tenDayDu || '', true).vi })) : [];
+//         return { results };
+//     },
+//     fetchOne: (id, done) => (getOneDnDoanhNghiep(id, (item) => done && done({ id: item.id, text: T.language.parse(item.tenDayDu || '', true).vi })))()
+// };

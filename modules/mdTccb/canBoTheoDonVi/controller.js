@@ -12,15 +12,6 @@ module.exports = app => {
     );
     app.get('/user/nhan-su-don-vi', app.permission.check('manager:read'), app.templates.admin);
 
-    //Manager hook -------------------------------------------------------------------------------------------------
-
-    //Check role managers
-    app.permissionHooks.add('staff', 'manager', user => new Promise(resolve => {
-        user.staff.donViQuanLy = app.initManager(user, '013', '005', '003', '016', '009', '007');
-        user.staff.donViQuanLy.length && app.permissionHooks.pushUserPermission(user, 'manager:read', 'manager:write');
-        resolve();
-    }));
-
     app.get('/api/nhan-su-don-vi', app.permission.check('manager:read'), (req, res) => {
         let listDonVi = req.query.listDonVi || [],
             condition = {
