@@ -6588,7 +6588,8 @@
             "moduleName": "hcthCongVanDi",
             "modelName": "hcthCongVanDi",
             "methods": {
-                "HCTH_CONG_VAN_DI_SEARCH_PAGE": "searchPage"
+                "HCTH_CONG_VAN_DI_SEARCH_PAGE": "searchPage",
+                "HCTH_CONG_VAN_DI_UPDATE_SO_CONG_VAN": "updateSoCongVanDi"
             },
             "columns": {
                 "ID": {
