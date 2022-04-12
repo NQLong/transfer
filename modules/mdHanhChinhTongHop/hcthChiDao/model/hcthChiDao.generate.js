@@ -1,6 +1,6 @@
-// Table name: HCTH_CHI_DAO { id, chiDao, loai, congVan, canBo, thoiGian }
+// Table name: HCTH_CHI_DAO { id, chiDao, loai, congVan, canBo, thoiGian, action }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'chiDao': 'CHI_DAO', 'loai': 'LOAI', 'congVan': 'CONG_VAN', 'canBo': 'CAN_BO', 'thoiGian': 'THOI_GIAN' };
+const obj2Db = { 'id': 'ID', 'chiDao': 'CHI_DAO', 'loai': 'LOAI', 'congVan': 'CONG_VAN', 'canBo': 'CAN_BO', 'thoiGian': 'THOI_GIAN', 'action': 'ACTION' };
 
 module.exports = app => {
     app.model.hcthChiDao = {

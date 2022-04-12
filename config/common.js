@@ -23,6 +23,17 @@ module.exports = (app) => {
         fse.copySync(oldPath, newPath);
         fse.removeSync(oldPath);
     };
+
+    app.fs.rename = (oldPath, newPath, done) => {
+        try {
+            fse.copySync(oldPath, newPath);
+            fse.removeSync(oldPath);
+            done && done();
+        } catch (error) {
+            done && done(error);
+        }
+    };
+
     // app.fs.renameSync = (oldPath, newPath) => app.fs.copyFileSync(oldPath, newPath) && app.fs.unlinkSync(oldPath);
 
     // Template html file ---------------------------------------------------------------------------------------------------------------------------
