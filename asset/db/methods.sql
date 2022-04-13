@@ -3615,62 +3615,7 @@ BEGIN
                                   LEFT JOIN DM_BO_MON bm ON qtcv_temp.MA_BO_MON = bm.MA
                                   LEFT JOIN DM_NGACH_CDNN cdnn on cb.NGACH = cdnn.MA
                          WHERE (qtcv_temp.SHCC = qtcv.SHCC)
-                           AND ((listShcc IS NOT NULL AND
-                                 qtcv_temp.SHCC IN (SELECT regexp_substr(listShcc, '[^,]+', 1, level)
-                                                    from dual
-                                                    connect by regexp_substr(listShcc, '[^,]+', 1, level) is not null))
-                             OR (listDonVi IS NOT NULL AND
-                                 qtcv_temp.MA_DON_VI IN (SELECT regexp_substr(listDonVi, '[^,]+', 1, level)
-                                                         from dual
-                                                         connect by regexp_substr(listDonVi, '[^,]+', 1, level) is not null))
-                             OR (listShcc IS NULL AND listDonVi IS NULL))
-                           AND (gioiTinh IS NULL OR (cb.PHAI = gioiTinh))
-                           AND (timeType = 0 OR timeType IS NULL OR (timeType = 1 AND
-                                                                     (fromYear IS NULL OR fromYear = 0 OR
-                                                                      qtcv_temp.NGAY_RA_QD IS NULL OR
-                                                                      qtcv_temp.NGAY_RA_QD >= fromYear) AND
-                                                                     (toYear IS NULL OR toYear = 0 OR
-                                                                      qtcv_temp.NGAY_RA_QD IS NULL OR
-                                                                      qtcv_temp.NGAY_RA_QD <= toYear))
-                             OR ((timeType = 2) AND
-                                 (fromYear IS NULL OR fromYear = 0 OR qtcv_temp.NGAY_THOI_CHUC_VU IS NULL OR
-                                  qtcv_temp.NGAY_THOI_CHUC_VU >= fromYear) AND
-                                 (toYear IS NULL OR toYear = 0 OR qtcv_temp.NGAY_THOI_CHUC_VU IS NULL OR
-                                  qtcv_temp.NGAY_THOI_CHUC_VU <= toYear))
-                             OR ((timeType = 3) AND
-                                 (fromYear IS NULL OR fromYear = 0 OR qtcv_temp.NGAY_RA_QD_THOI_CHUC_VU IS NULL OR
-                                  qtcv_temp.NGAY_RA_QD_THOI_CHUC_VU >= fromYear) AND
-                                 (toYear IS NULL OR toYear = 0 OR qtcv_temp.NGAY_RA_QD_THOI_CHUC_VU IS NULL OR
-                                  qtcv_temp.NGAY_RA_QD <= toYear))
-                             )
-                           AND (listChucVu IS NULL OR (listChucVu IS NOT NULL AND qtcv_temp.MA_CHUC_VU IN
-                                                                                  (SELECT regexp_substr(listChucVu, '[^,]+', 1, level)
-                                                                                   from dual
-                                                                                   connect by regexp_substr(listChucVu, '[^,]+', 1, level) is not null)))
-                           AND (listChucDanh IS NULL OR
-                                (listChucDanh IS NOT NULL AND
-                                 CB.NGACH IN (SELECT regexp_substr(listChucDanh, '[^,]+', 1, level)
-                                              from dual
-                                              connect by regexp_substr(listChucDanh, '[^,]+', 1, level) is not null)))
-                           AND (fromAge IS NULL OR fromAge = 0 OR
-                                (SELECT TRUNC(MONTHS_BETWEEN(TRUNC(sysdate),
-                                                             (select to_date('19700101', 'YYYYMMDD') + (1 / 24 / 60 / 60 / 1000) * cb.NGAY_SINH
-                                                              from dual)) / 12)
-                                 from dual) >= fromAge)
-                           AND (toAge IS NULL OR toAge = 0 OR
-                                (SELECT TRUNC(MONTHS_BETWEEN(TRUNC(sysdate),
-                                                             (select to_date('19700101', 'YYYYMMDD') + (1 / 24 / 60 / 60 / 1000) * cb.NGAY_SINH
-                                                              from dual)) / 12)
-                                 from dual) <= toAge)
-                           AND (qtcv_temp.THOI_CHUC_VU = 0)
-                           AND (searchTerm = ''
-                             OR LOWER(cb.SHCC) LIKE sT
-                             OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
-                             OR LOWER(qtcv_temp.SO_QD) LIKE sT
-                             OR LOWER(qtcv_temp.SO_QD_THOI_CHUC_VU) LIKE sT
-                             OR LOWER(cv.TEN) LIKE sT
-                             OR LOWER(dv.TEN) LIKE sT)
-                        )         AS                                                    "soChucVu",
+                           )         AS                                                    "soChucVu",
 
                         (select rtrim(xmlagg(xmlelement(e, cv.TEN || ' ', '??').extract('//text()') order by
                                              null).getclobval(), '??')
@@ -3681,61 +3626,6 @@ BEGIN
                                   LEFT JOIN DM_BO_MON bm ON qtcv_temp.MA_BO_MON = bm.MA
                                   LEFT JOIN DM_NGACH_CDNN cdnn on cb.NGACH = cdnn.MA
                          WHERE (qtcv_temp.SHCC = qtcv.SHCC)
-                           AND ((listShcc IS NOT NULL AND
-                                 qtcv_temp.SHCC IN (SELECT regexp_substr(listShcc, '[^,]+', 1, level)
-                                                    from dual
-                                                    connect by regexp_substr(listShcc, '[^,]+', 1, level) is not null))
-                             OR (listDonVi IS NOT NULL AND
-                                 qtcv_temp.MA_DON_VI IN (SELECT regexp_substr(listDonVi, '[^,]+', 1, level)
-                                                         from dual
-                                                         connect by regexp_substr(listDonVi, '[^,]+', 1, level) is not null))
-                             OR (listShcc IS NULL AND listDonVi IS NULL))
-                           AND (gioiTinh IS NULL OR (cb.PHAI = gioiTinh))
-                           AND (timeType = 0 OR timeType IS NULL OR (timeType = 1 AND
-                                                                     (fromYear IS NULL OR fromYear = 0 OR
-                                                                      qtcv_temp.NGAY_RA_QD IS NULL OR
-                                                                      qtcv_temp.NGAY_RA_QD >= fromYear) AND
-                                                                     (toYear IS NULL OR toYear = 0 OR
-                                                                      qtcv_temp.NGAY_RA_QD IS NULL OR
-                                                                      qtcv_temp.NGAY_RA_QD <= toYear))
-                             OR ((timeType = 2) AND
-                                 (fromYear IS NULL OR fromYear = 0 OR qtcv_temp.NGAY_THOI_CHUC_VU IS NULL OR
-                                  qtcv_temp.NGAY_THOI_CHUC_VU >= fromYear) AND
-                                 (toYear IS NULL OR toYear = 0 OR qtcv_temp.NGAY_THOI_CHUC_VU IS NULL OR
-                                  qtcv_temp.NGAY_THOI_CHUC_VU <= toYear))
-                             OR ((timeType = 3) AND
-                                 (fromYear IS NULL OR fromYear = 0 OR qtcv_temp.NGAY_RA_QD_THOI_CHUC_VU IS NULL OR
-                                  qtcv_temp.NGAY_RA_QD_THOI_CHUC_VU >= fromYear) AND
-                                 (toYear IS NULL OR toYear = 0 OR qtcv_temp.NGAY_RA_QD_THOI_CHUC_VU IS NULL OR
-                                  qtcv_temp.NGAY_RA_QD <= toYear))
-                             )
-                           AND (listChucVu IS NULL OR (listChucVu IS NOT NULL AND qtcv_temp.MA_CHUC_VU IN
-                                                                                  (SELECT regexp_substr(listChucVu, '[^,]+', 1, level)
-                                                                                   from dual
-                                                                                   connect by regexp_substr(listChucVu, '[^,]+', 1, level) is not null)))
-                           AND (listChucDanh IS NULL OR
-                                (listChucDanh IS NOT NULL AND
-                                 CB.NGACH IN (SELECT regexp_substr(listChucDanh, '[^,]+', 1, level)
-                                              from dual
-                                              connect by regexp_substr(listChucDanh, '[^,]+', 1, level) is not null)))
-                           AND (fromAge IS NULL OR fromAge = 0 OR
-                                (SELECT TRUNC(MONTHS_BETWEEN(TRUNC(sysdate),
-                                                             (select to_date('19700101', 'YYYYMMDD') + (1 / 24 / 60 / 60 / 1000) * cb.NGAY_SINH
-                                                              from dual)) / 12)
-                                 from dual) >= fromAge)
-                           AND (toAge IS NULL OR toAge = 0 OR
-                                (SELECT TRUNC(MONTHS_BETWEEN(TRUNC(sysdate),
-                                                             (select to_date('19700101', 'YYYYMMDD') + (1 / 24 / 60 / 60 / 1000) * cb.NGAY_SINH
-                                                              from dual)) / 12)
-                                 from dual) <= toAge)
-                           AND (qtcv_temp.THOI_CHUC_VU = 0)
-                           AND (searchTerm = ''
-                             OR LOWER(cb.SHCC) LIKE sT
-                             OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
-                             OR LOWER(qtcv_temp.SO_QD) LIKE sT
-                             OR LOWER(qtcv_temp.SO_QD_THOI_CHUC_VU) LIKE sT
-                             OR LOWER(cv.TEN) LIKE sT
-                             OR LOWER(dv.TEN) LIKE sT)
                         )         AS                                                    "danhSachChucVu",
 
                         (select rtrim(xmlagg(xmlelement(e, bm.TEN || ' ', '??').extract('//text()') order by
@@ -3747,61 +3637,6 @@ BEGIN
                                   LEFT JOIN DM_BO_MON bm ON qtcv_temp.MA_BO_MON = bm.MA
                                   LEFT JOIN DM_NGACH_CDNN cdnn on cb.NGACH = cdnn.MA
                          WHERE (qtcv_temp.SHCC = qtcv.SHCC)
-                           AND ((listShcc IS NOT NULL AND
-                                 qtcv_temp.SHCC IN (SELECT regexp_substr(listShcc, '[^,]+', 1, level)
-                                                    from dual
-                                                    connect by regexp_substr(listShcc, '[^,]+', 1, level) is not null))
-                             OR (listDonVi IS NOT NULL AND
-                                 qtcv_temp.MA_DON_VI IN (SELECT regexp_substr(listDonVi, '[^,]+', 1, level)
-                                                         from dual
-                                                         connect by regexp_substr(listDonVi, '[^,]+', 1, level) is not null))
-                             OR (listShcc IS NULL AND listDonVi IS NULL))
-                           AND (gioiTinh IS NULL OR (cb.PHAI = gioiTinh))
-                           AND (timeType = 0 OR timeType IS NULL OR (timeType = 1 AND
-                                                                     (fromYear IS NULL OR fromYear = 0 OR
-                                                                      qtcv_temp.NGAY_RA_QD IS NULL OR
-                                                                      qtcv_temp.NGAY_RA_QD >= fromYear) AND
-                                                                     (toYear IS NULL OR toYear = 0 OR
-                                                                      qtcv_temp.NGAY_RA_QD IS NULL OR
-                                                                      qtcv_temp.NGAY_RA_QD <= toYear))
-                             OR ((timeType = 2) AND
-                                 (fromYear IS NULL OR fromYear = 0 OR qtcv_temp.NGAY_THOI_CHUC_VU IS NULL OR
-                                  qtcv_temp.NGAY_THOI_CHUC_VU >= fromYear) AND
-                                 (toYear IS NULL OR toYear = 0 OR qtcv_temp.NGAY_THOI_CHUC_VU IS NULL OR
-                                  qtcv_temp.NGAY_THOI_CHUC_VU <= toYear))
-                             OR ((timeType = 3) AND
-                                 (fromYear IS NULL OR fromYear = 0 OR qtcv_temp.NGAY_RA_QD_THOI_CHUC_VU IS NULL OR
-                                  qtcv_temp.NGAY_RA_QD_THOI_CHUC_VU >= fromYear) AND
-                                 (toYear IS NULL OR toYear = 0 OR qtcv_temp.NGAY_RA_QD_THOI_CHUC_VU IS NULL OR
-                                  qtcv_temp.NGAY_RA_QD <= toYear))
-                             )
-                           AND (listChucVu IS NULL OR (listChucVu IS NOT NULL AND qtcv_temp.MA_CHUC_VU IN
-                                                                                  (SELECT regexp_substr(listChucVu, '[^,]+', 1, level)
-                                                                                   from dual
-                                                                                   connect by regexp_substr(listChucVu, '[^,]+', 1, level) is not null)))
-                           AND (listChucDanh IS NULL OR
-                                (listChucDanh IS NOT NULL AND
-                                 CB.NGACH IN (SELECT regexp_substr(listChucDanh, '[^,]+', 1, level)
-                                              from dual
-                                              connect by regexp_substr(listChucDanh, '[^,]+', 1, level) is not null)))
-                           AND (fromAge IS NULL OR fromAge = 0 OR
-                                (SELECT TRUNC(MONTHS_BETWEEN(TRUNC(sysdate),
-                                                             (select to_date('19700101', 'YYYYMMDD') + (1 / 24 / 60 / 60 / 1000) * cb.NGAY_SINH
-                                                              from dual)) / 12)
-                                 from dual) >= fromAge)
-                           AND (toAge IS NULL OR toAge = 0 OR
-                                (SELECT TRUNC(MONTHS_BETWEEN(TRUNC(sysdate),
-                                                             (select to_date('19700101', 'YYYYMMDD') + (1 / 24 / 60 / 60 / 1000) * cb.NGAY_SINH
-                                                              from dual)) / 12)
-                                 from dual) <= toAge)
-                           AND (qtcv_temp.THOI_CHUC_VU = 0)
-                           AND (searchTerm = ''
-                             OR LOWER(cb.SHCC) LIKE sT
-                             OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
-                             OR LOWER(qtcv_temp.SO_QD) LIKE sT
-                             OR LOWER(qtcv_temp.SO_QD_THOI_CHUC_VU) LIKE sT
-                             OR LOWER(cv.TEN) LIKE sT
-                             OR LOWER(dv.TEN) LIKE sT)
                         )         AS                                                    "danhSachBoMon",
 
                         (select rtrim(xmlagg(xmlelement(e, dv.TEN || ' ', '??').extract('//text()') order by
@@ -3813,73 +3648,78 @@ BEGIN
                                   LEFT JOIN DM_BO_MON bm ON qtcv_temp.MA_BO_MON = bm.MA
                                   LEFT JOIN DM_NGACH_CDNN cdnn on cb.NGACH = cdnn.MA
                          WHERE (qtcv_temp.SHCC = qtcv.SHCC)
-                           AND ((listShcc IS NOT NULL AND
-                                 qtcv_temp.SHCC IN (SELECT regexp_substr(listShcc, '[^,]+', 1, level)
-                                                    from dual
-                                                    connect by regexp_substr(listShcc, '[^,]+', 1, level) is not null))
-                             OR (listDonVi IS NOT NULL AND
-                                 qtcv_temp.MA_DON_VI IN (SELECT regexp_substr(listDonVi, '[^,]+', 1, level)
-                                                         from dual
-                                                         connect by regexp_substr(listDonVi, '[^,]+', 1, level) is not null))
-                             OR (listShcc IS NULL AND listDonVi IS NULL))
-                           AND (gioiTinh IS NULL OR (cb.PHAI = gioiTinh))
-                           AND (timeType = 0 OR timeType IS NULL OR (timeType = 1 AND
-                                                                     (fromYear IS NULL OR fromYear = 0 OR
-                                                                      qtcv_temp.NGAY_RA_QD IS NULL OR
-                                                                      qtcv_temp.NGAY_RA_QD >= fromYear) AND
-                                                                     (toYear IS NULL OR toYear = 0 OR
-                                                                      qtcv_temp.NGAY_RA_QD IS NULL OR
-                                                                      qtcv_temp.NGAY_RA_QD <= toYear))
-                             OR ((timeType = 2) AND
-                                 (fromYear IS NULL OR fromYear = 0 OR qtcv_temp.NGAY_THOI_CHUC_VU IS NULL OR
-                                  qtcv_temp.NGAY_THOI_CHUC_VU >= fromYear) AND
-                                 (toYear IS NULL OR toYear = 0 OR qtcv_temp.NGAY_THOI_CHUC_VU IS NULL OR
-                                  qtcv_temp.NGAY_THOI_CHUC_VU <= toYear))
-                             OR ((timeType = 3) AND
-                                 (fromYear IS NULL OR fromYear = 0 OR qtcv_temp.NGAY_RA_QD_THOI_CHUC_VU IS NULL OR
-                                  qtcv_temp.NGAY_RA_QD_THOI_CHUC_VU >= fromYear) AND
-                                 (toYear IS NULL OR toYear = 0 OR qtcv_temp.NGAY_RA_QD_THOI_CHUC_VU IS NULL OR
-                                  qtcv_temp.NGAY_RA_QD <= toYear))
-                             )
-                           AND (listChucVu IS NULL OR (listChucVu IS NOT NULL AND qtcv_temp.MA_CHUC_VU IN
-                                                                                  (SELECT regexp_substr(listChucVu, '[^,]+', 1, level)
-                                                                                   from dual
-                                                                                   connect by regexp_substr(listChucVu, '[^,]+', 1, level) is not null)))
-                           AND (listChucDanh IS NULL OR
-                                (listChucDanh IS NOT NULL AND
-                                 CB.NGACH IN (SELECT regexp_substr(listChucDanh, '[^,]+', 1, level)
-                                              from dual
-                                              connect by regexp_substr(listChucDanh, '[^,]+', 1, level) is not null)))
-                           AND (fromAge IS NULL OR fromAge = 0 OR
-                                (SELECT TRUNC(MONTHS_BETWEEN(TRUNC(sysdate),
-                                                             (select to_date('19700101', 'YYYYMMDD') + (1 / 24 / 60 / 60 / 1000) * cb.NGAY_SINH
-                                                              from dual)) / 12)
-                                 from dual) >= fromAge)
-                           AND (toAge IS NULL OR toAge = 0 OR
-                                (SELECT TRUNC(MONTHS_BETWEEN(TRUNC(sysdate),
-                                                             (select to_date('19700101', 'YYYYMMDD') + (1 / 24 / 60 / 60 / 1000) * cb.NGAY_SINH
-                                                              from dual)) / 12)
-                                 from dual) <= toAge)
-                           AND (qtcv_temp.THOI_CHUC_VU = 0)
-                           AND (searchTerm = ''
-                             OR LOWER(cb.SHCC) LIKE sT
-                             OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
-                             OR LOWER(qtcv_temp.SO_QD) LIKE sT
-                             OR LOWER(qtcv_temp.SO_QD_THOI_CHUC_VU) LIKE sT
-                             OR LOWER(cv.TEN) LIKE sT
-                             OR LOWER(dv.TEN) LIKE sT)
                         )         AS                                                    "danhSachDonVi",
 
                         ROW_NUMBER() OVER (ORDER BY qtcv.NGAY_RA_QD_THOI_CHUC_VU DESC ) R
                  FROM (SELECT *
-                       FROM QT_CHUC_VU
-                       WHERE STT IN
-                             (SELECT MAX(STT)
-                              FROM (SELECT * FROM QT_CHUC_VU ORDER BY MA_CHUC_VU ASC)
-                              GROUP BY SHCC)) qtcv
+                            FROM QT_CHUC_VU WHERE STT IN (SELECT STT FROM
+                                    (SELECT *
+                                    FROM QT_CHUC_VU qtcv_temp
+                                             LEFT JOIN TCHC_CAN_BO cb on qtcv_temp.SHCC = cb.SHCC
+                                             LEFT JOIN DM_CHUC_VU cv ON qtcv_temp.MA_CHUC_VU = cv.MA
+                                             LEFT JOIN DM_DON_VI dv ON qtcv_temp.MA_DON_VI = dv.MA
+                                             LEFT JOIN DM_BO_MON bm ON qtcv_temp.MA_BO_MON = bm.MA
+                                             LEFT JOIN DM_NGACH_CDNN cdnn on cb.NGACH = cdnn.MA
+                                    WHERE ((listShcc IS NOT NULL AND
+                                            qtcv_temp.SHCC IN (SELECT regexp_substr(listShcc, '[^,]+', 1, level)
+                                                               from dual
+                                                               connect by regexp_substr(listShcc, '[^,]+', 1, level) is not null))
+                                        OR (listDonVi IS NOT NULL AND
+                                            qtcv_temp.MA_DON_VI IN (SELECT regexp_substr(listDonVi, '[^,]+', 1, level)
+                                                                    from dual
+                                                                    connect by regexp_substr(listDonVi, '[^,]+', 1, level) is not null))
+                                        OR (listShcc IS NULL AND listDonVi IS NULL))
+                                      AND (gioiTinh IS NULL OR (cb.PHAI = gioiTinh))
+                                      AND (timeType = 0 OR timeType IS NULL OR (timeType = 1 AND
+                                                                                (fromYear IS NULL OR fromYear = 0 OR
+                                                                                 qtcv_temp.NGAY_RA_QD IS NULL OR
+                                                                                 qtcv_temp.NGAY_RA_QD >= fromYear) AND
+                                                                                (toYear IS NULL OR toYear = 0 OR
+                                                                                 qtcv_temp.NGAY_RA_QD IS NULL OR
+                                                                                 qtcv_temp.NGAY_RA_QD <= toYear))
+                                        OR ((timeType = 2) AND
+                                            (fromYear IS NULL OR fromYear = 0 OR qtcv_temp.NGAY_THOI_CHUC_VU IS NULL OR
+                                             qtcv_temp.NGAY_THOI_CHUC_VU >= fromYear) AND
+                                            (toYear IS NULL OR toYear = 0 OR qtcv_temp.NGAY_THOI_CHUC_VU IS NULL OR
+                                             qtcv_temp.NGAY_THOI_CHUC_VU <= toYear))
+                                        OR ((timeType = 3) AND
+                                            (fromYear IS NULL OR fromYear = 0 OR
+                                             qtcv_temp.NGAY_RA_QD_THOI_CHUC_VU IS NULL OR
+                                             qtcv_temp.NGAY_RA_QD_THOI_CHUC_VU >= fromYear) AND
+                                            (toYear IS NULL OR toYear = 0 OR
+                                             qtcv_temp.NGAY_RA_QD_THOI_CHUC_VU IS NULL OR
+                                             qtcv_temp.NGAY_RA_QD <= toYear))
+                                        )
+                                      AND (listChucVu IS NULL OR (listChucVu IS NOT NULL AND qtcv_temp.MA_CHUC_VU IN
+                                                                                             (SELECT regexp_substr(listChucVu, '[^,]+', 1, level)
+                                                                                              from dual
+                                                                                              connect by regexp_substr(listChucVu, '[^,]+', 1, level) is not null)))
+                                      AND (listChucDanh IS NULL OR
+                                           (listChucDanh IS NOT NULL AND
+                                            CB.NGACH IN (SELECT regexp_substr(listChucDanh, '[^,]+', 1, level)
+                                                         from dual
+                                                         connect by regexp_substr(listChucDanh, '[^,]+', 1, level) is not null)))
+                                      AND (fromAge IS NULL OR fromAge = 0 OR
+                                           (SELECT TRUNC(MONTHS_BETWEEN(TRUNC(sysdate),
+                                                                        (select to_date('19700101', 'YYYYMMDD') + (1 / 24 / 60 / 60 / 1000) * cb.NGAY_SINH
+                                                                         from dual)) / 12)
+                                            from dual) >= fromAge)
+                                      AND (toAge IS NULL OR toAge = 0 OR
+                                           (SELECT TRUNC(MONTHS_BETWEEN(TRUNC(sysdate),
+                                                                        (select to_date('19700101', 'YYYYMMDD') + (1 / 24 / 60 / 60 / 1000) * cb.NGAY_SINH
+                                                                         from dual)) / 12)
+                                            from dual) <= toAge)
+                                      AND (qtcv_temp.THOI_CHUC_VU = 0)
+                                      AND (searchTerm = ''
+                                        OR LOWER(cb.SHCC) LIKE sT
+                                        OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
+                                        OR LOWER(qtcv_temp.SO_QD) LIKE sT
+                                        OR LOWER(qtcv_temp.SO_QD_THOI_CHUC_VU) LIKE sT
+                                        OR LOWER(cv.TEN) LIKE sT
+                                        OR LOWER(dv.TEN) LIKE sT)) GROUP BY SHCC)) qtcv
                           LEFT JOIN TCHC_CAN_BO cb
                                     on qtcv.SHCC = cb.SHCC
-                 ORDER BY qtcv.STT DESC
+                 ORDER BY qtcv.MA_CHUC_VU
              )
         WHERE R BETWEEN (pageNumber - 1) * pageSize + 1 AND pageNumber * pageSize;
     RETURN my_cursor;
@@ -5120,15 +4960,31 @@ END;
 --EndMethod--
 
 CREATE OR REPLACE FUNCTION QT_DI_NUOC_NGOAI_GROUP_PAGE(pageNumber IN OUT NUMBER, pageSize IN OUT NUMBER,
-                                          list_shcc IN STRING, list_dv IN STRING,
-                                          fromYear IN NUMBER, toYear IN NUMBER, timeType IN NUMBER, tinhTrang IN NUMBER,
-                                          loaiHocVi IN STRING, mucDich IN STRING, searchTerm IN STRING,
+                                          filter IN STRING, searchTerm IN STRING,
                                           totalItem OUT NUMBER, pageTotal OUT NUMBER) RETURN SYS_REFCURSOR
 AS
     my_cursor SYS_REFCURSOR;
     sT        STRING(500) := '%' || lower(searchTerm) || '%';
     today     NUMBER(20);
+    list_shcc STRING(100);
+    list_dv STRING(100);
+    fromYear NUMBER;
+    toYear NUMBER;
+    timeType NUMBER;
+    loaiHocVi STRING(100);
+    mucDich STRING(100);
+    tinhTrang NUMBER;
 BEGIN
+    /* Init filter */-------------------------------------------------------------------------------------
+    SELECT JSON_VALUE(filter, '$.listDv') INTO list_dv FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.listShcc') INTO list_shcc FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.fromYear') INTO fromYear FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.toYear') INTO toYear FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.timeType') INTO timeType FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.loaiHocVi') INTO loaiHocVi FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.mucDich') INTO mucDich FROM DUAL;
+    SELECT JSON_VALUE(filter, '$.tinhTrang') INTO tinhTrang FROM DUAL;
+    
     select (cast(sysdate as date) - cast(to_date('1970-01-01', 'YYYY-MM-DD') as date)) * 86400000 into today from dual;
     SELECT COUNT(*)
     INTO totalItem
@@ -5157,28 +5013,45 @@ BEGIN
                                  LEFT JOIN TCHC_CAN_BO cb on qtdnn_temp.SHCC = cb.SHCC
                                  LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
                                  LEFT JOIN DM_MUC_DICH_NUOC_NGOAI DMDNN on qtdnn_temp.MUC_DICH = DMDNN.MA
+                                 LEFT JOIN DM_CHUC_VU cv ON (cb.MA_CHUC_VU = cv.MA)
+                                 LEFT JOIN DM_TRINH_DO td ON (cb.HOC_VI = td.MA)
+                                 LEFT JOIN DM_NGACH_CDNN cdnn ON (cdnn.MA = cb.NGACH)
                         WHERE (qtdnn_temp.SHCC = qtdnn.SHCC)
-                            AND (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL) AND (timeType = 0) AND (tinhTrang IS NULL) AND (loaiHocVi IS NULL) AND (mucDich IS NULL))
+                            AND (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL) AND (timeType IS NULL) AND (tinhTrang IS NULL) AND (loaiHocVi IS NULL) AND (mucDich IS NULL))
                             OR (((list_shcc IS NOT NULL AND cb.SHCC IN (SELECT regexp_substr(list_shcc, '[^,]+', 1, level) from dual connect by regexp_substr(list_shcc, '[^,]+', 1, level) is not null))
                           OR (list_dv IS NOT NULL AND cb.MA_DON_VI IN (SELECT regexp_substr(list_dv, '[^,]+', 1, level) from dual connect by regexp_substr(list_dv, '[^,]+', 1, level) is not null))
                           OR (list_shcc IS NULL AND list_dv IS NULL))
-                            AND (loaiHocVi IS NULL OR INSTR(loaiHocVi, cb.HOC_VI) != 0)
-                            AND (mucDich IS NULL OR INSTR(mucDich, qtdnn_temp.MUC_DICH) != 0)
-                            AND (timeType = 0 OR (
+                            AND (loaiHocVi IS NULL OR cb.HOC_VI IN (SELECT regexp_substr(loaiHocVi, '[^,]+', 1, level) from dual connect by regexp_substr(loaiHocVi, '[^,]+', 1, level) is not null))
+                            AND (mucDich IS NULL OR qtdnn_temp.MUC_DICH IN (SELECT regexp_substr(mucDich, '[^,]+', 1, level) from dual connect by regexp_substr(mucDich, '[^,]+', 1, level) is not null))
+                            AND (timeType IS NULL OR (
                                         timeType = 1 AND
                                         (qtdnn_temp.NGAY_DI IS NOT NULL AND (fromYear IS NULL OR qtdnn_temp.NGAY_DI >= fromYear)) AND
                                         (toYear IS NULL OR qtdnn_temp.NGAY_DI <= toYear)
                                 ) OR (
-                                    timeType = 2 
+                                    timeType = 2
+                                    AND (qtdnn_temp.NGAY_VE IS NOT NULL AND (fromYear IS NULL OR qtdnn_temp.NGAY_VE >= fromYear))
+                                    AND (toYear IS NULL OR qtdnn_temp.NGAY_VE <= toYear)
+                                ) OR (
+                                    timeType = 3
                                     AND (qtdnn_temp.NGAY_QUYET_DINH IS NOT NULL AND (fromYear IS NULL OR qtdnn_temp.NGAY_QUYET_DINH >= fromYear))
                                     AND (toYear IS NULL OR qtdnn_temp.NGAY_QUYET_DINH <= toYear)
+                                ) OR (
+                                    timeType = 4
+                                    AND (qtdnn_temp.NGAY_QD_TIEP_NHAN IS NOT NULL AND (fromYear IS NULL OR qtdnn_temp.NGAY_QD_TIEP_NHAN >= fromYear))
+                                    AND (toYear IS NULL OR qtdnn_temp.NGAY_QD_TIEP_NHAN <= toYear)
                                 ))
-                            AND (tinhTrang IS NULL OR ((qtdnn_temp.NGAY_VE = -1 OR qtdnn_temp.NGAY_VE >= today) AND tinhTrang = 2) OR
-                                 (qtdnn_temp.NGAY_VE IS NOT NULL AND qtdnn_temp.NGAY_VE != -1 AND qtdnn_temp.NGAY_VE < today AND tinhTrang = 1))))
+                            AND (tinhTrang IS NULL OR (
+                                    tinhTrang = 1 AND qtdnn_temp.NGAY_VE < today and qtdnn_temp.SO_QD_TIEP_NHAN IS NOT NULL
+                                    ) OR (
+                                    tinhTrang = 2 AND qtdnn_temp.NGAY_VE < today and qtdnn_temp.SO_QD_TIEP_NHAN IS NULL
+                                    ) OR (
+                                    tinhTrang = 3 AND qtdnn_temp.NGAY_VE >= today))
+                            ))
                           AND (searchTerm = ''
                             OR LOWER(cb.SHCC) LIKE sT
                             OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
                             OR LOWER(qtdnn_temp.NOI_DUNG) LIKE sT
+                            OR LOWER(qtdnn_temp.NOI_DUNG_TIEP_NHAN) LIKE sT
                             OR LOWER(DMDNN.MO_TA) LIKE sT)
                         ) AS "soQuaTrinh",
 
@@ -5187,28 +5060,45 @@ BEGIN
                                  LEFT JOIN TCHC_CAN_BO cb on qtdnn_temp.SHCC = cb.SHCC
                                  LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
                                  LEFT JOIN DM_MUC_DICH_NUOC_NGOAI DMDNN on qtdnn_temp.MUC_DICH = DMDNN.MA
+                                 LEFT JOIN DM_CHUC_VU cv ON (cb.MA_CHUC_VU = cv.MA)
+                                 LEFT JOIN DM_TRINH_DO td ON (cb.HOC_VI = td.MA)
+                                 LEFT JOIN DM_NGACH_CDNN cdnn ON (cdnn.MA = cb.NGACH)
                         WHERE (qtdnn_temp.SHCC = qtdnn.SHCC)
-                            AND (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL) AND (timeType = 0) AND (tinhTrang IS NULL) AND (loaiHocVi IS NULL) AND (mucDich IS NULL))
+                            AND (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL) AND (timeType IS NULL) AND (tinhTrang IS NULL) AND (loaiHocVi IS NULL) AND (mucDich IS NULL))
                             OR (((list_shcc IS NOT NULL AND cb.SHCC IN (SELECT regexp_substr(list_shcc, '[^,]+', 1, level) from dual connect by regexp_substr(list_shcc, '[^,]+', 1, level) is not null))
                           OR (list_dv IS NOT NULL AND cb.MA_DON_VI IN (SELECT regexp_substr(list_dv, '[^,]+', 1, level) from dual connect by regexp_substr(list_dv, '[^,]+', 1, level) is not null))
                           OR (list_shcc IS NULL AND list_dv IS NULL))
-                            AND (loaiHocVi IS NULL OR INSTR(loaiHocVi, cb.HOC_VI) != 0)
-                            AND (mucDich IS NULL OR INSTR(mucDich, qtdnn_temp.MUC_DICH) != 0)
-                            AND (timeType = 0 OR (
+                            AND (loaiHocVi IS NULL OR cb.HOC_VI IN (SELECT regexp_substr(loaiHocVi, '[^,]+', 1, level) from dual connect by regexp_substr(loaiHocVi, '[^,]+', 1, level) is not null))
+                            AND (mucDich IS NULL OR qtdnn_temp.MUC_DICH IN (SELECT regexp_substr(mucDich, '[^,]+', 1, level) from dual connect by regexp_substr(mucDich, '[^,]+', 1, level) is not null))
+                            AND (timeType IS NULL OR (
                                         timeType = 1 AND
                                         (qtdnn_temp.NGAY_DI IS NOT NULL AND (fromYear IS NULL OR qtdnn_temp.NGAY_DI >= fromYear)) AND
                                         (toYear IS NULL OR qtdnn_temp.NGAY_DI <= toYear)
                                 ) OR (
-                                    timeType = 2 
+                                    timeType = 2
+                                    AND (qtdnn_temp.NGAY_VE IS NOT NULL AND (fromYear IS NULL OR qtdnn_temp.NGAY_VE >= fromYear))
+                                    AND (toYear IS NULL OR qtdnn_temp.NGAY_VE <= toYear)
+                                ) OR (
+                                    timeType = 3
                                     AND (qtdnn_temp.NGAY_QUYET_DINH IS NOT NULL AND (fromYear IS NULL OR qtdnn_temp.NGAY_QUYET_DINH >= fromYear))
                                     AND (toYear IS NULL OR qtdnn_temp.NGAY_QUYET_DINH <= toYear)
+                                ) OR (
+                                    timeType = 4
+                                    AND (qtdnn_temp.NGAY_QD_TIEP_NHAN IS NOT NULL AND (fromYear IS NULL OR qtdnn_temp.NGAY_QD_TIEP_NHAN >= fromYear))
+                                    AND (toYear IS NULL OR qtdnn_temp.NGAY_QD_TIEP_NHAN <= toYear)
                                 ))
-                            AND (tinhTrang IS NULL OR ((qtdnn_temp.NGAY_VE = -1 OR qtdnn_temp.NGAY_VE >= today) AND tinhTrang = 2) OR
-                                 (qtdnn_temp.NGAY_VE IS NOT NULL AND qtdnn_temp.NGAY_VE != -1 AND qtdnn_temp.NGAY_VE < today AND tinhTrang = 1))))
+                            AND (tinhTrang IS NULL OR (
+                                    tinhTrang = 1 AND qtdnn_temp.NGAY_VE < today and qtdnn_temp.SO_QD_TIEP_NHAN IS NOT NULL
+                                    ) OR (
+                                    tinhTrang = 2 AND qtdnn_temp.NGAY_VE < today and qtdnn_temp.SO_QD_TIEP_NHAN IS NULL
+                                    ) OR (
+                                    tinhTrang = 3 AND qtdnn_temp.NGAY_VE >= today))
+                            ))
                           AND (searchTerm = ''
                             OR LOWER(cb.SHCC) LIKE sT
                             OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
                             OR LOWER(qtdnn_temp.NOI_DUNG) LIKE sT
+                            OR LOWER(qtdnn_temp.NOI_DUNG_TIEP_NHAN) LIKE sT
                             OR LOWER(DMDNN.MO_TA) LIKE sT)
                         ) AS "danhSachNgayDi",
 
@@ -5217,28 +5107,45 @@ BEGIN
                                  LEFT JOIN TCHC_CAN_BO cb on qtdnn_temp.SHCC = cb.SHCC
                                  LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
                                  LEFT JOIN DM_MUC_DICH_NUOC_NGOAI DMDNN on qtdnn_temp.MUC_DICH = DMDNN.MA
+                                 LEFT JOIN DM_CHUC_VU cv ON (cb.MA_CHUC_VU = cv.MA)
+                                 LEFT JOIN DM_TRINH_DO td ON (cb.HOC_VI = td.MA)
+                                 LEFT JOIN DM_NGACH_CDNN cdnn ON (cdnn.MA = cb.NGACH)
                         WHERE (qtdnn_temp.SHCC = qtdnn.SHCC)
-                            AND (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL) AND (timeType = 0) AND (tinhTrang IS NULL) AND (loaiHocVi IS NULL) AND (mucDich IS NULL))
+                            AND (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL) AND (timeType IS NULL) AND (tinhTrang IS NULL) AND (loaiHocVi IS NULL) AND (mucDich IS NULL))
                             OR (((list_shcc IS NOT NULL AND cb.SHCC IN (SELECT regexp_substr(list_shcc, '[^,]+', 1, level) from dual connect by regexp_substr(list_shcc, '[^,]+', 1, level) is not null))
                           OR (list_dv IS NOT NULL AND cb.MA_DON_VI IN (SELECT regexp_substr(list_dv, '[^,]+', 1, level) from dual connect by regexp_substr(list_dv, '[^,]+', 1, level) is not null))
                           OR (list_shcc IS NULL AND list_dv IS NULL))
-                            AND (loaiHocVi IS NULL OR INSTR(loaiHocVi, cb.HOC_VI) != 0)
-                            AND (mucDich IS NULL OR INSTR(mucDich, qtdnn_temp.MUC_DICH) != 0)
-                            AND (timeType = 0 OR (
+                            AND (loaiHocVi IS NULL OR cb.HOC_VI IN (SELECT regexp_substr(loaiHocVi, '[^,]+', 1, level) from dual connect by regexp_substr(loaiHocVi, '[^,]+', 1, level) is not null))
+                            AND (mucDich IS NULL OR qtdnn_temp.MUC_DICH IN (SELECT regexp_substr(mucDich, '[^,]+', 1, level) from dual connect by regexp_substr(mucDich, '[^,]+', 1, level) is not null))
+                            AND (timeType IS NULL OR (
                                         timeType = 1 AND
                                         (qtdnn_temp.NGAY_DI IS NOT NULL AND (fromYear IS NULL OR qtdnn_temp.NGAY_DI >= fromYear)) AND
                                         (toYear IS NULL OR qtdnn_temp.NGAY_DI <= toYear)
                                 ) OR (
-                                    timeType = 2 
+                                    timeType = 2
+                                    AND (qtdnn_temp.NGAY_VE IS NOT NULL AND (fromYear IS NULL OR qtdnn_temp.NGAY_VE >= fromYear))
+                                    AND (toYear IS NULL OR qtdnn_temp.NGAY_VE <= toYear)
+                                ) OR (
+                                    timeType = 3
                                     AND (qtdnn_temp.NGAY_QUYET_DINH IS NOT NULL AND (fromYear IS NULL OR qtdnn_temp.NGAY_QUYET_DINH >= fromYear))
                                     AND (toYear IS NULL OR qtdnn_temp.NGAY_QUYET_DINH <= toYear)
+                                ) OR (
+                                    timeType = 4
+                                    AND (qtdnn_temp.NGAY_QD_TIEP_NHAN IS NOT NULL AND (fromYear IS NULL OR qtdnn_temp.NGAY_QD_TIEP_NHAN >= fromYear))
+                                    AND (toYear IS NULL OR qtdnn_temp.NGAY_QD_TIEP_NHAN <= toYear)
                                 ))
-                            AND (tinhTrang IS NULL OR ((qtdnn_temp.NGAY_VE = -1 OR qtdnn_temp.NGAY_VE >= today) AND tinhTrang = 2) OR
-                                 (qtdnn_temp.NGAY_VE IS NOT NULL AND qtdnn_temp.NGAY_VE != -1 AND qtdnn_temp.NGAY_VE < today AND tinhTrang = 1))))
+                            AND (tinhTrang IS NULL OR (
+                                    tinhTrang = 1 AND qtdnn_temp.NGAY_VE < today and qtdnn_temp.SO_QD_TIEP_NHAN IS NOT NULL
+                                    ) OR (
+                                    tinhTrang = 2 AND qtdnn_temp.NGAY_VE < today and qtdnn_temp.SO_QD_TIEP_NHAN IS NULL
+                                    ) OR (
+                                    tinhTrang = 3 AND qtdnn_temp.NGAY_VE >= today))
+                            ))
                           AND (searchTerm = ''
                             OR LOWER(cb.SHCC) LIKE sT
                             OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
                             OR LOWER(qtdnn_temp.NOI_DUNG) LIKE sT
+                            OR LOWER(qtdnn_temp.NOI_DUNG_TIEP_NHAN) LIKE sT
                             OR LOWER(DMDNN.MO_TA) LIKE sT)
                         ) AS "danhSachNgayDiType",
 
@@ -5247,28 +5154,45 @@ BEGIN
                                  LEFT JOIN TCHC_CAN_BO cb on qtdnn_temp.SHCC = cb.SHCC
                                  LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
                                  LEFT JOIN DM_MUC_DICH_NUOC_NGOAI DMDNN on qtdnn_temp.MUC_DICH = DMDNN.MA
+                                 LEFT JOIN DM_CHUC_VU cv ON (cb.MA_CHUC_VU = cv.MA)
+                                 LEFT JOIN DM_TRINH_DO td ON (cb.HOC_VI = td.MA)
+                                 LEFT JOIN DM_NGACH_CDNN cdnn ON (cdnn.MA = cb.NGACH)
                         WHERE (qtdnn_temp.SHCC = qtdnn.SHCC)
-                            AND (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL) AND (timeType = 0) AND (tinhTrang IS NULL) AND (loaiHocVi IS NULL) AND (mucDich IS NULL))
+                            AND (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL) AND (timeType IS NULL) AND (tinhTrang IS NULL) AND (loaiHocVi IS NULL) AND (mucDich IS NULL))
                             OR (((list_shcc IS NOT NULL AND cb.SHCC IN (SELECT regexp_substr(list_shcc, '[^,]+', 1, level) from dual connect by regexp_substr(list_shcc, '[^,]+', 1, level) is not null))
                           OR (list_dv IS NOT NULL AND cb.MA_DON_VI IN (SELECT regexp_substr(list_dv, '[^,]+', 1, level) from dual connect by regexp_substr(list_dv, '[^,]+', 1, level) is not null))
                           OR (list_shcc IS NULL AND list_dv IS NULL))
-                            AND (loaiHocVi IS NULL OR INSTR(loaiHocVi, cb.HOC_VI) != 0)
-                            AND (mucDich IS NULL OR INSTR(mucDich, qtdnn_temp.MUC_DICH) != 0)
-                            AND (timeType = 0 OR (
+                            AND (loaiHocVi IS NULL OR cb.HOC_VI IN (SELECT regexp_substr(loaiHocVi, '[^,]+', 1, level) from dual connect by regexp_substr(loaiHocVi, '[^,]+', 1, level) is not null))
+                            AND (mucDich IS NULL OR qtdnn_temp.MUC_DICH IN (SELECT regexp_substr(mucDich, '[^,]+', 1, level) from dual connect by regexp_substr(mucDich, '[^,]+', 1, level) is not null))
+                            AND (timeType IS NULL OR (
                                         timeType = 1 AND
                                         (qtdnn_temp.NGAY_DI IS NOT NULL AND (fromYear IS NULL OR qtdnn_temp.NGAY_DI >= fromYear)) AND
                                         (toYear IS NULL OR qtdnn_temp.NGAY_DI <= toYear)
                                 ) OR (
-                                    timeType = 2 
+                                    timeType = 2
+                                    AND (qtdnn_temp.NGAY_VE IS NOT NULL AND (fromYear IS NULL OR qtdnn_temp.NGAY_VE >= fromYear))
+                                    AND (toYear IS NULL OR qtdnn_temp.NGAY_VE <= toYear)
+                                ) OR (
+                                    timeType = 3
                                     AND (qtdnn_temp.NGAY_QUYET_DINH IS NOT NULL AND (fromYear IS NULL OR qtdnn_temp.NGAY_QUYET_DINH >= fromYear))
                                     AND (toYear IS NULL OR qtdnn_temp.NGAY_QUYET_DINH <= toYear)
+                                ) OR (
+                                    timeType = 4
+                                    AND (qtdnn_temp.NGAY_QD_TIEP_NHAN IS NOT NULL AND (fromYear IS NULL OR qtdnn_temp.NGAY_QD_TIEP_NHAN >= fromYear))
+                                    AND (toYear IS NULL OR qtdnn_temp.NGAY_QD_TIEP_NHAN <= toYear)
                                 ))
-                            AND (tinhTrang IS NULL OR ((qtdnn_temp.NGAY_VE = -1 OR qtdnn_temp.NGAY_VE >= today) AND tinhTrang = 2) OR
-                                 (qtdnn_temp.NGAY_VE IS NOT NULL AND qtdnn_temp.NGAY_VE != -1 AND qtdnn_temp.NGAY_VE < today AND tinhTrang = 1))))
+                            AND (tinhTrang IS NULL OR (
+                                    tinhTrang = 1 AND qtdnn_temp.NGAY_VE < today and qtdnn_temp.SO_QD_TIEP_NHAN IS NOT NULL
+                                    ) OR (
+                                    tinhTrang = 2 AND qtdnn_temp.NGAY_VE < today and qtdnn_temp.SO_QD_TIEP_NHAN IS NULL
+                                    ) OR (
+                                    tinhTrang = 3 AND qtdnn_temp.NGAY_VE >= today))
+                            ))
                           AND (searchTerm = ''
                             OR LOWER(cb.SHCC) LIKE sT
                             OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
                             OR LOWER(qtdnn_temp.NOI_DUNG) LIKE sT
+                            OR LOWER(qtdnn_temp.NOI_DUNG_TIEP_NHAN) LIKE sT
                             OR LOWER(DMDNN.MO_TA) LIKE sT)
                         ) AS "danhSachNgayVe",
 
@@ -5277,28 +5201,45 @@ BEGIN
                                  LEFT JOIN TCHC_CAN_BO cb on qtdnn_temp.SHCC = cb.SHCC
                                  LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
                                  LEFT JOIN DM_MUC_DICH_NUOC_NGOAI DMDNN on qtdnn_temp.MUC_DICH = DMDNN.MA
+                                 LEFT JOIN DM_CHUC_VU cv ON (cb.MA_CHUC_VU = cv.MA)
+                                 LEFT JOIN DM_TRINH_DO td ON (cb.HOC_VI = td.MA)
+                                 LEFT JOIN DM_NGACH_CDNN cdnn ON (cdnn.MA = cb.NGACH)
                         WHERE (qtdnn_temp.SHCC = qtdnn.SHCC)
-                            AND (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL) AND (timeType = 0) AND (tinhTrang IS NULL) AND (loaiHocVi IS NULL) AND (mucDich IS NULL))
+                            AND (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL) AND (timeType IS NULL) AND (tinhTrang IS NULL) AND (loaiHocVi IS NULL) AND (mucDich IS NULL))
                             OR (((list_shcc IS NOT NULL AND cb.SHCC IN (SELECT regexp_substr(list_shcc, '[^,]+', 1, level) from dual connect by regexp_substr(list_shcc, '[^,]+', 1, level) is not null))
                           OR (list_dv IS NOT NULL AND cb.MA_DON_VI IN (SELECT regexp_substr(list_dv, '[^,]+', 1, level) from dual connect by regexp_substr(list_dv, '[^,]+', 1, level) is not null))
                           OR (list_shcc IS NULL AND list_dv IS NULL))
-                            AND (loaiHocVi IS NULL OR INSTR(loaiHocVi, cb.HOC_VI) != 0)
-                            AND (mucDich IS NULL OR INSTR(mucDich, qtdnn_temp.MUC_DICH) != 0)
-                            AND (timeType = 0 OR (
+                            AND (loaiHocVi IS NULL OR cb.HOC_VI IN (SELECT regexp_substr(loaiHocVi, '[^,]+', 1, level) from dual connect by regexp_substr(loaiHocVi, '[^,]+', 1, level) is not null))
+                            AND (mucDich IS NULL OR qtdnn_temp.MUC_DICH IN (SELECT regexp_substr(mucDich, '[^,]+', 1, level) from dual connect by regexp_substr(mucDich, '[^,]+', 1, level) is not null))
+                            AND (timeType IS NULL OR (
                                         timeType = 1 AND
                                         (qtdnn_temp.NGAY_DI IS NOT NULL AND (fromYear IS NULL OR qtdnn_temp.NGAY_DI >= fromYear)) AND
                                         (toYear IS NULL OR qtdnn_temp.NGAY_DI <= toYear)
                                 ) OR (
-                                    timeType = 2 
+                                    timeType = 2
+                                    AND (qtdnn_temp.NGAY_VE IS NOT NULL AND (fromYear IS NULL OR qtdnn_temp.NGAY_VE >= fromYear))
+                                    AND (toYear IS NULL OR qtdnn_temp.NGAY_VE <= toYear)
+                                ) OR (
+                                    timeType = 3
                                     AND (qtdnn_temp.NGAY_QUYET_DINH IS NOT NULL AND (fromYear IS NULL OR qtdnn_temp.NGAY_QUYET_DINH >= fromYear))
                                     AND (toYear IS NULL OR qtdnn_temp.NGAY_QUYET_DINH <= toYear)
+                                ) OR (
+                                    timeType = 4
+                                    AND (qtdnn_temp.NGAY_QD_TIEP_NHAN IS NOT NULL AND (fromYear IS NULL OR qtdnn_temp.NGAY_QD_TIEP_NHAN >= fromYear))
+                                    AND (toYear IS NULL OR qtdnn_temp.NGAY_QD_TIEP_NHAN <= toYear)
                                 ))
-                            AND (tinhTrang IS NULL OR ((qtdnn_temp.NGAY_VE = -1 OR qtdnn_temp.NGAY_VE >= today) AND tinhTrang = 2) OR
-                                 (qtdnn_temp.NGAY_VE IS NOT NULL AND qtdnn_temp.NGAY_VE != -1 AND qtdnn_temp.NGAY_VE < today AND tinhTrang = 1))))
+                            AND (tinhTrang IS NULL OR (
+                                    tinhTrang = 1 AND qtdnn_temp.NGAY_VE < today and qtdnn_temp.SO_QD_TIEP_NHAN IS NOT NULL
+                                    ) OR (
+                                    tinhTrang = 2 AND qtdnn_temp.NGAY_VE < today and qtdnn_temp.SO_QD_TIEP_NHAN IS NULL
+                                    ) OR (
+                                    tinhTrang = 3 AND qtdnn_temp.NGAY_VE >= today))
+                            ))
                           AND (searchTerm = ''
                             OR LOWER(cb.SHCC) LIKE sT
                             OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
                             OR LOWER(qtdnn_temp.NOI_DUNG) LIKE sT
+                            OR LOWER(qtdnn_temp.NOI_DUNG_TIEP_NHAN) LIKE sT
                             OR LOWER(DMDNN.MO_TA) LIKE sT)
                         ) AS "danhSachNgayVeType",
 
@@ -5307,29 +5248,45 @@ BEGIN
                                  LEFT JOIN TCHC_CAN_BO cb on qtdnn_temp.SHCC = cb.SHCC
                                  LEFT JOIN DM_DON_VI dv on (cb.MA_DON_VI = dv.MA)
                                  LEFT JOIN DM_MUC_DICH_NUOC_NGOAI DMDNN on qtdnn_temp.MUC_DICH = DMDNN.MA
+                                 LEFT JOIN DM_CHUC_VU cv ON (cb.MA_CHUC_VU = cv.MA)
+                                 LEFT JOIN DM_TRINH_DO td ON (cb.HOC_VI = td.MA)
+                                 LEFT JOIN DM_NGACH_CDNN cdnn ON (cdnn.MA = cb.NGACH)
                         WHERE (qtdnn_temp.SHCC = qtdnn.SHCC)
-                            AND (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL) AND (timeType = 0) AND (tinhTrang IS NULL) AND (loaiHocVi IS NULL) AND (mucDich IS NULL))
-                            OR (((list_shcc IS NOT NULL AND
-                                  ((INSTR(list_shcc, ',') != 0 AND INSTR(list_shcc, qtdnn_temp.SHCC) != 0) OR (list_shcc = qtdnn_temp.SHCC)))
-                                OR (list_dv IS NOT NULL AND INSTR(list_dv, cb.MA_DON_VI) != 0)
-                                OR (list_shcc IS NULL AND list_dv IS NULL))
-                                AND (loaiHocVi IS NULL OR INSTR(loaiHocVi, cb.HOC_VI) != 0)
-                                AND (mucDich IS NULL OR INSTR(mucDich, qtdnn_temp.MUC_DICH) != 0)
-                                AND (timeType = 0 OR (
-                                            timeType = 1 AND
-                                            (qtdnn_temp.NGAY_DI IS NOT NULL AND (fromYear IS NULL OR qtdnn_temp.NGAY_DI >= fromYear)) AND
-                                            (toYear IS NULL OR qtdnn_temp.NGAY_DI <= toYear)
+                            AND (((list_shcc IS NULL) AND (list_dv IS NULL) AND (fromYear IS NULL) AND (toYear IS NULL) AND (timeType IS NULL) AND (tinhTrang IS NULL) AND (loaiHocVi IS NULL) AND (mucDich IS NULL))
+                            OR (((list_shcc IS NOT NULL AND cb.SHCC IN (SELECT regexp_substr(list_shcc, '[^,]+', 1, level) from dual connect by regexp_substr(list_shcc, '[^,]+', 1, level) is not null))
+                          OR (list_dv IS NOT NULL AND cb.MA_DON_VI IN (SELECT regexp_substr(list_dv, '[^,]+', 1, level) from dual connect by regexp_substr(list_dv, '[^,]+', 1, level) is not null))
+                          OR (list_shcc IS NULL AND list_dv IS NULL))
+                            AND (loaiHocVi IS NULL OR cb.HOC_VI IN (SELECT regexp_substr(loaiHocVi, '[^,]+', 1, level) from dual connect by regexp_substr(loaiHocVi, '[^,]+', 1, level) is not null))
+                            AND (mucDich IS NULL OR qtdnn_temp.MUC_DICH IN (SELECT regexp_substr(mucDich, '[^,]+', 1, level) from dual connect by regexp_substr(mucDich, '[^,]+', 1, level) is not null))
+                            AND (timeType IS NULL OR (
+                                        timeType = 1 AND
+                                        (qtdnn_temp.NGAY_DI IS NOT NULL AND (fromYear IS NULL OR qtdnn_temp.NGAY_DI >= fromYear)) AND
+                                        (toYear IS NULL OR qtdnn_temp.NGAY_DI <= toYear)
+                                ) OR (
+                                    timeType = 2
+                                    AND (qtdnn_temp.NGAY_VE IS NOT NULL AND (fromYear IS NULL OR qtdnn_temp.NGAY_VE >= fromYear))
+                                    AND (toYear IS NULL OR qtdnn_temp.NGAY_VE <= toYear)
+                                ) OR (
+                                    timeType = 3
+                                    AND (qtdnn_temp.NGAY_QUYET_DINH IS NOT NULL AND (fromYear IS NULL OR qtdnn_temp.NGAY_QUYET_DINH >= fromYear))
+                                    AND (toYear IS NULL OR qtdnn_temp.NGAY_QUYET_DINH <= toYear)
+                                ) OR (
+                                    timeType = 4
+                                    AND (qtdnn_temp.NGAY_QD_TIEP_NHAN IS NOT NULL AND (fromYear IS NULL OR qtdnn_temp.NGAY_QD_TIEP_NHAN >= fromYear))
+                                    AND (toYear IS NULL OR qtdnn_temp.NGAY_QD_TIEP_NHAN <= toYear)
+                                ))
+                            AND (tinhTrang IS NULL OR (
+                                    tinhTrang = 1 AND qtdnn_temp.NGAY_VE < today and qtdnn_temp.SO_QD_TIEP_NHAN IS NOT NULL
                                     ) OR (
-                                        timeType = 2
-                                        AND (qtdnn_temp.NGAY_QUYET_DINH IS NOT NULL AND (fromYear IS NULL OR qtdnn_temp.NGAY_QUYET_DINH >= fromYear))
-                                        AND (toYear IS NULL OR qtdnn_temp.NGAY_QUYET_DINH <= toYear)
-                                    ))
-                                AND (tinhTrang IS NULL OR ((qtdnn_temp.NGAY_VE = -1 OR qtdnn_temp.NGAY_VE >= today) AND tinhTrang = 2) OR
-                                     (qtdnn_temp.NGAY_VE IS NOT NULL AND qtdnn_temp.NGAY_VE != -1 AND qtdnn_temp.NGAY_VE < today AND tinhTrang = 1))))
+                                    tinhTrang = 2 AND qtdnn_temp.NGAY_VE < today and qtdnn_temp.SO_QD_TIEP_NHAN IS NULL
+                                    ) OR (
+                                    tinhTrang = 3 AND qtdnn_temp.NGAY_VE >= today))
+                            ))
                           AND (searchTerm = ''
                             OR LOWER(cb.SHCC) LIKE sT
                             OR LOWER(TRIM(cb.HO || ' ' || cb.TEN)) LIKE sT
                             OR LOWER(qtdnn_temp.NOI_DUNG) LIKE sT
+                            OR LOWER(qtdnn_temp.NOI_DUNG_TIEP_NHAN) LIKE sT
                             OR LOWER(DMDNN.MO_TA) LIKE sT)
                         ) AS "danhSachMucDich",
 
@@ -5421,6 +5378,10 @@ BEGIN
                 timeType = 3
                 AND (qtdnn.NGAY_QUYET_DINH IS NOT NULL AND (fromYear IS NULL OR qtdnn.NGAY_QUYET_DINH >= fromYear))
                 AND (toYear IS NULL OR qtdnn.NGAY_QUYET_DINH <= toYear)
+            ) OR (
+                timeType = 4
+                AND (qtdnn.NGAY_QD_TIEP_NHAN IS NOT NULL AND (fromYear IS NULL OR qtdnn.NGAY_QD_TIEP_NHAN >= fromYear))
+                AND (toYear IS NULL OR qtdnn.NGAY_QD_TIEP_NHAN <= toYear)
             ))
         AND (tinhTrang IS NULL OR (
                 tinhTrang = 1 AND qtdnn.NGAY_VE < today and qtdnn.SO_QD_TIEP_NHAN IS NOT NULL
