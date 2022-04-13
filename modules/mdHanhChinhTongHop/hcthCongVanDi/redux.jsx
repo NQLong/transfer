@@ -147,10 +147,10 @@ export function getHcthCongVanDiSearchPage(pageNumber, pageSize, pageCondition, 
     };
 }
 
-export function deleteFile(id, index, file, done) {
+export function deleteFile(id, fileId, file, done) {
     return () => {
         const url = '/api/hcth/cong-van-cac-phong/delete-file';
-        T.put(url, { id, index, file }, data => {
+        T.put(url, { id, fileId, file }, data => {
             if (data.error) {
                 console.error('PUT: ' + url + '.', data.error);
                 T.notify('Xóa file đính kèm lỗi!', 'danger');
@@ -176,5 +176,24 @@ export function getCongVanDi(id, done) {
                 done && done(data.item);
             }
         }, () => T.notify('Xóa file đính kèm bị lỗi!', 'danger'));
+    };
+}
+
+export function createPhanHoi(data, done) {
+    return dispatch => {
+        const url = '/api/hcth/cong-van-cac-phong/phan-hoi';
+        // console.log(data);
+        console.log(data);
+        T.post(url, { data: data }, res => {
+            if (res.error) {
+                console.log(res);
+                T.notify('Thêm phản hồi bị lỗi', 'danger');
+                console.error('POST: ' + url + '. ' + res.error);
+            } else {
+                T.notify('Thêm phản hồi thành công!', 'success');
+                dispatch(getHcthCongVanDiSearchPage());
+                done && done(data);
+            }
+        }, () => T.notify('Thêm phản hồi bị lỗi', 'danger'));
     };
 }

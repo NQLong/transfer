@@ -6589,7 +6589,8 @@
             "modelName": "hcthCongVanDi",
             "methods": {
                 "HCTH_CONG_VAN_DI_SEARCH_PAGE": "searchPage",
-                "HCTH_CONG_VAN_DI_UPDATE_SO_CONG_VAN": "updateSoCongVanDi"
+                "HCTH_CONG_VAN_DI_UPDATE_SO_CONG_VAN": "updateSoCongVanDi",
+                "hcth_cong_van_di_get_all_phan_hoi": "getAllPhanHoi"
             },
             "columns": {
                 "ID": {
@@ -8415,6 +8416,10 @@
             "active": true,
             "moduleName": "hcthGiaoNhiemVu",
             "modelName": "hcthGiaoNhiemVu",
+            "methods": {
+                "HCTH_GIAO_NHIEM_VU_SEARCH_PAGE": "searchPage",
+                "HCTH_GIAO_NHIEM_VU_GET_ALL_PHAN_HOI": "getAllPhanHoi"
+            },
             "columns": {
                 "ID": {
                     "value": "id",
