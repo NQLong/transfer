@@ -18,6 +18,7 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
         T.ready('/user/dao-tao', () => {
             const route = T.routeMatcher('/user/dao-tao/chuong-trinh-dao-tao/:ma');
             this.ma = route.parse(window.location.pathname)?.ma;
+            this.setState({ isLoading: false });
             const query = new URLSearchParams(this.props.location.search);
             const id = query.get('id');
             if (this.ma !== 'new') {
@@ -31,7 +32,6 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                 this.khoa.value(maKhoa);
                 [this.kienThucDaiCuong, this.kienThucCoSoNganh, this.kienThucChuyenNganh, this.kienThucBoTro, this.kienThucLVTN].forEach(e => e.setVal([], maKhoa));
             }
-            this.setState({ isLoading: false });
         });
     }
 
