@@ -61,7 +61,7 @@ class ComponentToChucKhac extends AdminPage {
 
     deleteToChucKhac = (e, item) => {
         T.confirm('Xóa thông tin tổ chức tham gia', 'Bạn có chắc bạn muốn xóa mục này?', true, isConfirm =>
-            isConfirm && (this.props.userEdit ? this.props.deleteToChucKhacStaffUser(item.ma, () => this.props.userGetStaff(this.email)) : this.props.deleteToChucKhacStaff(item.ma, () => this.props.getStaffEdit(this.shcc))));
+            isConfirm && ((this.props.staff && this.props.staff.userItem) ? this.props.deleteToChucKhacStaffUser(item.ma, () => this.props.userGetStaff(this.email)) : this.props.deleteToChucKhacStaff(item.ma, () => this.props.getStaffEdit(this.shcc))));
         e.preventDefault();
     }
 
@@ -102,8 +102,8 @@ class ComponentToChucKhac extends AdminPage {
                     </button>
                 </div>
                 <ToChucKhacModal ref={e => this.modal = e} shcc={this.shcc} email={this.email}
-                    create={this.props.userEdit ? this.props.createToChucKhacStaffUser : this.props.createToChucKhacStaff}
-                    update={this.props.userEdit ? this.props.updateToChucKhacStaffUser : this.props.updateToChucKhacStaff} />
+                    create={(this.props.staff && this.props.staff.userItem) ? this.props.createToChucKhacStaffUser : this.props.createToChucKhacStaff}
+                    update={(this.props.staff && this.props.staff.userItem) ? this.props.updateToChucKhacStaffUser : this.props.updateToChucKhacStaff} />
             </div>
         );
     }
