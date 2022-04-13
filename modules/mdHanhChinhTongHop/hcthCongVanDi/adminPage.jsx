@@ -51,8 +51,8 @@ const listTrangThai = {
 };
 
 const selectCongVan = [
-    {id: 1, text: 'Nội bộ'},
-    {id: 2, text: 'Ra ngoài'}
+    { id: 1, text: 'Nội bộ' },
+    { id: 2, text: 'Ra ngoài' }
 ];
 class HcthCongVanDi extends AdminPage {
     state = { filter: {} };
@@ -120,7 +120,7 @@ class HcthCongVanDi extends AdminPage {
             permission = this.getUserPermission('hcthCongVanDi', ['read', 'write', 'delete']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.hcthCongVanDi && this.props.hcthCongVanDi.page ?
             this.props.hcthCongVanDi.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
-    
+
         // Chỉ trưởng phòng mới có quyền thêm công văn
         let listDonViQuanLy = this.props.system && this.props.system.user.staff && this.props.system.user.staff.donViQuanLy ? this.props.system.user.staff.donViQuanLy : [];
         let dsQuanLy = listDonViQuanLy.map(item => item.maDonVi).toString();
@@ -130,12 +130,12 @@ class HcthCongVanDi extends AdminPage {
             getDataSource: () => list, stickyHead: false,
             renderHead: () => (
                 <tr>
-                    <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle'}}>#</th>
-                    <th style={{ width: 'auto', verticalAlign: 'middle', whiteSpace: 'nowrap'}}>Số công văn</th>
+                    <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }}>#</th>
+                    <th style={{ width: 'auto', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>Số công văn</th>
                     <th style={{ width: '100%', verticalAlign: 'middle' }}>Trích yếu</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Thời gian</th>
                     <th style={{ width: 'auto', verticalAlign: 'middle' }}>Đơn vị gửi</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Đơn vị, nguời nhận</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Đơn vị, người nhận</th>
                     {/* <th style={{ width: 'auto', verticalAlign: 'middle' }}>Tình trạng</th> */}
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Trạng thái</th>
                     <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }}>Thao tác</th>
@@ -147,7 +147,7 @@ class HcthCongVanDi extends AdminPage {
                 return (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'center' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap', fontWeight: 'bold'}} content={item.soDi && item.tenVietTatDonViGui ? this.getSoCongVan(item.soDi, item.tenVietTatDonViGui, item.tenVietTatLoaiCongVanDi) : ''} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap', fontWeight: 'bold' }} content={item.soDi && item.tenVietTatDonViGui ? this.getSoCongVan(item.soDi, item.tenVietTatDonViGui, item.tenVietTatLoaiCongVanDi) : ''} />
                         <TableCell type='link' content={item.trichYeu || ''} onClick={() => this.props.history.push(`/user/hcth/cong-van-cac-phong/${item.id}`)} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
                             <>
@@ -190,10 +190,10 @@ class HcthCongVanDi extends AdminPage {
                                 }</span>
                             </>
                         } />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap', color: item.trangThai ? listTrangThai[item.trangThai].color : '' }} content={item.trangThai? listTrangThai[item.trangThai].status : ''}></TableCell>
-                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} 
-                        onEdit={() => this.props.history.push({ pathname: `/user/hcth/cong-van-cac-phong/${item.id}`, state: { soCongVan: this.getSoCongVan(item.soDi, item.tenVietTatDonViGui, item.tenVietTatLoaiCongVanDi) }})} 
-                        onDelete={(e) => this.onDelete(e, item)} permissions={currentPermissions} />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap', color: item.trangThai ? listTrangThai[item.trangThai].color : '' }} content={item.trangThai ? listTrangThai[item.trangThai].status : ''}></TableCell>
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
+                            onEdit={() => this.props.history.push({ pathname: `/user/hcth/cong-van-cac-phong/${item.id}`, state: { soCongVan: this.getSoCongVan(item.soDi, item.tenVietTatDonViGui, item.tenVietTatLoaiCongVanDi) } })}
+                            onDelete={(e) => this.onDelete(e, item)} permissions={currentPermissions} />
                     </tr>
 
                 );

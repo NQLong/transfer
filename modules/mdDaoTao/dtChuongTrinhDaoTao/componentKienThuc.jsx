@@ -66,9 +66,6 @@ export class ComponentKienThuc extends AdminPage {
         if (!this.rows[idx] || !this.rows[idx].maMonHoc.value()) {
             T.notify('Vui lòng chọn môn học!', 'danger');
             return;
-        } else if (!this.rows[idx].tinChiLyThuyet.value()) {
-            T.notify('Vui lòng nhập tín chỉ lý thuyết', 'danger');
-            return;
         } else if (this.rows[idx].tongSoTc.value() != this.rows[idx].tinChiLyThuyet.value() + this.rows[idx].tinChiThucHanh.value()) {
             T.notify('Tổng TC LT và TH/TN phải bằng tổng TC của môn', 'danger');
             return;
