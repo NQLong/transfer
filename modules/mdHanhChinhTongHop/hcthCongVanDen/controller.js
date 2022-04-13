@@ -419,11 +419,40 @@ module.exports = (app) => {
         app.model.hcthChiDao.getCongVanChiDao(parseInt(req.params.id), CONG_VAN_TYPE, (error, items) => res.send({ error, items: items?.rows || [] }));
     });
 
-    app.assignRoleHooks.addRoles('quanLyHcth', { id: 'hcth:manage', text: 'Công văn: Quản lý phòng hành chính tổng hợp' });
-    app.permissionHooks.add('staff', 'checkQuanLyHcth', (user, staff) => new Promise(resolve => {
-        if (staff.donViQuanLy && staff.donViQuanLy.find(item => item.maDonVi == MA_HCTH)) {
+    // Phân quyền cho các đơn vị ------------------------------------------------------------------------------------------------------------------------
+    app.assignRoleHooks.addRoles('quanLyCongVan', { id: 'hcth:manage', text: 'Hành Chính Tổng Hợp: Quản lý Công Văn' });
+
+    // app.assignRoleHooks.addHook('ttDoanhNghiep', (req, roles) => new Promise(resolve => {
+    //     const userPermissions = req.session.user ? req.session.user.permissions : [];
+    //     if (req.query.nhomRole && req.query.nhomRole == 'ttDoanhNghiep' && userPermissions.includes('manager:write')) {
+    //         const assignRolesList = app.assignRoleHooks.get('ttDoanhNghiep').map(item => item.id);
+    //         console.log(roles && roles.length && assignRolesList.contains(roles));
+    //         resolve(roles && roles.length && assignRolesList.contains(roles));
+    //     } else resolve(null);
+    // }));
+
+    app.assignRoleHooks.addHook('quanLyCongVan', async (req, roles) => {
+        const userPermissions = req.session.user ? req.session.user.permissions : [];
+        if (req.query.nhomRole && req.query.nhomRole == 'quanLyCongVan' && userPermissions.includes('manager:write')) {
+            const assignRolesList = app.assignRoleHooks.get('quanLyCongVan').map(item => item.id);
+            return roles && roles.length && assignRolesList.contains(roles);
+        }
+    });
+
+    app.permissionHooks.add('staff', 'checkRoleQuanLyCongVan', (user, staff) => new Promise(resolve => {
+        if (staff.donViQuanLy && staff.donViQuanLy.length && staff.maDonVi == MA_HCTH) {
             app.permissionHooks.pushUserPermission(user, 'hcth:manage');
         }
+        resolve();
+    }));
+
+    app.permissionHooks.add('assignRole', 'checkRoleQuanLyCongVan', (user, assignRoles) => new Promise(resolve => {
+        const inScopeRoles = assignRoles.filter(role => role.nhomRole == 'quanLyCongVan');
+        inScopeRoles.forEach(role => {
+            if (role.tenRole == 'hcth:manage') {
+                app.permissionHooks.pushUserPermission(user, 'hcth:manage');
+            }
+        });
         resolve();
     }));
 
