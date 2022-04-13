@@ -455,7 +455,7 @@ class StaffEditPage extends AdminPage {
         e.preventDefault();
         const newState = [trangThaiSwitcher.MOI.id, trangThaiSwitcher.TRA_LAI_BGH.id].includes(this.state.trangThai) ? trangThaiSwitcher.CHO_DUYET.id : trangThaiSwitcher.CHO_PHAN_PHOI.id;
         T.confirm('Hoàn thiện công văn', 'Bạn có chắc bạn đã hoàn thiện công văn này công văn này?', true,
-            isConfirm => isConfirm && this.setState({trangThai: newState}, () => this.save()));
+            isConfirm => isConfirm && this.setState({ trangThai: newState }, () => this.save()));
     }
 
     onReturn = (e, status) => {
@@ -590,21 +590,21 @@ class StaffEditPage extends AdminPage {
                     <div className='tile-body row'>
                         {/* <FormTextBox onChange={this.setChange} type='text' className='col-md-2' ref={e => this.soDen = e} label='Số đến' readOnlyEmptyText='Chưa có' readOnly={readOnly} /> */}
                         <FormTextBox onChange={this.setChange} type='text' className='col-md-4' ref={e => this.soCongVan = e} label='Mã số CV' readOnlyEmptyText='Chưa có' readOnly={readOnly} />
-                        <FormSelect onChange={this.setChange} className='col-md-8' ref={e => this.donViGui = e} label={(<>
+                        <FormSelect onChange={this.setChange} className='col-md-8' ref={e => this.donViGui = e} label={(<span onClick={(e) => e.stopPropagation()}>
                             Đơn vị gửi công văn
                             {!readOnly && <>
                                 (
                                 <Link to='#' onClick={() => this.modal.show(null)}>Nhấn vào đây để thêm</Link>
                                 ) </>
                             }
-                        </>)} data={SelectAdapter_DmDonViGuiCongVan} placeholder='Đơn vị gửi công văn' readOnly={readOnly} required />
+                        </span>)} data={SelectAdapter_DmDonViGuiCongVan} placeholder='Đơn vị gửi công văn' readOnly={readOnly} required />
                         <FormDatePicker type='date-mask' className='col-md-4' ref={e => this.ngayCongVan = e} label='Ngày CV' readOnlyEmptyText='Chưa có ngày công văn' readOnly={readOnly} required />
                         <FormDatePicker type='date-mask' className='col-md-4' ref={e => this.ngayNhan = e} label='Ngày nhận' readOnlyEmptyText='Chưa có ngày nhận' readOnly={readOnly} required />
                         <FormDatePicker type='date-mask' className='col-md-4' ref={e => this.ngayHetHan = e} readOnlyEmptyText='Chưa có ngày hết hạn' label='Ngày hết hạn' readOnly={readOnly} />
                         <FormRichTextBox type='text' className='col-md-12' ref={e => this.trichYeu = e} label='Trích yếu' readOnly={readOnly} required />
                         {this.state.id && <span className='form-group col-md-12'>Tình trạng: <b style={{ color: criticalStatus.includes(this.state.trangThai) ? 'red' : 'blue' }}>{getTrangThaiText(this.state.trangThai)}</b></span>}
                         <FormSelect multiple={true} className='col-md-12' ref={e => this.donViNhan = e} label='Đơn vị nhận công văn' data={SelectAdapter_DmDonVi} readOnly={readOnly} readOnlyEmptyText='Chưa có đơn vị nhận' />
-                        <FormSelect multiple={true} className='col-md-12' ref={e => this.canBoNhan = e} label='Cán bộ nhận công văn' data={SelectAdapter_FwCanBo} readOnly={readOnly} />
+                        <FormSelect multiple={true} className='col-md-12' ref={e => this.canBoNhan = e} label='Cán bộ nhận công văn' data={SelectAdapter_FwCanBo} readOnly={readOnly} readOnlyEmptyText='Chưa có cán bộ nhận' />
                         <span className='col-md-12 form-group'>Cán bộ chỉ đạo :</span>
                         {
                             this.renderQuyenChiDao(this.state.quyenChiDao || [], { write: hcthStaffPermission.login || presidentPermission.login }, readOnly)

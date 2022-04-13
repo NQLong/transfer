@@ -42,7 +42,6 @@ module.exports = (app) => {
 
     app.post('/api/hcth/cong-van-den', app.permission.check('hcthCongVanDen:write'), (req, res) => {
         const { fileList, chiDao, quyenChiDao, donViNhan, ...data } = req.body.data;
-        
         const dsCanBoChiDao = quyenChiDao.split(',');
         app.model.qtChucVu.get({ maChucVu: MA_CHUC_VU_HIEU_TRUONG }, (error, hieuTruong) => {
             if (error)
@@ -297,7 +296,7 @@ module.exports = (app) => {
         });
     });
 
-    app.get('/api/hcth/cong-van-den/download/:id/:fileName', app.permission.check('hcthCongVanDen:read'), (req, res) => {
+    app.get('/api/hcth/cong-van-den/download/:id/:fileName', app.permission.check('staff:login'), (req, res) => {
         const { id, fileName } = req.params;
         const dir = app.path.join(app.assetPath, `/congVanDen/${id}`);
         if (app.fs.existsSync(dir)) {
