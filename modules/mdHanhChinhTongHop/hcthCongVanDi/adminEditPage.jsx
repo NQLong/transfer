@@ -138,7 +138,6 @@ class AdminEditPage extends AdminPage {
         // if (lengthDv === 1) {
         //     donViGui = (this.state.listDonViQuanLy[0]);
         // }
-
         this.trichYeu.value(trichYeu);
         this.ngayGui.value(ngayGui);
         this.ngayKy.value(ngayKy);
@@ -147,9 +146,14 @@ class AdminEditPage extends AdminPage {
         this.phanHoi?.value('');
         
         this.setState({
-            noiBo
+            noiBo,
+            trangThai,
+            id, 
+            donViGui, 
+            donViNhan, 
         }, () => {
             this.noiBo.value(this.state.noiBo);
+            this.trangThai?.value(trangThai || '');
         });
 
         if (donViNhan) {
@@ -166,13 +170,11 @@ class AdminEditPage extends AdminPage {
             canBoNhan = canBoNhan.split(',');
             this.canBoNhan.value(canBoNhan);
         }
-
-
-        this.trangThai?.value(trangThai || '');
+        
         this.soCongVan?.value(this.props.location.state.soCongVan || '');
         this.fileBox?.setData('hcthCongVanDiFile:' + (this.state.id ? this.state.id : 'new'));
         
-        this.setState({ id, trangThai, donViGui, donViNhan, listFile, phanHoi: danhSachPhanHoi, noiBo: data ? data.noiBo : 1}, () => {
+        this.setState({ listFile, phanHoi: danhSachPhanHoi }, () => {
             listFile.map((item, index) => this.listFileRefs[index]?.value(item.viTri));
         });
         this.setState({checkDonViGui: this.state.listDonViQuanLy.includes(this.state.donViGui)});
@@ -304,8 +306,8 @@ class AdminEditPage extends AdminPage {
     onReadCvDi = () => {
         T.confirm('Thông báo', 'Bạn có muốn xác nhận là đã đọc công văn này không ?', 'warning', true, isConfirm => {
             if (isConfirm) {
-                this.onCreatePhanHoi();
-                this.props.updateHcthCongVanDi(this.state.id, { trangThai: '4' }, this.getData);
+                //this.onCreatePhanHoi();
+                this.props.updateHcthCongVanDi(this.state.id, { trangThai: '6' }, this.getData);
             }
         });
     }
@@ -438,15 +440,17 @@ class AdminEditPage extends AdminPage {
                             { !isNew && (
                                     <div className='pr-0'>
                                         {
-                                            this.state.noiBo && this.state.donViNhan && !this.state.donViNhan.indexOf('68') < 0 ? null :
+                                            this.state.noiBo && this.state.donViNhan && this.state.donViNhan.indexOf('68') < 0 ? 
                                              (
                                                  checkDaDoc ?
                                                  <button className='btn btn-success mr-2 form-group' type='button' onClick={this.onReadCvDi}>
                                                      Đã đọc
                                                  </button> :
  
-                                                <FormSelect className='col-md-12' ref={e => this.trangThai = e} label='Trạng thái' readOnly={true} data={listTrangThaiCv} required />
+                                                <FormSelect className='col-md-12' ref={e => this.trangThai = e} label='Trạng thái 2' readOnly={true} data={listTrangThaiCv} required />
                                             )
+                                            : 
+                                            <FormSelect className='col-md-12' ref={e => this.trangThai = e} label='Trạng thái' readOnly={true} data={listTrangThaiCv} required />
                                         }
                                     </div>                                    
                             )}
@@ -521,7 +525,7 @@ class AdminEditPage extends AdminPage {
                 
             </>,
             backRoute: '/user/hcth/cong-van-cac-phong',
-            onSave: ((permission && permission.write && lengthDv >= 1 && this.state.trangThai == '') || (hcthStaffPermission && hcthStaffPermission.login  && this.state.trangThai == '') || (checkDonViGui  && this.state.trangThai == '1')) && (!this.state.id || hcthStaffPermission.login) ? this.save : null
+            onSave: ((permission && permission.write && lengthDv >= 1 && this.state.trangThai == '') || (hcthStaffPermission && hcthStaffPermission.login  && this.state.trangThai == '') || (checkDonViGui  && this.state.trangThai == '1')) ? this.save : null
         });
     }
 }
