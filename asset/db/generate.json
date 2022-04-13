@@ -10690,6 +10690,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 100
+                },
+                "NOI_VAO_CONG_DOAN": {
+                    "value": "noiVaoCongDoan",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 200
                 }
             },
             "primaryKeys": [

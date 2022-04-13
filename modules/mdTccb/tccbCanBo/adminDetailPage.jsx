@@ -42,7 +42,6 @@ class CanBoPage extends AdminPage {
         this.componentTTCongTac.value(item);
         this.componentQuanHe.value(item.email, item.phai, item.shcc);
         this.componentTrinhDo.value(item);
-
     }
 
     save = () => {
