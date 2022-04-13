@@ -12350,6 +12350,13 @@
                     "dataDefault": "",
                     "nullable": false,
                     "size": "22,0"
+                },
+                "HOC_KY_DU_KIEN": {
+                    "value": "hocKyDuKien",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
                 }
             },
             "primaryKeys": [
@@ -12426,6 +12433,9 @@
             "active": true,
             "moduleName": "dtKhungDaoTao",
             "modelName": "dtKhungDaoTao",
+            "methods": {
+                "dt_khung_dao_tao_search_page": "searchPage"
+            },
             "columns": {
                 "ID": {
                     "value": "id",

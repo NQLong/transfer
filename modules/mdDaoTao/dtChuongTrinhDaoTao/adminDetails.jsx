@@ -8,10 +8,11 @@ import { SelectAdapter_DtNganhDaoTaoMa } from '../dtNganhDaoTao/redux';
 import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_DmSvBacDaoTao } from 'modules/mdDanhMuc/dmSvBacDaoTao/redux';
 import { SelectAdapter_DmSvLoaiHinhDaoTao } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
+import Loading from 'view/component/Loading';
 
 
 class DtChuongTrinhDaoTaoDetails extends AdminPage {
-    state = {}
+    state = { isLoading: true }
 
     componentDidMount() {
         T.ready('/user/dao-tao', () => {
@@ -55,6 +56,7 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
             this.props.getDtChuongTrinhDaoTao(id, (ctdt) => {
                 //TODO: Group SQL
                 [this.kienThucDaiCuong, this.kienThucCoSoNganh, this.kienThucChuyenNganh, this.kienThucBoTro, this.kienThucLVTN].forEach(e => e.setVal(ctdt, data.maKhoa));
+                this.setState({ isLoading: false });
             });
         });
     }
@@ -132,20 +134,20 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
         }
     }
     render() {
-        const isData = this.props.dtChuongTrinhDaoTao ? this.props.dtChuongTrinhDaoTao : null;
         const permission = this.getUserPermission('dtChuongTrinhDaoTao', ['read', 'write', 'delete', 'manage']);
         const readOnly = !(permission.write || permission.manage);
 
         return this.renderPage({
             icon: 'fa fa-university',
-            title: isData ? 'Chỉnh sửa chương trình đào tạo' : 'Tạo mới chương trình đào tạo',
+            title: this.ma !== 'new' ? 'Chỉnh sửa chương trình đào tạo' : 'Tạo mới chương trình đào tạo',
             subTitle: <span style={{ color: 'red' }}>Lưu ý: Các mục đánh dấu * là bắt buộc</span>,
             breadcrumb: [
                 <Link key={0} to='/user/dao-tao'>Đào tạo</Link>,
                 <Link key={1} to='/user/chuong-trinh-dao-tao'>Chương trình đào tạo</Link>,
-                isData ? 'Chỉnh sửa' : 'Tạo mới',
+                this.ma !== 'new' ? 'Chỉnh sửa' : 'Tạo mới',
             ],
             content: <>
+                {this.state.isLoading && <Loading />}
                 <div className='tile'>
                     <h3 className='tile-title'>1. Thông tin chung về chương trình đào tạo</h3>
                     <div className='tile-body'>
