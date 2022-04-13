@@ -1,6 +1,6 @@
-// Table name: DT_CHUONG_TRINH_DAO_TAO { id, maMonHoc, loaiMonHoc, tinChiLyThuyet, tinChiThucHanh, phongThiNghiem, ghiChu, kichHoat, maKhoiKienThuc, maKhungDaoTao }
+// Table name: DT_CHUONG_TRINH_DAO_TAO { id, maMonHoc, loaiMonHoc, tinChiLyThuyet, tinChiThucHanh, phongThiNghiem, ghiChu, kichHoat, maKhoiKienThuc, maKhungDaoTao, hocKyDuKien }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'maMonHoc': 'MA_MON_HOC', 'loaiMonHoc': 'LOAI_MON_HOC', 'tinChiLyThuyet': 'TIN_CHI_LY_THUYET', 'tinChiThucHanh': 'TIN_CHI_THUC_HANH', 'phongThiNghiem': 'PHONG_THI_NGHIEM', 'ghiChu': 'GHI_CHU', 'kichHoat': 'KICH_HOAT', 'maKhoiKienThuc': 'MA_KHOI_KIEN_THUC', 'maKhungDaoTao': 'MA_KHUNG_DAO_TAO' };
+const obj2Db = { 'id': 'ID', 'maMonHoc': 'MA_MON_HOC', 'loaiMonHoc': 'LOAI_MON_HOC', 'tinChiLyThuyet': 'TIN_CHI_LY_THUYET', 'tinChiThucHanh': 'TIN_CHI_THUC_HANH', 'phongThiNghiem': 'PHONG_THI_NGHIEM', 'ghiChu': 'GHI_CHU', 'kichHoat': 'KICH_HOAT', 'maKhoiKienThuc': 'MA_KHOI_KIEN_THUC', 'maKhungDaoTao': 'MA_KHUNG_DAO_TAO', 'hocKyDuKien': 'HOC_KY_DU_KIEN' };
 
 module.exports = app => {
     app.model.dtChuongTrinhDaoTao = {

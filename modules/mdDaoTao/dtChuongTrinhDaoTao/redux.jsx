@@ -142,12 +142,13 @@ export function createDtChuongTrinhDaoTao(item, done) {
         const url = '/api/dao-tao/chuong-trinh-dao-tao';
         T.post(url, { item }, data => {
             if (data.error) {
-                T.notify(`Tạo mới bị lỗi: ${data.error}`, 'danger');
-                console.error(`POST ${url}. ${data.error}`);
+                T.notify(`Tạo mới bị lỗi: ${data.error.message}`, 'danger');
+                console.error(`POST ${url}. ${data.error.message}`);
             } else {
                 T.notify('Tạo chương trình đào tạo thành công!', 'success');
-                if (done) done(data.item);
+                data.warning && T.notify(data.warning.message, 'warning');
                 dispatch(getDtChuongTrinhDaoTaoPage());
+                if (done) done(data.item);
             }
         });
     };
