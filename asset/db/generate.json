@@ -6589,7 +6589,8 @@
             "modelName": "hcthCongVanDi",
             "methods": {
                 "HCTH_CONG_VAN_DI_SEARCH_PAGE": "searchPage",
-                "HCTH_CONG_VAN_DI_UPDATE_SO_CONG_VAN": "updateSoCongVanDi"
+                "HCTH_CONG_VAN_DI_UPDATE_SO_CONG_VAN": "updateSoCongVanDi",
+                "hcth_cong_van_di_get_all_phan_hoi": "getAllPhanHoi"
             },
             "columns": {
                 "ID": {
