@@ -10,9 +10,9 @@ import { SelectAdapter_DmTonGiaoV2 } from 'modules/mdDanhMuc/dmTonGiao/redux';
 import { SelectAdapter_DmGioiTinhV2 } from 'modules/mdDanhMuc/dmGioiTinh/redux';
 import { SelectAdapter_DmLoaiSinhVienV2 } from 'modules/mdDanhMuc/dmLoaiSinhVien/redux';
 import { SelectAdapter_DmTinhTrangSinhVienV2 } from 'modules/mdDanhMuc/dmTinhTrangSinhVien/redux';
-import { SelectAdapter_DmLoaiHinhDaoTaoV2 } from 'modules/mdDanhMuc/dmLoaiHinhDaoTao/redux';
 import T from 'view/js/common';
 import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
+import { SelectAdapter_DmSvLoaiHinhDaoTao } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
 
 class SinhVienPage extends AdminPage {
     state = { data: {}, lastModified: null, image: '', mssv: '' }
@@ -205,7 +205,7 @@ class SinhVienPage extends AdminPage {
                                 postUrl='/user/upload'
                                 uploadType='SinhVienImage'
                                 onSuccess={this.imageChanged}
-                                className='form-group col-md-3'
+                                className='col-md-3 rounded-circle' isProfile={true}
                             />
                             <div className="form-group col-md-9">
                                 <div className="row">
@@ -216,13 +216,14 @@ class SinhVienPage extends AdminPage {
                                     <FormSelect ref={e => this.khoa = e} label='Khoa' className='form-group col-md-4' readOnly={readOnly} data={SelectAdapter_DmDonViFaculty_V2} />
                                     <FormTextBox type='year' ref={e => this.namTuyenSinh = e} label='Năm tuyển sinh' className='col-md-2' readOnly={readOnly} />
                                     <FormDatePicker type='date-mask' ref={e => this.ngayNhapHoc = e} label='Nhập học' className='col-md-3' readOnly={readOnly} />
+                                    <FormTextBox ref={e => this.nienKhoa = e} label='Niên khóa' className='form-group col-md-3' readOnly={readOnly} />
+                                    <FormTextBox ref={e => this.maKhoa = e} label='Mã khóa' className='form-group col-md-3' readOnly={readOnly} />
+                                    <FormTextBox ref={e => this.maNganh = e} label='Mã ngành' className='form-group col-md-3' readOnly={readOnly} />
+                                    <FormTextBox ref={e => this.lop = e} label='Lớp' className='form-group col-md-3' readOnly={readOnly} />
                                 </div>
                             </div>
-                            <FormTextBox ref={e => this.nienKhoa = e} label='Niên khóa' className='form-group col-md-3' readOnly={readOnly} />
-                            <FormTextBox ref={e => this.maKhoa = e} label='Mã khóa' className='form-group col-md-3' readOnly={readOnly} />
-                            <FormTextBox ref={e => this.maNganh = e} label='Mã ngành' className='form-group col-md-3' readOnly={readOnly} />
-                            <FormTextBox ref={e => this.lop = e} label='Lớp' className='form-group col-md-3' readOnly={readOnly} />
-                            <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Loại hình đào tạo' className='form-group col-md-4' readOnly={readOnly} data={SelectAdapter_DmLoaiHinhDaoTaoV2} />
+
+                            <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Loại hình đào tạo' className='form-group col-md-4' readOnly={readOnly} data={SelectAdapter_DmSvLoaiHinhDaoTao} />
                             <FormSelect ref={e => this.loaiSinhVien = e} label='Loại sinh viên' className='form-group col-md-4' readOnly={readOnly} data={SelectAdapter_DmLoaiSinhVienV2} />
                             <FormSelect ref={e => this.tinhTrang = e} label='Tình trạng' className='form-group col-md-4' readOnly={readOnly} data={SelectAdapter_DmTinhTrangSinhVienV2} />
                             <FormDatePicker ref={e => this.ngaySinh = e} label='Ngày sinh' type='date-mask' className='form-group col-md-3' required />

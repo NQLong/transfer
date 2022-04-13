@@ -64,12 +64,12 @@ class ComponentNN extends AdminPage {
 
     deleteTrinhDoNN = (e, item) => {
         T.confirm('Xóa thông tin trình độ ngoại ngữ', 'Bạn có chắc bạn muốn xóa mục này?', true, isConfirm =>
-            isConfirm && (this.props.userEdit ? this.props.deleteTrinhDoNNStaffUser(item.id, () => this.props.userGetStaff(this.email)) : this.props.deleteTrinhDoNNStaff(item.id, () => this.props.getStaffEdit(this.shcc))));
+            isConfirm && ((this.props.staff && this.props.staff.userItem) ? this.props.deleteTrinhDoNNStaffUser(item.id, () => this.props.userGetStaff(this.email)) : this.props.deleteTrinhDoNNStaff(item.id, () => this.props.getStaffEdit(this.shcc))));
         e.preventDefault();
     }
 
     render() {
-        const dataTrinhDoNgoaiNgu = this.props.userEdit ? this.props.staff?.userItem?.trinhDoNN : this.props.staff?.selectedItem?.trinhDoNN;
+        const dataTrinhDoNgoaiNgu = (this.props.staff && this.props.staff.userItem) ? this.props.staff?.userItem?.trinhDoNN : this.props.staff?.selectedItem?.trinhDoNN;
         let permission = this.getUserPermission('staff', ['read', 'write', 'delete']);
         permission.read = true;
         permission.write = true;
@@ -103,8 +103,8 @@ class ComponentNN extends AdminPage {
                         </button>
                     </div>
                     <TrinhDoNNModal ref={e => this.modal = e} shcc={this.shcc} email={this.email}
-                        create={this.props.userEdit ? this.props.createTrinhDoNNStaffUser : this.props.createTrinhDoNNStaff}
-                        update={this.props.userEdit ? this.props.updateTrinhDoNNStaffUser : this.props.updateTrinhDoNNStaff} />
+                        create={(this.props.staff && this.props.staff.userItem) ? this.props.createTrinhDoNNStaffUser : this.props.createTrinhDoNNStaff}
+                        update={(this.props.staff && this.props.staff.userItem) ? this.props.updateTrinhDoNNStaffUser : this.props.updateTrinhDoNNStaff} />
                 </div>
             </div>
         );
