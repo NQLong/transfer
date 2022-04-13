@@ -256,7 +256,7 @@ module.exports = app => {
 
     app.get('/user/doi-ngoai/doanh-nghiep/doitac/:hiddenShortName', (req, res) => {
         new Promise((resolve, reject) => {
-            app.model.dnDoanhNghiep.get({ hiddenShortName: req.params.hiddenShortName }, 'id, quocGia, tenVietTat, tenDayDu, moTa, namThanhLap, theManh, diaChi, email, phone, image, website', 'id', (error, item) => {
+            app.model.dnDoanhNghiep.get({ hiddenShortName: req.params.hiddenShortName }, 'id, quocGia, tenVietTat, tenDayDu, moTa, namThanhLap, theManh, diaChi, email, phone, image, website, moTaHopTac, ketQuaHopTac', 'id', (error, item) => {
                 if (error || !item) {
                     reject(error);
                 } else {

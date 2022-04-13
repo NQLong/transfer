@@ -4,7 +4,7 @@ import { updateDnDoanhNghiep, createDnDoanhNghiep, getDnDoanhNghiep } from './re
 import { SelectAdapter_DmLinhVucKinhDoanhAll } from 'modules/mdDanhMuc/dmLinhVucKinhDoanh/redux';
 import { SelectAdapter_DmQuocGia } from 'modules/mdDanhMuc/dmQuocGia/redux';
 import { Link } from 'react-router-dom';
-import { FormEditor, FormSelect, FormTextBox, FormImageBox, AdminPage, FormTabs, FormRichTextBox, FormCheckbox } from 'view/component/AdminPage';
+import { FormEditor, FormSelect, FormTextBox, FormImageBox, AdminPage, FormTabs, FormCheckbox } from 'view/component/AdminPage';
 import { EditModal } from 'modules/mdDanhMuc/dmLinhVucKinhDoanh/adminPage';
 import { createDmLinhVucKinhDoanh } from 'modules/mdDanhMuc/dmLinhVucKinhDoanh/redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
@@ -32,12 +32,11 @@ class DnDoanhNghiepEditPage extends AdminPage {
         const user = this.props.system.user;
         let {
             id = null, tenDayDu = '', tenVietTat = '', namThanhLap = '', phone = '', email = '', website = '', capDo = 1,
-            diaChi = '', theManh = '', moTa = '', moTaHopTac = '', ketQuaHopTac = '', ghiChu = '', kichHoat = false, doiTac = false, image = '/img/avatar.jpg',
+            diaChi = '', moTa = '', moTaHopTac = '', ketQuaHopTac = '', ghiChu = '', kichHoat = false, doiTac = false, image = '/img/avatar.jpg',
             listLV = [], quocGia = '', donViPhuTrach = '', listLoaiDoanhNghiep = []
         } = data;
         tenDayDu = T.language.parse(tenDayDu || '', true);
         diaChi = T.language.parse(diaChi || '', true);
-        theManh = T.language.parse(theManh || '', true);
         moTa = T.language.parse(moTa || '', true);
         moTaHopTac = T.language.parse(moTaHopTac || '', true);
         ketQuaHopTac = T.language.parse(ketQuaHopTac || '', true);
@@ -62,9 +61,6 @@ class DnDoanhNghiepEditPage extends AdminPage {
 
         this.dnDoanhNghiepViDiaChi.value(diaChi.vi);
         this.dnDoanhNghiepEnDiaChi.value(diaChi.en);
-
-        this.dnDoanhNghiepViTheManh.value(theManh.vi);
-        this.dnDoanhNghiepEnTheManh.value(theManh.en);
 
         this.moTaVi.value(moTa.vi);
         this.moTaEn.value(moTa.en);
@@ -128,7 +124,6 @@ class DnDoanhNghiepEditPage extends AdminPage {
                     website: this.validate(this.dnDoanhNghiepEditWebsite),
                     capDo: this.validate(this.dnDoanhNghiepEditCapDo, 'level'),
                     diaChi: this.viEnValidate(this.dnDoanhNghiepViDiaChi, this.dnDoanhNghiepEnDiaChi),
-                    theManh: this.viEnValidate(this.dnDoanhNghiepViTheManh, this.dnDoanhNghiepEnTheManh),
                     moTa: this.viEnValidate(this.moTaVi, this.moTaEn),
                     moTaHopTac: this.viEnValidate(this.moTaHopTacVi, this.moTaHopTacEn),
                     ketQuaHopTac: this.viEnValidate(this.ketQuaHopTacVi, this.ketQuaHopTacEn),
@@ -255,18 +250,6 @@ class DnDoanhNghiepEditPage extends AdminPage {
                                     {
                                         title: <>Addresss</>,
                                         component: <FormTextBox placeholder='Address' ref={e => this.dnDoanhNghiepEnDiaChi = e} readOnly={readOnly} />
-                                    }
-                                ]} onChange={this.changeTab} />
-                            </div>
-                            <div className='col-md-12' >
-                                <FormTabs ref={e => this.tabs = e} tabs={[
-                                    {
-                                        title: <>Thế mạnh <span style={{ color: 'red' }}>*</span></>,
-                                        component: <FormRichTextBox placeholder='Thế mạnh' ref={e => this.dnDoanhNghiepViTheManh = e} readOnly={readOnly} required style={{ minHeight: 50 }} />
-                                    },
-                                    {
-                                        title: <>Strengths</>,
-                                        component: <FormRichTextBox placeholder='Strengths' ref={e => this.dnDoanhNghiepEnTheManh = e} readOnly={readOnly} style={{ minHeight: 50 }} />
                                     }
                                 ]} onChange={this.changeTab} />
                             </div>
