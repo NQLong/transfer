@@ -420,7 +420,7 @@ module.exports = (app) => {
     });
 
     // Phân quyền cho các đơn vị ------------------------------------------------------------------------------------------------------------------------
-    app.assignRoleHooks.addRoles('quanLyCongVan', { id: 'hcth:manage', text: 'Hành Chính Tổng Hợp: Quản lý Công Văn' });
+    app.assignRoleHooks.addRoles('quanLyCongVan', { id: 'hcth:manage', text: 'Hành chính - Tổng hợp: Quản lý Công văn' });
 
     // app.assignRoleHooks.addHook('ttDoanhNghiep', (req, roles) => new Promise(resolve => {
     //     const userPermissions = req.session.user ? req.session.user.permissions : [];
