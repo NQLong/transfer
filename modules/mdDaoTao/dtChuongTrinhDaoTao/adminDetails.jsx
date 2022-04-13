@@ -32,7 +32,6 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                 this.khoa.value(maKhoa);
                 [this.kienThucDaiCuong, this.kienThucCoSoNganh, this.kienThucChuyenNganh, this.kienThucBoTro, this.kienThucLVTN].forEach(e => e.setVal([], maKhoa));
             }
-            console.log(this.state.isLoading);
         });
     }
 
