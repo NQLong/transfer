@@ -259,7 +259,7 @@ module.exports = app => {
             });
     });
 
-    app.get('/api/hcth/cong-van-cac-phong/download/:id/:fileName', app.permission.check('hcthCongVanDi:read'), (req, res) => {
+    app.get('/api/hcth/cong-van-cac-phong/download/:id/:fileName', app.permission.check('staff:login'), (req, res) => {
         const { id, fileName } = req.params;
         const dir = app.path.join(app.assetPath, `/congVanDi/${id}`);
         if (app.fs.existsSync(dir)) {
