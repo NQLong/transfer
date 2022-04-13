@@ -11,9 +11,7 @@ import {
     getCongVanDi,
     createPhanHoi
 } from './redux';
-import {
-    createHcthPhanHoi
-} from '../hcthPhanHoi/redux';
+
 import { Link } from 'react-router-dom';
 import { 
     AdminPage, 
@@ -393,7 +391,7 @@ class AdminEditPage extends AdminPage {
        // let readTrangThai = (this.state.trangThai == '2' || this.state.trangThai == '4' || this.state.trangThai == '5' || this.state.trangThai == '6' || this.state.trangThai == '3');
         let readPhanHoi = (this.state.trangThai == '5' || this.state.trangThai == '6' );
         //let checkDonViGui = this.state.listDonViQuanLy.includes(this.state.donViGui);
-        let readTrangThai = (this.state.trangThai == '2' || this.state.trangThai == '5' || this.state.trangThai == '6' || this.state.trangThai == '3');
+        let readTrangThai = (this.state.trangThai == '2' || this.state.trangThai == '5' || this.state.trangThai == '6' || this.state.trangThai == '3' || this.state.trangThai == '4');
         
         //let lengthDv = this.state.listDonViQuanLy.length;
         let checkDonViGui = this.state.checkDonViGui;        
@@ -538,7 +536,6 @@ const mapActionsToProps = {
     getHcthCongVanDiSearchPage,
     deleteFile,
     getCongVanDi,
-    createPhanHoi,
-    createHcthPhanHoi
+    createPhanHoi
 };
 export default connect(mapStateToProps, mapActionsToProps)(AdminEditPage);
