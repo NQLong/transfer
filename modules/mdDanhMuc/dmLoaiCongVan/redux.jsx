@@ -10,8 +10,6 @@ export default function dmLoaiCongVanReducer(state = null, data) {
         case DmLoaiCongVanGetAll:
             return Object.assign({}, state, { items: data.items });
         case DmLoaiCongVanGetPage:
-            console.log(data);
-            console.log(state);
             return Object.assign({}, state, { page: data.page });
         case DmLoaiCongVanUpdate:
             if (state) {
@@ -51,7 +49,6 @@ export function getDmLoaiCongVanPage(pageNumber, pageSize, pageCondition, done) 
     return dispatch => {
         const url = `/api/danh-muc/loai-cong-van/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition }, data => {
-            console.log('data :', data);
             if (data.error) {
                 T.notify('Lấy danh sách loại công văn bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
@@ -129,7 +126,6 @@ export function updateDmLoaiCongVan(id, changes, done) {
     return dispatch => {
         const url = '/api/danh-muc/loai-cong-van';
         T.put(url, { id, changes }, data => {
-            console.log('data 2: ', data);
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông loại công văn bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`PUT: ${url}.`, data.error);
