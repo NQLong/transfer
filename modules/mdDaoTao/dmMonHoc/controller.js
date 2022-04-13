@@ -56,11 +56,11 @@ module.exports = app => {
         app.model.dmMonHoc.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
     });
 
-    app.post('/api/dao-tao/mon-hoc', app.permission.check('dmMonHoc:write'), (req, res) => {
+    app.post('/api/dao-tao/mon-hoc', app.permission.orCheck('dmMonHoc:write', 'dmMonHoc:manage', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
         app.model.dmMonHoc.create(req.body.item, (error, item) => res.send({ error, item }));
     });
 
-    app.put('/api/dao-tao/mon-hoc', app.permission.check('dmMonHoc:write'), (req, res) => {
+    app.put('/api/dao-tao/mon-hoc', app.permission.orCheck('dmMonHoc:write', 'dmMonHoc:manage', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
         app.model.dmMonHoc.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
@@ -68,7 +68,7 @@ module.exports = app => {
         app.model.dmMonHoc.delete({ ma: req.body.ma }, errors => res.send({ errors }));
     });
 
-    app.post('/api/dao-tao/mon-hoc/multiple', app.permission.check('dmMonHoc:write'), (req, res) => {
+    app.post('/api/dao-tao/mon-hoc/multiple', app.permission.orCheck('dmMonHoc:write', 'dmMonHoc:manage', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
         const dmMonHoc = req.body.dmMonHoc, errorList = [];
         for (let i = 0; i <= dmMonHoc.length; i++) {
             if (i == dmMonHoc.length) {
