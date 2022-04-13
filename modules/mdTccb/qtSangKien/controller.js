@@ -53,21 +53,18 @@ module.exports = app => {
         app.model.qtSangKien.delete({ id: req.body.id }, (error) => res.send(error)));
     
     app.post('/api/tccb/qua-trinh/sang-kien/multiple', app.permission.check('qtSangKien:write'), (req, res) => {
-        const qtSangKien = req.body.qtSangKien, errorList = [];
+        const qtSangKien = req.body.qtSangKien;
 
         let promises = qtSangKien ? qtSangKien.map(item => {
-            return new Promise((resolve, reject) => {
-                app.model.qtSangKien.create(item, (error, item) => {
-                    if (error) reject(error);
-                    else resolve(item);
+            return new Promise((resolve) => {
+                app.model.qtSangKien.create(item, (error) => {
+                    resolve(error);
                 });
             });
         }) : [];
 
-        Promise.all(promises).catch(error => {
-            errorList.push(error);
-        }).then(() => {
-            res.send({ errorList });
+        Promise.all(promises).then(errorList => {
+            res.send({ error: errorList.filter(error => error != null) });
         });
     });
 
