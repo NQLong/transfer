@@ -238,9 +238,6 @@ class AdminEditPage extends AdminPage {
         } else if (!changes.ngayGui) {
             T.notify('Ngày gửi công văn bị trống', 'danger');
             this.ngayGui.focus();
-        } else if (!changes.ngayKy) {
-            T.notify('Ngày ký công văn bị trống', 'danger');
-            this.ngayKy.focus();
         } else if (!changes.donViGui) {
             T.notify('Đơn vị gửi bị trống', 'danger');
             this.donViGui.focus();
@@ -446,7 +443,7 @@ class AdminEditPage extends AdminPage {
                             <FormTextBox type='text' className='col-md-12' ref={e => this.soCongVan = e} label='Số công văn' readOnly={true}/>
                         }
                         <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayGui = e} label='Ngày gửi' readOnly={readCondition} required readOnlyEmptyText='Chưa có ngày gửi'/>
-                        <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayKy = e} label='Ngày ký' readOnly={readCondition} required readOnlyEmptyText='Chưa có ngày ký'/>
+                        <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngayKy = e} label='Ngày ký' readOnly={readCondition} readOnlyEmptyText='Chưa có ngày ký'/>
                         <FormSelect className='col-md-12' ref={e => this.donViGui = e} label='Đơn vị gửi' readOnly={readCondition ? 1 : 0} data={SelectAdapter_DmDonViFilter(this.state.listDonViQuanLy)} required readOnlyEmptyText='Chưa có đơn vị gửi'/>
                         <FormCheckbox isSwitch className='col-md-12 form-group' ref={e => this.noiBo = e} label='Công văn nội bộ' readOnly={readCondition} onChange={value => this.setState({ noiBo: value })}></FormCheckbox>
                         {this.state.noiBo ? <FormSelect multiple={true} className='col-md-12' label='Đơn vị nhận' placeholder='Đơn vị nhận' ref={e => this.donViNhan = e} data={SelectAdapter_DmDonVi} readOnly={readCondition} readOnlyEmptyText='Chưa có đơn vị nhận'/> : null}
@@ -508,7 +505,7 @@ class AdminEditPage extends AdminPage {
                 
             </>,
             backRoute: '/user/hcth/cong-van-cac-phong',
-            onSave: ((permission && permission.write && lengthDv >= 1 && this.state.trangThai == '') || (hcthStaffPermission && hcthStaffPermission.login  && this.state.trangThai == '') || (checkDonViGui  && this.state.trangThai == '1')) ? this.save : null
+            onSave: (((permission && permission.write) || (lengthDv >= 1) && this.state.trangThai == '') || (hcthStaffPermission && hcthStaffPermission.login  && this.state.trangThai == '') || (checkDonViGui  && this.state.trangThai == '1')) ? this.save : null
         });
     }
 }
