@@ -1,13 +1,13 @@
 module.exports = (app) => {
-    const menu = {
-        parentMenu: app.parentMenu.hcth,
-        menus: {
-            503: { title: 'Giao nhiệm vụ', link: '/user/hcth/giao-nhiem-vu', icon: 'fa-list-alt', backgroundColor: '#de602f' },
-        },
-    };
+    // const menu = {
+    //     parentMenu: app.parentMenu.hcth,
+    //     menus: {
+    //         503: { title: 'Giao nhiệm vụ', link: '/user/hcth/giao-nhiem-vu', icon: 'fa-list-alt', backgroundColor: '#de602f' },
+    //     },
+    // };
     // app.permission.add({ name: 'president:login', menu });
     // app.permission.add({ name: 'vice-president:login', menu });
-    app.permission.add({ name: 'hcthGiaoNhiemVu:read', menu});
+    app.permission.add({ name: 'hcthGiaoNhiemVu:read' });
     app.permission.add({ name: 'hcthGiaoNhiemVu:write' });
     app.permission.add({ name: 'hcthGiaoNhiemVu:delete' });
 
