@@ -422,15 +422,6 @@ module.exports = (app) => {
     // Phân quyền cho các đơn vị ------------------------------------------------------------------------------------------------------------------------
     app.assignRoleHooks.addRoles('quanLyCongVan', { id: 'hcth:manage', text: 'Hành chính - Tổng hợp: Quản lý Công văn' });
 
-    // app.assignRoleHooks.addHook('ttDoanhNghiep', (req, roles) => new Promise(resolve => {
-    //     const userPermissions = req.session.user ? req.session.user.permissions : [];
-    //     if (req.query.nhomRole && req.query.nhomRole == 'ttDoanhNghiep' && userPermissions.includes('manager:write')) {
-    //         const assignRolesList = app.assignRoleHooks.get('ttDoanhNghiep').map(item => item.id);
-    //         console.log(roles && roles.length && assignRolesList.contains(roles));
-    //         resolve(roles && roles.length && assignRolesList.contains(roles));
-    //     } else resolve(null);
-    // }));
-
     app.assignRoleHooks.addHook('quanLyCongVan', async (req, roles) => {
         const userPermissions = req.session.user ? req.session.user.permissions : [];
         if (req.query.nhomRole && req.query.nhomRole == 'quanLyCongVan' && userPermissions.includes('manager:write')) {
@@ -450,23 +441,7 @@ module.exports = (app) => {
         const inScopeRoles = assignRoles.filter(role => role.nhomRole == 'quanLyCongVan');
         inScopeRoles.forEach(role => {
             if (role.tenRole == 'hcth:manage') {
-                app.permissionHooks.pushUserPermission(user, 'hcth:manage');
-                app.permissionHooks.pushUserPermission(user, 'hcth:login');
-
-                app.permissionHooks.pushUserPermission(user, 'dmDonVi:read');
-
-                app.permissionHooks.pushUserPermission(user, 'dmDonViGuiCv:read');
-                app.permissionHooks.pushUserPermission(user, 'dmDonViGuiCv:write');
-                app.permissionHooks.pushUserPermission(user, 'dmDonViGuiCv:delete');
-
-                app.permissionHooks.pushUserPermission(user, 'hcthCongVanDen:read');
-                app.permissionHooks.pushUserPermission(user, 'hcthCongVanDen:write');
-                app.permissionHooks.pushUserPermission(user, 'hcthCongVanDen:delete');
-
-                app.permissionHooks.pushUserPermission(user, 'hcthCongVanDi:read');
-                app.permissionHooks.pushUserPermission(user, 'hcthCongVanDi:write');
-                app.permissionHooks.pushUserPermission(user, 'hcthCongVanDi:delete');
-                // app.permissionHooks.pushUserPermission(user, 'staff:read');
+                app.permissionHooks.pushUserPermission(user, 'hcth:manage', 'hcth:login', 'dmDonVi:read', 'dmDonViGuiCv:read', 'dmDonViGuiCv:write', 'dmDonViGuiCv:delete', 'hcthCongVanDen:read', 'hcthCongVanDen:write', 'hcthCongVanDen:delete', 'hcthCongVanDi:read', 'hcthCongVanDi:write', 'hcthCongVanDi:delete');
             }
         });
         resolve();
