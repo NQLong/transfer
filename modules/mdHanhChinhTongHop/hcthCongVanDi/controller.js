@@ -1,4 +1,6 @@
 module.exports = app => {
+    const FILE_TYPE = 'DI';
+
     const menu = {
         parentMenu: app.parentMenu.hcth,
         menus: {
@@ -6,20 +8,35 @@ module.exports = app => {
         },
     };
     app.permission.add(
-        { name: 'hcthCongVanDi:read', menu },
+        { name: 'hcthCongVanDi:read' },
         { name: 'hcthCongVanDi:write' },
         { name: 'hcthCongVanDi:delete' },
+        { name: 'hcth:login'},
+        { name: 'staff:login', menu},
     );
-    app.get('/user/hcth/cong-van-cac-phong', app.permission.check('hcthCongVanDi:read'), app.templates.admin);
-    app.get('/user/hcth/cong-van-cac-phong/:id', app.permission.check('hcthCongVanDi:read'), app.templates.admin);
+    app.get('/user/hcth/cong-van-cac-phong', app.permission.check('staff:login'), app.templates.admin);
+    app.get('/user/hcth/cong-van-cac-phong/:id', app.permission.check('staff:login'), app.templates.admin);
 
     // APIs ----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/hcth/cong-van-cac-phong/search/page/:pageNumber/:pageSize', app.permission.check('hcthCongVanDi:read'), (req, res) => {
+    app.get('/api/hcth/cong-van-cac-phong/search/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        let { donViGui, donViNhan, canBoNhan } = (req.query.filter && req.query.filter != '%%%%%%') ? req.query.filter : { donViGui: null, donViNhan: null, canBoNhan: null };
-        app.model.hcthCongVanDi.searchPage(pageNumber, pageSize, canBoNhan, donViGui, donViNhan, searchTerm, (error, page) => {
+        let { donViGui, donViNhan, canBoNhan, loaiCongVan, donViNhanNgoai } = (req.query.filter && req.query.filter != '%%%%%%') ? req.query.filter : 
+            { donViGui: null, donViNhan: null, canBoNhan: null, loaiCongVan: null, donViNhanNgoai: null};
+
+        let donViXem = '', canBoXem = '';
+
+        const rectorsPermission = getUserPermission(req, 'rectors', ['login']);
+        const hcthPermission = getUserPermission(req, 'hcth', ['login']);
+
+        if (!rectorsPermission.login && !hcthPermission.login) {
+            donViXem = (req.session?.user?.staff?.donViQuanLy || []);
+            donViXem = donViXem.map(item => item.maDonVi).toString();
+            canBoXem = req.session?.user?.shcc || '';
+        }
+        
+        app.model.hcthCongVanDi.searchPage(pageNumber, pageSize, canBoNhan, donViGui, donViNhan, loaiCongVan, donViNhanNgoai, donViXem, canBoXem, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -30,6 +47,14 @@ module.exports = app => {
         });
     });
 
+    const getCurrentPermissions = (req) => (req.session && req.session.user && req.session.user.permissions) || [];
+
+    const getUserPermission = (req, prefix, listPermissions = ['read', 'write', 'delete']) => {
+        const permission = {}, currentPermissions = getCurrentPermissions(req);
+        listPermissions.forEach(item => permission[item] = currentPermissions.includes(`${prefix}:${item}`));
+        return permission;
+    };
+
     app.get('/api/hcth/cong-van-cac-phong/all', app.permission.check('hcthCongVanDi:read'), (req, res) => {
         app.model.hcthCongVanDi.getAll((error, items) => res.send({ error, items }));
     });
@@ -38,76 +63,126 @@ module.exports = app => {
         app.model.hcthCongVanDi.get({ id: req.params.id }, (error, item) => res.send({ error, item }));
     });
 
-    app.post('/api/hcth/cong-van-cac-phong', app.permission.check('hcthCongVanDi:read'), (req, res) => {
-        app.model.hcthCongVanDi.create(req.body.data, (error, item) => {
-            if (error)
+    // app.permission.check('hcthCongVanDi:write')
+    app.post('/api/hcth/cong-van-cac-phong', (req, res) => {
+        const {fileList, ...data} = req.body.data;
+        app.model.hcthCongVanDi.create(data, (error, item) => {
+            if(error) {
                 res.send({ error, item });
-            else {
-                let { id, linkCongVan } = item;
-                let listCongVan = null;
-                try {
-                    listCongVan = JSON.parse(linkCongVan);
-                }
-                catch {
-                    listCongVan = [];
-                }
-                updateListFile(listCongVan, id, ({ error, listFile }) => {
-                    if (error) {
-                        app.model.hcthCongVanDi.delete({ id }, () => res.send({ error }));
-                    } else {
-                        let listCv = null;
-                        try {
-                            listCv = JSON.stringify(listFile);
-                        } catch {
-                            listCv = '[]';
+            } else {
+                let { id } = item;
+                app.createFolder(app.path.join(app.assetPath, `/congVanDi/${id}`));
+                if (fileList && fileList.length > 0) {
+                    updateListFile(fileList, id, ({ error }) => {
+                        if (error) {
+                            deleteCongVan(id, () => res.send({ error }));
                         }
-                        app.model.hcthCongVanDi.update({ id }, { 'linkCongVan': listCv }, (errors, item) => res.send({ errors, item }));
-
-                    }
-                });
+                        else
+                            res.send({ item });
+                    });
+                }
+                else res.send({ item });
             }
         });
     });
 
-    const updateListFile = (listFile, id, done) => {
-        if (!listFile || listFile.length == 0) return listFile;
-        app.createFolder(
-            app.path.join(app.assetPath, `/congVanDi/${id}`)
-        );
-        const pattern = /\/new.*/;
-        const newList = listFile.map(fileName => {
-            if (pattern.test(fileName)) {
-                const
-                    destFile = fileName.replace('new', `${id}`),
-                    destPath = app.assetPath + '/congVanDi' + destFile,
-                    srcPath = app.assetPath + '/congVanDi' + fileName;
-                app.fs.rename(srcPath, destPath, error => {
-                    if (error)
-                        done && done({ error });
-                });
-                return destFile;
-            }
-            return fileName;
-        });
-        done && done({ error: null, listFile: newList });
+    const updateListFile = (listFile, congVanId, done) => {
+        const [{ id, ...changes }] = listFile.splice(0, 1),
+            sourcePath = app.path.join(app.assetPath, `/congVanDi/new/${changes.ten}`),
+            destPath = app.path.join(app.assetPath, `/congVanDi/${congVanId}/${changes.ten}`);
+        if (!changes.congVan)
+            app.fs.rename(sourcePath, destPath, error => {
+                if (error) done && done({ error });
+                else {
+                    app.model.hcthFileCongVan.update({ id }, { ...changes, congVan: congVanId }, (error, item) => {
+                        if (error)
+                            done && done({ error });
+                        else {
+                            if (listFile.length > 0)
+                                updateListFile(listFile, congVanId, done);
+                            else
+                                done && done({ error, item });
+                        }
+                    });
+                }
+            });
+        else {
+            app.model.hcthFileCongVan.update({ id }, { ...changes }, (error, item) => {
+                if (error)
+                    done && done({ error });
+                else {
+                    if (listFile.length > 0)
+                        updateListFile(listFile, congVanId, done);
+                    else
+                        done && done({ error, item });
+                }
+            });
+        }
     };
 
-    app.put('/api/hcth/cong-van-cac-phong', app.permission.check('hcthCongVanDi:write'), (req, res) => {
-        app.model.hcthCongVanDi.update({ id: req.body.id }, req.body.changes, (errors, items) => res.send({ errors, items }));
+    const deleteCongVan = (id, done) => {
+        app.model.hcthFileCongVan.delete({ congVan: id }, (error) => {
+            if (error) done && done({ error });
+            else
+                app.model.hcthCongVanDi.delete({ id }, error => {
+                    app.deleteFolder(app.assetPath + '/congVanDi/' + id);
+                    done && done({ error });
+                });
+        });
+    };
+
+    // Cần sửa lại
+    app.put('/api/hcth/cong-van-cac-phong', app.permission.check('staff:login'), (req, res) => {
+        const { fileList, ...changes } = req.body.changes;
+        const { isSend = false } = changes;
+
+        if (isSend) {
+            const currentYear = new Date().getFullYear();
+            const firstDayOfYear = new Date(currentYear, 0, 1);
+            const nam = Date.parse(firstDayOfYear);
+            let { id: ma, donViGui, trangThai } = changes;
+            ma = parseInt(ma);
+            donViGui = parseInt(donViGui);
+            app.model.hcthCongVanDi.updateSoCongVanDi(ma, donViGui, nam, (errors, result) => {
+                if (errors)
+                    res.send({ errors, result });
+                else {
+                    app.model.hcthCongVanDi.update({ id: req.body.id }, { trangThai }, (errors, item) => {
+                        if (errors)
+                            res.send({ errors, item });
+                        else {
+                            if (fileList && fileList.length > 0) {
+                                updateListFile(fileList, req.body.id, ({ error }) => res.send({ error }));
+                            }
+                            else res.send({ item });
+                        }
+                    });
+                }
+            });
+            
+        } else {
+            app.model.hcthCongVanDi.update({ id: req.body.id }, changes, (errors, item) => {
+                if (errors)
+                    res.send({ errors, item });
+                else {
+                    if (fileList && fileList.length > 0) {
+                        updateListFile(fileList, req.body.id, ({ error }) => res.send({ error }));
+                    }
+                    else res.send({ item });
+                }
+            });
+        }
     });
 
     app.delete('/api/hcth/cong-van-cac-phong', app.permission.check('hcthCongVanDi:delete'), (req, res) => {
-        app.model.hcthCongVanDi.delete({ id: req.body.id }, errors => {
-            app.deleteFolder(app.assetPath + '/congVanDi/' + req.body.id);
-            res.send({ errors });
-        });
+        deleteCongVan(req.body.id, ({ error }) => res.send({ error }));
     });
 
     app.get('/api/hcth/cong-van-cac-phong/page/:pageNumber/:pageSize', app.permission.check('hcthCongVanDi:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         let condition = { statement: null };
-        const statement = ['noiDung', 'donViGui']
+        const statement = ['trichYeu', 'donViGui']
             .map(i => `lower(${i}) LIKE :searchText`).join(' OR ');
         if (req.query.condition) {
             condition = {
@@ -139,12 +214,14 @@ module.exports = app => {
                 srcPath = files.hcthCongVanDiFile[0].path,
                 isNew = fields.userData[0].substring(18) == 'new',
                 id = fields.userData[0].substring(18),
-                filePath = (isNew ? '/new/' : `/${id}/`) + (new Date().getTime()).toString() + '_' + files.hcthCongVanDiFile[0].originalFilename,
+                // filePath = (isNew ? '/new/' : `/${id}/`) + (new Date().getTime()).toString() + '_' + files.hcthCongVanDiFile[0].originalFilename,
+                originalFilename = files.hcthCongVanDiFile[0].originalFilename,
+                filePath = (isNew ? '/new/' : `/${id}/`) + originalFilename,
                 destPath = app.assetPath + '/congVanDi' + filePath,
                 validUploadFileType = ['.xls', '.xlsx', '.doc', '.docx', '.pdf', '.png', '.jpg'],
                 baseNamePath = app.path.extname(srcPath);
             if (!validUploadFileType.includes(baseNamePath.toLowerCase())) {
-                done({ error: 'Định dạng tập tin không hợp lệ!' });
+                done && done({ error: 'Định dạng tập tin không hợp lệ!' });
                 app.deleteFile(srcPath);
             } else {
                 app.createFolder(
@@ -152,50 +229,37 @@ module.exports = app => {
                 );
                 app.fs.rename(srcPath, destPath, error => {
                     if (error) {
-                        done({ error });
+                        done && done({ error });
                     } else {
-                        done({ data: filePath });
+                        app.model.hcthFileCongVan.create({ ten: originalFilename, thoiGian: new Date().getTime(), loai: FILE_TYPE, congVan: id === 'new' ? null : id }, (error, item) => done && done({ error, item }));
                     }
                 });
             }
         }
     };
 
+
     //Delete file
-    app.put('/api/hcth/cong-van-cac-phong/delete-file', app.permission.check('staff:login'), (req, res) => {
-        const id = req.body.id,
-            index = req.body.index,
-            file = req.body.file;
-        app.model.hcthCongVanDi.get({ id: id }, (error, item) => {
-            if (error) {
-                res.send({ error });
-            } else if (item && item.linkCongVan) {
-                try {
-                    let newList = JSON.parse(item.linkCongVan);
-                    const filePath = app.assetPath + '/congVanDi' + newList[index];
-                    newList.splice(index, 1);
-                    const newListStr = JSON.stringify(newList);
+    app.put('/api/hcth/cong-van-cac-phong/delete-file', app.permission.check('hcthCongVanDi:delete'), (req, res) => {
+        const
+            id = req.body.id,
+            fileId = req.body.fileId,
+            file = req.body.file,
+            congVan = id || null,
+            filePath = app.assetPath + '/congVanDi/' + (id ? id + '/' : 'new/') + file;
+            app.model.hcthFileCongVan.delete({ id: fileId, congVan }, (error) => {
+                if (error) {
+                    res.send({ error });
+                }
+                else {
                     if (app.fs.existsSync(filePath))
                         app.deleteFile(filePath);
-                    app.model.hcthCongVanDi.update(id, { linkCongVan: newListStr }, (error, item) => {
-                        res.send({ error, item });
-                    });
-                } catch {
-                    res.send({ error: 'Cập nhật danh sách tệp tin thất bại' });
-                }
-            } else {
-                const filePath = app.path.join(app.assetPath, '/congVanDi', file);
-                if (app.fs.existsSync(filePath)) {
-                    app.deleteFile(filePath);
                     res.send({ error: null });
-                } else {
-                    res.send({ error: 'Không tìm thấy công văn' });
                 }
-            }
-        });
+            });
     });
 
-    app.get('/api/hcth/cong-van-cac-phong/download/:id/:fileName', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/cong-van-cac-phong/download/:id/:fileName', app.permission.check('hcthCongVanDi:read'), (req, res) => {
         const { id, fileName } = req.params;
         const dir = app.path.join(app.assetPath, `/congVanDi/${id}`);
         if (app.fs.existsSync(dir)) {
@@ -211,7 +275,38 @@ module.exports = app => {
     });
 
     app.get('/api/hcth/cong-van-cac-phong/:id', app.permission.check('staff:login'), (req, res) => {
-        app.model.hcthCongVanDi.get({ id: req.params.id }, (error, item) => res.send({ error, item }));
+        const id = req.params.id;
+        app.model.hcthCongVanDi.get({ id }, (error, item) => {
+            if (error) {
+                res.send({ error, item });
+            } else {
+                app.model.hcthFileCongVan.getAll({congVan: id, loai: FILE_TYPE}, '*', 'thoiGian', (fileError, files) => {
+                    app.model.hcthCongVanDi.getAllPhanHoi(id, (phanHoiError, phanHoi) => {
+                        res.send({error: fileError || phanHoiError, item: {...item, listFile: files || [], danhSachPhanHoi: phanHoi?.rows || []}});
+                    });
+                });
+            }
+        });
+    });
+
+    app.post('/api/hcth/cong-van-cac-phong/phan-hoi', app.permission.check('staff:login'), (req, res) => {
+        const {
+            canBoGui,
+            noiDung,
+            key,
+            ngayTao,
+            loai
+        } = req.body.data;
+
+        const newPhanHoi = {
+            canBoGui,
+            noiDung,
+            key: Number(key),
+            ngayTao: Number(ngayTao),
+            loai
+        };
+
+        app.model.hcthPhanHoi.create(newPhanHoi, (error, item) => res.send({ error, item }));
     });
 };
 
