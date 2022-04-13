@@ -8415,6 +8415,10 @@
             "active": true,
             "moduleName": "hcthGiaoNhiemVu",
             "modelName": "hcthGiaoNhiemVu",
+            "methods": {
+                "HCTH_GIAO_NHIEM_VU_SEARCH_PAGE": "searchPage",
+                "HCTH_GIAO_NHIEM_VU_GET_ALL_PHAN_HOI": "getAllPhanHoi"
+            },
             "columns": {
                 "ID": {
                     "value": "id",

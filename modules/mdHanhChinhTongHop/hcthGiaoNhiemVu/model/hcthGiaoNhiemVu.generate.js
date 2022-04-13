@@ -130,12 +130,6 @@ module.exports = app => {
             const sql = 'SELECT COUNT(*) FROM HCTH_GIAO_NHIEM_VU' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.database.oracle.connection.main.execute(sql, parameter, (error, result) => done(error, result));
         },
-        
-        // searchPage: (pageNumber, pageSize, donViNhan, canBoNhan, searchterm, done) => {
-        //     console.log("excute : ", pageNumber,  pagesize, donViNhan, canBoNhan, searchterm);
-        //     app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_giao_nhiem_vu_search_page(:pagenumber, :pagesize, :donvinhan, :canbonhan, :searchterm, :totalitem, :pagetotal); END;',
-        //         { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pageNumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pageSize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, donViNhan, canBoNhan, searchterm, totalItem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pageTotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
-        // },
 
         searchPage: (pagenumber, pagesize, userid, donvinhan, canbonhan, ngayhethan, searchterm, done) => {
             app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_giao_nhiem_vu_search_page(:pagenumber, :pagesize, :userid, :donvinhan, :canbonhan, :ngayhethan, :searchterm, :totalitem, :pagetotal); END;',
