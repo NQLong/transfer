@@ -22,17 +22,17 @@ module.exports = app => {
             donViFilter = req.query.donViFilter,
             donVi = req.query.donVi ? req.query.donVi : (req.session.user.staff ? req.session.user.staff.maDonVi : null),
             searchTerm = typeof req.query.searchTerm === 'string' ? `%${req.query.searchTerm.toLowerCase()}%` : '',
-            statement = 'lower(ten) LIKE :searchTerm',
+            statement = '(lower(ten) LIKE :searchTerm OR lower(ma) LIKE :searchTerm)',
             parameter = { searchTerm },
             selectedItems = req.query.selectedItems || [];
 
         if (req.session.user.permissions.includes(['dmMonHoc:read']) && donViFilter) donVi = donViFilter;
         if (donVi) {
-            statement = 'boMon = :donVi AND lower(ten) LIKE :searchTerm';
+            statement = 'boMon = :donVi AND (lower(ten) LIKE :searchTerm OR lower(ma) LIKE :searchTerm)';
             parameter.donVi = parseInt(donVi);
         }
         if (selectedItems.length) {
-            statement = 'boMon = :donVi AND lower(ten) LIKE :searchTerm AND ma NOT IN (:selectedItems)';
+            statement = 'boMon = :donVi AND (lower(ten) LIKE :searchTerm OR lower(ma) LIKE :searchTerm) AND ma NOT IN (:selectedItems)';
             parameter.selectedItems = selectedItems;
         }
         let condition = { statement, parameter };

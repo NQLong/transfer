@@ -140,8 +140,8 @@ class HcthCongVanDenStaffPage extends AdminPage {
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', }}>Số CV</th>
                     <TableHeader style={{ width: '10%', whiteSpace: 'nowrap' }} sort isSorted={this.state.sortBy == 'ngayNhan'} onSort={(type) => this.onSort('ngayNhan', type)}>Ngày nhận</TableHeader>
                     <TableHeader style={{ width: '10%', whiteSpace: 'nowrap' }} sort isSorted={this.state.sortBy == 'ngayHetHan'} onSort={(type) => this.onSort('ngayHetHan', type)}>Hết hạn</TableHeader>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Đơn vị gửi</th>
-                    <th style={{ width: '80%', whiteSpace: 'nowrap' }}>Trích yếu</th>
+                    <th style={{ width: '80%', whiteSpace: 'nowrap' }}>Đơn vị gửi</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Trích yếu</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Đơn vị, người nhận</th>
                     <TableHeader style={{ width: 'auto', whiteSpace: 'nowrap' }} sort isSorted={this.state.sortBy == 'tinhTrang'} onSort={(type) => this.onSort('tinhTrang', type)}>Tình trạng</TableHeader>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
@@ -169,7 +169,7 @@ class HcthCongVanDenStaffPage extends AdminPage {
                             </>) : null
                         } />
                         <TableCell type='text' contentClassName='multiple-lines' content={item.tenDonViGuiCV} />
-                        <TableCell type='text' content={item.trichYeu} />
+                        <TableCell type='text' contentClassName='multiple-lines-3' content={item.trichYeu} />
                         <TableCell type='text' contentClassName='multiple-lines' style={{ whiteSpace: 'nowrap' }} content={
                             <>
                                 <span>{danhSachCanBoNhan && danhSachCanBoNhan.length > 0 ? danhSachCanBoNhan.map((item, index) => (
