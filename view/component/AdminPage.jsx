@@ -150,7 +150,7 @@ export function renderTable({
 
 export function renderComment({
     renderAvatar = () => null, renderName = () => null, renderContent = () => null, renderTime = () => null, getDataSource = () => null, loadingText = 'Đang tải ...',
-    emptyComment = 'Chưa có phản hồi', getItemStyle = () => {}
+    emptyComment = 'Chưa có phản hồi', getItemStyle = () => { }
 }) {
     const list = getDataSource();
     if (list == null) {
@@ -185,7 +185,7 @@ export function renderComment({
                         return (
                             <div key={index} style={flexRow}>
                                 <div >{renderAvatar(item)}</div>
-                                <div style={{...contentStyle, ...getItemStyle(item)}}>
+                                <div style={{ ...contentStyle, ...getItemStyle(item) }}>
                                     <div style={{ borderBottom: '1px solid #000000 ', paddingLeft: '5px', ...flexRow }}>
                                         <b style={{ flex: 1 }}>{renderName(item)}</b>
                                         <span>{renderTime(item)}</span>
@@ -266,7 +266,7 @@ export class FormTabs extends React.Component {
     }
 
     render() {
-        const { style={}, tabClassName = '', contentClassName = '', tabs = [] } = this.props,
+        const { style = {}, tabClassName = '', contentClassName = '', tabs = [] } = this.props,
             id = this.props.id || 'tab',
             tabLinks = [], tabPanes = [];
         tabs.forEach((item, index) => {
@@ -673,7 +673,7 @@ export class FormSelect extends React.Component {
         const { className = '', style = {}, labelStyle = {}, label = '', multiple = false, readOnly = false, required = false, readOnlyEmptyText = '' } = this.props;
         return (
             <div className={'form-group admin-form-select ' + className} style={style}>
-                {label ? <label style={labelStyle} onClick={this.focus}>{label}{!readOnly && required ? <span style={{ color: 'red' }}> *</span> : ''}{readOnly ? ':' : ''}</label> : null} {readOnly ? <b>{this.state.valueText == null ? readOnlyEmptyText : this.state.valueText}</b> : ''}
+                {label ? <label style={labelStyle} onClick={this.focus}>{label}{!readOnly && required ? <span style={{ color: 'red' }}> *</span> : ''}{readOnly ? ':' : ''}</label> : null} {readOnly ? <b>{this.state.valueText || readOnlyEmptyText}</b> : ''}
                 <div style={{ width: '100%', display: readOnly ? 'none' : 'inline-flex' }}>
                     <select ref={e => this.input = e} multiple={multiple} disabled={readOnly} />
                 </div>
