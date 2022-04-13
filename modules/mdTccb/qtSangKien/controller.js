@@ -66,8 +66,9 @@ module.exports = app => {
 
         Promise.all(promises).catch(error => {
             errorList.push(error);
+        }).then(() => {
+            res.send({ errorList });
         });
-        res.send({ errorList });
     });
 
     // End TCCB APIs ---------------------------------------------------------------------------------------------------------------------------
