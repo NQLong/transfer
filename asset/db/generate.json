@@ -12433,6 +12433,9 @@
             "active": true,
             "moduleName": "dtKhungDaoTao",
             "modelName": "dtKhungDaoTao",
+            "methods": {
+                "dt_khung_dao_tao_search_page": "searchPage"
+            },
             "columns": {
                 "ID": {
                     "value": "id",
