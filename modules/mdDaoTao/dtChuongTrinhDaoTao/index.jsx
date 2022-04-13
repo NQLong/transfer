@@ -17,10 +17,6 @@ export default {
         {
             path: '/user/dao-tao/chuong-trinh-dao-tao/:ma',
             component: Loadable({ loading: Loading, loader: () => import('./adminDetails') })
-        },
-        {
-            path: '/user/dao-tao/chuong-trinh-dao-tao/new',
-            component: Loadable({ loading: Loading, loader: () => import('./adminDetails') })
-        },
+        }
     ],
 };

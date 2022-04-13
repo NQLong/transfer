@@ -31,6 +31,7 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                 this.khoa.value(maKhoa);
                 [this.kienThucDaiCuong, this.kienThucCoSoNganh, this.kienThucChuyenNganh, this.kienThucBoTro, this.kienThucLVTN].forEach(e => e.setVal([], maKhoa));
             }
+            this.setState({ isLoading: false });
         });
     }
 
@@ -56,7 +57,6 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
             this.props.getDtChuongTrinhDaoTao(id, (ctdt) => {
                 //TODO: Group SQL
                 [this.kienThucDaiCuong, this.kienThucCoSoNganh, this.kienThucChuyenNganh, this.kienThucBoTro, this.kienThucLVTN].forEach(e => e.setVal(ctdt, data.maKhoa));
-                this.setState({ isLoading: false });
             });
         });
     }

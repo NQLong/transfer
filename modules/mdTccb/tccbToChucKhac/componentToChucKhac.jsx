@@ -66,7 +66,7 @@ class ComponentToChucKhac extends AdminPage {
     }
 
     render() {
-        const dataToChucKhac = this.props.userEdit ? this.props.staff?.userItem?.toChucKhac : this.props.staff?.selectedItem?.toChucKhac;
+        const dataToChucKhac = (this.props.staff && this.props.staff.userItem) ? this.props.staff?.userItem?.toChucKhac : this.props.staff?.selectedItem?.toChucKhac;
         let permission = {
             write: true,
             read: true,
