@@ -6,7 +6,8 @@ import {
     renderTable,
     FormSelect,
     TableCell,
-    TableHeader
+    TableHeader,
+    FormTabs
 } from 'view/component/AdminPage';
 import { Link } from 'react-router-dom';
 import {
@@ -21,6 +22,9 @@ import { SelectAdapter_DmDonViGuiCongVan } from 'modules/mdDanhMuc/dmDonViGuiCv/
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import Pagination from 'view/component/Pagination';
+import { getTrangThaiText } from './staffEditPage';
+
+const { trangThaiSwitcher } = require('./constant');
 
 const timeList = [
     { id: 1, text: 'Theo ngày công văn' },
@@ -28,6 +32,7 @@ const timeList = [
     { id: 3, text: 'Theo ngày hết hạn' },
 ];
 
+const TAB_ID = 'congVanDenTabs';
 
 const
     start = new Date().getFullYear(),
@@ -40,7 +45,7 @@ const
 
 class HcthCongVanDenStaffPage extends AdminPage {
 
-    state = { filter: {}, sortBy: '', sortType: '' };
+    state = { filter: {}, sortBy: '', sortType: '', tab: 0 };
 
     componentDidMount() {
         T.ready('/user/hcth', () => {
@@ -56,22 +61,24 @@ class HcthCongVanDenStaffPage extends AdminPage {
                 this.toTime?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
-            this.getPage();
-            this.changeAdvancedSearch(true);
         });
     }
 
     changeAdvancedSearch = (isInitial = false) => {
         let { pageNumber, pageSize } = this.props && this.props.hcthCongVanDen && this.props.hcthCongVanDen.page ? this.props.hcthCongVanDen.page : { pageNumber: 1, pageSize: 50 };
-        let donViGuiCongVan = this.donViGuiCongVan?.value() || null;
-        let donViNhanCongVan = this.donViNhanCongVan?.value().toString() || null;
-        let canBoNhanCongVan = this.canBoNhanCongVan?.value() || null;
-        let timeType = this.timeType?.value() || null;
-        let fromTime = this.fromTime?.value() ? Number(this.fromTime.value()) : null;
-        let toTime = this.toTime?.value() ? Number(this.toTime.value()) : null;
-        let congVanYear = this.congVanYear?.value() || null;
+        let
+            donViGuiCongVan = this.donViGuiCongVan?.value() || null,
+            donViNhanCongVan = this.donViNhanCongVan?.value().toString() || null,
+            canBoNhanCongVan = this.canBoNhanCongVan?.value() || null,
+            timeType = this.timeType?.value() || null,
+            fromTime = this.fromTime?.value() ? Number(this.fromTime.value()) : null,
+            toTime = this.toTime?.value() ? Number(this.toTime.value()) : null,
+            congVanYear = this.congVanYear?.value() || null,
+            status = this.status?.value() || null,
+            tab = this.tabs?.selectedTabIndex()
+            ;
 
-        const pageFilter = isInitial ? {} : { donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, timeType, fromTime, toTime, congVanYear };
+        const pageFilter = isInitial ? {} : { donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, timeType, fromTime, toTime, congVanYear, tab, status };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
                 if (isInitial) {
@@ -84,6 +91,7 @@ class HcthCongVanDenStaffPage extends AdminPage {
                     this.fromTime?.value(filter.fromTime || '');
                     this.toTime?.value(filter.toTime || '');
                     this.congVanYear?.value(filter.congVanYear || '');
+                    this.status?.value(filter.status || '');
                     if (!$.isEmptyObject(filter) && filter && (filter.donViGuiCongVan || filter.donViNhanCongVan || filter.canBoNhanCongVan || filter.timeType || filter.fromTime || filter.toTime)) this.showAdvanceSearch();
                 }
             });
@@ -112,12 +120,19 @@ class HcthCongVanDenStaffPage extends AdminPage {
     }
 
     render() {
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
+        const user = this.props.system && this.props.system.user ? this.props.system.user : {},
+            { permissions: currentPermissions, staff } = user,
+            donViQuanLy = staff && staff.donViQuanLy ? staff.donViQuanLy : [],
             permission = this.getUserPermission('hcthCongVanDen', ['read', 'write', 'delete']);
+        const hcthStaff = currentPermissions.includes('hcth:login');
+
+        const statusSelector = Object.keys(trangThaiSwitcher).filter(key => hcthStaff || trangThaiSwitcher[key].id != trangThaiSwitcher.MOI.id).map(key => trangThaiSwitcher[key]);
+
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.hcthCongVanDen && this.props.hcthCongVanDen.page ? this.props.hcthCongVanDen.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = renderTable({
+            style: { marginTop: '5px' },
             getDataSource: () => list,
-            emptyTable: 'Không dữ liệu công văn đến',
+            emptyTable: 'Không có dữ liệu công văn đến',
             stickyHead: false,
             renderHead: () => (
                 <tr>
@@ -175,14 +190,33 @@ class HcthCongVanDenStaffPage extends AdminPage {
                         } />
 
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
-                            item.hasChiDao ?
-                                (<span style={{ color: 'blue' }}>Đã chỉ đạo</span>) :
-                                (<span style={{ color: 'red' }}>Chưa chỉ đạo</span>)
+                            <span style={{ color: [trangThaiSwitcher.MOI.id, trangThaiSwitcher.TRA_LAI_BGH.id, trangThaiSwitcher.TRA_LAI_HCTH.id].includes(item.trangThai) ? 'red' : 'blue' }}>{getTrangThaiText(item.trangThai)}</span>
                         } />
-                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission} onEdit={() => this.props.history.push(`/user/hcth/cong-van-den/${item.id}`)} onDelete={(e) => this.onDelete(e, item)} permissions={currentPermissions} />
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={{ ...permission, delete: permission.delete && item.trangThai == trangThaiSwitcher.MOI.id }} onEdit={() => this.props.history.push(`/user/hcth/cong-van-den/${item.id}`)} onDelete={(e) => this.onDelete(e, item)} permissions={currentPermissions} />
                     </tr>);
             }
         });
+
+        let tabList = {
+            all: {
+                title: 'Tất cả',
+                // component: table
+            },
+            donVi: {
+                title: 'Đơn vị quản lý',
+                // component: table
+            },
+            self: {
+                title: 'Cá nhân',
+                // component: table
+            }
+        };
+
+        const tabs = !(user.isStaff || user.isStudent) ? [tabList.all] :
+            donViQuanLy.length || currentPermissions.includes('president:login') ? [tabList.all, tabList.donVi, tabList.self]
+                : currentPermissions.includes('rectors:login') || (currentPermissions.includes('hcth:login')) ? [tabList.all, tabList.self]
+                    : [tabList.self];
+
         return this.renderPage({
             icon: 'fa fa-caret-square-o-left',
             title: 'Công văn đến',
@@ -190,7 +224,11 @@ class HcthCongVanDenStaffPage extends AdminPage {
                 <Link key={0} to='/user/hcth'>Hành chính tổng hợp</Link>,
                 'Công văn đến'
             ],
-            header: <FormSelect style={{ width: '300px', marginBottom: '0' }} allowClear={true} ref={e => this.congVanYear = e} placeholder='Năm' onChange={() => this.changeAdvancedSearch()} data={yearSelector} />,
+            header: <>
+                <FormSelect style={{ width: '150px', marginBottom: '0' }} allowClear={true} ref={e => this.congVanYear = e} placeholder='Năm' onChange={() => this.changeAdvancedSearch()} data={yearSelector} />
+                {(currentPermissions.includes('rectors:login') || currentPermissions.includes('hcth:login')) && <FormSelect style={{ width: '150px', marginBottom: '0', marginLeft: '5px' }} allowClear={true} ref={e => this.status = e} placeholder='Tình trạng' onChange={() => this.changeAdvancedSearch()} data={statusSelector} />}
+            </>
+            ,
             advanceSearch: <>
                 <div className='row'>
                     <div className='col-12 col-md-12 row'>
@@ -207,9 +245,9 @@ class HcthCongVanDenStaffPage extends AdminPage {
                 </div>
             </>,
             content: <div className='tile'>
-                {/* <FormTextBox type='year' ref={e => this.congVanYear = e} label='Năm' onChange={() => this.changeAdvancedSearch()} /> */}
+                <FormTabs style={tabs.length == 1 ? { display: 'none' } : {}} ref={e => this.tabs = e} tabs={tabs} id={TAB_ID} onChange={() => this.changeAdvancedSearch()} />
                 {table}
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
+                < Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
             </div>,
 

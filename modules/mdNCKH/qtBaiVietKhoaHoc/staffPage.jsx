@@ -144,8 +144,8 @@ class QtBaiVietKhoaHocUserPage extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tác giả</th>
-                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Bài viết</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Tạp chí</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Bài viết</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Tạp chí</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số hiệu ISSN</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Xuất bản</th>
                         <th style={{ width: 'auto', textAlign: 'center' }}>Thao tác</th>
@@ -155,8 +155,8 @@ class QtBaiVietKhoaHocUserPage extends AdminPage {
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='link' onClick={() => this.modal.show({ item, shcc })} content={(item.tenTacGia || '')} />
-                        <TableCell type='text' content={(<b>{item.tenBaiViet}</b>)} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(<i>{item.tenTapChi}</i>)} />
+                        <TableCell type='text' contentClassName='multiple-lines-5' content={(<b>{item.tenBaiViet}</b>)} />
+                        <TableCell type='text' content={(<i>{item.tenTapChi}</i>)} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.soHieuIssn} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>

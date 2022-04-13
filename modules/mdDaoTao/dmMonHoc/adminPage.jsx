@@ -104,14 +104,13 @@ class EditModal extends AdminModal {
                 <FormTextBox type='number' className='col-2' ref={e => this.soTietDa = e} label='Số tiết DA' readOnly={readOnly} placeholder='Số tiết DA' required />
                 <FormTextBox type='number' className='col-2' ref={e => this.soTietLa = e} label='Số tiết LA' readOnly={readOnly} placeholder='Số tiết LA' required />
                 <FormTextBox className='col-12' ref={e => this.tinhChatPhong = e} label='Tính chất phòng' readOnly={readOnly} placeholder='Tính chất phòng' />
-                <FormSelect className='col-12' ref={e => this.boMon = e} data={SelectAdapter_DmDonViFaculty_V2} label='Khoa/Bộ Môn' readOnly={readOnly || this.props.khoa != 'all'} required />
+                <FormSelect className='col-12' ref={e => this.boMon = e} data={SelectAdapter_DmDonViFaculty_V2} label='Khoa/Bộ Môn' readOnly={readOnly || this.props.khoa} required />
                 <FormSelect className='col-6' ref={e => this.loaiHinh = e} label='Loại hình' readOnly={readOnly} data={SelectAdapter_DmSvLoaiHinhDaoTao} placeholder='Loại hình' />
                 <FormTextBox className='col-6' ref={e => this.chuyenNganh = e} label='Chuyên ngành' readOnly={readOnly} placeholder='Chuyên ngành' />
                 <FormTextBox className='col-12' ref={e => this.ghiChu = e} label='Ghi chú' readOnly={readOnly} placeholder='Ghi chú' />
                 <FormRichTextBox rows='5' className='col-6' ref={e => this.maCtdt = e} label='Mã CTĐT' readOnly={readOnly} placeholder='Mã CTĐT' />
                 <FormRichTextBox rows='5' className='col-6' ref={e => this.tenCtdt = e} label='Tên CTĐT' readOnly={readOnly} placeholder='Tên CTĐT' />
-                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }}
-                    onChange={value => this.changeKichHoat(value ? 1 : 0)} />
+                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }} onChange={value => this.changeKichHoat(value ? 1 : 0)} />
             </div>
         });
     }
@@ -119,7 +118,8 @@ class EditModal extends AdminModal {
 
 class DmMonHocPage extends AdminPage {
     donViMapper = {};
-    state = { donVi: '' }
+    state = { donViFilter: '' }
+
     componentDidMount() {
         this.props.getDmDonViAll(items => {
             if (items) {
@@ -127,18 +127,15 @@ class DmMonHocPage extends AdminPage {
                 items.forEach(item => this.donViMapper[item.ma] = item.ten);
             }
         });
-        T.ready('/user/pdt', () => {
-            let permission = this.getUserPermission('dmMonHoc');
-            this.setState({ donVi: permission.read ? 'all' : this.props.system.user.staff.maDonVi }, () => {
-                T.onSearch = (searchText) => this.props.getDmMonHocPage(undefined, undefined, {
-                    searchTerm: searchText || '',
-                    donVi: this.state.donVi
-                });
-                T.showSearchBox();
-                this.props.getDmMonHocPage(undefined, undefined, {
-                    searchTerm: '',
-                    donVi: this.state.donVi
-                });
+        T.ready('/user/dao-tao', () => {
+            T.clearSearchBox();
+            this.setState({ donViFilter: this.props.system.user.staff?.maDonVi });
+            T.onSearch = (searchText) => this.props.getDmMonHocPage(undefined, undefined, {
+                searchTerm: searchText || '',
+            });
+            T.showSearchBox();
+            this.props.getDmMonHocPage(undefined, undefined, {
+                searchTerm: ''
             });
         });
     }
@@ -155,19 +152,18 @@ class DmMonHocPage extends AdminPage {
     }
 
     render() {
-        const permissionDaoTao = this.getUserPermission('dmMonHoc'),
-            permissionManager = this.getUserPermission('manager');
+        const permissionDaoTao = this.getUserPermission('dmMonHoc', ['read', 'write', 'delete', 'manage']);
         let permission = {
-            read: permissionDaoTao.read || permissionManager.read,
-            write: permissionManager.write,
-            delete: permissionManager.write
+            write: permissionDaoTao.write || permissionDaoTao.manage,
+            delete: permissionDaoTao.delete || permissionDaoTao.manage
         };
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmMonHoc && this.props.dmMonHoc.page ?
             this.props.dmMonHoc.page : {
                 pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {
-                    searchTerm: '', donVi: this.state.donVi
+                    searchTerm: '', donViFilter: this.state.donViFilter
                 }, list: []
             };
+
         let table = renderTable({
             emptyTable: 'Chưa có dữ liệu môn học',
             getDataSource: () => list, stickyHead: false,
@@ -210,32 +206,37 @@ class DmMonHocPage extends AdminPage {
                     <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietLa} />
                     <TableCell content={this.donViMapper && this.donViMapper[item.boMon] ? this.donViMapper[item.boMon] : ''} />
                     <TableCell contentClassName='multiple-lines-4' content={item.tenCtdt?.split(',').map((ctdt, index) => <div key={index}>{ctdt} <br /></div>)} />
-                    <TableCell type='checkbox' content={item.kichHoat} permission={permission}
-                        onChanged={value => this.props.updateDmMonHoc(item.ma, { kichHoat: value ? 1 : 0, })} />
-                    <TableCell type='buttons' content={item} permission={permission}
+                    < TableCell type='checkbox' content={item.kichHoat} permission={permission}
+                        onChanged={value => this.props.updateDmMonHoc(item.ma, { kichHoat: value ? 1 : 0, })
+                        } />
+                    < TableCell type='buttons' content={item} permission={permission}
                         onEdit={() => this.modal.show(item)} onDelete={this.delete} />
-                </tr>)
+                </tr >)
         });
 
         return this.renderPage({
             icon: 'fa fa-leanpub',
             title: 'Danh sách Môn Học',
             breadcrumb: [
-                <Link key={0} to='/user/pdt'>Đào tạo</Link>,
+                <Link key={0} to='/user/dao-tao'>Đào tạo</Link>,
                 'Danh sách Môn Học'
             ],
-            header: permissionDaoTao.read && <FormSelect style={{ width: '300px', marginBottom: '0' }} placeholder='Danh sách khoa/bộ môn' ref={e => this.donVi = e} onChange={value => this.props.getDmMonHocPage(undefined, undefined, {
-                searchTerm: '',
-                donVi: value ? value.id : 'all'
-            })} data={SelectAdapter_DmDonViFaculty_V2} allowClear={true} />,
+            header: permissionDaoTao.read && <FormSelect style={{ width: '300px', marginBottom: '0' }} placeholder='Danh sách khoa/bộ môn' ref={e => this.donVi = e} onChange={value => {
+                T.clearSearchBox();
+                this.setState({ donViFilter: value ? value.id : '' });
+                this.props.getDmMonHocPage(undefined, undefined, {
+                    searchTerm: '',
+                    donViFilter: value && value.id
+                });
+            }} data={SelectAdapter_DmDonViFaculty_V2} allowClear={true} />,
             content: <>
                 <div className='tile'>{table}</div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.props.getDmMonHocPage} />
                 <EditModal ref={e => this.modal = e} permission={permission} readOnly={!permission.write}
-                    create={this.props.createDmMonHoc} update={this.props.updateDmMonHoc} khoa={this.state.donVi} />
+                    create={this.props.createDmMonHoc} update={this.props.updateDmMonHoc} khoa={this.state.donViFilter} />
             </>,
-            backRoute: '/user/pdt',
+            backRoute: '/user/dao-tao',
             onCreate: permission.write ? (e) => this.showModal(e) : null,
         });
     }

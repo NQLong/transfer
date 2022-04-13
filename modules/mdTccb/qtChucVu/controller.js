@@ -201,6 +201,10 @@ module.exports = app => {
         });
 
     });
+
+    app.get('/api/get-dai-dien-ky', app.permission.check('staff:read'), (req, res) => {
+        app.model.qtChucVu.getDaiDienKy((error, items) => res.send({ error, items: items.rows || [] }));
+    });
 };
 
 /// End Others APIs -------------------------------------------------------------------------------------------------------------------------------

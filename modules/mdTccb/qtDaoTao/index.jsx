@@ -18,7 +18,7 @@ export default {
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
         {
-            path: '/user/dao-tao',
+            path: '/user/qua-trinh-dao-tao-boi-duong',
             component: Loadable({ loading: Loading, loader: () => import('./staffPage') })
         },
     ],

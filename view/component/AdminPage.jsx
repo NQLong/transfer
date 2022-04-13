@@ -43,7 +43,7 @@ export class TableCell extends React.Component { // type = number | date | link 
                     </label>
                 </td>);
         } else if (type == 'buttons') {
-            const { onSwap, onEdit, onDelete, children } = this.props;
+            const { onSwap, onEdit, onDelete, onClone, children } = this.props;
             return (
                 <td className={className} style={{ ...style }} rowSpan={rowSpan} colSpan={colSpan}>
                     <div className='btn-group'>
@@ -54,6 +54,8 @@ export class TableCell extends React.Component { // type = number | date | link 
                             <a className='btn btn-warning' href='#' onClick={e => e.preventDefault() || onSwap(e, content, false)}><i className='fa fa-lg fa-arrow-down' /></a> : null}
                         {onEdit && typeof onEdit == 'function' ?
                             <a className='btn btn-primary' href='#' title={permission.write ? 'Chỉnh sửa' : 'Xem'} onClick={e => e.preventDefault() || onEdit(e, content)}><i className={'fa fa-lg ' + (permission.write ? 'fa-edit' : 'fa-eye')} /></a> : null}
+                        {permission.write && onClone && typeof onClone == 'function' ?
+                            <a className='btn btn-info' href='#' title={'Sao chép'} onClick={e => e.preventDefault() || onClone(e, content)}><i className='fa fa-lg fa-clone' /></a> : null}
                         {onEdit && typeof onEdit == 'string' ?
                             <Link to={onEdit} className='btn btn-primary'><i className='fa fa-lg fa-edit' /></Link> : null}
                         {permission.delete && onDelete ?
@@ -148,7 +150,7 @@ export function renderTable({
 
 export function renderComment({
     renderAvatar = () => null, renderName = () => null, renderContent = () => null, renderTime = () => null, getDataSource = () => null, loadingText = 'Đang tải ...',
-    emptyComment = 'Chưa có phản hồi'
+    emptyComment = 'Chưa có phản hồi', getItemStyle = () => { }
 }) {
     const list = getDataSource();
     if (list == null) {
@@ -183,7 +185,7 @@ export function renderComment({
                         return (
                             <div key={index} style={flexRow}>
                                 <div >{renderAvatar(item)}</div>
-                                <div style={contentStyle}>
+                                <div style={{ ...contentStyle, ...getItemStyle(item) }}>
                                     <div style={{ borderBottom: '1px solid #000000 ', paddingLeft: '5px', ...flexRow }}>
                                         <b style={{ flex: 1 }}>{renderName(item)}</b>
                                         <span>{renderTime(item)}</span>
@@ -199,6 +201,39 @@ export function renderComment({
     } else
         return <b>{emptyComment}</b>;
 }
+
+
+export const renderTimeline = ({
+    className = '', style = {},
+    handleItem = () => ({}), getDataSource = () => null, loadingText = 'Đang tải ...', emptyTimeline = 'Chưa có dữ liệu'
+}) => {
+    const list = getDataSource();
+    if (list == null)
+        return (
+            <div className='overlay' style={{ minHeight: '120px' }}>
+                <div className='m-loader mr-4'>
+                    <svg className='m-circular' viewBox='25 25 50 50'>
+                        <circle className='path' cx='50' cy='50' r='20' fill='none' strokeWidth='4' strokeMiterlimit='10' />
+                    </svg>
+                </div>
+                <h3 className='l-text'>{loadingText}</h3>
+            </div>);
+    else if (list && list.length > 0) {
+        return (
+            <div className={'history-container ' + className} style={style}>
+                <ul className='sessions'>
+                    {list.map((item, index) => {
+                        const { component = null, style = {}, className = '' } = handleItem(item);
+                        return <li key={index} style={style} className={className}>{component}</li>;
+                    })}
+                </ul>
+            </div>
+        );
+    }
+    else {
+        return <b>{emptyTimeline}</b>;
+    }
+};
 
 // Form components ----------------------------------------------------------------------------------------------------
 export class FormTabs extends React.Component {
@@ -229,8 +264,9 @@ export class FormTabs extends React.Component {
         e && e.preventDefault();
         $(`a[href='#${(this.props.id || 'tab')}_${index}${this.randomKey}']`).click();
     }
+
     render() {
-        const { tabClassName = '', contentClassName = '', tabs = [] } = this.props,
+        const { style = {}, tabClassName = '', contentClassName = '', tabs = [] } = this.props,
             id = this.props.id || 'tab',
             tabLinks = [], tabPanes = [];
         tabs.forEach((item, index) => {
@@ -240,10 +276,10 @@ export class FormTabs extends React.Component {
             tabPanes.push(<div key={index} className={'tab-pane fade' + className} id={tabId}>{item.component}</div>);
         });
 
-        return <>
+        return <div style={style}>
             <ul ref={e => this.tabs = e} className={'nav nav-tabs ' + tabClassName}>{tabLinks}</ul>
             <div className={'tab-content ' + contentClassName}>{tabPanes}</div>
-        </>;
+        </div>;
     }
 }
 
@@ -427,7 +463,7 @@ export class FormTextBox extends React.Component {
                 className: 'form-control',
                 placeholder: placeholder || label,
                 value: this.state.value,
-                onChange: e => this.setState({ value: e.target.value }) || (onChange && onChange(e))
+                onChange: e => this.setState({ value: e.target.value }, () => (onChange && onChange(e)))
             };
             if (type == 'password') properties.autoComplete = 'new-password';
             if (type == 'phone') {
@@ -634,10 +670,10 @@ export class FormSelect extends React.Component {
     };
 
     render = () => {
-        const { className = '', style = {}, labelStyle = {}, label = '', multiple = false, readOnly = false, required = false } = this.props;
+        const { className = '', style = {}, labelStyle = {}, label = '', multiple = false, readOnly = false, required = false, readOnlyEmptyText = '' } = this.props;
         return (
             <div className={'form-group admin-form-select ' + className} style={style}>
-                {label ? <label style={labelStyle} onClick={this.focus}>{label}{!readOnly && required ? <span style={{ color: 'red' }}> *</span> : ''}{readOnly ? ':' : ''}</label> : null} {readOnly ? <b>{this.state.valueText}</b> : ''}
+                {label ? <label style={labelStyle} onClick={this.focus}>{label}{!readOnly && required ? <span style={{ color: 'red' }}> *</span> : ''}{readOnly ? ':' : ''}</label> : null} {readOnly ? <b>{this.state.valueText || readOnlyEmptyText}</b> : ''}
                 <div style={{ width: '100%', display: readOnly ? 'none' : 'inline-flex' }}>
                     <select ref={e => this.input = e} multiple={multiple} disabled={readOnly} />
                 </div>
@@ -922,9 +958,9 @@ export class AdminPage extends React.Component {
 
     showAdvanceSearch = () => $(this.advanceSearchBox).addClass('show');
 
-    renderPage = ({ icon, title, subTitle, header, breadcrumb, advanceSearch, content, backRoute, onCreate, onSave, onExport, onImport }) => {
+    renderPage = ({ icon, title, subTitle, header, breadcrumb, advanceSearch, content, backRoute, onCreate, onSave, onExport, onImport, buttons = null }) => {
 
-        let right = 10, createButton, saveButton, exportButton, importButton;
+        let right = 10, createButton, saveButton, exportButton, importButton, customButtons;
         if (onCreate) {
             createButton = <CirclePageButton type='create' onClick={onCreate} style={{ right }} />;
             right += 60;
@@ -941,13 +977,25 @@ export class AdminPage extends React.Component {
             importButton = <CirclePageButton type='import' onClick={onImport} style={{ right }} />;
             right += 60;
         }
+        if (buttons) {
+            if (buttons.length) {
+                customButtons = buttons.map((item, index) => {
+                    right += 60;
+                    return <CirclePageButton key={index} type='custom' customClassName={item.className} customIcon={item.icon} onClick={item.onClick} style={{ right: right - 60 }} />;
+                });
+            }
+            else {
+                customButtons = <CirclePageButton type='custom' customClassName={buttons.className} customIcon={buttons.icon} onClick={buttons.onClick} style={{ right: right }} />;
+                right += 60;
+            }
+        }
 
         return (
             <main className='app-content'>
                 <div className='app-title'>
                     <div>
                         <h1><i className={icon} /> {title}</h1>
-                        <p>{subTitle}</p>
+                        <div>{subTitle}</div>
                     </div>
                     <ul className='app-breadcrumb breadcrumb' style={{ alignItems: 'center' }}>
                         <div style={{ display: 'flex', marginRight: '15px' }} >{header}</div>
@@ -961,7 +1009,7 @@ export class AdminPage extends React.Component {
                 </div>
                 {content}
                 {backRoute ? <CirclePageButton type='back' to={backRoute} /> : null}
-                {importButton} {exportButton} {saveButton} {createButton}
+                {importButton} {exportButton} {saveButton} {createButton} {customButtons}
             </main>);
     }
 

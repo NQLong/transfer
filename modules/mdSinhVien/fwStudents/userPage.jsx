@@ -10,10 +10,10 @@ import { SelectAdapter_DmTonGiaoV2 } from 'modules/mdDanhMuc/dmTonGiao/redux';
 import { SelectAdapter_DmGioiTinhV2 } from 'modules/mdDanhMuc/dmGioiTinh/redux';
 import { SelectAdapter_DmLoaiSinhVienV2 } from 'modules/mdDanhMuc/dmLoaiSinhVien/redux';
 import { SelectAdapter_DmTinhTrangSinhVienV2 } from 'modules/mdDanhMuc/dmTinhTrangSinhVien/redux';
-import { SelectAdapter_DmLoaiHinhDaoTaoV2 } from 'modules/mdDanhMuc/dmLoaiHinhDaoTao/redux';
 import { updateSystemState } from 'modules/_default/_init/reduxSystem';
 import T from 'view/js/common';
 import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
+import { SelectAdapter_DmSvLoaiHinhDaoTao } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
 
 class SinhVienPage extends AdminPage {
     state = { item: null, lastModified: null, image: '' }
@@ -197,7 +197,7 @@ class SinhVienPage extends AdminPage {
                                 postUrl='/user/upload'
                                 uploadType='SinhVienImage'
                                 onSuccess={this.imageChanged}
-                                className='form-group col-md-3'
+                                className='col-md-3 rounded-circle' isProfile={true}
                             />
                             <div className="form-group col-md-9">
                                 <div className="row">
@@ -212,7 +212,7 @@ class SinhVienPage extends AdminPage {
                                     <FormTextBox ref={e => this.maKhoa = e} label='Mã khóa' className='form-group col-md-3' readOnly />
                                     <FormTextBox ref={e => this.maNganh = e} label='Mã ngành' className='form-group col-md-3' readOnly />
                                     <FormTextBox ref={e => this.lop = e} label='Lớp' className='form-group col-md-3' readOnly />
-                                    <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Loại hình đào tạo' className='form-group col-md-4' data={SelectAdapter_DmLoaiHinhDaoTaoV2} readOnly />
+                                    <FormSelect ref={e => this.loaiHinhDaoTao = e} label='Loại hình đào tạo' className='form-group col-md-4' data={SelectAdapter_DmSvLoaiHinhDaoTao} readOnly />
                                     <FormSelect ref={e => this.loaiSinhVien = e} label='Loại sinh viên' className='form-group col-md-4' data={SelectAdapter_DmLoaiSinhVienV2} readOnly />
                                     <FormSelect ref={e => this.tinhTrang = e} label='Tình trạng' className='form-group col-md-4' data={SelectAdapter_DmTinhTrangSinhVienV2} readOnly />
                                 </div>

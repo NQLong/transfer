@@ -2,63 +2,72 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.daoTao,
         menus: {
-            9007: { title: 'Danh sách Môn học', subTitle: 'Của các Khoa/Bộ môn', link: '/user/pdt/mon-hoc', groupIndex: 2, backgroundColor: '#9DE7BE', icon: 'fa-leanpub', color: '#000' },
+            9007: { title: 'Danh sách Môn học', subTitle: 'Của các Khoa/Bộ môn', link: '/user/dao-tao/mon-hoc', groupIndex: 2, backgroundColor: '#9DE7BE', icon: 'fa-leanpub', color: '#000' },
         },
     };
     app.permission.add(
         { name: 'dmMonHoc:read', menu },
-        { name: 'manager:read', menu },
+        { name: 'dmMonHoc:manage', menu },
         { name: 'dmMonHoc:write' },
         { name: 'dmMonHoc:delete' },
         { name: 'dmMonHoc:upload' },
     );
-    app.get('/user/pdt/mon-hoc', app.permission.orCheck('dmMonHoc:read', 'manager:read'), app.templates.admin);
-    app.get('/user/pdt/mon-hoc/upload', app.permission.orCheck('dmMonHoc:read', 'manager:read'), app.templates.admin);
+    app.get('/user/dao-tao/mon-hoc', app.permission.orCheck('dmMonHoc:read', 'manager:read'), app.templates.admin);
+    app.get('/user/dao-tao/mon-hoc/upload', app.permission.orCheck('dmMonHoc:read', 'manager:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/pdt/mon-hoc/page/:pageNumber/:pageSize', app.permission.orCheck('dmMonHoc:read', 'manager:read'), (req, res) => {
+    app.get('/api/dao-tao/mon-hoc/page/:pageNumber/:pageSize', app.permission.orCheck('dmMonHoc:read', 'dmMonHoc:manage'), (req, res) => {
         let pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
-            donVi = req.query.donVi || 'all',
+            donViFilter = req.query.donViFilter,
+            donVi = req.query.donVi ? req.query.donVi : (req.session.user.staff ? req.session.user.staff.maDonVi : null),
             searchTerm = typeof req.query.searchTerm === 'string' ? `%${req.query.searchTerm.toLowerCase()}%` : '',
             statement = 'lower(ten) LIKE :searchTerm',
-            parameter = { searchTerm };
-        if (donVi != 'all') {
+            parameter = { searchTerm },
+            selectedItems = req.query.selectedItems || [];
+
+        if (req.session.user.permissions.includes(['dmMonHoc:read']) && donViFilter) donVi = donViFilter;
+        if (donVi) {
             statement = 'boMon = :donVi AND lower(ten) LIKE :searchTerm';
             parameter.donVi = parseInt(donVi);
+        }
+        if (selectedItems.length) {
+            statement = 'boMon = :donVi AND lower(ten) LIKE :searchTerm AND ma NOT IN (:selectedItems)';
+            parameter.selectedItems = selectedItems;
         }
         let condition = { statement, parameter };
         app.model.dmMonHoc.getPage(pageNumber, pageSize, condition, '*', 'boMon', (error, page) => {
             page.pageCondition = {
-                searchTerm, donVi
+                searchTerm,
+                donViFilter: donViFilter
             };
             res.send({ error, page });
         });
     });
 
-    app.get('/api/pdt/mon-hoc/all', app.permission.orCheck('dmMonHoc:read', 'manager:read'), (req, res) => {
+    app.get('/api/dao-tao/mon-hoc/all', app.permission.orCheck('dmMonHoc:read', 'manager:read'), (req, res) => {
         const condition = req.query.condition || {};
         Object.keys(condition).forEach(key => { condition[key] === '' ? condition[key] = null : ''; });
         app.model.dmMonHoc.getAll(condition, '*', 'ten ASC', (error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/pdt/mon-hoc/item/:ma', app.permission.orCheck('dmMonHoc:read', 'manager:read'), (req, res) => {
+    app.get('/api/dao-tao/mon-hoc/item/:ma', app.permission.orCheck('dmMonHoc:read', 'manager:read'), (req, res) => {
         app.model.dmMonHoc.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
     });
 
-    app.post('/api/pdt/mon-hoc', app.permission.check('dmMonHoc:write'), (req, res) => {
+    app.post('/api/dao-tao/mon-hoc', app.permission.check('dmMonHoc:write'), (req, res) => {
         app.model.dmMonHoc.create(req.body.item, (error, item) => res.send({ error, item }));
     });
 
-    app.put('/api/pdt/mon-hoc', app.permission.check('dmMonHoc:write'), (req, res) => {
+    app.put('/api/dao-tao/mon-hoc', app.permission.check('dmMonHoc:write'), (req, res) => {
         app.model.dmMonHoc.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
-    app.delete('/api/pdt/mon-hoc', app.permission.check('dmMonHoc:delete'), (req, res) => {
+    app.delete('/api/dao-tao/mon-hoc', app.permission.check('dmMonHoc:delete'), (req, res) => {
         app.model.dmMonHoc.delete({ ma: req.body.ma }, errors => res.send({ errors }));
     });
 
-    app.post('/api/pdt/mon-hoc/multiple', app.permission.check('dmMonHoc:write'), (req, res) => {
+    app.post('/api/dao-tao/mon-hoc/multiple', app.permission.check('dmMonHoc:write'), (req, res) => {
         const dmMonHoc = req.body.dmMonHoc, errorList = [];
         for (let i = 0; i <= dmMonHoc.length; i++) {
             if (i == dmMonHoc.length) {
@@ -129,7 +138,7 @@ module.exports = app => {
     });
 
     // Download Template ---------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/pdt/mon-hoc/download-template', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/dao-tao/mon-hoc/download-template', app.permission.check('staff:login'), (req, res) => {
         const workBook = app.excel.create();
         const ws = workBook.addWorksheet('Danh_muc_mon_hoc_Template');
         const defaultColumns = [
@@ -158,4 +167,31 @@ module.exports = app => {
         app.excel.attachment(workBook, res, 'Danh_muc_mon_hoc_Template.xlsx');
     });
 
+    //Phân quyền cho đơn vị ------------------------------------------------------------------------------
+    app.assignRoleHooks.addRoles('daoTao', { id: 'dmMonHoc:manage', text: 'Đào tạo: Quản lý môn học' });
+
+    app.assignRoleHooks.addHook('daoTao', async (req, roles) => {
+        const userPermissions = req.session.user ? req.session.user.permissions : [];
+        if (req.query.nhomRole && req.query.nhomRole == 'daoTao' && userPermissions.includes('manager:write')) {
+            const assignRolesList = app.assignRoleHooks.get('daoTao').map(item => item.id);
+            return roles && roles.length && assignRolesList.contains(roles);
+        }
+    });
+
+    app.permissionHooks.add('staff', 'checkRoleDTQuanLyMonHoc', (user, staff) => new Promise(resolve => {
+        if (staff.donViQuanLy && staff.donViQuanLy.length && user.permissions.includes('faculty:login')) {
+            app.permissionHooks.pushUserPermission(user, 'dmMonHoc:manage');
+        }
+        resolve();
+    }));
+
+    app.permissionHooks.add('assignRole', 'checkRoleDTQuanLyMonHoc', (user, assignRoles) => new Promise(resolve => {
+        const inScopeRoles = assignRoles.filter(role => role.nhomRole == 'daoTao');
+        inScopeRoles.forEach(role => {
+            if (role.tenRole == 'dmMonHoc:manage') {
+                app.permissionHooks.pushUserPermission(user, 'dmMonHoc:manage');
+            }
+        });
+        resolve();
+    }));
 };
