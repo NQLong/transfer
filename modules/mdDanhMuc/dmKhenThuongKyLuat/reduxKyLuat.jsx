@@ -101,7 +101,7 @@ export function createDmKyLuat(item, done) {
                 }
                 console.error(`POST: ${url}.`, data.error);
             } else {
-                T.notify('Tạo khen thưởng thành công!', 'success');
+                T.notify('Tạo hình thức kỷ luật thành công!', 'success');
                 dispatch(getDmKyLuatPage());
                 if (done) done(data);
             }

@@ -9,7 +9,7 @@ module.exports = app => {
     const menuStaff = {
         parentMenu: app.parentMenu.user,
         menus: {
-            1015: { title: 'Đào tạo, bồi dưỡng', subTitle: 'Bằng cấp, chứng nhận, chứng chỉ', link: '/user/dao-tao', icon: 'fa-podcast', color: '#000000', backgroundColor: '#7ae6e6', groupIndex: 0 },
+            1015: { title: 'Đào tạo, bồi dưỡng', subTitle: 'Bằng cấp, chứng nhận, chứng chỉ', link: '/user/qua-trinh-dao-tao-boi-duong', icon: 'fa-podcast', color: '#000000', backgroundColor: '#7ae6e6', groupIndex: 0 },
         },
     };
 
@@ -22,7 +22,7 @@ module.exports = app => {
     app.get('/user/tccb/qua-trinh/dao-tao/:stt', app.permission.check('qtDaoTao:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/dao-tao', app.permission.check('qtDaoTao:read'), app.templates.admin);
     app.get('/user/tccb/qua-trinh/dao-tao/:ma', app.permission.check('qtHocTapCongTac:read'), app.templates.admin);
-    app.get('/user/dao-tao', app.permission.check('staff:login'), app.templates.admin);
+    app.get('/user/qua-trinh-dao-tao-boi-duong', app.permission.check('staff:login'), app.templates.admin);
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     const checkGetStaffPermission = (req, res, next) => app.isDebug ? next() : app.permission.check('staff:login')(req, res, next);
 
@@ -149,7 +149,7 @@ module.exports = app => {
                         cells.push({ cell: 'C' + (index + 2), border: '1234', value: item.hoCanBo });
                         cells.push({ cell: 'D' + (index + 2), border: '1234', value: item.tenCanBo });
                         cells.push({ cell: 'E' + (index + 2), border: '1234', value: item.gioiTinhCanBo == '02' ? 'x' : '' });
-                        cells.push({ cell: 'F' + (index + 2), alignment: 'left', border: '1234', value: item.ngaySinhCanBo ? app.date.dateTimeFormat(new Date(item.ngaySinhCanBo), 'dd/mm/yyyy') : ''});
+                        cells.push({ cell: 'F' + (index + 2), alignment: 'left', border: '1234', value: item.ngaySinhCanBo ? app.date.dateTimeFormat(new Date(item.ngaySinhCanBo), 'dd/mm/yyyy') : '' });
                         cells.push({ cell: 'G' + (index + 2), border: '1234', value: item.tenLoaiBangCap });
                         cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.tenTrinhDo });
                         cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.chuyenNganh });

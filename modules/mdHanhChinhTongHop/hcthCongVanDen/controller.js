@@ -1,6 +1,6 @@
+
 module.exports = (app) => {
-    const CONG_VAN_TYPE = 'DEN';
-    const MA_CHUC_VU_HIEU_TRUONG = '001';
+    const { trangThaiSwitcher, action, CONG_VAN_TYPE, MA_CHUC_VU_HIEU_TRUONG, MA_BAN_GIAM_HIEU, MA_HCTH } = require('./constant');
 
     const menu = {
         parentMenu: app.parentMenu.hcth,
@@ -8,35 +8,19 @@ module.exports = (app) => {
             501: { title: 'Công văn đến', link: '/user/hcth/cong-van-den', icon: 'fa-caret-square-o-left', backgroundColor: '#00aa00' },
         },
     };
-    app.permission.add({ name: 'hcthCongVanDen:read', menu });
+    app.permission.add({ name: 'hcthCongVanDen:read' });
+    app.permission.add({ name: 'staff:login', menu });
     app.permission.add({ name: 'hcthCongVanDen:write' });
     app.permission.add({ name: 'hcthCongVanDen:delete' });
     app.permission.add({ name: 'hcth:login' });
+    app.permission.add({ name: 'hcth:manage' });
 
-    app.get('/user/hcth/cong-van-den', app.permission.check('hcthCongVanDen:read'), app.templates.admin);
-    app.get('/user/hcth/cong-van-den/:id', app.permission.check('hcthCongVanDen:read'), app.templates.admin);
-
+    app.get('/user/hcth/cong-van-den', app.permission.check('staff:login'), app.templates.admin);
+    app.get('/user/hcth/cong-van-den/:id', app.permission.check('staff:login'), app.templates.admin);
 
     //api
-    app.get('/api/hcth/cong-van-den/all', app.permission.check('hcthCongVanDen:read'), (req, res) => {
+    app.get('/api/hcth/cong-van-den/all', app.permission.check('staff:login'), (req, res) => {
         app.model.hcthCongVanDen.getAll((error, items) => res.send({ error, items }));
-    });
-
-    app.get('/api/hcth/cong-van-den/page/:pageNumber/:pageSize', app.permission.check('hcthCongVanDen:read'), (req, res) => {
-        const pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize);
-        let condition = { statement: null };
-        const statement = ['soCongVan', 'noiDung', 'chiDao']
-            .map(i => `lower(${i}) LIKE :searchText`).join(' OR ');
-        if (req.query.condition) {
-            condition = {
-                statement,
-                parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
-            };
-        }
-        app.model.hcthCongVanDen.getPage(pageNumber, pageSize, condition, (error, page) => {
-            res.send({ error, page });
-        });
     });
 
     app.get('/api/hcth/cong-van-den/page/:pageNumber/:pageSize', app.permission.check('hcthCongVanDen:read'), (req, res) => {
@@ -84,8 +68,14 @@ module.exports = (app) => {
                                             createDonViNhanFromList(donViNhan, id, ({ error }) => {
                                                 if (error)
                                                     throw error;
-                                                else
-                                                    res.send({ item });
+                                                else {
+                                                    app.model.hcthHistory.create({ key: id, loai: CONG_VAN_TYPE, hanhDong: action.CREATE, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc }, (error) => {
+                                                        if (error)
+                                                            throw error;
+                                                        else
+                                                            res.send({ error, item });
+                                                    });
+                                                }
                                             });
                                     });
                             });
@@ -149,8 +139,10 @@ module.exports = (app) => {
                 res.send({ errors, item });
             else
                 createChiDaoFromList(chiDao, req.body.id, () => {
-                    app.model.hcthDonViNhanCongVan.delete({ congVan: req.body.id }, () => createDonViNhanFromList(donViNhan?.split(',') || [], req.body.id, () => {
-                        updateListFile(fileList, req.body.id, ({ error }) => res.send({ error, item }));
+                    app.model.hcthDonViNhanCongVan.delete({ congVan: req.body.id }, () => createDonViNhanFromList(donViNhan, req.body.id, () => {
+                        updateListFile(fileList, req.body.id, () => app.model.hcthHistory.create({ key: req.body.id, loai: CONG_VAN_TYPE, hanhDong: action.UPDATE, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc }, (error) => {
+                            res.send({ error, item });
+                        }));
                     })
                     );
                 });
@@ -189,50 +181,59 @@ module.exports = (app) => {
         deleteCongVan(req.body.id, ({ error }) => res.send({ error }));
     });
 
-    const getCurrentPermissions = (req) => (req.session && req.session.user && req.session.user.permissions) || [];
-
-    const getUserPermission = (req, prefix, listPermissions = ['read', 'write', 'delete']) => {
-        const permission = {}, currentPermissions = getCurrentPermissions(req);
-        listPermissions.forEach(item => permission[item] = currentPermissions.includes(`${prefix}:${item}`));
-        return permission;
-    };
 
 
-    app.get('/api/hcth/cong-van-den/search/page/:pageNumber/:pageSize', app.permission.check('hcthCongVanDen:read'), (req, res) => {
-        const
-            obj2Db = { 'ngayHetHan': 'NGAY_HET_HAN', 'ngayNhan': 'NGAY_NHAN', 'tinhTrang': 'TINH_TRANG' },
-            pageNumber = parseInt(req.params.pageNumber),
-            pageSize = parseInt(req.params.pageSize),
-            searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        let { donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, timeType, fromTime, toTime, congVanYear, sortBy, sortType } = (req.query.filter && req.query.filter != '%%%%%%') ? req.query.filter :
-            { donViGuiCongVan: null, donViNhanCongVan: null, canBoNhanCongVan: null, timeType: null, fromTime: null, toTime: null, congVanYear: null };
-        let donViCanBo = '', canBo = '';
+    app.get('/api/hcth/cong-van-den/search/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
+        try {
+            const
+                obj2Db = { 'ngayHetHan': 'NGAY_HET_HAN', 'ngayNhan': 'NGAY_NHAN', 'tinhTrang': 'TINH_TRANG' },
+                pageNumber = parseInt(req.params.pageNumber),
+                pageSize = parseInt(req.params.pageSize),
+                searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+            let { donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, timeType, fromTime, toTime, congVanYear, sortBy, sortType, tab, status = '' } = (req.query.filter && req.query.filter != '%%%%%%') ? req.query.filter :
+                { donViGuiCongVan: null, donViNhanCongVan: null, canBoNhanCongVan: null, timeType: null, fromTime: null, toTime: null, congVanYear: null },
+                donViCanBo = '', canBo = '', tabValue = parseInt(tab);
 
-        const rectorsPermission = getUserPermission(req, 'rectors', ['login']);
-        const hcthPermission = getUserPermission(req, 'hcth', ['login']);
-
-        if (!rectorsPermission.login && !hcthPermission.login) {
+            const user = req.session.user;
+            const permissions = user.permissions;
             donViCanBo = (req.session?.user?.staff?.donViQuanLy || []);
-            donViCanBo = donViCanBo.map(item => item.maDonVi).toString();
+            donViCanBo = donViCanBo.map(item => item.maDonVi).toString() || (permissions.includes('president:login') && MA_BAN_GIAM_HIEU) || '';
             canBo = req.session?.user?.shcc || '';
-        }
 
-        if (congVanYear && Number(congVanYear) > 1900) {
-            timeType = 2;
-            fromTime = new Date(`${congVanYear}-01-01`).getTime();
-            toTime = new Date(`${Number(congVanYear) + 1}-01-01`).getTime();
-        }
-
-        app.model.hcthCongVanDen.searchPage(pageNumber, pageSize, donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, timeType, fromTime, toTime, obj2Db[sortBy] || '', sortType, canBo, donViCanBo, searchTerm, (error, page) => {
-            if (error || page == null) {
-
-                res.send({ error });
-            } else {
-                const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
-                const pageCondition = searchTerm;
-                res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
+            if (tabValue == 0) {
+                if (permissions.includes('rectors:login') || permissions.includes('hcth:login') || (!user.isStaff && !user.isStudent)) {
+                    donViCanBo = '';
+                    canBo = '';
+                }
             }
-        });
+            else if (tabValue == 1) {
+                if (donViCanBo.length) {
+                    canBo = '';
+                } else
+                    donViCanBo = '';
+            } else donViCanBo = '';
+
+
+
+            if (congVanYear && Number(congVanYear) > 1900) {
+                timeType = 2;
+                fromTime = new Date(`${congVanYear}-01-01`).getTime();
+                toTime = new Date(`${Number(congVanYear) + 1}-01-01`).getTime();
+            }
+
+            app.model.hcthCongVanDen.searchPage(pageNumber, pageSize, donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, timeType, fromTime, toTime, obj2Db[sortBy] || '', sortType, canBo, donViCanBo, permissions.includes('rectors:login') ? 1 : permissions.includes('hcth:login') ? 0 : 2, status, searchTerm, (error, page) => {
+                if (error || page == null) {
+
+                    res.send({ error });
+                } else {
+                    const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
+                    const pageCondition = searchTerm;
+                    res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, pageCondition, list } });
+                }
+            });
+        } catch (error) {
+            res.send({ error });
+        }
     });
 
     app.createFolder(app.path.join(app.assetPath, '/congVanDen'));
@@ -295,7 +296,7 @@ module.exports = (app) => {
         });
     });
 
-    app.get('/api/hcth/cong-van-den/download/:id/:fileName', app.permission.check('hcthCongVanDen:read'), (req, res) => {
+    app.get('/api/hcth/cong-van-den/download/:id/:fileName', app.permission.check('staff:login'), (req, res) => {
         const { id, fileName } = req.params;
         const dir = app.path.join(app.assetPath, `/congVanDen/${id}`);
         if (app.fs.existsSync(dir)) {
@@ -307,11 +308,14 @@ module.exports = (app) => {
                 }
             }
         }
-
         res.status(400).send('Không tìm thấy tập tin');
     });
 
-    app.get('/api/hcth/cong-van-den/:id', app.permission.check('hcthCongVanDen:read'), (req, res) => {
+    app.post('/api/hcth/cong-van-den/phan-hoi', app.permission.check('staff:login'), (req, res) => {
+        app.model.hcthPhanHoi.create({ ...req.body.data, loai: CONG_VAN_TYPE }, (error, item) => res.send({ error, item }));
+    });
+
+    app.get('/api/hcth/cong-van-den/:id', app.permission.check('staff:login'), (req, res) => {
         const id = req.params.id;
         app.model.hcthCongVanDen.get({ id }, (error, item) => {
             if (error)
@@ -320,14 +324,107 @@ module.exports = (app) => {
                 app.model.hcthFileCongVan.getAll({ congVan: id, loai: CONG_VAN_TYPE }, '*', 'thoiGian', (fileError, files) => {
                     app.model.hcthChiDao.getCongVanChiDao(id, CONG_VAN_TYPE, (chiDaoError, chiDao) => {
                         app.model.hcthDonViNhanCongVan.getAll({ congVan: id, loai: CONG_VAN_TYPE }, 'donViNhan', 'id', (donViError, donViNhan) => {
-                            res.send({ error: fileError || chiDaoError || donViError, item: { ...item, donViNhan: (donViNhan ? donViNhan.map(item => item.donViNhan) : []).toString(), listFile: files || [], danhSachChiDao: chiDao?.rows || [] } });
+                            app.model.hcthPhanHoi.getAllFrom(id, CONG_VAN_TYPE, (phanHoiError, phanHoi) => {
+                                app.model.hcthHistory.getAllFrom(id, CONG_VAN_TYPE, (historyError, history) => {
+                                    res.send({ error: fileError || chiDaoError || donViError || phanHoiError || historyError, item: { ...item, phanHoi: phanHoi?.rows || [], donViNhan: (donViNhan ? donViNhan.map(item => item.donViNhan) : []).toString(), listFile: files || [], danhSachChiDao: chiDao?.rows || [], history: history?.rows || [] } });
+                                });
+                            });
                         });
                     });
                 });
         });
     });
 
-    app.post('/api/hcth/cong-van-den/chi-dao', app.permission.check('hcthCongVanDen:read'), (req, res) => {
+    app.post('/api/hcth/cong-van-den/chi-dao', app.permission.orCheck('rectors:login', 'hcth:login'), (req, res) => {
         app.model.hcthChiDao.create({ ...req.body.data, loai: CONG_VAN_TYPE }, (error, item) => res.send({ error, item }));
     });
+
+
+    app.get('/api/hcth/cong-van-den/lich-su/:id', app.permission.check('staff:login'), (req, res) => {
+        app.model.hcthHistory.getAllFrom(parseInt(req.params.id), CONG_VAN_TYPE, (error, items) => res.send({ error, items: items?.rows || [] }));
+    });
+
+
+    const updateCongvanDen = (id, changes) => new Promise((resolve, reject) => {
+        app.model.hcthCongVanDen.update({ id }, changes, (error, item) => {
+            if (error)
+                reject(error);
+            else
+                resolve(item);
+        });
+    });
+
+    const getCongVanDen = (id) => new Promise((resolve, reject) => {
+        app.model.hcthCongVanDen.get({ id }, (error, item) => {
+            if (error)
+                reject(error);
+            else
+                resolve(item);
+        });
+    });
+
+    const statusToAction = (before, after) => {
+        switch (after) {
+            case trangThaiSwitcher.CHO_DUYET.id:
+                return action.UPDATE;
+            case trangThaiSwitcher.CHO_PHAN_PHOI.id:
+                if (before == trangThaiSwitcher.TRA_LAI_HCTH)
+                    return action.UPDATE;
+                else
+                    return action.APPROVE;
+            case trangThaiSwitcher.TRA_LAI_HCTH.id:
+            case trangThaiSwitcher.TRA_LAI_BGH.id:
+                return action.RETURN;
+            case trangThaiSwitcher.DA_PHAN_PHOI.id:
+                return action.PUBLISH;
+            default:
+                return '';
+        }
+    };
+
+    app.put('/api/hcth/cong-van-den/status', app.permission.orCheck('rectors:login', 'hcthCongVanDen:write'), async (req, res) => {
+        try {
+            let { id, trangThai } = req.body.data;
+            trangThai = parseInt(trangThai);
+            const congVan = await getCongVanDen(id);
+            if (congVan.trangThai == trangThai || !trangThai) {
+                res.send({ error: null, item: congVan });
+            }
+            else {
+                const newCongVan = await updateCongvanDen(id, { trangThai });
+                await app.model.hcthHistory.createHistory({
+                    key: id, loai: CONG_VAN_TYPE, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc,
+                    hanhDong: statusToAction(congVan.trangThai, trangThai),
+                });
+                res.send({ newCongVan });
+            }
+        } catch (error) {
+            res.send({ error });
+        }
+    });
+
+
+    app.get('/api/hcth/cong-van-den/phan-hoi/:id', app.permission.check('staff:login'), async (req, res) => {
+        try {
+            const id = parseInt(req.params.id);
+            const phanHoi = await app.model.hcthPhanHoi.getPhanHoi(id, CONG_VAN_TYPE);
+            res.send({ error: null, items: phanHoi.items });
+        }
+        catch (error) {
+            res.send({ error });
+        }
+    });
+
+    app.get('/api/hcth/cong-van-den/chi-dao/:id', app.permission.check('staff:login'), async (req, res) => {
+        app.model.hcthChiDao.getCongVanChiDao(parseInt(req.params.id), CONG_VAN_TYPE, (error, items) => res.send({ error, items: items?.rows || [] }));
+    });
+
+    app.assignRoleHooks.addRoles('quanLyHcth', { id: 'hcth:manage', text: 'Công văn: Quản lý phòng hành chính tổng hợp' });
+    app.permissionHooks.add('staff', 'checkQuanLyHcth', (user, staff) => new Promise(resolve => {
+        if (staff.donViQuanLy && staff.donViQuanLy.find(item => item.maDonVi == MA_HCTH)) {
+            app.permissionHooks.pushUserPermission(user, 'hcth:manage');
+        }
+        resolve();
+    }));
+
 };

@@ -147,8 +147,7 @@ class QtBangPhatMinhGroupPage extends AdminPage {
 
 
     render() {
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permission = this.getUserPermission('qtBangPhatMinh', ['read', 'write', 'delete']);
+        const permission = this.getUserPermission('qtBangPhatMinh', ['read', 'write', 'delete', 'readOnly']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.qtBangPhatMinh && this.props.qtBangPhatMinh.pageMa ? this.props.qtBangPhatMinh.pageMa : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = 'Không có danh sách!';
         if (list && list.length > 0) {
@@ -157,21 +156,26 @@ class QtBangPhatMinhGroupPage extends AdminPage {
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br/>Đơn vị công tác</th>
                         <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Tên bằng</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số hiệu</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Năm cấp</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Nơi cấp</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tác giả</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br/>Đơn vị công tác</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
                     </tr>
                 ),
                 renderRow: (item, index) => (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
+                        <TableCell type='text' content={(item.tenBang || '')} />
+                        <TableCell type='text' content={(item.soHieu || '')} />
+                        <TableCell type='text' content={(<span style={{ color: 'blue' }}>{item.namCap}</span>)} />
+                        <TableCell type='text' content={(item.noiCap)} />
+                        <TableCell type='text' content={(item.tacGia)}/>
                         <TableCell type='link' onClick={() => this.modal.show(item)} style={{ whiteSpace: 'nowrap' }} content={(
                             <>
                                 <span>{(item.hoCanBo ? item.hoCanBo.normalizedName() : ' ') + ' ' + (item.tenCanBo ? item.tenCanBo.normalizedName() : ' ')}</span><br />
@@ -186,11 +190,6 @@ class QtBangPhatMinhGroupPage extends AdminPage {
                                 {(item.tenDonVi || '').normalizedName()}
                             </>
                         )} />
-                        <TableCell type='text' content={(item.tenBang || '')} />
-                        <TableCell type='text' content={(item.soHieu || '')} />
-                        <TableCell type='text' content={(<span style={{ color: 'blue' }}>{item.namCap}</span>)} />
-                        <TableCell type='text' content={(item.noiCap)} />
-                        <TableCell type='text' content={(item.tacGia)}/>
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={this.delete} >
                         </TableCell>
@@ -219,8 +218,8 @@ class QtBangPhatMinhGroupPage extends AdminPage {
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
-                <EditModal ref={e => this.modal = e} permission={permission}
-                    permissions={currentPermissions} shcc={this.shcc}
+                <EditModal ref={e => this.modal = e} readOnly={!permission.write}
+                    shcc={this.shcc}
                     create={this.props.createQtBangPhatMinhGroupPageMa} update={this.props.updateQtBangPhatMinhGroupPageMa}
                 />
             </>,

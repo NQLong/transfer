@@ -35,8 +35,8 @@ export default {
             component: () => <SubMenusPage menuLink='/user/library' menuKey={8000} headerIcon='fa-th-large' />
         },
         {
-            path: '/user/pdt',
-            component: () => <SubMenusPage menuLink='/user/pdt' menuKey={7000} headerIcon='fa-diamond' />
+            path: '/user/dao-tao',
+            component: () => <SubMenusPage menuLink='/user/dao-tao' menuKey={7000} headerIcon='fa-diamond' />
         },
         {
             path: '/user/khcn',
