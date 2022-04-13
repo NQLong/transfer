@@ -23,7 +23,7 @@ module.exports = (app) => {
         app.model.hcthCongVanDen.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/hcth/cong-van-den/page/:pageNumber/:pageSize', app.permission.check('hcthCongVanDen:read'), (req, res) => {
+    app.get('/api/hcth/cong-van-den/page/:pageNumber/:pageSize', app.permission.orCheck('hcthCongVanDen:read', 'hcth:manage'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         let condition = { statement: null };
@@ -451,6 +451,22 @@ module.exports = (app) => {
         inScopeRoles.forEach(role => {
             if (role.tenRole == 'hcth:manage') {
                 app.permissionHooks.pushUserPermission(user, 'hcth:manage');
+                app.permissionHooks.pushUserPermission(user, 'hcth:login');
+
+                app.permissionHooks.pushUserPermission(user, 'dmDonVi:read');
+
+                app.permissionHooks.pushUserPermission(user, 'dmDonViGuiCv:read');
+                app.permissionHooks.pushUserPermission(user, 'dmDonViGuiCv:write');
+                app.permissionHooks.pushUserPermission(user, 'dmDonViGuiCv:delete');
+
+                app.permissionHooks.pushUserPermission(user, 'hcthCongVanDen:read');
+                app.permissionHooks.pushUserPermission(user, 'hcthCongVanDen:write');
+                app.permissionHooks.pushUserPermission(user, 'hcthCongVanDen:delete');
+
+                app.permissionHooks.pushUserPermission(user, 'hcthCongVanDi:read');
+                app.permissionHooks.pushUserPermission(user, 'hcthCongVanDi:write');
+                app.permissionHooks.pushUserPermission(user, 'hcthCongVanDi:delete');
+                // app.permissionHooks.pushUserPermission(user, 'staff:read');
             }
         });
         resolve();
