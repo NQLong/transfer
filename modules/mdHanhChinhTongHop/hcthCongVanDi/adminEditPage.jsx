@@ -133,11 +133,6 @@ class AdminEditPage extends AdminPage {
         let { id, trichYeu, ngayGui, ngayKy, donViGui, donViNhan, canBoNhan, donViNhanNgoai, listFile = [], danhSachPhanHoi = [], trangThai, loaiCongVan, noiBo} = data ? data :
             { id: '', trichYeu: '', ngayGui: '', ngayKy: '', donViGui: '', donViNhan: '', canBoNhan: '', donViNhanNgoai, trangThai: '', loaiCongVan: '', noiBo: 1};
         
-        // let lengthDv = this.state.listDonViQuanLy.length;
-        // var donViManager;
-        // if (lengthDv === 1) {
-        //     donViGui = (this.state.listDonViQuanLy[0]);
-        // }
         this.trichYeu.value(trichYeu);
         this.ngayGui.value(ngayGui);
         this.ngayKy.value(ngayKy);
@@ -315,18 +310,6 @@ class AdminEditPage extends AdminPage {
     onSend = () => {
         T.confirm('Thông báo', 'Bạn có chắc chắn muốn gửi công văn này đi không ?', 'warning', true, isConfirm => {
             if (isConfirm) {
-                // if (!this.state.noiBo || (this.state.noiBo && this.donViNhan.value().includes('68'))) {
-                //     const updateData = {
-                //         // id: this.state.id,
-                //         // donViGui: this.donViGui.value(),
-                //         // loaiCongVan: this.loaiCongVan.value(),
-                //         trangThai: '2',
-                //         //isSend: true
-                //     };
-                //     this.props.updateHcthCongVanDi(this.state.id, updateData, () => this.props.history.push('/user/hcth/cong-van-cac-phong'));
-                // } else {
-                //     this.props.updateHcthCongVanDi(this.state.id, { trangThai: '5'}, () => this.props.history.push('/user/hcth/cong-van-cac-phong'));
-                // }
                  if (!this.state.noiBo || (this.state.noiBo && this.donViNhan.value().includes('68'))) {
                     this.props.updateHcthCongVanDi(this.state.id, { trangThai:  '2'}, () => this.props.history.push('/user/hcth/cong-van-cac-phong'));
                 } else {
@@ -447,7 +430,7 @@ class AdminEditPage extends AdminPage {
                                                      Đã đọc
                                                  </button> :
  
-                                                <FormSelect className='col-md-12' ref={e => this.trangThai = e} label='Trạng thái 2' readOnly={true} data={listTrangThaiCv} required />
+                                                <FormSelect className='col-md-12' ref={e => this.trangThai = e} label='Trạng thái' readOnly={true} data={listTrangThaiCv} required />
                                             )
                                             : 
                                             <FormSelect className='col-md-12' ref={e => this.trangThai = e} label='Trạng thái' readOnly={true} data={listTrangThaiCv} required />
