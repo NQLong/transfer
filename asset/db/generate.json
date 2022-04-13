@@ -9467,7 +9467,8 @@
             "moduleName": "qtSangKien",
             "modelName": "qtSangKien",
             "methods": {
-                "QT_SANG_KIEN_SEARCH_PAGE": "searchPage"
+                "QT_SANG_KIEN_SEARCH_PAGE": "searchPage",
+                "QT_SANG_KIEN_DOWNLOAD_EXCEL": "downloadExcel"
             },
             "columns": {
                 "ID": {

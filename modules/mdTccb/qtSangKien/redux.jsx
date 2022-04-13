@@ -153,6 +153,21 @@ export function getQtSangKienGroupPage(pageNumber, pageSize, pageCondition, filt
     };
 }
 
+// Import Page
+export function createMultiQtSangKien(qtSangKien, done) {
+    return () => {
+        const url = '/api/tccb/qua-trinh/sang-kien/multiple';
+        T.post(url, { qtSangKien }, data => {
+            if (data.error && data.error.length) {
+                T.notify('Cập nhật dữ liệu bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                console.error('PUT: ' + url + '. ' + data.error.toString());
+            } else {
+                done && done(data.item);
+            }
+        }, () => T.notify('Cập nhật dữ liệu bị lỗi!', 'danger'));
+    };
+}
+
 // End TCCB Actions -------------------------------------------------------------------------------------------------------------
 
 // User Actions -----------------------------------------------------------------------------------------------------------------
