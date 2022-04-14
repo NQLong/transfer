@@ -36,7 +36,16 @@ class Footer extends React.Component {
                     data.item.filter(i => i.header == 1).map(v => footerData.push(Object.assign({}, v, { childData: [] })));
                     footerData.reverse();
                     data.item.filter(i => i.header == 0).map(v => footerData.filter(d => d.priority <= v.priority)[0].childData.push(v));
-                    this.setState({ footerData: footerData.reverse() });
+                    this.setState({ footerData: footerData.reverse() }, () => {
+                        //Handle loader and paddingFooter
+                        const handlePaddingFooter = () => {
+                            console.log('resize');
+                            const footerHeight = $('footer').outerHeight();
+                            $('#paddingFooterSection').css('padding-bottom', footerHeight + 'px');
+                        };
+                        handlePaddingFooter();
+                        $(window).on('resize', handlePaddingFooter);
+                    });
                 }
             });
         });
@@ -45,6 +54,8 @@ class Footer extends React.Component {
     componentDidUpdate() {
         $('.footer-link h3 i').click(function () {
             $(this).parents('.footer-link').find('ul').slideToggle();
+            $('.home-footer').css('height', '0px');
+            $('#paddingFooterSection').css('padding-bottom', '0px');
         });
     }
 
@@ -344,7 +355,7 @@ class Footer extends React.Component {
             }
         }
         return (
-            <footer className='ftco-footer ftco-section img footer' style={{ paddingBottom: '30px', paddingTop: '30px', backgroundColor: '#0139A6', color: 'white' }}>
+            <footer className='ftco-footer ftco-section img footer home-footer' style={{ position: 'absolute', bottom: 0, width: '100%', paddingBottom: '30px', paddingTop: '30px', backgroundColor: '#0139A6', color: 'white' }}>
                 <div className='container-fluid' >
                     <div className='row justify-content-center'>
                         {footerList}

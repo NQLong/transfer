@@ -140,5 +140,10 @@ module.exports = app => {
             app.database.oracle.connection.main.execute('BEGIN hcth_cong_van_di_update_so_cong_van(:ma, :donvigui, :nam); END;',
                 { ma, donvigui, nam }, done);
         },
+
+        getAllPhanHoi: (idnhiemvu, done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_di_get_all_phan_hoi(:idnhiemvu); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, idnhiemvu }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
+        },
     };
 };

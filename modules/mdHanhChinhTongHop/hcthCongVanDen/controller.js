@@ -23,7 +23,7 @@ module.exports = (app) => {
         app.model.hcthCongVanDen.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/hcth/cong-van-den/page/:pageNumber/:pageSize', app.permission.check('hcthCongVanDen:read'), (req, res) => {
+    app.get('/api/hcth/cong-van-den/page/:pageNumber/:pageSize', app.permission.orCheck('hcthCongVanDen:read', 'hcth:manage'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         let condition = { statement: null };
@@ -42,7 +42,6 @@ module.exports = (app) => {
 
     app.post('/api/hcth/cong-van-den', app.permission.check('hcthCongVanDen:write'), (req, res) => {
         const { fileList, chiDao, quyenChiDao, donViNhan, ...data } = req.body.data;
-        
         const dsCanBoChiDao = quyenChiDao.split(',');
         app.model.qtChucVu.get({ maChucVu: MA_CHUC_VU_HIEU_TRUONG }, (error, hieuTruong) => {
             if (error)
@@ -297,7 +296,7 @@ module.exports = (app) => {
         });
     });
 
-    app.get('/api/hcth/cong-van-den/download/:id/:fileName', app.permission.check('hcthCongVanDen:read'), (req, res) => {
+    app.get('/api/hcth/cong-van-den/download/:id/:fileName', app.permission.check('staff:login'), (req, res) => {
         const { id, fileName } = req.params;
         const dir = app.path.join(app.assetPath, `/congVanDen/${id}`);
         if (app.fs.existsSync(dir)) {
@@ -420,11 +419,31 @@ module.exports = (app) => {
         app.model.hcthChiDao.getCongVanChiDao(parseInt(req.params.id), CONG_VAN_TYPE, (error, items) => res.send({ error, items: items?.rows || [] }));
     });
 
-    app.assignRoleHooks.addRoles('quanLyHcth', { id: 'hcth:manage', text: 'Công văn: Quản lý phòng hành chính tổng hợp' });
-    app.permissionHooks.add('staff', 'checkQuanLyHcth', (user, staff) => new Promise(resolve => {
-        if (staff.donViQuanLy && staff.donViQuanLy.find(item => item.maDonVi == MA_HCTH)) {
+    // Phân quyền cho các đơn vị ------------------------------------------------------------------------------------------------------------------------
+    app.assignRoleHooks.addRoles('quanLyCongVan', { id: 'hcth:manage', text: 'Hành chính - Tổng hợp: Quản lý Công văn' });
+
+    app.assignRoleHooks.addHook('quanLyCongVan', async (req, roles) => {
+        const userPermissions = req.session.user ? req.session.user.permissions : [];
+        if (req.query.nhomRole && req.query.nhomRole == 'quanLyCongVan' && userPermissions.includes('manager:write')) {
+            const assignRolesList = app.assignRoleHooks.get('quanLyCongVan').map(item => item.id);
+            return roles && roles.length && assignRolesList.contains(roles);
+        }
+    });
+
+    app.permissionHooks.add('staff', 'checkRoleQuanLyCongVan', (user, staff) => new Promise(resolve => {
+        if (staff.donViQuanLy && staff.donViQuanLy.length && staff.maDonVi == MA_HCTH) {
             app.permissionHooks.pushUserPermission(user, 'hcth:manage');
         }
+        resolve();
+    }));
+
+    app.permissionHooks.add('assignRole', 'checkRoleQuanLyCongVan', (user, assignRoles) => new Promise(resolve => {
+        const inScopeRoles = assignRoles.filter(role => role.nhomRole == 'quanLyCongVan');
+        inScopeRoles.forEach(role => {
+            if (role.tenRole == 'hcth:manage') {
+                app.permissionHooks.pushUserPermission(user, 'hcth:manage', 'hcth:login', 'dmDonVi:read', 'dmDonViGuiCv:read', 'dmDonViGuiCv:write', 'dmDonViGuiCv:delete', 'hcthCongVanDen:read', 'hcthCongVanDen:write', 'hcthCongVanDen:delete', 'hcthCongVanDi:read', 'hcthCongVanDi:write', 'hcthCongVanDi:delete');
+            }
+        });
         resolve();
     }));
 

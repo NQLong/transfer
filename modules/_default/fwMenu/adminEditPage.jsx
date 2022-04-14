@@ -86,8 +86,8 @@ export class ComponentModal extends React.Component {
             $('#titleCom').css('display', 'block');
             $('#divLinkSeeAll').css('display', 'none');
         } else if (selectedType == 'all companies') {
+            $('#titleCom').css('display', 'block');
             $('#comDisplay').css('display', 'none');
-            $('#titleCom').css('display', 'none');
             $('#divLinkSeeAll').css('display', 'none');
         } else {
             $('#comDisplay').css('display', 'none');
