@@ -29,27 +29,20 @@ module.exports = app => {
 
         if (req.session.user.permissions.includes('dmMonHoc:read') && donViFilter) donVi = donViFilter;
         if (donVi) {
-            statement = 'khoa = :donVi AND (lower(ten) LIKE :searchTerm OR lower(ma) LIKE :searchTerm)';
-            parameter.donVi = parseInt(donVi);
+            statement = 'khoa IN (:donVi) AND (lower(ten) LIKE :searchTerm OR lower(ma) LIKE :searchTerm)';
+            parameter.donVi = donVi;
         }
         if (selectedItems.length) {
-            statement = 'khoa = :donVi AND (lower(ten) LIKE :searchTerm OR lower(ma) LIKE :searchTerm) AND ma NOT IN (:selectedItems)';
+            statement = 'khoa IN (:donVi) AND (lower(ten) LIKE :searchTerm OR lower(ma) LIKE :searchTerm) AND ma NOT IN (:selectedItems)';
             parameter.selectedItems = selectedItems;
         }
         let condition = { statement: `(${statement}) AND MA IS NOT NULL`, parameter };
         app.model.dmMonHoc.getPage(pageNumber, pageSize, condition, '*', 'khoa,ten,ma', (error, page) => {
-            app.model.dmMonHoc.getAll({
-                statement: `(${statement}) AND MA IS NULL`,
-                parameter
-            }, (error, items) => {
-                if (!error && items) {
-                    page.pageCondition = {
-                        searchTerm,
-                        donViFilter: donViFilter
-                    };
-                    res.send({ error, page: app.clone(page, { listPending: items }), });
-                }
-            });
+            page.pageCondition = {
+                searchTerm,
+                donViFilter: donViFilter
+            };
+            res.send({ error, page });
         });
     });
 
@@ -66,7 +59,7 @@ module.exports = app => {
         if (req.session.user.permissions.includes('dmMonHoc:read') && donViFilter) donVi = donViFilter;
         if (donVi) {
             statement = 'khoa = :donVi AND (lower(ten) LIKE :searchTerm OR lower(ma) LIKE :searchTerm)';
-            parameter.donVi = parseInt(donVi);
+            parameter.donVi = donVi;
         }
         if (selectedItems.length) {
             statement = 'khoa = :donVi AND (lower(ten) LIKE :searchTerm OR lower(ma) LIKE :searchTerm) AND ma NOT IN (:selectedItems)';
@@ -79,18 +72,6 @@ module.exports = app => {
                 donViFilter: donViFilter
             };
             res.send({ error, page });
-            // app.model.dmMonHoc.getAll({
-            //     statement: `(${statement}) AND MA IS NULL`,
-            //     parameter
-            // }, (error, items) => {
-            //     if (!error && items) {
-            //         page.pageCondition = {
-            //             searchTerm,
-            //             donViFilter: donViFilter
-            //         };
-            //         res.send({ error, page: app.clone(page, { listPending: items }), });
-            //     }
-            // });
         });
     });
 

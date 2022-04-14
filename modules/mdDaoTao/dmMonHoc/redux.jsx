@@ -213,7 +213,7 @@ export const SelectAdapter_DmMonHocFaculty = (donVi) => {
     };
 };
 
-export const SelectAdapter_DmMonHocFacultyFilter = (donVi, ...selectedItems) => {
+export const SelectAdapter_DmMonHocFacultyFilter = (donVi, selectedItems) => {
     return {
         ajax: true,
         url: '/api/dao-tao/mon-hoc/page/1/20',
