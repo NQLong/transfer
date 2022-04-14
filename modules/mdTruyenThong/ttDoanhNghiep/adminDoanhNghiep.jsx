@@ -19,6 +19,8 @@ class DoanhNghiepAdminPage extends AdminPage {
 
     changeActive = item => this.props.updateDnDoanhNghiep(item.id, { kichHoat: Number(!item.kichHoat) });
 
+    changeActiveTrangTruong = item => this.props.updateDnDoanhNghiep(item.id, { kichHoatTrangTruong: Number(!item.kichHoatTrangTruong) });
+
     delete = (e, item) => {
         e.preventDefault();
         T.confirm('Xóa doanh nghiệp', 'Bạn có muốn xóa doanh nghiệp này không?', true, isConfirm => isConfirm && this.props.deleteDnDoanhNghiep(item.id));
@@ -41,6 +43,7 @@ class DoanhNghiepAdminPage extends AdminPage {
                     <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Quốc gia</th>
                     <th style={{ width: 'auto' }} nowrap='true'>Hình ảnh</th>
                     <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
+                    {permission.read && <th style={{ width: 'auto' }} nowrap='true' >Hiển thị website trường</th>}
                     <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
                 </tr>
             ),
@@ -52,6 +55,7 @@ class DoanhNghiepAdminPage extends AdminPage {
                     <TableCell style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={item.tenQuocGia} />
                     <TableCell type='image' content={item.image || '/img/hcmussh.png'} />
                     <TableCell type='checkbox' content={item.kichHoat} permission={permission} onChanged={() => this.changeActive(item)} />
+                    {permission.read && <TableCell type='checkbox' content={item.kichHoatTrangTruong} permission={permission} onChanged={() => this.changeActiveTrangTruong(item)} />}
                     <TableCell content={item} type='buttons' style={{ textAlign: 'center' }} permission={permission} onEdit={'/user/truyen-thong/doanh-nghiep/edit/' + item.id} onDelete={this.delete}/>
                 </tr>
             ),

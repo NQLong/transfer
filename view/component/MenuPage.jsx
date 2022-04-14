@@ -49,7 +49,7 @@ export default class MenuPage extends React.Component {
             } else if (item.viewType == 'all divisions') {
                 itemView = <fWLoaiDonVi.Section.SectionAllDivision viewId={item.viewId} />;
             } else if (item.viewType == 'all companies') {
-                itemView = <ttDoanhNghiep.Section.SectionHexagonCompany loai={item.viewId} />;
+                itemView = <ttDoanhNghiep.Section.SectionHexagonCompany loai={item.viewId} detail={item.detail} />;
             } else if (item.viewType == 'notification') {
                 itemView = <fwNews.Section.SectionNotification item={item} />;
             } else if (item.viewType == 'admission') {

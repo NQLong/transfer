@@ -1,6 +1,6 @@
-// Table name: DM_MON_HOC { ma, ten, kichHoat, soTinChi, tongSoTiet, soTietLt, soTietTh, soTietTt, soTietTl, soTietDa, soTietLa, tinhChatPhong, tenTiengAnh, boMon, loaiHinh, chuyenhNganh, ghiChu, maCtdt, tenCtdt }
+// Table name: DM_MON_HOC { ma, ten, kichHoat, khoa, tinChiLt, tinChiTh, tietLt, tietTh, tongTiet, tienQuyet, tongTinChi }
 const keys = ['MA'];
-const obj2Db = { 'ma': 'MA', 'ten': 'TEN', 'kichHoat': 'KICH_HOAT', 'soTinChi': 'SO_TIN_CHI', 'tongSoTiet': 'TONG_SO_TIET', 'soTietLt': 'SO_TIET_LT', 'soTietTh': 'SO_TIET_TH', 'soTietTt': 'SO_TIET_TT', 'soTietTl': 'SO_TIET_TL', 'soTietDa': 'SO_TIET_DA', 'soTietLa': 'SO_TIET_LA', 'tinhChatPhong': 'TINH_CHAT_PHONG', 'tenTiengAnh': 'TEN_TIENG_ANH', 'boMon': 'BO_MON', 'loaiHinh': 'LOAI_HINH', 'chuyenhNganh': 'CHUYENH_NGANH', 'ghiChu': 'GHI_CHU', 'maCtdt': 'MA_CTDT', 'tenCtdt': 'TEN_CTDT' };
+const obj2Db = { 'ma': 'MA', 'ten': 'TEN', 'kichHoat': 'KICH_HOAT', 'khoa': 'KHOA', 'tinChiLt': 'TIN_CHI_LT', 'tinChiTh': 'TIN_CHI_TH', 'tietLt': 'TIET_LT', 'tietTh': 'TIET_TH', 'tongTiet': 'TONG_TIET', 'tienQuyet': 'TIEN_QUYET', 'tongTinChi': 'TONG_TIN_CHI' };
 
 module.exports = app => {
     app.model.dmMonHoc = {

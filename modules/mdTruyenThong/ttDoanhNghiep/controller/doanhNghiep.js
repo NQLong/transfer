@@ -59,7 +59,8 @@ module.exports = app => {
     app.post('/api/doi-ngoai/doanh-nghiep', app.permission.orCheck('dnDoanhNghiep:write', 'dnDoanhNghiep:manage'), (req, res) => {
         const user = req.session.user, permissions = user.permissions;
         let newData = req.body.item;
-        if (!permissions.includes('dnOoanhNghiep:write')) { // Chỉ quản lý doanh nghiệp trong đơn vị
+        if (!permissions.includes('dnDoanhNghiep:write')) { // Chỉ quản lý doanh nghiệp trong đơn vị
+            delete newData.kichHoatTrangTruong;
             if (user.maDonVi) newData.donViPhuTrach = user.maDonVi;
             else return res.send({ error: 'Permission denied!' });
         }
@@ -101,10 +102,11 @@ module.exports = app => {
         const changes = req.body.changes, id = req.body.id;
         const user = req.session.user, permissions = user.permissions;
         let updateCondition = { id: req.body.id };
-        if (!permissions.includes('dnOoanhNghiep:write')) { // Chỉ quản lý doanh nghiệp trong đơn vị
+        if (!permissions.includes('dnDoanhNghiep:write')) { // Chỉ quản lý doanh nghiệp trong đơn vị
             if (user.maDonVi) {
                 updateCondition.donViPhuTrach = user.maDonVi;
                 delete changes.donViPhuTrach;
+                delete changes.kichHoatTrangTruong;
             } else return res.send({ error: 'Permission denied!' });
         }
         const updateLoaiDoanhNghiep = (listLoaiDoanhNghiep) => new Promise((resolve, reject) => {
@@ -167,7 +169,11 @@ module.exports = app => {
                         res.send({ duplicateShortName: true });
                     } else {
                         changes.hiddenShortName = hiddenShortName;
-                        app.model.dnDoanhNghiep.update(updateCondition, changes, (error, item) => res.send({ error, item: app.clone(item, { listLV, listLoaiDoanhNghiep }) }));
+                        delete changes.listLoaiDoanhNghiep;
+                        delete changes.linhVucs;
+                        app.model.dnDoanhNghiep.update(updateCondition, changes, (error, item) => {
+                            res.send({ error, item: app.clone(item, { listLV, listLoaiDoanhNghiep }) });
+                        });
                     }
                 });
             } else {
