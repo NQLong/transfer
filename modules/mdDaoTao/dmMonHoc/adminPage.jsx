@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getDmMonHocPage, createDmMonHoc, updateDmMonHoc, deleteDmMonHoc, SelectAdapter_DmMonHocFacultyFilter } from './redux';
+import { getDmMonHocPage, createDmMonHoc, updateDmMonHoc, deleteDmMonHoc, SelectAdapter_DmMonHocFacultyFilter, getDmMonHocPending } from './redux';
 import { Link } from 'react-router-dom';
 import { getDmDonViAll, SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { AdminPage, AdminModal, renderTable, TableCell, FormTextBox, FormCheckbox, FormSelect, FormTabs, FormRichTextBox } from 'view/component/AdminPage';
@@ -109,11 +109,11 @@ class DmMonHocPage extends AdminPage {
         T.ready('/user/dao-tao', () => {
             T.clearSearchBox();
             this.setState({ donViFilter: this.props.system.user.staff?.maDonVi });
-            T.onSearch = (searchText) => this.props.getDmMonHocPage(undefined, undefined, {
-                searchTerm: searchText || '',
-            });
             T.showSearchBox();
             this.props.getDmMonHocPage(undefined, undefined, {
+                searchTerm: ''
+            });
+            this.props.getDmMonHocPending(undefined, undefined, {
                 searchTerm: ''
             });
         });
@@ -136,17 +136,15 @@ class DmMonHocPage extends AdminPage {
             write: permissionDaoTao.write || permissionDaoTao.manage,
             delete: permissionDaoTao.delete || permissionDaoTao.manage
         };
-        const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list, listPending } = this.props.dmMonHoc && this.props.dmMonHoc.page ?
-            this.props.dmMonHoc.page : {
-                pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {
-                    searchTerm: '', donViFilter: this.state.donViFilter
-                }, list: null, listPending: null
-            };
+        const monHoc = this.props.dmMonHoc && this.props.dmMonHoc.page ?
+            this.props.dmMonHoc.page : { pageNumber: 1, pageSize: 25, pageCondition: {}, totalItem: 0, pageTotal: 1, list: null };
+        const monHocPending = this.props.dmMonHocPending && this.props.dmMonHocPending.page ?
+            this.props.dmMonHocPending.page : { pageNumber: 1, pageSize: 25, pageCondition: {}, totalItem: 0, pageTotal: 1, list: null };
         let remark = (item) => (item.ma || item.ma == '') ? '#FFFFFF' : (item.phanHoi ? '#ffdad9' : '#C8F7C8');
-        let tableMonHoc = (list) => renderTable({
+        let tableMonHoc = (props) => renderTable({
             emptyTable: 'Chưa có dữ liệu',
             header: 'thead-light',
-            getDataSource: () => list, stickyHead: false,
+            getDataSource: () => props.list, stickyHead: false,
             renderHead: () => (
                 <>
                     <tr>
@@ -171,7 +169,7 @@ class DmMonHocPage extends AdminPage {
                 </>),
             renderRow: (item, index) => (
                 <tr key={index} style={{ backgroundColor: remark(item) }}>
-                    <TableCell style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
+                    <TableCell style={{ textAlign: 'right' }} content={(props.pageNumber - 1) * props.pageSize + index + 1} />
                     <TableCell type='link' style={{ whiteSpace: 'nowrap' }} content={item.ma || '(Chờ cấp mã)'} onClick={() => this.modal.show(item)} />
                     <TableCell contentClassName='multiple-lines-5' content={<>
                         <a href='#' onClick={e => e.preventDefault() || this.modal.show(item)} ><span style={{ color: 'black' }}>{T.parse(item.ten).vi}</span>< br />
@@ -207,24 +205,31 @@ class DmMonHocPage extends AdminPage {
                     searchTerm: '',
                     donViFilter: value && value.id
                 });
+                this.props.getDmMonHocPending(undefined, undefined, {
+                    searchTerm: '',
+                    donViFilter: value && value.id
+                });
             }} data={SelectAdapter_DmDonViFaculty_V2} allowClear={true} />,
             content: <>
-                <div className='tile'>
+                {(monHocPending.list && monHocPending.list.length > 0) ? <div className='tile'>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <h4 className='tile-title col-8'>Danh sách môn học chờ cấp mã</h4>
+                        <div> <Pagination style={{ position: 'initial' }} pageNumber={monHocPending.pageNumber} pageSize={monHocPending.pageSize} pageCondition={monHocPending.pageCondition} pageTotal={monHocPending.pageTotal} totalItem={monHocPending.totalItem}
+                            getPage={this.props.getDmMonHocPending} /></div>
                     </div>
-                    {tableMonHoc(listPending)}
-                </div>
+                    {tableMonHoc(monHocPending)}
+                </div> : null}
                 <div className='tile'>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <h4 className='tile-title'>Danh sách môn học hiện tại</h4>
-                        <div> <Pagination style={{ position: 'initial' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
+                        <div> <Pagination style={{ position: 'initial' }} pageNumber={monHoc.pageNumber} pageSize={monHoc.pageSize} pageCondition={monHoc.pageCondition} pageTotal={monHoc.pageTotal} totalItem={monHoc.totalItem}
                             getPage={this.props.getDmMonHocPage} /></div>
                     </div>
-                    {tableMonHoc(list)}
+                    {tableMonHoc(monHoc)}
                 </div>
                 <EditModal ref={e => this.modal = e} permission={permissionDaoTao} readOnly={!permission.write}
-                    create={this.props.createDmMonHoc} update={this.props.updateDmMonHoc} khoa={this.state.donViFilter || this.props.system.user.staff?.maDonVi} />
+                    create={this.props.createDmMonHoc} update={this.props.updateDmMonHoc}
+                    khoa={this.state.donViFilter || this.props.system.user.staff?.maDonVi} />
             </>,
             backRoute: '/user/dao-tao',
             onCreate: permission.write ? (e) => this.showModal(e) : null,
@@ -232,6 +237,6 @@ class DmMonHocPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, dmMonHoc: state.daoTao.dmMonHoc, dmMonHocPending: state.daoTao.dmMonHoc });
-const mapActionsToProps = { getDmDonViAll, getDmMonHocPage, createDmMonHoc, updateDmMonHoc, deleteDmMonHoc };
+const mapStateToProps = state => ({ system: state.system, dmMonHoc: state.daoTao.dmMonHoc, dmMonHocPending: state.daoTao.dmMonHocPending });
+const mapActionsToProps = { getDmDonViAll, getDmMonHocPage, createDmMonHoc, updateDmMonHoc, deleteDmMonHoc, getDmMonHocPending };
 export default connect(mapStateToProps, mapActionsToProps)(DmMonHocPage);

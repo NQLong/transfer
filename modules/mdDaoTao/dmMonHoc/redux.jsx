@@ -6,6 +6,7 @@ const DmMonHocUpdate = 'DmMonHoc:Update';
 const DmMonHocDelete = 'DmMonHoc:Delete';
 const DmMonHocCreate = 'DmMonHoc:Create';
 const DmMonHocPendingGet = 'DmMonHocPending:Get';
+const DmMonHocPendingCreate = 'DmMonHocPending:Create';
 
 export function dmMonHoc(state = null, data) {
     switch (data.type) {
@@ -51,7 +52,40 @@ export function dmMonHoc(state = null, data) {
 export function dmMonHocPending(state = null, data) {
     switch (data.type) {
         case DmMonHocPendingGet:
-            return Object.assign({}, state, { list: data.item });
+            return Object.assign({}, state, { page: data.page });
+        case DmMonHocUpdate:
+            if (state) {
+                let updatedPage = Object.assign({}, state.page),
+                    updatedItem = data.item;
+                if (updatedPage) {
+                    updatedPage.list = updatedPage.list.map(item => item.id != updatedItem.id ? item : updatedItem);
+                }
+                return Object.assign({}, state, { page: updatedPage });
+            } else {
+                return null;
+            }
+        case DmMonHocDelete:
+            if (state) {
+                let updatedPage = Object.assign({}, state.page),
+                    deletedItem = data.item;
+                if (updatedPage) {
+                    updatedPage.list = updatedPage.list.filter(item => item.id != deletedItem.id);
+                }
+                return Object.assign({}, state, { page: updatedPage });
+            } else {
+                return null;
+            }
+        case DmMonHocPendingCreate:
+            if (state) {
+                let updatedPage = Object.assign({}, state.page),
+                    createdItem = data.item;
+                if (updatedPage) {
+                    updatedPage.list.unshift(createdItem);
+                }
+                return Object.assign({}, state, { page: updatedPage });
+            } else {
+                return null;
+            }
         default:
             return state;
     }
@@ -75,16 +109,17 @@ export function getDmMonHocPage(pageNumber, pageSize, pageCondition, done) {
         });
     };
 }
-
-export function getDmMonHocPending(pageCondition) {
+T.initPage('monHocPendingPage');
+export function getDmMonHocPending(pageNumber, pageSize, pageCondition) {
+    const page = T.updatePage('monHocPendingPage', pageNumber, pageSize, pageCondition);
     return dispatch => {
-        const url = '/api/dao-tao/mon-hoc-pending';
+        const url = `/api/dao-tao/mon-hoc-pending/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { searchTerm: pageCondition?.searchTerm, donViFilter: pageCondition?.donViFilter }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách môn học chờ cấp mã bị lỗi!', 'danger');
                 console.error(`GET ${url}. ${data.error}`);
             } else {
-                dispatch({ type: DmMonHocPendingGet, item: data.item, listPending: data.listPending });
+                dispatch({ type: DmMonHocPendingGet, page: data.page });
             }
         });
     };
@@ -99,7 +134,8 @@ export function createDmMonHoc(item, done) {
                 console.error(`POST ${url}. ${data.error}`);
             } else {
                 T.notify('Tạo môn học thành công!', 'success');
-                dispatch({ type: DmMonHocCreate, item: data.item });
+                data.item.ma ? dispatch({ type: DmMonHocCreate, item: data.item }) :
+                    dispatch({ type: DmMonHocPendingCreate, item: data.item });
                 if (done) done(data.item);
             }
         });

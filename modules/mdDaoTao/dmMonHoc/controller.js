@@ -53,6 +53,47 @@ module.exports = app => {
         });
     });
 
+    app.get('/api/dao-tao/mon-hoc-pending/page/:pageNumber/:pageSize', app.permission.orCheck('dmMonHoc:read', 'dmMonHoc:manage', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
+        let pageNumber = parseInt(req.params.pageNumber),
+            pageSize = parseInt(req.params.pageSize),
+            donViFilter = req.query.donViFilter,
+            donVi = req.query.donVi ? req.query.donVi : (req.session.user.staff ? req.session.user.staff.maDonVi : null),
+            searchTerm = typeof req.query.searchTerm === 'string' ? `%${req.query.searchTerm.toLowerCase()}%` : '',
+            statement = '(lower(ten) LIKE :searchTerm OR lower(ma) LIKE :searchTerm)',
+            parameter = { searchTerm },
+            selectedItems = (req.query.selectedItems || []).filter(i => i != '' && i);
+
+        if (req.session.user.permissions.includes('dmMonHoc:read') && donViFilter) donVi = donViFilter;
+        if (donVi) {
+            statement = 'khoa = :donVi AND (lower(ten) LIKE :searchTerm OR lower(ma) LIKE :searchTerm)';
+            parameter.donVi = parseInt(donVi);
+        }
+        if (selectedItems.length) {
+            statement = 'khoa = :donVi AND (lower(ten) LIKE :searchTerm OR lower(ma) LIKE :searchTerm) AND ma NOT IN (:selectedItems)';
+            parameter.selectedItems = selectedItems;
+        }
+        let condition = { statement: `(${statement}) AND MA IS NULL`, parameter };
+        app.model.dmMonHoc.getPage(pageNumber, pageSize, condition, '*', 'khoa,ten,ma', (error, page) => {
+            page.pageCondition = {
+                searchTerm,
+                donViFilter: donViFilter
+            };
+            res.send({ error, page });
+            // app.model.dmMonHoc.getAll({
+            //     statement: `(${statement}) AND MA IS NULL`,
+            //     parameter
+            // }, (error, items) => {
+            //     if (!error && items) {
+            //         page.pageCondition = {
+            //             searchTerm,
+            //             donViFilter: donViFilter
+            //         };
+            //         res.send({ error, page: app.clone(page, { listPending: items }), });
+            //     }
+            // });
+        });
+    });
+
     app.get('/api/dao-tao/mon-hoc/all', app.permission.orCheck('dmMonHoc:read', 'manager:read'), (req, res) => {
         const condition = req.query.condition || {};
         Object.keys(condition).forEach(key => { condition[key] === '' ? condition[key] = null : ''; });
