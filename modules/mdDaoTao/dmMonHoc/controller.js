@@ -25,24 +25,31 @@ module.exports = app => {
             searchTerm = typeof req.query.searchTerm === 'string' ? `%${req.query.searchTerm.toLowerCase()}%` : '',
             statement = '(lower(ten) LIKE :searchTerm OR lower(ma) LIKE :searchTerm)',
             parameter = { searchTerm },
-            selectedItems = req.query.selectedItems || [];
+            selectedItems = (req.query.selectedItems || []).filter(i => i != '' && i);
 
-        if (req.session.user.permissions.includes(['dmMonHoc:read']) && donViFilter) donVi = donViFilter;
+        if (req.session.user.permissions.includes('dmMonHoc:read') && donViFilter) donVi = donViFilter;
         if (donVi) {
-            statement = 'boMon = :donVi AND (lower(ten) LIKE :searchTerm OR lower(ma) LIKE :searchTerm)';
+            statement = 'khoa = :donVi AND (lower(ten) LIKE :searchTerm OR lower(ma) LIKE :searchTerm)';
             parameter.donVi = parseInt(donVi);
         }
         if (selectedItems.length) {
-            statement = 'boMon = :donVi AND (lower(ten) LIKE :searchTerm OR lower(ma) LIKE :searchTerm) AND ma NOT IN (:selectedItems)';
+            statement = 'khoa = :donVi AND (lower(ten) LIKE :searchTerm OR lower(ma) LIKE :searchTerm) AND ma NOT IN (:selectedItems)';
             parameter.selectedItems = selectedItems;
         }
-        let condition = { statement, parameter };
-        app.model.dmMonHoc.getPage(pageNumber, pageSize, condition, '*', 'boMon', (error, page) => {
-            page.pageCondition = {
-                searchTerm,
-                donViFilter: donViFilter
-            };
-            res.send({ error, page });
+        let condition = { statement: `(${statement}) AND MA IS NOT NULL`, parameter };
+        app.model.dmMonHoc.getPage(pageNumber, pageSize, condition, '*', 'khoa,ten,ma', (error, page) => {
+            app.model.dmMonHoc.getAll({
+                statement: `(${statement}) AND MA IS NULL`,
+                parameter
+            }, (error, items) => {
+                if (!error && items) {
+                    page.pageCondition = {
+                        searchTerm,
+                        donViFilter: donViFilter
+                    };
+                    res.send({ error, page: app.clone(page, { listPending: items }), });
+                }
+            });
         });
     });
 
@@ -61,11 +68,11 @@ module.exports = app => {
     });
 
     app.put('/api/dao-tao/mon-hoc', app.permission.orCheck('dmMonHoc:write', 'dmMonHoc:manage', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
-        app.model.dmMonHoc.update({ ma: req.body.ma }, req.body.changes, (error, item) => res.send({ error, item }));
+        app.model.dmMonHoc.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
-    app.delete('/api/dao-tao/mon-hoc', app.permission.check('dmMonHoc:delete'), (req, res) => {
-        app.model.dmMonHoc.delete({ ma: req.body.ma }, errors => res.send({ errors }));
+    app.delete('/api/dao-tao/mon-hoc', app.permission.orCheck('dmMonHoc:write', 'dmMonHoc:manage', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
+        app.model.dmMonHoc.delete({ id: req.body.id }, errors => res.send({ errors }));
     });
 
     app.post('/api/dao-tao/mon-hoc/multiple', app.permission.orCheck('dmMonHoc:write', 'dmMonHoc:manage', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
@@ -118,7 +125,7 @@ module.exports = app => {
                         soTietLa = worksheet.getCell('J' + index).value ? worksheet.getCell('J' + index).value.toString().trim() : 0,
                         tinhChatPhong = worksheet.getCell('J' + index).value ? worksheet.getCell('J' + index).value.toString().trim() : '',
                         tenTiengAnh = worksheet.getCell('L' + index).value ? worksheet.getCell('L' + index).value.toString().trim() : '',
-                        boMon = worksheet.getCell('M' + index).value ? worksheet.getCell('M' + index).value.toString().trim() : '',
+                        khoa = worksheet.getCell('M' + index).value ? worksheet.getCell('M' + index).value.toString().trim() : '',
                         loaiHinh = worksheet.getCell('N' + index).value ? worksheet.getCell('N' + index).value.toString().trim() : '',
                         chuyenNganh = worksheet.getCell('O' + index).value ? worksheet.getCell('O' + index).value.toString().trim() : '',
                         ghiChu = worksheet.getCell('P' + index).value ? worksheet.getCell('P' + index).value.toString().trim() : '',
@@ -126,7 +133,7 @@ module.exports = app => {
                         tenCtdt = worksheet.getCell('R' + index).value ? worksheet.getCell('R' + index).value.toString().trim() : '',
                         kichHoat = worksheet.getCell('S' + index).value ? worksheet.getCell('S' + index).value.toString().trim() : '';
                     kichHoat = Number(kichHoat) || 0;
-                    items.push({ ma, ten, soTinChi, tongSoTiet, soTietLt, soTietTh, soTietTt, soTietTl, soTietDa, soTietLa, tinhChatPhong, tenTiengAnh, boMon, loaiHinh, chuyenNganh, maCtdt, tenCtdt, kichHoat, ghiChu });
+                    items.push({ ma, ten, soTinChi, tongSoTiet, soTietLt, soTietTh, soTietTt, soTietTl, soTietDa, soTietLa, tinhChatPhong, tenTiengAnh, khoa, loaiHinh, chuyenNganh, maCtdt, tenCtdt, kichHoat, ghiChu });
                 } else {
                     done({ items });
                     break;
@@ -155,7 +162,7 @@ module.exports = app => {
             { header: 'Số Tiết LA', key: 'soTietLa', width: 15 },
             { header: 'Tính Chất Phòng', key: 'tinhChatPhong', width: 30 },
             { header: 'Tên Tiếng Anh', key: 'tenTiengAnh', width: 40 },
-            { header: 'Khoa - Bộ Môn', key: 'boMon', width: 40 },
+            { header: 'Khoa - Bộ Môn', key: 'khoa', width: 40 },
             { header: 'Loại hình', key: 'loaiHinh', width: 20 },
             { header: 'Chuyên Ngành', key: 'chuyenNganh', width: 20 },
             { header: 'Ghi Chú', key: 'ghiChu', width: 20 },

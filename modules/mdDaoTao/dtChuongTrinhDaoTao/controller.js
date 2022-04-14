@@ -210,7 +210,7 @@ module.exports = app => {
         resolve();
     }));
 
-    app.permissionHooks.add('assignRole', 'checkRoleDTQuanLyMonHoc', (user, assignRoles) => new Promise(resolve => {
+    app.permissionHooks.add('assignRole', 'checkRoleDTQuanLyCTDT', (user, assignRoles) => new Promise(resolve => {
         const inScopeRoles = assignRoles.filter(role => role.nhomRole == 'daoTao');
         inScopeRoles.forEach(role => {
             if (role.tenRole == 'dtChuongTrinhDaoTao:manage') {
