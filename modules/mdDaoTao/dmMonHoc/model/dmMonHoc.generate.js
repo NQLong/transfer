@@ -1,6 +1,6 @@
-// Table name: DM_MON_HOC { ma, ten, kichHoat, khoa, tinChiLt, tinChiTh, tietLt, tietTh, tongTiet, tienQuyet, tongTinChi, id }
+// Table name: DM_MON_HOC { ma, ten, kichHoat, khoa, tinChiLt, tinChiTh, tietLt, tietTh, tongTiet, tienQuyet, tongTinChi, id, phanHoi }
 const keys = ['ID'];
-const obj2Db = { 'ma': 'MA', 'ten': 'TEN', 'kichHoat': 'KICH_HOAT', 'khoa': 'KHOA', 'tinChiLt': 'TIN_CHI_LT', 'tinChiTh': 'TIN_CHI_TH', 'tietLt': 'TIET_LT', 'tietTh': 'TIET_TH', 'tongTiet': 'TONG_TIET', 'tienQuyet': 'TIEN_QUYET', 'tongTinChi': 'TONG_TIN_CHI', 'id': 'ID' };
+const obj2Db = { 'ma': 'MA', 'ten': 'TEN', 'kichHoat': 'KICH_HOAT', 'khoa': 'KHOA', 'tinChiLt': 'TIN_CHI_LT', 'tinChiTh': 'TIN_CHI_TH', 'tietLt': 'TIET_LT', 'tietTh': 'TIET_TH', 'tongTiet': 'TONG_TIET', 'tienQuyet': 'TIEN_QUYET', 'tongTinChi': 'TONG_TIN_CHI', 'id': 'ID', 'phanHoi': 'PHAN_HOI' };
 
 module.exports = app => {
     app.model.dmMonHoc = {
