@@ -32,7 +32,7 @@ class SectionHexagonCompany extends React.Component {
                     }
                     this.onResize(true, () => {
                         this.initItem(companies);
-                        $('footer').fadeOut();
+                        // $('footer').fadeOut();
                         setTimeout(() => this.onResize(false), 750);
                     });
                 }
@@ -44,7 +44,7 @@ class SectionHexagonCompany extends React.Component {
 
     componentWillUnmount() {
         $(window).off('resize');
-        $('footer').fadeIn();
+        // $('footer').fadeIn();
     }
 
     onResize = (initial, done = () => { }) => {
@@ -75,6 +75,7 @@ class SectionHexagonCompany extends React.Component {
         this.boxArea.style.marginLeft = boxMargin + 'px';
 
         if (!initial) {
+            let lastRow = 0;
             const boxElements = this.boxArea.children;
             for (let i = 0; i < boxElements.length; i++) {
                 const item = boxElements[i];
@@ -83,6 +84,7 @@ class SectionHexagonCompany extends React.Component {
                 const polygon = item.children[1];
 
                 const { col, row } = this.getPosition(index + 1, columns);
+                lastRow = row;
                 item.style.width = itemSize + 'px';
                 item.style.height = itemSize + 'px';
                 item.style.top = ((row - 1) * 53 * itemSize / 60) + 'px';
@@ -96,6 +98,9 @@ class SectionHexagonCompany extends React.Component {
 
                 const points = `${itemSize / 2},${itemSize} ${itemSize / 15},${3 * itemSize / 4} ${itemSize / 15},${itemSize / 4} ${itemSize / 2},0 ${14 * itemSize / 15},${itemSize / 4} ${14 * itemSize / 15},${3 * itemSize / 4}`;
                 polygon.setAttribute('points', points);
+
+                const boxHeight = itemSize + ((lastRow - 1) * 53 * itemSize / 60);
+                this.boxArea.style.height = boxHeight + 'px';
             }
         }
 
@@ -170,8 +175,17 @@ class SectionHexagonCompany extends React.Component {
     }
 
     render() {
+        let detail = {};
+        try {
+            detail = this.props.detail ? JSON.parse(this.props.detail) : {};
+        } catch (e) {
+            console.error(e);
+        }
+
+
         return <>
-            <div ref={e => this.boxArea = e} style={{ position: 'relative' }}>
+            <h3 className='text-center homeTitle' style={{ color: '#0139A6', margin: 0, paddingTop: '10px' }}><strong>{detail.valueTitleCom || ''}</strong></h3>
+            <div ref={e => this.boxArea = e} style={{ position: 'relative', marginBottom: '10px' }}>
                 {this.state.boxes}
             </div>
             <div id='tooltip' ref={e => this.tooltipArea = e} style={{ position: 'absolute', display: 'none', background: 'rgba(0, 0, 0, 0.8)', color: '#fff', borderRadius: '5px', padding: '5px 10px' }} />

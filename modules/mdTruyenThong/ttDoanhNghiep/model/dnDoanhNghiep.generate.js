@@ -1,6 +1,6 @@
-// Table name: DN_DOANH_NGHIEP { id, quocGia, tenVietTat, tenDayDu, kichHoat, namThanhLap, theManh, diaChi, email, phone, image, doiTac, hiddenShortName, website, donViPhuTrach, moTa, moTaHopTac, ketQuaHopTac, ghiChu }
+// Table name: DN_DOANH_NGHIEP { id, quocGia, tenVietTat, tenDayDu, kichHoat, namThanhLap, diaChi, email, phone, image, doiTac, hiddenShortName, website, donViPhuTrach, moTa, moTaHopTac, ketQuaHopTac, ghiChu, kichHoatTrangTruong }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'quocGia': 'QUOC_GIA', 'tenVietTat': 'TEN_VIET_TAT', 'tenDayDu': 'TEN_DAY_DU', 'kichHoat': 'KICH_HOAT', 'namThanhLap': 'NAM_THANH_LAP', 'theManh': 'THE_MANH', 'diaChi': 'DIA_CHI', 'email': 'EMAIL', 'phone': 'PHONE', 'image': 'IMAGE', 'doiTac': 'DOI_TAC', 'hiddenShortName': 'HIDDEN_SHORT_NAME', 'website': 'WEBSITE', 'donViPhuTrach': 'DON_VI_PHU_TRACH', 'moTa': 'MO_TA', 'moTaHopTac': 'MO_TA_HOP_TAC', 'ketQuaHopTac': 'KET_QUA_HOP_TAC', 'ghiChu': 'GHI_CHU' };
+const obj2Db = { 'id': 'ID', 'quocGia': 'QUOC_GIA', 'tenVietTat': 'TEN_VIET_TAT', 'tenDayDu': 'TEN_DAY_DU', 'kichHoat': 'KICH_HOAT', 'namThanhLap': 'NAM_THANH_LAP', 'diaChi': 'DIA_CHI', 'email': 'EMAIL', 'phone': 'PHONE', 'image': 'IMAGE', 'doiTac': 'DOI_TAC', 'hiddenShortName': 'HIDDEN_SHORT_NAME', 'website': 'WEBSITE', 'donViPhuTrach': 'DON_VI_PHU_TRACH', 'moTa': 'MO_TA', 'moTaHopTac': 'MO_TA_HOP_TAC', 'ketQuaHopTac': 'KET_QUA_HOP_TAC', 'ghiChu': 'GHI_CHU', 'kichHoatTrangTruong': 'KICH_HOAT_TRANG_TRUONG' };
 
 module.exports = app => {
     app.model.dnDoanhNghiep = {

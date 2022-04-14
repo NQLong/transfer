@@ -7804,7 +7804,8 @@
                 "QT_HOP_DONG_LAO_DONG_SEARCH_PAGE": "searchPage",
                 "DOWNLOAD_HOP_DONG_LAO_DONG": "download",
                 "QT_HOP_DONG_LAO_DONG_GROUP_PAGE": "groupPage",
-                "DOWNLOAD_EXCEL_QT_HOP_DONG_LAO_DONG": "downloadExcel"
+                "DOWNLOAD_EXCEL_QT_HOP_DONG_LAO_DONG": "downloadExcel",
+                "QT_HOP_DONG_GET_MAX_SHCC_BY_DON_VI": "getMaxShccByDonVi"
             },
             "columns": {
                 "LOAI_HOP_DONG": {
@@ -10710,6 +10711,20 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 200
+                },
+                "IS_CVDT": {
+                    "value": "isCvdt",
+                    "dataType": "NUMBER",
+                    "dataDefault": "0",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "IS_HDTN": {
+                    "value": "isHdtn",
+                    "dataType": "NUMBER",
+                    "dataDefault": "0",
+                    "nullable": true,
+                    "size": "1,0"
                 }
             },
             "primaryKeys": [
