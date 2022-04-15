@@ -184,7 +184,6 @@ module.exports = app => {
         }
     });
 
-
     app.delete('/api/doi-ngoai/doanh-nghiep', app.permission.check('dnDoanhNghiep:delete'), (req, res) => {
         app.model.dnLinhVucKinhDoanh.delete({ idDoanhNghiep: req.body.id }, error => {
             if (error) {
@@ -230,7 +229,7 @@ module.exports = app => {
 
     // APIs Home page-----------------------------------------------------------------------------------------------------------------
     app.get('/user/doi-ngoai/doanh-nghiep/item/:id', (req, res) => {
-        app.model.dnDoanhNghiep.get({ id: req.params.id, kichHoat: 1 }, 'id, quocGia, tenVietTat, tenDayDu, linhVucKinhDoanh, moTa, namThanhLap, theManh, diaChi, email, phone, image, website', 'id', (error, item) => {
+        app.model.dnDoanhNghiep.get({ id: req.params.id, kichHoatTrangTruong: 1 }, 'id, quocGia, tenVietTat, tenDayDu, linhVucKinhDoanh, moTa, namThanhLap, diaChi, email, phone, image, website', 'id', (error, item) => {
             if (error || !item) {
                 res.send({ error });
             } else {
@@ -241,15 +240,19 @@ module.exports = app => {
                         } else {
                             if (quocGia) {
                                 item.tenQuocGia = JSON.stringify({ vi: quocGia.tenQuocGia, en: quocGia.country });
-                                if (item.linhVucKinhDoanh) {
-                                    let linhVucKinhDoanh = item.linhVucKinhDoanh.split(',');
-                                    app.model.dnDoanhNghiep.getLinhVucKinhDoanh(linhVucKinhDoanh, (error, tenCacLinhVuc) => {
-                                        item.tenCacLinhVuc = tenCacLinhVuc;
-                                        res.send({ item });
-                                    });
-                                } else {
-                                    res.send({ item });
-                                }
+                                app.model.dnLinhVucKinhDoanh.getAll({ idDoanhNghiep: item.id }, (error, linhVucKinhDoanh) => {
+                                    if (error) res.send({ error });
+                                    else {
+                                        const condition = {
+                                            statement: 'ma IN (:linhVucKinhDoanh)',
+                                            parameter: { linhVucKinhDoanh: (linhVucKinhDoanh || []).map(item => item.linhVuc) }
+                                        };
+                                        app.model.dmLinhVucKinhDoanh.getAll(condition, 'ten', null, (error, items) => {
+                                            item.tenCacLinhVuc = items;
+                                            res.send({ item });
+                                        });
+                                    }
+                                });
                             }
                         }
                     });
@@ -262,7 +265,7 @@ module.exports = app => {
 
     app.get('/user/doi-ngoai/doanh-nghiep/doitac/:hiddenShortName', (req, res) => {
         new Promise((resolve, reject) => {
-            app.model.dnDoanhNghiep.get({ hiddenShortName: req.params.hiddenShortName }, 'id, quocGia, tenVietTat, tenDayDu, moTa, namThanhLap, theManh, diaChi, email, phone, image, website, moTaHopTac, ketQuaHopTac', 'id', (error, item) => {
+            app.model.dnDoanhNghiep.get({ hiddenShortName: req.params.hiddenShortName }, 'id, quocGia, tenVietTat, tenDayDu, moTa, namThanhLap, diaChi, email, phone, image, website, moTaHopTac, ketQuaHopTac', 'id', (error, item) => {
                 if (error || !item) {
                     reject(error);
                 } else {

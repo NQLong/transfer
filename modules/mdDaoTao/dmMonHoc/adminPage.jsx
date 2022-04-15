@@ -1,45 +1,34 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getDmMonHocPage, createDmMonHoc, updateDmMonHoc, deleteDmMonHoc } from './redux';
+import { getDmMonHocPage, createDmMonHoc, updateDmMonHoc, deleteDmMonHoc, SelectAdapter_DmMonHocFacultyFilter, getDmMonHocPending } from './redux';
 import { Link } from 'react-router-dom';
 import { getDmDonViAll, SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
-import { AdminPage, AdminModal, renderTable, TableCell, FormTextBox, FormCheckbox, FormSelect, FormRichTextBox } from 'view/component/AdminPage';
+import { AdminPage, AdminModal, renderTable, TableCell, FormTextBox, FormCheckbox, FormSelect, FormTabs, FormRichTextBox } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
-import { SelectAdapter_DmSvLoaiHinhDaoTao } from 'modules/mdDanhMuc/dmSvLoaiHinhDaoTao/redux';
 
 class EditModal extends AdminModal {
-    state = { active: true, ma: '' };
-
+    listMa = []
     componentDidMount() {
-        $(document).ready(() => this.onShown(() => {
-            !this.ma.value() ? this.ma.focus() : this.ten.focus();
-        }));
+        this.onShown(() => {
+            !this.props.permission.manage ? this.ma.focus() : this.tenVi.focus();
+        });
     }
 
     onShow = (item) => {
-        let { ma, ten, soTinChi, tongSoTiet, soTietLt, soTietTh, soTietTt, soTietTl, soTietDa, soTietLa, tinhChatPhong, tenTiengAnh,
-            boMon, loaiHinh, chuyenNganh, ghiChu, maCtdt, tenCtdt, kichHoat } = item ? item : { ma: '', ten: '', soTinChi: 0, tongSoTiet: 0, soTietLt: 0, soTietTh: 0, soTietTt: 0, soTietTl: 0, soTietDa: 0, soTietLa: 0, tinhChatPhong: '', tenTiengAnh: '', boMon: 0, loaiHinh: '', chuyenNganh: '', ghiChu: '', maCtdt: '', tenCtdt: '', kichHoat: 1 };
-
-        this.ma.value(ma);
-        this.ten.value(ten);
-        this.soTinChi.value(soTinChi);
-        this.tongSoTiet.value(tongSoTiet);
-        this.soTietLt.value(soTietLt);
-        this.soTietTh.value(soTietTh);
-        this.soTietTt.value(soTietTt);
-        this.soTietTl.value(soTietTl);
-        this.soTietDa.value(soTietDa);
-        this.soTietLa.value(soTietLa);
-        this.tinhChatPhong.value(tinhChatPhong || '');
-        this.tenTiengAnh.value(tenTiengAnh || '');
-        this.boMon.value(boMon || (this.props.khoa != 'all' ? this.props.khoa : ''));
-        this.loaiHinh.value(loaiHinh || '');
-        this.chuyenNganh.value(chuyenNganh || '');
-        this.ghiChu.value(ghiChu || '');
-        this.maCtdt.value(maCtdt || '');
-        this.tenCtdt.value(tenCtdt || '');
-        this.kichHoat.value(kichHoat);
-        this.setState({ active: kichHoat == 1, ma: ma });
+        let { ma, ten, tinChiLt, tinChiTh, khoa, kichHoat, tienQuyet, id, phanHoi } = item ? item : { ma: null, ten: null, tinChiLt: 0, tinChiTh: 0, khoa: this.props.khoa, kichHoat: 1, tienQuyet: null, id: null, phanHoi: null };
+        ten = ten && T.parse(ten, { vi: '', en: '' });
+        ma ? this.listMa.push(ma) : this.listMa = [];
+        this.setState({ ma, kichHoat, khoa, id, phanHoi }, () => {
+            this.ma.value(ma || '');
+            this.tenVi.value(ten ? ten.vi : '');
+            this.tenEn.value(ten ? ten.en : '');
+            this.tinChiLt.value(tinChiLt);
+            this.tinChiTh.value(tinChiTh);
+            this.khoa.value(khoa);
+            this.tienQuyet.value(tienQuyet ? tienQuyet.split(',') : []);
+            this.kichHoat.value(kichHoat);
+            this.phanHoi.value(phanHoi);
+        });
 
     };
 
@@ -47,70 +36,61 @@ class EditModal extends AdminModal {
 
     onSubmit = (e) => {
         e.preventDefault();
-        const
-            changes = {
-                ma: this.ma.value(),
-                ten: this.ten.value(),
-                soTinChi: this.soTinChi.value(),
-                tongSoTiet: this.tongSoTiet.value(),
-                soTietLt: this.soTietLt.value(),
-                soTietTh: this.soTietTh.value(),
-                soTietTt: this.soTietTt.value(),
-                soTietTl: this.soTietTl.value(),
-                soTietDa: this.soTietDa.value(),
-                soTietLa: this.soTietLa.value(),
-                tinhChatPhong: this.tinhChatPhong.value(),
-                tenTiengAnh: this.tenTiengAnh.value(),
-                boMon: this.boMon.value(),
-                loaiHinh: this.loaiHinh.value(),
-                chuyenNganh: this.chuyenNganh.value(),
-                ghiChu: this.ghiChu.value(),
-                maCtdt: this.maCtdt.value(),
-                tenCtdt: this.tenCtdt.value(),
-                kichHoat: this.state.active ? '1' : '0',
-            };
-        if (changes.ma == '') {
-            T.notify('Mã môn học bị trống!', 'danger');
-            this.ma.focus();
-        } else if (changes.ten == '') {
-            T.notify('Tên môn học bị trống!', 'danger');
-            this.ten.focus();
-        } else if (changes.soTinChi <= 0) {
+        const changes = {
+            ma: this.ma.value(),
+            ten: T.stringify({
+                vi: this.tenVi.value(),
+                en: this.tenEn.value()
+            }),
+            tinChiLt: this.tinChiLt.value(),
+            tinChiTh: this.tinChiTh.value(),
+            khoa: this.khoa.value(),
+            tienQuyet: this.tienQuyet.value() ? this.tienQuyet.value().join(',') : '',
+            kichHoat: Number(this.kichHoat.value()),
+            phanHoi: this.phanHoi.value()
+        };
+        if (changes.tenVi == '') {
+            T.notify('Tên môn học (tiếng Việt) bị trống!', 'danger');
+            this.tenVi.focus();
+        } else if (changes.tinChiLt + changes.tinChiTh <= 0) {
             T.notify('Số tín chỉ phải lớn hơn 0!', 'danger');
-            this.tongSoTiet.focus();
-        } else if (changes.tongSoTiet <= 0) {
-            T.notify('Tổng số tiết phải lớn hơn 0!', 'danger');
-            this.tongSoTiet.focus();
+            this.tinChiLt.focus();
         } else {
-            this.state.ma ? this.props.update(this.state.ma, changes, this.hide) : this.props.create(changes, this.hide);
+            changes.tongTinChi = changes.tinChiLt + changes.tinChiTh;
+            changes.tietLt = changes.tinChiLt * 15;
+            changes.tietTh = changes.tinChiTh * 30;
+            changes.tongTiet = changes.tietLt + changes.tietTh;
+            this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
         }
     }
 
     render = () => {
         const readOnly = this.props.readOnly;
+        const isDaoTao = this.props.permission.write;
         return this.renderModal({
             title: this.state.ma ? 'Cập nhật môn học' : 'Tạo mới môn học',
-            size: 'elarge',
+            size: 'large',
             body: <div className='row'>
-                <FormTextBox className='col-12' ref={e => this.ma = e} label='Mã môn học' readOnly={this.state.ma ? true : readOnly} placeholder='Mã môn học' required />
-                <FormTextBox className='col-12' ref={e => this.ten = e} label='Tên môn học' readOnly={readOnly} placeholder='Tên môn học' required />
-                <FormTextBox className='col-12' ref={e => this.tenTiengAnh = e} label='Tên tiếng Anh' readOnly={readOnly} placeholder='Tên tiếng Anh' />
-                <FormTextBox type='number' className='col-6' ref={e => this.soTinChi = e} label='Số tín chỉ' readOnly={readOnly} placeholder='Số tín chỉ' required />
-                <FormTextBox type='number' className='col-6' ref={e => this.tongSoTiet = e} label='Tổng số tiết' readOnly={readOnly} placeholder='Tổng số tiết' required />
-                <FormTextBox type='number' className='col-2' ref={e => this.soTietLt = e} label='Số tiết LT' readOnly={readOnly} placeholder='Số tiết LT' required />
-                <FormTextBox type='number' className='col-2' ref={e => this.soTietTh = e} label='Số tiết TH' readOnly={readOnly} placeholder='Số tiết TH' required />
-                <FormTextBox type='number' className='col-2' ref={e => this.soTietTt = e} label='Số tiết TT' readOnly={readOnly} placeholder='Số tiết TT' required />
-                <FormTextBox type='number' className='col-2' ref={e => this.soTietTl = e} label='Số tiết TL' readOnly={readOnly} placeholder='Số tiết TL' required />
-                <FormTextBox type='number' className='col-2' ref={e => this.soTietDa = e} label='Số tiết DA' readOnly={readOnly} placeholder='Số tiết DA' required />
-                <FormTextBox type='number' className='col-2' ref={e => this.soTietLa = e} label='Số tiết LA' readOnly={readOnly} placeholder='Số tiết LA' required />
-                <FormTextBox className='col-12' ref={e => this.tinhChatPhong = e} label='Tính chất phòng' readOnly={readOnly} placeholder='Tính chất phòng' />
-                <FormSelect className='col-12' ref={e => this.boMon = e} data={SelectAdapter_DmDonViFaculty_V2} label='Khoa/Bộ Môn' readOnly={readOnly || this.props.khoa} required />
-                <FormSelect className='col-6' ref={e => this.loaiHinh = e} label='Loại hình' readOnly={readOnly} data={SelectAdapter_DmSvLoaiHinhDaoTao} placeholder='Loại hình' />
-                <FormTextBox className='col-6' ref={e => this.chuyenNganh = e} label='Chuyên ngành' readOnly={readOnly} placeholder='Chuyên ngành' />
-                <FormTextBox className='col-12' ref={e => this.ghiChu = e} label='Ghi chú' readOnly={readOnly} placeholder='Ghi chú' />
-                <FormRichTextBox rows='5' className='col-6' ref={e => this.maCtdt = e} label='Mã CTĐT' readOnly={readOnly} placeholder='Mã CTĐT' />
-                <FormRichTextBox rows='5' className='col-6' ref={e => this.tenCtdt = e} label='Tên CTĐT' readOnly={readOnly} placeholder='Tên CTĐT' />
-                <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }} onChange={value => this.changeKichHoat(value ? 1 : 0)} />
+                <FormTextBox style={{ display: this.state.ma ? 'block' : isDaoTao ? 'block' : 'none' }} className='col-12' ref={e => this.ma = e} label='Mã môn học' readOnly={!isDaoTao} required />
+
+                <div className='col-12'>
+                    <FormTabs tabs={[
+                        {
+                            title: <>Tên môn tiếng Việt  <span style={{ color: 'red' }}>*</span></>,
+                            component: <FormTextBox ref={e => this.tenVi = e} placeholder='Tên ngành (tiếng Việt)' required />
+                        },
+                        {
+                            title: <>Tên môn tiếng Anh</>,
+                            component: <FormTextBox ref={e => this.tenEn = e} placeholder='Tên ngành (tiếng Anh)' />
+                        }
+                    ]} />
+                </div>
+                <FormTextBox type='number' className='col-6' ref={e => this.tinChiLt = e} label='Tín chỉ lý thuyết' readOnly={readOnly} required />
+                <FormTextBox type='number' className='col-6' ref={e => this.tinChiTh = e} label='Tín chỉ thực hành' readOnly={readOnly} required />
+                <FormSelect className='col-12' ref={e => this.khoa = e} data={SelectAdapter_DmDonViFaculty_V2} label='Khoa/Bộ môn' readOnly={!isDaoTao} required onChange={value => this.setState({ khoa: value.id })} />
+                <FormSelect className='col-12' ref={e => this.tienQuyet = e} data={SelectAdapter_DmMonHocFacultyFilter(this.state.khoa, this.listMa)} onChange={value => value ? this.listMa.push(value.id) : []} multiple allowClear label='Danh sách môn tiên quyết' />
+                <FormCheckbox className='col-md-12' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} onChange={value => this.changeKichHoat(value ? 1 : 0)} />
+                <FormRichTextBox style={{ display: isDaoTao ? (!this.state.ma ? 'block' : 'none') : (this.state.phanHoi) ? 'block' : 'none' }} className='col-md-12' ref={e => this.phanHoi = e} label='Phản hồi' readOnly={!isDaoTao} />
             </div>
         });
     }
@@ -129,12 +109,20 @@ class DmMonHocPage extends AdminPage {
         });
         T.ready('/user/dao-tao', () => {
             T.clearSearchBox();
+            T.onSearch = (searchText) => {
+                this.props.getDmMonHocPage(undefined, undefined, {
+                    searchTerm: searchText
+                });
+                this.props.getDmMonHocPending(undefined, undefined, {
+                    searchTerm: searchText
+                });
+            };
             this.setState({ donViFilter: this.props.system.user.staff?.maDonVi });
-            T.onSearch = (searchText) => this.props.getDmMonHocPage(undefined, undefined, {
-                searchTerm: searchText || '',
-            });
             T.showSearchBox();
             this.props.getDmMonHocPage(undefined, undefined, {
+                searchTerm: ''
+            });
+            this.props.getDmMonHocPending(undefined, undefined, {
                 searchTerm: ''
             });
         });
@@ -148,7 +136,7 @@ class DmMonHocPage extends AdminPage {
     delete = (e, item) => {
         e.preventDefault();
         T.confirm('Xóa môn học', 'Bạn có chắc bạn muốn xóa môn học này?', true, isConfirm =>
-            isConfirm && this.props.deleteDmMonHoc(item.ma));
+            isConfirm && this.props.deleteDmMonHoc(item.id));
     }
 
     render() {
@@ -157,59 +145,57 @@ class DmMonHocPage extends AdminPage {
             write: permissionDaoTao.write || permissionDaoTao.manage,
             delete: permissionDaoTao.delete || permissionDaoTao.manage
         };
-        const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmMonHoc && this.props.dmMonHoc.page ?
-            this.props.dmMonHoc.page : {
-                pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {
-                    searchTerm: '', donViFilter: this.state.donViFilter
-                }, list: []
-            };
-
-        let table = renderTable({
-            emptyTable: 'Chưa có dữ liệu môn học',
-            getDataSource: () => list, stickyHead: false,
+        const monHoc = this.props.dmMonHoc && this.props.dmMonHoc.page ?
+            this.props.dmMonHoc.page : { pageNumber: 1, pageSize: 25, pageCondition: {}, totalItem: 0, pageTotal: 1, list: null };
+        const monHocPending = this.props.dmMonHoc && this.props.dmMonHoc.pagePending ?
+            this.props.dmMonHoc.pagePending : { pageNumber: 1, pageSize: 25, pageCondition: {}, totalItem: 0, pageTotal: 1, list: null };
+        let remark = (item) => (item.ma || item.ma == '') ? '#FFFFFF' : (item.phanHoi ? '#ffdad9' : '#C8F7C8');
+        let tableMonHoc = (props) => renderTable({
+            emptyTable: 'Chưa có dữ liệu',
+            header: 'thead-light',
+            getDataSource: () => props.list, stickyHead: false,
             renderHead: () => (
                 <>
                     <tr>
                         <th rowSpan='2' style={{ width: 'auto', textAlign: 'right', verticalAlign: 'middle' }}>#</th>
                         <th rowSpan='2' style={{ width: 'auto', verticalAlign: 'middle' }}>Mã</th>
                         <th rowSpan='2' style={{ width: 'auto', verticalAlign: 'middle' }}>Tên môn học</th>
-                        <th rowSpan='2' style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center', verticalAlign: 'middle' }}>Số tín chỉ</th>
-                        <th rowSpan='2' style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center', verticalAlign: 'middle' }}>Tổng số tiết</th>
-                        <th colSpan='6' rowSpan='1' style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Số tiết
+                        <th colSpan='3' rowSpan='1' style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tín chỉ</th>
+                        <th colSpan='3' rowSpan='1' style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Số tiết
                         </th>
                         <th rowSpan='2' style={{ width: '100%', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Khoa/Bộ môn</th>
-                        <th rowSpan='2' style={{ width: 'auto', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Danh sách CTĐT</th>
                         <th rowSpan='2' style={{ width: 'auto', verticalAlign: 'middle' }} nowrap='true'>Kích hoạt</th>
                         <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Thao tác</th>
                     </tr>
                     <tr>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tổng</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>LT</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>TH</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>TT</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>TL</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>ĐA</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>LA</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tổng</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>LT</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>TH</th>
                     </tr>
                 </>),
             renderRow: (item, index) => (
-                <tr key={index}>
-                    <TableCell style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                    <TableCell type='link' content={item.ma} onClick={() => this.modal.show(item)} />
-                    <TableCell contentClassName='multiple-lines-3' content={item.ten} />
-                    <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTinChi} />
-                    <TableCell type='number' style={{ textAlign: 'center' }} content={item.tongSoTiet} />
-                    <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietLt} />
-                    <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietTh} />
-                    <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietTt} />
-                    <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietTl} />
-                    <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietDa} />
-                    <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietLa} />
-                    <TableCell content={this.donViMapper && this.donViMapper[item.boMon] ? this.donViMapper[item.boMon] : ''} />
-                    <TableCell contentClassName='multiple-lines-4' content={item.tenCtdt?.split(',').map((ctdt, index) => <div key={index}>{ctdt} <br /></div>)} />
-                    < TableCell type='checkbox' content={item.kichHoat} permission={permission}
-                        onChanged={value => this.props.updateDmMonHoc(item.ma, { kichHoat: value ? 1 : 0, })
+                <tr key={index} style={{ backgroundColor: remark(item) }}>
+                    <TableCell style={{ textAlign: 'right' }} content={(props.pageNumber - 1) * props.pageSize + index + 1} />
+                    <TableCell type='link' style={{ whiteSpace: 'nowrap' }} content={item.ma || '(Chờ cấp mã)'} onClick={() => this.modal.show(item)} />
+                    <TableCell contentClassName='multiple-lines-5' content={<>
+                        <a href='#' onClick={e => e.preventDefault() || this.modal.show(item)} ><span style={{ color: 'black' }}>{T.parse(item.ten).vi}</span>< br />
+                            {T.parse(item.ten).en != '' && <span style={{ color: 'blue' }}>{T.parse(item.ten).en}</span>}
+                        </a>
+                    </>} />
+                    <TableCell type='number' style={{ textAlign: 'center' }} content={item.tongTinChi} />
+                    <TableCell type='number' style={{ textAlign: 'center' }} content={item.tinChiLt} />
+                    <TableCell type='number' style={{ textAlign: 'center' }} content={item.tinChiTh} />
+                    <TableCell type='number' style={{ textAlign: 'center' }} content={item.tongTiet} />
+                    <TableCell type='number' style={{ textAlign: 'center' }} content={item.tietLt} />
+                    <TableCell type='number' style={{ textAlign: 'center' }} content={item.tietTh} />
+                    <TableCell content={this.donViMapper && this.donViMapper[item.khoa] ? this.donViMapper[item.khoa] : ''} />
+                    <TableCell type='checkbox' content={item.kichHoat} permission={permission}
+                        onChanged={value => this.props.updateDmMonHoc(item.id, { kichHoat: value ? 1 : 0, })
                         } />
-                    < TableCell type='buttons' content={item} permission={permission}
+                    <TableCell type='buttons' content={item} permission={permission}
                         onEdit={() => this.modal.show(item)} onDelete={this.delete} />
                 </tr >)
         });
@@ -228,13 +214,31 @@ class DmMonHocPage extends AdminPage {
                     searchTerm: '',
                     donViFilter: value && value.id
                 });
+                this.props.getDmMonHocPending(undefined, undefined, {
+                    searchTerm: '',
+                    donViFilter: value && value.id
+                });
             }} data={SelectAdapter_DmDonViFaculty_V2} allowClear={true} />,
             content: <>
-                <div className='tile'>{table}</div>
-                <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                    getPage={this.props.getDmMonHocPage} />
-                <EditModal ref={e => this.modal = e} permission={permission} readOnly={!permission.write}
-                    create={this.props.createDmMonHoc} update={this.props.updateDmMonHoc} khoa={this.state.donViFilter} />
+                {(monHocPending.list && monHocPending.list.length > 0) ? <div className='tile'>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <h4 className='tile-title col-8'>Danh sách môn học chờ cấp mã</h4>
+                        <div> <Pagination style={{ position: 'initial' }} pageNumber={monHocPending.pageNumber} pageSize={monHocPending.pageSize} pageCondition={monHocPending.pageCondition} pageTotal={monHocPending.pageTotal} totalItem={monHocPending.totalItem}
+                            getPage={this.props.getDmMonHocPending} /></div>
+                    </div>
+                    {tableMonHoc(monHocPending)}
+                </div> : null}
+                <div className='tile'>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <h4 className='tile-title'>Danh sách môn học hiện tại</h4>
+                        <div> <Pagination style={{ position: 'initial' }} pageNumber={monHoc.pageNumber} pageSize={monHoc.pageSize} pageCondition={monHoc.pageCondition} pageTotal={monHoc.pageTotal} totalItem={monHoc.totalItem}
+                            getPage={this.props.getDmMonHocPage} /></div>
+                    </div>
+                    {tableMonHoc(monHoc)}
+                </div>
+                <EditModal ref={e => this.modal = e} permission={permissionDaoTao} readOnly={!permission.write}
+                    create={this.props.createDmMonHoc} update={this.props.updateDmMonHoc}
+                    khoa={this.state.donViFilter || this.props.system.user.staff?.maDonVi} />
             </>,
             backRoute: '/user/dao-tao',
             onCreate: permission.write ? (e) => this.showModal(e) : null,
@@ -243,5 +247,5 @@ class DmMonHocPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, dmMonHoc: state.daoTao.dmMonHoc });
-const mapActionsToProps = { getDmDonViAll, getDmMonHocPage, createDmMonHoc, updateDmMonHoc, deleteDmMonHoc };
+const mapActionsToProps = { getDmDonViAll, getDmMonHocPage, createDmMonHoc, updateDmMonHoc, deleteDmMonHoc, getDmMonHocPending };
 export default connect(mapStateToProps, mapActionsToProps)(DmMonHocPage);
