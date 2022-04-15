@@ -230,7 +230,7 @@ module.exports = app => {
 
     // APIs Home page-----------------------------------------------------------------------------------------------------------------
     app.get('/user/doi-ngoai/doanh-nghiep/item/:id', (req, res) => {
-        app.model.dnDoanhNghiep.get({ id: req.params.id, kichHoat: 1 }, 'id, quocGia, tenVietTat, tenDayDu, linhVucKinhDoanh, moTa, namThanhLap, theManh, diaChi, email, phone, image, website', 'id', (error, item) => {
+        app.model.dnDoanhNghiep.get({ id: req.params.id, kichHoat: 1 }, 'id, quocGia, tenVietTat, tenDayDu, linhVucKinhDoanh, moTa, namThanhLap, diaChi, email, phone, image, website', 'id', (error, item) => {
             if (error || !item) {
                 res.send({ error });
             } else {
@@ -262,7 +262,7 @@ module.exports = app => {
 
     app.get('/user/doi-ngoai/doanh-nghiep/doitac/:hiddenShortName', (req, res) => {
         new Promise((resolve, reject) => {
-            app.model.dnDoanhNghiep.get({ hiddenShortName: req.params.hiddenShortName }, 'id, quocGia, tenVietTat, tenDayDu, moTa, namThanhLap, theManh, diaChi, email, phone, image, website, moTaHopTac, ketQuaHopTac', 'id', (error, item) => {
+            app.model.dnDoanhNghiep.get({ hiddenShortName: req.params.hiddenShortName }, 'id, quocGia, tenVietTat, tenDayDu, moTa, namThanhLap, diaChi, email, phone, image, website, moTaHopTac, ketQuaHopTac', 'id', (error, item) => {
                 if (error || !item) {
                     reject(error);
                 } else {
