@@ -11864,13 +11864,6 @@
             "moduleName": "tccbStaffLog",
             "modelName": "tccbStaffLog",
             "columns": {
-                "EMAIL": {
-                    "value": "email",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": false,
-                    "size": 100
-                },
                 "THAO_TAC": {
                     "value": "thaoTac",
                     "dataType": "NVARCHAR2",
@@ -11891,10 +11884,24 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "20,0"
+                },
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_105389\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "EMAIL": {
+                    "value": "email",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 100
                 }
             },
             "primaryKeys": [
-                "EMAIL"
+                "ID"
             ],
             "foreignKeys": [],
             "type": "table"
