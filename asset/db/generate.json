@@ -8457,13 +8457,6 @@
                     "nullable": true,
                     "size": 100
                 },
-                "NGAY_HET_HAN": {
-                    "value": "ngayHetHan",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": false,
-                    "size": "20,0"
-                },
                 "NOI_DUNG": {
                     "value": "noiDung",
                     "dataType": "NVARCHAR2",
@@ -8471,12 +8464,40 @@
                     "nullable": true,
                     "size": 255
                 },
-                "TRANG_THAI": {
-                    "value": "trangThai",
+                "TIEU_DE": {
+                    "value": "tieuDe",
                     "dataType": "NVARCHAR2",
-                    "dataDefault": "null",
-                    "nullable": false,
-                    "size": 5
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 255
+                },
+                "NGAY_BAT_DAU": {
+                    "value": "ngayBatDau",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "NGAY_KET_THUC": {
+                    "value": "ngayKetThuc",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "DO_UU_TIEN": {
+                    "value": "doUuTien",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "5,0"
+                },
+                "NGAY_TAO": {
+                    "value": "ngayTao",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
                 }
             },
             "primaryKeys": [
@@ -12124,6 +12145,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "4,0"
+                },
+                "NGANH": {
+                    "value": "nganh",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
                 }
             },
             "primaryKeys": [
@@ -12487,6 +12515,67 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 4000
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "HCTH_LIEN_KET": {
+            "active": true,
+            "moduleName": "hcthLienKet",
+            "modelName": "hcthLienKet",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_109161\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "LOAI_A": {
+                    "value": "loaiA",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                },
+                "DON_VI_A": {
+                    "value": "donViA",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "10,0"
+                },
+                "KEY_A": {
+                    "value": "keyA",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "10,0"
+                },
+                "DON_VI_B": {
+                    "value": "donViB",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "10,0"
+                },
+                "KEY_B": {
+                    "value": "keyB",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "10,0"
+                },
+                "CHIEU": {
+                    "value": "chieu",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "10,0"
                 }
             },
             "primaryKeys": [

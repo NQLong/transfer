@@ -1,4 +1,4 @@
-let package = require('../../package');
+let appConfig = require('../../package');
 const path = require('path');
 // Variables ==================================================================
 const app = {
@@ -6,11 +6,14 @@ const app = {
     isDebug: !path.join(__dirname, '../../').startsWith('/var/www/'),
     fs: require('fs'), path,
     database: {},
-    publicPath: path.join(__dirname, package.path.public),
-    modulesPath: path.join(__dirname, '../../' + package.path.modules)
+    publicPath: path.join(__dirname, appConfig.path.public),
+    modulesPath: path.join(__dirname, '../../' + appConfig.path.modules)
 };
+
+if (!app.isDebug) appConfig = Object.assign({}, appConfig, require('../../asset/config.json'));
+
 // Configure ==================================================================
-require('../../config/database.oracleDB')(app, package);
+require('../../config/database.oracleDB')(app, appConfig);
 require('../../config/common')(app);
 require('../../config/io')(app);
 require('../../config/lib/excel')(app);
