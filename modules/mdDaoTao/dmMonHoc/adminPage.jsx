@@ -108,6 +108,14 @@ class DmMonHocPage extends AdminPage {
         });
         T.ready('/user/dao-tao', () => {
             T.clearSearchBox();
+            T.onSearch = (searchText) => {
+                this.props.getDmMonHocPage(undefined, undefined, {
+                    searchTerm: searchText
+                });
+                this.props.getDmMonHocPending(undefined, undefined, {
+                    searchTerm: searchText
+                });
+            };
             this.setState({ donViFilter: this.props.system.user.staff?.maDonVi });
             T.showSearchBox();
             this.props.getDmMonHocPage(undefined, undefined, {
