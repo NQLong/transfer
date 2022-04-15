@@ -25,41 +25,61 @@ class EditModal extends AdminModal {
     state = {
         id: null,
         ngayDi: '',
-        ngayVe: '',
+        ngayVe: null,
         dangDienRa: true,
         ngayDiType: 'dd/mm/yyyy',
         ngayVeType: 'dd/mm/yyyy',
+        tiepNhan: false,
+        giaHan: false,
+        mucDich: '',
+        readOnly: false,
     };
+    // Table name: QT_DI_NUOC_NGOAI { id, shcc, quocGia, ngayDi, ngayDiType, ngayVe, ngayVeType, mucDich, noiDung, chiPhi, ghiChu, soQuyetDinh, ngayQuyetDinh, loaiChiPhi, soQdTiepNhan, ngayQdTiepNhan, noiDungTiepNhan, ngayVeNuoc }
 
     onShow = (item) => {
-        let { id, quocGia, ngayDi, ngayDiType, ngayVe, ngayVeType, mucDich, noiDung, chiPhi, ghiChu, soQuyetDinh, ngayQuyetDinh, today } = item && item.item ? item.item : {
-            id: '', quocGia: '', ngayDi: null, ngayDiType: '', ngayVe: null, ngayVeType: '', mucDich: '', noiDung: '', chiPhi: null, ghiChu: '', soQuyetDinh: '', ngayQuyetDinh: null,
+        let { id, quocGia, ngayDi, ngayDiType, ngayVe, ngayVeType, mucDich, noiDung, chiPhi, ghiChu, soQuyetDinh, ngayQuyetDinh, today, soQdTiepNhan, ngayQdTiepNhan, noiDungTiepNhan, ngayVeNuoc } = item && item.item ? item.item : {
+            id: '', quocGia: '', ngayDi: null, ngayDiType: '', ngayVe: null, ngayVeType: '', mucDich: '', noiDung: '', chiPhi: null, ghiChu: '', soQuyetDinh: '', ngayQuyetDinh: null, today: new Date().getTime(), soQdTiepNhan: '', ngayQdTiepNhan: null, noiDungTiepNhan: '', ngayVeNuoc: null,
         };
+
         this.setState({
             id, ngayDiType: ngayDiType ? ngayDiType : 'dd/mm/yyyy',
             ngayVeType: ngayVeType ? ngayVeType : 'dd/mm/yyyy',
             ngayDi, ngayVe,
+            dangDienRa: ngayVe ? (ngayVe == -1 || ngayVe >= today) : true,
+            tiepNhan: soQdTiepNhan ? true : false,
             shcc: item.shcc,
-            dangDienRa: ngayVe ? (ngayVe == -1 || ngayVe >= today) : true
+            giaHan: false,
+            mucDich: mucDich,
+            readOnly: this.props.canEdit,
         }, () => {
             if (quocGia) {
                 quocGia = quocGia.split(',');
                 this.quocGia.value(quocGia);
             } else this.quocGia.value('');
             this.mucDich.value(mucDich);
-            this.noiDung.value(noiDung ? noiDung : '');
-            this.chiPhi.value(chiPhi ? chiPhi : '');
-            this.ghiChu.value(ghiChu ? ghiChu : '');
-            this.soQuyetDinh.value(soQuyetDinh ? soQuyetDinh : '');
-            this.ngayQuyetDinh.value(ngayQuyetDinh ? ngayQuyetDinh : '');
+            this.noiDung.value(noiDung || '');
+            this.chiPhi.value(chiPhi || '');
+            this.ghiChu.value(ghiChu || '');
+            this.soQuyetDinh.value(soQuyetDinh || '');
+            this.ngayQuyetDinh.value(ngayQuyetDinh || '');
 
             this.ngayDiType.setText({ text: ngayDiType ? ngayDiType : 'dd/mm/yyyy' });
-            this.ngayDi.setVal(ngayDi ? ngayDi : '');
+            this.ngayDi.setVal(ngayDi || '');
             this.denNayCheck.value(this.state.dangDienRa);
             this.ngayVeType.setText({ text: ngayVeType ? ngayVeType : 'dd/mm/yyyy' });
             if (this.state.ngayVe) {
                 this.state.ngayVe != -1 && this.ngayVe.setVal(ngayVe);
             } else this.ngayVe.setVal(null);
+            if (this.state.tiepNhan) {
+                this.tiepNhanCheck.value(true);
+                $('#tiepNhan').show();
+            } else {
+                $('#tiepNhan').hide();
+            }
+            this.soQdTiepNhan.value(soQdTiepNhan || '');
+            this.ngayQdTiepNhan.value(ngayQdTiepNhan || '');
+            this.noiDungTiepNhan.value(noiDungTiepNhan || '');
+            this.ngayVeNuoc.value(ngayVeNuoc || '');
         });
     };
 
@@ -78,12 +98,14 @@ class EditModal extends AdminModal {
             ngayDiType: this.state.ngayDiType,
             ngayDi: this.ngayDi.getVal(),
             ngayVeType: this.state.ngayVeType,
-            ngayVe: this.ngayVe.getVal()
+            ngayVe: this.ngayVe.getVal(),
+
+            soQdTiepNhan: this.state.tiepNhan ? this.soQdTiepNhan.value() : null,
+            ngayQdTiepNhan: this.state.tiepNhan ? Number(this.ngayQdTiepNhan.value()) : null,
+            noiDungTiepNhan: this.state.tiepNhan ? this.noiDungTiepNhan.value() : null,
+            ngayVeNuoc: this.state.tiepNhan ? this.ngayVeNuoc.value() : null,
         };
-        if (!changes.shcc) {
-            T.notify('Chưa chọn cán bộ', 'danger');
-            this.shcc.focus();
-        } else if (!this.noiDung.value()) {
+        if (!this.noiDung.value()) {
             T.notify('Nội dung đi nước ngoài trống', 'danger');
             this.noiDung.focus();
         } else if (!this.quocGia.value().length) {
@@ -98,6 +120,9 @@ class EditModal extends AdminModal {
         } else if (this.ngayDi.getVal() > this.ngayVe.getVal()) {
             T.notify('Ngày đi lớn hơn ngày về', 'danger');
             this.ngayDi.focus();
+        } else if (this.state.tiepNhan && !this.soQdTiepNhan.value()) {
+            T.notify('Số quyết định tiếp nhận trống', 'danger');
+            this.soQdTiepNhan.focus();
         } else {
             this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
         }
@@ -107,36 +132,57 @@ class EditModal extends AdminModal {
         this.setState({ dangDienRa: value });
     }
 
+    handleGiaHan = (value) => {
+        if (value) {
+            this.setState({ giaHan: true, readOnly: false }, () => {
+                this.ghiChu.value('Đang chờ gia hạn');
+                this.mucDich.value('16');
+            });
+        } else {
+            this.setState({ giaHan: false, readOnly: true }, () => {
+                this.mucDich.value(this.state.mucDich);
+                this.ghiChu.value('');
+            });
+        }
+    }
+
     render = () => {
-        const readOnly = this.props.readOnly;
+        const readOnly = this.state.readOnly;
         return this.renderModal({
             title: this.state.id ? 'Cập nhật quá trình đi nước ngoài' : 'Tạo mới quá trình đi nước ngoài',
-            size: 'large',
+            size: 'elarge',
             body: <div className='row'>
-                <FormTextBox className='col-md-3' ref={e => this.soQuyetDinh = e} type='text' label='Số quyết định' readOnly={readOnly} />
-                <FormDatePicker className='col-md-3' ref={e => this.ngayQuyetDinh = e} type='date-mask' label='Ngày quyết định' readOnly={readOnly} />
-                <FormSelect className='col-md-6' ref={e => this.mucDich = e} label='Mục đích' data={SelectAdapter_DmMucDichNuocNgoaiV2} />
-                <FormRichTextBox className='col-md-12' ref={e => this.noiDung = e} rows={2} readOnly={readOnly} label='Nội dung' placeholder='Nhập nội dung đi nước ngoài (tối đa 1000 ký tự)' required maxLength={1000} />
-                <FormSelect className='col-md-12' multiple={true} ref={e => this.quocGia = e} label='Quốc gia' data={SelectAdapter_DmQuocGia} required />
-                <FormRichTextBox className='col-md-12' ref={e => this.chiPhi = e} rows={2} type='text' label='Chi phí' readOnly={readOnly} placeholder='Nhập chi phí (tối đa 500 ký tự)' maxLength={500}/>
+                <FormTextBox className='col-md-3' ref={e => this.soQuyetDinh = e} type='text' label='Số quyết định' readOnly={this.props.canEdit} />
+                <FormDatePicker className='col-md-3' ref={e => this.ngayQuyetDinh = e} type='date-mask' label='Ngày quyết định' readOnly={this.props.canEdit} />
+                <FormSelect className='col-md-6' ref={e => this.mucDich = e} label='Mục đích' data={SelectAdapter_DmMucDichNuocNgoaiV2} readOnly={readOnly} />
+                <FormRichTextBox className='col-md-12' ref={e => this.noiDung = e} rows={2} label='Nội dung' placeholder='Nhập nội dung đi nước ngoài (tối đa 1000 ký tự)' required readOnly={this.props.canEdit} />
+                <FormSelect className='col-md-12' multiple={true} ref={e => this.quocGia = e} label='Quốc gia' data={SelectAdapter_DmQuocGia} required readOnly={this.props.canEdit} />
+                <FormTextBox className='col-md-8' ref={e => this.chiPhi = e} rows={2} type='text' label='Chi phí' readOnly={this.props.canEdit} placeholder='Nhập chi phí (tối đa 500 ký tự)'/>
+                <FormTextBox className='col-md-4' ref={e => this.ghiChu = e} type='text' label='Ghi chú' readOnly={this.props.canEdit} />
 
-                <div className='form-group col-md-6'><DateInput ref={e => this.ngayDi = e} placeholder='Ngày đi'
+                <div className='form-group col-md-5'><DateInput ref={e => this.ngayDi = e} placeholder='Ngày đi'
                     label={
                         <div style={{ display: 'flex' }}>Ngày đi (&nbsp; <Dropdown ref={e => this.ngayDiType = e}
                             items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
-                            onSelected={item => this.setState({ ngayDiType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
+                            onSelected={item => this.setState({ ngayDiType: item })} readOnly={this.props.canEdit} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
                     }
-                    type={this.state.ngayDiType ? typeMapper[this.state.ngayDiType] : null} readOnly={readOnly} /></div>
-                <FormCheckbox ref={e => this.denNayCheck = e} label='Đang diễn ra' onChange={this.handleNgayVe} className='form-group col-md-3' />
-                <div className='form-group col-md-6' id='ketThucDate'><DateInput ref={e => this.ngayVe = e} placeholder='Ngày về'
+                    type={this.state.ngayDiType ? typeMapper[this.state.ngayDiType] : null} readOnly={this.props.canEdit} /></div>
+                <FormCheckbox ref={e => this.denNayCheck = e} label='Đang diễn ra' onChange={this.handleNgayVe} className='form-group col-md-2' readOnly={readOnly} />
+                <div className='form-group col-md-5' id='ketThucDate'><DateInput ref={e => this.ngayVe = e} placeholder='Ngày về'
                     label={
                         <div style={{ display: 'flex' }}>{this.state.dangDienRa ? 'Ngày về dự kiến' : 'Ngày về'} (&nbsp; <Dropdown ref={e => this.ngayVeType = e}
                             items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
                             onSelected={item => this.setState({ ngayVeType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
                     }
-                    type={this.state.ngayVeType ? typeMapper[this.state.ngayVeType] : null} /></div>
-
-                <FormTextBox className='col-md-12' ref={e => this.ghiChu = e} type='text' label='Ghi chú' readOnly={readOnly} />
+                    type={this.state.ngayVeType ? typeMapper[this.state.ngayVeType] : null} readOnly={readOnly} /></div>
+                {this.state.tiepNhan && <FormCheckbox label='Đã tiếp nhận' className='form-group col-md-6' ref={e => this.tiepNhanCheck = e} readOnly={true} />}
+                <div className='row form-group col-12' id='tiepNhan'>
+                    <FormTextBox className='col-md-4' ref={e => this.soQdTiepNhan = e} type='text' label='Số quyết định tiếp nhận' readOnly={this.props.canEdit} required />
+                    <FormDatePicker className='col-md-4' ref={e => this.ngayQdTiepNhan = e} type='date-mask' label='Ngày quyết định tiếp nhận' readOnly={this.props.canEdit} />
+                    <FormDatePicker className='col-md-4' ref={e => this.ngayVeNuoc = e} type='date-mask' label='Ngày về nước' readOnly={this.props.canEdit} />
+                    <FormRichTextBox className='col-md-12' ref={e => this.noiDungTiepNhan = e} rows={3} readOnly={this.props.canEdit} label='Nội dung tiếp nhận' placeholder='Nhập nội dung tiếp nhận về nước (tối đa 1000 ký tự)' />
+                </div>
+                {!this.state.tiepNhan && <FormCheckbox label='Bấm vào đây nếu bạn muốn gia hạn' onChange={this.handleGiaHan} className='form-group col-md-6' />}
             </div>
         });
     }
@@ -147,7 +193,7 @@ class QtDiNuocNgoaiUserPage extends AdminPage {
     componentDidMount() {
         T.ready('/user', () => {
             const { shcc } = this.props.system && this.props.system.user ? this.props.system.user : { shcc: '' };
-            this.setState({ filter: { listShcc: shcc, listDv: '', fromYear: null, toYear: null, timeType: 0, tinhTrang: null, loaiHocVi: null, mucDich: null } });
+            this.setState({ filter: { listShcc: shcc, listDv: '', fromYear: null, toYear: null, timeType: null, tinhTrang: null, loaiHocVi: null, mucDich: null } });
             this.getPage();
         });
     }
@@ -175,7 +221,7 @@ class QtDiNuocNgoaiUserPage extends AdminPage {
         let permission = this.getUserPermission('staff', ['login']);
         if (permission.login == true) {
             permission = {
-                write: true,
+                write: false,
                 delete: true
             };
         }
@@ -192,9 +238,9 @@ class QtDiNuocNgoaiUserPage extends AdminPage {
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày quyết định</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Số quyết định</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Nơi đến</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Mục đích</th>
-                        <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Nội dung</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nơi đến</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Mục đích</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Nội dung</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tình trạng</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thao tác</th>
@@ -207,7 +253,7 @@ class QtDiNuocNgoaiUserPage extends AdminPage {
                         <TableCell type='text' content={(<b> {item.soQuyetDinh || ''} </b>)} />
                         <TableCell type='text' style={{color: 'blue'}} content={(item.danhSachQuocGia || '')} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(<b>{item.tenMucDich || ''}</b>)} />
-                        <TableCell type='text' content={(item.noiDung || '')} />
+                        <TableCell type='text' contentClassName='multiple-lines-5' content={(item.noiDung || '')} />
                         <TableCell type='text' content={(
                             <>
                                 {item.ngayDi ? <span style={{ whiteSpace: 'nowrap' }}>Ngày đi: <span style={{ color: 'blue' }}>{item.ngayDi ? T.dateToText(item.ngayDi, item.ngayDiType ? item.ngayDiType : 'dd/mm/yyyy') : ''}</span><br /></span> : null}
@@ -217,7 +263,7 @@ class QtDiNuocNgoaiUserPage extends AdminPage {
                         />
                         <TableCell type='text' content={(
                             <>
-                                <span>{(item.ngayVe == -1 || item.ngayVe >= item.today) ? <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đang diễn ra</span> : <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đã kết thúc</span>}</span>
+                                <span>{item.ngayVe >= item.today ? <span style={{ whiteSpace: 'nowrap' }}><i>Đang ở<br/>nước ngoài</i></span> : item.soQdTiepNhan ? <span style={{ color: 'blue', whiteSpace: 'nowrap' }}> Đã tiếp nhận<br/>về nước</span>: <span style={{ color: 'red', whiteSpace: 'nowrap' }}> Hết hạn và<br/>chưa tiếp nhận </span>} </span>
                             </>
                         )}></TableCell>
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
@@ -238,11 +284,17 @@ class QtDiNuocNgoaiUserPage extends AdminPage {
             ],
             content: <>
                 <div className='tile'>
+                    <h3 className='tile-title'>
+                        Thống kê
+                    </h3>
+                    <b>{'Số lượng: ' + totalItem.toString()}</b>
+                </div>
+                <div className='tile'>
                     {table}
                 </div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />
-                <EditModal ref={e => this.modal = e} shcc={this.shcc} readOnly={!permission.write}
+                <EditModal ref={e => this.modal = e} shcc={this.shcc} canEdit={!permission.write}
                     create={this.props.createQtDiNuocNgoaiUserPage} update={this.props.updateQtDiNuocNgoaiUserPage}
                 />
             </>,

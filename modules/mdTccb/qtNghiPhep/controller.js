@@ -141,21 +141,21 @@ module.exports = app => {
         app.model.qtNghiPhep.getAll(condition, (error, items) => res.send({ error, items }));
     });
     
-    app.post('/api/qua-trinh/nghi-phep', app.permission.check('staff:write'), (req, res) =>
+    app.post('/api/qua-trinh/nghi-phep', app.permission.check('qtNghiPhep:write'), (req, res) =>
         app.model.qtNghiPhep.create(req.body.data, (error, item) => {
             app.tccbSaveCRUD(req.session.user.email, 'C', 'Nghỉ phép');
             res.send({ error, item });
         })
     );
 
-    app.put('/api/qua-trinh/nghi-phep', app.permission.check('staff:write'), (req, res) =>
+    app.put('/api/qua-trinh/nghi-phep', app.permission.check('qtNghiPhep:write'), (req, res) =>
         app.model.qtNghiPhep.update({ id: req.body.id }, req.body.changes, (error, item) => {
             app.tccbSaveCRUD(req.session.user.email, 'U', 'Nghỉ phép');
             res.send({ error, item });
         })
     );
 
-    app.delete('/api/qua-trinh/nghi-phep', app.permission.check('staff:write'), (req, res) =>
+    app.delete('/api/qua-trinh/nghi-phep', app.permission.check('qtNghiPhep:write'), (req, res) =>
         app.model.qtNghiPhep.delete({ id: req.body.id }, (error) => {
             app.tccbSaveCRUD(req.session.user.email, 'D', 'Nghỉ phép');
             res.send(error);

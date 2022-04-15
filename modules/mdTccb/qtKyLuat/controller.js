@@ -134,21 +134,21 @@ module.exports = app => {
         app.model.qtKyLuat.get({ id: req.params.id }, (error, item) => res.send({ error, item }));
     });
 
-    app.post('/api/tccb/qua-trinh/ky-luat', app.permission.check('staff:write'), (req, res) => {
+    app.post('/api/tccb/qua-trinh/ky-luat', app.permission.check('qtKyLuat:write'), (req, res) => {
         app.model.qtKyLuat.create(req.body.data, (error, item) => {
             app.tccbSaveCRUD(req.session.user.email, 'C', 'Kỷ luật');
             res.send({ error, item });
         });
     });
 
-    app.put('/api/tccb/qua-trinh/ky-luat', app.permission.check('staff:write'), (req, res) => {
+    app.put('/api/tccb/qua-trinh/ky-luat', app.permission.check('qtKyLuat:write'), (req, res) => {
         app.model.qtKyLuat.update({ id: req.body.id }, req.body.changes, (error, item) => {
             app.tccbSaveCRUD(req.session.user.email, 'U', 'Kỷ luật');
             res.send({ error, item });
         });
     });
 
-    app.delete('/api/tccb/qua-trinh/ky-luat', app.permission.check('staff:write'), (req, res) => {
+    app.delete('/api/tccb/qua-trinh/ky-luat', app.permission.check('qtKyLuat:write'), (req, res) => {
         app.model.qtKyLuat.delete({ id: req.body.id }, (error) => {
             app.tccbSaveCRUD(req.session.user.email, 'D', 'Kỷ luật');
             res.send(error);
