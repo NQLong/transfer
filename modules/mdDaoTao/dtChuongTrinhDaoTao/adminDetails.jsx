@@ -29,7 +29,7 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                     return;
                 }
                 const maKhoa = this.props.system.user.staff ? this.props.system.user.staff.maDonVi : '';
-                this.khoa.value(maKhoa);
+                this.khoa.value(maKhoa == 33 ? '' : maKhoa);
                 [this.kienThucDaiCuong, this.kienThucCoSoNganh, this.kienThucChuyenNganh, this.kienThucBoTro, this.kienThucLVTN].forEach(e => e.setVal([], maKhoa));
             }
         });
@@ -189,7 +189,7 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                                     }
                                 ]} />
                             </div>
-                            <FormSelect ref={e => this.khoa = e} data={SelectAdapter_DmDonViFaculty_V2} label='Nơi đào tạo' className='col-12' readOnly={this.props.system.user.staff?.maDonVi || false} />
+                            <FormSelect ref={e => this.khoa = e} data={SelectAdapter_DmDonViFaculty_V2} label='Nơi đào tạo' className='col-12' readOnly={this.props.system.user.staff?.maDonVi == 33 ? false : true} />
                         </div>
                     </div>
                 </div>
