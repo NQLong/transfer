@@ -12117,6 +12117,9 @@
             "active": true,
             "moduleName": "dtDanhSachChuyenNganh",
             "modelName": "dtDanhSachChuyenNganh",
+            "methods": {
+                "DT_DANH_SACH_CHUYEN_NGANH_SEARCH_PAGE": "searchPage"
+            },
             "columns": {
                 "ID": {
                     "value": "id",
