@@ -3,12 +3,11 @@
 import Loadable from 'react-loadable';
 import Loading from 'view/component/Loading';
 import { dmMonHoc } from './redux';
-import { dmMonHocPending } from './redux';
 
 export default {
     redux: {
         parent: 'daoTao',
-        reducers: { dmMonHoc, dmMonHocPending }
+        reducers: { dmMonHoc }
     },
     routes: [
         // {

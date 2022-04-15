@@ -138,8 +138,8 @@ class DmMonHocPage extends AdminPage {
         };
         const monHoc = this.props.dmMonHoc && this.props.dmMonHoc.page ?
             this.props.dmMonHoc.page : { pageNumber: 1, pageSize: 25, pageCondition: {}, totalItem: 0, pageTotal: 1, list: null };
-        const monHocPending = this.props.dmMonHocPending && this.props.dmMonHocPending.page ?
-            this.props.dmMonHocPending.page : { pageNumber: 1, pageSize: 25, pageCondition: {}, totalItem: 0, pageTotal: 1, list: null };
+        const monHocPending = this.props.dmMonHoc && this.props.dmMonHoc.pagePending ?
+            this.props.dmMonHoc.pagePending : { pageNumber: 1, pageSize: 25, pageCondition: {}, totalItem: 0, pageTotal: 1, list: null };
         let remark = (item) => (item.ma || item.ma == '') ? '#FFFFFF' : (item.phanHoi ? '#ffdad9' : '#C8F7C8');
         let tableMonHoc = (props) => renderTable({
             emptyTable: 'Chưa có dữ liệu',
@@ -237,6 +237,6 @@ class DmMonHocPage extends AdminPage {
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, dmMonHoc: state.daoTao.dmMonHoc, dmMonHocPending: state.daoTao.dmMonHocPending });
+const mapStateToProps = state => ({ system: state.system, dmMonHoc: state.daoTao.dmMonHoc });
 const mapActionsToProps = { getDmDonViAll, getDmMonHocPage, createDmMonHoc, updateDmMonHoc, deleteDmMonHoc, getDmMonHocPending };
 export default connect(mapStateToProps, mapActionsToProps)(DmMonHocPage);

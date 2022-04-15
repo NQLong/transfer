@@ -6,42 +6,53 @@ const DmMonHocUpdate = 'DmMonHoc:Update';
 const DmMonHocDelete = 'DmMonHoc:Delete';
 const DmMonHocCreate = 'DmMonHoc:Create';
 const DmMonHocPendingGet = 'DmMonHocPending:Get';
-const DmMonHocPendingCreate = 'DmMonHocPending:Create';
 
 export function dmMonHoc(state = null, data) {
     switch (data.type) {
         case DmMonHocGetPage:
             return Object.assign({}, state, { page: data.page });
+        case DmMonHocPendingGet:
+            return Object.assign({}, state, { pagePending: data.page });
         case DmMonHocUpdate:
             if (state) {
                 let updatedPage = Object.assign({}, state.page),
+                    updatedPending = Object.assign({}, state.pagePending),
                     updatedItem = data.item;
-                if (updatedPage) {
-                    updatedPage.list = updatedPage.list.map(item => item.id != updatedItem.id ? item : updatedItem);
+                if (updatedPage && updatedItem.ma) {
+                    if (updatedPage.list.some(monHoc => monHoc.ma == updatedItem.ma)) {
+                        updatedPage.list = updatedPage.list.map(item => item.id != updatedItem.id ? item : updatedItem);
+                    } else {
+                        updatedPage.list.unshift(updatedItem);
+                    }
+                    updatedPending.list = updatedPending.list.filter(item => item.id != updatedItem.id);
                 }
-                return Object.assign({}, state, { page: updatedPage });
+                if (updatedPending && !updatedItem.ma) {
+                    updatedPending.list = updatedPending.list.map(item => item.id != updatedItem.id ? item : updatedItem);
+                    updatedPage.list = updatedPage.list.filter(item => item.id != updatedItem.id);
+                }
+                return Object.assign({}, state, { page: updatedPage, pagePending: updatedPending });
             } else {
                 return null;
             }
         case DmMonHocDelete:
             if (state) {
                 let updatedPage = Object.assign({}, state.page),
+                    updatedPending = Object.assign({}, state.pagePending),
                     deletedItem = data.item;
-                if (updatedPage) {
-                    updatedPage.list = updatedPage.list.filter(item => item.id != deletedItem.id);
-                }
-                return Object.assign({}, state, { page: updatedPage });
+                if (updatedPage) updatedPage.list = updatedPage.list.filter(item => item.id != deletedItem.id);
+                if (updatedPending) updatedPending.list = updatedPending.list.filter(item => item.id != deletedItem.id);
+                return Object.assign({}, state, { page: updatedPage, pagePending: updatedPending });
             } else {
                 return null;
             }
         case DmMonHocCreate:
             if (state) {
                 let updatedPage = Object.assign({}, state.page),
+                    updatedPending = Object.assign({}, state.pagePending),
                     createdItem = data.item;
-                if (updatedPage) {
-                    updatedPage.list.unshift(createdItem);
-                }
-                return Object.assign({}, state, { page: updatedPage });
+                updatedPage && createdItem.ma && updatedPage.list.unshift(createdItem);
+                updatedPending && !createdItem.ma && updatedPending && updatedPending.list.unshift(createdItem);
+                return Object.assign({}, state, { page: updatedPage, pagePending: updatedPending });
             } else {
                 return null;
             }
@@ -49,48 +60,6 @@ export function dmMonHoc(state = null, data) {
             return state;
     }
 }
-export function dmMonHocPending(state = null, data) {
-    switch (data.type) {
-        case DmMonHocPendingGet:
-            return Object.assign({}, state, { page: data.page });
-        case DmMonHocUpdate:
-            if (state) {
-                let updatedPage = Object.assign({}, state.page),
-                    updatedItem = data.item;
-                if (updatedPage) {
-                    updatedPage.list = updatedPage.list.map(item => item.id != updatedItem.id ? item : updatedItem);
-                }
-                return Object.assign({}, state, { page: updatedPage });
-            } else {
-                return null;
-            }
-        case DmMonHocDelete:
-            if (state) {
-                let updatedPage = Object.assign({}, state.page),
-                    deletedItem = data.item;
-                if (updatedPage) {
-                    updatedPage.list = updatedPage.list.filter(item => item.id != deletedItem.id);
-                }
-                return Object.assign({}, state, { page: updatedPage });
-            } else {
-                return null;
-            }
-        case DmMonHocPendingCreate:
-            if (state) {
-                let updatedPage = Object.assign({}, state.page),
-                    createdItem = data.item;
-                if (updatedPage) {
-                    updatedPage.list.unshift(createdItem);
-                }
-                return Object.assign({}, state, { page: updatedPage });
-            } else {
-                return null;
-            }
-        default:
-            return state;
-    }
-}
-
 // Actions ------------------------------------------------------------------------------------------------------------
 
 T.initPage('pageDmMonHoc');
@@ -134,8 +103,8 @@ export function createDmMonHoc(item, done) {
                 console.error(`POST ${url}. ${data.error}`);
             } else {
                 T.notify('Tạo môn học thành công!', 'success');
-                data.item.ma ? dispatch({ type: DmMonHocCreate, item: data.item }) :
-                    dispatch({ type: DmMonHocPendingCreate, item: data.item });
+                dispatch({ type: DmMonHocCreate, item: data.item });
+                // dispatch({ type: DmMonHocPendingCreate, item: data.item });
                 if (done) done(data.item);
             }
         });
