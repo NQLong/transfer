@@ -25,7 +25,7 @@ module.exports = app => {
             searchTerm = typeof req.query.searchTerm === 'string' ? `%${req.query.searchTerm.toLowerCase()}%` : '',
             statement = '(lower(ten) LIKE :searchTerm OR lower(ma) LIKE :searchTerm)',
             parameter = { searchTerm },
-            selectedItems = (req.query.selectedItems || []).filter(i => i != '' && i);
+            selectedItems = req.query.selectedItems ? (Array.isArray(req.query.selectedItems) ? (req.query.selectedItems || []).filter(i => i != '' && i) : [req.query.selectedItems]) : [];
 
         if (req.session.user.permissions.includes('dmMonHoc:read') && donViFilter) donVi = donViFilter;
         if (donVi) {

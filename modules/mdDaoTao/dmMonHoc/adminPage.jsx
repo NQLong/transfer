@@ -7,7 +7,7 @@ import { AdminPage, AdminModal, renderTable, TableCell, FormTextBox, FormCheckbo
 import Pagination from 'view/component/Pagination';
 
 class EditModal extends AdminModal {
-
+    listMa = []
     componentDidMount() {
         this.onShown(() => {
             !this.props.permission.manage ? this.ma.focus() : this.tenVi.focus();
@@ -17,6 +17,7 @@ class EditModal extends AdminModal {
     onShow = (item) => {
         let { ma, ten, tinChiLt, tinChiTh, khoa, kichHoat, tienQuyet, id, phanHoi } = item ? item : { ma: null, ten: null, tinChiLt: 0, tinChiTh: 0, khoa: this.props.khoa, kichHoat: 1, tienQuyet: null, id: null, phanHoi: null };
         ten = ten && T.parse(ten, { vi: '', en: '' });
+        ma ? this.listMa.push(ma) : this.listMa = [];
         this.setState({ ma, kichHoat, khoa, id, phanHoi }, () => {
             this.ma.value(ma || '');
             this.tenVi.value(ten ? ten.vi : '');
@@ -87,7 +88,7 @@ class EditModal extends AdminModal {
                 <FormTextBox type='number' className='col-6' ref={e => this.tinChiLt = e} label='Tín chỉ lý thuyết' readOnly={readOnly} required />
                 <FormTextBox type='number' className='col-6' ref={e => this.tinChiTh = e} label='Tín chỉ thực hành' readOnly={readOnly} required />
                 <FormSelect className='col-12' ref={e => this.khoa = e} data={SelectAdapter_DmDonViFaculty_V2} label='Khoa/Bộ môn' readOnly={!isDaoTao} required onChange={value => this.setState({ khoa: value.id })} />
-                <FormSelect className='col-12' ref={e => this.tienQuyet = e} data={SelectAdapter_DmMonHocFacultyFilter(this.state.khoa, this.state.ma)} multiple allowClear label='Danh sách môn tiên quyết' />
+                <FormSelect className='col-12' ref={e => this.tienQuyet = e} data={SelectAdapter_DmMonHocFacultyFilter(this.state.khoa, this.listMa)} onChange={value => value ? this.listMa.push(value.id) : []} multiple allowClear label='Danh sách môn tiên quyết' />
                 <FormCheckbox className='col-md-12' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} onChange={value => this.changeKichHoat(value ? 1 : 0)} />
                 <FormRichTextBox style={{ display: isDaoTao ? (!this.state.ma ? 'block' : 'none') : (this.state.phanHoi) ? 'block' : 'none' }} className='col-md-12' ref={e => this.phanHoi = e} label='Phản hồi' readOnly={!isDaoTao} />
             </div>
