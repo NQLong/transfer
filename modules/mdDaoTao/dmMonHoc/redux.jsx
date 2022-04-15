@@ -1,67 +1,58 @@
 import T from 'view/js/common';
 
 // Reducer ------------------------------------------------------------------------------------------------------------
-const DmMonHocGetAll = 'DmMonHoc:GetAll';
 const DmMonHocGetPage = 'DmMonHoc:GetPage';
 const DmMonHocUpdate = 'DmMonHoc:Update';
 const DmMonHocDelete = 'DmMonHoc:Delete';
 const DmMonHocCreate = 'DmMonHoc:Create';
+const DmMonHocPendingGet = 'DmMonHocPending:Get';
 
-export default function dmMonHocReducer(state = null, data) {
+export function dmMonHoc(state = null, data) {
     switch (data.type) {
-        case DmMonHocGetAll:
-            return Object.assign({}, state, { items: data.items });
         case DmMonHocGetPage:
             return Object.assign({}, state, { page: data.page });
+        case DmMonHocPendingGet:
+            return Object.assign({}, state, { pagePending: data.page });
         case DmMonHocUpdate:
             if (state) {
-                let updatedItems = Object.assign({}, state.items),
-                    updatedPage = Object.assign({}, state.page),
+                let updatedPage = Object.assign({}, state.page),
+                    updatedPending = Object.assign({}, state.pagePending),
                     updatedItem = data.item;
-                if (updatedItems) {
-                    for (let i = 0, n = updatedItems.length; i < n; i++) {
-                        if (updatedItems[i].ma == updatedItem.ma) {
-                            updatedItems.splice(i, 1, updatedItem);
-                            break;
-                        }
+                if (updatedPage && updatedItem.ma) {
+                    if (updatedPage.list.some(monHoc => monHoc.ma == updatedItem.ma)) {
+                        updatedPage.list = updatedPage.list.map(item => item.id != updatedItem.id ? item : updatedItem);
+                    } else {
+                        updatedPage.list.unshift(updatedItem);
                     }
+                    updatedPending.list = updatedPending.list.filter(item => item.id != updatedItem.id);
                 }
-                if (updatedPage) {
-                    for (let i = 0, n = updatedPage.list.length; i < n; i++) {
-                        if (updatedPage.list[i].ma == updatedItem.ma) {
-                            updatedPage.list.splice(i, 1);
-                            break;
-                        }
-                    }
+                if (updatedPending && !updatedItem.ma) {
+                    updatedPending.list = updatedPending.list.map(item => item.id != updatedItem.id ? item : updatedItem);
+                    updatedPage.list = updatedPage.list.filter(item => item.id != updatedItem.id);
                 }
-                return Object.assign({}, state, { items: updatedItems, page: updatedPage });
+                return Object.assign({}, state, { page: updatedPage, pagePending: updatedPending });
             } else {
                 return null;
             }
         case DmMonHocDelete:
             if (state) {
                 let updatedPage = Object.assign({}, state.page),
+                    updatedPending = Object.assign({}, state.pagePending),
                     deletedItem = data.item;
-                if (updatedPage) {
-                    for (let i = 0, n = updatedPage.list.length; i < n; i++) {
-                        if (updatedPage.list[i].ma == deletedItem.ma) {
-                            updatedPage.list.splice(i, 1, deletedItem);
-                            break;
-                        }
-                    }
-                }
-                return Object.assign({}, state, { page: updatedPage });
+                if (updatedPage) updatedPage.list = updatedPage.list.filter(item => item.id != deletedItem.id);
+                if (updatedPending) updatedPending.list = updatedPending.list.filter(item => item.id != deletedItem.id);
+                return Object.assign({}, state, { page: updatedPage, pagePending: updatedPending });
             } else {
                 return null;
             }
         case DmMonHocCreate:
             if (state) {
                 let updatedPage = Object.assign({}, state.page),
+                    updatedPending = Object.assign({}, state.pagePending),
                     createdItem = data.item;
-                if (updatedPage) {
-                    updatedPage.list.unshift(createdItem);
-                }
-                return Object.assign({}, state, { page: updatedPage });
+                updatedPage && createdItem.ma && updatedPage.list.unshift(createdItem);
+                updatedPending && !createdItem.ma && updatedPending && updatedPending.list.unshift(createdItem);
+                return Object.assign({}, state, { page: updatedPage, pagePending: updatedPending });
             } else {
                 return null;
             }
@@ -69,30 +60,10 @@ export default function dmMonHocReducer(state = null, data) {
             return state;
     }
 }
-
 // Actions ------------------------------------------------------------------------------------------------------------
-export function getDmMonHocAll(condition, done) {
-    if (typeof condition === 'function') {
-        done = condition;
-        condition = {};
-    }
-    return dispatch => {
-        const url = '/api/dao-tao/mon-hoc/all';
-        T.get(url, { condition }, data => {
-            if (data.error) {
-                T.notify('Lấy danh sách môn học bị lỗi', 'danger');
-                console.error(`GET ${url}. ${data.error}`);
-            } else {
-                if (done) done(data.items);
-                dispatch({ type: DmMonHocGetAll, items: data.items ? data.items : [] });
-            }
-        });
-    };
-}
 
 T.initPage('pageDmMonHoc');
-
-export function getDmMonHocPage(pageNumber, pageSize, pageCondition) {
+export function getDmMonHocPage(pageNumber, pageSize, pageCondition, done) {
     const page = T.updatePage('pageDmMonHoc', pageNumber, pageSize, pageCondition);
     return dispatch => {
         const url = `/api/dao-tao/mon-hoc/page/${page.pageNumber}/${page.pageSize}`;
@@ -102,6 +73,22 @@ export function getDmMonHocPage(pageNumber, pageSize, pageCondition) {
                 console.error(`GET ${url}. ${data.error}`);
             } else {
                 dispatch({ type: DmMonHocGetPage, page: data.page });
+                done && done();
+            }
+        });
+    };
+}
+T.initPage('monHocPendingPage');
+export function getDmMonHocPending(pageNumber, pageSize, pageCondition) {
+    const page = T.updatePage('monHocPendingPage', pageNumber, pageSize, pageCondition);
+    return dispatch => {
+        const url = `/api/dao-tao/mon-hoc-pending/page/${page.pageNumber}/${page.pageSize}`;
+        T.get(url, { searchTerm: pageCondition?.searchTerm, donViFilter: pageCondition?.donViFilter }, data => {
+            if (data.error) {
+                T.notify('Lấy danh sách môn học chờ cấp mã bị lỗi!', 'danger');
+                console.error(`GET ${url}. ${data.error}`);
+            } else {
+                dispatch({ type: DmMonHocPendingGet, page: data.page });
             }
         });
     };
@@ -117,6 +104,7 @@ export function createDmMonHoc(item, done) {
             } else {
                 T.notify('Tạo môn học thành công!', 'success');
                 dispatch({ type: DmMonHocCreate, item: data.item });
+                // dispatch({ type: DmMonHocPendingCreate, item: data.item });
                 if (done) done(data.item);
             }
         });
@@ -138,25 +126,25 @@ export function getDmMonHoc(ma, done) {
 }
 
 
-export function deleteDmMonHoc(ma) {
+export function deleteDmMonHoc(id) {
     return dispatch => {
         const url = '/api/dao-tao/mon-hoc';
-        T.delete(url, { ma }, data => {
+        T.delete(url, { id }, data => {
             if (data.error) {
                 T.notify('Xóa môn học bị lỗi!', 'danger');
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('Môn học đã xóa thành công!', 'success', false, 800);
-                dispatch({ type: DmMonHocDelete, item: { ma } });
+                dispatch({ type: DmMonHocDelete, item: { id } });
             }
         }, () => T.notify('Xóa môn học bị lỗi!', 'danger'));
     };
 }
 
-export function updateDmMonHoc(ma, changes, done) {
+export function updateDmMonHoc(id, changes, done) {
     return dispatch => {
         const url = '/api/dao-tao/mon-hoc';
-        T.put(url, { ma, changes }, data => {
+        T.put(url, { id, changes }, data => {
             if (data.error) {
                 T.notify('Cập nhật môn học bị lỗi!', 'danger');
                 console.error(`PUT ${url}. ${data.error}`);
@@ -188,18 +176,18 @@ export const SelectAdapter_DmMonHocFaculty = (donVi) => {
         ajax: true,
         url: '/api/dao-tao/mon-hoc/page/1/20',
         data: params => ({ searchTerm: params.term || '', donViFilter: donVi }),
-        processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: `${item.ma}: ${item.ten}` })) : [] }),
-        fetchOne: (ma, done) => (getDmMonHoc(ma, item => done && done({ id: item.ma, text: `${item.ma}: ${item.ten}` })))(),
+        processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: `${item.ma}: ${T.parse(item.ten).vi}` })) : [] }),
+        fetchOne: (ma, done) => (getDmMonHoc(ma, item => done && done({ id: item.ma, text: `${item.ma}: ${T.parse(item.ten).vi}` })))(),
 
     };
 };
 
-export const SelectAdapter_DmMonHocFacultyFilter = (donVi, selectedItems = []) => {
+export const SelectAdapter_DmMonHocFacultyFilter = (donVi, selectedItems) => {
     return {
         ajax: true,
         url: '/api/dao-tao/mon-hoc/page/1/20',
         data: params => ({ searchTerm: params.term || '', donVi: donVi, selectedItems }),
-        processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: `${item.ma}: ${item.ten}` })) : [] }),
-        fetchOne: (ma, done) => (getDmMonHoc(ma, item => done && done({ id: item.ma, text: `${item.ma}: ${item.ten}` })))(),
+        processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: `${item.ma}: ${T.parse(item.ten).vi}` })) : [] }),
+        fetchOne: (ma, done) => (getDmMonHoc(ma, item => done && done({ id: item.ma, text: `${item.ma}: ${T.parse(item.ten).vi}` })))(),
     };
 };
