@@ -24,7 +24,7 @@ import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 import Pagination from 'view/component/Pagination';
 import { getTrangThaiText } from './staffEditPage';
 
-const { trangThaiSwitcher } = require('./constant');
+const { trangThaiSwitcher } = require('../constant');
 
 const timeList = [
     { id: 1, text: 'Theo ngày công văn' },
@@ -138,10 +138,11 @@ class HcthCongVanDenStaffPage extends AdminPage {
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', }}>Số CV</th>
+                    <th style={{ width: 'auto', whiteSpace: 'nowrap', }}>Số đến</th>
                     <TableHeader style={{ width: '10%', whiteSpace: 'nowrap' }} sort isSorted={this.state.sortBy == 'ngayNhan'} onSort={(type) => this.onSort('ngayNhan', type)}>Ngày nhận</TableHeader>
                     <TableHeader style={{ width: '10%', whiteSpace: 'nowrap' }} sort isSorted={this.state.sortBy == 'ngayHetHan'} onSort={(type) => this.onSort('ngayHetHan', type)}>Hết hạn</TableHeader>
-                    <th style={{ width: '80%', whiteSpace: 'nowrap' }}>Đơn vị gửi</th>
-                    <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Trích yếu</th>
+                    <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Đơn vị gửi</th>
+                    <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Trích yếu</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Đơn vị, người nhận</th>
                     <TableHeader style={{ width: 'auto', whiteSpace: 'nowrap' }} sort isSorted={this.state.sortBy == 'tinhTrang'} onSort={(type) => this.onSort('tinhTrang', type)}>Tình trạng</TableHeader>
                     <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
@@ -158,6 +159,7 @@ class HcthCongVanDenStaffPage extends AdminPage {
                                 {item.ngayCongVan ? <span style={{ whiteSpace: 'nowrap' }}><br />{'Ngày CV: ' + T.dateToText(item.ngayCongVan, 'dd/mm/yyyy')}</span> : null}
                             </>
                         } />
+                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.soDen} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
                             item.ngayNhan ? (<>
                                 <span style={{ color: 'blue' }}> {T.dateToText(item.ngayNhan, 'dd/mm/yyyy')}</span>
@@ -168,9 +170,9 @@ class HcthCongVanDenStaffPage extends AdminPage {
                                 <span style={{ color: 'red' }}> {T.dateToText(item.ngayHetHan, 'dd/mm/yyyy')}</span>
                             </>) : null
                         } />
-                        <TableCell type='text' contentClassName='multiple-lines' content={item.tenDonViGuiCV} />
-                        <TableCell type='text' contentClassName='multiple-lines-3' content={item.trichYeu} />
-                        <TableCell type='text' contentClassName='multiple-lines' style={{ whiteSpace: 'nowrap' }} content={
+                        <TableCell type='text' contentClassName='multiple-lines' contentStyle={{ width: '100%' }} content={item.tenDonViGuiCV} />
+                        <TableCell type='text' contentClassName='multiple-lines-3' contentStyle={{ width: '100%' }} content={item.trichYeu} />
+                        <TableCell type='text' contentClassName='multiple-lines' style={{}} content={
                             <>
                                 <span>{danhSachCanBoNhan && danhSachCanBoNhan.length > 0 ? danhSachCanBoNhan.map((item, index) => (
                                     <span key={index}>
