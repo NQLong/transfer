@@ -170,7 +170,7 @@ module.exports = app => {
         app.model.qtKhenThuongAll.get({ id: req.params.id }, (error, item) => res.send({ error, item }));
     });
 
-    app.post('/api/tccb/qua-trinh/khen-thuong-all', app.permission.check('staff:write'), (req, res) => {
+    app.post('/api/tccb/qua-trinh/khen-thuong-all', app.permission.check('qtKhenThuongAll:write'), (req, res) => {
         app.model.qtKhenThuongAll.create(req.body.items, (error, item) => {
             app.tccbSaveCRUD(req.session.user.email, 'C', 'Khen thưởng');
             res.send({ error, item });
@@ -191,14 +191,14 @@ module.exports = app => {
         }
     });
 
-    app.put('/api/tccb/qua-trinh/khen-thuong-all', app.permission.check('staff:write'), (req, res) => {
+    app.put('/api/tccb/qua-trinh/khen-thuong-all', app.permission.check('qtKhenThuongAll:write'), (req, res) => {
         app.model.qtKhenThuongAll.update({ id: req.body.id }, req.body.changes, (error, item) => {
             app.tccbSaveCRUD(req.session.user.email, 'U', 'Khen thưởng');
             res.send({ error, item });
         });
     });
 
-    app.delete('/api/tccb/qua-trinh/khen-thuong-all', app.permission.check('staff:write'), (req, res) => {
+    app.delete('/api/tccb/qua-trinh/khen-thuong-all', app.permission.check('qtKhenThuongAll:write'), (req, res) => {
         app.model.qtKhenThuongAll.delete({ id: req.body.id }, (error) => {
             app.tccbSaveCRUD(req.session.user.email, 'D', 'Khen thưởng');
             res.send(error);
