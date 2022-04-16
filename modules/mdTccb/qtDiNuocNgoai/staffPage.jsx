@@ -222,7 +222,7 @@ class QtDiNuocNgoaiUserPage extends AdminPage {
         if (permission.login == true) {
             permission = {
                 write: false,
-                delete: true
+                delete: false
             };
         }
         const { isStaff, shcc } = this.props.system && this.props.system.user ? this.props.system.user : { isStaff: false, shcc: '' };
