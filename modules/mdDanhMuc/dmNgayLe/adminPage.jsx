@@ -1,9 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getDmNgayLePage, createDmNgayLe, updateDmNgayLe, deleteDmNgayLe } from './redux';
+import { getDmNgayLePage, createDmNgayLe, updateDmNgayLe, deleteDmNgayLe, SelectAdapter_DmNgayLeGetYear } from './redux';
 import { Link } from 'react-router-dom';
 import { getDmDonViAll } from 'modules/mdDanhMuc/dmDonVi/redux';
-import { AdminPage, AdminModal, renderTable, TableCell, FormCheckbox, FormRichTextBox, FormDatePicker } from 'view/component/AdminPage';
+import { AdminPage, AdminModal, renderTable, TableCell, FormCheckbox, FormRichTextBox, FormDatePicker, FormSelect } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
 
 class EditModal extends AdminModal {
@@ -40,10 +40,10 @@ class EditModal extends AdminModal {
                     ngay: start.getTime(),
                     moTa: this.moTa.value(),
                     kichHoat: Number(this.kichHoat.value()),
-                }; 
+                };
                 let hide = (start.getDate() == end.getDate() && start.getMonth() == end.getMonth() && start.getFullYear() == end.getFullYear()) ? this.hide : null;
                 this.state.id ? this.props.update(this.state.id, data, hide) : this.props.create(data, hide);
-                start = start.nextDate();    
+                start = start.nextDate();
             }
         };
         if (!changes.ngay) {
@@ -89,7 +89,7 @@ class EditModal extends AdminModal {
                 <FormDatePicker type='date-mask' className='col-md-6' ref={e => this.ngay = e} label={this.state.visibleKetThuc ? 'Ngày bắt đầu lễ' : 'Ngày lễ'} readOnly={this.state.ma ? true : readOnly} placeholder={this.state.visibleKetThuc ? 'Ngày bắt đầu lễ' : 'Ngày lễ'} required />
                 {this.state.isCreate && <FormCheckbox className='col-md-6' label='Bấm vào đây nếu nhập nhiều ngày' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }} onChange={this.changeKetThuc} />}
                 <div className='col-md-6' id='ketThuc'> <FormDatePicker type='date-mask' ref={e => this.ketThuc = e} label={'Ngày kết thúc lễ'} readOnly={this.state.ma ? true : readOnly} placeholder='Ngày kết thúc lễ' required /> </div>
-                <FormRichTextBox rows='3' className='col-12' ref={e => this.moTa = e} label='Mô tả' readOnly={readOnly} placeholder='Mô tả' required/>
+                <FormRichTextBox rows='3' className='col-12' ref={e => this.moTa = e} label='Mô tả' readOnly={readOnly} placeholder='Mô tả' required />
                 <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} style={{ display: 'inline-flex', margin: 0 }} onChange={value => this.changeKichHoat(value ? 1 : 0)} />
             </div>
         });
@@ -97,13 +97,19 @@ class EditModal extends AdminModal {
 }
 
 class DmNgayLePage extends AdminPage {
-    DayStrs = ['Chủ Nhật','Hai', 'Ba', 'Tư', 'Năm', 'Sáu', 'Bảy']
+    DayStrs = ['Chủ Nhật', 'Hai', 'Ba', 'Tư', 'Năm', 'Sáu', 'Bảy']
     componentDidMount() {
-    
-        T.ready('/user/category', () => {
-            T.onSearch = (searchText) => this.props.getDmNgayLePage(undefined, undefined, searchText || '');
+        let route = T.routeMatcher('/user/:menu/ngay-le');
+        this.menu = route.parse(window.location.pathname).menu;
+        T.ready(this.menu == 'danh-muc' ? '/user/category' : '/user/dao-tao', () => {
+            this.year.value(new Date().getFullYear());
+            T.onSearch = (searchText) => this.props.getDmNgayLePage(undefined, undefined, {
+                searchText: searchText || '', year: this.year.value()
+            });
             T.showSearchBox();
-            this.props.getDmNgayLePage();
+            this.props.getDmNgayLePage(undefined, undefined, { year: this.year.value() }, (page) => {
+                page && page.pageCondition && this.year.value(page.pageCondition?.year || new Date().getFullYear());
+            });
         });
     }
 
@@ -114,14 +120,14 @@ class DmNgayLePage extends AdminPage {
     }
 
 
-    getFullDate = (value) =>{
+    getFullDate = (value) => {
         const d = new Date(value);
         const date = d.getDate() < 10 ? `0${d.getDate()}` : d.getDate();
-        const month = d.getMonth() + 1 < 10 ? `0${d.getMonth()+1}` : d.getMonth() + 1;
+        const month = d.getMonth() + 1 < 10 ? `0${d.getMonth() + 1}` : d.getMonth() + 1;
         const year = d.getFullYear();
         return `${date}/${month}/${year}`;
     }
- 
+
     showModal = (e) => {
         e.preventDefault();
         this.modal.show();
@@ -138,7 +144,6 @@ class DmNgayLePage extends AdminPage {
             permission = this.getUserPermission('dmNgayLe', ['read', 'write', 'delete']);
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dmNgayLe && this.props.dmNgayLe.page ?
             this.props.dmNgayLe.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: [] };
-
         let table = renderTable({
             emptyTable: 'Không có dữ liệu ngày lễ',
             getDataSource: () => list, stickyHead: false,
@@ -146,19 +151,19 @@ class DmNgayLePage extends AdminPage {
                 <>
                     <tr>
                         <th rowSpan='2' style={{ width: 'auto', textAlign: 'right', verticalAlign: 'middle' }}>#</th>
-                        <th rowSpan='2' style={{ width: '20%',textAlign: 'center' }}>Thứ</th>
+                        <th rowSpan='2' style={{ width: '20%', textAlign: 'center' }}>Thứ</th>
                         <th rowSpan='2' style={{ width: '30%', textAlign: 'center' }}>Ngày</th>
                         <th rowSpan='2' style={{ width: '50%', verticalAlign: 'left' }}>Mô tả</th>
                         <th rowSpan='2' style={{ width: 'auto', verticalAlign: 'middle' }} nowrap='true'>Kích hoạt</th>
                         <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Thao tác</th>
                     </tr>
-                  
+
                 </>),
             renderRow: (item, index) => (
                 <tr key={index}>
                     <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                     <TableCell type='text' style={{ textAlign: 'center' }} content={this.getDay(item.ngay)} />
-                    <TableCell type='text' style={{ textAlign: 'center' }}content={this.getFullDate(item.ngay)} />
+                    <TableCell type='text' style={{ textAlign: 'center' }} content={this.getFullDate(item.ngay)} />
                     <TableCell type='link' style={{ textAlign: 'left' }} content={item.moTa} onClick={() => this.modal.show(item)} />
                     <TableCell type='checkbox' content={item.kichHoat} permission={permission}
                         onChanged={value => this.props.updateDmNgayLe(item.id, { kichHoat: value ? 1 : 0, })} />
@@ -169,10 +174,16 @@ class DmNgayLePage extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-list-alt',
-            title: 'Danh mục Ngày Lễ',
+            title: 'Ngày Lễ',
+            header: <FormSelect ref={e => this.year = e} style={{ width: '200px', marginBottom: '0' }} placeholder='Năm' data={SelectAdapter_DmNgayLeGetYear} onChange={
+                value => this.props.getDmNgayLePage(undefined, undefined, {
+                    searchText: '',
+                    year: value && value.id
+                })
+            } />,
             breadcrumb: [
-                <Link key={0} to='/user/category'>Danh mục</Link>,
-                'Danh mục Ngày Lễ'
+                <Link key={0} to={this.menu == 'danh-muc' ? '/user/category' : '/user/dao-tao'}>{this.menu == 'danh-muc' ? 'Danh mục' : 'Đào tạo'}</Link>,
+                'Ngày Lễ'
             ],
             content: <>
                 <div className='tile'>{table}</div>
@@ -181,7 +192,7 @@ class DmNgayLePage extends AdminPage {
                 <EditModal ref={e => this.modal = e} permission={permission} getDataSelect={this.props.getDmDonViAll}
                     create={this.props.createDmNgayLe} update={this.props.updateDmNgayLe} permissions={currentPermissions} />
             </>,
-            backRoute: '/user/category',
+            backRoute: this.menu == 'danh-muc' ? '/user/category' : '/user/dao-tao',
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
         });
     }
