@@ -10,7 +10,6 @@ const texts = {
         phoneNumberInfo: 'Số điện thoại',
         addressInfo: 'Địa chỉ',
         statusUpdate: 'Chưa cập nhật',
-        strengths: 'Thế mạnh',
         descriptionInfo: 'Mô tả về doanh nghiệp',
         noInfo: 'Không có thông tin',
         areaActivityInfo: 'Lĩnh vực hoạt động của doanh nghiệp',
@@ -22,7 +21,9 @@ const texts = {
         coopLogoPartner: 'Logo đối tác',
         recpTime: 'Ngày tiếp',
         recpContent: 'Nội dung dự kiến',
-        recpResult: 'Kết quả'
+        recpResult: 'Kết quả',
+        moTaHopTacInfo: 'Thông tin hợp tác',
+        ketQuaHopTacInfo: 'Kết quả hợp tác'
     }, en: {
         companyInfo: 'Company information',
         nationInfo: 'Nation',
@@ -30,7 +31,6 @@ const texts = {
         phoneNumberInfo: 'Phone number',
         addressInfo: 'Address',
         statusUpdate: 'Not updated',
-        strengths: 'Strengths',
         descriptionInfo: 'Description about the company',
         noInfo: 'No informations',
         areaActivityInfo: 'Area of company activities',
@@ -42,7 +42,9 @@ const texts = {
         coopLogoPartner: 'Logo of partner',
         recpTime: 'Time reception',
         recpContent: 'Expected Content',
-        recpResult: 'Result'
+        recpResult: 'Result',
+        moTaHopTacInfo: 'Cooperate information',
+        ketQuaHopTacInfo: 'Kết quả hợp tác'
     }
 };
 
@@ -187,13 +189,6 @@ class PageCompany extends React.Component {
                                         <p className='text-justify'>{T.language.parse(company.diaChi)}</p>
                                     </>
                                     }
-                                    {company.theManh && T.language.parse(company.theManh) &&
-                                    <>
-                                        <h6 style={h6Style}>{language.strengths}:&nbsp;</h6>
-                                        <p className='text-justify'>{T.language.parse(company.theManh)}</p>
-                                    </>
-                                    }
-
                                     {company.tenCacLinhVuc ? (
                                         <div>
                                             <h6 style={h6Style}>{language.areaActivityInfo}:</h6>
@@ -213,6 +208,19 @@ class PageCompany extends React.Component {
                                     </h6>
                                     }
 
+                                    {company.moTaHopTac && T.language.parse(company.moTaHopTac) ? (
+                                        <div>
+                                            <h6 style={h6Style}>{language.moTaHopTacInfo}:</h6>
+                                            <p className='text-justify' dangerouslySetInnerHTML={{ __html: T.language.parse(company.moTaHopTac) }} />
+                                        </div>
+                                    ) : null}
+
+                                    {company.ketQuaHopTac && T.language.parse(company.ketQuaHopTac) ? (
+                                        <div>
+                                            <h6 style={h6Style}>{language.ketQuaHopTacInfo}:</h6>
+                                            <p className='text-justify' dangerouslySetInnerHTML={{ __html: T.language.parse(company.ketQuaHopTac) }} />
+                                        </div>
+                                    ) : null}
                                 </div>
                             </div>
                         </div>

@@ -17,8 +17,9 @@ class DoanhNghiepAdminPage extends AdminPage {
         });
     }
 
-    changeDoiTac = item => this.props.updateDnDoanhNghiep(item.id, { doiTac: Number(!item.doiTac) });
     changeActive = item => this.props.updateDnDoanhNghiep(item.id, { kichHoat: Number(!item.kichHoat) });
+
+    changeActiveTrangTruong = item => this.props.updateDnDoanhNghiep(item.id, { kichHoatTrangTruong: Number(!item.kichHoatTrangTruong) });
 
     delete = (e, item) => {
         e.preventDefault();
@@ -26,7 +27,8 @@ class DoanhNghiepAdminPage extends AdminPage {
     }
 
     render() {
-        const permission = this.getUserPermission('dnDoanhNghiep');
+        const permission = this.getUserPermission('dnDoanhNghiep', ['read', 'write', 'delete', 'manage']);
+        if (permission.manage) permission.write = true;
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dnDoanhNghiep && this.props.dnDoanhNghiep.page ?
             this.props.dnDoanhNghiep.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         const table = renderTable({
@@ -37,11 +39,11 @@ class DoanhNghiepAdminPage extends AdminPage {
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                     <th style={{ width: '70%' }}>Tên doanh nghiệp</th>
-                    <th style={{ width: '30%' }}>Tên viết tắt</th>
+                    {permission.read && <th style={{ width: '30%' }}>Đơn vị phụ trách</th>}
                     <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Quốc gia</th>
                     <th style={{ width: 'auto' }} nowrap='true'>Hình ảnh</th>
-                    <th style={{ width: 'auto' }} nowrap='true'>Đối tác</th>
                     <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
+                    {permission.read && <th style={{ width: 'auto' }} nowrap='true' >Hiển thị website trường</th>}
                     <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
                 </tr>
             ),
@@ -49,11 +51,11 @@ class DoanhNghiepAdminPage extends AdminPage {
                 <tr key={index}>
                     <TableCell style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                     <TableCell type='link' url={'/user/truyen-thong/doanh-nghiep/edit/' + item.id} style={{ color: item.confirm == 0 ? 'red' : '' }} content={(item.tenDayDu || '').viText()} />
-                    <TableCell content={item.tenVietTat} />
+                    {permission.read && <TableCell content={item.tenDonViPhuTrach} />}
                     <TableCell style={{ textAlign: 'center', whiteSpace: 'nowrap' }} content={item.tenQuocGia} />
                     <TableCell type='image' content={item.image || '/img/hcmussh.png'} />
-                    <TableCell type='checkbox' content={item.doiTac} permission={permission} onChanged={() => this.changeDoiTac(item)} />
                     <TableCell type='checkbox' content={item.kichHoat} permission={permission} onChanged={() => this.changeActive(item)} />
+                    {permission.read && <TableCell type='checkbox' content={item.kichHoatTrangTruong} permission={permission} onChanged={() => this.changeActiveTrangTruong(item)} />}
                     <TableCell content={item} type='buttons' style={{ textAlign: 'center' }} permission={permission} onEdit={'/user/truyen-thong/doanh-nghiep/edit/' + item.id} onDelete={this.delete}/>
                 </tr>
             ),

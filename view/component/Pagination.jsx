@@ -84,7 +84,7 @@ export default class Pagination extends React.Component {
                 </li>;
         }
 
-        const style = Object.assign({}, this.props.style ? this.props.style : {}, { width: '100%', display: 'flex', position: 'fixed', bottom: '10px', pointerEvents: 'none' });
+        const style = Object.assign({}, { width: '100%', display: 'flex', position: 'fixed', bottom: '10px', pointerEvents: 'none' }, this.props.style ? this.props.style : {});
         return (
             <div className='d-print-none' style={style}>
                 <Dropdown className='btn btn-info' text={this.props.pageSize} items={[25, 50, 100, 200, 500]} onSelected={pageSize => this.pageSizeChanged(pageSize, pageCondition)} />

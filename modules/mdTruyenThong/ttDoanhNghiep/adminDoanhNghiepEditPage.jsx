@@ -4,18 +4,18 @@ import { updateDnDoanhNghiep, createDnDoanhNghiep, getDnDoanhNghiep } from './re
 import { SelectAdapter_DmLinhVucKinhDoanhAll } from 'modules/mdDanhMuc/dmLinhVucKinhDoanh/redux';
 import { SelectAdapter_DmQuocGia } from 'modules/mdDanhMuc/dmQuocGia/redux';
 import { Link } from 'react-router-dom';
-import { FormEditor, FormSelect, FormTextBox, FormImageBox, AdminPage, FormTabs, FormRichTextBox, FormCheckbox } from 'view/component/AdminPage';
+import { FormEditor, FormSelect, FormTextBox, FormImageBox, AdminPage, FormTabs, FormCheckbox } from 'view/component/AdminPage';
 import { EditModal } from 'modules/mdDanhMuc/dmLinhVucKinhDoanh/adminPage';
 import { createDmLinhVucKinhDoanh } from 'modules/mdDanhMuc/dmLinhVucKinhDoanh/redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_DmLoaiDoanhNghiep } from 'modules/mdDanhMuc/dmLoaiDoanhNghiep/redux';
 import { LoaiDoanhNghiepEditModal } from 'modules/mdDanhMuc/dmLoaiDoanhNghiep/adminPage';
 import { createDmLoaiDoanhNghiep } from 'modules/mdDanhMuc/dmLoaiDoanhNghiep/redux';
+
 class DnDoanhNghiepEditPage extends AdminPage {
-    state = { id: null, kichHoat: true, doiTac: false, searching: false, listLinhVuc: null, listLoaiDoanhNghiep: null }
+    state = { id: null, searching: false, listLinhVuc: null, listLoaiDoanhNghiep: null }
     isNew = false;
     componentDidMount() {
-
         T.ready('/user/truyen-thong', () => {
             const route = T.routeMatcher('/user/truyen-thong/doanh-nghiep/edit/:doanhNghiepId'),
                 doanhNghiepId = route.parse(window.location.pathname).doanhNghiepId;
@@ -28,17 +28,25 @@ class DnDoanhNghiepEditPage extends AdminPage {
     }
 
     getData = (data = {}) => {
+        const permission = this.getUserPermission('dnDoanhNghiep', ['write', 'manage']);
+        const user = this.props.system.user;
         let {
             id = null, tenDayDu = '', tenVietTat = '', namThanhLap = '', phone = '', email = '', website = '', capDo = 1,
-            diaChi = '', theManh = '', moTa = '', kichHoat = false, doiTac = false, image = '/img/avatar.jpg',
+            diaChi = '', moTa = '', moTaHopTac = '', ketQuaHopTac = '', ghiChu = '', kichHoat = false, doiTac = false, kichHoatTrangTruong = false, image = '/img/avatar.jpg',
             listLV = [], quocGia = '', donViPhuTrach = '', listLoaiDoanhNghiep = []
         } = data;
         tenDayDu = T.language.parse(tenDayDu || '', true);
         diaChi = T.language.parse(diaChi || '', true);
-        theManh = T.language.parse(theManh || '', true);
         moTa = T.language.parse(moTa || '', true);
+        moTaHopTac = T.language.parse(moTaHopTac || '', true);
+        ketQuaHopTac = T.language.parse(ketQuaHopTac || '', true);
+        ghiChu = T.language.parse(ghiChu || '', true);
 
-        this.donViPhuTrach.value(donViPhuTrach);
+        if (!permission.write) {
+            this.donViPhuTrach.value(user.maDonVi);
+        } else {
+            this.donViPhuTrach.value(donViPhuTrach);
+        }
         this.dnDoanhNghiepViTitle.value(tenDayDu.vi);
         this.dnDoanhNghiepEnTitle.value(tenDayDu.en);
 
@@ -54,16 +62,21 @@ class DnDoanhNghiepEditPage extends AdminPage {
         this.dnDoanhNghiepViDiaChi.value(diaChi.vi);
         this.dnDoanhNghiepEnDiaChi.value(diaChi.en);
 
-        this.dnDoanhNghiepViTheManh.value(theManh.vi);
-        this.dnDoanhNghiepEnTheManh.value(theManh.en);
-
         this.moTaVi.value(moTa.vi);
         this.moTaEn.value(moTa.en);
+        this.moTaHopTacVi.value(moTaHopTac.vi);
+        this.moTaHopTacEn.value(moTaHopTac.en);
+        this.ketQuaHopTacVi.value(ketQuaHopTac.vi);
+        this.ketQuaHopTacEn.value(ketQuaHopTac.en);
+        this.ghiChuVi.value(ghiChu.vi);
+        this.ghiChuEn.value(ghiChu.en);
+
         this.imageBox.setData('dnDoanhNghiep:' + (id || 'new'), image || '/img/hcmussh.png');
         this.linhVucKinhDoanh.value((listLV || []).map(item => item.linhVuc));
         this.setState({ kichHoat, doiTac, id, listLinhVuc: (listLV || []).map(item => item.linhVuc), listLoaiDoanhNghiep: (listLoaiDoanhNghiep || []).map(item => item.loai) });
 
         this.kichHoat.value(kichHoat);
+        this.kichHoatTrangTruong.value(kichHoatTrangTruong);
         this.doiTac.value(doiTac);
         this.quocGia.value(quocGia || 'VN');
     }
@@ -112,13 +125,12 @@ class DnDoanhNghiepEditPage extends AdminPage {
                     website: this.validate(this.dnDoanhNghiepEditWebsite),
                     capDo: this.validate(this.dnDoanhNghiepEditCapDo, 'level'),
                     diaChi: this.viEnValidate(this.dnDoanhNghiepViDiaChi, this.dnDoanhNghiepEnDiaChi),
-                    theManh: this.viEnValidate(this.dnDoanhNghiepViTheManh, this.dnDoanhNghiepEnTheManh),
                     moTa: this.viEnValidate(this.moTaVi, this.moTaEn),
                     moTaHopTac: this.viEnValidate(this.moTaHopTacVi, this.moTaHopTacEn),
                     ketQuaHopTac: this.viEnValidate(this.ketQuaHopTacVi, this.ketQuaHopTacEn),
                     ghiChu: this.viEnValidate(this.ghiChuVi, this.ghiChuEn),
-                    kichHoat: this.state.kichHoat ? 1 : 0,
-                    doiTac: this.state.doiTac ? 1 : 0,
+                    kichHoat: Number(this.kichHoat.value()),
+                    doiTac: Number(this.doiTac.value()),
                     quocGia: this.validate(this.quocGia),
                     linhVucs: this.state.listLinhVuc || [],
                     listLoaiDoanhNghiep: this.state.listLoaiDoanhNghiep || []
@@ -136,6 +148,10 @@ class DnDoanhNghiepEditPage extends AdminPage {
         e.preventDefault();
         let data = this.onGetData(), id = this.state.id;
         if (data) {
+            const permission = this.getUserPermission('dnDoanhNghiep', ['write']);
+            if (permission.write) {
+                data.kichHoatTrangTruong = Number(this.kichHoatTrangTruong.value());
+            }
             id ? this.props.updateDnDoanhNghiep(id, data) : this.props.createDnDoanhNghiep(data, result => {
                 this.props.history.push(`/user/truyen-thong/doanh-nghiep/edit/${result.id}`);
                 this.setState({ id: result.id });
@@ -174,10 +190,10 @@ class DnDoanhNghiepEditPage extends AdminPage {
     }
 
     render() {
-        const permission = this.getUserPermission('dnDoanhNghiep', ['write']),
+        const permission = this.getUserPermission('dnDoanhNghiep', ['write', 'manage']),
             dmLinhVucKinhDoanhPermission = this.getUserPermission('dmLinhVucKinhDoanh', ['write']),
-            dmLoaiDoanhNghiepPermission = this.getUserPermission('dmLoaiDoanhNghiep', ['write']),
-            readOnly = !permission.write;
+            dmLoaiDoanhNghiepPermission = this.getUserPermission('dmLoaiDoanhNghiep', ['write']);
+        const readOnly = !(permission.write || permission.manage);
         const doanhNghiep = this.props.doanhNghiep && this.props.doanhNghiep.item ? this.props.doanhNghiep.item : {};
 
         return this.renderPage({
@@ -193,8 +209,7 @@ class DnDoanhNghiepEditPage extends AdminPage {
                         <div className='tile-body row'>
                             <div className='col-md-8'>
                                 <div className='row'>
-                                    <FormSelect ref={e => this.donViPhuTrach = e} className='form-group col-md-12' label='Đơn vị phụ trách' data={SelectAdapter_DmDonVi} readOnly={readOnly} required />
-
+                                    <FormSelect ref={e => this.donViPhuTrach = e} className='form-group col-md-12' label='Đơn vị phụ trách' data={SelectAdapter_DmDonVi} readOnly={!permission.write} required />
                                 </div>
                                 <FormTabs ref={e => this.tabs = e} tabs={[
                                     {
@@ -218,14 +233,16 @@ class DnDoanhNghiepEditPage extends AdminPage {
                             </div>
                             <div className='col-md-4 row'>
                                 <FormImageBox ref={e => this.imageBox = e} className='col-md-12' uploadType='doanhNghiepLogo' label='Hình ảnh' />
-                                <FormCheckbox ref={e => this.kichHoat = e} isSwitch={true} className='col-md-6' style={{ display: 'inline-flex', margin: 0 }} label='Kích hoạt' readOnly={readOnly} onChange={() => this.setState({ kichHoat: !this.state.kichHoat })} />
-                                <FormCheckbox ref={e => this.doiTac = e} isSwitch={true} className='col-md-6' style={{ display: 'inline-flex', margin: 0 }} label='Đối tác' readOnly={readOnly} onChange={() => this.setState({ doiTac: !this.state.doiTac })} />
+                                <div className='col-md-12' style={{ display: 'flex' }}>
+                                    <FormCheckbox ref={e => this.kichHoat = e} style={{ flex: 1 }} label='Kích hoạt' readOnly={readOnly} />
+                                    <FormCheckbox ref={e => this.kichHoatTrangTruong = e} style={{ flex: 1, textAlign: 'center', display: permission.write ? '' : 'none' }} label='Hiển thị website trường' readOnly={readOnly} />
+                                    <FormCheckbox ref={e => this.doiTac = e} style={{ flex: 1, textAlign: permission.write ? 'right' : 'left' }} label='Đối tác' readOnly={readOnly} />
+                                </div>
                             </div>
 
                             <FormSelect ref={e => this.dnLoai = e} placeholder='Loại doanh nghiệp' className='col-md-6' label={<span>Loại doanh nghiệp {dmLoaiDoanhNghiepPermission.write && <span><Link to='#' onClick={() => this.modalLoaiDN.show(null)}>Nhấn vào đây để thêm loại.</Link></span>}</span>} data={SelectAdapter_DmLoaiDoanhNghiep} onChange={() => this.setState({ listLoaiDoanhNghiep: this.dnLoai.value() })} readOnly={readOnly} multiple={true} required />
 
                             <FormSelect ref={e => this.linhVucKinhDoanh = e} placeholder='Lĩnh vực kinh doanh' className='col-md-6' label={<span>Lĩnh vực kinh doanh {dmLinhVucKinhDoanhPermission.write && <span><Link to='#' onClick={() => this.modal.show(null)}>Nhấn vào đây để thêm lĩnh vực.</Link></span>}</span>} data={SelectAdapter_DmLinhVucKinhDoanhAll} multiple={true} onChange={() => this.setState({ listLinhVuc: this.linhVucKinhDoanh.value() })} readOnly={readOnly} required />
-
 
                             <FormTextBox ref={e => this.dnDoanhNghiepEditSoDienThoai = e} type='phone' className='col-md-5' label='Số điện thoại' readOnly={readOnly} />
                             <FormTextBox ref={e => this.dnDoanhNghiepEditEmail = e} className='col-md-5' label='Email' readOnly={readOnly} />
@@ -240,18 +257,6 @@ class DnDoanhNghiepEditPage extends AdminPage {
                                     {
                                         title: <>Addresss</>,
                                         component: <FormTextBox placeholder='Address' ref={e => this.dnDoanhNghiepEnDiaChi = e} readOnly={readOnly} />
-                                    }
-                                ]} onChange={this.changeTab} />
-                            </div>
-                            <div className='col-md-12' >
-                                <FormTabs ref={e => this.tabs = e} tabs={[
-                                    {
-                                        title: <>Thế mạnh <span style={{ color: 'red' }}>*</span></>,
-                                        component: <FormRichTextBox placeholder='Thế mạnh' ref={e => this.dnDoanhNghiepViTheManh = e} readOnly={readOnly} required style={{ minHeight: 50 }} />
-                                    },
-                                    {
-                                        title: <>Strengths</>,
-                                        component: <FormRichTextBox placeholder='Strengths' ref={e => this.dnDoanhNghiepEnTheManh = e} readOnly={readOnly} style={{ minHeight: 50 }} />
                                     }
                                 ]} onChange={this.changeTab} />
                             </div>
@@ -321,15 +326,11 @@ class DnDoanhNghiepEditPage extends AdminPage {
                             ]} onChange={this.changeTab} />
                         </div>
                     </div>
-                    <EditModal ref={e => this.modal = e}
-                        permissions={dmLinhVucKinhDoanhPermission}
-                        create={this.onCreateLinhVucKinhDoanh}
-                    />
-                    <LoaiDoanhNghiepEditModal ref={e => this.modalLoaiDN = e}
-                        create={this.onCreateDmLoaiDoanhNghiep} permissions={dmLoaiDoanhNghiepPermission} />
+                    <EditModal ref={e => this.modal = e} permissions={dmLinhVucKinhDoanhPermission} create={this.onCreateLinhVucKinhDoanh} />
+                    <LoaiDoanhNghiepEditModal ref={e => this.modalLoaiDN = e} create={this.onCreateDmLoaiDoanhNghiep} permissions={dmLoaiDoanhNghiepPermission} />
                 </>,
             backRoute: '/user/truyen-thong/doanh-nghiep',
-            onSave: permission.write ? this.save : null
+            onSave: permission.write || permission.manage ? this.save : null
         });
     }
 }

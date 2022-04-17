@@ -17,28 +17,31 @@ module.exports = app => {
 
     app.permission.add(
         { name: 'dnDoanhNghiep:read', menu },
+        { name: 'dnDoanhNghiep:manage', menu },
         { name: 'dnDoanhNghiep:write' },
         { name: 'dnDoanhNghiep:delete' }
     );
 
-    app.get('/user/truyen-thong/doanh-nghiep', app.permission.check('dnDoanhNghiep:read'), app.templates.admin);
-    app.get('/user/truyen-thong/doanh-nghiep/edit/:doanhNghiepId', app.permission.check('dnDoanhNghiep:read'), app.templates.admin);
+    app.get('/user/truyen-thong/doanh-nghiep', app.permission.orCheck('dnDoanhNghiep:read', 'dnDoanhNghiep:manage'), app.templates.admin);
+    app.get('/user/truyen-thong/doanh-nghiep/edit/:doanhNghiepId', app.permission.orCheck('dnDoanhNghiep:read', 'dnDoanhNghiep:manage'), app.templates.admin);
     app.get('/doanh-nghiep/:hiddenShortName', app.templates.home);
 
     // APIs Admin Doanh nghiep -----------------------------------------------------------------------------------------
-    app.get('/api/doi-ngoai/doanh-nghiep/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
+    app.get('/api/doi-ngoai/doanh-nghiep/page/:pageNumber/:pageSize', app.permission.orCheck('dnDoanhNghiep:read', 'dnDoanhNghiep:manage'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         const searchTerm = req.query.condition ? req.query.condition.searchText.toLowerCase() || '' : '';
-        app.model.dnDoanhNghiep.searchPage(pageNumber, pageSize, searchTerm, (error, page) => {
+        const user = req.session.user, permissions = user.permissions;
+        let maDonVi = '';
+        if (!permissions.includes('dnDoanhNghiep:read')) { // Chỉ quản lý doanh nghiệp trong đơn vị
+            if (user.maDonVi) maDonVi = user.maDonVi;
+            else return res.send({ error: 'Permission denied!' });
+        }
+
+        app.model.dnDoanhNghiep.searchPage(pageNumber, pageSize, searchTerm, maDonVi, (error, page) => {
             const { totalitem: totalItem, pagesize: pageSize, pagetotal: pageTotal, pagenumber: pageNumber, rows: list } = page;
             res.send({ error, page: { totalItem, pageSize, pageTotal, pageNumber, list } });
         });
-    });
-
-    app.get('/api/doi-ngoai/doanh-nghiep/all', app.permission.check('dnDoanhNghiep:read'), (req, res) => {
-        const condition = req.query.condition || {};
-        app.model.dnDoanhNghiep.getAll(condition, (error, items) => res.send({ error, items }));
     });
 
     app.get('/api/doi-ngoai/doanh-nghiep/item/:id', app.permission.check('user:login'), (req, res) => {
@@ -53,8 +56,14 @@ module.exports = app => {
         });
     });
 
-    app.post('/api/doi-ngoai/doanh-nghiep', app.permission.check('dnDoanhNghiep:write'), (req, res) => {
+    app.post('/api/doi-ngoai/doanh-nghiep', app.permission.orCheck('dnDoanhNghiep:write', 'dnDoanhNghiep:manage'), (req, res) => {
+        const user = req.session.user, permissions = user.permissions;
         let newData = req.body.item;
+        if (!permissions.includes('dnDoanhNghiep:write')) { // Chỉ quản lý doanh nghiệp trong đơn vị
+            delete newData.kichHoatTrangTruong;
+            if (user.maDonVi) newData.donViPhuTrach = user.maDonVi;
+            else return res.send({ error: 'Permission denied!' });
+        }
         const hiddenShortName = app.toEngWord(newData.tenVietTat).toLowerCase().replaceAll(' ', '-');
         newData.hiddenShortName = hiddenShortName;
         app.model.dnDoanhNghiep.get({ hiddenShortName }, (error, item) => {
@@ -89,8 +98,17 @@ module.exports = app => {
         });
     });
 
-    app.put('/api/doi-ngoai/doanh-nghiep', app.permission.check('dnDoanhNghiep:write'), async (req, res) => {
+    app.put('/api/doi-ngoai/doanh-nghiep', app.permission.orCheck('dnDoanhNghiep:write', 'dnDoanhNghiep:manage'), async (req, res) => {
         const changes = req.body.changes, id = req.body.id;
+        const user = req.session.user, permissions = user.permissions;
+        let updateCondition = { id: req.body.id };
+        if (!permissions.includes('dnDoanhNghiep:write')) { // Chỉ quản lý doanh nghiệp trong đơn vị
+            if (user.maDonVi) {
+                updateCondition.donViPhuTrach = user.maDonVi;
+                delete changes.donViPhuTrach;
+                delete changes.kichHoatTrangTruong;
+            } else return res.send({ error: 'Permission denied!' });
+        }
         const updateLoaiDoanhNghiep = (listLoaiDoanhNghiep) => new Promise((resolve, reject) => {
             app.model.dnLoaiDoanhNghiep.delete({ doanhNghiep: id }, (error) => {
                 if (error) reject(error);
@@ -151,17 +169,20 @@ module.exports = app => {
                         res.send({ duplicateShortName: true });
                     } else {
                         changes.hiddenShortName = hiddenShortName;
-                        app.model.dnDoanhNghiep.update({ id: req.body.id }, changes, (error, item) => res.send({ error, item: app.clone(item, { listLV, listLoaiDoanhNghiep }) }));
+                        delete changes.listLoaiDoanhNghiep;
+                        delete changes.linhVucs;
+                        app.model.dnDoanhNghiep.update(updateCondition, changes, (error, item) => {
+                            res.send({ error, item: app.clone(item, { listLV, listLoaiDoanhNghiep }) });
+                        });
                     }
                 });
             } else {
-                app.model.dnDoanhNghiep.update({ id: req.body.id }, changes, (error, item) => res.send({ error, item: app.clone(item, { listLV, listLoaiDoanhNghiep }) }));
+                app.model.dnDoanhNghiep.update(updateCondition, changes, (error, item) => res.send({ error, item: app.clone(item, { listLV, listLoaiDoanhNghiep }) }));
             }
         } catch (error) {
             res.send({ error });
         }
     });
-
 
     app.delete('/api/doi-ngoai/doanh-nghiep', app.permission.check('dnDoanhNghiep:delete'), (req, res) => {
         app.model.dnLinhVucKinhDoanh.delete({ idDoanhNghiep: req.body.id }, error => {
@@ -191,17 +212,24 @@ module.exports = app => {
         }
     };
 
-    app.uploadHooks.add('uploadDoanhNghiepLogoByAdmin', (req, fields, files, params, done) => {
+    app.uploadHooks.add('uploadDoanhNghiepLogo', (req, fields, files, params, done) => {
         app.permission.has(req, () => uploadDoanhNghiepLogo(req, fields, files, params, done), done, 'dnDoanhNghiep:write');
     });
 
-    app.uploadHooks.add('uploadDnDoanhNghiepCkEditorByAdmin', (req, fields, files, params, done) =>
+    app.uploadHooks.add('uploadDnDoanhNghiepCkEditor', (req, fields, files, params, done) =>
         app.permission.has(req, () => app.uploadCkEditorImage('dnDoanhNghiep', fields, files, params, done), done, 'dnDoanhNghiep:write'));
+
+    app.uploadHooks.add('uploadDoanhNghiepLogoManager', (req, fields, files, params, done) => {
+        app.permission.has(req, () => uploadDoanhNghiepLogo(req, fields, files, params, done), done, 'dnDoanhNghiep:manage');
+    });
+
+    app.uploadHooks.add('uploadDnDoanhNghiepCkEditorManager', (req, fields, files, params, done) =>
+        app.permission.has(req, () => app.uploadCkEditorImage('dnDoanhNghiep', fields, files, params, done), done, 'dnDoanhNghiep:manage'));
 
 
     // APIs Home page-----------------------------------------------------------------------------------------------------------------
     app.get('/user/doi-ngoai/doanh-nghiep/item/:id', (req, res) => {
-        app.model.dnDoanhNghiep.get({ id: req.params.id, kichHoat: 1 }, 'id, quocGia, tenVietTat, tenDayDu, linhVucKinhDoanh, moTa, namThanhLap, theManh, diaChi, email, phone, image, website', 'id', (error, item) => {
+        app.model.dnDoanhNghiep.get({ id: req.params.id, kichHoatTrangTruong: 1 }, 'id, quocGia, tenVietTat, tenDayDu, linhVucKinhDoanh, moTa, namThanhLap, diaChi, email, phone, image, website', 'id', (error, item) => {
             if (error || !item) {
                 res.send({ error });
             } else {
@@ -212,15 +240,19 @@ module.exports = app => {
                         } else {
                             if (quocGia) {
                                 item.tenQuocGia = JSON.stringify({ vi: quocGia.tenQuocGia, en: quocGia.country });
-                                if (item.linhVucKinhDoanh) {
-                                    let linhVucKinhDoanh = item.linhVucKinhDoanh.split(',');
-                                    app.model.dnDoanhNghiep.getLinhVucKinhDoanh(linhVucKinhDoanh, (error, tenCacLinhVuc) => {
-                                        item.tenCacLinhVuc = tenCacLinhVuc;
-                                        res.send({ item });
-                                    });
-                                } else {
-                                    res.send({ item });
-                                }
+                                app.model.dnLinhVucKinhDoanh.getAll({ idDoanhNghiep: item.id }, (error, linhVucKinhDoanh) => {
+                                    if (error) res.send({ error });
+                                    else {
+                                        const condition = {
+                                            statement: 'ma IN (:linhVucKinhDoanh)',
+                                            parameter: { linhVucKinhDoanh: (linhVucKinhDoanh || []).map(item => item.linhVuc) }
+                                        };
+                                        app.model.dmLinhVucKinhDoanh.getAll(condition, 'ten', null, (error, items) => {
+                                            item.tenCacLinhVuc = items;
+                                            res.send({ item });
+                                        });
+                                    }
+                                });
                             }
                         }
                     });
@@ -233,7 +265,7 @@ module.exports = app => {
 
     app.get('/user/doi-ngoai/doanh-nghiep/doitac/:hiddenShortName', (req, res) => {
         new Promise((resolve, reject) => {
-            app.model.dnDoanhNghiep.get({ hiddenShortName: req.params.hiddenShortName }, 'id, quocGia, tenVietTat, tenDayDu, moTa, namThanhLap, theManh, diaChi, email, phone, image, website', 'id', (error, item) => {
+            app.model.dnDoanhNghiep.get({ hiddenShortName: req.params.hiddenShortName }, 'id, quocGia, tenVietTat, tenDayDu, moTa, namThanhLap, diaChi, email, phone, image, website, moTaHopTac, ketQuaHopTac', 'id', (error, item) => {
                 if (error || !item) {
                     reject(error);
                 } else {
@@ -297,4 +329,41 @@ module.exports = app => {
             res.send({ error, items: result && result.rows || [] });
         });
     });
+
+    // Phân quyền cho các đơn vị ------------------------------------------------------------------------------------------------------------------------
+    app.assignRoleHooks.addRoles('ttDoanhNghiep', { id: 'dnDoanhNghiep:manage', text: 'Doanh nghiệp: Quản lý doanh nghiệp' });
+
+    // app.assignRoleHooks.addHook('ttDoanhNghiep', (req, roles) => new Promise(resolve => {
+    //     const userPermissions = req.session.user ? req.session.user.permissions : [];
+    //     if (req.query.nhomRole && req.query.nhomRole == 'ttDoanhNghiep' && userPermissions.includes('manager:write')) {
+    //         const assignRolesList = app.assignRoleHooks.get('ttDoanhNghiep').map(item => item.id);
+    //         console.log(roles && roles.length && assignRolesList.contains(roles));
+    //         resolve(roles && roles.length && assignRolesList.contains(roles));
+    //     } else resolve(null);
+    // }));
+
+    app.assignRoleHooks.addHook('ttDoanhNghiep', async (req, roles) => {
+        const userPermissions = req.session.user ? req.session.user.permissions : [];
+        if (req.query.nhomRole && req.query.nhomRole == 'ttDoanhNghiep' && userPermissions.includes('manager:write')) {
+            const assignRolesList = app.assignRoleHooks.get('ttDoanhNghiep').map(item => item.id);
+            return roles && roles.length && assignRolesList.contains(roles);
+        }
+    });
+
+    app.permissionHooks.add('staff', 'checkRoleQuanLyDoanhNghiep', (user, staff) => new Promise(resolve => {
+        if (staff.donViQuanLy && staff.donViQuanLy.length) {
+            app.permissionHooks.pushUserPermission(user, 'dnDoanhNghiep:manage');
+        }
+        resolve();
+    }));
+
+    app.permissionHooks.add('assignRole', 'checkRoleQuanLyDoanhNghiep', (user, assignRoles) => new Promise(resolve => {
+        const inScopeRoles = assignRoles.filter(role => role.nhomRole == 'ttDoanhNghiep');
+        inScopeRoles.forEach(role => {
+            if (role.tenRole == 'dnDoanhNghiep:manage') {
+                app.permissionHooks.pushUserPermission(user, 'dnDoanhNghiep:manage');
+            }
+        });
+        resolve();
+    }));
 };

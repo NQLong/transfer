@@ -23,6 +23,17 @@ module.exports = (app) => {
         fse.copySync(oldPath, newPath);
         fse.removeSync(oldPath);
     };
+
+    app.fs.rename = (oldPath, newPath, done) => {
+        try {
+            fse.copySync(oldPath, newPath);
+            fse.removeSync(oldPath);
+            done && done();
+        } catch (error) {
+            done && done(error);
+        }
+    };
+
     // app.fs.renameSync = (oldPath, newPath) => app.fs.copyFileSync(oldPath, newPath) && app.fs.unlinkSync(oldPath);
 
     // Template html file ---------------------------------------------------------------------------------------------------------------------------
@@ -96,8 +107,8 @@ module.exports = (app) => {
             subMenusRender: false
         },
         daoTao: {
-            index: 7000, title: 'Đào tạo', link: '/user/pdt', icon: 'fa-diamond',
-            subMenusRender: false
+            index: 7000, title: 'Đào tạo', link: '/user/dao-tao', icon: 'fa-diamond',
+            subMenusRender: false, groups: ['NGÀNH ĐÀO TẠO', 'CÔNG TÁC ĐÀO TẠO', 'MÔN HỌC']
         },
         category: {
             index: 4000, title: 'Danh mục', link: '/user/category', icon: 'fa-list-alt',
@@ -193,5 +204,22 @@ module.exports = (app) => {
         });
         modelPaths.forEach(path => require(path)(app));
         if (loadController) controllerPaths.forEach(path => require(path)(app));
+    };
+
+    //Utils-----------------------------------------------------------------------------------------------------------------------
+    app.stringify = (value, defaultValue = '') => {
+        try {
+            return JSON.stringify(value);
+        } catch (exception) {
+            return defaultValue;
+        }
+    };
+
+    app.parse = (value, defaultValue = {}) => {
+        try {
+            return JSON.parse(value);
+        } catch (exception) {
+            return defaultValue;
+        }
     };
 };

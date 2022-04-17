@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { getDtThoiKhoaBieuPage, createDtThoiKhoaBieu, updateDtThoiKhoaBieu, deleteDtThoiKhoaBieu } from './redux';
 import { Link } from 'react-router-dom';
 import { getDmDonViAll, SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
-import { getDmMonHocAll, SelectAdapter_DmMonHoc } from 'modules/mdDanhMuc/dmMonHoc/redux';
+import { SelectAdapter_DmMonHoc } from '../dmMonHoc/redux';
 import { getDmPhongAll, SelectAdapter_DmPhong } from 'modules/mdDanhMuc/dmPhong/redux';
 import { AdminPage, AdminModal, renderTable, TableCell, FormTextBox, FormSelect, FormDatePicker } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
@@ -186,7 +186,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                 items.forEach(item => this.monHocMapper[item.ma] = item);
             }
         });
-        T.ready('/user/pdt', () => {
+        T.ready('/user/dao-tao', () => {
             T.onSearch = (searchText) => this.props.getDtThoiKhoaBieuPage(undefined, undefined, searchText || '');
             T.showSearchBox();
             this.props.getDtThoiKhoaBieuPage();
@@ -255,7 +255,9 @@ class DtThoiKhoaBieuPage extends AdminPage {
                     <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietLa} />
                     <TableCell style={{}} content={item.tenKhoaBoMon} />
                     <TableCell type='buttons' content={item} permission={permission}
-                        onEdit={() => this.modal.show(item)} onDelete={this.delete} />
+                    // onEdit={() => this.modal.show(item)} //TODO: Sắp xếp thời khóa biểu cho phòng đào tạo
+                    // onDelete={this.delete}
+                    />
                 </tr>)
         });
 
@@ -263,7 +265,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
             icon: 'fa fa-calendar',
             title: 'Thời khoá biểu',
             breadcrumb: [
-                <Link key={0} to='/user/pdt'>Đào tạo</Link>,
+                <Link key={0} to='/user/dao-tao'>Đào tạo</Link>,
                 'Thời khoá niểu'
             ],
             content: <>
@@ -273,12 +275,13 @@ class DtThoiKhoaBieuPage extends AdminPage {
                 <EditModal ref={e => this.modal = e} permission={permission} getDonViSelect={this.props.getDmDonViAll} getMonHocSelect={this.props.getDmMonHocAll} getPhongSelect={this.props.getDmPhongAll}
                     create={this.props.createDtThoiKhoaBieu} update={this.props.updateDtThoiKhoaBieu} permissions={currentPermissions} />
             </>,
-            backRoute: '/user/pdt',
-            onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
+            backRoute: '/user/dao-tao',
+            onCreate: null, //TODO: Sắp xếp thời khóa biểu cho phòng đào tạo
+            // permission && permission.write ? (e) => this.showModal(e) : null,
         });
     }
 }
 
 const mapStateToProps = state => ({ system: state.system, dtThoiKhoaBieu: state.daoTao.dtThoiKhoaBieu });
-const mapActionsToProps = { getDmPhongAll, getDmMonHocAll, getDmDonViAll, getDtThoiKhoaBieuPage, createDtThoiKhoaBieu, updateDtThoiKhoaBieu, deleteDtThoiKhoaBieu };
+const mapActionsToProps = { getDmPhongAll, getDmDonViAll, getDtThoiKhoaBieuPage, createDtThoiKhoaBieu, updateDtThoiKhoaBieu, deleteDtThoiKhoaBieu };
 export default connect(mapStateToProps, mapActionsToProps)(DtThoiKhoaBieuPage);

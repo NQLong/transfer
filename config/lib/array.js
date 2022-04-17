@@ -11,6 +11,10 @@ module.exports = () => {
     }
   };
 
+  Array.prototype.exists = function (pattern) {
+    return pattern.some(item => this.includes(item));
+  };
+
   Array.prototype.groupBy = function (key) {
     return this.reduce(
       (result, item) => ({

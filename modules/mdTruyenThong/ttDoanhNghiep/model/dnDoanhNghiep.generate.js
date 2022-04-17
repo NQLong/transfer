@@ -1,6 +1,6 @@
-// Table name: DN_DOANH_NGHIEP { id, quocGia, tenVietTat, tenDayDu, moTa, kichHoat, namThanhLap, theManh, diaChi, email, phone, image, doiTac, hiddenShortName, website, moTaHopTac, ketQuaHopTac, ghiChu, donViPhuTrach }
+// Table name: DN_DOANH_NGHIEP { id, quocGia, tenVietTat, tenDayDu, kichHoat, namThanhLap, diaChi, email, phone, image, doiTac, hiddenShortName, website, donViPhuTrach, moTa, moTaHopTac, ketQuaHopTac, ghiChu, kichHoatTrangTruong }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'quocGia': 'QUOC_GIA', 'tenVietTat': 'TEN_VIET_TAT', 'tenDayDu': 'TEN_DAY_DU', 'moTa': 'MO_TA', 'kichHoat': 'KICH_HOAT', 'namThanhLap': 'NAM_THANH_LAP', 'theManh': 'THE_MANH', 'diaChi': 'DIA_CHI', 'email': 'EMAIL', 'phone': 'PHONE', 'image': 'IMAGE', 'doiTac': 'DOI_TAC', 'hiddenShortName': 'HIDDEN_SHORT_NAME', 'website': 'WEBSITE', 'moTaHopTac': 'MO_TA_HOP_TAC', 'ketQuaHopTac': 'KET_QUA_HOP_TAC', 'ghiChu': 'GHI_CHU', 'donViPhuTrach': 'DON_VI_PHU_TRACH' };
+const obj2Db = { 'id': 'ID', 'quocGia': 'QUOC_GIA', 'tenVietTat': 'TEN_VIET_TAT', 'tenDayDu': 'TEN_DAY_DU', 'kichHoat': 'KICH_HOAT', 'namThanhLap': 'NAM_THANH_LAP', 'diaChi': 'DIA_CHI', 'email': 'EMAIL', 'phone': 'PHONE', 'image': 'IMAGE', 'doiTac': 'DOI_TAC', 'hiddenShortName': 'HIDDEN_SHORT_NAME', 'website': 'WEBSITE', 'donViPhuTrach': 'DON_VI_PHU_TRACH', 'moTa': 'MO_TA', 'moTaHopTac': 'MO_TA_HOP_TAC', 'ketQuaHopTac': 'KET_QUA_HOP_TAC', 'ghiChu': 'GHI_CHU', 'kichHoatTrangTruong': 'KICH_HOAT_TRANG_TRUONG' };
 
 module.exports = app => {
     app.model.dnDoanhNghiep = {
@@ -131,9 +131,9 @@ module.exports = app => {
             app.database.oracle.connection.main.execute(sql, parameter, (error, result) => done(error, result));
         },
 
-        searchPage: (pagenumber, pagesize, searchterm, done) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=dn_doanh_nghiep_search_page(:pagenumber, :pagesize, :searchterm, :totalitem, :pagetotal); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
+        searchPage: (pagenumber, pagesize, searchterm, madonvi, done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=dn_doanh_nghiep_search_page(:pagenumber, :pagesize, :searchterm, :madonvi, :totalitem, :pagetotal); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, searchterm, madonvi, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
 
         searchAll: (loaidoanhnghiep, kichhoat, searchterm, done) => {

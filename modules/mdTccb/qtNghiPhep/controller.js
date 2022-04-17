@@ -74,8 +74,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, listShcc, listDv, tinhTrang } = (req.query.filter && req.query.filter != '%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, tinhTrang: null };
-        app.model.qtNghiPhep.searchPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, tinhTrang, searchTerm, (error, page) => {
+        const filter = app.stringify(req.query.filter);
+        app.model.qtNghiPhep.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -91,8 +91,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, listShcc, listDv, tinhTrang } = (req.query.filter && req.query.filter != '%%%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, tinhTrang: null };
-        app.model.qtNghiPhep.searchPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, tinhTrang, searchTerm, (error, page) => {
+        const filter = app.stringify(req.query.filter);
+        app.model.qtNghiPhep.searchPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -107,8 +107,8 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        const { fromYear, toYear, listShcc, listDv, tinhTrang } = (req.query.filter && req.query.filter != '%%%%%%%%%%') ? req.query.filter : { fromYear: null, toYear: null, listShcc: null, listDv: null, tinhTrang: null };
-        app.model.qtNghiPhep.groupPage(pageNumber, pageSize, listShcc, listDv, fromYear, toYear, tinhTrang, searchTerm, (error, page) => {
+        const filter = app.stringify(req.query.filter);
+        app.model.qtNghiPhep.groupPage(pageNumber, pageSize, filter, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -118,14 +118,161 @@ module.exports = app => {
             }
         });
     });
+
+    app.get('/api/tccb/qua-trinh/nghi-phep/all', app.permission.check('qtNghiPhep:read'), (req, res) => {
+        let condition = { statement: null };
+        if (req.query.shcc) {
+            condition = {
+                statement: 'shcc = :shcc',
+                parameter: { shcc: req.query.shcc },
+            };
+        }
+        app.model.qtNghiPhep.getAll(condition, (error, items) => res.send({ error, items }));
+    });
+
+    app.get('/api/user/qua-trinh/nghi-phep/all', app.permission.check('staff:login'), (req, res) => {
+        let condition = { statement: null };
+        if (req.query.shcc) {
+            condition = {
+                statement: 'shcc = :shcc',
+                parameter: { shcc: req.query.shcc },
+            };
+        }
+        app.model.qtNghiPhep.getAll(condition, (error, items) => res.send({ error, items }));
+    });
     
-    app.post('/api/qua-trinh/nghi-phep', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtNghiPhep.create(req.body.data, (error, item) => res.send({ error, item })));
+    app.post('/api/qua-trinh/nghi-phep', app.permission.check('qtNghiPhep:write'), (req, res) =>
+        app.model.qtNghiPhep.create(req.body.data, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'C', 'Nghỉ phép');
+            res.send({ error, item });
+        })
+    );
 
-    app.put('/api/qua-trinh/nghi-phep', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtNghiPhep.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item })));
+    app.put('/api/qua-trinh/nghi-phep', app.permission.check('qtNghiPhep:write'), (req, res) =>
+        app.model.qtNghiPhep.update({ id: req.body.id }, req.body.changes, (error, item) => {
+            app.tccbSaveCRUD(req.session.user.email, 'U', 'Nghỉ phép');
+            res.send({ error, item });
+        })
+    );
 
-    app.delete('/api/qua-trinh/nghi-phep', app.permission.check('staff:write'), (req, res) =>
-        app.model.qtNghiPhep.delete({ id: req.body.id }, (error) => res.send(error)));
+    app.delete('/api/qua-trinh/nghi-phep', app.permission.check('qtNghiPhep:write'), (req, res) =>
+        app.model.qtNghiPhep.delete({ id: req.body.id }, (error) => {
+            app.tccbSaveCRUD(req.session.user.email, 'D', 'Nghỉ phép');
+            res.send(error);
+        })
+    );
+
+    const calcSoNgayPhepConLai = (shcc, ngayBatDauCongTac, current, danhSachNgayLe, done) => {
+        new Promise(resolve => {
+            let result = 12 + current;
+            if (ngayBatDauCongTac) { //+ thâm niên
+                let thamnien = parseInt(app.date.monthDiff(new Date(ngayBatDauCongTac), new Date()) / 12 / 5);
+                result += thamnien;
+            }
+            let currentYear = new Date().getFullYear();
+            app.model.qtNghiPhep.getAll({
+                statement: 'shcc = :shcc',
+                parameter: shcc,
+            }, (error, items) => {
+                const solve = (idx = 0) => {
+                    if (idx == items.length)  {
+                        resolve(result);
+                        return;
+                    }
+                    let year = new Date(items[idx].batDau).getFullYear();
+                    if (year == currentYear) {
+                        app.model.dmNghiPhep.get({ ma: items[idx].lyDo }, (error, itemNghiPhep ) => {
+                            let value = Math.max(app.date.numberNgayNghi(new Date(items[idx].batDau), new Date(items[idx].ketThuc), danhSachNgayLe) - itemNghiPhep.soNgayPhep, 0);
+                            result -= value;
+                            solve(idx + 1);
+                        });
+                    }
+                };
+                solve();
+            });
+        }).then(data => {
+            done && done(data);
+        });
+    };
+
+    app.get('/api/qua-trinh/nghi-phep/download-excel/:filter', app.permission.check('qtNghiPhep:read'), (req, res) => {
+        let objFilter = app.parse(req.params.filter);
+        let batDau = objFilter && objFilter.batDau ? objFilter.batDau : null;
+        if (batDau) {
+            let batDauDate = new Date(batDau);
+            batDauDate.setHours(0, 0, 0, 0);
+            batDau = batDauDate.getTime();
+        }
+        app.model.qtNghiPhep.downloadExcel(req.params.filter, (error, result) => {
+            if (error || !result) {
+                res.send({ error });
+            } else {
+                let condition = {};
+                if (batDau) {
+                    condition = {
+                        statement: 'ngay >= :ngay',
+                        parameter: {
+                            ngay: batDau,
+                        }
+                    };
+                }
+                app.model.dmNgayLe.getAll(condition, (error, items) => {
+                    const danhSachNgayLe = (items || []).map(item => item.ngay);
+                    const workbook = app.excel.create(), worksheet = workbook.addWorksheet('nghiphep');
+                    new Promise(resolve => {
+                        let cells = [
+                            { cell: 'A1', value: '#', bold: true, border: '1234' },
+                            { cell: 'B1', value: 'Học vị', bold: true, border: '1234' },
+                            { cell: 'C1', value: 'Mã thẻ cán bộ', bold: true, border: '1234' },
+                            { cell: 'D1', value: 'Họ', bold: true, border: '1234' },
+                            { cell: 'E1', value: 'Tên', bold: true, border: '1234' },
+                            { cell: 'F1', value: 'Chức vụ', bold: true, border: '1234' },
+                            { cell: 'G1', value: 'Đơn vị', bold: true, border: '1234' },
+                            { cell: 'H1', value: 'Lý do nghỉ', bold: true, border: '1234' },
+                            { cell: 'I1', value: 'Nơi đến', bold: true, border: '1234' },
+                            { cell: 'J1', value: 'Bắt đầu', bold: true, border: '1234' },
+                            { cell: 'K1', value: 'Kết thúc',   bold: true, border: '1234' },
+                            { cell: 'L1', value: 'Tổng ngày được nghỉ',   bold: true, border: '1234' },
+                            { cell: 'M1', value: 'Số ngày xin nghỉ',   bold: true, border: '1234' },
+                            { cell: 'N1', value: 'Số ngày tính phép',   bold: true, border: '1234' },
+                            { cell: 'O1', value: 'Thâm niên',   bold: true, border: '1234' },
+                        ];
+                        const solve = (index = 0) => {
+                            if (index == result.rows.length) {
+                                resolve(cells);
+                                return;
+                            }
+                            let item = result.rows[index];
+                            calcSoNgayPhepConLai(item.shcc, item.ngayBatDauCongTac, item.ngayNghiPhep, danhSachNgayLe, soNgayPhepConLai => {
+                                cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
+                                cells.push({ cell: 'B' + (index + 2), border: '1234', value: item.tenHocVi });
+                                cells.push({ cell: 'C' + (index + 2), border: '1234', value: item.shcc });
+                                cells.push({ cell: 'D' + (index + 2), border: '1234', value: item.hoCanBo });
+                                cells.push({ cell: 'E' + (index + 2), border: '1234', value: item.tenCanBo });
+                                cells.push({ cell: 'F' + (index + 2), border: '1234', value: item.tenChucVu });
+                                cells.push({ cell: 'G' + (index + 2), border: '1234', value: item.tenDonVi });
+                                cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.lyDo == '99' ? item.lyDoKhac : item.tenNghiPhep });
+                                cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.noiDen });
+                                cells.push({ cell: 'J' + (index + 2), border: '1234', value: item.batDau ? app.date.dateTimeFormat(new Date(item.batDau), item.batDauType) : '' });
+                                cells.push({ cell: 'K' + (index + 2), border: '1234', value: item.ketThuc ? app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType) : '' });
+                                cells.push({ cell: 'L' + (index + 2), border: '1234', value: soNgayPhepConLai });
+                                cells.push({ cell: 'M' + (index + 2), border: '1234', value: app.date.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), danhSachNgayLe) });
+                                cells.push({ cell: 'N' + (index + 2), border: '1234', value: Math.max(app.date.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), danhSachNgayLe) - item.ngayNghiPhep, 0) });
+                                cells.push({ cell: 'O' + (index + 2), border: '1234', value: parseInt(app.date.monthDiff(new Date(item.ngayBatDauCongTac), new Date()) / 12 / 5) + 'tn' });
+                                solve(index + 1);
+                            });
+                        };
+                        solve();
+                    }).then((cells) => {
+                        app.excel.write(worksheet, cells);
+                        app.excel.attachment(workbook, res, 'nghiphep.xlsx');
+                    }).catch((error) => {
+                        res.send({ error });
+                    });
+                });
+            }
+        });
+
+    });
 
 };
