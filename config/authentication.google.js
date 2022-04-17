@@ -4,7 +4,7 @@ module.exports = (app) => {
 
     const GoogleStrategyConfig = {
         clientID: '318805336792-3g9b03uc6tk8b6ra1v49otm7ajddb8oi.apps.googleusercontent.com',
-        clientSecret: '5m_LfDfX9sEXixR9G4qMJwc5',
+        clientSecret: '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',
         callbackURL: '/auth/google/callback'
     };
 
