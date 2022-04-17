@@ -1,6 +1,6 @@
 {
     "name": "hcmussh",
-    "version": "1.0.50",
+    "version": "1.0.51",
     "title": "TRƯỜNG ĐẠI HỌC KHOA HỌC XÃ HỘI VÀ NHÂN VĂN - ĐHQG TP.HCM",
     "description": "HCMUSSH website",
     "main": "hcmussh.web.js",
@@ -138,7 +138,6 @@
         "oracledb": "^5.0.0",
         "passport": "^0.5.2",
         "passport-google-oauth": "^2.0.0",
-        "passport-google-oauth2": "^0.2.0",
         "pizzip": "^3.0.6",
         "redis": "^3.0.2",
         "serve-favicon": "^2.5.0",
