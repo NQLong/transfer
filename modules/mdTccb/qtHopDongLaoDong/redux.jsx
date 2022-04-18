@@ -284,3 +284,17 @@ export function getDaiDienKyHopDong(shcc, done) {
         });
     };
 }
+
+export function getPreShcc(maDonVi, done) {
+    return () => {
+        const url = `/api/tccb/qua-trinh/hop-dong/pre-shcc/${maDonVi}`;
+        T.get(url, data => {
+            if (data.error) {
+                T.notify('Lấy thông tin mã thẻ cán bộ mới bị lỗi', 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else if (done) {
+                done(data);
+            }
+        });
+    };
+}

@@ -39,7 +39,7 @@ export class ComponentPhiaTruong extends React.Component {
         const isRequired = selector.props.required;
         if (data || data === 0) return data;
         if (isRequired) throw selector;
-        return '';
+        return null;
     };
 
     getValue = () => {

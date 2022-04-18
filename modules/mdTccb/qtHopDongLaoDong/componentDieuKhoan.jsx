@@ -79,6 +79,7 @@ export class ComponentDieuKhoan extends React.Component {
             this.cheDoNghiNgoi.value(defaultValue.cheDoNghiNgoi);
             this.boiThuong.value(defaultValue.boiThuong);
             this.tuNgay.value(new Date().getTime());
+            this.batDauLamViec.value(new Date().getTime());
             this.chiuSuPhanCong.value(defaultValue.chiuSuPhanCong);
         }
     }
@@ -120,19 +121,13 @@ export class ComponentDieuKhoan extends React.Component {
             this.denNgay.value(newDate.valueOf() - 24 * 3600000);
             this.ngayKyTiepTheo.value(newDate.valueOf());
         }
-    }
-
-    handlePhanCong = (value) => {
-        if (this.state.maDv) {
-            let curPhanCong = value.currentTarget.value;
-            if (!curPhanCong.includes(this.tenDonViMapper[this.state.maDv]))
-                this.chiuSuPhanCong.value(curPhanCong + ' ' + this.tenDonViMapper[this.state.maDv]);
-        }
+        value && this.batDauLamViec.value(value);
     }
 
     handleDonVi = () => {
         let trachNhiem = this.state.listMaKhoa.includes(this.state.maDv) ? 'Trưởng khoa ' : 'Trưởng/Giám đốc ';
         this.chiuSuPhanCong.value(defaultValue.chiuSuPhanCong + trachNhiem + this.tenDonViMapper[this.state.maDv].normalizedName());
+        this.congViecDuocGiao.value(defaultValue.congViecDuocGiao + trachNhiem + this.tenDonViMapper[this.state.maDv].normalizedName());
     }
 
     validate = (selector) => {
@@ -140,7 +135,7 @@ export class ComponentDieuKhoan extends React.Component {
         const isRequired = selector.props.required;
         if (data || data === 0) return data;
         if (isRequired) throw selector;
-        return '';
+        return null;
     };
 
     getValue = () => {
@@ -175,6 +170,10 @@ export class ComponentDieuKhoan extends React.Component {
         }
     }
 
+    getDonVi = () => {
+        return this.donVi.value();
+    };
+
     render() {
         const currentPermission = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [];
         let readOnly = !currentPermission.includes('qtHopDongLaoDong:write');
@@ -188,12 +187,15 @@ export class ComponentDieuKhoan extends React.Component {
                     <FormSelect ref={e => this.loaiHopDong = e} data={SelectAdapter_DmLoaiHopDongV2} className='col-xl-12 col-md-12' label='Loại hợp đồng lao động' onChange={this.handleLoaiHD} required readOnly={readOnly} />
                     <FormDatePicker ref={e => this.tuNgay = e} type='date-mask' className='col-xl-3 col-md-6' label='Từ ngày' required readOnly={readOnly} onChange={this.handleTuNgay} />
                     <FormDatePicker ref={e => this.denNgay = e} type='date-mask' className={this.state.isXacDinhTg ? 'col-xl-3 col-md-6' : 'd-none'} label='Đến ngày' required readOnly={readOnly} />
-                    <FormDatePicker ref={e => this.batDauLamViec = e} type='date-mask' className='col-xl-3 col-md-6' label='Ngày bắt đầu làm việc' required readOnly={readOnly} />
+                    <FormDatePicker ref={e => this.batDauLamViec = e} type='date-mask' className='col-xl-3 col-md-6' label='Ngày bắt đầu làm việc' required readOnly={true} />
                     <FormDatePicker ref={e => this.ngayKyTiepTheo = e} type='date-mask' className={this.state.isXacDinhTg ? 'col-xl-3 col-md-6' : 'd-none'} label='Ngày tái ký' required readOnly={readOnly} />
-                    <FormSelect ref={e => this.donVi = e} data={SelectAdapter_DmDonVi} className='col-xl-4 col-md-6' label='Địa điểm làm việc' readOnly={readOnly} onChange={value => { this.setState({ maDv: value.id }, () => this.maBoMon.value(null)); this.handleDonVi(); }} required />
+                    <FormSelect ref={e => this.donVi = e} data={SelectAdapter_DmDonVi} className='col-xl-4 col-md-6' label='Địa điểm làm việc' readOnly={readOnly} onChange={value => { 
+                        this.setState({ maDv: value.id }, () => this.maBoMon.value(null)); 
+                        this.handleDonVi(); 
+                        this.props.genNewShcc(value.id, value.preShcc); }} required />
                     <FormSelect ref={e => this.maBoMon = e} data={SelectAdapter_DmBoMonTheoDonVi(this.state.maDv)} label='Bộ môn' readOnly={readOnly} className={!this.state.maDv || !this.state.listMaKhoa.includes(this.state.maDv) ? 'd-none' : 'col-xl-4 col-md-6'} />
                     <FormSelect ref={e => this.chucDanh = e} data={SelectAdapter_DmNgachCdnnV2} onChange={this.handleNgach} className='col-md-4' label='Chức danh chuyên môn' required />
-                    <FormTextBox ref={e => this.congViecDuocGiao = e} label='Công việc được giao' readOnly={readOnly} className='col-12' maxLength={100} />
+                    <FormTextBox ref={e => this.congViecDuocGiao = e} label='Công việc được giao' readOnly={readOnly} className='col-12' maxLength={200} />
                     <div className='col-12 form-group' />
                     <div className='col-12 form-group'>
                         <h4 className='control-label' style={{ fontWeight: 'bold', textAlign: 'left' }}>Điều 2: Chế độ làm việc</h4>
@@ -217,7 +219,7 @@ export class ComponentDieuKhoan extends React.Component {
                     <div className='col-12 form-group'>
                         <h5 className='control-label' style={{ fontWeight: 'bold' }}>2. Nghĩa vụ: </h5>
                     </div>
-                    <FormTextBox ref={e => this.chiuSuPhanCong = e} label='Chịu sự điều hành, quản lý của' onChange={this.handlePhanCong} className='col-xl-6 col-md-6' />
+                    <FormTextBox ref={e => this.chiuSuPhanCong = e} label='Chịu sự điều hành, quản lý của' className='col-xl-6 col-md-6' />
                     <FormTextBox ref={e => this.boiThuong = e} label='Bồi thường vi phạm và vật chất' className='col-xl-6 col-md-6' />
                 </div>
             </div>
