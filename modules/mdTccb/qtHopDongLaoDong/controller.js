@@ -327,4 +327,14 @@ module.exports = app => {
             res.send({ error, soHopDongSuggested: maxSoHD + 1 });
         });
     });
+
+    app.get('/api/tccb/qua-trinh/hop-dong/pre-shcc/:maDonVi', app.permission.check('qtHopDongLaoDong:write'), (req, res) => {
+        app.model.qtHopDongLaoDong.getMaxShccByDonVi(req.params.maDonVi, (error, item) => {
+            if (error) {
+                res.send({ error });
+            } else {
+                res.send({ preShcc: item && item.outBinds && item.outBinds.ret ? item.outBinds.ret + 1 : 1 });
+            }
+        });
+    });
 };

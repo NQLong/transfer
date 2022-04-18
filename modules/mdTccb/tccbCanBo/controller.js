@@ -982,9 +982,9 @@ module.exports = app => {
         })).then(() => new Promise(resolve => {
             app.model.qtHopDongVienChuc.get({ nguoiDuocThue: canBo.shcc }, 'ngayKyHopDong,loaiHopDong', 'NGAY_KY_HOP_DONG DESC', (error, hopDongVC) => {
                 if (error) {
-                    res.send({ error: 'Lỗi khi lấy thông tin hợp đồng lao động !' });
+                    res.send({ error: 'Lỗi khi lấy thông tin hợp đồng làm việc !' });
                 } else if (!hopDongVC)
-                    result = app.clone(result, { hopDongCanBo: 'VC' });
+                    result = app.clone(result, { hopDongCanBo: 'LĐ' });
                 else {
                     result = app.clone(result, { hopDongCanBo: 'VC', hopDongCanBoNgay: hopDongVC.ngayKyHopDong, loaiHopDongCanBo: hopDongVC.loaiHopDong });
                 }

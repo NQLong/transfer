@@ -41,31 +41,35 @@ export class ComponentPhiaCanBo extends React.Component {
         nguooiKy: this.daiDien.value()
     })
 
+    setShcc = (preShcc) => {
+        if (this.newSHCC) this.newSHCC.value(preShcc);
+    }
+
     setVal = (data = null) => {
         if (data) {
             if (data.isTaoMoi)
                 this.setState({ isCanBoCu: true });
             else
                 this.setState({ isTaoMoi: false, isCanBoCu: true });
-            this.canBo.value(data.shcc);
+            this.canBo.value(data.shcc ? data.shcc : '');
             this.ngaySinh.value(data.ngaySinh);
-            this.gioiTinh.value(data.phai);
-            data.cmnd && this.cmnd.value(data.cmnd);
+            this.gioiTinh.value(data.phai ? data.phai : '');
+            data.cmnd && this.cmnd.value(data.cmnd ? data.cmnd : '');
             data.cmndNgayCap && this.cmndNgayCap.value(data.cmndNgayCap);
             data.cmndNoiCap && this.cmndNoiCap.value(data.cmndNoiCap);
-            this.quocTich.value(data.quocGia);
-            this.danToc.value(data.danToc);
-            data.emailCaNhan && this.emailCaNhan.value(data.emailCaNhan);
-            this.email.value(data.email);
+            this.quocTich.value(data.quocGia ? data.quocGia : '');
+            this.danToc.value(data.danToc ? data.danToc : '');
+            data.emailCaNhan && this.emailCaNhan.value(data.emailCaNhan ? data.emailCaNhan : '');
+            this.email.value(data.email ? data.email : '');
             this.dienThoai.value(data.dienThoaiCaNhan ? data.dienThoaiCaNhan : '');
 
-            this.noiSinh.value(data.maTinhNoiSinh);
-            this.nguyenQuan.value(data.maTinhNguyenQuan);
+            this.noiSinh.value(data.maTinhNoiSinh, data.maHuyenNoiSinh, data.maXaNoiSinh);
+            this.nguyenQuan.value(data.maTinhNguyenQuan, data.maHuyenNoiSinh, data.maXaNguyenQuan);
             this.cuTru.value(data.hienTaiMaTinh, data.hienTaiMaHuyen, data.hienTaiMaXa, data.hienTaiSoNha);
             this.thuongTru.value(data.thuongTruMaTinh, data.thuongTruMaHuyen, data.thuongTruMaXa, data.thuongTruSoNha);
 
-            this.hocVi.value(data.hocVi);
-            this.hocViChuyenNganh.value(data.chuyenNganh);
+            this.hocVi.value(data.hocVi ? data.hocVi : '');
+            this.hocViChuyenNganh.value(data.chuyenNganh ? data.chuyenNganh : '');
 
         }
     }
@@ -73,9 +77,11 @@ export class ComponentPhiaCanBo extends React.Component {
     validate = (selector) => {
         const data = selector.value();
         const isRequired = selector.props.required;
-        if (data || data === 0) return data;
-        if (isRequired) throw selector;
-        return '';
+        if (data || data === 0 || data != '') return data;
+        if (isRequired) {
+            throw selector;
+        }
+        return null;
     };
 
     handleNewShcc = (value) => {
@@ -92,14 +98,21 @@ export class ComponentPhiaCanBo extends React.Component {
         }
     }
 
+    copyAddress = e => {
+        e.preventDefault();
+        const dataThuongTru = this.thuongTru.value();
+        this.cuTru.value(dataThuongTru.maTinhThanhPho, dataThuongTru.maQuanHuyen, dataThuongTru.maPhuongXa, dataThuongTru.soNhaDuong);
+    }
+
     getValue = () => {
         try {
             const data = {
                 shcc: (this.state.isCanBoCu) ? this.validate(this.canBo) : this.validate(this.newSHCC),
-                ngaySinh: this.validate(this.ngaySinh).getTime(),
-                gioiTinh: this.validate(this.gioiTinh),
+                isTaoMoi: !this.state.isCanBoCu,
+                ngaySinh: this.validate(this.ngaySinh)?.getTime(),
+                phai: this.validate(this.gioiTinh),
                 cmnd: this.validate(this.cmnd),
-                cmndNgayCap: this.validate(this.cmndNgayCap).getTime(),
+                cmndNgayCap: this.validate(this.cmndNgayCap)?.getTime(),
                 cmndNoiCap: this.validate(this.cmndNoiCap),
                 quocGia: this.validate(this.quocTich),
                 danToc: this.validate(this.danToc),
@@ -115,7 +128,11 @@ export class ComponentPhiaCanBo extends React.Component {
                 hienTaiMaXa: this.cuTru.value().maPhuongXa,
                 hienTaiSoNha: this.cuTru.value().soNhaDuong,
                 maTinhNoiSinh: this.noiSinh.value().maTinhThanhPho,
+                maHuyenNoiSinh: this.noiSinh.value().maQuanHuyen,
+                maXaNoiSinh: this.noiSinh.value().maPhuongXa,
                 maTinhNguyenQuan: this.nguyenQuan.value().maTinhThanhPho,
+                maHuyenNguyenQuan: this.nguyenQuan.value().maQuanHuyen,
+                maXaNguyenQuan: this.nguyenQuan.value().maPhuongXa,
                 hocVi: this.validate(this.hocVi),
                 chuyenNganh: this.validate(this.hocViChuyenNganh)
             };
@@ -157,7 +174,7 @@ export class ComponentPhiaCanBo extends React.Component {
                             <FormDatePicker ref={e => this.ngaySinh = e} type='date-mask' className='col-xl-3 col-md-6' label='Ngày sinh' required readOnly={readOnly} />
                         </>
                     }
-                    <FormSelect ref={e => this.gioiTinh = e} label='Giới tính' data={SelectAdapter_DmGioiTinhV2} className='col-xl-3 col-md-6' />
+                    <FormSelect ref={e => this.gioiTinh = e} label='Giới tính' data={SelectAdapter_DmGioiTinhV2} className='col-xl-3 col-md-6'required />
                     <FormTextBox ref={e => this.cmnd = e} className='col-md-3' label='CMND/CCCD' required />
                     <FormDatePicker ref={e => this.cmndNgayCap = e} type='date-mask' className='col-md-3' label='Ngày cấp' />
                     <FormTextBox ref={e => this.cmndNoiCap = e} className='col-md-6' label='Nơi cấp' />
@@ -166,8 +183,8 @@ export class ComponentPhiaCanBo extends React.Component {
                     <FormTextBox ref={e => this.emailCaNhan = e} label='Email cá nhân' className='col-md-4' readOnly={readOnly} />
                     <FormTextBox ref={e => this.email = e} label='Email trường' className='col-md-4' readOnly={readOnly} />
                     <FormTextBox type='phone' ref={e => this.dienThoai = e} label='Số diện thoại cá nhân' className='col-md-4' readOnly={readOnly} />
-                    <ComponentDiaDiem ref={e => this.noiSinh = e} label='Nơi sinh' className='col-xl-6 col-md-6' onlyTinhThanh={true} />
-                    <ComponentDiaDiem ref={e => this.nguyenQuan = e} label='Nguyên quán' className='col-xl-6 col-md-6' onlyTinhThanh={true} />
+                    <ComponentDiaDiem ref={e => this.noiSinh = e} label='Nơi sinh' className='col-xl-6 col-md-6' />
+                    <ComponentDiaDiem ref={e => this.nguyenQuan = e} label='Nguyên quán' className='col-xl-6 col-md-6' />
                     <ComponentDiaDiem ref={e => this.thuongTru = e} label='Địa chỉ thường trú' className='col-md-12' requiredSoNhaDuong={true} />
                     <p className='col-md-12'>
                         Nếu <b>Địa chỉ thường trú</b> là <b>Địa chỉ hiện tại</b> thì&nbsp;<a href='#' onClick={this.copyAddress}>nhấp vào đây</a>.

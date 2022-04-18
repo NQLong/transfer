@@ -1,12 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { getQtHopDongLaoDongEdit, getHopDongMoiNhat, createQtHopDongLaoDong, updateQtHopDongLaoDong } from './redux';
+import { getQtHopDongLaoDongEdit, getHopDongMoiNhat, createQtHopDongLaoDong, updateQtHopDongLaoDong, getPreShcc } from './redux';
 import { AdminPage } from 'view/component/AdminPage';
 import ComponentPhiaTruong from './componentPhiaTruong';
 import ComponentPhiaCanBo from './componentPhiaCanBo';
 import { getStaff, updateStaff, createStaff } from '../tccbCanBo/redux';
 import ComponentDieuKhoan from './componentDieuKhoan';
+import getDmDonVi from '../../mdDanhMuc/dmDonVi/redux';
 
 class HDLD_Details extends AdminPage {
     url = '';
@@ -43,22 +44,40 @@ class HDLD_Details extends AdminPage {
     }
 
     validateNewest = (ngayKyHopDong, shcc, done) => {
-        this.props.getHopDongMoiNhat(shcc, data => {
-            data && this.setState({ canUpdate: ngayKyHopDong >= data.ngayKyHopDong }, () => {
-                if (done) done(this.state.canUpdate);
-            });
+        this.props.getHopDongMoiNhat(shcc, data => {    
+            data ? this.setState({ canUpdate: ngayKyHopDong >= data.ngayKyHopDong }, () => {
+                done(this.state.canUpdate);
+            }) : done();
         });
     }
 
+    genNewShcc = (maDonVi, preShcc) => {
+        this.props.getPreShcc(maDonVi, (data) => {
+            preShcc = preShcc + '.' + data.preShcc.toString().padStart(4, '0');
+            this.phiaCanBo.setShcc(preShcc);
+        });
+    };
+
     save = () => {
         const dataPhiaTruong = this.phiaTruong.getValue();
+        if (!dataPhiaTruong) {
+            return;
+        }
         const dataPhiaCanBo = this.phiaCanBo.getValue();
+        if (!dataPhiaCanBo) {
+            return;
+        }
         const dataDieuKhoan = this.dieuKhoan.getValue();
+        if (!dataDieuKhoan) {
+            return;
+        }
         dataDieuKhoan.nguoiDuocThue = dataPhiaCanBo.shcc;
         Object.assign(dataDieuKhoan, dataPhiaTruong);
+        dataPhiaCanBo.maDonVi = dataDieuKhoan.diaDiemLamViec;
         dataPhiaCanBo.ngach = dataDieuKhoan.maNgach;
         dataPhiaCanBo.bacLuong = dataDieuKhoan.bac;
         dataPhiaCanBo.heSoLuong = dataDieuKhoan.heSo;
+        dataPhiaCanBo.ngayBatDauCongTac = dataDieuKhoan.batDauLamViec;
         let ma = dataDieuKhoan.ma;
         delete dataDieuKhoan.ma;
         this.validateNewest(dataDieuKhoan.ngayKyHopDong, dataDieuKhoan.nguoiDuocThue, (canUpdateCanBo) => {
@@ -108,7 +127,7 @@ class HDLD_Details extends AdminPage {
                 <ComponentPhiaTruong ref={e => this.phiaTruong = e} />
                 <ComponentPhiaCanBo ref={e => this.phiaCanBo = e}
                     onCanBoChange={(value) => this.handleCanBoChange(value)} />
-                <ComponentDieuKhoan ref={e => this.dieuKhoan = e} />
+                <ComponentDieuKhoan ref={e => this.dieuKhoan = e} genNewShcc={this.genNewShcc}/>
             </>,
             backRoute: '/user/tccb/qua-trinh/hop-dong-lao-dong',
             onSave: permissionWrite ? this.save : null,
@@ -119,6 +138,7 @@ class HDLD_Details extends AdminPage {
 
 const mapStateToProps = state => ({ system: state.system, qtHopDongLaoDong: state.tccb.qtHopDongLaoDong });
 const mapActionsToProps = {
-    getQtHopDongLaoDongEdit, getStaff, getHopDongMoiNhat, updateStaff, createStaff, createQtHopDongLaoDong, updateQtHopDongLaoDong
+    getQtHopDongLaoDongEdit, getStaff, getHopDongMoiNhat, updateStaff, createStaff, createQtHopDongLaoDong, updateQtHopDongLaoDong, 
+    getDmDonVi, getPreShcc
 };
 export default connect(mapStateToProps, mapActionsToProps)(HDLD_Details);

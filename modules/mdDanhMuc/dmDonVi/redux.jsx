@@ -178,15 +178,15 @@ export const SelectAdapter_DmDonVi = {
     ajax: true,
     url: '/api/danh-muc/don-vi/page/1/50',
     data: params => ({ condition: params.term, kichHoat: 1 }),
-    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.ten })) : [] }),
-    fetchOne: (id, done) => (getDmDonVi(id, item => item && done && done({ id: item.ma, text: item.ten })))(),
+    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.ten, preShcc: item.preShcc })) : [] }),
+    fetchOne: (id, done) => (getDmDonVi(id, item => item && done && done({ id: item.ma, text: item.ten, preShcc: item.preShcc })))(),
 };
 
 export const SelectAdapter_DmDonViFaculty = {
     ajax: true,
     getAll: getDmDonViFaculty,
-    processResults: response => ({ results: response ? response.items.map(item => ({ value: item.ma, text: item.ten })) : [] }),
-    fetchOne: (id, done) => (getDmDonVi(id, item => item && done && done({ id: item.ma, text: item.ten })))(),
+    processResults: response => ({ results: response ? response.items.map(item => ({ value: item.ma, text: item.ten, preShcc: item.preShcc })) : [] }),
+    fetchOne: (id, done) => (getDmDonVi(id, item => item && done && done({ id: item.ma, text: item.ten, preShcc: item.preShcc })))(),
     condition: { kichHoat: 1 },
 };
 
