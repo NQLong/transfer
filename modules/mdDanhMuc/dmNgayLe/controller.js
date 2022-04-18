@@ -5,13 +5,21 @@ module.exports = app => {
             4100: { title: 'Ngày lễ', link: '/user/danh-muc/ngay-le' },
         },
     };
+
+    const menuDaoTao = {
+        parentMenu: app.parentMenu.daoTao,
+        menus: {
+            7007: { title: 'Danh sách ngày lễ trong năm', link: '/user/dao-tao/ngay-le', backgroundColor: '#FF9074', groupIndex: 2 }
+        },
+    };
     app.permission.add(
         { name: 'dmNgayLe:read', menu },
+        { name: 'dtNgayLe:read', menu: menuDaoTao },
         { name: 'dmNgayLe:write' },
         { name: 'dmNgayLe:delete' },
         { name: 'dmNgayLe:upload' },
     );
-    app.get('/user/danh-muc/ngay-le', app.permission.check('dmNgayLe:read'), app.templates.admin);
+    app.get('/user/:menu/ngay-le', app.permission.orCheck('dmNgayLe:read', 'dtNgayLe:read'), app.templates.admin);
     app.get('/user/danh-muc/ngay-le/upload', app.permission.check('dmNgayLe:write'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
@@ -20,19 +28,33 @@ module.exports = app => {
             pageSize = parseInt(req.params.pageSize);
         let condition = { statement: null };
         const statement = ['ngay', 'moTa'].map(i => `lower(${i}) LIKE :searchText`).join(' OR ');
-        if (req.query.condition) {
+        if (req.query.searchText) {
             condition = {
                 statement,
                 parameter: { searchText: `%${req.query.condition.toLowerCase()}%` },
             };
         }
-        app.model.dmNgayLe.getPage(pageNumber, pageSize, condition, '*', 'ngay DESC', (error, page) => res.send({ error, page }));
+        app.model.dmNgayLe.getPage(pageNumber, pageSize, condition, '*', 'ngay DESC', (error, page) => {
+            if (req.query.year) page.list = page.list.filter(item => new Date(item.ngay).getFullYear() == req.query.year);
+            page.pageCondition = {
+                searchText: req.query.searchText || '',
+                year: req.query.year || ''
+            };
+            res.send({ error, page });
+        });
     });
 
     app.get('/api/danh-muc/ngay-le/all', app.permission.check('user:login'), (req, res) => {
         const condition = req.query.condition || {};
         Object.keys(condition).forEach(key => { condition[key] === '' ? condition[key] = null : ''; });
         app.model.dmNgayLe.getAll(condition, '*', 'ngay DESC', (error, items) => res.send({ error, items }));
+    });
+
+    app.get('/api/danh-muc/ngay-le/get-all-year', app.permission.check('user:login'), (req, res) => {
+        app.model.dmNgayLe.getAll({ kichHoat: 1 }, 'ngay', 'ngay DESC', (error, items) => {
+            let newItems = items.map(item => item = new Date(item.ngay).getFullYear());
+            res.send({ error, items: [...new Set(newItems)] });
+        });
     });
 
     app.get('/api/danh-muc/ngay-le/item/:id', app.permission.check('user:login'), (req, res) => {
@@ -44,7 +66,7 @@ module.exports = app => {
     });
 
     app.put('/api/danh-muc/ngay-le', app.permission.check('dmNgayLe:write'), (req, res) => {
-        app.model.dmNgayLe.update({ id: req.body.id }, req.body.changes, (error, items) => res.send({ error, items }));
+        app.model.dmNgayLe.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
     app.delete('/api/danh-muc/ngay-le', app.permission.check('dmNgayLe:delete'), (req, res) => {

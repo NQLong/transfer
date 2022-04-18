@@ -18,15 +18,16 @@ export default function dmNgayLeReducer(state = null, data) {
                     updatedItem = data.item;
                 if (updatedItems) {
                     for (let i = 0, n = updatedItems.length; i < n; i++) {
-                        if (updatedItems[i].ma == updatedItem.ma) {
+                        if (updatedItems[i].id == updatedItem.id) {
                             updatedItems.splice(i, 1, updatedItem);
                             break;
                         }
                     }
                 }
                 if (updatedPage) {
-                    for (let i = 0, n = updatedPage.list.length; i < n; i++) {
-                        if (updatedPage.list[i].ma == updatedItem.ma) {
+                    if (updatedItem.isDelete) updatedPage.list = updatedPage.list.filter(item => item.id != updatedItem.id);
+                    else for (let i = 0, n = updatedPage.list.length; i < n; i++) {
+                        if (updatedPage.list[i].id == updatedItem.id) {
                             updatedPage.list.splice(i, 1, updatedItem);
                             break;
                         }
@@ -66,12 +67,12 @@ export function getDmNgayLePage(pageNumber, pageSize, pageCondition, done) {
     const page = T.updatePage('pageDmNgayLe', pageNumber, pageSize, pageCondition);
     return dispatch => {
         const url = `/api/danh-muc/ngay-le/page/${page.pageNumber}/${page.pageSize}`;
-        T.get(url, { condition: pageCondition }, data => {
+        T.get(url, { searchText: pageCondition?.searchText, year: pageCondition?.year }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách ngày lễ bị lỗi!', 'danger');
                 console.error(`GET ${url}. ${data.error}`);
             } else {
-                if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
+                if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem, data.page.pageCondition);
                 dispatch({ type: DmNgayLeGetPage, page: data.page });
             }
         });
@@ -88,8 +89,8 @@ export function createDmNgayLe(item, done) {
             } else {
                 if (done) {
                     T.notify('Tạo ngày lễ thành công', 'success');
-                    done(data.items);
-                    dispatch(getDmNgayLePage());
+                    dispatch(getDmNgayLePage(undefined, undefined, { year: new Date(data.item.ngay).getFullYear() }));
+                    done && done(data.item);
                 }
             }
         });
@@ -120,7 +121,7 @@ export function deleteDmNgayLe(id) {
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('Ngày lễ đã xóa thành công!', 'success', false, 800);
-                dispatch(getDmNgayLePage());
+                dispatch({ type: DmNgayLeUpdate, item: { id, isDelete: true } });
             }
         }, () => T.notify('Xóa ngày lễ bị lỗi!', 'danger'));
     };
@@ -135,11 +136,9 @@ export function updateDmNgayLe(id, changes, done) {
                 console.error(`PUT ${url}. ${data.error}`);
                 done && done(data.error);
             } else {
-                if (done) {
-                    T.notify('Cập nhật thông tin ngày lễ thành công!', 'success');
-                    dispatch(getDmNgayLePage());
-                    done();
-                }
+                T.notify('Cập nhật thông tin ngày lễ thành công!', 'success');
+                dispatch({ type: DmNgayLeUpdate, item: data.item });
+                done && done();
             }
         }, () => T.notify('Cập nhật thông tin ngày lễ bị lỗi!', 'danger'));
     };
@@ -148,4 +147,11 @@ export function updateDmNgayLe(id, changes, done) {
 export function changeDmNgayLe(item) {
     return { type: DmNgayLeUpdate, item };
 }
+
+export const SelectAdapter_DmNgayLeGetYear = {
+    ajax: true,
+    url: '/api/danh-muc/ngay-le/get-all-year',
+    data: () => { },
+    processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item, text: item })) : [] }),
+};
 
