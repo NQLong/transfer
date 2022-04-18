@@ -15,7 +15,7 @@ export default {
         //     component: Loadable({ loading: Loading, loader: () => import('./adminImportPage') })
         // },
         {
-            path: '/user/danh-muc/ngay-le',
+            path: '/user/:menu/ngay-le',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
     ],
