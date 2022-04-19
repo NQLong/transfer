@@ -38,7 +38,8 @@ export class ComponentDieuKhoan extends React.Component {
     setVal = (data = null) => {
         if (data) {
             let { ma, loaiHopDong, ngayKyHopDong, batDauLamViec, ketThucHopDong, diaDiemLamViec,
-                congViecDuocGiao, maNgach, heSo, bac, phanTramHuong, chiuSuPhanCong, ngayKyHdTiepTheo } = data;
+                congViecDuocGiao, maNgach, heSo, bac, phanTramHuong, chiuSuPhanCong, ngayKyHdTiepTheo, thoiGianLamViec, 
+                dungCuDuocCapPhat, phuongTienDiLaiLamViec, hinhThucTraLuong, cheDoNghiNgoi, boiThuongVatChat } = data;
             this.setState({ ma });
             this.props.getDmDonVi(diaDiemLamViec, data => {
                 this.setState({ tenDonVi: data.ten, maDv: diaDiemLamViec, ngach: this.cdnnMapper[maNgach] }, () => {
@@ -60,13 +61,13 @@ export class ComponentDieuKhoan extends React.Component {
                     this.heSoLuong.value(heSo.toFixed(2));
                     this.bacLuong.value(bac);
                     this.phanTramHuong.value(phanTramHuong ? phanTramHuong : '');
-                    this.thoiGianLamViec.value(defaultValue.thoiGianLamViec);
-                    this.cheDoNghiNgoi.value(defaultValue.cheDoNghiNgoi);
-                    this.dungCuLamViec.value(defaultValue.dungCuLamViec);
-                    this.phuongTienLamViec.value(defaultValue.phuongTienLamViec);
-                    this.hinhThucTraLuong.value(defaultValue.hinhThucTraLuong);
+                    this.thoiGianLamViec.value(thoiGianLamViec ? thoiGianLamViec : defaultValue.thoiGianLamViec);
+                    this.cheDoNghiNgoi.value(cheDoNghiNgoi ? cheDoNghiNgoi : defaultValue.cheDoNghiNgoi);
+                    this.dungCuLamViec.value(dungCuDuocCapPhat ? dungCuDuocCapPhat : defaultValue.dungCuLamViec);
+                    this.phuongTienLamViec.value(phuongTienDiLaiLamViec ? phuongTienDiLaiLamViec : defaultValue.phuongTienLamViec);
+                    this.hinhThucTraLuong.value(hinhThucTraLuong ? hinhThucTraLuong : defaultValue.hinhThucTraLuong);
                     this.chiuSuPhanCong.value(chiuSuPhanCong ? chiuSuPhanCong + ' ' + this.state.tenDonVi.normalizedName() : defaultValue.chiuSuPhanCong + ' ' + this.state.tenDonVi.normalizedName());
-                    this.boiThuong.value(defaultValue.boiThuong);
+                    this.boiThuong.value(boiThuongVatChat ? boiThuongVatChat : defaultValue.boiThuong);
                     this.ngayKyTiepTheo.value(ngayKyHdTiepTheo);
                 });
             });
@@ -155,11 +156,11 @@ export class ComponentDieuKhoan extends React.Component {
                 ngayKyHdTiepTheo: this.validate(this.ngayKyTiepTheo).getTime(),
                 //new thing
                 thoiGianLamViec: this.validate(this.thoiGianLamViec),
-                dungCuLamViec: this.validate(this.dungCuLamViec),
-                phuongTienLamViec: this.validate(this.phuongTienLamViec),
+                dungCuDuocCapPhat: this.validate(this.dungCuLamViec),
+                phuongTienDiLaiLamViec: this.validate(this.phuongTienLamViec),
                 hinhThucTraLuong: this.validate(this.hinhThucTraLuong),
                 cheDoNghiNgoi: this.validate(this.cheDoNghiNgoi),
-                boiThuong: this.validate(this.boiThuong),
+                boiThuongVatChat: this.validate(this.boiThuong),
                 boMon: this.validate(this.maBoMon)
             };
             return data;

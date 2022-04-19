@@ -112,7 +112,6 @@ class HDLD_Details extends AdminPage {
     }
 
     render() {
-        const isData = this.props.qtHopDongLaoDong ? this.props.qtHopDongLaoDong : null;
         const currentPermission = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [];
         let permissionWrite = currentPermission.includes('qtHopDongLaoDong:write');
         return this.renderPage({
@@ -122,7 +121,7 @@ class HDLD_Details extends AdminPage {
                 <Link key={1} to='user/tccb/hop-dong-lao-dong'>Danh sách hợp đồng</Link>,
                 'Hợp đồng cán bộ'
             ],
-            title: isData ? 'Chỉnh sửa hợp đồng lao động' : 'Tạo mới hợp đồng lao động',
+            title: this.url ? 'Chỉnh sửa hợp đồng lao động' : 'Tạo mới hợp đồng lao động',
             content: <>
                 <ComponentPhiaTruong ref={e => this.phiaTruong = e} />
                 <ComponentPhiaCanBo ref={e => this.phiaCanBo = e}
