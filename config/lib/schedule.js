@@ -4,7 +4,9 @@ module.exports = app => {
     app.scheduleJobs = [];
 
     app.schedule = (time, task) => {
-        schedule.scheduleJob(time, task);
+        if (app.primaryWorker) {
+            schedule.scheduleJob(time, task);
+        }
     };
 
     // Hourly
