@@ -23,6 +23,8 @@ class HDLD_Details extends AdminPage {
                     if (data.error) {
                         T.notify('Lấy thông tin hợp đồng bị lỗi!', 'danger');
                     } else {
+                        // console.log(data.item.canBoDuocThue);
+                        data.item.qtHopDongLaoDong.isCvdt = data.item.canBoDuocThue.isCvdt;
                         this.phiaTruong.setVal(data.item.qtHopDongLaoDong);
                         this.phiaCanBo.setVal(data.item.canBoDuocThue);
                         this.dieuKhoan.setVal(data.item.qtHopDongLaoDong);
@@ -78,6 +80,7 @@ class HDLD_Details extends AdminPage {
         dataPhiaCanBo.bacLuong = dataDieuKhoan.bac;
         dataPhiaCanBo.heSoLuong = dataDieuKhoan.heSo;
         dataPhiaCanBo.ngayBatDauCongTac = dataDieuKhoan.batDauLamViec;
+        dataPhiaCanBo.isCvdt = dataDieuKhoan.isCvdt ? 1 : 0;
         let ma = dataDieuKhoan.ma;
         delete dataDieuKhoan.ma;
         this.validateNewest(dataDieuKhoan.ngayKyHopDong, dataDieuKhoan.nguoiDuocThue, (canUpdateCanBo) => {
@@ -112,7 +115,6 @@ class HDLD_Details extends AdminPage {
     }
 
     render() {
-        const isData = this.props.qtHopDongLaoDong ? this.props.qtHopDongLaoDong : null;
         const currentPermission = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [];
         let permissionWrite = currentPermission.includes('qtHopDongLaoDong:write');
         return this.renderPage({
@@ -122,7 +124,7 @@ class HDLD_Details extends AdminPage {
                 <Link key={1} to='user/tccb/hop-dong-lao-dong'>Danh sách hợp đồng</Link>,
                 'Hợp đồng cán bộ'
             ],
-            title: isData ? 'Chỉnh sửa hợp đồng lao động' : 'Tạo mới hợp đồng lao động',
+            title: this.url ? 'Chỉnh sửa hợp đồng lao động' : 'Tạo mới hợp đồng lao động',
             content: <>
                 <ComponentPhiaTruong ref={e => this.phiaTruong = e} />
                 <ComponentPhiaCanBo ref={e => this.phiaCanBo = e}
