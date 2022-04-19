@@ -6656,13 +6656,6 @@
                     "nullable": true,
                     "size": "1,0"
                 },
-                "TRANG_THAI": {
-                    "value": "trangThai",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "'0'",
-                    "nullable": true,
-                    "size": 10
-                },
                 "LOAI_CONG_VAN": {
                     "value": "loaiCongVan",
                     "dataType": "NVARCHAR2",
@@ -6690,6 +6683,20 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 200
+                },
+                "TRANG_THAI": {
+                    "value": "trangThai",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 10
+                },
+                "LAY_SO": {
+                    "value": "laySo",
+                    "dataType": "NUMBER",
+                    "dataDefault": "1",
+                    "nullable": true,
+                    "size": "1,0"
                 }
             },
             "primaryKeys": [
@@ -11969,37 +11976,6 @@
             "foreignKeys": [],
             "type": "table"
         },
-        "DT_DS_MON_MO": {
-            "active": true,
-            "moduleName": "dtDsMonMo",
-            "modelName": "dtDsMonMo",
-            "columns": {
-                "KHOA": {
-                    "value": "khoa",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "22,0"
-                },
-                "MON_HOC": {
-                    "value": "monHoc",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 20
-                },
-                "ID": {
-                    "value": "id",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "22,0"
-                }
-            },
-            "primaryKeys": [],
-            "foreignKeys": [],
-            "type": "table"
-        },
         "DT_DANG_KY_MO_MON": {
             "active": true,
             "moduleName": "dtDangKyMoMon",
@@ -12036,12 +12012,12 @@
                     "nullable": true,
                     "size": "1,0"
                 },
-                "NAM_HOC": {
-                    "value": "namHoc",
-                    "dataType": "NVARCHAR2",
+                "NAM": {
+                    "value": "nam",
+                    "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 20
+                    "size": "4,0"
                 },
                 "GHI_CHU": {
                     "value": "ghiChu",
@@ -12745,6 +12721,109 @@
                     "dataDefault": "0",
                     "nullable": true,
                     "size": "1,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "DT_DANH_SACH_MON_MO": {
+            "active": true,
+            "moduleName": "dtDanhSachMonMo",
+            "modelName": "dtDanhSachMonMo",
+            "columns": {
+                "KHOA": {
+                    "value": "khoa",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "MA_MON_HOC": {
+                    "value": "maMonHoc",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                },
+                "TEN_MON_HOC": {
+                    "value": "tenMonHoc",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 500
+                },
+                "LOAI_MON_HOC": {
+                    "value": "loaiMonHoc",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "SO_TIET_LY_THUYET": {
+                    "value": "soTietLyThuyet",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "5,0"
+                },
+                "SO_TIET_THUC_HANH": {
+                    "value": "soTietThucHanh",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "5,0"
+                },
+                "SO_TIET_BUOI": {
+                    "value": "soTietBuoi",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "5,0"
+                },
+                "SO_BUOI_TUAN": {
+                    "value": "soBuoiTuan",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "5,0"
+                },
+                "MA_NGANH": {
+                    "value": "maNganh",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 15
+                },
+                "MA_CTDT": {
+                    "value": "maCtdt",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "NAM": {
+                    "value": "nam",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "4,0"
+                },
+                "HOC_KY": {
+                    "value": "hocKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_105693\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
                 }
             },
             "primaryKeys": [
