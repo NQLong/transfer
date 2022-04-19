@@ -166,7 +166,7 @@ class Dashboard extends AdminPage {
                 </div>
                 <div className='col-lg-6'>
                     <div className='tile'>
-                        <div className='tile-title'>Học hàm</div>
+                        <div className='tile-title'>Chức danh khoa học</div>
                         <AdminChart type='pie' data={this.state.listHocHam || {}} />
                     </div>
                 </div>
