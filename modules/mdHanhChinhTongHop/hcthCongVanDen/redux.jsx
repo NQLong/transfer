@@ -8,7 +8,8 @@ const
     HcthCongVanDenGet = 'HcthCongVanDen:Get',
     HcthCongVanDenGetPhanHoi = 'HcthCongVanDen:GetPhanHoi',
     HcthCongVanDenGetHistory = 'HcthCongVanDen:GetHistory',
-    HcthCongVanDenGetChiDao = 'HcthCongVanDen:GetChiDao';
+    HcthCongVanDenGetChiDao = 'HcthCongVanDen:GetChiDao',
+    HcthCongVanDenGetError = 'HcthCongVanDen:GetError';
 
 // const HcthCongVanDenUpdate = 'HcthCongVanDen:Update';
 
@@ -22,11 +23,13 @@ export default function HcthCongVanDenReducer(state = null, data) {
         case HcthCongVanDenSearchPage:
             return Object.assign({}, state, { page: data.page });
         case HcthCongVanDenGetPhanHoi:
-            return Object.assign({}, state, { item: { ...(state.item || {}), phanHoi: data.phanHoi } });
+            return Object.assign({}, state, { item: { ...(state?.item || {}), phanHoi: data.phanHoi } });
         case HcthCongVanDenGetHistory:
-            return Object.assign({}, state, { item: { ...(state.item || {}), history: data.history } });
+            return Object.assign({}, state, { item: { ...(state?.item || {}), history: data.history } });
         case HcthCongVanDenGetChiDao:
-            return Object.assign({}, state, { item: { ...(state.item || {}), danhSachChiDao: data.chiDao } });
+            return Object.assign({}, state, { item: { ...(state?.item || {}), danhSachChiDao: data.chiDao } });
+        case HcthCongVanDenGetError:
+            return Object.assign({}, state, { item: { ...(state?.item || {}), error: data.error } });
         default:
             return state;
     }
@@ -162,7 +165,12 @@ export function getCongVanDen(id, done) {
         const url = `/api/hcth/cong-van-den/${id}`;
         T.get(url, data => {
             if (data.error) {
-                console.error('GET: ' + url + '.', data.error);
+                if (data.error.status == 401) {
+                    dispatch({ type: HcthCongVanDenGetError, error: 401 });
+                    console.error('GET: ' + url + '.', data.error.message);
+                }
+                else
+                    console.error('GET: ' + url + '.', data.error);
                 T.notify('Lấy công văn đến bị lỗi!', 'danger');
             } else {
                 dispatch({ type: HcthCongVanDenGet, item: data.item });
@@ -226,7 +234,7 @@ export function getPhanHoi(id, done) {
                 T.notify('Lấy danh sách phản hồi lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
-                dispatch({type: HcthCongVanDenGetPhanHoi, phanHoi: res.items});
+                dispatch({ type: HcthCongVanDenGetPhanHoi, phanHoi: res.items });
                 done && done(res.items);
             }
         }, () => T.notify('Lấy danh sách phản hồi lỗi', 'danger'));
@@ -241,7 +249,7 @@ export function getHistory(id, done) {
                 T.notify('Lấy lịch sử công văn lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
-                dispatch({type: HcthCongVanDenGetHistory, history: res.items});
+                dispatch({ type: HcthCongVanDenGetHistory, history: res.items });
                 done && done(res.items);
             }
         }, () => T.notify('Lấy lịch sử công văn lỗi', 'danger'));
@@ -256,7 +264,7 @@ export function getChiDao(id, done) {
                 T.notify('Lấy công văn chỉ đạo lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
-                dispatch({type: HcthCongVanDenGetChiDao, chiDao: res.items});
+                dispatch({ type: HcthCongVanDenGetChiDao, chiDao: res.items });
                 done && done(res.items);
             }
         }, () => T.notify('Lấy công văn chỉ đạo lỗi', 'danger'));
