@@ -23,6 +23,8 @@ class HDLD_Details extends AdminPage {
                     if (data.error) {
                         T.notify('Lấy thông tin hợp đồng bị lỗi!', 'danger');
                     } else {
+                        // console.log(data.item.canBoDuocThue);
+                        data.item.qtHopDongLaoDong.isCvdt = data.item.canBoDuocThue.isCvdt;
                         this.phiaTruong.setVal(data.item.qtHopDongLaoDong);
                         this.phiaCanBo.setVal(data.item.canBoDuocThue);
                         this.dieuKhoan.setVal(data.item.qtHopDongLaoDong);
@@ -78,6 +80,7 @@ class HDLD_Details extends AdminPage {
         dataPhiaCanBo.bacLuong = dataDieuKhoan.bac;
         dataPhiaCanBo.heSoLuong = dataDieuKhoan.heSo;
         dataPhiaCanBo.ngayBatDauCongTac = dataDieuKhoan.batDauLamViec;
+        dataPhiaCanBo.isCvdt = dataDieuKhoan.isCvdt ? 1 : 0;
         let ma = dataDieuKhoan.ma;
         delete dataDieuKhoan.ma;
         this.validateNewest(dataDieuKhoan.ngayKyHopDong, dataDieuKhoan.nguoiDuocThue, (canUpdateCanBo) => {
