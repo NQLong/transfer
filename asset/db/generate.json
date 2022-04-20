@@ -6694,7 +6694,7 @@
                 "LAY_SO": {
                     "value": "laySo",
                     "dataType": "NUMBER",
-                    "dataDefault": "1",
+                    "dataDefault": "0",
                     "nullable": true,
                     "size": "1,0"
                 }
@@ -12032,6 +12032,13 @@
                     "dataDefault": "0",
                     "nullable": true,
                     "size": "1,0"
+                },
+                "MA_NGANH": {
+                    "value": "maNganh",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
                 }
             },
             "primaryKeys": [
@@ -12823,6 +12830,13 @@
                     "dataType": "NUMBER",
                     "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_105693\".nextval",
                     "nullable": false,
+                    "size": "22,0"
+                },
+                "MA_DANG_KY": {
+                    "value": "maDangKy",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
                     "size": "22,0"
                 }
             },
