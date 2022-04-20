@@ -26,33 +26,42 @@ import {
 const listTrangThai = {
     '1': {
         status: 'Mới',
-        color: '#a86e18'
+        color: 'red'
     },
     '2': {
-        status: 'Chờ duyệt',
-        color: '#9aa115'
+        status: 'Chờ kiểm tra',
+        color: 'blue'
     },
     '3': {
-        status: 'Đã duyệt',
-        color: '#438238'
+        status: 'Chờ duyệt',
+        color: 'blue'
     },
     '4': {
         status: 'Trả lại',
-        color: '#911717'
+        color: 'red'
     },
     '5': {
         status: 'Đã gửi',
-        color: '#165e91F'
+        color: 'green'
     },
     '6': {
         status: 'Đã đọc',
-        color: '#114d78'
+        color: 'green'
+    },
+    '7': {
+        status: 'Đã duyệt',
+        color: 'green'
     }
 };
 
 const selectCongVan = [
     { id: 1, text: 'Nội bộ' },
     { id: 2, text: 'Ra ngoài' }
+];
+
+const selectCongVanV2 = [
+    { id: 1, text: 'Lấy số' },
+    { id: 2, text: 'Không lấy số'}
 ];
 class HcthCongVanDi extends AdminPage {
     state = { filter: {} };
@@ -62,6 +71,7 @@ class HcthCongVanDi extends AdminPage {
             T.clearSearchBox();
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
+                this.congVanLaySo?.value(1);
                 this.loaiCongVan?.value('');
                 this.maDonViGui?.value('');
                 this.maDonViNhan?.value('');
@@ -80,13 +90,13 @@ class HcthCongVanDi extends AdminPage {
         let donViNhan = this.donViNhan?.value() || null;
         let canBoNhan = this.canBoNhan?.value() || null;
         let loaiCongVan = this.loaiCongVan?.value() || null;
+        let congVanLaySo = this.congVanLaySo?.value() || null;
         let donViNhanNgoai = this.donViNhanNgoai?.value() || null;
-        // let trangThai = this.trangThai?.value() || null;
 
-
-        const pageFilter = isInitial ? {} : { donViGui, donViNhan, canBoNhan, loaiCongVan, donViNhanNgoai };
+        const pageFilter = isInitial ? {} : { donViGui, donViNhan, canBoNhan, loaiCongVan, donViNhanNgoai, congVanLaySo};
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
+                console.log(page.filter);
                 if (isInitial) {
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
@@ -94,6 +104,7 @@ class HcthCongVanDi extends AdminPage {
                     this.donViNhan?.value(filter.donViNhan || '');
                     this.canBoNhan?.value(filter.canBoNhan || '');
                     this.loaiCongVan?.value(filter.loaiCongVan || '');
+                    this.congVanLaySo?.value(filter.congVanLaySo || '');
                     this.donViNhanNgoai?.value(filter.donViNhanNgoai || '');
                     if (!$.isEmptyObject(filter) && filter && (filter.donViGui || filter.donViNhan || filter.canBoNhan || filter.loaiCongVan || filter.donViNhanNgoai)) this.showAdvanceSearch();
                 }
@@ -107,12 +118,15 @@ class HcthCongVanDi extends AdminPage {
 
     onDelete = (e, item) => {
         e.preventDefault();
-        T.confirm('Xóa công văn', 'Bạn có chắc bạn muốn xóa công văn này?', true,
+        T.confirm('Xóa công văn', 'Bạn có chắc chắn muốn xóa công văn này?', true,
             isConfirm => isConfirm && this.props.deleteHcthCongVanDi(item.id));
 
     }
 
     getSoCongVan = (soDi, donVi, loai) => {
+        if (loai == null) {
+            return soDi + '/' + 'XHNV-' + donVi;
+        }
         return soDi + '/' + loai + '-XHNV-' + donVi;
     }
     render() {
@@ -120,14 +134,14 @@ class HcthCongVanDi extends AdminPage {
             permission = this.getUserPermission('hcthCongVanDi', ['read', 'write', 'delete']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.hcthCongVanDi && this.props.hcthCongVanDi.page ?
             this.props.hcthCongVanDi.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
-
         // Chỉ trưởng phòng mới có quyền thêm công văn
         let listDonViQuanLy = this.props.system && this.props.system.user.staff && this.props.system.user.staff.donViQuanLy ? this.props.system.user.staff.donViQuanLy : [];
         let dsQuanLy = listDonViQuanLy.map(item => item.maDonVi).toString();
         // console.log(dsQuanLy);
         let table = renderTable({
             emptyTable: 'Chưa có dữ liệu công văn các phòng',
-            getDataSource: () => list, stickyHead: false,
+            getDataSource: () => list, 
+            stickyHead: false,
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }}>#</th>
@@ -136,7 +150,6 @@ class HcthCongVanDi extends AdminPage {
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Thời gian</th>
                     <th style={{ width: 'auto', verticalAlign: 'middle' }}>Đơn vị gửi</th>
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Đơn vị, người nhận</th>
-                    {/* <th style={{ width: 'auto', verticalAlign: 'middle' }}>Tình trạng</th> */}
                     <th style={{ width: 'auto', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Trạng thái</th>
                     <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }}>Thao tác</th>
                 </tr>),
@@ -165,7 +178,7 @@ class HcthCongVanDi extends AdminPage {
                             </>
                         } />
                         <TableCell type='text' contentClassName='multiple-lines' content={item.tenDonViGui ? item.tenDonViGui.normalizedName() : ''} />
-                        <TableCell type='text' style={{}} contentStyle={{ width: '10rem' }} content={
+                        <TableCell type='text' style={{}} contentStyle={{ width: '12rem' }} content={
                             <>
                                 <span>{danhSachCanBoNhan && danhSachCanBoNhan.length > 0 ? danhSachCanBoNhan.map((item, index) => (
                                     <span key={index}>
@@ -209,7 +222,7 @@ class HcthCongVanDi extends AdminPage {
             ],
             onCreate: (permission && permission.write) || (dsQuanLy.length >= 1) ? () => this.props.history.push('/user/hcth/cong-van-cac-phong/new') : null,
             header: <>
-                <FormSelect style={{ width: '150px', marginBottom: '0', marginRight: '16px' }} allowClear={true} ref={e => this.loaiCongVan = e} placeholder="Loại công văn" data={selectCongVan} onChange={() => this.changeAdvancedSearch()} />
+                <FormSelect style={{ width: '150px', marginBottom: '0', marginRight: '16px' }} ref={e => this.congVanLaySo = e} placeholder="Công văn" data={selectCongVanV2} allowClear={true} onChange={() => this.changeAdvancedSearch()} />
                 <FormSelect style={{ width: '300px', marginBottom: '0' }} allowClear={true} ref={e => this.donViGui = e} placeholder="Đơn vị gửi" data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />
             </>,
             content: <>
@@ -225,6 +238,7 @@ class HcthCongVanDi extends AdminPage {
                     <FormSelect allowClear={true} className='col-md-4' ref={e => this.donViNhan = e} label='Đơn vị nhận' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />
                     <FormSelect allowClear={true} className='col-md-4' ref={e => this.canBoNhan = e} label='Cán bộ nhận' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} />
                     <FormSelect allowClear={true} className='col-md-4' ref={e => this.donViNhanNgoai = e} label='Đơn vị nhận bên ngoài' data={SelectAdapter_DmDonViGuiCongVan} onChange={() => this.changeAdvancedSearch()} />
+                    <FormSelect allowClear={true} className='col-md-4' ref={e => this.loaiCongVan = e} label='Loại công văn' data={selectCongVan} onChange={() => this.changeAdvancedSearch()} />
                 </div>
             </>
 

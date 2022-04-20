@@ -135,7 +135,7 @@ export function getHcthCongVanDiSearchPage(pageNumber, pageSize, pageCondition, 
         const url = `/api/hcth/cong-van-cac-phong/search/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition, filter: page.filter }, data => {
             if (data.error) {
-                T.notify('Lấy danh sách công văn đến bị lỗi, s1' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                T.notify('Lấy danh sách công văn đi bị lỗi, s1' + (data.error.message && (':<br>' + data.error.message)), 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
