@@ -57,6 +57,9 @@ class EditModal extends AdminModal {
             T.notify('Độ dài tiền tố mã thẻ cán bộ phải là 3!', 'danger');
             this.preShcc.value('');
             this.preShcc.focus();
+        } else if (changes.preShcc == '') {
+            T.notify('Tiền tố mã thẻ cán bộ không được trống!', 'danger');
+            this.preShcc.focus();
         } else {
             this.state.ma ? this.props.update(this.state.ma, changes, this.hide) : this.props.create(changes, this.hide);
         }
@@ -91,7 +94,7 @@ class EditModal extends AdminModal {
                 <FormImageBox className='col-md-6' ref={e => this.imageBox2 = e}
                     postUrl='/user/upload' uploadType='DmDonViImageDisplayTA' label='Hiện thị trang Tiếng Anh' />
                 <FormTextBox type='text' className='col-12' ref={e => this.ghiChu = e} label='Ghi chú' readOnly={readOnly} />
-                <FormTextBox type='text' className='col-md-6' ref={e => this.preShcc = e} label='Mã thẻ cán bộ (3 chữ số đầu)' readOnly={readOnly} />
+                <FormTextBox type='text' className='col-md-6' ref={e => this.preShcc = e} label='Tiền tố mã thẻ cán bộ (3 chữ số đầu)' readOnly={readOnly} required />
             </div>
         });
     }
