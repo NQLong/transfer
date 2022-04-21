@@ -179,7 +179,7 @@ export function renderComment({
                 gap: '15px'
             };
         return (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '10px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '10px', maxHeight: '300px', overflowY: 'scroll' }}>
                 {
                     list.map((item, index) => {
                         return (
@@ -502,10 +502,11 @@ export class FormRichTextBox extends React.Component {
     focus = () => this.input.focus();
 
     render() {
-        const { style = {}, rows = 3, label = '', placeholder = '', className = '', readOnly = false, onChange = null, required = false } = this.props;
+        const { style = {}, rows = 3, label = '', placeholder = '', className = '', readOnly = false, onChange = null, required = false, readOnlyEmptyText = ''} = this.props;
         let displayElement = '';
         if (label) {
-            displayElement = <><label onClick={() => this.input.focus()}>{label}{!readOnly && required ? <span style={{ color: 'red' }}> *</span> : ''}</label>{readOnly && this.state.value ? <>: <br /> <b>{this.state.value}</b></> : ''}</>;
+            displayElement = <><label onClick={() => this.input.focus()}>{label}{!readOnly && required ? <span style={{ color: 'red' }}> *</span> : ''}</label>{readOnly && this.state.value ? <>: <br /> <b>{this.state.value}</b></> : 
+            (readOnly && readOnlyEmptyText) ? <b>{readOnlyEmptyText}</b> : ''}</>;
         } else {
             displayElement = readOnly ? <b>{this.state.value}</b> : '';
         }
