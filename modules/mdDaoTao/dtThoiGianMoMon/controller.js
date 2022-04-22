@@ -1,14 +1,4 @@
 module.exports = app => {
-    // const menu = {
-    //     parentMenu: app.parentMenu.daoTao,
-    //     menus: {
-    //         7008: {
-    //             title: '', groupIndex: 0,
-    //             icon: 'fa-cube', backgroundColor: '#b36154',
-    //             link: '/user/dao-tao/nganh-dao-tao'
-    //         },
-    //     },
-    // }
 
     app.permission.add(
         'dtThoiGianMoMon:read', 'dtThoiGianMoMon:write', 'dtThoiGianMoMon:delete'

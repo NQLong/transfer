@@ -1,13 +1,3 @@
-export function createDanhSachMonMo(data, done) {
-    return () => {
-        const url = '/api/dao-tao/danh-sach-mon-mo';
-        T.post(url, { data }, item => {
-            console.log(item);
-            done && done();
-        });
-    };
-}
-
 export function getDanhSachMonMo(condition, done) {
     return () => {
         const url = '/api/dao-tao/danh-sach-mon-mo/all';

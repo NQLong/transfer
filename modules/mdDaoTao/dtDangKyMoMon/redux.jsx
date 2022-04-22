@@ -42,7 +42,6 @@ export default function dtDangKyMoMonReducer(state = null, data) {
                 let updatedPage = Object.assign({}, state.page),
                     createdItem = data.item;
                 updatedPage && createdItem.id && updatedPage.list.unshift(createdItem);
-                console.log(Object.assign({}, state, { page: updatedPage }));
                 return Object.assign({}, state, { page: updatedPage });
             } else {
                 return null;
@@ -77,21 +76,6 @@ export function getDtDangKyMoMonPage(pageNumber, pageSize, pageCondition, done) 
         });
     };
 }
-
-export function getDsDuKien(condition, done) {
-    return () => {
-        const url = '/api/dao-tao/get-chuong-trinh-du-kien/all';
-        T.get(url, { yearth: condition?.yearth }, data => {
-            if (data.error) {
-                T.notify(`Lỗi: ${data.error.message}`, 'danger');
-                console.error(data.error.message);
-            } else {
-                done && done(data.item);
-            }
-        });
-    };
-}
-
 export function createDangKyMoMon(data, done) {
     return dispatch => {
         const url = '/api/dao-tao/dang-ky-mo-mon';

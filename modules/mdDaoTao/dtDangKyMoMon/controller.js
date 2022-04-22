@@ -37,36 +37,6 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/dao-tao/get-chuong-trinh-du-kien/all', app.permission.orCheck('dtDangKyMoMon:read', 'dtDsMonMo:read', 'dtDangKyMoMon:manage', 'dtDsMonMo:manage'), async (req, res) => {
-        let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
-        let yearth = req.query.yearth,
-            year = thoiGianMoMon.nam - yearth,
-            semester = thoiGianMoMon.hocKy + yearth * 2;
-        // donVi = req.session.user.staff ? req.session.user.staff.maDonVi : '';
-        app.model.dtKhungDaoTao.get({ namDaoTao: year }, (error, item) => {
-            if (error) {
-                res.send({ error: `Lỗi lấy CTDT năm ${year}` });
-                return;
-            } else if (!item) {
-                res.send({ error: `Năm ${year} không tồn tại CTDT nào!` });
-                return;
-            } else {
-                let condition = {
-                    statement: 'maKhungDaoTao = (:id) AND hocKyDuKien = (:semester)',
-                    parameter: { id: item.id, semester }
-                };
-                app.model.dtChuongTrinhDaoTao.getAll(condition, (error, items) => {
-                    if (error) {
-                        res.send({ error });
-                        return;
-                    } else {
-                        res.send({ item: app.clone({}, { items, ctdt: item, thoiGianMoMon }) });
-                    }
-                });
-            }
-        });
-    });
-
     app.post('/api/dao-tao/dang-ky-mo-mon', app.permission.orCheck('dtDangKyMoMon:manage', 'dtDangKyMoMon:write'), async (req, res) => {
         let thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive(),
             hocKy = thoiGianMoMon.hocKy,

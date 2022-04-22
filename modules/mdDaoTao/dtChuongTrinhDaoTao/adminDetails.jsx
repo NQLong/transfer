@@ -107,7 +107,6 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
             const kienThucChuyenNganh = this.kienThucChuyenNganh.getValue() || { updateDatas: [], deleteDatas: [] };
             const kienThucBoTro = this.kienThucBoTro.getValue() || { updateDatas: [], deleteDatas: [] };
             const kienThucLVTN = this.kienThucLVTN.getValue() || { updateDatas: [], deleteDatas: [] };
-            // console.log(kienThucDaiCuong);
             const updateItems = [
                 ...kienThucDaiCuong.updateDatas,
                 ...kienThucCoSoNganh.updateDatas,
@@ -124,7 +123,6 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
             // ];
             const updateDatas = { items: updateItems, ...{ id: this.ma, data } };
             // const deleteDatas = { items: deleteItems };
-            console.log(updateDatas);
             this.ma == 'new' ? this.props.createDtChuongTrinhDaoTao(updateDatas, (item) => {
                 location.replace('/new', `/${item.id}`);
                 location.reload();
