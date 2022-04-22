@@ -22,21 +22,22 @@ module.exports = app => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize),
             searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
-        let { donViGui, donViNhan, canBoNhan, loaiCongVan, donViNhanNgoai } = (req.query.filter && req.query.filter != '%%%%%%') ? req.query.filter : 
-            { donViGui: null, donViNhan: null, canBoNhan: null, loaiCongVan: null, donViNhanNgoai: null};
-
-        let donViXem = '', canBoXem = '';
+        let { donViGui, donViNhan, canBoNhan, loaiCongVan, donViNhanNgoai, congVanLaySo } = (req.query.filter && req.query.filter != '%%%%%%') ? req.query.filter : 
+            { donViGui: null, donViNhan: null, canBoNhan: null, loaiCongVan: null, donViNhanNgoai: null, congVanLaySo: null };
 
         const rectorsPermission = getUserPermission(req, 'rectors', ['login']);
         const hcthPermission = getUserPermission(req, 'hcth', ['login']);
 
+        let donViXem = '', canBoXem = '';
+
+        let loaiCanBo = rectorsPermission.login ? 1 : hcthPermission.login ? 2 : 0;
         if (!rectorsPermission.login && !hcthPermission.login) {
             donViXem = (req.session?.user?.staff?.donViQuanLy || []);
             donViXem = donViXem.map(item => item.maDonVi).toString();
             canBoXem = req.session?.user?.shcc || '';
         }
         
-        app.model.hcthCongVanDi.searchPage(pageNumber, pageSize, canBoNhan, donViGui, donViNhan, loaiCongVan, donViNhanNgoai, donViXem, canBoXem, searchTerm, (error, page) => {
+        app.model.hcthCongVanDi.searchPage(pageNumber, pageSize, canBoNhan, donViGui, donViNhan, loaiCongVan, donViNhanNgoai, donViXem, canBoXem, loaiCanBo, congVanLaySo, searchTerm, (error, page) => {
             if (error || page == null) {
                 res.send({ error });
             } else {
@@ -259,7 +260,7 @@ module.exports = app => {
             });
     });
 
-    app.get('/api/hcth/cong-van-cac-phong/download/:id/:fileName', app.permission.check('staff:login'), (req, res) => {
+    app.get('/api/hcth/cong-van-cac-phong/download/:id/:fileName', app.permission.check('hcthCongVanDi:read'), (req, res) => {
         const { id, fileName } = req.params;
         const dir = app.path.join(app.assetPath, `/congVanDi/${id}`);
         if (app.fs.existsSync(dir)) {
