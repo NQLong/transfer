@@ -126,7 +126,7 @@ export const SelectAdapter_DtNganhDaoTao = {
     ajax: true,
     url: '/api/dao-tao/nganh-dao-tao/page/1/20',
     data: params => ({ condition: params.term }),
-    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.maNganh, text: item.tenNganh })) : [] }),
+    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.maNganh, text: item.tenNganh, khoa: item.khoa })) : [] }),
     fetchOne: (maNganh, done) => (getDtNganhDaoTao(maNganh, item => done && done({ id: item.maNganh, text: item.tenNganh })))(),
 };
 

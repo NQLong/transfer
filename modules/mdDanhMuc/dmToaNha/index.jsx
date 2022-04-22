@@ -11,7 +11,7 @@ export default {
     },
     routes: [
         {
-            path: '/user/danh-muc/day-nha',
+            path: '/user/:menu/toa-nha',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
     ],

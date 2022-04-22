@@ -23,20 +23,13 @@ module.exports = app => {
             donViFilter = req.query.donViFilter,
             donVi = req.query.donVi ? req.query.donVi : (req.session.user.staff ? req.session.user.staff.maDonVi : null),
             searchTerm = typeof req.query.searchTerm === 'string' ? `%${req.query.searchTerm.toLowerCase()}%` : '',
-            statement = '(lower(ten) LIKE :searchTerm OR lower(ma) LIKE :searchTerm)',
-            parameter = { searchTerm },
-            selectedItems = req.query.selectedItems ? (Array.isArray(req.query.selectedItems) ? (req.query.selectedItems || []).filter(i => i != '' && i) : [req.query.selectedItems]) : [];
-
+            selectedItems = req.query.selectedItems ? [req.query.selectedItems].flat() : [];
         if (req.session.user.permissions.includes('dmMonHoc:read') && donViFilter) donVi = donViFilter;
-        if (donVi) {
-            statement = 'khoa IN (:donVi) AND (lower(ten) LIKE :searchTerm OR lower(ma) LIKE :searchTerm)';
-            parameter.donVi = donVi;
-        }
-        if (selectedItems.length) {
-            statement = 'khoa IN (:donVi) AND (lower(ten) LIKE :searchTerm OR lower(ma) LIKE :searchTerm) AND ma NOT IN (:selectedItems)';
-            parameter.selectedItems = selectedItems;
-        }
-        let condition = { statement: `(${statement}) AND MA IS NOT NULL`, parameter };
+        let statement = 'ma IS NOT NULL AND (:selectedItems IS NULL OR ma NOT IN (:selectedItems)) AND (lower(ten) LIKE :searchTerm OR lower(ma) LIKE :searchTerm) AND (:donVi IS NULL OR khoa IN (:donVi))',
+            parameter = {
+                searchTerm, donVi, selectedItems: selectedItems.length ? selectedItems : null
+            };
+        let condition = { statement, parameter };
         app.model.dmMonHoc.getPage(pageNumber, pageSize, condition, '*', 'khoa,ten,ma', (error, page) => {
             page.pageCondition = {
                 searchTerm,
@@ -82,7 +75,14 @@ module.exports = app => {
     });
 
     app.get('/api/dao-tao/mon-hoc/item/:ma', app.permission.orCheck('dmMonHoc:read', 'dmMonHoc:manage', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
-        app.model.dmMonHoc.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
+        app.model.dmMonHoc.get({ ma: req.params.ma }, (error, item) => {
+            if (error) res.send({ error });
+            else {
+                app.model.dmDonVi.get({ ma: item.khoa }, (error, khoa) => {
+                    res.send({ error, item: { ...item, khoa } });
+                });
+            }
+        });
     });
 
     app.post('/api/dao-tao/mon-hoc', app.permission.orCheck('dmMonHoc:write', 'dmMonHoc:manage', 'dtChuongTrinhDaoTao:manage'), (req, res) => {
@@ -113,6 +113,17 @@ module.exports = app => {
         }
     });
 
+    app.get('/api/dao-tao/mon-hoc/page-all/:pageNumber/:pageSize', app.permission.orCheck('dtDangKyMoMon:manage', 'dtDangKyMoMon:read', 'dmMonHoc:read'), (req, res) => {
+        let pageNumber = parseInt(req.params.pageNumber),
+            pageSize = parseInt(req.params.pageSize),
+            searchTerm = typeof req.query.searchTerm === 'string' ? `%${req.query.searchTerm.toLowerCase()}%` : '';
+        app.model.dmMonHoc.getPage(pageNumber, pageSize, {
+            statement: 'lower(ten) LIKE :searchTerm OR lower(ma) LIKE :searchTerm',
+            parameter: { searchTerm }
+        }, '*', 'khoa,ten,ma', (error, page) => {
+            res.send({ error, page });
+        });
+    });
 
     // Hook--------------------------------------------------------------------------------------------------------------------------------------------------------
 

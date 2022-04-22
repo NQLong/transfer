@@ -1,4 +1,5 @@
-import { SelectAdapter_DmMonHoc, getDmMonHoc, SelectAdapter_DmMonHocFacultyFilter } from 'modules/mdDaoTao/dmMonHoc/redux';
+import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
+import { SelectAdapter_DmMonHoc, getDmMonHoc, SelectAdapter_DmMonHocAll } from 'modules/mdDaoTao/dmMonHoc/redux';
 import React from 'react';
 import { connect } from 'react-redux';
 import { AdminPage, FormCheckbox, FormSelect, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
@@ -6,7 +7,6 @@ import { deleteDtChuongTrinhDaoTao } from './redux';
 export class ComponentKienThuc extends AdminPage {
     maKhoa = null;
     rows = {};
-    selectedMonHoc = [];
     state = { datas: {} };
 
     addRow = (idx, item) => {
@@ -17,29 +17,22 @@ export class ComponentKienThuc extends AdminPage {
         this.rows[idx] = {
             maMonHoc: null,
             loaiMonHoc: null,
-            tongSoTc: null,
-            tinChiLyThuyet: null,
-            tinChiThucHanh: null,
+            soTinChi: null,
+            soTietLyThuyet: null,
+            soTietThucHanh: null,
             soTiet: null,
-            phongTn: null,
             hocKyDuKien: null,
+            khoa: null
         };
         this.setEditState(idx, editFlag, id, isDeleted, () => {
             this.rows[idx].loaiMonHoc.value(item ? item.loaiMonHoc : 0);
-            this.rows[idx].tinChiLyThuyet.value(item ? item.tinChiLyThuyet : 0);
-            this.rows[idx].tinChiThucHanh.value(item ? item.tinChiThucHanh : 0);
+            this.rows[idx].soTietLyThuyet.value(item ? item.soTietLyThuyet.toString() : '0');
+            this.rows[idx].soTietThucHanh.value(item ? item.soTietThucHanh.toString() : '0');
             this.rows[idx].hocKyDuKien.value(item ? item.hocKyDuKien : null);
-            if (item) {
-                this.selectedMonHoc.push(item.maMonHoc);
-                SelectAdapter_DmMonHoc.fetchOneItem(item.maMonHoc, ({ item }) => {
-                    const { tongTinChi, tongTiet, tinChiLt, tinChiTh } = item;
-                    this.rows[idx].tongSoTc.value(tongTinChi);
-                    this.rows[idx].tinChiLyThuyet.value(tinChiLt.toString());
-                    this.rows[idx].tinChiThucHanh.value(tinChiTh.toString());
-                    this.rows[idx].soTiet.value(tongTiet);
-                });
-                this.rows[idx].maMonHoc.value(item.maMonHoc);
-            }
+            this.rows[idx].soTinChi.value(item ? item.soTinChi.toString() : '0');
+            this.rows[idx].maMonHoc.value(item ? item.maMonHoc : '');
+            this.rows[idx].khoa.value(item ? item.khoa : '');
+            this.rows[idx].soTiet.value(item ? item.tongSoTiet.toString() : '0');
         });
     }
 
@@ -64,10 +57,6 @@ export class ComponentKienThuc extends AdminPage {
             T.notify('Vui lòng chọn môn học!', 'danger');
             return;
         }
-        // else if (!this.rows[idx].hocKyDuKien.value()) {
-        //     T.notify('Vui lòng nhập học kỳ dự kiến', 'danger');
-        //     return;
-        // }
         const permission = this.getUserPermission(this.props.prefixPermission || 'dtChuongTrinhDaoTao', ['write', 'manage']);
         if (permission.write || permission.manage) {
             const curEdit = this.state.datas[idx].edit;
@@ -102,13 +91,13 @@ export class ComponentKienThuc extends AdminPage {
         if (this.rows[idx - 1] && this.state.datas[idx - 1]?.edit) {
             this.editRow(null, idx - 1);
         }
-        this.selectedMonHoc.push(id);
         SelectAdapter_DmMonHoc.fetchOneItem(id, ({ item }) => {
-            const { tongTinChi, tongTiet, tinChiLt, tinChiTh } = item;
-            this.rows[idx].tongSoTc.value(tongTinChi);
-            this.rows[idx].tinChiLyThuyet.value(tinChiLt);
-            this.rows[idx].tinChiThucHanh.value(tinChiTh || 0);
+            const { tongTinChi, tongTiet, tietLt, tietTh, khoa } = item;
+            this.rows[idx].soTinChi.value(tongTinChi);
+            this.rows[idx].soTietLyThuyet.value(tietLt.toString() || '0');
+            this.rows[idx].soTietThucHanh.value(tietTh.toString() || '0');
             this.rows[idx].soTiet.value(tongTiet);
+            this.rows[idx].khoa.value(khoa.ma);
             this.addRow(idx + 1);
         });
 
@@ -116,20 +105,23 @@ export class ComponentKienThuc extends AdminPage {
 
     selectMh = (idx) => {
         return (
-            <FormSelect ref={e => this.rows[idx].maMonHoc = e} data={SelectAdapter_DmMonHocFacultyFilter(this.props.khoiKienThucId === 1 ? [33, this.maKhoa] : this.maKhoa, this.selectedMonHoc)} style={{ marginBottom: 0, width: '350px' }} placeholder='Chọn môn học' readOnly={!this.state.datas[idx].edit} onChange={value => this.setMonHoc(idx, value.id)} />
+            <>
+                <FormSelect ref={e => this.rows[idx].maMonHoc = e} data={SelectAdapter_DmMonHocAll} style={{ marginBottom: 0, width: '350px' }} placeholder='Chọn môn học' readOnly={!this.state.datas[idx].edit} onChange={value => this.setMonHoc(idx, value.id)} />
+                <FormSelect ref={e => this.rows[idx].khoa = e} data={SelectAdapter_DmDonViFaculty_V2} style={{ marginBottom: 0, width: '350px', marginTop: 10 }} readOnly readOnlyNormal />
+            </>
         );
     };
     insertLoaiMh = (idx) => {
         return <FormCheckbox ref={e => this.rows[idx].loaiMonHoc = e} readOnly={this.state.datas[idx].isDeleted} />;
     };
     insertTongSoTc = (idx) => {
-        return (<FormTextBox ref={e => this.rows[idx].tongSoTc = e} readOnly={true} style={{ marginBottom: 0, width: '50px' }} />);
+        return (<FormTextBox ref={e => this.rows[idx].soTinChi = e} readOnly={true} style={{ marginBottom: 0, width: '50px' }} />);
     };
-    insertTinChiLt = (idx) => {
-        return (<FormTextBox ref={e => this.rows[idx].tinChiLyThuyet = e} readOnly={true} max={999} style={{ marginBottom: 0, width: '50px' }} />);
+    insertTietLt = (idx) => {
+        return (<FormTextBox ref={e => this.rows[idx].soTietLyThuyet = e} readOnly={true} max={999} style={{ marginBottom: 0, width: '50px' }} />);
     };
-    insertTinChiTh = (idx) => {
-        return (<FormTextBox ref={e => this.rows[idx].tinChiThucHanh = e} readOnly={true} style={{ marginBottom: 0, width: '50px' }} />);
+    insertTietTh = (idx) => {
+        return (<FormTextBox ref={e => this.rows[idx].soTietThucHanh = e} readOnly={true} style={{ marginBottom: 0, width: '50px' }} />);
     };
     insertSoTiet = (idx) => {
         return (<FormTextBox ref={e => this.rows[idx].soTiet = e} className='col-12' readOnly={true} style={{ marginBottom: 0 }} />);
@@ -148,33 +140,36 @@ export class ComponentKienThuc extends AdminPage {
     }
 
     getValue = () => {
-        try {
-            const keys = Object.keys(this.rows);
-            const updateDatas = [];
-            const deleteDatas = [];
-            keys.forEach((key) => {
-                const id = this.state.datas[key].id;
-                const item = {
-                    id: id,
-                    maMonHoc: this.rows[key].maMonHoc?.value(),
-                    loaiMonHoc: Number(this.rows[key].loaiMonHoc?.value()),
-                    maKhoiKienThuc: this.props.khoiKienThucId,
-                    tinChiLyThuyet: this.rows[key].tinChiLyThuyet?.value(),
-                    tinChiThucHanh: this.rows[key].tinChiThucHanh?.value(),
-                    hocKyDuKien: this.rows[key].hocKyDuKien?.value(),
-                };
-                if (item.maMonHoc) {
-                    if (id > 0 && this.state.datas[key].isDeleted) {
-                        deleteDatas.push(item);
-                    } else if (!this.state.datas[key].isDeleted) {
-                        updateDatas.push(item);
-                    }
+        const keys = Object.keys(this.rows);
+        const updateDatas = [];
+        const deleteDatas = [];
+        keys.forEach((key, index, array) => {
+            const id = this.state.datas[key].id;
+            const item = {
+                id: id,
+                maMonHoc: this.rows[key].maMonHoc?.value(),
+                tenMonHoc: this.rows[key].maMonHoc?.data()?.text,
+                loaiMonHoc: Number(this.rows[key].loaiMonHoc?.value()),
+                maKhoiKienThuc: this.props.khoiKienThucId,
+                soTinChi: Number(this.rows[key].soTinChi?.value()),
+                soTietLyThuyet: Number(this.rows[key].soTietLyThuyet?.value()),
+                soTietThucHanh: Number(this.rows[key].soTietThucHanh?.value()),
+                tongSoTiet: this.rows[key].soTiet?.value(),
+                hocKyDuKien: this.rows[key].hocKyDuKien?.value(),
+                tenKhoa: this.rows[key].khoa?.data()?.text,
+                khoa: this.rows[key].khoa?.value(),
+            };
+            if (item.maMonHoc) {
+                if (id > 0 && this.state.datas[key].isDeleted) {
+                    deleteDatas.push(item);
+                } else if (!this.state.datas[key].isDeleted) {
+                    updateDatas.push(item);
                 }
-            });
-            return { updateDatas, deleteDatas };
-        } catch (e) {
-            return false;
-        }
+            }
+
+            if (index == array.length - 1) return ({ updateDatas, deleteDatas });
+        });
+        return ({ updateDatas, deleteDatas });
     }
 
     setVal = (items = [], maKhoa) => {
@@ -208,15 +203,15 @@ export class ComponentKienThuc extends AdminPage {
                         <th rowSpan='2' style={{ width: '100%', verticalAlign: 'middle', textAlign: 'center' }} nowrap='true'>Môn học</th>
                         <th rowSpan='2' style={{ width: 'auto', verticalAlign: 'middle', textAlign: 'center' }} nowrap='true'>Tự chọn</th>
                         <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Học kỳ<br />(dự kiến)</th>
-                        <th colSpan='3' rowSpan='1' style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tín chỉ
+                        <th rowSpan='2' style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center', verticalAlign: 'middle', }}>Tín chỉ
                         </th>
-                        <th rowSpan='2' style={{ width: 'auto', verticalAlign: 'middle', textAlign: 'center' }} nowrap='true'>Số tiết</th>
+                        <th rowSpan='1' colSpan='3' style={{ width: 'auto', verticalAlign: 'middle', textAlign: 'center' }} nowrap='true'>Số tiết</th>
                         <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Thao tác</th>
                     </tr>
                     <tr>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tổng</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>LT</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>TH/TN</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tổng</th>
                     </tr>
 
                 </>),
@@ -229,8 +224,8 @@ export class ComponentKienThuc extends AdminPage {
                         <TableCell content={this.insertLoaiMh(index)} style={{ backgroundColor: styleRow(index).backgroundColor, textAlign: 'center' }} />
                         <TableCell type='number' content={this.insertHocKyDuKien(index)} style={{ textAlign: 'center', backgroundColor: styleRow(index).backgroundColor }} />
                         <TableCell type='number' style={{ textAlign: 'center', backgroundColor: styleRow(index).backgroundColor }} content={this.insertTongSoTc(index)} />
-                        <TableCell type='number' style={{ textAlign: 'center', backgroundColor: styleRow(index).backgroundColor }} content={this.insertTinChiLt(index)} />
-                        <TableCell type='number' style={{ textAlign: 'center', backgroundColor: styleRow(index).backgroundColor }} content={this.insertTinChiTh(index)} />
+                        <TableCell type='number' style={{ textAlign: 'center', backgroundColor: styleRow(index).backgroundColor }} content={this.insertTietLt(index)} />
+                        <TableCell type='number' style={{ textAlign: 'center', backgroundColor: styleRow(index).backgroundColor }} content={this.insertTietTh(index)} />
                         <TableCell type='number' content={this.insertSoTiet(index)} style={{ textAlign: 'center', backgroundColor: styleRow(index).backgroundColor }} />
                         <td rowSpan={1} colSpan={1} style={{ textAlign: 'center', backgroundColor: styleRow(index).backgroundColor }}>
                             <div className='btn-group'>

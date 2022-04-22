@@ -79,9 +79,9 @@ export function getDmPhongPage(pageNumber, pageSize, done) {
     };
 }
 
-export function getDmPhong(ten, done) {
+export function getDmPhong(ma, done) {
     return () => {
-        const url = `/api/danh-muc/phong/item/${ten}`;
+        const url = `/api/danh-muc/phong/item/${ma}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy thông tin phòng học bị lỗi!', 'danger');
@@ -109,10 +109,10 @@ export function createDmPhong(item, done) {
     };
 }
 
-export function deleteDmPhong(ten) {
+export function deleteDmPhong(ma) {
     return dispatch => {
         const url = '/api/danh-muc/phong';
-        T.delete(url, { ten }, data => {
+        T.delete(url, { ma }, data => {
             if (data.error) {
                 T.notify('Xóa phòng học bị lỗi!', 'danger');
                 console.error(`DELETE: ${url}.`, data.error);
@@ -124,10 +124,10 @@ export function deleteDmPhong(ten) {
     };
 }
 
-export function updateDmPhong(ten, changes, done) {
+export function updateDmPhong(ma, changes, done) {
     return dispatch => {
         const url = '/api/danh-muc/phong';
-        T.put(url, { ten, changes }, data => {
+        T.put(url, { ma, changes }, data => {
             if (data.error || changes == null) {
                 T.notify('Cập nhật thông phòng học bị lỗi!', 'danger');
                 console.error(`PUT: ${url}.`, data.error);
@@ -135,6 +135,7 @@ export function updateDmPhong(ten, changes, done) {
             } else {
                 T.notify('Cập nhật thông tin phòng học thành công!', 'success');
                 dispatch(getDmPhongAll());
+                done && done();
             }
         }, () => T.notify('Cập nhật thông tin phòng học bị lỗi!', 'danger'));
     };
@@ -162,6 +163,6 @@ export const SelectAdapter_DmPhong = {
     ajax: true,
     url: '/api/danh-muc/phong/page/1/20',
     data: params => ({ condition: params.term }),
-    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ten, text: item.ten })) : [] }),
-    fetchOne: (ma, done) => (getDmPhong(ma, item => done && done({ id: item.ten, text: `${item.ten}` })))(),
+    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.ten })) : [] }),
+    fetchOne: (ma, done) => (getDmPhong(ma, item => done && done({ id: item.ma, text: `${item.ten}` })))(),
 };
