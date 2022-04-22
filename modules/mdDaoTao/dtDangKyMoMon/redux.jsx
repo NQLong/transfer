@@ -4,14 +4,14 @@ import T from 'view/js/common';
 
 const DtDangKyMoMonGetPage = 'DtDangKyMoMon:GetPage';
 const DtDangKyMoMonUpdate = 'DtDangKyMoMon:Update';
+const DtDangKyMoMonCreate = 'DtDangKyMoMon:Create';
+const DtThoiGianDangKyMoMon = 'DtThoiGianDangKyMoMon:Get';
 // const DtDangKyMoMonGetItem = 'DtDangKyMoMon:GetItem';
 
 export default function dtDangKyMoMonReducer(state = null, data) {
     switch (data.type) {
         case DtDangKyMoMonGetPage:
             return Object.assign({}, state, { page: data.page });
-        // case DtDangKyMoMonGetItem:
-        //     return Object.assign({}, state, { item: data.item });
         case DtDangKyMoMonUpdate:
             if (state) {
                 let updatedItems = Object.assign({}, state.items),
@@ -37,6 +37,23 @@ export default function dtDangKyMoMonReducer(state = null, data) {
             } else {
                 return null;
             }
+        case DtDangKyMoMonCreate:
+            if (state) {
+                let updatedPage = Object.assign({}, state.page),
+                    createdItem = data.item;
+                updatedPage && createdItem.id && updatedPage.list.unshift(createdItem);
+                console.log(Object.assign({}, state, { page: updatedPage }));
+                return Object.assign({}, state, { page: updatedPage });
+            } else {
+                return null;
+            }
+        case DtThoiGianDangKyMoMon:
+            if (state) {
+                let updatedPage = Object.assign({}, state.page),
+                    updatedThoiGian = data.item;
+                let newPage = Object.assign({}, updatedPage, { thoiGianMoMon: updatedThoiGian.kichHoat ? updatedThoiGian : null });
+                return Object.assign({}, state, { page: newPage });
+            } else return null;
         default:
             return state;
     }
@@ -51,11 +68,59 @@ export function getDtDangKyMoMonPage(pageNumber, pageSize, pageCondition, done) 
         const url = `/api/dao-tao/dang-ky-mo-mon/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { searchTerm: pageCondition?.searchText, donViFilter: pageCondition?.donViFilter }, data => {
             if (data.error) {
-                T.notify('Lấy danh sách đăng ký mở môn bị lỗi!', 'danger');
+                T.notify(`Lấy danh sách đăng ký mở môn bị lỗi: ${data.error.message}`, 'danger');
                 console.error(`GET ${url}. ${data.error}`);
             } else {
                 dispatch({ type: DtDangKyMoMonGetPage, page: data.page });
                 done && done();
+            }
+        });
+    };
+}
+
+export function getDsDuKien(condition, done) {
+    return () => {
+        const url = '/api/dao-tao/get-chuong-trinh-du-kien/all';
+        T.get(url, { yearth: condition?.yearth }, data => {
+            if (data.error) {
+                T.notify(`Lỗi: ${data.error.message}`, 'danger');
+                console.error(data.error.message);
+            } else {
+                done && done(data.item);
+            }
+        });
+    };
+}
+
+export function createDangKyMoMon(data, done) {
+    return dispatch => {
+        const url = '/api/dao-tao/dang-ky-mo-mon';
+        T.post(url, { data }, item => {
+            if (item.error) {
+                T.notify(`Lỗi: ${item.error.message}`, 'danger');
+                console.error(item.error.message);
+            } else {
+                T.notify('Tạo đăng ký môn thành công', 'success');
+                dispatch(getDtDangKyMoMonPage());
+                done && done(item.item);
+            }
+        });
+    };
+}
+export function changeThoiGianDangKyMoMon(item) {
+    return { type: DtThoiGianDangKyMoMon, item };
+}
+
+export function saveDangKyMoMon(id, data, done) {
+    return () => {
+        const url = '/api/dao-tao/dang-ky-mo-mon';
+        T.put(url, { id, data }, result => {
+            if (result.error) {
+                T.notify(`Lỗi: ${result.error.message}`, 'danger');
+                console.error(result.error.message);
+            } else {
+                T.alert('Lưu thành công', 'success', false, 1000);
+                done && done(result.item);
             }
         });
     };

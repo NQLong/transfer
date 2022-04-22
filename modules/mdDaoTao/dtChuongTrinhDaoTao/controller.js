@@ -176,12 +176,16 @@ module.exports = app => {
                 }
             });
         });
-        try {
-            let listMonHocCTDT = changes.items && changes.items.length ? await updateCTDT(changes.items) : [];
-            app.model.dtKhungDaoTao.update({ id }, changes.data, (error, item) => res.send({ error, item: app.clone(item, { listMonHocCTDT }) }));
-        } catch (error) {
-            res.send({ error });
-        }
+        app.model.dtKhungDaoTao.get({ namDaoTao: changes.data.namDaoTao, maNganh: changes.data.maNganh }, async (error, createdCTDT) => {
+            if ((!error && !createdCTDT) || createdCTDT.id == id) {
+                try {
+                    let listMonHocCTDT = await updateCTDT(changes.items || []);
+                    app.model.dtKhungDaoTao.update({ id }, changes.data, (error, item) => res.send({ error, item: app.clone(item, { listMonHocCTDT }) }));
+                } catch (error) {
+                    res.send({ error });
+                }
+            } else res.send({ error: `Mã ngành ${changes.data.maNganh} năm ${changes.data.namDaoTao} đã tồn tại!` });
+        });
     });
 
     app.delete('/api/dao-tao/chuong-trinh-dao-tao', app.permission.orCheck('dtChuongTrinhDaoTao:delete', 'manager:write'), (req, res) => {

@@ -187,8 +187,8 @@ class NotificationItem extends AdminPage {
                     <i className='fa fa-bell-o fa-lg' />
                     {notificationLength ? <span className='badge badge-pill badge-danger' style={{ position: 'absolute', top: '6px', right: notificationLength >= 10 ? '-8px' : '-2px', fontSize: '87%' }}>{notificationLength}</span> : ''}
                 </a>
-                <ul className='app-notification dropdown-menu dropdown-menu-right'>
-                    <li className='app-notification__title'>{notificationLength ? `Bạn có ${notificationLength} thông báo mới` : 'Bạn không có thông báo mới nào'}</li>
+                <ul className='app-notification dropdown-menu dropdown-menu-right' style={{ top: '10px' }}>
+                    {!notificationLength && <li className='app-notification__title'>Không có thông báo mới!</li>}
 
                     <div className='app-notification__content'>
                         {notificationElements}
