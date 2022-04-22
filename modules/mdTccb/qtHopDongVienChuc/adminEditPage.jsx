@@ -8,7 +8,7 @@ import {
     deleteStaff, updateStaff, SelectAdapter_FwCanBo
 } from 'modules/mdTccb/tccbCanBo/redux';
 import moment from 'moment';
-import { getDmDonViAll, SelectAdapter_DmDonViFaculty } from 'modules/mdDanhMuc/dmDonVi/redux';
+import { getDmDonViAll, SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { getDmNgachCdnnAll } from 'modules/mdDanhMuc/dmNgachCdnn/redux';
 import {
     getQtHopDongVienChucPage, getQtHopDongVienChucAll, updateQtHopDongVienChuc, downloadWord,
@@ -28,6 +28,10 @@ import Loading from 'view/component/Loading';
 import { SelectAdapter_DmChucDanhChuyenMon } from 'modules/mdDanhMuc/dmChucDanhChuyenMon/redux';
 import { DateInput } from 'view/component/Input';
 import { Select } from 'view/component/Input';
+import { getPreShcc } from '../qtHopDongLaoDong/redux';
+import { getDmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
+import { SelectApdater_DaiDienKy } from 'modules/mdTccb/qtChucVu/redux';
+import { getDaiDienKyHopDong } from '../qtHopDongLaoDong/redux';
 
 
 const EnumLoaiCanBo = Object.freeze({
@@ -186,10 +190,10 @@ class QtHopDongVienChucEditPage extends QTForm {
             this.nguoiKy.current.setVal(data.canBo.shcc);
             this.setState({ chucVuNguoiKy: (this.chucVuMapper[data.canBo.maChucVu] ? this.chucVuMapper[data.canBo.maChucVu] : '') + ' - ' + (this.donViMapper[data.canBo.maDonVi] ? this.donViMapper[data.canBo.maDonVi] : '') });
         }
-        else {
-            this.nguoiKy.current.setVal(this.state.truongPhongTccb);
-            this.setState({ chucVuNguoiKy: this.chucVuMapper['003'] + ' - ' + this.donViMapper['30'] });
-        }
+        // else {
+        //     this.nguoiKy.current.setVal(this.state.truongPhongTccb);
+        //     this.setState({ chucVuNguoiKy: this.chucVuMapper['003'] + ' - ' + this.donViMapper['30'] });
+        // }
         this.urlMa && this.selectedShcc.current.setVal(shcc);
         this.phai.current.setVal(phai);
         this.quocGia.current.setVal(quocGia ? quocGia : '');
@@ -430,6 +434,19 @@ class QtHopDongVienChucEditPage extends QTForm {
         });
     }
 
+    genNewShcc = (maDonVi) => {
+        if (maDonVi == '') {
+            return;
+        }
+        this.props.getDmDonVi(maDonVi, (item) => {
+            let preShcc = item.preShcc;
+            this.props.getPreShcc(maDonVi, (data) => {
+                preShcc = preShcc + '.' + data.preShcc.toString().padStart(4, '0');
+                if (this.shcc.current) this.shcc.current.setVal(preShcc);
+            });
+        });
+    };
+
     render() {
         const currentPermission = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [];
         let readOnly = !currentPermission.includes('qtHopDongVienChuc:write');
@@ -448,7 +465,7 @@ class QtHopDongVienChucEditPage extends QTForm {
                     <h3 className='tile-title'>Thông tin phía trường</h3>
                     <div className='tile-body row'>
                         <div className='form-group col-xl-4 col-md-6'><TextInput ref={this.soQd} label='Số quyết định' disable={readOnly} required /> </div>
-                        <div className='form-group col-xl-4 col-md-6'><Select adapter={SelectAdapter_FwCanBo} ref={this.nguoiKy} onChange={value => this.autoChucVu(value)} label='Người đại diện ký' disable={readOnly} required /></div>
+                        <div className='form-group col-xl-4 col-md-6'><Select adapter={SelectApdater_DaiDienKy} ref={this.nguoiKy} onChange={value => this.autoChucVu(value)} label='Người đại diện ký' disable={readOnly} required /></div>
                         <div className='form-group col-md-4'>Chức vụ: <><br /><b>{this.state.chucVuNguoiKy}</b></></div>
                     </div>
                 </div>
@@ -506,7 +523,7 @@ class QtHopDongVienChucEditPage extends QTForm {
                         <div className='form-group col-xl-3 col-md-6'><DateInput ref={this.ngayBatDauLamViec} label='Ngày bắt đầu làm việc' min={new Date(1900, 1, 1).getTime()} max={new Date(new Date().getFullYear() + 1, 1, 1).getTime()} disable={readOnly} onChange={this.handleTuNgay} required /></div>
                         <div className='form-group col-xl-3 col-md-6' id='ketThucHd'><DateInput ref={this.ngayKetThucHopDong} label='Ngày kết thúc hợp đồng' min={new Date(1900, 1, 1).getTime()} max={new Date(new Date().getFullYear() + 4, 1, 1).getTime()} disable={readOnly} required={this.state.isKetThucHd} /></div>
                         <div className='form-group col-xl-3 col-md-6' id='kyTiepTheo'><DateInput ref={this.ngayKyHdTiepTheo} min={new Date(1900, 1, 1).getTime()} max={new Date(new Date().getFullYear() + 4, 1, 1).getTime()} disable={readOnly} label='Ngày ký hợp đồng tiếp theo' /></div>
-                        <div className='form-group col-xl-12 col-md-12'><Select adapter={SelectAdapter_DmDonViFaculty} ref={this.diaDiemLamViec} disable={readOnly} label='Địa điểm làm việc' /></div>
+                        <div className='form-group col-xl-12 col-md-12'><Select adapter={SelectAdapter_DmDonVi} ref={this.diaDiemLamViec} disable={readOnly} label='Địa điểm làm việc' onChange={value => this.genNewShcc(value)}/></div>
                         <div className='form-group col-xl-4 col-md-4'><Select adapter={SelectAdapter_DmChucDanhChuyenMon} ref={this.chucDanhChuyenMon} disable={readOnly} label='Chức danh chuyên môn' /></div>
                         <div className='form-group col-xl-4 col-md-4'><TextInput ref={this.nhiemVu} label='Nhiệm vụ' disable={readOnly} /></div>
                         <div className='form-group col-xl-4 col-md-4'><Select ref={this.maNgach} label='Ngạch' adapter={SelectAdapter_DmNgachCdnn} disable={readOnly} onChange={this.changeNgach} required /></div>
@@ -536,6 +553,7 @@ const mapActionsToProps = {
     createStaff, deleteStaff, updateStaff, getStaffAll, getDmLoaiHopDong,
     getQtHopDongVienChucPage, getQtHopDongVienChucAll, updateQtHopDongVienChuc, getdmLoaiHopDongAll,
     deleteQtHopDongVienChuc, createQtHopDongVienChuc, getStaff, getDmChucVuAll, downloadWord,
-    getDmDonViAll, getDmNgachCdnnAll, getQtHopDongVienChucEdit, getTruongPhongTccb
+    getDmDonViAll, getDmNgachCdnnAll, getQtHopDongVienChucEdit, getTruongPhongTccb,
+    getDmDonVi, getDaiDienKyHopDong, getPreShcc
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtHopDongVienChucEditPage);

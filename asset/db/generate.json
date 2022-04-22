@@ -8483,6 +8483,46 @@
             "foreignKeys": [],
             "type": "table"
         },
+        "HCTH_CAN_BO_NHAN": {
+            "active": true,
+            "moduleName": "hcthCanBoNhan",
+            "modelName": "hcthCanBoNhan",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "CAN_BO_NHAN": {
+                    "value": "canBoNhan",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 255
+                },
+                "KEY": {
+                    "value": "key",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "LOAI": {
+                    "value": "loai",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
         "HCTH_GIAO_NHIEM_VU": {
             "active": true,
             "moduleName": "hcthGiaoNhiemVu",
@@ -12892,46 +12932,6 @@
                     "dataDefault": "0",
                     "nullable": true,
                     "size": "1,0"
-                }
-            },
-            "primaryKeys": [
-                "ID"
-            ],
-            "foreignKeys": [],
-            "type": "table"
-        },
-        "HCTH_CAN_BO_NHAN": {
-            "active": true,
-            "moduleName": "hcthCanBoNhan",
-            "modelName": "hcthCanBoNhan",
-            "columns": {
-                "ID": {
-                    "value": "id",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": false,
-                    "size": "22,0"
-                },
-                "CAN_BO_NHAN": {
-                    "value": "canBoNhan",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 255
-                },
-                "KEY": {
-                    "value": "key",
-                    "dataType": "NUMBER",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": "22,0"
-                },
-                "LOAI": {
-                    "value": "loai",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 20
                 }
             },
             "primaryKeys": [

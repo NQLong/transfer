@@ -22,4 +22,12 @@ module.exports = {
     MA_BAN_GIAM_HIEU: '68',
     MA_HCTH: '29',
 
+    handleResult: (resolve, reject, item, error) => {
+        if (error) {
+            reject(error);
+        }
+        else
+            resolve(item);
+    },
+
 };

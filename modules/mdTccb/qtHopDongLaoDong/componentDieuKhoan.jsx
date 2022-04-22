@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getDmDonViFaculty, getDmDonVi, getDmDonViAll, SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import moment from 'moment';
-import { FormDatePicker, FormSelect, FormTextBox } from 'view/component/AdminPage';
+import { FormCheckbox, FormDatePicker, FormSelect, FormTextBox } from 'view/component/AdminPage';
 import { SelectAdapter_DmLoaiHopDongV2 } from 'modules/mdDanhMuc/dmLoaiHopDong/redux';
 import { SelectAdapter_DmBoMonTheoDonVi } from 'modules/mdDanhMuc/dmBoMon/redux';
 import { SelectAdapter_DmNgachCdnnV2, getDmNgachCdnnAll } from 'modules/mdDanhMuc/dmNgachCdnn/redux';
@@ -38,8 +38,9 @@ export class ComponentDieuKhoan extends React.Component {
     setVal = (data = null) => {
         if (data) {
             let { ma, loaiHopDong, ngayKyHopDong, batDauLamViec, ketThucHopDong, diaDiemLamViec,
-                congViecDuocGiao, maNgach, heSo, bac, phanTramHuong, chiuSuPhanCong, ngayKyHdTiepTheo } = data;
-            this.setState({ ma });
+                congViecDuocGiao, maNgach, heSo, bac, phanTramHuong, chiuSuPhanCong, ngayKyHdTiepTheo, thoiGianLamViec, 
+                dungCuDuocCapPhat, phuongTienDiLaiLamViec, hinhThucTraLuong, cheDoNghiNgoi, boiThuongVatChat, isCvdt } = data;
+            this.setState({ ma, maNgach });
             this.props.getDmDonVi(diaDiemLamViec, data => {
                 this.setState({ tenDonVi: data.ten, maDv: diaDiemLamViec, ngach: this.cdnnMapper[maNgach] }, () => {
                     this.loaiHopDong.value(loaiHopDong);
@@ -60,14 +61,15 @@ export class ComponentDieuKhoan extends React.Component {
                     this.heSoLuong.value(heSo.toFixed(2));
                     this.bacLuong.value(bac);
                     this.phanTramHuong.value(phanTramHuong ? phanTramHuong : '');
-                    this.thoiGianLamViec.value(defaultValue.thoiGianLamViec);
-                    this.cheDoNghiNgoi.value(defaultValue.cheDoNghiNgoi);
-                    this.dungCuLamViec.value(defaultValue.dungCuLamViec);
-                    this.phuongTienLamViec.value(defaultValue.phuongTienLamViec);
-                    this.hinhThucTraLuong.value(defaultValue.hinhThucTraLuong);
+                    this.thoiGianLamViec.value(thoiGianLamViec ? thoiGianLamViec : defaultValue.thoiGianLamViec);
+                    this.cheDoNghiNgoi.value(cheDoNghiNgoi ? cheDoNghiNgoi : defaultValue.cheDoNghiNgoi);
+                    this.dungCuLamViec.value(dungCuDuocCapPhat ? dungCuDuocCapPhat : defaultValue.dungCuLamViec);
+                    this.phuongTienLamViec.value(phuongTienDiLaiLamViec ? phuongTienDiLaiLamViec : defaultValue.phuongTienLamViec);
+                    this.hinhThucTraLuong.value(hinhThucTraLuong ? hinhThucTraLuong : defaultValue.hinhThucTraLuong);
                     this.chiuSuPhanCong.value(chiuSuPhanCong ? chiuSuPhanCong + ' ' + this.state.tenDonVi.normalizedName() : defaultValue.chiuSuPhanCong + ' ' + this.state.tenDonVi.normalizedName());
-                    this.boiThuong.value(defaultValue.boiThuong);
+                    this.boiThuong.value(boiThuongVatChat ? boiThuongVatChat : defaultValue.boiThuong);
                     this.ngayKyTiepTheo.value(ngayKyHdTiepTheo);
+                    this.isCVDT.value(isCvdt);
                 });
             });
         } else {
@@ -79,12 +81,13 @@ export class ComponentDieuKhoan extends React.Component {
             this.cheDoNghiNgoi.value(defaultValue.cheDoNghiNgoi);
             this.boiThuong.value(defaultValue.boiThuong);
             this.tuNgay.value(new Date().getTime());
+            this.batDauLamViec.value(new Date().getTime());
             this.chiuSuPhanCong.value(defaultValue.chiuSuPhanCong);
         }
     }
 
     handleNgach = (item) => {
-        this.setState({ ngach: this.cdnnMapper[item.id] }, () => {
+        this.setState({ ngach: this.cdnnMapper[item.id], maNgach: item.id }, () => {
             this.bacLuong.value(null);
         });
     }
@@ -120,19 +123,13 @@ export class ComponentDieuKhoan extends React.Component {
             this.denNgay.value(newDate.valueOf() - 24 * 3600000);
             this.ngayKyTiepTheo.value(newDate.valueOf());
         }
-    }
-
-    handlePhanCong = (value) => {
-        if (this.state.maDv) {
-            let curPhanCong = value.currentTarget.value;
-            if (!curPhanCong.includes(this.tenDonViMapper[this.state.maDv]))
-                this.chiuSuPhanCong.value(curPhanCong + ' ' + this.tenDonViMapper[this.state.maDv]);
-        }
+        value && this.batDauLamViec.value(value);
     }
 
     handleDonVi = () => {
         let trachNhiem = this.state.listMaKhoa.includes(this.state.maDv) ? 'Trưởng khoa ' : 'Trưởng/Giám đốc ';
         this.chiuSuPhanCong.value(defaultValue.chiuSuPhanCong + trachNhiem + this.tenDonViMapper[this.state.maDv].normalizedName());
+        this.congViecDuocGiao.value(defaultValue.congViecDuocGiao + trachNhiem + this.tenDonViMapper[this.state.maDv].normalizedName());
     }
 
     validate = (selector) => {
@@ -140,7 +137,7 @@ export class ComponentDieuKhoan extends React.Component {
         const isRequired = selector.props.required;
         if (data || data === 0) return data;
         if (isRequired) throw selector;
-        return '';
+        return null;
     };
 
     getValue = () => {
@@ -160,12 +157,13 @@ export class ComponentDieuKhoan extends React.Component {
                 ngayKyHdTiepTheo: this.validate(this.ngayKyTiepTheo).getTime(),
                 //new thing
                 thoiGianLamViec: this.validate(this.thoiGianLamViec),
-                dungCuLamViec: this.validate(this.dungCuLamViec),
-                phuongTienLamViec: this.validate(this.phuongTienLamViec),
+                dungCuDuocCapPhat: this.validate(this.dungCuLamViec),
+                phuongTienDiLaiLamViec: this.validate(this.phuongTienLamViec),
                 hinhThucTraLuong: this.validate(this.hinhThucTraLuong),
                 cheDoNghiNgoi: this.validate(this.cheDoNghiNgoi),
-                boiThuong: this.validate(this.boiThuong),
-                boMon: this.validate(this.maBoMon)
+                boiThuongVatChat: this.validate(this.boiThuong),
+                boMon: this.validate(this.maBoMon),
+                isCvdt: this.validate(this.isCVDT),
             };
             return data;
         } catch (selector) {
@@ -174,6 +172,10 @@ export class ComponentDieuKhoan extends React.Component {
             return false;
         }
     }
+
+    getDonVi = () => {
+        return this.donVi.value();
+    };
 
     render() {
         const currentPermission = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [];
@@ -188,12 +190,16 @@ export class ComponentDieuKhoan extends React.Component {
                     <FormSelect ref={e => this.loaiHopDong = e} data={SelectAdapter_DmLoaiHopDongV2} className='col-xl-12 col-md-12' label='Loại hợp đồng lao động' onChange={this.handleLoaiHD} required readOnly={readOnly} />
                     <FormDatePicker ref={e => this.tuNgay = e} type='date-mask' className='col-xl-3 col-md-6' label='Từ ngày' required readOnly={readOnly} onChange={this.handleTuNgay} />
                     <FormDatePicker ref={e => this.denNgay = e} type='date-mask' className={this.state.isXacDinhTg ? 'col-xl-3 col-md-6' : 'd-none'} label='Đến ngày' required readOnly={readOnly} />
-                    <FormDatePicker ref={e => this.batDauLamViec = e} type='date-mask' className='col-xl-3 col-md-6' label='Ngày bắt đầu làm việc' required readOnly={readOnly} />
+                    <FormDatePicker ref={e => this.batDauLamViec = e} type='date-mask' className='col-xl-3 col-md-6' label='Ngày bắt đầu làm việc' required readOnly={true} />
                     <FormDatePicker ref={e => this.ngayKyTiepTheo = e} type='date-mask' className={this.state.isXacDinhTg ? 'col-xl-3 col-md-6' : 'd-none'} label='Ngày tái ký' required readOnly={readOnly} />
-                    <FormSelect ref={e => this.donVi = e} data={SelectAdapter_DmDonVi} className='col-xl-4 col-md-6' label='Địa điểm làm việc' readOnly={readOnly} onChange={value => { this.setState({ maDv: value.id }, () => this.maBoMon.value(null)); this.handleDonVi(); }} required />
+                    <FormSelect ref={e => this.donVi = e} data={SelectAdapter_DmDonVi} className='col-xl-4 col-md-6' label='Địa điểm làm việc' readOnly={readOnly} onChange={value => { 
+                        this.setState({ maDv: value.id }, () => this.maBoMon.value(null)); 
+                        this.handleDonVi(); 
+                        this.props.genNewShcc(value.id, value.preShcc); }} required />
                     <FormSelect ref={e => this.maBoMon = e} data={SelectAdapter_DmBoMonTheoDonVi(this.state.maDv)} label='Bộ môn' readOnly={readOnly} className={!this.state.maDv || !this.state.listMaKhoa.includes(this.state.maDv) ? 'd-none' : 'col-xl-4 col-md-6'} />
                     <FormSelect ref={e => this.chucDanh = e} data={SelectAdapter_DmNgachCdnnV2} onChange={this.handleNgach} className='col-md-4' label='Chức danh chuyên môn' required />
-                    <FormTextBox ref={e => this.congViecDuocGiao = e} label='Công việc được giao' readOnly={readOnly} className='col-12' maxLength={100} />
+                    <FormCheckbox ref={e => this.isCVDT = e} className={this.state.maNgach == '01.003' ? 'col-md-12' : 'd-none'} label='Chuyên viên phục vụ đào tạo' />
+                    <FormTextBox ref={e => this.congViecDuocGiao = e} label='Công việc được giao' readOnly={readOnly} className='col-12' maxLength={200} />
                     <div className='col-12 form-group' />
                     <div className='col-12 form-group'>
                         <h4 className='control-label' style={{ fontWeight: 'bold', textAlign: 'left' }}>Điều 2: Chế độ làm việc</h4>
@@ -217,7 +223,7 @@ export class ComponentDieuKhoan extends React.Component {
                     <div className='col-12 form-group'>
                         <h5 className='control-label' style={{ fontWeight: 'bold' }}>2. Nghĩa vụ: </h5>
                     </div>
-                    <FormTextBox ref={e => this.chiuSuPhanCong = e} label='Chịu sự điều hành, quản lý của' onChange={this.handlePhanCong} className='col-xl-6 col-md-6' />
+                    <FormTextBox ref={e => this.chiuSuPhanCong = e} label='Chịu sự điều hành, quản lý của' className='col-xl-6 col-md-6' />
                     <FormTextBox ref={e => this.boiThuong = e} label='Bồi thường vi phạm và vật chất' className='col-xl-6 col-md-6' />
                 </div>
             </div>
