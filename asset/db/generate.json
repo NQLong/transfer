@@ -8483,6 +8483,46 @@
             "foreignKeys": [],
             "type": "table"
         },
+        "HCTH_CAN_BO_NHAN": {
+            "active": true,
+            "moduleName": "hcthCanBoNhan",
+            "modelName": "hcthCanBoNhan",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "CAN_BO_NHAN": {
+                    "value": "canBoNhan",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 255
+                },
+                "KEY": {
+                    "value": "key",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "LOAI": {
+                    "value": "loai",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
         "HCTH_GIAO_NHIEM_VU": {
             "active": true,
             "moduleName": "hcthGiaoNhiemVu",
@@ -8561,6 +8601,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "20,0"
+                },
+                "IS_NHIEM_VU_LIEN_PHONG": {
+                    "value": "isNhiemVuLienPhong",
+                    "dataType": "NUMBER",
+                    "dataDefault": "0",
+                    "nullable": true,
+                    "size": "10,0"
                 }
             },
             "primaryKeys": [
@@ -12838,6 +12885,46 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "22,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "FW_USER_NOTIFICATION": {
+            "active": true,
+            "moduleName": "fwUserNotification",
+            "modelName": "fwUserNotification",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_111161\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "NOTIFICATION": {
+                    "value": "notification",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "EMAIL": {
+                    "value": "email",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 64
+                },
+                "READ": {
+                    "value": "read",
+                    "dataType": "NUMBER",
+                    "dataDefault": "0",
+                    "nullable": true,
+                    "size": "1,0"
                 }
             },
             "primaryKeys": [
