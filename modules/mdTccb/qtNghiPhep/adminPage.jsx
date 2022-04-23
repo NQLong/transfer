@@ -469,9 +469,7 @@ class QtNghiPhep extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh<br/>nghề nghiệp</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br />Đơn vị công tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Đơn vị công tác</th>
                         {!this.checked && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>}
                         {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Lý do nghỉ</th>}
                         {!this.checked && <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nơi đến</th>}
@@ -493,11 +491,8 @@ class QtNghiPhep extends AdminPage {
                                 {item.shcc}
                             </>
                         )} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenHocVi || ''} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucDanhNgheNghiep || ''} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span> {item.tenChucVu || ''}<br /> </span>
                                 {(item.tenDonVi || '').normalizedName()}
                             </>
                         )} />

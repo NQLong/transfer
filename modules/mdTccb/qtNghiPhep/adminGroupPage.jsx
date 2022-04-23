@@ -405,9 +405,7 @@ class QtNghiPhepGroupPage extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Học vị</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh<br/>nghề nghiệp</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức vụ<br />Đơn vị công tác</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Đơn vị công tác</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thời gian</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Lý do nghỉ</th>
                         <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nơi đến</th>
@@ -427,11 +425,8 @@ class QtNghiPhepGroupPage extends AdminPage {
                                 {item.shcc}
                             </>
                         )} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenHocVi || ''} />
-                        <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={item.tenChucDanhNgheNghiep || ''} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={(
                             <>
-                                <span> {item.tenChucVu || ''}<br /> </span>
                                 {(item.tenDonVi || '').normalizedName()}
                             </>
                         )} />
