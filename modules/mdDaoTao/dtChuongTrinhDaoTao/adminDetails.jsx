@@ -123,19 +123,19 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
             // ];
             const updateDatas = { items: updateItems, ...{ id: this.ma, data } };
             // const deleteDatas = { items: deleteItems };
-
             this.ma == 'new' ? this.props.createDtChuongTrinhDaoTao(updateDatas, (item) => {
                 location.replace('/new', `/${item.id}`);
                 location.reload();
             }) : this.props.updateDtChuongTrinhDaoTao(this.ma, updateDatas, () => {
-                location.reload();
+                // location.reload();
             });
             // this.props.deleteMultiDtChuongTrinhDaoTao(deleteDatas, () => { });
         }
     }
     render() {
         const permission = this.getUserPermission('dtChuongTrinhDaoTao', ['read', 'write', 'delete', 'manage']);
-        const readOnly = !(permission.write || permission.manage);
+        const readOnly = !(permission.write || permission.manage),
+            isPhongDaoTao = permission.write;
 
         return this.renderPage({
             icon: 'fa fa-university',
@@ -189,7 +189,7 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                                     }
                                 ]} />
                             </div>
-                            <FormSelect ref={e => this.khoa = e} data={SelectAdapter_DmDonViFaculty_V2} label='Nơi đào tạo' className='col-12' readOnly={this.props.system.user.staff?.maDonVi == 33 ? false : true} />
+                            <FormSelect ref={e => this.khoa = e} data={SelectAdapter_DmDonViFaculty_V2} label='Nơi đào tạo' className='col-12' readOnly={!isPhongDaoTao} />
                         </div>
                     </div>
                 </div>

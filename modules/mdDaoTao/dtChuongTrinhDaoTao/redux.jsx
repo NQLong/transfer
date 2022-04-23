@@ -175,15 +175,15 @@ export function updateDtChuongTrinhDaoTao(id, changes, done) {
         const url = '/api/dao-tao/chuong-trinh-dao-tao';
         T.put(url, { id, changes }, data => {
             if (data.error) {
-                T.notify('Cập nhật chương trình đào tạo bị lỗi!', 'danger');
-                console.error(`PUT ${url}. ${data.error}`);
+                T.notify(`Lưu lỗi: ${data.error.message}`, 'danger');
+                console.error(`PUT ${url}. ${data.error.message}`);
                 done && done(data.error);
             } else {
-                T.notify('Cập nhật thông tin chương trình đào tạo thành công!', 'success');
+                T.notify('Cập nhật thành công!', 'success');
                 dispatch(getDtChuongTrinhDaoTaoPage());
                 done && done(data.item);
             }
-        }, () => T.notify('Cập nhật thông tin chương trình đào tạo bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật bị lỗi!', 'danger'));
     };
 }
 

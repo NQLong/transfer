@@ -48,10 +48,10 @@ export function getDmToaNhaAll(condition, done) {
         condition = {};
     }
     return dispatch => {
-        const url = '/api/danh-muc/day-nha/all';
+        const url = '/api/danh-muc/toa-nha/all';
         T.get(url, { condition }, data => {
             if (data.error) {
-                T.notify('Lấy danh sách dãy nhà bị lỗi', 'danger');
+                T.notify('Lấy danh sách tòa nhà bị lỗi', 'danger');
                 console.error(`GET ${url}. ${data.error}`);
             } else {
                 if (done) done(data.items);
@@ -65,10 +65,10 @@ T.initPage('pageDmToaNha');
 export function getDmToaNhaPage(pageNumber, pageSize, done) {
     const page = T.updatePage('pageDmToaNha', pageNumber, pageSize);
     return dispatch => {
-        const url = `/api/danh-muc/day-nha/page/${page.pageNumber}/${page.pageSize}`;
+        const url = `/api/danh-muc/toa-nha/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, data => {
             if (data.error) {
-                T.notify('Lấy danh sách dãy nhà bị lỗi!', 'danger');
+                T.notify('Lấy danh sách tòa nhà bị lỗi!', 'danger');
                 console.error(`GET ${url}. ${data.error}`);
             } else {
                 if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
@@ -80,14 +80,15 @@ export function getDmToaNhaPage(pageNumber, pageSize, done) {
 
 export function createDmToaNha(item, done) {
     return dispatch => {
-        const url = '/api/danh-muc/day-nha';
+        const url = '/api/danh-muc/toa-nha';
         T.post(url, { item }, data => {
             if (data.error) {
-                T.notify('Tạo dãy nhà bị lỗi!', 'danger');
+                T.notify('Tạo tòa nhà bị lỗi!', 'danger');
                 console.error(`POST ${url}. ${data.error}`);
             } else {
-                if (done) done(data.items);
+                T.notify('Tạo thông tin tòa nhà thành công!', 'success');
                 dispatch(getDmToaNhaAll());
+                if (done) done(data.items);
             }
         });
     };
@@ -95,35 +96,59 @@ export function createDmToaNha(item, done) {
 
 export function deleteDmToaNha(ma) {
     return dispatch => {
-        const url = '/api/danh-muc/day-nha';
+        const url = '/api/danh-muc/toa-nha';
         T.delete(url, { ma }, data => {
             if (data.error) {
-                T.notify('Xóa dãy nhà bị lỗi!', 'danger');
+                T.notify('Xóa tòa nhà bị lỗi!', 'danger');
                 console.error(`DELETE: ${url}.`, data.error);
             } else {
                 T.alert('Tòa nhà đã xóa thành công!', 'success', false, 800);
                 dispatch(getDmToaNhaAll());
             }
-        }, () => T.notify('Xóa dãy nhà bị lỗi!', 'danger'));
+        }, () => T.notify('Xóa tòa nhà bị lỗi!', 'danger'));
     };
 }
 
 export function updateDmToaNha(ma, changes, done) {
     return dispatch => {
-        const url = '/api/danh-muc/day-nha';
+        const url = '/api/danh-muc/toa-nha';
         T.put(url, { ma, changes }, data => {
             if (data.error) {
-                T.notify('Cập nhật dãy nhà bị lỗi!', 'danger');
+                T.notify('Cập nhật tòa nhà bị lỗi!', 'danger');
                 console.error(`PUT ${url}. ${data.error}`);
                 done && done(data.error);
             } else {
-                T.notify('Cập nhật thông tin dãy nhà thành công!', 'success');
+                T.notify('Cập nhật thông tin tòa nhà thành công!', 'success');
                 dispatch(getDmToaNhaAll());
+                done && done();
             }
-        }, () => T.notify('Cập nhật thông tin dãy nhà bị lỗi!', 'danger'));
+        }, () => T.notify('Cập nhật thông tin tòa nhà bị lỗi!', 'danger'));
     };
 }
 
 export function changeDmToaNha(item) {
     return { type: DmToaNhaUpdate, item };
 }
+export function getDmToaNha(ma, done) {
+    return () => {
+        const url = `/api/danh-muc/toa-nha/item/${ma}`;
+        T.get(url, { ma }, data => {
+            if (data.error) {
+                T.notify('Lấy thông tin tòa nhà bị lỗi' + (data.error.message && (':<br>' + data.error.message)), 'danger');
+                console.error(`GET: ${url}.`, data.error);
+            } else {
+                if (done) done(data.item);
+            }
+        }, error => {
+            console.error(`GET: ${url}.`, error);
+        });
+    };
+}
+
+export const SelectAdapter_DmToaNha = {
+    ajax: true,
+    url: '/api/danh-muc/toa-nha/all',
+    data: params => ({ condition: params.term }),
+    processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.ma, text: item.ten })) : [] }),
+    fetchOne: (ma, done) => (getDmToaNha(ma, item => item && done && done({ id: item.ma, text: item.ten })))(),
+};

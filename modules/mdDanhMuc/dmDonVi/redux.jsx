@@ -194,7 +194,7 @@ export const SelectAdapter_DmDonViFaculty_V2 = {
     ajax: true,
     url: '/api/danh-muc/don-vi/faculty',
     data: params => ({ condition: params.term }),
-    processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.ma, text: item.ten.normalizedName() })) : [] }),
+    processResults: response => ({ results: response && response.items ? response.items.map(item => ({ id: item.ma, text: item.ten })) : [] }),
     fetchOne: (id, done) => (getDmDonVi(id, item => item && done && done({ id: item.ma, text: item.ten })))(),
 };
 

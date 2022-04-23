@@ -7,7 +7,7 @@ import Datetime from 'react-datetime';
 import InputMask from 'react-input-mask';
 import NumberFormat from 'react-number-format';
 import 'react-datetime/css/react-datetime.css';
-
+import Tooltip from '@mui/material/Tooltip';
 // Table components ---------------------------------------------------------------------------------------------------
 export class TableCell extends React.Component { // type = number | date | link | image | checkbox | buttons | text (default)
     render() {
@@ -53,13 +53,22 @@ export class TableCell extends React.Component { // type = number | date | link 
                         {permission.write && onSwap ?
                             <a className='btn btn-warning' href='#' onClick={e => e.preventDefault() || onSwap(e, content, false)}><i className='fa fa-lg fa-arrow-down' /></a> : null}
                         {onEdit && typeof onEdit == 'function' ?
-                            <a className='btn btn-primary' href='#' title={permission.write ? 'Chỉnh sửa' : 'Xem'} onClick={e => e.preventDefault() || onEdit(e, content)}><i className={'fa fa-lg ' + (permission.write ? 'fa-edit' : 'fa-eye')} /></a> : null}
+                            <Tooltip title={permission.write ? 'Chỉnh sửa' : 'Xem'} arrow placeholder='bottom'>
+                                <a className='btn btn-primary' href='#' onClick={e => e.preventDefault() || onEdit(e, content)}><i className={'fa fa-lg ' + (permission.write ? 'fa-edit' : 'fa-eye')} /></a>
+                            </Tooltip> : null
+                        }
                         {permission.write && onClone && typeof onClone == 'function' ?
-                            <a className='btn btn-info' href='#' title={'Sao chép'} onClick={e => e.preventDefault() || onClone(e, content)}><i className='fa fa-lg fa-clone' /></a> : null}
+                            <Tooltip title='Sao chép' arrow placeholder='bottom' >
+                                <a className='btn btn-info' href='#' onClick={e => e.preventDefault() || onClone(e, content)}><i className='fa fa-lg fa-clone' /></a>
+                            </Tooltip> : null}
                         {onEdit && typeof onEdit == 'string' ?
-                            <Link to={onEdit} className='btn btn-primary'><i className='fa fa-lg fa-edit' /></Link> : null}
+                            <Tooltip title='Chỉnh sửa' arrow placeholder='bottom'>
+                                <Link to={onEdit} className='btn btn-primary'><i className='fa fa-lg fa-edit' /></Link>
+                            </Tooltip> : null}
                         {permission.delete && onDelete ?
-                            <a className='btn btn-danger' href='#' title='Xóa' onClick={e => e.preventDefault() || onDelete(e, content)}><i className='fa fa-lg fa-trash' /></a> : null}
+                            <Tooltip title='Xóa' arrow placeholder='bottom'>
+                                <a className='btn btn-danger' href='#' onClick={e => e.preventDefault() || onDelete(e, content)}><i className='fa fa-lg fa-trash' /></a>
+                            </Tooltip> : null}
                     </div>
                 </td>);
         } else {
@@ -79,8 +88,6 @@ export class TableHeader extends React.Component {
         { className: 'fa fa-sort-desc', value: 'DESC' },
         { className: 'fa fa-sort-asc', value: 'ASC' }
     ]
-
-
 
     onSortChange = (e, done) => {
         e.preventDefault();
@@ -266,7 +273,7 @@ export class FormTabs extends React.Component {
     }
 
     render() {
-        const { style = {}, tabClassName = '', contentClassName = '', tabs = [] } = this.props,
+        const { style = {}, tabClassName = '', contentClassName = '', tabs = [], header = null } = this.props,
             id = this.props.id || 'tab',
             tabLinks = [], tabPanes = [];
         tabs.forEach((item, index) => {
@@ -278,7 +285,10 @@ export class FormTabs extends React.Component {
 
         return <div style={style}>
             <ul ref={e => this.tabs = e} className={'nav nav-tabs ' + tabClassName}>{tabLinks}</ul>
-            <div className={'tab-content ' + contentClassName}>{tabPanes}</div>
+            <div className={'tab-content ' + contentClassName} style={{ position: 'relative' }}>
+                {header}
+                {tabPanes}
+            </div>
         </div>;
     }
 }
@@ -502,11 +512,11 @@ export class FormRichTextBox extends React.Component {
     focus = () => this.input.focus();
 
     render() {
-        const { style = {}, rows = 3, label = '', placeholder = '', className = '', readOnly = false, onChange = null, required = false, readOnlyEmptyText = ''} = this.props;
+        const { style = {}, rows = 3, label = '', placeholder = '', className = '', readOnly = false, onChange = null, required = false, readOnlyEmptyText = '' } = this.props;
         let displayElement = '';
         if (label) {
-            displayElement = <><label onClick={() => this.input.focus()}>{label}{!readOnly && required ? <span style={{ color: 'red' }}> *</span> : ''}</label>{readOnly && this.state.value ? <>: <br /> <b>{this.state.value}</b></> : 
-            (readOnly && readOnlyEmptyText) ? <b>{readOnlyEmptyText}</b> : ''}</>;
+            displayElement = <><label onClick={() => this.input.focus()}>{label}{!readOnly && required ? <span style={{ color: 'red' }}> *</span> : ''}</label>{readOnly && this.state.value ? <>: <br /> <b>{this.state.value}</b></> :
+                (readOnly && readOnlyEmptyText) ? <b>{readOnlyEmptyText}</b> : ''}</>;
         } else {
             displayElement = readOnly ? <b>{this.state.value}</b> : '';
         }
@@ -666,15 +676,15 @@ export class FormSelect extends React.Component {
         if (this.props.multiple) {
             return inputData.map(item => ({ id: item.id, text: item.text }));
         } else {
-            return { id: inputData[0].id, text: inputData[0].text };
+            return inputData[0];
         }
     };
 
     render = () => {
-        const { className = '', style = {}, labelStyle = {}, label = '', multiple = false, readOnly = false, required = false, readOnlyEmptyText = '' } = this.props;
+        const { className = '', style = {}, labelStyle = {}, label = '', multiple = false, readOnly = false, required = false, readOnlyEmptyText = '', readOnlyNormal = false } = this.props;
         return (
             <div className={'form-group admin-form-select ' + className} style={style}>
-                {label ? <label style={labelStyle} onClick={this.focus}>{label}{!readOnly && required ? <span style={{ color: 'red' }}> *</span> : ''}{readOnly ? ':' : ''}</label> : null} {readOnly ? <b>{this.state.valueText || readOnlyEmptyText}</b> : ''}
+                {label ? <label style={labelStyle} onClick={this.focus}>{label}{!readOnly && required ? <span style={{ color: 'red' }}> *</span> : ''}{readOnly ? ':' : ''}</label> : null} {readOnly ? (readOnlyNormal ? (this.state.valueText || readOnlyEmptyText) : <b>{this.state.valueText || readOnlyEmptyText}</b>) : ''}
                 <div style={{ width: '100%', display: readOnly ? 'none' : 'inline-flex' }}>
                     <select ref={e => this.input = e} multiple={multiple} disabled={readOnly} />
                 </div>
@@ -757,7 +767,7 @@ export class FormDatePicker extends React.Component {
         let { label = '', type = 'date', className = '', readOnly = false, required = false, style = {}, readOnlyEmptyText = '' } = this.props; // type = date || time || date-mask || time-mask || month-mask
         return (
             <div className={'form-group ' + (className || '')} style={style}>
-                <label onClick={() => this.focus()}>{label}{!readOnly && required ? <span style={{ color: 'red' }}> *</span> : ''}</label>{readOnly && this.state.value ? <>: <b>{this.state.readOnlyText}</b></> : readOnly && readOnlyEmptyText && <b>: {readOnlyEmptyText}</b>}
+                {label && <label onClick={() => this.focus()}>{label}{!readOnly && required ? <span style={{ color: 'red' }}> *</span> : ''}</label>}{readOnly && this.state.value ? <> {label && ':'} <b>{this.state.readOnlyText}</b></> : readOnly && readOnlyEmptyText && <b>: {readOnlyEmptyText}</b>}
                 {(type.endsWith('-mask') || type == 'date-month') ? (
                     <InputMask ref={e => this.input = e} className='form-control' mask={this.mask[type]} onChange={this.handleChange} style={{ display: readOnly ? 'none' : '' }} formatChars={{ '2': '[12]', '0': '[09]', '1': '[01]', '3': '[0-3]', '9': '[0-9]', '5': '[0-5]', 'h': '[0-2]' }} value={this.state.value} readOnly={readOnly} placeholder={label} />
                 ) : (
@@ -832,7 +842,6 @@ export class CirclePageButton extends React.Component {
         const properties = {
             type: 'button',
             style: { position: 'fixed', right: '10px', bottom: '10px', zIndex: 500, ...style },
-            'data-toggle': 'tooltip', title: tooltip,
             onClick
         };
         let result = null;
@@ -841,7 +850,7 @@ export class CirclePageButton extends React.Component {
         } else if (type == 'search') {
             result = <button {...properties} className='btn btn-primary btn-circle'><i className='fa fa-lg fa-search' /></button>;
         } else if (type == 'create') {
-            result = <button {...properties} className='btn btn-info btn-circle'><i className='fa fa-lg fa-plus' /></button>;
+            result = <button {...properties} className='btn btn-info btn-circle' ><i className='fa fa-lg fa-plus' /></button>;
         } else if (type == 'export') {
             result = <button {...properties} className='btn btn-success btn-circle'><i className='fa fa-lg fa-file-excel-o' /></button>;
         } else if (type == 'import') {
@@ -856,7 +865,9 @@ export class CirclePageButton extends React.Component {
                     <i className='fa fa-lg fa-reply' />
                 </Link>);
         }
-        return result;
+        return tooltip ?
+            <Tooltip title={tooltip} arrow placement='top'>{result}</Tooltip> :
+            result;
     }
 }
 
@@ -963,19 +974,19 @@ export class AdminPage extends React.Component {
 
         let right = 10, createButton, saveButton, exportButton, importButton, customButtons;
         if (onCreate) {
-            createButton = <CirclePageButton type='create' onClick={onCreate} style={{ right }} />;
+            createButton = <CirclePageButton type='create' onClick={onCreate} style={{ right }} tooltip='Tạo mới' />;
             right += 60;
         }
         if (onSave) {
-            saveButton = <CirclePageButton type='save' onClick={onSave} style={{ right }} />;
+            saveButton = <CirclePageButton type='save' onClick={onSave} style={{ right }} tooltip='Lưu' />;
             right += 60;
         }
         if (onExport) {
-            exportButton = <CirclePageButton type='export' onClick={onExport} style={{ right }} />;
+            exportButton = <CirclePageButton type='export' onClick={onExport} style={{ right }} tooltip='Export' />;
             right += 60;
         }
         if (onImport) {
-            importButton = <CirclePageButton type='import' onClick={onImport} style={{ right }} />;
+            importButton = <CirclePageButton type='import' onClick={onImport} style={{ right }} tooltip='Import' />;
             right += 60;
         }
         if (buttons) {
