@@ -296,8 +296,8 @@ class EditModal extends AdminModal {
             size: 'large',
             body: <div className='row'>
                 <FormSelect className='col-md-12' ref={e => this.maCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo} onChange={this.handleCanBo} required readOnly={readOnly} />
-                {this.state.batDau && <span className='form-group col-md-12' style={{ color: 'blue'}}>Năm {new Date(this.state.batDau).getFullYear()}, cán bộ còn <b>{this.state.soNgayNghiPhepConLai}</b> ngày nghỉ phép<br/></span> }
-                {this.state.diffYear && <span className='form-group col-md-12' style={{ color: 'blue'}}>Năm {new Date(this.state.ketThuc).getFullYear()}, cán bộ còn <b>{this.state.soNgayNghiPhepConLai2}</b> ngày nghỉ phép<br/></span> }
+                {this.state.batDau && <span className='form-group col-md-12' style={{ color: 'blue'}}>Tại thời điểm {new Date(this.state.batDau).toLocaleDateString()}, cán bộ còn <b>{this.state.soNgayNghiPhepConLai}</b> ngày nghỉ phép<br/></span> }
+                {this.state.diffYear && <span className='form-group col-md-12' style={{ color: 'blue'}}>Tại thời điểm {new Date(new Date(this.state.ketThuc).getFullYear(), 0, 1).toLocaleDateString()}, cán bộ còn <b>{this.state.soNgayNghiPhepConLai2}</b> ngày nghỉ phép<br/></span> }
                 <FormSelect className='col-md-6' ref={e => this.lyDo = e} readOnly={readOnly} data={SelectAdapter_DmNghiPhepV2} label='Lý do nghỉ' onChange={this.handleLyDo} required />
                 <div className='col-md-12' id='lyDoKhac'><FormRichTextBox type='text' ref={e => this.lyDoKhac = e} rows={2} label='Nhập lý do khác' placeholder='Nhập lý do xin nghỉ phép (tối đa 200 ký tự)' readOnly={readOnly} /> </div>
                 <FormTextBox className='col-md-12' ref={e => this.noiDen = e} label='Nơi đến' readOnly={readOnly} />
@@ -516,7 +516,7 @@ class QtNghiPhep extends AdminPage {
                         {!this.checked && <TableCell type='text' content={parseInt(T.monthDiff(new Date(item.ngayBatDauCongTac), new Date()) / 12 / 5) + 'tn'} />}
                         {!this.checked && <TableCell type='text' content={(
                             <>
-                                <span>{(item.ketThuc == -1 || item.ketThuc >= item.today) ? <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đang nghỉ</span> : <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đã kết<br/>thúc nghỉ</span>}</span>
+                                <span>{(item.batDau <= item.today && item.ketThuc >= item.today) ? <span style={{ color: 'blue', whiteSpace: 'nowrap' }}>Đang nghỉ</span> : (item.ketThuc < item.today) ? <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đã kết<br/>thúc nghỉ</span> : <span style={{ color: 'black', whiteSpace: 'nowrap' }}>Chưa diễn ra</span>}</span>
                             </>
                         )}></TableCell>}
                         {this.checked && <TableCell type='text' content={item.soLanNghi} />}
@@ -552,7 +552,7 @@ class QtNghiPhep extends AdminPage {
                     <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.lyDo = e} label='Lý do nghỉ' data={SelectAdapter_DmNghiPhepV2}  allowClear={true} minimumResultsForSearch={-1} />
                     <FormSelect className='col-12 col-md-2' ref={e => this.tinhTrang = e} label='Tình trạng'
                         data={[
-                            { id: 1, text: 'Đã kết thúc nghỉ' }, { id: 2, text: 'Đang nghỉ' }
+                            { id: 1, text: 'Đã kết thúc nghỉ' }, { id: 2, text: 'Đang nghỉ' }, { id : 3, text: 'Chưa diễn ra'}
                         ]} allowClear={true} minimumResultsForSearch={-1} />
                     <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.maDonVi = e} label='Đơn vị' data={SelectAdapter_DmDonVi}  allowClear={true} minimumResultsForSearch={-1} />
                     <FormSelect className='col-12 col-md-6' multiple={true} ref={e => this.mulCanBo = e} label='Cán bộ' data={SelectAdapter_FwCanBo}  allowClear={true} minimumResultsForSearch={-1} />

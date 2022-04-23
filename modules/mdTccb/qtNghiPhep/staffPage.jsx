@@ -255,13 +255,13 @@ class EditModal extends AdminModal {
         }
     }
     render = () => {
-        const readOnly = this.props.readOnly;
+        const readOnly = this.state.id ? true : this.props.readOnly;
         return this.renderModal({
             title: this.state.id ? 'Cập nhật quá trình nghỉ phép' : 'Tạo mới quá trình nghỉ phép',
             size: 'large',
             body: <div className='row'>
-                {this.state.batDau && <span className='form-group col-md-12' style={{ color: 'blue'}}>Năm {new Date(this.state.batDau).getFullYear()}, cán bộ còn <b>{this.state.soNgayNghiPhepConLai}</b> ngày nghỉ phép<br/></span> }
-                {this.state.diffYear && <span className='form-group col-md-12' style={{ color: 'blue'}}>Năm {new Date(this.state.ketThuc).getFullYear()}, cán bộ còn <b>{this.state.soNgayNghiPhepConLai2}</b> ngày nghỉ phép<br/></span> }
+                {this.state.batDau && <span className='form-group col-md-12' style={{ color: 'blue'}}>Tại thời điểm {new Date(this.state.batDau).toLocaleDateString()}, cán bộ còn <b>{this.state.soNgayNghiPhepConLai}</b> ngày nghỉ phép<br/></span> }
+                {this.state.diffYear && <span className='form-group col-md-12' style={{ color: 'blue'}}>Tại thời điểm {new Date(new Date(this.state.ketThuc).getFullYear(), 0, 1).toLocaleDateString()}, cán bộ còn <b>{this.state.soNgayNghiPhepConLai2}</b> ngày nghỉ phép<br/></span> }
                 <FormSelect className='col-md-6' ref={e => this.lyDo = e} readOnly={readOnly} data={SelectAdapter_DmNghiPhepV2} label='Lý do nghỉ' onChange={this.handleLyDo} required />
                 <div className='col-md-12' id='lyDoKhac'><FormRichTextBox type='text' ref={e => this.lyDoKhac = e} rows={2} label='Nhập lý do khác' placeholder='Nhập lý do xin nghỉ phép (tối đa 200 ký tự)' readOnly={readOnly} /> </div>
                 <FormTextBox className='col-md-12' ref={e => this.noiDen = e} label='Nơi đến' readOnly={readOnly} />
@@ -391,7 +391,7 @@ class QtNghiPhepUserPage extends AdminPage {
                         <TableCell type='text' content={parseInt(T.monthDiff(new Date(item.ngayBatDauCongTac), new Date()) / 12 / 5) + 'tn'} />
                         <TableCell type='text' content={(
                             <>
-                                <span>{(item.ketThuc == -1 || item.ketThuc >= item.today) ? <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đang nghỉ</span> : <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đã kết<br/>thúc nghỉ</span>}</span>
+                                <span>{(item.batDau <= item.today && item.ketThuc >= item.today) ? <span style={{ color: 'blue', whiteSpace: 'nowrap' }}>Đang nghỉ</span> : (item.ketThuc < item.today) ? <span style={{ color: 'red', whiteSpace: 'nowrap' }}>Đã kết<br/>thúc nghỉ</span> : <span style={{ color: 'black', whiteSpace: 'nowrap' }}>Chưa diễn ra</span>}</span>
                             </>
                         )}></TableCell>
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}

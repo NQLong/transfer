@@ -245,20 +245,40 @@ module.exports = app => {
                             }
                             let item = result.rows[index];
                             calcSoNgayPhepConLai(item.shcc, item.ngayBatDauCongTac, new Date(item.batDau), danhSachNgayLe, soNgayPhepConLai => {
-                                cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
-                                cells.push({ cell: 'B' + (index + 2), border: '1234', value: item.shcc });
-                                cells.push({ cell: 'C' + (index + 2), border: '1234', value: item.hoCanBo });
-                                cells.push({ cell: 'D' + (index + 2), border: '1234', value: item.tenCanBo });
-                                cells.push({ cell: 'E' + (index + 2), border: '1234', value: item.tenDonVi });
-                                cells.push({ cell: 'F' + (index + 2), border: '1234', value: item.lyDo == '99' ? item.lyDoKhac : item.tenNghiPhep });
-                                cells.push({ cell: 'G' + (index + 2), border: '1234', value: item.noiDen });
-                                cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.batDau ? app.date.dateTimeFormat(new Date(item.batDau), item.batDauType) : '' });
-                                cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.ketThuc ? app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType) : '' });
-                                cells.push({ cell: 'J' + (index + 2), border: '1234', value: soNgayPhepConLai });
-                                cells.push({ cell: 'K' + (index + 2), border: '1234', value: app.date.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), danhSachNgayLe) });
-                                cells.push({ cell: 'L' + (index + 2), border: '1234', value: Math.max(app.date.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), danhSachNgayLe) - item.ngayNghiPhep, 0) });
-                                cells.push({ cell: 'M' + (index + 2), border: '1234', value: parseInt(app.date.monthDiff(new Date(item.ngayBatDauCongTac), new Date()) / 12 / 5) + 'tn' });
-                                solve(index + 1);
+                                if (new Date(item.batDau).getFullYear() != new Date(item.ketThuc).getFullYear()) {
+                                    calcSoNgayPhepConLai(item.shcc, item.ngayBatDauCongTac, new Date(item.ketThuc), danhSachNgayLe, soNgayPhepConLai2 => {
+                                        soNgayPhepConLai2 += app.date.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), new Date(item.ketThuc).getFullYear(), danhSachNgayLe);
+                                        cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
+                                        cells.push({ cell: 'B' + (index + 2), border: '1234', value: item.shcc });
+                                        cells.push({ cell: 'C' + (index + 2), border: '1234', value: item.hoCanBo });
+                                        cells.push({ cell: 'D' + (index + 2), border: '1234', value: item.tenCanBo });
+                                        cells.push({ cell: 'E' + (index + 2), border: '1234', value: item.tenDonVi });
+                                        cells.push({ cell: 'F' + (index + 2), border: '1234', value: item.lyDo == '99' ? item.lyDoKhac : item.tenNghiPhep });
+                                        cells.push({ cell: 'G' + (index + 2), border: '1234', value: item.noiDen });
+                                        cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.batDau ? app.date.dateTimeFormat(new Date(item.batDau), item.batDauType) : '' });
+                                        cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.ketThuc ? app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType) : '' });
+                                        cells.push({ cell: 'J' + (index + 2), border: '1234', value: soNgayPhepConLai + ' + ' + soNgayPhepConLai2 });
+                                        cells.push({ cell: 'K' + (index + 2), border: '1234', value: app.date.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), null, danhSachNgayLe) });
+                                        cells.push({ cell: 'L' + (index + 2), border: '1234', value: Math.max(app.date.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), new Date(item.batDau).getFullYear(), danhSachNgayLe) - item.ngayNghiPhep, 0) + ' + ' + app.date.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), new Date(item.ketThuc).getFullYear(), danhSachNgayLe) });
+                                        cells.push({ cell: 'M' + (index + 2), border: '1234', value: parseInt(app.date.monthDiff(new Date(item.ngayBatDauCongTac), new Date()) / 12 / 5) + 'tn' });
+                                        solve(index + 1);
+                                    });
+                                } else {
+                                    cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
+                                    cells.push({ cell: 'B' + (index + 2), border: '1234', value: item.shcc });
+                                    cells.push({ cell: 'C' + (index + 2), border: '1234', value: item.hoCanBo });
+                                    cells.push({ cell: 'D' + (index + 2), border: '1234', value: item.tenCanBo });
+                                    cells.push({ cell: 'E' + (index + 2), border: '1234', value: item.tenDonVi });
+                                    cells.push({ cell: 'F' + (index + 2), border: '1234', value: item.lyDo == '99' ? item.lyDoKhac : item.tenNghiPhep });
+                                    cells.push({ cell: 'G' + (index + 2), border: '1234', value: item.noiDen });
+                                    cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.batDau ? app.date.dateTimeFormat(new Date(item.batDau), item.batDauType) : '' });
+                                    cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.ketThuc ? app.date.dateTimeFormat(new Date(item.ketThuc), item.ketThucType) : '' });
+                                    cells.push({ cell: 'J' + (index + 2), border: '1234', value: soNgayPhepConLai });
+                                    cells.push({ cell: 'K' + (index + 2), border: '1234', value: app.date.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), null, danhSachNgayLe) });
+                                    cells.push({ cell: 'L' + (index + 2), border: '1234', value: Math.max(app.date.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), new Date(item.batDau).getFullYear(), danhSachNgayLe) - item.ngayNghiPhep, 0) });
+                                    cells.push({ cell: 'M' + (index + 2), border: '1234', value: parseInt(app.date.monthDiff(new Date(item.ngayBatDauCongTac), new Date()) / 12 / 5) + 'tn' });
+                                    solve(index + 1);
+                                }
                             });
                         };
                         solve();
