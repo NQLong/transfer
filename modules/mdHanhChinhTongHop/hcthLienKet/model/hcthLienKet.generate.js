@@ -1,6 +1,6 @@
-// Table name: HCTH_LIEN_KET { id, loaiA, donViA, keyA, donViB, keyB, chieu }
+// Table name: HCTH_LIEN_KET { id, loaiA, keyA, loaiB, keyB, chieu }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'loaiA': 'LOAI_A', 'donViA': 'DON_VI_A', 'keyA': 'KEY_A', 'donViB': 'DON_VI_B', 'keyB': 'KEY_B', 'chieu': 'CHIEU' };
+const obj2Db = { 'id': 'ID', 'loaiA': 'LOAI_A', 'keyA': 'KEY_A', 'loaiB': 'LOAI_B', 'keyB': 'KEY_B', 'chieu': 'CHIEU' };
 
 module.exports = app => {
     app.model.hcthLienKet = {

@@ -1,6 +1,6 @@
-// Table name: DM_CA_HOC { ma, ten, moTa, thoiGianBatDau, thoiGianKetThuc, kichHoat, maCoSo }
+// Table name: DM_CA_HOC { ma, ten, moTa, thoiGianBatDau, thoiGianKetThuc, kichHoat, maCoSo, buoi }
 const keys = ['MA'];
-const obj2Db = { 'ma': 'MA', 'ten': 'TEN', 'moTa': 'MO_TA', 'thoiGianBatDau': 'THOI_GIAN_BAT_DAU', 'thoiGianKetThuc': 'THOI_GIAN_KET_THUC', 'kichHoat': 'KICH_HOAT', 'maCoSo': 'MA_CO_SO' };
+const obj2Db = { 'ma': 'MA', 'ten': 'TEN', 'moTa': 'MO_TA', 'thoiGianBatDau': 'THOI_GIAN_BAT_DAU', 'thoiGianKetThuc': 'THOI_GIAN_KET_THUC', 'kichHoat': 'KICH_HOAT', 'maCoSo': 'MA_CO_SO', 'buoi': 'BUOI' };
 
 module.exports = app => {
     app.model.dmCaHoc = {

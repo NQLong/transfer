@@ -1,6 +1,6 @@
-// Table name: DT_THOI_KHOA_BIEU { id, maHocPhan, nhom, maHocKy, thu, phong, ngayBatDau, cbgd }
+// Table name: DT_THOI_KHOA_BIEU { id, maMonHoc, nhom, hocKy, thu, phong, ngayBatDau, giangVien, nam, tietBatDau, soTiet, khoa }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'maHocPhan': 'MA_HOC_PHAN', 'nhom': 'NHOM', 'maHocKy': 'MA_HOC_KY', 'thu': 'THU', 'phong': 'PHONG', 'ngayBatDau': 'NGAY_BAT_DAU', 'cbgd': 'CBGD' };
+const obj2Db = { 'id': 'ID', 'maMonHoc': 'MA_MON_HOC', 'nhom': 'NHOM', 'hocKy': 'HOC_KY', 'thu': 'THU', 'phong': 'PHONG', 'ngayBatDau': 'NGAY_BAT_DAU', 'giangVien': 'GIANG_VIEN', 'nam': 'NAM', 'tietBatDau': 'TIET_BAT_DAU', 'soTiet': 'SO_TIET', 'khoa': 'KHOA' };
 
 module.exports = app => {
     app.model.dtThoiKhoaBieu = {
