@@ -162,30 +162,33 @@ module.exports = app => {
         })
     );
 
-    const calcSoNgayPhepConLai = (shcc, ngayBatDauCongTac, current, danhSachNgayLe, done) => {
+    const calcSoNgayPhepConLai = (shcc, ngayBatDauCongTac, dateCalc, danhSachNgayLe, done) => {
         new Promise(resolve => {
-            let result = 12 + current;
+            dateCalc.setHours(0, 0, 0, 0);
+            let result = 12;
+            let yearCalc = dateCalc.getFullYear();
             if (ngayBatDauCongTac) { //+ thâm niên
-                let thamnien = parseInt(app.date.monthDiff(new Date(ngayBatDauCongTac), new Date()) / 12 / 5);
+                let thamnien = parseInt(app.date.monthDiff(new Date(ngayBatDauCongTac), dateCalc) / 12 / 5);
                 result += thamnien;
             }
-            let currentYear = new Date().getFullYear();
             app.model.qtNghiPhep.getAll({
                 statement: 'shcc = :shcc',
-                parameter: shcc,
-            }, (error, items) => {
+                parameter: { shcc },
+            }, '*', 'batDau', (error, items) => {
                 const solve = (idx = 0) => {
-                    if (idx == items.length)  {
+                    if (idx == items.length || new Date(items[idx].batDau) >= dateCalc)  {
                         resolve(result);
                         return;
                     }
-                    let year = new Date(items[idx].batDau).getFullYear();
-                    if (year == currentYear) {
+                    if (new Date(items[idx].batDau).getFullYear() == yearCalc || new Date(items[idx].ketThuc).getFullYear() == yearCalc) {
                         app.model.dmNghiPhep.get({ ma: items[idx].lyDo }, (error, itemNghiPhep ) => {
-                            let value = Math.max(app.date.numberNgayNghi(new Date(items[idx].batDau), new Date(items[idx].ketThuc), danhSachNgayLe) - itemNghiPhep.soNgayPhep, 0);
+                            let value = app.date.numberNgayNghi(new Date(items[idx].batDau), new Date(items[idx].ketThuc), yearCalc, danhSachNgayLe);
+                            if (new Date(items[idx].batDau).getFullYear() == yearCalc) value = Math.max(value - itemNghiPhep.soNgayPhep, 0);
                             result -= value;
                             solve(idx + 1);
                         });
+                    } else {
+                        solve(idx + 1);
                     }
                 };
                 solve();
@@ -243,7 +246,7 @@ module.exports = app => {
                                 return;
                             }
                             let item = result.rows[index];
-                            calcSoNgayPhepConLai(item.shcc, item.ngayBatDauCongTac, item.ngayNghiPhep, danhSachNgayLe, soNgayPhepConLai => {
+                            calcSoNgayPhepConLai(item.shcc, item.ngayBatDauCongTac, new Date(item.batDau), danhSachNgayLe, soNgayPhepConLai => {
                                 cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
                                 cells.push({ cell: 'B' + (index + 2), border: '1234', value: item.tenHocVi });
                                 cells.push({ cell: 'C' + (index + 2), border: '1234', value: item.shcc });

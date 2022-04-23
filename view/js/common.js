@@ -333,27 +333,34 @@ const T = {
         return months <= 0 ? 0 : months;
     },
 
-    numberNgayNghi: (start, end, danhSachNgayLe = []) => { //Số ngày nghỉ trong khoảng [start, end]
-        let result = 0;
-        while (end >= start && result <= 30) {
+    numberNgayNghi: (start, end, yearCalc, danhSachNgayLe = []) => { //Số ngày nghỉ trong khoảng [start, end] ở năm yearCalc (nếu tồn tại)
+        if (yearCalc) {
+            let startDateOfYear = new Date(yearCalc, 0, 1, 0, 0, 0, 0);
+            let endDateOfYear = new Date(yearCalc, 11, 31, 23, 59, 59, 999);
+            if (start <= startDateOfYear) start = startDateOfYear;
+            if (endDateOfYear <= end) end = endDateOfYear;
+        }
+        start.setHours(0, 0, 0, 0);
+        end.setHours(23, 59, 59, 999);
+        danhSachNgayLe.sort();
+        let result = 0, idNgayLe = 0;
+        while (end >= start && result <= 70) {
             let positionDay = start.getDay();
             if (positionDay == 0 || positionDay == 6) {
                  //thứ bảy, chủ nhật
-                 //TODO: thêm ngày lễ
             } else {
-                let isNgayLe = false;
-                for (let idx = 0; idx < danhSachNgayLe.length; idx++) {
-                    let ngayLeDate = new Date(danhSachNgayLe[idx]);
+                // kiểm tra ngày lễ
+                while (idNgayLe < danhSachNgayLe.length && new Date(danhSachNgayLe[idNgayLe]) < start) idNgayLe++;
+                if (idNgayLe < danhSachNgayLe.length) {
+                    let ngayLeDate = new Date(danhSachNgayLe[idNgayLe]);
                     if (ngayLeDate.getFullYear() == start.getFullYear() && ngayLeDate.getMonth() == start.getMonth() && ngayLeDate.getDate() == start.getDate()) {
-                        isNgayLe = true;
-                        break;
-                    }
-                }
-                result += isNgayLe ? 0 : 1;
+                        // do nothing
+                    } else result += 1;
+                } else result += 1;
             }
             start = start.nextDate();
         }
-        if (result > 30) { //Case: Quá nhiều ngày nghỉ
+        if (result > 70) { //Case: Quá nhiều ngày nghỉ
             return -1; 
         }
         return result;

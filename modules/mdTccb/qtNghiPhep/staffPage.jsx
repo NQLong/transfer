@@ -35,29 +35,35 @@ class EditModal extends AdminModal {
         soNgayXinNghi: 0,
         soNgayPhep: 0,
         ngayPhepLyDo: 0,
+        ngayBatDauCongTac: '',
         lyDoKhac: false,
+        diffYear: false,
+        soNgayPhep2: 0,
+        soNgayNghiPhepConLai2: 0,
     };
-    calcSoNgayPhepConLai = (shcc, ngayBatDauCongTac, current, done) => {
+    calcSoNgayPhepConLai = (shcc, ngayBatDauCongTac, currentId, dateCalc, done) => {
         new Promise(resolve => {
-            let result = 12 + current;
+            let result = 12;
+            let yearCalc = dateCalc.getFullYear();
             if (ngayBatDauCongTac) { //+ thâm niên
-                let thamnien = parseInt(T.monthDiff(new Date(ngayBatDauCongTac), new Date()) / 12 / 5);
+                let thamnien = parseInt(T.monthDiff(new Date(ngayBatDauCongTac), dateCalc) / 12 / 5);
                 result += thamnien;
             }
-            let currentYear = new Date().getFullYear();
             this.props.getAll(shcc, items => {
                 const solve = (idx = 0) => {
                     if (idx == items.length)  {
                         resolve(result);
                         return;
                     }
-                    let year = new Date(items[idx].batDau).getFullYear();
-                    if (year == currentYear) {
+                    if (new Date(items[idx].batDau).getFullYear() == yearCalc || new Date(items[idx].ketThuc).getFullYear() == yearCalc) {
                         this.props.getNghiPhep(items[idx].lyDo, itemNghiPhep => {
-                            let value = Math.max(T.numberNgayNghi(new Date(items[idx].batDau), new Date(items[idx].ketThuc), this.props.danhSachNgayLe) - itemNghiPhep.soNgayPhep, 0);
-                            result -= value;
+                            let value = T.numberNgayNghi(new Date(items[idx].batDau), new Date(items[idx].ketThuc), yearCalc, this.props.danhSachNgayLe);
+                            if (new Date(items[idx].batDau).getFullYear() == yearCalc) value = Math.max(value - itemNghiPhep.soNgayPhep, 0);
+                            if (currentId != items[idx].id) result -= value;
                             solve(idx + 1);
                         });
+                    } else {
+                        solve(idx + 1);
                     }
                 };
                 solve();
@@ -70,20 +76,31 @@ class EditModal extends AdminModal {
         let { id, shcc, lyDo, batDau, batDauType, ketThuc, ketThucType, noiDen, ghiChu, lyDoKhac, ngayNghiPhep, ngayBatDauCongTac } = item && item.item ? item.item : {
             id: '', shcc: '', lyDo: '', batDau: null, batDauType: '', ketThuc: null, ketThucType: '', noiDen: '', ghiChu: '', lyDoKhac: '', ngayNghiPhep: 0, ngayBatDauCongTac: null
         };
-        if (!shcc) {
+        if (shcc) {
+            this.calcSoNgayPhepConLai(shcc, ngayBatDauCongTac, id, new Date(batDau), soNgayNghiPhepConLai => {
+                this.setState({ soNgayNghiPhepConLai });
+            });
+            let firstYear = new Date(new Date(ketThuc).getFullYear(), 0, 1, 0, 0, 0, 0);
+            this.calcSoNgayPhepConLai(shcc, ngayBatDauCongTac, id, firstYear, soNgayNghiPhepConLai => {
+                this.setState({
+                    soNgayNghiPhepConLai2: soNgayNghiPhepConLai,
+                });
+            });
+        } else {
             shcc = item.shcc;
             ngayBatDauCongTac = this.props.ngayBatDauCongTac;
+            this.setState({ soNgayNghiPhepConLai: 0, soNgayNghiPhepConLai2: 0 });
         }
-        this.calcSoNgayPhepConLai(shcc, ngayBatDauCongTac, batDau && ketThuc ? Math.max(T.numberNgayNghi(new Date(batDau), new Date(ketThuc), this.props.danhSachNgayLe) - ngayNghiPhep, 0) : 0, soNgayNghiPhepConLai => {
-            this.setState({ soNgayNghiPhepConLai });
-        });
         this.setState({
-            soNgayXinNghi: batDau && ketThuc ? T.numberNgayNghi(new Date(batDau), new Date(ketThuc), this.props.danhSachNgayLe) : 0,
-            soNgayPhep: batDau && ketThuc ? Math.max(T.numberNgayNghi(new Date(batDau), new Date(ketThuc), this.props.danhSachNgayLe) - ngayNghiPhep, 0) : 0,
+            soNgayXinNghi: batDau && ketThuc ? T.numberNgayNghi(new Date(batDau), new Date(ketThuc), null, this.props.danhSachNgayLe) : 0,
+            soNgayPhep: batDau && ketThuc ? Math.max(T.numberNgayNghi(new Date(batDau), new Date(ketThuc), new Date(batDau).getFullYear(), this.props.danhSachNgayLe) - ngayNghiPhep, 0) : 0,
+            soNgayPhep2: batDau && ketThuc ? Math.max(T.numberNgayNghi(new Date(batDau), new Date(ketThuc), new Date(ketThuc).getFullYear(), this.props.danhSachNgayLe), 0) : 0,
+            diffYear: batDau && ketThuc ? new Date(batDau).getFullYear() != new Date(ketThuc).getFullYear() : false,
             id, batDauType: batDauType ? batDauType : 'dd/mm/yyyy',
             ketThucType: ketThucType ? ketThucType : 'dd/mm/yyyy',
             batDau, ketThuc, lyDoKhac: lyDo == '99' ? true : false,
-            ngayPhepLyDo: ngayNghiPhep, shcc: shcc
+            ngayPhepLyDo: ngayNghiPhep, shcc: shcc,
+            ngayBatDauCongTac: ngayBatDauCongTac,
         }, () => {
             this.lyDo.value(lyDo || '');
             this.noiDen.value(noiDen || '');
@@ -123,11 +140,14 @@ class EditModal extends AdminModal {
             T.notify('Ngày bắt đầu lớn hơn ngày kết thúc', 'danger');
             this.batDau.focus();
         } else if (this.state.soNgayXinNghi == -1) {
-            T.notify('Chênh lệch giữa ngày bắt đầu và kết thúc là rất lớn', 'danger');
+            T.notify('Số ngày xin nghỉ là rất lớn', 'danger');
             this.batDau.focus();
-        } else if (this.state.soNgayNghiPhepConLai + this.state.ngayPhepLyDo < this.state.soNgayPhep) {
-            T.notify(`Số ngày phép có thể sử dụng ${this.state.soNgayNghiPhepConLai + this.state.ngayPhepLyDo} nhỏ hơn số ngày phép đăng ký ${this.state.soNgayPhep}`, 'danger');
+        } else if (this.state.soNgayNghiPhepConLai < this.state.soNgayPhep) {
+            T.notify(`Số ngày phép có thể sử dụng trong năm ${new Date(this.state.batDau).getFullYear()} là ${this.state.soNgayNghiPhepConLai} nhỏ hơn số ngày phép đăng ký là ${this.state.soNgayPhep}`, 'danger');
             this.batDau.focus();
+        } else if (this.state.diffYear && this.state.soNgayNghiPhepConLai2 < this.state.soNgayPhep2) {
+            T.notify(`Số ngày phép có thể sử dụng trong năm ${new Date(this.state.ketThuc).getFullYear()} là ${this.state.soNgayNghiPhepConLai2} nhỏ hơn số ngày phép đăng ký là ${this.state.soNgayPhep2}`, 'danger');
+            this.ketThuc.focus();
         } else {
             this.state.id ? this.props.update(this.state.id, changes, this.hide) : this.props.create(changes, this.hide);
         }
@@ -135,22 +155,77 @@ class EditModal extends AdminModal {
 
     handleBatDau = (value) => {
         this.setState({ batDau: value }, () => {
-            let { batDau, ketThuc, ngayPhepLyDo } = this.state;
-            if (batDau && ketThuc) {
+            let { batDau, ketThuc, ngayPhepLyDo, shcc, ngayBatDauCongTac, id } = this.state;
+            if (shcc && batDau) {
+                this.calcSoNgayPhepConLai(shcc, ngayBatDauCongTac, id, new Date(batDau), soNgayNghiPhepConLai => {
+                    this.setState({
+                        soNgayNghiPhepConLai,
+                    });
+                });
+            } else {
                 this.setState({
-                    soNgayXinNghi: T.numberNgayNghi(new Date(batDau), new Date(ketThuc), this.props.danhSachNgayLe),
-                    soNgayPhep: Math.max(T.numberNgayNghi(new Date(batDau), new Date(ketThuc), this.props.danhSachNgayLe) - ngayPhepLyDo, 0),
+                    soNgayNghiPhepConLai: 0,
+                });
+            }
+            if (batDau && ketThuc) {
+                if (new Date(batDau).getFullYear() != new Date(ketThuc).getFullYear()) {
+                    this.setState({
+                        soNgayPhep2: Math.max(T.numberNgayNghi(new Date(batDau), new Date(ketThuc), new Date(ketThuc).getFullYear(), this.props.danhSachNgayLe), 0),
+                        diffYear: true,
+                        soNgayXinNghi: T.numberNgayNghi(new Date(batDau), new Date(ketThuc), null, this.props.danhSachNgayLe),
+                        soNgayPhep: Math.max(T.numberNgayNghi(new Date(batDau), new Date(ketThuc), new Date(batDau).getFullYear(), this.props.danhSachNgayLe) - ngayPhepLyDo, 0),
+                    });
+                } else {
+                    this.setState({
+                        soNgayPhep2: 0,
+                        diffYear: false,
+                        soNgayXinNghi: T.numberNgayNghi(new Date(batDau), new Date(ketThuc), null, this.props.danhSachNgayLe),
+                        soNgayPhep: Math.max(T.numberNgayNghi(new Date(batDau), new Date(ketThuc), new Date(batDau).getFullYear(), this.props.danhSachNgayLe) - ngayPhepLyDo, 0),
+                    });
+                }
+            } else {
+                this.setState({
+                    soNgayPhep2: 0,
+                    diffYear: false,
                 });
             }
         });
     }
     handleKetThuc = (value) => {
         this.setState({ ketThuc: value }, () => {
-            let { batDau, ketThuc, ngayPhepLyDo } = this.state;
-            if (batDau && ketThuc) {
+            let { batDau, ketThuc, ngayPhepLyDo, shcc, ngayBatDauCongTac, id } = this.state;
+            if (shcc && ketThuc) {
+                let firstYear = new Date(new Date(ketThuc).getFullYear(), 0, 1, 0, 0, 0, 0);
+                this.calcSoNgayPhepConLai(shcc, ngayBatDauCongTac, id, firstYear, soNgayNghiPhepConLai => {
+                    this.setState({
+                        soNgayNghiPhepConLai2: soNgayNghiPhepConLai,
+                    });
+                });
+            } else {
                 this.setState({
-                    soNgayXinNghi: T.numberNgayNghi(new Date(batDau), new Date(ketThuc), this.props.danhSachNgayLe),
-                    soNgayPhep: Math.max(T.numberNgayNghi(new Date(batDau), new Date(ketThuc), this.props.danhSachNgayLe) - ngayPhepLyDo, 0),
+                    soNgayNghiPhepConLai2: 0,
+                });
+            }
+            if (batDau && ketThuc) {
+                if (new Date(batDau).getFullYear() != new Date(ketThuc).getFullYear()) {
+                    this.setState({
+                        soNgayPhep2: Math.max(T.numberNgayNghi(new Date(batDau), new Date(ketThuc), new Date(ketThuc).getFullYear(), this.props.danhSachNgayLe), 0),
+                        diffYear: true,
+                        soNgayXinNghi: T.numberNgayNghi(new Date(batDau), new Date(ketThuc), null, this.props.danhSachNgayLe),
+                        soNgayPhep: Math.max(T.numberNgayNghi(new Date(batDau), new Date(ketThuc), new Date(batDau).getFullYear(), this.props.danhSachNgayLe) - ngayPhepLyDo, 0),
+                    });
+                } else {
+                    this.setState({
+                        soNgayPhep2: 0,
+                        diffYear: false,
+                        soNgayXinNghi: T.numberNgayNghi(new Date(batDau), new Date(ketThuc), null, this.props.danhSachNgayLe),
+                        soNgayPhep: Math.max(T.numberNgayNghi(new Date(batDau), new Date(ketThuc), new Date(batDau).getFullYear(), this.props.danhSachNgayLe) - ngayPhepLyDo, 0),
+                    });
+                }
+            } else {
+                this.setState({
+                    soNgayPhep2: 0,
+                    diffYear: false,
                 });
             }
         });
@@ -162,7 +237,7 @@ class EditModal extends AdminModal {
                 let { batDau, ketThuc, ngayPhepLyDo } = this.state;
                 if (batDau && ketThuc) {
                     this.setState({
-                        soNgayPhep: Math.max(T.numberNgayNghi(new Date(batDau), new Date(ketThuc), this.props.danhSachNgayLe) - ngayPhepLyDo, 0),
+                        soNgayPhep: Math.max(T.numberNgayNghi(new Date(batDau), new Date(ketThuc), new Date(batDau).getFullYear(), this.props.danhSachNgayLe) - ngayPhepLyDo, 0),
                     });
                 }
                 
@@ -173,7 +248,7 @@ class EditModal extends AdminModal {
                 let { batDau, ketThuc, ngayPhepLyDo } = this.state;
                 if (batDau && ketThuc) {
                     this.setState({
-                        soNgayPhep: Math.max(T.numberNgayNghi(new Date(batDau), new Date(ketThuc), this.props.danhSachNgayLe) - ngayPhepLyDo, 0),
+                        soNgayPhep: Math.max(T.numberNgayNghi(new Date(batDau), new Date(ketThuc), new Date(batDau).getFullYear(), this.props.danhSachNgayLe) - ngayPhepLyDo, 0),
                     });
                 }
             });
@@ -181,32 +256,32 @@ class EditModal extends AdminModal {
     }
     render = () => {
         const readOnly = this.props.readOnly;
-        const currentYear = (new Date()).getFullYear();
         return this.renderModal({
             title: this.state.id ? 'Cập nhật quá trình nghỉ phép' : 'Tạo mới quá trình nghỉ phép',
             size: 'large',
             body: <div className='row'>
-                <span className='form-group col-md-12' style={{ color: 'blue'}}>Năm {currentYear}, cán bộ còn <b>{this.state.soNgayNghiPhepConLai}</b> ngày nghỉ phép<br/></span>
+                {this.state.batDau && <span className='form-group col-md-12' style={{ color: 'blue'}}>Năm {new Date(this.state.batDau).getFullYear()}, cán bộ còn <b>{this.state.soNgayNghiPhepConLai}</b> ngày nghỉ phép<br/></span> }
+                {this.state.diffYear && <span className='form-group col-md-12' style={{ color: 'blue'}}>Năm {new Date(this.state.ketThuc).getFullYear()}, cán bộ còn <b>{this.state.soNgayNghiPhepConLai2}</b> ngày nghỉ phép<br/></span> }
                 <FormSelect className='col-md-6' ref={e => this.lyDo = e} readOnly={readOnly} data={SelectAdapter_DmNghiPhepV2} label='Lý do nghỉ' onChange={this.handleLyDo} required />
                 <div className='col-md-12' id='lyDoKhac'><FormRichTextBox type='text' ref={e => this.lyDoKhac = e} rows={2} label='Nhập lý do khác' placeholder='Nhập lý do xin nghỉ phép (tối đa 200 ký tự)' readOnly={readOnly} /> </div>
                 <FormTextBox className='col-md-12' ref={e => this.noiDen = e} label='Nơi đến' readOnly={readOnly} />
             
-                <div className='form-group col-md-6'><DateInput ref={e => this.batDau = e} onChange={this.handleBatDau} placeholder='Thời gian bắt đầu'
+                <div className='form-group col-md-5'><DateInput ref={e => this.batDau = e} onChange={this.handleBatDau} placeholder='Thời gian bắt đầu'
                     label={
                         <div style={{ display: 'flex' }}>Thời gian bắt đầu (định dạng:&nbsp; <Dropdown ref={e => this.batDauType = e}
                             items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
                             onSelected={item => this.setState({ batDauType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
                     }
                     type={this.state.batDauType ? typeMapper[this.state.batDauType] : null} readOnly={readOnly} /></div>
-                <div className='form-group col-md-6'><DateInput ref={e => this.ketThuc = e} onChange={this.handleKetThuc} placeholder='Thời gian kết thúc'
+                <div className='form-group col-md-7'><DateInput ref={e => this.ketThuc = e} onChange={this.handleKetThuc} placeholder='Thời gian kết thúc'
                     label={
                         <div style={{ display: 'flex' }}>Thời gian kết thúc (định dạng:&nbsp; <Dropdown ref={e => this.ketThucType = e}
                             items={[...Object.keys(EnumDateType).map(key => EnumDateType[key].text)]}
                             onSelected={item => this.setState({ ketThucType: item })} readOnly={readOnly} />)&nbsp;<span style={{ color: 'red' }}> *</span></div>
                     }
                     type={this.state.ketThucType ? typeMapper[this.state.ketThucType] : null} readOnly={readOnly} /></div>
-                <span className='form-group col-md-6' style={{ color: 'blue'}}>Tổng số ngày xin nghỉ là <b>{this.state.soNgayXinNghi}</b> ngày</span>
-                <span className='form-group col-md-6' style={{ color: 'blue'}}>Tổng số ngày phép là <b>{this.state.soNgayPhep}</b> ngày<br/></span>
+                <span className='form-group col-md-5' style={{ color: 'blue'}}>{this.state.soNgayXinNghi == '-1' ? 'Tổng số ngày xin nghỉ là rất lớn' : <>Tổng số ngày xin nghỉ là <b>{this.state.soNgayXinNghi}</b> ngày</>  }</span>
+                {this.state.soNgayXinNghi != -1 && <span className='form-group col-md-7' style={{ color: 'blue'}}>{this.state.diffYear ? `Tổng số ngày phép là ${this.state.soNgayPhep} ngày (năm ${new Date(this.state.batDau).getFullYear()}) + ${this.state.soNgayPhep2} ngày (năm ${new Date(this.state.ketThuc).getFullYear()})` : <>Tổng số ngày phép là <b>{this.state.soNgayPhep} ngày </b></>}</span> }
                 <FormRichTextBox className='col-md-12' ref={e => this.ghiChu = e} rows={2} readOnly={readOnly} label='Ghi chú' placeholder='Ghi chú (tối đa 200 ký tự)' />
             </div>
         });
@@ -268,7 +343,7 @@ class QtNghiPhepUserPage extends AdminPage {
         let permission = this.getUserPermission('staff', ['login']);
         if (permission.login == true) {
             permission = { //TODO: Sẽ thêm vào phần gửi yêu cầu tới tổ chức cán bộ duyệt
-                write: false,
+                write: true,
                 delete: false
             };
         }
@@ -305,8 +380,14 @@ class QtNghiPhepUserPage extends AdminPage {
                         />
                         <TableCell type='text' content={item.lyDo == '99' ? item.lyDoKhac : <b>{item.tenNghiPhep}</b>} />
                         <TableCell type='text' content={item.noiDen} />
-                        <TableCell type='number' content={T.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), this.state.danhSachNgayLe)} />
-                        <TableCell type='number' content={Math.max(T.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), this.state.danhSachNgayLe) - item.ngayNghiPhep, 0)} />
+                        <TableCell type='number' content={T.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), null, this.state.danhSachNgayLe)} />
+                        <TableCell type='number' content={(
+                            <>
+                                {Math.max(T.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), new Date(item.batDau).getFullYear(), this.state.danhSachNgayLe) - item.ngayNghiPhep, 0)}
+                                {new Date(item.batDau).getFullYear() != new Date(item.ketThuc).getFullYear() ? ` + ${T.numberNgayNghi(new Date(item.batDau), new Date(item.ketThuc), new Date(item.ketThuc).getFullYear(), this.state.danhSachNgayLe)}` : ''}
+                            </>
+                        )}
+                        />
                         <TableCell type='text' content={parseInt(T.monthDiff(new Date(item.ngayBatDauCongTac), new Date()) / 12 / 5) + 'tn'} />
                         <TableCell type='text' content={(
                             <>
