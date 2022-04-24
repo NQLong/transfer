@@ -18,5 +18,13 @@ export default {
             path: '/user/hcth/cong-van-den/:id',
             component: Loadable({ loading: Loading, loader: () => import('./staffEditPage') })
         },
+        {
+            path: '/user/cong-van-den',
+            component: Loadable({ loading: Loading, loader: () => import('./staffPage') })
+        },
+        {
+            path: '/user/cong-van-den/:id',
+            component: Loadable({ loading: Loading, loader: () => import('./staffEditPage') })
+        },
     ]
 };

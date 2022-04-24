@@ -21,6 +21,8 @@ module.exports = {
     MA_CHUC_VU_HIEU_TRUONG: '001',
     MA_BAN_GIAM_HIEU: '68',
     MA_HCTH: '29',
+    MA_TRUONG_PHONG: '003',
+    MA_TRUONG_KHOA: '009',
 
     handleResult: (resolve, reject, item, error) => {
         if (error) {

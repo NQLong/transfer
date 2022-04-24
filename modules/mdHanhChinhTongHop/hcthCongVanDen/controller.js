@@ -1,22 +1,31 @@
-
 module.exports = (app) => {
-    const { trangThaiSwitcher, action, CONG_VAN_TYPE, MA_BAN_GIAM_HIEU, MA_HCTH } = require('../constant');
+    const { trangThaiSwitcher, action, CONG_VAN_TYPE, MA_BAN_GIAM_HIEU, MA_HCTH, MA_TRUONG_PHONG, MA_TRUONG_KHOA } = require('../constant');
 
-    const menu = {
+    const staffMenu = {
         parentMenu: app.parentMenu.hcth,
         menus: {
             501: { title: 'Công văn đến', link: '/user/hcth/cong-van-den', icon: 'fa-caret-square-o-left', backgroundColor: '#00aa00' },
         },
     };
-    app.permission.add({ name: 'hcthCongVanDen:read' });
+    const menu = {
+        parentMenu: app.parentMenu.user,
+        menus: {
+            1051: { title: 'Công văn đến', link: '/user/cong-van-den', icon: 'fa-caret-square-o-left', backgroundColor: '#00aa00', groupIndex: 5 },
+        },
+    };
+    app.permission.add({ name: 'hcthCongVanDen:read', menu: staffMenu });
     app.permission.add({ name: 'staff:login', menu });
     app.permission.add({ name: 'hcthCongVanDen:write' });
     app.permission.add({ name: 'hcthCongVanDen:delete' });
+    app.permission.add({ name: 'hcthCongVanDen:manage' });
+    app.permission.add({ name: 'donViCongVanDen:read' });
     app.permission.add({ name: 'hcth:login' });
     app.permission.add({ name: 'hcth:manage' });
 
-    app.get('/user/hcth/cong-van-den', app.permission.check('staff:login'), app.templates.admin);
-    app.get('/user/hcth/cong-van-den/:id', app.permission.check('staff:login'), app.templates.admin);
+    app.get('/user/cong-van-den', app.permission.check('staff:login'), app.templates.admin);
+    app.get('/user/cong-van-den/:id', app.permission.check('staff:login'), app.templates.admin);
+    app.get('/user/hcth/cong-van-den', app.permission.check('hcthCongVanDen:read'), app.templates.admin);
+    app.get('/user/hcth/cong-van-den/:id', app.permission.check('hcthCongVanDen:read'), app.templates.admin);
 
     //api
     app.get('/api/hcth/cong-van-den/all', app.permission.check('staff:login'), (req, res) => {
@@ -127,19 +136,33 @@ module.exports = (app) => {
 
     app.put('/api/hcth/cong-van-den', app.permission.check('hcthCongVanDen:read'), (req, res) => {
         const { fileList, chiDao, donViNhan, ...changes } = req.body.changes;
-        app.model.hcthCongVanDen.update({ id: req.body.id }, changes, (errors, item) => {
-            if (errors)
-                res.send({ errors, item });
-            else
-                createChiDaoFromList(chiDao, req.body.id, () => {
-                    app.model.hcthDonViNhanCongVan.delete({ congVan: req.body.id }, () => createDonViNhanFromList(donViNhan, req.body.id, () => {
-                        updateListFile(fileList, req.body.id, () => app.model.hcthHistory.create({ key: req.body.id, loai: CONG_VAN_TYPE, hanhDong: action.UPDATE, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc }, (error) => {
-                            res.send({ error, item });
-                        }));
-                    })
-                    );
-                });
-        });
+        try {
+            app.model.hcthCongVanDen.get({ id: req.body.id }, (error, congVan) => {
+                if (error) throw error;
+                else {
+                    app.model.hcthCongVanDen.update({ id: req.body.id }, changes, (errors, item) => {
+                        if (errors)
+                            res.send({ errors, item });
+                        else
+                            createChiDaoFromList(chiDao, req.body.id, () => {
+                                app.model.hcthDonViNhanCongVan.delete({ congVan: req.body.id }, () => createDonViNhanFromList(donViNhan, req.body.id, () => {
+                                    updateListFile(fileList, req.body.id, () => app.model.hcthHistory.create({ key: req.body.id, loai: CONG_VAN_TYPE, hanhDong: action.UPDATE, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc }, (error) => {
+                                        const trangThaiBefore = congVan.trangThai;
+                                        const trangThaiAfter = item.trangThai;
+                                        onStatusChange(item, trangThaiBefore, trangThaiAfter);
+                                        res.send({ error, item });
+                                    }));
+                                })
+                                );
+                            });
+                    });
+                }
+            });
+        } catch (error) {
+            res.send({ error });
+        }
+
+
     });
 
 
@@ -190,7 +213,7 @@ module.exports = (app) => {
             const user = req.session.user;
             const permissions = user.permissions;
             donViCanBo = (req.session?.user?.staff?.donViQuanLy || []);
-            donViCanBo = donViCanBo.map(item => item.maDonVi).toString() || (permissions.includes('president:login') && MA_BAN_GIAM_HIEU) || '';
+            donViCanBo = donViCanBo.map(item => item.maDonVi).toString() || (permissions.includes('president:login') && MA_BAN_GIAM_HIEU) || permissions.includes('donViCongVanDen:read') && req.session?.user?.staff?.maDonVi || '';
             canBo = req.session?.user?.shcc || '';
 
             if (tabValue == 0) {
@@ -289,19 +312,29 @@ module.exports = (app) => {
         });
     });
 
-    app.get('/api/hcth/cong-van-den/download/:id/:fileName', app.permission.check('staff:login'), (req, res) => {
-        const { id, fileName } = req.params;
-        const dir = app.path.join(app.assetPath, `/congVanDen/${id}`);
-        if (app.fs.existsSync(dir)) {
-            const serverFileNames = app.fs.readdirSync(dir).filter(v => app.fs.lstatSync(app.path.join(dir, v)).isFile());
-            for (const serverFileName of serverFileNames) {
-                const clientFileIndex = serverFileName.indexOf(fileName);
-                if (clientFileIndex !== -1 && serverFileName.slice(clientFileIndex) === fileName) {
-                    return res.sendFile(app.path.join(dir, serverFileName));
+    app.get('/api/hcth/cong-van-den/download/:id/:fileName', app.permission.check('staff:login'), async (req, res) => {
+        try {
+            const { id, fileName } = req.params;
+            const congVan = await app.model.hcthCongVanDen.getCVD({ id });
+            const donViNhan = await app.model.hcthDonViNhanCongVan.getAllDVN({ congVan: id, loai: CONG_VAN_TYPE }, 'donViNhan', 'id');
+            if (!isRelated(congVan, donViNhan, req)) {
+                throw { status: 401, message: 'Bạn không có quyền xem tập tin này!' };
+            } else {
+                const dir = app.path.join(app.assetPath, `/congVanDen/${id}`);
+                if (app.fs.existsSync(dir)) {
+                    const serverFileNames = app.fs.readdirSync(dir).filter(v => app.fs.lstatSync(app.path.join(dir, v)).isFile());
+                    for (const serverFileName of serverFileNames) {
+                        const clientFileIndex = serverFileName.indexOf(fileName);
+                        if (clientFileIndex !== -1 && serverFileName.slice(clientFileIndex) === fileName) {
+                            return res.sendFile(app.path.join(dir, serverFileName));
+                        }
+                    }
                 }
+                throw { status: 404, message: 'Không tìm thấy tập tin!' };
             }
+        } catch (error) {
+            res.status(error.status || 400).send(error.message || 'Không tìm thấy tập tin');
         }
-        res.status(400).send('Không tìm thấy tập tin');
     });
 
     app.post('/api/hcth/cong-van-den/phan-hoi', app.permission.check('staff:login'), (req, res) => {
@@ -320,7 +353,7 @@ module.exports = (app) => {
             else {
                 let maDonViNhan = donViNhan.map((item) => item.donViNhan);
                 let maDonViQuanLy = req.session.user?.staff?.donViQuanLy || [];
-                return maDonViQuanLy.find(item => maDonViNhan.includes(item.maDonVi));
+                return maDonViQuanLy.find(item => maDonViNhan.includes(item.maDonVi)) || (permissions.includes('donViCongVanDen:read') && maDonViNhan.includes(Number(req.session.user.staff?.maDonVi)));
             }
         }
     };
@@ -405,6 +438,7 @@ module.exports = (app) => {
                     key: id, loai: CONG_VAN_TYPE, thoiGian: new Date().getTime(), shcc: req.session?.user?.shcc,
                     hanhDong: statusToAction(congVan.trangThai, trangThai),
                 });
+                await onStatusChange(newCongVan, congVan.trangThai, trangThai);
                 res.send({ newCongVan });
             }
         } catch (error) {
@@ -429,31 +463,193 @@ module.exports = (app) => {
     });
 
     // Phân quyền cho các đơn vị ------------------------------------------------------------------------------------------------------------------------
-    app.assignRoleHooks.addRoles('quanLyCongVan', { id: 'hcth:manage', text: 'Hành chính - Tổng hợp: Quản lý Công văn' });
 
-    app.assignRoleHooks.addHook('quanLyCongVan', async (req, roles) => {
+    const docCongVanPhongRole = 'quanLyCongVanPhong';
+    app.assignRoleHooks.addRoles(docCongVanPhongRole, { id: 'donViCongVanDen:read', text: 'Quản lý công văn đến đơn vị' });
+
+    app.assignRoleHooks.addHook(docCongVanPhongRole, async (req, roles) => {
         const userPermissions = req.session.user ? req.session.user.permissions : [];
-        if (req.query.nhomRole && req.query.nhomRole == 'quanLyCongVan' && userPermissions.includes('manager:write')) {
-            const assignRolesList = app.assignRoleHooks.get('quanLyCongVan').map(item => item.id);
+        if (req.query.nhomRole && req.query.nhomRole == docCongVanPhongRole && userPermissions.includes('manager:write')) {
+            const assignRolesList = app.assignRoleHooks.get(docCongVanPhongRole).map(item => item.id);
             return roles && roles.length && assignRolesList.contains(roles);
         }
     });
 
-    app.permissionHooks.add('staff', 'checkRoleQuanLyCongVan', (user, staff) => new Promise(resolve => {
-        if (staff.donViQuanLy && staff.donViQuanLy.length && staff.maDonVi == MA_HCTH) {
-            app.permissionHooks.pushUserPermission(user, 'hcth:manage');
+    app.permissionHooks.add('staff', 'checkRoleDocCongVanDenPhong', (user, staff) => new Promise(resolve => {
+        if (staff.donViQuanLy && staff.donViQuanLy.length) {
+            app.permissionHooks.pushUserPermission(user, 'donViCongVanDen:read');
         }
         resolve();
     }));
 
-    app.permissionHooks.add('assignRole', 'checkRoleQuanLyCongVan', (user, assignRoles) => new Promise(resolve => {
-        const inScopeRoles = assignRoles.filter(role => role.nhomRole == 'quanLyCongVan');
+
+    app.permissionHooks.add('assignRole', 'checkRoleDocCongVanDenPhong', (user, assignRoles) => new Promise(resolve => {
+        const inScopeRoles = assignRoles.filter(role => role.nhomRole == docCongVanPhongRole);
         inScopeRoles.forEach(role => {
-            if (role.tenRole == 'hcth:manage') {
-                app.permissionHooks.pushUserPermission(user, 'hcth:manage', 'hcth:login', 'dmDonVi:read', 'dmDonViGuiCv:read', 'dmDonViGuiCv:write', 'dmDonViGuiCv:delete', 'hcthCongVanDen:read', 'hcthCongVanDen:write', 'hcthCongVanDen:delete', 'hcthCongVanDi:read', 'hcthCongVanDi:write', 'hcthCongVanDi:delete');
+            if (role.tenRole == 'donViCongVanDen:read') {
+                app.permissionHooks.pushUserPermission(user, 'donViCongVanDen:read');
             }
         });
         resolve();
     }));
+
+    const nhomRole = 'quanLyCongVanDen';
+    app.assignRoleHooks.addRoles(nhomRole, { id: 'hcthCongVanDen:manage', text: 'Hành chính - Tổng hợp: Quản lý Công văn đến' });
+
+    app.assignRoleHooks.addHook(nhomRole, async (req, roles) => {
+        const userPermissions = req.session.user ? req.session.user.permissions : [];
+        if (req.query.nhomRole && req.query.nhomRole == nhomRole && userPermissions.includes('manager:write')) {
+            const assignRolesList = app.assignRoleHooks.get(nhomRole).map(item => item.id);
+            return roles && roles.length && assignRolesList.contains(roles);
+        }
+    });
+
+    app.permissionHooks.add('staff', 'checkRoleQuanLyHcth', (user, staff) => new Promise(resolve => {
+        if (staff.donViQuanLy && staff.donViQuanLy.length && staff.maDonVi == MA_HCTH) {
+            app.permissionHooks.pushUserPermission(user, 'hcthCongVanDen:manage', 'hcth:manage');
+        }
+        resolve();
+    }));
+
+    app.permissionHooks.add('assignRole', 'checkRoleQuanLyCongVanDen', (user, assignRoles) => new Promise(resolve => {
+        const inScopeRoles = assignRoles.filter(role => role.nhomRole == nhomRole);
+        inScopeRoles.forEach(role => {
+            if (role.tenRole == 'hcthCongVanDen:manage') {
+                app.permissionHooks.pushUserPermission(user, 'hcthCongVanDen:manage', 'hcth:login', 'dmDonVi:read', 'dmDonViGuiCv:read', 'dmDonViGuiCv:write', 'dmDonViGuiCv:delete', 'hcthCongVanDen:read', 'hcthCongVanDen:write', 'hcthCongVanDen:delete');
+            }
+        });
+        resolve();
+    }));
+
+
+    const createNotificaction = (shccs, condition, notification, done) => {
+        app.model.canBo.getAll({
+            statement: 'shcc IN (:dsCanBo) ' + condition.statement || '',
+            parameter: {
+                dsCanBo: shccs,
+                ...condition.parameter
+            }
+        }, 'email', 'email', (error, canBos) => {
+            if (error) {
+                done(error);
+            }
+            else {
+                const prmomises = [];
+                canBos.forEach(canBo => {
+                    prmomises.push(app.notification.send({
+                        toEmail: canBo.email,
+                        ...notification
+                    }));
+                });
+                Promise.all(prmomises).then(() => done(null)).catch(error => done(error));
+            }
+        });
+    };
+
+    const getMessage = (status) => {
+        switch (status) {
+            case trangThaiSwitcher.TRA_LAI_BGH.id:
+            case trangThaiSwitcher.TRA_LAI_HCTH.id:
+                return 'Bạn có công văn đến bị trả lại!';
+            case trangThaiSwitcher.CHO_PHAN_PHOI.id:
+                return 'Bạn có công văn chờ phân phối.';
+            case trangThaiSwitcher.DA_PHAN_PHOI.id:
+                return 'Bạn có công văn đến mới.';
+            default:
+                return '';
+
+        }
+    };
+
+    const getIconColor = (status) => {
+        switch (status) {
+            case trangThaiSwitcher.TRA_LAI_BGH.id:
+            case trangThaiSwitcher.TRA_LAI_HCTH.id:
+                return 'danger';
+            case trangThaiSwitcher.CHO_PHAN_PHOI.id:
+                return 'info';
+            default:
+                return '';
+        }
+    };
+
+    const onStatusChange = (item, before, after) => new Promise((resolve) => {
+        try {
+            if (before == after)
+                resolve();
+            if (after == trangThaiSwitcher.CHO_DUYET.id) {
+                const canBoChiDao = item.quyenChiDao.split(',');
+                createNotificaction(canBoChiDao, {}, {
+                    title: 'Công văn đến',
+                    icon: 'fa-book',
+                    subTitle: 'Bạn có một công văn cần chỉ đạo',
+                    link: `/user/cong-van-den/${item.id}`,
+                }, (error) => {
+                    if (error)
+                        throw error;
+                    else resolve();
+                });
+            }
+            else if ([trangThaiSwitcher.CHO_PHAN_PHOI.id, trangThaiSwitcher.TRA_LAI_BGH.id].includes(after)) {
+                app.model.fwAssignRole.getAll({ nhomRole: 'quanLyCongVanDen' }, 'nguoiDuocGan', '', (error, canBos) => {
+                    if (error) throw error;
+                    const shccCanBo = canBos.map(canBo => canBo.nguoiDuocGan);
+                    createNotificaction(
+                        shccCanBo,
+                        {
+                            statement: 'OR EXISTS(select SHCC from QT_CHUC_VU qtcv where qtcv.SHCC = TCHC_CAN_BO.SHCC AND qtcv.CHUC_VU_CHINH = 1 AND qtcv.MA_CHUC_VU = :matruongphong AND qtcv.MA_DON_VI = :mahcth)',
+                            parameter: {
+                                matruongphong: MA_TRUONG_PHONG,
+                                mahcth: MA_HCTH
+                            }
+                        },
+                        {
+                            title: 'Công văn đến',
+                            icon: 'fa-book',
+                            subTitle: getMessage(after),
+                            iconColor: getIconColor(after),
+                            link: `/user/hcth/cong-van-den/${item.id}`,
+                        }, (error) => {
+                            if (error)
+                                throw error;
+                            else resolve();
+                        });
+                });
+            }
+            else if (after == trangThaiSwitcher.DA_PHAN_PHOI.id) {
+                app.model.hcthDonViNhanCongVan.getAll({
+                    congVan: item.id,
+                    loai: CONG_VAN_TYPE
+                }, 'donViNhan', '', (error, donViNhan) => {
+                    if (error) throw error;
+                    donViNhan = donViNhan.map(item => item.donViNhan);
+                    createNotificaction(
+                        item.canBoNhan?.split(',') || [],
+                        {
+                            statement: `OR EXISTS(select SHCC from QT_CHUC_VU qtcv where qtcv.SHCC = TCHC_CAN_BO.SHCC AND qtcv.CHUC_VU_CHINH = 1 AND qtcv.MA_CHUC_VU in (${[MA_TRUONG_PHONG, MA_TRUONG_KHOA].map(item => `'${item}'`).toString()}) AND qtcv.MA_DON_VI in (:madonvi))`,
+                            parameter: {
+                                madonvi: donViNhan
+                            }
+                        },
+                        {
+                            title: 'Công văn đến',
+                            subTitle: getMessage(after),
+                            icon: 'fa-book',
+                            iconColor: getIconColor(after),
+                            link: `/user/cong-van-den/${item.id}`,
+                        }, (error) => {
+                            if (error)
+                                throw error;
+                            else resolve();
+                        });
+                });
+            }
+        } catch (error) {
+            console.error('fail to send notification', error);
+            resolve();
+        }
+    });
+
+
 
 };
