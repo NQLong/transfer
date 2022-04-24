@@ -71,7 +71,7 @@ export function getDtThoiKhoaBieuPage(pageNumber, pageSize, pageCondition, done)
                 T.notify('Lấy danh sách thời khoá biểu bị lỗi!', 'danger');
                 console.error(`GET ${url}. ${data.error}`);
             } else {
-                if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
+                if (done) done(data.page);
                 dispatch({ type: DtThoiKhoaBieuGetPage, page: data.page });
             }
         });
@@ -79,7 +79,7 @@ export function getDtThoiKhoaBieuPage(pageNumber, pageSize, pageCondition, done)
 }
 
 export function createDtThoiKhoaBieu(item, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/dao-tao/thoi-khoa-bieu';
         T.post(url, { item }, data => {
             if (data.error) {
@@ -88,7 +88,6 @@ export function createDtThoiKhoaBieu(item, done) {
             } else {
                 T.notify('Tạo thời khoá biểu thành công!', 'success');
                 if (done) done();
-                dispatch(getDtThoiKhoaBieuPage());
             }
         });
     };
@@ -125,7 +124,16 @@ export function updateDtThoiKhoaBieu(id, changes, done) {
     };
 }
 
-
+export function initSchedule(done) {
+    return () => new Promise(resolve => {
+        T.get('/api/dao-tao/init-schedule', data => {
+            if (data) {
+                done && done();
+                resolve();
+            }
+        });
+    });
+}
 
 export function changeDtThoiKhoaBieu(item) {
     return { type: DtThoiKhoaBieuUpdate, item };

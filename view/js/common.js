@@ -175,12 +175,13 @@ const T = {
     notify: (message, type) => $.notify({ message }, { type, placement: { from: 'bottom' }, z_index: 2000 }),
 
     alert: (text, icon, button, timer) => {
-        let options = {};
+        let options = {}, done = null;
         if (icon) {
             if (typeof icon == 'boolean') {
                 options.button = icon;
                 options.icon = 'success';
-                if (timer) options.timer = timer;
+                if (typeof timer == 'number') options.timer = timer;
+                else if (typeof timer == 'function') done = timer;
             } else if (typeof icon == 'number') {
                 options.timer = icon;
                 options.icon = 'success';
@@ -204,7 +205,7 @@ const T = {
             options.button = true;
         }
         options.text = text;
-        swal(options);
+        done ? swal(options).then(done) : swal(options);
     },
 
     confirm: (title, html, icon, dangerMode, done) => {
@@ -223,6 +224,35 @@ const T = {
         var content = document.createElement('div');
         content.innerHTML = html;
         swal({ icon, title, content, dangerMode, buttons: { cancel: true, confirm: true }, }).then(done);
+    },
+
+    confirmLoading: (title, text, successText = 'Thành công', icon, buttonText, done) => {
+        swal({
+            title,
+            text,
+            icon,
+            buttons: {
+                text: buttonText,
+                closeModal: false,
+            },
+        })
+            .then(() => {
+                swal({
+                    title: "Loading",
+                    text: "Vui lòng giữ nguyên trang",
+                    icon: "warning",
+                    button: null,
+                });
+                done().then(() => {
+                    swal({
+                        title: "Load done",
+                        text: successText,
+                        icon: "success",
+                        button: null,
+                        timer: 800
+                    });
+                });
+            });
     },
 
     randomHexColor: () => {
@@ -338,8 +368,8 @@ const T = {
         while (end >= start && result <= 30) {
             let positionDay = start.getDay();
             if (positionDay == 0 || positionDay == 6) {
-                 //thứ bảy, chủ nhật
-                 //TODO: thêm ngày lễ
+                //thứ bảy, chủ nhật
+                //TODO: thêm ngày lễ
             } else {
                 let isNgayLe = false;
                 for (let idx = 0; idx < danhSachNgayLe.length; idx++) {
@@ -354,7 +384,7 @@ const T = {
             start = start.nextDate();
         }
         if (result > 30) { //Case: Quá nhiều ngày nghỉ
-            return -1; 
+            return -1;
         }
         return result;
     }

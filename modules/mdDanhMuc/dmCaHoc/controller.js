@@ -5,15 +5,22 @@ module.exports = app => {
             4007: { title: 'Giờ học', link: '/user/danh-muc/ca-hoc' },
         },
     };
+    const menuDaoTao = {
+        parentMenu: app.parentMenu.daoTao,
+        menus: {
+            7010: { title: 'Giờ học', link: '/user/dao-tao/ca-hoc', groupIndex: 2 },
+        },
+    };
     app.permission.add(
         { name: 'dmCaHoc:read', menu },
+        { name: 'dtCaHoc:read', menu: menuDaoTao },
         { name: 'dmCaHoc:write' },
         { name: 'dmCaHoc:delete' },
     );
-    app.get('/user/danh-muc/ca-hoc', app.permission.check('dmCaHoc:read'), app.templates.admin);
+    app.get('/user/:menu/ca-hoc', app.permission.orCheck('dmCaHoc:read', 'dtCaHoc:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/danh-muc/ca-hoc/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
+    app.get('/api/danh-muc/ca-hoc/page/:pageNumber/:pageSize', app.permission.orCheck('dmCaHoc:read', 'dtCaHoc:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         app.model.dmCaHoc.getPage(pageNumber, pageSize, {}, (error, page) => {
@@ -21,11 +28,11 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/danh-muc/ca-hoc/all', app.permission.check('user:login'), (req, res) => {
-        app.model.dmCaHoc.getAll((error, items) => res.send({ error, items }));
+    app.get('/api/danh-muc/ca-hoc/all', app.permission.orCheck('dmCaHoc:read', 'dtCaHoc:read'), (req, res) => {
+        app.model.dmCaHoc.getAll({}, '*', 'maCoSo,thoiGianBatDau', (error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/danh-muc/ca-hoc/item/:_id', app.permission.check('user:login'), (req, res) => {
+    app.get('/api/danh-muc/ca-hoc/item/:_id', app.permission.orCheck('dmCaHoc:read', 'dtCaHoc:read'), (req, res) => {
         app.model.dmCaHoc.get(req.params._id, (error, item) => res.send({ error, item }));
     });
 

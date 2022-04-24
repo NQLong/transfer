@@ -14,6 +14,7 @@ module.exports = app => {
                 res.send({ error });
                 return;
             } else {
+                let thoiGianDangKy = dotDangKy.thoiGian || null;
                 let year = thoiGianMoMon.nam - yearth,
                     semester = thoiGianMoMon.hocKy + yearth * 2;
                 app.model.dtKhungDaoTao.get({ namDaoTao: year }, (error, item) => {
@@ -29,7 +30,7 @@ module.exports = app => {
                                         statement: 'maKhungDaoTao = (:id) AND hocKyDuKien = (:semester)',
                                         parameter: { id: item.id, semester }
                                     };
-                                    app.model.dtChuongTrinhDaoTao.getAll(condition, (error, items) => {
+                                    !thoiGianDangKy && app.model.dtChuongTrinhDaoTao.getAll(condition, (error, items) => {
                                         if (error) {
                                             res.send({ error });
                                             return;
