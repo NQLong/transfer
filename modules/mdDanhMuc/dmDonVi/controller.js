@@ -31,7 +31,7 @@ module.exports = app => {
         app.model.dmDonVi.getAll((error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/danh-muc/don-vi/get-in-list', app.permission.check('manager:read'), (req, res) => {
+    app.get('/api/danh-muc/don-vi/get-in-list', app.permission.check('staff:login'), (req, res) => {
         app.model.dmDonVi.getAll({
             statement: 'ma IN (:list)',
             parameter: { list: req.query.condition || [] }
