@@ -1,6 +1,6 @@
-// Table name: HCTH_GIAO_NHIEM_VU { id, nguoiTao, canBoNhan, donViNhan, noiDung, tieuDe, ngayBatDau, ngayKetThuc, doUuTien, ngayTao, isNhiemVuLienPhong }
+// Table name: HCTH_GIAO_NHIEM_VU { id, nguoiTao, donViNhan, noiDung, tieuDe, ngayBatDau, ngayKetThuc, doUuTien, ngayTao, isNhiemVuLienPhong }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'nguoiTao': 'NGUOI_TAO', 'canBoNhan': 'CAN_BO_NHAN', 'donViNhan': 'DON_VI_NHAN', 'noiDung': 'NOI_DUNG', 'tieuDe': 'TIEU_DE', 'ngayBatDau': 'NGAY_BAT_DAU', 'ngayKetThuc': 'NGAY_KET_THUC', 'doUuTien': 'DO_UU_TIEN', 'ngayTao': 'NGAY_TAO', 'isNhiemVuLienPhong': 'IS_NHIEM_VU_LIEN_PHONG' };
+const obj2Db = { 'id': 'ID', 'nguoiTao': 'NGUOI_TAO', 'donViNhan': 'DON_VI_NHAN', 'noiDung': 'NOI_DUNG', 'tieuDe': 'TIEU_DE', 'ngayBatDau': 'NGAY_BAT_DAU', 'ngayKetThuc': 'NGAY_KET_THUC', 'doUuTien': 'DO_UU_TIEN', 'ngayTao': 'NGAY_TAO', 'isNhiemVuLienPhong': 'IS_NHIEM_VU_LIEN_PHONG' };
 
 module.exports = app => {
     app.model.hcthGiaoNhiemVu = {
@@ -134,11 +134,6 @@ module.exports = app => {
         searchPage: (pagenumber, pagesize, userid, donvinhan, canbonhan, searchterm, done) => {
             app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_giao_nhiem_vu_search_page(:pagenumber, :pagesize, :userid, :donvinhan, :canbonhan, :searchterm, :totalitem, :pagetotal); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, userid, donvinhan, canbonhan, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
-        },
-
-        getAllPhanHoi: (idnhiemvu, done) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_giao_nhiem_vu_get_all_phan_hoi(:idnhiemvu); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, idnhiemvu }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
     };
 };

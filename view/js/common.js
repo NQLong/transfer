@@ -582,7 +582,13 @@ String.prototype.normalizedName = function () {
 String.prototype.numberWithCommas = function () {
     return this.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
-
+String.prototype.getFirstLetters = function () {
+    const firstLetters = this
+        .split(' ')
+        .map(word => word[0])
+        .join('');
+    return firstLetters;
+}
 //Array prototype -----------------------------------------------------------------------------------------------------
 Array.prototype.contains = function (...pattern) {
     return pattern.reduce((result, item) => result && this.includes(item), true);

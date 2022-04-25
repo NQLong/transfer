@@ -79,9 +79,9 @@ export function getDmPhongPage(pageNumber, pageSize, done) {
     };
 }
 
-export function getDmPhong(ma, done) {
+export function getDmPhong(ten, done) {
     return () => {
-        const url = `/api/danh-muc/phong/item/${ma}`;
+        const url = `/api/danh-muc/phong/item/${ten}`;
         T.get(url, data => {
             if (data.error) {
                 T.notify('Lấy thông tin phòng học bị lỗi!', 'danger');
@@ -163,6 +163,6 @@ export const SelectAdapter_DmPhong = {
     ajax: true,
     url: '/api/danh-muc/phong/page/1/20',
     data: params => ({ condition: params.term }),
-    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ma, text: item.ten })) : [] }),
-    fetchOne: (ma, done) => (getDmPhong(ma, item => done && done({ id: item.ma, text: `${item.ten}` })))(),
+    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.ten, text: item.ten })) : [] }),
+    fetchOne: (ten, done) => (getDmPhong(ten, item => done && done({ id: item.ten, text: `${item.ten}` })))(),
 };

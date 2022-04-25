@@ -109,6 +109,11 @@ module.exports = app => {
         app.model.canBo.get({ shcc: req.params.shcc }, (error, item) => res.send({ error, item }));
     });
 
+    app.get('/api/staff/get-giang-vien', app.permission.check('staff:login'), (req, res) => {
+        let searchTerm = req.query.searchTerm || '';
+        app.model.canBo.getGiangVien(searchTerm, (error, items) => res.send({ items: items.rows }));
+    });
+
     // app.get('/api/staff/calc-shcc', checkGetStaffPermission, (req, res) => {
     //     app.model.canBo.getShccCanBo(req.query.item, (error, shcc) => {
     //         res.send({ error, shcc });

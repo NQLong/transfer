@@ -160,5 +160,10 @@ module.exports = app => {
             app.database.oracle.connection.main.execute('BEGIN :ret:=tccb_dashboard_get_staff_dang_trong_nuoc_by_muc_dich(); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
+
+        getGiangVien: (searchterm, done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=tchc_can_bo_get_giang_vien(:searchterm); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, searchterm }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
+        },
     };
 };

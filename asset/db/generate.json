@@ -6603,6 +6603,13 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 32
+                },
+                "NHAC_NHO": {
+                    "value": "nhacNho",
+                    "dataType": "NUMBER",
+                    "dataDefault": "1",
+                    "nullable": true,
+                    "size": "1,0"
                 }
             },
             "primaryKeys": [
@@ -10167,7 +10174,8 @@
                 "tccb_dashboard_total_gender": "tccbDasboardTotalGender",
                 "TCCB_DASHBOARD_GET_NUMBER_STAFF_BY_DON_VI": "tccbDashboardStaffByDV",
                 "TCCB_DASHBOARD_GET_STAFF_DANG_NUOC_NGOAI_BY_MUC_DICH": "tccbDashboardStaffCurrentlyForeign",
-                "TCCB_DASHBOARD_GET_STAFF_DANG_TRONG_NUOC_BY_MUC_DICH": "tccbDashboardStaffCurrentlyWorkOutside"
+                "TCCB_DASHBOARD_GET_STAFF_DANG_TRONG_NUOC_BY_MUC_DICH": "tccbDashboardStaffCurrentlyWorkOutside",
+                "TCHC_CAN_BO_GET_GIANG_VIEN": "getGiangVien"
             },
             "modelName": "canBo",
             "columns": {

@@ -64,7 +64,7 @@ export function getDtThoiKhoaBieuAll(condition, done) {
 T.initPage('pageDtThoiKhoaBieu');
 export function getDtThoiKhoaBieuPage(pageNumber, pageSize, pageCondition, done) {
     const page = T.updatePage('pageDtThoiKhoaBieu', pageNumber, pageSize, pageCondition);
-    return dispatch => {
+    return () => {
         const url = `/api/dao-tao/thoi-khoa-bieu/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: pageCondition }, data => {
             if (data.error) {
@@ -72,7 +72,6 @@ export function getDtThoiKhoaBieuPage(pageNumber, pageSize, pageCondition, done)
                 console.error(`GET ${url}. ${data.error}`);
             } else {
                 if (done) done(data.page);
-                dispatch({ type: DtThoiKhoaBieuGetPage, page: data.page });
             }
         });
     };
@@ -109,7 +108,7 @@ export function deleteDtThoiKhoaBieu(id) {
 }
 
 export function updateDtThoiKhoaBieu(id, changes, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/dao-tao/thoi-khoa-bieu';
         T.put(url, { id, changes }, data => {
             if (data.error) {
@@ -118,7 +117,8 @@ export function updateDtThoiKhoaBieu(id, changes, done) {
                 done && done(data.error);
             } else {
                 T.notify('Cập nhật thông tin thời khoá biểu thành công!', 'success');
-                dispatch(getDtThoiKhoaBieuPage());
+                done && done();
+                // dispatch({ type: DtThoiKhoaBieuUpdate, item: data.item });
             }
         }, () => T.notify('Cập nhật thông tin thời khoá biểu bị lỗi!', 'danger'));
     };

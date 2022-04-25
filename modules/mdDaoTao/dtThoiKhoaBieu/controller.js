@@ -72,7 +72,7 @@ module.exports = app => {
     });
 
     app.put('/api/dao-tao/thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:write'), (req, res) => {
-        app.model.dtThoiKhoaBieu.update({ id: req.body.id }, req.body.changes, (error, items) => res.send({ error, items }));
+        app.model.dtThoiKhoaBieu.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
     app.delete('/api/dao-tao/thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:delete'), (req, res) => {
