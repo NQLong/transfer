@@ -193,11 +193,18 @@ export class ComponentDieuKhoan extends React.Component {
                     <FormDatePicker ref={e => this.batDauLamViec = e} type='date-mask' className='col-xl-3 col-md-6' label='Ngày bắt đầu làm việc' required readOnly={true} />
                     <FormDatePicker ref={e => this.ngayKyTiepTheo = e} type='date-mask' className={this.state.isXacDinhTg ? 'col-xl-3 col-md-6' : 'd-none'} label='Ngày tái ký' required readOnly={readOnly} />
                     <FormSelect ref={e => this.donVi = e} data={SelectAdapter_DmDonVi} className='col-xl-4 col-md-6' label='Địa điểm làm việc' readOnly={readOnly} onChange={value => { 
-                        this.setState({ maDv: value.id }, () => this.maBoMon.value(null)); 
-                        this.handleDonVi(); 
-                        this.props.genNewShcc(value.id, value.preShcc); }} required />
+                        this.setState({ maDv: value.id, preShcc: value.preShcc }, () => {
+                            this.maBoMon.value(null); 
+                            this.props.genNewShcc(this.state.maDv, this.state.preShcc, this.state.nhomNgach);
+                        }); 
+                        this.handleDonVi(); }} required />
                     <FormSelect ref={e => this.maBoMon = e} data={SelectAdapter_DmBoMonTheoDonVi(this.state.maDv)} label='Bộ môn' readOnly={readOnly} className={!this.state.maDv || !this.state.listMaKhoa.includes(this.state.maDv) ? 'd-none' : 'col-xl-4 col-md-6'} />
-                    <FormSelect ref={e => this.chucDanh = e} data={SelectAdapter_DmNgachCdnnV2} onChange={this.handleNgach} className='col-md-4' label='Chức danh chuyên môn' required />
+                    <FormSelect ref={e => this.chucDanh = e} data={SelectAdapter_DmNgachCdnnV2} onChange={(value) => {
+                        this.setState({ nhomNgach: value.nhom }, () => {
+                            this.props.genNewShcc(this.state.maDv, this.state.preShcc, this.state.nhomNgach);
+                        });
+                        this.handleNgach(value);
+                    }} className='col-md-4' label='Chức danh chuyên môn' required />
                     <FormCheckbox ref={e => this.isCVDT = e} className={this.state.maNgach == '01.003' ? 'col-md-12' : 'd-none'} label='Chuyên viên phục vụ đào tạo' />
                     <FormTextBox ref={e => this.congViecDuocGiao = e} label='Công việc được giao' readOnly={readOnly} className='col-12' maxLength={200} />
                     <div className='col-12 form-group' />
