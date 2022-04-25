@@ -140,10 +140,12 @@ module.exports = app => {
         });
     });
 
-    app.get('/api/qua-trinh/di-nuoc-ngoai/download-excel/:filter', app.permission.check('qtDiNuocNgoai:read'), (req, res) => {
-        app.model.qtDiNuocNgoai.download(req.params.filter, (error, result) => {
-            if (error || !result) {
-                res.send({ error });
+    app.get('/api/qua-trinh/di-nuoc-ngoai/download-excel/:filter/:searchTerm', app.permission.check('qtDiNuocNgoai:read'), (req, res) => {
+        let searchTerm = req.params.searchTerm;
+        if (searchTerm == 'null') searchTerm = '';
+        app.model.qtDiNuocNgoai.download(req.params.filter, searchTerm, (err, result) => {
+            if (err || !result) {
+                res.send({ err });
             } else {
                 const workbook = app.excel.create(),
                     worksheet = workbook.addWorksheet('dinuocngoai');
@@ -159,15 +161,16 @@ module.exports = app => {
                         { cell: 'G1', value: 'TÊN', bold: true, border: '1234' },
                         { cell: 'H1', value: 'GIỚI TÍNH', bold: true, border: '1234' },
                         { cell: 'I1', value: 'NGÀY SINH', bold: true, border: '1234' },
-                        { cell: 'J1', value: 'CHỨC VỤ', bold: true, border: '1234' },
-                        { cell: 'K1', value: 'ĐƠN VỊ', bold: true, border: '1234' },
-                        { cell: 'L1', value: 'NƯỚC ĐẾN', bold: true, border: '1234' },
-                        { cell: 'M1', value: 'VIẾT TẮT', bold: true, border: '1234' },
-                        { cell: 'N1', value: 'NỘI DUNG', bold: true, border: '1234' },
-                        { cell: 'O1', value: 'NGÀY ĐI', bold: true, border: '1234' },
-                        { cell: 'P1', value: 'NGÀY VỀ', bold: true, border: '1234' },
-                        { cell: 'Q1', value: 'CHI PHÍ', bold: true, border: '1234' },
-                        { cell: 'R1', value: 'GHI CHÚ', bold: true, border: '1234' },
+                        { cell: 'J1', value: 'CHỨC DANH NGHỀ NGHIỆP', bold: true, border: '1234' },
+                        { cell: 'K1', value: 'CHỨC VỤ', bold: true, border: '1234' },
+                        { cell: 'L1', value: 'ĐƠN VỊ', bold: true, border: '1234' },
+                        { cell: 'M1', value: 'NƯỚC ĐẾN', bold: true, border: '1234' },
+                        { cell: 'N1', value: 'VIẾT TẮT', bold: true, border: '1234' },
+                        { cell: 'O1', value: 'NỘI DUNG', bold: true, border: '1234' },
+                        { cell: 'P1', value: 'NGÀY ĐI', bold: true, border: '1234' },
+                        { cell: 'Q1', value: 'NGÀY VỀ', bold: true, border: '1234' },
+                        { cell: 'R1', value: 'CHI PHÍ', bold: true, border: '1234' },
+                        { cell: 'S1', value: 'GHI CHÚ', bold: true, border: '1234' },
                     ];
                     result.rows.forEach((item, index) => {
                         cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
@@ -178,16 +181,17 @@ module.exports = app => {
                         cells.push({ cell: 'F' + (index + 2), border: '1234', value: item.hoCanBo });
                         cells.push({ cell: 'G' + (index + 2), border: '1234', value: item.tenCanBo });
                         cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.phai == '01' ? 'Nam' : 'Nữ' });
-                        cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.ngaySinh ? app.date.dateTimeFormat(new Date(item.ngaySinh), 'dd/mm/yyyy') : '' });
-                        cells.push({ cell: 'J' + (index + 2), border: '1234', value: item.tenChucVu });
-                        cells.push({ cell: 'K' + (index + 2), border: '1234', value: item.tenDonVi });
-                        cells.push({ cell: 'L' + (index + 2), border: '1234', value: item.danhSachQuocGia });
-                        cells.push({ cell: 'M' + (index + 2), border: '1234', value: item.tenMucDich });
-                        cells.push({ cell: 'N' + (index + 2), border: '1234', value: item.noiDung });
-                        cells.push({ cell: 'O' + (index + 2), alignment: 'center', border: '1234', value: item.ngayDi ? app.date.dateTimeFormat(new Date(item.ngayDi), item.ngayDiType ? item.ngayDiType : 'dd/mm/yyyy') : '' });
-                        cells.push({ cell: 'P' + (index + 2), alignment: 'center', border: '1234', value: (item.ngayVe != null && item.ngayVe != -1) ? app.date.dateTimeFormat(new Date(item.ngayVe), item.ngayVeType ? item.ngayVeType : 'dd/mm/yyyy') : '' });
-                        cells.push({ cell: 'Q' + (index + 2), border: '1234', value: item.chiPhi });
-                        cells.push({ cell: 'R' + (index + 2), border: '1234', value: item.ghiChu });
+                        cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.ngaySinh ? app.date.dateTimeFormat(new Date(item.ngaySinh), 'dd/mm/yyyy') : ''});
+                        cells.push({ cell: 'J' + (index + 2), border: '1234', value: item.tenChucDanhNgheNghiep });
+                        cells.push({ cell: 'K' + (index + 2), border: '1234', value: item.tenChucVu });
+                        cells.push({ cell: 'L' + (index + 2), border: '1234', value: item.tenDonVi });
+                        cells.push({ cell: 'M' + (index + 2), border: '1234', value: item.danhSachQuocGia });
+                        cells.push({ cell: 'N' + (index + 2), border: '1234', value: item.tenMucDich });
+                        cells.push({ cell: 'O' + (index + 2), border: '1234', value: item.noiDung });
+                        cells.push({ cell: 'P' + (index + 2), alignment: 'center', border: '1234', value: item.ngayDi ? app.date.dateTimeFormat(new Date(item.ngayDi), item.ngayDiType ? item.ngayDiType : 'dd/mm/yyyy') : '' });
+                        cells.push({ cell: 'Q' + (index + 2), alignment: 'center', border: '1234', value: (item.ngayVe != null && item.ngayVe != -1) ? app.date.dateTimeFormat(new Date(item.ngayVe), item.ngayVeType ? item.ngayVeType : 'dd/mm/yyyy') : '' });
+                        cells.push({ cell: 'R' + (index + 2), border: '1234', value: item.chiPhi });
+                        cells.push({ cell: 'S' + (index + 2), border: '1234', value: item.ghiChu });
                     });
                     resolve(cells);
                 }).then((cells) => {
@@ -199,11 +203,12 @@ module.exports = app => {
             }
         });
     });
-
-    app.get('/api/qua-trinh/tiep-nhan-ve-nuoc/download-excel/:filter', app.permission.check('qtDiNuocNgoai:read'), (req, res) => {
-        app.model.qtDiNuocNgoai.download(req.params.filter, (error, result) => {
-            if (error || !result) {
-                res.send({ error });
+    app.get('/api/qua-trinh/tiep-nhan-ve-nuoc/download-excel/:filter/:searchTerm', app.permission.check('qtDiNuocNgoai:read'), (req, res) => {
+        let searchTerm = req.params.searchTerm;
+        if (searchTerm == 'null') searchTerm = '';
+        app.model.qtDiNuocNgoai.download(req.params.filter, searchTerm, (err, result) => {
+            if (err || !result) {
+                res.send({ err });
             } else {
                 const workbook = app.excel.create(),
                     worksheet = workbook.addWorksheet('DANH SACH VE NUOC');
@@ -220,11 +225,12 @@ module.exports = app => {
                         { cell: 'G1', value: 'TÊN', bold: true, border: '1234' },
                         { cell: 'H1', value: 'GIỚI TÍNH', bold: true, border: '1234' },
                         { cell: 'I1', value: 'NGÀY SINH', bold: true, border: '1234' },
-                        { cell: 'J1', value: 'CHỨC VỤ', bold: true, border: '1234' },
-                        { cell: 'K1', value: 'ĐƠN VỊ', bold: true, border: '1234' },
-                        { cell: 'L1', value: 'NƯỚC ĐẾN', bold: true, border: '1234' },
-                        { cell: 'M1', value: 'NỘI DUNG', bold: true, border: '1234' },
-                        { cell: 'N1', value: 'NGÀY VỀ', bold: true, border: '1234' },
+                        { cell: 'J1', value: 'CHỨC DANH NGHỀ NGHIỆP', bold: true, border: '1234' },
+                        { cell: 'K1', value: 'CHỨC VỤ', bold: true, border: '1234' },
+                        { cell: 'L1', value: 'ĐƠN VỊ', bold: true, border: '1234' },
+                        { cell: 'M1', value: 'NƯỚC ĐẾN', bold: true, border: '1234' },
+                        { cell: 'N1', value: 'NỘI DUNG', bold: true, border: '1234' },
+                        { cell: 'O1', value: 'NGÀY VỀ', bold: true, border: '1234' },
                     ];
                     result.rows.forEach((item, index) => {
                         cells.push({ cell: 'A' + (index + 2), border: '1234', number: index + 1 });
@@ -235,12 +241,13 @@ module.exports = app => {
                         cells.push({ cell: 'F' + (index + 2), border: '1234', value: item.hoCanBo });
                         cells.push({ cell: 'G' + (index + 2), border: '1234', value: item.tenCanBo });
                         cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.phai == '01' ? 'Nam' : 'Nữ' });
-                        cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.ngaySinh ? app.date.dateTimeFormat(new Date(item.ngaySinh), 'dd/mm/yyyy') : '' });
-                        cells.push({ cell: 'J' + (index + 2), border: '1234', value: item.tenChucVu });
-                        cells.push({ cell: 'K' + (index + 2), border: '1234', value: item.tenDonVi });
-                        cells.push({ cell: 'L' + (index + 2), border: '1234', value: item.danhSachQuocGia });
-                        cells.push({ cell: 'M' + (index + 2), border: '1234', value: item.noiDungTiepNhan });
-                        cells.push({ cell: 'N' + (index + 2), alignment: 'center', border: '1234', value: item.ngayVeNuoc ? app.date.dateTimeFormat(new Date(item.ngayVeNuoc), 'dd/mm/yyyy') : '' });
+                        cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.ngaySinh ? app.date.dateTimeFormat(new Date(item.ngaySinh), 'dd/mm/yyyy') : ''});
+                        cells.push({ cell: 'J' + (index + 2), border: '1234', value: item.tenChucDanhNgheNghiep });
+                        cells.push({ cell: 'K' + (index + 2), border: '1234', value: item.tenChucVu });
+                        cells.push({ cell: 'L' + (index + 2), border: '1234', value: item.tenDonVi });
+                        cells.push({ cell: 'M' + (index + 2), border: '1234', value: item.danhSachQuocGia });
+                        cells.push({ cell: 'N' + (index + 2), border: '1234', value: item.noiDungTiepNhan });
+                        cells.push({ cell: 'O' + (index + 2), alignment: 'center', border: '1234', value: item.ngayVeNuoc ? app.date.dateTimeFormat(new Date(item.ngayVeNuoc), 'dd/mm/yyyy') : '' });
                     });
                     resolve(cells);
                 }).then((cells) => {
@@ -249,6 +256,18 @@ module.exports = app => {
                 }).catch((error) => {
                     res.send({ error });
                 });
+            }
+        });
+    });
+
+    app.get('/api/tccb/qua-trinh/di-nuoc-ngoai/thong-ke-muc-dich', app.permission.orCheck('qtDiNuocNgoai:read', 'staff:login'), (req, res) => {
+        const searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
+        const filter = app.stringify(req.query.filter);
+        app.model.qtDiNuocNgoai.download(filter, searchTerm, (error, page) => {
+            if (error || page == null) {
+                res.send({ error });
+            } else {
+                res.send({ error, items: page.rows });
             }
         });
     });

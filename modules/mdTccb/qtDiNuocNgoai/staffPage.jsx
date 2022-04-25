@@ -7,7 +7,7 @@ import Dropdown from 'view/component/Dropdown';
 import { DateInput } from 'view/component/Input';
 import {
     getQtDiNuocNgoaiUserPage, deleteQtDiNuocNgoaiUserPage, createQtDiNuocNgoaiUserPage,
-    updateQtDiNuocNgoaiUserPage
+    updateQtDiNuocNgoaiUserPage, getThongKeMucDich
 } from './redux';
 import { SelectAdapter_DmQuocGia } from 'modules/mdDanhMuc/dmQuocGia/redux';
 import { SelectAdapter_DmMucDichNuocNgoaiV2 } from 'modules/mdDanhMuc/dmMucDichNuocNgoai/redux';
@@ -189,13 +189,36 @@ class EditModal extends AdminModal {
 }
 
 class QtDiNuocNgoaiUserPage extends AdminPage {
-    state = { filter: {} };
+    state = { filter: {}, listMucDich: [] };
     componentDidMount() {
         T.ready('/user', () => {
             const { shcc } = this.props.system && this.props.system.user ? this.props.system.user : { shcc: '' };
-            this.setState({ filter: { listShcc: shcc, listDv: '', fromYear: null, toYear: null, timeType: null, tinhTrang: null, loaiHocVi: null, mucDich: null } });
-            this.getPage();
+            this.thongKeMucDich('', { listShcc: shcc, listDv: '', fromYear: null, toYear: null, timeType: null, tinhTrang: null, loaiHocVi: null, mucDich: null }, (items) => {
+                this.setState({ filter: { listShcc: shcc, listDv: '', fromYear: null, toYear: null, timeType: null, tinhTrang: null, loaiHocVi: null, mucDich: null }, listMucDich: this.setUp(items, 'tenMucDich') }, () => {
+                    this.getPage();
+                });
+            });
         });
+    }
+
+    setUp = (data = [], keyGroup) => {
+        let dataGroupBy = data.groupBy(keyGroup);
+        let filterData = [];
+        Object.keys(dataGroupBy).filter(item => dataGroupBy[item].length > 0).map(item => {
+            filterData.push({ id: item, len: dataGroupBy[item].length });
+        });
+        filterData.sort(function(a, b) { //sắp xếp theo số lượng giảm dần
+            return -(a.len - b.len);
+        });
+        let result = [];
+        filterData.forEach(item => {
+            result.push(<div key={item.id}><b><span>{' - ' + item.id + ': ' + item.len}</span></b></div>);
+        });
+        return result;
+    }
+    
+    thongKeMucDich = (pageC, filter, done) => {
+        this.props.getThongKeMucDich(pageC, filter, done);
     }
 
     getPage = (pageN, pageS, pageC, done) => {
@@ -287,7 +310,8 @@ class QtDiNuocNgoaiUserPage extends AdminPage {
                     <h3 className='tile-title'>
                         Thống kê
                     </h3>
-                    <b>{'Số lượng: ' + totalItem.toString()}</b>
+                    <div>{this.state.listMucDich}</div>
+                    <big><b>{'Tổng cộng: ' + totalItem.toString()}</b></big>
                 </div>
                 <div className='tile'>
                     {table}
@@ -307,6 +331,6 @@ class QtDiNuocNgoaiUserPage extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtDiNuocNgoai: state.tccb.qtDiNuocNgoai });
 const mapActionsToProps = {
     getQtDiNuocNgoaiUserPage, deleteQtDiNuocNgoaiUserPage,
-    updateQtDiNuocNgoaiUserPage, createQtDiNuocNgoaiUserPage,
+    updateQtDiNuocNgoaiUserPage, createQtDiNuocNgoaiUserPage, getThongKeMucDich
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtDiNuocNgoaiUserPage);

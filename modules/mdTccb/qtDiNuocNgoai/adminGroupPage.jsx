@@ -8,7 +8,7 @@ import { DateInput } from 'view/component/Input';
 import { SelectAdapter_FwCanBo } from '../tccbCanBo/redux';
 import {
     getQtDiNuocNgoaiGroupPageMa, deleteQtDiNuocNgoaiGroupPageMa, createQtDiNuocNgoaiGroupPageMa,
-    updateQtDiNuocNgoaiGroupPageMa
+    updateQtDiNuocNgoaiGroupPageMa, getThongKeMucDich
 } from './redux';
 import { SelectAdapter_DmQuocGia } from 'modules/mdDanhMuc/dmQuocGia/redux';
 import { SelectAdapter_DmMucDichNuocNgoaiV2 } from 'modules/mdDanhMuc/dmMucDichNuocNgoai/redux';
@@ -193,7 +193,7 @@ class EditModal extends AdminModal {
 }
 
 class QtDiNuocNgoaiGroupPage extends AdminPage {
-    state = { filter: {}, visibleTime: false};
+    state = { filter: {}, visibleTime: false, listMucDich: [] };
 
     componentDidMount() {
         T.ready('/user/tccb', () => {
@@ -201,9 +201,18 @@ class QtDiNuocNgoaiGroupPage extends AdminPage {
             const route = T.routeMatcher('/user/tccb/qua-trinh/di-nuoc-ngoai/group/:shcc'),
                 params = route.parse(window.location.pathname);
             this.shcc = params.shcc;
-            this.setState({ filter: { listShcc: params.shcc, listDv: '', loaiHocVi: null } });
-            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
-
+            this.thongKeMucDich('', { listShcc: params.shcc, listDv: '', loaiHocVi: null }, (items) => {
+                this.setState({ filter: { listShcc: params.shcc, listDv: '', loaiHocVi: null }, listMucDich: this.setUp(items, 'tenMucDich')}, () => {
+                    this.changeAdvancedSearch(true);
+                });
+            });
+            T.onSearch = (searchText) => {
+                this.thongKeMucDich(searchText, this.state.filter, (items) => {
+                    this.setState({ listMucDich: this.setUp(items, 'tenMucDich') }, () => {
+                        this.getPage(undefined, undefined, searchText || '');
+                    });
+                });
+            };
             T.showSearchBox(() => {
                 let filterCookie = T.getCookiePage('groupPageMaQtDiNuocNgoai', 'F'), {
                     timeType = '', fromYear = '', toYear = '', tinhTrang = '', mucDich = '',
@@ -215,8 +224,23 @@ class QtDiNuocNgoaiGroupPage extends AdminPage {
                 this.mucDich.value(mucDich);
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
-            this.getPage();
         });
+    }
+
+    setUp = (data = [], keyGroup) => {
+        let dataGroupBy = data.groupBy(keyGroup);
+        let filterData = [];
+        Object.keys(dataGroupBy).filter(item => dataGroupBy[item].length > 0).map(item => {
+            filterData.push({ id: item, len: dataGroupBy[item].length });
+        });
+        filterData.sort(function(a, b) { //sắp xếp theo số lượng giảm dần
+            return -(a.len - b.len);
+        });
+        let result = [];
+        filterData.forEach(item => {
+            result.push(<div key={item.id}><b><span>{' - ' + item.id + ': ' + item.len}</span></b></div>);
+        });
+        return result;
     }
 
     changeAdvancedSearch = (isInitial = false, isReset = false) => {
@@ -244,28 +268,34 @@ class QtDiNuocNgoaiGroupPage extends AdminPage {
         const tinhTrang = this.tinhTrang.value() == '' ? null : this.tinhTrang.value();
         const mucDich = this.mucDich.value().toString() || '';
         const pageFilter = (isInitial || isReset) ? { listShcc, listDv, loaiHocVi } : { listDv, fromYear, toYear, listShcc, tinhTrang, timeType, loaiHocVi, mucDich };
-        this.setState({ filter: pageFilter }, () => {
-            this.getPage(pageNumber, pageSize, pageCondition, (page) => {
-                if (isInitial) {
-                    const filter = page.filter || { listShcc, listDv, loaiHocVi };
-                    const filterCookie = T.getCookiePage('groupPageMaQtDiNuocNgoai', 'F');
-                    this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
+        this.thongKeMucDich(pageCondition, pageFilter, (items) => {
+            this.setState({ filter: pageFilter, listMucDich: this.setUp(items, 'tenMucDich') }, () => {
+                this.getPage(pageNumber, pageSize, pageCondition, (page) => {
+                    if (isInitial) {
+                        const filter = page.filter || { listShcc, listDv, loaiHocVi };
+                        const filterCookie = T.getCookiePage('groupPageMaQtDiNuocNgoai', 'F');
+                        this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
 
-                    this.fromYear?.value(filter.fromYear || filterCookie.fromYear || '');
-                    this.toYear?.value(filter.toYear || filterCookie.toYear || '');
-                    this.timeType.value(filter.timeType || filterCookie.timeType || '');
-                    this.tinhTrang.value(filter.tinhTrang || filterCookie.tinhTrang || '');
-                    this.mucDich.value(filter.mucDich || filterCookie.mucDich || '');
-                    if (this.fromYear?.value() || this.toYear?.value() || this.timeType.value() || this.tinhTrang.value() || this.mucDich.value()) this.showAdvanceSearch();
-                } else if (isReset) {
-                    this.fromYear?.value('');
-                    this.toYear?.value('');
-                    this.timeType.value('');
-                    this.tinhTrang.value('');
-                    this.mucDich.value('');
-                }
+                        this.fromYear?.value(filter.fromYear || filterCookie.fromYear || '');
+                        this.toYear?.value(filter.toYear || filterCookie.toYear || '');
+                        this.timeType.value(filter.timeType || filterCookie.timeType || '');
+                        this.tinhTrang.value(filter.tinhTrang || filterCookie.tinhTrang || '');
+                        this.mucDich.value(filter.mucDich || filterCookie.mucDich || '');
+                        if (this.fromYear?.value() || this.toYear?.value() || this.timeType.value() || this.tinhTrang.value() || this.mucDich.value()) this.showAdvanceSearch();
+                    } else if (isReset) {
+                        this.fromYear?.value('');
+                        this.toYear?.value('');
+                        this.timeType.value('');
+                        this.tinhTrang.value('');
+                        this.mucDich.value('');
+                    }
+                });
             });
         });
+    }
+
+    thongKeMucDich = (pageC, filter, done) => {
+        this.props.getThongKeMucDich(pageC, filter, done);
     }
 
     getPage = (pageN, pageS, pageC, done) => {
@@ -395,7 +425,8 @@ class QtDiNuocNgoaiGroupPage extends AdminPage {
                     <h3 className='tile-title'>
                         Thống kê
                     </h3>
-                    <b>{'Số lượng: ' + totalItem.toString()}</b>
+                    <div>{this.state.listMucDich}</div>
+                    <big><b>{'Tổng cộng: ' + totalItem.toString()}</b></big>
                 </div>
                 <div className='tile'>
                     {table}
@@ -411,9 +442,13 @@ class QtDiNuocNgoaiGroupPage extends AdminPage {
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
             onExport: (e) => {
                 e.preventDefault();
+                let { pageCondition } = this.props && this.props.qtDiNuocNgoai && this.props.qtDiNuocNgoai.pageMa ? this.props.qtDiNuocNgoai.pageMa : { pageCondition: {} };
+                pageCondition = typeof pageCondition === 'string' ? pageCondition : '';
+                if (pageCondition.length == 0) pageCondition = null;
+                
                 const filter = T.stringify(this.state.filter);
 
-                T.download(T.url(`/api/qua-trinh/di-nuoc-ngoai/download-excel/${filter}`), 'dinuocngoai.xlsx');
+                T.download(T.url(`/api/qua-trinh/di-nuoc-ngoai/download-excel/${filter}/${pageCondition}`), 'dinuocngoai.xlsx');
             }
         });
     }
@@ -422,6 +457,6 @@ class QtDiNuocNgoaiGroupPage extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtDiNuocNgoai: state.tccb.qtDiNuocNgoai });
 const mapActionsToProps = {
     getQtDiNuocNgoaiGroupPageMa, deleteQtDiNuocNgoaiGroupPageMa,
-    updateQtDiNuocNgoaiGroupPageMa, createQtDiNuocNgoaiGroupPageMa,
+    updateQtDiNuocNgoaiGroupPageMa, createQtDiNuocNgoaiGroupPageMa, getThongKeMucDich
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtDiNuocNgoaiGroupPage);

@@ -8,7 +8,7 @@ import { DateInput } from 'view/component/Input';
 import { SelectAdapter_FwCanBo } from '../tccbCanBo/redux';
 import {
     getQtDiNuocNgoaiPage, deleteQtDiNuocNgoai, createQtDiNuocNgoai,
-    updateQtDiNuocNgoai, getQtDiNuocNgoaiGroupPage
+    updateQtDiNuocNgoai, getQtDiNuocNgoaiGroupPage, getThongKeMucDich
 }
     from './redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
@@ -215,12 +215,18 @@ class EditModal extends AdminModal {
 
 class QtDiNuocNgoai extends AdminPage {
     checked = parseInt(T.cookie('hienThiTheoCanBo')) == 1 ? true : false;
-    state = { filter: {}, visibleTime: false};
+    state = { filter: {}, visibleTime: false, listMucDich: [] };
 
     componentDidMount() {
         T.ready('/user/tccb', () => {
             T.clearSearchBox();
-            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
+            T.onSearch = (searchText) => {
+                this.thongKeMucDich(searchText, this.state.filter, (items) => {
+                    this.setState({ listMucDich: this.setUp(items, 'tenMucDich') }, () => {
+                        this.getPage(undefined, undefined, searchText || '');
+                    });
+                });
+            };
             T.showSearchBox(() => {
                 // const pageFilter = isInitial ? null : { listDv, fromYear, toYear, listShcc, tinhTrang, timeType, loaiHocVi, mucDich };
                 let filterCookie = T.getCookiePage('pageQtDiNuocNgoai', 'F'), {
@@ -239,7 +245,6 @@ class QtDiNuocNgoai extends AdminPage {
             if (this.checked) {
                 this.hienThiTheoCanBo.value(true);
             }
-            this.getPage();
             this.changeAdvancedSearch(true);
         });
     }
@@ -247,6 +252,22 @@ class QtDiNuocNgoai extends AdminPage {
     showModal = (e) => {
         e.preventDefault();
         this.modal.show();
+    }
+
+    setUp = (data = [], keyGroup) => {
+        let dataGroupBy = data.groupBy(keyGroup);
+        let filterData = [];
+        Object.keys(dataGroupBy).filter(item => dataGroupBy[item].length > 0).map(item => {
+            filterData.push({ id: item, len: dataGroupBy[item].length });
+        });
+        filterData.sort(function(a, b) { //sắp xếp theo số lượng giảm dần
+            return -(a.len - b.len);
+        });
+        let result = [];
+        filterData.forEach(item => {
+            result.push(<div key={item.id}><b><span>{' - ' + item.id + ': ' + item.len}</span></b></div>);
+        });
+        return result;
     }
 
     changeAdvancedSearch = (isInitial = false, isReset = false) => {
@@ -273,34 +294,40 @@ class QtDiNuocNgoai extends AdminPage {
         const loaiHocVi = this.loaiHocVi.value().toString() || '';
         const mucDich = this.mucDich.value().toString() || '';
         const pageFilter = (isInitial || isReset) ? {} : { listDv, fromYear, toYear, listShcc, tinhTrang, timeType, loaiHocVi, mucDich };
-        this.setState({ filter: pageFilter }, () => {
-            this.getPage(pageNumber, pageSize, pageCondition, (page) => {
-                if (isInitial) {
-                    const filter = page.filter || {};
-                    const filterCookie = T.getCookiePage('pageQtDiNuocNgoai', 'F');
-                    this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
+        this.thongKeMucDich(pageCondition, pageFilter, (items) => {
+            this.setState({ filter: pageFilter, listMucDich: this.setUp(items, 'tenMucDich') }, () => {
+                this.getPage(pageNumber, pageSize, pageCondition, (page) => {
+                    if (isInitial) {
+                        const filter = page.filter || {};
+                        const filterCookie = T.getCookiePage('pageQtDiNuocNgoai', 'F');
+                        this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
 
-                    this.fromYear?.value(filter.fromYear || filterCookie.fromYear || '');
-                    this.toYear?.value(filter.toYear || filterCookie.toYear || '');
-                    this.maDonVi.value(filter.listDv || filterCookie.listDv || '');
-                    this.mulCanBo.value(filter.listShcc || filterCookie.listShcc || '');
-                    this.timeType.value(filter.timeType || filterCookie.timeType || '');
-                    this.tinhTrang.value(filter.tinhTrang || filterCookie.tinhTrang || '');
-                    this.loaiHocVi.value(filter.loaiHocVi || filterCookie.loaiHocVi || '');
-                    this.mucDich.value(filter.mucDich || filterCookie.mucDich || '');
-                    if (this.fromYear?.value() || this.toYear?.value() || this.mulCanBo.value() || this.maDonVi.value() || this.timeType.value() || this.tinhTrang.value() || this.loaiHocVi.value() || this.mucDich.value()) this.showAdvanceSearch();
-                } else if (isReset) {
-                    this.fromYear?.value('');
-                    this.toYear?.value('');
-                    this.maDonVi.value('');
-                    this.mulCanBo.value('');
-                    this.timeType.value('');
-                    this.tinhTrang.value('');
-                    this.loaiHocVi.value('');
-                    this.mucDich.value('');
-                }
+                        this.fromYear?.value(filter.fromYear || filterCookie.fromYear || '');
+                        this.toYear?.value(filter.toYear || filterCookie.toYear || '');
+                        this.maDonVi.value(filter.listDv || filterCookie.listDv || '');
+                        this.mulCanBo.value(filter.listShcc || filterCookie.listShcc || '');
+                        this.timeType.value(filter.timeType || filterCookie.timeType || '');
+                        this.tinhTrang.value(filter.tinhTrang || filterCookie.tinhTrang || '');
+                        this.loaiHocVi.value(filter.loaiHocVi || filterCookie.loaiHocVi || '');
+                        this.mucDich.value(filter.mucDich || filterCookie.mucDich || '');
+                        if (this.fromYear?.value() || this.toYear?.value() || this.mulCanBo.value() || this.maDonVi.value() || this.timeType.value() || this.tinhTrang.value() || this.loaiHocVi.value() || this.mucDich.value()) this.showAdvanceSearch();
+                    } else if (isReset) {
+                        this.fromYear?.value('');
+                        this.toYear?.value('');
+                        this.maDonVi.value('');
+                        this.mulCanBo.value('');
+                        this.timeType.value('');
+                        this.tinhTrang.value('');
+                        this.loaiHocVi.value('');
+                        this.mucDich.value('');
+                    }
+                });
             });
         });
+    }
+
+    thongKeMucDich = (pageC, filter, done) => {
+        this.props.getThongKeMucDich(pageC, filter, done);
     }
 
     getPage = (pageN, pageS, pageC, done) => {
@@ -478,7 +505,8 @@ class QtDiNuocNgoai extends AdminPage {
                     <h3 className='tile-title'>
                         Thống kê
                     </h3>
-                    <b>{'Số lượng: ' + totalItem.toString()}</b>
+                    <div>{this.state.listMucDich}</div>
+                    <big><b>{'Tổng cộng: ' + totalItem.toString()}</b></big>
                 </div>}
                 <div className='tile'>
                     <FormCheckbox label='Hiển thị theo cán bộ' ref={e => this.hienThiTheoCanBo = e} onChange={this.groupPage} />
@@ -494,9 +522,12 @@ class QtDiNuocNgoai extends AdminPage {
             onCreate: permission && permission.write && !this.checked ? (e) => this.showModal(e) : null,
             onExport: !this.checked ? (e) => {
                 e.preventDefault();
-                const filter = T.stringify(this.state.filter);
+                let { pageCondition } = this.props && this.props.qtDiNuocNgoai && this.props.qtDiNuocNgoai.page ? this.props.qtDiNuocNgoai.page : { pageCondition: {} };
+                pageCondition = typeof pageCondition === 'string' ? pageCondition : '';
+                if (pageCondition.length == 0) pageCondition = null;
 
-                this.state.filter && this.state.filter.timeType == 4 ? T.download(T.url(`/api/qua-trinh/tiep-nhan-ve-nuoc/download-excel/${filter}`), 'DANH SACH VE NUOC.xlsx') : T.download(T.url(`/api/qua-trinh/di-nuoc-ngoai/download-excel/${filter}`), 'dinuocngoai.xlsx');
+                const filter = T.stringify(this.state.filter);
+                this.state.filter && this.state.filter.timeType == 4 ? T.download(T.url(`/api/qua-trinh/tiep-nhan-ve-nuoc/download-excel/${filter}/${pageCondition}`), 'DANH SACH VE NUOC.xlsx') : T.download(T.url(`/api/qua-trinh/di-nuoc-ngoai/download-excel/${filter}/${pageCondition}`), 'dinuocngoai.xlsx');
             } : null
         });
     }
@@ -505,6 +536,6 @@ class QtDiNuocNgoai extends AdminPage {
 const mapStateToProps = state => ({ system: state.system, qtDiNuocNgoai: state.tccb.qtDiNuocNgoai });
 const mapActionsToProps = {
     getQtDiNuocNgoaiPage, deleteQtDiNuocNgoai, createQtDiNuocNgoai,
-    updateQtDiNuocNgoai, getQtDiNuocNgoaiGroupPage,
+    updateQtDiNuocNgoai, getQtDiNuocNgoaiGroupPage, getThongKeMucDich
 };
 export default connect(mapStateToProps, mapActionsToProps)(QtDiNuocNgoai);
