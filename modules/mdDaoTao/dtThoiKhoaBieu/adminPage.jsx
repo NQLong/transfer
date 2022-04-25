@@ -15,13 +15,23 @@ const dataThu = [2, 3, 4, 5, 6, 7], dataTiet = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 class AdjustModal extends AdminModal {
 
     onShow = (item) => {
-        let { id, giangVien } = item;
-        this.setState({ id });
+        let { id, giangVien, maMonHoc, tenMonHoc, nhom, tenKhoaBoMon, phong, thu, tietBatDau, soTiet } = item;
+        this.setState({ id, soTiet });
         this.giangVien.value(giangVien);
+        this.monHoc.value(maMonHoc + ': ' + T.parse(tenMonHoc, { vi: '' }).vi);
+        this.nhom.value(nhom);
+        this.khoa.value(tenKhoaBoMon);
+        this.phong.value(phong);
+        this.thu.value(thu);
+        this.tietBatDau.value(tietBatDau);
     }
     onSubmit = (e) => {
         e.preventDefault();
         let data = {
+            phong: this.phong.value(),
+            thu: this.thu.value(),
+            tietBatDau: this.tietBatDau.value(),
+            soTiet: this.state.soTiet,
             giangVien: this.giangVien.value()
         };
         if (!data.giangVien) {
@@ -35,11 +45,18 @@ class AdjustModal extends AdminModal {
         }
     }
     render = () => {
+        let readOnly = this.props.readOnly;
         return this.renderModal({
             title: 'Điều chỉnh',
             size: 'large',
             body: <div className='row'>
-                <FormSelect ref={e => this.giangVien = e} className='form-group col-md-12' data={SelectAdapter_FwCanBoGiangVien} label='Chọn giảng viên' />
+                <FormTextBox ref={e => this.monHoc = e} className='form-group col-md-12' readOnly label='Môn' />
+                <FormTextBox ref={e => this.nhom = e} className='form-group col-md-4' readOnly label='Nhóm' />
+                <FormTextBox ref={e => this.khoa = e} className='form-group col-md-8' readOnly label='Khoa, bộ môn' />
+                <FormSelect ref={e => this.phong = e} className='col-md-4' label='Phòng' data={SelectAdapter_DmPhong} readOnly={readOnly} />
+                <FormSelect ref={e => this.thu = e} className='form-group col-md-4' label='Thứ' data={dataThu} readOnly={readOnly} />
+                <FormSelect ref={e => this.tietBatDau = e} className='form-group col-md-4' label='Tiết bắt đầu' data={dataTiet} readOnly={readOnly} />
+                <FormSelect ref={e => this.giangVien = e} className='form-group col-md-12' data={SelectAdapter_FwCanBoGiangVien} label='Chọn giảng viên' readOnly={readOnly} />
             </div>
         });
     }
@@ -52,14 +69,14 @@ class DtThoiKhoaBieuPage extends AdminPage {
     state = { page: null, isEdit: {} }
     componentDidMount() {
         T.ready('/user/dao-tao', () => {
-            T.onSearch = (searchText) => this.props.getDtThoiKhoaBieuPage(undefined, undefined, searchText || '');
+            T.onSearch = (searchText) => this.initData(searchText || '');
             T.showSearchBox();
         });
         this.initData();
     }
 
-    initData = () => {
-        this.props.getDtThoiKhoaBieuPage(undefined, undefined, '', page => {
+    initData = (searchText) => {
+        this.props.getDtThoiKhoaBieuPage(undefined, undefined, searchText, page => {
             this.setState({ page }, () => {
                 let { pageNumber, pageSize, list } = page;
                 list.forEach((item, index) => {
@@ -85,12 +102,15 @@ class DtThoiKhoaBieuPage extends AdminPage {
 
     updateSoTiet = (index, item) => {
         if (!this.soTiet[index].value() || !this.thu[index].value() || !this.tietBatDau[index].value() || !this.phong[index].value()) T.notify('Vui lòng nhập giá trị', 'danger');
-        else this.props.updateDtThoiKhoaBieu(item.id, {
-            soTiet: this.soTiet[index].value(),
-            phong: this.phong[index].value(),
-            tietBatDau: this.tietBatDau[index].value(),
-            thu: this.thu[index].value()
-        }, this.initData());
+        else {
+            this.props.updateDtThoiKhoaBieu(item.id, {
+                soTiet: this.soTiet[index].value(),
+                phong: this.phong[index].value(),
+                tietBatDau: this.tietBatDau[index].value(),
+                thu: this.thu[index].value()
+            });
+            location.reload();
+        }
     };
 
     render() {
@@ -194,9 +214,9 @@ class DtThoiKhoaBieuPage extends AdminPage {
                                     <i className='fa fa-lg fa-check' />
                                 </button>
                             </Tooltip>}</>}
-                        {item.phong && <Tooltip title='Chọn giảng viên' arrow>
-                            <button className='btn btn-success' onClick={e => e.preventDefault() || this.modal.show(item)}>
-                                <i className='fa fa-lg fa-user-plus' />
+                        {item.phong && <Tooltip title='Điều chỉnh' arrow>
+                            <button className='btn btn-primary' onClick={e => e.preventDefault() || this.modal.show(item)}>
+                                <i className='fa fa-lg fa-wrench' />
                             </button>
                         </Tooltip>}
                     </TableCell>
@@ -225,7 +245,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                         });
                     }}
                 />
-                <AdjustModal ref={e => this.modal = e}
+                <AdjustModal ref={e => this.modal = e} readOnly={!permission.write}
                     update={this.props.updateDtThoiKhoaBieu}
                     initData={this.initData}
                 />

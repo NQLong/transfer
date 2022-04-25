@@ -106,7 +106,20 @@ module.exports = app => {
     });
 
     app.get('/api/staff/item/:shcc', checkGetStaffPermission, (req, res) => {
-        app.model.canBo.get({ shcc: req.params.shcc }, (error, item) => res.send({ error, item }));
+        app.model.canBo.get({ shcc: req.params.shcc }, (error, item) => {
+            if (error) {
+                res.send({ error });
+                return;
+            } else {
+                app.model.dmTrinhDo.get({ ma: item.hocVi }, (error, hocVi) => {
+                    item = { ...item, trinhDo: hocVi ? hocVi.vietTat : '' };
+                    app.model.dmDonVi.get({ ma: item.maDonVi }, (error, donVi) => {
+                        item = { ...item, tenDonVi: donVi ? donVi.ten : '' };
+                        res.send({ item });
+                    });
+                });
+            }
+        });
     });
 
     app.get('/api/staff/get-giang-vien', app.permission.check('staff:login'), (req, res) => {

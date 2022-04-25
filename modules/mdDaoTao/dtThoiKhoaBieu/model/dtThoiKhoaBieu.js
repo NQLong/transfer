@@ -29,14 +29,14 @@ module.exports = app => {
     };
 
     const generateSchedule = (listSubjectsOfSem, listDays, listLessons, listRooms) => new Promise(resolve => {
-        listSubjectsOfSem = listSubjectsOfSem.filter(subject => !subject.phong);
-        if (!listSubjectsOfSem.length) resolve({ error: 'Các môn học đều đã có thời khóa biểu!' });
+        let listSubjectsOfSem_noRoom = listSubjectsOfSem.filter(subject => !subject.phong);
+        if (!listSubjectsOfSem_noRoom.length) resolve({ error: 'Các môn học đều đã có thời khóa biểu!' });
         const setRoomForSubject = (index = 0) => {
-            if (index >= listSubjectsOfSem.length) {
+            if (index >= listSubjectsOfSem_noRoom.length) {
                 resolve({ success: 'Tạo thời khóa biểu thành công!' });
                 return;
             } //This 'return' belongs to recursive FUNCTION 'setRoomForSubject'
-            let subject = listSubjectsOfSem[index];
+            let subject = listSubjectsOfSem_noRoom[index];
             for (let room of listRooms)
                 for (let day of listDays)
                     for (let lesson of listLessons) {
@@ -44,13 +44,13 @@ module.exports = app => {
                         if (isValid == undefined) {
                             return;
                         } else {
-                            if (isValid && isAvailabledRoom(room.ten, listSubjectsOfSem, {
+                            if (isValid && app.model.dtThoiKhoaBieu.isAvailabledRoom(room.ten, listSubjectsOfSem, {
                                 tietBatDau: parseInt(lesson.ten), soTiet: parseInt(subject.soTiet), day
                             })) {
                                 app.model.dtThoiKhoaBieu.update({ id: subject.id }, {
                                     tietBatDau: parseInt(lesson.ten), thu: day, phong: room.ten
                                 }, () => {
-                                    listSubjectsOfSem = listSubjectsOfSem.map(updatedSubject => {
+                                    listSubjectsOfSem_noRoom = listSubjectsOfSem_noRoom.map(updatedSubject => {
                                         if (updatedSubject.id != subject.id) return updatedSubject;
                                         else {
                                             updatedSubject.tietBatDau = parseInt(lesson.ten);
@@ -70,7 +70,7 @@ module.exports = app => {
     });
 
 
-    const isAvailabledRoom = (room, listSubjectsOfSem, condition) => {
+    app.model.dtThoiKhoaBieu.isAvailabledRoom = (room, listSubjectsOfSem, condition) => {
         let { tietBatDau, soTiet, day } = condition, tietKetThuc = tietBatDau + soTiet - 1;
 
         let listPresentStatus = listSubjectsOfSem.filter(subject => subject.phong == room && subject.thu == day).map(subject => subject = { tietBatDau: subject.tietBatDau, tietKetThuc: subject.tietBatDau + subject.soTiet - 1 });

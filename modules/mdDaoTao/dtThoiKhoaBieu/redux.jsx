@@ -112,11 +112,11 @@ export function updateDtThoiKhoaBieu(id, changes, done) {
         const url = '/api/dao-tao/thoi-khoa-bieu';
         T.put(url, { id, changes }, data => {
             if (data.error) {
-                T.notify('Cập nhật thời khoá biểu bị lỗi!', 'danger');
+                T.alert(`Lỗi: ${data.error.message}`, 'error', false, 2000);
                 console.error(`PUT ${url}. ${data.error}`);
                 done && done(data.error);
             } else {
-                T.notify('Cập nhật thông tin thời khoá biểu thành công!', 'success');
+                T.alert('Điều chỉnh thành công!', 'success', false, 1000);
                 done && done();
                 // dispatch({ type: DtThoiKhoaBieuUpdate, item: data.item });
             }
