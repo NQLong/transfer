@@ -1,6 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 module.exports = app => {
     // app.model.dtThoiKhoaBieu.foo = () => { };
+
     app.model.dtThoiKhoaBieu.init = async (done) => {
         const listDays = [2, 3, 4, 5, 6, 7];
         const thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
@@ -13,11 +14,12 @@ module.exports = app => {
                     if (error) {
                         return error;
                     } else {
-                        app.model.dmPhong.getAll({ kichHoat: 1 }, (error, listRooms) => {
+                        app.model.dmPhong.getAll({ kichHoat: 1 }, async (error, listRooms) => {
                             if (error) {
                                 return error;
                             } else {
-                                generateSchedule(listSubjectsOfSem, listDays, listLessons, listRooms, done);
+                                let status = await generateSchedule(listSubjectsOfSem, listDays, listLessons, listRooms);
+                                done(status);
                             }
                         });
                     }
@@ -26,10 +28,12 @@ module.exports = app => {
         });
     };
 
-    const generateSchedule = (listSubjectsOfSem, listDays, listLessons, listRooms, done) => {
+    const generateSchedule = (listSubjectsOfSem, listDays, listLessons, listRooms) => new Promise(resolve => {
+        listSubjectsOfSem = listSubjectsOfSem.filter(subject => !subject.phong);
+        if (!listSubjectsOfSem.length) resolve({ error: 'Các môn học đều đã có thời khóa biểu!' });
         const setRoomForSubject = (index = 0) => {
             if (index >= listSubjectsOfSem.length) {
-                done && done();
+                resolve({ success: 'Tạo thời khóa biểu thành công!' });
                 return;
             } //This 'return' belongs to recursive FUNCTION 'setRoomForSubject'
             let subject = listSubjectsOfSem[index];
@@ -57,13 +61,13 @@ module.exports = app => {
                                     });
                                     setRoomForSubject(index + 1);
                                 });
-                                return; //This 'return' belongs to listRooms iFOR LOOP
+                                return; //This 'return' belongs to listRooms FOR LOOP
                             }
                         }
                     }
         };
         setRoomForSubject();
-    };
+    });
 
 
     const isAvailabledRoom = (room, listSubjectsOfSem, condition) => {

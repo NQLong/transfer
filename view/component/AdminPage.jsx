@@ -11,7 +11,7 @@ import Tooltip from '@mui/material/Tooltip';
 // Table components ---------------------------------------------------------------------------------------------------
 export class TableCell extends React.Component { // type = number | date | link | image | checkbox | buttons | text (default)
     render() {
-        let { type = 'text', content = '', permission = {}, className = '', style = {}, contentStyle = {}, alt = '', display = true, rowSpan = 1, colSpan = 1, dateFormat, contentClassName = '' } = this.props;
+        let { type = 'text', content = '', permission = {}, className = '', style = {}, contentStyle = {}, alt = '', display = true, rowSpan = 1, colSpan = 1, dateFormat, contentClassName = '', onClick = null } = this.props;
         if (style == null) style = {};
 
         if (display != true) {
@@ -72,7 +72,7 @@ export class TableCell extends React.Component { // type = number | date | link 
                     </div>
                 </td>);
         } else {
-            return <td className={className} style={{ ...style }} rowSpan={rowSpan} colSpan={colSpan}><div style={contentStyle} className={contentClassName}>{content}</div></td>;
+            return <td className={className} style={{ ...style }} rowSpan={rowSpan} colSpan={colSpan} onClick={onClick}><div style={contentStyle} className={contentClassName}>{content}</div></td>;
         }
     }
 }

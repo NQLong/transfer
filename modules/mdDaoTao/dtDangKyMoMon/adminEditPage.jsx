@@ -90,6 +90,7 @@ class DtDsMonMoEditPage extends AdminPage {
         isLoading: false,
         isDuyet: item.dotDangKy.isDuyet,
         hocKy: item.thoiGianMoMon.hocKy,
+        khoaDangKy: item.dotDangKy.khoa,
         nam: item.thoiGianMoMon.nam,
         expired: today >= item.thoiGianMoMon.ketThuc || today <= item.thoiGianMoMon.batDau,
         title: `HK${item.thoiGianMoMon.hocKy} - ${item.thoiGianMoMon.nam}`,
@@ -156,6 +157,7 @@ class DtDsMonMoEditPage extends AdminPage {
         let data = [];
         [0, 1, 2, 3].forEach((index) => data = [...data, this.create(this.state.data[index], index)].flat().map(item => {
             delete item.id;
+            item.khoaDangKy = this.state.khoaDangKy;
             return item;
         }));
         this.props.saveDangKyMoMon(this.id, { isDuyet: 1 }, () => {

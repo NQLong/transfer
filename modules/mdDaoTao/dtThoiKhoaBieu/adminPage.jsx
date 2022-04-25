@@ -26,7 +26,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
             this.setState({ page }, () => {
                 let { pageNumber, pageSize, list } = page;
                 list.forEach((item, index) => {
-                    !item.phong && this.soTiet[(pageNumber - 1) * pageSize + index + 1].value(item.soTiet);
+                    this.soTiet[(pageNumber - 1) * pageSize + index + 1].value(item.soTiet);
                 });
             });
         });
@@ -35,7 +35,13 @@ class DtThoiKhoaBieuPage extends AdminPage {
 
 
     taoThoiKhoaBieu = () => {
-        T.confirmLoading('Tạo thời khóa biểu', 'Xác nhận tạo thời khóa biểu tự động?', 'Tạo thời gian thời khóa biểu thành công', 'info', 'Tạo', () => this.props.initSchedule(() => this.initData()));
+        T.confirmLoading('Tạo thời khóa biểu', 'Xác nhận tạo thời khóa biểu tự động?', 'Tạo thời khóa biểu thành công', 'Tạo thời khóa biểu thất bại', 'info', 'Tạo', () =>
+            new Promise(resolve => {
+                this.props.initSchedule((result) => {
+                    result.success && setTimeout(() => location.reload(), 2000);
+                    resolve(result);
+                });
+            }));
     }
     updateSoTiet = (index, item) => {
         if (!this.soTiet[index].value()) T.notify('Vui lòng nhập giá trị', 'danger');
@@ -66,7 +72,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                         <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Nhóm</th>
                         <th colSpan='4' rowSpan='1' style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thời gian
                         </th>
-                        <th rowSpan='2' style={{ width: '50%', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Khoa/Bộ môn</th>
+                        <th rowSpan='2' style={{ width: '50%', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Khoa/Bộ môn đăng ký</th>
                         <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Thao tác</th>
                     </tr>
                     <tr>
@@ -81,15 +87,23 @@ class DtThoiKhoaBieuPage extends AdminPage {
                     <TableCell style={{ width: 'auto', textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                     <TableCell style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} content={item.nam + ' - HK' + item.hocKy} />
                     <TableCell style={{ width: 'auto', textAlign: 'center' }} content={item.maMonHoc} />
-                    <TableCell style={{}} contentClassName='multiple-lines-4' content={T.parse(item.tenMonHoc, { vi: '' }).vi} />
+                    <TableCell style={{}} contentClassName='multiple-lines-4' content={<>
+                        <span style={{ color: 'blue' }}>{T.parse(item.tenMonHoc, { vi: '' }).vi}</span> <br />
+                        <i> {item.tenKhoaBoMon}</i>
+                    </>} />
                     <TableCell style={{ width: 'auto', textAlign: 'center' }} content={item.phong} />
                     <TableCell style={{ width: 'auto', textAlign: 'center' }} content={item.nhom} />
                     <TableCell style={{ width: 'auto', textAlign: 'center' }} content={item.thu} />
                     <TableCell type='number' style={{ textAlign: 'center' }} content={item.tietBatDau} />
                     <TableCell type='number' style={{ textAlign: 'center' }} content={item.phong ? Number(item.tietBatDau) + Number(item.soTiet) - 1 : ''} />
-                    <TableCell style={{ textAlign: 'center' }} content={item.phong ? item.soTiet :
-                        <FormTextBox type='number' ref={e => this.soTiet[(pageNumber - 1) * pageSize + index + 1] = e} style={{ width: '50px', marginBottom: '0' }} readOnly={!this.state.isEdit[(pageNumber - 1) * pageSize + index + 1]} />} />
-                    <TableCell style={{}} content={item.tenKhoaBoMon} />
+                    <TableCell style={{ textAlign: 'center' }} content={
+                        <FormTextBox type='number' ref={e => this.soTiet[(pageNumber - 1) * pageSize + index + 1] = e} style={{ width: '50px', marginBottom: '0' }} readOnly={!this.state.isEdit[(pageNumber - 1) * pageSize + index + 1]} />} onClick={e => {
+                            e.preventDefault();
+                            if (e.type == 'click') this.setState({
+                                isEdit: { ...this.state.isEdit, [(pageNumber - 1) * pageSize + index + 1]: !this.state.isEdit[(pageNumber - 1) * pageSize + index + 1] }
+                            });
+                        }} />
+                    <TableCell style={{}} content={item.tenKhoaDangKy} />
                     <TableCell type='buttons' content={item} permission={permission}
                     >
                         {!item.phong && <>
@@ -126,7 +140,7 @@ class DtThoiKhoaBieuPage extends AdminPage {
                         this.setState({ page }, () => {
                             let { pageNumber, pageSize, list } = page;
                             list.forEach((item, index) => {
-                                !item.phong && this.soTiet[(pageNumber - 1) * pageSize + index + 1].value(item.soTiet);
+                                this.soTiet[(pageNumber - 1) * pageSize + index + 1].value(item.soTiet);
                             });
                         });
                     }} />

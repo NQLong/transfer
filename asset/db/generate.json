@@ -7522,6 +7522,34 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": "20,0"
+                },
+                "BAO_CAO_TEN": {
+                    "value": "baoCaoTen",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 50
+                },
+                "BAO_CAO_NGAY_NOP": {
+                    "value": "baoCaoNgayNop",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "20,0"
+                },
+                "BAO_CAO_TINH_TRANG": {
+                    "value": "baoCaoTinhTrang",
+                    "dataType": "NUMBER",
+                    "dataDefault": "0",
+                    "nullable": true,
+                    "size": "1,0"
+                },
+                "BAO_CAO_LY_DO_TRA_VE": {
+                    "value": "baoCaoLyDoTraVe",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 1000
                 }
             },
             "primaryKeys": [
@@ -8521,7 +8549,7 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 24
+                    "size": 255
                 },
                 "LOAI": {
                     "value": "loai",
@@ -8572,13 +8600,6 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": false,
-                    "size": 100
-                },
-                "CAN_BO_NHAN": {
-                    "value": "canBoNhan",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
                     "size": 100
                 },
                 "DON_VI_NHAN": {
@@ -11858,10 +11879,10 @@
                 },
                 "PHONG": {
                     "value": "phong",
-                    "dataType": "NUMBER",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "5,0"
+                    "size": 20
                 },
                 "NGAY_BAT_DAU": {
                     "value": "ngayBatDau",
@@ -11900,6 +11921,13 @@
                 },
                 "KHOA": {
                     "value": "khoa",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "22,0"
+                },
+                "KHOA_DANG_KY": {
+                    "value": "khoaDangKy",
                     "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
@@ -13042,6 +13070,46 @@
                     "dataDefault": "1",
                     "nullable": true,
                     "size": "1,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
+        "DT_CAU_TRUC_KHUNG_DAO_TAO": {
+            "active": true,
+            "moduleName": "dtCauTrucKhungDaoTao",
+            "modelName": "dtCauTrucKhungDaoTao",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_112766\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "MUC_CON": {
+                    "value": "mucCon",
+                    "dataType": "CLOB",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 4000
+                },
+                "NAM_DAO_TAO": {
+                    "value": "namDaoTao",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 20
+                },
+                "MUC_CHA": {
+                    "value": "mucCha",
+                    "dataType": "CLOB",
+                    "dataDefault": "",
+                    "nullable": false,
+                    "size": 4000
                 }
             },
             "primaryKeys": [

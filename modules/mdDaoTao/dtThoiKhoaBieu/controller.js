@@ -55,7 +55,9 @@ module.exports = app => {
                 app.model.dtThoiKhoaBieu.get({ maMonHoc: m.maMonHoc, nhom: i, hocKy: m.hocKy, soTiet: m.soTiet }, (error, tkb) => {
                     if (!error && !tkb) {
                         m.nhom = i;
-                        app.model.dtThoiKhoaBieu.create({ ...m, nam: thoiGianMoMon.nam, hocKy: thoiGianMoMon.hocKy, soTiet: m.soTietBuoi }, () => { });
+                        for (let i = 1; i <= m.soBuoiTuan; i++) {
+                            app.model.dtThoiKhoaBieu.create({ ...m, nam: thoiGianMoMon.nam, hocKy: thoiGianMoMon.hocKy, soTiet: m.soTietBuoi }, () => { });
+                        }
                     }
                     save(i + 1, m);
                 });
@@ -78,6 +80,6 @@ module.exports = app => {
     });
 
     app.get('/api/dao-tao/init-schedule', app.permission.check('dtThoiKhoaBieu:write'), (req, res) => {
-        app.model.dtThoiKhoaBieu.init(() => res.send('Done'));
+        app.model.dtThoiKhoaBieu.init((status) => res.send(status));
     });
 };

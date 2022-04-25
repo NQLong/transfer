@@ -125,14 +125,11 @@ export function updateDtThoiKhoaBieu(id, changes, done) {
 }
 
 export function initSchedule(done) {
-    return () => new Promise(resolve => {
+    return () => {
         T.get('/api/dao-tao/init-schedule', data => {
-            if (data) {
-                done && done();
-                resolve();
-            }
+            done && done(data);
         });
-    });
+    };
 }
 
 export function changeDtThoiKhoaBieu(item) {
