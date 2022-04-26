@@ -12098,23 +12098,16 @@
                     "nullable": true,
                     "size": "20,0"
                 },
-                "ID": {
-                    "value": "id",
-                    "dataType": "NUMBER",
-                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_105389\".nextval",
-                    "nullable": false,
-                    "size": "22,0"
-                },
                 "EMAIL": {
                     "value": "email",
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
-                    "nullable": true,
+                    "nullable": false,
                     "size": 100
                 }
             },
             "primaryKeys": [
-                "ID"
+                "EMAIL"
             ],
             "foreignKeys": [],
             "type": "table"
