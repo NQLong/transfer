@@ -21,7 +21,7 @@ module.exports = app => {
                     if (error) {
                         res.send({ error: `Lỗi lấy CTDT năm ${year}` }); return;
                     } else if (!item) {
-                        res.send({ error: `Năm ${year} không tồn tại CTDT nào!` }); return;
+                        res.send({ warning: `Năm ${year} không tồn tại CTDT nào!`, item: { items: [], ctdt: [], dotDangKy, thoiGianMoMon } }); return;
                     } else {
                         app.model.dtDanhSachMonMo.getAll({ maDangKy: id, hocKy }, (error, items) => {
                             if (error) { res.send({ error }); return; } else {
