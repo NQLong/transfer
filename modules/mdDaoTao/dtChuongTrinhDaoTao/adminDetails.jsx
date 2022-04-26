@@ -50,17 +50,13 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
             this.thoiGianDaoTao.value(data.thoiGianDaoTao || '');
             this.tenVanBangVi.value(T.parse(data.tenVanBang).vi || '');
             this.tenVanBangEn.value(T.parse(data.tenVanBang).en || '');
-            this.mucTieuChung.value(data.mucTieuChung);
-
-            let mucTieuCuThe = T.parse(data.mucTieuCuThe || '{}');
-            this.mucTieuCuThe1.value(mucTieuCuThe[1] || '');
-            this.mucTieuCuThe2.value(mucTieuCuThe[2] || '');
-            this.mucTieuCuThe3.value(mucTieuCuThe[3] || '');
-            this.mucTieuCuThe4.value(mucTieuCuThe[4] || '');
+            const mucTieu = T.parse(data.mucTieu || '{}');
             this.props.getDtChuongTrinhDaoTao(id, (ctdt) => {
-                //TODO: Group SQL
-                [this.kienThucDaiCuong, this.kienThucCoSoNganh, this.kienThucChuyenNganh, this.kienThucBoTro, this.kienThucLVTN].forEach(e => e.setVal(ctdt, data.maKhoa));
+                SelectAdapter_DtCauTrucKhungDaoTao.fetchOne(data.namDaoTao, (rs) => {
+                    this.setNamDaoTao(rs, mucTieu, ctdt);
+                });
             });
+
         });
     }
 
@@ -125,14 +121,18 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
         }
     }
 
-    setNamDaoTao = (value) => {
+    setNamDaoTao = (value, mucTieu, ctdt) => {
         const { data } = value;
         const mucCha = T.parse(data.mucCha, { mucTieuDaoTao: {}, chuongTrinhDaoTao: {} });
         const mucCon = T.parse(data.mucCon, { mucTieuDaoTao: {}, chuongTrinhDaoTao: {} });
         this.setState({ mucTieuDaoTao: { parents: mucCha.mucTieuDaoTao, childs: mucCon.mucTieuDaoTao }, chuongTrinhDaoTao: { parents: mucCha.chuongTrinhDaoTao, childs: mucCon.chuongTrinhDaoTao } }, () => {
             Object.keys(this.chuongTrinh).forEach(key => {
-                const childs = this.state.chuongTrinhDaoTao.childs[key];
-                this.chuongTrinh[key]?.setVal([], this.maKhoa, childs);
+                const childs = mucCon.chuongTrinhDaoTao[key] || null;
+                const data = ctdt.filter(item => item.maKhoiKienThuc === parseInt(mucCha.chuongTrinhDaoTao[key].id));
+                this.chuongTrinh[key]?.setVal(data, this.maKhoa, childs);
+            });
+            mucTieu.forEach(mt => {
+                this.mucTieu[mt.id]?.value(mt.value);
             });
         });
     }
@@ -142,7 +142,6 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
         const readOnly = !(permission.write || permission.manage),
             isPhongDaoTao = permission.write;
         const { mucTieuDaoTao, chuongTrinhDaoTao } = this.state;
-        console.log(this.state.mucTieuDaoTao, this.state.chuongTrinhDaoTao);
 
         return this.renderPage({
             icon: 'fa fa-university',
@@ -231,7 +230,6 @@ class DtChuongTrinhDaoTaoDetails extends AdminPage {
                         const childs = chuongTrinhDaoTao.childs;
                         const pIdx = parseInt(key) + 1;
                         const { id, text } = chuongTrinhDaoTao.parents[key];
-                        console.log(id, text);
                         return (
                             <ComponentKienThuc key={pIdx} title={text} khoiKienThucId={id} childs={childs[key]} ref={e => this.chuongTrinh[key] = e} />
                         );

@@ -2,7 +2,7 @@ module.exports = app => {
     const menu = {
         parentMenu: app.parentMenu.daoTao,
         menus: {
-            7008: {
+            7012: {
                 title: 'Cấu trúc khung đào tạo', groupIndex: 1,
                 link: '/user/dao-tao/cau-truc-khung-dao-tao', icon: 'fa-cogs', backgroundColor: '#14C053'
             },

@@ -11,11 +11,10 @@ export class ComponentKienThuc extends AdminPage {
 
     addRow = (idx, item, childId, childText, done = () => { }) => {
         const permission = this.getUserPermission(this.props.prefixPermission || 'dtChuongTrinhDaoTao', ['write', 'manage']);
-        idx = childId >= 0 ? `${childId}_${idx}` : idx;
+        idx = childId !== null && childId >= 0 ? `${childId}_${idx}` : idx;
         const id = item ? item.id : -1;
         const editFlag = (permission.write || permission.manage) ? (id > 0 ? false : true) : false;
         const isDeleted = false;
-        console.log(idx);
         this.rows[idx] = {
             maMonHoc: null,
             tenMonHoc: null,
@@ -28,12 +27,13 @@ export class ComponentKienThuc extends AdminPage {
             khoa: null
         };
         this.setEditState(idx, childId, childText, editFlag, id, isDeleted, () => {
+            this.rows[idx].ten = item ? item?.tenMonHoc : '';
             this.rows[idx].loaiMonHoc.value(item ? item.loaiMonHoc : 0);
             this.rows[idx].soTietLyThuyet.value(item ? (item.soTietLyThuyet || 0).toString() : '0');
             this.rows[idx].soTietThucHanh.value(item ? (item.soTietThucHanh || 0).toString() : '0');
             this.rows[idx].hocKyDuKien.value(item ? item.hocKyDuKien : null);
             this.rows[idx].soTinChi.value(item ? (item.soTinChi || 0).toString() : '0');
-            id != -1 && this.rows[idx].tenMonHoc.value(item && item.tenMonHoc ? item.tenMonHoc : '');
+            id != -1 && this.rows[idx]?.tenMonHoc?.value(item && item.tenMonHoc ? item.tenMonHoc : '');
             // id == -1 ? this.rows[idx].maMonHoc.value(item ? item.maMonHoc : '') : this.rows[idx].tenMonHoc.value(item ? item.tenMonHoc : '');
             this.rows[idx].ma.value((item && item.maMonHoc) ? item.maMonHoc : '');
             this.rows[idx].khoa.value(item ? item.khoa : '');
@@ -43,7 +43,6 @@ export class ComponentKienThuc extends AdminPage {
     }
 
     setEditState = (idx, childId, childText, editFlag, id, isDeleted, done) => {
-        console.log('preDatas', this.state.datas);
         this.setState({
             datas: {
                 ...this.state.datas,
@@ -64,7 +63,6 @@ export class ComponentKienThuc extends AdminPage {
     editRow = (e, idx, childId) => {
         e?.preventDefault();
         idx = childId >= 0 ? `${childId}_${idx}` : idx;
-        console.log('editRow', idx);
         if (!this.rows[idx] || !this.rows[idx].maMonHoc.value()) {
             T.notify('Vui lòng chọn môn học!', 'danger');
             return;
@@ -109,7 +107,7 @@ export class ComponentKienThuc extends AdminPage {
         const id = value.id,
             { tongTinChi, tietLt, tietTh, tongTiet, khoa, ten } = value.item;
         let preIdx, nextIdx;
-        if (childId >= 0) {
+        if (childId !== null && childId >= 0) {
             const arr = idx.split('_');
             preIdx = parseInt(arr[1]) - 1;
             nextIdx = parseInt(arr[1]) + 1;
@@ -189,7 +187,7 @@ export class ComponentKienThuc extends AdminPage {
                 hocKyDuKien: this.rows[key].hocKyDuKien?.value(),
                 tenKhoa: this.rows[key].khoa?.data()?.text,
                 khoa: this.rows[key].khoa?.value(),
-                mucCon: childId,
+                maKhoiKienThucCon: childId
             };
             if (item.maMonHoc) {
                 if (id > 0 && this.state.datas[key].isDeleted) {
@@ -201,33 +199,58 @@ export class ComponentKienThuc extends AdminPage {
 
             if (index == array.length - 1) return ({ updateDatas, deleteDatas });
         });
-        console.log(updateDatas);
         return ({ updateDatas, deleteDatas });
     }
 
-    setVal = (items = [], maKhoa, childs) => {
+    setVal = (data = [], maKhoa, childs) => {
         this.maKhoa = maKhoa;
-        let length = 0;
-        items.forEach((item) => {
-            if (item.maKhoiKienThuc.toString() === this.props.khoiKienThucId.toString()) {
-                this.addRow(length, item);
-                length++;
-            }
-        });
         if (childs) {
-            let cIdx = 0;
-            const addRow = (childId, childText) => {
-                if (childId < 0) return;
-                this.addRow(length, null, childId, childText, () => {
-                    cIdx += 1;
-                    addRow(childs[cIdx]?.id || -1, childs[cIdx]?.value?.text || '');
+            let length = {};
+
+            //add last row
+            const addLast = () => {
+                let cIdx = 0;
+                const addLastRow = (childId, childText) => {
+                    if (childId < 0) return;
+                    if (!length[childId]) length[childId] = 0;
+                    this.addRow(length[childId], null, childId, childText, () => {
+                        cIdx++;
+                        addLastRow(childs[cIdx]?.id || -1, childs[cIdx]?.value?.text || '');
+                    });
+                };
+                addLastRow(childs[cIdx].id, childs[cIdx].value.text);
+            };
+
+            const addRow = (item, idx) => {
+                if (!item) {
+                    addLast();
+                    return;
+                }
+                if (!length[item.maKhoiKienThucCon]) {
+                    length[item.maKhoiKienThucCon] = 0;
+                }
+                this.addRow(length[item.maKhoiKienThucCon], item, item.maKhoiKienThucCon, childs[item.maKhoiKienThucCon]?.value?.text, () => {
+                    length[item.maKhoiKienThucCon]++;
+                    idx++;
+                    addRow(data[idx], idx);
                 });
             };
-            addRow(childs[cIdx].id, childs[cIdx].value.text);
+            addRow(data[0], 0);
+
+
 
         } else {
-            this.addRow(length);
-
+            const addRow = (length, item) => {
+                if (!item) {
+                    this.addRow(length);
+                    return;
+                }
+                this.addRow(length, item, null, null, () => {
+                    length++;
+                    addRow(length, data[length]);
+                });
+            };
+            addRow(0, data[0]);
         }
 
     }
@@ -239,7 +262,6 @@ export class ComponentKienThuc extends AdminPage {
 
         let styleRow = (idx) => ({ backgroundColor: `${this.state.datas[idx]?.isDeleted ? '#ffdad9' : (!this.state.datas[idx]?.edit ? '#C8F7C8' : null)}` });
         let count = 1;
-        console.log(this.state.datas);
         const table = renderTable({
             getDataSource: () => this.convertObjToArr(),
             stickyHead: false,
@@ -266,7 +288,7 @@ export class ComponentKienThuc extends AdminPage {
                 </>),
             renderRow: (item) => {
                 const index = item.idx;
-                const idx = item.childId >= 0 ? index.split('_')[1] : index;
+                const idx = item.childId !== null && item.childId >= 0 ? index.split('_')[1] : index;
                 const stt = (!this.state.datas[index]?.edit && !this.state.datas[index]?.isDeleted) ? count++ : null;
                 return (
                     <React.Fragment key={index}>
