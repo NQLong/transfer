@@ -1,6 +1,6 @@
-// Table name: QT_DI_NUOC_NGOAI { id, shcc, quocGia, ngayDi, ngayDiType, ngayVe, ngayVeType, mucDich, noiDung, chiPhi, ghiChu, soQuyetDinh, ngayQuyetDinh, loaiChiPhi, soQdTiepNhan, ngayQdTiepNhan, noiDungTiepNhan, ngayVeNuoc }
+// Table name: QT_DI_NUOC_NGOAI { id, shcc, quocGia, ngayDi, ngayDiType, ngayVe, ngayVeType, mucDich, noiDung, chiPhi, ghiChu, soQuyetDinh, ngayQuyetDinh, loaiChiPhi, soQdTiepNhan, ngayQdTiepNhan, noiDungTiepNhan, ngayVeNuoc, baoCaoTen, baoCaoNgayNop, baoCaoTinhTrang, baoCaoLyDoTraVe }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'shcc': 'SHCC', 'quocGia': 'QUOC_GIA', 'ngayDi': 'NGAY_DI', 'ngayDiType': 'NGAY_DI_TYPE', 'ngayVe': 'NGAY_VE', 'ngayVeType': 'NGAY_VE_TYPE', 'mucDich': 'MUC_DICH', 'noiDung': 'NOI_DUNG', 'chiPhi': 'CHI_PHI', 'ghiChu': 'GHI_CHU', 'soQuyetDinh': 'SO_QUYET_DINH', 'ngayQuyetDinh': 'NGAY_QUYET_DINH', 'loaiChiPhi': 'LOAI_CHI_PHI', 'soQdTiepNhan': 'SO_QD_TIEP_NHAN', 'ngayQdTiepNhan': 'NGAY_QD_TIEP_NHAN', 'noiDungTiepNhan': 'NOI_DUNG_TIEP_NHAN', 'ngayVeNuoc': 'NGAY_VE_NUOC' };
+const obj2Db = { 'id': 'ID', 'shcc': 'SHCC', 'quocGia': 'QUOC_GIA', 'ngayDi': 'NGAY_DI', 'ngayDiType': 'NGAY_DI_TYPE', 'ngayVe': 'NGAY_VE', 'ngayVeType': 'NGAY_VE_TYPE', 'mucDich': 'MUC_DICH', 'noiDung': 'NOI_DUNG', 'chiPhi': 'CHI_PHI', 'ghiChu': 'GHI_CHU', 'soQuyetDinh': 'SO_QUYET_DINH', 'ngayQuyetDinh': 'NGAY_QUYET_DINH', 'loaiChiPhi': 'LOAI_CHI_PHI', 'soQdTiepNhan': 'SO_QD_TIEP_NHAN', 'ngayQdTiepNhan': 'NGAY_QD_TIEP_NHAN', 'noiDungTiepNhan': 'NOI_DUNG_TIEP_NHAN', 'ngayVeNuoc': 'NGAY_VE_NUOC', 'baoCaoTen': 'BAO_CAO_TEN', 'baoCaoNgayNop': 'BAO_CAO_NGAY_NOP', 'baoCaoTinhTrang': 'BAO_CAO_TINH_TRANG', 'baoCaoLyDoTraVe': 'BAO_CAO_LY_DO_TRA_VE' };
 
 module.exports = app => {
     app.model.qtDiNuocNgoai = {
@@ -141,9 +141,9 @@ module.exports = app => {
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, filter, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
 
-        download: (filter, done) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=qt_di_nuoc_ngoai_download_excel(:filter); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, filter }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
+        download: (filter, searchterm, done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=qt_di_nuoc_ngoai_download_excel(:filter, :searchterm); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, filter, searchterm }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
     };
 };
