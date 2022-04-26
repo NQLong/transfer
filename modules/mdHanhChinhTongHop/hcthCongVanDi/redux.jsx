@@ -84,6 +84,7 @@ export function createHcthCongVanDi(data, done) {
         const url = '/api/hcth/cong-van-cac-phong';
         T.post(url, { data }, res => {
             if (res.error) {
+                // console.log(data);
                 T.notify('Thêm công văn giữa các phòng bị lỗi', 'danger');
                 console.error('POST: ' + url + '. ' + res.error);
             } else {
