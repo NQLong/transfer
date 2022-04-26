@@ -9,11 +9,13 @@ export class ComponentKienThuc extends AdminPage {
     rows = {};
     state = { datas: {} };
 
-    addRow = (idx, item) => {
+    addRow = (idx, item, childId, childText, done = () => { }) => {
         const permission = this.getUserPermission(this.props.prefixPermission || 'dtChuongTrinhDaoTao', ['write', 'manage']);
+        idx = childId >= 0 ? `${childId}_${idx}` : idx;
         const id = item ? item.id : -1;
         const editFlag = (permission.write || permission.manage) ? (id > 0 ? false : true) : false;
         const isDeleted = false;
+        console.log(idx);
         this.rows[idx] = {
             maMonHoc: null,
             loaiMonHoc: null,
@@ -24,7 +26,7 @@ export class ComponentKienThuc extends AdminPage {
             hocKyDuKien: null,
             khoa: null
         };
-        this.setEditState(idx, editFlag, id, isDeleted, () => {
+        this.setEditState(idx, childId, childText, editFlag, id, isDeleted, () => {
             this.rows[idx].loaiMonHoc.value(item ? item.loaiMonHoc : 0);
             this.rows[idx].soTietLyThuyet.value(item ? item.soTietLyThuyet.toString() : '0');
             this.rows[idx].soTietThucHanh.value(item ? item.soTietThucHanh.toString() : '0');
@@ -33,14 +35,19 @@ export class ComponentKienThuc extends AdminPage {
             this.rows[idx].maMonHoc.value(item ? item.maMonHoc : '');
             this.rows[idx].khoa.value(item ? item.khoa : '');
             this.rows[idx].soTiet.value(item ? item.tongSoTiet.toString() : '0');
+            done();
         });
     }
 
-    setEditState = (idx, editFlag, id, isDeleted, done) => {
+    setEditState = (idx, childId, childText, editFlag, id, isDeleted, done) => {
+        console.log('preDatas', this.state.datas);
         this.setState({
             datas: {
                 ...this.state.datas,
                 [idx]: {
+                    idx: idx,
+                    childText: childText,
+                    childId: childId,
                     edit: editFlag,
                     id: id,
                     isDeleted: isDeleted,
@@ -51,8 +58,10 @@ export class ComponentKienThuc extends AdminPage {
         });
     }
 
-    editRow = (e, idx) => {
+    editRow = (e, idx, childId) => {
         e?.preventDefault();
+        idx = childId >= 0 ? `${childId}_${idx}` : idx;
+        console.log('editRow', idx);
         if (!this.rows[idx] || !this.rows[idx].maMonHoc.value()) {
             T.notify('Vui lòng chọn môn học!', 'danger');
             return;
@@ -62,7 +71,9 @@ export class ComponentKienThuc extends AdminPage {
             const curEdit = this.state.datas[idx].edit;
             const id = this.state.datas[idx].id;
             const isDeleted = this.state.datas[idx].isDeleted;
-            this.setEditState(idx, !curEdit, id, isDeleted, () => {
+            const childText = this.state.datas[idx].childText;
+            const childId = this.state.datas[idx].childId;
+            this.setEditState(idx, childId, childText, !curEdit, id, isDeleted, () => {
                 this.rows[idx].maMonHoc.value(this.rows[idx].maMonHoc.value());
                 this.rows[idx].loaiMonHoc.value(this.rows[idx].loaiMonHoc.value());
             });
@@ -75,21 +86,35 @@ export class ComponentKienThuc extends AdminPage {
         T.confirm('Xóa môn học', 'Bạn có chắc bạn muốn xóa môn học này?', 'warning', true, isConfirm => {
             if (isConfirm) {
                 T.alert('Xóa môn học thành công!', 'success', false, 800);
-                this.setEditState(idx, false, id, true);
+                const childId = this.state.datas[idx].childId;
+                const childText = this.state.datas[idx].childText;
+                this.setEditState(idx, childId, childText, false, id, true);
             }
         });
     }
 
-    undoRow = (e, idx) => {
+    undoRow = (e, idx, childId) => {
         e.preventDefault();
+        idx = childId >= 0 ? `${childId}_${idx}` : idx;
         const id = this.state.datas[idx].id;
-        this.setEditState(idx, false, id, false);
+        const childText = this.state.datas[idx].childText;
+        this.setEditState(idx, childId, childText, false, id, false);
     }
 
 
-    setMonHoc = (idx, id) => {
-        if (this.rows[idx - 1] && this.state.datas[idx - 1]?.edit) {
-            this.editRow(null, idx - 1);
+    setMonHoc = (idx, id, childId, childText) => {
+        let preIdx, nextIdx;
+        if (childId >= 0) {
+            const arr = idx.split('_');
+            preIdx = parseInt(arr[1]) - 1;
+            nextIdx = parseInt(arr[1]) + 1;
+        } else {
+            preIdx = idx - 1;
+            nextIdx = idx + 1;
+        }
+        const statePreIdx = childId >= 0 ? `${childId}_${preIdx}` : preIdx;
+        if (this.rows[statePreIdx] && this.state.datas[statePreIdx]?.edit) {
+            this.editRow(null, preIdx, childId);
         }
         SelectAdapter_DmMonHoc.fetchOneItem(id, ({ item }) => {
             const { tongTinChi, tongTiet, tietLt, tietTh, khoa } = item;
@@ -98,21 +123,21 @@ export class ComponentKienThuc extends AdminPage {
             this.rows[idx].soTietThucHanh.value(tietTh.toString() || '0');
             this.rows[idx].soTiet.value(tongTiet);
             this.rows[idx].khoa.value(khoa.ma);
-            this.addRow(idx + 1);
+            this.addRow(nextIdx, null, childId, childText);
         });
 
     }
 
-    selectMh = (idx) => {
+    selectMh = (idx, childId, childText) => {
         return (
             <>
-                <FormSelect ref={e => this.rows[idx].maMonHoc = e} data={SelectAdapter_DmMonHocAll} style={{ marginBottom: 0, width: '350px' }} placeholder='Chọn môn học' readOnly={!this.state.datas[idx].edit} onChange={value => this.setMonHoc(idx, value.id)} />
+                <FormSelect ref={e => this.rows[idx].maMonHoc = e} data={SelectAdapter_DmMonHocAll} style={{ marginBottom: 0, width: '350px' }} placeholder='Chọn môn học' readOnly={!this.state.datas[idx]?.edit} onChange={value => this.setMonHoc(idx, value.id, childId, childText)} />
                 <FormSelect ref={e => this.rows[idx].khoa = e} data={SelectAdapter_DmDonViFaculty_V2} style={{ marginBottom: 0, width: '350px', marginTop: 10 }} readOnly readOnlyNormal />
             </>
         );
     };
     insertLoaiMh = (idx) => {
-        return <FormCheckbox ref={e => this.rows[idx].loaiMonHoc = e} readOnly={this.state.datas[idx].isDeleted} />;
+        return <FormCheckbox ref={e => this.rows[idx].loaiMonHoc = e} readOnly={this.state.datas[idx]?.isDeleted} />;
     };
     insertTongSoTc = (idx) => {
         return (<FormTextBox ref={e => this.rows[idx].soTinChi = e} readOnly={true} style={{ marginBottom: 0, width: '50px' }} />);
@@ -127,15 +152,11 @@ export class ComponentKienThuc extends AdminPage {
         return (<FormTextBox ref={e => this.rows[idx].soTiet = e} className='col-12' readOnly={true} style={{ marginBottom: 0 }} />);
     };
     insertHocKyDuKien = (idx) => {
-        return (<FormTextBox type='number' ref={e => this.rows[idx].hocKyDuKien = e} placeholder='HK' readOnly={this.state.datas[idx].isDeleted} style={{ marginBottom: 0, width: '70px' }} prefix='HK' />);
+        return (<FormTextBox type='number' ref={e => this.rows[idx].hocKyDuKien = e} placeholder='HK' readOnly={this.state.datas[idx]?.isDeleted} style={{ marginBottom: 0, width: '70px' }} prefix='HK' />);
     };
 
     convertObjToArr = () => {
-        const keys = Object.keys(this.state.datas);
-        const tmp = [];
-        keys.forEach(key => {
-            tmp.push(this.state.datas[key]);
-        });
+        const tmp = Object.values(this.state.datas).sort((a, b) => a.childId - b.childId);
         return tmp;
     }
 
@@ -145,6 +166,7 @@ export class ComponentKienThuc extends AdminPage {
         const deleteDatas = [];
         keys.forEach((key, index, array) => {
             const id = this.state.datas[key].id;
+            const childId = this.state.datas[key].childId;
             const item = {
                 id: id,
                 maMonHoc: this.rows[key].maMonHoc?.value(),
@@ -158,6 +180,7 @@ export class ComponentKienThuc extends AdminPage {
                 hocKyDuKien: this.rows[key].hocKyDuKien?.value(),
                 tenKhoa: this.rows[key].khoa?.data()?.text,
                 khoa: this.rows[key].khoa?.value(),
+                mucCon: childId,
             };
             if (item.maMonHoc) {
                 if (id > 0 && this.state.datas[key].isDeleted) {
@@ -169,10 +192,11 @@ export class ComponentKienThuc extends AdminPage {
 
             if (index == array.length - 1) return ({ updateDatas, deleteDatas });
         });
+        console.log(updateDatas);
         return ({ updateDatas, deleteDatas });
     }
 
-    setVal = (items = [], maKhoa) => {
+    setVal = (items = [], maKhoa, childs) => {
         this.maKhoa = maKhoa;
         let length = 0;
         items.forEach((item) => {
@@ -181,7 +205,22 @@ export class ComponentKienThuc extends AdminPage {
                 length++;
             }
         });
-        this.addRow(length);
+        if (childs) {
+            let cIdx = 0;
+            const addRow = (childId, childText) => {
+                if (childId < 0) return;
+                this.addRow(length, null, childId, childText, () => {
+                    cIdx += 1;
+                    addRow(childs[cIdx]?.id || -1, childs[cIdx]?.value?.text || '');
+                });
+            };
+            addRow(childs[cIdx].id, childs[cIdx].value.text);
+
+        } else {
+            this.addRow(length);
+
+        }
+
     }
 
 
@@ -191,6 +230,7 @@ export class ComponentKienThuc extends AdminPage {
 
         let styleRow = (idx) => ({ backgroundColor: `${this.state.datas[idx]?.isDeleted ? '#ffdad9' : (!this.state.datas[idx]?.edit ? '#C8F7C8' : null)}` });
         let count = 1;
+        console.log(this.state.datas);
         const table = renderTable({
             getDataSource: () => this.convertObjToArr(),
             stickyHead: false,
@@ -213,33 +253,37 @@ export class ComponentKienThuc extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>TH/TN</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Tổng</th>
                     </tr>
-
                 </>),
-            renderRow: (item, index) => {
-                let stt = (!this.state.datas[index]?.edit && !this.state.datas[index]?.isDeleted) ? count++ : null;
+            renderRow: (item) => {
+                const index = item.idx;
+                const idx = item.childId >= 0 ? index.split('_')[1] : index;
+                const stt = (!this.state.datas[index]?.edit && !this.state.datas[index]?.isDeleted) ? count++ : null;
                 return (
-                    <tr key={index}>
-                        <TableCell type='text' style={{ textAlign: 'center', backgroundColor: styleRow(index).backgroundColor }} content={stt} />
-                        <TableCell content={this.selectMh(index)} style={{ backgroundColor: styleRow(index).backgroundColor }} />
-                        <TableCell content={this.insertLoaiMh(index)} style={{ backgroundColor: styleRow(index).backgroundColor, textAlign: 'center' }} />
-                        <TableCell type='number' content={this.insertHocKyDuKien(index)} style={{ textAlign: 'center', backgroundColor: styleRow(index).backgroundColor }} />
-                        <TableCell type='number' style={{ textAlign: 'center', backgroundColor: styleRow(index).backgroundColor }} content={this.insertTongSoTc(index)} />
-                        <TableCell type='number' style={{ textAlign: 'center', backgroundColor: styleRow(index).backgroundColor }} content={this.insertTietLt(index)} />
-                        <TableCell type='number' style={{ textAlign: 'center', backgroundColor: styleRow(index).backgroundColor }} content={this.insertTietTh(index)} />
-                        <TableCell type='number' content={this.insertSoTiet(index)} style={{ textAlign: 'center', backgroundColor: styleRow(index).backgroundColor }} />
-                        <td rowSpan={1} colSpan={1} style={{ textAlign: 'center', backgroundColor: styleRow(index).backgroundColor }}>
-                            <div className='btn-group'>
-                                {
-                                    (permission.write || permission.manage) && !item.isDeleted ?
-                                        <>
-                                            <a className='btn btn-primary' href='#' title={!item.edit ? 'Chỉnh sửa' : 'Xong'} onClick={(e) => this.editRow(e, index)}><i className={'fa fa-lg ' + (!item.edit ? 'fa-edit' : 'fa-check')} /></a>
-                                            {!item.edit && <a className='btn btn-danger' href='#' title='Xóa' onClick={(e) => this.removeRow(e, index)}><i className='fa fa-lg fa-trash' /></a>}
-                                        </>
-                                        : !item.edit && <a className='btn btn-danger' href='#' title='Xóa' onClick={(e) => this.undoRow(e, index)}><i className='fa fa-lg fa-undo' /></a>
-                                }
-                            </div>
-                        </td>
-                    </tr>
+                    <React.Fragment key={index}>
+                        {item.childText && parseInt(idx) == 0 && <tr><td colSpan={10}><b>{item.childText}</b></td></tr>}
+                        <tr>
+                            <TableCell type='text' style={{ textAlign: 'center', backgroundColor: styleRow(index).backgroundColor }} content={stt} />
+                            <TableCell content={this.selectMh(index, item.childId, item.childText)} style={{ backgroundColor: styleRow(index).backgroundColor }} />
+                            <TableCell content={this.insertLoaiMh(index)} style={{ backgroundColor: styleRow(index).backgroundColor, textAlign: 'center' }} />
+                            <TableCell type='number' content={this.insertHocKyDuKien(index)} style={{ textAlign: 'center', backgroundColor: styleRow(index).backgroundColor }} />
+                            <TableCell type='number' style={{ textAlign: 'center', backgroundColor: styleRow(index).backgroundColor }} content={this.insertTongSoTc(index)} />
+                            <TableCell type='number' style={{ textAlign: 'center', backgroundColor: styleRow(index).backgroundColor }} content={this.insertTietLt(index)} />
+                            <TableCell type='number' style={{ textAlign: 'center', backgroundColor: styleRow(index).backgroundColor }} content={this.insertTietTh(index)} />
+                            <TableCell type='number' content={this.insertSoTiet(index)} style={{ textAlign: 'center', backgroundColor: styleRow(index).backgroundColor }} />
+                            <td rowSpan={1} colSpan={1} style={{ textAlign: 'center', backgroundColor: styleRow(index).backgroundColor }}>
+                                <div className='btn-group'>
+                                    {
+                                        (permission.write || permission.manage) && !item.isDeleted ?
+                                            <>
+                                                <a className='btn btn-primary' href='#' title={!item.edit ? 'Chỉnh sửa' : 'Xong'} onClick={(e) => this.editRow(e, index)}><i className={'fa fa-lg ' + (!item.edit ? 'fa-edit' : 'fa-check')} /></a>
+                                                {!item.edit && <a className='btn btn-danger' href='#' title='Xóa' onClick={(e) => this.removeRow(e, index)}><i className='fa fa-lg fa-trash' /></a>}
+                                            </>
+                                            : !item.edit && <a className='btn btn-danger' href='#' title='Xóa' onClick={(e) => this.undoRow(e, index)}><i className='fa fa-lg fa-undo' /></a>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    </React.Fragment>
                 );
             },
         });
@@ -251,6 +295,7 @@ export class ComponentKienThuc extends AdminPage {
                     <p>{this.props.subTitle}</p>
                 </div>
                 {table}
+                {/* <button onClick={() => this.getValue()}>Get Data</button> */}
             </div>
         </>
         );
