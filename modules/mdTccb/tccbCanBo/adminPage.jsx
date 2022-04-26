@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { PageName, getStaffPage, deleteStaff, SelectAdapter_FwCanBo } from './redux';
 import Pagination, { OverlayLoading } from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, FormSelect, FormDatePicker } from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, FormSelect, FormDatePicker, FormTextBox } from 'view/component/AdminPage';
 import { getDmDonViAll, SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_DmGioiTinhV2 } from 'modules/mdDanhMuc/dmGioiTinh/redux';
 import { SelectAdapter_DmNgachCdnnV3 } from 'modules/mdDanhMuc/dmNgachCdnn/redux';
@@ -23,7 +23,7 @@ class StaffPage extends AdminPage {
             T.showSearchBox(() => {
                 // listShcc, listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe, fromYear, toYear, listDanToc, listTonGiao, loaiHopDong, loaiChuyenVien, listQuocGia
                 let filterCookie = T.getCookiePage(PageName, 'F'),
-                    { listShcc = '', listDonVi = '', gender = '', listNgach = '', listHocVi = '', listChucDanh = '', isBienChe = '', fromYear = '', toYear = '', listDanToc = '', listTonGiao = '', loaiHopDong = '', loaiChuyenVien = '', listQuocGia = '' } = filterCookie;
+                    { listShcc = '', listDonVi = '', gender = '', listNgach = '', listHocVi = '', listChucDanh = '', isBienChe = '', fromYear = '', toYear = '', listDanToc = '', listTonGiao = '', loaiHopDong = '', loaiChuyenVien = '', listQuocGia = '', fromAge = '', toAge = '' } = filterCookie;
                 this.listShcc.value(listShcc);
                 this.listDonVi.value(listDonVi);
                 this.gender.value(gender);
@@ -38,6 +38,8 @@ class StaffPage extends AdminPage {
                 this.loaiHopDong?.value(loaiHopDong);
                 this.loaiChuyenVien?.value(loaiChuyenVien);
                 this.listQuocGia.value(listQuocGia);
+                this.fromAge.value(fromAge);
+                this.toAge.value(toAge);
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
             this.changeAdvancedSearch(true);
@@ -73,15 +75,17 @@ class StaffPage extends AdminPage {
             listTonGiao = this.listTonGiao.value().toString() || '',
             loaiHopDong = this.loaiHopDong?.value() || '',
             loaiChuyenVien = this.loaiChuyenVien?.value() || '',
-            listQuocGia = this.listQuocGia.value().toString() || '';
-        const pageFilter = (isInitial || isReset)  ? {} : { listShcc, listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe, fromYear, toYear, listDanToc, listTonGiao, loaiHopDong, loaiChuyenVien, listQuocGia };
+            listQuocGia = this.listQuocGia.value().toString() || '',
+            fromAge = this.fromAge.value() ? Number(this.fromAge.value()) : '',
+            toAge = this.toAge.value() ? Number(this.toAge.value()) : '';
+        const pageFilter = (isInitial || isReset)  ? {} : { listShcc, listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe, fromYear, toYear, listDanToc, listTonGiao, loaiHopDong, loaiChuyenVien, listQuocGia, fromAge, toAge };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, pageCondition, (page) => {
                 if (isInitial) {
                     // Initial
                     const filter = page.filter || {};
                     const filterCookie = T.getCookiePage(PageName, 'F');
-                    let { listShcc, listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe, fromYear, toYear, listDanToc, listTonGiao, loaiHopDong, loaiChuyenVien, listQuocGia } = filter;
+                    let { listShcc, listDonVi, gender, listNgach, listHocVi, listChucDanh, isBienChe, fromYear, toYear, listDanToc, listTonGiao, loaiHopDong, loaiChuyenVien, listQuocGia, fromAge, toAge } = filter;
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
 
                     this.listShcc.value(listShcc || filterCookie.listShcc || '');
@@ -98,7 +102,9 @@ class StaffPage extends AdminPage {
                     this.loaiHopDong?.value(loaiHopDong || filter.loaiHopDong || '');
                     this.loaiChuyenVien?.value(loaiChuyenVien || filter.loaiChuyenVien || '');
                     this.listQuocGia.value(listQuocGia || filter.listQuocGia || '');
-                    if (this.listShcc.value() || this.listDonVi.value() || this.gender.value() || this.listNgach.value() || this.listHocVi.value() || this.listChucDanh.value() || this.isBienChe.value() || this.fromYear.value() || this.toYear.value() || this.listDanToc.value() || this.listTonGiao.value() || this.loaiHopDong?.value() || this.loaiChuyenVien?.value() || this.listQuocGia.value()) this.showAdvanceSearch();
+                    this.fromAge.value(fromAge || filter.fromAge || '');
+                    this.toAge.value(toAge || filter.toAge || '');
+                    if (this.listShcc.value() || this.listDonVi.value() || this.gender.value() || this.listNgach.value() || this.listHocVi.value() || this.listChucDanh.value() || this.isBienChe.value() || this.fromYear.value() || this.toYear.value() || this.listDanToc.value() || this.listTonGiao.value() || this.loaiHopDong?.value() || this.loaiChuyenVien?.value() || this.listQuocGia.value() || this.fromAge.value() || this.toAge.value()) this.showAdvanceSearch();
                 } else if (isReset) {
                     this.listShcc.value('');
                     this.listDonVi.value('');
@@ -114,6 +120,8 @@ class StaffPage extends AdminPage {
                     this.loaiHopDong?.value('');
                     this.loaiChuyenVien?.value('');
                     this.listQuocGia.value('');
+                    this.fromAge.value('');
+                    this.toAge.value('');
                 }
             });
         });
@@ -136,7 +144,7 @@ class StaffPage extends AdminPage {
     };
 
     handleBienChe = (value) => {
-        if (value.id == '1') {
+        if (value && value.id == '1') {
             this.setState({ visibleHDTN: true }); 
         } else {
             this.setState({ visibleHDTN: false });
@@ -237,11 +245,13 @@ class StaffPage extends AdminPage {
                     {this.state.visibleCVDT && <FormSelect className='col-md-3' ref={e => this.loaiChuyenVien = e} data={[{ id: 0, text: 'Chuyên viên' }, { id: 1, text: 'Chuyên viên PVĐT' }]} minimumResultsForSearch={-1} allowClear={true} label='Lọc theo loại chuyên viên'/> }
                     <FormSelect className='col-md-4' ref={e => this.listHocVi = e} data={SelectAdapter_DmTrinhDoV2} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo học vị' />
                     <FormSelect className='col-md-4' ref={e => this.listQuocGia = e} data={SelectAdapter_DmQuocGia} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo quốc gia tốt nghiệp' />
-                    <FormSelect className='col-md-4' ref={e => this.listChucDanh = e} data={SelectAdapter_DmChucDanhKhoaHoc} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo học hàm' />
+                    <FormSelect className='col-md-4' ref={e => this.listChucDanh = e} data={SelectAdapter_DmChucDanhKhoaHoc} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo chức danh khoa học' />
                     <FormDatePicker type='date-mask' ref={e => this.fromYear = e} className='col-12 col-md-2' label='Từ thời gian (bắt đầu công tác)' onChange={() => this.changeAdvancedSearch()} />
                     <FormDatePicker type='date-mask' ref={e => this.toYear = e} className='col-12 col-md-2' label='Đến thời gian (bắt đầu công tác)' onChange={() => this.changeAdvancedSearch()} />
                     <FormSelect className='col-md-4' ref={e => this.listDanToc = e} data={SelectAdapter_DmDanTocV2} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo dân tộc' />
                     <FormSelect className='col-md-4' ref={e => this.listTonGiao = e} data={SelectAdapter_DmTonGiaoV2} minimumResultsForSearch={-1} multiple={true} allowClear={true} label='Lọc theo tôn giáo' />
+                    <FormTextBox className='col-md-2' type='number' ref={e => this.fromAge = e} label='Từ độ tuổi' />
+                    <FormTextBox className='col-md-2' type='number' ref={e => this.toAge = e} label='Đến độ tuổi' />
                     <div className='form-group col-12' style={{ justifyContent: 'end', display: 'flex' }}>
                         <button className='btn btn-danger' style={{ marginRight: '10px' }} type='button' onClick={e => e.preventDefault() || this.changeAdvancedSearch(null, true)}>
                             <i className='fa fa-fw fa-lg fa-times' />Xóa bộ lọc
