@@ -8542,53 +8542,6 @@
             "foreignKeys": [],
             "type": "table"
         },
-        "DT_CHUAN_DAU_RA": {
-            "active": true,
-            "moduleName": "dtChuanDauRa",
-            "modelName": "dtChuanDauRa",
-            "columns": {
-                "ID": {
-                    "value": "id",
-                    "dataType": "NUMBER",
-                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_111904\".nextval",
-                    "nullable": false,
-                    "size": "22,0"
-                },
-                "THANG_DO_MIN": {
-                    "value": "thangDoMin",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 5
-                },
-                "THANG_DO_MAX": {
-                    "value": "thangDoMax",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 5
-                },
-                "MO_TA": {
-                    "value": "moTa",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 2000
-                },
-                "KICH_HOAT": {
-                    "value": "kichHoat",
-                    "dataType": "NUMBER",
-                    "dataDefault": "1",
-                    "nullable": true,
-                    "size": "1,0"
-                }
-            },
-            "primaryKeys": [
-                "ID"
-            ],
-            "foreignKeys": [],
-            "type": "table"
-        },
         "HCTH_CAN_BO_NHAN": {
             "active": true,
             "moduleName": "hcthCanBoNhan",
@@ -8607,13 +8560,6 @@
                     "dataDefault": "",
                     "nullable": true,
                     "size": 255
-                },
-                "LOAI": {
-                    "value": "loai",
-                    "dataType": "NVARCHAR2",
-                    "dataDefault": "",
-                    "nullable": true,
-                    "size": 20
                 },
                 "LOAI": {
                     "value": "loai",
