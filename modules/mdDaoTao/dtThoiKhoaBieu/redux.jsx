@@ -64,22 +64,21 @@ export function getDtThoiKhoaBieuAll(condition, done) {
 T.initPage('pageDtThoiKhoaBieu');
 export function getDtThoiKhoaBieuPage(pageNumber, pageSize, pageCondition, done) {
     const page = T.updatePage('pageDtThoiKhoaBieu', pageNumber, pageSize, pageCondition);
-    return dispatch => {
+    return () => {
         const url = `/api/dao-tao/thoi-khoa-bieu/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: pageCondition }, data => {
             if (data.error) {
                 T.notify('Lấy danh sách thời khoá biểu bị lỗi!', 'danger');
                 console.error(`GET ${url}. ${data.error}`);
             } else {
-                if (done) done(data.page.pageNumber, data.page.pageSize, data.page.pageTotal, data.page.totalItem);
-                dispatch({ type: DtThoiKhoaBieuGetPage, page: data.page });
+                if (done) done(data.page);
             }
         });
     };
 }
 
 export function createDtThoiKhoaBieu(item, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/dao-tao/thoi-khoa-bieu';
         T.post(url, { item }, data => {
             if (data.error) {
@@ -88,7 +87,6 @@ export function createDtThoiKhoaBieu(item, done) {
             } else {
                 T.notify('Tạo thời khoá biểu thành công!', 'success');
                 if (done) done();
-                dispatch(getDtThoiKhoaBieuPage());
             }
         });
     };
@@ -110,23 +108,43 @@ export function deleteDtThoiKhoaBieu(id) {
 }
 
 export function updateDtThoiKhoaBieu(id, changes, done) {
-    return dispatch => {
+    return () => {
         const url = '/api/dao-tao/thoi-khoa-bieu';
         T.put(url, { id, changes }, data => {
             if (data.error) {
-                T.notify('Cập nhật thời khoá biểu bị lỗi!', 'danger');
+                T.alert(`Lỗi: ${data.error.message}`, 'error', false, 2000);
                 console.error(`PUT ${url}. ${data.error}`);
                 done && done(data.error);
             } else {
-                T.notify('Cập nhật thông tin thời khoá biểu thành công!', 'success');
-                dispatch(getDtThoiKhoaBieuPage());
+                T.alert('Điều chỉnh thành công!', 'success', false, 1000);
+                done && done();
+                // dispatch({ type: DtThoiKhoaBieuUpdate, item: data.item });
             }
         }, () => T.notify('Cập nhật thông tin thời khoá biểu bị lỗi!', 'danger'));
     };
 }
 
-
+export function initSchedule(done) {
+    return () => {
+        T.get('/api/dao-tao/init-schedule', data => {
+            done && done(data);
+        });
+    };
+}
 
 export function changeDtThoiKhoaBieu(item) {
     return { type: DtThoiKhoaBieuUpdate, item };
+}
+
+export function getDtLichDayHoc(phong, done) {
+    return () => {
+        T.get(`/api/dao-tao/get-schedule/${phong}`, data => {
+            if (data.error) {
+                T.notify(`Lỗi: ${data.error.message}`, 'danger');
+                console.error(data.error.message);
+            } else {
+                done && done(data.items);
+            }
+        });
+    };
 }

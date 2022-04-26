@@ -311,7 +311,9 @@ previous button's border...
 .fc-popover .fc-header .fc-title {
 	margin: 0 2px;
 }
-
+.fc-title {
+    color:white;
+}
 .fc-popover .fc-header .fc-close {
 	cursor: pointer;
 }
@@ -548,7 +550,7 @@ temporary rendered events).
 	display: block;
 	/* make the <a> tag block */
 	font-size: 14px;
-	padding: 5px;
+	padding-left: 5px;
 	line-height: 1.3;
 	border-radius: 3px;
 	border: 1px solid $primary-color;
@@ -829,7 +831,7 @@ a.fc-more:hover {
 	/* we are sure there are no day numbers in these views, so... */
 	padding-top: 1px;
 	/* add a pixel to make sure there are 2px padding above events */
-	padding-bottom: 1em;
+	padding-bottom: 2em;
 	/* ensure a space at bottom of cell for user selecting/clicking */
 }
 

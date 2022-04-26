@@ -61,8 +61,16 @@ const selectCongVan = [
 
 const selectCongVanV2 = [
     { id: 1, text: 'Lấy số' },
-    { id: 2, text: 'Không lấy số'}
+    { id: 2, text: 'Không lấy số' }
 ];
+
+export function getSoCongVan(soDi, donVi, loai) {
+    if (loai == null) {
+        return soDi + '/' + 'XHNV-' + donVi;
+    }
+    return soDi + '/' + loai + '-XHNV-' + donVi;
+}
+
 class HcthCongVanDi extends AdminPage {
     state = { filter: {} };
 
@@ -71,7 +79,7 @@ class HcthCongVanDi extends AdminPage {
             T.clearSearchBox();
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
-                this.congVanLaySo?.value(1);
+                this.congVanLaySo?.value('');
                 this.loaiCongVan?.value('');
                 this.maDonViGui?.value('');
                 this.maDonViNhan?.value('');
@@ -79,7 +87,6 @@ class HcthCongVanDi extends AdminPage {
                 this.donViNhanNgoai?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
-            this.getPage();
             this.changeAdvancedSearch(true);
         });
     }
@@ -93,10 +100,10 @@ class HcthCongVanDi extends AdminPage {
         let congVanLaySo = this.congVanLaySo?.value() || null;
         let donViNhanNgoai = this.donViNhanNgoai?.value() || null;
 
-        const pageFilter = isInitial ? {} : { donViGui, donViNhan, canBoNhan, loaiCongVan, donViNhanNgoai, congVanLaySo};
+        const pageFilter = isInitial ? { congVanLaySo: 1 } : { donViGui, donViNhan, canBoNhan, loaiCongVan, donViNhanNgoai, congVanLaySo };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
-                console.log(page.filter);
+                // console.log(page.filter);
                 if (isInitial) {
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
@@ -120,15 +127,8 @@ class HcthCongVanDi extends AdminPage {
         e.preventDefault();
         T.confirm('Xóa công văn', 'Bạn có chắc chắn muốn xóa công văn này?', true,
             isConfirm => isConfirm && this.props.deleteHcthCongVanDi(item.id));
-
     }
 
-    getSoCongVan = (soDi, donVi, loai) => {
-        if (loai == null) {
-            return soDi + '/' + 'XHNV-' + donVi;
-        }
-        return soDi + '/' + loai + '-XHNV-' + donVi;
-    }
     render() {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('hcthCongVanDi', ['read', 'write', 'delete']);
@@ -137,10 +137,9 @@ class HcthCongVanDi extends AdminPage {
         // Chỉ trưởng phòng mới có quyền thêm công văn
         let listDonViQuanLy = this.props.system && this.props.system.user.staff && this.props.system.user.staff.donViQuanLy ? this.props.system.user.staff.donViQuanLy : [];
         let dsQuanLy = listDonViQuanLy.map(item => item.maDonVi).toString();
-        // console.log(dsQuanLy);
         let table = renderTable({
             emptyTable: 'Chưa có dữ liệu công văn các phòng',
-            getDataSource: () => list, 
+            getDataSource: () => list,
             stickyHead: false,
             renderHead: () => (
                 <tr>
@@ -160,7 +159,7 @@ class HcthCongVanDi extends AdminPage {
                 return (
                     <tr key={index}>
                         <TableCell type='text' style={{ textAlign: 'center' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                        <TableCell type='link' style={{ whiteSpace: 'nowrap'}} onClick={() => this.props.history.push(`/user/hcth/cong-van-cac-phong/${item.id}`)}  content={item.soDi && item.tenVietTatDonViGui ? this.getSoCongVan(item.soDi, item.tenVietTatDonViGui, item.tenVietTatLoaiCongVanDi) : 'Chưa có số công văn'} />
+                        <TableCell type='link' style={{ whiteSpace: 'nowrap' }} onClick={() => this.props.history.push(`/user/hcth/cong-van-cac-phong/${item.id}`)} content={item.soDi && item.tenVietTatDonViGui ? getSoCongVan(item.soDi, item.tenVietTatDonViGui, item.tenVietTatLoaiCongVanDi) : 'Chưa có số công văn'} />
                         <TableCell type='text' contentClassName='multiple-lines' content={item.trichYeu || ''} />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
                             <>
@@ -205,7 +204,7 @@ class HcthCongVanDi extends AdminPage {
                         } />
                         <TableCell type='text' style={{ whiteSpace: 'nowrap', color: item.trangThai ? listTrangThai[item.trangThai].color : '' }} content={item.trangThai ? listTrangThai[item.trangThai].status : ''}></TableCell>
                         <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                            onEdit={() => this.props.history.push({ pathname: `/user/hcth/cong-van-cac-phong/${item.id}`, state: { soCongVan: this.getSoCongVan(item.soDi, item.tenVietTatDonViGui, item.tenVietTatLoaiCongVanDi) } })}
+                            onEdit={() => this.props.history.push({ pathname: `/user/hcth/cong-van-cac-phong/${item.id}` })}
                             onDelete={(e) => this.onDelete(e, item)} permissions={currentPermissions} />
                     </tr>
 

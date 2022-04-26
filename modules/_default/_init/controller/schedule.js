@@ -3,10 +3,7 @@ module.exports = app => {
         ready: () => app.schedule,
         run: () => {
             // TODO: Long
-            // app.schedule('0 0 * * *', () => {
-            //     // const today = new Date();
-            //
-            // });
-        },
+            app.schedule('0 8 * * *', app.hcthCongVanDen.notifyExpired);
+        }
     });
 };

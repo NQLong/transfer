@@ -14,7 +14,11 @@ export default {
             component: Loadable({ loading: Loading, loader: () => import('./adminUploadPage') })
         },
         {
-            path: '/user/:menu/phong',
+            path: '/user/danh-muc/phong',
+            component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
+        },
+        {
+            path: '/user/dao-tao/phong',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
     ],
