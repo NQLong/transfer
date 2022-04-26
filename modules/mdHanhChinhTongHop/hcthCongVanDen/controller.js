@@ -1,5 +1,5 @@
 module.exports = (app) => {
-    const { trangThaiSwitcher, action, CONG_VAN_TYPE, MA_BAN_GIAM_HIEU, MA_HCTH, MA_TRUONG_PHONG, MA_TRUONG_KHOA } = require('../constant');
+    const { trangThaiSwitcher, action, CONG_VAN_TYPE, MA_BAN_GIAM_HIEU, MA_HCTH } = require('../constant');
 
     const staffMenu = {
         parentMenu: app.parentMenu.hcth,
@@ -522,28 +522,15 @@ module.exports = (app) => {
     }));
 
 
-    const createNotificaction = (shccs, condition, notification, done) => {
-        app.model.canBo.getAll({
-            statement: 'shcc IN (:dsCanBo) ' + condition.statement || '',
-            parameter: {
-                dsCanBo: shccs,
-                ...condition.parameter
-            }
-        }, 'email', 'email', (error, canBos) => {
-            if (error) {
-                done(error);
-            }
-            else {
-                const prmomises = [];
-                canBos.forEach(canBo => {
-                    prmomises.push(app.notification.send({
-                        toEmail: canBo.email,
-                        ...notification
-                    }));
-                });
-                Promise.all(prmomises).then(() => done(null)).catch(error => done(error));
-            }
+    const createNotification = (emails, notification, done) => {
+        const prmomises = [];
+        emails.forEach(email => {
+            prmomises.push(app.notification.send({
+                toEmail: email,
+                ...notification
+            }));
         });
+        Promise.all(prmomises).then(() => done(null)).catch(error => done(error));
     };
 
     const getMessage = (status) => {
@@ -573,76 +560,63 @@ module.exports = (app) => {
         }
     };
 
+
+    const createChiDaoNotification = (item) => new Promise((resolve, reject) => {
+        const canBoChiDao = item.quyenChiDao?.split(',') || [];
+        app.model.canBo.getAll({
+            statement: 'shcc IN (:dsCanBo)',
+            parameter: {
+                dsCanBo: [...canBoChiDao, ''],
+            }
+        }, 'email', 'email', (error, canBos) => {
+            if (error) reject(error);
+            else {
+                createNotification(canBos.map(item => item.email), { title: 'Công văn đến', icon: 'fa-book', iconColor: 'info', subTitle: 'Bạn có một công văn cần chỉ đạo', link: `/user/cong-van-den/${item.id}` }, (error) => {
+                    if (error)
+                        reject(error);
+                    else resolve();
+                });
+            }
+        });
+    });
+
+    const createHcthStaffNotification = (item, status) => new Promise((resolve, reject) => {
+        app.model.hcthCongVanDen.getAuthorizedStaff((error, staffs) => {
+            if (error) reject(error);
+            else {
+                const emails = staffs.rows.map(item => item.email);
+                createNotification(emails, { title: 'Công văn đến', icon: 'fa-book', subTitle: getMessage(status), iconColor: getIconColor(status), link: `/user/hcth/cong-van-den/${item.id}` }, error => {
+                    if (error) reject(error);
+                    else resolve();
+                });
+            }
+        });
+    });
+
+    const createRelatedStaffNotification = (item, status) => new Promise((resolve, reject) => {
+        app.model.hcthCongVanDen.getRelatedStaff(item.id, (error, staffs) => {
+            if (error) reject(error);
+            else {
+                const emails = staffs.rows.map(item => item.email);
+                createNotification(emails, { title: 'Công văn đến', icon: 'fa-book', subTitle: getMessage(status), iconColor: getIconColor(status), link: `/user/cong-van-den/${item.id}` }, error => {
+                    error ? reject(error) : resolve();
+                });
+            }
+        });
+    });
+
     const onStatusChange = (item, before, after) => new Promise((resolve) => {
         try {
             if (before == after)
                 resolve();
             if (after == trangThaiSwitcher.CHO_DUYET.id) {
-                const canBoChiDao = item.quyenChiDao.split(',');
-                createNotificaction(canBoChiDao, {}, {
-                    title: 'Công văn đến',
-                    icon: 'fa-book',
-                    subTitle: 'Bạn có một công văn cần chỉ đạo',
-                    link: `/user/cong-van-den/${item.id}`,
-                }, (error) => {
-                    if (error)
-                        throw error;
-                    else resolve();
-                });
+                createChiDaoNotification(item).then(() => resolve()).catch(error => { throw error; });
             }
             else if ([trangThaiSwitcher.CHO_PHAN_PHOI.id, trangThaiSwitcher.TRA_LAI_BGH.id].includes(after)) {
-                app.model.fwAssignRole.getAll({ nhomRole: 'quanLyCongVanDen' }, 'nguoiDuocGan', '', (error, canBos) => {
-                    if (error) throw error;
-                    const shccCanBo = canBos.map(canBo => canBo.nguoiDuocGan);
-                    createNotificaction(
-                        shccCanBo,
-                        {
-                            statement: 'OR EXISTS(select SHCC from QT_CHUC_VU qtcv where qtcv.SHCC = TCHC_CAN_BO.SHCC AND qtcv.CHUC_VU_CHINH = 1 AND qtcv.MA_CHUC_VU = :matruongphong AND qtcv.MA_DON_VI = :mahcth)',
-                            parameter: {
-                                matruongphong: MA_TRUONG_PHONG,
-                                mahcth: MA_HCTH
-                            }
-                        },
-                        {
-                            title: 'Công văn đến',
-                            icon: 'fa-book',
-                            subTitle: getMessage(after),
-                            iconColor: getIconColor(after),
-                            link: `/user/hcth/cong-van-den/${item.id}`,
-                        }, (error) => {
-                            if (error)
-                                throw error;
-                            else resolve();
-                        });
-                });
+                createHcthStaffNotification(item, after).then(() => resolve()).catch(error => { throw error; });
             }
             else if (after == trangThaiSwitcher.DA_PHAN_PHOI.id) {
-                app.model.hcthDonViNhanCongVan.getAll({
-                    congVan: item.id,
-                    loai: CONG_VAN_TYPE
-                }, 'donViNhan', '', (error, donViNhan) => {
-                    if (error) throw error;
-                    donViNhan = donViNhan.map(item => item.donViNhan);
-                    createNotificaction(
-                        item.canBoNhan?.split(',') || [],
-                        {
-                            statement: `OR EXISTS(select SHCC from QT_CHUC_VU qtcv where qtcv.SHCC = TCHC_CAN_BO.SHCC AND qtcv.CHUC_VU_CHINH = 1 AND qtcv.MA_CHUC_VU in (${[MA_TRUONG_PHONG, MA_TRUONG_KHOA].map(item => `'${item}'`).toString()}) AND qtcv.MA_DON_VI in (:madonvi))`,
-                            parameter: {
-                                madonvi: donViNhan
-                            }
-                        },
-                        {
-                            title: 'Công văn đến',
-                            subTitle: getMessage(after),
-                            icon: 'fa-book',
-                            iconColor: getIconColor(after),
-                            link: `/user/cong-van-den/${item.id}`,
-                        }, (error) => {
-                            if (error)
-                                throw error;
-                            else resolve();
-                        });
-                });
+                createRelatedStaffNotification(item, after).then(() => resolve()).catch(error => { throw error; });
             }
         } catch (error) {
             console.error('fail to send notification', error);
@@ -650,6 +624,45 @@ module.exports = (app) => {
         }
     });
 
-
-
+    app.hcthCongVanDen = {
+        notifyExpired: () => {
+            try {
+                const today = new Date();
+                const expireTime = new Date();
+                expireTime.setDate(today.getDate() + 3);
+                expireTime.setHours(0, 0, 0, 0);
+                app.model.hcthCongVanDen.getNotification(expireTime.getTime(), (error, result) => {
+                    if (error) throw error;
+                    else if (result.rows && result.rows.length > 0) {
+                        app.model.hcthCongVanDen.update(
+                            {
+                                statement: 'id in (:ids)',
+                                parameter: { ids: result.rows.map(item => item.id) },
+                            },
+                            { nhacNho: 1 }, (error) => {
+                                if (error) throw error;
+                                else {
+                                    app.model.hcthCongVanDen.getAuthorizedStaff((error, canBos) => {
+                                        if (error) throw error;
+                                        const emails = canBos.rows.map(canBo => canBo.email);
+                                        const prmomises = [];
+                                        result.rows.forEach(item => {
+                                            prmomises.push(new Promise((resolve, reject) => {
+                                                createNotification(emails, { title: 'Công văn đến', icon: 'fa-book', subTitle: 'Công văn đến sắp hết hạn. Bạn hãy kiểm tra lại các đơn vị liên quan đã có thao tác cần thiết đối với công văn.', iconColor: 'danger', link: `/user/hcth/cong-van-den/${item.id}` }, (error) => {
+                                                    error ? reject(error) : resolve();
+                                                });
+                                            }));
+                                        });
+                                        Promise.all(prmomises).catch(error => { throw error; });
+                                    });
+                                }
+                            }
+                        );
+                    }
+                });
+            } catch (error) {
+                console.error('Gửi thông báo nhắc nhở công văn đến hết hạn lỗi', error);
+            }
+        }
+    };
 };
