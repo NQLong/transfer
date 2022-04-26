@@ -4,11 +4,23 @@ import { createHcthGiaoNhiemVu, getHcthGiaoNhiemVuSearchPage, getHcthGiaoNhiemVu
 import { getDmLoaiDonViAll } from 'modules/mdDanhMuc/dmLoaiDonVi/redux';
 import Pagination from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, FormSelect, FormDatePicker} from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, FormSelect, TableHeader} from 'view/component/AdminPage';
 // import { SelectAdapter_DmDonViGuiCongVan } from 'modules/mdDanhMuc/dmDonViGuiCv/redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
 
+const dsDoUuTien = [
+    {
+        id: 1,
+        text: 'Thường',
+        color: 'blue'
+    },
+    {
+        id: 2, 
+        text: 'Khẩn cấp',
+        color: 'red'
+    }
+];
 class hcthGiaoNhiemVuPage extends AdminPage {
     state = { searching: false, loaiDonVi: [] };
 
@@ -19,7 +31,6 @@ class hcthGiaoNhiemVuPage extends AdminPage {
             T.showSearchBox(() => {
                 this.donViNhan?.value('');
                 this.canBoNhan?.value('');
-                this.ngayHetHan?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
             this.getPage();
@@ -29,14 +40,13 @@ class hcthGiaoNhiemVuPage extends AdminPage {
     }
 
     changeAdvancedSearch = (isInitial = false) => {
-        let { pageNumber, pageSize } = this.props && this.props.hcthCongVanDen && this.props.hcthCongVanDen.page ? this.props.hcthCongVanDen.page : { pageNumber: 1, pageSize: 50 };
+        let { pageNumber, pageSize } = this.props && this.props.hcthGiaoNhiemVu && this.props.hcthGiaoNhiemVu.page ? this.props.hcthGiaoNhiemVu.page : { pageNumber: 1, pageSize: 50 };
         let donViNhan = this.donViNhan?.value().toString() || null;
         let canBoNhan = this.canBoNhan?.value() || null;
         // let timeType = this.timeType?.value() || null;
         // let fromTime = this.fromTime?.value() ? Number(this.fromTime.value()) : null;
-        let ngayHetHan = this.ngayHetHan?.value() ? Number(this.ngayHetHan.value()) : null;
-        const userId = this.props.system.user.ma;
-        const pageFilter = isInitial ? { userId } : { donViNhan, canBoNhan, userId , ngayHetHan};
+        const userId = this.props.system.user.shcc;
+        const pageFilter = isInitial ? { userId } : { donViNhan, canBoNhan, userId};
         
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
@@ -45,11 +55,10 @@ class hcthGiaoNhiemVuPage extends AdminPage {
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
                     this.donViNhan?.value(filter.donViNhan || '');
                     this.canBoNhan?.value(filter.canBoNhan || '');
-                    this.ngayHetHan?.value(filter.ngayHetHan || '');
                     // this.timeType?.value(filter.timeType || '');
                     // this.fromTime?.value(filter.fromTime || '');
                     
-                    if (!$.isEmptyObject(filter) && filter && (filter.donViNhan || filter.canBoNhan || filter.ngayHetHan)) this.showAdvanceSearch();
+                    if (!$.isEmptyObject(filter) && filter && (filter.donViNhan || filter.canBoNhan)) this.showAdvanceSearch();
                 }
             });
         });
@@ -72,23 +81,39 @@ class hcthGiaoNhiemVuPage extends AdminPage {
             isConfirm && this.props.deleteHcthGiaoNhiemVu(item.id));
     }
 
+    formatText = (str, numOfChar) => {
+        return str.length > numOfChar ? `${str.slice(0, numOfChar)}...` : str;
+    }
+
     render() {
         //const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [], 
-        const permission = this.getUserPermission('hcthGiaoNhiemVu', ['read', 'write', 'delete']);
-        //presidentPermission = this.getUserPermission('president', ['login']);
+        const permission = this.getUserPermission('hcthGiaoNhiemVu', ['read', 'write', 'delete']),
+        presidentPermission = this.getUserPermission('president', ['login']),
+        managerPermision = this.getUserPermission('manager', ['write']),
+        rectorPermission = this.getUserPermission('rectors', ['login']);
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.hcthGiaoNhiemVu && this.props.hcthGiaoNhiemVu.page ?
             this.props.hcthGiaoNhiemVu.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null };
+        const doUuTienMapObj = dsDoUuTien.reduce((acc, ele) => {
+            acc[ele.id] = ele;
+            return acc;
+        }, {});
 
-        let table = 'Không có danh sách giao nhiệm vụ!';
+        let table = 'Không có danh sách nhiệm vụ!';
         if (list && list.length > 0) {
             table = renderTable({
                 getDataSource: () => list, stickyHead: false,
                 renderHead: () => (
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
-                        <th style={{ width: '100%', whiteSpace: 'nowrap' }}>Nội dung</th>
+                        <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Tiêu đề</th>
+                        <th style={{ width: '50%', whiteSpace: 'nowrap' }}>Nội dung</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Đơn vị, người nhận</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày hết hạn</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Độ ưu tiên</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Loại</th>
+                        <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Người tạo</th>
+                        <TableHeader style={{ width: 'atuo', whiteSpace: 'nowrap' }} sort isSorted={this.state.sortBy == 'ngayTao'} onSort={(type) => this.onSort('ngayTao', type)}>Ngày tạo</TableHeader>
+                        <TableHeader style={{ width: 'auto', whiteSpace: 'nowrap' }} sort isSorted={this.state.sortBy == 'ngayBatDau'} onSort={(type) => this.onSort('ngayBatDau', type)}>Ngày bắt đầu</TableHeader>
+                        <TableHeader style={{ width: 'auto', whiteSpace: 'nowrap' }} sort isSorted={this.state.sortBy == 'ngayKetThuc'} onSort={(type) => this.onSort('ngayKetThuc', type)}>Ngày kết thúc</TableHeader>
                         <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                     </tr>
                 ),
@@ -98,7 +123,8 @@ class hcthGiaoNhiemVuPage extends AdminPage {
                     return (
                         <tr key={index}>
                             <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
-                            <TableCell type='text' content={item.noiDung ? item.noiDung : ''} />
+                            <TableCell type='text' content={item.tieuDe ? this.formatText(item.tieuDe, 20) : ''} />
+                            <TableCell type='text' content={item.noiDung ? this.formatText(item.noiDung , 30) : ''} />
                             <TableCell type='text' content={
                                 <>
                                     <span>{danhSachCanBoNhan && danhSachCanBoNhan.length > 0 ? danhSachCanBoNhan.map((item, index) => (
@@ -117,10 +143,28 @@ class hcthGiaoNhiemVuPage extends AdminPage {
                                     }</span>
                                 </>
                             } style={{ whiteSpace: 'nowrap' }} />
-                            
-                            <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={T.dateToText(item.ngayHetHan, 'dd/mm/yyyy')} />
+                            <TableCell type='text' content={item.doUuTien ? doUuTienMapObj[item.doUuTien].text : ''} style={{ color: item.doUuTien ? doUuTienMapObj[item.doUuTien].color : '#000000', fontWeight: 'bold'}} />
+                            <TableCell type='text' content={item.isNhiemVuLienPhong ? 'Liên phòng' : 'Thường'} style={{ fontWeight: 'bold'}} />
+                            <TableCell type='text' content={item.tenNguoiTao} style={{ fontWeight: 'bold'}}/>
+                            <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
+                                item.ngayTao ? (<>
+                                    <span style={{ color: 'black' }}> {T.dateToText(item.ngayTao, 'dd/mm/yyyy')}</span>
+                                </>) : null
+                            } />
+
+                            <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
+                                item.ngayBatDau ? (<>
+                                    <span style={{ color: 'blue' }}> {T.dateToText(item.ngayBatDau, 'dd/mm/yyyy')}</span>
+                                </>) : null
+                            } />
+                            <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
+                                item.ngayKetThuc ? (<>
+                                    <span style={{ color: 'red' }}> {T.dateToText(item.ngayKetThuc, 'dd/mm/yyyy')}</span>
+                                </>) : null
+                            } />
+            
                             <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
-                                onEdit={() => this.props.history.push(`/user/hcth/giao-nhiem-vu/${item.id}`)} onDelete={e => this.delete(e, item)} />
+                                onEdit={() => this.props.history.push({ pathname : `/user/hcth/giao-nhiem-vu/${item.id}`, state: { nguoiTao: item.ngayTao}})} onDelete={e => this.delete(e, item)} />
                         </tr>
                     );
                 }
@@ -147,7 +191,6 @@ class hcthGiaoNhiemVuPage extends AdminPage {
 
                     <FormSelect multiple={true} allowClear={true} className='col-md-4' ref={e => this.donViNhan = e} label='Đơn vị nhận' data={SelectAdapter_DmDonVi} onChange={() => this.changeAdvancedSearch()} />
                     <FormSelect allowClear={true} className='col-md-4' ref={e => this.canBoNhan = e} label='Cán bộ nhận' data={SelectAdapter_FwCanBo} onChange={() => this.changeAdvancedSearch()} />
-                    <FormDatePicker allowClear={true} type='date' className='col-md-4' ref={e => this.ngayHetHan = e} label='Ngày hết hạn' onChange={() => this.changeAdvancedSearch()} />
                 </div>
             </>,
             content: <>
@@ -162,7 +205,7 @@ class hcthGiaoNhiemVuPage extends AdminPage {
                 /> */}
             </>,
             backRoute: '/user/hcth',
-            onCreate: permission && permission.write ? () => this.props.history.push('/user/hcth/giao-nhiem-vu/new') : null,
+            onCreate: ((managerPermision && managerPermision.write) || (presidentPermission && presidentPermission.login) || (rectorPermission && rectorPermission.login)) ? () => this.props.history.push('/user/hcth/giao-nhiem-vu/new') : null,
         });
     }
 }
