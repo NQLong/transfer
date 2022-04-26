@@ -197,3 +197,13 @@ export function createPhanHoi(data, done) {
         }, () => T.notify('Thêm phản hồi bị lỗi', 'danger'));
     };
 }
+
+export const SelectAdapter_CongVanDi = {
+    ajax: true,
+    url: '/api/hcth/cong-van-cac-phong/page/1/20',
+    data: params => ({ condition: params.term }),
+    processResults: response => ({ results: console.log(response) || response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.id, text: `${item.soCongVan || 'Chưa có số công văn'} : ${item.trichYeu}` })) : [] }),
+    getOne: getCongVanDi,
+    fetchOne: (id, done) => (getCongVanDi(id, ({ item }) => done && done({ id: item.id, text: `${item.soCongVan || 'Chưa có số công văn'} : ${item.trichYeu}` })))(),
+    processResultOne: response => response && response.item && ({ value: response.item.id, text: `${response.item.soCongVan || 'Chưa có số công văn'} : ${response.item.trichYeu}` }),
+};
