@@ -15,12 +15,16 @@ module.exports = {
         APPROVE: 'APPROVE',
         PUBLISH: 'PUBLISH',
         UPDATE_STATUS: 'UPDATE_STATUS',
+        ACCEPT: 'ACCEPT',
+        READ: 'READ'
     },
 
     CONG_VAN_TYPE: 'DEN',
     MA_CHUC_VU_HIEU_TRUONG: '001',
     MA_BAN_GIAM_HIEU: '68',
     MA_HCTH: '29',
+    MA_TRUONG_PHONG: '003',
+    MA_TRUONG_KHOA: '009',
 
     handleResult: (resolve, reject, item, error) => {
         if (error) {
