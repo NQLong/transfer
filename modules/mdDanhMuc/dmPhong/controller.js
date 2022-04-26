@@ -18,7 +18,8 @@ module.exports = app => {
         { name: 'dmPhong:delete' },
         { name: 'dmPhong:upload' }
     );
-    app.get('/user/:menu/phong', app.permission.orCheck('dmPhong:read', 'dtPhong:read'), app.templates.admin);
+    app.get('/user/danh-muc/phong', app.permission.check('dmPhong:read'), app.templates.admin);
+    app.get('/user/dao-tao/phong', app.permission.check('dtPhong:read'), app.templates.admin);
     app.get('/user/danh-muc/phong/upload', app.permission.check('dmPhong:write'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------

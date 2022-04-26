@@ -17,7 +17,8 @@ module.exports = app => {
         { name: 'dmCaHoc:write' },
         { name: 'dmCaHoc:delete' },
     );
-    app.get('/user/:menu/ca-hoc', app.permission.orCheck('dmCaHoc:read', 'dtCaHoc:read'), app.templates.admin);
+    app.get('/user/danh-muc/ca-hoc', app.permission.check('dmCaHoc:read'), app.templates.admin);
+    app.get('/user/dao-tao/ca-hoc', app.permission.check('dtCaHoc:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/danh-muc/ca-hoc/page/:pageNumber/:pageSize', app.permission.orCheck('dmCaHoc:read', 'dtCaHoc:read'), (req, res) => {

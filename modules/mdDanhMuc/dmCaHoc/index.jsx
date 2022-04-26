@@ -10,7 +10,11 @@ export default {
     },
     routes: [
         {
-            path: '/user/:menu/ca-hoc',
+            path: '/user/danh-muc/ca-hoc',
+            component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
+        },
+        {
+            path: '/user/dao-tao/ca-hoc',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
     ],
