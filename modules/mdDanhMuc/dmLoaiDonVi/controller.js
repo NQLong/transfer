@@ -26,7 +26,7 @@ module.exports = app => {
     });
 
     app.get('/api/dm-loai-don-vi/item/:ma', app.permission.check('user:login'), (req, res) => {
-        app.model.dmLoaiDonVi.get(req.params.ma, (error, item) => res.send({ error, item }));
+        app.model.dmLoaiDonVi.get({ ma: req.params.ma }, (error, item) => res.send({ error, item }));
     });
 
     app.post('/api/dm-loai-don-vi', app.permission.check('dmLoaiDonVi:write'), (req, res) => {

@@ -205,6 +205,17 @@ class QtChucVu extends AdminPage {
                     this.fromAge?.value(filter.fromAge);
                     this.toAge?.value(filter.toAge);
                     if (!$.isEmptyObject(filter) && filter && (filter.fromYear || filter.toYear || filter.listShcc || filter.listDonVi || filter.timeType || filter.listChucVu || filter.gioiTinh || filter.listChucDanh || filter.fromAge || filter.toYear)) this.showAdvanceSearch();
+                } else if (isReset) {
+                    this.fromYear?.value('');
+                    this.toYear?.value('');
+                    this.maDonVi.value('');
+                    this.mulCanBo.value('');
+                    this.timeType.value('');
+                    this.mulMaChucVu.value('');
+                    this.gioiTinh.value('');
+                    this.mulMaChucDanh.value('');
+                    this.fromAge.value('');
+                    this.toAge.value('');
                 }
             });
         });
@@ -263,12 +274,12 @@ class QtChucVu extends AdminPage {
                         <th style={{ width: 'auto', textAlign: 'right' }}>#</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Cán bộ</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày sinh</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh nghề nghiệp</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Chức danh<br/>nghề nghiệp</th>
                         <th style={{ width: '40%', whiteSpace: 'nowrap' }}>Chức vụ</th>
                         <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Đơn vị cấp trường</th>
                         <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Đơn vị cấp khoa</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Hệ số phụ cấp</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Quyết định bổ nhiệm</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Quyết định<br/>bổ nhiệm</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Chức vụ chính</th>
                         <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                     </tr>
