@@ -130,8 +130,9 @@ class StaffEditPage extends AdminPage {
 
 
     componentDidMount() {
-        T.ready('/user/hcth', () => {
-            const params = T.routeMatcher('/user/hcth/cong-van-den/:id').parse(window.location.pathname),
+        const isHcthMenu = window.location.pathname.startsWith('/user/hcth');
+        T.ready(isHcthMenu ? '/user/hcth' : '/user' , () => {
+            const params = T.routeMatcher(isHcthMenu ? '/user/hcth/cong-van-den/:id' : '/user/cong-van-den/:id').parse(window.location.pathname),
                 user = this.props.system && this.props.system.user ? this.props.system.user : { shcc: '', staff: {}, lastName: '', firstName: '' },
                 { shcc, staff, image } = user;
             this.setState({
@@ -145,8 +146,6 @@ class StaffEditPage extends AdminPage {
             // fetch chuc vu
             if (staff && staff.listChucVu?.length > 0)
                 SelectAdapter_DmChucVuV2.fetchOne(staff.listChucVu[0].maChucVu, (item) => this.setState({ chucVu: item.text }));
-
-
         });
     }
 
@@ -592,7 +591,7 @@ class StaffEditPage extends AdminPage {
     }
 
     canPublish = () => {
-        return this.state.id && this.getUserPermission('hcth', ['manage']).manage && this.state.trangThai == trangThaiSwitcher.CHO_PHAN_PHOI.id;
+        return this.state.id && this.getUserPermission('hcthCongVanDen', ['manage']).manage && this.state.trangThai == trangThaiSwitcher.CHO_PHAN_PHOI.id;
     }
 
     canApprove = () => {
@@ -643,9 +642,9 @@ class StaffEditPage extends AdminPage {
                 <div className='tile'>
                     <h3 className='tile-title'>{!this.state.id ? 'Tạo mới công văn đến' : 'Cập nhật công văn đến'}</h3>
                     <div className='tile-body row'>
-                        <FormTextBox onChange={this.setChange} type='text' className='col-md-2' ref={e => this.soDen = e} label='Số đến' readOnlyEmptyText='Chưa có' readOnly={readOnly} />
-                        <FormTextBox onChange={this.setChange} type='text' className='col-md-2' ref={e => this.soCongVan = e} label='Mã số CV' readOnlyEmptyText='Chưa có' readOnly={readOnly} />
-                        <FormSelect onChange={this.setChange} className='col-md-8' ref={e => this.donViGui = e} label={(<span onClick={(e) => e.stopPropagation()}>
+                        <FormTextBox type='text' className='col-md-2' ref={e => this.soDen = e} label='Số đến' readOnlyEmptyText='Chưa có' readOnly={readOnly} />
+                        <FormTextBox type='text' className='col-md-2' ref={e => this.soCongVan = e} label='Mã số CV' readOnlyEmptyText='Chưa có' readOnly={readOnly} />
+                        <FormSelect className='col-md-8' ref={e => this.donViGui = e} label={(<span onClick={(e) => e.stopPropagation()}>
                             Đơn vị gửi công văn
                             {!readOnly && <>
                                 (
