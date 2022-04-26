@@ -7536,9 +7536,9 @@
                 "BAO_CAO_TEN": {
                     "value": "baoCaoTen",
                     "dataType": "NVARCHAR2",
-                    "dataDefault": "",
+                    "dataDefault": "null",
                     "nullable": true,
-                    "size": 50
+                    "size": 1000
                 },
                 "BAO_CAO_NGAY_NOP": {
                     "value": "baoCaoNgayNop",
@@ -8546,6 +8546,9 @@
             "active": true,
             "moduleName": "hcthCanBoNhan",
             "modelName": "hcthCanBoNhan",
+            "methods": {
+                "HCTH_GIAO_NHIEM_VU_GET_ALL_CAN_BO_NHAN": "getAllCanBoNhan"
+            },
             "columns": {
                 "ID": {
                     "value": "id",
@@ -12761,6 +12764,9 @@
             "active": true,
             "moduleName": "hcthLienKet",
             "modelName": "hcthLienKet",
+            "methods": {
+                "HCTH_GIAO_NHIEM_VU_GET_ALL_LIEN_KET": "getAllLienKet"
+            },
             "columns": {
                 "ID": {
                     "value": "id",
