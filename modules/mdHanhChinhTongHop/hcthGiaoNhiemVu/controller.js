@@ -10,6 +10,7 @@ module.exports = (app) => {
         { name: 'hcthGiaoNhiemVu:write' },
         { name: 'hcthGiaoNhiemVu:delete' },
         { name: 'hcth:login'},
+        { name: 'hcth:manage'},
         { name: 'staff:login', menu},
     );
 
@@ -115,7 +116,7 @@ module.exports = (app) => {
         });
     });
 
-    app.put('/api/hcth/giao-nhiem-vu', app.permission.orCheck('manager:write', 'rectors:login', 'hcth:manager', 'president:login'), (req, res) => {
+    app.put('/api/hcth/giao-nhiem-vu', app.permission.orCheck('manager:write', 'rectors:login', 'hcth:manage', 'president:login'), (req, res) => {
         // app.model.hcthGiaoNhiemVu.update({ id: req.body.id }, req.body.changes, (errors, items) => res.send({ errors, items }));
         const { fileList, ...changes } = req.body.changes;
         const postData = {

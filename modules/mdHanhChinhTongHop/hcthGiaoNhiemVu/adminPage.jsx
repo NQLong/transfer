@@ -90,7 +90,8 @@ class hcthGiaoNhiemVuPage extends AdminPage {
         const permission = this.getUserPermission('hcthGiaoNhiemVu', ['read', 'write', 'delete']),
         presidentPermission = this.getUserPermission('president', ['login']),
         managerPermision = this.getUserPermission('manager', ['write']),
-        rectorPermission = this.getUserPermission('rectors', ['login']);
+        rectorPermission = this.getUserPermission('rectors', ['login']),
+        hcthPermission = this.getUserPermission('hcth', ['login']);
         const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.hcthGiaoNhiemVu && this.props.hcthGiaoNhiemVu.page ?
             this.props.hcthGiaoNhiemVu.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, list: null };
         const doUuTienMapObj = dsDoUuTien.reduce((acc, ele) => {
@@ -205,7 +206,10 @@ class hcthGiaoNhiemVuPage extends AdminPage {
                 /> */}
             </>,
             backRoute: '/user/hcth',
-            onCreate: ((managerPermision && managerPermision.write) || (presidentPermission && presidentPermission.login) || (rectorPermission && rectorPermission.login)) ? () => this.props.history.push('/user/hcth/giao-nhiem-vu/new') : null,
+            onCreate: ((managerPermision && managerPermision.write) 
+            || (presidentPermission && presidentPermission.login) 
+            || (rectorPermission && rectorPermission.login)
+            || (hcthPermission && hcthPermission.login)) ? () => this.props.history.push('/user/hcth/giao-nhiem-vu/new') : null,
         });
     }
 }
