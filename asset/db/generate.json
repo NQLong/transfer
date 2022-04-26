@@ -11847,7 +11847,8 @@
             "moduleName": "dtThoiKhoaBieu",
             "modelName": "dtThoiKhoaBieu",
             "methods": {
-                "DT_THOI_KHOA_BIEU_SEARCH_PAGE": "searchPage"
+                "DT_THOI_KHOA_BIEU_SEARCH_PAGE": "searchPage",
+                "DT_LICH_PHONG": "getLichPhong"
             },
             "columns": {
                 "ID": {
@@ -13053,17 +13054,17 @@
                 },
                 "THANG_DO_MIN": {
                     "value": "thangDoMin",
-                    "dataType": "NUMBER",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "1,1"
+                    "size": 5
                 },
                 "THANG_DO_MAX": {
                     "value": "thangDoMax",
-                    "dataType": "NUMBER",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "1,1"
+                    "size": 5
                 },
                 "MO_TA": {
                     "value": "moTa",

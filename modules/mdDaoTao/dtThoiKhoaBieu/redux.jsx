@@ -135,3 +135,16 @@ export function initSchedule(done) {
 export function changeDtThoiKhoaBieu(item) {
     return { type: DtThoiKhoaBieuUpdate, item };
 }
+
+export function getDtLichDayHoc(phong, done) {
+    return () => {
+        T.get(`/api/dao-tao/get-schedule/${phong}`, data => {
+            if (data.error) {
+                T.notify(`Lỗi: ${data.error.message}`, 'danger');
+                console.error(data.error.message);
+            } else {
+                done && done(data.items);
+            }
+        });
+    };
+}

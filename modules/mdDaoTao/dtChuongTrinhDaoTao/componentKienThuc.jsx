@@ -178,7 +178,6 @@ export class ComponentKienThuc extends AdminPage {
 
             if (index == array.length - 1) return ({ updateDatas, deleteDatas });
         });
-        console.log(updateDatas);
         return ({ updateDatas, deleteDatas });
     }
 
