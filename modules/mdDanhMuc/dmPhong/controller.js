@@ -18,7 +18,8 @@ module.exports = app => {
         { name: 'dmPhong:delete' },
         { name: 'dmPhong:upload' }
     );
-    app.get('/user/:menu/phong', app.permission.orCheck('dmPhong:read', 'dtPhong:read'), app.templates.admin);
+    app.get('/user/danh-muc/phong', app.permission.check('dmPhong:read'), app.templates.admin);
+    app.get('/user/dao-tao/phong', app.permission.check('dtPhong:read'), app.templates.admin);
     app.get('/user/danh-muc/phong/upload', app.permission.check('dmPhong:write'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
@@ -28,7 +29,7 @@ module.exports = app => {
         app.model.dmPhong.getPage(pageNumber, pageSize, {
             statement: 'lower(ten) LIKE :searchText',
             parameter: {
-                searchText: `%${req.query.condition.toLowerCase()}%`
+                searchText: `%${req.query.condition ? req.query.condition.toLowerCase() : ''}%`
             }
         }, (error, page) => res.send({ error, page }));
     });
@@ -46,8 +47,8 @@ module.exports = app => {
         app.model.dmPhong.getAll(condition, (error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/danh-muc/phong/item/:ma', app.permission.orCheck('dmPhong:read', 'dtPhong:read'), (req, res) => {
-        app.model.dmPhong.get(req.params.ma, (error, item) => res.send({ error, item }));
+    app.get('/api/danh-muc/phong/item/:ten', app.permission.orCheck('dmPhong:read', 'dtPhong:read'), (req, res) => {
+        app.model.dmPhong.get({ ten: req.params.ten }, (error, item) => res.send({ error, item }));
     });
 
     app.post('/api/danh-muc/phong', app.permission.check('dmPhong:write'), (req, res) => {

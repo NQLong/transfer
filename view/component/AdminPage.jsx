@@ -11,7 +11,7 @@ import Tooltip from '@mui/material/Tooltip';
 // Table components ---------------------------------------------------------------------------------------------------
 export class TableCell extends React.Component { // type = number | date | link | image | checkbox | buttons | text (default)
     render() {
-        let { type = 'text', content = '', permission = {}, className = '', style = {}, contentStyle = {}, alt = '', display = true, rowSpan = 1, colSpan = 1, dateFormat, contentClassName = '' } = this.props;
+        let { type = 'text', content = '', permission = {}, className = '', style = {}, contentStyle = {}, alt = '', display = true, rowSpan = 1, colSpan = 1, dateFormat, contentClassName = '', onClick = null } = this.props;
         if (style == null) style = {};
 
         if (display != true) {
@@ -72,7 +72,7 @@ export class TableCell extends React.Component { // type = number | date | link 
                     </div>
                 </td>);
         } else {
-            return <td className={className} style={{ ...style }} rowSpan={rowSpan} colSpan={colSpan}><div style={contentStyle} className={contentClassName}>{content}</div></td>;
+            return <td className={className} style={{ ...style }} rowSpan={rowSpan} colSpan={colSpan} onClick={onClick}><div style={contentStyle} className={contentClassName}>{content}</div></td>;
         }
     }
 }
@@ -362,7 +362,7 @@ class FormNumberBox extends React.Component {
     }
 
     render() {
-        let { smallText = '', label = '', placeholder = '', className = '', style = {}, readOnly = false, onChange = null, required = false, step = false, prefix = '', suffix = '' } = this.props,
+        let { smallText = '', label = '', placeholder = '', className = '', style = {}, readOnly = false, onChange = null, required = false, step = false, prefix = '', suffix = '', onKeyPress = null } = this.props,
             readOnlyText = this.exactValue ? this.exactValue : this.state.value;
         const properties = {
             className: 'form-control',
@@ -379,6 +379,7 @@ class FormNumberBox extends React.Component {
                     onChange && onChange(val.floatValue);
                 }
             },
+            onKeyPress: e => onKeyPress && onKeyPress(e),
             getInputRef: e => this.input = e
         };
         readOnlyText = readOnlyText ? T.numberDisplay(readOnlyText, ',') : '';
@@ -473,7 +474,7 @@ export class FormTextBox extends React.Component {
                 className: 'form-control',
                 placeholder: placeholder || label,
                 value: this.state.value,
-                onChange: e => this.setState({ value: e.target.value }, () => (onChange && onChange(e)))
+                onChange: e => this.setState({ value: e.target.value }, () => (onChange && onChange(e))),
             };
             if (type == 'password') properties.autoComplete = 'new-password';
             if (type == 'phone') {

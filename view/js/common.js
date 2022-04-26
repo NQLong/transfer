@@ -175,12 +175,13 @@ const T = {
     notify: (message, type) => $.notify({ message }, { type, placement: { from: 'bottom' }, z_index: 2000 }),
 
     alert: (text, icon, button, timer) => {
-        let options = {};
+        let options = {}, done = null;
         if (icon) {
             if (typeof icon == 'boolean') {
                 options.button = icon;
                 options.icon = 'success';
-                if (timer) options.timer = timer;
+                if (typeof timer == 'number') options.timer = timer;
+                else if (typeof timer == 'function') done = timer;
             } else if (typeof icon == 'number') {
                 options.timer = icon;
                 options.icon = 'success';
@@ -204,7 +205,7 @@ const T = {
             options.button = true;
         }
         options.text = text;
-        swal(options);
+        done ? swal(options).then(done) : swal(options);
     },
 
     confirm: (title, html, icon, dangerMode, done) => {
@@ -223,6 +224,35 @@ const T = {
         var content = document.createElement('div');
         content.innerHTML = html;
         swal({ icon, title, content, dangerMode, buttons: { cancel: true, confirm: true }, }).then(done);
+    },
+
+    confirmLoading: (title, text, successText = 'Thành công', failText = 'Thất bại', icon, buttonText, done) => {
+        swal({
+            title,
+            text,
+            icon,
+            buttons: {
+                text: buttonText,
+                closeModal: false,
+            },
+        })
+            .then(() => {
+                swal({
+                    title: "Loading",
+                    text: "Vui lòng giữ nguyên trang",
+                    icon: "warning",
+                    button: null,
+                });
+                done().then((data) => {
+                    swal({
+                        title: data.success ? successText : failText,
+                        text: data.success ? data.success : data.error.message,
+                        icon: data.success ? "success" : "error",
+                        button: null,
+                        timer: 3000
+                    });
+                });
+            });
     },
 
     randomHexColor: () => {
@@ -347,7 +377,7 @@ const T = {
         while (end >= start && result <= 70) {
             let positionDay = start.getDay();
             if (positionDay == 0 || positionDay == 6) {
-                 //thứ bảy, chủ nhật
+                //thứ bảy, chủ nhật
             } else {
                 // kiểm tra ngày lễ
                 while (idNgayLe < danhSachNgayLe.length && new Date(danhSachNgayLe[idNgayLe]) < start) idNgayLe++;
@@ -361,7 +391,7 @@ const T = {
             start = start.nextDate();
         }
         if (result > 70) { //Case: Quá nhiều ngày nghỉ
-            return -1; 
+            return -1;
         }
         return result;
     }
@@ -559,7 +589,13 @@ String.prototype.normalizedName = function () {
 String.prototype.numberWithCommas = function () {
     return this.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
-
+String.prototype.getFirstLetters = function () {
+    const firstLetters = this
+        .split(' ')
+        .map(word => word[0])
+        .join('');
+    return firstLetters;
+}
 //Array prototype -----------------------------------------------------------------------------------------------------
 Array.prototype.contains = function (...pattern) {
     return pattern.reduce((result, item) => result && this.includes(item), true);

@@ -15,7 +15,11 @@ export default {
         //     component: Loadable({ loading: Loading, loader: () => import('./adminImportPage') })
         // },
         {
-            path: '/user/:menu/ngay-le',
+            path: '/user/danh-muc/ngay-le',
+            component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
+        },
+        {
+            path: '/user/dao-tao/ngay-le',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
     ],

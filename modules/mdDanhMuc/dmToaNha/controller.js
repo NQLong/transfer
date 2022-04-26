@@ -18,7 +18,8 @@ module.exports = app => {
         { name: 'dmToaNha:write' },
         { name: 'dmToaNha:delete' },
     );
-    app.get('/user/:menu/toa-nha', app.permission.orCheck('dmToaNha:read', 'dtToaNha:read'), app.templates.admin);
+    app.get('/user/danh-muc/toa-nha', app.permission.check('dmToaNha:read'), app.templates.admin);
+    app.get('/user/dao-tao/toa-nha', app.permission.check('dtToaNha:read'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
     app.get('/api/danh-muc/toa-nha/page/:pageNumber/:pageSize', app.permission.orCheck('dmToaNha:read', 'dtToaNha:read'), (req, res) => {

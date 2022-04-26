@@ -19,7 +19,9 @@ module.exports = app => {
         { name: 'dmNgayLe:delete' },
         { name: 'dmNgayLe:upload' },
     );
-    app.get('/user/:menu/ngay-le', app.permission.orCheck('dmNgayLe:read', 'dtNgayLe:read'), app.templates.admin);
+    app.get('/user/danh-muc/ngay-le', app.permission.check('dmNgayLe:read'), app.templates.admin);
+    app.get('/user/dao-tao/ngay-le', app.permission.check('dtNgayLe:read'), app.templates.admin);
+
     app.get('/user/danh-muc/ngay-le/upload', app.permission.check('dmNgayLe:write'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
