@@ -6517,7 +6517,10 @@
             "moduleName": "hcthCongVanDen",
             "modelName": "hcthCongVanDen",
             "methods": {
-                "HCTH_CONG_VAN_DEN_SEARCH_PAGE": "searchPage"
+                "HCTH_CONG_VAN_DEN_SEARCH_PAGE": "searchPage",
+                "HCTH_CONG_VAN_DEN_GET_NOTIFICATION": "getNotification",
+                "HCTH_CONG_VAN_DEN_GET_RELATED_STAFF": "getRelatedStaff",
+                "HCTH_CONG_VAN_DEN_GET_AUTHORIZED_STAFF": "getAuthorizedStaff"
             },
             "columns": {
                 "ID": {
@@ -8553,17 +8556,17 @@
                 },
                 "THANG_DO_MIN": {
                     "value": "thangDoMin",
-                    "dataType": "NUMBER",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "1,1"
+                    "size": 5
                 },
                 "THANG_DO_MAX": {
                     "value": "thangDoMax",
-                    "dataType": "NUMBER",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": "1,1"
+                    "size": 5
                 },
                 "MO_TA": {
                     "value": "moTa",
@@ -8603,7 +8606,7 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 24
+                    "size": 255
                 },
                 "LOAI": {
                     "value": "loai",
@@ -11942,7 +11945,7 @@
                 },
                 "PHONG": {
                     "value": "phong",
-                    "dataType": "NUMBER",
+                    "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
                     "size": 20

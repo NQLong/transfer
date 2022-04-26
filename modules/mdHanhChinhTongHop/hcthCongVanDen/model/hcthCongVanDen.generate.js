@@ -135,5 +135,20 @@ module.exports = app => {
             app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_den_search_page(:pagenumber, :pagesize, :donviguicv, :listdonvi, :macanbo, :timetype, :fromtime, :totime, :sortby, :sorttype, :shcccanbo, :donvicanbo, :stafftype, :status, :searchterm, :totalitem, :pagetotal); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, donviguicv, listdonvi, macanbo, timetype, fromtime, totime, sortby, sorttype, shcccanbo, donvicanbo, stafftype, status, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
+
+        getNotification: (expiretime, done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_den_get_notification(:expiretime); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, expiretime }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
+        },
+
+        getRelatedStaff: (key, done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_den_get_related_staff(:key); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, key }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
+        },
+
+        getAuthorizedStaff: (done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_cong_van_den_get_authorized_staff(); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
+        },
     };
 };
