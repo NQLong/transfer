@@ -144,20 +144,20 @@ class hcthGiaoNhiemVuPage extends AdminPage {
                                 </>
                             } style={{ whiteSpace: 'nowrap' }} />
                             <TableCell type='text' content={item.doUuTien ? doUuTienMapObj[item.doUuTien].text : ''} style={{ color: item.doUuTien ? doUuTienMapObj[item.doUuTien].color : '#000000', fontWeight: 'bold'}} />
-                            <TableCell type='text' content={item.isNhiemVuLienPhong ? 'Liên phòng' : 'Thường'} style={{ fontWeight: 'bold'}} />
-                            <TableCell type='text' content={item.tenNguoiTao} style={{ fontWeight: 'bold'}}/>
+                            <TableCell type='text' content={item.isNhiemVuLienPhong ? 'Liên phòng' : 'Thường'} style={{ fontWeight: 'bold', whiteSpace: 'nowrap'}} />
+                            <TableCell type='text' content={item.tenNguoiTao} style={{ fontWeight: 'bold', whiteSpace: 'nowrap'}}/>
                             <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
                                 item.ngayTao ? (<>
                                     <span style={{ color: 'black' }}> {T.dateToText(item.ngayTao, 'dd/mm/yyyy')}</span>
                                 </>) : null
                             } />
 
-                            <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
+                            <TableCell type='text' style={{ whiteSpace: 'nowrap', fontWeight: 'bold' }} content={
                                 item.ngayBatDau ? (<>
                                     <span style={{ color: 'blue' }}> {T.dateToText(item.ngayBatDau, 'dd/mm/yyyy')}</span>
                                 </>) : null
                             } />
-                            <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
+                            <TableCell type='text' style={{ whiteSpace: 'nowrap', fontWeight: 'bold' }} content={
                                 item.ngayKetThuc ? (<>
                                     <span style={{ color: 'red' }}> {T.dateToText(item.ngayKetThuc, 'dd/mm/yyyy')}</span>
                                 </>) : null

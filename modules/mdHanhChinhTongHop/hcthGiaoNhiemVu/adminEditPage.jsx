@@ -340,7 +340,8 @@ class AdminEditPage extends AdminPage {
             lienKet,
             nguoiTao,
             isNhiemVuLienPhong,
-            donViNhan
+            donViNhan,
+            doUuTien
         }, () => {
             listFile.map((item, index) => this.listFileRefs[index]?.value(item.viTri));
         });
@@ -478,7 +479,6 @@ class AdminEditPage extends AdminPage {
         }, []) || [];
         const isShowCanBoNhanLienPhong = isNhiemVuLienPhong && !isNew;
         const userShcc = user?.staff.shcc;
-
         return this.renderPage({
             icon: 'fa fa-caret-square-o-left',
             title: 'Giao nhiệm vụ',
@@ -503,7 +503,8 @@ class AdminEditPage extends AdminPage {
                         <FormDatePicker type='date' className='col-md-6' ref={e => this.ngayKetThuc = e} label='Ngày kết thúc' readOnly={readOnly} readOnlyEmptyText='Chưa có'/>
                         <FormCheckbox isSwitch className='col-md-6 form-group' ref={e => this.isNhiemVuLienPhong = e} label='Nhiệm vụ liên phòng' readOnly={!isNew} 
                         onChange={() => this.setState({ isNhiemVuLienPhong: !this.state.isNhiemVuLienPhong})}></FormCheckbox>
-                        {((!isNew && this.state.donViNhan !== '') && (presidentPermission && presidentPermission.login) || (rectorPermission && rectorPermission.login) || (!isNew && isNguoiTaoNhiemVu) || (isNew && this.state.isNhiemVuLienPhong) || readOnly) ?
+                        {
+                            (((this.state.isNhiemVuLienPhong || (presidentPermission && presidentPermission.login)|| (rectorPermission && rectorPermission.login) || readOnly) && this.state.donViNhan) || (isNew && ((presidentPermission && presidentPermission.login) || (rectorPermission && rectorPermission.login) || this.state.isNhiemVuLienPhong))) ? 
                             <FormSelect multiple={true} className='col-md-12' ref={e => this.donViNhan = e} label='Đơn vị nhận' data={SelectAdapter_DmDonVi} readOnly={readOnly} required={this.state.isNhiemVuLienPhong}/>
                             : null
                         }
