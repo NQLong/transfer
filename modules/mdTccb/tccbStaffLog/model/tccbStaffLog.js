@@ -3,7 +3,7 @@ module.exports = app => {
     // app.model.tccbStaffLog.foo = () => { };
     app.tccbSaveCRUD = (email, crud, quaTrinh = '') => {
         let now = new Date().getTime();
-        app.model.tccbStaffLog.get({ email, quaTrinh }, (error, tccbStaff) => {
+        app.model.tccbStaffLog.get({ email }, (error, tccbStaff) => {
             if (error || !tccbStaff) {
                 app.model.tccbStaffLog.create({ email, thaoTac: crud, quaTrinh, ngay: now }, () => { });
             }
