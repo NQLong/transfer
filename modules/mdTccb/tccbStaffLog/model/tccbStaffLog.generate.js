@@ -1,6 +1,6 @@
-// Table name: TCCB_STAFF_LOG { thaoTac, quaTrinh, ngay, id, email }
-const keys = ['ID'];
-const obj2Db = { 'thaoTac': 'THAO_TAC', 'quaTrinh': 'QUA_TRINH', 'ngay': 'NGAY', 'id': 'ID', 'email': 'EMAIL' };
+// Table name: TCCB_STAFF_LOG { thaoTac, quaTrinh, ngay, email }
+const keys = ['EMAIL'];
+const obj2Db = { 'thaoTac': 'THAO_TAC', 'quaTrinh': 'QUA_TRINH', 'ngay': 'NGAY', 'email': 'EMAIL' };
 
 module.exports = app => {
     app.model.tccbStaffLog = {
