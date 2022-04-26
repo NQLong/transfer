@@ -115,17 +115,18 @@ module.exports = (app) => {
         });
     });
 
-    app.put('/api/hcth/giao-nhiem-vu', app.permission.check('manager:write'), (req, res) => {
+    app.put('/api/hcth/giao-nhiem-vu', app.permission.orCheck('manager:write', 'rectors:login', 'hcth:manager', 'president:login'), (req, res) => {
         // app.model.hcthGiaoNhiemVu.update({ id: req.body.id }, req.body.changes, (errors, items) => res.send({ errors, items }));
         const { fileList, ...changes } = req.body.changes;
         const postData = {
-            nguoiTao: Number(changes.nguoiTao),
+            nguoiTao: changes.nguoiTao,
             tieuDe: changes.tieuDe,
             noiDung: changes.noiDung,
             ngayBatDau: Number(changes.ngayBatDau),
             ngayKetThuc: Number(changes.ngayKetThuc),
             doUuTien: Number(changes.doUuTien),
-            ngayTao: Number(changes.ngayTao)
+            ngayTao: Number(changes.ngayTao),
+            donViNhan: changes.donViNhan
         };
         app.model.hcthGiaoNhiemVu.update({ id: parseInt(req.body.id) }, postData, (errors, item) => {
             if (errors) {

@@ -179,7 +179,7 @@ module.exports = app => {
         deleteCongVan(req.body.id, ({ error }) => res.send({ error }));
     });
 
-    app.get('/api/hcth/cong-van-cac-phong/page/:pageNumber/:pageSize', app.permission.check('hcthCongVanDi:read'), (req, res) => {
+    app.get('/api/hcth/cong-van-cac-phong/page/:pageNumber/:pageSize', app.permission.check('staff:login'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         let condition = { statement: null };

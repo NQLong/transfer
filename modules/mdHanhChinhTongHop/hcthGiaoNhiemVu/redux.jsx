@@ -34,23 +34,19 @@ export default function HcthGiaoNhiemVuReducer(state = null, data) {
 // Actions ------------------------------------------------------------------------------------------------------------
 T.initPage('pageHcthGiaoNhiemVu');
 export function getHcthGiaoNhiemVuPage(pageNumber, pageSize, pageCondition, done) {
-    // if (typeof filter === 'function') {
-    //     done = filter;
-    //     filter = {};
-    // }
     const page = T.updatePage('pageHcthGiaoNhiemVu', pageNumber, pageSize, pageCondition);
     return dispatch => {
         const url = `/api/hcth/giao-nhiem-vu/page/${page.pageNumber}/${page.pageSize}`;
         T.get(url, { condition: page.pageCondition }, data => {
             if (data.error) {
-                T.notify('Lấy danh sách sách giao nhiệm vụ bị lỗi!', 'danger');
+                T.notify('Lấy danh sách nhiệm vụ bị lỗi!', 'danger');
                 console.error(`GET: ${url}.`, data.error);
             } else {
                 if (page.pageCondition) data.page.pageCondition = page.pageCondition;
                 dispatch({ type: HcthGiaoNhiemVuGetPage, page: data.page });
                 done && done(data.page);
             }
-        }, () => T.notify('Lấy danh sách sách giao nhiệm vụ bị lỗi!', 'danger'));
+        }, () => T.notify('Lấy danh sách nhiệm vụ bị lỗi!', 'danger'));
     };
 }
 

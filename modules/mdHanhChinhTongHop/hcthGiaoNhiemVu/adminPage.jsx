@@ -4,7 +4,7 @@ import { createHcthGiaoNhiemVu, getHcthGiaoNhiemVuSearchPage, getHcthGiaoNhiemVu
 import { getDmLoaiDonViAll } from 'modules/mdDanhMuc/dmLoaiDonVi/redux';
 import Pagination from 'view/component/Pagination';
 import { Link } from 'react-router-dom';
-import { AdminPage, TableCell, renderTable, FormSelect, TableHeader} from 'view/component/AdminPage';
+import { AdminPage, TableCell, renderTable, FormSelect } from 'view/component/AdminPage';
 // import { SelectAdapter_DmDonViGuiCongVan } from 'modules/mdDanhMuc/dmDonViGuiCv/redux';
 import { SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
 import { SelectAdapter_FwCanBo } from 'modules/mdTccb/tccbCanBo/redux';
@@ -25,15 +25,15 @@ class hcthGiaoNhiemVuPage extends AdminPage {
     state = { searching: false, loaiDonVi: [] };
 
     componentDidMount() {
-        T.ready('/user/hcth', () => {
+        T.ready(window.location.pathname.startsWith('/user/hcth') ? '/user/hcth' : '/user', () => {
             T.clearSearchBox();
-            T.onSearch = (searchText) => this.props.getHcthGiaoNhiemVuPage(undefined, undefined, searchText || '');
+            T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
                 this.donViNhan?.value('');
                 this.canBoNhan?.value('');
                 setTimeout(() => this.changeAdvancedSearch(), 50);
             });
-            this.getPage();
+            // this.getPage();
             this.changeAdvancedSearch(true);
             //this.props.getHcthGiaoNhiemVuPage();
         });
@@ -111,9 +111,9 @@ class hcthGiaoNhiemVuPage extends AdminPage {
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Độ ưu tiên</th>
                         <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Loại</th>
                         <th style={{ width: '30%', whiteSpace: 'nowrap' }}>Người tạo</th>
-                        <TableHeader style={{ width: 'atuo', whiteSpace: 'nowrap' }} sort isSorted={this.state.sortBy == 'ngayTao'} onSort={(type) => this.onSort('ngayTao', type)}>Ngày tạo</TableHeader>
-                        <TableHeader style={{ width: 'auto', whiteSpace: 'nowrap' }} sort isSorted={this.state.sortBy == 'ngayBatDau'} onSort={(type) => this.onSort('ngayBatDau', type)}>Ngày bắt đầu</TableHeader>
-                        <TableHeader style={{ width: 'auto', whiteSpace: 'nowrap' }} sort isSorted={this.state.sortBy == 'ngayKetThuc'} onSort={(type) => this.onSort('ngayKetThuc', type)}>Ngày kết thúc</TableHeader>
+                        <th style={{ width: 'atuo', whiteSpace: 'nowrap' }}>Ngày tạo</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày bắt đầu</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Ngày kết thúc</th>
                         <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>Thao tác</th>
                     </tr>
                 ),

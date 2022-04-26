@@ -78,7 +78,7 @@ export class EditModal extends AdminModal {
         this.keyB?.value(keyB);
     }
 
-    onSubmit = () => {
+    onSubmit = (e) => {
         const changes = {
             loaiA: 'NHIEM_VU',
             keyA: this.props.nhiemVuId,
@@ -86,18 +86,19 @@ export class EditModal extends AdminModal {
             keyB: this.keyB.value(),
             chieu: 0
         };
-        if (changes.loaiB == '') {
+
+        if (!changes.loaiB) {
             T.notify('Loại liên kết bị trống!', 'danger');
             this.loaiB.focus();
-        }
-        if (changes.keyB == '') {
+        } else
+        if (!changes.keyB) {
             T.notify('Mã liên kết bị trống', 'danger');
             this.keyB.focus();
         } else {
             this.state.id ? this.props.update(this.state.id, changes, this.hide) : 
             this.props.create(this.props.nhiemVuId, changes, this.hide);
-        }
-       // e.preventDefault();
+       }
+       e.preventDefault();
     }
 
     render = () => {
@@ -267,7 +268,7 @@ class AdminEditPage extends AdminPage {
         }
     });
 
-    tableCanBoNhan = (data, userShcc, readOnly) => renderTable({
+    tableCanBoNhan = (data, userShcc, addEmployeeToTaskPermission) => renderTable({
         getDataSource: () => data,
         stickyHead: false,
         emptyTable: 'Chưa có cán bộ nào!',
@@ -279,7 +280,7 @@ class AdminEditPage extends AdminPage {
                 <th style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }}>#</th>
                 <th style={{ width: '80%', whiteSpace: 'nowrap'}}>Tên cán bộ</th>
                 <th style={{ width: '20%', whiteSpace: 'nowrap' }}>Người tạo</th>
-                { !readOnly && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thao tác</th> }
+                { addEmployeeToTaskPermission && <th style={{ width: 'auto', whiteSpace: 'nowrap' }}>Thao tác</th> }
             </tr>
         ),
         renderRow: (item, index) => {
@@ -288,7 +289,7 @@ class AdminEditPage extends AdminPage {
                     <TableCell style={{ textAlign: 'right' }} content={index + 1} />
                     <TableCell type='text' style={{ wordBreak: 'break-all' }} content={item.canBo} />
                     <TableCell type='text' style={{ wordBreak: 'break-all', fontWeight: 'bold' }} content={item.tenNguoiTao} />
-                    { !readOnly && <TableCell type='text' content={
+                    { addEmployeeToTaskPermission && <TableCell type='text' content={
                         item.shccNguoiTao === userShcc && <button className='btn btn-danger' onClick={e => this.onRemoveCanBoNhanNhiemVu(e, item.shcc)}><i className="fa fa-trash-o"></i></button>
                     } 
                     /> }
@@ -462,6 +463,7 @@ class AdminEditPage extends AdminPage {
         const isNguoiTaoNhiemVu = this.state.nguoiTao !== '' && user.staff.shcc === this.state.nguoiTao;
         const dsDonViQuanLi = user.staff.donViQuanLy.map(dv => dv.maDonVi).join(',');
         const readOnly = !isNew && !isNguoiTaoNhiemVu;
+
         const addEmployeeToTaskPermission = managerPermission.write && this.state.donViNhan && this.state.donViNhan.includes(user.staff.maDonVi);
         const canBoNhanNhiemVu = this.props.hcthGiaoNhiemVu?.item?.canBoNhanNhiemVu;
         const totalCanBoNhanObj = canBoNhanNhiemVu?.reduce((acc, ele) => {
@@ -474,7 +476,7 @@ class AdminEditPage extends AdminPage {
             })) || [];
             return acc.concat(listCanBoNhanObj);
         }, []) || [];
-        const isShowCanBoNhanLienPhong = isNhiemVuLienPhong && !isNew && !isNguoiTaoNhiemVu;
+        const isShowCanBoNhanLienPhong = isNhiemVuLienPhong && !isNew;
         const userShcc = user?.staff.shcc;
 
         return this.renderPage({
@@ -501,7 +503,7 @@ class AdminEditPage extends AdminPage {
                         <FormDatePicker type='date' className='col-md-6' ref={e => this.ngayKetThuc = e} label='Ngày kết thúc' readOnly={readOnly} readOnlyEmptyText='Chưa có'/>
                         <FormCheckbox isSwitch className='col-md-6 form-group' ref={e => this.isNhiemVuLienPhong = e} label='Nhiệm vụ liên phòng' readOnly={!isNew} 
                         onChange={() => this.setState({ isNhiemVuLienPhong: !this.state.isNhiemVuLienPhong})}></FormCheckbox>
-                        {((presidentPermission && presidentPermission.login) || (rectorPermission && rectorPermission.login) || readOnly || (isNew && this.state.isNhiemVuLienPhong)) ?
+                        {((!isNew && this.state.donViNhan !== '') && (presidentPermission && presidentPermission.login) || (rectorPermission && rectorPermission.login) || (!isNew && isNguoiTaoNhiemVu) || (isNew && this.state.isNhiemVuLienPhong) || readOnly) ?
                             <FormSelect multiple={true} className='col-md-12' ref={e => this.donViNhan = e} label='Đơn vị nhận' data={SelectAdapter_DmDonVi} readOnly={readOnly} required={this.state.isNhiemVuLienPhong}/>
                             : null
                         }
@@ -516,7 +518,7 @@ class AdminEditPage extends AdminPage {
                     <div className='tile'>
                         <div className='form-group'>
                             <h3 className='tile-title'>{ addEmployeeToTaskPermission ? 'Thêm cán bộ vào nhiệm vụ' : 'Danh sách cán bộ tham gia'}</h3>
-                            { !readOnly &&
+                            { addEmployeeToTaskPermission &&
                                 <div className='tile-body row'>
                                     <div className='col-md-4'>
                                         <FormSelect multiple={true} ref={e => this.canBoNhan = e} data={SelectAdapter_FwCanBoByDonVi(dsDonViQuanLi)}  required={!this.state.isNhiemVuLienPhong} placeholder="Chọn cán bộ tham gia"/>
@@ -530,7 +532,7 @@ class AdminEditPage extends AdminPage {
                             }
                             <div className='tile-body row'>
                                 <div className="col-md-12">
-                                    {this.tableCanBoNhan(totalCanBoNhanObj, userShcc, readOnly)}
+                                    {this.tableCanBoNhan(totalCanBoNhanObj, userShcc, addEmployeeToTaskPermission)}
                                 </div>
                             </div>
                         </div>
