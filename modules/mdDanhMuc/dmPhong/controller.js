@@ -5,28 +5,36 @@ module.exports = app => {
             4059: { title: 'Phòng học', link: '/user/danh-muc/phong' },
         },
     };
+    const menuDaoTao = {
+        parentMenu: app.parentMenu.daoTao,
+        menus: {
+            7008: { title: 'Phòng học', link: '/user/dao-tao/phong', groupIndex: 2 },
+        },
+    };
     app.permission.add(
         { name: 'dmPhong:read', menu },
+        { name: 'dtPhong:read', menu: menuDaoTao },
         { name: 'dmPhong:write' },
         { name: 'dmPhong:delete' },
         { name: 'dmPhong:upload' }
     );
     app.get('/user/danh-muc/phong', app.permission.check('dmPhong:read'), app.templates.admin);
+    app.get('/user/dao-tao/phong', app.permission.check('dtPhong:read'), app.templates.admin);
     app.get('/user/danh-muc/phong/upload', app.permission.check('dmPhong:write'), app.templates.admin);
 
     // APIs -----------------------------------------------------------------------------------------------------------------------------------------
-    app.get('/api/danh-muc/phong/page/:pageNumber/:pageSize', app.permission.check('user:login'), (req, res) => {
+    app.get('/api/danh-muc/phong/page/:pageNumber/:pageSize', app.permission.orCheck('dmPhong:read', 'dtPhong:read'), (req, res) => {
         const pageNumber = parseInt(req.params.pageNumber),
             pageSize = parseInt(req.params.pageSize);
         app.model.dmPhong.getPage(pageNumber, pageSize, {
             statement: 'lower(ten) LIKE :searchText',
             parameter: {
-                searchText: `%${req.query.condition.toLowerCase()}%`
+                searchText: `%${req.query.condition ? req.query.condition.toLowerCase() : ''}%`
             }
         }, (error, page) => res.send({ error, page }));
     });
 
-    app.get('/api/danh-muc/phong/all', app.permission.check('user:login'), (req, res) => {
+    app.get('/api/danh-muc/phong/all', app.permission.orCheck('dmPhong:read', 'dtPhong:read'), (req, res) => {
         let condition = {};
         if (req.query.condition) {
             condition = {
@@ -39,8 +47,8 @@ module.exports = app => {
         app.model.dmPhong.getAll(condition, (error, items) => res.send({ error, items }));
     });
 
-    app.get('/api/danh-muc/phong/item/:ten', app.permission.check('user:login'), (req, res) => {
-        app.model.dmPhong.get(req.params.ten, (error, item) => res.send({ error, item }));
+    app.get('/api/danh-muc/phong/item/:ten', app.permission.orCheck('dmPhong:read', 'dtPhong:read'), (req, res) => {
+        app.model.dmPhong.get({ ten: req.params.ten }, (error, item) => res.send({ error, item }));
     });
 
     app.post('/api/danh-muc/phong', app.permission.check('dmPhong:write'), (req, res) => {
@@ -49,11 +57,11 @@ module.exports = app => {
 
     app.put('/api/danh-muc/phong', app.permission.check('dmPhong:write'), (req, res) => {
         let changes = app.clone(req.body.changes);
-        app.model.dmPhong.update({ ten: req.body.ten }, changes, (error, items) => res.send({ error, items }));
+        app.model.dmPhong.update({ ma: req.body.ma }, changes, (error, items) => res.send({ error, items }));
     });
 
     app.delete('/api/danh-muc/phong', app.permission.check('dmPhong:delete'), (req, res) => {
-        app.model.dmPhong.delete({ ten: req.body.ten }, (error) => res.send({ error }));
+        app.model.dmPhong.delete({ ma: req.body.ma }, (error) => res.send({ error }));
     });
 
     app.post('/api/danh-muc/phong/createFromFile', app.permission.check('dmPhong:write'), (req, res) => {

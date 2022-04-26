@@ -48,7 +48,7 @@ class HcthCongVanDenStaffPage extends AdminPage {
     state = { filter: {}, sortBy: '', sortType: '', tab: 0 };
 
     componentDidMount() {
-        T.ready('/user/hcth', () => {
+        T.ready(window.location.pathname.startsWith('/user/hcth') ? '/user/hcth' : '/user', () => {
             T.clearSearchBox();
             T.onSearch = (searchText) => this.getPage(undefined, undefined, searchText || '');
             T.showSearchBox(() => {
@@ -155,7 +155,7 @@ class HcthCongVanDenStaffPage extends AdminPage {
                         <TableCell type='text' style={{ textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
                         <TableCell type='text' content={
                             <>
-                                <Link to={`/user/hcth/cong-van-den/${item.id}`}>{item.soCongVan || 'Chưa có số công văn'}</Link>
+                                <Link to={`${window.location.pathname}/${item.id}`}>{item.soCongVan || 'Chưa có số công văn'}</Link>
                                 {item.ngayCongVan ? <span style={{ whiteSpace: 'nowrap' }}><br />{'Ngày CV: ' + T.dateToText(item.ngayCongVan, 'dd/mm/yyyy')}</span> : null}
                             </>
                         } />
@@ -194,7 +194,7 @@ class HcthCongVanDenStaffPage extends AdminPage {
                         <TableCell type='text' style={{ whiteSpace: 'nowrap' }} content={
                             <span style={{ color: [trangThaiSwitcher.MOI.id, trangThaiSwitcher.TRA_LAI_BGH.id, trangThaiSwitcher.TRA_LAI_HCTH.id].includes(item.trangThai) ? 'red' : 'blue' }}>{getTrangThaiText(item.trangThai)}</span>
                         } />
-                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={{ ...permission, delete: permission.delete && item.trangThai == trangThaiSwitcher.MOI.id }} onEdit={() => this.props.history.push(`/user/hcth/cong-van-den/${item.id}`)} onDelete={(e) => this.onDelete(e, item)} permissions={currentPermissions} />
+                        <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={{ ...permission, delete: permission.delete && item.trangThai == trangThaiSwitcher.MOI.id }} onEdit={() => this.props.history.push(`${window.location.pathname}/${item.id}`)} onDelete={(e) => this.onDelete(e, item)} permissions={currentPermissions} />
                     </tr>);
             }
         });
@@ -215,7 +215,7 @@ class HcthCongVanDenStaffPage extends AdminPage {
         };
 
         const tabs = !(user.isStaff || user.isStudent) ? [tabList.all] :
-            donViQuanLy.length || currentPermissions.includes('president:login') ? [tabList.all, tabList.donVi, tabList.self]
+            donViQuanLy.length || currentPermissions.includes('president:login') || currentPermissions.includes('donViCongVanDen:read') ? [tabList.all, tabList.donVi, tabList.self]
                 : currentPermissions.includes('rectors:login') || (currentPermissions.includes('hcth:login')) ? [tabList.all, tabList.self]
                     : [tabList.self];
 

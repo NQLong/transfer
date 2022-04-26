@@ -1,6 +1,6 @@
-// Table name: HCTH_CAN_BO_NHAN { id, canBoNhan, key, loai }
+// Table name: HCTH_CAN_BO_NHAN { id, canBoNhan, loai, key, nguoiTao }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'canBoNhan': 'CAN_BO_NHAN', 'key': 'KEY', 'loai': 'LOAI' };
+const obj2Db = { 'id': 'ID', 'canBoNhan': 'CAN_BO_NHAN', 'loai': 'LOAI', 'key': 'KEY', 'nguoiTao': 'NGUOI_TAO' };
 
 module.exports = app => {
     app.model.hcthCanBoNhan = {
@@ -129,6 +129,11 @@ module.exports = app => {
             const parameter = condition.parameter ? condition.parameter : {};
             const sql = 'SELECT COUNT(*) FROM HCTH_CAN_BO_NHAN' + (condition.statement ? ' WHERE ' + condition.statement : '');
             app.database.oracle.connection.main.execute(sql, parameter, (error, result) => done(error, result));
+        },
+
+        getAllCanBoNhan: (nhiemvuid, done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_giao_nhiem_vu_get_all_can_bo_nhan(:nhiemvuid); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, nhiemvuid }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
     };
 };

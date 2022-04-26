@@ -43,30 +43,80 @@ module.exports = app => {
         app.model.dtThoiKhoaBieu.get({ id: req.params.id }, (error, item) => res.send({ error, item }));
     });
 
-    app.post('/api/dao-tao/thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:write'), (req, res) => {
-        let item = req.body.item,
-            soNhom = item.nhom;
-        const onCreate = (index = 1) => {
-            if (index - 1 == Number(soNhom)) {
-                res.send({ item: 'OK' });
-                return;
-            }
-            app.model.dtThoiKhoaBieu.get({ maHocPhan: item.maHocPhan, nhom: index, maHocKy: item.maHocKy }, 'id', null, (error, tkb) => {
-                if (!error && !tkb) {
-                    item.nhom = index;
-                    app.model.dtThoiKhoaBieu.create(item, error => error && res.send({ error }));
+    app.post('/api/dao-tao/thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:write'), async (req, res) => {
+        let item = req.body.item || [];
+        const thoiGianMoMon = await app.model.dtThoiGianMoMon.getActive();
+        const onCreate = (index, monHoc) => new Promise(resolve => {
+            const save = (i, m) => {
+                if (i > parseInt(m.soNhom)) {
+                    resolve(m);
+                    return;
                 }
-                onCreate(index + 1);
-            });
-        };
-        onCreate();
+                app.model.dtThoiKhoaBieu.get({ maMonHoc: m.maMonHoc, nhom: i, hocKy: m.hocKy, soTiet: m.soTiet }, (error, tkb) => {
+                    if (!error && !tkb) {
+                        m.nhom = i;
+                        for (let i = 1; i <= m.soBuoiTuan; i++) {
+                            app.model.dtThoiKhoaBieu.create({ ...m, nam: thoiGianMoMon.nam, hocKy: thoiGianMoMon.hocKy, soTiet: m.soTietBuoi }, () => { });
+                        }
+                    }
+                    save(i + 1, m);
+                });
+            };
+            save(index, monHoc);
+        });
+        let listPromise = item.map(monHoc => item = onCreate(1, monHoc));
+        Promise.all(listPromise).then((values) => {
+            // app.model.dtThoiKhoaBieu.init();
+            res.send({ item: values });
+        });
     });
 
     app.put('/api/dao-tao/thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:write'), (req, res) => {
-        app.model.dtThoiKhoaBieu.update({ id: req.body.id }, req.body.changes, (error, items) => res.send({ error, items }));
+        let changes = req.body.changes, id = req.body.id;
+        if (changes.thu) {
+            let { tietBatDau, thu, soTiet, phong } = changes;
+            let condition = {
+                tietBatDau,
+                day: thu,
+                soTiet
+            };
+            app.model.dtThoiKhoaBieu.get({ id }, (error, item) => {
+                if (error) {
+                    res.send({ error });
+                    return;
+                } else {
+                    if (tietBatDau == item.tietBatDau && thu == item.thu && phong == item.phong) {
+                        app.model.dtThoiKhoaBieu.update({ id }, req.body.changes, (error, item) => res.send({ error, item }));
+                    } else {
+                        app.model.dtThoiKhoaBieu.getAll({
+                            statement: 'phong = :phong AND id != :id',
+                            parameter: { phong, id }
+                        }, (error, items) => {
+                            if (error) {
+                                res.send({ error });
+                                return;
+                            } else {
+                                if (app.model.dtThoiKhoaBieu.isAvailabledRoom(changes.phong, items, condition)) app.model.dtThoiKhoaBieu.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item }));
+                                else res.send({ error: `Phòng ${changes.phong} không trống vào thứ ${changes.thu}, tiết ${changes.tietBatDau} - ${changes.tietBatDau + changes.soTiet - 1}` });
+                            }
+                        });
+                    }
+                }
+            });
+        }
+        else app.model.dtThoiKhoaBieu.update({ id: req.body.id }, req.body.changes, (error, item) => res.send({ error, item }));
     });
 
     app.delete('/api/dao-tao/thoi-khoa-bieu', app.permission.check('dtThoiKhoaBieu:delete'), (req, res) => {
         app.model.dtThoiKhoaBieu.delete({ id: req.body.id }, errors => res.send({ errors }));
+    });
+
+    app.get('/api/dao-tao/init-schedule', app.permission.check('dtThoiKhoaBieu:write'), (req, res) => {
+        app.model.dtThoiKhoaBieu.init((status) => res.send(status));
+    });
+
+    app.get('/api/dao-tao/get-schedule/:phong', app.permission.check('dtThoiKhoaBieu:read'), (req, res) => {
+        let phong = req.params.phong;
+        app.model.dtThoiKhoaBieu.getLichPhong(phong, (error, items) => res.send({ error, items: items.rows }));
     });
 };

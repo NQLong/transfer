@@ -11,7 +11,11 @@ export default {
     },
     routes: [
         {
-            path: '/user/danh-muc/day-nha',
+            path: '/user/danh-muc/toa-nha',
+            component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
+        },
+        {
+            path: '/user/dao-tao/toa-nha',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
     ],

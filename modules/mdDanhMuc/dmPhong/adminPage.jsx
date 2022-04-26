@@ -1,8 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { getDmPhongAll, deleteDmPhong, createDmPhong, updateDmPhong } from './redux';
-import { getDmCoSoAll } from 'modules/mdDanhMuc/dmCoSo/redux';
-import { getDmToaNhaAll } from 'modules/mdDanhMuc/dmToaNha/redux';
+import { getDmToaNhaAll, SelectAdapter_DmToaNha } from 'modules/mdDanhMuc/dmToaNha/redux';
 import { Link } from 'react-router-dom';
 import { AdminPage, AdminModal, TableCell, renderTable, FormTextBox, FormCheckbox, FormSelect, FormRichTextBox } from 'view/component/AdminPage';
 
@@ -16,13 +15,13 @@ class EditModal extends AdminModal {
     }
 
     onShow = (item) => {
-        let { ten, toaNha, moTa, kichHoat } = item ? item : { ten: '', toaNha: '', moTa: '', kichHoat: 1 };
-
+        let { ma, ten, toaNha, moTa, kichHoat, sucChua } = item ? item : { ma: null, ten: '', toaNha: '', moTa: '', kichHoat: 1, sucChua: 0 };
+        this.setState({ ma });
         this.toaNha.value(toaNha ? item.toaNha : '');
         this.ten.value(ten);
+        this.sucChua.value(sucChua);
         this.moTa.value(moTa);
         this.kichHoat.value(kichHoat);
-        this.setState({ item });
     }
 
     changeKichHoat = value => this.kichHoat.value(value ? 1 : 0) || this.kichHoat.value(value);
@@ -34,7 +33,8 @@ class EditModal extends AdminModal {
                 ten: this.ten.value().trim(),
                 toaNha: this.toaNha.value(),
                 moTa: this.moTa.value(),
-                kichHoat: this.state.kichHoat,
+                sucChua: this.sucChua.value(),
+                kichHoat: Number(this.kichHoat.value()),
             };
         if (changes.ten == '') {
             T.notify('Tên phòng học bị trống!', 'danger');
@@ -49,15 +49,13 @@ class EditModal extends AdminModal {
 
     render = () => {
         const readOnly = this.props.readOnly;
-        let listToaNha = this.props.building;
-        if (typeof listToaNha == 'object') listToaNha = Object.values(listToaNha);
-        const listToaNhaOption = [];
         return (this.renderModal({
             title: this.state.ma ? 'Cập nhật Phòng' : 'Tạo mới Phòng',
             body: <div className='row'>
                 <FormTextBox type='text' className='col-md-12' ref={e => this.ten = e} label='Tên phòng học' readOnly={readOnly} required />
-                <FormSelect className='col-md-12' ref={e => this.toaNha = e} label='Tòa nhà' data={listToaNhaOption} />
+                <FormSelect className='col-md-12' ref={e => this.toaNha = e} label='Tòa nhà' data={SelectAdapter_DmToaNha} />
                 <FormRichTextBox className='col-md-12' ref={e => this.moTa = e} label='Mô tả' />
+                <FormTextBox type='number' className='col-md-12' ref={e => this.sucChua = e} label='Sức chứa tối đa' />
                 <FormCheckbox className='col-md-6' ref={e => this.kichHoat = e} label='Kích hoạt' isSwitch={true} readOnly={readOnly} onChange={value => this.changeKichHoat(value ? 1 : 0)} />
             </div>
         }));
@@ -67,11 +65,12 @@ class EditModal extends AdminModal {
 class DmPhongPage extends AdminPage {
 
     componentDidMount() {
-        T.ready('/user/category');
+        let route = T.routeMatcher('/user/:menu/phong').parse(window.location.pathname);
+        this.menu = route.menu;
+        T.ready(`/user/${this.menu}`);
         T.showSearchBox();
         this.props.getDmPhongAll();
         this.props.getDmToaNhaAll();
-        this.props.getDmCoSoAll();
     }
 
     showModal = (e) => {
@@ -86,8 +85,7 @@ class DmPhongPage extends AdminPage {
     }
 
     render() {
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permission = this.getUserPermission('dmPhong', ['read', 'write', 'delete', 'upload']);
+        const permission = this.getUserPermission('dmPhong', ['read', 'write', 'delete', 'upload']);
         let listToaNha = this.props.dmToaNha && this.props.dmToaNha.items ? this.props.dmToaNha.items : [],
             toaNhaMapper = {};
         listToaNha.forEach(item => toaNhaMapper[item.ma] = item.ten);
@@ -101,8 +99,9 @@ class DmPhongPage extends AdminPage {
                     <tr>
                         <th style={{ width: 'auto', textAlign: 'center' }}>#</th>
                         <th style={{ width: '20%' }}>Tên phòng</th>
-                        <th style={{ width: '20%' }}>Tòa nhà</th>
-                        <th style={{ width: '60%' }}>Ghi chú</th>
+                        <th style={{ width: '20%' }} nowrap='true'>Tòa nhà</th>
+                        <th style={{ width: '60%' }} nowrap='true'>Ghi chú</th>
+                        <th style={{ width: 'auto' }} nowrap='true'>Sức chứa</th>
                         <th style={{ width: 'auto' }} nowrap='true'>Kích hoạt</th>
                         <th style={{ width: 'auto', textAlign: 'center' }} nowrap='true'>Thao tác</th>
                     </tr>),
@@ -112,8 +111,9 @@ class DmPhongPage extends AdminPage {
                         <TableCell type='link' content={item.ten} onClick={() => this.modal.show(item)} />
                         <TableCell type='text' content={toaNhaMapper[item.toaNha] || ''} />
                         <TableCell type='text' content={item.moTa} />
+                        <TableCell style={{ textAlign: 'right' }} type='text' content={item.sucChua} />
                         <TableCell type='checkbox' content={item.kichHoat} permission={permission}
-                            onChanged={value => this.props.updateDmPhong(item.ten, { kichHoat: value ? 1 : 0, })} />
+                            onChanged={value => this.props.updateDmPhong(item.ma, { kichHoat: value ? 1 : 0, })} />
                         <TableCell type='buttons' content={item} permission={permission}
                             onEdit={() => this.modal.show(item)} onDelete={this.delete} />
                     </tr>)
@@ -122,23 +122,23 @@ class DmPhongPage extends AdminPage {
 
         return this.renderPage({
             icon: 'fa fa-list-alt',
-            title: 'Danh mục Phòng',
+            title: 'Danh sách Phòng học',
             breadcrumb: [
-                <Link key={0} to='/user/category'>Danh mục</Link>,
-                'Danh mục Phòng'
+                <Link key={0} to={`/user/${this.menu}`}>{this.menu == 'dao-tao' ? 'Đào tạo' : 'Danh mục'}</Link>,
+                'Phòng học'
             ],
             content: <>
                 <div className='tile'>{table}</div>
-                <EditModal ref={e => this.modal = e} permission={permission}
-                    create={this.props.createDmPhong} update={this.props.updateDmPhong} permissions={currentPermissions} />
+                <EditModal ref={e => this.modal = e} readOnly={!permission.write}
+                    create={this.props.createDmPhong} update={this.props.updateDmPhong} />
             </>,
-            backRoute: '/user/category',
+
+            backRoute: `/user/${this.menu}`,
             onCreate: permission && permission.write ? (e) => this.showModal(e) : null,
-            // onImport: permission && permission.write ? (e) => e.preventDefault() || this.props.history.push('/user/danh-muc/phong/upload') : null
         });
     }
 }
 
-const mapStateToProps = state => ({ system: state.system, dmPhong: state.danhMuc.dmPhong, categoryCampus: state.danhMuc.dmCoSo, dmToaNha: state.danhMuc.dmToaNha });
-const mapActionsToProps = { getDmCoSoAll, getDmToaNhaAll, getDmPhongAll, deleteDmPhong, createDmPhong, updateDmPhong };
+const mapStateToProps = state => ({ system: state.system, dmPhong: state.danhMuc.dmPhong, dmToaNha: state.danhMuc.dmToaNha });
+const mapActionsToProps = { getDmToaNhaAll, getDmPhongAll, deleteDmPhong, createDmPhong, updateDmPhong };
 export default connect(mapStateToProps, mapActionsToProps)(DmPhongPage);

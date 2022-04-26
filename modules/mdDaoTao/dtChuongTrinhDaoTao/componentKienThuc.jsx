@@ -1,5 +1,5 @@
 import { SelectAdapter_DmDonViFaculty_V2 } from 'modules/mdDanhMuc/dmDonVi/redux';
-import { SelectAdapter_DmMonHoc, getDmMonHoc, SelectAdapter_DmMonHocAll } from 'modules/mdDaoTao/dmMonHoc/redux';
+import { getDmMonHoc, SelectAdapter_DmMonHocAll } from 'modules/mdDaoTao/dmMonHoc/redux';
 import React from 'react';
 import { connect } from 'react-redux';
 import { AdminPage, FormCheckbox, FormSelect, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
@@ -18,6 +18,7 @@ export class ComponentKienThuc extends AdminPage {
         console.log(idx);
         this.rows[idx] = {
             maMonHoc: null,
+            tenMonHoc: null,
             loaiMonHoc: null,
             soTinChi: null,
             soTietLyThuyet: null,
@@ -28,13 +29,15 @@ export class ComponentKienThuc extends AdminPage {
         };
         this.setEditState(idx, childId, childText, editFlag, id, isDeleted, () => {
             this.rows[idx].loaiMonHoc.value(item ? item.loaiMonHoc : 0);
-            this.rows[idx].soTietLyThuyet.value(item ? item.soTietLyThuyet.toString() : '0');
-            this.rows[idx].soTietThucHanh.value(item ? item.soTietThucHanh.toString() : '0');
+            this.rows[idx].soTietLyThuyet.value(item ? (item.soTietLyThuyet || 0).toString() : '0');
+            this.rows[idx].soTietThucHanh.value(item ? (item.soTietThucHanh || 0).toString() : '0');
             this.rows[idx].hocKyDuKien.value(item ? item.hocKyDuKien : null);
-            this.rows[idx].soTinChi.value(item ? item.soTinChi.toString() : '0');
-            this.rows[idx].maMonHoc.value(item ? item.maMonHoc : '');
+            this.rows[idx].soTinChi.value(item ? (item.soTinChi || 0).toString() : '0');
+            id != -1 && this.rows[idx].tenMonHoc.value(item && item.tenMonHoc ? item.tenMonHoc : '');
+            // id == -1 ? this.rows[idx].maMonHoc.value(item ? item.maMonHoc : '') : this.rows[idx].tenMonHoc.value(item ? item.tenMonHoc : '');
+            this.rows[idx].ma.value((item && item.maMonHoc) ? item.maMonHoc : '');
             this.rows[idx].khoa.value(item ? item.khoa : '');
-            this.rows[idx].soTiet.value(item ? item.tongSoTiet.toString() : '0');
+            this.rows[idx].soTiet.value(item ? (item.tongSoTiet || 0).toString() : '0');
             done();
         });
     }
@@ -102,7 +105,9 @@ export class ComponentKienThuc extends AdminPage {
     }
 
 
-    setMonHoc = (idx, id, childId, childText) => {
+    setMonHoc = (idx, value, childId, childText) => {
+        const id = value.id,
+            { tongTinChi, tietLt, tietTh, tongTiet, khoa, ten } = value.item;
         let preIdx, nextIdx;
         if (childId >= 0) {
             const arr = idx.split('_');
@@ -116,26 +121,30 @@ export class ComponentKienThuc extends AdminPage {
         if (this.rows[statePreIdx] && this.state.datas[statePreIdx]?.edit) {
             this.editRow(null, preIdx, childId);
         }
-        SelectAdapter_DmMonHoc.fetchOneItem(id, ({ item }) => {
-            const { tongTinChi, tongTiet, tietLt, tietTh, khoa } = item;
-            this.rows[idx].soTinChi.value(tongTinChi);
-            this.rows[idx].soTietLyThuyet.value(tietLt.toString() || '0');
-            this.rows[idx].soTietThucHanh.value(tietTh.toString() || '0');
-            this.rows[idx].soTiet.value(tongTiet);
-            this.rows[idx].khoa.value(khoa.ma);
-            this.addRow(nextIdx, null, childId, childText);
-        });
-
+        this.rows[idx].ten = T.parse(ten, { vi: '' }).vi;
+        this.rows[idx].soTinChi.value(tongTinChi);
+        this.rows[idx].soTietLyThuyet.value(tietLt.toString() || '0');
+        this.rows[idx].soTietThucHanh.value(tietTh.toString() || '0');
+        this.rows[idx].soTiet.value(tongTiet);
+        this.rows[idx].khoa.value(khoa);
+        this.rows[idx].ma.value(id);
+        this.addRow(nextIdx, null, childId, childText);
     }
 
-    selectMh = (idx, childId, childText) => {
+    selectMh = (item, idx, childId, childText) => {
         return (
             <>
-                <FormSelect ref={e => this.rows[idx].maMonHoc = e} data={SelectAdapter_DmMonHocAll} style={{ marginBottom: 0, width: '350px' }} placeholder='Chọn môn học' readOnly={!this.state.datas[idx]?.edit} onChange={value => this.setMonHoc(idx, value.id, childId, childText)} />
+                {item.id != -1 ? <FormTextBox ref={e => this.rows[idx].tenMonHoc = e} style={{ marginBottom: 0, width: '350px', marginTop: 10 }} readOnly readOnlyNormal /> : <FormSelect ref={e => this.rows[idx].maMonHoc = e} data={SelectAdapter_DmMonHocAll} style={{ marginBottom: 0, width: '350px' }} placeholder='Chọn môn học' readOnly={!this.state.datas[idx].edit} onChange={value => this.setMonHoc(idx, value, childId, childText)} />}
                 <FormSelect ref={e => this.rows[idx].khoa = e} data={SelectAdapter_DmDonViFaculty_V2} style={{ marginBottom: 0, width: '350px', marginTop: 10 }} readOnly readOnlyNormal />
             </>
         );
     };
+
+    selectMaMonHoc = (idx) => {
+        return (
+            <FormTextBox ref={e => this.rows[idx].ma = e} style={{ marginBottom: 0, width: '150px' }} readOnly readOnlyNormal />
+        );
+    }
     insertLoaiMh = (idx) => {
         return <FormCheckbox ref={e => this.rows[idx].loaiMonHoc = e} readOnly={this.state.datas[idx]?.isDeleted} />;
     };
@@ -169,8 +178,8 @@ export class ComponentKienThuc extends AdminPage {
             const childId = this.state.datas[key].childId;
             const item = {
                 id: id,
-                maMonHoc: this.rows[key].maMonHoc?.value(),
-                tenMonHoc: this.rows[key].maMonHoc?.data()?.text,
+                maMonHoc: this.rows[key].ma?.value(),
+                tenMonHoc: this.rows[key].ten,
                 loaiMonHoc: Number(this.rows[key].loaiMonHoc?.value()),
                 maKhoiKienThuc: this.props.khoiKienThucId,
                 soTinChi: Number(this.rows[key].soTinChi?.value()),
@@ -240,6 +249,7 @@ export class ComponentKienThuc extends AdminPage {
                 <>
                     <tr>
                         <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>STT</th>
+                        <th rowSpan='2' style={{ width: 'auto', verticalAlign: 'middle', textAlign: 'center' }} nowrap='true'>Mã môn học</th>
                         <th rowSpan='2' style={{ width: '100%', verticalAlign: 'middle', textAlign: 'center' }} nowrap='true'>Môn học</th>
                         <th rowSpan='2' style={{ width: 'auto', verticalAlign: 'middle', textAlign: 'center' }} nowrap='true'>Tự chọn</th>
                         <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Học kỳ<br />(dự kiến)</th>
@@ -263,7 +273,8 @@ export class ComponentKienThuc extends AdminPage {
                         {item.childText && parseInt(idx) == 0 && <tr><td colSpan={10}><b>{item.childText}</b></td></tr>}
                         <tr>
                             <TableCell type='text' style={{ textAlign: 'center', backgroundColor: styleRow(index).backgroundColor }} content={stt} />
-                            <TableCell content={this.selectMh(index, item.childId, item.childText)} style={{ backgroundColor: styleRow(index).backgroundColor }} />
+                            <TableCell content={this.selectMaMonHoc(index)} style={{ backgroundColor: styleRow(index).backgroundColor, textAlign: 'center' }} />
+                            <TableCell content={this.selectMh(item, index, item.childId, item.childText)} style={{ backgroundColor: styleRow(index).backgroundColor }} />
                             <TableCell content={this.insertLoaiMh(index)} style={{ backgroundColor: styleRow(index).backgroundColor, textAlign: 'center' }} />
                             <TableCell type='number' content={this.insertHocKyDuKien(index)} style={{ textAlign: 'center', backgroundColor: styleRow(index).backgroundColor }} />
                             <TableCell type='number' style={{ textAlign: 'center', backgroundColor: styleRow(index).backgroundColor }} content={this.insertTongSoTc(index)} />

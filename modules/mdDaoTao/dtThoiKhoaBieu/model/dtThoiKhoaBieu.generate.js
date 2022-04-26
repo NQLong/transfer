@@ -1,6 +1,6 @@
-// Table name: DT_THOI_KHOA_BIEU { id, maHocPhan, nhom, maHocKy, thu, phong, ngayBatDau, cbgd }
+// Table name: DT_THOI_KHOA_BIEU { id, maMonHoc, nhom, hocKy, thu, phong, ngayBatDau, giangVien, nam, tietBatDau, soTiet, khoa, khoaDangKy }
 const keys = ['ID'];
-const obj2Db = { 'id': 'ID', 'maHocPhan': 'MA_HOC_PHAN', 'nhom': 'NHOM', 'maHocKy': 'MA_HOC_KY', 'thu': 'THU', 'phong': 'PHONG', 'ngayBatDau': 'NGAY_BAT_DAU', 'cbgd': 'CBGD' };
+const obj2Db = { 'id': 'ID', 'maMonHoc': 'MA_MON_HOC', 'nhom': 'NHOM', 'hocKy': 'HOC_KY', 'thu': 'THU', 'phong': 'PHONG', 'ngayBatDau': 'NGAY_BAT_DAU', 'giangVien': 'GIANG_VIEN', 'nam': 'NAM', 'tietBatDau': 'TIET_BAT_DAU', 'soTiet': 'SO_TIET', 'khoa': 'KHOA', 'khoaDangKy': 'KHOA_DANG_KY' };
 
 module.exports = app => {
     app.model.dtThoiKhoaBieu = {
@@ -134,6 +134,11 @@ module.exports = app => {
         searchPage: (pagenumber, pagesize, searchterm, done) => {
             app.database.oracle.connection.main.execute('BEGIN :ret:=dt_thoi_khoa_bieu_search_page(:pagenumber, :pagesize, :searchterm, :totalitem, :pagetotal); END;',
                 { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
+        },
+
+        getLichPhong: (room, done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=dt_lich_phong(:room); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, room }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
     };
 };

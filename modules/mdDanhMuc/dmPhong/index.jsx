@@ -6,7 +6,7 @@ import dmPhong from './redux';
 export default {
     redux: {
         parent: 'danhMuc',
-        reducers: {  dmPhong }
+        reducers: { dmPhong }
     },
     routes: [
         {
@@ -15,6 +15,10 @@ export default {
         },
         {
             path: '/user/danh-muc/phong',
+            component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
+        },
+        {
+            path: '/user/dao-tao/phong',
             component: Loadable({ loading: Loading, loader: () => import('./adminPage') })
         },
     ],

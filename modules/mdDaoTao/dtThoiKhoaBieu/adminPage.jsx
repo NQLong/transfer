@@ -1,263 +1,233 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getDtThoiKhoaBieuPage, createDtThoiKhoaBieu, updateDtThoiKhoaBieu, deleteDtThoiKhoaBieu } from './redux';
+import { getDtThoiKhoaBieuPage, createDtThoiKhoaBieu, updateDtThoiKhoaBieu, deleteDtThoiKhoaBieu, initSchedule } from './redux';
 import { Link } from 'react-router-dom';
-import { getDmDonViAll, SelectAdapter_DmDonVi } from 'modules/mdDanhMuc/dmDonVi/redux';
-import { SelectAdapter_DmMonHoc } from '../dmMonHoc/redux';
+import { getDmDonViAll } from 'modules/mdDanhMuc/dmDonVi/redux';
+import { } from '../dmMonHoc/redux';
 import { getDmPhongAll, SelectAdapter_DmPhong } from 'modules/mdDanhMuc/dmPhong/redux';
-import { AdminPage, AdminModal, renderTable, TableCell, FormTextBox, FormSelect, FormDatePicker } from 'view/component/AdminPage';
+import { AdminModal, AdminPage, CirclePageButton, FormSelect, FormTextBox, renderTable, TableCell } from 'view/component/AdminPage';
 import Pagination from 'view/component/Pagination';
+import { Tooltip } from '@mui/material';
+import T from 'view/js/common';
+import { SelectAdapter_FwCanBoGiangVien } from 'modules/mdTccb/tccbCanBo/redux';
 
-class EditModal extends AdminModal {
-    state = { ma: null, maHocPhan: '', soTinChi: 0, tongSoTiet: 0, boMon: 0 };
-    MonHocTable = [];
-    monHocMapper = {};
-    donviMapper = {};
-
-    componentDidMount() {
-        $(document).ready(() => this.onShown(() => {
-            !this.maHocKy.value() ? this.maHocKy.focus() : null;
-        }));
-
-        this.props.getDonViSelect(items => {
-            if (items) {
-                items.forEach(item => {
-                    this.donviMapper[item.ma] = item.ten;
-                });
-            }
-        });
-
-        this.props.getMonHocSelect(items => {
-            if (items) {
-                this.MonHocTable = [];
-                items.forEach(item => {
-                    this.MonHocTable.push({ 'id': item.ma, 'text': item.ten });
-                    this.monHocMapper[item.ma] = item;
-                });
-            }
-        });
-    }
-
-    setMaHocPhan = (id) => {
-        this.setState({ maHocPhan: id }, () => {
-            this.soTinChi?.value(this.monHocMapper[id].soTinChi);
-            this.tongSoTiet?.value(this.monHocMapper[id].tongSoTiet);
-            this.boMon?.value(this.monHocMapper[id].boMon);
-        });
-    }
+const dataThu = [2, 3, 4, 5, 6, 7], dataTiet = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+class AdjustModal extends AdminModal {
 
     onShow = (item) => {
-        let { id, maHocKy, soNhom, maHocPhan, thu, phong, ngayBatDau, cbgd } = item ? item : {
-            id: '', maHocKy: 'HK0', soNhom: 1, maHocPhan: '', thu: 0, phong: '', ngayBatDau: '', cbgd: ''
-        };
-
-        this.maHocKy.value(maHocKy);
-        this.soNhom?.value(soNhom);
-        this.maHocPhan.value(maHocPhan);
-        // this.maLop.value(maLop);
-        // this.loaiHp.value(loaiHp);
-        // this.soTinChi.value(soTinChi);
-        // this.tongSoMh.value(tongSoMh);
-        // this.thu.value(thu);
-        // this.tietBd.value(tietBd);
-        // this.soTiet.value(soTiet);
-        // this.tietBd2.value(tietBd2);
-        // this.soTiet2.value(soTiet2);
-        // this.phong.value(phong);
-        // this.ngayBd.value(ngayBd);
-        // this.cbgd.value(cbgd);
-        // this.siSoTt.value(siSoTt);
-        // this.siSoTd.value(siSoTd);
-        // this.hocKy.value(hocKy);
-        // this.khoaLop.value(khoaLop);
-        this.setState({ ma: id }, () => {
-            if (id !== '') {
-                this.thu?.value(thu);
-                this.phong?.value(phong);
-                this.cbgd?.value(cbgd);
-                this.ngayBatDau?.value(ngayBatDau);
-            }
-            if (!this.state.ma) this.setMaHocPhan(maHocPhan);
-            else {
-                this.soTinChi?.value(item.soTinChi);
-                this.tongSoTiet?.value(item.tongSoTiet);
-                this.boMon?.value(item.maKhoaBoMon);
-                this.nhom.value('0' + item.nhom);
-            }
-        });
-
-
-    };
-
-
+        let { id, giangVien, maMonHoc, tenMonHoc, nhom, tenKhoaBoMon, phong, thu, tietBatDau, soTiet } = item;
+        this.setState({ id, soTiet });
+        this.giangVien.value(giangVien);
+        this.monHoc.value(maMonHoc + ': ' + T.parse(tenMonHoc, { vi: '' }).vi);
+        this.nhom.value(nhom);
+        this.khoa.value(tenKhoaBoMon);
+        this.phong.value(phong);
+        this.thu.value(thu);
+        this.tietBatDau.value(tietBatDau);
+    }
     onSubmit = (e) => {
         e.preventDefault();
-        const
-            changes = {
-                maHocKy: this.maHocKy.value(),
-                soNhom: this.soNhom.value(),
-                maHocPhan: this.maHocPhan.value(),
-            };
-        if (changes.maHocKy == '') {
-            T.notify('Mã học kỳ bị trống!', 'danger');
-            this.maHocKy.focus();
-        } else if (changes.soNhom <= 0) {
-            T.notify('Số nhóm phải lớn hơn 0!', 'danger');
-            this.soNhom.focus();
-        } else if (changes.maHocPhan == '') {
-            T.notify('Mã học phần bị trống!', 'danger');
-            this.maHocPhan.focus();
+        let data = {
+            phong: this.phong.value(),
+            thu: this.thu.value(),
+            tietBatDau: this.tietBatDau.value(),
+            soTiet: this.state.soTiet,
+            giangVien: this.giangVien.value()
+        };
+        if (!data.phong) {
+            T.notify('Vui lòng chọn phòng', 'danger');
+            this.phong.focus();
+        } else if (!data.thu) {
+            T.notify('Vui lòng chọn thứ', 'danger');
+            this.thu.focus();
+        } else if (!data.tietBatDau) {
+            T.notify('Vui lòng chọn tiết bắt đầu', 'danger');
+            this.tietBatDau.focus();
         } else {
-            if (this.state.ma) {
-                const nChanges = {
-                    thu: this.thu.value(),
-                    phong: this.phong.value(),
-                    ngayBatDau: this.ngayBatDau.value(),
-                    cbgd: this.cbgd.value(),
-                };
-
-                this.props.update(this.state.ma, { ...changes, ...nChanges }, this.hide);
-                return;
-            }
-            const nChanges = {
-                maHocKy: changes.maHocKy,
-                nhom: changes.soNhom,
-                maHocPhan: changes.maHocPhan,
-            };
-            this.props.create(nChanges, this.hide);
+            this.props.update(this.state.id, data, (result) => {
+                if (result.item) {
+                    this.hide();
+                    this.props.initData();
+                }
+            });
         }
     }
-
     render = () => {
-        const readOnly = this.props.readOnly;
+        let readOnly = this.props.readOnly;
         return this.renderModal({
-            title: this.state.ma ? 'Cập nhật học phần' : 'Tạo mới học phần',
+            title: 'Điều chỉnh',
             size: 'large',
             body: <div className='row'>
-                <FormTextBox type='text' className='col-6' ref={e => this.maHocKy = e} label='Mã học kỳ' readOnly={this.state.ma ? true : readOnly} placeholder='Mã học kỳ' required />
-                {/* <FormTextBox type='text' className='col-12' ref={e => this.ten = e} label='Tên học phần' readOnly={readOnly} placeholder='Tên học phần' required /> */}
-                {
-                    !this.state.ma ? <FormTextBox type='number' className='col-6' ref={e => this.soNhom = e} label='Số lượng nhóm' readOnly={readOnly} placeholder='Nhập số lượng nhóm của môn học' required /> :
-                        <FormTextBox className='col-6' ref={e => this.nhom = e} label='Nhóm' readOnly={true} required />
-                }
-                {/* <FormTextBox type='text' className='col-6' ref={e => this.maLop = e} label='Mã Lớp' readOnly={readOnly} placeholder='Mã Lớp' required />
-                <FormSelect className='col-12' ref={e => this.loaiHp = e} data={[{'id': 'LT', 'text': 'LT'}, {'id': 'TH', 'text': 'TH'}]} label='Loại HP' required />
-                <FormTextBox type='number' className='col-6' ref={e => this.soTinChi = e} label='Số tín chỉ' readOnly={readOnly} placeholder='Số tín chỉ' required />
-                <FormTextBox type='number' className='col-6' ref={e => this.tongSoMh = e} label='Tổng số MH' readOnly={readOnly} placeholder='Tổng số MH' required />
-                <FormTextBox type='text' className='col-12' ref={e => this.hocKy = e} label='Học Kỳ' readOnly={readOnly} placeholder='Học Kỳ' /> */}
-                <FormSelect className='col-12' ref={e => this.maHocPhan = e} data={SelectAdapter_DmMonHoc} label='Môn học' required
-                    onChange={value => this.setMaHocPhan(value.id)} />
-                {(this.state.ma || this.state.maHocPhan) && (
-                    <React.Fragment>
-                        <FormTextBox type='text' className='col-12' ref={e => this.soTinChi = e} label='Số tín Chỉ' readOnly={true} />
-                        <FormTextBox type='text' className='col-12' ref={e => this.tongSoTiet = e} label='Tổng số tiết' readOnly={true} />
-                        <FormSelect type='text' className='col-12' ref={e => this.boMon = e} label='Khoa/Bộ môn' readOnly={true} data={SelectAdapter_DmDonVi} />
-                    </React.Fragment>
-                )}
-                {
-                    this.state.ma && (
-                        <React.Fragment>
-                            <FormTextBox type='number' className='col-6' ref={e => this.thu = e} label='Thứ' readOnly={readOnly} placeholder='Thứ' />
-                            {/* <FormTextBox type='number' className='col-4' ref={e => this.tietBd = e} label='Tiết bắt đầu' readOnly={readOnly} placeholder='Tiết bắt đầu' required />
-                            <FormTextBox type='number' className='col-4' ref={e => this.soTiet = e} label='Số tiết' readOnly={readOnly} placeholder='Số tiết' required />
-                            <FormTextBox type='number' className='col-4' ref={e => this.tietBd2 = e} label='Tiết bắt đầu 2' readOnly={readOnly} placeholder='Tiết bắt đầu 2' />
-                            <FormTextBox type='number' className='col-4' ref={e => this.soTiet2 = e} label='Số tiết 2' readOnly={readOnly} placeholder='Số tiết 2' required /> */}
-                            <FormSelect type='text' className='col-6' ref={e => this.phong = e} label='Phòng' readOnly={readOnly} data={SelectAdapter_DmPhong} />
-                            <FormDatePicker type='date-mask' className='col-6' ref={e => this.ngayBatDau = e} label='Ngày bắt đầu' readOnly={readOnly} placeholder='Ngày bắt đầu' />
-                            <FormTextBox type='text' className='col-6' ref={e => this.cbgd = e} label='Cán bộ giảng dạy' readOnly={readOnly} placeholder='Cán bộ giảng dạy' />
-                            {/* <FormTextBox type='number' className='col-6' ref={e => this.siSoTt = e} label='Sỉ sô tối thiểu' readOnly={readOnly} placeholder='Sỉ sô tối thiểu' />
-                            <FormTextBox type='number' className='col-6' ref={e => this.siSoTd = e} label='Sỉ sô tối đa' readOnly={readOnly} placeholder='Sỉ sô tối đa' /> */}
-                        </React.Fragment>
-                    )
-                }
+                <FormTextBox ref={e => this.monHoc = e} className='form-group col-md-12' readOnly label='Môn' />
+                <FormTextBox ref={e => this.nhom = e} className='form-group col-md-4' readOnly label='Nhóm' />
+                <FormTextBox ref={e => this.khoa = e} className='form-group col-md-8' readOnly label='Khoa, bộ môn' />
+                <FormSelect ref={e => this.phong = e} className='col-md-4' label='Phòng' data={SelectAdapter_DmPhong} readOnly={readOnly} />
+                <FormSelect ref={e => this.thu = e} className='form-group col-md-4' label='Thứ' data={dataThu} readOnly={readOnly} />
+                <FormSelect ref={e => this.tietBatDau = e} className='form-group col-md-4' label='Tiết bắt đầu' data={dataTiet} readOnly={readOnly} />
+                <FormSelect ref={e => this.giangVien = e} className='form-group col-md-12' data={SelectAdapter_FwCanBoGiangVien} label='Chọn giảng viên' readOnly={readOnly} />
             </div>
         });
     }
 }
-
 class DtThoiKhoaBieuPage extends AdminPage {
-    donViMapper = {};
-    monHocMapper = {};
-
+    soTiet = {}
+    thu = {}
+    tietBatDau = {}
+    phong = {}
+    state = { page: null, isEdit: {} }
     componentDidMount() {
-        this.props.getDmMonHocAll(items => {
-            if (items) {
-                this.monHocMapper = {};
-                items.forEach(item => this.monHocMapper[item.ma] = item);
-            }
-        });
         T.ready('/user/dao-tao', () => {
-            T.onSearch = (searchText) => this.props.getDtThoiKhoaBieuPage(undefined, undefined, searchText || '');
+            T.onSearch = (searchText) => this.initData(searchText || '');
             T.showSearchBox();
-            this.props.getDtThoiKhoaBieuPage();
         });
+        this.initData();
     }
 
-    showModal = (e) => {
-        e.preventDefault();
-        this.modal.show();
+    initData = (searchText) => {
+        this.props.getDtThoiKhoaBieuPage(undefined, undefined, searchText, page => {
+            this.setState({ page }, () => {
+                let { pageNumber, pageSize, list } = page;
+                list.forEach((item, index) => {
+                    this.soTiet[(pageNumber - 1) * pageSize + index + 1].value(item.soTiet);
+                    this.thu[(pageNumber - 1) * pageSize + index + 1].value(item.thu);
+                    this.tietBatDau[(pageNumber - 1) * pageSize + index + 1].value(item.tietBatDau);
+                    this.phong[(pageNumber - 1) * pageSize + index + 1].value(item.phong);
+                });
+            });
+        });
+    };
+
+
+    taoThoiKhoaBieu = () => {
+        T.confirmLoading('Tạo thời khóa biểu', 'Xác nhận tạo thời khóa biểu tự động?', 'Tạo thời khóa biểu thành công', 'Tạo thời khóa biểu thất bại', 'info', 'Tạo', () =>
+            new Promise(resolve => {
+                this.props.initSchedule((result) => {
+                    result.success && setTimeout(() => location.reload(), 2000);
+                    resolve(result);
+                });
+            }));
     }
 
-    changeActive = item => this.props.updateDtThoiKhoaBieu(item.id, { kichHoat: item.kichHoat == '1' ? '0' : '1' });
-
-    delete = (e, item) => {
-        e.preventDefault();
-        T.confirm('Xóa học phần', 'Bạn có chắc bạn muốn xóa học phần này?', true, isConfirm =>
-            isConfirm && this.props.deleteDtThoiKhoaBieu(item.id));
-    }
+    updateSoTiet = (index, item) => {
+        if (!this.soTiet[index].value() || !this.thu[index].value() || !this.tietBatDau[index].value() || !this.phong[index].value()) T.notify('Vui lòng nhập giá trị', 'danger');
+        else {
+            this.props.updateDtThoiKhoaBieu(item.id, {
+                soTiet: this.soTiet[index].value(),
+                phong: this.phong[index].value(),
+                tietBatDau: this.tietBatDau[index].value(),
+                thu: this.thu[index].value()
+            });
+            location.reload();
+        }
+    };
 
     render() {
-        const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
-            permission = this.getUserPermission('dtThoiKhoaBieu', ['read', 'write', 'delete']);
-        const { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.dtThoiKhoaBieu && this.props.dtThoiKhoaBieu.page ?
-            this.props.dtThoiKhoaBieu.page : { pageNumber: 1, pageSize: 200, pageTotal: 1, totalItem: 0, list: [] };
-
+        const permission = this.getUserPermission('dtThoiKhoaBieu', ['read', 'write', 'delete']);
+        const { pageNumber, pageSize, pageTotal, totalItem, pageCondition } = this.state.page ? this.state.page : { pageNumber: 1, pageSize: 1, pageTotal: 1, totalItem: 1, pageCondition: '' };
         let table = renderTable({
             emptyTable: 'Không có dữ liệu thời khóa biểu',
-            getDataSource: () => list, stickyHead: false,
+            getDataSource: () => this.state.page ? this.state.page.list : null, stickyHead: false,
+            header: 'thead-light',
             renderHead: () => (
                 <>
                     <tr>
                         <th rowSpan='2' style={{ width: 'auto', textAlign: 'right', verticalAlign: 'middle' }}>#</th>
-                        <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Mã học kỳ</th>
-                        <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }}>Nhóm</th>
-                        <th rowSpan='2' style={{ width: '50%', verticalAlign: 'middle' }}>Tên học phần</th>
-                        <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Số tín chỉ</th>
-                        <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Tổng số tiết</th>
-                        <th colSpan='6' rowSpan='1' style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Số tiết
+                        <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }}>Học kỳ</th>
+                        <th rowSpan='2' style={{ width: '25%', textAlign: 'center', verticalAlign: 'middle' }}>Mã</th>
+                        <th rowSpan='2' style={{ width: '50%', verticalAlign: 'middle' }}>Môn học</th>
+                        <th rowSpan='2' style={{ width: '25%', textAlign: 'center', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Phòng</th>
+                        <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Nhóm</th>
+                        <th colSpan='3' rowSpan='1' style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thời gian
                         </th>
-                        <th rowSpan='2' style={{ width: '50%', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>Khoa/Bộ môn</th>
+                        <th rowSpan='2' style={{ width: 'auto', verticalAlign: 'middle' }}>Khoa <br />Bộ môn</th>
+                        <th rowSpan='2' style={{ width: 'auto', verticalAlign: 'middle' }}>Giảng viên</th>
                         <th rowSpan='2' style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }} nowrap='true'>Thao tác</th>
                     </tr>
                     <tr>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>LT</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>TH</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>TT</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>TL</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>ĐA</th>
-                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>LA</th>
+                        <th style={{ width: 'auto', whiteSpace: 'nowrap', textAlign: 'center' }}>Thứ</th>
+                        <th style={{ width: 'auto', textAlign: 'center' }}>Tiết bắt đầu</th>
+                        <th style={{ width: 'auto', textAlign: 'center' }}>Số tiết</th>
                     </tr>
                 </>),
-            renderRow: (
-                item, index) => (
+            renderRow: (item, index) => (
                 <tr key={index}>
-                    <TableCell style={{ width: 'auto', textAlign: 'right' }} content={index + 1} />
-                    <TableCell style={{ width: 'auto', textAlign: 'center' }} content={item.maHocKy} />
-                    <TableCell style={{ width: 'auto', textAlign: 'center' }} content={'0' + item.nhom} />
-                    <TableCell type='link' content={item.tenMonHoc} onClick={() => this.modal.show(item)} />
-                    <TableCell style={{ width: 'auto', textAlign: 'center' }} content={item.soTinChi} />
-                    <TableCell style={{ width: 'auto', textAlign: 'center' }} content={item.tongSoTiet} />
-                    <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietLt} />
-                    <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietTh} />
-                    <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietTt} />
-                    <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietTl} />
-                    <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietDa} />
-                    <TableCell type='number' style={{ textAlign: 'center' }} content={item.soTietLa} />
-                    <TableCell style={{}} content={item.tenKhoaBoMon} />
-                    <TableCell type='buttons' content={item} permission={permission}
-                    // onEdit={() => this.modal.show(item)} //TODO: Sắp xếp thời khóa biểu cho phòng đào tạo
-                    // onDelete={this.delete}
+                    <TableCell style={{ width: 'auto', textAlign: 'right' }} content={(pageNumber - 1) * pageSize + index + 1} />
+                    <TableCell style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} content={<>{item.nam} <br /> {'HK' + item.hocKy}</>} />
+                    <TableCell style={{ width: 'auto', textAlign: 'center' }} content={item.maMonHoc} />
+                    <TableCell style={{}} contentClassName='multiple-lines-4' content={<>
+                        <span style={{ color: 'blue' }}>{T.parse(item.tenMonHoc, { vi: '' }).vi}</span> <br />
+                        <i> {item.tenKhoaBoMon}</i>
+                    </>} />
+                    <TableCell style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} content={
+                        <FormSelect ref={e => this.phong[(pageNumber - 1) * pageSize + index + 1] = e} style={{ marginBottom: '0' }} readOnly={!this.state.isEdit[(pageNumber - 1) * pageSize + index + 1]} data={SelectAdapter_DmPhong} placeholder='Phòng' />
+                    } onClick={e => {
+                        e.preventDefault();
+                        if (e.type == 'click') this.setState({
+                            isEdit: { ...this.state.isEdit, [(pageNumber - 1) * pageSize + index + 1]: !item.phong }
+                        }, () => this.phong[(pageNumber - 1) * pageSize + index + 1].focus());
+                    }}
                     />
+                    <TableCell style={{ width: 'auto', textAlign: 'center', whiteSpace: 'nowrap' }} content={item.nhom} />
+                    <TableCell style={{ width: 'auto', textAlign: 'center' }} content={
+                        <FormSelect ref={e => this.thu[(pageNumber - 1) * pageSize + index + 1] = e} style={{ width: '70px', marginBottom: '0' }} readOnly={!this.state.isEdit[(pageNumber - 1) * pageSize + index + 1]} data={dataThu} minimumResultsForSearch={-1} placeholder='Thứ' />
+                    }
+                        onClick={e => {
+                            e.preventDefault();
+                            if (e.type == 'click') this.setState({
+                                isEdit: { ...this.state.isEdit, [(pageNumber - 1) * pageSize + index + 1]: !item.phong }
+                            }, () => this.thu[(pageNumber - 1) * pageSize + index + 1].focus());
+                        }}
+                    />
+                    <TableCell style={{ textAlign: 'center' }} content={
+                        <FormSelect ref={e => this.tietBatDau[(pageNumber - 1) * pageSize + index + 1] = e} style={{ width: '70px', marginBottom: '0' }} readOnly={!this.state.isEdit[(pageNumber - 1) * pageSize + index + 1]} data={dataTiet} minimumResultsForSearch={-1} placeholder='Tiết BĐ' />
+                    }
+                        onClick={e => {
+                            e.preventDefault();
+                            if (e.type == 'click') this.setState({
+                                isEdit: { ...this.state.isEdit, [(pageNumber - 1) * pageSize + index + 1]: !item.phong }
+                            }, () => this.tietBatDau[(pageNumber - 1) * pageSize + index + 1].focus());
+                        }}
+                    />
+                    <TableCell style={{ textAlign: 'center' }} content={
+                        <FormTextBox type='number' ref={e => this.soTiet[(pageNumber - 1) * pageSize + index + 1] = e} style={{ width: '50px', marginBottom: '0' }} readOnly={!this.state.isEdit[(pageNumber - 1) * pageSize + index + 1]}
+                            onKeyPress={e => e.key == 'Enter' && this.setState({ isEdit: { ...this.state.isEdit, [(pageNumber - 1) * pageSize + index + 1]: false } }, () => {
+                                this.updateSoTiet((pageNumber - 1) * pageSize + index + 1, item);
+                            })}
+                        />
+                    }
+                        onClick={e => {
+                            e.preventDefault();
+                            if (e.type == 'click') this.setState({
+                                isEdit: { ...this.state.isEdit, [(pageNumber - 1) * pageSize + index + 1]: !item.phong }
+                            }, () => this.soTiet[(pageNumber - 1) * pageSize + index + 1].focus());
+                        }}
+                    />
+                    <TableCell style={{}} content={item.tenKhoaDangKy.getFirstLetters().toUpperCase()} />
+                    <TableCell style={{ whiteSpace: 'nowrap' }} content={`${item.trinhDo || ''} ${(item.hoGiangVien || '').normalizedName()} ${(item.tenGiangVien || '').normalizedName()}`} />
+                    <TableCell type='buttons' style={{ textAlign: 'center' }} content={item} permission={permission}
+                    >
+                        {!item.phong && <>
+                            {!this.state.isEdit[(pageNumber - 1) * pageSize + index + 1] && <Tooltip title='Điều chỉnh' arrow>
+                                <button className='btn btn-primary' onClick={e => e.preventDefault() || this.setState({ isEdit: { ...this.state.isEdit, [(pageNumber - 1) * pageSize + index + 1]: true } })}>
+                                    <i className='fa fa-lg fa-edit' />
+                                </button>
+                            </Tooltip>}
+                            {this.state.isEdit[(pageNumber - 1) * pageSize + index + 1] && <Tooltip title='Lưu' arrow>
+                                <button className='btn btn-success' onClick={e => {
+                                    e.preventDefault();
+                                    this.setState({ isEdit: { ...this.state.isEdit, [(pageNumber - 1) * pageSize + index + 1]: false } }, () => {
+                                        this.updateSoTiet((pageNumber - 1) * pageSize + index + 1, item);
+                                    });
+                                }}>
+                                    <i className='fa fa-lg fa-check' />
+                                </button>
+                            </Tooltip>}</>}
+                        {item.phong && <Tooltip title='Điều chỉnh' arrow>
+                            <button className='btn btn-info' onClick={e => e.preventDefault() || this.modal.show(item)}>
+                                <i className='fa fa-lg fa-cog' />
+                            </button>
+                        </Tooltip>}
+                    </TableCell>
                 </tr>)
         });
 
@@ -266,14 +236,29 @@ class DtThoiKhoaBieuPage extends AdminPage {
             title: 'Thời khoá biểu',
             breadcrumb: [
                 <Link key={0} to='/user/dao-tao'>Đào tạo</Link>,
-                'Thời khoá niểu'
+                'Thời khoá biểu'
             ],
             content: <>
                 <div className='tile'>{table}</div>
                 <Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
-                    getPage={this.props.getDtThoiKhoaBieuPage} />
-                <EditModal ref={e => this.modal = e} permission={permission} getDonViSelect={this.props.getDmDonViAll} getMonHocSelect={this.props.getDmMonHocAll} getPhongSelect={this.props.getDmPhongAll}
-                    create={this.props.createDtThoiKhoaBieu} update={this.props.updateDtThoiKhoaBieu} permissions={currentPermissions} />
+                    getPage={this.props.getDtThoiKhoaBieuPage} done={(page) => {
+                        this.setState({ page }, () => {
+                            let { pageNumber, pageSize, list } = page;
+                            list.forEach((item, index) => {
+                                this.soTiet[(pageNumber - 1) * pageSize + index + 1].value(item.soTiet);
+                                this.thu[(pageNumber - 1) * pageSize + index + 1].value(item.thu);
+                                this.tietBatDau[(pageNumber - 1) * pageSize + index + 1].value(item.tietBatDau);
+                                this.phong[(pageNumber - 1) * pageSize + index + 1].value(item.phong);
+                            });
+                        });
+                    }}
+                />
+                <AdjustModal ref={e => this.modal = e} readOnly={!permission.write}
+                    update={this.props.updateDtThoiKhoaBieu}
+                    initData={this.initData}
+                />
+                <CirclePageButton type='custom' customIcon='fa fa-lg fa-calendar' tooltip='Tạo thời khóa biểu cho danh sách hiện tại' onClick={e => e.preventDefault()
+                    || this.taoThoiKhoaBieu()} />
             </>,
             backRoute: '/user/dao-tao',
             onCreate: null, //TODO: Sắp xếp thời khóa biểu cho phòng đào tạo
@@ -283,5 +268,5 @@ class DtThoiKhoaBieuPage extends AdminPage {
 }
 
 const mapStateToProps = state => ({ system: state.system, dtThoiKhoaBieu: state.daoTao.dtThoiKhoaBieu });
-const mapActionsToProps = { getDmPhongAll, getDmDonViAll, getDtThoiKhoaBieuPage, createDtThoiKhoaBieu, updateDtThoiKhoaBieu, deleteDtThoiKhoaBieu };
+const mapActionsToProps = { getDmPhongAll, getDmDonViAll, getDtThoiKhoaBieuPage, createDtThoiKhoaBieu, updateDtThoiKhoaBieu, deleteDtThoiKhoaBieu, initSchedule };
 export default connect(mapStateToProps, mapActionsToProps)(DtThoiKhoaBieuPage);

@@ -14,13 +14,14 @@ module.exports = app => {
                 res.send({ error });
                 return;
             } else {
+                let thoiGianDangKy = dotDangKy.thoiGian || null;
                 let year = thoiGianMoMon.nam - yearth,
                     semester = thoiGianMoMon.hocKy + yearth * 2;
                 app.model.dtKhungDaoTao.get({ namDaoTao: year }, (error, item) => {
                     if (error) {
                         res.send({ error: `Lỗi lấy CTDT năm ${year}` }); return;
                     } else if (!item) {
-                        res.send({ error: `Năm ${year} không tồn tại CTDT nào!` }); return;
+                        res.send({ warning: `Năm ${year} không tồn tại CTDT nào!`, item: { items: [], ctdt: [], dotDangKy, thoiGianMoMon } }); return;
                     } else {
                         app.model.dtDanhSachMonMo.getAll({ maDangKy: id, hocKy }, (error, items) => {
                             if (error) { res.send({ error }); return; } else {
@@ -29,7 +30,7 @@ module.exports = app => {
                                         statement: 'maKhungDaoTao = (:id) AND hocKyDuKien = (:semester)',
                                         parameter: { id: item.id, semester }
                                     };
-                                    app.model.dtChuongTrinhDaoTao.getAll(condition, (error, items) => {
+                                    !thoiGianDangKy && app.model.dtChuongTrinhDaoTao.getAll(condition, (error, items) => {
                                         if (error) {
                                             res.send({ error });
                                             return;
