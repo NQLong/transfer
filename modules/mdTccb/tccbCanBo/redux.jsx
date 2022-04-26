@@ -236,6 +236,16 @@ export const SelectAdapter_FwCanBo = {
     processResultOne: response => response && response.item && ({ value: response.item.shcc, text: `${response.item.shcc}: ${(response.item.ho + ' ' + response.item.ten).normalizedName()}` }),
 };
 
+export const SelectAdapter_FwCanBoByDonVi = (listDonVi) => ({
+    ajax: true,
+    url: '/api/staff/page/1/20',
+    data: params => ({ condition: params.term , filter: {listDonVi }}),
+    processResults: response => ({ results: response && response.page && response.page.list ? response.page.list.map(item => ({ id: item.shcc, text: `${item.shcc}: ${(item.ho + ' ' + item.ten).normalizedName()}`, ngayBatDauCongTac: item.ngayBatDauCongTac })) : [] }),
+    getOne: getStaff,
+    fetchOne: (shcc, done) => (getStaff(shcc, ({ item }) => done && done({ id: item.shcc, text: `${item.shcc}: ${(item.ho + ' ' + item.ten).normalizedName()}`, ngayBatDauCongTac: item.ngayBatDauCongTac })))(),
+    processResultOne: response => response && response.item && ({ value: response.item.shcc, text: `${response.item.shcc}: ${(response.item.ho + ' ' + response.item.ten).normalizedName()}` }),
+});
+
 export const SelectAdapter_FwCanBoGiangVien = {
     ajax: true,
     url: '/api/staff/get-giang-vien',

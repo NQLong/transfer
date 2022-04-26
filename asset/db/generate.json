@@ -8546,6 +8546,11 @@
             "active": true,
             "moduleName": "hcthCanBoNhan",
             "modelName": "hcthCanBoNhan",
+            "methods": {
+                "HCTH_GIAO_NHIEM_VU_GET_ALL_CAN_BO_NHAN": "getAllCanBoNhan",
+                "HCTH_GIAO_NHIEM_VU_GET_ALL_LIEN_KET": "getAllLienKet",
+                "HCTH_GIAO_NHIEM_VU_SEARCH_PAGE": "searchPage"
+            },
             "columns": {
                 "ID": {
                     "value": "id",
