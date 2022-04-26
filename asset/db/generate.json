@@ -8539,6 +8539,53 @@
             "foreignKeys": [],
             "type": "table"
         },
+        "DT_CHUAN_DAU_RA": {
+            "active": true,
+            "moduleName": "dtChuanDauRa",
+            "modelName": "dtChuanDauRa",
+            "columns": {
+                "ID": {
+                    "value": "id",
+                    "dataType": "NUMBER",
+                    "dataDefault": "\"DEV_HCMUSSH\".\"ISEQ$$_111904\".nextval",
+                    "nullable": false,
+                    "size": "22,0"
+                },
+                "THANG_DO_MIN": {
+                    "value": "thangDoMin",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,1"
+                },
+                "THANG_DO_MAX": {
+                    "value": "thangDoMax",
+                    "dataType": "NUMBER",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": "1,1"
+                },
+                "MO_TA": {
+                    "value": "moTa",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 2000
+                },
+                "KICH_HOAT": {
+                    "value": "kichHoat",
+                    "dataType": "NUMBER",
+                    "dataDefault": "1",
+                    "nullable": true,
+                    "size": "1,0"
+                }
+            },
+            "primaryKeys": [
+                "ID"
+            ],
+            "foreignKeys": [],
+            "type": "table"
+        },
         "HCTH_CAN_BO_NHAN": {
             "active": true,
             "moduleName": "hcthCanBoNhan",
@@ -8556,7 +8603,14 @@
                     "dataType": "NVARCHAR2",
                     "dataDefault": "",
                     "nullable": true,
-                    "size": 255
+                    "size": 24
+                },
+                "LOAI": {
+                    "value": "loai",
+                    "dataType": "NVARCHAR2",
+                    "dataDefault": "",
+                    "nullable": true,
+                    "size": 20
                 },
                 "LOAI": {
                     "value": "loai",
@@ -11888,7 +11942,7 @@
                 },
                 "PHONG": {
                     "value": "phong",
-                    "dataType": "NVARCHAR2",
+                    "dataType": "NUMBER",
                     "dataDefault": "",
                     "nullable": true,
                     "size": 20
