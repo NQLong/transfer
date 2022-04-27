@@ -246,7 +246,7 @@ module.exports = app => {
                         cells.push({ cell: 'K' + (index + 2), border: '1234', value: item.tenChucVu });
                         cells.push({ cell: 'L' + (index + 2), border: '1234', value: item.tenDonVi });
                         cells.push({ cell: 'M' + (index + 2), border: '1234', value: item.danhSachQuocGia });
-                        cells.push({ cell: 'N' + (index + 2), border: '1234', value: item.noiDungTiepNhan });
+                        cells.push({ cell: 'N' + (index + 2), border: '1234', value: item.tenNoiDungTiepNhan });
                         cells.push({ cell: 'O' + (index + 2), alignment: 'center', border: '1234', value: item.ngayVeNuoc ? app.date.dateTimeFormat(new Date(item.ngayVeNuoc), 'dd/mm/yyyy') : '' });
                     });
                     resolve(cells);

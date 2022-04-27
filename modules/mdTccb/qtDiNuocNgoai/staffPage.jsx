@@ -11,6 +11,8 @@ import {
 } from './redux';
 import { SelectAdapter_DmQuocGia } from 'modules/mdDanhMuc/dmQuocGia/redux';
 import { SelectAdapter_DmMucDichNuocNgoaiV2 } from 'modules/mdDanhMuc/dmMucDichNuocNgoai/redux';
+import { SelectAdapter_DmTiepNhanVeNuocV2 } from 'modules/mdDanhMuc/dmTiepNhanVeNuoc/redux';
+
 const EnumDateType = Object.freeze({
     0: { text: '' },
     1: { text: 'dd/mm/yyyy' },
@@ -250,7 +252,7 @@ class EditModal extends AdminModal {
                     <FormTextBox className='col-md-4' ref={e => this.soQdTiepNhan = e} type='text' label='Số quyết định tiếp nhận' readOnly={readOnly} required />
                     <FormDatePicker className='col-md-4' ref={e => this.ngayQdTiepNhan = e} type='date-mask' label='Ngày quyết định tiếp nhận' readOnly={readOnly} required />
                     <FormDatePicker className='col-md-4' ref={e => this.ngayVeNuoc = e} type='date-mask' label='Ngày về nước' readOnly={readOnly} />
-                    <FormRichTextBox className='col-md-12' ref={e => this.noiDungTiepNhan = e} rows={3} readOnly={readOnly} label='Nội dung tiếp nhận' placeholder='Nhập nội dung tiếp nhận về nước (tối đa 1000 ký tự)' />
+                    <FormSelect className='col-md-12' ref={e => this.noiDungTiepNhan = e} readOnly={readOnly} label='Nội dung tiếp nhận' data={SelectAdapter_DmTiepNhanVeNuocV2} />
                 </div>
                 <div className='form-group col-12'>
                     <h3 className='tile-title'>Danh sách tập tin báo cáo</h3>
