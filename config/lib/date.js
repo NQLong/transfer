@@ -34,6 +34,11 @@ module.exports = app => {
             months += d2.getMonth();
             return months <= 0 ? 0 : months;
         },
+        
+        dayDiff: (d1, d2) => { //Difference in Days between two dates
+            let result = d2.getTime() - d1.getTime();
+            return Math.floor(result / (1000 * 60 * 60 * 24));
+        },
 
         numberNgayNghi: (start, end, yearCalc, danhSachNgayLe = []) => { //Số ngày nghỉ trong khoảng [start, end] ở năm yearCalc (nếu tồn tại)
             if (yearCalc) {
