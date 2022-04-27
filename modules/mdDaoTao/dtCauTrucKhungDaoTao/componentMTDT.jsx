@@ -15,7 +15,6 @@ export class ComponentMTDT extends AdminPage {
         const parents = items?.parents || {};
         const childs = items?.childs || {};
         Object.keys(parents).forEach((key) => {
-            console.log(key);
             this.addParentRow(length, { id: key, value: parents[key] });
             length++;
             childs[key] && childs[key].forEach((cItem, idx) => {
@@ -101,7 +100,6 @@ export class ComponentMTDT extends AdminPage {
     }
 
     onRemoveChildRow = (parentId, idx) => {
-        console.log('onRemoveChildRow', parentId, idx);
         const nChildItems = { ...this.state.childItems };
         if (idx >= 0) {
             nChildItems[parentId][idx].isDeleted = true;
@@ -171,7 +169,6 @@ export class ComponentMTDT extends AdminPage {
     };
 
     getValue = () => {
-        console.log('Get Value');
         const parentKeys = Object.keys(this.parentRows);
         const datas = { parents: [], childrens: {} };
         parentKeys.forEach((pKey) => {
@@ -198,7 +195,6 @@ export class ComponentMTDT extends AdminPage {
             }
 
         });
-        console.log(datas);
         return datas;
     }
 

@@ -40,7 +40,6 @@ class DtCauTrucKhungDaoTaoPage extends AdminPage {
                     searchTerm: '', donViFilter: this.state.donViFilter
                 }
             };
-        console.log(list);
 
         let table = renderTable({
             emptyTable: 'Không có dữ liệu cấu trúc khung đào tạo',
@@ -56,9 +55,9 @@ class DtCauTrucKhungDaoTaoPage extends AdminPage {
                 <tr key={index}>
                     <TableCell style={{ textAlign: 'right' }} content={index + 1} />
                     <TableCell style={{ textAlign: 'center' }} content={item.namDaoTao} />
-                    <TableCell style={{ textAlign: 'center' }} type='buttons' content={item} permission={permission} 
-                        onEdit={permission.write ? (e) => e.preventDefault() || this.props.history.push(`/user/dao-tao/cau-truc-khung-dao-tao/${item.id}`) : null} 
-                        onClone={(e) => e.preventDefault() || this.props.history.push(`/user/dao-tao/cau-truc-khung-dao-tao/new?id=${item.id}`)}/>
+                    <TableCell style={{ textAlign: 'center' }} type='buttons' content={item} permission={permission}
+                        onEdit={permission.write ? (e) => e.preventDefault() || this.props.history.push(`/user/dao-tao/cau-truc-khung-dao-tao/${item.id}`) : null}
+                        onClone={(e) => e.preventDefault() || this.props.history.push(`/user/dao-tao/cau-truc-khung-dao-tao/new?id=${item.id}`)} />
                 </tr>
             )
         });

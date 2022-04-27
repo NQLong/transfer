@@ -15,13 +15,11 @@ export class ComponentCTDT extends AdminPage {
         let length = 0;
         const parents = items?.parents || {};
         const childs = items?.childs || {};
-        console.log(parents, childs);
         Object.keys(parents).forEach((key) => {
             const item = parents[key];
             this.addParentRow(length, item);
             length++;
             childs[key] && childs[key].forEach((cItem) => {
-                console.log(cItem);
                 this.addChildRow(cItem.id, cItem.value, key);
             });
         });
@@ -103,7 +101,6 @@ export class ComponentCTDT extends AdminPage {
     }
 
     onRemoveChildRow = (parentId, idx) => {
-        console.log('onRemoveChildRow', parentId, idx);
         const nChildItems = { ...this.state.childItems };
         if (idx >= 0) {
             nChildItems[parentId][idx].isDeleted = true;
@@ -177,7 +174,6 @@ export class ComponentCTDT extends AdminPage {
     };
 
     getValue = () => {
-        console.log('Get Value');
         const parentKeys = Object.keys(this.parentRows);
         const datas = { parents: [], childrens: {} };
         parentKeys.forEach((pKey) => {
@@ -207,7 +203,6 @@ export class ComponentCTDT extends AdminPage {
                 });
             }
         });
-        console.log(datas);
         return datas;
     }
 

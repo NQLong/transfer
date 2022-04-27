@@ -46,7 +46,6 @@ module.exports = app => {
         const item = req.body.item;
         const namDaoTao = item?.namDaoTao;
         app.model.dtCauTrucKhungDaoTao.get({ namDaoTao: namDaoTao }, (error, ctKhungDt) => {
-            console.log(error, ctKhungDt);
             if (!error && !ctKhungDt) {
                 const data = { namDaoTao, mucCha: item.mucCha, mucCon: item.mucCon };
                 app.model.dtCauTrucKhungDaoTao.create(data, (error, item) => {
