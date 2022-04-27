@@ -4,7 +4,7 @@ module.exports = app => {
         menus: {
             7006: {
                 title: 'Chương trình đào tạo', groupIndex: 1,
-                link: '/user/dao-tao/chuong-trinh-dao-tao', icon: 'fa-university', backgroundColor: '#F4C053'
+                link: '/user/dao-tao/chuong-trinh-dao-tao', icon: 'fa-university', backgroundColor: '#384C46'
             },
         },
     };

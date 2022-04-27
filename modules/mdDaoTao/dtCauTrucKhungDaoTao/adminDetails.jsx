@@ -33,11 +33,9 @@ class DtCauTrucKhungDaoTaoDetails extends AdminPage {
 
     getData = (id, isClone = false) => {
         this.props.getDtCauTrucKhungDaoTao(id, (ctkdt) => {
-            console.log(ctkdt);
             if (isClone) {
                 ctkdt.namDaoTao = parseInt(ctkdt.namDaoTao) + 1;
             }
-            console.log(ctkdt);
             this.namDaoTao.value(ctkdt.namDaoTao);
             const mucCha = T.parse(ctkdt.mucCha, { mucTieuDaoTao: {}, chuongTrinhDaoTao: {} });
             const mucCon = T.parse(ctkdt.mucCon, { mucTieuDaoTao: {}, chuongTrinhDaoTao: {} });
@@ -91,15 +89,14 @@ class DtCauTrucKhungDaoTaoDetails extends AdminPage {
 
             let updateDatas = { ...{ mucCha: T.stringify(mucCha) }, ...{ mucCon: T.stringify(mucCon) } };
             // const deleteDatas = { items: deleteItems };
-            console.log(updateDatas);
             if (this.ma == 'new') {
-                updateDatas = {...updateDatas, ...{ namDaoTao: data.namDaoTao }};
+                updateDatas = { ...updateDatas, ...{ namDaoTao: data.namDaoTao } };
                 this.props.createDtCauTrucKhungDaoTao(updateDatas, (item) => {
                     location.replace('/new', `/${item.id}`);
                     location.reload();
                 });
             } else {
-                this.props.updateDtCauTrucKhungDaoTao(this.ma, updateDatas, () => {
+                this.props.updateDtCauTrucKhungDaoTao(this.ma, { ...updateDatas, ...data }, () => {
                     // location.reload();
                 });
             }
@@ -123,7 +120,7 @@ class DtCauTrucKhungDaoTaoDetails extends AdminPage {
                 <div className='tile'>
                     <h3 className='tile-title'>Thông tin chung</h3>
                     <div className='tile-body'>
-                        <FormTextBox ref={e => this.namDaoTao = e} label='Năm đào tạo' className='col-md-3' required readOnly={readOnly} />
+                        <FormTextBox type='year' ref={e => this.namDaoTao = e} label='Năm đào tạo' className='col-md-3' required readOnly={readOnly} />
                     </div>
                 </div>
                 <div className='tile'>

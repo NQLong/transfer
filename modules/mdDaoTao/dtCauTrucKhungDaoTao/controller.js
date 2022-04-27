@@ -3,8 +3,8 @@ module.exports = app => {
         parentMenu: app.parentMenu.daoTao,
         menus: {
             7012: {
-                title: 'Cấu trúc khung đào tạo', groupIndex: 1,
-                link: '/user/dao-tao/cau-truc-khung-dao-tao', icon: 'fa-cogs', backgroundColor: '#14C053'
+                title: 'Cấu trúc khung CTĐT', groupIndex: 1,
+                link: '/user/dao-tao/cau-truc-khung-dao-tao', icon: 'fa-cogs', backgroundColor: '#A84A48'
             },
         },
     };
@@ -51,7 +51,7 @@ module.exports = app => {
                 const data = { namDaoTao, mucCha: item.mucCha, mucCon: item.mucCon };
                 app.model.dtCauTrucKhungDaoTao.create(data, (error, item) => {
                     if (!error) {
-                        res.send({ error, item});
+                        res.send({ error, item });
                     } else res.send({ error });
                 });
             } else res.send({ error: `Năm ${namDaoTao} đã tồn tại!` });
