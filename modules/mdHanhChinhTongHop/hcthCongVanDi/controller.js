@@ -347,10 +347,10 @@ module.exports = app => {
         } = req.body.data;
 
         const newHistory = {
-            loai: loai,
+            loai,
             key: Number(key),
-            shcc: shcc,
-            hanhDong: hanhDong,
+            shcc,
+            hanhDong,
             thoiGian: Number(thoiGian)
         };
 
@@ -361,21 +361,6 @@ module.exports = app => {
         app.model.hcthHistory.getAllFrom(parseInt(req.params.id), 'DI', (error, item) => res.send({ error, item: item?.rows || [] }));
     });
 
-    // const createNotification = (emails, notification, done) => {
-    //     const promises = [];
-    //     emails.forEach(email => {
-    //         promises.push(app.notification.send({
-    //             toEmail: email,
-    //             ...notification
-    //         }));
-    //     });
-    //     Promise.all(promises).then(() => done(null)).catch(error => done(error));
-    // };
-
-    //cần sửa lại permission
-    // app.put('/api/hcth/cong-van-cac-phong/notification', app.permission.check('staff:login'), (req, res) => {
-    //     app.model.canBo
-    // })
 
 };
 
