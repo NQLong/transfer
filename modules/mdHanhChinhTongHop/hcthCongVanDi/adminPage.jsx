@@ -133,7 +133,7 @@ class HcthCongVanDi extends AdminPage {
         const currentPermissions = this.props.system && this.props.system.user && this.props.system.user.permissions ? this.props.system.user.permissions : [],
             permission = this.getUserPermission('hcthCongVanDi', ['read', 'write', 'delete']);
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.hcthCongVanDi && this.props.hcthCongVanDi.page ?
-            this.props.hcthCongVanDi.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
+            this.props.hcthCongVanDi.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: null };
         // Chỉ trưởng phòng mới có quyền thêm công văn
         let listDonViQuanLy = this.props.system && this.props.system.user.staff && this.props.system.user.staff.donViQuanLy ? this.props.system.user.staff.donViQuanLy : [];
         let dsQuanLy = listDonViQuanLy.map(item => item.maDonVi).toString();
@@ -141,6 +141,7 @@ class HcthCongVanDi extends AdminPage {
             emptyTable: 'Chưa có dữ liệu công văn các phòng',
             getDataSource: () => list,
             stickyHead: false,
+            header: 'thead-light',
             renderHead: () => (
                 <tr>
                     <th style={{ width: 'auto', textAlign: 'center', verticalAlign: 'middle' }}>#</th>

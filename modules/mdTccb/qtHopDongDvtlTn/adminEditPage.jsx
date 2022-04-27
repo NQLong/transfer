@@ -402,14 +402,16 @@ class QtHopDongDvtlTnEditPage extends QTForm {
         }
     }
 
-    genNewShcc = (maDonVi) => {
-        if (maDonVi == '') {
+    genNewShcc = () => {
+        let maDonVi = this.diaDiemLamViec.current?.getVal(),
+            maChucDanhChuyenMon = this.chucDanhChuyenMon.current?.getVal();
+        if (maDonVi == '' || maDonVi == null || maChucDanhChuyenMon == '' || maChucDanhChuyenMon == null) {
             return;
         }
         this.props.getDmDonVi(maDonVi, (item) => {
             let preShcc = item.preShcc;
             this.props.getPreShcc(maDonVi, (data) => {
-                preShcc = preShcc + '.' + data.preShcc.toString().padStart(4, '0');
+                preShcc = preShcc + '.' + (['01', '07', '12'].includes(maChucDanhChuyenMon) ? '0' : '5') + data.preShcc.toString().padStart(3, '0');
                 if (this.shcc.current) this.shcc.current.setVal(preShcc);
             });
         });
@@ -491,8 +493,8 @@ class QtHopDongDvtlTnEditPage extends QTForm {
                         <div className='form-group col-xl-3 col-md-6'><DateInput ref={this.batDauLamViec} label='Ngày bắt đầu làm việc' required /></div>
                         <div className='form-group col-xl-3 col-md-6' id='ketThucHd'><DateInput ref={this.ketThucHopDong} label='Ngày kết thúc hợp đồng' required /></div>
                         <div className='form-group col-xl-3 col-md-6' id='kyTiepTheo'><DateInput ref={this.ngayKyHopDongTiepTheo} label='Ngày ký hợp đồng tiếp theo' /></div>
-                        <div className='form-group col-xl-12 col-md-12'><Select adapter={SelectAdapter_DmDonVi} ref={this.diaDiemLamViec} label='Địa điểm làm việc' onChange={value => this.genNewShcc(value)}/></div>
-                        <div className='form-group col-xl-4 col-md-4'><Select adapter={SelectAdapter_DmChucDanhChuyenMon} ref={this.chucDanhChuyenMon} label='Chức danh chuyên môn' /></div>
+                        <div className='form-group col-xl-12 col-md-12'><Select adapter={SelectAdapter_DmDonVi} ref={this.diaDiemLamViec} label='Địa điểm làm việc' onChange={this.genNewShcc}/></div>
+                        <div className='form-group col-xl-4 col-md-4'><Select adapter={SelectAdapter_DmChucDanhChuyenMon} ref={this.chucDanhChuyenMon} onChange={this.genNewShcc} label='Chức danh chuyên môn' /></div>
                         <div className='form-group col-xl-4 col-md-4'><TextInput ref={this.congViecDuocGiao} label='Công việc được giao' /></div>
                         <div className='form-group col-xl-4 col-md-4'><TextInput ref={this.chiuSuPhanCong} label='Chịu sự phân công' /></div>
                         {this.state.dienHopDong == 'DVTL' ? <div className='form-group col-xl-6 col-md-6'><Select adapter={SelectAdapter_DmDonVi} ref={this.donViChiTra} label='Đơn vị chi trả' /></div> : null}

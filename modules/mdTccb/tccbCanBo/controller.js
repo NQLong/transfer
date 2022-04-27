@@ -2295,4 +2295,14 @@ module.exports = app => {
         });
 
     });
+
+    app.get('/api/staff/by-email/:email', app.permission.check('staff:read'), (req, res) => {
+        app.model.canBo.get({ email: req.params.email }, (error, items) => {
+            if (error) {
+                res.send({ error });
+            } else {
+                res.send({ items });
+            }
+        });
+    });
 };

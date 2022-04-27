@@ -119,6 +119,7 @@ class StaffEditPage extends AdminPage {
 
     state = {
         id: null,
+        isLoading: true,
         listFile: [],
         newChiDao: [],
         chiDao: [],
@@ -131,12 +132,14 @@ class StaffEditPage extends AdminPage {
 
     componentDidMount() {
         const isHcthMenu = window.location.pathname.startsWith('/user/hcth');
-        T.ready(isHcthMenu ? '/user/hcth' : '/user' , () => {
+        T.ready(isHcthMenu ? '/user/hcth' : '/user', () => {
             const params = T.routeMatcher(isHcthMenu ? '/user/hcth/cong-van-den/:id' : '/user/cong-van-den/:id').parse(window.location.pathname),
                 user = this.props.system && this.props.system.user ? this.props.system.user : { shcc: '', staff: {}, lastName: '', firstName: '' },
                 { shcc, staff, image } = user;
             this.setState({
+
                 id: params.id === 'new' ? null : params.id,
+                isLoading: params.id === 'new' ? false : true,
                 // needConduct: !params.id === 'new',
                 shcc,
                 image,
@@ -246,7 +249,7 @@ class StaffEditPage extends AdminPage {
 
     getData = () => {
         if (this.state.id) {
-            this.props.getCongVanDen(Number(this.state.id), (item) => this.setData(item));
+            this.props.getCongVanDen(Number(this.state.id), (item) => this.setState({ isLoading: false }, () => this.setData(item)));
         } else this.setData();
     }
 
@@ -612,13 +615,13 @@ class StaffEditPage extends AdminPage {
             item = this.state.id ? this.getItem() : {};
 
         const loading = (
-            <div className='overlay tile' style={{ minHeight: '120px' }}>
+            <div className='overlay tile' style={{ minHeight: '120px', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <div className='m-loader mr-4'>
                     <svg className='m-circular' viewBox='25 25 50 50'>
                         <circle className='path' cx='50' cy='50' r='20' fill='none' strokeWidth='4' strokeMiterlimit='10' />
                     </svg>
                 </div>
-                <h4 className='l-text'>Đang tải công văn...</h4>
+                <h4 className='l-text'>Đang tải...</h4>
             </div>);
 
         const permissionDenied = (
@@ -629,7 +632,6 @@ class StaffEditPage extends AdminPage {
         const quyenChiDao = this.renderQuyenChiDao(this.state.quyenChiDao || [], { write: hcthStaffPermission.login || presidentPermission.login }, readOnly);
 
 
-
         return this.renderPage({
             icon: 'fa fa-caret-square-o-left',
             title: 'Công văn đến',
@@ -638,7 +640,7 @@ class StaffEditPage extends AdminPage {
                 <Link key={1} to='/user/hcth/cong-van-den'>Danh sách Công văn đến</Link>,
                 isNew ? 'Tạo mới' : 'Cập nhật'
             ],
-            content: !item ? loading : item.error && item.error == 401 ? permissionDenied : (<>
+            content: this.state.isLoading ? loading : item.error && item.error == 401 ? permissionDenied : (<>
                 <div className='tile'>
                     <h3 className='tile-title'>{!this.state.id ? 'Tạo mới công văn đến' : 'Cập nhật công văn đến'}</h3>
                     <div className='tile-body row'>
