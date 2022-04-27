@@ -269,7 +269,6 @@ class QtHopDongVienChucEditPage extends QTForm {
         thoiGianXetNangBacLuong: this.thoiGianXetNangBacLuong.current.getFormVal(),
     })
 
-
     changeCanBo = (value) => {
         if (value) {
             this.props.getStaff(value, data => {
@@ -327,6 +326,7 @@ class QtHopDongVienChucEditPage extends QTForm {
         const dataThuongTru = this.thuongTru.value();
         this.cuTru.value(dataThuongTru.maTinhThanhPho, dataThuongTru.maQuanHuyen, dataThuongTru.maPhuongXa, dataThuongTru.soNhaDuong);
     }
+
     autoChucVu = (value) => {
         if (value) {
             this.props.getStaff(value, data => {
@@ -358,10 +358,10 @@ class QtHopDongVienChucEditPage extends QTForm {
         });
     }
 
-
     newShcc = (value) => {
         this.setState({ shcc: moment(value) });
     }
+    
     handleTuNgay = () => {
         if (this.ngayKyHopDong.current.getVal() && !this.state.hdkxdtg && this.state.thoiGianHd) {
             const newDate = moment(this.ngayKyHopDong.current.getVal()).add(parseInt(this.state.thoiGianHd), 'M');
@@ -434,14 +434,16 @@ class QtHopDongVienChucEditPage extends QTForm {
         });
     }
 
-    genNewShcc = (maDonVi) => {
-        if (maDonVi == '') {
+    genNewShcc = () => {
+        let maDonVi = this.diaDiemLamViec.current?.getVal(),
+            maChucDanhChuyenMon = this.chucDanhChuyenMon.current?.getVal();
+        if (maDonVi == '' || maDonVi == null || maChucDanhChuyenMon == '' || maChucDanhChuyenMon == null) {
             return;
         }
         this.props.getDmDonVi(maDonVi, (item) => {
             let preShcc = item.preShcc;
             this.props.getPreShcc(maDonVi, (data) => {
-                preShcc = preShcc + '.' + data.preShcc.toString().padStart(4, '0');
+                preShcc = preShcc + '.' + (['01', '07', '12'].includes(maChucDanhChuyenMon) ? '0' : '5') + data.preShcc.toString().padStart(3, '0');
                 if (this.shcc.current) this.shcc.current.setVal(preShcc);
             });
         });
@@ -523,8 +525,8 @@ class QtHopDongVienChucEditPage extends QTForm {
                         <div className='form-group col-xl-3 col-md-6'><DateInput ref={this.ngayBatDauLamViec} label='Ngày bắt đầu làm việc' min={new Date(1900, 1, 1).getTime()} max={new Date(new Date().getFullYear() + 1, 1, 1).getTime()} disable={readOnly} onChange={this.handleTuNgay} required /></div>
                         <div className='form-group col-xl-3 col-md-6' id='ketThucHd'><DateInput ref={this.ngayKetThucHopDong} label='Ngày kết thúc hợp đồng' min={new Date(1900, 1, 1).getTime()} max={new Date(new Date().getFullYear() + 4, 1, 1).getTime()} disable={readOnly} required={this.state.isKetThucHd} /></div>
                         <div className='form-group col-xl-3 col-md-6' id='kyTiepTheo'><DateInput ref={this.ngayKyHdTiepTheo} min={new Date(1900, 1, 1).getTime()} max={new Date(new Date().getFullYear() + 4, 1, 1).getTime()} disable={readOnly} label='Ngày ký hợp đồng tiếp theo' /></div>
-                        <div className='form-group col-xl-12 col-md-12'><Select adapter={SelectAdapter_DmDonVi} ref={this.diaDiemLamViec} disable={readOnly} label='Địa điểm làm việc' onChange={value => this.genNewShcc(value)}/></div>
-                        <div className='form-group col-xl-4 col-md-4'><Select adapter={SelectAdapter_DmChucDanhChuyenMon} ref={this.chucDanhChuyenMon} disable={readOnly} label='Chức danh chuyên môn' /></div>
+                        <div className='form-group col-xl-12 col-md-12'><Select adapter={SelectAdapter_DmDonVi} ref={this.diaDiemLamViec} disable={readOnly} label='Địa điểm làm việc' onChange={this.genNewShcc}/></div>
+                        <div className='form-group col-xl-4 col-md-4'><Select adapter={SelectAdapter_DmChucDanhChuyenMon} ref={this.chucDanhChuyenMon} onChange={this.genNewShcc} disable={readOnly} label='Chức danh chuyên môn' /></div>
                         <div className='form-group col-xl-4 col-md-4'><TextInput ref={this.nhiemVu} label='Nhiệm vụ' disable={readOnly} /></div>
                         <div className='form-group col-xl-4 col-md-4'><Select ref={this.maNgach} label='Ngạch' adapter={SelectAdapter_DmNgachCdnn} disable={readOnly} onChange={this.changeNgach} required /></div>
 

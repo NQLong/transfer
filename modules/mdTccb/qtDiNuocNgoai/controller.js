@@ -141,9 +141,9 @@ module.exports = app => {
     });
 
     app.get('/api/qua-trinh/di-nuoc-ngoai/download-excel/:filter', app.permission.check('qtDiNuocNgoai:read'), (req, res) => {
-        app.model.qtDiNuocNgoai.download(req.params.filter, (err, result) => {
-            if (err || !result) {
-                res.send({ err });
+        app.model.qtDiNuocNgoai.download(req.params.filter, (error, result) => {
+            if (error || !result) {
+                res.send({ error });
             } else {
                 const workbook = app.excel.create(),
                     worksheet = workbook.addWorksheet('dinuocngoai');
@@ -178,7 +178,7 @@ module.exports = app => {
                         cells.push({ cell: 'F' + (index + 2), border: '1234', value: item.hoCanBo });
                         cells.push({ cell: 'G' + (index + 2), border: '1234', value: item.tenCanBo });
                         cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.phai == '01' ? 'Nam' : 'Nữ' });
-                        cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.ngaySinh ? app.date.dateTimeFormat(new Date(item.ngaySinh), 'dd/mm/yyyy') : ''});
+                        cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.ngaySinh ? app.date.dateTimeFormat(new Date(item.ngaySinh), 'dd/mm/yyyy') : '' });
                         cells.push({ cell: 'J' + (index + 2), border: '1234', value: item.tenChucVu });
                         cells.push({ cell: 'K' + (index + 2), border: '1234', value: item.tenDonVi });
                         cells.push({ cell: 'L' + (index + 2), border: '1234', value: item.danhSachQuocGia });
@@ -198,12 +198,12 @@ module.exports = app => {
                 });
             }
         });
-
     });
+
     app.get('/api/qua-trinh/tiep-nhan-ve-nuoc/download-excel/:filter', app.permission.check('qtDiNuocNgoai:read'), (req, res) => {
-        app.model.qtDiNuocNgoai.download(req.params.filter, (err, result) => {
-            if (err || !result) {
-                res.send({ err });
+        app.model.qtDiNuocNgoai.download(req.params.filter, (error, result) => {
+            if (error || !result) {
+                res.send({ error });
             } else {
                 const workbook = app.excel.create(),
                     worksheet = workbook.addWorksheet('DANH SACH VE NUOC');
@@ -235,7 +235,7 @@ module.exports = app => {
                         cells.push({ cell: 'F' + (index + 2), border: '1234', value: item.hoCanBo });
                         cells.push({ cell: 'G' + (index + 2), border: '1234', value: item.tenCanBo });
                         cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.phai == '01' ? 'Nam' : 'Nữ' });
-                        cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.ngaySinh ? app.date.dateTimeFormat(new Date(item.ngaySinh), 'dd/mm/yyyy') : ''});
+                        cells.push({ cell: 'I' + (index + 2), border: '1234', value: item.ngaySinh ? app.date.dateTimeFormat(new Date(item.ngaySinh), 'dd/mm/yyyy') : '' });
                         cells.push({ cell: 'J' + (index + 2), border: '1234', value: item.tenChucVu });
                         cells.push({ cell: 'K' + (index + 2), border: '1234', value: item.tenDonVi });
                         cells.push({ cell: 'L' + (index + 2), border: '1234', value: item.danhSachQuocGia });
@@ -251,6 +251,5 @@ module.exports = app => {
                 });
             }
         });
-
     });
 };

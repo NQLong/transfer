@@ -81,6 +81,7 @@ class HcthCongVanDenStaffPage extends AdminPage {
         const pageFilter = isInitial ? {} : { donViGuiCongVan, donViNhanCongVan, canBoNhanCongVan, timeType, fromTime, toTime, congVanYear, tab, status };
         this.setState({ filter: pageFilter }, () => {
             this.getPage(pageNumber, pageSize, '', (page) => {
+                this.setState({ loading: false });
                 if (isInitial) {
                     const filter = page.filter || {};
                     this.setState({ filter: !$.isEmptyObject(filter) ? filter : pageFilter });
@@ -131,7 +132,7 @@ class HcthCongVanDenStaffPage extends AdminPage {
         let { pageNumber, pageSize, pageTotal, totalItem, pageCondition, list } = this.props.hcthCongVanDen && this.props.hcthCongVanDen.page ? this.props.hcthCongVanDen.page : { pageNumber: 1, pageSize: 50, pageTotal: 1, totalItem: 0, pageCondition: {}, list: [] };
         let table = renderTable({
             style: { marginTop: '5px' },
-            getDataSource: () => list,
+            getDataSource: () => this.state.loading ? null : list,
             emptyTable: 'Không có dữ liệu công văn đến',
             stickyHead: false,
             renderHead: () => (
@@ -202,15 +203,12 @@ class HcthCongVanDenStaffPage extends AdminPage {
         let tabList = {
             all: {
                 title: 'Tất cả',
-                // component: table
             },
             donVi: {
                 title: 'Đơn vị quản lý',
-                // component: table
             },
             self: {
                 title: 'Cá nhân',
-                // component: table
             }
         };
 
@@ -247,7 +245,7 @@ class HcthCongVanDenStaffPage extends AdminPage {
                 </div>
             </>,
             content: <div className='tile'>
-                <FormTabs style={tabs.length == 1 ? { display: 'none' } : {}} ref={e => this.tabs = e} tabs={tabs} id={TAB_ID} onChange={() => this.changeAdvancedSearch()} />
+                <FormTabs style={tabs.length == 1 ? { display: 'none' } : {}} ref={e => this.tabs = e} tabs={tabs} id={TAB_ID} onChange={() => this.setState({ loading: true }, this.changeAdvancedSearch)} />
                 {table}
                 < Pagination style={{ marginLeft: '70px' }} {...{ pageNumber, pageSize, pageTotal, totalItem, pageCondition }}
                     getPage={this.getPage} />

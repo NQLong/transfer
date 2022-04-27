@@ -109,7 +109,6 @@ module.exports = app => {
         app.model.canBo.get({ shcc: req.params.shcc }, (error, item) => {
             if (error) {
                 res.send({ error });
-                return;
             } else {
                 app.model.dmTrinhDo.get({ ma: item.hocVi }, (error, hocVi) => {
                     item = { ...item, trinhDo: hocVi ? hocVi.vietTat : '' };
@@ -289,9 +288,7 @@ module.exports = app => {
                     resolve();
                 });
             })).then(() => new Promise(resolve => {
-                app.model.sachGiaoTrinh.delete({ shcc: req.body.shcc }, () => {
-                    resolve();
-                });
+                app.model.sachGiaoTrinh.delete({ shcc: req.body.shcc }, () => resolve());
             })).then(() => {
                 res.send({ error });
             });
@@ -1334,10 +1331,7 @@ module.exports = app => {
                         });
                     })).then((data) => {
                         app.docx.generateFile(source, data, (error, data) => {
-                            if (error)
-                                res.send({ error });
-                            else
-                                res.send({ data });
+                            res.send({ error, data });
                         });
                     });
                 }
@@ -1480,10 +1474,7 @@ module.exports = app => {
 
                     })).then((data) => {
                         app.docx.generateFile(source, data, (error, data) => {
-                            if (error) {
-                                res.send({ error });
-                            } else
-                                res.send({ data });
+                            res.send({ error, data });
                         });
                     });
                 }
@@ -2248,9 +2239,9 @@ module.exports = app => {
         app.permission.has(req, () => staffImportData(req, fields, files, params, done), done, 'staff:write'));
 
     app.get('/api/staff/download-excel/:filter', checkGetStaffPermission, (req, res) => {
-        app.model.canBo.download(req.params.filter, (err, result) => {
-            if (err || !result) {
-                res.send({ err });
+        app.model.canBo.download(req.params.filter, (error, result) => {
+            if (error || !result) {
+                res.send({ error });
             } else {
                 const workbook = app.excel.create(),
                     worksheet = workbook.addWorksheet('Sheet1');
@@ -2293,6 +2284,9 @@ module.exports = app => {
                 });
             }
         });
+    });
 
+    app.get('/api/staff/by-email/:email', app.permission.check('staff:read'), (req, res) => {
+        app.model.canBo.get({ email: req.params.email }, (error, item) => res.send({ error, item }));
     });
 };

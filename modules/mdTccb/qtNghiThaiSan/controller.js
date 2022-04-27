@@ -143,9 +143,9 @@ module.exports = app => {
         if (fromYear == 'null') fromYear = null;
         if (toYear == 'null') toYear = null;
         if (tinhTrang == 'null') tinhTrang = null;
-        app.model.qtNghiThaiSan.download(listShcc, listDv, fromYear, toYear, timeType, tinhTrang, (err, result) => {
-            if (err || !result) {
-                res.send({ err });
+        app.model.qtNghiThaiSan.download(listShcc, listDv, fromYear, toYear, timeType, tinhTrang, (error, result) => {
+            if (error || !result) {
+                res.send({ error });
             } else {
                 const workbook = app.excel.create(),
                     worksheet = workbook.addWorksheet('nghithaisan');
@@ -186,6 +186,5 @@ module.exports = app => {
                 });
             }
         });
-
     });
 };

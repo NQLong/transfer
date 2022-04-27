@@ -19,8 +19,9 @@ module.exports = app => {
                 parameter: { listDonVi }
             };
         listDonVi.length ? app.model.canBo.getAll(condition, 'shcc,ho,ten,email,dienThoaiCaNhan,ngach,maDonVi,ngayNghi', 'ten', (error, items) => {
-            if (error || !items) res.send({ error });
-            else if (listDonVi.includes('30')) {
+            if (error || !items) {
+                res.send({ error });
+            } else if (listDonVi.includes('30')) {
                 let result = [];
                 items.forEach((tccbStaff, index, list) =>
                     app.model.tccbStaffLog.get({ email: tccbStaff.email }, (error, tccbLog) => {

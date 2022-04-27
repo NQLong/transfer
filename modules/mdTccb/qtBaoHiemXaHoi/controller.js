@@ -128,15 +128,15 @@ module.exports = app => {
         app.model.qtBaoHiemXaHoi.delete({ id: req.body.id }, (error) => res.send(error)));
 
     app.get('/api/qua-trinh/bao-hiem-xa-hoi/download-excel/:listShcc/:listDv/:fromYear/:toYear/:timeType/:tinhTrang', app.permission.check('qtBaoHiemXaHoi:read'), (req, res) => {
-        let { listShcc, listDv, fromYear, toYear, timeType, tinhTrang } = req.params ? req.params : { listShcc: null, listDv: null, toYear: null, timeType: 0, tinhTrang: null};
+        let { listShcc, listDv, fromYear, toYear, timeType, tinhTrang } = req.params ? req.params : { listShcc: null, listDv: null, toYear: null, timeType: 0, tinhTrang: null };
         if (listShcc == 'null') listShcc = null;
         if (listDv == 'null') listDv = null;
         if (fromYear == 'null') fromYear = null;
         if (toYear == 'null') toYear = null;
         if (tinhTrang == 'null') tinhTrang = null;
-        app.model.qtBaoHiemXaHoi.download(listShcc, listDv, fromYear, toYear, timeType, tinhTrang, (err, result) => {
-            if (err || !result) {
-                res.send({ err });
+        app.model.qtBaoHiemXaHoi.download(listShcc, listDv, fromYear, toYear, timeType, tinhTrang, (error, result) => {
+            if (error || !result) {
+                res.send({ error });
             } else {
                 const workbook = app.excel.create(),
                     worksheet = workbook.addWorksheet('baohiemxahoi');

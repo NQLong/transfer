@@ -45,6 +45,7 @@ module.exports = app => {
             }
         });
     });
+
     app.post('/api/qua-trinh/giai-thuong', app.permission.check('staff:write'), (req, res) =>
         app.model.qtGiaiThuong.create(req.body.data, (error, item) => res.send({ error, item })));
 

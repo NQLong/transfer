@@ -51,7 +51,7 @@ module.exports = app => {
 
     app.delete('/api/tccb/qua-trinh/sang-kien', app.permission.check('qtSangKien:write'), (req, res) =>
         app.model.qtSangKien.delete({ id: req.body.id }, (error) => res.send(error)));
-    
+
     app.post('/api/tccb/qua-trinh/sang-kien/multiple', app.permission.check('qtSangKien:write'), (req, res) => {
         const qtSangKien = req.body.qtSangKien;
 
@@ -78,7 +78,7 @@ module.exports = app => {
         } else {
             res.send({ error: 'Invalid parameter!' });
         }
-    }); 
+    });
 
     app.put('/api/user/qua-trinh/sang-kien', app.permission.check('staff:login'), (req, res) => {
         if (req.body.changes && req.session.user) {
@@ -138,12 +138,12 @@ module.exports = app => {
     app.get('/api/qua-trinh/sang-kien/download-excel/:filter', app.permission.check('qtSangKien:read'), (req, res) => {
         const searchTerm = typeof req.query.condition === 'string' ? req.query.condition : '';
         const filter = req.params.filter;
-        app.model.qtSangKien.downloadExcel(filter, searchTerm, (err, result) => {
-            if (err) {
-                res.send({ err });
+        app.model.qtSangKien.downloadExcel(filter, searchTerm, (error, result) => {
+            if (error) {
+                res.send({ error });
             } else {
                 const workbook = app.excel.create(),
-                worksheet = workbook.addWorksheet('sangkien');
+                    worksheet = workbook.addWorksheet('sangkien');
                 new Promise(resolve => {
                     let cells = [
                         { cell: 'A1', value: 'STT', bold: true, border: '1234' },
@@ -162,7 +162,7 @@ module.exports = app => {
                         cells.push({ cell: 'B' + (index + 2), border: '1234', value: item.shcc });
                         cells.push({ cell: 'C' + (index + 2), border: '1234', value: item.hoCanBo + ' ' + item.tenCanBo });
                         cells.push({ cell: 'D' + (index + 2), border: '1234', value: item.tenDonVi });
-                        cells.push({ cell: 'E' + (index + 2), border: '1234', value: item.tenBoMon});
+                        cells.push({ cell: 'E' + (index + 2), border: '1234', value: item.tenBoMon });
                         cells.push({ cell: 'F' + (index + 2), border: '1234', value: item.tenChucVu });
                         cells.push({ cell: 'G' + (index + 2), border: '1234', value: item.tenChucDanhNgheNghiep });
                         cells.push({ cell: 'H' + (index + 2), border: '1234', value: item.maSo });
@@ -198,7 +198,7 @@ module.exports = app => {
             res.send({ error });
         });
     });
-    
+
     const sangKienImportData = (fields, files, done) => {
         let worksheet = null;
         new Promise((resolve, reject) => {
@@ -218,7 +218,7 @@ module.exports = app => {
                 let shcc = (worksheet.getCell('B' + index).value || '').toString().trim();
                 let maSo = (worksheet.getCell('C' + index).value || '').toString().trim();
                 let tenSangKien = (worksheet.getCell('D' + index).value || '').toString().trim();
-                
+
                 if (soQuyetDinh.length == 0) {
                     done({ items });
                     return;
