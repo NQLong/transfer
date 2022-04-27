@@ -131,9 +131,9 @@ module.exports = app => {
             app.database.oracle.connection.main.execute(sql, parameter, (error, result) => done(error, result));
         },
 
-        searchPage: (pagenumber, pagesize, userid, madonvi, donvinhan, canbonhan, searchterm, done) => {
-            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_giao_nhiem_vu_search_page(:pagenumber, :pagesize, :userid, :madonvi, :donvinhan, :canbonhan, :searchterm, :totalitem, :pagetotal); END;',
-                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, userid, madonvi, donvinhan, canbonhan, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
+        searchPage: (pagenumber, pagesize, userid, donvinhan, canbonhan, searchterm, done) => {
+            app.database.oracle.connection.main.execute('BEGIN :ret:=hcth_giao_nhiem_vu_search_page(:pagenumber, :pagesize, :userid, :donvinhan, :canbonhan, :searchterm, :totalitem, :pagetotal); END;',
+                { ret: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.CURSOR }, pagenumber: { val: pagenumber, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, pagesize: { val: pagesize, dir: app.database.oracle.BIND_INOUT, type: app.database.oracle.NUMBER }, userid, donvinhan, canbonhan, searchterm, totalitem: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER }, pagetotal: { dir: app.database.oracle.BIND_OUT, type: app.database.oracle.NUMBER } }, (error, result) => app.database.oracle.fetchRowsFromCursor(error, result, done));
         },
     };
 };
