@@ -17,33 +17,43 @@ module.exports = app => {
                 let thoiGianDangKy = dotDangKy.thoiGian || null;
                 let year = thoiGianMoMon.nam - yearth,
                     semester = thoiGianMoMon.hocKy + yearth * 2;
-                app.model.dtKhungDaoTao.get({ namDaoTao: year }, (error, item) => {
+                app.model.dtCauTrucKhungDaoTao.get({ namDaoTao: year }, (error, item) => {
                     if (error) {
-                        res.send({ error: `Lỗi lấy CTDT năm ${year}` }); return;
+                        res.send({ error: `Lỗi lấy dữ liệu năm ${year}` });
+                        return;
                     } else if (!item) {
-                        res.send({ warning: `Năm ${year} không tồn tại CTDT nào!`, item: { items: [], ctdt: [], dotDangKy, thoiGianMoMon } }); return;
-                    } else {
-                        app.model.dtDanhSachMonMo.getAll({ maDangKy: id, hocKy }, (error, items) => {
-                            if (error) { res.send({ error }); return; } else {
-                                if (!items.length) {
-                                    let condition = {
-                                        statement: 'maKhungDaoTao = (:id) AND hocKyDuKien = (:semester)',
-                                        parameter: { id: item.id, semester }
-                                    };
-                                    !thoiGianDangKy && app.model.dtChuongTrinhDaoTao.getAll(condition, (error, items) => {
-                                        if (error) {
-                                            res.send({ error });
-                                            return;
-                                        } else {
-                                            res.send({ item: app.clone({}, { items, ctdt: item, thoiGianMoMon, dotDangKy }) });
-                                        }
-                                    });
-                                }
-                                else res.send({ item: { items, ctdt: item, dotDangKy, thoiGianMoMon } });
-                            }
-                        });
+                        res.send({ warning: `Chưa có dữ liệu năm ${year}` });
+                        return;
                     }
+                    app.model.dtKhungDaoTao.get({ namDaoTao: item.id }, (error, item) => {
+                        if (error) {
+                            res.send({ error: `Lỗi lấy CTDT năm ${year}` }); return;
+                        } else if (!item) {
+                            res.send({ warning: `Năm ${year} không tồn tại CTDT nào!`, item: { items: [], ctdt: [], dotDangKy, thoiGianMoMon } }); return;
+                        } else {
+                            app.model.dtDanhSachMonMo.getAll({ maDangKy: id, hocKy }, (error, items) => {
+                                if (error) { res.send({ error }); return; } else {
+                                    if (!items.length) {
+                                        let condition = {
+                                            statement: 'maKhungDaoTao = (:id) AND hocKyDuKien = (:semester)',
+                                            parameter: { id: item.id, semester }
+                                        };
+                                        !thoiGianDangKy && app.model.dtChuongTrinhDaoTao.getAll(condition, (error, items) => {
+                                            if (error) {
+                                                res.send({ error });
+                                                return;
+                                            } else {
+                                                res.send({ item: app.clone({}, { items, ctdt: item, thoiGianMoMon, dotDangKy }) });
+                                            }
+                                        });
+                                    }
+                                    else res.send({ item: { items, ctdt: item, dotDangKy, thoiGianMoMon } });
+                                }
+                            });
+                        }
+                    });
                 });
+
             }
         });
 
