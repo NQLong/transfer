@@ -271,4 +271,51 @@ module.exports = app => {
             }
         });
     });
+
+    app.get('/api/di-nuoc-ngoai/download/:shcc/:fileName', app.permission.orCheck('qtDiNuocNgoai:read', 'staff:login'), (req, res) => {
+        const { shcc, fileName } = req.params;
+        const dir = app.path.join(app.assetPath, `/baoCaoDiNuocNgoai/${shcc}`);
+
+        if (app.fs.existsSync(dir)) {
+            const serverFileNames = app.fs.readdirSync(dir).filter(v => app.fs.lstatSync(app.path.join(dir, v)).isFile());
+            for (const serverFileName of serverFileNames) {
+                const clientFileIndex = serverFileName.indexOf(fileName);
+                if (clientFileIndex !== -1 && serverFileName.slice(clientFileIndex) === fileName) {
+                    return res.sendFile(app.path.join(dir, serverFileName));
+                }
+            }
+        }
+
+        res.status(400).send('Không tìm thấy tập tin');
+    });
+
+    app.uploadHooks.add('baoCaoDiNuocNgoaiStaffFile', (req, fields, files, params, done) =>
+        app.permission.has(req, () => baoCaoDiNuocNgoaiStaffFile(req, fields, files, params, done), done, 'staff:login'));
+
+    const baoCaoDiNuocNgoaiStaffFile = (req, fields, files, params, done) => {
+        if (fields.userData && fields.userData[0] && fields.userData[0].startsWith('baoCaoDiNuocNgoaiStaffFile') && files.baoCaoDiNuocNgoaiStaffFile && files.baoCaoDiNuocNgoaiStaffFile.length > 0) {
+            const user = req.session.user,
+                srcPath = files.baoCaoDiNuocNgoaiStaffFile[0].path,
+                originalFilename = files.baoCaoDiNuocNgoaiStaffFile[0].originalFilename,
+                filePath = '/' + user.shcc + '/' + (new Date().getTime()).toString() + '_' + originalFilename,
+                destPath = app.assetPath + '/baoCaoDiNuocNgoai' + filePath,
+                validUploadFileType = ['.xls', '.xlsx', '.doc', '.docx', '.pdf', '.png', '.jpg'],
+                baseNamePath = app.path.extname(srcPath);
+            if (!validUploadFileType.includes(baseNamePath.toLowerCase())) {
+                done({ error: 'Định dạng tập tin không hợp lệ!' });
+                app.deleteFile(srcPath);
+            } else {
+                app.createFolder(
+                    app.path.join(app.assetPath, '/baoCaoDiNuocNgoai/' + user.shcc)
+                );
+                app.fs.rename(srcPath, destPath, error => {
+                    if (error) {
+                        done({ error });
+                    } else {
+                        done({ data: filePath });
+                    }
+                });
+            }
+        }
+    };
 };
